@@ -4,6 +4,8 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 <p align="center"><em>Screenshot coming soon</em></p>
 
+**[Download the latest .dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** — unsigned build, so the first launch needs right-click → Open to clear Gatekeeper. Or build from source below.
+
 ## What it does
 
 - **Start/stop `mlx_lm.server`** from the menu bar, against any model in your models folder (`~/.llmtray/models` by default, configurable in Settings — point it at `~/.lmstudio/models` to share models already downloaded via LM Studio).
