@@ -84,15 +84,21 @@ final class ServerManager: ObservableObject {
         handle.readabilityHandler = { [weak self] fh in
             let data = fh.availableData
             guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
-            Task { @MainActor in
-                self?.appendLog(text)
-                self?.checkForReadySignal(text, port: port, modelPath: modelPath)
-                self?.markActivity()
+            // The weak capture must be re-checked *inside* the Task's own
+            // closure, not hoisted from the outer one -- strict concurrency
+            // checking (on newer toolchains than what this was written
+            // against) treats a weak `self` threaded into a concurrently-
+            // scheduled closure from outside as an unchecked data race.
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.appendLog(text)
+                self.checkForReadySignal(text, port: port, modelPath: modelPath)
+                self.markActivity()
             }
         }
 
         task.terminationHandler = { [weak self] proc in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 guard let self else { return }
                 if case .running = self.state {
                     self.state = .stopped

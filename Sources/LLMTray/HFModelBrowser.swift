@@ -222,7 +222,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadETASeconds = nil
         for (path, task) in tasksByPath {
             task.cancel(byProducingResumeData: { [weak self] data in
-                Task { @MainActor in
+                Task { @MainActor [weak self] in
                     self?.files[path]?.resumeData = data
                 }
             })
@@ -331,7 +331,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
               let file = files[path] else { return }
         let dest = file.destination
         let fm = FileManager.default
-        var saveError: String?
+        // `let`, not `var` -- assigned exactly once on every path below, so
+        // it's an immutable value by the time the Task below captures it.
+        // Strict concurrency checking flags a genuinely mutable var here as
+        // an unchecked data race even though this control flow never
+        // actually mutates it after the fact.
+        let saveError: String?
         do {
             try fm.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
             try? fm.removeItem(at: dest)
@@ -346,6 +351,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 saveError = "\(dest.lastPathComponent): expected \(file.expectedBytes) bytes, got \(actualSize)"
             } else {
                 files[path]?.isDone = true
+                saveError = nil
             }
         } catch {
             saveError = "Failed to save \(dest.lastPathComponent): \(error.localizedDescription)"
