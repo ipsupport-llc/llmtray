@@ -3,8 +3,56 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LLMTray — local LLMs from your menu bar</title>
-<meta name="description" content="A native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon.">
+<title>LLMTray — local LLM menu bar app for macOS (mlx-lm)</title>
+<meta name="description" content="LLMTray is a native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat — in a ~1MB app with no Electron, no background bloat.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/">
+<meta name="theme-color" content="#0d2818">
+
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="LLMTray">
+<meta property="og:title" content="LLMTray — local LLM menu bar app for macOS">
+<meta property="og:description" content="A native, ~1MB macOS menu bar app for running local LLMs with mlx-lm: server control, Hugging Face model browser, and chat. No Electron, no bloat.">
+<meta property="og:url" content="https://ipsupport-llc.github.io/llmtray/">
+<meta property="og:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LLMTray — local LLM menu bar app for macOS">
+<meta name="twitter:description" content="A native, ~1MB macOS menu bar app for running local LLMs with mlx-lm. No Electron, no bloat.">
+<meta name="twitter:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "LLMTray",
+  "url": "https://ipsupport-llc.github.io/llmtray/",
+  "description": "A native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS 13+ (Apple Silicon)",
+  "softwareVersion": "0.1.1",
+  "downloadUrl": "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg",
+  "fileSize": "1MB",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "license": "https://github.com/ipsupport-llc/llmtray/blob/main/LICENSE",
+  "author": {
+    "@type": "Organization",
+    "name": "ipsupport-llc",
+    "url": "https://github.com/ipsupport-llc"
+  }
+}
+</script>
+
 <style>
   :root {
     --bg: #ffffff;
@@ -92,6 +140,7 @@
     gap: 0.9rem;
   }
   @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .grid .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -135,6 +184,7 @@
       <h1>LLMTray</h1>
       <p class="tagline">Local LLMs from your macOS menu bar — no terminal tab required.</p>
       <div class="badges">
+        <span class="badge">~1MB, no Electron</span>
         <span class="badge">macOS 13+ · Apple Silicon</span>
         <span class="badge">Swift / SwiftUI</span>
         <span class="badge">Apache 2.0</span>
@@ -166,6 +216,10 @@
         <div class="card">
           <h3>Icon reflects real state</h3>
           <p>Green + pulsing while anything is generating — including an external tool hitting the server directly — orange/red under real thermal pressure.</p>
+        </div>
+        <div class="card">
+          <h3>Small, fast, no bloat</h3>
+          <p>Native Swift/SwiftUI, no Electron, no bundled runtime. The whole app is a ~1MB download and sits idle at a few MB of memory until you actually start a server.</p>
         </div>
       </div>
     </section>

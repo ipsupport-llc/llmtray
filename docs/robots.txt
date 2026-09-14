@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ipsupport-llc.github.io/llmtray/sitemap.xml
