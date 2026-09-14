@@ -37,22 +37,39 @@ final class ServerManager: ObservableObject {
     /// run_server.sh every launch) skips a `pip install mlx-lm` network
     /// round-trip and a re-check of both idempotent patch scripts on every
     /// single "Start Server" click -- work that only ever needs doing once,
-    /// not once per app launch. If the venv doesn't exist yet, this is the
-    /// one-time bootstrap: run `runtime/run_server.sh <any model>` once from
-    /// a terminal to create and patch it, then the app can drive it
-    /// directly from here on.
-    private var venvServerBinary: String { RuntimePaths.runtimeDir + "/.mlx_server_venv/bin/mlx_lm.server" }
+    /// not once per app launch.
+    private var venvDir: String { RuntimePaths.runtimeDir + "/.mlx_server_venv" }
+    private var venvServerBinary: String { venvDir + "/bin/mlx_lm.server" }
 
     func start(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
         guard case .stopped = state else { return }
-        guard FileManager.default.fileExists(atPath: venvServerBinary) else {
-            state = .failed("mlx_lm.server venv not set up yet -- run runtime/run_server.sh once from a terminal first")
-            return
-        }
-
         state = .starting
         log = ""
 
+        // A downloaded .app has no venv at all (only run_server.sh's dev
+        // flow created one before) -- someone who just dragged LLMTray.dmg
+        // to Applications has no terminal-accessible path to run that
+        // script anyway, so bootstrapping it here is the only way "download
+        // and click Start Server" actually works end to end.
+        Task {
+            do {
+                try await ensureRuntimeReady()
+            } catch {
+                // Only report the failure if the user hasn't already hit
+                // Stop mid-bootstrap -- state would be .stopped in that
+                // case, and clobbering it back to .failed would resurrect
+                // a state they already dismissed.
+                if case .starting = self.state {
+                    self.state = .failed("runtime setup failed: \(error.localizedDescription)")
+                }
+                return
+            }
+            guard case .starting = self.state else { return }
+            self.launchServerProcess(modelPath: modelPath, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+        }
+    }
+
+    private func launchServerProcess(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: venvServerBinary)
         var args = [
@@ -143,6 +160,75 @@ final class ServerManager: ObservableObject {
     func terminateImmediately() {
         guard let process, process.isRunning else { return }
         kill(process.processIdentifier, SIGKILL)
+    }
+
+    /// A downloaded .app has no venv (that only ever got created by
+    /// manually running runtime/run_server.sh) -- this does the same setup
+    /// run_server.sh does, in-process, so "download the DMG, click Start
+    /// Server" works without ever opening a terminal. No-ops instantly if
+    /// the venv's already there (the normal case after the first run).
+    private func ensureRuntimeReady() async throws {
+        guard !FileManager.default.fileExists(atPath: venvServerBinary) else { return }
+
+        appendLog("--- first run: setting up mlx-lm runtime (this can take a minute) ---\n")
+        let runtimeDir = RuntimePaths.runtimeDir
+
+        if !FileManager.default.fileExists(atPath: venvDir) {
+            try await runProcess("/usr/bin/python3", ["-m", "venv", venvDir])
+        }
+        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
+
+        guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
+              let pinObj = try? JSONSerialization.jsonObject(with: pinData) as? [String: Any],
+              let version = pinObj["pinned_version"] as? String else {
+            throw NSError(
+                domain: "ServerManager", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "could not read mlx_lm_runtime.json"]
+            )
+        }
+        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "mlx-lm==\(version)"])
+        try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_server_kv.py"])
+        try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_tool_parser.py"])
+        appendLog("--- runtime ready ---\n")
+    }
+
+    /// Runs one setup step to completion, streaming its output into the
+    /// same log the server's own output goes to -- so a slow first run
+    /// (venv creation, pip install) is visible progress, not a silently
+    /// stuck spinner.
+    private func runProcess(_ executable: String, _ arguments: [String]) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: executable)
+            task.arguments = arguments
+            task.standardInput = FileHandle.nullDevice
+            let pipe = Pipe()
+            task.standardOutput = pipe
+            task.standardError = pipe
+            pipe.fileHandleForReading.readabilityHandler = { fh in
+                let data = fh.availableData
+                guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
+                Task { @MainActor in
+                    self.appendLog(text)
+                }
+            }
+            task.terminationHandler = { proc in
+                pipe.fileHandleForReading.readabilityHandler = nil
+                if proc.terminationStatus == 0 {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: NSError(
+                        domain: "ServerManager", code: Int(proc.terminationStatus),
+                        userInfo: [NSLocalizedDescriptionKey: "\(executable) exited \(proc.terminationStatus)"]
+                    ))
+                }
+            }
+            do {
+                try task.run()
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
     }
 
     private func appendLog(_ text: String) {

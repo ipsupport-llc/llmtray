@@ -4,8 +4,6 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 <p align="center"><em>Screenshot coming soon</em></p>
 
-**[Download the latest .dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** — unsigned build, so the first launch needs right-click → Open to clear Gatekeeper. Or build from source below.
-
 ## What it does
 
 - **Start/stop `mlx_lm.server`** from the menu bar, against any model in your models folder (`~/.llmtray/models` by default, configurable in Settings — point it at `~/.lmstudio/models` to share models already downloaded via LM Studio).
@@ -23,21 +21,22 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 ## Quick start
 
+1. [Download LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg) and drag it to Applications.
+2. First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).
+3. Click the brain icon in the menu bar → pick or download a model → Start Server.
+
+The first "Start Server" click creates the `mlx-lm` venv and applies the runtime patches automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant.
+
+The app looks for models under `~/.llmtray/models/<publisher>/<model-name>/` by default (configurable in Settings; the layout matches LM Studio's own `~/.lmstudio/models`, so pointing it there works too) — either point it at models you already have, or use the in-app Hugging Face browser to pull one down.
+
+### Building from source
+
 ```bash
 git clone https://github.com/ipsupport-llc/llmtray.git
 cd llmtray
-
-# One-time: create the mlx-lm venv and apply the runtime patches.
-# Point this at any local model directory just to bootstrap the venv.
-./runtime/run_server.sh ~/.llmtray/models/<publisher>/<model> --port 8765
-
-# Build and run the app (Ctrl-C the command above first; the app drives
-# the server itself from here on).
 swift build
 .build/debug/LLMTray
 ```
-
-The app looks for models under `~/.llmtray/models/<publisher>/<model-name>/` by default (configurable in Settings; the layout matches LM Studio's own `~/.lmstudio/models`, so pointing it there works too) — either point it at models you already have, or use the in-app Hugging Face browser to pull one down.
 
 ## Why a patched mlx-lm?
 
@@ -67,7 +66,7 @@ runtime/
 
 ## Status
 
-Working daily driver on a MacBook Air M5. Not yet code-signed/notarized or packaged as a distributable `.app` — that's the next milestone (see [Actions](../../actions) for CI build checks).
+Working daily driver on a MacBook Air M5. Packaged as a `.app`/`.dmg` via [`scripts/build_app.sh`](./scripts/build_app.sh) and [`scripts/build_dmg.sh`](./scripts/build_dmg.sh), ad-hoc signed only -- Developer ID + notarization is the next milestone (see [Actions](../../actions) for CI build/release status).
 
 ## License
 

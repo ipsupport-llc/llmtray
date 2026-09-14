@@ -226,13 +226,18 @@
 
     <section>
       <h2>Quick start</h2>
+      <ol style="padding-left: 1.2rem; color: var(--fg-muted);">
+        <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download LLMTray.dmg</a> and drag it to Applications.</li>
+        <li>First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).</li>
+        <li>Click the brain icon in the menu bar → pick or download a model → Start Server.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Building from source</h2>
+      <p style="color: var(--fg-muted); font-size: 0.92rem;">For contributing, or if you'd rather not run an unsigned binary:</p>
       <pre><code>git clone https://github.com/ipsupport-llc/llmtray.git
 cd llmtray
-
-# One-time: bootstrap the mlx-lm venv + patches
-./runtime/run_server.sh ~/.llmtray/models/&lt;publisher&gt;/&lt;model&gt; --port 8765
-
-# Build and run the app
 swift build
 .build/debug/LLMTray</code></pre>
     </section>
