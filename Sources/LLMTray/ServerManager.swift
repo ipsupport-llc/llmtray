@@ -162,6 +162,52 @@ final class ServerManager: ObservableObject {
         kill(process.processIdentifier, SIGKILL)
     }
 
+    /// GUI apps launched via Finder/LaunchServices don't inherit the
+    /// interactive shell PATH that adds a package manager's bin dir -- so a
+    /// plain "python3" (or hardcoded /usr/bin/python3) resolves to the
+    /// ancient Xcode Command Line Tools Python (3.9.6 here), whose pip
+    /// can't find wheels for a current `mlx` (needs 3.10+), and the venv
+    /// creation silently succeeds while the mlx-lm install inside it then
+    /// fails with a version-not-found error.
+    ///
+    /// Path presence alone isn't enough to trust, though -- not everyone
+    /// uses Homebrew (or the same install prefix), so this actually checks
+    /// each candidate's real version and picks the first that's modern
+    /// enough, covering Homebrew (both CPU architectures), pyenv, MacPorts,
+    /// and Anaconda/Miniconda. Falls back to the CLT Python only if none of
+    /// those exist -- at which point pip's own error is what the user sees,
+    /// which is why the README calls out the 3.10+ requirement explicitly.
+    private func findPython3() -> String {
+        let candidates = [
+            "/opt/homebrew/bin/python3",
+            "/usr/local/bin/python3",
+            NSString(string: "~/.pyenv/shims/python3").expandingTildeInPath,
+            "/opt/local/bin/python3",
+            NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
+            NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
+            "/usr/bin/python3",
+        ]
+        for path in candidates where FileManager.default.isExecutableFile(atPath: path) && isModernPython(path) {
+            return path
+        }
+        return "/usr/bin/python3"
+    }
+
+    private func isModernPython(_ path: String) -> Bool {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: path)
+        task.arguments = ["-c", "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"]
+        task.standardOutput = FileHandle.nullDevice
+        task.standardError = FileHandle.nullDevice
+        do {
+            try task.run()
+            task.waitUntilExit()
+            return task.terminationStatus == 0
+        } catch {
+            return false
+        }
+    }
+
     /// A downloaded .app has no venv (that only ever got created by
     /// manually running runtime/run_server.sh) -- this does the same setup
     /// run_server.sh does, in-process, so "download the DMG, click Start
@@ -173,9 +219,14 @@ final class ServerManager: ObservableObject {
         appendLog("--- first run: setting up mlx-lm runtime (this can take a minute) ---\n")
         let runtimeDir = RuntimePaths.runtimeDir
 
-        if !FileManager.default.fileExists(atPath: venvDir) {
-            try await runProcess("/usr/bin/python3", ["-m", "venv", venvDir])
+        if FileManager.default.fileExists(atPath: venvDir) {
+            // Left over from a previous failed attempt (e.g. the venv got
+            // created with an incompatible Python and the mlx-lm install
+            // inside it failed) -- venv creation is cheap, so start clean
+            // rather than trying to patch up a half-working one.
+            try? FileManager.default.removeItem(atPath: venvDir)
         }
+        try await runProcess(findPython3(), ["-m", "venv", venvDir])
         try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
 
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),

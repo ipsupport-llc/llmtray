@@ -49,6 +49,15 @@ struct ContentView: View {
                 selectedModelID = models.first?.id
             }
         }
+        .onChange(of: modelsRoot) { newRoot in
+            // Covers every way modelsRoot can change (typing, Browse…, the
+            // "Use LM Studio" shortcut) with one rescan instead of needing
+            // an explicit call at each call site -- previously this only
+            // happened on the specific buttons, so editing the text field
+            // directly and not hitting Return left the picker stale until
+            // the app was restarted.
+            models = ModelDiscovery.scanModels(root: newRoot)
+        }
         .onReceive(NotificationCenter.default.publisher(for: .modelsDidChange)) { notification in
             // Fires after a Hugging Face download finishes -- rescan and
             // jump straight to the model that just landed on disk instead
@@ -205,17 +214,17 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Models folder").foregroundColor(.secondary)
             HStack {
+                // No .onSubmit rescan needed here -- the .onChange(of: modelsRoot)
+                // on the root view already rescans on every edit, live.
                 TextField("models folder", text: $modelsRoot)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11, design: .monospaced))
-                    .onSubmit { models = ModelDiscovery.scanModels(root: modelsRoot) }
                 Button("Browse…") {
                     chooseModelsRootFolder()
                 }
             }
             Button("Use LM Studio's folder (~/.lmstudio/models)") {
                 modelsRoot = NSString(string: "~/.lmstudio/models").expandingTildeInPath
-                models = ModelDiscovery.scanModels(root: modelsRoot)
             }
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
@@ -232,7 +241,6 @@ struct ContentView: View {
         panel.prompt = "Use Folder"
         guard panel.runModal() == .OK, let url = panel.url else { return }
         modelsRoot = url.path
-        models = ModelDiscovery.scanModels(root: modelsRoot)
     }
 
     private var chatSettingsSection: some View {

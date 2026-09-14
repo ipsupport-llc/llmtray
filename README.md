@@ -17,7 +17,7 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 - macOS 13+, Apple Silicon.
 - Xcode command line tools (`swift build`) — no full Xcode project needed.
-- Python 3 (for the one-time `mlx-lm` venv bootstrap in `runtime/`).
+- **Python 3.10+** somewhere on the machine (Homebrew, pyenv, MacPorts, Anaconda/Miniconda, or python.org) — used once to create the `mlx-lm` venv in `runtime/`. The macOS-provided `/usr/bin/python3` (Xcode Command Line Tools, currently 3.9.x) is too old: `mlx` doesn't publish wheels for it, so the first-run setup fails with a `pip` "could not find a version that satisfies the requirement mlx" error if that's the only Python installed. LLMTray looks for a newer interpreter in common install locations automatically; it only falls back to the CLT one if none of those exist.
 
 ## Quick start
 

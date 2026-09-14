@@ -52,6 +52,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showHFBrowserWindow), name: .showHFBrowser, object: nil
         )
+        // The `Settings { EmptyView() }` scene below exists only because
+        // SwiftUI's App protocol requires *some* Scene -- but macOS can
+        // still materialize it as a real, visible, empty "LLMTray Settings"
+        // window (seen via window-state restoration once anything ever
+        // triggered it, e.g. an accidental Cmd+,). Every window that exists
+        // at launch is one of those -- logWindow/hfWindow are only ever
+        // created lazily, later, in response to the user's own action.
+        DispatchQueue.main.async {
+            NSApp.windows.forEach { $0.close() }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
