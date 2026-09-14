@@ -1,0 +1,30 @@
+name: Release
+
+# Builds LLMTray.app and attaches it (zipped) to a GitHub Release whenever
+# a version tag is pushed. Ad-hoc signed only (no Developer ID/notarization
+# secrets configured) -- users launch it once via right-click > Open to
+# clear Gatekeeper, same as any unsigned/ad-hoc app from outside the
+# App Store.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build LLMTray.app
+        run: ./scripts/build_app.sh
+      - name: Zip app bundle
+        run: |
+          cd .build/app
+          ditto -c -k --sequesterRsrc --keepParent LLMTray.app LLMTray-${{ github.ref_name }}.zip
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: .build/app/LLMTray-${{ github.ref_name }}.zip
+          generate_release_notes: true

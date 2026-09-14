@@ -1,0 +1,5 @@
+.build/
+.swiftpm/
+runtime/.mlx_server_venv/
+*.xcodeproj
+.DS_Store

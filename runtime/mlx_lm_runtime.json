@@ -1,0 +1,4 @@
+{
+  "pinned_version": "0.31.3",
+  "_comment": "Pinned mlx-lm version for poc/run_server.sh and LLMTray's runtime-update check. Bump deliberately, not via an unpinned 'pip install -U mlx-lm' -- our patch scripts (patch_mlx_server_kv.py, patch_mlx_tool_parser.py) target specific line patterns in mlx_lm's server.py/tool_parsers, and an unannounced upstream release could silently change those without either patch script's idempotency guard catching it."
+}

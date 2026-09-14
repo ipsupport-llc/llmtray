@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMTray — local LLMs from your menu bar</title>
+<meta name="description" content="A native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon.">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --fg-muted: #5f6368;
+    --card: #f6f6f7;
+    --border: #e3e3e6;
+    --accent: #2f7d4f;
+    --code-bg: #0f1115;
+    --code-fg: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14151a;
+      --fg: #eaeaec;
+      --fg-muted: #a0a3ab;
+      --card: #1c1e24;
+      --border: #2a2c33;
+      --accent: #5fd394;
+      --code-bg: #0a0b0d;
+      --code-fg: #e6e6e6;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --fg: #1a1a1a; --fg-muted: #5f6368; --card: #f6f6f7;
+    --border: #e3e3e6; --accent: #2f7d4f; --code-bg: #0f1115; --code-fg: #e6e6e6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14151a; --fg: #eaeaec; --fg-muted: #a0a3ab; --card: #1c1e24;
+    --border: #2a2c33; --accent: #5fd394; --code-bg: #0a0b0d; --code-fg: #e6e6e6;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+  header { text-align: center; margin-bottom: 3rem; }
+  .icon {
+    font-size: 3.2rem;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+  }
+  h1 { font-size: 2.1rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+  .tagline { color: var(--fg-muted); font-size: 1.05rem; margin: 0 0 1.6rem; }
+  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.6rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+  .cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 0.65rem 1.3rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    color: var(--fg);
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: #0b1210;
+    border-color: transparent;
+  }
+
+  section { margin: 3rem 0; }
+  h2 { font-size: 1.3rem; margin: 0 0 1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 0.35rem; font-size: 0.98rem; }
+  .card p { margin: 0; color: var(--fg-muted); font-size: 0.9rem; }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  p code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="icon">🧠</div>
+      <h1>LLMTray</h1>
+      <p class="tagline">Local LLMs from your macOS menu bar — no terminal tab required.</p>
+      <div class="badges">
+        <span class="badge">macOS 13+ · Apple Silicon</span>
+        <span class="badge">Swift / SwiftUI</span>
+        <span class="badge">Apache 2.0</span>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/ipsupport-llc/llmtray">View on GitHub</a>
+        <a class="btn" href="https://github.com/ipsupport-llc/llmtray#quick-start">Quick start</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>What it does</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Start/stop a local server</h3>
+          <p>Runs a patched <code>mlx_lm.server</code> against any model in your models folder (<code>~/.llmtray/models</code> by default, or point it at LM Studio's).</p>
+        </div>
+        <div class="card">
+          <h3>Browse &amp; download from Hugging Face</h3>
+          <p>Search mlx-format models, download with a real progress bar — speed, ETA, pause/resume, and a size check per file.</p>
+        </div>
+        <div class="card">
+          <h3>Built-in chat</h3>
+          <p>Streamed reasoning shown separately from the final answer, tok/s, adjustable temperature/top-p/max tokens.</p>
+        </div>
+        <div class="card">
+          <h3>Icon reflects real state</h3>
+          <p>Green + pulsing while anything is generating — including an external tool hitting the server directly — orange/red under real thermal pressure.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Quick start</h2>
+      <pre><code>git clone https://github.com/ipsupport-llc/llmtray.git
+cd llmtray
+
+# One-time: bootstrap the mlx-lm venv + patches
+./runtime/run_server.sh ~/.llmtray/models/&lt;publisher&gt;/&lt;model&gt; --port 8765
+
+# Build and run the app
+swift build
+.build/debug/LLMTray</code></pre>
+    </section>
+
+    <footer>
+      <a href="https://github.com/ipsupport-llc/llmtray">github.com/ipsupport-llc/llmtray</a>
+    </footer>
+  </div>
+</body>
+</html>
