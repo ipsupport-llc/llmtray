@@ -97,38 +97,53 @@
     margin: 0 auto;
     padding: 4rem 1.5rem 6rem;
   }
-  header { text-align: center; margin-bottom: 3rem; }
-  .icon {
-    font-size: 3.2rem;
-    line-height: 1;
-    margin-bottom: 0.75rem;
-    display: inline-block;
+  header { text-align: center; margin-bottom: 3.5rem; }
+  .icon-img {
+    width: 84px;
+    height: 84px;
+    border-radius: 20px;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
-  h1 { font-size: 2.1rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
-  .tagline { color: var(--fg-muted); font-size: 1.05rem; margin: 0 0 1.6rem; }
-  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.6rem; }
+  h1 { font-size: 2.3rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+  .tagline { color: var(--fg-muted); font-size: 1.08rem; margin: 0 0 2rem; }
+
+  .cta { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--accent);
+    color: #0b1210;
+    box-shadow: 0 6px 20px rgba(47, 125, 79, 0.35);
+    transition: transform 0.15s ease;
+  }
+  .btn-download:hover { transform: translateY(-1px); }
+  .btn-download svg { width: 20px; height: 20px; }
+  .cta-meta {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+  }
+  .secondary-link {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .secondary-link:hover { color: var(--fg); }
+
+  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
   .badge {
     font-size: 0.78rem;
     padding: 0.3rem 0.65rem;
     border-radius: 999px;
     border: 1px solid var(--border);
     color: var(--fg-muted);
-  }
-  .cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
-  .btn {
-    display: inline-block;
-    padding: 0.65rem 1.3rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    border: 1px solid var(--border);
-    color: var(--fg);
-  }
-  .btn.primary {
-    background: var(--accent);
-    color: #0b1210;
-    border-color: transparent;
   }
 
   section { margin: 3rem 0; }
@@ -180,22 +195,24 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="icon">🧠</div>
+      <img class="icon-img" src="assets/icon-512.png" alt="LLMTray icon">
       <h1>LLMTray</h1>
       <p class="tagline">Local LLMs from your macOS menu bar — no terminal tab required.</p>
+
+      <div class="cta">
+        <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+          Download for macOS
+        </a>
+        <span class="cta-meta">~1MB · macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch</span>
+        <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
+      </div>
+
       <div class="badges">
-        <span class="badge">~1MB, no Electron</span>
-        <span class="badge">macOS 13+ · Apple Silicon</span>
+        <span class="badge">No Electron</span>
         <span class="badge">Swift / SwiftUI</span>
         <span class="badge">Apache 2.0</span>
       </div>
-      <div class="cta">
-        <a class="btn primary" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download for macOS</a>
-        <a class="btn" href="https://github.com/ipsupport-llc/llmtray">View on GitHub</a>
-      </div>
-      <p style="margin-top: 0.9rem; font-size: 0.82rem; color: var(--fg-muted);">
-        Unsigned build — first launch needs right-click → Open to clear Gatekeeper.
-      </p>
     </header>
 
     <section>
