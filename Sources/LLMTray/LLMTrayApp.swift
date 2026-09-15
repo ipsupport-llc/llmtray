@@ -181,6 +181,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(.separator())
         }
 
+        let uninstallItem = NSMenuItem(
+            title: "Uninstall Runtime Data…", action: #selector(uninstallRuntimeData), keyEquivalent: ""
+        )
+        uninstallItem.target = self
+        menu.addItem(uninstallItem)
+
+        menu.addItem(.separator())
+
         let quitItem = NSMenuItem(title: "Quit LLMTray", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
@@ -230,6 +238,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func quickStop() {
         server.stop()
+    }
+
+    /// The venv (and, for a Full install, its vendored Python.framework
+    /// copy) lives under Application Support specifically so deleting
+    /// LLMTray.app itself doesn't touch it -- that's what makes it survive
+    /// Sparkle auto-updates, but it also means dragging the app to the
+    /// Trash leaves it behind forever with no other way to clean it up.
+    /// This is that explicit escape hatch.
+    @objc private func uninstallRuntimeData() {
+        let alert = NSAlert()
+        alert.messageText = "Uninstall Runtime Data?"
+        alert.informativeText = "Removes the downloaded mlx-lm runtime from \(RuntimePaths.externalRuntimeDir). "
+            + "The next time you start the server, it will be set up again from scratch."
+        alert.addButton(withTitle: "Uninstall")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .warning
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        server.removeExternalRuntime()
     }
 
     @objc private func quitApp() {

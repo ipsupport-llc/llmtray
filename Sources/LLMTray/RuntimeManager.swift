@@ -23,8 +23,15 @@ final class RuntimeManager: ObservableObject {
 
     private var runtimeDir: String { RuntimePaths.runtimeDir }
     private var pinFilePath: String { runtimeDir + "/mlx_lm_runtime.json" }
-    private var venvPip: String { runtimeDir + "/.mlx_server_venv/bin/pip" }
-    private var venvPython: String { runtimeDir + "/.mlx_server_venv/bin/python" }
+    // The venv itself lives outside the bundle now (see ServerManager's
+    // venvDir / RuntimePaths.externalRuntimeDir) so Sparkle replacing
+    // Contents/ on every auto-update doesn't wipe it -- this has to point
+    // at the exact same place ServerManager actually runs the server from,
+    // or "Update" here would pip-install into a venv nothing ever reads.
+    private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
+    private var venvPip: String { venvDir + "/bin/pip" }
+    private var venvPython: String { venvDir + "/bin/python" }
+    private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
 
     func pinnedVersion() -> String? {
         guard let data = FileManager.default.contents(atPath: pinFilePath),
@@ -81,6 +88,13 @@ final class RuntimeManager: ObservableObject {
         }
     }
 
+    /// Updates both the bundled pin (what a fresh install/first bootstrap
+    /// will target) and the external venv's own version marker (what
+    /// ServerManager.ensureRuntimeReady compares against to decide whether
+    /// the venv needs touching) -- if only the bundled copy changed, the
+    /// next server start would see the marker "behind" the pin and
+    /// re-install right back down to the bundle's original version,
+    /// silently undoing the update this method just applied.
     private func writePinnedVersion(_ version: String) throws {
         let obj: [String: Any] = [
             "pinned_version": version,
@@ -88,6 +102,7 @@ final class RuntimeManager: ObservableObject {
         ]
         let data = try JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted])
         try data.write(to: URL(fileURLWithPath: pinFilePath))
+        try version.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {

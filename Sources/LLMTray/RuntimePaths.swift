@@ -33,4 +33,18 @@ enum RuntimePaths {
         }
         return FileManager.default.currentDirectoryPath + "/runtime"
     }
+
+    /// Where the mlx-lm venv (and, for the vendored "Full" build, a copy of
+    /// its own bundled Python.framework) actually live once bootstrapped --
+    /// deliberately outside the app bundle. Sparkle updates delete and
+    /// replace the *entire* .app, so anything kept under Contents/ -- which
+    /// is where this used to live -- gets wiped on every single
+    /// auto-update, forcing a re-bootstrap (or, for Full installs, losing
+    /// the whole point of shipping a vendored runtime) each time. Living
+    /// under Application Support instead survives that.
+    static var externalRuntimeDir: String {
+        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSHomeDirectory() + "/Library/Application Support")
+        return appSupport.appendingPathComponent("LLMTray").path
+    }
 }

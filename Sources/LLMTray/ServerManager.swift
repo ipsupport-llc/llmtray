@@ -49,14 +49,39 @@ final class ServerManager: ObservableObject {
     /// app controls, not the model process itself).
     private var internalPort: Int { (currentPublicPort ?? 8765) + 10_000 }
 
-    /// The venv runtime/run_server.sh creates and patches on its first run.
-    /// Talking to the binary directly (instead of shelling out through
-    /// run_server.sh every launch) skips a `pip install mlx-lm` network
-    /// round-trip and a re-check of both idempotent patch scripts on every
-    /// single "Start Server" click -- work that only ever needs doing once,
-    /// not once per app launch.
-    private var venvDir: String { RuntimePaths.runtimeDir + "/.mlx_server_venv" }
+    /// Lives outside the app bundle (see RuntimePaths.externalRuntimeDir) so
+    /// it survives Sparkle replacing Contents/ wholesale on every
+    /// auto-update. Talking to the binary directly (instead of shelling out
+    /// through run_server.sh every launch) skips a `pip install mlx-lm`
+    /// network round-trip and a re-check of both idempotent patch scripts on
+    /// every single "Start Server" click -- work that only ever needs doing
+    /// once, not once per app launch (or, prior to this, once per update).
+    private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
     private var venvServerBinary: String { venvDir + "/bin/mlx_lm.server" }
+    private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
+
+    /// Only present in the "Full" build variant (scripts/build_full_app.sh),
+    /// which vendors a working venv straight into the bundle so first launch
+    /// never needs the network. Reused as the *source* for the one-time
+    /// external copy above rather than a copy this app ever runs from
+    /// directly -- Contents/ is exactly what the next Sparkle update wipes.
+    private var bundledVenvDir: String { RuntimePaths.runtimeDir + "/.mlx_server_venv" }
+    private var bundledVenvServerBinary: String { bundledVenvDir + "/bin/mlx_lm.server" }
+
+    /// Also Full-build-only: the self-contained Python.framework
+    /// build_full_app.sh vendored to create that venv in the first place.
+    /// Copied out alongside the venv so that if the external venv is ever
+    /// deleted (e.g. via the "Uninstall Runtime Data" menu item) and needs
+    /// recreating on a machine with no system Python 3.10+, there's still a
+    /// working interpreter to recreate it with -- without that, a Full
+    /// install would silently degrade into needing a system Python anyway,
+    /// defeating the point of "Full" in the first place.
+    private var bundledFrameworkDir: String? {
+        guard let frameworksPath = Bundle.main.privateFrameworksPath else { return nil }
+        let path = frameworksPath + "/Python.framework"
+        return FileManager.default.fileExists(atPath: path) ? path : nil
+    }
+    private var externalFrameworkDir: String { RuntimePaths.externalRuntimeDir + "/Python.framework" }
 
     // Resumed by launchServerProcess's terminationHandler/checkForReadySignal
     // -- only switchModel() actually awaits these (see below); the public
@@ -282,7 +307,12 @@ final class ServerManager: ObservableObject {
     /// from a background bootstrap step. Returning nil here instead lets
     /// the caller fail with a clear, actionable message up front.
     private func findModernPython3() -> String? {
-        let candidates = [
+        var candidates = [String]()
+        // A previously-externalized Full-build framework (see
+        // externalFrameworkDir) takes priority: it's guaranteed modern and
+        // needs no network, unlike everything else in this list.
+        if let vendored = externalFrameworkPython() { candidates.append(vendored) }
+        candidates += [
             "/opt/homebrew/bin/python3",
             "/usr/local/bin/python3",
             NSString(string: "~/.pyenv/shims/python3").expandingTildeInPath,
@@ -291,6 +321,18 @@ final class ServerManager: ObservableObject {
             NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
         ]
         return candidates.first { FileManager.default.isExecutableFile(atPath: $0) && isModernPython($0) }
+    }
+
+    /// Version directory name (e.g. "3.14") isn't known ahead of time, so
+    /// this just looks at whatever's actually there instead of hardcoding it.
+    private func externalFrameworkPython() -> String? {
+        let versionsDir = externalFrameworkDir + "/Versions"
+        guard let versions = try? FileManager.default.contentsOfDirectory(atPath: versionsDir) else { return nil }
+        for version in versions where version != "Current" {
+            let candidate = "\(versionsDir)/\(version)/bin/python\(version)"
+            if FileManager.default.isExecutableFile(atPath: candidate) { return candidate }
+        }
+        return nil
     }
 
     private func isModernPython(_ path: String) -> Bool {
@@ -308,46 +350,134 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    /// A downloaded .app has no venv (that only ever got created by
-    /// manually running runtime/run_server.sh) -- this does the same setup
-    /// run_server.sh does, in-process, so "download the DMG, click Start
-    /// Server" works without ever opening a terminal. No-ops instantly if
-    /// the venv's already there (the normal case after the first run).
+    /// A downloaded .app has no external venv yet on first launch -- this
+    /// does the same setup runtime/run_server.sh does for local dev, in-
+    /// process, so "download the DMG, click Start Server" works without
+    /// ever opening a terminal. Also the one place that notices a new
+    /// release bumped the pinned mlx-lm version and upgrades the existing
+    /// external venv in place, since -- now that the venv lives outside
+    /// Contents/ specifically so updates *don't* wipe it -- nothing else
+    /// would ever pick that up otherwise.
     private func ensureRuntimeReady() async throws {
-        guard !FileManager.default.fileExists(atPath: venvServerBinary) else { return }
-
-        appendLog("--- first run: setting up mlx-lm runtime (this can take a minute) ---\n")
         let runtimeDir = RuntimePaths.runtimeDir
-
-        if FileManager.default.fileExists(atPath: venvDir) {
-            // Left over from a previous failed attempt (e.g. the venv got
-            // created with an incompatible Python and the mlx-lm install
-            // inside it failed) -- venv creation is cheap, so start clean
-            // rather than trying to patch up a half-working one.
-            try? FileManager.default.removeItem(atPath: venvDir)
-        }
-        guard let python = findModernPython3() else {
-            throw NSError(
-                domain: "ServerManager", code: 2,
-                userInfo: [NSLocalizedDescriptionKey:
-                    "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh), then try Start Server again."]
-            )
-        }
-        try await runProcess(python, ["-m", "venv", venvDir])
-        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
-
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
               let pinObj = try? JSONSerialization.jsonObject(with: pinData) as? [String: Any],
-              let version = pinObj["pinned_version"] as? String else {
+              let pinnedVersion = pinObj["pinned_version"] as? String else {
             throw NSError(
                 domain: "ServerManager", code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "could not read mlx_lm_runtime.json"]
             )
         }
-        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "mlx-lm==\(version)"])
+
+        // The marker is only ever written after a fully successful install
+        // (see the two write sites below), so its presence -- not just the
+        // venv directory's -- is what distinguishes "ready" or "just needs
+        // a version bump" from "leftover half-built venv from a prior
+        // crashed attempt."
+        let installedVersion = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if FileManager.default.fileExists(atPath: venvServerBinary), installedVersion == pinnedVersion {
+            return
+        }
+
+        try FileManager.default.createDirectory(
+            atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
+        )
+
+        // Full build, first launch: a working venv (for this exact pinned
+        // version, since both were produced by the same build_full_app.sh
+        // run) is already sitting in the bundle -- copying it out is a fast
+        // local operation with no network, unlike everything below.
+        if !FileManager.default.fileExists(atPath: venvDir),
+           FileManager.default.fileExists(atPath: bundledVenvServerBinary) {
+            appendLog("--- first run: copying vendored runtime out of the app bundle ---\n")
+            try FileManager.default.copyItem(atPath: bundledVenvDir, toPath: venvDir)
+            if let bundledFramework = bundledFrameworkDir {
+                if !FileManager.default.fileExists(atPath: externalFrameworkDir) {
+                    try? FileManager.default.copyItem(atPath: bundledFramework, toPath: externalFrameworkDir)
+                }
+                // The copied venv's own bin/python3.X is a symlink pointing
+                // at the *bundled* framework by absolute path (that's how
+                // `python -m venv` created it in build_full_app.sh) -- valid
+                // only as long as that original .app sticks around. Left
+                // alone, it dangles the instant the next Sparkle update
+                // replaces Contents/, which is exactly the update this
+                // whole external-copy was supposed to survive. Repoint it at
+                // the framework copy that now lives right alongside it.
+                relinkVendoredInterpreter(oldFrameworkDir: bundledFramework, newFrameworkDir: externalFrameworkDir)
+            }
+            try pinnedVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
+            appendLog("--- runtime ready ---\n")
+            return
+        }
+
+        appendLog("--- first run: setting up mlx-lm runtime (this can take a minute) ---\n")
+
+        if FileManager.default.fileExists(atPath: venvDir), installedVersion == nil {
+            // No marker means the previous attempt at this exact venv never
+            // finished (e.g. it was created with an incompatible Python and
+            // the mlx-lm install inside it failed) -- venv creation is
+            // cheap, so start clean rather than trying to patch up a
+            // half-working one. A venv WITH a marker just needs the pip
+            // install/patch steps below re-run against the new version, not
+            // a full recreation.
+            try? FileManager.default.removeItem(atPath: venvDir)
+        }
+
+        if !FileManager.default.fileExists(atPath: venvDir) {
+            guard let python = findModernPython3() else {
+                throw NSError(
+                    domain: "ServerManager", code: 2,
+                    userInfo: [NSLocalizedDescriptionKey:
+                        "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh), then try Start Server again."]
+                )
+            }
+            try await runProcess(python, ["-m", "venv", venvDir])
+            try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
+        }
+        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "mlx-lm==\(pinnedVersion)"])
         try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_server_kv.py"])
         try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_tool_parser.py"])
+        try pinnedVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
         appendLog("--- runtime ready ---\n")
+    }
+
+    /// Confirmed live (copying a vendored venv out to a scratch directory,
+    /// then simulating a Sparkle update by moving the original .app aside):
+    /// without this, `venvDir/bin/python3.X` still resolves fine as long as
+    /// the source .app happens to still be sitting where it was, then
+    /// starts failing with a bare "no such file or directory" -- a broken
+    /// symlink, not a Python-level error -- the moment it's gone.
+    private func relinkVendoredInterpreter(oldFrameworkDir: String, newFrameworkDir: String) {
+        if let binEntries = try? FileManager.default.contentsOfDirectory(atPath: venvDir + "/bin") {
+            for entry in binEntries {
+                let path = venvDir + "/bin/" + entry
+                guard let target = try? FileManager.default.destinationOfSymbolicLink(atPath: path),
+                      target.hasPrefix(oldFrameworkDir) else { continue }
+                let newTarget = newFrameworkDir + target.dropFirst(oldFrameworkDir.count)
+                try? FileManager.default.removeItem(atPath: path)
+                try? FileManager.default.createSymbolicLink(atPath: path, withDestinationPath: newTarget)
+            }
+        }
+        // pyvenv.cfg's home/executable/command fields aren't what actually
+        // gets executed (bin/python3.X above is), but leaving them pointing
+        // at a now-deleted path would confuse any tooling that does read it.
+        let cfgPath = venvDir + "/pyvenv.cfg"
+        if let cfg = try? String(contentsOfFile: cfgPath, encoding: .utf8) {
+            try? cfg.replacingOccurrences(of: oldFrameworkDir, with: newFrameworkDir)
+                .write(toFile: cfgPath, atomically: true, encoding: .utf8)
+        }
+    }
+
+    /// Backing the "Uninstall Runtime Data" menu item: removes the
+    /// externalized venv (and, for Full installs, the copied Python
+    /// framework) entirely. Deleting the app bundle itself never touches
+    /// this directory (it lives outside Contents/ specifically so Sparkle
+    /// updates don't wipe it) -- without an explicit way to clear it, it
+    /// would just sit there forever after an uninstall.
+    func removeExternalRuntime() {
+        stop()
+        try? FileManager.default.removeItem(atPath: RuntimePaths.externalRuntimeDir)
     }
 
     /// Runs one setup step to completion, streaming its output into the
