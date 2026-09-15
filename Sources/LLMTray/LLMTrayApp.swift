@@ -6,6 +6,14 @@ import Combine
 struct LLMTrayApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
+    init() {
+        // stdout is fully buffered (not line-buffered) once it's redirected
+        // to a file/pipe instead of a terminal -- debug print() tracing
+        // otherwise sits in that buffer and never shows up until the
+        // process exits, which looks exactly like "nothing happened."
+        setvbuf(stdout, nil, _IONBF, 0)
+    }
+
     // MenuBarExtra only gives one click behavior for both mouse buttons, and
     // there's no public way to tell left- from right-click inside it -- the
     // right-click quick menu needs a raw NSStatusItem, so the whole menu bar
@@ -56,11 +64,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // SwiftUI's App protocol requires *some* Scene -- but macOS can
         // still materialize it as a real, visible, empty "LLMTray Settings"
         // window (seen via window-state restoration once anything ever
-        // triggered it, e.g. an accidental Cmd+,). Every window that exists
-        // at launch is one of those -- logWindow/hfWindow are only ever
-        // created lazily, later, in response to the user's own action.
+        // triggered it, e.g. an accidental Cmd+,). Filtering by its exact
+        // title (rather than closing every NSApp.windows entry) matters:
+        // closing indiscriminately here previously took down the popover's
+        // own not-yet-shown internal window along with it, leaving the
+        // status item non-interactive for the rest of the run.
         DispatchQueue.main.async {
-            NSApp.windows.forEach { $0.close() }
+            NSApp.windows.filter { $0.title == "LLMTray Settings" }.forEach { $0.close() }
         }
     }
 
@@ -82,12 +92,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupPopover() {
         let popover = NSPopover()
         popover.behavior = .transient
-        popover.contentSize = NSSize(width: 420, height: 560)
-        popover.contentViewController = NSHostingController(
+        let hosting = NSHostingController(
             rootView: ContentView()
                 .environmentObject(server)
                 .environmentObject(chat)
         )
+        // Tracks the SwiftUI content's own intrinsic size instead of a
+        // fixed contentSize -- ContentView's chatArea shrinks toward a
+        // minimum when the chat is empty and grows (up to its own cap) as
+        // messages arrive, and this is what actually lets that resize the
+        // popover window instead of leaving it pinned at one fixed height.
+        hosting.sizingOptions = [.preferredContentSize]
+        popover.contentViewController = hosting
         self.popover = popover
     }
 
@@ -148,7 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let port = defaults.object(forKey: "llmtray.port") as? Int ?? 8765
         let kvBits = defaults.object(forKey: "llmtray.kvBits") as? Int ?? 4
         let kvGroupSize = defaults.object(forKey: "llmtray.kvGroupSize") as? Int ?? 64
-        let alias = defaults.string(forKey: "llmtray.alias") ?? "n"
+        let alias = ModelAliasStore.alias(for: model.id)
         server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
     }
 

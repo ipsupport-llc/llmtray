@@ -20,9 +20,13 @@ struct ContentView: View {
     @AppStorage("llmtray.port") private var port: Int = 8765
     @AppStorage("llmtray.kvBits") private var kvBits: Int = 4
     @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = 64
-    @AppStorage("llmtray.alias") private var alias: String = "n"
+    // Not @AppStorage -- remembered per selected model via ModelAliasStore
+    // instead of one value shared across every model (see onChange(of:
+    // selectedModelID) below, which loads/saves it on every switch).
+    @State private var alias: String = ModelAliasStore.defaultAlias
     @State private var draft: String = ""
     @State private var showSettings: Bool = false
+    @FocusState private var isInputFocused: Bool
     @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
     @AppStorage("llmtray.topP") private var topP: Double = 0.95
     @AppStorage("llmtray.maxTokens") private var maxTokens: Double = 1024
@@ -39,7 +43,7 @@ struct ContentView: View {
             Divider()
             inputBar
         }
-        .frame(width: 420, height: 560)
+        .frame(width: 420)
         .onAppear {
             models = ModelDiscovery.scanModels(root: modelsRoot)
             // Fall back to the first discovered model if nothing was saved,
@@ -48,6 +52,15 @@ struct ContentView: View {
             if selectedModelID == nil || !models.contains(where: { $0.id == selectedModelID }) {
                 selectedModelID = models.first?.id
             }
+            if let selectedModelID {
+                alias = ModelAliasStore.alias(for: selectedModelID)
+            }
+            isInputFocused = true
+        }
+        .onChange(of: selectedModelID) { newID in
+            // Swap in that model's own remembered alias instead of leaving
+            // whatever was typed for the previous model still in the field.
+            alias = newID.map(ModelAliasStore.alias(for:)) ?? ModelAliasStore.defaultAlias
         }
         .onChange(of: modelsRoot) { newRoot in
             // Covers every way modelsRoot can change (typing, Browse…, the
@@ -197,6 +210,11 @@ struct ContentView: View {
                     Text("Model alias:")
                     TextField("alias", text: $alias)
                         .textFieldStyle(.roundedBorder)
+                        .onChange(of: alias) { newAlias in
+                            if let selectedModelID {
+                                ModelAliasStore.setAlias(newAlias, for: selectedModelID)
+                            }
+                        }
                 }
             }
             .disabled(isBusy || isRunning)
@@ -319,6 +337,13 @@ struct ContentView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 10) {
+                    if chat.messages.isEmpty {
+                        Text("No messages yet")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 8)
+                    }
                     ForEach(chat.messages) { msg in
                         chatBubble(msg)
                             .id(msg.id)
@@ -331,6 +356,11 @@ struct ContentView: View {
                 }
                 .padding(12)
             }
+            // Collapses toward minHeight for an empty chat instead of
+            // always reserving the full 560px popover for nothing, but
+            // caps out at maxHeight so a long conversation scrolls within
+            // a fixed viewport rather than growing the window unbounded.
+            .frame(minHeight: 48, maxHeight: chat.messages.isEmpty ? 48 : 380)
             .onChange(of: (chat.messages.last?.content ?? "") + (chat.messages.last?.reasoning ?? "")) { _ in
                 if let last = chat.messages.last?.id {
                     proxy.scrollTo(last, anchor: .bottom)
@@ -401,10 +431,17 @@ struct ContentView: View {
                 .padding(.horizontal, 12)
             }
             HStack(spacing: 8) {
+                // Not disabled during streaming: a disabled NSTextField
+                // resigns first responder, which is what was actually
+                // kicking focus out of the input field every time a
+                // response started -- sendDraft()'s own guard already
+                // stops a second send from firing, so disabling here too
+                // only cost focus retention for no added safety.
                 TextField("Message…", text: $draft, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...4)
                     .onSubmit(sendDraft)
+                    .focused($isInputFocused)
                     .disabled(!isRunning)
 
                 if chat.isStreaming {
@@ -428,11 +465,17 @@ struct ContentView: View {
     }
 
     private func sendDraft() {
-        guard isRunning else { return }
+        // The input field stays enabled (and focused) through streaming --
+        // this guard is what actually stops Return from firing a second
+        // send() mid-stream and stomping ChatClient's in-flight
+        // assistantMessageIndex, without having to disable the field
+        // itself (which would kick focus out of it every time).
+        guard isRunning, !chat.isStreaming else { return }
         let text = draft
         draft = ""
         let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens))
         chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings)
+        isInputFocused = true
     }
 
     // Only offered once a reply has actually finished -- mid-stream there's

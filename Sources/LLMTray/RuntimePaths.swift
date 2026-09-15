@@ -15,15 +15,21 @@ enum RuntimePaths {
                 return bundled.path
             }
         }
-        // Dev case: `swift build` puts the executable at
-        // <repo>/.build/<config>/LLMTray -- three path components below
-        // repo root (the binary itself, <config>, and .build).
+        // Dev case: walk up from the executable looking for Package.swift
+        // to identify the repo root, rather than assuming a fixed depth --
+        // SwiftPM's `.build/<config>` is a symlink to a toolchain-triple-
+        // specific directory (e.g. `.build/arm64-apple-macosx/debug/`) on
+        // newer toolchains, and resolving that symlink adds an extra path
+        // component that a fixed "go up 3" silently landed one level too
+        // high with (producing `.build/runtime` instead of `<repo>/runtime`).
         if let exePath = Bundle.main.executablePath {
-            let repoRoot = URL(fileURLWithPath: exePath).resolvingSymlinksInPath()
-                .deletingLastPathComponent() // LLMTray (binary)
-                .deletingLastPathComponent() // <config>
-                .deletingLastPathComponent() // .build
-            return repoRoot.appendingPathComponent("runtime").path
+            var dir = URL(fileURLWithPath: exePath).deletingLastPathComponent()
+            while dir.pathComponents.count > 1 {
+                if FileManager.default.fileExists(atPath: dir.appendingPathComponent("Package.swift").path) {
+                    return dir.appendingPathComponent("runtime").path
+                }
+                dir = dir.deletingLastPathComponent()
+            }
         }
         return FileManager.default.currentDirectoryPath + "/runtime"
     }

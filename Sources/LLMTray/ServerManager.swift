@@ -31,6 +31,23 @@ final class ServerManager: ObservableObject {
     private var stdoutPipe: Pipe?
     private var stdoutHandle: FileHandle?
     private var quietTimer: Timer?
+    private lazy var proxy = ModelProxyServer(server: self)
+
+    // Remembered from the initial start() call so switchModel() (driven by
+    // the proxy, not the UI) knows what port/KV settings to keep reusing
+    // when a client's `model` field asks for something else.
+    private var currentPublicPort: Int?
+    private var currentKVBits: Int = 4
+    private var currentKVGroupSize: Int = 64
+    private var currentModelPath: String?
+
+    /// mlx_lm.server actually binds here, not to the port the user
+    /// configured -- that public port is instead served by `proxy`, which
+    /// is what makes switching models based on a request's `model` field
+    /// possible at all (mlx_lm.server itself is a single-model process
+    /// with no hot-swap; the public-facing port has to be something this
+    /// app controls, not the model process itself).
+    private var internalPort: Int { (currentPublicPort ?? 8765) + 10_000 }
 
     /// The venv runtime/run_server.sh creates and patches on its first run.
     /// Talking to the binary directly (instead of shelling out through
@@ -41,10 +58,22 @@ final class ServerManager: ObservableObject {
     private var venvDir: String { RuntimePaths.runtimeDir + "/.mlx_server_venv" }
     private var venvServerBinary: String { venvDir + "/bin/mlx_lm.server" }
 
+    // Resumed by launchServerProcess's terminationHandler/checkForReadySignal
+    // -- only switchModel() actually awaits these (see below); the public
+    // start()/stop() keep their original fire-and-forget timing so the UI
+    // still flips to "Stopped" immediately on click rather than waiting on
+    // the process to actually exit.
+    private var processExitContinuation: CheckedContinuation<Void, Never>?
+    private var startContinuation: CheckedContinuation<Void, Error>?
+
     func start(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
         guard case .stopped = state else { return }
         state = .starting
         log = ""
+        currentPublicPort = port
+        currentKVBits = kvBits
+        currentKVGroupSize = kvGroupSize
+        currentModelPath = modelPath
 
         // A downloaded .app has no venv at all (only run_server.sh's dev
         // flow created one before) -- someone who just dragged LLMTray.dmg
@@ -65,15 +94,32 @@ final class ServerManager: ObservableObject {
                 return
             }
             guard case .starting = self.state else { return }
-            self.launchServerProcess(modelPath: modelPath, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+            self.launchServerProcess(modelPath: modelPath, alias: alias)
         }
     }
 
-    private func launchServerProcess(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
+    /// Swaps the model backing mlx_lm.server without the caller having to
+    /// re-specify port/KV settings -- driven by ModelProxyServer when a
+    /// client's `model` field doesn't match what's currently loaded.
+    /// mlx_lm.server has no hot-swap of its own, so this really does stop
+    /// the whole process and start a fresh one; the public port stays up
+    /// throughout since that's `proxy`, not this process.
+    func switchModel(modelPath: String, alias: String) async throws {
+        guard modelPath != currentModelPath else { return }
+        await terminateAndWaitForExit()
+        state = .starting
+        currentModelPath = modelPath
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            startContinuation = continuation
+            launchServerProcess(modelPath: modelPath, alias: alias)
+        }
+    }
+
+    private func launchServerProcess(modelPath: String, alias: String) {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: venvServerBinary)
         var args = [
-            "--model", modelPath, "--port", String(port), "--prefill-step-size", "128",
+            "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
             // DEBUG is what makes the server log per-token during decoding
             // (default INFO only logs around request start/prompt prefill,
             // silent through the actual generation) -- needed for isBusy's
@@ -81,8 +127,8 @@ final class ServerManager: ObservableObject {
             // instead of just its first moment.
             "--log-level", "DEBUG",
         ]
-        if kvBits > 0 {
-            args += ["--kv-bits", String(kvBits), "--kv-group-size", String(kvGroupSize), "--quantized-kv-start", "0"]
+        if currentKVBits > 0 {
+            args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", "0"]
         }
         if !alias.isEmpty {
             args += ["--model-alias", alias]
@@ -109,7 +155,7 @@ final class ServerManager: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.appendLog(text)
-                self.checkForReadySignal(text, port: port, modelPath: modelPath)
+                self.checkForReadySignal(text, modelPath: modelPath)
                 self.markActivity()
             }
         }
@@ -120,12 +166,20 @@ final class ServerManager: ObservableObject {
                 if case .running = self.state {
                     self.state = .stopped
                 } else if case .starting = self.state {
-                    self.state = .failed("server exited during startup (code \(proc.terminationStatus))")
+                    let error = NSError(
+                        domain: "ServerManager", code: Int(proc.terminationStatus),
+                        userInfo: [NSLocalizedDescriptionKey: "server exited during startup (code \(proc.terminationStatus))"]
+                    )
+                    self.state = .failed(error.localizedDescription)
+                    self.startContinuation?.resume(throwing: error)
+                    self.startContinuation = nil
                 }
                 self.process = nil
                 self.quietTimer?.invalidate()
                 self.quietTimer = nil
                 self.isBusy = false
+                self.processExitContinuation?.resume()
+                self.processExitContinuation = nil
             }
         }
 
@@ -134,22 +188,58 @@ final class ServerManager: ObservableObject {
         } catch {
             state = .failed("failed to launch: \(error.localizedDescription)")
             process = nil
+            startContinuation?.resume(throwing: error)
+            startContinuation = nil
         }
     }
 
     func stop() {
         guard let process, process.isRunning else {
             state = .stopped
+            proxy.stop()
             return
         }
-        process.terminate()
+        let processToKill = process
+        processToKill.terminate()
         // Give it a moment, then hard-kill if it's still alive -- mlx_lm.server
         // doesn't always react to SIGTERM promptly while a generation is in flight.
+        // Must confirm self.process is STILL this exact instance before
+        // sending SIGKILL: if a switchModel() (or another stop()+start())
+        // already replaced it by the time this fires, self.process points
+        // at a brand new, unrelated, already-running process -- confirmed
+        // this exact bug once already (see terminateAndWaitForExit below).
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            guard let self, let p = self.process, p.isRunning else { return }
-            kill(p.processIdentifier, SIGKILL)
+            guard let self, self.process === processToKill, processToKill.isRunning else { return }
+            kill(processToKill.processIdentifier, SIGKILL)
         }
         state = .stopped
+        proxy.stop()
+    }
+
+    /// Used only by switchModel(): unlike the public stop() above, this
+    /// actually waits for the old process to exit before returning, since
+    /// launching the replacement needs the internal port free first --
+    /// stop() itself stays fire-and-forget so the UI flips to "Stopped"
+    /// immediately on click rather than waiting on the OS.
+    private func terminateAndWaitForExit() async {
+        guard let process, process.isRunning else { return }
+        let processToKill = process
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            processExitContinuation = continuation
+            processToKill.terminate()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+                // Reference-identity check against processToKill, not just
+                // "is self.process currently running" -- by the time this
+                // fires, switchModel() has very likely already installed a
+                // freshly launched process in self.process, and the naive
+                // check would SIGKILL that brand new process instead of
+                // doing nothing. Root-caused via live trace: a model switch
+                // killed the *new* model mid-generation (status 9) exactly
+                // 3 seconds after the *old* model's graceful terminate().
+                guard let self, self.process === processToKill, processToKill.isRunning else { return }
+                kill(processToKill.processIdentifier, SIGKILL)
+            }
+        }
     }
 
     /// For app-quit paths only (applicationWillTerminate): there's no time
@@ -158,6 +248,7 @@ final class ServerManager: ObservableObject {
     /// the "user clicked Stop Server, app keeps running" case; this is for
     /// "the whole app is going away right now."
     func terminateImmediately() {
+        proxy.stop()
         guard let process, process.isRunning else { return }
         kill(process.processIdentifier, SIGKILL)
     }
@@ -174,10 +265,14 @@ final class ServerManager: ObservableObject {
     /// uses Homebrew (or the same install prefix), so this actually checks
     /// each candidate's real version and picks the first that's modern
     /// enough, covering Homebrew (both CPU architectures), pyenv, MacPorts,
-    /// and Anaconda/Miniconda. Falls back to the CLT Python only if none of
-    /// those exist -- at which point pip's own error is what the user sees,
-    /// which is why the README calls out the 3.10+ requirement explicitly.
-    private func findPython3() -> String {
+    /// and Anaconda/Miniconda. Deliberately does NOT fall back to
+    /// /usr/bin/python3 -- on a genuinely clean Mac with no Xcode Command
+    /// Line Tools installed yet, that path is a stub that pops a system
+    /// "Install Command Line Developer Tools" dialog the first time
+    /// anything runs it, which is a confusing thing to trigger silently
+    /// from a background bootstrap step. Returning nil here instead lets
+    /// the caller fail with a clear, actionable message up front.
+    private func findModernPython3() -> String? {
         let candidates = [
             "/opt/homebrew/bin/python3",
             "/usr/local/bin/python3",
@@ -185,12 +280,8 @@ final class ServerManager: ObservableObject {
             "/opt/local/bin/python3",
             NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
             NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
-            "/usr/bin/python3",
         ]
-        for path in candidates where FileManager.default.isExecutableFile(atPath: path) && isModernPython(path) {
-            return path
-        }
-        return "/usr/bin/python3"
+        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) && isModernPython($0) }
     }
 
     private func isModernPython(_ path: String) -> Bool {
@@ -226,7 +317,14 @@ final class ServerManager: ObservableObject {
             // rather than trying to patch up a half-working one.
             try? FileManager.default.removeItem(atPath: venvDir)
         }
-        try await runProcess(findPython3(), ["-m", "venv", venvDir])
+        guard let python = findModernPython3() else {
+            throw NSError(
+                domain: "ServerManager", code: 2,
+                userInfo: [NSLocalizedDescriptionKey:
+                    "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh), then try Start Server again."]
+            )
+        }
+        try await runProcess(python, ["-m", "venv", venvDir])
         try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
 
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
@@ -290,15 +388,25 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    private func checkForReadySignal(_ chunk: String, port: Int, modelPath: String) {
+    private func checkForReadySignal(_ chunk: String, modelPath: String) {
         guard case .starting = state else { return }
         // mlx_lm.server prints a "Starting httpd at ..." line (via werkzeug/uvicorn)
         // once it's actually accepting connections -- that's the real "ready" signal,
         // not just "process launched" (model loading can take tens of seconds).
-        if chunk.contains("Starting httpd") || chunk.contains("Uvicorn running") || chunk.contains("http://") {
-            let name = (modelPath as NSString).lastPathComponent
-            state = .running(port: port, model: name)
+        guard chunk.contains("Starting httpd") || chunk.contains("Uvicorn running") || chunk.contains("http://") else { return }
+
+        let name = (modelPath as NSString).lastPathComponent
+        let publicPort = currentPublicPort ?? 8765
+        state = .running(port: publicPort, model: name)
+        // Idempotent: a model switch re-enters this same "ready" path, but
+        // the proxy is already listening on the public port from the
+        // first start() and must NOT be rebound.
+        if proxy.publicPort == nil {
+            try? proxy.start(publicPort: publicPort, internalPort: internalPort)
         }
+        proxy.noteCurrentModel(modelPath)
+        startContinuation?.resume()
+        startContinuation = nil
     }
 
     /// Called on every chunk of server output, regardless of what it says --
