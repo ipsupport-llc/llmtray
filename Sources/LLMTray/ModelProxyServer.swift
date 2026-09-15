@@ -200,12 +200,11 @@ final class ModelProxyServer {
         request.timeoutInterval = 300
 
         // Balances route()'s beginRequest() -- called once, exactly when the
-        // internal mlx_lm.server call fully finishes (success or failure),
-        // not when the last byte reaches the downstream client afterward
-        // (that's just local I/O, not model activity).
-        let delegate = ProxyForwardDelegate(connection: connection, onFinished: { [weak server] in
-            server?.endRequest()
-        })
+        // internal mlx_lm.server call fully finishes (success or failure)
+        // *or* the stall watchdog below gives up on it, not when the last
+        // byte reaches the downstream client afterward (that's just local
+        // I/O, not model activity).
+        let delegate = ProxyForwardDelegate(connection: connection, server: server)
         let queue = OperationQueue()
         queue.underlyingQueue = .main
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
@@ -231,23 +230,96 @@ final class ModelProxyServer {
 /// bytes would desync the downstream client's own framing.
 private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     private let connection: NWConnection
+    private weak var server: ServerManager?
     private var session: URLSession?
     private var headersSent = false
-    private let onFinished: @MainActor () -> Void
+    // Guards against double-handling: the stall watchdog and the normal
+    // didCompleteWithError path can both fire for the same request (once
+    // the watchdog cancels the session, that cancellation itself triggers
+    // didCompleteWithError again) -- everything that matters (endRequest(),
+    // sending a response, tearing down the connection) must happen exactly
+    // once regardless of which path gets there first.
+    private var finished = false
+    private var lastActivityAt = Date()
+    private var stallTimer: Timer?
 
-    init(connection: NWConnection, onFinished: @escaping @MainActor () -> Void) {
+    // No response headers *and* no streamed data for this long means
+    // something is actually stuck -- a hung model process, a GPU deadlock,
+    // whatever -- not just a slow one; a legitimate long prompt prefill
+    // still streams a "Starting httpd"-adjacent response and then tokens
+    // well within a minute in every case seen so far. Comfortably inside
+    // forward()'s own URLRequest.timeoutInterval (300s) so this fires
+    // first, leaving a diagnosable log line and a real error response for
+    // the caller instead of the busy indicator staying lit indefinitely
+    // and the caller hanging silently until that much longer timeout.
+    private static let stallThreshold: TimeInterval = 60
+
+    init(connection: NWConnection, server: ServerManager) {
         self.connection = connection
-        self.onFinished = onFinished
+        self.server = server
+        super.init()
+        // Polls rather than a single one-shot timer so activity resets the
+        // clock without needing to cancel/reschedule anything from
+        // didReceive -- it only has to bump lastActivityAt.
+        let timer = Timer(timeInterval: 5, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.checkForStall()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        stallTimer = timer
     }
 
     func own(_ session: URLSession) {
         self.session = session
     }
 
+    private func checkForStall() {
+        MainActor.assumeIsolated {
+            guard !finished, Date().timeIntervalSince(lastActivityAt) > Self.stallThreshold else { return }
+            server?.appendLog(
+                "--- proxy: no response from mlx_lm.server for \(Int(Self.stallThreshold))s -- treating as stalled and resetting ---\n"
+            )
+            _ = finish(stalled: true)
+        }
+    }
+
+    /// The single place endRequest() actually gets called for this
+    /// delegate's request, from whichever path (normal completion or
+    /// stall) reaches it first. Returns whether *this* call was the one
+    /// that actually did it -- callers that also want to react (send their
+    /// own response, etc.) must check this, since cancelling the session
+    /// on the stall path makes URLSession call didCompleteWithError again
+    /// afterward, and that second call must not repeat any of this.
+    @discardableResult
+    private func finish(stalled: Bool) -> Bool {
+        var didFinish = false
+        MainActor.assumeIsolated {
+            guard !finished else { return }
+            finished = true
+            didFinish = true
+            stallTimer?.invalidate()
+            server?.endRequest()
+            guard stalled else { return }
+            session?.invalidateAndCancel()
+            if headersSent {
+                connection.cancel()
+            } else {
+                let body = "{\"error\":\"upstream stalled with no response\"}"
+                let response = "HTTP/1.1 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
+                connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
+                    self?.connection.cancel()
+                })
+            }
+        }
+        return didFinish
+    }
+
     func urlSession(
         _ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
         completionHandler: @escaping (URLSession.ResponseDisposition) -> Void
     ) {
+        MainActor.assumeIsolated { lastActivityAt = Date() }
         guard let http = response as? HTTPURLResponse else {
             completionHandler(.cancel)
             return
@@ -266,6 +338,7 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        MainActor.assumeIsolated { lastActivityAt = Date() }
         guard !data.isEmpty else { return }
         var chunk = Data(String(format: "%x\r\n", data.count).utf8)
         chunk.append(data)
@@ -277,9 +350,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         // The internal mlx_lm.server call is fully done at this point
         // (successfully or not) regardless of which branch below runs --
         // that's the actual end of "busy," not whenever the last byte
-        // finishes being written back to the downstream client.
-        let finish = onFinished
-        Task { @MainActor in finish() }
+        // finishes being written back to the downstream client. Bails
+        // entirely if the stall watchdog already handled (and responded
+        // to) this request -- this fires again once that watchdog's own
+        // session.invalidateAndCancel() completes, and sending a second
+        // response after the 504 already went out would be wrong.
+        guard finish(stalled: false) else { return }
         if let error, !headersSent {
             // Failed before ever getting a response (e.g. the internal
             // mlx_lm.server wasn't reachable) -- a bare chunk terminator

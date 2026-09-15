@@ -513,7 +513,11 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    private func appendLog(_ text: String) {
+    // Not private: ModelProxyServer's stall watchdog also writes into this
+    // same log (see ProxyForwardDelegate) so a stalled/reset request shows
+    // up right alongside the server's own output instead of vanishing
+    // silently.
+    func appendLog(_ text: String) {
         log += text
         // Cap the retained log so a long-running server doesn't grow this unbounded.
         if log.count > 200_000 {
