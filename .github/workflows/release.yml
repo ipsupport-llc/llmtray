@@ -6,10 +6,19 @@ name: Release
 # right-click > Open to clear Gatekeeper, same as any unsigned/ad-hoc app
 # from outside the App Store.
 #
-# The asset is always named LLMTray.dmg (no version in the filename) so
+# Produces two DMGs from the same build: LLMTray.dmg (thin -- bootstraps
+# mlx-lm via pip on first launch) and LLMTray-Full.dmg (same app with an
+# official-python.org-sourced Python + mlx-lm already vendored inside the
+# bundle, for machines with no compatible Python or that would rather skip
+# the first-run install). Both are built from the *same* .build/app/LLMTray.app
+# directory -- build_full_app.sh mutates it in place after the thin DMG is
+# already captured, so the two DMGs must be built in this order.
+#
+# Asset names have no version in them so
 # https://github.com/<owner>/<repo>/releases/latest/download/LLMTray.dmg
-# is a permanent link to whatever's newest -- used by docs/index.html's
-# download button, which would otherwise need editing on every release.
+# (and .../LLMTray-Full.dmg) are permanent links to whatever's newest --
+# used by docs/index.html's download buttons, which would otherwise need
+# editing on every release.
 on:
   push:
     tags: ["v*"]
@@ -28,8 +37,12 @@ jobs:
         run: ./scripts/build_app.sh
         env:
           VERSION: ${{ env.VERSION }}
-      - name: Build DMG
+      - name: Build DMG (thin)
         run: ./scripts/build_dmg.sh
+      - name: Vendor full runtime into LLMTray.app
+        run: ./scripts/build_full_app.sh
+      - name: Build DMG (full)
+        run: ./scripts/build_dmg.sh LLMTray-Full.dmg
       - name: Generate signed appcast.xml
         run: ./scripts/generate_appcast.sh
         env:
@@ -54,5 +67,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: .build/app/LLMTray.dmg
+          files: |
+            .build/app/LLMTray.dmg
+            .build/app/LLMTray-Full.dmg
           generate_release_notes: true
