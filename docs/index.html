@@ -108,6 +108,15 @@
   h1 { font-size: 2.3rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
   .tagline { color: var(--fg-muted); font-size: 1.08rem; margin: 0 0 2rem; }
 
+  .screenshot {
+    max-width: 340px;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    margin: 2.5rem 0;
+  }
+
   .cta { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
   .btn-download {
     display: inline-flex;
@@ -213,6 +222,8 @@
         <span class="badge">Swift / SwiftUI</span>
         <span class="badge">Apache 2.0</span>
       </div>
+
+      <img class="screenshot" src="assets/screenshot-popover.png" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
     </header>
 
     <section>
