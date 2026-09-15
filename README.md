@@ -2,7 +2,10 @@
 
 A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.com/ml-explore/mlx-lm) on Apple Silicon — a proper interface instead of a shell script and a terminal tab.
 
-<p align="center"><img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings"></p>
+<p align="center">
+  <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings"><br>
+  <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
+</p>
 
 ## What it does
 
