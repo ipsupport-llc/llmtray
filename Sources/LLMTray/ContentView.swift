@@ -133,41 +133,70 @@ struct ContentView: View {
                 .help("Browse & download models from Hugging Face")
             }
 
-            Picker("Model", selection: $selectedModelID) {
-                ForEach(models) { m in
-                    Text(m.displayName).tag(m.id as String?)
+            HStack(spacing: 6) {
+                Picker("Model", selection: $selectedModelID) {
+                    ForEach(models) { m in
+                        Text(m.displayName).tag(m.id as String?)
+                    }
                 }
-            }
-            .labelsHidden()
-            .disabled(isBusy)
+                .labelsHidden()
+                .disabled(isBusy)
 
-            HStack {
-                startStopButton
-                Spacer()
+                serverToggleButton
             }
         }
         .padding(12)
     }
 
-    private var startStopButton: some View {
+    /// Small icon instead of a full-width "Start Server"/"Stop Server"
+    /// button -- the server now starts on its own at launch (see
+    /// AppDelegate's quickStart() call in applicationDidFinishLaunching),
+    /// so this is for the "I changed the model, unload/reload" case, not
+    /// the everyday path.
+    private var serverToggleButton: some View {
         Group {
             switch server.state {
             case .stopped, .failed:
-                Button("Start Server") {
-                    guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-                    server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+                Button {
+                    startServer()
+                } label: {
+                    Image(systemName: "play.fill")
                 }
                 .disabled(selectedModelID == nil)
+                .help("Start server")
             case .starting:
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small)
-                    Text("Starting…")
-                }
+                ProgressView().controlSize(.small)
+                    .help("Starting…")
             case .running:
-                Button("Stop Server", role: .destructive) {
+                Button {
                     server.stop()
+                } label: {
+                    Image(systemName: "eject.fill")
                 }
+                .help("Stop server (unload model)")
             }
+        }
+        .buttonStyle(.plain)
+        // Explicit Start/Stop regardless of which icon is currently shown --
+        // e.g. right-clicking while stopped still offers "Stop Server" as a
+        // clearly-disabled no-op rather than nothing at all.
+        .contextMenu {
+            Button("Start Server") { startServer() }
+                .disabled(!isStoppedOrFailed || selectedModelID == nil)
+            Button("Stop Server") { server.stop() }
+                .disabled(!isRunning)
+        }
+    }
+
+    private func startServer() {
+        guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
+        server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+    }
+
+    private var isStoppedOrFailed: Bool {
+        switch server.state {
+        case .stopped, .failed: return true
+        default: return false
         }
     }
 

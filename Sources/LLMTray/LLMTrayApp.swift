@@ -72,6 +72,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.async {
             NSApp.windows.filter { $0.title == "LLMTray Settings" }.forEach { $0.close() }
         }
+
+        // Starts the server automatically instead of making "click Start
+        // Server" the first thing every session requires -- reuses the
+        // same quickStart() the right-click menu's "Start Server" item
+        // already calls, so this is exactly the last model/settings the
+        // user had, not a fresh default.
+        quickStart()
     }
 
     func applicationWillTerminate(_ notification: Notification) {

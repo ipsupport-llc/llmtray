@@ -23,9 +23,9 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 1. [Download LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg) and drag it to Applications.
 2. First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).
-3. Click the brain icon in the menu bar → pick or download a model → Start Server.
+3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
-The first "Start Server" click creates the `mlx-lm` venv and applies the runtime patches automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant.
+The very first start creates the `mlx-lm` venv and applies the runtime patches automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.
 
 The app looks for models under `~/.llmtray/models/<publisher>/<model-name>/` by default (configurable in Settings; the layout matches LM Studio's own `~/.lmstudio/models`, so pointing it there works too) — either point it at models you already have, or use the in-app Hugging Face browser to pull one down.
 
