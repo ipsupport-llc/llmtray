@@ -31,6 +31,12 @@ struct ContentView: View {
     @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
     @AppStorage("llmtray.topP") private var topP: Double = 0.95
     @AppStorage("llmtray.maxTokens") private var maxTokens: Double = 1024
+    // The selected model's own trained context ceiling (max_position_embeddings),
+    // read fresh on every model switch -- see updateModelMaxContext(for:).
+    // 32768 is just the fallback for a model whose config.json doesn't
+    // expose the field in a shape ModelDiscovery.maxContextLength recognizes,
+    // not a real technical limit of anything.
+    @State private var modelMaxContext: Int = 32768
 
     var body: some View {
         VStack(spacing: 0) {
@@ -56,6 +62,7 @@ struct ContentView: View {
             if let selectedModelID {
                 alias = ModelAliasStore.alias(for: selectedModelID)
             }
+            updateModelMaxContext(for: selectedModelID)
             isInputFocused = true
         }
         .onChange(of: selectedModelID) { newID in
@@ -63,6 +70,7 @@ struct ContentView: View {
             // whatever was typed for the previous model still in the field.
             alias = newID.map(ModelAliasStore.alias(for:)) ?? ""
             aliasConflict = false
+            updateModelMaxContext(for: newID)
         }
         .onChange(of: modelsRoot) { newRoot in
             // Covers every way modelsRoot can change (typing, Browse…, the
@@ -193,6 +201,20 @@ struct ContentView: View {
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
         server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+    }
+
+    /// Re-reads the newly-selected model's own context ceiling so the "Max
+    /// tokens" slider reflects what this specific model actually supports,
+    /// instead of one fixed number applied to every model regardless of its
+    /// real trained limit. Also pulls maxTokens back down if it's currently
+    /// set higher than the new model's ceiling allows.
+    private func updateModelMaxContext(for modelID: String?) {
+        let fallback = 32768
+        // max(64, ...) keeps the slider's range valid (lowerBound is a fixed
+        // 64) even in the unlikely case a config.json reports something
+        // smaller than that.
+        modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? fallback)
+        maxTokens = min(maxTokens, Double(modelMaxContext))
     }
 
     private var isStoppedOrFailed: Bool {
@@ -329,8 +351,8 @@ struct ContentView: View {
             }
             HStack {
                 Text("Max tokens").frame(width: 90, alignment: .leading)
-                Slider(value: $maxTokens, in: 64...32768, step: 64)
-                Text(String(Int(maxTokens))).frame(width: 44, alignment: .trailing)
+                Slider(value: $maxTokens, in: 64...Double(modelMaxContext), step: 256)
+                Text(String(Int(maxTokens))).frame(width: 52, alignment: .trailing)
             }
         }
     }

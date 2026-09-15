@@ -70,4 +70,23 @@ enum ModelDiscovery {
     static func isDownloaded(repoID: String, root: String) -> Bool {
         FileManager.default.fileExists(atPath: root + "/\(repoID)/config.json")
     }
+
+    /// The model's own trained context ceiling, straight from its
+    /// config.json -- used as the real max for the "Max tokens" slider
+    /// instead of one fixed guess for every model (some cap out around 8k,
+    /// some go past 256k). Checked at the top level first, then under
+    /// "text_config" -- newer multi-modal-style configs (e.g. Qwen3.5) nest
+    /// the language-model fields there instead. Returns nil (caller falls
+    /// back to a fixed default) if the field is missing entirely rather
+    /// than guessing at an unfamiliar config shape.
+    static func maxContextLength(forModelPath path: String) -> Int? {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        if let value = obj["max_position_embeddings"] as? Int { return value }
+        if let textConfig = obj["text_config"] as? [String: Any],
+           let value = textConfig["max_position_embeddings"] as? Int {
+            return value
+        }
+        return nil
+    }
 }
