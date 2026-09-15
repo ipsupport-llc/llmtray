@@ -189,6 +189,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
+        let aboutItem = NSMenuItem(title: "About LLMTray", action: #selector(showAboutPanel), keyEquivalent: "")
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
+        menu.addItem(.separator())
+
         let quitItem = NSMenuItem(title: "Quit LLMTray", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
@@ -256,6 +262,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.alertStyle = .warning
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         server.removeExternalRuntime()
+    }
+
+    /// LSUIElement apps (no Dock icon, no standard app menu bar) don't get
+    /// Cocoa's automatic "About <App>" menu item for free -- this wires the
+    /// same standard system panel up manually via the quick menu instead,
+    /// with a credits block for the two links there's currently nowhere
+    /// else in the app to put (license, source, and the company site).
+    @objc private func showAboutPanel() {
+        let credits = NSMutableAttributedString()
+        func appendLink(_ title: String, _ url: String) {
+            let range = NSRange(location: credits.length, length: title.count)
+            credits.append(NSAttributedString(string: title))
+            credits.addAttribute(.link, value: url, range: range)
+        }
+        credits.append(NSAttributedString(string: "Apache License 2.0\n"))
+        appendLink("Source on GitHub", "https://github.com/ipsupport-llc/llmtray")
+        credits.append(NSAttributedString(string: "\n"))
+        appendLink("ipsupport.us", "https://ipsupport.us")
+        credits.addAttribute(
+            .font, value: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+            range: NSRange(location: 0, length: credits.length)
+        )
+        credits.setAlignment(.center, range: NSRange(location: 0, length: credits.length))
+
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     @objc private func quitApp() {
