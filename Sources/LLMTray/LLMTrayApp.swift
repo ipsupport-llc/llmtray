@@ -179,10 +179,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func quickStart() {
         guard case .stopped = server.state else { return }
+        Task { await attemptStart(retriesLeft: 1) }
+    }
+
+    /// No `?? models.first` fallback on purpose: this also runs unattended
+    /// at every launch (applicationDidFinishLaunching), and silently
+    /// substituting "whatever's alphabetically first" for a model that
+    /// can't be found is a bad failure mode to have happen with zero
+    /// visual feedback -- confirmed live after a Sparkle update, where the
+    /// saved selection briefly didn't resolve (selectedModelID and the
+    /// models root were both still correctly persisted seconds later, so
+    /// this reads as a startup-timing race rather than a lost setting) and
+    /// it silently auto-loaded an unrelated 27B model instead of the
+    /// intended one. One short retry covers exactly that kind of transient
+    /// race; if it still can't find the model after that, surfacing a
+    /// clear reason is safer than guessing.
+    private func attemptStart(retriesLeft: Int) async {
         let defaults = UserDefaults.standard
+        guard let savedID = defaults.string(forKey: "selectedModelID") else { return }
         let models = ModelDiscovery.scanModels(root: ModelDiscovery.currentModelsRoot())
-        guard let savedID = defaults.string(forKey: "selectedModelID"),
-              let model = models.first(where: { $0.id == savedID }) ?? models.first else { return }
+        guard let model = models.first(where: { $0.id == savedID }) else {
+            if retriesLeft > 0 {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                await attemptStart(retriesLeft: retriesLeft - 1)
+            } else {
+                server.reportFailure("Couldn't find the last-selected model (\((savedID as NSString).lastPathComponent)) -- pick one from the menu.")
+            }
+            return
+        }
 
         let port = defaults.object(forKey: "llmtray.port") as? Int ?? 8765
         let kvBits = defaults.object(forKey: "llmtray.kvBits") as? Int ?? 4

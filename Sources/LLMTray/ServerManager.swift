@@ -253,6 +253,15 @@ final class ServerManager: ObservableObject {
         kill(process.processIdentifier, SIGKILL)
     }
 
+    /// Lets a caller outside this type (AppDelegate's auto-start) surface
+    /// a failure through the same .failed state the UI already knows how
+    /// to display, for a failure that happens before there's even a
+    /// process to launch (e.g. couldn't resolve which model to start).
+    func reportFailure(_ message: String) {
+        guard case .stopped = state else { return }
+        state = .failed(message)
+    }
+
     /// GUI apps launched via Finder/LaunchServices don't inherit the
     /// interactive shell PATH that adds a package manager's bin dir -- so a
     /// plain "python3" (or hardcoded /usr/bin/python3) resolves to the
