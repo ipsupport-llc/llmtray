@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ServiceManagement
 
 struct ContentView: View {
     @EnvironmentObject var server: ServerManager
@@ -27,6 +28,12 @@ struct ContentView: View {
     @State private var aliasConflict: Bool = false
     @State private var draft: String = ""
     @State private var showSettings: Bool = false
+    // SMAppService.mainApp.status is the actual source of truth (the user
+    // could also flip this from System Settings > General > Login Items
+    // directly) -- not persisted separately in UserDefaults, just read
+    // fresh on appear and updated locally after a successful toggle.
+    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
+    @State private var launchAtLoginError: String?
     @FocusState private var isInputFocused: Bool
     @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
     @AppStorage("llmtray.topP") private var topP: Double = 0.95
@@ -63,6 +70,7 @@ struct ContentView: View {
                 alias = ModelAliasStore.alias(for: selectedModelID)
             }
             updateModelMaxContext(for: selectedModelID)
+            launchAtLogin = SMAppService.mainApp.status == .enabled
             isInputFocused = true
         }
         .onChange(of: selectedModelID) { newID in
@@ -251,6 +259,20 @@ struct ContentView: View {
 
     private var settingsPanel: some View {
         VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 2) {
+                Toggle("Launch at Login", isOn: Binding(
+                    get: { launchAtLogin },
+                    set: { setLaunchAtLogin($0) }
+                ))
+                if let launchAtLoginError {
+                    Text(launchAtLoginError)
+                        .font(.system(size: 10))
+                        .foregroundColor(.red)
+                }
+            }
+
+            Divider().padding(.vertical, 4)
+
             modelsRootSection
 
             Divider().padding(.vertical, 4)
@@ -322,6 +344,26 @@ struct ContentView: View {
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
             .font(.system(size: 10))
+        }
+    }
+
+    /// SMAppService.mainApp -- the modern (macOS 13+, matching this app's
+    /// own minimum) way to register a login item, requiring no separate
+    /// helper binary the way the older SMLoginItemSetEnabled API did.
+    /// Registration can fail (e.g. running from a bare, unsigned dev build
+    /// rather than a properly installed .app), so this surfaces the error
+    /// inline instead of silently leaving the toggle in the wrong state.
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+            launchAtLogin = enabled
+            launchAtLoginError = nil
+        } catch {
+            launchAtLoginError = error.localizedDescription
         }
     }
 
