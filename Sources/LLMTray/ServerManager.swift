@@ -143,6 +143,18 @@ final class ServerManager: ObservableObject {
         task.executableURL = URL(fileURLWithPath: venvServerBinary)
         var args = [
             "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
+            // Without a cap, mlx_lm.server's cross-request prompt cache
+            // (letting a conversation continue without re-prefilling the
+            // whole history each turn) just keeps every conversation's KV
+            // state around forever -- confirmed live: a long session's
+            // cache grew from 0.27 GB to 1.25 GB before a subsequent
+            // request's own KV allocation pushed the process into a METAL
+            // "Insufficient Memory" crash. 1 GiB is conservative on purpose
+            // -- this evicts old cached conversations before they can pile
+            // up into exactly that kind of failure, at the cost of
+            // occasionally re-prefilling a conversation that's been idle
+            // a while (cheap compared to a crash).
+            "--prompt-cache-bytes", String(1 << 30),
         ]
         if currentKVBits > 0 {
             args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", "0"]
