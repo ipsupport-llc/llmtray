@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Combine
+import Sparkle
 
 @main
 struct LLMTrayApp: App {
@@ -39,6 +40,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let chat = ChatClient()
     private let systemMonitor = SystemMonitor()
     private let hfBrowser = HFModelBrowser()
+    // startingUpdater: true begins Sparkle's own automatic background
+    // check schedule immediately (governed by SUEnableAutomaticChecks in
+    // Info.plist) -- separate from the manual "Check for Updates…" menu
+    // item below, which just calls checkForUpdates() on demand.
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil
+    )
 
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
@@ -149,6 +157,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         toggleItem.target = self
         menu.addItem(toggleItem)
+
+        menu.addItem(.separator())
+
+        let updateItem = NSMenuItem(
+            title: "Check for Updates…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
+        )
+        updateItem.target = updaterController
+        menu.addItem(updateItem)
 
         menu.addItem(.separator())
 

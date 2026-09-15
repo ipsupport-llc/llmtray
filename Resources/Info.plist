@@ -24,5 +24,11 @@
 	<true/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>SUFeedURL</key>
+	<string>https://ipsupport-llc.github.io/llmtray/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>Zql29c5Ol6ibqqO4TzglAV2fi53g+AExgcqtMtvBq9c=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 </dict>
 </plist>

@@ -22,10 +22,35 @@ jobs:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
+      - name: Derive version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
       - name: Build LLMTray.app
         run: ./scripts/build_app.sh
+        env:
+          VERSION: ${{ env.VERSION }}
       - name: Build DMG
         run: ./scripts/build_dmg.sh
+      - name: Generate signed appcast.xml
+        run: ./scripts/generate_appcast.sh
+        env:
+          VERSION: ${{ env.VERSION }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+      - name: Commit appcast.xml to main
+        run: |
+          # A tag push checks out that tag's commit in detached HEAD --
+          # pushing that tree straight to main would be a non-fast-forward
+          # (or worse, silently rewind main) if anything landed on main
+          # after the tag was cut. Explicitly resetting to the real tip of
+          # origin/main and applying only the appcast.xml change avoids that.
+          cp docs/appcast.xml /tmp/appcast.xml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+          cp /tmp/appcast.xml docs/appcast.xml
+          git add docs/appcast.xml
+          git diff --staged --quiet && echo "no appcast changes" || git commit -m "Update appcast.xml for ${{ github.ref_name }}"
+          git push origin main
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:

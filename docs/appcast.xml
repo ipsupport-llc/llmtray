@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>LLMTray</title>
+    <link>https://ipsupport-llc.github.io/llmtray/appcast.xml</link>
+    <description>LLMTray release updates</description>
+    <language>en</language>
+    <item>
+      <title>Version 0.2.0</title>
+      <pubDate>Tue, 15 Sep 2026 00:44:40 +0000</pubDate>
+      <sparkle:version>0.2.0</sparkle:version>
+      <sparkle:shortVersionString>0.2.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"
+                 sparkle:edSignature="eA3Ip1sFb0GmXXExI2XrgFyMvqEHdIuG5rLB9KF+1NZKqNw1uMCfZzVpwTJlI4dEnBNb2XuAYkylbwONnKTwDA==" length="1984678"
+                 type="application/octet-stream"/>
+    </item>
+  </channel>
+</rss>
