@@ -23,7 +23,8 @@ struct ContentView: View {
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
     // selectedModelID) below, which loads/saves it on every switch).
-    @State private var alias: String = ModelAliasStore.defaultAlias
+    @State private var alias: String = ""
+    @State private var aliasConflict: Bool = false
     @State private var draft: String = ""
     @State private var showSettings: Bool = false
     @FocusState private var isInputFocused: Bool
@@ -60,7 +61,8 @@ struct ContentView: View {
         .onChange(of: selectedModelID) { newID in
             // Swap in that model's own remembered alias instead of leaving
             // whatever was typed for the previous model still in the field.
-            alias = newID.map(ModelAliasStore.alias(for:)) ?? ModelAliasStore.defaultAlias
+            alias = newID.map(ModelAliasStore.alias(for:)) ?? ""
+            aliasConflict = false
         }
         .onChange(of: modelsRoot) { newRoot in
             // Covers every way modelsRoot can change (typing, Browse…, the
@@ -235,15 +237,37 @@ struct ContentView: View {
                 Stepper("Port: \(port)", value: $port, in: 1024...65535)
                 Stepper("KV bits: \(kvBits == 0 ? "off" : String(kvBits))", value: $kvBits, in: 0...8)
                 Stepper("KV group size: \(kvGroupSize)", value: $kvGroupSize, in: 16...128, step: 16)
-                HStack {
-                    Text("Model alias:")
-                    TextField("alias", text: $alias)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: alias) { newAlias in
-                            if let selectedModelID {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack {
+                        Text("Model alias:")
+                        TextField("alias", text: $alias)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: alias) { newAlias in
+                                guard let selectedModelID else { return }
+                                aliasConflict = ModelAliasStore.isAliasTaken(
+                                    newAlias, excluding: selectedModelID, among: models.map(\.id)
+                                )
+                                // Still saved even when it conflicts -- the
+                                // warning is informational (whichever model
+                                // a client's `model` field matches first
+                                // wins), not a hard block, since the user
+                                // might be mid-edit toward some other value.
                                 ModelAliasStore.setAlias(newAlias, for: selectedModelID)
                             }
+                        Button {
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(alias, forType: .string)
+                        } label: {
+                            Image(systemName: "doc.on.doc")
                         }
+                        .buttonStyle(.plain)
+                        .help("Copy alias — this is the `model` value other tools should send")
+                    }
+                    if aliasConflict {
+                        Text("Another model already uses this alias.")
+                            .font(.system(size: 10))
+                            .foregroundColor(.orange)
+                    }
                 }
             }
             .disabled(isBusy || isRunning)

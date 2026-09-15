@@ -40,12 +40,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let chat = ChatClient()
     private let systemMonitor = SystemMonitor()
     private let hfBrowser = HFModelBrowser()
-    // startingUpdater: true begins Sparkle's own automatic background
-    // check schedule immediately (governed by SUEnableAutomaticChecks in
+    // startingUpdater begins Sparkle's own automatic background check
+    // schedule immediately (governed by SUEnableAutomaticChecks in
     // Info.plist) -- separate from the manual "Check for Updates…" menu
-    // item below, which just calls checkForUpdates() on demand.
+    // item below, which just calls checkForUpdates() on demand. Gated on
+    // actually having a real Info.plist (SUFeedURL etc.) so this doesn't
+    // also try (and fail) to start against the bare `.build/debug/LLMTray`
+    // binary used for local dev iteration, which has none.
     private let updaterController = SPUStandardUpdaterController(
-        startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil
+        startingUpdater: Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil,
+        updaterDelegate: nil, userDriverDelegate: nil
     )
 
     private var statusItem: NSStatusItem!
@@ -160,13 +164,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        let updateItem = NSMenuItem(
-            title: "Check for Updates…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
-        )
-        updateItem.target = updaterController
-        menu.addItem(updateItem)
-
-        menu.addItem(.separator())
+        // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.) to
+        // do anything -- the bare `.build/debug/LLMTray` binary used for
+        // local dev iteration has none, so "Check for Updates…" would just
+        // fail with a confusing "updater failed to start" dialog (and
+        // report the app's name as "debug", the executable's containing
+        // folder, since there's no real CFBundleName to read either).
+        // Hiding the item entirely there is clearer than showing it and
+        // having it error out.
+        if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
+            let updateItem = NSMenuItem(
+                title: "Check for Updates…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
+            )
+            updateItem.target = updaterController
+            menu.addItem(updateItem)
+            menu.addItem(.separator())
+        }
 
         let quitItem = NSMenuItem(title: "Quit LLMTray", action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
