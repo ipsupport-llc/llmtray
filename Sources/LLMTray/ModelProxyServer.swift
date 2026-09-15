@@ -150,6 +150,14 @@ final class ModelProxyServer {
 
     private func route(method: String, path: String, headers: [String: String], body: Data.SubSequence, connection: NWConnection, internalPort: Int) {
         let bodyData = Data(body)
+        // Marked busy for the whole request, not just the eventual forward()
+        // below -- a model switch (stopping the old process, loading the
+        // new one) can itself take tens of seconds, and that's exactly the
+        // kind of stretch a "busy" indicator should cover, not just the
+        // per-token generation after it. Every exit path below -- switch
+        // failure, forward()'s own invalid-URL guard, or eventual proxy
+        // completion -- balances this with exactly one endRequest() call.
+        server.beginRequest()
         Task {
             if let modelName = Self.extractModelField(from: bodyData),
                let targetPath = ModelRouter.resolve(modelName: modelName),
@@ -158,6 +166,7 @@ final class ModelProxyServer {
                     try await self.server.switchModel(modelPath: targetPath, alias: modelName)
                     self.currentModelPath = targetPath
                 } catch {
+                    self.server.endRequest()
                     self.sendError(connection: connection, message: "model switch failed: \(error.localizedDescription)")
                     return
                 }
@@ -176,6 +185,7 @@ final class ModelProxyServer {
 
     private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int) {
         guard let url = URL(string: "http://127.0.0.1:\(internalPort)\(path)") else {
+            server.endRequest()
             connection.cancel()
             return
         }
@@ -189,7 +199,13 @@ final class ModelProxyServer {
         }
         request.timeoutInterval = 300
 
-        let delegate = ProxyForwardDelegate(connection: connection)
+        // Balances route()'s beginRequest() -- called once, exactly when the
+        // internal mlx_lm.server call fully finishes (success or failure),
+        // not when the last byte reaches the downstream client afterward
+        // (that's just local I/O, not model activity).
+        let delegate = ProxyForwardDelegate(connection: connection, onFinished: { [weak server] in
+            server?.endRequest()
+        })
         let queue = OperationQueue()
         queue.underlyingQueue = .main
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
@@ -217,9 +233,11 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     private let connection: NWConnection
     private var session: URLSession?
     private var headersSent = false
+    private let onFinished: @MainActor () -> Void
 
-    init(connection: NWConnection) {
+    init(connection: NWConnection, onFinished: @escaping @MainActor () -> Void) {
         self.connection = connection
+        self.onFinished = onFinished
     }
 
     func own(_ session: URLSession) {
@@ -256,6 +274,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        // The internal mlx_lm.server call is fully done at this point
+        // (successfully or not) regardless of which branch below runs --
+        // that's the actual end of "busy," not whenever the last byte
+        // finishes being written back to the downstream client.
+        let finish = onFinished
+        Task { @MainActor in finish() }
         if let error, !headersSent {
             // Failed before ever getting a response (e.g. the internal
             // mlx_lm.server wasn't reachable) -- a bare chunk terminator

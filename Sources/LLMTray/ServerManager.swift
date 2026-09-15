@@ -12,25 +12,23 @@ enum ServerState: Equatable {
 final class ServerManager: ObservableObject {
     @Published private(set) var state: ServerState = .stopped
     @Published private(set) var log: String = ""
-    // True while the server is actively producing output -- deliberately
-    // independent of ChatClient.isStreaming, which only knows about
-    // requests made through this app's own chat UI. An external tool
-    // hitting the OpenAI-compatible endpoint directly never touches
-    // ChatClient, but --log-level DEBUG (set below) makes the server print
-    // a line per generated token for every caller, so watching its own log
-    // -- which this app is already capturing -- covers everyone without
-    // needing to poll anything.
+    // True while at least one request is in flight -- driven directly by
+    // ModelProxyServer's beginRequest()/endRequest() around every request it
+    // forwards (and around a model switch, which can itself take tens of
+    // seconds while the old process stops and the new one loads). Precise
+    // by construction: the proxy already knows the exact start/end of every
+    // request it handles, for every caller (this app's own chat UI and any
+    // external OpenAI-API client alike, since both only ever reach
+    // mlx_lm.server through the proxy's public port) -- no need to guess
+    // from server log output, which used to require --log-level DEBUG
+    // (dropped below) and a debounce timer to bridge gaps between lines,
+    // and which never saw a model-switch as "busy" at all.
     @Published private(set) var isBusy: Bool = false
-    // Debounce window: isBusy flips true the instant a log line arrives and
-    // back to false once this long has passed with no further lines --
-    // long enough to bridge the gap between two DEBUG lines during normal
-    // decoding, short enough that it drops promptly once generation stops.
-    private static let quietWindow: TimeInterval = 0.6
+    private var activeRequestCount = 0
 
     private var process: Process?
     private var stdoutPipe: Pipe?
     private var stdoutHandle: FileHandle?
-    private var quietTimer: Timer?
     private lazy var proxy = ModelProxyServer(server: self)
 
     // Remembered from the initial start() call so switchModel() (driven by
@@ -145,12 +143,6 @@ final class ServerManager: ObservableObject {
         task.executableURL = URL(fileURLWithPath: venvServerBinary)
         var args = [
             "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
-            // DEBUG is what makes the server log per-token during decoding
-            // (default INFO only logs around request start/prompt prefill,
-            // silent through the actual generation) -- needed for isBusy's
-            // log-activity signal to track a request all the way through
-            // instead of just its first moment.
-            "--log-level", "DEBUG",
         ]
         if currentKVBits > 0 {
             args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", "0"]
@@ -181,7 +173,6 @@ final class ServerManager: ObservableObject {
                 guard let self else { return }
                 self.appendLog(text)
                 self.checkForReadySignal(text, modelPath: modelPath)
-                self.markActivity()
             }
         }
 
@@ -200,8 +191,11 @@ final class ServerManager: ObservableObject {
                     self.startContinuation = nil
                 }
                 self.process = nil
-                self.quietTimer?.invalidate()
-                self.quietTimer = nil
+                // Safety net: don't wait on the proxy's in-flight requests to
+                // notice the process died and unwind naturally -- whatever
+                // they were waiting on just went away, so there's nothing
+                // left to be busy about right now regardless.
+                self.activeRequestCount = 0
                 self.isBusy = false
                 self.processExitContinuation?.resume()
                 self.processExitContinuation = nil
@@ -548,24 +542,27 @@ final class ServerManager: ObservableObject {
         startContinuation = nil
     }
 
-    /// Called on every chunk of server output, regardless of what it says --
-    /// with --log-level DEBUG, a per-token line arrives throughout decoding
-    /// for any caller, so "a line just arrived" is itself the busy signal.
-    private func markActivity() {
+    /// Called by ModelProxyServer once per request it starts handling
+    /// (including the model-switch stretch ahead of an actual forward, if
+    /// one's needed) -- paired 1:1 with endRequest() below. A counter, not a
+    /// bool, because multiple clients can have requests in flight at once;
+    /// isBusy should only drop once the *last* one finishes.
+    func beginRequest() {
+        activeRequestCount += 1
         isBusy = true
-        quietTimer?.invalidate()
-        let timer = Timer(timeInterval: Self.quietWindow, repeats: false) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.isBusy = false
-            }
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        quietTimer = timer
+    }
+
+    /// Paired with beginRequest() above. Floors at 0 rather than going
+    /// negative -- the process-death safety net in launchServerProcess's
+    /// terminationHandler can zero this out before a request that was
+    /// in flight at the time gets around to calling this on its own.
+    func endRequest() {
+        activeRequestCount = max(0, activeRequestCount - 1)
+        isBusy = activeRequestCount > 0
     }
 
     deinit {
         stdoutHandle?.readabilityHandler = nil
-        quietTimer?.invalidate()
         process?.terminate()
     }
 }
