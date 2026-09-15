@@ -2,7 +2,7 @@
 
 A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.com/ml-explore/mlx-lm) on Apple Silicon — a proper interface instead of a shell script and a terminal tab.
 
-<p align="center"><em>Screenshot coming soon</em></p>
+<p align="center"><img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings"></p>
 
 ## What it does
 
@@ -21,7 +21,12 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 ## Quick start
 
-1. [Download LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg) and drag it to Applications.
+Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtray/releases/latest):
+
+- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~2MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
+- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~260MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
+
+1. Download one of the two above and drag it to Applications.
 2. First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
