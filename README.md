@@ -3,9 +3,16 @@
 A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.com/ml-explore/mlx-lm) on Apple Silicon — a proper interface instead of a shell script and a terminal tab.
 
 <p align="center">
-  <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings"><br>
-  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download LLMTray.dmg</a> (~2MB, Light) ·
-  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">LLMTray-Full.dmg</a> (~260MB, Full)<br>
+  <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
+</p>
+
+<p align="center">
+  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"><img src="https://img.shields.io/badge/Download-LLMTray.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray.dmg"></a>
+  &nbsp;
+  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"><img src="https://img.shields.io/badge/Download-LLMTray--Full.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray-Full.dmg"></a>
+  <br>
+  <sub>Light — ~2MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~260MB, self-contained</sub>
+  <br><br>
   <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
 </p>
 
