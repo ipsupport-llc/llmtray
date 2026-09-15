@@ -4,6 +4,8 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 <p align="center">
   <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings"><br>
+  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download LLMTray.dmg</a> (~2MB, Light) ·
+  <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">LLMTray-Full.dmg</a> (~260MB, Full)<br>
   <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
 </p>
 
