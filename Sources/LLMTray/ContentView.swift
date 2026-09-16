@@ -2,6 +2,11 @@ import SwiftUI
 import AppKit
 import ServiceManagement
 
+enum SettingsTab {
+    case general
+    case advanced
+}
+
 struct ContentView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
@@ -28,6 +33,8 @@ struct ContentView: View {
     @State private var aliasConflict: Bool = false
     @State private var draft: String = ""
     @State private var showSettings: Bool = false
+    @State private var settingsTab: SettingsTab = .general
+    @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold: Int = 3
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
     // directly) -- not persisted separately in UserDefaults, just read
@@ -259,6 +266,27 @@ struct ContentView: View {
 
     private var settingsPanel: some View {
         VStack(alignment: .leading, spacing: 6) {
+            Picker("", selection: $settingsTab) {
+                Text("General").tag(SettingsTab.general)
+                Text("Advanced").tag(SettingsTab.advanced)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .padding(.bottom, 4)
+
+            switch settingsTab {
+            case .general:
+                generalSettingsContent
+            case .advanced:
+                advancedSettingsContent
+            }
+        }
+        .font(.system(size: 12))
+        .padding(12)
+    }
+
+    private var generalSettingsContent: some View {
+        VStack(alignment: .leading, spacing: 6) {
             VStack(alignment: .leading, spacing: 2) {
                 Toggle("Launch at Login", isOn: Binding(
                     get: { launchAtLogin },
@@ -321,8 +349,26 @@ struct ContentView: View {
             Divider().padding(.vertical, 4)
             runtimeUpdateRow
         }
-        .font(.system(size: 12))
-        .padding(12)
+    }
+
+    private var advancedSettingsContent: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Server recovery").foregroundColor(.secondary)
+            Stepper(
+                autoRestartStallThreshold == 0
+                    ? "Auto-restart on repeated stalls: off"
+                    : "Auto-restart after \(autoRestartStallThreshold) consecutive stalled requests",
+                value: $autoRestartStallThreshold, in: 0...10
+            )
+            Text(
+                "A request can stall if mlx_lm.server's worker thread dies without crashing the whole "
+                    + "process (e.g. a METAL out-of-memory error) -- every request after that hangs until "
+                    + "its own 60s timeout, forever, since the process itself looks alive. This restarts the "
+                    + "model process after that many stalls in a row instead of leaving it wedged. 0 disables it."
+            )
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
+        }
     }
 
     private var modelsRootSection: some View {

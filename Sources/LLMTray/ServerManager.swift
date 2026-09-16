@@ -38,6 +38,14 @@ final class ServerManager: ObservableObject {
     private var currentKVBits: Int = 4
     private var currentKVGroupSize: Int = 64
     private var currentModelPath: String?
+    private var currentAlias: String = ""
+
+    // Consecutive endRequestStalled() calls with no successful endRequest()
+    // in between -- reset to 0 by any request that actually completes.
+    // Used by restartWedgedProcess() below: a single stall can be a
+    // legitimately slow request timing out for an unrelated reason, but an
+    // unbroken streak means the process itself is the problem.
+    private var consecutiveStallCount = 0
 
     /// mlx_lm.server actually binds here, not to the port the user
     /// configured -- that public port is instead served by `proxy`, which
@@ -97,6 +105,7 @@ final class ServerManager: ObservableObject {
         currentKVBits = kvBits
         currentKVGroupSize = kvGroupSize
         currentModelPath = modelPath
+        currentAlias = alias
 
         // A downloaded .app has no venv at all (only run_server.sh's dev
         // flow created one before) -- someone who just dragged LLMTray.dmg
@@ -132,9 +141,33 @@ final class ServerManager: ObservableObject {
         await terminateAndWaitForExit()
         state = .starting
         currentModelPath = modelPath
+        currentAlias = alias
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             startContinuation = continuation
             launchServerProcess(modelPath: modelPath, alias: alias)
+        }
+    }
+
+    /// Restarts the *same* model -- deliberately not routed through
+    /// switchModel(), which no-ops when modelPath is unchanged. Triggered
+    /// by endRequestStalled() below after too many consecutive stalls: a
+    /// mlx_lm.server worker thread can die (e.g. a METAL out-of-memory
+    /// error) without taking the whole process down with it, since Python
+    /// just prints a traceback and kills that one thread -- the process
+    /// looks alive to Process.terminationHandler, but every request after
+    /// that hangs forever, since nothing left is generating anything.
+    private func restartWedgedProcess() async {
+        guard let modelPath = currentModelPath, case .running = state else { return }
+        appendLog("--- restarting the model process after repeated stalls ---\n")
+        await terminateAndWaitForExit()
+        state = .starting
+        do {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                startContinuation = continuation
+                launchServerProcess(modelPath: modelPath, alias: currentAlias)
+            }
+        } catch {
+            state = .failed("auto-restart failed: \(error.localizedDescription)")
         }
     }
 
@@ -568,13 +601,36 @@ final class ServerManager: ObservableObject {
         isBusy = true
     }
 
-    /// Paired with beginRequest() above. Floors at 0 rather than going
-    /// negative -- the process-death safety net in launchServerProcess's
-    /// terminationHandler can zero this out before a request that was
-    /// in flight at the time gets around to calling this on its own.
+    /// Paired with beginRequest() above, for a request that actually
+    /// completed (successfully or with a normal upstream error) -- floors
+    /// at 0 rather than going negative, since the process-death safety net
+    /// in launchServerProcess's terminationHandler can zero activeRequestCount
+    /// out before a request that was in flight at the time gets around to
+    /// calling this on its own. Resets consecutiveStallCount: any request
+    /// that actually finishes proves the process is still doing real work,
+    /// which is what should "forgive" an earlier isolated stall.
     func endRequest() {
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
+        consecutiveStallCount = 0
+    }
+
+    /// Paired with beginRequest() above, for the proxy's stall watchdog
+    /// specifically (ProxyForwardDelegate.finish(stalled: true)) rather
+    /// than a normal completion -- same busy-indicator bookkeeping as
+    /// endRequest(), plus tracks how many of these have happened in a row
+    /// with nothing succeeding in between. After enough of them, the
+    /// process itself is almost certainly wedged (see restartWedgedProcess's
+    /// doc comment), not just one slow request, and gets restarted.
+    func endRequestStalled() {
+        activeRequestCount = max(0, activeRequestCount - 1)
+        isBusy = activeRequestCount > 0
+        consecutiveStallCount += 1
+
+        let threshold = UserDefaults.standard.object(forKey: "llmtray.autoRestartStallThreshold") as? Int ?? 3
+        guard threshold > 0, consecutiveStallCount >= threshold else { return }
+        consecutiveStallCount = 0
+        Task { await restartWedgedProcess() }
     }
 
     deinit {

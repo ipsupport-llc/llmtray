@@ -299,7 +299,15 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             finished = true
             didFinish = true
             stallTimer?.invalidate()
-            server?.endRequest()
+            // Stalled and normal completions are tracked separately --
+            // ServerManager only restarts the process on an unbroken streak
+            // of stalls, so a genuine completion needs to actually reset
+            // that streak, not just decrement the same busy counter.
+            if stalled {
+                server?.endRequestStalled()
+            } else {
+                server?.endRequest()
+            }
             guard stalled else { return }
             session?.invalidateAndCancel()
             if headersSent {
