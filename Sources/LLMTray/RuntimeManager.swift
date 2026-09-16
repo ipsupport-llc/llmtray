@@ -29,7 +29,6 @@ final class RuntimeManager: ObservableObject {
     // at the exact same place ServerManager actually runs the server from,
     // or "Update" here would pip-install into a venv nothing ever reads.
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
-    private var venvPip: String { venvDir + "/bin/pip" }
     private var venvPython: String { venvDir + "/bin/python" }
     private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
 
@@ -77,7 +76,7 @@ final class RuntimeManager: ObservableObject {
         checkState = .updating
         Task {
             do {
-                try await runProcess(venvPip, ["install", "--quiet", "mlx-lm==\(version)"])
+                try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "mlx-lm==\(version)"])
                 try await runProcess(venvPython, [runtimeDir + "/patch_mlx_server_kv.py"])
                 try await runProcess(venvPython, [runtimeDir + "/patch_mlx_tool_parser.py"])
                 try writePinnedVersion(version)

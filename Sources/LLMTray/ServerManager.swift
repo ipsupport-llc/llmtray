@@ -63,6 +63,10 @@ final class ServerManager: ObservableObject {
     /// every single "Start Server" click -- work that only ever needs doing
     /// once, not once per app launch (or, prior to this, once per update).
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
+    private var venvPython: String { venvDir + "/bin/python3" }
+    // Only ever used as an existence check (pip creates it as its last
+    // install step, so its presence is a reliable "setup finished" signal)
+    // -- never executed directly, see launchServerProcess's doc comment.
     private var venvServerBinary: String { venvDir + "/bin/mlx_lm.server" }
     private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
 
@@ -173,8 +177,19 @@ final class ServerManager: ObservableObject {
 
     private func launchServerProcess(modelPath: String, alias: String) {
         let task = Process()
-        task.executableURL = URL(fileURLWithPath: venvServerBinary)
+        // Not venvServerBinary (the "mlx_lm.server" console-script pip
+        // generates) directly -- that script's first line is a shebang
+        // hardcoding the exact absolute interpreter path that was live
+        // when pip created it. For a Full build that's a GitHub Actions
+        // runner path (/Users/runner/work/...) that exists nowhere else,
+        // and even a *correct* path here would still break: shebangs don't
+        // support spaces, and externalRuntimeDir lives under
+        // "~/Library/Application Support/..." -- guaranteed to contain
+        // one. Invoking the interpreter directly with -m sidesteps shebang
+        // parsing entirely; Process doesn't go through a shell either way.
+        task.executableURL = URL(fileURLWithPath: venvPython)
         var args = [
+            "-m", "mlx_lm.server",
             "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
             // Without a cap, mlx_lm.server's cross-request prompt cache
             // (letting a conversation continue without re-prefilling the
@@ -443,7 +458,7 @@ final class ServerManager: ObservableObject {
                 // replaces Contents/, which is exactly the update this
                 // whole external-copy was supposed to survive. Repoint it at
                 // the framework copy that now lives right alongside it.
-                relinkVendoredInterpreter(oldFrameworkDir: bundledFramework, newFrameworkDir: externalFrameworkDir)
+                relinkVendoredInterpreter(newFrameworkDir: externalFrameworkDir)
             }
             try pinnedVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
             appendLog("--- runtime ready ---\n")
@@ -472,11 +487,14 @@ final class ServerManager: ObservableObject {
                 )
             }
             try await runProcess(python, ["-m", "venv", venvDir])
-            try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "--upgrade", "pip"])
+            // -m pip, not the pip console-script directly -- same
+            // shebang-can't-survive-relocation-or-spaces reasoning as
+            // launchServerProcess above.
+            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
-        try await runProcess(venvDir + "/bin/pip", ["install", "--quiet", "mlx-lm==\(pinnedVersion)"])
-        try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_server_kv.py"])
-        try await runProcess(venvDir + "/bin/python", [runtimeDir + "/patch_mlx_tool_parser.py"])
+        try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "mlx-lm==\(pinnedVersion)"])
+        try await runProcess(venvPython, [runtimeDir + "/patch_mlx_server_kv.py"])
+        try await runProcess(venvPython, [runtimeDir + "/patch_mlx_tool_parser.py"])
         try pinnedVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
         appendLog("--- runtime ready ---\n")
     }
@@ -487,13 +505,26 @@ final class ServerManager: ObservableObject {
     /// the source .app happens to still be sitting where it was, then
     /// starts failing with a bare "no such file or directory" -- a broken
     /// symlink, not a Python-level error -- the moment it's gone.
-    private func relinkVendoredInterpreter(oldFrameworkDir: String, newFrameworkDir: String) {
+    ///
+    /// Matches by the stable "Python.framework/..." *suffix* of each
+    /// symlink's target, not by prefix against this run's own
+    /// bundledFrameworkDir -- confirmed live on a real release build: the
+    /// venv's symlink was created by `python -m venv` on whatever machine
+    /// originally ran build_full_app.sh (a GitHub Actions runner, for an
+    /// actual release), which has nothing in common with wherever this
+    /// copy of the app ends up installed. Prefix-matching against the
+    /// *current* Bundle.main path silently matched nothing there, leaving
+    /// the dead runner path in place. A broken absolute symlink pointing
+    /// somewhere inside *any* Python.framework is unambiguous regardless
+    /// of what machine's path precedes that suffix.
+    private func relinkVendoredInterpreter(newFrameworkDir: String) {
         if let binEntries = try? FileManager.default.contentsOfDirectory(atPath: venvDir + "/bin") {
             for entry in binEntries {
                 let path = venvDir + "/bin/" + entry
                 guard let target = try? FileManager.default.destinationOfSymbolicLink(atPath: path),
-                      target.hasPrefix(oldFrameworkDir) else { continue }
-                let newTarget = newFrameworkDir + target.dropFirst(oldFrameworkDir.count)
+                      !FileManager.default.fileExists(atPath: target),
+                      let range = target.range(of: "Python.framework/") else { continue }
+                let newTarget = newFrameworkDir + "/" + target[range.upperBound...]
                 try? FileManager.default.removeItem(atPath: path)
                 try? FileManager.default.createSymbolicLink(atPath: path, withDestinationPath: newTarget)
             }
@@ -501,10 +532,15 @@ final class ServerManager: ObservableObject {
         // pyvenv.cfg's home/executable/command fields aren't what actually
         // gets executed (bin/python3.X above is), but leaving them pointing
         // at a now-deleted path would confuse any tooling that does read it.
+        // Same suffix-based approach: a regex matching "<anything non-space>
+        // ending in Python.framework/" rather than a known literal prefix.
         let cfgPath = venvDir + "/pyvenv.cfg"
-        if let cfg = try? String(contentsOfFile: cfgPath, encoding: .utf8) {
-            try? cfg.replacingOccurrences(of: oldFrameworkDir, with: newFrameworkDir)
-                .write(toFile: cfgPath, atomically: true, encoding: .utf8)
+        if let cfg = try? String(contentsOfFile: cfgPath, encoding: .utf8),
+           let regex = try? NSRegularExpression(pattern: #"\S*Python\.framework/"#) {
+            let fullRange = NSRange(cfg.startIndex..., in: cfg)
+            let replacement = NSRegularExpression.escapedTemplate(for: newFrameworkDir + "/")
+            let fixed = regex.stringByReplacingMatches(in: cfg, range: fullRange, withTemplate: replacement)
+            try? fixed.write(toFile: cfgPath, atomically: true, encoding: .utf8)
         }
     }
 
