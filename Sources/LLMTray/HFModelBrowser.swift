@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 extension Notification.Name {
     static let showHFBrowser = Notification.Name("LLMTray.showHFBrowser")
@@ -10,11 +11,77 @@ struct HFModelSummary: Identifiable, Decodable, Hashable {
     let modelId: String
     let downloads: Int?
     let likes: Int?
+    let lastModified: String?
 
     enum CodingKeys: String, CodingKey {
         case modelId = "id"
         case downloads
         case likes
+        case lastModified
+    }
+}
+
+enum HFSortOption: String, CaseIterable, Identifiable {
+    case downloads
+    case likes
+    case lastModified
+
+    var id: String { rawValue }
+    /// Value HF's own `sort` query parameter expects -- happens to match
+    /// this enum's cases 1:1 today, kept as an explicit mapping (not just
+    /// rawValue) so a future rename of the case doesn't silently start
+    /// sending an invalid sort value.
+    var apiValue: String {
+        switch self {
+        case .downloads: return "downloads"
+        case .likes: return "likes"
+        case .lastModified: return "lastModified"
+        }
+    }
+    var label: String {
+        switch self {
+        case .downloads: return "Downloads"
+        case .likes: return "Likes"
+        case .lastModified: return "Recently updated"
+        }
+    }
+}
+
+/// A rough, honest heuristic -- not a promise. Compares a repo's on-disk
+/// size against total (not currently-free) physical memory, since "will
+/// this machine ever run this comfortably" is the more useful question
+/// while browsing than "is there room for it this exact second," and free
+/// memory fluctuates with whatever else happens to be running. Doesn't
+/// account for KV-cache/activation overhead on top of the weights
+/// themselves, which is real but depends on context length and isn't
+/// knowable in advance -- the thresholds leave headroom for it, but a
+/// model right at the "fits" boundary can still fail on a long context.
+enum ModelFitLevel {
+    case fits
+    case tight
+    case unlikely
+
+    var color: Color {
+        switch self {
+        case .fits: return .green
+        case .tight: return .orange
+        case .unlikely: return .red
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .fits: return "Fits comfortably"
+        case .tight: return "Tight -- may not leave room for context"
+        case .unlikely: return "Larger than this Mac's RAM -- unlikely to load"
+        }
+    }
+
+    static func estimate(sizeBytes: Int64, physicalMemoryBytes: UInt64) -> ModelFitLevel {
+        let ratio = Double(sizeBytes) / Double(physicalMemoryBytes)
+        if ratio < 0.45 { return .fits }
+        if ratio < 0.70 { return .tight }
+        return .unlikely
     }
 }
 
@@ -52,6 +119,16 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     @Published var results: [HFModelSummary] = []
     @Published var isSearching = false
     @Published var searchError: String?
+    @Published var sortOption: HFSortOption = .downloads
+    // Keyed by model id rather than stored on HFModelSummary itself --
+    // sizes arrive one at a time as each repo's detail fetch completes
+    // (see fetchSizes below), and HFModelSummary is a value type sitting
+    // in the `results` array, so updating one field of one element in
+    // place would mean finding-and-replacing by index on every single
+    // completion instead of a plain dictionary write.
+    @Published var sizesByID: [String: Int64] = [:]
+
+    let physicalMemoryBytes = ProcessInfo.processInfo.physicalMemory
 
     @Published var downloadingID: String?
     @Published var isPaused = false
@@ -132,6 +209,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         guard !q.isEmpty else { return }
         isSearching = true
         searchError = nil
+        sizesByID.removeAll()
         Task {
             do {
                 var comps = URLComponents(string: "https://huggingface.co/api/models")!
@@ -141,16 +219,42 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     // this server can only load mlx-format weights, so a
                     // plain PyTorch/GGUF hit would just fail to start.
                     URLQueryItem(name: "filter", value: "mlx"),
-                    URLQueryItem(name: "sort", value: "downloads"),
+                    URLQueryItem(name: "sort", value: sortOption.apiValue),
                     URLQueryItem(name: "direction", value: "-1"),
                     URLQueryItem(name: "limit", value: "30"),
                 ]
                 let (data, _) = try await URLSession.shared.data(from: comps.url!)
-                results = try JSONDecoder().decode([HFModelSummary].self, from: data)
+                let fetched = try JSONDecoder().decode([HFModelSummary].self, from: data)
+                results = fetched
+                fetchSizes(for: fetched)
             } catch {
                 searchError = error.localizedDescription
             }
             isSearching = false
+        }
+    }
+
+    private struct HFModelDetail: Decodable {
+        let usedStorage: Int64?
+    }
+
+    /// Fetches each shown result's exact on-disk size from HF's per-model
+    /// detail endpoint -- not available in bulk on the search/list endpoint
+    /// itself (its `expand[]` allowlist doesn't include usedStorage,
+    /// confirmed live: the API rejects it as an invalid option). Races
+    /// every result's fetch concurrently and lets each one update
+    /// sizesByID independently as it lands, rather than waiting for all
+    /// ~30 to finish before showing any -- this is a one-time burst per
+    /// search, not sustained load, so no throttling.
+    private func fetchSizes(for models: [HFModelSummary]) {
+        for model in models {
+            Task {
+                guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)") else { return }
+                guard let (data, _) = try? await URLSession.shared.data(from: url),
+                      let detail = try? JSONDecoder().decode(HFModelDetail.self, from: data),
+                      let size = detail.usedStorage else { return }
+                sizesByID[model.id] = size
+            }
         }
     }
 

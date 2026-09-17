@@ -14,7 +14,23 @@ struct HFBrowserView: View {
                 }
                 .disabled(browser.query.trimmingCharacters(in: .whitespaces).isEmpty || browser.isSearching)
             }
-            .padding(12)
+            .padding([.horizontal, .top], 12)
+
+            HStack(spacing: 6) {
+                Text("Sort by").font(.system(size: 11)).foregroundColor(.secondary)
+                Picker("", selection: $browser.sortOption) {
+                    ForEach(HFSortOption.allCases) { option in
+                        Text(option.label).tag(option)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                .onChange(of: browser.sortOption) { _ in browser.search() }
+                Spacer()
+                fitLegend
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 8)
 
             if let err = browser.searchError {
                 Text(err)
@@ -38,13 +54,26 @@ struct HFBrowserView: View {
                     .help("View model card")
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(model.id)
-                            .font(.system(size: 12, weight: .medium))
-                        if let downloads = model.downloads {
-                            Text("\(downloads) downloads")
-                                .font(.system(size: 10))
-                                .foregroundColor(.secondary)
+                        HStack(spacing: 4) {
+                            if let size = browser.sizesByID[model.id] {
+                                fitDot(for: size)
+                            }
+                            Text(model.id)
+                                .font(.system(size: 12, weight: .medium))
                         }
+                        HStack(spacing: 4) {
+                            if let downloads = model.downloads {
+                                Text("\(downloads) downloads")
+                            }
+                            if let size = browser.sizesByID[model.id] {
+                                Text("·")
+                                Text(Self.byteFormatter.string(fromByteCount: size))
+                            } else {
+                                Text("· size…")
+                            }
+                        }
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
                     }
                     Spacer()
                     downloadControl(for: model)
@@ -66,6 +95,27 @@ struct HFBrowserView: View {
         )) {
             ModelCardView(browser: browser)
         }
+    }
+
+    private func fitDot(for sizeBytes: Int64) -> some View {
+        let level = ModelFitLevel.estimate(sizeBytes: sizeBytes, physicalMemoryBytes: browser.physicalMemoryBytes)
+        return Circle()
+            .fill(level.color)
+            .frame(width: 7, height: 7)
+            .help(level.label)
+    }
+
+    private var fitLegend: some View {
+        HStack(spacing: 8) {
+            ForEach([ModelFitLevel.fits, .tight, .unlikely], id: \.label) { level in
+                HStack(spacing: 3) {
+                    Circle().fill(level.color).frame(width: 6, height: 6)
+                    Text(level.label.components(separatedBy: " -- ").first ?? level.label)
+                }
+            }
+        }
+        .font(.system(size: 9))
+        .foregroundColor(.secondary)
     }
 
     @ViewBuilder
