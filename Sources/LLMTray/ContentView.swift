@@ -26,6 +26,7 @@ struct ContentView: View {
     @AppStorage("llmtray.port") private var port: Int = 8765
     @AppStorage("llmtray.kvBits") private var kvBits: Int = 4
     @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = 64
+    @AppStorage("llmtray.quantizedKVStart") private var quantizedKVStart: Int = 0
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
     // selectedModelID) below, which loads/saves it on every switch).
@@ -48,6 +49,7 @@ struct ContentView: View {
     @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
     @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
     @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
+    @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
     // directly) -- not persisted separately in UserDefaults, just read
@@ -349,6 +351,17 @@ struct ContentView: View {
                 Stepper("Port: \(port)", value: $port, in: 1024...65535)
                 Stepper("KV bits: \(kvBits == 0 ? "off" : String(kvBits))", value: $kvBits, in: 0...8)
                 Stepper("KV group size: \(kvGroupSize)", value: $kvGroupSize, in: 16...128, step: 16)
+                if kvBits > 0 {
+                    Stepper(
+                        quantizedKVStart == 0
+                            ? "Start quantizing KV cache: from the first token"
+                            : "Start quantizing KV cache: after \(quantizedKVStart) tokens",
+                        value: $quantizedKVStart, in: 0...20000, step: 500
+                    )
+                    Text("Keeps the first N tokens of context at full precision before switching to quantized KV -- higher values trade some of the memory savings for accuracy on long prompts.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
                         Text("Model alias:")
@@ -420,6 +433,19 @@ struct ContentView: View {
 
             Divider().padding(.vertical, 4)
 
+            Text("Concurrency").foregroundColor(.secondary)
+            Stepper(
+                decodeConcurrency <= 1
+                    ? "Max concurrent predictions: 1 (requests queue)"
+                    : "Max concurrent predictions: \(decodeConcurrency)",
+                value: $decodeConcurrency, in: 1...16
+            )
+            Text("How many separate requests mlx_lm.server batches into one GPU step. Only helps when multiple clients/chats hit the server at the same time -- a single conversation isn't sped up by this. Higher values use more memory per loaded model.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+
+            Divider().padding(.vertical, 4)
+
             Text("Network").foregroundColor(.secondary)
             Toggle("Allow connections from local network", isOn: $allowLAN)
             Text(
@@ -436,7 +462,7 @@ struct ContentView: View {
             Toggle("Verbose server logging (DEBUG)", isOn: $verboseServerLogging)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
-                TextField("e.g. --decode-concurrency 2", text: $extraServerArgs)
+                TextField("e.g. --draft-model /path/to/model", text: $extraServerArgs)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11, design: .monospaced))
             }

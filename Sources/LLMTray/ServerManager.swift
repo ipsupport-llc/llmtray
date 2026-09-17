@@ -250,7 +250,12 @@ final class ServerManager: ObservableObject {
             "--prompt-cache-bytes", String(promptCacheMB * 1_048_576),
         ]
         if currentKVBits > 0 {
-            args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", "0"]
+            let quantizedKVStart = UserDefaults.standard.object(forKey: "llmtray.quantizedKVStart") as? Int ?? 0
+            args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", String(quantizedKVStart)]
+        }
+        let decodeConcurrency = UserDefaults.standard.object(forKey: "llmtray.decodeConcurrency") as? Int ?? 1
+        if decodeConcurrency > 1 {
+            args += ["--decode-concurrency", String(decodeConcurrency)]
         }
         if !alias.isEmpty {
             args += ["--model-alias", alias]
@@ -264,8 +269,8 @@ final class ServerManager: ObservableObject {
             args += ["--log-level", "DEBUG"]
         }
         // Advanced escape hatch for any mlx_lm.server flag this UI doesn't
-        // expose (--decode-concurrency, --draft-model, etc.) rather than
-        // building a dedicated control for every one of them.
+        // expose (--draft-model, etc.) rather than building a dedicated
+        // control for every one of them.
         let extraArgsRaw = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
         args += extraArgsRaw.split(separator: " ").map(String.init)
         task.arguments = args
