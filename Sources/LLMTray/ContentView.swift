@@ -70,7 +70,20 @@ struct ContentView: View {
             statusHeader
             Divider()
             if showSettings {
-                settingsPanel
+                // Plain (unwrapped) settingsPanel relied on the popover's
+                // own preferredContentSize sizing to grow to fit -- fine
+                // when Settings was short, but confirmed live once enough
+                // toggles piled up in General: NSPopover has nowhere to
+                // grow past screen bounds, so the excess just got clipped
+                // with no way to scroll to it (couldn't reach the top of
+                // the panel, or the chat below it, at all). Capping the
+                // height and scrolling internally here -- same pattern
+                // chatArea already uses -- keeps the whole popover on
+                // screen regardless of how many settings end up in either tab.
+                ScrollView {
+                    settingsPanel
+                }
+                .frame(maxHeight: 380)
                 Divider()
             }
             chatArea
