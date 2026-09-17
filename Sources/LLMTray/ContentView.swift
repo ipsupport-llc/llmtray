@@ -316,10 +316,15 @@ struct ContentView: View {
             Toggle("Show reasoning / thinking", isOn: $showReasoning)
             Stepper(
                 autoStopIdleMinutes == 0
-                    ? "Auto-stop server when idle: off"
-                    : "Auto-stop server after \(autoStopIdleMinutes) min idle",
+                    ? "Unload model when idle: off"
+                    : "Unload model after \(autoStopIdleMinutes) min idle",
                 value: $autoStopIdleMinutes, in: 0...180, step: 5
             )
+            if autoStopIdleMinutes > 0 {
+                Text("Frees the memory a loaded model holds; reloads automatically on the next request (with the usual startup delay).")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
 
             Divider().padding(.vertical, 4)
 

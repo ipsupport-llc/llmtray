@@ -175,17 +175,28 @@ final class ModelProxyServer {
         // completion -- balances this with exactly one endRequest() call.
         server.beginRequest()
         Task {
-            if let modelName = Self.extractModelField(from: bodyData),
-               let targetPath = ModelRouter.resolve(modelName: modelName),
-               targetPath != self.currentModelPath {
-                do {
-                    try await self.server.switchModel(modelPath: targetPath, alias: modelName)
+            let modelName = Self.extractModelField(from: bodyData)
+            let targetPath = modelName.flatMap(ModelRouter.resolve(modelName:))
+            do {
+                if let targetPath, targetPath != self.currentModelPath {
+                    // switchModel() already handles "nothing was actually
+                    // running" gracefully (terminateAndWaitForExit() no-ops
+                    // if there's no live process) -- covers both a genuine
+                    // model switch and a switch requested while idle-unloaded.
+                    try await self.server.switchModel(modelPath: targetPath, alias: modelName ?? "")
                     self.currentModelPath = targetPath
-                } catch {
-                    self.server.endRequest()
-                    self.sendError(connection: connection, message: "model switch failed: \(error.localizedDescription)")
-                    return
+                } else {
+                    // Same model (or none specified) as last time -- if the
+                    // server is idle-unloaded (see ServerManager.idleUnload),
+                    // this transparently reloads it instead of the caller
+                    // just getting connection-refused. A no-op if it's
+                    // already running.
+                    try await self.server.ensureModelLoaded()
                 }
+            } catch {
+                self.server.endRequest()
+                self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
+                return
             }
             self.forward(method: method, path: path, headers: headers, body: bodyData, connection: connection, internalPort: internalPort)
         }

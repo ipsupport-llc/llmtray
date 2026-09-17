@@ -160,6 +160,40 @@ final class ServerManager: ObservableObject {
         }
     }
 
+    /// Called by ModelProxyServer at the top of every request: if the
+    /// model was idle-unloaded (see checkIdleStop/idleUnload below), the
+    /// proxy's public port stayed up but nothing is actually running --
+    /// this transparently reloads the last-used model before the request
+    /// gets forwarded, instead of the caller just getting connection-refused.
+    /// A no-op once something's already running. If another concurrent
+    /// request already triggered the same reload, this waits on the
+    /// existing one via the @Published state stream rather than racing a
+    /// second launchServerProcess call.
+    func ensureModelLoaded() async throws {
+        if case .running = state { return }
+        if case .stopped = state {
+            guard let modelPath = currentModelPath else { return }
+            state = .starting
+            try await ensureRuntimeReady()
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                startContinuation = continuation
+                launchServerProcess(modelPath: modelPath, alias: currentAlias)
+            }
+            return
+        }
+        for await newState in $state.values {
+            switch newState {
+            case .running: return
+            case .failed(let message):
+                throw NSError(domain: "ServerManager", code: 3, userInfo: [NSLocalizedDescriptionKey: message])
+            case .stopped:
+                throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "stopped while reloading"])
+            case .starting:
+                continue
+            }
+        }
+    }
+
     /// Restarts the *same* model -- deliberately not routed through
     /// switchModel(), which no-ops when modelPath is unchanged. Triggered
     /// by endRequestStalled() below after too many consecutive stalls: a
@@ -677,16 +711,39 @@ final class ServerManager: ObservableObject {
         idleStopTimer = timer
     }
 
-    /// Advanced setting, minutes of no requests before the server is
-    /// stopped on its own -- 0 (the default) disables it. Exists so
+    /// Advanced setting, minutes of no requests before the model is
+    /// unloaded on its own -- 0 (the default) disables it. Exists so
     /// leaving a big model loaded and forgotten doesn't just sit there
     /// holding memory/battery indefinitely.
     private func checkIdleStop() {
         guard case .running = state, activeRequestCount == 0 else { return }
         let minutes = UserDefaults.standard.object(forKey: "llmtray.autoStopIdleMinutes") as? Int ?? 0
         guard minutes > 0, Date().timeIntervalSince(lastActivityAt) >= TimeInterval(minutes * 60) else { return }
-        appendLog("--- stopping server after \(minutes) min idle ---\n")
-        stop()
+        appendLog("--- unloading model after \(minutes) min idle (reloads automatically on the next request) ---\n")
+        idleUnload()
+    }
+
+    /// Kills the model process but, unlike stop(), leaves the proxy's
+    /// public-port listener running -- mlx_lm.server has no "unload the
+    /// model but stay alive" mode of its own, so actually freeing its
+    /// memory means killing the process, but a caller hitting the public
+    /// port a minute later should see it transparently reload (via
+    /// ensureModelLoaded(), from ModelProxyServer.route()) rather than a
+    /// bare connection-refused because the whole proxy went down too.
+    /// currentModelPath/currentAlias are deliberately left set -- that's
+    /// exactly what ensureModelLoaded() reloads.
+    private func idleUnload() {
+        guard let process, process.isRunning else {
+            state = .stopped
+            return
+        }
+        let processToKill = process
+        processToKill.terminate()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            guard let self, self.process === processToKill, processToKill.isRunning else { return }
+            kill(processToKill.processIdentifier, SIGKILL)
+        }
+        state = .stopped
     }
 
     /// Paired with beginRequest() above, for a request that actually
