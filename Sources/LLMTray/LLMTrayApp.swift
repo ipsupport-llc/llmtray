@@ -89,8 +89,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Server" the first thing every session requires -- reuses the
         // same quickStart() the right-click menu's "Start Server" item
         // already calls, so this is exactly the last model/settings the
-        // user had, not a fresh default.
-        quickStart()
+        // user had, not a fresh default. Opt-out, not opt-in (defaults to
+        // true if never set) -- this has always been the behavior, so
+        // making the key's *absence* mean "off" would silently change it
+        // for every existing install the first time this shipped.
+        if UserDefaults.standard.object(forKey: "llmtray.autoStartOnLaunch") as? Bool ?? true {
+            quickStart()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {

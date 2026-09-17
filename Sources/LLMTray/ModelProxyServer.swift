@@ -30,7 +30,23 @@ final class ModelProxyServer {
         guard let port = NWEndpoint.Port(rawValue: UInt16(publicPort)) else {
             throw NSError(domain: "ModelProxyServer", code: 1, userInfo: [NSLocalizedDescriptionKey: "invalid port \(publicPort)"])
         }
-        let listener = try NWListener(using: .tcp, on: port)
+        // NWListener binds every interface (confirmed live: `lsof` showed
+        // "*:8765", reachable from any device on the same network) unless
+        // explicitly constrained -- default here is loopback-only, opt-in
+        // via the Advanced "Allow connections from local network" toggle,
+        // not opt-out. Confirmed live which constructor actually does this:
+        // requiredLocalEndpoint conflicts with also passing `on: port` (NWListener
+        // throws POSIXErrorCode 22, "Invalid argument") since the endpoint
+        // already carries its own port -- the port must come from
+        // requiredLocalEndpoint alone here, not from a separate parameter.
+        let listener: NWListener
+        if UserDefaults.standard.bool(forKey: "llmtray.allowLAN") {
+            listener = try NWListener(using: .tcp, on: port)
+        } else {
+            let parameters = NWParameters.tcp
+            parameters.requiredLocalEndpoint = NWEndpoint.hostPort(host: "127.0.0.1", port: port)
+            listener = try NWListener(using: parameters)
+        }
         listener.newConnectionHandler = { [weak self] connection in
             // NWListener's callback isn't statically MainActor-isolated even
             // though listener.start(queue: .main) guarantees it runs on the
@@ -252,11 +268,16 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     // first, leaving a diagnosable log line and a real error response for
     // the caller instead of the busy indicator staying lit indefinitely
     // and the caller hanging silently until that much longer timeout.
-    private static let stallThreshold: TimeInterval = 60
+    // Configurable (Advanced settings) since "comfortably inside 300s" is
+    // a judgment call that depends on how slow this machine's prefill
+    // legitimately gets on a big model/prompt.
+    private let stallThreshold: TimeInterval
 
     init(connection: NWConnection, server: ServerManager) {
         self.connection = connection
         self.server = server
+        let configured = UserDefaults.standard.object(forKey: "llmtray.stallThresholdSeconds") as? Int ?? 60
+        self.stallThreshold = TimeInterval(configured)
         super.init()
         // Polls rather than a single one-shot timer so activity resets the
         // clock without needing to cancel/reschedule anything from
@@ -276,9 +297,9 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
 
     private func checkForStall() {
         MainActor.assumeIsolated {
-            guard !finished, Date().timeIntervalSince(lastActivityAt) > Self.stallThreshold else { return }
+            guard !finished, Date().timeIntervalSince(lastActivityAt) > stallThreshold else { return }
             server?.appendLog(
-                "--- proxy: no response from mlx_lm.server for \(Int(Self.stallThreshold))s -- treating as stalled and resetting ---\n"
+                "--- proxy: no response from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
             )
             _ = finish(stalled: true)
         }

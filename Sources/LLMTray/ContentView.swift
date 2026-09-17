@@ -35,6 +35,19 @@ struct ContentView: View {
     @State private var showSettings: Bool = false
     @State private var settingsTab: SettingsTab = .general
     @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold: Int = 3
+    @AppStorage("llmtray.autoStartOnLaunch") private var autoStartOnLaunch: Bool = true
+    // Reuses Sparkle's own UserDefaults key directly -- SPUUpdater reads
+    // this key itself on every access rather than caching it, so binding a
+    // Toggle straight to it controls Sparkle without needing a reference
+    // to the updater instance (which lives in AppDelegate, not here).
+    @AppStorage("SUEnableAutomaticChecks") private var autoCheckForUpdates: Bool = true
+    @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
+    @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes: Int = 0
+    @AppStorage("llmtray.promptCacheMB") private var promptCacheMB: Int = 1024
+    @AppStorage("llmtray.stallThresholdSeconds") private var stallThresholdSeconds: Int = 60
+    @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
+    @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
+    @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
     // directly) -- not persisted separately in UserDefaults, just read
@@ -298,6 +311,15 @@ struct ContentView: View {
                         .foregroundColor(.red)
                 }
             }
+            Toggle("Start server automatically on launch", isOn: $autoStartOnLaunch)
+            Toggle("Automatically check for updates", isOn: $autoCheckForUpdates)
+            Toggle("Show reasoning / thinking", isOn: $showReasoning)
+            Stepper(
+                autoStopIdleMinutes == 0
+                    ? "Auto-stop server when idle: off"
+                    : "Auto-stop server after \(autoStopIdleMinutes) min idle",
+                value: $autoStopIdleMinutes, in: 0...180, step: 5
+            )
 
             Divider().padding(.vertical, 4)
 
@@ -354,6 +376,7 @@ struct ContentView: View {
     private var advancedSettingsContent: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Server recovery").foregroundColor(.secondary)
+            Stepper("Stall timeout: \(stallThresholdSeconds)s", value: $stallThresholdSeconds, in: 10...300, step: 10)
             Stepper(
                 autoRestartStallThreshold == 0
                     ? "Auto-restart on repeated stalls: off"
@@ -363,12 +386,44 @@ struct ContentView: View {
             Text(
                 "A request can stall if mlx_lm.server's worker thread dies without crashing the whole "
                     + "process (e.g. a METAL out-of-memory error) -- every request after that hangs until "
-                    + "its own 60s timeout, forever, since the process itself looks alive. This restarts the "
-                    + "model process after that many stalls in a row instead of leaving it wedged. 0 disables it."
+                    + "its own timeout above, forever, since the process itself looks alive. Auto-restart "
+                    + "kicks in after that many stalls in a row instead of leaving it wedged. 0 disables it."
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
+
+            Divider().padding(.vertical, 4)
+
+            Text("Memory").foregroundColor(.secondary)
+            Stepper("Prompt cache limit: \(promptCacheMB) MB", value: $promptCacheMB, in: 128...8192, step: 128)
+            Text("Caps mlx_lm.server's cross-conversation KV cache -- without a limit it grows forever and can crash the process on a long session.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+
+            Divider().padding(.vertical, 4)
+
+            Text("Network").foregroundColor(.secondary)
+            Toggle("Allow connections from local network", isOn: $allowLAN)
+            Text(
+                allowLAN
+                    ? "The server is reachable from other devices on your network, not just this Mac."
+                    : "Loopback only (127.0.0.1) -- nothing outside this Mac can reach the server."
+            )
+            .font(.system(size: 10))
+            .foregroundColor(allowLAN ? .orange : .secondary)
+
+            Divider().padding(.vertical, 4)
+
+            Text("Diagnostics").foregroundColor(.secondary)
+            Toggle("Verbose server logging (DEBUG)", isOn: $verboseServerLogging)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
+                TextField("e.g. --decode-concurrency 2", text: $extraServerArgs)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 11, design: .monospaced))
+            }
         }
+        .disabled(isBusy || isRunning)
     }
 
     private var modelsRootSection: some View {
@@ -538,7 +593,7 @@ struct ContentView: View {
                 .font(.system(size: 10, weight: .semibold))
                 .foregroundColor(.secondary)
 
-            if !msg.reasoning.isEmpty {
+            if showReasoning && !msg.reasoning.isEmpty {
                 VStack(alignment: .leading, spacing: 3) {
                     Label(
                         msg.content.isEmpty ? "Thinking…" : "Thought process",

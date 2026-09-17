@@ -31,6 +31,14 @@ final class ServerManager: ObservableObject {
     private var stdoutHandle: FileHandle?
     private lazy var proxy = ModelProxyServer(server: self)
 
+    // Last time a request actually started -- checked by the idle-stop
+    // timer below (Advanced setting, 0 disables it). Only needs updating
+    // in beginRequest(): checkIdleStop already skips while
+    // activeRequestCount > 0, so a long-running request can never be
+    // judged idle regardless of how stale this timestamp gets meanwhile.
+    private var lastActivityAt = Date()
+    private var idleStopTimer: Timer?
+
     // Remembered from the initial start() call so switchModel() (driven by
     // the proxy, not the UI) knows what port/KV settings to keep reusing
     // when a client's `model` field asks for something else.
@@ -176,6 +184,8 @@ final class ServerManager: ObservableObject {
     }
 
     private func launchServerProcess(modelPath: String, alias: String) {
+        lastActivityAt = Date()
+        if idleStopTimer == nil { startIdleStopTimer() }
         let task = Process()
         // Not venvServerBinary (the "mlx_lm.server" console-script pip
         // generates) directly -- that script's first line is a shebang
@@ -188,21 +198,22 @@ final class ServerManager: ObservableObject {
         // one. Invoking the interpreter directly with -m sidesteps shebang
         // parsing entirely; Process doesn't go through a shell either way.
         task.executableURL = URL(fileURLWithPath: venvPython)
+        // Without a cap, mlx_lm.server's cross-request prompt cache
+        // (letting a conversation continue without re-prefilling the whole
+        // history each turn) just keeps every conversation's KV state
+        // around forever -- confirmed live: a long session's cache grew
+        // from 0.27 GB to 1.25 GB before a subsequent request's own KV
+        // allocation pushed the process into a METAL "Insufficient Memory"
+        // crash. 1 GiB is a conservative default (Advanced setting) --
+        // this evicts old cached conversations before they can pile up
+        // into exactly that kind of failure, at the cost of occasionally
+        // re-prefilling a conversation that's been idle a while (cheap
+        // compared to a crash).
+        let promptCacheMB = UserDefaults.standard.object(forKey: "llmtray.promptCacheMB") as? Int ?? 1024
         var args = [
             "-m", "mlx_lm.server",
             "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
-            // Without a cap, mlx_lm.server's cross-request prompt cache
-            // (letting a conversation continue without re-prefilling the
-            // whole history each turn) just keeps every conversation's KV
-            // state around forever -- confirmed live: a long session's
-            // cache grew from 0.27 GB to 1.25 GB before a subsequent
-            // request's own KV allocation pushed the process into a METAL
-            // "Insufficient Memory" crash. 1 GiB is conservative on purpose
-            // -- this evicts old cached conversations before they can pile
-            // up into exactly that kind of failure, at the cost of
-            // occasionally re-prefilling a conversation that's been idle
-            // a while (cheap compared to a crash).
-            "--prompt-cache-bytes", String(1 << 30),
+            "--prompt-cache-bytes", String(promptCacheMB * 1_048_576),
         ]
         if currentKVBits > 0 {
             args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", "0"]
@@ -210,6 +221,19 @@ final class ServerManager: ObservableObject {
         if !alias.isEmpty {
             args += ["--model-alias", alias]
         }
+        // Advanced setting: reintroduces the per-token DEBUG logging this
+        // app itself stopped needing once isBusy moved to the proxy's own
+        // request tracking (see ModelProxyServer) -- still useful as a
+        // manual diagnostic toggle when troubleshooting the model process
+        // itself, just no longer required for the app to function.
+        if UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging") {
+            args += ["--log-level", "DEBUG"]
+        }
+        // Advanced escape hatch for any mlx_lm.server flag this UI doesn't
+        // expose (--decode-concurrency, --draft-model, etc.) rather than
+        // building a dedicated control for every one of them.
+        let extraArgsRaw = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
+        args += extraArgsRaw.split(separator: " ").map(String.init)
         task.arguments = args
         task.standardInput = FileHandle.nullDevice
 
@@ -635,6 +659,34 @@ final class ServerManager: ObservableObject {
     func beginRequest() {
         activeRequestCount += 1
         isBusy = true
+        lastActivityAt = Date()
+    }
+
+    /// Started once, lazily, on the first launchServerProcess call --
+    /// left running for the app's lifetime rather than torn down between
+    /// starts/stops, since checkIdleStop's own guards (state == .running,
+    /// activeRequestCount == 0) already make it a no-op whenever it
+    /// doesn't apply.
+    private func startIdleStopTimer() {
+        let timer = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.checkIdleStop()
+            }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        idleStopTimer = timer
+    }
+
+    /// Advanced setting, minutes of no requests before the server is
+    /// stopped on its own -- 0 (the default) disables it. Exists so
+    /// leaving a big model loaded and forgotten doesn't just sit there
+    /// holding memory/battery indefinitely.
+    private func checkIdleStop() {
+        guard case .running = state, activeRequestCount == 0 else { return }
+        let minutes = UserDefaults.standard.object(forKey: "llmtray.autoStopIdleMinutes") as? Int ?? 0
+        guard minutes > 0, Date().timeIntervalSince(lastActivityAt) >= TimeInterval(minutes * 60) else { return }
+        appendLog("--- stopping server after \(minutes) min idle ---\n")
+        stop()
     }
 
     /// Paired with beginRequest() above, for a request that actually
