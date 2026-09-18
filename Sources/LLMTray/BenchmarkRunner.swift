@@ -44,6 +44,21 @@ struct AutoTuneCandidateResult: Identifiable {
     var isWinner: Bool = false
 }
 
+/// What auto-tune found vs what's currently applied -- surfaced to the user
+/// for an explicit apply/discard decision rather than silently overwriting
+/// their settings. The server is already back on `current*` by the time
+/// this is published (see autoTune's restore-before-propose step).
+struct AutoTuneProposal: Equatable {
+    var currentConcurrency: Int
+    var proposedConcurrency: Int
+    var currentPrefillStep: Int
+    var proposedPrefillStep: Int
+
+    var hasChanges: Bool {
+        currentConcurrency != proposedConcurrency || currentPrefillStep != proposedPrefillStep
+    }
+}
+
 enum BenchmarkPreset: Int, CaseIterable, Identifiable {
     case short = 128
     case medium = 512
@@ -59,6 +74,7 @@ final class BenchmarkRunner: ObservableObject {
     @Published var results: [BenchmarkResult] = []
     @Published var autoTuneLog: [AutoTuneCandidateResult] = []
     @Published var errorText: String?
+    @Published var pendingProposal: AutoTuneProposal?
 
     private var cancelRequested = false
     private let session = URLSession(configuration: .default)
@@ -163,6 +179,19 @@ final class BenchmarkRunner: ObservableObject {
         errorText = nil
         defer { isRunning = false; statusText = "" }
 
+        // A fresh (prompt-size, kv-bits, ...) combination pays a one-time
+        // Metal kernel compile cost on its first call -- confirmed live
+        // against the real 30B model at up to 5x the warm decode time.
+        // Thrown away rather than shown, so it can't be mistaken for a
+        // real (much worse) measurement.
+        statusText = "Warming up…"
+        do {
+            _ = try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens)
+        } catch {
+            errorText = error.localizedDescription
+            return
+        }
+
         var samples: [BenchmarkSample] = []
         for i in 0..<trials {
             if cancelRequested { break }
@@ -186,8 +215,10 @@ final class BenchmarkRunner: ObservableObject {
     /// long prompt) independently rather than as a full cross product --
     /// the two barely interact, and a 4x4 grid would roughly double the
     /// number of restarts (each a full model reload) for little extra
-    /// signal. Ends by restarting once more onto the winning combination,
-    /// since the last candidate tried in phase 2 isn't necessarily it.
+    /// signal. Restores the pre-sweep settings before returning and
+    /// publishes the result as `pendingProposal` -- the winning combination
+    /// is only ever written and applied via applyAutoTuneProposal(), never
+    /// automatically.
     func autoTune(
         server: ServerManager,
         port: Int,
@@ -273,15 +304,57 @@ final class BenchmarkRunner: ObservableObject {
                 bestPrefillStep = value
             }
         }
-        defaults.set(bestPrefillStep, forKey: "llmtray.prefillStepSize")
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "prefill-step-size" && $0.value == bestPrefillStep }) {
             autoTuneLog[idx].isWinner = true
         }
 
-        // Lock in the winning combination -- phase 2 may have left the
-        // server running on a non-winning prefill-step-size candidate, and
-        // UserDefaults changes alone don't affect an already-running process.
-        statusText = "Applying winning settings…"
-        _ = await restart()
+        // Restore the settings that were live before this sweep started --
+        // every candidate above ran with a real config change + restart, so
+        // without this the server would be left mid-sweep on the *last*
+        // prefill-step-size candidate tried, not necessarily the winner and
+        // not necessarily what the user had running before. The winning
+        // combination is only ever applied if the user confirms it via
+        // applyAutoTuneProposal(), never automatically.
+        defaults.set(originalConcurrency, forKey: "llmtray.decodeConcurrency")
+        defaults.set(originalPrefillStep, forKey: "llmtray.prefillStepSize")
+        if !cancelRequested {
+            statusText = "Restoring original settings…"
+            _ = await restart()
+            pendingProposal = AutoTuneProposal(
+                currentConcurrency: originalConcurrency,
+                proposedConcurrency: bestConcurrency,
+                currentPrefillStep: originalPrefillStep,
+                proposedPrefillStep: bestPrefillStep
+            )
+        } else {
+            statusText = "Cancelled -- restoring original settings…"
+            _ = await restart()
+        }
+    }
+
+    /// Applies a proposal the user confirmed: writes the winning values and
+    /// restarts once to pick them up. No-op if the proposal was already
+    /// cleared (e.g. a second tap while a restart is in flight).
+    func applyAutoTuneProposal(server: ServerManager) async {
+        guard let proposal = pendingProposal, !isRunning else { return }
+        isRunning = true
+        defer { isRunning = false; statusText = "" }
+        let defaults = UserDefaults.standard
+        defaults.set(proposal.proposedConcurrency, forKey: "llmtray.decodeConcurrency")
+        defaults.set(proposal.proposedPrefillStep, forKey: "llmtray.prefillStepSize")
+        statusText = "Applying new settings…"
+        do {
+            try await server.restartToApplyLaunchSettings()
+        } catch {
+            errorText = "restart failed: \(error.localizedDescription)"
+        }
+        pendingProposal = nil
+    }
+
+    /// Discards a proposal -- the server is already back on its original
+    /// settings (autoTune restores them before publishing the proposal), so
+    /// this only needs to clear the pending state, no further restart.
+    func discardAutoTuneProposal() {
+        pendingProposal = nil
     }
 }

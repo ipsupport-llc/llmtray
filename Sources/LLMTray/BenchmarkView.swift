@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct BenchmarkView: View {
@@ -9,7 +10,6 @@ struct BenchmarkView: View {
     @State private var promptPreset: BenchmarkPreset = .medium
     @State private var maxTokens: Double = 128
     @State private var trials: Int = 3
-    @State private var showAutoTuneWarning = false
 
     private var serverReady: Bool {
         if case .running = server.state { return true }
@@ -24,7 +24,25 @@ struct BenchmarkView: View {
                     .foregroundColor(.secondary)
             }
 
+            quickBenchmarkSection
+            Divider().padding(.vertical, 4)
+            autoTuneSection
+        }
+        .onChange(of: benchmark.pendingProposal) { proposal in
+            guard let proposal else { return }
+            showAutoTuneProposalAlert(proposal)
+        }
+    }
+
+    // MARK: - Quick benchmark
+
+    private var quickBenchmarkSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
             Text("Quick benchmark").foregroundColor(.secondary)
+
+            Text("Prompt size (input sent to the model):")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
             Picker("Prompt size", selection: $promptPreset) {
                 ForEach(BenchmarkPreset.allCases) { preset in
                     Text(preset.label).tag(preset)
@@ -33,8 +51,15 @@ struct BenchmarkView: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            Stepper("Generate: \(Int(maxTokens)) tok", value: $maxTokens, in: 16...512, step: 16)
-            Stepper("Trials: \(trials) (averaged)", value: $trials, in: 1...5)
+            Stepper("Response length: \(Int(maxTokens)) tok", value: $maxTokens, in: 16...512, step: 16)
+            Text("How many tokens it generates per trial.")
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
+
+            Stepper("Trials: \(trials)", value: $trials, in: 1...5)
+            Text("Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers.")
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
 
             HStack {
                 Button(benchmark.isRunning ? "Running…" : "Run benchmark") {
@@ -51,73 +76,158 @@ struct BenchmarkView: View {
                     ProgressView().controlSize(.small)
                     Text(benchmark.statusText).font(.system(size: 10)).foregroundColor(.secondary)
                 }
+                Spacer()
+                if !benchmark.results.isEmpty {
+                    Button("Clear") { benchmark.results.removeAll() }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
             }
 
             if let errorText = benchmark.errorText {
                 Text(errorText).font(.system(size: 10)).foregroundColor(.red)
             }
 
-            if !benchmark.results.isEmpty {
-                VStack(alignment: .leading, spacing: 3) {
+            if benchmark.results.isEmpty {
+                Text("No runs yet.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            } else {
+                VStack(alignment: .leading, spacing: 5) {
                     ForEach(benchmark.results.prefix(5)) { result in
-                        HStack(spacing: 8) {
-                            Text(result.label).frame(width: 110, alignment: .leading)
-                            Text("TTFT \(String(format: "%.2f", result.ttft))s")
-                            Text("prefill \(String(format: "%.0f", result.prefillTokPerSec)) tok/s")
-                            Text("decode \(String(format: "%.1f", result.decodeTokPerSec)) tok/s")
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(result.label)
+                                .font(.system(size: 10, weight: .medium))
+                            Text(
+                                "TTFT \(String(format: "%.2f", result.ttft))s   "
+                                    + "prefill \(String(format: "%.0f", result.prefillTokPerSec)) tok/s   "
+                                    + "decode \(String(format: "%.1f", result.decodeTokPerSec)) tok/s"
+                            )
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
                         }
-                        .font(.system(size: 10, design: .monospaced))
                     }
-                }
-                .padding(.top, 2)
-            }
-
-            Divider().padding(.vertical, 4)
-
-            Text("Auto-tune").foregroundColor(.secondary)
-            Text("Restarts the server several times to try different decode-concurrency and prefill-step-size values, then keeps whichever measured fastest. Takes several minutes for a large model. Close other apps and leave the Mac idle while it runs -- background load skews every measurement.")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-
-            HStack {
-                Button(benchmark.isRunning ? "Running…" : "Auto-tune performance") {
-                    showAutoTuneWarning = true
-                }
-                .disabled(!serverReady || benchmark.isRunning)
-                if benchmark.isRunning && !benchmark.autoTuneLog.isEmpty {
-                    Button("Cancel") { benchmark.cancel() }
-                }
-            }
-            .confirmationDialog(
-                "Before auto-tuning",
-                isPresented: $showAutoTuneWarning,
-                titleVisibility: .visible
-            ) {
-                Button("Start auto-tune") {
-                    Task {
-                        await benchmark.autoTune(server: server, port: port, modelAlias: modelAlias)
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Close other apps and don't use the Mac for anything else until this finishes -- it restarts the server repeatedly and measures raw throughput, so any other load (browser tabs, other GPU/CPU work) will skew the result toward the wrong setting.")
-            }
-
-            if !benchmark.autoTuneLog.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(benchmark.autoTuneLog) { candidate in
-                        HStack(spacing: 6) {
-                            Text(candidate.isWinner ? "★" : " ").frame(width: 12)
-                            Text("\(candidate.parameter)=\(candidate.value)").frame(width: 170, alignment: .leading)
-                            Text(String(format: "%.1f tok/s", candidate.throughput))
-                        }
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(candidate.isWinner ? .primary : .secondary)
-                        .fontWeight(candidate.isWinner ? .semibold : .regular)
+                    if benchmark.results.count > 5 {
+                        Text("(\(benchmark.results.count - 5) older run\(benchmark.results.count - 5 == 1 ? "" : "s") hidden)")
+                            .font(.system(size: 9))
+                            .foregroundColor(.secondary)
                     }
                 }
                 .padding(.top, 2)
             }
         }
+    }
+
+    // MARK: - Auto-tune
+
+    private var autoTuneSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Auto-tune").foregroundColor(.secondary)
+            Text("Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+
+            HStack {
+                Button(benchmark.isRunning ? "Running…" : "Auto-tune performance") {
+                    confirmAndStartAutoTune()
+                }
+                .disabled(!serverReady || benchmark.isRunning)
+                if benchmark.isRunning {
+                    Button("Cancel") { benchmark.cancel() }
+                    ProgressView().controlSize(.small)
+                    Text(benchmark.statusText).font(.system(size: 10)).foregroundColor(.secondary)
+                }
+                Spacer()
+                if !benchmark.autoTuneLog.isEmpty {
+                    Button("Clear") { benchmark.autoTuneLog.removeAll() }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            if benchmark.autoTuneLog.isEmpty {
+                Text("No auto-tune run yet.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            } else {
+                autoTuneResultsTable
+            }
+        }
+    }
+
+    private var autoTuneResultsTable: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(["decode-concurrency", "prefill-step-size"], id: \.self) { parameter in
+                let candidates = benchmark.autoTuneLog.filter { $0.parameter == parameter }
+                if !candidates.isEmpty {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(parameter)
+                            .font(.system(size: 9, weight: .medium))
+                            .foregroundColor(.secondary)
+                        ForEach(candidates) { candidate in
+                            HStack(spacing: 6) {
+                                Text(candidate.isWinner ? "★" : " ").frame(width: 10)
+                                Text("\(candidate.value)").frame(width: 36, alignment: .leading)
+                                Text(String(format: "%.1f tok/s", candidate.throughput))
+                            }
+                            .font(.system(size: 10, design: .monospaced))
+                            .foregroundColor(candidate.isWinner ? .primary : .secondary)
+                            .fontWeight(candidate.isWinner ? .semibold : .regular)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.top, 2)
+    }
+
+    /// A native NSAlert instead of SwiftUI's .confirmationDialog/.alert --
+    /// this view is hosted inside an NSPopover (see LLMTrayApp.swift), and
+    /// SwiftUI's own sheet-style dialogs don't reliably present from
+    /// inside a popover. Matches the pattern uninstallRuntimeData() already
+    /// uses for the same reason.
+    private func confirmAndStartAutoTune() {
+        let alert = NSAlert()
+        alert.messageText = "Before auto-tuning"
+        alert.informativeText = "This restarts the server several times and measures raw throughput -- "
+            + "close other apps and don't use the Mac for anything else until it finishes, or the "
+            + "results (and the setting it picks) will be skewed. Takes several minutes for a large model."
+        alert.addButton(withTitle: "Start Auto-tune")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .informational
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        Task {
+            await benchmark.autoTune(server: server, port: port, modelAlias: modelAlias)
+        }
+    }
+
+    /// Shown once the sweep finishes (server already restored to its
+    /// pre-sweep settings by then) -- applies only on explicit confirmation,
+    /// never automatically.
+    private func showAutoTuneProposalAlert(_ proposal: AutoTuneProposal) {
+        let alert = NSAlert()
+        if proposal.hasChanges {
+            alert.messageText = "Apply auto-tune results?"
+            alert.informativeText = "decode-concurrency: \(proposal.currentConcurrency) → \(proposal.proposedConcurrency)\n"
+                + "prefill-step-size: \(proposal.currentPrefillStep) → \(proposal.proposedPrefillStep)"
+            alert.addButton(withTitle: "Apply")
+            alert.addButton(withTitle: "Keep Current")
+            alert.alertStyle = .informational
+            if alert.runModal() == .alertFirstButtonReturn {
+                Task { await benchmark.applyAutoTuneProposal(server: server) }
+                return
+            }
+        } else {
+            alert.messageText = "Current settings are already fastest"
+            alert.informativeText = "decode-concurrency: \(proposal.currentConcurrency), "
+                + "prefill-step-size: \(proposal.currentPrefillStep) -- auto-tune didn't find anything faster."
+            alert.addButton(withTitle: "OK")
+            alert.alertStyle = .informational
+            alert.runModal()
+        }
+        benchmark.discardAutoTuneProposal()
     }
 }
