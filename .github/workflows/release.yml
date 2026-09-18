@@ -58,6 +58,11 @@ jobs:
           cp docs/appcast.xml /tmp/appcast.xml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # generate_appcast.sh just rewrote docs/appcast.xml in place, so
+          # it's always dirty relative to this tag's own commit (fresh
+          # signature/pubDate every run) -- discard that before switching
+          # branches, or checkout -B refuses to touch the file.
+          git checkout -- docs/appcast.xml
           git fetch origin main
           git checkout -B main origin/main
           cp /tmp/appcast.xml docs/appcast.xml
