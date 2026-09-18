@@ -7,12 +7,12 @@
     <language>en</language>
     <item>
       <title>Version 0.3.11</title>
-      <pubDate>Fri, 18 Sep 2026 23:45:53 +0000</pubDate>
+      <pubDate>Fri, 18 Sep 2026 23:48:02 +0000</pubDate>
       <sparkle:version>0.3.11</sparkle:version>
       <sparkle:shortVersionString>0.3.11</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"
-                 sparkle:edSignature="3w8PFv1ip0Eux5P+UBz4DyYArJLgcEst6T1Bh3IC8lN2RxaIe8zyYt1dzEBOgglXTZQ5ucxFxeWRjsWxOMKeDQ==" length="2209774"
+                 sparkle:edSignature="2WQn9nCgfcfp+AULbg/L2VZIY+ntHN5x4z4YcZlY1Re94DgJXUJwgL+l8aumM+a47LIKkGMRwmHXGFpV17f7Bw==" length="2209807"
                  type="application/octet-stream"/>
     </item>
   </channel>
