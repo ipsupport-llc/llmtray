@@ -5,6 +5,7 @@ import ServiceManagement
 enum SettingsTab {
     case general
     case chat
+    case benchmark
     case advanced
 }
 
@@ -12,6 +13,7 @@ struct ContentView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @StateObject private var runtime = RuntimeManager()
+    @StateObject private var benchmark = BenchmarkRunner()
 
     // Where models live -- ~/.llmtray/models by default (this app's own
     // namespace), not ~/.lmstudio/models. Anyone who wants to share models
@@ -300,6 +302,7 @@ struct ContentView: View {
             Picker("", selection: $settingsTab) {
                 Text("General").tag(SettingsTab.general)
                 Text("Chat").tag(SettingsTab.chat)
+                Text("Benchmark").tag(SettingsTab.benchmark)
                 Text("Advanced").tag(SettingsTab.advanced)
             }
             .pickerStyle(.segmented)
@@ -311,6 +314,8 @@ struct ContentView: View {
                 generalSettingsContent
             case .chat:
                 chatTabContent
+            case .benchmark:
+                BenchmarkView(benchmark: benchmark, port: port, modelAlias: alias.isEmpty ? "default" : alias)
             case .advanced:
                 advancedSettingsContent
             }

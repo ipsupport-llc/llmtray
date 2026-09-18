@@ -203,17 +203,35 @@ final class ServerManager: ObservableObject {
     /// looks alive to Process.terminationHandler, but every request after
     /// that hangs forever, since nothing left is generating anything.
     private func restartWedgedProcess() async {
-        guard let modelPath = currentModelPath, case .running = state else { return }
+        guard case .running = state else { return }
         appendLog("--- restarting the model process after repeated stalls ---\n")
-        await terminateAndWaitForExit()
-        state = .starting
         do {
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                startContinuation = continuation
-                launchServerProcess(modelPath: modelPath, alias: currentAlias)
-            }
+            try await restartSameModel()
         } catch {
             state = .failed("auto-restart failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// Public restart-in-place used by the benchmark tab's auto-tune sweep:
+    /// decode-concurrency and prefill-step-size are only read at process
+    /// launch (see launchServerProcess), so trying a new candidate value
+    /// requires a real restart even though the model itself isn't changing
+    /// -- switchModel() no-ops in that case since its guard is keyed on
+    /// modelPath, not on launch args.
+    func restartToApplyLaunchSettings() async throws {
+        guard case .running = state else {
+            throw NSError(domain: "ServerManager", code: 5, userInfo: [NSLocalizedDescriptionKey: "server isn't running"])
+        }
+        try await restartSameModel()
+    }
+
+    private func restartSameModel() async throws {
+        guard let modelPath = currentModelPath else { return }
+        await terminateAndWaitForExit()
+        state = .starting
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            startContinuation = continuation
+            launchServerProcess(modelPath: modelPath, alias: currentAlias)
         }
     }
 
@@ -244,9 +262,13 @@ final class ServerManager: ObservableObject {
         // re-prefilling a conversation that's been idle a while (cheap
         // compared to a crash).
         let promptCacheMB = UserDefaults.standard.object(forKey: "llmtray.promptCacheMB") as? Int ?? 1024
+        // Read fresh on every launch (not just once) so the benchmark tab's
+        // auto-tune sweep can change this and pick it up via a plain
+        // restartToApplyLaunchSettings() -- no separate code path needed.
+        let prefillStepSize = UserDefaults.standard.object(forKey: "llmtray.prefillStepSize") as? Int ?? 128
         var args = [
             "-m", "mlx_lm.server",
-            "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", "128",
+            "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", String(prefillStepSize),
             "--prompt-cache-bytes", String(promptCacheMB * 1_048_576),
         ]
         if currentKVBits > 0 {
