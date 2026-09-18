@@ -49,6 +49,7 @@ struct ContentView: View {
     @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
     @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
     @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
+    @AppStorage("llmtray.useMTPRuntime") private var useMTPRuntime: Bool = false
     @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
@@ -466,6 +467,20 @@ struct ContentView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11, design: .monospaced))
             }
+
+            Divider().padding(.vertical, 4)
+
+            Text("Experimental").foregroundColor(.secondary)
+            Toggle("Use MTP-enabled mlx-lm (self-speculative decoding)", isOn: $useMTPRuntime)
+            Text(
+                "Installs an unofficial mlx-lm fork instead of the pinned release. "
+                    + "Speeds up single-request generation for Nemotron-H models that ship "
+                    + "a Multi-Token-Prediction head (e.g. Nemotron-3.5-Lightning), no effect "
+                    + "on other models. Restart the server after changing this -- the first "
+                    + "start afterward reinstalls the runtime, which takes a minute."
+            )
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
         }
         .disabled(isBusy || isRunning)
     }
