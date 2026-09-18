@@ -4,6 +4,7 @@ import ServiceManagement
 
 enum SettingsTab {
     case general
+    case chat
     case advanced
 }
 
@@ -61,6 +62,7 @@ struct ContentView: View {
     @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
     @AppStorage("llmtray.topP") private var topP: Double = 0.95
     @AppStorage("llmtray.maxTokens") private var maxTokens: Double = 1024
+    @AppStorage("llmtray.systemPrompt") private var systemPrompt: String = ""
     // The selected model's own trained context ceiling (max_position_embeddings),
     // read fresh on every model switch -- see updateModelMaxContext(for:).
     // 32768 is just the fallback for a model whose config.json doesn't
@@ -297,6 +299,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 6) {
             Picker("", selection: $settingsTab) {
                 Text("General").tag(SettingsTab.general)
+                Text("Chat").tag(SettingsTab.chat)
                 Text("Advanced").tag(SettingsTab.advanced)
             }
             .pickerStyle(.segmented)
@@ -306,6 +309,8 @@ struct ContentView: View {
             switch settingsTab {
             case .general:
                 generalSettingsContent
+            case .chat:
+                chatTabContent
             case .advanced:
                 advancedSettingsContent
             }
@@ -398,8 +403,6 @@ struct ContentView: View {
             }
             .disabled(isBusy || isRunning)
 
-            Divider().padding(.vertical, 4)
-            chatSettingsSection
             Divider().padding(.vertical, 4)
             runtimeUpdateRow
         }
@@ -536,6 +539,25 @@ struct ContentView: View {
         panel.prompt = "Use Folder"
         guard panel.runModal() == .OK, let url = panel.url else { return }
         modelsRoot = url.path
+    }
+
+    private var chatTabContent: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("System prompt").foregroundColor(.secondary)
+                TextEditor(text: $systemPrompt)
+                    .font(.system(size: 12))
+                    .frame(height: 90)
+                    .padding(4)
+                    .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3)))
+                Text("Sent as the first message on every new chat. Leave empty for none.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+            }
+
+            Divider().padding(.vertical, 4)
+            chatSettingsSection
+        }
     }
 
     private var chatSettingsSection: some View {
@@ -750,7 +772,7 @@ struct ContentView: View {
         guard isRunning, !chat.isStreaming else { return }
         let text = draft
         draft = ""
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens))
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt)
         chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings)
         isInputFocused = true
     }
@@ -762,7 +784,7 @@ struct ContentView: View {
     }
 
     private func regenerate() {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens))
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt)
         chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings)
     }
 }

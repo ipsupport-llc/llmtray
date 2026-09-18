@@ -11,6 +11,7 @@ struct ChatSettings {
     var temperature: Double = 0.6
     var topP: Double = 0.95
     var maxTokens: Int = 1024
+    var systemPrompt: String = ""
 }
 
 @MainActor
@@ -65,7 +66,11 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         messages.append(ChatMessage(role: "assistant"))
         assistantMessageIndex = messages.count - 1
 
-        let payloadMessages: [[String: String]] = messages.dropLast(1).map { ["role": $0.role, "content": $0.content] }
+        var payloadMessages: [[String: String]] = messages.dropLast(1).map { ["role": $0.role, "content": $0.content] }
+        let systemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !systemPrompt.isEmpty {
+            payloadMessages.insert(["role": "system", "content": systemPrompt], at: 0)
+        }
 
         let body: [String: Any] = [
             "model": modelAlias,
