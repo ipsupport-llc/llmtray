@@ -300,6 +300,18 @@ final class ServerManager: ObservableObject {
         }
 
         task.terminationHandler = { [weak self] proc in
+            // Must clear this HERE, not in stop()/idleUnload() -- this
+            // handler is the one place that fires no matter WHY the process
+            // exited (explicit stop, idle-unload, a crash, switchModel's
+            // replacement). Left in place, the pipe's read end stays
+            // permanently "readable" once the write end (the dead process)
+            // closes -- availableData returns empty at EOF forever, and
+            // libdispatch re-invokes the handler as fast as it can instead
+            // of ever blocking, pegging a CPU core indefinitely. Confirmed
+            // live: LLMTray at 100% CPU with no mlx_lm.server process left
+            // alive at all, RES a few MB, sampled straight into this
+            // closure's availableData loop.
+            handle.readabilityHandler = nil
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 if case .running = self.state {
