@@ -85,8 +85,8 @@ struct BenchmarkView: View {
                 }
             }
 
-            if let errorText = benchmark.errorText {
-                Text(errorText).font(.system(size: 10)).foregroundColor(.red)
+            if let quickBenchmarkError = benchmark.quickBenchmarkError {
+                Text(quickBenchmarkError).font(.system(size: 10)).foregroundColor(.red)
             }
 
             if benchmark.results.isEmpty {
@@ -146,6 +146,10 @@ struct BenchmarkView: View {
                         .font(.system(size: 10))
                         .foregroundColor(.secondary)
                 }
+            }
+
+            if let autoTuneError = benchmark.autoTuneError {
+                Text(autoTuneError).font(.system(size: 10)).foregroundColor(.red)
             }
 
             if benchmark.autoTuneLog.isEmpty {

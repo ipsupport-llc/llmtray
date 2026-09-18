@@ -73,7 +73,12 @@ final class BenchmarkRunner: ObservableObject {
     @Published var statusText: String = ""
     @Published var results: [BenchmarkResult] = []
     @Published var autoTuneLog: [AutoTuneCandidateResult] = []
-    @Published var errorText: String?
+    // Separate fields (not one shared errorText) -- both sections are
+    // always visible on this tab at once, so a single field would either
+    // show the same message twice or leave one section's failure invisible
+    // depending on which happened to render it.
+    @Published var quickBenchmarkError: String?
+    @Published var autoTuneError: String?
     @Published var pendingProposal: AutoTuneProposal?
 
     private var cancelRequested = false
@@ -176,7 +181,7 @@ final class BenchmarkRunner: ObservableObject {
         guard !isRunning else { return }
         isRunning = true
         cancelRequested = false
-        errorText = nil
+        quickBenchmarkError = nil
         defer { isRunning = false; statusText = "" }
 
         // A fresh (prompt-size, kv-bits, ...) combination pays a one-time
@@ -188,7 +193,7 @@ final class BenchmarkRunner: ObservableObject {
         do {
             _ = try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens)
         } catch {
-            errorText = error.localizedDescription
+            quickBenchmarkError = error.localizedDescription
             return
         }
 
@@ -199,7 +204,7 @@ final class BenchmarkRunner: ObservableObject {
             do {
                 samples.append(try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens))
             } catch {
-                errorText = error.localizedDescription
+                quickBenchmarkError = error.localizedDescription
                 return
             }
         }
@@ -229,7 +234,7 @@ final class BenchmarkRunner: ObservableObject {
         guard !isRunning else { return }
         isRunning = true
         cancelRequested = false
-        errorText = nil
+        autoTuneError = nil
         autoTuneLog = []
         defer { isRunning = false; statusText = "" }
 
@@ -242,7 +247,7 @@ final class BenchmarkRunner: ObservableObject {
                 try await server.restartToApplyLaunchSettings()
                 return true
             } catch {
-                errorText = "restart failed: \(error.localizedDescription)"
+                autoTuneError = "restart failed: \(error.localizedDescription)"
                 return false
             }
         }
@@ -262,20 +267,33 @@ final class BenchmarkRunner: ObservableObject {
             guard await restart() else { break }
 
             let batchStart = Date()
-            let aggregate: (tokens: Int, elapsed: Double)? = await withTaskGroup(of: BenchmarkSample?.self) { group in
+            let results: [BenchmarkSample?] = await withTaskGroup(of: BenchmarkSample?.self) { group in
                 for _ in 0..<value {
                     group.addTask { [self] in
                         try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 512, maxTokens: 128)
                     }
                 }
-                var totalTokens = 0
-                for await sample in group {
-                    if let sample { totalTokens += sample.completionTokens }
-                }
-                return (totalTokens, Date().timeIntervalSince(batchStart))
+                var collected: [BenchmarkSample?] = []
+                for await sample in group { collected.append(sample) }
+                return collected
             }
-            guard let aggregate, aggregate.elapsed > 0.05, aggregate.tokens > 0 else { continue }
-            let throughput = Double(aggregate.tokens) / aggregate.elapsed
+            let elapsed = Date().timeIntervalSince(batchStart)
+            let failures = results.filter { $0 == nil }.count
+            let totalTokens = results.compactMap { $0?.completionTokens }.reduce(0, +)
+            guard failures == 0, elapsed > 0.05, totalTokens > 0 else {
+                // Higher concurrency needs proportionally more KV-cache
+                // memory for the SAME model already sitting close to this
+                // Mac's Metal working-set ceiling (see docs/FINDINGS.md) --
+                // once one candidate's concurrent requests fail outright,
+                // every larger value is just as likely to, so stop instead
+                // of burning more restart cycles on doomed candidates.
+                // Surfaced via autoTuneError so "why did it skip N" is never a
+                // silent gap in the results table.
+                autoTuneError = "decode-concurrency=\(value): \(failures)/\(value) requests failed "
+                    + "(likely out of memory at this concurrency) -- stopped sweeping higher values."
+                break
+            }
+            let throughput = Double(totalTokens) / elapsed
             autoTuneLog.append(AutoTuneCandidateResult(parameter: "decode-concurrency", value: value, throughput: throughput))
             if throughput > bestConcurrencyThroughput {
                 bestConcurrencyThroughput = throughput
@@ -346,7 +364,7 @@ final class BenchmarkRunner: ObservableObject {
         do {
             try await server.restartToApplyLaunchSettings()
         } catch {
-            errorText = "restart failed: \(error.localizedDescription)"
+            autoTuneError = "restart failed: \(error.localizedDescription)"
         }
         pendingProposal = nil
     }
