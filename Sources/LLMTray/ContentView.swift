@@ -489,6 +489,16 @@ struct ContentView: View {
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
+            if useMTPRuntime {
+                Text(
+                    "Already installed once before? Restarting the server alone won't pull "
+                    + "in a newer commit of the fork -- use \"Remove Runtime\" from the menu "
+                    + "bar icon's right-click menu, then start the server again, to force a "
+                    + "fresh install."
+                )
+                .font(.system(size: 10))
+                .foregroundColor(.orange)
+            }
         }
         .disabled(isBusy || isRunning)
     }
