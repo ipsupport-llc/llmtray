@@ -448,11 +448,19 @@ struct ContentView: View {
                     : "Auto-restart after \(autoRestartStallThreshold) consecutive stalled requests",
                 value: $autoRestartStallThreshold, in: 0...10
             )
+            // A single multi-line literal, not `+`-joined string literals --
+            // each `+` on String forces the type-checker to consider every
+            // visible `+` overload (numeric types, arrays, ...) at every
+            // join point, which is the single most common trigger for
+            // "unable to type-check this expression in reasonable time"
+            // inside a ViewBuilder (see experimentalSection's fix).
             Text(
-                "A request can stall if mlx_lm.server's worker thread dies without crashing the whole "
-                    + "process (e.g. a METAL out-of-memory error) -- every request after that hangs until "
-                    + "its own timeout above, forever, since the process itself looks alive. Auto-restart "
-                    + "kicks in after that many stalls in a row instead of leaving it wedged. 0 disables it."
+                """
+                A request can stall if mlx_lm.server's worker thread dies without crashing the whole \
+                process (e.g. a METAL out-of-memory error) -- every request after that hangs until \
+                its own timeout above, forever, since the process itself looks alive. Auto-restart \
+                kicks in after that many stalls in a row instead of leaving it wedged. 0 disables it.
+                """
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
@@ -534,15 +542,20 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Experimental").foregroundColor(.secondary)
             Toggle("Use MTP-enabled mlx-lm (self-speculative decoding)", isOn: mtpRuntimeToggleBinding)
+            // Multi-line literal, not `+`-joined -- see serverRecoverySection's
+            // comment; this one has more join points than that one and is
+            // exactly what tripped the type-checker on CI.
             Text(
-                "Tracks the mlx-lm fork's nemotron-h-mtp branch tip directly, instead of "
-                    + "the deliberately pinned main commit everything else here already runs. "
-                    + "Speeds up single-request generation for Nemotron-H models that ship "
-                    + "a Multi-Token-Prediction head (e.g. Nemotron-3.5-Lightning), no effect "
-                    + "on other models. Turning this on always reinstalls fresh from the "
-                    + "branch's current commit -- toggle off then on again any time to pick "
-                    + "up newer in-progress work on that branch, since the installed version "
-                    + "otherwise has no way to notice one exists."
+                """
+                Tracks the mlx-lm fork's nemotron-h-mtp branch tip directly, instead of \
+                the deliberately pinned main commit everything else here already runs. \
+                Speeds up single-request generation for Nemotron-H models that ship \
+                a Multi-Token-Prediction head (e.g. Nemotron-3.5-Lightning), no effect \
+                on other models. Turning this on always reinstalls fresh from the \
+                branch's current commit -- toggle off then on again any time to pick \
+                up newer in-progress work on that branch, since the installed version \
+                otherwise has no way to notice one exists.
+                """
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
