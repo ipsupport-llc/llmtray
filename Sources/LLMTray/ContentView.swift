@@ -413,7 +413,32 @@ struct ContentView: View {
         }
     }
 
+    // Split into one computed property per section (rather than one giant
+    // VStack) -- SwiftUI's ViewBuilder type-checking is worse than linear
+    // in the number of sibling views/modifiers in a single block, and this
+    // section had grown large enough that a release/optimized build (which
+    // type-checks more strictly than a debug build) started timing out
+    // with "unable to type-check this expression in reasonable time" on
+    // the enclosing VStack, even though `swift build` (debug) compiled it
+    // fine locally.
     private var advancedSettingsContent: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            serverRecoverySection
+            Divider().padding(.vertical, 4)
+            memorySection
+            Divider().padding(.vertical, 4)
+            concurrencySection
+            Divider().padding(.vertical, 4)
+            networkSection
+            Divider().padding(.vertical, 4)
+            diagnosticsSection
+            Divider().padding(.vertical, 4)
+            experimentalSection
+        }
+        .disabled(isBusy || isRunning)
+    }
+
+    private var serverRecoverySection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Server recovery").foregroundColor(.secondary)
             Stepper("Stall timeout: \(stallThresholdSeconds)s", value: $stallThresholdSeconds, in: 10...300, step: 10)
@@ -431,17 +456,21 @@ struct ContentView: View {
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
+        }
+    }
 
-            Divider().padding(.vertical, 4)
-
+    private var memorySection: some View {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Memory").foregroundColor(.secondary)
             Stepper("Prompt cache limit: \(promptCacheMB) MB", value: $promptCacheMB, in: 128...8192, step: 128)
             Text("Caps mlx_lm.server's cross-conversation KV cache -- without a limit it grows forever and can crash the process on a long session.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
+        }
+    }
 
-            Divider().padding(.vertical, 4)
-
+    private var concurrencySection: some View {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Concurrency").foregroundColor(.secondary)
             Stepper(
                 decodeConcurrency <= 1
@@ -452,9 +481,11 @@ struct ContentView: View {
             Text("How many separate requests mlx_lm.server batches into one GPU step. Only helps when multiple clients/chats hit the server at the same time -- a single conversation isn't sped up by this. Higher values use more memory per loaded model.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
+        }
+    }
 
-            Divider().padding(.vertical, 4)
-
+    private var networkSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Network").foregroundColor(.secondary)
             Toggle("Allow connections from local network", isOn: $allowLAN)
             Text(
@@ -464,9 +495,11 @@ struct ContentView: View {
             )
             .font(.system(size: 10))
             .foregroundColor(allowLAN ? .orange : .secondary)
+        }
+    }
 
-            Divider().padding(.vertical, 4)
-
+    private var diagnosticsSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Diagnostics").foregroundColor(.secondary)
             Toggle("Verbose server logging (DEBUG)", isOn: $verboseServerLogging)
             VStack(alignment: .leading, spacing: 2) {
@@ -475,9 +508,11 @@ struct ContentView: View {
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11, design: .monospaced))
             }
+        }
+    }
 
-            Divider().padding(.vertical, 4)
-
+    private var experimentalSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Experimental").foregroundColor(.secondary)
             Toggle(
                 "Use MTP-enabled mlx-lm (self-speculative decoding)",
@@ -505,7 +540,6 @@ struct ContentView: View {
             .font(.system(size: 10))
             .foregroundColor(.secondary)
         }
-        .disabled(isBusy || isRunning)
     }
 
     /// A native NSAlert instead of SwiftUI's .confirmationDialog/.alert --
