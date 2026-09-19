@@ -511,22 +511,29 @@ struct ContentView: View {
         }
     }
 
+    // Extracted with an explicit `Binding<Bool>` type (rather than inline
+    // inside the Toggle below) -- an inline `Binding(get:set:)` closure
+    // literal inside a ViewBuilder ties up overload resolution with every
+    // sibling view in the same block, which is a well-known SwiftUI
+    // type-checker blowup trigger; pulling it out with its type spelled
+    // out gives the compiler nothing left to infer at that call site.
+    private var mtpRuntimeToggleBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { useMTPRuntime },
+            set: { newValue in
+                if newValue {
+                    confirmAndEnableMTPRuntime()
+                } else {
+                    useMTPRuntime = false
+                }
+            }
+        )
+    }
+
     private var experimentalSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Experimental").foregroundColor(.secondary)
-            Toggle(
-                "Use MTP-enabled mlx-lm (self-speculative decoding)",
-                isOn: Binding(
-                    get: { useMTPRuntime },
-                    set: { newValue in
-                        if newValue {
-                            confirmAndEnableMTPRuntime()
-                        } else {
-                            useMTPRuntime = false
-                        }
-                    }
-                )
-            )
+            Toggle("Use MTP-enabled mlx-lm (self-speculative decoding)", isOn: mtpRuntimeToggleBinding)
             Text(
                 "Tracks the mlx-lm fork's nemotron-h-mtp branch tip directly, instead of "
                     + "the deliberately pinned main commit everything else here already runs. "
