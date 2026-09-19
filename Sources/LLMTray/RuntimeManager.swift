@@ -1,13 +1,15 @@
 import Foundation
 
-/// Manages the pinned mlx-lm version used by runtime/run_server.sh's venv,
-/// and this project's own patches on top of it (patch_mlx_server_kv.py,
-/// patch_mlx_tool_parser.py). Deliberately does NOT auto-track upstream's
-/// latest release -- an unannounced mlx-lm update could shift the exact
-/// text/line patterns those patch scripts target, silently un-patching the
-/// server (their idempotency guards check for *our* markers, not for
-/// "is this still the mlx-lm version we tested against"). Bumping the pin
-/// is a deliberate, visible action instead.
+/// Manages the pinned commit of our own mlx-lm fork (ipsupport-llc/mlx-lm,
+/// `main` branch) used by runtime/run_server.sh's venv. This app installs
+/// mlx_lm exclusively from that fork -- never from PyPI -- since it carries
+/// real fixes/features upstream doesn't have (NemotronH MTP self-
+/// speculative decode, RotatingKVCache quantization, native
+/// prism_hadamard_qwen35 support, server flags). Deliberately does NOT
+/// auto-track the branch tip on every launch -- an in-progress commit on
+/// `main` could be broken or mid-change; bumping the pin is a deliberate,
+/// visible action instead (via Check for Updates here, which compares
+/// against `main`'s current tip through the GitHub API).
 @MainActor
 final class RuntimeManager: ObservableObject {
     enum CheckState: Equatable {
@@ -20,6 +22,9 @@ final class RuntimeManager: ObservableObject {
     }
 
     @Published private(set) var checkState: CheckState = .idle
+
+    private static let repo = "ipsupport-llc/mlx-lm"
+    private static let trackedBranch = "main"
 
     private var runtimeDir: String { RuntimePaths.runtimeDir }
     private var pinFilePath: String { runtimeDir + "/mlx_lm_runtime.json" }
@@ -35,7 +40,7 @@ final class RuntimeManager: ObservableObject {
     func pinnedVersion() -> String? {
         guard let data = FileManager.default.contents(atPath: pinFilePath),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-        return obj["pinned_version"] as? String
+        return obj["pinned_ref"] as? String
     }
 
     func checkForUpdate() {
@@ -47,12 +52,13 @@ final class RuntimeManager: ObservableObject {
 
         Task {
             do {
-                let url = URL(string: "https://pypi.org/pypi/mlx-lm/json")!
-                let (data, _) = try await URLSession.shared.data(from: url)
+                let url = URL(string: "https://api.github.com/repos/\(Self.repo)/commits/\(Self.trackedBranch)")!
+                var request = URLRequest(url: url)
+                request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+                let (data, _) = try await URLSession.shared.data(for: request)
                 guard let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let info = obj["info"] as? [String: Any],
-                      let latest = info["version"] as? String else {
-                    checkState = .failed("unexpected PyPI response")
+                      let latest = obj["sha"] as? String else {
+                    checkState = .failed("unexpected GitHub API response")
                     return
                 }
                 if latest == current {
@@ -66,21 +72,19 @@ final class RuntimeManager: ObservableObject {
         }
     }
 
-    /// Bumps the pin, reinstalls the venv's mlx-lm at the new version, and
-    /// reapplies both patch scripts. If patching fails against the new
-    /// version, this surfaces as a `.failed` state rather than silently
-    /// leaving an unpatched server.py in place -- the venv is left on the
-    /// new (possibly unpatched) version either way; rerunning
-    /// runtime/run_server.sh manually will re-attempt the patch on next launch.
-    func applyUpdate(to version: String) {
+    /// Bumps the pin and reinstalls the venv's mlx-lm at the new commit. If
+    /// the install fails, this surfaces as a `.failed` state rather than
+    /// silently leaving the venv on a half-installed commit; the venv is
+    /// left on whatever the failed pip run got to either way -- rerunning
+    /// this action will retry the install against the same target commit.
+    func applyUpdate(to commit: String) {
         checkState = .updating
         Task {
             do {
-                try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "mlx-lm==\(version)"])
-                try await runProcess(venvPython, [runtimeDir + "/patch_mlx_server_kv.py"])
-                try await runProcess(venvPython, [runtimeDir + "/patch_mlx_tool_parser.py"])
-                try writePinnedVersion(version)
-                checkState = .upToDate(version)
+                let gitURL = "git+https://github.com/\(Self.repo).git@\(commit)"
+                try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
+                try writePinnedVersion(commit)
+                checkState = .upToDate(commit)
             } catch {
                 checkState = .failed("update failed: \(error.localizedDescription)")
             }
@@ -92,16 +96,17 @@ final class RuntimeManager: ObservableObject {
     /// ServerManager.ensureRuntimeReady compares against to decide whether
     /// the venv needs touching) -- if only the bundled copy changed, the
     /// next server start would see the marker "behind" the pin and
-    /// re-install right back down to the bundle's original version,
+    /// re-install right back down to the bundle's original commit,
     /// silently undoing the update this method just applied.
-    private func writePinnedVersion(_ version: String) throws {
+    private func writePinnedVersion(_ commit: String) throws {
         let obj: [String: Any] = [
-            "pinned_version": version,
-            "_comment": "Pinned mlx-lm version for runtime/run_server.sh and LLMTray's runtime-update check. Bumped via LLMTray's Check for Updates action.",
+            "repo": Self.repo,
+            "pinned_ref": commit,
+            "_comment": "Pinned commit of our own mlx-lm fork's main branch for runtime/run_server.sh and LLMTray's runtime-update check. Bumped via LLMTray's Check for Updates action.",
         ]
         let data = try JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted])
         try data.write(to: URL(fileURLWithPath: pinFilePath))
-        try version.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
+        try commit.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {

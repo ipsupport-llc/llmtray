@@ -479,28 +479,57 @@ struct ContentView: View {
             Divider().padding(.vertical, 4)
 
             Text("Experimental").foregroundColor(.secondary)
-            Toggle("Use MTP-enabled mlx-lm (self-speculative decoding)", isOn: $useMTPRuntime)
+            Toggle(
+                "Use MTP-enabled mlx-lm (self-speculative decoding)",
+                isOn: Binding(
+                    get: { useMTPRuntime },
+                    set: { newValue in
+                        if newValue {
+                            confirmAndEnableMTPRuntime()
+                        } else {
+                            useMTPRuntime = false
+                        }
+                    }
+                )
+            )
             Text(
-                "Installs an unofficial mlx-lm fork instead of the pinned release. "
+                "Tracks the mlx-lm fork's nemotron-h-mtp branch tip directly, instead of "
+                    + "the deliberately pinned main commit everything else here already runs. "
                     + "Speeds up single-request generation for Nemotron-H models that ship "
                     + "a Multi-Token-Prediction head (e.g. Nemotron-3.5-Lightning), no effect "
-                    + "on other models. Restart the server after changing this -- the first "
-                    + "start afterward reinstalls the runtime, which takes a minute."
+                    + "on other models. Turning this on always reinstalls fresh from the "
+                    + "branch's current commit -- toggle off then on again any time to pick "
+                    + "up newer in-progress work on that branch, since the installed version "
+                    + "otherwise has no way to notice one exists."
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
-            if useMTPRuntime {
-                Text(
-                    "Already installed once before? Restarting the server alone won't pull "
-                    + "in a newer commit of the fork -- use \"Remove Runtime\" from the menu "
-                    + "bar icon's right-click menu, then start the server again, to force a "
-                    + "fresh install."
-                )
-                .font(.system(size: 10))
-                .foregroundColor(.orange)
-            }
         }
         .disabled(isBusy || isRunning)
+    }
+
+    /// A native NSAlert instead of SwiftUI's .confirmationDialog/.alert --
+    /// this view is hosted inside an NSPopover (see LLMTrayApp.swift), and
+    /// SwiftUI's own sheet-style dialogs don't reliably present from
+    /// inside a popover. Matches the pattern uninstallRuntimeData() already
+    /// uses for the same reason. Forces a fresh reinstall on the next
+    /// server start (rather than trying to detect "is the branch tip newer
+    /// than what's installed" here) since removeExternalRuntime() wipes the
+    /// whole venv and ensureRuntimeReady() always reinstalls when the
+    /// version marker doesn't match the toggle's target.
+    private func confirmAndEnableMTPRuntime() {
+        let alert = NSAlert()
+        alert.messageText = "Use MTP-enabled mlx-lm?"
+        alert.informativeText = "This switches off the pinned, tested mlx-lm commit and tracks the "
+            + "nemotron-h-mtp branch's current tip instead -- in-progress work that could change or "
+            + "break at any time. The runtime will be reinstalled from scratch the next time the "
+            + "server starts."
+        alert.addButton(withTitle: "Switch to MTP Branch")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .warning
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        useMTPRuntime = true
+        server.removeExternalRuntime()
     }
 
     private var modelsRootSection: some View {
@@ -596,12 +625,19 @@ struct ContentView: View {
         }
     }
 
+    // The pin is a full git commit SHA now (our own fork, not a PyPI
+    // semver) -- shorten it for display the way GitHub itself does; the
+    // "mtp-runtime" branch-tip marker is already short and passes through.
+    private func shortRef(_ ref: String) -> String {
+        ref.count > 12 ? String(ref.prefix(7)) : ref
+    }
+
     private var runtimeUpdateRow: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text("mlx-lm runtime:")
                     .foregroundColor(.secondary)
-                Text(runtime.pinnedVersion() ?? "unknown")
+                Text(runtime.pinnedVersion().map(shortRef) ?? "unknown")
                 Spacer()
                 switch runtime.checkState {
                 case .checking, .updating:
@@ -620,7 +656,7 @@ struct ContentView: View {
                 Text("Up to date.").foregroundColor(.secondary)
             case .updateAvailable(let current, let latest):
                 HStack {
-                    Text("\(current) → \(latest) available")
+                    Text("\(shortRef(current)) → \(shortRef(latest)) available")
                     Button("Update") {
                         runtime.applyUpdate(to: latest)
                     }

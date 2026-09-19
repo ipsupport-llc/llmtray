@@ -47,8 +47,6 @@ cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
 # machine-specific and gets created fresh on first run.
 cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
-   "$REPO_ROOT/runtime/patch_mlx_server_kv.py" \
-   "$REPO_ROOT/runtime/patch_mlx_tool_parser.py" \
    "$APP/Contents/Resources/runtime/"
 
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"

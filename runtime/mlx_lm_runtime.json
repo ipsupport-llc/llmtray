@@ -1,4 +1,5 @@
 {
-  "pinned_version": "0.31.3",
-  "_comment": "Pinned mlx-lm version for poc/run_server.sh and LLMTray's runtime-update check. Bump deliberately, not via an unpinned 'pip install -U mlx-lm' -- our patch scripts (patch_mlx_server_kv.py, patch_mlx_tool_parser.py) target specific line patterns in mlx_lm's server.py/tool_parsers, and an unannounced upstream release could silently change those without either patch script's idempotency guard catching it."
+  "repo": "ipsupport-llc/mlx-lm",
+  "pinned_ref": "23aa4d0e25c83565147df968cede6791483b6ab1",
+  "_comment": "Pinned commit of our own mlx-lm fork's main branch -- installed via 'pip install git+https://github.com/ipsupport-llc/mlx-lm.git@<pinned_ref>'. This app no longer installs anything from PyPI: our fork's main carries real fixes/features PyPI's official mlx-lm doesn't have (NemotronH MTP self-speculative decode, RotatingKVCache quantization, native prism_hadamard_qwen35 support, --model-alias/--kv-bits/api-v0-models/disconnect-safety server flags). Bump deliberately via LLMTray's Check for Updates action, not by hand -- see the doc comment on RuntimeManager.swift."
 }

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Launch our patched mlx_lm.server (adds --kv-bits/--kv-group-size/
-# --quantized-kv-start and --model-alias, absent from stock mlx_lm.server)
-# against a given model. Self-contained: creates its own venv on first run,
-# (re)applies the server.py patch idempotently every run (so a
-# `pip install -U mlx-lm` never silently drops it), then execs the server.
+# Launch mlx_lm.server from our own mlx-lm fork (ipsupport-llc/mlx-lm,
+# pinned commit in mlx_lm_runtime.json) against a given model. That fork
+# carries --kv-bits/--kv-group-size/--quantized-kv-start and --model-alias
+# natively, plus real fixes stock PyPI mlx-lm doesn't have (NemotronH MTP,
+# RotatingKVCache quantization, native prism_hadamard_qwen35 support) --
+# see ipsupport-llc/mlx-lm's docs/FINDINGS.md. Self-contained: creates its
+# own venv on first run, force-reinstalls the pinned fork commit every run
+# (cheap once pip's already cached the wheel/sdist), then execs the server.
 #
 # --model-alias matters because many OpenAI-API clients (chat CLIs, agent
 # tools) send whatever model name they have configured, not "default_model"
@@ -59,15 +62,10 @@ if [[ ! -d "$VENV_DIR" ]]; then
   "$VENV_DIR/bin/pip" install --quiet --upgrade pip
 fi
 
-PINNED_VERSION="$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/mlx_lm_runtime.json'))['pinned_version'])")"
-echo "--- ensuring mlx-lm==$PINNED_VERSION is installed (see mlx_lm_runtime.json) ---"
-"$VENV_DIR/bin/pip" install --quiet "mlx-lm==$PINNED_VERSION"
-
-echo "--- applying KV-cache-quant patch to server.py (idempotent) ---"
-"$VENV_DIR/bin/python" "$SCRIPT_DIR/patch_mlx_server_kv.py"
-
-echo "--- applying tool-call-parser crash-safety patch (idempotent) ---"
-"$VENV_DIR/bin/python" "$SCRIPT_DIR/patch_mlx_tool_parser.py"
+PINNED_REPO="$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/mlx_lm_runtime.json'))['repo'])")"
+PINNED_REF="$(python3 -c "import json; print(json.load(open('$SCRIPT_DIR/mlx_lm_runtime.json'))['pinned_ref'])")"
+echo "--- ensuring $PINNED_REPO@$PINNED_REF is installed (see mlx_lm_runtime.json) ---"
+"$VENV_DIR/bin/pip" install --quiet --force-reinstall "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
 
 CMD=("$VENV_DIR/bin/mlx_lm.server" --model "$MODEL" --port "$PORT" --prefill-step-size "$PREFILL_STEP_SIZE")
 if [[ -n "$KV_BITS" ]]; then

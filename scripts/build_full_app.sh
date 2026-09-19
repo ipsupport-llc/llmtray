@@ -172,13 +172,10 @@ rm -rf "$VENV_DIR"
 "$FRAMEWORK_PYTHON" -m venv "$VENV_DIR"
 "$VENV_DIR/bin/pip" install --quiet --upgrade pip
 
-PINNED_VERSION="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/mlx_lm_runtime.json'))['pinned_version'])")"
-echo "--- installing mlx-lm==$PINNED_VERSION into the vendored venv ---"
-"$VENV_DIR/bin/pip" install --quiet "mlx-lm==$PINNED_VERSION"
-
-echo "--- applying runtime patches ---"
-"$VENV_DIR/bin/python" "$REPO_ROOT/runtime/patch_mlx_server_kv.py"
-"$VENV_DIR/bin/python" "$REPO_ROOT/runtime/patch_mlx_tool_parser.py"
+PINNED_REPO="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/mlx_lm_runtime.json'))['repo'])")"
+PINNED_REF="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/mlx_lm_runtime.json'))['pinned_ref'])")"
+echo "--- installing $PINNED_REPO@$PINNED_REF into the vendored venv ---"
+"$VENV_DIR/bin/pip" install --quiet "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
 
 echo "--- re-signing app bundle with the added framework + venv ---"
 codesign --force --deep --sign - "$APP"

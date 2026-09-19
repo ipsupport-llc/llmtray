@@ -23,7 +23,7 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 - **Chat** against the running server (OpenAI-compatible `/v1/chat/completions`), with streamed `<think>` reasoning shown separately from the final answer, tok/s, and per-chat sampling settings (temperature/top-p/max tokens).
 - **Menu bar icon reflects real state**: green + pulsing while anything is generating (this app's own chat *or* an external tool hitting the server directly), orange/red on real thermal pressure (`ProcessInfo.thermalState`), pulled independently so one signal never hides the other.
 - **Live server log** in its own window, and a quick right-click menu (start/stop, quit) for when you don't need the full chat window.
-- Runs a **pinned, patched `mlx-lm`** (see [`runtime/`](./runtime)) — two small, reversible patches on top of stock `mlx_lm.server`, with an in-app update check against PyPI.
+- Runs mlx-lm from **our own fork** ([`ipsupport-llc/mlx-lm`](https://github.com/ipsupport-llc/mlx-lm), see [`runtime/`](./runtime)) at a pinned commit — never installs from PyPI — with an in-app update check against the fork's `main` branch.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtra
 2. First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
-The very first start creates the `mlx-lm` venv and applies the runtime patches automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.
+The very first start creates the `mlx-lm` venv and installs our fork automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.
 
 The app looks for models under `~/.llmtray/models/<publisher>/<model-name>/` by default (configurable in Settings; the layout matches LM Studio's own `~/.lmstudio/models`, so pointing it there works too) — either point it at models you already have, or use the in-app Hugging Face browser to pull one down.
 
@@ -55,14 +55,15 @@ swift build
 .build/debug/LLMTray
 ```
 
-## Why a patched mlx-lm?
+## Why our own mlx-lm fork?
 
-Stock `mlx_lm.server` is missing a couple of things this app relies on:
+Stock (PyPI) `mlx_lm.server` is missing things this app relies on, and [`ipsupport-llc/mlx-lm`](https://github.com/ipsupport-llc/mlx-lm) carries them natively:
 
-- `--kv-bits` / `--kv-group-size` / `--quantized-kv-start` for KV-cache quantization (lets a bigger model's context fit in less memory).
-- A crash-safety fix in the tool-call parser.
+- `--kv-bits` / `--kv-group-size` / `--quantized-kv-start` for KV-cache quantization (lets a bigger model's context fit in less memory), plus `--model-alias` and an `/api/v0/models` alias for LM Studio-shaped clients.
+- NemotronH Multi-Token-Prediction self-speculative decoding, and `RotatingKVCache` quantization support (upstream raises `NotImplementedError`).
+- Native support for prism-ml's Hadamard-rotated, 2-bit ternary "Bonsai 2" checkpoints (`prism_hadamard_qwen35`) — loads them at full native precision with no separate conversion step.
 
-`runtime/run_server.sh` applies both patches idempotently against a pinned `mlx-lm` version (`runtime/mlx_lm_runtime.json`) — see the doc comment on `RuntimeManager.swift` for why the pin isn't auto-tracked to upstream's latest release.
+`runtime/run_server.sh` installs a pinned commit of the fork's `main` branch (`runtime/mlx_lm_runtime.json`) — see the doc comment on `RuntimeManager.swift` for why the pin isn't auto-tracked to the branch tip on every launch.
 
 ## Architecture
 
@@ -72,13 +73,11 @@ Sources/LLMTray/
 ├── ServerManager.swift    starts/stops mlx_lm.server, captures its log, busy detection
 ├── ChatClient.swift       OpenAI-compatible SSE streaming client
 ├── HFModelBrowser.swift   Hugging Face search + resumable downloads
-├── RuntimeManager.swift   pinned mlx-lm version + patch reapplication
+├── RuntimeManager.swift   pinned mlx-lm fork commit + update check
 └── ...
 runtime/
-├── run_server.sh          self-contained venv bootstrap + patched server launcher
-├── mlx_lm_runtime.json    pinned mlx-lm version
-├── patch_mlx_server_kv.py
-└── patch_mlx_tool_parser.py
+├── run_server.sh          self-contained venv bootstrap + fork-based server launcher
+└── mlx_lm_runtime.json    pinned mlx-lm fork commit
 ```
 
 ## Status

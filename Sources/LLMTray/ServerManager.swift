@@ -505,22 +505,22 @@ final class ServerManager: ObservableObject {
     /// does the same setup runtime/run_server.sh does for local dev, in-
     /// process, so "download the DMG, click Start Server" works without
     /// ever opening a terminal. Also the one place that notices a new
-    /// release bumped the pinned mlx-lm version and upgrades the existing
+    /// release bumped the pinned mlx-lm commit and upgrades the existing
     /// external venv in place, since -- now that the venv lives outside
     /// Contents/ specifically so updates *don't* wipe it -- nothing else
     /// would ever pick that up otherwise.
-    // Opt-in only (Advanced setting) -- installs mlx_lm from
-    // ipsupport-llc/mlx-lm's nemotron-h-mtp branch instead of the pinned
-    // PyPI release. That branch carries a NemotronH Multi-Token-Prediction
-    // head + self-speculative decode driver (stream_generate auto-dispatches
-    // to it for a compatible model/request, see mlx_lm/generate.py) plus
-    // real correctness fixes upstream mlx_lm doesn't have yet (a Metal
-    // fused-kernel bug in speculative rollback, an HF config float-encoding
-    // crash) -- see that repo's docs/FINDINGS.md section 4. Everything
-    // else (server flags, tool parsers) LLMTray's two patch scripts used to
-    // add is already native on this branch (commit 58e48fb), so they're
-    // skipped entirely on this path rather than risking them matching the
-    // wrong pattern against already-patched source.
+    // This app installs mlx_lm exclusively from our own fork,
+    // ipsupport-llc/mlx-lm -- never from PyPI. That fork carries real
+    // fixes/features upstream mlx_lm doesn't have (NemotronH Multi-Token-
+    // Prediction self-speculative decode, RotatingKVCache quantization,
+    // native prism_hadamard_qwen35 support, --model-alias/--kv-bits/
+    // /api/v0/models/disconnect-safety server flags) -- see that repo's
+    // docs/FINDINGS.md. The default path installs a deliberately pinned
+    // commit on `main` (runtime/mlx_lm_runtime.json), bumped only via
+    // Check for Updates. The Advanced "Use MTP-enabled mlx-lm" toggle
+    // instead tracks the `nemotron-h-mtp` branch tip directly -- for
+    // picking up in-progress work on that branch before it's merged to
+    // `main` and pinned.
     private static let mtpRuntimeGitURL = "git+https://github.com/ipsupport-llc/mlx-lm.git@nemotron-h-mtp"
     private var useMTPRuntime: Bool {
         UserDefaults.standard.bool(forKey: "llmtray.useMTPRuntime")
@@ -530,19 +530,21 @@ final class ServerManager: ObservableObject {
         let runtimeDir = RuntimePaths.runtimeDir
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
               let pinObj = try? JSONSerialization.jsonObject(with: pinData) as? [String: Any],
-              let pinnedVersion = pinObj["pinned_version"] as? String else {
+              let pinnedRepo = pinObj["repo"] as? String,
+              let pinnedRef = pinObj["pinned_ref"] as? String else {
             throw NSError(
                 domain: "ServerManager", code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "could not read mlx_lm_runtime.json"]
             )
         }
-        // The MTP runtime tracks a branch, not a pinned release -- there is
+        let pinnedRuntimeGitURL = "git+https://github.com/\(pinnedRepo).git@\(pinnedRef)"
+        // The MTP runtime tracks a branch, not a pinned commit -- there is
         // no meaningful "version" to compare, so its marker is just this
         // fixed tag. Switching the toggle either direction is therefore
         // always seen as a version change below, forcing exactly one
         // reinstall (in whichever direction) instead of silently keeping
         // whatever happened to already be in the venv.
-        let targetVersion = useMTPRuntime ? "mtp-runtime" : pinnedVersion
+        let targetVersion = useMTPRuntime ? "mtp-runtime" : pinnedRef
 
         // The marker is only ever written after a fully successful install
         // (see the two write sites below), so its presence -- not just the
@@ -560,11 +562,12 @@ final class ServerManager: ObservableObject {
         )
 
         // Full build, first launch: a working venv (for this exact pinned
-        // version, since both were produced by the same build_full_app.sh
+        // commit, since both were produced by the same build_full_app.sh
         // run) is already sitting in the bundle -- copying it out is a fast
         // local operation with no network, unlike everything below. Not
         // applicable to the MTP runtime: the bundled venv was built against
-        // stock PyPI mlx-lm, so this falls through to the from-scratch path.
+        // the pinned `main` commit, not the floating `nemotron-h-mtp`
+        // branch tip, so this falls through to the from-scratch path.
         if !useMTPRuntime, !FileManager.default.fileExists(atPath: venvDir),
            FileManager.default.fileExists(atPath: bundledVenvServerBinary) {
             appendLog("--- first run: copying vendored runtime out of the app bundle ---\n")
@@ -583,7 +586,7 @@ final class ServerManager: ObservableObject {
                 // the framework copy that now lives right alongside it.
                 relinkVendoredInterpreter(newFrameworkDir: externalFrameworkDir)
             }
-            try pinnedVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
+            try pinnedRef.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
             appendLog("--- runtime ready ---\n")
             return
         }
@@ -615,16 +618,11 @@ final class ServerManager: ObservableObject {
             // launchServerProcess above.
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
-        if useMTPRuntime {
-            // --force-reinstall: pip won't otherwise treat a git URL as
-            // newer than an already-satisfied "mlx-lm" (e.g. switching back
-            // from the pinned runtime, or picking up a branch update).
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", Self.mtpRuntimeGitURL])
-        } else {
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "mlx-lm==\(pinnedVersion)"])
-            try await runProcess(venvPython, [runtimeDir + "/patch_mlx_server_kv.py"])
-            try await runProcess(venvPython, [runtimeDir + "/patch_mlx_tool_parser.py"])
-        }
+        // --force-reinstall: pip won't otherwise treat a git URL as newer
+        // than an already-satisfied "mlx-lm" (e.g. switching back from the
+        // MTP-branch runtime, or picking up a bumped pin/branch update).
+        let gitURL = useMTPRuntime ? Self.mtpRuntimeGitURL : pinnedRuntimeGitURL
+        try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
         try targetVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
         appendLog("--- runtime ready ---\n")
     }
