@@ -92,8 +92,17 @@ final class BenchmarkRunner: ObservableObject {
         "The quick brown fox jumps over the lazy dog near the quiet river while the sun sets slowly behind distant hills"
             .split(separator: " ").map(String.init)
 
+    /// A leading UUID makes every call's full token sequence unique, even
+    /// across repeated trials of the same preset -- without it, the server's
+    /// own cross-request prompt cache (--prompt-cache-bytes, on by default)
+    /// recognizes the identical filler text on the 2nd+ call and skips
+    /// re-prefilling almost entirely, returning near-instantly. Confirmed
+    /// live: TTFT was ~0.08s for BOTH a 512-tok and a 2048-tok prompt --
+    /// identical latency regardless of length is the signature of a cache
+    /// hit, not real prefill work, and was inflating "prefill tok/s" by
+    /// roughly 4x on the longer preset alone.
     private func makePrompt(approxTokens: Int) -> String {
-        var words: [String] = []
+        var words: [String] = [UUID().uuidString]
         while words.count < approxTokens {
             words.append(contentsOf: Self.fillerWords)
         }
