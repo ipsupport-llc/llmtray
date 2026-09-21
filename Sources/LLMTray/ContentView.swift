@@ -735,6 +735,19 @@ struct ContentView: View {
                     .background(msg.role == "user" ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.12))
                     .cornerRadius(8)
             }
+
+            // Rendered straight from the in-memory bytes the model sent
+            // this turn -- never written to disk, so nothing to clean up
+            // when the chat is cleared or the app quits.
+            ForEach(Array(msg.images.enumerated()), id: \.offset) { _, data in
+                if let nsImage = NSImage(data: data) {
+                    Image(nsImage: nsImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 320, maxHeight: 320)
+                        .cornerRadius(8)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: msg.role == "user" ? .trailing : .leading)
     }

@@ -5,6 +5,12 @@ struct ChatMessage: Identifiable, Equatable {
     var role: String   // "user" | "assistant"
     var content: String = ""
     var reasoning: String = ""
+    // Decoded image bytes from an OpenAI-shaped content-array delta
+    // (type: "image_url", image_url: {url: "data:image/...;base64,..."}).
+    // Held only in memory for as long as this message exists -- never
+    // written to disk, so nothing needs cleaning up when the chat is
+    // cleared or the app quits.
+    var images: [Data] = []
 }
 
 struct ChatSettings {
@@ -190,13 +196,43 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 appendToAssistant(reasoning: reasoning)
                 approxCompletionTokens += max(1, reasoning.split(whereSeparator: { $0.isWhitespace }).count)
             }
+            // Most servers/deltas send plain string content. A model that
+            // emits image output uses OpenAI's multimodal content-array
+            // shape instead -- [{type: "text", text: "..."}, {type:
+            // "image_url", image_url: {url: "data:image/...;base64,..."}}]
+            // -- handle both.
             if let content = delta["content"] as? String, !content.isEmpty {
                 appendToAssistant(content: content)
                 // Word-count proxy, used only if the server never sends a
                 // real usage.completion_tokens (see finalizeTokensPerSecond).
                 approxCompletionTokens += max(1, content.split(whereSeparator: { $0.isWhitespace }).count)
+            } else if let parts = delta["content"] as? [[String: Any]] {
+                for part in parts {
+                    guard let type = part["type"] as? String else { continue }
+                    if type == "text", let text = part["text"] as? String, !text.isEmpty {
+                        appendToAssistant(content: text)
+                        approxCompletionTokens += max(1, text.split(whereSeparator: { $0.isWhitespace }).count)
+                    } else if type == "image_url",
+                              let imageURL = part["image_url"] as? [String: Any],
+                              let urlString = imageURL["url"] as? String,
+                              let data = Self.decodeDataURI(urlString) {
+                        appendToAssistant(image: data)
+                    }
+                }
             }
         }
+    }
+
+    /// Parses a "data:image/png;base64,...."-style URI. Returns nil for a
+    /// remote http(s) URL -- rendering those would mean fetching and
+    /// (however briefly) holding third-party content this app didn't
+    /// generate; only inline data URIs are treated as "the model's own
+    /// generated image."
+    private static func decodeDataURI(_ uriString: String) -> Data? {
+        guard uriString.hasPrefix("data:"),
+              let commaIndex = uriString.firstIndex(of: ",") else { return nil }
+        let base64Part = uriString[uriString.index(after: commaIndex)...]
+        return Data(base64Encoded: String(base64Part))
     }
 
     private func appendToAssistant(content: String) {
@@ -207,5 +243,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     private func appendToAssistant(reasoning: String) {
         guard let idx = assistantMessageIndex, idx < messages.count else { return }
         messages[idx].reasoning += reasoning
+    }
+
+    private func appendToAssistant(image: Data) {
+        guard let idx = assistantMessageIndex, idx < messages.count else { return }
+        messages[idx].images.append(image)
     }
 }
