@@ -52,7 +52,6 @@ struct ContentView: View {
     @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
     @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
     @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
-    @AppStorage("llmtray.useMTPRuntime") private var useMTPRuntime: Bool = false
     @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
@@ -432,8 +431,6 @@ struct ContentView: View {
             networkSection
             Divider().padding(.vertical, 4)
             diagnosticsSection
-            Divider().padding(.vertical, 4)
-            experimentalSection
         }
         .disabled(isBusy || isRunning)
     }
@@ -517,73 +514,6 @@ struct ContentView: View {
                     .font(.system(size: 11, design: .monospaced))
             }
         }
-    }
-
-    // Extracted with an explicit `Binding<Bool>` type (rather than inline
-    // inside the Toggle below) -- an inline `Binding(get:set:)` closure
-    // literal inside a ViewBuilder ties up overload resolution with every
-    // sibling view in the same block, which is a well-known SwiftUI
-    // type-checker blowup trigger; pulling it out with its type spelled
-    // out gives the compiler nothing left to infer at that call site.
-    private var mtpRuntimeToggleBinding: Binding<Bool> {
-        Binding<Bool>(
-            get: { useMTPRuntime },
-            set: { newValue in
-                if newValue {
-                    confirmAndEnableMTPRuntime()
-                } else {
-                    useMTPRuntime = false
-                }
-            }
-        )
-    }
-
-    private var experimentalSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Experimental").foregroundColor(.secondary)
-            Toggle("Use MTP-enabled mlx-lm (self-speculative decoding)", isOn: mtpRuntimeToggleBinding)
-            // Multi-line literal, not `+`-joined -- see serverRecoverySection's
-            // comment; this one has more join points than that one and is
-            // exactly what tripped the type-checker on CI.
-            Text(
-                """
-                Tracks the mlx-lm fork's nemotron-h-mtp branch tip directly, instead of \
-                the deliberately pinned main commit everything else here already runs. \
-                Speeds up single-request generation for Nemotron-H models that ship \
-                a Multi-Token-Prediction head (e.g. Nemotron-3.5-Lightning), no effect \
-                on other models. Turning this on always reinstalls fresh from the \
-                branch's current commit -- toggle off then on again any time to pick \
-                up newer in-progress work on that branch, since the installed version \
-                otherwise has no way to notice one exists.
-                """
-            )
-            .font(.system(size: 10))
-            .foregroundColor(.secondary)
-        }
-    }
-
-    /// A native NSAlert instead of SwiftUI's .confirmationDialog/.alert --
-    /// this view is hosted inside an NSPopover (see LLMTrayApp.swift), and
-    /// SwiftUI's own sheet-style dialogs don't reliably present from
-    /// inside a popover. Matches the pattern uninstallRuntimeData() already
-    /// uses for the same reason. Forces a fresh reinstall on the next
-    /// server start (rather than trying to detect "is the branch tip newer
-    /// than what's installed" here) since removeExternalRuntime() wipes the
-    /// whole venv and ensureRuntimeReady() always reinstalls when the
-    /// version marker doesn't match the toggle's target.
-    private func confirmAndEnableMTPRuntime() {
-        let alert = NSAlert()
-        alert.messageText = "Use MTP-enabled mlx-lm?"
-        alert.informativeText = "This switches off the pinned, tested mlx-lm commit and tracks the "
-            + "nemotron-h-mtp branch's current tip instead -- in-progress work that could change or "
-            + "break at any time. The runtime will be reinstalled from scratch the next time the "
-            + "server starts."
-        alert.addButton(withTitle: "Switch to MTP Branch")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .warning
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
-        useMTPRuntime = true
-        server.removeExternalRuntime()
     }
 
     private var modelsRootSection: some View {

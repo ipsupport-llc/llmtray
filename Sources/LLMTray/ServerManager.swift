@@ -515,16 +515,15 @@ final class ServerManager: ObservableObject {
     // Prediction self-speculative decode, RotatingKVCache quantization,
     // native prism_hadamard_qwen35 support, --model-alias/--kv-bits/
     // /api/v0/models/disconnect-safety server flags) -- see that repo's
-    // docs/FINDINGS.md. The default path installs a deliberately pinned
-    // commit on `main` (runtime/mlx_lm_runtime.json), bumped only via
-    // Check for Updates. The Advanced "Use MTP-enabled mlx-lm" toggle
-    // instead tracks the `nemotron-h-mtp` branch tip directly -- for
-    // picking up in-progress work on that branch before it's merged to
-    // `main` and pinned.
-    private static let mtpRuntimeGitURL = "git+https://github.com/ipsupport-llc/mlx-lm.git@nemotron-h-mtp"
-    private var useMTPRuntime: Bool {
-        UserDefaults.standard.bool(forKey: "llmtray.useMTPRuntime")
-    }
+    // docs/FINDINGS.md. Always a deliberately pinned commit on `main`
+    // (runtime/mlx_lm_runtime.json), bumped only via Check for Updates --
+    // there used to also be an Advanced toggle tracking the
+    // `nemotron-h-mtp` branch tip directly, for picking up in-progress
+    // work before it was merged to `main`, but that branch's own work is
+    // long since merged and every fix since has landed on `main` directly,
+    // so the toggle was just a second, easy-to-forget place a fix could
+    // land without reaching this app -- removed rather than kept as a
+    // permanent fixture with no active use.
 
     private func ensureRuntimeReady() async throws {
         let runtimeDir = RuntimePaths.runtimeDir
@@ -538,13 +537,7 @@ final class ServerManager: ObservableObject {
             )
         }
         let pinnedRuntimeGitURL = "git+https://github.com/\(pinnedRepo).git@\(pinnedRef)"
-        // The MTP runtime tracks a branch, not a pinned commit -- there is
-        // no meaningful "version" to compare, so its marker is just this
-        // fixed tag. Switching the toggle either direction is therefore
-        // always seen as a version change below, forcing exactly one
-        // reinstall (in whichever direction) instead of silently keeping
-        // whatever happened to already be in the venv.
-        let targetVersion = useMTPRuntime ? "mtp-runtime" : pinnedRef
+        let targetVersion = pinnedRef
 
         // The marker is only ever written after a fully successful install
         // (see the two write sites below), so its presence -- not just the
@@ -564,11 +557,8 @@ final class ServerManager: ObservableObject {
         // Full build, first launch: a working venv (for this exact pinned
         // commit, since both were produced by the same build_full_app.sh
         // run) is already sitting in the bundle -- copying it out is a fast
-        // local operation with no network, unlike everything below. Not
-        // applicable to the MTP runtime: the bundled venv was built against
-        // the pinned `main` commit, not the floating `nemotron-h-mtp`
-        // branch tip, so this falls through to the from-scratch path.
-        if !useMTPRuntime, !FileManager.default.fileExists(atPath: venvDir),
+        // local operation with no network, unlike everything below.
+        if !FileManager.default.fileExists(atPath: venvDir),
            FileManager.default.fileExists(atPath: bundledVenvServerBinary) {
             appendLog("--- first run: copying vendored runtime out of the app bundle ---\n")
             try FileManager.default.copyItem(atPath: bundledVenvDir, toPath: venvDir)
@@ -619,10 +609,8 @@ final class ServerManager: ObservableObject {
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
         // --force-reinstall: pip won't otherwise treat a git URL as newer
-        // than an already-satisfied "mlx-lm" (e.g. switching back from the
-        // MTP-branch runtime, or picking up a bumped pin/branch update).
-        let gitURL = useMTPRuntime ? Self.mtpRuntimeGitURL : pinnedRuntimeGitURL
-        try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
+        // than an already-satisfied "mlx-lm" (e.g. picking up a bumped pin).
+        try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", pinnedRuntimeGitURL])
         try targetVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
         appendLog("--- runtime ready ---\n")
     }
