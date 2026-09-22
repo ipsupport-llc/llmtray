@@ -186,7 +186,12 @@ struct ContentView: View {
                 }
                 .buttonStyle(.plain)
                 .help("New chat (saved)")
-                .disabled(chat.messages.isEmpty)
+                // Only disabled when there's truly nothing to start fresh
+                // from -- an empty *persistent* session. In temporary mode
+                // (currentSessionID == nil) messages is empty too, but this
+                // button is the only way back to a saved session, so it
+                // must stay enabled there regardless of message count.
+                .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
                 Menu {
                     // Recomputed by SwiftUI on every render of this Menu
                     // (including right before it opens), not cached --
