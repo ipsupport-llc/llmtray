@@ -59,6 +59,34 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
     var stepCount: String { "9" }
 }
 
+/// Scales whatever width/height the model's own tool call requested (see
+/// ChatClient.executeToolCalls) -- Z-Image-Turbo defaults to 1024x1024,
+/// so .balanced is a 1x no-op and .fast/.high bias the canvas down/up from
+/// there while preserving the model's own requested aspect ratio.
+enum ImageQuality: String, CaseIterable, Identifiable, Codable {
+    case fast
+    case balanced
+    case high
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .fast: return "Fast (smaller canvas)"
+        case .balanced: return "Balanced (default)"
+        case .high: return "High quality (larger canvas)"
+        }
+    }
+
+    var scale: Double {
+        switch self {
+        case .fast: return 0.5
+        case .balanced: return 1.0
+        case .high: return 1.5
+        }
+    }
+}
+
 /// Bootstraps and drives `mflux` (github.com/filipstrand/mflux), an
 /// MLX-native local image-generation runtime, for the `generate_image`
 /// tool exposed to chat models (see ChatClient.swift). Lives in its own

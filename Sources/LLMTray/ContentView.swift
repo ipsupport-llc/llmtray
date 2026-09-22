@@ -39,6 +39,11 @@ struct ContentView: View {
     @State private var draft: String = ""
     @State private var showSettings: Bool = false
     @State private var settingsTab: SettingsTab = .general
+    // Backs the History menu -- refreshed on appear and whenever
+    // ChatSessionStore posts .sessionsDidChange (save/delete), rather than
+    // read fresh from disk on every render (see that notification's own
+    // doc comment for why a plain disk read wasn't reliable here).
+    @State private var sessionHistory: [ChatSessionFile] = []
     @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold: Int = 3
     @AppStorage("llmtray.autoStartOnLaunch") private var autoStartOnLaunch: Bool = true
     // Reuses Sparkle's own UserDefaults key directly -- SPUUpdater reads
@@ -61,6 +66,7 @@ struct ContentView: View {
     // "share the GPU with something else right now." Off is there for
     // whoever has enough unified memory to comfortably hold both at once.
     @AppStorage("llmtray.unloadModelDuringImageGen") private var unloadModelDuringImageGen: Bool = true
+    @AppStorage("llmtray.imageQuality") private var imageQuality: ImageQuality = .balanced
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -115,6 +121,7 @@ struct ContentView: View {
         }
         .frame(width: 420)
         .onAppear {
+            sessionHistory = ChatSessionStore.list()
             models = ModelDiscovery.scanModels(root: modelsRoot)
             // Fall back to the first discovered model if nothing was saved,
             // or if the saved model no longer exists on disk (moved/deleted
@@ -157,6 +164,9 @@ struct ContentView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
+            sessionHistory = ChatSessionStore.list()
+        }
         .onChange(of: chat.isBusy) { busy in
             // Fires once a turn (streaming + any tool calls) fully settles,
             // not right when it starts -- send()/regenerate() themselves
@@ -193,15 +203,10 @@ struct ContentView: View {
                 // must stay enabled there regardless of message count.
                 .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
                 Menu {
-                    // Recomputed by SwiftUI on every render of this Menu
-                    // (including right before it opens), not cached --
-                    // ChatSessionStore.list() is just a handful of small
-                    // JSON file reads, cheap enough to not bother caching.
-                    let sessions = ChatSessionStore.list()
-                    if sessions.isEmpty {
+                    if sessionHistory.isEmpty {
                         Text("No saved sessions")
                     }
-                    ForEach(sessions) { session in
+                    ForEach(sessionHistory) { session in
                         Menu(session.title.isEmpty ? "New chat" : session.title) {
                             Button("Open") {
                                 chat.loadSession(session)
@@ -719,6 +724,14 @@ struct ContentView: View {
 
             Toggle("Enable image generation", isOn: enableImageGenerationBinding)
             if enableImageGeneration {
+                Picker("Canvas size", selection: $imageQuality) {
+                    ForEach(ImageQuality.allCases) { quality in
+                        Text(quality.displayName).tag(quality)
+                    }
+                }
+                Text("Scales whatever width/height the model asks for -- Balanced is a 1024x1024 no-op.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
                 Toggle("Unload chat model during generation", isOn: $unloadModelDuringImageGen)
                 Text(
                     """
@@ -994,7 +1007,7 @@ struct ContentView: View {
             // read -- see MfluxManager.generate), so nothing to clean up
             // when the chat is cleared or the app quits. Save button is the
             // one deliberate escape hatch for a user who wants to keep one.
-            ForEach(Array(msg.images.enumerated()), id: \.offset) { _, data in
+            ForEach(Array(msg.images.enumerated()), id: \.offset) { i, data in
                 if let nsImage = NSImage(data: data) {
                     VStack(alignment: .leading, spacing: 2) {
                         Image(nsImage: nsImage)
@@ -1002,13 +1015,19 @@ struct ContentView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(maxWidth: 320, maxHeight: 320)
                             .cornerRadius(8)
-                        Button {
-                            saveImage(data)
-                        } label: {
-                            Label("Save…", systemImage: "square.and.arrow.down")
-                                .font(.system(size: 10))
+                        HStack(spacing: 8) {
+                            Button {
+                                saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "")
+                            } label: {
+                                Label("Save…", systemImage: "square.and.arrow.down")
+                                    .font(.system(size: 10))
+                            }
+                            .buttonStyle(.plain)
+                            if let seconds = msg.imageDurations[safe: i] {
+                                Text(String(format: "Generated in %.1fs", seconds))
+                                    .font(.system(size: 10))
+                            }
                         }
-                        .buttonStyle(.plain)
                         .foregroundColor(.secondary)
                     }
                 }
@@ -1019,12 +1038,24 @@ struct ContentView: View {
 
     /// The one deliberate way a generated image reaches disk -- an explicit
     /// per-image save, not automatic (see chatBubble's images ForEach).
-    private func saveImage(_ data: Data) {
+    private func saveImage(_ data: Data, prompt: String) {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = "image.png"
+        panel.nameFieldStringValue = Self.slugify(prompt) + ".png"
         panel.allowedContentTypes = [.png]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         try? data.write(to: url)
+    }
+
+    /// Derives a save-panel filename straight from the prompt that made
+    /// the image, instead of a generic "image.png" every time -- no extra
+    /// model round-trip needed for this, the prompt text is already
+    /// exactly what the picture is of.
+    private static func slugify(_ text: String) -> String {
+        let lowered = text.lowercased()
+        let slug = lowered.map { $0.isLetter || $0.isNumber ? $0 : "-" }
+        let collapsed = String(slug).split(separator: "-", omittingEmptySubsequences: true).joined(separator: "-")
+        let trimmed = String(collapsed.prefix(48))
+        return trimmed.isEmpty ? "image" : trimmed
     }
 
     // MARK: - Input bar
@@ -1117,7 +1148,7 @@ struct ContentView: View {
         guard isRunning, !chat.isBusy else { return }
         let text = draft
         draft = ""
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
         chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
         isInputFocused = true
     }
@@ -1129,7 +1160,7 @@ struct ContentView: View {
     }
 
     private func regenerate() {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
         chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
     }
 
@@ -1140,7 +1171,7 @@ struct ContentView: View {
     }
 
     private func compact() async {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
         await chat.compactSession(
             port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings,
             keepStart: compactKeepStart, keepEnd: compactKeepEnd

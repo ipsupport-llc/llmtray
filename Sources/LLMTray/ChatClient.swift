@@ -20,6 +20,15 @@ struct ChatMessage: Identifiable, Equatable {
     // this message exists -- never written to disk, so nothing needs
     // cleaning up when the chat is cleared or the app quits.
     var images: [Data] = []
+    // Wall-clock seconds each entry in `images` took to generate, same
+    // index alignment -- shown as a small caption under the image (a
+    // rough per-image benchmark), and persisted alongside it (see
+    // PersistedMessage.imageDurations).
+    var imageDurations: [Double] = []
+    // The generate_image prompt behind each entry in `images`, same index
+    // alignment -- used to give the Save panel a filename derived from
+    // what was actually asked for instead of a generic "image.png".
+    var imagePrompts: [String] = []
     // Present on an assistant message that called one or more tools --
     // resent verbatim in the next request's message history, per the
     // OpenAI tool-calling protocol.
@@ -35,6 +44,16 @@ struct ChatMessage: Identifiable, Equatable {
     var isSummary: Bool = false
 }
 
+extension Array {
+    /// Used for msg.imageDurations[safe: i] in ContentView -- images and
+    /// their durations are meant to stay index-aligned, but an old
+    /// resumed session predating imageDurations decodes that array as
+    /// empty (see PersistedMessage), so a plain subscript would crash.
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
 struct ChatSettings {
     var temperature: Double = 0.6
     var topP: Double = 0.95
@@ -43,6 +62,7 @@ struct ChatSettings {
     var enableImageGeneration: Bool = false
     var imageGenModel: ImageGenModel = .gptqMixed
     var unloadModelDuringImageGen: Bool = true
+    var imageQuality: ImageQuality = .balanced
 }
 
 @MainActor
@@ -198,7 +218,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         let imagesDir = ChatSessionStore.imagesDir(for: file.id)
         messages = file.messages.map { pm in
             let images = pm.imageFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
-            return ChatMessage(role: pm.role, content: pm.content, reasoning: pm.reasoning, images: images, isSummary: pm.isSummary)
+            return ChatMessage(
+                role: pm.role, content: pm.content, reasoning: pm.reasoning, images: images,
+                imageDurations: pm.imageDurations, imagePrompts: pm.imagePrompts, isSummary: pm.isSummary
+            )
         }
         currentSessionID = file.id
         currentSessionTitle = file.title
@@ -231,7 +254,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             }
             return PersistedMessage(
                 role: msg.role, content: msg.content, reasoning: msg.reasoning, isSummary: msg.isSummary,
-                imageFilenames: filenames
+                imageFilenames: filenames, imageDurations: msg.imageDurations, imagePrompts: msg.imagePrompts
             )
         }
         guard !persisted.isEmpty else { return }
@@ -540,14 +563,25 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             }
             let arguments = Self.parseArguments(call.argumentsJSON)
             let prompt = (arguments["prompt"] as? String) ?? ""
-            let width = (arguments["width"] as? Int) ?? 1024
-            let height = (arguments["height"] as? Int) ?? 1024
+            let requestedWidth = (arguments["width"] as? Int) ?? 1024
+            let requestedHeight = (arguments["height"] as? Int) ?? 1024
+            // Scales whatever the model asked for rather than replacing it
+            // outright, so a deliberately non-square request from the model
+            // keeps its aspect ratio -- MfluxManager.generate rounds the
+            // result to a multiple of 16 regardless.
+            let scale = context.settings.imageQuality.scale
+            let width = Int(Double(requestedWidth) * scale)
+            let height = Int(Double(requestedHeight) * scale)
             do {
+                let start = Date()
                 let imageData = try await mfluxManager.generate(
                     prompt: prompt, width: width, height: height, model: context.settings.imageGenModel
                 )
+                let elapsed = Date().timeIntervalSince(start)
                 if sourceIndex < messages.count {
                     messages[sourceIndex].images.append(imageData)
+                    messages[sourceIndex].imageDurations.append(elapsed)
+                    messages[sourceIndex].imagePrompts.append(prompt)
                 }
                 imagesGeneratedThisTurn += 1
                 messages.append(
