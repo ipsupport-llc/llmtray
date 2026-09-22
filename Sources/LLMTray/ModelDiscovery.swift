@@ -89,4 +89,22 @@ enum ModelDiscovery {
         }
         return nil
     }
+
+    /// Heuristic, not a fixed model list: multimodal configs (Qwen-VL,
+    /// LLaVA-style, etc.) carry a sibling "vision_config" key alongside
+    /// "text_config" (same nesting maxContextLength already handles for
+    /// Qwen3.5-style configs), or name themselves in "architectures".
+    /// False (not "unknown") on anything unrecognized -- the attach-image
+    /// button only appears for models this can positively identify.
+    static func supportsVision(forModelPath path: String) -> Bool {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return false }
+        if obj["vision_config"] != nil { return true }
+        if let architectures = obj["architectures"] as? [String] {
+            return architectures.contains {
+                $0.localizedCaseInsensitiveContains("vision") || $0.localizedCaseInsensitiveContains("VL")
+            }
+        }
+        return false
+    }
 }

@@ -93,6 +93,14 @@ struct ContentView: View {
     // expose the field in a shape ModelDiscovery.maxContextLength recognizes,
     // not a real technical limit of anything.
     @State private var modelMaxContext: Int = 32768
+    // Whether the *currently selected chat model* (not the image-gen
+    // model) accepts image input -- see ModelDiscovery.supportsVision.
+    // Gates whether the attach-image button even appears.
+    @State private var modelSupportsVision: Bool = false
+    // Images the user has attached to the message they're composing, sent
+    // alongside it on the next send. Cleared after sendDraft() fires, or
+    // immediately if the model changes to one without vision support.
+    @State private var pendingAttachments: [Data] = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -330,6 +338,10 @@ struct ContentView: View {
         // smaller than that.
         modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? fallback)
         maxTokens = min(maxTokens, Double(modelMaxContext))
+        modelSupportsVision = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
+        if !modelSupportsVision {
+            pendingAttachments.removeAll()
+        }
     }
 
     private var isStoppedOrFailed: Bool {
@@ -1099,7 +1111,44 @@ struct ContentView: View {
                 }
                 .padding(.horizontal, 12)
             }
+            if !pendingAttachments.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(Array(pendingAttachments.enumerated()), id: \.offset) { i, data in
+                            if let nsImage = NSImage(data: data) {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(nsImage: nsImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 44, height: 44)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    Button {
+                                        pendingAttachments.remove(at: i)
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.white)
+                                            .background(Circle().fill(Color.black.opacity(0.5)))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .offset(x: 4, y: -4)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+            }
             HStack(spacing: 8) {
+                if modelSupportsVision {
+                    Button {
+                        attachImages()
+                    } label: {
+                        Image(systemName: "paperclip")
+                    }
+                    .buttonStyle(.plain)
+                    .help("Attach image(s) for the model to see")
+                }
                 // Not disabled during streaming: a disabled NSTextField
                 // resigns first responder, which is what was actually
                 // kicking focus out of the input field every time a
@@ -1131,7 +1180,7 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
                     }
-                    .disabled(!isRunning || draft.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .disabled(!isRunning || (draft.trimmingCharacters(in: .whitespaces).isEmpty && pendingAttachments.isEmpty))
                 }
             }
             .padding(.horizontal, 12)
@@ -1147,10 +1196,31 @@ struct ContentView: View {
         // itself (which would kick focus out of it every time).
         guard isRunning, !chat.isBusy else { return }
         let text = draft
+        let attachments = pendingAttachments
         draft = ""
+        pendingAttachments = []
         let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
-        chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+        chat.send(prompt: text, images: attachments, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
         isInputFocused = true
+    }
+
+    /// Lets the user pick one or more image files to send to a
+    /// vision-capable model (see modelSupportsVision). Always normalized
+    /// to PNG here -- ChatClient.serialize() assumes that MIME type for
+    /// every attachment rather than sniffing each file's real format.
+    private func attachImages() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.allowedContentTypes = [.image]
+        guard panel.runModal() == .OK else { return }
+        for url in panel.urls {
+            guard let nsImage = NSImage(contentsOf: url),
+                  let tiff = nsImage.tiffRepresentation,
+                  let rep = NSBitmapImageRep(data: tiff),
+                  let png = rep.representation(using: .png, properties: [:]) else { continue }
+            pendingAttachments.append(png)
+        }
     }
 
     // Only offered once a reply has actually finished -- mid-stream there's

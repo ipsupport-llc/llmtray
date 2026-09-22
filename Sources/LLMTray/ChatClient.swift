@@ -356,10 +356,13 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         return content
     }
 
-    func send(prompt: String, port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
-        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    func send(
+        prompt: String, images: [Data] = [], port: Int, modelAlias: String, settings: ChatSettings,
+        server: ServerManager
+    ) {
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
         imagesGeneratedThisTurn = 0
-        messages.append(ChatMessage(role: "user", content: prompt))
+        messages.append(ChatMessage(role: "user", content: prompt, images: images))
         startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 
@@ -459,6 +462,20 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 ["id": call.id, "type": "function", "function": ["name": call.name, "arguments": call.argumentsJSON]]
             }
             return dict
+        }
+        if message.role == "user", !message.images.isEmpty {
+            // Attachments are always normalized to PNG before landing in
+            // ChatMessage.images (see ContentView's attach-file handling),
+            // so the MIME half of this data URI is never a guess.
+            var parts: [[String: Any]] = []
+            if !message.content.isEmpty {
+                parts.append(["type": "text", "text": message.content])
+            }
+            for data in message.images {
+                let url = "data:image/png;base64,\(data.base64EncodedString())"
+                parts.append(["type": "image_url", "image_url": ["url": url]])
+            }
+            return ["role": "user", "content": parts]
         }
         return ["role": message.role, "content": message.content]
     }
