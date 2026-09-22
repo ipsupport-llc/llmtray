@@ -61,6 +61,14 @@ struct ContentView: View {
     // "share the GPU with something else right now." Off is there for
     // whoever has enough unified memory to comfortably hold both at once.
     @AppStorage("llmtray.unloadModelDuringImageGen") private var unloadModelDuringImageGen: Bool = true
+    // Compaction keeps these many messages verbatim at the start and end
+    // of a session, replacing everything in between with one
+    // model-generated summary (see ChatClient.compactSession).
+    @AppStorage("llmtray.compactKeepStart") private var compactKeepStart: Int = 4
+    @AppStorage("llmtray.compactKeepEnd") private var compactKeepEnd: Int = 6
+    // 0 disables auto-compaction -- otherwise, checked after every
+    // completed turn (see sendDraft's onChange-driven autoCompactIfNeeded).
+    @AppStorage("llmtray.autoCompactThreshold") private var autoCompactThreshold: Int = 0
     @State private var imageModelDownloadError: String?
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
@@ -149,6 +157,15 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: chat.isBusy) { busy in
+            // Fires once a turn (streaming + any tool calls) fully settles,
+            // not right when it starts -- send()/regenerate() themselves
+            // don't await that, so this is the one reliable "a turn just
+            // finished" signal available here.
+            if !busy {
+                autoCompactIfNeeded()
+            }
+        }
     }
 
     // MARK: - Status header
@@ -163,13 +180,40 @@ struct ContentView: View {
                     .font(.system(size: 12, weight: .medium))
                 Spacer()
                 Button {
-                    chat.clear()
+                    chat.newSession()
                 } label: {
                     Image(systemName: "square.and.pencil")
                 }
                 .buttonStyle(.plain)
-                .help("New chat")
+                .help("New chat (saved)")
                 .disabled(chat.messages.isEmpty)
+                Menu {
+                    // Recomputed by SwiftUI on every render of this Menu
+                    // (including right before it opens), not cached --
+                    // ChatSessionStore.list() is just a handful of small
+                    // JSON file reads, cheap enough to not bother caching.
+                    let sessions = ChatSessionStore.list()
+                    if sessions.isEmpty {
+                        Text("No saved sessions")
+                    }
+                    ForEach(sessions) { session in
+                        Button(session.title.isEmpty ? "New chat" : session.title) {
+                            chat.loadSession(session)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                }
+                .menuStyle(.borderlessButton)
+                .frame(width: 16)
+                .help("Past chats")
+                Button {
+                    chat.newTemporaryChat()
+                } label: {
+                    Image(systemName: "eye.slash")
+                }
+                .buttonStyle(.plain)
+                .help("New temporary chat -- nothing about it is ever saved")
                 Button {
                     NotificationCenter.default.post(name: .showServerLog, object: nil)
                 } label: {
@@ -617,7 +661,32 @@ struct ContentView: View {
             }
 
             Divider().padding(.vertical, 4)
+            sessionSettingsSection
+
+            Divider().padding(.vertical, 4)
             imageGenerationSection
+        }
+    }
+
+    private var sessionSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Sessions").foregroundColor(.secondary)
+            Stepper("Keep first \(compactKeepStart) messages", value: $compactKeepStart, in: 1...20)
+            Stepper("Keep last \(compactKeepEnd) messages", value: $compactKeepEnd, in: 1...20)
+            Stepper(
+                "Auto-compact past: \(autoCompactThreshold == 0 ? "off" : "\(autoCompactThreshold) messages")",
+                value: $autoCompactThreshold, in: 0...200, step: 10
+            )
+            Text(
+                """
+                Compacting replaces older messages in the middle of a long chat with one \
+                model-written summary, keeping the first/last few intact -- shrinks context \
+                without losing the gist. Manual "Compact" button always available once a chat is \
+                long enough; auto-compact (off by default) triggers it for you past the threshold.
+                """
+            )
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
         }
     }
 
@@ -854,6 +923,29 @@ struct ContentView: View {
     }
 
     private func chatBubble(_ msg: ChatMessage) -> some View {
+        Group {
+            if msg.isSummary {
+                summaryBubble(msg)
+            } else {
+                normalChatBubble(msg)
+            }
+        }
+    }
+
+    /// The synthetic message compactSession() splices in -- styled
+    /// distinctly (icon + italic + dimmed) so it plainly reads as "the app
+    /// compacted some history here," not something anyone actually said.
+    private func summaryBubble(_ msg: ChatMessage) -> some View {
+        Label(msg.content, systemImage: "arrow.down.right.and.arrow.up.left")
+            .font(.system(size: 11).italic())
+            .foregroundColor(.secondary)
+            .padding(8)
+            .background(Color.gray.opacity(0.06))
+            .cornerRadius(8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func normalChatBubble(_ msg: ChatMessage) -> some View {
         VStack(alignment: msg.role == "user" ? .trailing : .leading, spacing: 2) {
             Text(msg.role == "user" ? "You" : "Assistant")
                 .font(.system(size: 10, weight: .semibold))
@@ -929,8 +1021,13 @@ struct ContentView: View {
 
     private var inputBar: some View {
         VStack(spacing: 4) {
-            if canRegenerate || chat.lastTokensPerSecond != nil {
+            if canRegenerate || chat.lastTokensPerSecond != nil || canCompact || chat.currentSessionID == nil {
                 HStack {
+                    if chat.currentSessionID == nil {
+                        Label("Temporary — not saved", systemImage: "eye.slash")
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    }
                     if canRegenerate {
                         Button {
                             regenerate()
@@ -940,6 +1037,17 @@ struct ContentView: View {
                         }
                         .buttonStyle(.plain)
                         .foregroundColor(.secondary)
+                    }
+                    if canCompact {
+                        Button {
+                            Task { await compact() }
+                        } label: {
+                            Label("Compact", systemImage: "arrow.down.right.and.arrow.up.left")
+                                .font(.system(size: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.secondary)
+                        .disabled(chat.isBusy)
                     }
                     Spacer()
                     if let tps = chat.lastTokensPerSecond {
@@ -1013,5 +1121,27 @@ struct ContentView: View {
     private func regenerate() {
         let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
         chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+    }
+
+    // Only worth offering once there's actually a meaningful middle to
+    // replace -- matches compactSession()'s own no-op guard.
+    private var canCompact: Bool {
+        isRunning && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+    }
+
+    private func compact() async {
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        await chat.compactSession(
+            port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings,
+            keepStart: compactKeepStart, keepEnd: compactKeepEnd
+        )
+    }
+
+    // Checked once a turn fully settles (see body's onChange(of: chat.isBusy))
+    // rather than right after sendDraft() fires it, since send() itself
+    // doesn't await the turn's completion.
+    private func autoCompactIfNeeded() {
+        guard autoCompactThreshold > 0, chat.messages.count > autoCompactThreshold else { return }
+        Task { await compact() }
     }
 }

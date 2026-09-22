@@ -28,6 +28,11 @@ struct ChatMessage: Identifiable, Equatable {
     // result of. "tool" messages are protocol plumbing for the model, not
     // shown as their own chat bubble (see ContentView's chatArea).
     var toolCallID: String?
+    // True for the single synthetic message compactSession() splices in
+    // to replace a run of older messages -- styled distinctly in
+    // chatBubble so it reads as "the app summarized this," not something
+    // the assistant actually said.
+    var isSummary: Bool = false
 }
 
 struct ChatSettings {
@@ -64,6 +69,14 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     // driven from Settings, not the chat input, and shouldn't block
     // sending an unrelated message while it runs in the background.
     @Published private(set) var isDownloadingModel: Bool = false
+
+    // nil means "temporary chat" (see newTemporaryChat()) -- nothing about
+    // this conversation is ever written to ChatSessionStore. Non-nil means
+    // persistCurrentSession() writes a session file after every completed
+    // turn, keyed by this id.
+    @Published private(set) var currentSessionID: UUID?
+    @Published private(set) var currentSessionTitle: String = ""
+    private var sessionCreatedAt: Date?
 
     var isBusy: Bool { isStreaming || isGeneratingImage }
 
@@ -143,6 +156,157 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         mfluxPreviewCancellable = mfluxManager.$previewImage
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.mfluxPreviewImage = $0 }
+        // Every launch starts a fresh persistent session by default (see
+        // ChatSessionStore) -- picking up an older one is an explicit
+        // History action (ContentView), and newTemporaryChat() is the
+        // opt-out for a one-off that shouldn't be logged at all.
+        newSession()
+    }
+
+    // MARK: - Sessions
+
+    /// Starts a brand-new persistent session -- nothing is written to disk
+    /// until the first completed turn (see persistCurrentSession()), so an
+    /// abandoned empty session never litters the sessions directory.
+    func newSession() {
+        cancel()
+        messages.removeAll()
+        errorText = nil
+        lastTokensPerSecond = nil
+        imagesGeneratedThisTurn = 0
+        currentSessionID = UUID()
+        currentSessionTitle = ""
+        sessionCreatedAt = Date()
+    }
+
+    /// Nothing typed or generated in this chat is ever written anywhere --
+    /// currentSessionID stays nil, so persistCurrentSession() is a no-op
+    /// for the whole lifetime of this conversation.
+    func newTemporaryChat() {
+        cancel()
+        messages.removeAll()
+        errorText = nil
+        lastTokensPerSecond = nil
+        imagesGeneratedThisTurn = 0
+        currentSessionID = nil
+        currentSessionTitle = ""
+        sessionCreatedAt = nil
+    }
+
+    func loadSession(_ file: ChatSessionFile) {
+        cancel()
+        messages = file.messages.map {
+            ChatMessage(role: $0.role, content: $0.content, reasoning: $0.reasoning, isSummary: $0.isSummary)
+        }
+        currentSessionID = file.id
+        currentSessionTitle = file.title
+        sessionCreatedAt = file.createdAt
+        errorText = nil
+        lastTokensPerSecond = nil
+        imagesGeneratedThisTurn = 0
+    }
+
+    /// Called after every turn that ends with no pending tool call (see
+    /// continueWithPendingToolCalls) -- a no-op for a temporary chat
+    /// (currentSessionID == nil). "tool" role messages and content-less
+    /// assistant messages (the ones that only ever carried a tool_call)
+    /// are dropped -- see PersistedMessage's own doc comment for why.
+    private func persistCurrentSession() {
+        guard let sessionID = currentSessionID else { return }
+        let persisted = messages.compactMap { msg -> PersistedMessage? in
+            guard msg.role != "tool" else { return nil }
+            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty { return nil }
+            return PersistedMessage(role: msg.role, content: msg.content, reasoning: msg.reasoning, isSummary: msg.isSummary)
+        }
+        guard !persisted.isEmpty else { return }
+        if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
+            currentSessionTitle = String(firstUser.content.prefix(48))
+        }
+        let file = ChatSessionFile(
+            id: sessionID,
+            title: currentSessionTitle.isEmpty ? "New chat" : currentSessionTitle,
+            createdAt: sessionCreatedAt ?? Date(),
+            updatedAt: Date(),
+            messages: persisted
+        )
+        ChatSessionStore.save(file)
+    }
+
+    private static let compactionSystemPrompt = """
+        You are compacting an ongoing chat conversation to save context space. You'll be shown a \
+        chunk of earlier turns from the middle of the conversation (a beginning and an end are \
+        being kept as-is around it). Write a single concise paragraph -- not a list, not \
+        commentary addressed to anyone -- that preserves: what the user asked for or wanted; what \
+        was concluded, established as fact, or decided; concrete details a later turn might depend \
+        on again (names, numbers, file paths, chosen options, preferences); and the state of \
+        anything left unresolved. Write it as compressed background information for whoever \
+        continues this conversation next, not as a message to the user.
+        """
+
+    /// Replaces messages[keepStart..<(count-keepEnd)] with one synthetic
+    /// summary message generated by the model itself, cutting overall
+    /// message/token count without losing the substance of what happened
+    /// in between. No-op if there isn't enough in the middle to bother
+    /// compacting. See ContentView for the keepStart/keepEnd Settings.
+    func compactSession(port: Int, modelAlias: String, settings: ChatSettings, keepStart: Int, keepEnd: Int) async {
+        guard !isBusy else { return }
+        guard messages.count > keepStart + keepEnd + 1 else { return }
+        let middleRange = keepStart..<(messages.count - keepEnd)
+        let middle = Array(messages[middleRange])
+        guard !middle.isEmpty else { return }
+
+        let transcript = middle.map { msg -> String in
+            let speaker = msg.role == "user" ? "User" : (msg.role == "tool" ? "Tool result" : "Assistant")
+            let text = msg.content.isEmpty ? msg.reasoning : msg.content
+            return "\(speaker): \(text)"
+        }.joined(separator: "\n\n")
+
+        let requestMessages: [[String: Any]] = [
+            ["role": "system", "content": Self.compactionSystemPrompt],
+            ["role": "user", "content": transcript],
+        ]
+
+        do {
+            let summary = try await requestCompletion(port: port, modelAlias: modelAlias, messages: requestMessages)
+            messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
+            persistCurrentSession()
+        } catch {
+            errorText = "Compaction failed: \(error.localizedDescription)"
+        }
+    }
+
+    /// One-shot (non-streaming) completion, fully decoupled from the SSE
+    /// delegate machinery send()/regenerate() use -- compactSession() only
+    /// ever runs while !isBusy, so there's no risk of clobbering an
+    /// in-flight stream's `task`/`sseBuffer` state by using a separate
+    /// ad-hoc URLSession call instead.
+    private func requestCompletion(port: Int, modelAlias: String, messages: [[String: Any]]) async throws -> String {
+        guard let url = URL(string: "http://localhost:\(port)/v1/chat/completions") else {
+            throw URLError(.badURL)
+        }
+        let body: [String: Any] = [
+            "model": modelAlias,
+            "messages": messages,
+            "stream": false,
+            "temperature": 0.3,
+            "max_tokens": 512,
+        ]
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        request.timeoutInterval = 300
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let choices = json["choices"] as? [[String: Any]],
+              let content = (choices.first?["message"] as? [String: Any])?["content"] as? String else {
+            throw NSError(
+                domain: "ChatClient", code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Unexpected response shape from the chat completion endpoint."]
+            )
+        }
+        return content
     }
 
     func send(prompt: String, port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
@@ -257,13 +421,6 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         isStreaming = false
     }
 
-    func clear() {
-        cancel()
-        messages.removeAll()
-        lastTokensPerSecond = nil
-        errorText = nil
-    }
-
     // MARK: - URLSessionDataDelegate (incremental SSE parsing)
 
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
@@ -297,9 +454,15 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     /// tool calls, runs them and sends their results back as a follow-up
     /// request so the model can react -- otherwise this turn is done.
     private func continueWithPendingToolCalls() async {
-        guard let idx = assistantMessageIndex, idx < messages.count else { return }
+        guard let idx = assistantMessageIndex, idx < messages.count else {
+            persistCurrentSession()
+            return
+        }
         let toolCalls = messages[idx].toolCalls
-        guard !toolCalls.isEmpty, let context = pendingRequestContext else { return }
+        guard !toolCalls.isEmpty, let context = pendingRequestContext else {
+            persistCurrentSession()
+            return
+        }
         await executeToolCalls(toolCalls, sourceIndex: idx, context: context)
     }
 
@@ -366,9 +529,12 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 messages.append(
                     ChatMessage(
                         role: "tool",
-                        content: "Image generated and already shown to the user inline -- do not call "
-                            + "generate_image again for this request unless the user explicitly asks for a "
-                            + "new or different image.",
+                        content: "Image generated and already displayed to the user directly above your reply "
+                            + "-- you do not have the image data and cannot embed, link, or preview it yourself. "
+                            + "Do not write markdown image syntax (![...](...)) or any placeholder/fake URL for "
+                            + "it. Just reply in plain text (e.g. briefly describe what you asked for), or say "
+                            + "nothing else. Do not call generate_image again for this request unless the user "
+                            + "explicitly asks for a new or different image.",
                         toolCallID: call.id
                     )
                 )
