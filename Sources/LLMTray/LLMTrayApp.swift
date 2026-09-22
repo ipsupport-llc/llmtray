@@ -357,17 +357,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// green/red actually show. That constraint carries over even though
     /// this is now a plain NSStatusItem button rather than MenuBarExtra.
     private func observeStateForIcon() {
+        // combineLatest tops out at 4 publishers per call -- isGeneratingImage
+        // is folded in via a second, nested combineLatest instead of trying
+        // to cram a 5th into one. Without it, the icon stopped pulsing
+        // during image generation: the tool-call-carrying response has
+        // already finished streaming (isStreaming == false) by the time
+        // mflux is actually running, so that phase looked identical to idle.
         server.$state
             .combineLatest(chat.$isStreaming, systemMonitor.$thermalState, server.$isBusy)
+            .combineLatest(chat.$isGeneratingImage)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _, isStreaming, _, isBusy in
+            .sink { [weak self] combined, isGeneratingImage in
+                let (_, isStreaming, _, isBusy) = combined
                 guard let self else { return }
                 self.statusItem.button?.image = self.coloredStatusImage
                 // isStreaming is immediate but only fires for this app's own
                 // chat UI; isBusy is a ~1s-latency CPU-poll fallback that
                 // also catches an external tool hitting the OpenAI-compatible
                 // endpoint directly, which never touches ChatClient at all.
-                self.updatePulse(isStreaming: isStreaming || isBusy)
+                self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingImage)
             }
             .store(in: &cancellables)
     }
@@ -420,7 +428,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusColor: Color {
         if systemMonitor.isThrottling { return .red }
         if systemMonitor.isWarm { return .orange }
-        if chat.isStreaming || server.isBusy { return .green }
+        if chat.isStreaming || server.isBusy || chat.isGeneratingImage { return .green }
         return .primary
     }
 
