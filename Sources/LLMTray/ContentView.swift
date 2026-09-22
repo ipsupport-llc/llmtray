@@ -1033,11 +1033,22 @@ struct ContentView: View {
                             .onHover { hovering in
                                 if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
                             }
+                            .contextMenu {
+                                Button("Copy") { copyImageToClipboard(data) }
+                                Button("Save…") { saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "") }
+                            }
                         HStack(spacing: 8) {
                             Button {
                                 saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "")
                             } label: {
                                 Label("Save…", systemImage: "square.and.arrow.down")
+                                    .font(.system(size: 10))
+                            }
+                            .buttonStyle(.plain)
+                            Button {
+                                copyImageToClipboard(data)
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
                                     .font(.system(size: 10))
                             }
                             .buttonStyle(.plain)
@@ -1093,6 +1104,15 @@ struct ContentView: View {
         panel.allowedContentTypes = [.png]
         guard panel.runModal() == .OK, let url = panel.url else { return }
         try? data.write(to: url)
+    }
+
+    /// Puts the image on the system pasteboard -- still no disk write,
+    /// unlike Save; the fastest path for "paste this into another app."
+    private func copyImageToClipboard(_ data: Data) {
+        guard let nsImage = NSImage(data: data) else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.writeObjects([nsImage])
     }
 
     /// Derives a save-panel filename straight from the prompt that made
@@ -1164,6 +1184,10 @@ struct ContentView: View {
                                         }
                                         .onHover { hovering in
                                             if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                                        }
+                                        .contextMenu {
+                                            Button("Copy") { copyImageToClipboard(data) }
+                                            Button("Save…") { saveImage(data, prompt: "attachment") }
                                         }
                                     Button {
                                         pendingAttachments.remove(at: i)
