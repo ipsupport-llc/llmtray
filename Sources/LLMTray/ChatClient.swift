@@ -1,16 +1,32 @@
+import Combine
 import Foundation
+
+struct ToolCall: Equatable {
+    var id: String
+    var name: String
+    var argumentsJSON: String
+}
 
 struct ChatMessage: Identifiable, Equatable {
     let id = UUID()
-    var role: String   // "user" | "assistant"
+    var role: String   // "user" | "assistant" | "tool"
     var content: String = ""
     var reasoning: String = ""
     // Decoded image bytes from an OpenAI-shaped content-array delta
-    // (type: "image_url", image_url: {url: "data:image/...;base64,..."}).
-    // Held only in memory for as long as this message exists -- never
-    // written to disk, so nothing needs cleaning up when the chat is
-    // cleared or the app quits.
+    // (type: "image_url", image_url: {url: "data:image/...;base64,..."})
+    // OR appended directly once a generate_image tool call finishes (see
+    // ChatClient.executeToolCalls). Held only in memory for as long as
+    // this message exists -- never written to disk, so nothing needs
+    // cleaning up when the chat is cleared or the app quits.
     var images: [Data] = []
+    // Present on an assistant message that called one or more tools --
+    // resent verbatim in the next request's message history, per the
+    // OpenAI tool-calling protocol.
+    var toolCalls: [ToolCall] = []
+    // Present on a "tool" role message: which call (by id) this is the
+    // result of. "tool" messages are protocol plumbing for the model, not
+    // shown as their own chat bubble (see ContentView's chatArea).
+    var toolCallID: String?
 }
 
 struct ChatSettings {
@@ -18,6 +34,9 @@ struct ChatSettings {
     var topP: Double = 0.95
     var maxTokens: Int = 1024
     var systemPrompt: String = ""
+    var enableImageGeneration: Bool = false
+    var imageGenModel: ImageGenModel = .gptqMixed
+    var unloadModelDuringImageGen: Bool = true
 }
 
 @MainActor
@@ -26,6 +45,24 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
+    // True while a generate_image tool call is actually running (mflux
+    // bootstrap + generation) -- distinct from isStreaming since this
+    // spans the gap between the tool-call-carrying response finishing and
+    // the follow-up request (with the tool's result) starting. isBusy
+    // covers both for UI gating.
+    @Published private(set) var isGeneratingImage: Bool = false
+    @Published private(set) var mfluxStatusText: String = ""
+    // True only during the explicit, Settings-initiated warm-up download
+    // (see downloadImageModel) -- distinct from isGeneratingImage (a real
+    // chat-triggered generation) and NOT included in isBusy, since it's
+    // driven from Settings, not the chat input, and shouldn't block
+    // sending an unrelated message while it runs in the background.
+    @Published private(set) var isDownloadingModel: Bool = false
+
+    var isBusy: Bool { isStreaming || isGeneratingImage }
+
+    private let mfluxManager = MfluxManager()
+    private var mfluxStatusCancellable: AnyCancellable?
 
     private var session: URLSession!
     private var task: URLSessionDataTask?
@@ -43,42 +80,99 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     private var usageCompletionTokens: Int?
     private var assistantMessageIndex: Int?
 
+    private struct RequestContext {
+        var port: Int
+        var modelAlias: String
+        var settings: ChatSettings
+        var server: ServerManager
+    }
+    private var pendingRequestContext: RequestContext?
+
+    private static let generateImageTool: [String: Any] = [
+        "type": "function",
+        "function": [
+            "name": "generate_image",
+            "description": "Generate an image from a text description using a local diffusion "
+                + "model running on this Mac. Call this whenever the user asks to draw, create, "
+                + "generate, sketch, or make a picture, image, illustration, artwork, or photo.",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "prompt": [
+                        "type": "string",
+                        "description": "A detailed visual description of the image to generate.",
+                    ],
+                    "width": [
+                        "type": "integer",
+                        "description": "Image width in pixels. Defaults to 1024.",
+                    ],
+                    "height": [
+                        "type": "integer",
+                        "description": "Image height in pixels. Defaults to 1024.",
+                    ],
+                ],
+                "required": ["prompt"],
+            ],
+        ],
+    ]
+
     override init() {
         super.init()
         session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        mfluxStatusCancellable = mfluxManager.$statusText
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.mfluxStatusText = $0 }
     }
 
-    func send(prompt: String, port: Int, modelAlias: String, settings: ChatSettings) {
+    func send(prompt: String, port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         messages.append(ChatMessage(role: "user", content: prompt))
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings)
+        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 
     /// Re-runs the last user turn with a fresh generation -- drops the
     /// previous assistant reply (if any) so the retry doesn't just pile up
     /// underneath a garbled/unhelpful one, then asks again with the exact
     /// same prompt.
-    func regenerate(port: Int, modelAlias: String, settings: ChatSettings) {
-        guard !isStreaming else { return }
+    func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
+        guard !isBusy else { return }
         if messages.last?.role == "assistant" {
             messages.removeLast()
         }
         guard messages.last?.role == "user" else { return }
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings)
+        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 
-    private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings) {
+    /// Explicit, Settings-initiated warm-up download for the given image
+    /// model -- called before enabling the "Enable image generation"
+    /// toggle so the (potentially tens-of-GB) download happens visibly,
+    /// up front, not silently the first time a chat message happens to
+    /// trigger generate_image. Returns the error on failure (the toggle
+    /// stays off in that case) or nil on success.
+    func downloadImageModel(_ model: ImageGenModel) async -> Error? {
+        isDownloadingModel = true
+        defer { isDownloadingModel = false }
+        do {
+            try await mfluxManager.downloadModel(model)
+            return nil
+        } catch {
+            return error
+        }
+    }
+
+    private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         errorText = nil
+        pendingRequestContext = RequestContext(port: port, modelAlias: modelAlias, settings: settings, server: server)
         messages.append(ChatMessage(role: "assistant"))
         assistantMessageIndex = messages.count - 1
 
-        var payloadMessages: [[String: String]] = messages.dropLast(1).map { ["role": $0.role, "content": $0.content] }
+        var payloadMessages: [[String: Any]] = messages.dropLast(1).map(Self.serialize(message:))
         let systemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
         if !systemPrompt.isEmpty {
             payloadMessages.insert(["role": "system", "content": systemPrompt], at: 0)
         }
 
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "model": modelAlias,
             "messages": payloadMessages,
             "stream": true,
@@ -87,6 +181,9 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             "top_p": settings.topP,
             "max_tokens": settings.maxTokens,
         ]
+        if settings.enableImageGeneration {
+            body["tools"] = [Self.generateImageTool]
+        }
 
         guard let url = URL(string: "http://localhost:\(port)/v1/chat/completions"),
               let bodyData = try? JSONSerialization.data(withJSONObject: body) else {
@@ -108,6 +205,28 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
 
         task = session.dataTask(with: request)
         task?.resume()
+    }
+
+    /// Serializes one message for the request body, matching whichever of
+    /// the three shapes OpenAI's tool-calling protocol expects: a plain
+    /// user/system/assistant turn, an assistant turn that called tool(s)
+    /// (tool_calls attached, content omitted if the model produced none),
+    /// or a "tool" role result keyed by tool_call_id.
+    private static func serialize(message: ChatMessage) -> [String: Any] {
+        if message.role == "tool" {
+            return ["role": "tool", "tool_call_id": message.toolCallID ?? "", "content": message.content]
+        }
+        if message.role == "assistant", !message.toolCalls.isEmpty {
+            var dict: [String: Any] = ["role": "assistant"]
+            if !message.content.isEmpty {
+                dict["content"] = message.content
+            }
+            dict["tool_calls"] = message.toolCalls.map { call in
+                ["id": call.id, "type": "function", "function": ["name": call.name, "arguments": call.argumentsJSON]]
+            }
+            return dict
+        }
+        return ["role": message.role, "content": message.content]
     }
 
     func cancel() {
@@ -145,7 +264,87 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 self.errorText = error.localizedDescription
             }
             self.finalizeTokensPerSecond(endDate: completionDate)
+            if error == nil {
+                await self.continueWithPendingToolCalls()
+            }
         }
+    }
+
+    /// If the response that just finished streaming carried one or more
+    /// tool calls, runs them and sends their results back as a follow-up
+    /// request so the model can react -- otherwise this turn is done.
+    private func continueWithPendingToolCalls() async {
+        guard let idx = assistantMessageIndex, idx < messages.count else { return }
+        let toolCalls = messages[idx].toolCalls
+        guard !toolCalls.isEmpty, let context = pendingRequestContext else { return }
+        await executeToolCalls(toolCalls, sourceIndex: idx, context: context)
+    }
+
+    private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext) async {
+        isGeneratingImage = true
+        defer { isGeneratingImage = false }
+
+        // A diffusion model's own peak memory can rival or exceed a loaded
+        // chat model's (confirmed live: Z-Image Turbo alone peaked near
+        // 25GB on a 24GB Mac) -- mlx_lm.server has no notion of "make room,
+        // something else needs the GPU right now," so the chat model is
+        // stopped first and reloaded after, unless the user has said their
+        // Mac comfortably fits both at once. Reuses ServerManager's own
+        // idle-unload/reload pair (stop() + ensureModelLoaded()), which
+        // already remembers the last-loaded model/alias for exactly this
+        // "stopped, but not forgotten" case.
+        let shouldUnload = context.settings.unloadModelDuringImageGen
+        if shouldUnload {
+            context.server.stop()
+        }
+
+        for call in toolCalls {
+            guard call.name == "generate_image" else {
+                messages.append(ChatMessage(role: "tool", content: "Unknown tool: \(call.name)", toolCallID: call.id))
+                continue
+            }
+            let arguments = Self.parseArguments(call.argumentsJSON)
+            let prompt = (arguments["prompt"] as? String) ?? ""
+            let width = (arguments["width"] as? Int) ?? 1024
+            let height = (arguments["height"] as? Int) ?? 1024
+            do {
+                let imageData = try await mfluxManager.generate(
+                    prompt: prompt, width: width, height: height, model: context.settings.imageGenModel
+                )
+                if sourceIndex < messages.count {
+                    messages[sourceIndex].images.append(imageData)
+                }
+                messages.append(
+                    ChatMessage(role: "tool", content: "Image generated successfully.", toolCallID: call.id)
+                )
+            } catch {
+                messages.append(
+                    ChatMessage(
+                        role: "tool", content: "Image generation failed: \(error.localizedDescription)",
+                        toolCallID: call.id
+                    )
+                )
+            }
+        }
+
+        if shouldUnload {
+            do {
+                try await context.server.ensureModelLoaded()
+            } catch {
+                errorText = "Failed to reload the chat model after image generation: \(error.localizedDescription)"
+                return
+            }
+        }
+
+        startAssistantResponse(
+            port: context.port, modelAlias: context.modelAlias, settings: context.settings, server: context.server
+        )
+    }
+
+    private static func parseArguments(_ json: String) -> [String: Any] {
+        guard let data = json.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
+        return obj
     }
 
     private func finalizeTokensPerSecond(endDate: Date) {
@@ -220,6 +419,24 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                     }
                 }
             }
+
+            // mlx_lm.server only ever emits a complete tool call here --
+            // it accumulates the model's raw <tool_call>...</tool_call>
+            // text server-side and only appends to its own tool_calls list
+            // once that block closes (see server.py's generation loop), so
+            // by the time this delta is visible, "arguments" is already a
+            // complete, parseable JSON string -- no incremental/fragmented
+            // merging by index needed, unlike OpenAI's own real streaming
+            // protocol.
+            if let toolCallParts = delta["tool_calls"] as? [[String: Any]] {
+                for part in toolCallParts {
+                    guard let function = part["function"] as? [String: Any],
+                          let name = function["name"] as? String else { continue }
+                    let id = (part["id"] as? String) ?? UUID().uuidString
+                    let argumentsJSON = (function["arguments"] as? String) ?? "{}"
+                    appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
+                }
+            }
         }
     }
 
@@ -248,5 +465,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     private func appendToAssistant(image: Data) {
         guard let idx = assistantMessageIndex, idx < messages.count else { return }
         messages[idx].images.append(image)
+    }
+
+    private func appendToAssistant(toolCall: ToolCall) {
+        guard let idx = assistantMessageIndex, idx < messages.count else { return }
+        messages[idx].toolCalls.append(toolCall)
     }
 }

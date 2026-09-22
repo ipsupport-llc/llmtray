@@ -53,6 +53,14 @@ struct ContentView: View {
     @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
     @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
     @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
+    @AppStorage("llmtray.enableImageGeneration") private var enableImageGeneration: Bool = false
+    @AppStorage("llmtray.imageGenModel") private var imageGenModel: ImageGenModel = .gptqMixed
+    // On by default -- a diffusion model's own peak memory can rival or
+    // exceed a loaded chat model's, and mlx_lm.server has no notion of
+    // "share the GPU with something else right now." Off is there for
+    // whoever has enough unified memory to comfortably hold both at once.
+    @AppStorage("llmtray.unloadModelDuringImageGen") private var unloadModelDuringImageGen: Bool = true
+    @State private var imageModelDownloadError: String?
     // SMAppService.mainApp.status is the actual source of truth (the user
     // could also flip this from System Settings > General > Login Items
     // directly) -- not persisted separately in UserDefaults, just read
@@ -606,6 +614,108 @@ struct ContentView: View {
                 Slider(value: $maxTokens, in: 64...Double(modelMaxContext), step: 256)
                 Text(String(Int(maxTokens))).frame(width: 52, alignment: .trailing)
             }
+
+            Divider().padding(.vertical, 4)
+            imageGenerationSection
+        }
+    }
+
+    // Split out of chatSettingsSection -- same SwiftUI type-checker
+    // complexity reasoning as advancedSettingsContent's own split (see its
+    // comment): this section alone has a custom Binding, a Picker, and
+    // several Text/conditional views, easily enough to trip the same
+    // "unable to type-check this expression in reasonable time" seen there.
+    private var imageGenerationSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Tools").foregroundColor(.secondary)
+            Picker("Model", selection: $imageGenModel) {
+                ForEach(ImageGenModel.allCases) { model in
+                    Text(model.displayName).tag(model)
+                }
+            }
+            Text("\(imageGenModel.summary) Download: \(imageGenModel.approximateDownloadDescription).")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+
+            Toggle("Enable image generation", isOn: enableImageGenerationBinding)
+            if enableImageGeneration {
+                Toggle("Unload chat model during generation", isOn: $unloadModelDuringImageGen)
+                Text(
+                    """
+                    Both models resident at once can easily exceed unified memory (a diffusion \
+                    model's own peak can rival or exceed a loaded chat model's) -- on, the chat \
+                    model stops before generating and reloads right after, adding reload time \
+                    per image. Turn off only if this Mac comfortably fits both at once.
+                    """
+                )
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+            }
+            if chat.isDownloadingModel {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text(chat.mfluxStatusText.isEmpty ? "Downloading…" : chat.mfluxStatusText)
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
+            }
+            if let imageModelDownloadError {
+                Text(imageModelDownloadError)
+                    .font(.system(size: 10))
+                    .foregroundColor(.red)
+            }
+            Text(
+                """
+                Exposes a generate_image tool to the model (needs a tool-calling-capable model \
+                to actually use it) -- when called, runs the selected model locally and shows \
+                the result inline.
+                """
+            )
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
+        }
+    }
+
+    // Extracted with an explicit `Binding<Bool>` type -- see
+    // mtpRuntimeToggleBinding's old comment (now removed along with that
+    // toggle) for why an inline Binding(get:set:) in a ViewBuilder is a
+    // type-checker trap regardless of the surrounding block's own size.
+    private var enableImageGenerationBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { enableImageGeneration },
+            set: { newValue in
+                if newValue {
+                    confirmAndDownloadImageModel()
+                } else {
+                    enableImageGeneration = false
+                }
+            }
+        )
+    }
+
+    /// Downloads (if not already cached) before actually flipping the
+    /// toggle on -- a diffusion model is tens of GB; doing this eagerly,
+    /// with a visible progress row, beats silently stalling the first chat
+    /// message that happens to trigger generate_image.
+    private func confirmAndDownloadImageModel() {
+        let model = imageGenModel
+        let alert = NSAlert()
+        alert.messageText = "Enable image generation?"
+        alert.informativeText = "The first time, this downloads \(model.displayName) "
+            + "(\(model.approximateDownloadDescription)) to this Mac. Downloading now, before "
+            + "enabling, so it doesn't stall a later chat message."
+        alert.addButton(withTitle: "Download and Enable")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .informational
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        imageModelDownloadError = nil
+        Task {
+            if let error = await chat.downloadImageModel(model) {
+                imageModelDownloadError = error.localizedDescription
+            } else {
+                enableImageGeneration = true
+            }
         }
     }
 
@@ -678,9 +788,23 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.top, 8)
                     }
-                    ForEach(chat.messages) { msg in
+                    // "tool" messages are protocol plumbing for the
+                    // generate_image round-trip (see ChatClient) -- the
+                    // image they produced is already attached to the
+                    // assistant message that called the tool, so there's
+                    // nothing left worth showing as its own bubble.
+                    ForEach(chat.messages.filter { $0.role != "tool" }) { msg in
                         chatBubble(msg)
                             .id(msg.id)
+                    }
+                    if chat.isGeneratingImage {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.small)
+                            Text(chat.mfluxStatusText.isEmpty ? "Generating image…" : chat.mfluxStatusText)
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     if let err = chat.errorText {
                         Text(err)
@@ -791,12 +915,18 @@ struct ContentView: View {
                     .focused($isInputFocused)
                     .disabled(!isRunning)
 
-                if chat.isStreaming {
+                if chat.isBusy {
                     Button {
                         chat.cancel()
                     } label: {
                         Image(systemName: "stop.fill")
                     }
+                    // Cancelling mid-image-generation only stops the network
+                    // side of the tool round-trip; the mflux subprocess
+                    // itself isn't interruptible yet, so the button is
+                    // disabled rather than implying a generation already
+                    // running on the GPU can be stopped instantly.
+                    .disabled(chat.isGeneratingImage)
                 } else {
                     Button {
                         sendDraft()
@@ -817,22 +947,22 @@ struct ContentView: View {
         // send() mid-stream and stomping ChatClient's in-flight
         // assistantMessageIndex, without having to disable the field
         // itself (which would kick focus out of it every time).
-        guard isRunning, !chat.isStreaming else { return }
+        guard isRunning, !chat.isBusy else { return }
         let text = draft
         draft = ""
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt)
-        chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings)
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        chat.send(prompt: text, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
         isInputFocused = true
     }
 
     // Only offered once a reply has actually finished -- mid-stream there's
     // nothing settled yet to redo.
     private var canRegenerate: Bool {
-        isRunning && !chat.isStreaming && chat.messages.last?.role == "assistant"
+        isRunning && !chat.isBusy && chat.messages.last?.role == "assistant"
     }
 
     private func regenerate() {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt)
-        chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings)
+        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen)
+        chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
     }
 }
