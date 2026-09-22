@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import Foundation
 
@@ -52,6 +53,11 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     // covers both for UI gating.
     @Published private(set) var isGeneratingImage: Bool = false
     @Published private(set) var mfluxStatusText: String = ""
+    // Mirrored from MfluxManager (see its stepProgress/previewImage docs)
+    // for the same reason mfluxStatusText is -- ContentView only imports
+    // this file's types, not MfluxManager's directly.
+    @Published private(set) var mfluxStepProgress: (step: Int, total: Int)?
+    @Published private(set) var mfluxPreviewImage: NSImage?
     // True only during the explicit, Settings-initiated warm-up download
     // (see downloadImageModel) -- distinct from isGeneratingImage (a real
     // chat-triggered generation) and NOT included in isBusy, since it's
@@ -63,6 +69,8 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
 
     private let mfluxManager = MfluxManager()
     private var mfluxStatusCancellable: AnyCancellable?
+    private var mfluxProgressCancellable: AnyCancellable?
+    private var mfluxPreviewCancellable: AnyCancellable?
 
     private var session: URLSession!
     private var task: URLSessionDataTask?
@@ -87,6 +95,13 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         var server: ServerManager
     }
     private var pendingRequestContext: RequestContext?
+    // Small tool-calling models (this feature was built against a 4B one)
+    // can fail to treat a successful tool result as "done" and just call
+    // generate_image again unprompted -- confirmed live. This caps actual
+    // generations per user turn regardless of how many times the model
+    // tries, resetting whenever a real new turn starts (send/regenerate).
+    private var imagesGeneratedThisTurn = 0
+    private let maxImagesPerTurn = 1
 
     private static let generateImageTool: [String: Any] = [
         "type": "function",
@@ -122,10 +137,17 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         mfluxStatusCancellable = mfluxManager.$statusText
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.mfluxStatusText = $0 }
+        mfluxProgressCancellable = mfluxManager.$stepProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.mfluxStepProgress = $0 }
+        mfluxPreviewCancellable = mfluxManager.$previewImage
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in self?.mfluxPreviewImage = $0 }
     }
 
     func send(prompt: String, port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        imagesGeneratedThisTurn = 0
         messages.append(ChatMessage(role: "user", content: prompt))
         startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
@@ -136,6 +158,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     /// same prompt.
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
+        imagesGeneratedThisTurn = 0
         if messages.last?.role == "assistant" {
             messages.removeLast()
         }
@@ -281,6 +304,14 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     }
 
     private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext) async {
+        // Whether unloading/reloading the chat model is worth doing at all
+        // this round -- skip it entirely if every call here is already
+        // going to be refused by the per-turn cap below, so a model stuck
+        // repeating the tool call doesn't also repeatedly stop/reload the
+        // chat server for nothing.
+        let willActuallyGenerate = toolCalls.contains { $0.name == "generate_image" }
+            && imagesGeneratedThisTurn < maxImagesPerTurn
+
         isGeneratingImage = true
         defer { isGeneratingImage = false }
 
@@ -293,7 +324,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // idle-unload/reload pair (stop() + ensureModelLoaded()), which
         // already remembers the last-loaded model/alias for exactly this
         // "stopped, but not forgotten" case.
-        let shouldUnload = context.settings.unloadModelDuringImageGen
+        let shouldUnload = context.settings.unloadModelDuringImageGen && willActuallyGenerate
         if shouldUnload {
             context.server.stop()
         }
@@ -301,6 +332,23 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         for call in toolCalls {
             guard call.name == "generate_image" else {
                 messages.append(ChatMessage(role: "tool", content: "Unknown tool: \(call.name)", toolCallID: call.id))
+                continue
+            }
+            // Small tool-calling models can fail to treat a successful
+            // result as "done" and just call the tool again unprompted
+            // (confirmed live against a 4B model) -- refuse rather than
+            // burn another real generation, and say so plainly enough that
+            // even a small model should stop trying.
+            guard imagesGeneratedThisTurn < maxImagesPerTurn else {
+                messages.append(
+                    ChatMessage(
+                        role: "tool",
+                        content: "Not generating another image -- one was already generated for this request "
+                            + "and shown to the user. Do not call generate_image again unless the user sends a "
+                            + "new message explicitly asking for a new or different image.",
+                        toolCallID: call.id
+                    )
+                )
                 continue
             }
             let arguments = Self.parseArguments(call.argumentsJSON)
@@ -314,8 +362,15 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 if sourceIndex < messages.count {
                     messages[sourceIndex].images.append(imageData)
                 }
+                imagesGeneratedThisTurn += 1
                 messages.append(
-                    ChatMessage(role: "tool", content: "Image generated successfully.", toolCallID: call.id)
+                    ChatMessage(
+                        role: "tool",
+                        content: "Image generated and already shown to the user inline -- do not call "
+                            + "generate_image again for this request unless the user explicitly asks for a "
+                            + "new or different image.",
+                        toolCallID: call.id
+                    )
                 )
             } catch {
                 messages.append(

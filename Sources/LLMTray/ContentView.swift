@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import ServiceManagement
+import UniformTypeIdentifiers
 
 enum SettingsTab {
     case general
@@ -798,13 +799,7 @@ struct ContentView: View {
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.small)
-                            Text(chat.mfluxStatusText.isEmpty ? "Generating image…" : chat.mfluxStatusText)
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        imageGenerationProgressView
                     }
                     if let err = chat.errorText {
                         Text(err)
@@ -825,6 +820,37 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    // Split out for the same type-checker reason as the other extracted
+    // sections -- a conditional ProgressView + Image + Text stack inside
+    // the already-large chat ScrollView body.
+    private var imageGenerationProgressView: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                if let progress = chat.mfluxStepProgress, progress.total > 0 {
+                    ProgressView(value: Double(progress.step), total: Double(progress.total))
+                        .frame(width: 100)
+                    Text("Step \(progress.step)/\(progress.total)")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                } else {
+                    ProgressView().controlSize(.small)
+                    Text(chat.mfluxStatusText.isEmpty ? "Generating image…" : chat.mfluxStatusText)
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+            }
+            if let preview = chat.mfluxPreviewImage {
+                Image(nsImage: preview)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: 320, maxHeight: 320)
+                    .cornerRadius(8)
+                    .opacity(0.85)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func chatBubble(_ msg: ChatMessage) -> some View {
@@ -861,19 +887,42 @@ struct ContentView: View {
             }
 
             // Rendered straight from the in-memory bytes the model sent
-            // this turn -- never written to disk, so nothing to clean up
-            // when the chat is cleared or the app quits.
+            // this turn -- never written to disk (except mflux's own
+            // transient temp file, deleted immediately after this Data is
+            // read -- see MfluxManager.generate), so nothing to clean up
+            // when the chat is cleared or the app quits. Save button is the
+            // one deliberate escape hatch for a user who wants to keep one.
             ForEach(Array(msg.images.enumerated()), id: \.offset) { _, data in
                 if let nsImage = NSImage(data: data) {
-                    Image(nsImage: nsImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: 320, maxHeight: 320)
-                        .cornerRadius(8)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Image(nsImage: nsImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(maxWidth: 320, maxHeight: 320)
+                            .cornerRadius(8)
+                        Button {
+                            saveImage(data)
+                        } label: {
+                            Label("Save…", systemImage: "square.and.arrow.down")
+                                .font(.system(size: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.secondary)
+                    }
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: msg.role == "user" ? .trailing : .leading)
+    }
+
+    /// The one deliberate way a generated image reaches disk -- an explicit
+    /// per-image save, not automatic (see chatBubble's images ForEach).
+    private func saveImage(_ data: Data) {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "image.png"
+        panel.allowedContentTypes = [.png]
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        try? data.write(to: url)
     }
 
     // MARK: - Input bar

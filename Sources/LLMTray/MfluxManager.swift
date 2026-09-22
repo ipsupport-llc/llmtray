@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 /// Which GPTQ-corrected Z-Image-Turbo checkpoint mflux drives. Unlike
@@ -85,6 +86,12 @@ final class MfluxManager: ObservableObject {
 
     @Published private(set) var isBusy: Bool = false
     @Published private(set) var statusText: String = ""
+    // Derived from mflux's own `--stepwise-image-output-dir` output files
+    // (named "seed_<seed>_step<N>of<TOTAL>.png") during generate() -- gives
+    // real step-accurate progress and a live-updating preview for free,
+    // instead of parsing mflux's tqdm stdout text. nil when not generating.
+    @Published private(set) var stepProgress: (step: Int, total: Int)?
+    @Published private(set) var previewImage: NSImage?
 
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mflux_venv" }
     private var venvPython: String { venvDir + "/bin/python3" }
@@ -206,14 +213,28 @@ final class MfluxManager: ObservableObject {
 
         let outputPath = FileManager.default.temporaryDirectory
             .appendingPathComponent("llmtray-mflux-\(UUID().uuidString).png").path
-        defer { try? FileManager.default.removeItem(atPath: outputPath) }
+        let stepDir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("llmtray-mflux-steps-\(UUID().uuidString)").path
+        try FileManager.default.createDirectory(atPath: stepDir, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.removeItem(atPath: outputPath)
+            try? FileManager.default.removeItem(atPath: stepDir)
+        }
 
         isBusy = true
         statusText = "Generating image…"
+        let steps = Int(model.stepCount) ?? 9
+        stepProgress = (step: 0, total: steps)
+        previewImage = nil
         defer {
             isBusy = false
             statusText = ""
+            stepProgress = nil
+            previewImage = nil
         }
+
+        let pollTask = Task { [weak self] in await self?.pollStepwiseProgress(in: stepDir) }
+        defer { pollTask.cancel() }
 
         // width/height must be multiples of 16 for the model's patch size;
         // round rather than reject so an odd model-supplied value doesn't
@@ -226,6 +247,7 @@ final class MfluxManager: ObservableObject {
             "--height", String(roundedHeight),
             "--steps", model.stepCount,
             "--output", outputPath,
+            "--stepwise-image-output-dir", stepDir,
         ]
 
         let savedDir = savedModelDir(for: model)
@@ -243,6 +265,42 @@ final class MfluxManager: ObservableObject {
             throw MfluxError.outputMissing
         }
         return data
+    }
+
+    /// Watches --stepwise-image-output-dir for mflux's own
+    /// "seed_<seed>_step<N>of<TOTAL>.png" files (one written per denoising
+    /// step) and publishes the latest one as a live preview, plus exact
+    /// step/total progress parsed straight from the filename -- no stdout
+    /// parsing needed. Polling (vs. FSEvents) because steps land every ~2s;
+    /// simplicity wins over the small latency. Cancelled via the caller's
+    /// Task handle once generate()'s runProcess call returns.
+    private static let stepFilePattern = try! NSRegularExpression(pattern: #"seed_\d+_step(\d+)of(\d+)\.png$"#)
+
+    private func pollStepwiseProgress(in stepDir: String) async {
+        var lastStep = -1
+        while !Task.isCancelled {
+            if let entries = try? FileManager.default.contentsOfDirectory(atPath: stepDir) {
+                var best: (step: Int, total: Int, name: String)?
+                for name in entries {
+                    let range = NSRange(name.startIndex..., in: name)
+                    guard let match = Self.stepFilePattern.firstMatch(in: name, range: range),
+                          let stepRange = Range(match.range(at: 1), in: name),
+                          let totalRange = Range(match.range(at: 2), in: name),
+                          let step = Int(name[stepRange]), let total = Int(name[totalRange]) else { continue }
+                    if best == nil || step > best!.step {
+                        best = (step, total, name)
+                    }
+                }
+                if let best, best.step != lastStep {
+                    lastStep = best.step
+                    stepProgress = (step: best.step, total: best.total)
+                    if let image = NSImage(contentsOfFile: stepDir + "/" + best.name) {
+                        previewImage = image
+                    }
+                }
+            }
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {
