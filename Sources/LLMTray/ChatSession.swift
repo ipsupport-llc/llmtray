@@ -1,20 +1,45 @@
 import Foundation
 
 /// The persisted subset of a ChatMessage -- deliberately narrower than the
-/// in-memory struct. Dropped on purpose:
-///   - images: generated pictures stay in-memory-only by design (see
-///     ChatMessage's own doc comment) -- a resumed session shows text only,
-///     never a cached copy of a generated image.
-///   - toolCalls/toolCallID: OpenAI tool-calling wire plumbing, meaningless
-///     after a restart (there's no live pending call to resume), and
-///     "tool" role messages are filtered out entirely when saving (see
-///     ChatClient.persistCurrentSession) -- a resumed session is a plain
-///     readable user/assistant transcript.
+/// in-memory struct. toolCalls/toolCallID are dropped: OpenAI tool-calling
+/// wire plumbing, meaningless after a restart (there's no live pending
+/// call to resume), and "tool" role messages are filtered out entirely
+/// when saving (see ChatClient.persistCurrentSession) -- a resumed session
+/// is a plain readable user/assistant transcript. Generated images ARE
+/// persisted (as sibling files, see ChatSessionStore.imagesDir) -- unlike
+/// a temporary chat's images, which still never touch disk at all.
 struct PersistedMessage: Codable {
     var role: String
     var content: String
     var reasoning: String
     var isSummary: Bool
+    // Filenames (not full paths) under this session's imagesDir, in the
+    // same order as the original ChatMessage.images.
+    var imageFilenames: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case role, content, reasoning, isSummary, imageFilenames
+    }
+
+    init(role: String, content: String, reasoning: String, isSummary: Bool, imageFilenames: [String] = []) {
+        self.role = role
+        self.content = content
+        self.reasoning = reasoning
+        self.isSummary = isSummary
+        self.imageFilenames = imageFilenames
+    }
+
+    // Custom init (rather than relying on synthesis) so that session files
+    // written before imageFilenames existed (v0.5.0/v0.5.1) still decode
+    // instead of the whole session silently vanishing from the list.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        role = try c.decode(String.self, forKey: .role)
+        content = try c.decode(String.self, forKey: .content)
+        reasoning = try c.decode(String.self, forKey: .reasoning)
+        isSummary = try c.decode(Bool.self, forKey: .isSummary)
+        imageFilenames = try c.decodeIfPresent([String].self, forKey: .imageFilenames) ?? []
+    }
 }
 
 struct ChatSessionFile: Codable, Identifiable {
@@ -27,7 +52,10 @@ struct ChatSessionFile: Codable, Identifiable {
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --
 /// human-inspectable "logs" per the feature's own goal, and simple enough
-/// that a session list is just "read every file in this directory."
+/// that a session list is just "read every file in this directory." Each
+/// session's generated images live alongside it in a sibling
+/// "<uuid>-images/" directory (see imagesDir) rather than inline/base64 in
+/// the JSON, so the log itself stays small and readable.
 enum ChatSessionStore {
     static var sessionsDir: String {
         RuntimePaths.externalRuntimeDir + "/sessions"
@@ -35,6 +63,10 @@ enum ChatSessionStore {
 
     private static func path(for id: UUID) -> String {
         sessionsDir + "/\(id.uuidString).json"
+    }
+
+    static func imagesDir(for id: UUID) -> String {
+        sessionsDir + "/\(id.uuidString)-images"
     }
 
     private static let encoder: JSONEncoder = {
@@ -77,5 +109,6 @@ enum ChatSessionStore {
 
     static func delete(id: UUID) {
         try? FileManager.default.removeItem(atPath: path(for: id))
+        try? FileManager.default.removeItem(atPath: imagesDir(for: id))
     }
 }

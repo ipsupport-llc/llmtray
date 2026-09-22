@@ -202,8 +202,13 @@ struct ContentView: View {
                         Text("No saved sessions")
                     }
                     ForEach(sessions) { session in
-                        Button(session.title.isEmpty ? "New chat" : session.title) {
-                            chat.loadSession(session)
+                        Menu(session.title.isEmpty ? "New chat" : session.title) {
+                            Button("Open") {
+                                chat.loadSession(session)
+                            }
+                            Button("Delete", role: .destructive) {
+                                deleteSession(session)
+                            }
                         }
                     }
                 } label: {
@@ -1148,5 +1153,15 @@ struct ContentView: View {
     private func autoCompactIfNeeded() {
         guard autoCompactThreshold > 0, chat.messages.count > autoCompactThreshold else { return }
         Task { await compact() }
+    }
+
+    private func deleteSession(_ session: ChatSessionFile) {
+        ChatSessionStore.delete(id: session.id)
+        // Deleting the session currently on screen would otherwise leave
+        // the chat showing a conversation whose log no longer exists --
+        // start a fresh one instead of leaving that dangling state.
+        if chat.currentSessionID == session.id {
+            chat.newSession()
+        }
     }
 }

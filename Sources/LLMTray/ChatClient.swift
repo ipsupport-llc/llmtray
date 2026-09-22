@@ -195,8 +195,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
 
     func loadSession(_ file: ChatSessionFile) {
         cancel()
-        messages = file.messages.map {
-            ChatMessage(role: $0.role, content: $0.content, reasoning: $0.reasoning, isSummary: $0.isSummary)
+        let imagesDir = ChatSessionStore.imagesDir(for: file.id)
+        messages = file.messages.map { pm in
+            let images = pm.imageFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
+            return ChatMessage(role: pm.role, content: pm.content, reasoning: pm.reasoning, images: images, isSummary: pm.isSummary)
         }
         currentSessionID = file.id
         currentSessionTitle = file.title
@@ -208,17 +210,39 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
 
     /// Called after every turn that ends with no pending tool call (see
     /// continueWithPendingToolCalls) -- a no-op for a temporary chat
-    /// (currentSessionID == nil). "tool" role messages and content-less
-    /// assistant messages (the ones that only ever carried a tool_call)
-    /// are dropped -- see PersistedMessage's own doc comment for why.
+    /// (currentSessionID == nil). "tool" role messages are dropped; a
+    /// content-less assistant message is only dropped if it also carries
+    /// no image (an image-only tool-call-carrier message is real content
+    /// now that images are persisted, not plumbing to discard).
     private func persistCurrentSession() {
         guard let sessionID = currentSessionID else { return }
+        let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
+        var pendingImageWrites: [(path: String, data: Data)] = []
+
         let persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool" else { return nil }
-            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty { return nil }
-            return PersistedMessage(role: msg.role, content: msg.content, reasoning: msg.reasoning, isSummary: msg.isSummary)
+            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty { return nil }
+            // Keyed by this message's own (stable for its lifetime) id, so
+            // re-persisting the same session after a later turn doesn't
+            // re-derive different filenames for images already on disk.
+            let filenames = msg.images.enumerated().map { i, _ in "\(msg.id.uuidString)-\(i).png" }
+            for (i, data) in msg.images.enumerated() {
+                pendingImageWrites.append((imagesDir + "/" + filenames[i], data))
+            }
+            return PersistedMessage(
+                role: msg.role, content: msg.content, reasoning: msg.reasoning, isSummary: msg.isSummary,
+                imageFilenames: filenames
+            )
         }
         guard !persisted.isEmpty else { return }
+
+        if !pendingImageWrites.isEmpty {
+            try? FileManager.default.createDirectory(atPath: imagesDir, withIntermediateDirectories: true)
+            for (path, data) in pendingImageWrites where !FileManager.default.fileExists(atPath: path) {
+                try? data.write(to: URL(fileURLWithPath: path))
+            }
+        }
+
         if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
             currentSessionTitle = String(firstUser.content.prefix(48))
         }
