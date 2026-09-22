@@ -1027,6 +1027,12 @@ struct ContentView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(maxWidth: 320, maxHeight: 320)
                             .cornerRadius(8)
+                            .onTapGesture {
+                                openImagePreview(data, title: msg.imagePrompts[safe: i] ?? "Image")
+                            }
+                            .onHover { hovering in
+                                if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                            }
                         HStack(spacing: 8) {
                             Button {
                                 saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "")
@@ -1047,6 +1053,37 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, alignment: msg.role == "user" ? .trailing : .leading)
     }
+
+    /// Opens a full-size, resizable preview window for a tapped thumbnail --
+    /// entirely in-memory (NSHostingView over the same NSImage already
+    /// decoded for the thumbnail), no disk write, unlike Save. Windows are
+    /// retained in a static array (not @State) since they're meant to
+    /// outlive this View struct's own lifecycle -- the popover can close
+    /// without closing a preview the user opened from it.
+    private func openImagePreview(_ data: Data, title: String) {
+        guard let nsImage = NSImage(data: data) else { return }
+        let screenSize = NSScreen.main?.visibleFrame.size ?? NSSize(width: 1200, height: 800)
+        let maxSize = NSSize(width: screenSize.width * 0.9, height: screenSize.height * 0.9)
+        let scale = min(1, min(maxSize.width / nsImage.size.width, maxSize.height / nsImage.size.height))
+        let windowSize = NSSize(width: nsImage.size.width * scale, height: nsImage.size.height * scale)
+
+        let window = NSWindow(
+            contentRect: NSRect(origin: .zero, size: windowSize),
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
+            backing: .buffered, defer: false
+        )
+        window.title = title
+        window.contentView = NSHostingView(
+            rootView: Image(nsImage: nsImage).resizable().aspectRatio(contentMode: .fit)
+        )
+        window.center()
+        window.isReleasedWhenClosed = false
+        Self.imagePreviewWindows.append(window)
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    private static var imagePreviewWindows: [NSWindow] = []
 
     /// The one deliberate way a generated image reaches disk -- an explicit
     /// per-image save, not automatic (see chatBubble's images ForEach).
@@ -1122,6 +1159,12 @@ struct ContentView: View {
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 44, height: 44)
                                         .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .onTapGesture {
+                                            openImagePreview(data, title: "Attachment")
+                                        }
+                                        .onHover { hovering in
+                                            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
+                                        }
                                     Button {
                                         pendingAttachments.remove(at: i)
                                     } label: {
