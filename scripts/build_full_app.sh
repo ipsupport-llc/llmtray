@@ -37,12 +37,15 @@ echo "--- finding latest official python.org macOS release ---"
 # --head loop) with a short pause between tries -- python.org's own server
 # started returning connection resets partway through an earlier, more
 # aggressive version of this loop, almost certainly a rate limit.
+# `sed -n '1,8p'`, not `| head -8`: head exits after 8 lines, the upstream
+# stage then dies of SIGPIPE, and under pipefail that failed the whole
+# release build ("tail: stdout: Broken pipe", v0.6.7) once python.org's
+# index got long enough not to fit in the pipe buffer.
 VERSIONS="$(curl -fsSL https://www.python.org/ftp/python/ \
   | grep -oE 'href="3\.[0-9]+\.[0-9]+/"' \
   | sed 's/href="//;s#/"##' \
-  | sort -t. -k1,1n -k2,2n -k3,3n \
-  | tail -r \
-  | head -8)"
+  | sort -t. -k1,1nr -k2,2nr -k3,3nr \
+  | sed -n '1,8p')"
 
 PY_VERSION=""
 PKG_URL=""
