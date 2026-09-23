@@ -235,6 +235,35 @@ final class ServerManager: ObservableObject {
         }
     }
 
+    /// `--draft-model` value for the model's MTP drafter (see
+    /// ModelDiscovery.mtpDrafterRepo), or nil. Only when the installed
+    /// mlx-lm actually has the drafter architecture: an older pinned
+    /// runtime would fail to load it and the whole server start with it,
+    /// so the setting simply has no effect until Check for Updates brings
+    /// in a runtime that supports it. A --draft-model the user put in the
+    /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
+    /// Face itself (~450MB, cached after the first start).
+    private func mtpDrafterArgument(forModelPath modelPath: String) -> String? {
+        guard UserDefaults.standard.object(forKey: "llmtray.mtpDrafter") as? Bool ?? true else { return nil }
+        guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath) else { return nil }
+        let extra = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
+        if extra.contains("--draft-model") { return nil }
+        guard runtimeSupportsModelType("gemma4_assistant") else {
+            appendLog("--- MTP drafter available for this model, but the installed mlx-lm runtime doesn't support it yet (Check for Updates) ---\n")
+            return nil
+        }
+        appendLog("--- speculative decoding with MTP drafter \(repo) ---\n")
+        return repo
+    }
+
+    private func runtimeSupportsModelType(_ modelType: String) -> Bool {
+        let lib = venvDir + "/lib"
+        guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }
+        return pythons.contains { py in
+            FileManager.default.fileExists(atPath: "\(lib)/\(py)/site-packages/mlx_lm/models/\(modelType).py")
+        }
+    }
+
     private func launchServerProcess(modelPath: String, alias: String) {
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }
@@ -281,6 +310,9 @@ final class ServerManager: ObservableObject {
         }
         if !alias.isEmpty {
             args += ["--model-alias", alias]
+        }
+        if let drafter = mtpDrafterArgument(forModelPath: modelPath) {
+            args += ["--draft-model", drafter]
         }
         // Advanced setting: reintroduces the per-token DEBUG logging this
         // app itself stopped needing once isBusy moved to the proxy's own

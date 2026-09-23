@@ -108,6 +108,28 @@ enum ModelDiscovery {
         return false
     }
 
+    /// HF repo of a Multi-Token-Prediction drafter for this model, if we
+    /// publish one: mlx_lm.server's `--draft-model` then speculatively
+    /// decodes with it (same output, faster -- ~+50% tok/s on short prompts
+    /// for Gemma 4 26B-A4B). Matched by architecture shape from config.json
+    /// rather than by folder name, so any MLX quant of the same base model
+    /// gets it; the drafter only shares the tokenizer and hidden size with
+    /// the main model, not its weights.
+    static func mtpDrafterRepo(forModelPath path: String) -> String? {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        let modelType = obj["model_type"] as? String
+        guard modelType == "gemma4" || modelType == "gemma4_text" else { return nil }
+        let text = (obj["text_config"] as? [String: Any]) ?? obj
+        // Gemma 4 26B-A4B: 2816 hidden, 30 layers, MoE block.
+        if text["hidden_size"] as? Int == 2816,
+           text["num_hidden_layers"] as? Int == 30,
+           text["enable_moe_block"] as? Bool == true {
+            return "roman220220/gemma-4-26B-A4B-it-assistant-mlx-8bit"
+        }
+        return nil
+    }
+
     /// Models with KV-shared layers (e.g. Gemma 4's `num_kv_shared_layers`)
     /// reuse an earlier layer's raw cache-internal (keys, values) tuple
     /// directly inside the shared layer's attention call, bypassing that
