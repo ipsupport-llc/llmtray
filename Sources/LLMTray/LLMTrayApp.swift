@@ -265,7 +265,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let alert = NSAlert()
         alert.messageText = "Uninstall Runtime Data?"
         alert.informativeText = "Removes the downloaded mlx-lm runtime from \(RuntimePaths.externalRuntimeDir). "
-            + "The next time you start the server, it will be set up again from scratch."
+            + "The next time you start the server, it will be set up again from scratch. "
+            + "Saved chats and settings profiles are kept."
         alert.addButton(withTitle: "Uninstall")
         alert.addButton(withTitle: "Cancel")
         alert.alertStyle = .warning

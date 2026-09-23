@@ -700,9 +700,18 @@ final class ServerManager: ObservableObject {
     /// this directory (it lives outside Contents/ specifically so Sparkle
     /// updates don't wipe it) -- without an explicit way to clear it, it
     /// would just sit there forever after an uninstall.
+    ///
+    /// User data in the same directory -- saved chats (`sessions`) and
+    /// settings profiles (`profiles`) -- is kept: it's small, and losing it
+    /// to "uninstall the runtime" would be a nasty surprise (profiles would
+    /// be re-migrated from the stale pre-profiles settings).
     func removeExternalRuntime() {
         stop()
-        try? FileManager.default.removeItem(atPath: RuntimePaths.externalRuntimeDir)
+        let dir = RuntimePaths.externalRuntimeDir
+        let keep: Set<String> = ["sessions", "profiles"]
+        for item in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where !keep.contains(item) {
+            try? FileManager.default.removeItem(atPath: dir + "/" + item)
+        }
     }
 
     /// Runs one setup step to completion, streaming its output into the

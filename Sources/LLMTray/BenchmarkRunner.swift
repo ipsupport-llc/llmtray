@@ -53,6 +53,9 @@ struct AutoTuneProposal: Equatable {
     /// The model that was tuned -- Apply writes into *its* profile, even
     /// if a proxy request switched the loaded model in the meantime.
     var modelPath: String?
+    /// The profile the sweep wrote to; Apply writes there too, even if the
+    /// model has been switched to another profile since.
+    var profileID: String
     var currentConcurrency: Int
     var proposedConcurrency: Int
     var currentPrefillStep: Int
@@ -260,6 +263,13 @@ final class BenchmarkRunner: ObservableObject {
         // Pinned once: every candidate and the final restore go to this
         // profile even if the model's assignment changes mid-sweep.
         let profileID = profiles.profileID(for: modelPath)
+        // A profile that can't be written (Default with a broken
+        // default.json) would make every candidate a no-op: the sweep would
+        // restart with identical arguments and "pick" a winner from noise.
+        guard profiles.isEditable(id: profileID) else {
+            autoTuneError = "profile \u{201C}\(profiles.profile(for: modelPath).name)\u{201D} can't be saved (its file is unreadable) -- fix it first"
+            return
+        }
         func setLaunch(_ keyPath: WritableKeyPath<Profile, Int?>, _ value: Int?) {
             profiles.update(id: profileID) { $0[keyPath: keyPath] = value }
         }
@@ -366,6 +376,7 @@ final class BenchmarkRunner: ObservableObject {
             _ = await restart()
             pendingProposal = AutoTuneProposal(
                 modelPath: modelPath,
+                profileID: profileID,
                 currentConcurrency: originalConcurrency,
                 proposedConcurrency: bestConcurrency,
                 currentPrefillStep: originalPrefillStep,
@@ -385,8 +396,15 @@ final class BenchmarkRunner: ObservableObject {
         isRunning = true
         defer { isRunning = false; statusText = "" }
         let modelPath = proposal.modelPath
-        ProfileManager.shared.set(\.launch.decodeConcurrency, proposal.proposedConcurrency, for: modelPath)
-        ProfileManager.shared.set(\.launch.prefillStepSize, proposal.proposedPrefillStep, for: modelPath)
+        guard ProfileManager.shared.isEditable(id: proposal.profileID) else {
+            autoTuneError = "the tuned profile no longer exists or can't be saved"
+            pendingProposal = nil
+            return
+        }
+        ProfileManager.shared.update(id: proposal.profileID) {
+            $0.launch.decodeConcurrency = proposal.proposedConcurrency
+            $0.launch.prefillStepSize = proposal.proposedPrefillStep
+        }
         // Only the tuned model needs a restart to pick the values up; if
         // another model is loaded now, they apply on its next launch.
         if server.loadedModelPath == modelPath {

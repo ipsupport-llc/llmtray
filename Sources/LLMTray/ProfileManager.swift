@@ -38,7 +38,11 @@ final class ProfileManager: ObservableObject {
             guard url.lastPathComponent != "\(Profile.defaultID).json" else { return }
             errors.append("\(url.lastPathComponent): \(error.localizedDescription)")
         }
-        assignments = store.loadAssignments().filter { entry in profiles.contains { $0.id == entry.value } }
+        // Kept as stored, even for a profile that didn't load this time (a
+        // broken hand edit): filtering them out here would get the
+        // filtered list written back by the next assign() and lose those
+        // models' assignments for good. Lookups fall back to Default.
+        assignments = store.loadAssignments()
         loadErrors = errors
     }
 
@@ -57,7 +61,8 @@ final class ProfileManager: ObservableObject {
 
     /// The profile a model is assigned to (Default if none).
     func profileID(for modelPath: String?) -> String {
-        modelPath.flatMap { assignments[$0] } ?? Profile.defaultID
+        guard let id = modelPath.flatMap({ assignments[$0] }), profile(id: id) != nil else { return Profile.defaultID }
+        return id
     }
 
     func profile(for modelPath: String?) -> Profile {
@@ -155,6 +160,12 @@ final class ProfileManager: ObservableObject {
 
     func models(assignedTo profileID: String) -> [String] {
         assignments.filter { $0.value == profileID }.map(\.key).sorted()
+    }
+
+    /// Whether writes to this profile can be saved (false for a Default
+    /// whose file is broken -- it isn't in `profiles` then).
+    func isEditable(id: String) -> Bool {
+        profile(id: id) != nil
     }
 
     private func persist(_ p: Profile) {

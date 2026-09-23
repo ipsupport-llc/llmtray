@@ -20,7 +20,10 @@ struct ContentView: View {
     // Chat, tool and server-launch settings live in profiles (see
     // ProfileManager): the selected model's profile, layered on Default.
     @ObservedObject private var profiles = ProfileManager.shared
-    @State private var profileNameDraft: String = ""
+    // Profile names being typed in the Profiles tab, committed on Return:
+    // renaming on every keystroke fought the user (the stored name is
+    // trimmed and can't be empty, so spaces and clearing snapped back).
+    @State private var profileNameDrafts: [String: String] = [:]
 
     // Where models live -- ~/.llmtray/models by default (this app's own
     // namespace), not ~/.lmstudio/models. Anyone who wants to share models
@@ -352,11 +355,19 @@ struct ContentView: View {
                     Text(p.name).fontWeight(.medium)
                 } else {
                     TextField("name", text: Binding(
-                        get: { p.name },
-                        set: { profiles.rename(id: p.id, to: $0) }
+                        get: { profileNameDrafts[p.id] ?? p.name },
+                        set: { profileNameDrafts[p.id] = $0 }
                     ))
                     .textFieldStyle(.roundedBorder)
                     .frame(maxWidth: 160)
+                    .onSubmit {
+                        if let draft = profileNameDrafts[p.id] { profiles.rename(id: p.id, to: draft) }
+                        profileNameDrafts[p.id] = nil
+                    }
+                    .help("Press Return to rename")
+                    if let draft = profileNameDrafts[p.id], draft != p.name {
+                        Text("↵").foregroundColor(.secondary).help("Press Return to save the name")
+                    }
                 }
                 Text(p.isDefault ? "base" : "\(p.overrideCount) overrides")
                     .font(.system(size: 10))
