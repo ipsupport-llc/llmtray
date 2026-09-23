@@ -28,8 +28,8 @@ struct ContentView: View {
     // Server" -- which has no settings panel of its own -- can read the
     // same values back out of UserDefaults from AppDelegate.
     @AppStorage("llmtray.port") private var port: Int = 8765
-    @AppStorage("llmtray.kvBits") private var kvBits: Int = 4
-    @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = 64
+    @AppStorage("llmtray.kvBits") private var kvBits: Int = KVSettings.defaultBits
+    @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = KVSettings.defaultGroupSize
     @AppStorage("llmtray.quantizedKVStart") private var quantizedKVStart: Int = 0
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
@@ -324,8 +324,8 @@ struct ContentView: View {
 
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : kvBits
-        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: kvGroupSize, alias: alias)
+        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : KVSettings.validBits(kvBits)
+        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: KVSettings.validGroupSize(kvGroupSize), alias: alias)
     }
 
     /// Re-reads the newly-selected model's own context ceiling so the "Max
@@ -441,9 +441,28 @@ struct ContentView: View {
 
             Group {
                 Stepper("Port: \(port)", value: $port, in: 1024...65535)
-                Stepper("KV bits: \(kvBits == 0 ? "off" : String(kvBits))", value: $kvBits, in: 0...8)
-                Stepper("KV group size: \(kvGroupSize)", value: $kvGroupSize, in: 16...128, step: 16)
+                HStack {
+                    Text("KV cache:")
+                    Picker("KV cache", selection: $kvBits) {
+                        ForEach(KVSettings.bitsChoices, id: \.self) { bits in
+                            Text(bits == 0 ? "full" : "\(bits)-bit").tag(bits)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+                Text("8-bit: nearly lossless, half the KV memory (default). 4-bit: a quarter, but noticeably worse on long context. Full: best quality, most memory.")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
                 if kvBits > 0 {
+                    HStack {
+                        Text("KV group size:")
+                        Picker("KV group size", selection: $kvGroupSize) {
+                            ForEach(KVSettings.groupSizeChoices, id: \.self) { Text("\($0)").tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                    }
                     Stepper(
                         quantizedKVStart == 0
                             ? "Start quantizing KV cache: from the first token"
