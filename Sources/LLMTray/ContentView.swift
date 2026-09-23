@@ -995,7 +995,7 @@ struct ContentView: View {
                     )
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundColor(.secondary)
-                    Text(msg.reasoning)
+                    Text(ChatMarkdown.render(msg.reasoning, baseSize: 11))
                         .font(.system(size: 11).italic())
                         .foregroundColor(.secondary)
                         .textSelection(.enabled)
@@ -1006,7 +1006,15 @@ struct ContentView: View {
             }
 
             if !msg.content.isEmpty || msg.reasoning.isEmpty {
-                Text(msg.content.isEmpty ? "…" : msg.content)
+                // Assistant output is markdown (see ChatMarkdown); the
+                // user's own text is shown exactly as typed.
+                Group {
+                    if msg.role == "user" || msg.content.isEmpty {
+                        Text(msg.content.isEmpty ? "…" : msg.content)
+                    } else {
+                        Text(ChatMarkdown.render(msg.content, baseSize: 13))
+                    }
+                }
                     .font(.system(size: 13))
                     .textSelection(.enabled)
                     .padding(8)
