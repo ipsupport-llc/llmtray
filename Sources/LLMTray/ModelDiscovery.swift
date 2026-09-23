@@ -107,4 +107,26 @@ enum ModelDiscovery {
         }
         return false
     }
+
+    /// Models with KV-shared layers (e.g. Gemma 4's `num_kv_shared_layers`)
+    /// reuse an earlier layer's raw cache-internal (keys, values) tuple
+    /// directly inside the shared layer's attention call, bypassing that
+    /// layer's own `cache.update_and_fetch()` -- so if the KV cache has been
+    /// switched to quantized mode by the time the shared read happens, the
+    /// shared layer receives a quantized-tuple representation instead of a
+    /// plain array and crashes `scaled_dot_product_attention` with
+    /// "incompatible function arguments" (keys/values typed as `list`).
+    /// Real crash observed with LLMTray's default `--quantized-kv-start`.
+    /// Detected structurally (config field), not by architecture name, so
+    /// it also covers future models with the same sharing pattern.
+    static func disallowsQuantizedKV(forModelPath path: String) -> Bool {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return false }
+        if let n = obj["num_kv_shared_layers"] as? Int, n > 0 { return true }
+        if let textConfig = obj["text_config"] as? [String: Any],
+           let n = textConfig["num_kv_shared_layers"] as? Int, n > 0 {
+            return true
+        }
+        return false
+    }
 }

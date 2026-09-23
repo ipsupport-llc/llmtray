@@ -323,7 +323,8 @@ struct ContentView: View {
 
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-        server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : kvBits
+        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: kvGroupSize, alias: alias)
     }
 
     /// Re-reads the newly-selected model's own context ceiling so the "Max
