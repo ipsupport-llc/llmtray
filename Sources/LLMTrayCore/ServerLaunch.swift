@@ -17,13 +17,18 @@ public enum ServerLaunch {
         /// `--draft-model` value, already decided by the caller (profile's
         /// `mtpDrafter`, a known drafter for this model, runtime support).
         public var drafterRepo: String?
+        /// The model's trained context length, if known: caps the
+        /// server-side `--max-tokens` default (Default is shared across
+        /// models, so its max_tokens may be sized for a bigger one).
+        public var maxContext: Int?
 
-        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?) {
+        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
             self.disallowQuantizedKV = disallowQuantizedKV
             self.drafterRepo = drafterRepo
+            self.maxContext = maxContext
         }
     }
 
@@ -40,7 +45,7 @@ public enum ServerLaunch {
             // server default is temp 0 (greedy).
             "--temp", String(p.temperature),
             "--top-p", String(p.topP),
-            "--max-tokens", String(p.maxTokens),
+            "--max-tokens", String(min(p.maxTokens, c.maxContext ?? p.maxTokens)),
         ]
         if p.topK > 0 {
             args += ["--top-k", String(p.topK)]
@@ -66,12 +71,26 @@ public enum ServerLaunch {
         return args
     }
 
-    /// Whether switching a running model from one resolved profile to
-    /// another changes its launch arguments (so the server must restart).
-    /// Includes the sampling defaults, which are launch arguments too.
-    public static func needsRestart(from a: ResolvedProfile, to b: ResolvedProfile) -> Bool {
-        let c = Context(modelPath: "", internalPort: 0, alias: "", disallowQuantizedKV: false, drafterRepo: nil)
-        return arguments(a, c) != arguments(b, c) || a.mtpDrafter != b.mtpDrafter
+    /// The `--draft-model` a profile gets on a model whose usable drafter
+    /// (known for the model *and* supported by the runtime) is
+    /// `available`: none if the profile turns the drafter off, or if its
+    /// own extra arguments already pick one.
+    public static func drafter(for p: ResolvedProfile, available: String?) -> String? {
+        guard p.mtpDrafter, !extraArgsSetDrafter(p) else { return nil }
+        return available
+    }
+
+    /// Whether moving a running model from one resolved profile to another
+    /// changes its actual launch arguments (so the server must restart).
+    /// `context` is the model's real one (KV-shared guard, context cap);
+    /// its `drafterRepo` is the drafter *available* to the model, applied
+    /// per profile via `drafter(for:available:)` -- so a KV or drafter
+    /// difference that doesn't apply to this model restarts nothing.
+    public static func needsRestart(from a: ResolvedProfile, to b: ResolvedProfile, context: Context) -> Bool {
+        var ca = context, cb = context
+        ca.drafterRepo = drafter(for: a, available: context.drafterRepo)
+        cb.drafterRepo = drafter(for: b, available: context.drafterRepo)
+        return arguments(a, ca) != arguments(b, cb)
     }
 
     /// Whether the user's own extra arguments already choose a drafter,

@@ -58,7 +58,7 @@ extension Array {
 struct ChatSettings {
     var temperature: Double = 0.6
     var topP: Double = 0.95
-    /// 0 = not sent (top-k off).
+    /// 0 = top-k off.
     var topK: Int = 0
     var maxTokens: Int = 1024
     var systemPrompt: String = ""
@@ -479,9 +479,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             "top_p": settings.topP,
             "max_tokens": settings.maxTokens,
         ]
-        if settings.topK > 0 {
-            body["top_k"] = settings.topK
-        }
+        // Always sent, 0 included: omitting it would fall back to the
+        // server's launch-time --top-k, which can be stale after the
+        // profile changed.
+        body["top_k"] = settings.topK
         if settings.enableImageGeneration {
             body["tools"] = [Self.generateImageTool]
         }

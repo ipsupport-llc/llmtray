@@ -25,13 +25,17 @@ final class ProfileManager: ObservableObject {
     /// Re-reads everything from disk -- picks up hand edits to the JSON
     /// files (called when the settings panel opens).
     func reload() {
+        var errors: [String] = []
         do {
             try store.ensureDefault(migratingFrom: .standard)
         } catch {
-            loadErrors = ["could not write Default profile: \(error.localizedDescription)"]
+            // A broken hand edit of default.json: never overwritten (that
+            // would silently throw away the user's settings). Built-in
+            // values are used until it's fixed or deleted.
+            errors.append("default.json can't be read (\(error.localizedDescription)) -- using built-in settings until it's fixed or deleted. Edits to Default aren't saved meanwhile.")
         }
-        var errors: [String] = []
         profiles = store.loadAll { url, error in
+            guard url.lastPathComponent != "\(Profile.defaultID).json" else { return }
             errors.append("\(url.lastPathComponent): \(error.localizedDescription)")
         }
         assignments = store.loadAssignments().filter { entry in profiles.contains { $0.id == entry.value } }

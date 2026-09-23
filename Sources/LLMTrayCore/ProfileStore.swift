@@ -76,10 +76,15 @@ public final class ProfileStore {
     /// Creates `default.json` from the old global settings if it doesn't
     /// exist yet. The old UserDefaults keys are left alone, so going back
     /// to a pre-profiles build loses nothing.
+    ///
+    /// Only a *missing* file is created: an existing `default.json` that
+    /// doesn't decode (a broken hand edit) throws instead of being
+    /// silently replaced by the old settings.
     @discardableResult
     public func ensureDefault(migratingFrom defaults: UserDefaults) throws -> Profile {
-        if let data = try? Data(contentsOf: url(for: Profile.defaultID)),
-           var p = try? JSONDecoder().decode(Profile.self, from: data) {
+        let file = url(for: Profile.defaultID)
+        if FileManager.default.fileExists(atPath: file.path) {
+            var p = try JSONDecoder().decode(Profile.self, from: Data(contentsOf: file))
             p.id = Profile.defaultID
             return p
         }

@@ -248,15 +248,44 @@ final class ServerManager: ObservableObject {
     /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
     /// Face itself (~450MB, cached after the first start).
     private func mtpDrafterArgument(forModelPath modelPath: String, profile: ResolvedProfile) -> String? {
-        guard profile.mtpDrafter else { return nil }
-        guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath) else { return nil }
-        if ServerLaunch.extraArgsSetDrafter(profile) { return nil }
-        guard runtimeSupportsModelType("gemma4_assistant") else {
+        let known = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath)
+        let drafter = ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
+        if let drafter {
+            appendLog("--- speculative decoding with MTP drafter \(drafter) ---\n")
+        } else if known != nil, profile.mtpDrafter, !ServerLaunch.extraArgsSetDrafter(profile) {
             appendLog("--- MTP drafter available for this model, but the installed mlx-lm runtime doesn't support it yet (Check for Updates) ---\n")
-            return nil
         }
-        appendLog("--- speculative decoding with MTP drafter \(repo) ---\n")
+        return drafter
+    }
+
+    /// The drafter this model can actually use: one is known for it and the
+    /// installed runtime has the architecture. An older pinned runtime
+    /// would fail to load it and the whole server start with it.
+    private func availableDrafter(forModelPath modelPath: String) -> String? {
+        guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath),
+              runtimeSupportsModelType("gemma4_assistant") else { return nil }
         return repo
+    }
+
+    /// The model-specific facts the launch arguments depend on; drafterRepo
+    /// is the drafter *available* to the model (see ServerLaunch.drafter).
+    private func launchContext(modelPath: String, alias: String, drafterRepo: String?) -> ServerLaunch.Context {
+        ServerLaunch.Context(
+            modelPath: modelPath,
+            internalPort: internalPort,
+            alias: alias,
+            disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
+            drafterRepo: drafterRepo,
+            maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath)
+        )
+    }
+
+    /// Whether switching the loaded model from profile `a` to `b` would
+    /// change its real launch arguments (so a restart is needed).
+    func needsRestart(modelPath: String, from a: ResolvedProfile, to b: ResolvedProfile) -> Bool {
+        ServerLaunch.needsRestart(from: a, to: b, context: launchContext(
+            modelPath: modelPath, alias: currentAlias, drafterRepo: availableDrafter(forModelPath: modelPath)
+        ))
     }
 
     private func runtimeSupportsModelType(_ modelType: String) -> Bool {
@@ -296,11 +325,8 @@ final class ServerManager: ObservableObject {
         //   first start()'s KV bits.
         let profile = ProfileManager.shared.resolved(for: modelPath)
         appendLog("--- profile: \(profile.profileName) ---\n")
-        let args = ServerLaunch.arguments(profile, ServerLaunch.Context(
-            modelPath: modelPath,
-            internalPort: internalPort,
-            alias: alias,
-            disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
+        let args = ServerLaunch.arguments(profile, launchContext(
+            modelPath: modelPath, alias: alias,
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         ))
         task.arguments = args

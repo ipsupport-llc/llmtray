@@ -92,11 +92,37 @@ final class ServerLaunchTests: XCTestCase {
 
     func testNeedsRestart() {
         let a = resolved()
-        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.systemPrompt = "hi" }))
-        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.tools.enableImageGeneration = true }))
-        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.temperature = 1.0 }))
-        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.launch.kvBits = 0 }))
-        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.launch.mtpDrafter = false }))
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.systemPrompt = "hi" }, context: ctx))
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.tools.enableImageGeneration = true }, context: ctx))
+        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.temperature = 1.0 }, context: ctx))
+        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.launch.kvBits = 0 }, context: ctx))
+    }
+
+    func testNoRestartForDifferencesThatDontApplyToThisModel() {
+        // KV bits differ, but the model is KV-shared: KV is off either way.
+        var kvShared = ctx
+        kvShared.disallowQuantizedKV = true
+        XCTAssertFalse(ServerLaunch.needsRestart(from: resolved(), to: resolved { $0.launch.kvBits = 0 }, context: kvShared))
+        // Drafter toggled, but the model has no drafter.
+        XCTAssertFalse(ServerLaunch.needsRestart(from: resolved(), to: resolved { $0.launch.mtpDrafter = false }, context: ctx))
+        // ...and does restart when it has one.
+        var withDrafter = ctx
+        withDrafter.drafterRepo = "org/drafter"
+        XCTAssertTrue(ServerLaunch.needsRestart(from: resolved(), to: resolved { $0.launch.mtpDrafter = false }, context: withDrafter))
+    }
+
+    func testDrafterDecision() {
+        XCTAssertEqual(ServerLaunch.drafter(for: resolved(), available: "d"), "d")
+        XCTAssertNil(ServerLaunch.drafter(for: resolved { $0.launch.mtpDrafter = false }, available: "d"))
+        XCTAssertNil(ServerLaunch.drafter(for: resolved { $0.launch.extraServerArgs = "--draft-model x" }, available: "d"))
+        XCTAssertNil(ServerLaunch.drafter(for: resolved(), available: nil))
+    }
+
+    func testMaxTokensCappedToModelContext() {
+        var c = ctx
+        c.maxContext = 8192
+        XCTAssertEqual(value(ServerLaunch.arguments(resolved { $0.request.maxTokens = 131072 }, c), "--max-tokens"), "8192")
+        XCTAssertEqual(value(ServerLaunch.arguments(resolved { $0.request.maxTokens = 2048 }, c), "--max-tokens"), "2048")
     }
 
     func testTopKZeroOmitted() {
@@ -187,6 +213,16 @@ final class ProfileStoreTests: XCTestCase {
 
         try store.delete(id: Profile.defaultID)                  // refused
         XCTAssertTrue(store.loadAll().contains { $0.isDefault })
+    }
+
+    func testBrokenDefaultIsNotOverwritten() throws {
+        let store = ProfileStore(directory: dir)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let broken = Data(#"{"id":"default","name": "Default"  "request": {}}"#.utf8)   // missing comma
+        let file = dir.appendingPathComponent("default.json")
+        try broken.write(to: file)
+        XCTAssertThrowsError(try store.ensureDefault(migratingFrom: UserDefaults(suiteName: "x-\(UUID())")!))
+        XCTAssertEqual(try Data(contentsOf: file), broken)
     }
 
     func testBrokenFileSkipped() throws {

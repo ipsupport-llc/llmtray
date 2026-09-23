@@ -50,6 +50,9 @@ struct AutoTuneCandidateResult: Identifiable {
 /// their settings. The server is already back on `current*` by the time
 /// this is published (see autoTune's restore-before-propose step).
 struct AutoTuneProposal: Equatable {
+    /// The model that was tuned -- Apply writes into *its* profile, even
+    /// if a proxy request switched the loaded model in the meantime.
+    var modelPath: String?
     var currentConcurrency: Int
     var proposedConcurrency: Int
     var currentPrefillStep: Int
@@ -254,6 +257,12 @@ final class BenchmarkRunner: ObservableObject {
         // "not set here, inherited from Default" for an overlay profile.
         let profiles = ProfileManager.shared
         let modelPath = server.loadedModelPath
+        // Pinned once: every candidate and the final restore go to this
+        // profile even if the model's assignment changes mid-sweep.
+        let profileID = profiles.profileID(for: modelPath)
+        func setLaunch(_ keyPath: WritableKeyPath<Profile, Int?>, _ value: Int?) {
+            profiles.update(id: profileID) { $0[keyPath: keyPath] = value }
+        }
         let originalConcurrencyField = profiles.profile(for: modelPath).launch.decodeConcurrency
         let originalPrefillField = profiles.profile(for: modelPath).launch.prefillStepSize
         let originalConcurrency = profiles.value(\.launch.decodeConcurrency, for: modelPath)
@@ -280,7 +289,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in decodeConcurrencyCandidates {
             if cancelRequested { break }
             statusText = "Testing decode-concurrency=\(value)…"
-            profiles.set(\.launch.decodeConcurrency, value, for: modelPath)
+            setLaunch(\.launch.decodeConcurrency, value)
             guard await restart() else { break }
 
             let batchStart = Date()
@@ -317,7 +326,7 @@ final class BenchmarkRunner: ObservableObject {
                 bestConcurrency = value
             }
         }
-        profiles.set(\.launch.decodeConcurrency, bestConcurrency, for: modelPath)
+        setLaunch(\.launch.decodeConcurrency, bestConcurrency)
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "decode-concurrency" && $0.value == bestConcurrency }) {
             autoTuneLog[idx].isWinner = true
         }
@@ -329,7 +338,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in prefillStepSizeCandidates {
             if cancelRequested { break }
             statusText = "Testing prefill-step-size=\(value)…"
-            profiles.set(\.launch.prefillStepSize, value, for: modelPath)
+            setLaunch(\.launch.prefillStepSize, value)
             guard await restart() else { break }
 
             guard let sample = try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 2048, maxTokens: 8) else { continue }
@@ -350,12 +359,13 @@ final class BenchmarkRunner: ObservableObject {
         // not necessarily what the user had running before. The winning
         // combination is only ever applied if the user confirms it via
         // applyAutoTuneProposal(), never automatically.
-        profiles.set(\.launch.decodeConcurrency, originalConcurrencyField, for: modelPath)
-        profiles.set(\.launch.prefillStepSize, originalPrefillField, for: modelPath)
+        setLaunch(\.launch.decodeConcurrency, originalConcurrencyField)
+        setLaunch(\.launch.prefillStepSize, originalPrefillField)
         if !cancelRequested {
             statusText = "Restoring original settings…"
             _ = await restart()
             pendingProposal = AutoTuneProposal(
+                modelPath: modelPath,
                 currentConcurrency: originalConcurrency,
                 proposedConcurrency: bestConcurrency,
                 currentPrefillStep: originalPrefillStep,
@@ -374,14 +384,18 @@ final class BenchmarkRunner: ObservableObject {
         guard let proposal = pendingProposal, !isRunning else { return }
         isRunning = true
         defer { isRunning = false; statusText = "" }
-        let modelPath = server.loadedModelPath
+        let modelPath = proposal.modelPath
         ProfileManager.shared.set(\.launch.decodeConcurrency, proposal.proposedConcurrency, for: modelPath)
         ProfileManager.shared.set(\.launch.prefillStepSize, proposal.proposedPrefillStep, for: modelPath)
-        statusText = "Applying new settings…"
-        do {
-            try await server.restartToApplyLaunchSettings()
-        } catch {
-            autoTuneError = "restart failed: \(error.localizedDescription)"
+        // Only the tuned model needs a restart to pick the values up; if
+        // another model is loaded now, they apply on its next launch.
+        if server.loadedModelPath == modelPath {
+            statusText = "Applying new settings…"
+            do {
+                try await server.restartToApplyLaunchSettings()
+            } catch {
+                autoTuneError = "restart failed: \(error.localizedDescription)"
+            }
         }
         pendingProposal = nil
     }

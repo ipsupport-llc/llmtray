@@ -257,19 +257,28 @@ struct ContentView: View {
         }
         .labelsHidden()
         .frame(maxWidth: 110)
-        .disabled(isBusy || selectedModelID == nil)
-        .help("Settings profile for this model")
+        .disabled(!canSwitchProfile)
+        .help(canSwitchProfile ? "Settings profile for this model" : "Can't switch profiles while a request or the auto-tune is running")
+    }
+
+    /// Switching can restart the server, which would kill an in-flight
+    /// request (in-app or external -- both go through the proxy, counted
+    /// by server.isBusy) or race the auto-tune sweep's own restarts and
+    /// make it write its candidates into the newly assigned profile.
+    private var canSwitchProfile: Bool {
+        selectedModelID != nil && !isBusy && !server.isBusy && !chat.isBusy && !benchmark.isRunning
     }
 
     /// Assigns a profile to the selected model. If that model is running
     /// and the new profile changes its launch arguments (KV bits, drafter,
     /// sampling defaults...), the server restarts to apply them.
     private func switchProfile(to id: String) {
-        guard let modelID = selectedModelID else { return }
+        guard canSwitchProfile, let modelID = selectedModelID else { return }
         let before = profiles.resolved(for: modelID)
         profiles.assign(profileID: id, to: modelID)
         let after = profiles.resolved(for: modelID)
-        if isRunning, server.loadedModelPath == modelID, ServerLaunch.needsRestart(from: before, to: after) {
+        if isRunning, server.loadedModelPath == modelID,
+           server.needsRestart(modelPath: modelID, from: before, to: after) {
             Task { try? await server.restartToApplyLaunchSettings() }
         }
     }
@@ -308,14 +317,17 @@ struct ContentView: View {
                 profileRow(p)
             }
             HStack {
-                Button("New profile") {
-                    let p = profiles.create(name: "New profile")
-                    switchProfile(to: p.id)
+                Group {
+                    Button("New profile") {
+                        let p = profiles.create(name: "New profile")
+                        switchProfile(to: p.id)
+                    }
+                    Button("Duplicate current") {
+                        let p = profiles.create(name: activeProfile.name + " copy", copying: activeProfile)
+                        switchProfile(to: p.id)
+                    }
                 }
-                Button("Duplicate current") {
-                    let p = profiles.create(name: activeProfile.name + " copy", copying: activeProfile)
-                    switchProfile(to: p.id)
-                }
+                .disabled(!canSwitchProfile)
                 Spacer()
                 Button("Open folder") {
                     NSWorkspace.shared.open(URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles"))
@@ -354,7 +366,7 @@ struct ContentView: View {
                     Button("Use") { switchProfile(to: p.id) }
                         .buttonStyle(.plain)
                         .foregroundColor(.accentColor)
-                        .disabled(selectedModelID == nil)
+                        .disabled(!canSwitchProfile)
                 }
                 if !p.isDefault {
                     Button {
@@ -364,6 +376,7 @@ struct ContentView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Delete (models using it go back to Default)")
+                    .disabled(!canSwitchProfile)
                 }
             }
             if !assigned.isEmpty {
