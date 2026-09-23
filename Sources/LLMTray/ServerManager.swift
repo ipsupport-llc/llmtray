@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 import Combine
 
 enum ServerState: Equatable {
@@ -43,8 +44,6 @@ final class ServerManager: ObservableObject {
     // the proxy, not the UI) knows what port/KV settings to keep reusing
     // when a client's `model` field asks for something else.
     private var currentPublicPort: Int?
-    private var currentKVBits: Int = 4
-    private var currentKVGroupSize: Int = 64
     private var currentModelPath: String?
     private var currentAlias: String = ""
 
@@ -109,13 +108,18 @@ final class ServerManager: ObservableObject {
     private var processExitContinuation: CheckedContinuation<Void, Never>?
     private var startContinuation: CheckedContinuation<Void, Error>?
 
-    func start(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
+    /// The model the server is (or was last) running -- the auto-tune
+    /// sweep writes its results into this model's profile.
+    var loadedModelPath: String? { currentModelPath }
+
+    /// Launch settings (KV quantization, prefill, drafter...) come from the
+    /// model's profile at every launch, see launchServerProcess -- so a
+    /// proxy-driven model switch picks up the new model's own settings too.
+    func start(modelPath: String, port: Int, alias: String) {
         guard case .stopped = state else { return }
         state = .starting
         log = ""
         currentPublicPort = port
-        currentKVBits = kvBits
-        currentKVGroupSize = kvGroupSize
         currentModelPath = modelPath
         currentAlias = alias
 
@@ -243,11 +247,10 @@ final class ServerManager: ObservableObject {
     /// in a runtime that supports it. A --draft-model the user put in the
     /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
     /// Face itself (~450MB, cached after the first start).
-    private func mtpDrafterArgument(forModelPath modelPath: String) -> String? {
-        guard UserDefaults.standard.object(forKey: "llmtray.mtpDrafter") as? Bool ?? true else { return nil }
+    private func mtpDrafterArgument(forModelPath modelPath: String, profile: ResolvedProfile) -> String? {
+        guard profile.mtpDrafter else { return nil }
         guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath) else { return nil }
-        let extra = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
-        if extra.contains("--draft-model") { return nil }
+        if ServerLaunch.extraArgsSetDrafter(profile) { return nil }
         guard runtimeSupportsModelType("gemma4_assistant") else {
             appendLog("--- MTP drafter available for this model, but the installed mlx-lm runtime doesn't support it yet (Check for Updates) ---\n")
             return nil
@@ -279,54 +282,27 @@ final class ServerManager: ObservableObject {
         // one. Invoking the interpreter directly with -m sidesteps shebang
         // parsing entirely; Process doesn't go through a shell either way.
         task.executableURL = URL(fileURLWithPath: venvPython)
-        // Without a cap, mlx_lm.server's cross-request prompt cache
-        // (letting a conversation continue without re-prefilling the whole
-        // history each turn) just keeps every conversation's KV state
-        // around forever -- confirmed live: a long session's cache grew
-        // from 0.27 GB to 1.25 GB before a subsequent request's own KV
-        // allocation pushed the process into a METAL "Insufficient Memory"
-        // crash. 1 GiB is a conservative default (Advanced setting) --
-        // this evicts old cached conversations before they can pile up
-        // into exactly that kind of failure, at the cost of occasionally
-        // re-prefilling a conversation that's been idle a while (cheap
-        // compared to a crash).
-        let promptCacheMB = UserDefaults.standard.object(forKey: "llmtray.promptCacheMB") as? Int ?? 1024
-        // Read fresh on every launch (not just once) so the benchmark tab's
-        // auto-tune sweep can change this and pick it up via a plain
-        // restartToApplyLaunchSettings() -- no separate code path needed.
-        let prefillStepSize = UserDefaults.standard.object(forKey: "llmtray.prefillStepSize") as? Int ?? 128
-        var args = [
-            "-m", "mlx_lm.server",
-            "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", String(prefillStepSize),
-            "--prompt-cache-bytes", String(promptCacheMB * 1_048_576),
-        ]
-        if currentKVBits > 0 {
-            let quantizedKVStart = UserDefaults.standard.object(forKey: "llmtray.quantizedKVStart") as? Int ?? 0
-            args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", String(quantizedKVStart)]
-        }
-        let decodeConcurrency = UserDefaults.standard.object(forKey: "llmtray.decodeConcurrency") as? Int ?? 1
-        if decodeConcurrency > 1 {
-            args += ["--decode-concurrency", String(decodeConcurrency)]
-        }
-        if !alias.isEmpty {
-            args += ["--model-alias", alias]
-        }
-        if let drafter = mtpDrafterArgument(forModelPath: modelPath) {
-            args += ["--draft-model", drafter]
-        }
-        // Advanced setting: reintroduces the per-token DEBUG logging this
-        // app itself stopped needing once isBusy moved to the proxy's own
-        // request tracking (see ModelProxyServer) -- still useful as a
-        // manual diagnostic toggle when troubleshooting the model process
-        // itself, just no longer required for the app to function.
-        if UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging") {
-            args += ["--log-level", "DEBUG"]
-        }
-        // Advanced escape hatch for any mlx_lm.server flag this UI doesn't
-        // expose (--draft-model, etc.) rather than building a dedicated
-        // control for every one of them.
-        let extraArgsRaw = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
-        args += extraArgsRaw.split(separator: " ").map(String.init)
+        // Everything launch-related comes from the model's profile (see
+        // ProfileManager / LLMTrayCore.ServerLaunch), resolved fresh on
+        // every launch: a model switch or the benchmark's auto-tune
+        // restart picks up current values without a separate code path.
+        // Notable defaults kept from before profiles:
+        // - prompt cache capped (1 GiB): uncapped, a long session's
+        //   cross-request KV cache grew until a later request's own
+        //   allocation hit METAL "Insufficient Memory";
+        // - KV quantization forced off for KV-shared models (Gemma 4
+        //   E2B/E4B), which crash with quantized KV -- now also applied
+        //   on proxy-driven model switches, which used to reuse the
+        //   first start()'s KV bits.
+        let profile = ProfileManager.shared.resolved(for: modelPath)
+        appendLog("--- profile: \(profile.profileName) ---\n")
+        let args = ServerLaunch.arguments(profile, ServerLaunch.Context(
+            modelPath: modelPath,
+            internalPort: internalPort,
+            alias: alias,
+            disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
+            drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
+        ))
         task.arguments = args
         task.standardInput = FileHandle.nullDevice
 

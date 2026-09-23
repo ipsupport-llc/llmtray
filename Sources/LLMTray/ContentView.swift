@@ -2,10 +2,12 @@ import SwiftUI
 import AppKit
 import ServiceManagement
 import UniformTypeIdentifiers
+import LLMTrayCore
 
 enum SettingsTab {
     case general
     case chat
+    case profiles
     case benchmark
     case advanced
 }
@@ -15,6 +17,10 @@ struct ContentView: View {
     @EnvironmentObject var chat: ChatClient
     @StateObject private var runtime = RuntimeManager()
     @StateObject private var benchmark = BenchmarkRunner()
+    // Chat, tool and server-launch settings live in profiles (see
+    // ProfileManager): the selected model's profile, layered on Default.
+    @ObservedObject private var profiles = ProfileManager.shared
+    @State private var profileNameDraft: String = ""
 
     // Where models live -- ~/.llmtray/models by default (this app's own
     // namespace), not ~/.lmstudio/models. Anyone who wants to share models
@@ -28,9 +34,6 @@ struct ContentView: View {
     // Server" -- which has no settings panel of its own -- can read the
     // same values back out of UserDefaults from AppDelegate.
     @AppStorage("llmtray.port") private var port: Int = 8765
-    @AppStorage("llmtray.kvBits") private var kvBits: Int = KVSettings.defaultBits
-    @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = KVSettings.defaultGroupSize
-    @AppStorage("llmtray.quantizedKVStart") private var quantizedKVStart: Int = 0
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
     // selectedModelID) below, which loads/saves it on every switch).
@@ -53,21 +56,8 @@ struct ContentView: View {
     @AppStorage("SUEnableAutomaticChecks") private var autoCheckForUpdates: Bool = true
     @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
     @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes: Int = 0
-    @AppStorage("llmtray.promptCacheMB") private var promptCacheMB: Int = 1024
     @AppStorage("llmtray.stallThresholdSeconds") private var stallThresholdSeconds: Int = 60
     @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
-    @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
-    @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
-    @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
-    @AppStorage("llmtray.mtpDrafter") private var mtpDrafter: Bool = true
-    @AppStorage("llmtray.enableImageGeneration") private var enableImageGeneration: Bool = false
-    @AppStorage("llmtray.imageGenModel") private var imageGenModel: ImageGenModel = .gptqMixed
-    // On by default -- a diffusion model's own peak memory can rival or
-    // exceed a loaded chat model's, and mlx_lm.server has no notion of
-    // "share the GPU with something else right now." Off is there for
-    // whoever has enough unified memory to comfortably hold both at once.
-    @AppStorage("llmtray.unloadModelDuringImageGen") private var unloadModelDuringImageGen: Bool = true
-    @AppStorage("llmtray.imageQuality") private var imageQuality: ImageQuality = .balanced
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -84,10 +74,6 @@ struct ContentView: View {
     @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
     @State private var launchAtLoginError: String?
     @FocusState private var isInputFocused: Bool
-    @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
-    @AppStorage("llmtray.topP") private var topP: Double = 0.95
-    @AppStorage("llmtray.maxTokens") private var maxTokens: Double = 1024
-    @AppStorage("llmtray.systemPrompt") private var systemPrompt: String = ""
     // The selected model's own trained context ceiling (max_position_embeddings),
     // read fresh on every model switch -- see updateModelMaxContext(for:).
     // 32768 is just the fallback for a model whose config.json doesn't
@@ -187,6 +173,208 @@ struct ContentView: View {
         }
     }
 
+
+    // MARK: - Profile-backed settings
+
+    /// Binding to a field of the selected model's profile. Writes go to
+    /// that profile (its overlay, or Default for models on Default).
+    private func pb<T>(_ keyPath: WritableKeyPath<Profile, T?>) -> Binding<T> {
+        Binding(
+            get: { profiles.value(keyPath, for: selectedModelID) },
+            set: { profiles.set(keyPath, $0, for: selectedModelID) }
+        )
+    }
+
+    private var activeProfile: Profile { profiles.profile(for: selectedModelID) }
+    private var resolvedProfile: ResolvedProfile { profiles.resolved(for: selectedModelID) }
+
+    private var kvBits: Int { resolvedProfile.kvBits }
+    private var quantizedKVStart: Int { resolvedProfile.quantizedKVStart }
+    private var promptCacheMB: Int { resolvedProfile.promptCacheMB }
+    private var decodeConcurrency: Int { resolvedProfile.decodeConcurrency }
+    private var enableImageGeneration: Bool { resolvedProfile.enableImageGeneration }
+    private var imageGenModel: ImageGenModel { ImageGenModel(rawValue: resolvedProfile.imageGenModel) ?? .gptqMixed }
+    private var temperature: Double { resolvedProfile.temperature }
+    private var topP: Double { resolvedProfile.topP }
+    private var maxTokens: Double { Double(min(resolvedProfile.maxTokens, modelMaxContext)) }
+
+    private var imageGenModelBinding: Binding<ImageGenModel> {
+        Binding(
+            get: { imageGenModel },
+            set: { profiles.set(\.tools.imageGenModel, $0.rawValue, for: selectedModelID) }
+        )
+    }
+
+    private var imageQualityBinding: Binding<ImageQuality> {
+        Binding(
+            get: { ImageQuality(rawValue: resolvedProfile.imageQuality) ?? .balanced },
+            set: { profiles.set(\.tools.imageQuality, $0.rawValue, for: selectedModelID) }
+        )
+    }
+
+    private var maxTokensBinding: Binding<Double> {
+        Binding(
+            get: { maxTokens },
+            set: { profiles.set(\.request.maxTokens, Int($0), for: selectedModelID) }
+        )
+    }
+
+    private var chatSettings: ChatSettings {
+        ChatSettings(profile: resolvedProfile, maxTokensCap: modelMaxContext)
+    }
+
+    /// Shown next to a setting the selected model's (non-Default) profile
+    /// overrides: click to drop the override and inherit from Default.
+    @ViewBuilder
+    private func overrideMark<T>(_ keyPath: WritableKeyPath<Profile, T?>) -> some View {
+        if profiles.source(keyPath, for: selectedModelID) == .overlay {
+            Button {
+                profiles.reset(keyPath, for: selectedModelID)
+            } label: {
+                Image(systemName: "arrow.uturn.backward.circle")
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.accentColor)
+            .help("Set by profile \u{201C}\(activeProfile.name)\u{201D} -- click to inherit from Default")
+        }
+    }
+
+
+    // MARK: - Profiles UI
+
+    private var profilePickerBinding: Binding<String> {
+        Binding(
+            get: { profiles.profileID(for: selectedModelID) },
+            set: { switchProfile(to: $0) }
+        )
+    }
+
+    private var profilePicker: some View {
+        Picker("Profile", selection: profilePickerBinding) {
+            ForEach(profiles.profiles) { p in
+                Text(p.name).tag(p.id)
+            }
+        }
+        .labelsHidden()
+        .frame(maxWidth: 110)
+        .disabled(isBusy || selectedModelID == nil)
+        .help("Settings profile for this model")
+    }
+
+    /// Assigns a profile to the selected model. If that model is running
+    /// and the new profile changes its launch arguments (KV bits, drafter,
+    /// sampling defaults...), the server restarts to apply them.
+    private func switchProfile(to id: String) {
+        guard let modelID = selectedModelID else { return }
+        let before = profiles.resolved(for: modelID)
+        profiles.assign(profileID: id, to: modelID)
+        let after = profiles.resolved(for: modelID)
+        if isRunning, server.loadedModelPath == modelID, ServerLaunch.needsRestart(from: before, to: after) {
+            Task { try? await server.restartToApplyLaunchSettings() }
+        }
+    }
+
+    /// Top of the Chat / Advanced tabs: which profile these controls edit.
+    private var editingProfileBanner: some View {
+        let p = activeProfile
+        return HStack(spacing: 4) {
+            Image(systemName: "slider.horizontal.3")
+            Text("Profile: \(p.name)").fontWeight(.medium)
+            if !p.isDefault {
+                Text("· overrides \(p.overrideCount), rest from Default")
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Button("Manage") { settingsTab = .profiles }
+                .buttonStyle(.plain)
+                .foregroundColor(.accentColor)
+        }
+        .font(.system(size: 11))
+    }
+
+    private var profilesTabContent: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Profiles").foregroundColor(.secondary)
+            Text(
+                """
+                A profile bundles chat sampling, system prompt, tools and server launch settings. \
+                Default holds everything; any other profile only overrides what it changes and \
+                inherits the rest. Each model uses the profile picked next to it in the header.
+                """
+            )
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
+            ForEach(profiles.profiles) { p in
+                profileRow(p)
+            }
+            HStack {
+                Button("New profile") {
+                    let p = profiles.create(name: "New profile")
+                    switchProfile(to: p.id)
+                }
+                Button("Duplicate current") {
+                    let p = profiles.create(name: activeProfile.name + " copy", copying: activeProfile)
+                    switchProfile(to: p.id)
+                }
+                Spacer()
+                Button("Open folder") {
+                    NSWorkspace.shared.open(URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles"))
+                }
+                .help("Profiles are plain JSON files -- editable by hand, copyable to another Mac")
+            }
+            .disabled(selectedModelID == nil)
+            ForEach(profiles.loadErrors, id: \.self) { e in
+                Text(e).font(.system(size: 10)).foregroundColor(.red)
+            }
+        }
+    }
+
+    private func profileRow(_ p: Profile) -> some View {
+        let isActive = p.id == profiles.profileID(for: selectedModelID)
+        let assigned = profiles.models(assignedTo: p.id).map { ($0 as NSString).lastPathComponent }
+        return VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Image(systemName: isActive ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isActive ? .accentColor : .secondary)
+                if p.isDefault {
+                    Text(p.name).fontWeight(.medium)
+                } else {
+                    TextField("name", text: Binding(
+                        get: { p.name },
+                        set: { profiles.rename(id: p.id, to: $0) }
+                    ))
+                    .textFieldStyle(.roundedBorder)
+                    .frame(maxWidth: 160)
+                }
+                Text(p.isDefault ? "base" : "\(p.overrideCount) overrides")
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                Spacer()
+                if !isActive {
+                    Button("Use") { switchProfile(to: p.id) }
+                        .buttonStyle(.plain)
+                        .foregroundColor(.accentColor)
+                        .disabled(selectedModelID == nil)
+                }
+                if !p.isDefault {
+                    Button {
+                        profiles.delete(id: p.id)
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                    .buttonStyle(.plain)
+                    .help("Delete (models using it go back to Default)")
+                }
+            }
+            if !assigned.isEmpty {
+                Text("Used by: " + assigned.joined(separator: ", "))
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 20)
+            }
+        }
+    }
+
     // MARK: - Status header
 
     private var statusHeader: some View {
@@ -246,6 +434,7 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .help("View server log")
                 Button {
+                    if !showSettings { profiles.reload() }
                     showSettings.toggle()
                 } label: {
                     Image(systemName: "gearshape")
@@ -275,6 +464,8 @@ struct ContentView: View {
                 }
                 .labelsHidden()
                 .disabled(isBusy)
+
+                profilePicker
 
                 serverToggleButton
             }
@@ -324,8 +515,7 @@ struct ContentView: View {
 
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : KVSettings.validBits(kvBits)
-        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: KVSettings.validGroupSize(kvGroupSize), alias: alias)
+        server.start(modelPath: model.path, port: port, alias: alias)
     }
 
     /// Re-reads the newly-selected model's own context ceiling so the "Max
@@ -339,7 +529,6 @@ struct ContentView: View {
         // 64) even in the unlikely case a config.json reports something
         // smaller than that.
         modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? fallback)
-        maxTokens = min(maxTokens, Double(modelMaxContext))
         modelSupportsVision = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
         if !modelSupportsVision {
             pendingAttachments.removeAll()
@@ -383,6 +572,7 @@ struct ContentView: View {
             Picker("", selection: $settingsTab) {
                 Text("General").tag(SettingsTab.general)
                 Text("Chat").tag(SettingsTab.chat)
+                Text("Profiles").tag(SettingsTab.profiles)
                 Text("Benchmark").tag(SettingsTab.benchmark)
                 Text("Advanced").tag(SettingsTab.advanced)
             }
@@ -394,11 +584,19 @@ struct ContentView: View {
             case .general:
                 generalSettingsContent
             case .chat:
-                chatTabContent
+                VStack(alignment: .leading, spacing: 6) {
+                    editingProfileBanner
+                    chatTabContent
+                }
+            case .profiles:
+                profilesTabContent
             case .benchmark:
                 BenchmarkView(benchmark: benchmark, port: port, modelAlias: alias.isEmpty ? "default" : alias)
             case .advanced:
-                advancedSettingsContent
+                VStack(alignment: .leading, spacing: 6) {
+                    editingProfileBanner
+                    advancedSettingsContent
+                }
             }
         }
         .font(.system(size: 12))
@@ -443,13 +641,14 @@ struct ContentView: View {
                 Stepper("Port: \(port)", value: $port, in: 1024...65535)
                 HStack {
                     Text("KV cache:")
-                    Picker("KV cache", selection: $kvBits) {
+                    Picker("KV cache", selection: pb(\.launch.kvBits)) {
                         ForEach(KVSettings.bitsChoices, id: \.self) { bits in
                             Text(bits == 0 ? "full" : "\(bits)-bit").tag(bits)
                         }
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()
+                    overrideMark(\.launch.kvBits)
                 }
                 Text("8-bit: nearly lossless, half the KV memory (default). 4-bit: a quarter, but noticeably worse on long context. Full: best quality, most memory.")
                     .font(.system(size: 10))
@@ -457,7 +656,7 @@ struct ContentView: View {
                 if kvBits > 0 {
                     HStack {
                         Text("KV group size:")
-                        Picker("KV group size", selection: $kvGroupSize) {
+                        Picker("KV group size", selection: pb(\.launch.kvGroupSize)) {
                             ForEach(KVSettings.groupSizeChoices, id: \.self) { Text("\($0)").tag($0) }
                         }
                         .pickerStyle(.segmented)
@@ -467,7 +666,7 @@ struct ContentView: View {
                         quantizedKVStart == 0
                             ? "Start quantizing KV cache: from the first token"
                             : "Start quantizing KV cache: after \(quantizedKVStart) tokens",
-                        value: $quantizedKVStart, in: 0...20000, step: 500
+                        value: pb(\.launch.quantizedKVStart), in: 0...20000, step: 500
                     )
                     Text("Keeps the first N tokens of context at full precision before switching to quantized KV -- higher values trade some of the memory savings for accuracy on long prompts.")
                         .font(.system(size: 10))
@@ -568,7 +767,10 @@ struct ContentView: View {
     private var memorySection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Memory").foregroundColor(.secondary)
-            Stepper("Prompt cache limit: \(promptCacheMB) MB", value: $promptCacheMB, in: 128...8192, step: 128)
+            HStack {
+                Stepper("Prompt cache limit: \(promptCacheMB) MB", value: pb(\.launch.promptCacheMB), in: 128...8192, step: 128)
+                overrideMark(\.launch.promptCacheMB)
+            }
             Text("Caps mlx_lm.server's cross-conversation KV cache -- without a limit it grows forever and can crash the process on a long session.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
@@ -582,12 +784,16 @@ struct ContentView: View {
                 decodeConcurrency <= 1
                     ? "Max concurrent predictions: 1 (requests queue)"
                     : "Max concurrent predictions: \(decodeConcurrency)",
-                value: $decodeConcurrency, in: 1...16
+                value: pb(\.launch.decodeConcurrency), in: 1...16
             )
+            overrideMark(\.launch.decodeConcurrency)
             Text("How many separate requests mlx_lm.server batches into one GPU step. Only helps when multiple clients/chats hit the server at the same time -- a single conversation isn't sped up by this. Higher values use more memory per loaded model.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
-            Toggle("Speculative decoding (MTP drafter) when available", isOn: $mtpDrafter)
+            HStack {
+                Toggle("Speculative decoding (MTP drafter) when available", isOn: pb(\.launch.mtpDrafter))
+                overrideMark(\.launch.mtpDrafter)
+            }
             Text("For models with a published Multi-Token-Prediction drafter (Gemma 4 26B-A4B): a small extra model (~450MB, downloaded on first start) guesses a few tokens ahead and the main model checks them in one pass. Same output, noticeably faster decoding. Requests are then served one at a time (no batching), and image requests decode without it. Takes effect on the next server start.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
@@ -611,10 +817,13 @@ struct ContentView: View {
     private var diagnosticsSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Diagnostics").foregroundColor(.secondary)
-            Toggle("Verbose server logging (DEBUG)", isOn: $verboseServerLogging)
+            Toggle("Verbose server logging (DEBUG)", isOn: pb(\.launch.verboseServerLogging))
             VStack(alignment: .leading, spacing: 2) {
-                Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
-                TextField("e.g. --draft-model /path/to/model", text: $extraServerArgs)
+                HStack {
+                    Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
+                    overrideMark(\.launch.extraServerArgs)
+                }
+                TextField("e.g. --draft-model /path/to/model", text: pb(\.launch.extraServerArgs))
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 11, design: .monospaced))
             }
@@ -677,13 +886,16 @@ struct ContentView: View {
     private var chatTabContent: some View {
         VStack(alignment: .leading, spacing: 6) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("System prompt").foregroundColor(.secondary)
-                TextEditor(text: $systemPrompt)
+                HStack {
+                    Text("System prompt").foregroundColor(.secondary)
+                    overrideMark(\.request.systemPrompt)
+                }
+                TextEditor(text: pb(\.request.systemPrompt))
                     .font(.system(size: 12))
                     .frame(height: 90)
                     .padding(4)
                     .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3)))
-                Text("Sent as the first message on every new chat. Leave empty for none.")
+                Text("Sent as the first message of every in-app chat request. Leave empty for none. Not applied to external clients.")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -698,19 +910,32 @@ struct ContentView: View {
             Text("Chat sampling").foregroundColor(.secondary)
             HStack {
                 Text("Temperature").frame(width: 90, alignment: .leading)
-                Slider(value: $temperature, in: 0...2, step: 0.05)
+                Slider(value: pb(\.request.temperature), in: 0...2, step: 0.05)
                 Text(String(format: "%.2f", temperature)).frame(width: 36, alignment: .trailing)
+                overrideMark(\.request.temperature)
             }
             HStack {
                 Text("Top-p").frame(width: 90, alignment: .leading)
-                Slider(value: $topP, in: 0...1, step: 0.01)
+                Slider(value: pb(\.request.topP), in: 0...1, step: 0.01)
                 Text(String(format: "%.2f", topP)).frame(width: 36, alignment: .trailing)
+                overrideMark(\.request.topP)
+            }
+            HStack {
+                Stepper(
+                    resolvedProfile.topK == 0 ? "Top-k: off" : "Top-k: \(resolvedProfile.topK)",
+                    value: pb(\.request.topK), in: 0...200, step: 8
+                )
+                overrideMark(\.request.topK)
             }
             HStack {
                 Text("Max tokens").frame(width: 90, alignment: .leading)
-                Slider(value: $maxTokens, in: 64...Double(modelMaxContext), step: 256)
+                Slider(value: maxTokensBinding, in: 64...Double(modelMaxContext), step: 256)
                 Text(String(Int(maxTokens))).frame(width: 52, alignment: .trailing)
+                overrideMark(\.request.maxTokens)
             }
+            Text("External clients (through the proxy) get these as defaults for anything they don't send, after the next server start.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
 
             Divider().padding(.vertical, 4)
             sessionSettingsSection
@@ -750,7 +975,7 @@ struct ContentView: View {
     private var imageGenerationSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Tools").foregroundColor(.secondary)
-            Picker("Model", selection: $imageGenModel) {
+            Picker("Model", selection: imageGenModelBinding) {
                 ForEach(ImageGenModel.allCases) { model in
                     Text(model.displayName).tag(model)
                 }
@@ -759,9 +984,12 @@ struct ContentView: View {
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
 
-            Toggle("Enable image generation", isOn: enableImageGenerationBinding)
+            HStack {
+                Toggle("Enable image generation", isOn: enableImageGenerationBinding)
+                overrideMark(\.tools.enableImageGeneration)
+            }
             if enableImageGeneration {
-                Picker("Canvas size", selection: $imageQuality) {
+                Picker("Canvas size", selection: imageQualityBinding) {
                     ForEach(ImageQuality.allCases) { quality in
                         Text(quality.displayName).tag(quality)
                     }
@@ -769,7 +997,7 @@ struct ContentView: View {
                 Text("Scales whatever width/height the model asks for -- Balanced is a 1024x1024 no-op.")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
-                Toggle("Unload chat model during generation", isOn: $unloadModelDuringImageGen)
+                Toggle("Unload chat model during generation", isOn: pb(\.tools.unloadModelDuringImageGen))
                 Text(
                     """
                     Both models resident at once can easily exceed unified memory (a diffusion \
@@ -803,6 +1031,31 @@ struct ContentView: View {
             )
             .font(.system(size: 10))
             .foregroundColor(.secondary)
+            toolUsePolicyEditor
+        }
+    }
+
+    private var toolUsePolicyEditor: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack {
+                Text("Tool-use rule").foregroundColor(.secondary)
+                overrideMark(\.tools.toolUsePolicy)
+                Spacer()
+                Button("Restore default") {
+                    profiles.set(\.tools.toolUsePolicy, Profile.defaultToolUsePolicy, for: selectedModelID)
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.accentColor)
+                .font(.system(size: 10))
+            }
+            TextEditor(text: pb(\.tools.toolUsePolicy))
+                .font(.system(size: 11))
+                .frame(height: 54)
+                .padding(4)
+                .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3)))
+            Text("Added to the system prompt whenever tools are offered -- the model's own tool template only says how to call a tool, never when not to. Empty disables it.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
         }
     }
 
@@ -817,7 +1070,7 @@ struct ContentView: View {
                 if newValue {
                     confirmAndDownloadImageModel()
                 } else {
-                    enableImageGeneration = false
+                    profiles.set(\.tools.enableImageGeneration, false, for: selectedModelID)
                 }
             }
         )
@@ -840,11 +1093,12 @@ struct ContentView: View {
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         imageModelDownloadError = nil
+        let modelID = selectedModelID
         Task {
             if let error = await chat.downloadImageModel(model) {
                 imageModelDownloadError = error.localizedDescription
             } else {
-                enableImageGeneration = true
+                profiles.set(\.tools.enableImageGeneration, true, for: modelID)
             }
         }
     }
@@ -1299,7 +1553,7 @@ struct ContentView: View {
         let attachments = pendingAttachments
         draft = ""
         pendingAttachments = []
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
+        let settings = chatSettings
         chat.send(prompt: text, images: attachments, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
         isInputFocused = true
     }
@@ -1330,7 +1584,7 @@ struct ContentView: View {
     }
 
     private func regenerate() {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
+        let settings = chatSettings
         chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
     }
 
@@ -1341,7 +1595,7 @@ struct ContentView: View {
     }
 
     private func compact() async {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
+        let settings = chatSettings
         await chat.compactSession(
             port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings,
             keepStart: compactKeepStart, keepEnd: compactKeepEnd

@@ -1,6 +1,7 @@
 import AppKit
 import Combine
 import Foundation
+import LLMTrayCore
 
 struct ToolCall: Equatable {
     var id: String
@@ -57,12 +58,32 @@ extension Array {
 struct ChatSettings {
     var temperature: Double = 0.6
     var topP: Double = 0.95
+    /// 0 = not sent (top-k off).
+    var topK: Int = 0
     var maxTokens: Int = 1024
     var systemPrompt: String = ""
     var enableImageGeneration: Bool = false
     var imageGenModel: ImageGenModel = .gptqMixed
     var unloadModelDuringImageGen: Bool = true
     var imageQuality: ImageQuality = .balanced
+    /// Appended to the system prompt whenever tools are offered.
+    var toolUsePolicy: String = Profile.defaultToolUsePolicy
+
+    /// The chat settings a model's profile resolves to.
+    init(profile p: ResolvedProfile, maxTokensCap: Int) {
+        temperature = p.temperature
+        topP = p.topP
+        topK = p.topK
+        maxTokens = min(p.maxTokens, maxTokensCap)
+        systemPrompt = p.systemPrompt
+        enableImageGeneration = p.enableImageGeneration
+        imageGenModel = ImageGenModel(rawValue: p.imageGenModel) ?? .gptqMixed
+        unloadModelDuringImageGen = p.unloadModelDuringImageGen
+        imageQuality = ImageQuality(rawValue: p.imageQuality) ?? .balanced
+        toolUsePolicy = p.toolUsePolicy
+    }
+
+    init() {}
 }
 
 @MainActor
@@ -153,8 +174,9 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         "function": [
             "name": "generate_image",
             "description": "Generate an image from a text description using a local diffusion "
-                + "model running on this Mac. Call this whenever the user asks to draw, create, "
-                + "generate, sketch, or make a picture, image, illustration, artwork, or photo.",
+                + "model running on this Mac. Call this only when the user's latest message explicitly "
+                + "asks for an image (draw, create, generate, sketch, or make a picture, illustration, "
+                + "artwork, or photo). Never call it for greetings, small talk or questions.",
             "parameters": [
                 "type": "object",
                 "properties": [
@@ -440,7 +462,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         assistantMessageIndex = messages.count - 1
 
         var payloadMessages: [[String: Any]] = messages.dropLast(1).map(Self.serialize(message:))
-        let systemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        let userSystemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
+        let systemPrompt = [userSystemPrompt, settings.enableImageGeneration ? settings.toolUsePolicy : ""]
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
         if !systemPrompt.isEmpty {
             payloadMessages.insert(["role": "system", "content": systemPrompt], at: 0)
         }
@@ -454,6 +479,9 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             "top_p": settings.topP,
             "max_tokens": settings.maxTokens,
         ]
+        if settings.topK > 0 {
+            body["top_k"] = settings.topK
+        }
         if settings.enableImageGeneration {
             body["tools"] = [Self.generateImageTool]
         }

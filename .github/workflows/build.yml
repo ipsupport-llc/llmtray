@@ -13,3 +13,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: swift build
         run: swift build
+      - name: swift test
+        run: swift test

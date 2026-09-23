@@ -1,4 +1,5 @@
 import SwiftUI
+import LLMTrayCore
 import AppKit
 import Combine
 import Sparkle
@@ -243,14 +244,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let port = defaults.object(forKey: "llmtray.port") as? Int ?? 8765
-        let kvBits = KVSettings.validBits(defaults.object(forKey: "llmtray.kvBits") as? Int ?? KVSettings.defaultBits)
-        let kvGroupSize = KVSettings.validGroupSize(defaults.object(forKey: "llmtray.kvGroupSize") as? Int ?? KVSettings.defaultGroupSize)
-        // Same guard as ContentView.startServer -- auto-start used to skip
-        // it and launch KV-shared models (Gemma 4 E2B/E4B) with quantized
-        // KV, which crashes them.
-        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : kvBits
+        // KV bits, drafter etc. come from the model's profile at launch
+        // (ServerManager.launchServerProcess), including the KV-shared
+        // model guard auto-start used to skip.
         let alias = ModelAliasStore.alias(for: model.id)
-        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: kvGroupSize, alias: alias)
+        server.start(modelPath: model.path, port: port, alias: alias)
     }
 
     @objc private func quickStop() {

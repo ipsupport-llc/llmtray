@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 /// One measured request: TTFT approximates prefill time (the server can't
 /// stream a token before it finishes prefilling the prompt), so
@@ -247,9 +248,16 @@ final class BenchmarkRunner: ObservableObject {
         autoTuneLog = []
         defer { isRunning = false; statusText = "" }
 
-        let defaults = UserDefaults.standard
-        let originalConcurrency = defaults.object(forKey: "llmtray.decodeConcurrency") as? Int ?? 1
-        let originalPrefillStep = defaults.object(forKey: "llmtray.prefillStepSize") as? Int ?? 128
+        // Candidates are written into the running model's profile (the
+        // server reads launch settings from it at every restart), and the
+        // profile's own values are restored afterwards -- including
+        // "not set here, inherited from Default" for an overlay profile.
+        let profiles = ProfileManager.shared
+        let modelPath = server.loadedModelPath
+        let originalConcurrencyField = profiles.profile(for: modelPath).launch.decodeConcurrency
+        let originalPrefillField = profiles.profile(for: modelPath).launch.prefillStepSize
+        let originalConcurrency = profiles.value(\.launch.decodeConcurrency, for: modelPath)
+        let originalPrefillStep = profiles.value(\.launch.prefillStepSize, for: modelPath)
 
         func restart() async -> Bool {
             do {
@@ -272,7 +280,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in decodeConcurrencyCandidates {
             if cancelRequested { break }
             statusText = "Testing decode-concurrency=\(value)…"
-            defaults.set(value, forKey: "llmtray.decodeConcurrency")
+            profiles.set(\.launch.decodeConcurrency, value, for: modelPath)
             guard await restart() else { break }
 
             let batchStart = Date()
@@ -309,7 +317,7 @@ final class BenchmarkRunner: ObservableObject {
                 bestConcurrency = value
             }
         }
-        defaults.set(bestConcurrency, forKey: "llmtray.decodeConcurrency")
+        profiles.set(\.launch.decodeConcurrency, bestConcurrency, for: modelPath)
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "decode-concurrency" && $0.value == bestConcurrency }) {
             autoTuneLog[idx].isWinner = true
         }
@@ -321,7 +329,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in prefillStepSizeCandidates {
             if cancelRequested { break }
             statusText = "Testing prefill-step-size=\(value)…"
-            defaults.set(value, forKey: "llmtray.prefillStepSize")
+            profiles.set(\.launch.prefillStepSize, value, for: modelPath)
             guard await restart() else { break }
 
             guard let sample = try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 2048, maxTokens: 8) else { continue }
@@ -342,8 +350,8 @@ final class BenchmarkRunner: ObservableObject {
         // not necessarily what the user had running before. The winning
         // combination is only ever applied if the user confirms it via
         // applyAutoTuneProposal(), never automatically.
-        defaults.set(originalConcurrency, forKey: "llmtray.decodeConcurrency")
-        defaults.set(originalPrefillStep, forKey: "llmtray.prefillStepSize")
+        profiles.set(\.launch.decodeConcurrency, originalConcurrencyField, for: modelPath)
+        profiles.set(\.launch.prefillStepSize, originalPrefillField, for: modelPath)
         if !cancelRequested {
             statusText = "Restoring original settings…"
             _ = await restart()
@@ -366,9 +374,9 @@ final class BenchmarkRunner: ObservableObject {
         guard let proposal = pendingProposal, !isRunning else { return }
         isRunning = true
         defer { isRunning = false; statusText = "" }
-        let defaults = UserDefaults.standard
-        defaults.set(proposal.proposedConcurrency, forKey: "llmtray.decodeConcurrency")
-        defaults.set(proposal.proposedPrefillStep, forKey: "llmtray.prefillStepSize")
+        let modelPath = server.loadedModelPath
+        ProfileManager.shared.set(\.launch.decodeConcurrency, proposal.proposedConcurrency, for: modelPath)
+        ProfileManager.shared.set(\.launch.prefillStepSize, proposal.proposedPrefillStep, for: modelPath)
         statusText = "Applying new settings…"
         do {
             try await server.restartToApplyLaunchSettings()
