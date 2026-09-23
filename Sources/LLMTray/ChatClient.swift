@@ -117,6 +117,18 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     // apparent elapsed time toward zero, which is what was inflating tok/s
     // to nonsense values.
     nonisolated(unsafe) private var firstByteDate: Date?
+    // HTTP status of the in-flight chat response, and its body when that
+    // status isn't 2xx. mlx_lm.server reports request errors (e.g. an image
+    // sent to a model without vision) as a plain JSON `{"error": ...}` body,
+    // not SSE -- previously those bytes went into the SSE parser, matched no
+    // `data:` line, and the turn silently ended with an empty assistant
+    // bubble and no error shown. Set in the nonisolated delegate callbacks,
+    // same as firstByteDate (URLSession serializes those per task).
+    nonisolated(unsafe) private var responseStatusCode: Int?
+    nonisolated(unsafe) private var errorResponseBody = Data()
+    // See resetConversationState(): async continuations capture this and
+    // drop their result if the conversation was replaced meanwhile.
+    private var conversationEpoch = 0
     private var approxCompletionTokens: Int = 0
     private var usageCompletionTokens: Int?
     private var assistantMessageIndex: Int?
@@ -189,11 +201,8 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     /// until the first completed turn (see persistCurrentSession()), so an
     /// abandoned empty session never litters the sessions directory.
     func newSession() {
-        cancel()
+        resetConversationState()
         messages.removeAll()
-        errorText = nil
-        lastTokensPerSecond = nil
-        imagesGeneratedThisTurn = 0
         currentSessionID = UUID()
         currentSessionTitle = ""
         sessionCreatedAt = Date()
@@ -203,18 +212,41 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     /// currentSessionID stays nil, so persistCurrentSession() is a no-op
     /// for the whole lifetime of this conversation.
     func newTemporaryChat() {
-        cancel()
+        resetConversationState()
         messages.removeAll()
-        errorText = nil
-        lastTokensPerSecond = nil
-        imagesGeneratedThisTurn = 0
         currentSessionID = nil
         currentSessionTitle = ""
         sessionCreatedAt = nil
     }
 
-    func loadSession(_ file: ChatSessionFile) {
+    /// Everything that must not survive a switch to a different
+    /// conversation. The New chat / History controls stay enabled while a
+    /// turn is still running (by design -- so you can leave a slow one), and
+    /// several steps of a turn are async (mflux image generation takes tens
+    /// of seconds and can't be cancelled; compaction awaits its own
+    /// request). Those continuations used to resume into whatever
+    /// `messages` held by then: a generated image + tool result appended
+    /// into the NEW session and a follow-up request sent from it (the model
+    /// continued the old conversation there), or an old session's
+    /// compaction summary spliced into the new one and saved into its file
+    /// -- the "context leaks between chat sessions" a tester reported.
+    /// Bumping `conversationEpoch` makes every such continuation discard its
+    /// result; dropping `task` makes late SSE callbacks from the cancelled
+    /// stream ignorable (see the taskIdentifier checks in the delegate).
+    private func resetConversationState() {
         cancel()
+        task = nil
+        conversationEpoch += 1
+        assistantMessageIndex = nil
+        pendingRequestContext = nil
+        sseBuffer = ""
+        errorText = nil
+        lastTokensPerSecond = nil
+        imagesGeneratedThisTurn = 0
+    }
+
+    func loadSession(_ file: ChatSessionFile) {
+        resetConversationState()
         let imagesDir = ChatSessionStore.imagesDir(for: file.id)
         messages = file.messages.map { pm in
             let images = pm.imageFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
@@ -226,9 +258,6 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         currentSessionID = file.id
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
-        errorText = nil
-        lastTokensPerSecond = nil
-        imagesGeneratedThisTurn = 0
     }
 
     /// Called after every turn that ends with no pending tool call (see
@@ -313,11 +342,18 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             ["role": "user", "content": transcript],
         ]
 
+        let epoch = conversationEpoch
         do {
             let summary = try await requestCompletion(port: port, modelAlias: modelAlias, messages: requestMessages)
+            // Switched to another session while the summary was being
+            // written: middleRange indexes the OLD message list -- splicing
+            // it into the new one would inject (and persist) the old
+            // conversation's summary there.
+            guard epoch == conversationEpoch else { return }
             messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
             persistCurrentSession()
         } catch {
+            guard epoch == conversationEpoch else { return }
             errorText = "Compaction failed: \(error.localizedDescription)"
         }
     }
@@ -438,6 +474,8 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         approxCompletionTokens = 0
         usageCompletionTokens = nil
         firstByteDate = nil
+        responseStatusCode = nil
+        errorResponseBody = Data()
         isStreaming = true
 
         task = session.dataTask(with: request)
@@ -487,12 +525,31 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
 
     // MARK: - URLSessionDataDelegate (incremental SSE parsing)
 
+    nonisolated func urlSession(
+        _ session: URLSession,
+        dataTask: URLSessionDataTask,
+        didReceive response: URLResponse,
+        completionHandler: @escaping @Sendable (URLSession.ResponseDisposition) -> Void
+    ) {
+        responseStatusCode = (response as? HTTPURLResponse)?.statusCode
+        completionHandler(.allow)
+    }
+
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if let code = responseStatusCode, !(200..<300).contains(code) {
+            errorResponseBody.append(data)
+            return
+        }
         if firstByteDate == nil {
             firstByteDate = Date()
         }
         guard let chunk = String(data: data, encoding: .utf8) else { return }
+        let taskID = dataTask.taskIdentifier
         Task { @MainActor in
+            // A cancelled stream from a conversation that was since replaced
+            // can still have chunks queued -- they must not land in the new
+            // one (see resetConversationState).
+            guard self.task?.taskIdentifier == taskID else { return }
             self.handleChunk(chunk)
         }
     }
@@ -502,8 +559,21 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // the same reason as firstByteDate above -- not inside the
         // dispatched Task, which could run late.
         let completionDate = Date()
+        let statusCode = responseStatusCode
+        let errorBody = errorResponseBody
+        let taskID = task.taskIdentifier
         Task { @MainActor in
+            // Completion of a stream abandoned by switching conversations:
+            // nothing of it (error text, tool-call continuation, persisting)
+            // belongs to the conversation now on screen.
+            guard self.task?.taskIdentifier == taskID else { return }
             self.isStreaming = false
+            if let statusCode, !(200..<300).contains(statusCode) {
+                self.errorText = Self.serverErrorMessage(statusCode: statusCode, body: errorBody)
+                self.dropEmptyAssistantPlaceholder()
+                self.persistCurrentSession()
+                return
+            }
             if let error, (error as NSError).code != NSURLErrorCancelled {
                 self.errorText = error.localizedDescription
             }
@@ -511,6 +581,31 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             if error == nil {
                 await self.continueWithPendingToolCalls()
             }
+        }
+    }
+
+    /// mlx_lm.server's error bodies are `{"error": "<message>"}`; fall back
+    /// to the raw body (or just the status) for anything else.
+    private static func serverErrorMessage(statusCode: Int, body: Data) -> String {
+        if let obj = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
+           let message = obj["error"] as? String, !message.isEmpty {
+            return "Server error (\(statusCode)): \(message)"
+        }
+        let raw = String(data: body, encoding: .utf8)?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return raw.isEmpty ? "Server error (\(statusCode))" : "Server error (\(statusCode)): \(raw)"
+    }
+
+    /// A failed request leaves the assistant message that was appended up
+    /// front with nothing in it -- remove it rather than leaving a blank
+    /// bubble that looks like a hung response.
+    private func dropEmptyAssistantPlaceholder() {
+        guard let idx = assistantMessageIndex, idx < messages.count else { return }
+        let msg = messages[idx]
+        if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty,
+           msg.toolCalls.isEmpty, msg.images.isEmpty {
+            messages.remove(at: idx)
+            assistantMessageIndex = nil
         }
     }
 
@@ -538,8 +633,11 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // chat server for nothing.
         let willActuallyGenerate = toolCalls.contains { $0.name == "generate_image" }
             && imagesGeneratedThisTurn < maxImagesPerTurn
+            && context.settings.enableImageGeneration
 
-        isGeneratingImage = true
+        // Only when mflux will actually run -- a refused call (toggle off,
+        // per-turn cap) shouldn't flash the "Generating image…" UI / pulse.
+        isGeneratingImage = willActuallyGenerate
         defer { isGeneratingImage = false }
 
         // A diffusion model's own peak memory can rival or exceed a loaded
@@ -556,9 +654,32 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             context.server.stop()
         }
 
-        for call in toolCalls {
+        // Session switched mid-call (see resetConversationState): stop
+        // touching `messages` -- it now belongs to another conversation.
+        let epoch = conversationEpoch
+
+        callLoop: for call in toolCalls {
+            guard epoch == conversationEpoch else { break callLoop }
             guard call.name == "generate_image" else {
                 messages.append(ChatMessage(role: "tool", content: "Unknown tool: \(call.name)", toolCallID: call.id))
+                continue
+            }
+            // The tool is only *declared* when image generation is enabled,
+            // but a model that saw generate_image calls earlier in the same
+            // session keeps emitting them from history after the toggle is
+            // turned off (reported by a tester, confirmed in code: nothing
+            // here checked the toggle) -- and the server still parses that
+            // text as a tool call. Refuse instead of silently running mflux.
+            guard context.settings.enableImageGeneration else {
+                messages.append(
+                    ChatMessage(
+                        role: "tool",
+                        content: "Image generation is turned off in LLMTray's settings, so no image was "
+                            + "generated. Do not call generate_image; answer in text, and if the user wants "
+                            + "an image, tell them to enable image generation in settings first.",
+                        toolCallID: call.id
+                    )
+                )
                 continue
             }
             // Small tool-calling models can fail to treat a successful
@@ -594,6 +715,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 let imageData = try await mfluxManager.generate(
                     prompt: prompt, width: width, height: height, model: context.settings.imageGenModel
                 )
+                guard epoch == conversationEpoch else { break callLoop }
                 let elapsed = Date().timeIntervalSince(start)
                 if sourceIndex < messages.count {
                     messages[sourceIndex].images.append(imageData)
@@ -614,6 +736,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                     )
                 )
             } catch {
+                guard epoch == conversationEpoch else { break callLoop }
                 messages.append(
                     ChatMessage(
                         role: "tool", content: "Image generation failed: \(error.localizedDescription)",
@@ -623,6 +746,8 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             }
         }
 
+        // Reload even if the conversation was switched meanwhile -- the new
+        // one needs the chat model too.
         if shouldUnload {
             do {
                 try await context.server.ensureModelLoaded()
@@ -631,6 +756,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
                 return
             }
         }
+
+        // ...but never send the old conversation's follow-up request from
+        // the new one.
+        guard epoch == conversationEpoch else { return }
 
         startAssistantResponse(
             port: context.port, modelAlias: context.modelAlias, settings: context.settings, server: context.server
