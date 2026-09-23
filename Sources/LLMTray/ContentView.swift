@@ -59,6 +59,7 @@ struct ContentView: View {
     @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
     @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
     @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
+    @AppStorage("llmtray.mtpDrafter") private var mtpDrafter: Bool = true
     @AppStorage("llmtray.enableImageGeneration") private var enableImageGeneration: Bool = false
     @AppStorage("llmtray.imageGenModel") private var imageGenModel: ImageGenModel = .gptqMixed
     // On by default -- a diffusion model's own peak memory can rival or
@@ -565,6 +566,10 @@ struct ContentView: View {
                 value: $decodeConcurrency, in: 1...16
             )
             Text("How many separate requests mlx_lm.server batches into one GPU step. Only helps when multiple clients/chats hit the server at the same time -- a single conversation isn't sped up by this. Higher values use more memory per loaded model.")
+                .font(.system(size: 10))
+                .foregroundColor(.secondary)
+            Toggle("Speculative decoding (MTP drafter) when available", isOn: $mtpDrafter)
+            Text("For models with a published Multi-Token-Prediction drafter (Gemma 4 26B-A4B): a small extra model (~450MB, downloaded on first start) guesses a few tokens ahead and the main model checks them in one pass. Same output, noticeably faster decoding. Requests are then served one at a time (no batching), and image requests decode without it. Takes effect on the next server start.")
                 .font(.system(size: 10))
                 .foregroundColor(.secondary)
         }
