@@ -13,6 +13,8 @@ struct LLMTrayApp: App {
         // otherwise sits in that buffer and never shows up until the
         // process exits, which looks exactly like "nothing happened."
         setvbuf(stdout, nil, _IONBF, 0)
+        // Before any view's @AppStorage or the auto-start path reads them.
+        KVSettings.migrateIfNeeded()
     }
 
     // MenuBarExtra only gives one click behavior for both mouse buttons, and
@@ -241,10 +243,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let port = defaults.object(forKey: "llmtray.port") as? Int ?? 8765
-        let kvBits = defaults.object(forKey: "llmtray.kvBits") as? Int ?? 4
-        let kvGroupSize = defaults.object(forKey: "llmtray.kvGroupSize") as? Int ?? 64
+        let kvBits = KVSettings.validBits(defaults.object(forKey: "llmtray.kvBits") as? Int ?? KVSettings.defaultBits)
+        let kvGroupSize = KVSettings.validGroupSize(defaults.object(forKey: "llmtray.kvGroupSize") as? Int ?? KVSettings.defaultGroupSize)
+        // Same guard as ContentView.startServer -- auto-start used to skip
+        // it and launch KV-shared models (Gemma 4 E2B/E4B) with quantized
+        // KV, which crashes them.
+        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : kvBits
         let alias = ModelAliasStore.alias(for: model.id)
-        server.start(modelPath: model.path, port: port, kvBits: kvBits, kvGroupSize: kvGroupSize, alias: alias)
+        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: kvGroupSize, alias: alias)
     }
 
     @objc private func quickStop() {
