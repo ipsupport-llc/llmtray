@@ -6,13 +6,13 @@
     <description>LLMTray release updates</description>
     <language>en</language>
     <item>
-      <title>Version 0.6.4</title>
-      <pubDate>Wed, 23 Sep 2026 05:52:47 +0000</pubDate>
-      <sparkle:version>0.6.4</sparkle:version>
-      <sparkle:shortVersionString>0.6.4</sparkle:shortVersionString>
+      <title>Version 0.6.5</title>
+      <pubDate>Wed, 23 Sep 2026 13:53:30 +0000</pubDate>
+      <sparkle:version>0.6.5</sparkle:version>
+      <sparkle:shortVersionString>0.6.5</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
       <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"
-                 sparkle:edSignature="q9JCmB0OFTnYVRRe9/2Dg4JXL4LtoHTheQ7kOUgtUSbgLeBDX+TmWVmyKgXkBC06deIMRv0zvrdLvl8yEZKRCA==" length="2421942"
+                 sparkle:edSignature="ckdNZmtSHOr/Ppgs6NW4ghZhq3OcadG6nhdbaBSJKxw/tvhP9Yod+6DpLbZMgHDHsPR9ZZNy0rS1wIe8M/LnAQ==" length="2427399"
                  type="application/octet-stream"/>
     </item>
   </channel>
