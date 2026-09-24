@@ -1,3 +1,4 @@
+import LLMTrayCore
 import Foundation
 
 /// Installs and upgrades the mlx-lm runtime (a Python venv with LLMTray's

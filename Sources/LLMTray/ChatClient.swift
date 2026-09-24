@@ -46,7 +46,8 @@ final class ChatClient: ObservableObject {
     /// second Compact (or a send) can't work on a stale message range.
     var isBusy: Bool { isTurnInProgress || isCompacting }
 
-    private let imageTool = ImageToolRunner()
+    private let toolbox = ChatToolbox()
+    private var imageTool: ImageToolRunner { toolbox.imageGeneration }
     private var mfluxManager: MfluxManager { imageTool.mflux }
     private var mfluxStatusCancellable: AnyCancellable?
     private var mfluxProgressCancellable: AnyCancellable?
@@ -129,7 +130,7 @@ final class ChatClient: ObservableObject {
         decoder = SSEDecoder()
         errorText = nil
         lastTokensPerSecond = nil
-        imageTool.startTurn()
+        toolbox.startTurn()
         toolRoundsThisTurn = 0
     }
 
@@ -160,7 +161,7 @@ final class ChatClient: ObservableObject {
         var pendingImageWrites: [(path: String, data: Data)] = []
 
         let persisted = messages.compactMap { msg -> PersistedMessage? in
-            guard msg.role != "tool" else { return nil }
+            guard msg.role != "tool", !msg.isToolContext else { return nil }
             if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty { return nil }
             // Keyed by this message's own (stable for its lifetime) id, so
             // re-persisting the same session after a later turn doesn't
@@ -265,7 +266,7 @@ final class ChatClient: ObservableObject {
         server: ServerManager
     ) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
-        imageTool.startTurn()
+        toolbox.startTurn()
         toolRoundsThisTurn = 0
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
         startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
@@ -277,7 +278,7 @@ final class ChatClient: ObservableObject {
     /// same prompt.
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
-        imageTool.startTurn()
+        toolbox.startTurn()
         toolRoundsThisTurn = 0
         if messages.last?.role == "assistant" {
             messages.removeLast()
@@ -312,7 +313,7 @@ final class ChatClient: ObservableObject {
         guard let request = ChatRequestBuilder.streaming(
             port: port, modelAlias: modelAlias, settings: settings,
             history: Array(messages.dropLast(1)),
-            tools: settings.enableImageGeneration ? [ImageToolRunner.definition] : []
+            tools: toolbox.definitions(for: settings)
         ) else {
             errorText = "failed to build request"
             return
@@ -388,6 +389,13 @@ final class ChatClient: ObservableObject {
         }
     }
 
+    /// Images generated in this conversation, oldest first (view_image).
+    private var generatedImages: [(data: Data, prompt: String)] {
+        messages.filter { $0.role == "assistant" }.flatMap { msg in
+            msg.images.enumerated().map { (data: $1, prompt: msg.imagePrompts[safe: $0] ?? "") }
+        }
+    }
+
     private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext) async {
         let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: context.settings)
         // Only when mflux will actually run -- a refused call shouldn't
@@ -410,14 +418,18 @@ final class ChatClient: ObservableObject {
         // Session switched mid-call (see resetConversationState): stop
         // touching `messages` -- it now belongs to another conversation.
         let epoch = conversationEpoch
+        var pendingModelImages: [Data] = []
         for call in toolCalls {
             guard epoch == conversationEpoch else { break }
-            let result = await imageTool.run(call, settings: context.settings)
+            let result = await toolbox.run(call, context: ToolContext(settings: context.settings, generatedImages: generatedImages))
             guard epoch == conversationEpoch else { break }
             switch result {
-            case .message(let text):
+            case .text(let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
-            case .image(let data, let seconds, let prompt, let text):
+            case .imageForModel(let data, let text):
+                messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+                pendingModelImages.append(data)
+            case .generatedImage(let data, let seconds, let prompt, let text):
                 if sourceIndex < messages.count {
                     messages[sourceIndex].images.append(data)
                     messages[sourceIndex].imageDurations.append(seconds)
@@ -425,6 +437,15 @@ final class ChatClient: ObservableObject {
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             }
+        }
+
+        // Images a tool put in front of the model (view_image) follow the
+        // tool results as one hidden user message: tool results are text.
+        if epoch == conversationEpoch, !pendingModelImages.isEmpty {
+            messages.append(ChatMessage(
+                role: "user", content: "(The image(s) you asked to look at.)",
+                images: pendingModelImages, isToolContext: true
+            ))
         }
 
         // Reload even if the conversation was switched meanwhile -- the new

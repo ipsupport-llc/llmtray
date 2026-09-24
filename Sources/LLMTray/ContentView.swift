@@ -106,7 +106,9 @@ struct ContentView: View {
     }
 
     private var chatSettings: ChatSettings {
-        ChatSettings(profile: profiles.resolved(for: selectedModelID), maxTokensCap: modelMaxContext)
+        var settings = ChatSettings(profile: profiles.resolved(for: selectedModelID), maxTokensCap: modelMaxContext)
+        settings.modelSupportsVision = composer.acceptsImages
+        return settings
     }
 
     // MARK: - Chat
@@ -125,7 +127,7 @@ struct ContentView: View {
                     // "tool" messages are protocol plumbing: the image a
                     // tool produced is attached to the assistant message
                     // that called it.
-                    ForEach(chat.messages.filter { $0.role != "tool" }) { msg in
+                    ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning)
                             .id(msg.id)
                     }

@@ -41,6 +41,9 @@ struct ChatMessage: Identifiable, Equatable {
     // chatBubble so it reads as "the app summarized this," not something
     // the assistant actually said.
     var isSummary: Bool = false
+    // A message the app adds for the model only -- an image view_image put
+    // in front of it. Not shown as a bubble, not saved with the session.
+    var isToolContext: Bool = false
 }
 
 extension Array {
@@ -64,6 +67,8 @@ struct ChatSettings {
     var imageGenModel: ImageGenModel = .gptqMixed
     var unloadModelDuringImageGen: Bool = true
     var imageQuality: ImageQuality = .balanced
+    /// The chat model accepts images (view_image is offered only then).
+    var modelSupportsVision: Bool = false
     /// Appended to the system prompt whenever tools are offered.
     var toolUsePolicy: String = Profile.defaultToolUsePolicy
 

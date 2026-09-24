@@ -3,14 +3,14 @@ import Foundation
 /// Runs the helper processes the runtime installers need (venv creation,
 /// pip) -- shared by the mlx-lm runtime, its updater and the image-generation
 /// runtime, which used to carry three copies of this.
-enum ProcessRunner {
-    struct Failure: LocalizedError {
-        let executable: String
-        let status: Int32
+public enum ProcessRunner {
+    public struct Failure: LocalizedError {
+        public let executable: String
+        public let status: Int32
         /// The last part of the process's output, for the error message.
-        let outputTail: String
+        public let outputTail: String
 
-        var errorDescription: String? {
+        public var errorDescription: String? {
             let name = (executable as NSString).lastPathComponent
             return outputTail.isEmpty ? "\(name) exited \(status)" : "\(name) exited \(status): \(outputTail)"
         }
@@ -21,7 +21,7 @@ enum ProcessRunner {
     /// 64 KB and blocks the child forever (a chatty pip install did exactly
     /// that when output was only read after exit) -- passed to `log` when
     /// given, and its tail is kept for the error.
-    static func run(
+    public static func run(
         _ executable: String, _ arguments: [String],
         log: (@MainActor @Sendable (String) -> Void)? = nil
     ) async throws {
@@ -69,8 +69,64 @@ enum ProcessRunner {
         }
     }
 
+    /// Like run(), but hands each complete stdout line to `onLine`, in
+    /// order, from a background thread -- for a child that reports through
+    /// a line protocol. Returns once every line has been delivered and the
+    /// process has exited. stderr is kept apart; its tail goes into the error.
+    public static func runStreaming(
+        _ executable: String, _ arguments: [String],
+        onLine: @escaping @Sendable (String) -> Void
+    ) async throws {
+        let tail = OutputTail()
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: executable)
+            task.arguments = arguments
+            task.standardInput = FileHandle.nullDevice
+            let out = Pipe(), err = Pipe()
+            task.standardOutput = out
+            task.standardError = err
+            err.fileHandleForReading.readabilityHandler = { fh in
+                let data = fh.availableData
+                if !data.isEmpty { tail.append(data) }
+            }
+            // Done = stdout at EOF (every line delivered) AND exited.
+            let done = DispatchGroup()
+            done.enter()
+            done.enter()
+            task.terminationHandler = { _ in done.leave() }
+            do {
+                try task.run()
+            } catch {
+                err.fileHandleForReading.readabilityHandler = nil
+                continuation.resume(throwing: error)
+                return
+            }
+            DispatchQueue.global(qos: .userInitiated).async {
+                let lines = LineSplitter()
+                let handle = out.fileHandleForReading
+                while true {
+                    let data = handle.availableData   // blocks; empty at EOF
+                    if data.isEmpty { break }
+                    lines.append(data).forEach(onLine)
+                }
+                lines.flush().map(onLine)   // a last line without a newline
+                done.leave()
+            }
+            done.notify(queue: .global()) {
+                err.fileHandleForReading.readabilityHandler = nil
+                if let rest = try? err.fileHandleForReading.readToEnd() { tail.append(rest) }
+                if task.terminationStatus == 0 {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: Failure(executable: executable, status: task.terminationStatus, outputTail: tail.text))
+                }
+            }
+        }
+    }
+
     /// Runs blocking file / process work on a background thread.
-    static func offMain<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
+    public static func offMain<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
         try await Task.detached(priority: .userInitiated) { try work() }.value
     }
 }
@@ -91,8 +147,8 @@ enum ProcessRunner {
 /// "Install Command Line Developer Tools" dialog the first time anything
 /// runs it -- confusing from a background bootstrap step. nil instead lets
 /// the caller fail with a clear, actionable message.
-enum PythonLocator {
-    static var commonLocations: [String] {
+public enum PythonLocator {
+    public static var commonLocations: [String] {
         [
             "/opt/homebrew/bin/python3",
             "/usr/local/bin/python3",
@@ -105,13 +161,13 @@ enum PythonLocator {
 
     /// The first modern Python among `preferred`, then the common locations.
     /// The version probes run off the main thread.
-    static func findModern(preferring preferred: [String] = []) async -> String? {
+    public static func findModern(preferring preferred: [String] = []) async -> String? {
         let candidates = (preferred + commonLocations).filter { FileManager.default.isExecutableFile(atPath: $0) }
         return try? await ProcessRunner.offMain { candidates.first(where: isModern) }
     }
 
     /// Blocks until the probe exits -- call it off the main thread.
-    static func isModern(_ path: String) -> Bool {
+    public static func isModern(_ path: String) -> Bool {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: path)
         task.arguments = ["-c", "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"]
@@ -144,5 +200,32 @@ private final class OutputTail: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         return String(decoding: data.suffix(limit), as: UTF8.self)
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+/// Splits a byte stream into complete lines (UTF-8), keeping a partial
+/// last line for the next chunk. Thread-safe.
+public final class LineSplitter: @unchecked Sendable {
+    public init() {}
+    private let lock = NSLock()
+    private var pending = Data()
+
+    /// What's left after the last newline, if anything (at EOF).
+    public func flush() -> String? {
+        lock.lock(); defer { lock.unlock() }
+        guard !pending.isEmpty else { return nil }
+        defer { pending = Data() }
+        return String(decoding: pending, as: UTF8.self)
+    }
+
+    public func append(_ data: Data) -> [String] {
+        lock.lock(); defer { lock.unlock() }
+        pending.append(data)
+        var lines: [String] = []
+        while let newline = pending.firstIndex(of: 0x0A) {
+            lines.append(String(decoding: pending[pending.startIndex..<newline], as: UTF8.self))
+            pending = Data(pending[pending.index(after: newline)...])
+        }
+        return lines
     }
 }

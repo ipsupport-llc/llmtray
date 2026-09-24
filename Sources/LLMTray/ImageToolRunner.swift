@@ -5,13 +5,15 @@ import Foundation
 /// the model is decided here; ChatClient only places the results in the
 /// conversation (and unloads/reloads the chat model around generation).
 @MainActor
-final class ImageToolRunner {
-    static let name = "generate_image"
+final class ImageToolRunner: ChatTool {
+    static let toolName = "generate_image"
+    let name = ImageToolRunner.toolName
+    var definition: [String: Any] { Self.declaration }
 
-    static let definition: [String: Any] = [
+    static let declaration: [String: Any] = [
         "type": "function",
         "function": [
-            "name": name,
+            "name": toolName,
             "description": "Generate an image from a text description using a local diffusion "
                 + "model running on this Mac. Call this only when the user's latest message explicitly "
                 + "asks for an image (draw, create, generate, sketch, or make a picture, illustration, "
@@ -37,13 +39,6 @@ final class ImageToolRunner {
         ],
     ]
 
-    enum Result {
-        /// Only a tool result for the model (a refusal, an error...).
-        case message(String)
-        /// A generated image, shown to the user, plus the tool result.
-        case image(Data, seconds: Double, prompt: String, message: String)
-    }
-
     let mflux = MfluxManager()
 
     // Small tool-calling models (this feature was built against a 4B one)
@@ -62,32 +57,33 @@ final class ImageToolRunner {
     /// -- so a model stuck repeating the call doesn't make the chat model
     /// unload/reload (or the "Generating image…" UI flash) for nothing.
     func willGenerate(_ calls: [ToolCall], settings: ChatSettings) -> Bool {
-        calls.contains { $0.name == Self.name } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
+        calls.contains { $0.name == Self.toolName } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
-    func run(_ call: ToolCall, settings: ChatSettings) async -> Result {
-        guard call.name == Self.name else {
-            return .message("Unknown tool: \(call.name)")
-        }
+    func isOffered(_ settings: ChatSettings) -> Bool {
+        settings.enableImageGeneration
+    }
+
+    func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+        let settings = context.settings
         // Only *declared* while image generation is enabled, but a model
         // that saw generate_image calls earlier in the session keeps
         // emitting them from history after the toggle is turned off
         // (reported by a tester), and the server still parses them.
         guard settings.enableImageGeneration else {
-            return .message(
+            return .text(
                 "Image generation is turned off in LLMTray's settings, so no image was "
                     + "generated. Do not call generate_image; answer in text, and if the user wants "
                     + "an image, tell them to enable image generation in settings first."
             )
         }
         guard imagesThisTurn < maxImagesPerTurn else {
-            return .message(
+            return .text(
                 "Not generating another image -- one was already generated for this request "
                     + "and shown to the user. Do not call generate_image again unless the user sends a "
                     + "new message explicitly asking for a new or different image."
             )
         }
-        let arguments = Self.parseArguments(call.argumentsJSON)
         let prompt = (arguments["prompt"] as? String) ?? ""
         // Scales what the model asked for rather than replacing it, so a
         // deliberately non-square request keeps its aspect ratio --
@@ -99,23 +95,19 @@ final class ImageToolRunner {
             let start = Date()
             let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: settings.imageGenModel)
             imagesThisTurn += 1
-            return .image(
+            return .generatedImage(
                 image, seconds: Date().timeIntervalSince(start), prompt: prompt,
-                message: "Image generated and already displayed to the user directly above your reply "
-                    + "-- you do not have the image data and cannot embed, link, or preview it yourself. "
+                text: "Image generated and already displayed to the user directly above your reply "
+                    + (settings.modelSupportsVision
+                        ? "-- you can't embed or link it; call view_image if you need to see it. "
+                        : "-- you do not have the image data and cannot embed, link, or preview it yourself. ")
                     + "Do not write markdown image syntax (![...](...)) or any placeholder/fake URL for "
                     + "it. Just reply in plain text (e.g. briefly describe what you asked for), or say "
                     + "nothing else. Do not call generate_image again for this request unless the user "
                     + "explicitly asks for a new or different image."
             )
         } catch {
-            return .message("Image generation failed: \(error.localizedDescription)")
+            return .text("Image generation failed: \(error.localizedDescription)")
         }
-    }
-
-    private static func parseArguments(_ json: String) -> [String: Any] {
-        guard let data = json.data(using: .utf8),
-              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
-        return obj
     }
 }
