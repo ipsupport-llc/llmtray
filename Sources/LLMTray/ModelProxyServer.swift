@@ -330,6 +330,34 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
 
     func own(_ session: URLSession) {
         self.session = session
+        watchDownstream()
+    }
+
+    /// The client went away (Stop in the chat, a cancelled benchmark, a
+    /// closed curl): cancel the upstream generation too. Otherwise it keeps
+    /// running to max_tokens, holds the GPU, and a model switch or restart
+    /// waiting for in-flight requests waits on it. A pending receive is how
+    /// NWConnection notices the peer closing; clients send nothing more
+    /// after the request body.
+    private func watchDownstream() {
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 4096) { [weak self] data, _, isComplete, error in
+            MainActor.assumeIsolated {
+                guard let self, !self.finished else { return }
+                if isComplete || error != nil {
+                    self.cancelUpstream()
+                } else if data != nil {
+                    self.watchDownstream()
+                }
+            }
+        }
+    }
+
+    private func cancelUpstream() {
+        MainActor.assumeIsolated {
+            guard !finished else { return }
+            // didCompleteWithError(cancelled) follows and ends the request.
+            session?.invalidateAndCancel()
+        }
     }
 
     private func checkForStall() {
@@ -409,7 +437,10 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         var chunk = Data(String(format: "%x\r\n", data.count).utf8)
         chunk.append(data)
         chunk.append(Data("\r\n".utf8))
-        connection.send(content: chunk, completion: .contentProcessed { _ in })
+        connection.send(content: chunk, completion: .contentProcessed { [weak self] error in
+            guard error != nil else { return }
+            self?.cancelUpstream()
+        })
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {

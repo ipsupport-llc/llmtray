@@ -158,9 +158,6 @@ final class ServerManager: ObservableObject {
         state = .starting
         isIdleUnloaded = false
         log = ""
-        currentPublicPort = port
-        currentModelPath = modelPath
-        currentAlias = alias
 
         // A downloaded .app has no venv at all (only run_server.sh's dev
         // flow created one before) -- someone who just dragged LLMTray.dmg
@@ -171,6 +168,22 @@ final class ServerManager: ObservableObject {
         Task {
             do {
                 try await serialized(epoch: epoch) {
+                    // A transition queued ahead of this one may already have
+                    // brought exactly this model up.
+                    if case .running = self.state, self.currentModelPath == modelPath, self.currentPublicPort == port { return }
+                    // Otherwise whatever it left running is replaced (waiting
+                    // for it to exit on its own could wait forever).
+                    await self.terminateAndWaitForExit()
+                    try self.checkNotStopped(epoch)
+                    // A listener left from a failed run may be on another
+                    // port, forwarding to another internal port.
+                    if let listening = self.proxy.publicPort, listening != port {
+                        self.proxy.stop()
+                    }
+                    self.currentPublicPort = port
+                    self.currentModelPath = modelPath
+                    self.currentAlias = alias
+                    self.state = .starting
                     try await self.ensureRuntimeReady()
                     try self.checkNotStopped(epoch)
                     try await self.launchAndWaitReady(modelPath: modelPath, alias: alias, epoch: epoch)
@@ -200,6 +213,7 @@ final class ServerManager: ObservableObject {
     func acquireModel(modelPath target: String?, alias: String) async throws {
         let epoch = stopEpoch
         try await serialized(epoch: epoch) {
+            try self.checkAutoLoadAllowed()
             if let target, target != self.currentModelPath {
                 await self.waitForForwardsToDrain()
                 try self.checkNotStopped(epoch)
@@ -227,6 +241,7 @@ final class ServerManager: ObservableObject {
 
     private func loadIfNeeded(epoch: Int) async throws {
         if case .running = state { return }
+        try checkAutoLoadAllowed()
         guard let modelPath = currentModelPath else { return }
         try await ensureRuntimeReady()
         try checkNotStopped(epoch)
@@ -290,6 +305,17 @@ final class ServerManager: ObservableObject {
         }
         transitionTail = Task { @MainActor in _ = try? await task.value }
         try await task.value
+    }
+
+    /// Requests may bring the model (back) up only while it's running or
+    /// idle-unloaded -- never after an explicit Stop (a connection accepted
+    /// just before it, or an image generation that unloaded the model and
+    /// reloads it afterwards) or a failure the user hasn't acted on.
+    private func checkAutoLoadAllowed() throws {
+        if case .running = state { return }
+        guard isIdleUnloaded else {
+            throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "the server isn't running"])
+        }
     }
 
     private func checkNotStopped(_ epoch: Int) throws {
@@ -997,18 +1023,25 @@ final class ServerManager: ObservableObject {
     /// currentModelPath/currentAlias are deliberately left set -- that's
     /// exactly what ensureModelLoaded() reloads.
     private func idleUnload() {
-        unloadModel()
+        Task { await unloadModel(onlyIfIdle: true) }
     }
 
     /// Frees the model's memory but keeps the public listener, so the next
     /// request (in-app or external) reloads it -- idle-unload, and making
-    /// room for image generation. The in-app chat stays usable.
-    func unloadModel() {
-        isIdleUnloaded = true
-        state = .stopped
-        guard let process, process.isRunning else { return }
-        process.terminate()
-        killIfStillRunning(process)
+    /// room for image generation. The in-app chat stays usable. Queued like
+    /// every transition, a no-op unless the model is running, and returns
+    /// once the process has actually exited (its memory is free).
+    func unloadModel(onlyIfIdle: Bool = false) async {
+        let epoch = stopEpoch
+        try? await serialized(epoch: epoch) {
+            guard case .running = self.state else { return }
+            // A request that arrived since the idle check is already
+            // counted -- don't unload the model out from under it.
+            guard !onlyIfIdle || self.activeRequestCount == 0 else { return }
+            self.isIdleUnloaded = true
+            self.state = .stopped
+            await self.terminateAndWaitForExit()
+        }
     }
 
     /// Paired with beginRequest() above, for a request that completed

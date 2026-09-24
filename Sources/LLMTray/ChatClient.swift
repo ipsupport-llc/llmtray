@@ -687,7 +687,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // "stopped, but not forgotten" case.
         let shouldUnload = context.settings.unloadModelDuringImageGen && willActuallyGenerate
         if shouldUnload {
-            context.server.unloadModel()
+            await context.server.unloadModel()
         }
 
         // Session switched mid-call (see resetConversationState): stop
