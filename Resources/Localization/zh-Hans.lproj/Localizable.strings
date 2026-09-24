@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "要重启 LLMTray 以更改语言吗？";
 "Restart Now" = "立即重启";
 "Restart Server" = "重启服务器";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "连续停滞请求达到此数量后，重启模型进程，而不是让其卡住。0 表示关闭。";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "在连续出错的请求达到此数量后重启模型进程，以免进程挂起；当生成线程崩溃（例如 GPU 内存不足）时也会重启（10 分钟内最多重启 3 次）。设为 0 以关闭此功能。";
 "Restarts the model process with the new settings (a few seconds to reload)." = "使用新设置重启模型进程（重新加载需几秒钟）。";
 "Resume download" = "继续下载。";
 "Retry" = "重试";

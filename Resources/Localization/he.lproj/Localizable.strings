@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "להפעיל מחדש את LLMTray כדי לשנות את השפה?";
 "Restart Now" = "הפעל מחדש כעת";
 "Restart Server" = "הפעל את השרת מחדש";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "מפעיל מחדש את תהליך המודל אחרי מספר כזה של בקשות תקועות ברצף, במקום להשאיר אותו תקוע. 0 מכבה זאת.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "מאתחל מחדש את תהליך המודל לאחר מספר הבקשות התקועות הרצופות הזה, במקום להשאירו תקוע, וכאשר תהליך ההפקה שלו מתפוגג (למשל גמר זיכרון GPU; עד 3 פעמים בתוך 10 דקות). 0 מבטל את האפשרות.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "מפעיל מחדש את תהליך המודל עם ההגדרות החדשות (כמה שניות לטעינה מחדש).";
 "Resume download" = "ממשיך את ההורדה.";
 "Retry" = "נסה שוב";

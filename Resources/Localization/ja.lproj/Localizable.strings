@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "言語を変更するには LLMTray を再起動しますか？";
 "Restart Now" = "今すぐ再起動";
 "Restart Server" = "サーバを再起動";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "この回数のリクエストが連続して停止したら、固まったままにせずモデルプロセスを再起動します。0 でオフになります。";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "連続してこの回数だけリクエストが停止した場合、または生成スレッドが停止したとき（例：GPUメモリ不足）、プロセスを再起動します（10分間に最大3回）。0にすると無効になります。";
 "Restarts the model process with the new settings (a few seconds to reload)." = "新しい設定でモデルプロセスを再起動します（再読み込みに数秒かかります）。";
 "Resume download" = "ダウンロードを再開します。";
 "Retry" = "再試行";

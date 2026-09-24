@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "Riavviare LLMTray per cambiare la lingua?";
 "Restart Now" = "Riavvia ora";
 "Restart Server" = "Riavvia il server";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Riavvia il processo del modello dopo questo numero di richieste bloccate consecutive, invece di lasciarlo in stallo. 0 lo disattiva.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Riavvia il processo del modello dopo questo numero di richieste bloccate consecutive, invece di lasciarlo inceppato, e quando il suo thread di generazione termina (es. esaurimento della memoria GPU; max 3 volte in 10 minuti). 0 lo disattiva.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Riavvia il processo del modello con le nuove impostazioni (richiede alcuni secondi per ricaricare).";
 "Resume download" = "Riprendi il download.";
 "Retry" = "Riprova";

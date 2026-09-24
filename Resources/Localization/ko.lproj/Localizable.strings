@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "언어를 변경하려면 LLMTray를 재시동할까요?";
 "Restart Now" = "지금 재시동";
 "Restart Server" = "서버 재시동";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "연속으로 이 횟수만큼 요청이 멈추면 그대로 두지 않고 모델 프로세스를 재시동합니다. 0이면 끕니다.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "연속으로 이만큼 요청이 정지될 경우(또는 생성 스레드가 죽을 때 — 예: GPU 메모리 부족) 모델 프로세스를 재시작합니다(10분에 최대 3회). 0이면 비활성화됩니다.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "새 설정으로 모델 프로세스를 재시동합니다(다시 로드하는 데 몇 초 걸림).";
 "Resume download" = "다운로드 재개";
 "Retry" = "다시 시도";

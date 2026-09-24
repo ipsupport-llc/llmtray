@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "Dili değiştirmek için LLMTray yeniden başlatılsın mı?";
 "Restart Now" = "Şimdi Yeniden Başlat";
 "Restart Server" = "Sunucuyu Yeniden Başlat";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Model sürecini takılı bırakmak yerine, arka arkaya bu kadar takılan istekten sonra yeniden başlatır. 0 devre dışı bırakır.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Modelin üretim iş parçacığı öldüğünde (ör. GPU belleği bittiğinde) veya art arda bu kadar başarısız istekten sonra takılı kalmasını önlemek için model sürecini yeniden başlatır (10 dakikada en fazla 3 kez). 0 kapatır.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Model sürecini yeni ayarlarla yeniden başlatır (yeniden yükleme birkaç saniye sürer).";
 "Resume download" = "İndirmeyi sürdür.";
 "Retry" = "Yeniden Dene";
