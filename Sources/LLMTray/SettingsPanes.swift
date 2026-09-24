@@ -670,8 +670,7 @@ struct BenchmarkPane: View {
 
     private var alias: String {
         guard let path = server.loadedModelPath else { return "default" }
-        let a = ModelCatalog.shared.alias(for: path)
-        return a.isEmpty ? (path as NSString).lastPathComponent : a
+        return ModelCatalog.shared.requestName(for: path)
     }
 
     var body: some View {

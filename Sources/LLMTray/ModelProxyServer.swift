@@ -183,10 +183,28 @@ final class ModelProxyServer {
         // per-token generation after it. Every exit path below -- switch
         // failure, forward()'s own invalid-URL guard, or eventual proxy
         // completion -- balances this with exactly one endRequest() call.
+        // The model list comes from the catalog: mlx_lm.server's own lists
+        // its Hugging Face cache (image models included), names this proxy
+        // would refuse below.
+        let route = path.split(separator: "?", maxSplits: 1).first.map(String.init) ?? path
+        if route.hasPrefix("/v1/models") || route.hasPrefix("/api/v0/models") {
+            serveModels(route: route, method: method, headers: headers, connection: connection)
+            return
+        }
+        let modelName = ProxyRequestBody.requestedModel(bodyData)
+        let targetPath = modelName.flatMap { ModelCatalog.shared.resolve(modelName: $0) ?? server.modelPath(launchedAs: $0) }
+        // A name the catalog doesn't know must not reach mlx_lm.server: it
+        // would load it itself -- any path, or a Hugging Face repo,
+        // downloading it -- bypassing the model switch and its profile.
+        if let modelName, targetPath == nil {
+            let known = ModelCatalog.shared.servedNames
+            sendJSON(connection: connection, status: "404 Not Found", Self.notFound(
+                "The model '\(modelName)' is not in LLMTray's models folder. Available: \(known.isEmpty ? "none" : known.joined(separator: ", "))"
+            ))
+            return
+        }
         server.beginRequest()
         Task {
-            let modelName = Self.extractModelField(from: bodyData)
-            let targetPath = modelName.flatMap(ModelCatalog.shared.resolve(modelName:))
             do {
                 // Switches to the requested model (or reloads the last one
                 // if it was idle-unloaded), serialized with every other
@@ -198,14 +216,54 @@ final class ModelProxyServer {
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
                 return
             }
-            self.forward(method: method, path: path, headers: headers, body: bodyData, connection: connection, internalPort: internalPort)
+            // Only now: the backend's name for its model is the one the
+            // model just acquired was launched with (no switch can happen
+            // while this request counts as forwarding).
+            let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName)
+            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort)
         }
     }
 
-    private static func extractModelField(from body: Data) -> String? {
-        guard !body.isEmpty,
-              let obj = try? JSONSerialization.jsonObject(with: body) as? [String: Any] else { return nil }
-        return obj["model"] as? String
+    /// GET /v1/models (and /v1/models/<id>, LM Studio's /api/v0/models)
+    /// from the catalog: mlx_lm.server's own lists its Hugging Face cache,
+    /// image models included -- names this proxy refuses.
+    private func serveModels(route: String, method: String, headers: [String: String], connection: NWConnection) {
+        if method == "OPTIONS" {
+            // CORS preflight. "*" doesn't cover Authorization, so the
+            // headers asked for are allowed by name.
+            let asked = headers["access-control-request-headers"].map { $0.filter { $0 != "\r" && $0 != "\n" } }
+            let allowed = asked.map { "\($0), Authorization" } ?? "*, Authorization"
+            let response = "HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, OPTIONS\r\nAccess-Control-Allow-Headers: \(allowed)\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            connection.send(content: Data(response.utf8), completion: .contentProcessed { _ in connection.cancel() })
+            return
+        }
+        guard method == "GET" else {
+            sendJSON(connection: connection, status: "405 Method Not Allowed", ["error": ["message": "use GET", "type": "invalid_request_error"] as [String: Any]])
+            return
+        }
+        let names = ModelCatalog.shared.servedNames
+        let prefix = route.hasPrefix("/v1/models") ? "/v1/models" : "/api/v0/models"
+        let id = String(route.dropFirst(prefix.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/")).removingPercentEncoding ?? ""
+        if id.isEmpty {
+            sendJSON(connection: connection, Self.modelList(names))
+        } else if let entry = (Self.modelList(names)["data"] as? [[String: Any]])?.first(where: { $0["id"] as? String == id }) {
+            sendJSON(connection: connection, entry)
+        } else {
+            sendJSON(connection: connection, status: "404 Not Found", Self.notFound("The model '\(id)' does not exist"))
+        }
+    }
+
+    private static func notFound(_ message: String) -> [String: Any] {
+        ["error": ["message": message, "type": "invalid_request_error", "param": "model", "code": "model_not_found"] as [String: Any]]
+    }
+
+    /// OpenAI's GET /v1/models shape.
+    static func modelList(_ names: [String]) -> [String: Any] {
+        var seen = Set<String>()
+        let data: [[String: Any]] = names.filter { seen.insert($0).inserted }.map {
+            ["id": $0, "object": "model", "created": 0, "owned_by": "llmtray"]
+        }
+        return ["object": "list", "data": data]
     }
 
     // MARK: - Forwarding
@@ -237,6 +295,16 @@ final class ModelProxyServer {
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
         delegate.own(session)
         session.dataTask(with: request).resume()
+    }
+
+    private func sendJSON(connection: NWConnection, status: String = "200 OK", _ object: [String: Any]) {
+        let body = (try? JSONSerialization.data(withJSONObject: object, options: [.sortedKeys, .withoutEscapingSlashes])) ?? Data("{}".utf8)
+        // CORS as mlx_lm.server sends it (browser clients read these too).
+        var response = Data("HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nContent-Length: \(body.count)\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n".utf8)
+        response.append(body)
+        connection.send(content: response, completion: .contentProcessed { _ in
+            connection.cancel()
+        })
     }
 
     private func sendError(connection: NWConnection, status: String = "502 Bad Gateway", message: String) {

@@ -105,8 +105,7 @@ struct ContentView: View {
     /// so a rename in Settings applies at once.
     private var requestModelName: String {
         guard let id = selectedModelID else { return "default" }
-        let alias = catalog.alias(for: id)
-        return alias.isEmpty ? (id as NSString).lastPathComponent : alias
+        return catalog.requestName(for: id)
     }
 
     private var chatSettings: ChatSettings {
