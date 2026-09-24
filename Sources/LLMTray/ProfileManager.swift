@@ -94,6 +94,34 @@ final class ProfileManager: ObservableObject {
         ProfileResolver.source(keyPath, overlay: overlay(for: modelPath), base: defaultProfile)
     }
 
+    // MARK: - By profile id (the Profiles editor edits a profile directly,
+    // not "whatever the selected model uses")
+
+    private func overlay(profileID: String) -> Profile? {
+        profileID == Profile.defaultID ? nil : profile(id: profileID)
+    }
+
+    func resolved(profileID: String) -> ResolvedProfile {
+        ProfileResolver.resolve(overlay: overlay(profileID: profileID), base: defaultProfile)
+    }
+
+    func value<T>(_ keyPath: KeyPath<Profile, T?>, profileID: String) -> T {
+        ProfileResolver.value(keyPath, overlay: overlay(profileID: profileID), base: defaultProfile)
+    }
+
+    func source<T>(_ keyPath: KeyPath<Profile, T?>, profileID: String) -> ProfileResolver.Source {
+        ProfileResolver.source(keyPath, overlay: overlay(profileID: profileID), base: defaultProfile)
+    }
+
+    func set<T>(_ keyPath: WritableKeyPath<Profile, T?>, _ value: T?, profileID: String) {
+        update(id: profileID) { $0[keyPath: keyPath] = value }
+    }
+
+    func reset<T>(_ keyPath: WritableKeyPath<Profile, T?>, profileID: String) {
+        guard profileID != Profile.defaultID else { return }
+        update(id: profileID) { $0[keyPath: keyPath] = nil }
+    }
+
     // MARK: - Editing
 
     /// Sets a field on the profile this model uses (its overlay, or Default).

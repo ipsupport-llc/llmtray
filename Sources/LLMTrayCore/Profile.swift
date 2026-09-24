@@ -81,7 +81,10 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         /// (`ModelDiscovery.mtpDrafterRepo`).
         public var mtpDrafter: Bool?
         public var extraServerArgs: String?
-        public var verboseServerLogging: Bool?
+        // Verbose (DEBUG) server logging is a global diagnostics setting
+        // (Settings > Server), not a per-profile one. An older profile file
+        // that still has "verboseServerLogging" decodes fine: unknown keys
+        // are ignored.
         public init() {}
     }
 }
@@ -98,15 +101,23 @@ extension Profile {
         + "(for example: draw, generate or create an image). For greetings, small talk, questions and "
         + "anything else, answer in text and do not call any tool."
 
+    /// Shown (and sent) as Default's system prompt, so users see what the
+    /// model gets and what they can add to it, instead of an empty box.
+    public static let defaultSystemPrompt =
+        "You are a helpful assistant running locally on the user's Mac. "
+        + "Answer in the language the user writes in. Be concise and direct; "
+        + "use Markdown (lists, code blocks) when it helps readability."
+
     /// Every field set: the last layer of resolution. Values match what the
-    /// app used before profiles existed.
+    /// app used before profiles existed (except the system prompt, which
+    /// used to be empty).
     public static let builtIn: Profile = {
         var p = Profile(id: "builtin", name: "Built-in")
         p.request.temperature = 0.6
         p.request.topP = 0.95
         p.request.topK = 0
         p.request.maxTokens = 1024
-        p.request.systemPrompt = ""
+        p.request.systemPrompt = defaultSystemPrompt
         p.tools.enableImageGeneration = false
         p.tools.imageGenModel = "gptqMixed"
         p.tools.imageQuality = "balanced"
@@ -120,7 +131,6 @@ extension Profile {
         p.launch.promptCacheMB = 1024
         p.launch.mtpDrafter = true
         p.launch.extraServerArgs = ""
-        p.launch.verboseServerLogging = false
         return p
     }()
 
@@ -173,8 +183,7 @@ public enum ProfileResolver {
             decodeConcurrency: max(1, v(\.launch.decodeConcurrency)),
             promptCacheMB: max(0, v(\.launch.promptCacheMB)),
             mtpDrafter: v(\.launch.mtpDrafter),
-            extraServerArgs: v(\.launch.extraServerArgs),
-            verboseServerLogging: v(\.launch.verboseServerLogging)
+            extraServerArgs: v(\.launch.extraServerArgs)
         )
     }
 }
@@ -201,7 +210,6 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var promptCacheMB: Int
     public var mtpDrafter: Bool
     public var extraServerArgs: String
-    public var verboseServerLogging: Bool
 }
 
 /// Type-erased handle on one optional field, for counting and resetting
@@ -244,6 +252,5 @@ extension Profile {
         ProfileField("promptCacheMB", \.launch.promptCacheMB),
         ProfileField("mtpDrafter", \.launch.mtpDrafter),
         ProfileField("extraServerArgs", \.launch.extraServerArgs),
-        ProfileField("verboseServerLogging", \.launch.verboseServerLogging),
     ]
 }

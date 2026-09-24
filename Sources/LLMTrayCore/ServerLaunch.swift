@@ -21,14 +21,17 @@ public enum ServerLaunch {
         /// server-side `--max-tokens` default (Default is shared across
         /// models, so its max_tokens may be sized for a bigger one).
         public var maxContext: Int?
+        /// Global diagnostics setting (Settings > Server), not per profile.
+        public var verboseLogging: Bool
 
-        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil) {
+        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
             self.disallowQuantizedKV = disallowQuantizedKV
             self.drafterRepo = drafterRepo
             self.maxContext = maxContext
+            self.verboseLogging = verboseLogging
         }
     }
 
@@ -64,7 +67,7 @@ public enum ServerLaunch {
         if let drafter = c.drafterRepo {
             args += ["--draft-model", drafter]
         }
-        if p.verboseServerLogging {
+        if c.verboseLogging {
             args += ["--log-level", "DEBUG"]
         }
         args += p.extraServerArgs.split(separator: " ").map(String.init)

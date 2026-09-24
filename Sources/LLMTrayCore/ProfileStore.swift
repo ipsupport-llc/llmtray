@@ -106,7 +106,11 @@ public final class ProfileStore {
         if let v = dbl("llmtray.temperature") { p.request.temperature = v }
         if let v = dbl("llmtray.topP") { p.request.topP = v }
         if let v = dbl("llmtray.maxTokens") { p.request.maxTokens = Int(v) } else if let v = int("llmtray.maxTokens") { p.request.maxTokens = v }
-        if let v = str("llmtray.systemPrompt") { p.request.systemPrompt = v }
+        // An empty old system prompt means "never set": Default gets the
+        // visible built-in one instead, so the user sees what to extend.
+        if let v = str("llmtray.systemPrompt"), !v.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            p.request.systemPrompt = v
+        }
         if let v = bool("llmtray.enableImageGeneration") { p.tools.enableImageGeneration = v }
         if let v = str("llmtray.imageGenModel") { p.tools.imageGenModel = v }
         if let v = str("llmtray.imageQuality") { p.tools.imageQuality = v }
@@ -119,7 +123,6 @@ public final class ProfileStore {
         if let v = int("llmtray.promptCacheMB") { p.launch.promptCacheMB = v }
         if let v = bool("llmtray.mtpDrafter") { p.launch.mtpDrafter = v }
         if let v = str("llmtray.extraServerArgs") { p.launch.extraServerArgs = v }
-        if let v = bool("llmtray.verboseServerLogging") { p.launch.verboseServerLogging = v }
         return p
     }
 }

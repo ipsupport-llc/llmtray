@@ -1,0 +1,255 @@
+#!/usr/bin/env python3
+"""LLMTray localization: one folder per language, English fallback.
+
+    Resources/Localization/<lang>.lproj/Localizable.strings
+
+Keys are the English UI text itself (what SwiftUI's Text("...") /
+NSLocalizedString("...") look up), so a string a language doesn't
+translate yet simply shows in English. Adding a language = adding a folder
+(copy en.lproj, translate the values); build_app.sh picks up every folder
+and lists it in CFBundleLocalizations.
+
+    scripts/l10n.py extract   # regenerate en.lproj from the Swift sources
+    scripts/l10n.py check     # CI: en.lproj up to date, every file valid,
+                              # format specifiers match; missing keys per
+                              # language are reported, not an error
+    scripts/l10n.py missing <lang>   # list untranslated keys (for translators)
+
+SwiftUI turns an interpolated literal into a format key: "After \\(m) min"
+is looked up as "After %lld min" (an Int), "\\(name)" becomes %@ (a String).
+The extractor maps each interpolation with a small heuristic (string-ish
+expressions -> %@, everything else -> %lld); keep interpolations in UI text
+to Ints or plain Strings.
+"""
+
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SOURCES = sorted((ROOT / "Sources" / "LLMTray").glob("*.swift"))
+LOC = ROOT / "Resources" / "Localization"
+BASE = LOC / "en.lproj" / "Localizable.strings"
+
+# Call sites whose string-literal arguments are localized.
+CALL = re.compile(
+    r"\b(Text|Toggle|Button|Section|Menu|LabeledContent|Picker|TextField|Label|"
+    r"SettingLabel|SettingHelp|NSLocalizedString|row)\s*\("
+)
+STRING_ISH = re.compile(r"(name|Name|Ref\(|lastPathComponent|displayName|title|message|Text|path)")
+LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')
+
+
+def _args(src: str, start: int) -> str:
+    """The text of a call's argument list, from `start` (just past "(")."""
+    depth, i, in_str = 1, start, False
+    while i < len(src) and depth:
+        c = src[i]
+        if in_str:
+            if c == "\\" and i + 1 < len(src) and src[i + 1] == "(":
+                # interpolation: skip to its matching paren
+                j, d = i + 2, 1
+                while j < len(src) and d:
+                    d += {"(": 1, ")": -1}.get(src[j], 0)
+                    j += 1
+                i = j
+                continue
+            if c == "\\":
+                i += 2
+                continue
+            if c == '"':
+                in_str = False
+        else:
+            if c == '"':
+                in_str = True
+            elif c == "(":
+                depth += 1
+            elif c == ")":
+                depth -= 1
+        i += 1
+    return src[start:i - 1]
+
+
+def _literals(args: str) -> list[str]:
+    """Top-level string literals in an argument list, skipping the ones
+    that are String(format:) patterns (verbatim, not localized) and
+    handling interpolations that contain their own string literals."""
+    out, i = [], 0
+    while i < len(args):
+        if args[i] == '"':
+            if args.startswith('"""', i):
+                j = args.index('"""', i + 3)
+                body = args[i + 3:j].strip("\n")
+                body = re.sub(r"\\\n\s*", "", body)  # line continuations
+                out.append(("", body))
+                i = j + 3
+                continue
+            j, buf = i + 1, []
+            while j < len(args) and args[j] != '"':
+                if args.startswith("\\(", j):
+                    k, d = j + 2, 1
+                    while k < len(args) and d:
+                        if args[k] == '"':  # string inside interpolation
+                            k = args.index('"', k + 1) + 1
+                            continue
+                        d += {"(": 1, ")": -1}.get(args[k], 0)
+                        k += 1
+                    buf.append(args[j:k])
+                    j = k
+                    continue
+                if args[j] == "\\":
+                    buf.append(args[j:j + 2])
+                    j += 2
+                    continue
+                buf.append(args[j])
+                j += 1
+            before = args[max(0, i - 20):i]
+            out.append((before, "".join(buf)))
+            i = j + 1
+            continue
+        i += 1
+    # String(format:) patterns are verbatim; NSLocalizedString's comment: is
+    # for translators, not a key; systemImage:/systemName: are SF Symbols.
+    return [lit for before, lit in out
+            if not re.search(r"(format|comment|systemImage|systemName):\s*$", before)]
+
+
+def _unescape(s: str) -> str:
+    s = re.sub(r"\\u\{([0-9A-Fa-f]+)\}", lambda m: chr(int(m.group(1), 16)), s)
+    return s.replace('\\"', '"').replace("\\n", "\n").replace("\\\\", "\\")
+
+
+def _to_key(literal: str) -> str | None:
+    out, i = [], 0
+    while i < len(literal):
+        if literal.startswith("\\(", i):
+            j, d = i + 2, 1
+            while j < len(literal) and d:
+                if literal[j] == '"':
+                    j = literal.index('"', j + 1) + 1
+                    continue
+                d += {"(": 1, ")": -1}.get(literal[j], 0)
+                j += 1
+            expr = literal[i + 2:j - 1]
+            if '"' in expr:  # a conditional inside the key: not a stable key
+                return None
+            out.append("%@" if STRING_ISH.search(expr) else "%lld")
+            i = j
+            continue
+        out.append(literal[i])
+        i += 1
+    key = _unescape("".join(out))
+    # Not UI text: empty, pure placeholders/format strings, identifiers.
+    if not key.strip() or re.fullmatch(r"[\s%@lldf.\d/→·()x,:-]*", key):
+        return None
+    if key.startswith(("llmtray.", "http", "/")) or re.fullmatch(r"[a-z_]+", key):
+        return None
+    if re.fullmatch(r"[a-z0-9]+(\.[a-z0-9]+)+", key) or len(key.strip()) < 2:  # SF Symbol names, "★", "…"
+        return None
+    return key
+
+
+def extract() -> list[str]:
+    keys: dict[str, None] = {}
+    for f in SOURCES:
+        src = f.read_text()
+        for m in CALL.finditer(src):
+            args = _args(src, m.end())
+            for lit in _literals(args):
+                key = _to_key(lit)
+                if key:
+                    keys.setdefault(key, None)
+        for m in re.finditer(r"\.help\(\s*Text\(", src):
+            args = _args(src, m.end())
+            for lit in _literals(args):
+                key = _to_key(lit)
+                if key:
+                    keys.setdefault(key, None)
+    return sorted(keys)
+
+
+def _escape(s: str) -> str:
+    return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
+
+
+def write_base(keys: list[str]) -> None:
+    BASE.parent.mkdir(parents=True, exist_ok=True)
+    body = ["/* Generated by scripts/l10n.py extract -- the English base (keys are the English text). */", ""]
+    body += [f'"{_escape(k)}" = "{_escape(k)}";' for k in keys]
+    BASE.write_text("\n".join(body) + "\n", encoding="utf-8")
+
+
+def load(path: Path) -> dict[str, str]:
+    """Parse a .strings file via plutil (the same parser Foundation uses)."""
+    out = subprocess.run(["plutil", "-convert", "json", "-o", "-", str(path)],
+                         capture_output=True, text=True)
+    if out.returncode != 0:
+        raise ValueError(f"{path}: {out.stderr.strip()}")
+    import json
+    return json.loads(out.stdout)
+
+
+def specifiers(s: str) -> list[str]:
+    return re.findall(r"%(?:\d+\$)?(?:lld|ld|d|@|lf|f|\.\d+f)", s)
+
+
+def languages() -> list[Path]:
+    return sorted(p for p in LOC.glob("*.lproj") if p.name != "en.lproj")
+
+
+def check() -> int:
+    errors = 0
+    code_keys = extract()
+    try:
+        base = load(BASE)
+    except (ValueError, FileNotFoundError) as e:
+        print(f"error: {e}")
+        return 1
+    stale = sorted(set(code_keys) - set(base))
+    if stale:
+        errors += 1
+        print(f"error: en.lproj is missing {len(stale)} key(s) used in the code -- run scripts/l10n.py extract:")
+        for k in stale[:20]:
+            print(f"   {k!r}")
+    for lang in languages():
+        f = lang / "Localizable.strings"
+        try:
+            table = load(f)
+        except ValueError as e:
+            errors += 1
+            print(f"error: {e}")
+            continue
+        unknown = sorted(set(table) - set(base))
+        bad = [k for k, v in table.items() if k in base and sorted(specifiers(k)) != sorted(specifiers(v))]
+        missing = sorted(set(base) - set(table))
+        for k in bad:
+            errors += 1
+            print(f"error: {lang.name}: format specifiers differ for {k!r} -> {table[k]!r}")
+        print(f"{lang.name}: {len(table) - len(unknown)}/{len(base)} translated"
+              + (f", {len(missing)} missing (shown in English)" if missing else "")
+              + (f", {len(unknown)} obsolete key(s)" if unknown else ""))
+    return 1 if errors else 0
+
+
+def main() -> int:
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
+    if cmd == "extract":
+        keys = extract()
+        write_base(keys)
+        print(f"wrote {BASE.relative_to(ROOT)}: {len(keys)} keys")
+        return 0
+    if cmd == "check":
+        return check()
+    if cmd == "missing":
+        lang = LOC / f"{sys.argv[2]}.lproj" / "Localizable.strings"
+        table = load(lang) if lang.exists() else {}
+        for k in sorted(set(load(BASE)) - set(table)):
+            print(f'"{_escape(k)}" = "{_escape(k)}";')
+        return 0
+    print(__doc__)
+    return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

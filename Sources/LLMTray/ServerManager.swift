@@ -49,6 +49,9 @@ final class ServerManager: ObservableObject {
     // when a client's `model` field asks for something else.
     private var currentPublicPort: Int?
     private var currentModelPath: String?
+    /// Arguments the running process was started with, to tell whether
+    /// profile edits since then need a restart (see pendingLaunchChange).
+    private var lastLaunchArguments: [String]?
     private var currentAlias: String = ""
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
@@ -280,8 +283,23 @@ final class ServerManager: ObservableObject {
             alias: alias,
             disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
             drafterRepo: drafterRepo,
-            maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath)
+            maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
+            verboseLogging: UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging")
         )
+    }
+
+    /// The running model's current profile (or the global verbose-logging
+    /// setting) would launch it with different arguments than it's running
+    /// with: shown as a "Restart Server" prompt, never applied on its own
+    /// (a restart kills in-flight requests).
+    var pendingLaunchChange: Bool {
+        guard case .running = state, let modelPath = currentModelPath, let last = lastLaunchArguments else { return false }
+        let profile = ProfileManager.shared.resolved(for: modelPath)
+        let planned = ServerLaunch.arguments(profile, launchContext(
+            modelPath: modelPath, alias: currentAlias,
+            drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
+        ))
+        return planned != last
     }
 
     /// Whether switching the loaded model from profile `a` to `b` would
@@ -334,6 +352,7 @@ final class ServerManager: ObservableObject {
             modelPath: modelPath, alias: alias,
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         ))
+        lastLaunchArguments = args
         task.arguments = args
         task.standardInput = FileHandle.nullDevice
 

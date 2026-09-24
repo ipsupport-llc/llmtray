@@ -43,6 +43,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let chat = ChatClient()
     private let systemMonitor = SystemMonitor()
     private let hfBrowser = HFModelBrowser()
+    // Shared by the popover and the Settings window (both show auto-tune /
+    // runtime state, and "auto-tune is running" must lock both).
+    private let runtime = RuntimeManager()
+    private let benchmark = BenchmarkRunner()
+    private lazy var settingsWindow = SettingsWindowController(.init(
+        server: server, chat: chat, runtime: runtime, benchmark: benchmark,
+        checkForAppUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) }
+    ))
     // startingUpdater begins Sparkle's own automatic background check
     // schedule immediately (governed by SUEnableAutomaticChecks in
     // Info.plist) -- separate from the manual "Check for Updates…" menu
@@ -83,6 +91,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showHFBrowserWindow), name: .showHFBrowser, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
         )
         // The `Settings { EmptyView() }` scene below exists only because
         // SwiftUI's App protocol requires *some* Scene -- but macOS can
@@ -133,6 +144,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             rootView: ContentView()
                 .environmentObject(server)
                 .environmentObject(chat)
+                .environmentObject(benchmark)
         )
         // Tracks the SwiftUI content's own intrinsic size instead of a
         // fixed contentSize -- ContentView's chatArea shrinks toward a
@@ -173,9 +185,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let toggleItem: NSMenuItem
         if isServerRunning {
-            toggleItem = NSMenuItem(title: "Stop Server", action: #selector(quickStop), keyEquivalent: "")
+            toggleItem = NSMenuItem(title: NSLocalizedString("Stop Server", comment: ""), action: #selector(quickStop), keyEquivalent: "")
         } else {
-            toggleItem = NSMenuItem(title: "Start Server", action: #selector(quickStart), keyEquivalent: "")
+            toggleItem = NSMenuItem(title: NSLocalizedString("Start Server", comment: ""), action: #selector(quickStart), keyEquivalent: "")
         }
         toggleItem.target = self
         menu.addItem(toggleItem)
@@ -192,28 +204,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // having it error out.
         if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
             let updateItem = NSMenuItem(
-                title: "Check for Updates…", action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
+                title: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
             )
             updateItem.target = updaterController
             menu.addItem(updateItem)
             menu.addItem(.separator())
         }
 
-        let uninstallItem = NSMenuItem(
-            title: "Uninstall Runtime Data…", action: #selector(uninstallRuntimeData), keyEquivalent: ""
-        )
-        uninstallItem.target = self
-        menu.addItem(uninstallItem)
+        let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+        let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
+        logItem.target = self
+        menu.addItem(logItem)
 
         menu.addItem(.separator())
 
-        let aboutItem = NSMenuItem(title: "About LLMTray", action: #selector(showAboutPanel), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Quit LLMTray", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: NSLocalizedString("Quit LLMTray", comment: ""), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -265,25 +278,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         server.stop()
     }
 
-    /// The venv (and, for a Full install, its vendored Python.framework
-    /// copy) lives under Application Support specifically so deleting
-    /// LLMTray.app itself doesn't touch it -- that's what makes it survive
-    /// Sparkle auto-updates, but it also means dragging the app to the
-    /// Trash leaves it behind forever with no other way to clean it up.
-    /// This is that explicit escape hatch.
-    @objc private func uninstallRuntimeData() {
-        let alert = NSAlert()
-        alert.messageText = "Uninstall Runtime Data?"
-        alert.informativeText = "Removes the downloaded mlx-lm runtime from \(RuntimePaths.externalRuntimeDir). "
-            + "The next time you start the server, it will be set up again from scratch. "
-            + "Saved chats and settings profiles are kept."
-        alert.addButton(withTitle: "Uninstall")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .warning
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
-        server.removeExternalRuntime()
-    }
-
     /// LSUIElement apps (no Dock icon, no standard app menu bar) don't get
     /// Cocoa's automatic "About <App>" menu item for free -- this wires the
     /// same standard system panel up manually via the quick menu instead,
@@ -317,6 +311,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Server log window
+
+    // MARK: - Settings window
+
+    @objc private func showSettingsWindow() {
+        popover.performClose(nil)
+        settingsWindow.show()
+    }
+
+    @objc private func showSettingsFromNotification(_ note: Notification) {
+        popover.performClose(nil)
+        let pane = (note.userInfo?["pane"] as? String).flatMap(SettingsPane.init(rawValue:))
+        settingsWindow.show(pane: pane, profileID: note.userInfo?["profileID"] as? String)
+    }
 
     @objc private func showServerLogWindow() {
         if logWindow == nil {

@@ -47,6 +47,12 @@ final class ProfileTests: XCTestCase {
         XCTAssertEqual(r.kvGroupSize, 32)
     }
 
+    func testOldFileWithRemovedFieldDecodes() throws {
+        let json = #"{"id":"x","name":"Old","launch":{"verboseServerLogging":true,"kvBits":4}}"#
+        let p = try JSONDecoder().decode(Profile.self, from: Data(json.utf8))
+        XCTAssertEqual(p.launch.kvBits, 4)
+    }
+
     func testPartialFileDecodes() throws {
         // A hand-written overlay with only a couple of fields.
         let json = #"{"id":"x","name":"Hot","request":{"temperature":1.3}}"#
@@ -139,9 +145,9 @@ final class ServerLaunchTests: XCTestCase {
     func testDrafterConcurrencyVerboseExtra() {
         var c = ctx
         c.drafterRepo = "org/drafter"
+        c.verboseLogging = true
         let r = resolved {
             $0.launch.decodeConcurrency = 4
-            $0.launch.verboseServerLogging = true
             $0.launch.extraServerArgs = "--foo 1  --bar"
         }
         let args = ServerLaunch.arguments(r, c)
@@ -183,6 +189,7 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertEqual(p.launch.kvBits, 8)
         XCTAssertEqual(p.tools.enableImageGeneration, true)
         XCTAssertEqual(p.request.topP, 0.95)              // untouched key -> built-in
+        XCTAssertEqual(p.request.systemPrompt, Profile.defaultSystemPrompt)  // never set -> visible default
         XCTAssertEqual(p.overrideCount, Profile.allFields.count)
 
         // Second call reads the file instead of re-migrating.
