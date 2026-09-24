@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HFBrowserView: View {
     @ObservedObject var browser: HFModelBrowser
+    @ObservedObject private var catalog = ModelCatalog.shared
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,7 +31,18 @@ struct HFBrowserView: View {
                 fitLegend
             }
             .padding(.horizontal, 12)
+            .padding(.bottom, 4)
+
+            HStack {
+                Image(systemName: "internaldrive").foregroundColor(.secondary)
+                Text(diskLine).monospacedDigit()
+                Spacer()
+            }
+            .font(.system(size: 10))
+            .foregroundColor(.secondary)
+            .padding(.horizontal, 12)
             .padding(.bottom, 8)
+            .onAppear { catalog.refreshUsage() }
 
             if let err = browser.searchError {
                 Text(err)
@@ -156,13 +168,20 @@ struct HFBrowserView: View {
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
         } else {
+            let tooBig = browser.sizesByID[model.id].map { size in catalog.freeBytes.map { size > $0 } ?? false } ?? false
             Button("Download") {
                 browser.download(model) {
                     NotificationCenter.default.post(name: .modelsDidChange, object: model.id)
                 }
             }
-            .disabled(browser.downloadingID != nil)
+            .disabled(browser.downloadingID != nil || tooBig)
+            .help(Text(tooBig ? "Not enough free disk space for this model." : "Download into the models folder"))
         }
+    }
+
+    private var diskLine: String {
+        let free = catalog.freeBytes.map(ModelCatalog.format) ?? "…"
+        return String(format: NSLocalizedString("Free on disk: %@ · your models: %@", comment: "HF browser: free space, size of installed models"), free, ModelCatalog.format(catalog.totalBytes))
     }
 
     private var statusLine: String {
