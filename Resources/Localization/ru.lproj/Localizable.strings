@@ -4,6 +4,7 @@
 
 "%@ → %@ available" = "Доступно: %@ → %@";
 "%d overridden, rest from Default · %@" = "Переопределено: %d, остальное из Default · %@";
+"%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld загрузок";
 "%lld-bit" = "%lld бит";
 "(no server output yet)" = "(вывода сервера пока нет)";
@@ -90,6 +91,7 @@
 "Keep first messages: %lld" = "Первых сообщений сохранять: %lld";
 "Keep last messages: %lld" = "Последних сообщений сохранять: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Первые N токенов контекста хранятся в полной точности, дальше квантуются. Больше — точнее на длинных промптах, но меньше экономия памяти.";
+"LLMTray" = "LLMTray";
 "Language" = "Язык";
 "Later" = "Позже";
 "Launch at login" = "Запускать при входе";
@@ -227,6 +229,8 @@
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл этого профиля не читается, поэтому редактировать его здесь нельзя. Исправьте или удалите файл, затем снова откройте Настройки.";
 "Thought process" = "Ход размышлений";
 "Tool-use rule" = "Правило инструментов";
+"Top-k" = "Top-k";
+"Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирает decode-concurrency (1/2/4/8) и prefill-step-size (64/128/256/512) на запущенной модели, перезапуская сервер между попытками, и оставляет самое быстрое.";
 "Uninstall" = "Удалить";
 "Uninstall Runtime Data…" = "Удалить данные рантайма…";
@@ -247,5 +251,9 @@
 "Which Z-Image-Turbo quantization generates the images." = "Какая квантовка Z-Image-Turbo генерирует картинки.";
 "You" = "Вы";
 "copy" = "копия";
+"decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
+"decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"mlx-lm runtime" = "Среда выполнения mlx-lm";
 "not used by any model" = "не используется ни одной моделью";
 "used by %@" = "используют: %@";
+"· size…" = "· размер…";
