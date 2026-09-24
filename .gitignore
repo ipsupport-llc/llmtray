@@ -3,3 +3,4 @@
 runtime/.mlx_server_venv/
 *.xcodeproj
 .DS_Store
+__pycache__/
