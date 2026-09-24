@@ -240,14 +240,14 @@ final class MfluxManager: ObservableObject {
             case .image(let data):
                 result.set(data)
             case .step(let step, let total):
-                Task { @MainActor in
-                    guard self?.isBusy == true else { return }   // a late line after the run
-                    self?.stepProgress = (step: step, total: total)
+                Task { @MainActor [weak self] in
+                    guard let self, self.isBusy else { return }   // a late line after the run
+                    self.stepProgress = (step: step, total: total)
                 }
             case .preview(let data):
-                Task { @MainActor in
-                    guard self?.isBusy == true, let image = NSImage(data: data) else { return }
-                    self?.previewImage = image
+                Task { @MainActor [weak self] in
+                    guard let self, self.isBusy, let image = NSImage(data: data) else { return }
+                    self.previewImage = image
                 }
             }
         })
