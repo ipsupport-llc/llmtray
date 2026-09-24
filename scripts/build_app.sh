@@ -42,6 +42,10 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/runtime" "$APP/Contents/
 cp "$RELEASE_DIR/LLMTray" "$APP/Contents/MacOS/LLMTray"
 cp "$REPO_ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 cp "$REPO_ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+# Licenses.json (About LLMTray lists it) + THIRD_PARTY_NOTICES.txt, from
+# the real license files of what's bundled (build_full_app.sh adds the
+# vendored Python runtime).
+python3 "$SCRIPT_DIR/generate_licenses.py" base "$REPO_ROOT" "$APP/Contents/Resources"
 # Localizations: every Resources/Localization/<lang>.lproj is copied into the
 # bundle and listed in CFBundleLocalizations -- adding a language is just
 # adding a folder (see scripts/l10n.py). Keys are the English text, so a

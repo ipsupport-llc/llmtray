@@ -138,6 +138,23 @@ PINNED_REF="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/
 echo "--- installing $PINNED_REPO@$PINNED_REF into the vendored venv ---"
 "$VENV_DIR/bin/pip" install --quiet "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
 
+# Everything redistributed in this bundle keeps its notices: CPython's
+# license (with the summary of changes PSF §3 asks for) and every package
+# in the venv, with its license files. Never vendor the image-generation
+# venv (mflux_venv) this way: its opencv-python bundles GPL codecs.
+echo "--- writing third-party notices for the vendored runtime ---"
+# The framework's own libraries: python.org's license page (OpenSSL, expat,
+# libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, Tcl/Tk
+# from their frameworks, and libzstd / ncurses (dylibs the page doesn't
+# cover) from scripts/licenses.
+DOC_LICENSE="$WORK_DIR/expanded/Python_Documentation.pkg/Payload/license.html"
+[[ -f "$DOC_LICENSE" ]] || { echo "error: $DOC_LICENSE not found -- installer layout changed?" >&2; exit 1; }
+textutil -convert txt -output "$WORK_DIR/python-bundled-licenses.txt" "$DOC_LICENSE"
+FRAMEWORK_EXTRAS=("$WORK_DIR/python-bundled-licenses.txt")
+while IFS= read -r -d '' terms; do FRAMEWORK_EXTRAS+=("$terms"); done < <(find "$VERSIONS_ROOT/Frameworks" -name license.terms -print0 2>/dev/null)
+FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses/ncurses-COPYING.txt")
+"$VENV_DIR/bin/python" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
+
 echo "--- re-signing app bundle with the added framework + venv ---"
 codesign --force --deep --sign - "$APP"
 

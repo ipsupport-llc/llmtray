@@ -10,6 +10,8 @@ struct MessageBubble: View {
     /// Debug view of the tool calls (Pref.showToolCalls): call id -> the
     /// tool's result; nil hides them.
     var toolResults: [String: String]?
+    /// Credits of the data this answer's tools used.
+    var sources: [String] = []
 
     var body: some View {
         if message.isSummary {
@@ -74,6 +76,13 @@ struct MessageBubble: View {
 
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
+            }
+
+            ForEach(sources, id: \.self) { source in
+                Text(verbatim: source)
+                    .font(.system(size: 9))
+                    .foregroundColor(.secondary)
+                    .textSelection(.enabled)
             }
 
             if let toolResults, !message.toolCalls.isEmpty {

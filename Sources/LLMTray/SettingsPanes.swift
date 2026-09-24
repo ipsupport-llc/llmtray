@@ -389,6 +389,9 @@ struct ProfilesPane: View {
                                         Image(systemName: "globe").foregroundStyle(.secondary).imageScale(.small)
                                             .help(Text("Uses the internet"))
                                     }
+                                    if let credit = tool.credit {
+                                        Text(verbatim: credit).font(.caption).foregroundStyle(.secondary)
+                                    }
                                 }
                             }
                         }

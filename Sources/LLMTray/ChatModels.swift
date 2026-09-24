@@ -44,6 +44,37 @@ struct ChatMessage: Identifiable, Equatable {
     // A message the app adds for the model only -- an image view_image put
     // in front of it. Not shown as a bubble, not saved with the session.
     var isToolContext: Bool = false
+    // Credits of the data an answer's tools used (their results' "source",
+    // e.g. ExchangeRate-API's required one). Saved with the session, where
+    // the tool messages they come from aren't.
+    var sources: [String] = []
+}
+
+extension ChatMessage {
+    /// Each answer's credits: the "source" of the tool results of its turn
+    /// (collected up to the answer that ends it), plus any it was saved with.
+    static func sourcesByAnswer(_ messages: [ChatMessage]) -> [UUID: [String]] {
+        var pending: [String] = []
+        var out: [UUID: [String]] = [:]
+        for msg in messages {
+            switch msg.role {
+            case "user" where !msg.isToolContext:
+                pending = []
+            case "tool" where msg.content.contains("\"source\""):
+                if let obj = (try? JSONSerialization.jsonObject(with: Data(msg.content.utf8))) as? [String: Any],
+                   let source = obj["source"] as? String, !pending.contains(source) {
+                    pending.append(source)
+                }
+            case "assistant" where msg.toolCalls.isEmpty && !msg.content.isEmpty:
+                let all = msg.sources + pending.filter { !msg.sources.contains($0) }
+                if !all.isEmpty { out[msg.id] = all }
+                pending = []
+            default:
+                break
+            }
+        }
+        return out
+    }
 }
 
 extension Array {

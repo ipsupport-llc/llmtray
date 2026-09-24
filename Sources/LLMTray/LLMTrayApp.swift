@@ -92,6 +92,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     private var logWindow: NSWindow?
     private var hfWindow: NSWindow?
+    private var aboutWindow: NSWindow?
     private var cancellables: Set<AnyCancellable> = []
     private var sigtermSource: DispatchSourceSignal?
     private var pulseTimer: Timer?
@@ -294,28 +295,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// LSUIElement apps (no Dock icon, no standard app menu bar) don't get
-    /// Cocoa's automatic "About <App>" menu item for free -- this wires the
-    /// same standard system panel up manually via the quick menu instead,
-    /// with a credits block for the two links there's currently nowhere
-    /// else in the app to put (license, source, and the company site).
+    /// Cocoa's automatic "About <App>" item: the quick menu opens this
+    /// window instead -- the app, its links, and every license that applies
+    /// (AboutView).
     @objc private func showAboutPanel() {
-        let credits = NSMutableAttributedString()
-        func appendLink(_ title: String, _ url: String) {
-            let range = NSRange(location: credits.length, length: title.count)
-            credits.append(NSAttributedString(string: title))
-            credits.addAttribute(.link, value: url, range: range)
+        if aboutWindow == nil {
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 720, height: 540),
+                styleMask: [.titled, .closable, .resizable, .miniaturizable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = NSLocalizedString("About LLMTray", comment: "")
+            window.isReleasedWhenClosed = false
+            window.center()
+            aboutWindow = window
         }
-        credits.append(NSAttributedString(string: "Apache License 2.0\n"))
-        appendLink("Source on GitHub", "https://github.com/ipsupport-llc/llmtray")
-        credits.append(NSAttributedString(string: "\n"))
-        appendLink("ipsupport.us", "https://ipsupport.us")
-        credits.addAttribute(
-            .font, value: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
-            range: NSRange(location: 0, length: credits.length)
-        )
-        credits.setAlignment(.center, range: NSRange(location: 0, length: credits.length))
-
-        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
+        // Fresh each time: it lists what's installed right now.
+        if aboutWindow?.isVisible != true {
+            aboutWindow?.contentView = NSHostingView(rootView: AboutView())
+        }
+        aboutWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 

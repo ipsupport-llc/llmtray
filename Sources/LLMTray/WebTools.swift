@@ -222,6 +222,8 @@ final class WikipediaTool: SelectableTool {
             "summary": extract.count > 1200 ? String(extract.prefix(1199)) + "…" : extract,
             "url": url ?? "https://\(lang).wikipedia.org/wiki/\(slug)",
             "lang": lang,
+            // CC BY-SA asks for attribution and the license (shown under the answer).
+            "source": "Wikipedia, CC BY-SA 4.0: \(url ?? "https://\(lang).wikipedia.org/wiki/\(slug)")",
         ]
     }
 }
@@ -446,6 +448,24 @@ final class HolidaysTool: SelectableTool {
 final class CurrencyTool: SelectableTool {
     init() { super.init(name: "convert_currency") }
 
+    /// ExchangeRate-API's open access asks for this credit wherever its
+    /// rates are shown.
+    nonisolated static let attribution = "Rates By Exchange Rate API (https://www.exchangerate-api.com)"
+
+    /// Rates per base currency until the service's next update (daily):
+    /// in memory only, and it keeps repeated questions off their rate limit.
+    private static var cache: [String: (rates: [String: Any], until: Date)] = [:]
+
+    private static func rates(for base: String) async throws -> [String: Any] {
+        if let hit = cache[base], hit.until > Date() { return hit.rates }
+        let rates = try await WebFetch.json("https://open.er-api.com/v6/latest/\(base)")
+        if rates["result"] as? String == "success" {
+            let next = (rates["time_next_update_unix"] as? Double).map(Date.init(timeIntervalSince1970:))
+            cache[base] = (rates, min(next ?? .distantPast, Date().addingTimeInterval(24 * 3600)))
+        }
+        return rates
+    }
+
     override var definition: [String: Any] {
         Self.function(
             name,
@@ -469,7 +489,7 @@ final class CurrencyTool: SelectableTool {
             return Self.error("amount, from_currency and to_currency (3-letter codes) are required")
         }
         do {
-            let rates = try await WebFetch.json("https://open.er-api.com/v6/latest/\(from)")
+            let rates = try await Self.rates(for: from)
             guard rates["result"] as? String == "success" else { return Self.error("unknown currency \(from)") }
             guard let rate = (rates["rates"] as? [String: Any])?[to] as? Double else { return Self.error("unknown currency \(to)") }
             // Decimal: a Double like 0.877372 prints as 0.87737200000000004.
@@ -481,6 +501,7 @@ final class CurrencyTool: SelectableTool {
                 "amount": amount, "from": from, "to": to, "rate": exactRate,
                 "result": converted,
                 "rate_date": rates["time_last_update_utc"] as? String ?? "",
+                "source": Self.attribution,
             ])
         } catch {
             return Self.error("rate lookup failed: \(error.localizedDescription)")
@@ -494,6 +515,8 @@ enum ToolCatalog {
         let name: String
         let title: String
         let usesNetwork: Bool
+        /// Credit its data source asks for, shown next to the tool.
+        var credit: String? = nil
         var id: String { name }
     }
 
@@ -507,7 +530,8 @@ enum ToolCatalog {
         Entry(name: "get_wikipedia_summary", title: NSLocalizedString("Wikipedia", comment: "chat tool"), usesNetwork: true),
         Entry(name: "get_country_info", title: NSLocalizedString("Country facts", comment: "chat tool"), usesNetwork: true),
         Entry(name: "get_public_holidays", title: NSLocalizedString("Public holidays", comment: "chat tool"), usesNetwork: true),
-        Entry(name: "convert_currency", title: NSLocalizedString("Currency rates", comment: "chat tool"), usesNetwork: true),
+        Entry(name: "convert_currency", title: NSLocalizedString("Currency rates", comment: "chat tool"), usesNetwork: true,
+              credit: CurrencyTool.attribution),
     ]
 
     @MainActor

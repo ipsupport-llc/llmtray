@@ -147,7 +147,8 @@ final class ChatClient: ObservableObject {
             let images = pm.imageFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             return ChatMessage(
                 role: pm.role, content: pm.content, reasoning: pm.reasoning, images: images,
-                imageDurations: pm.imageDurations, imagePrompts: pm.imagePrompts, isSummary: pm.isSummary
+                imageDurations: pm.imageDurations, imagePrompts: pm.imagePrompts, isSummary: pm.isSummary,
+                sources: pm.sources
             )
         }
         currentSessionID = file.id
@@ -166,6 +167,8 @@ final class ChatClient: ObservableObject {
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
 
+        // Before the tool messages they come from are dropped.
+        let sources = ChatMessage.sourcesByAnswer(messages)
         let persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
             if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty { return nil }
@@ -178,7 +181,8 @@ final class ChatClient: ObservableObject {
             }
             return PersistedMessage(
                 role: msg.role, content: msg.content, reasoning: msg.reasoning, isSummary: msg.isSummary,
-                imageFilenames: filenames, imageDurations: msg.imageDurations, imagePrompts: msg.imagePrompts
+                imageFilenames: filenames, imageDurations: msg.imageDurations, imagePrompts: msg.imagePrompts,
+                sources: sources[msg.id] ?? []
             )
         }
         guard !persisted.isEmpty else { return }
