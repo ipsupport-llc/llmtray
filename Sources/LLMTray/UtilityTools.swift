@@ -50,7 +50,9 @@ class SelectableTool: ChatTool {
         case let number as NSNumber where CFGetTypeID(number) != CFBooleanGetTypeID() && !(number is NSDecimalNumber):
             let d = number.doubleValue
             guard d.isFinite, d != d.rounded() else { return number }
-            return NSDecimalNumber(string: String(d))
+            let decimal = NSDecimalNumber(string: String(d))
+            // Out of Decimal's range (1e-200): as it was.
+            return decimal == .notANumber ? number : decimal
         default:
             return value
         }

@@ -22,9 +22,14 @@ enum WeatherPlace {
             return Resolved(place: place, note: ["location": "\(place.name), \(place.country)"])
         }
         let home = Geocoder.homeCity()
-        // The Mac's region may not be the country of its time zone.
+        // The Mac's region may not be the country of its time zone (region
+        // Canada, zone Europe/London: not London, Ontario): the place must
+        // be in that zone.
         var found = try await Geocoder.find(home.city, countryCode: home.countryCode)
-        if found == nil { found = try await Geocoder.find(home.city, countryCode: nil) }
+        if found?.timezone != home.zone {
+            let anywhere = try await Geocoder.find(home.city, countryCode: nil)
+            if anywhere?.timezone == home.zone || found == nil { found = anywhere }
+        }
         guard let place = found else {
             throw Failure.notFound("the user's city isn't known (time zone \(home.zone)): ask them which city")
         }
@@ -221,7 +226,7 @@ final class AirQualityTool: WeatherTool {
                 "pm10": "pm10_ug_m3", "ozone": "ozone_ug_m3", "nitrogen_dioxide": "no2_ug_m3", "uv_index": "uv_index",
             ])
             result["scale"] = "European AQI: 0-20 good, 20-40 fair, 40-60 moderate, 60-80 poor, 80-100 very poor, 100+ extremely poor. "
-                + "US AQI: 0-50 good, 51-100 moderate, 101-150 unhealthy for sensitive groups, 151-200 unhealthy, 201+ very unhealthy."
+                + "US AQI: 0-50 good, 51-100 moderate, 101-150 unhealthy for sensitive groups, 151-200 unhealthy, 201-300 very unhealthy, 301+ hazardous."
             result["source"] = "Air quality by Open-Meteo (https://open-meteo.com), CAMS, CC BY 4.0"
             return Self.json(result)
         } catch {

@@ -43,6 +43,22 @@ final class WeatherTests: XCTestCase {
         XCTAssertLessThan(dawn, rise)
     }
 
+    /// A zone a day away from its longitude's solar time: the events must
+    /// fall on the asked-for local date (USNO: rise 06:34, set 18:40).
+    func testFarFromSolarTime() {
+        let zone = "Pacific/Kiritimati"
+        let d = day("2025-03-20", 1.8721, -157.4278, zone)
+        let f = DateFormatter()
+        f.timeZone = TimeZone(identifier: zone)
+        f.dateFormat = "yyyy-MM-dd"
+        guard case .time(let rise) = d.sunrise, case .time(let set) = d.sunset else { return XCTFail() }
+        XCTAssertEqual(f.string(from: rise), "2025-03-20")
+        XCTAssertEqual(f.string(from: set), "2025-03-20")
+        XCTAssertEqual(f.string(from: d.solarNoon), "2025-03-20")
+        XCTAssertLessThanOrEqual(abs(minutes(local(d.sunrise, zone)) - minutes("06:34")), 2)
+        XCTAssertLessThanOrEqual(abs(minutes(local(d.sunset, zone)) - minutes("18:40")), 2)
+    }
+
     func testPolar() {
         let summer = day("2025-06-21", 69.65, 18.96, "Europe/Oslo")
         XCTAssertEqual(summer.sunrise, .alwaysAbove)

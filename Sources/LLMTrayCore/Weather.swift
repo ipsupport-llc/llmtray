@@ -29,7 +29,21 @@ public enum SolarCalculator {
         utc.timeZone = TimeZone(identifier: "UTC")!
         let midnight = utc.date(from: parts)!   // that calendar day, 00:00 UTC
         let julianDate = midnight.timeIntervalSince1970 / 86400 + 2440587.5
-        let n = (julianDate - 2451545.0 + 0.0008).rounded(.up)
+        let n0 = (julianDate - 2451545.0 + 0.0008).rounded(.up)
+        // The cycle whose solar noon falls on that local date: where a zone
+        // is far from its longitude's solar time (Kiritimati, UTC+14 at
+        // -157°), the plain formula picks the neighbouring day.
+        func transitJD(_ n: Double) -> Double {
+            let j = n - longitude / 360
+            let m = (357.5291 + 0.98560028 * j).truncatingRemainder(dividingBy: 360) * .pi / 180
+            let c = 1.9148 * sin(m) + 0.02 * sin(2 * m) + 0.0003 * sin(3 * m)
+            let l = (m * 180 / .pi + c + 180 + 102.9372).truncatingRemainder(dividingBy: 360) * .pi / 180
+            return 2451545.0 + j + 0.0053 * sin(m) - 0.0069 * sin(2 * l)
+        }
+        let n = [n0, n0 - 1, n0 + 1].first { candidate in
+            let noon = Date(timeIntervalSince1970: (transitJD(candidate) - 2440587.5) * 86400)
+            return calendar.dateComponents([.year, .month, .day], from: noon) == parts
+        } ?? n0
         let meanSolarNoon = n - longitude / 360
         let m = (357.5291 + 0.98560028 * meanSolarNoon).truncatingRemainder(dividingBy: 360)
         let mr = m * .pi / 180
