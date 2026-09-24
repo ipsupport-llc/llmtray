@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "يحذف ملف التعريف هذا (تعود النماذج التي تستخدمه إلى Default).";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "يحذف بيئة تشغيل mlx-lm التي تم تنزيلها (وبيئة تشغيل إنشاء الصور). يُعاد إعدادها من البداية عند بدء الخادم التالي. تُحفظ الدردشات وملفات التعريف المحفوظة.";
 "Diagnostics" = "التشخيصات";
+"Disk usage" = "استخدام القرص";
 "Download" = "تنزيل";
 "Download and Enable" = "تنزيل وتمكين";
+"Download into the models folder" = "التنزيل إلى مجلد النماذج";
 "Download models" = "تنزيل النماذج";
 "Download models from Hugging Face" = "تنزيل النماذج من Hugging Face";
 "Downloaded" = "تم التنزيل";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "وسيطات الخادم الإضافية";
 "Failed: %@" = "فشل: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "للنماذج التي لها نموذج مُسوِّد منشور (Gemma 4 26B): يخمّن نموذج إضافي صغير الرموز مسبقًا، ويتحقق منها النموذج الرئيسي في مرور واحد. النتيجة نفسها وبسرعة أكبر. عندئذٍ تُلبّى الطلبات واحدًا تلو الآخر.";
+"Free on disk: %@ · your models: %@" = "المساحة الحرة على القرص: %@ · نماذجك: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "يحرر الذاكرة التي يشغلها نموذج محمّل بعد هذه المدة من دون طلبات. يُعاد تحميله تلقائيًا عند الطلب التالي، مع تأخير التحميل المعتاد.";
 "Full" = "كامل";
 "General" = "عام";
@@ -111,6 +114,7 @@
 "Model card" = "بطاقة النموذج";
 "Models" = "النماذج";
 "Models folder" = "مجلد النماذج";
+"Models: %@ · free: %@" = "نماذج: %@ · مساحة حرة: %@";
 "Network" = "الشبكة";
 "Never" = "أبدًا";
 "New Profile…" = "ملف تعريف جديد…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "لم يتم العثور على نماذج في هذا المجلد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
 "No saved sessions" = "لا توجد جلسات محفوظة";
+"Not enough free disk space for this model." = "لا توجد مساحة قرص كافية لهذا النموذج.";
 "OK" = "موافق";
 "Off" = "إيقاف";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "إيقاف: لا يمكن إلا لهذا الـ Mac الوصول إلى الخادم. تشغيل: يمكن للأجهزة الأخرى على شبكتك الوصول إليه أيضًا — أي شخص عليها، لذا لا تستخدمه إلا على الشبكات التي تثق بها.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "اعرض ملفات ملف التعريف في Finder — بصيغة JSON عادية، قابلة للتحرير يدويًا وللنسخ إلى Mac آخر.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
 "Sort by" = "فرز حسب";
+"Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";
 "Speculative decoding (MTP)" = "فك الترميز التخميني (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "مهلة التوقف: %lld ث";

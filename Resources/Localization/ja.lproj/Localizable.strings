@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "このプロファイルを削除します（使用中のモデルはDefaultに戻ります）。";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "ダウンロード済みのmlx-lmランタイム（および画像生成ランタイム）を削除します。次回サーバの起動時に最初から再設定されます。保存済みのチャットとプロファイルは保持されます。";
 "Diagnostics" = "診断";
+"Disk usage" = "ディスク使用量";
 "Download" = "ダウンロード";
 "Download and Enable" = "ダウンロードして有効にする";
+"Download into the models folder" = "models フォルダにダウンロードします";
 "Download models" = "モデルをダウンロード";
 "Download models from Hugging Face" = "Hugging Face からモデルをダウンロードします。";
 "Downloaded" = "ダウンロード済み";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "追加のサーバ引数";
 "Failed: %@" = "失敗しました：%@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "公開済みの下書きモデルがあるモデル（Gemma 4 26B）では、小さな追加モデルが先のトークンを予測し、メインモデルが1回のパスで確認します。出力は同じで、より高速です。その場合、リクエストは1件ずつ処理されます。";
+"Free on disk: %@ · your models: %@" = "ディスクの空き: %@ · あなたのモデル: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "リクエストがないままこの時間が経過したら、読み込まれたモデルが保持しているメモリを解放します。次のリクエスト時に自動的に再読み込みされ、通常の読み込み待ち時間が発生します。";
 "Full" = "フル";
 "General" = "一般";
@@ -111,6 +114,7 @@
 "Model card" = "モデルカード";
 "Models" = "モデル";
 "Models folder" = "モデルフォルダ";
+"Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
 "Network" = "ネットワーク";
 "Never" = "しない";
 "New Profile…" = "新規プロファイル…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "このフォルダにモデルが見つかりません。";
 "No runs yet." = "実行履歴はまだありません。";
 "No saved sessions" = "保存済みセッションはありません";
+"Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
 "OK" = "OK";
 "Off" = "オフ";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "プロファイルファイルを Finder に表示します。プレーン JSON で、手動編集や別の Mac へのコピーができます。";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
 "Sort by" = "並べ替え";
+"Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";
 "Speculative decoding (MTP)" = "投機的デコード（MTP）";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "ストールタイムアウト: %lld秒";

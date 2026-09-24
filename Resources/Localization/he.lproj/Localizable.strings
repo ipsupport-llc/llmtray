@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "מוחק את הפרופיל הזה (מודלים שמשתמשים בו חוזרים ל־Default).";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "מוחק את זמן הריצה mlx-lm שהורד (ואת זמן הריצה ליצירת תמונות). הוא יותקן מחדש מאפס בהפעלת השרת הבאה. צ׳אטים ופרופילים שמורים יישמרו.";
 "Diagnostics" = "אבחון";
+"Disk usage" = "שימוש בדיסק";
 "Download" = "הורד";
 "Download and Enable" = "הורד והפעל";
+"Download into the models folder" = "הורדה לתיקיית models";
 "Download models" = "הורדת דגמים";
 "Download models from Hugging Face" = "הורדת דגמים מ‑Hugging Face.";
 "Downloaded" = "הורד";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
 "Failed: %@" = "נכשל: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם drafter שפורסם (Gemma 4 26B): מודל קטן נוסף מנחש מראש אסימונים, והמודל הראשי בודק אותם במעבר אחד. אותו פלט, מהר יותר. לאחר מכן הבקשות מטופלות אחת בכל פעם.";
+"Free on disk: %@ · your models: %@" = "חופשי בדיסק: %@ · המודלים שלך: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "משחרר את הזיכרון שמודל טעון מחזיק אחרי פרק זמן כזה ללא בקשות. הוא נטען מחדש אוטומטית בבקשה הבאה, עם עיכוב הטעינה הרגיל.";
 "Full" = "מלא";
 "General" = "כללי";
@@ -111,6 +114,7 @@
 "Model card" = "כרטיס המודל";
 "Models" = "מודלים";
 "Models folder" = "תיקיית המודלים";
+"Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
 "Network" = "רשת";
 "Never" = "אף פעם";
 "New Profile…" = "פרופיל חדש…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "לא נמצאו מודלים בתיקייה זו.";
 "No runs yet." = "עדיין אין הרצות.";
 "No saved sessions" = "אין הפעלות שמורות";
+"Not enough free disk space for this model." = "אין מספיק מקום פנוי בדיסק עבור המודל הזה.";
 "OK" = "אישור";
 "Off" = "כבוי";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "מציג את קובצי הפרופיל ב-Finder -- JSON פשוט, ניתן לעריכה ידנית ולהעתקה ל-Mac אחר.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
 "Sort by" = "מיון לפי";
+"Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
 "Speculative decoding (MTP)" = "פענוח ספקולטיבי (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "זמן קצוב לתקיעה: %lld שנ׳";

@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "Xóa hồ sơ này (các mô hình dùng hồ sơ này sẽ quay về Default)";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Xóa môi trường chạy mlx-lm đã tải về (và môi trường chạy tạo ảnh). Môi trường này sẽ được thiết lập lại từ đầu vào lần khởi động máy chủ tiếp theo. Các cuộc trò chuyện và hồ sơ đã lưu vẫn được giữ.";
 "Diagnostics" = "Chẩn đoán";
+"Disk usage" = "Sử dụng ổ đĩa";
 "Download" = "Tải về";
 "Download and Enable" = "Tải về và bật";
+"Download into the models folder" = "Tải về vào thư mục models";
 "Download models" = "Tải mô hình";
 "Download models from Hugging Face" = "Tải mô hình từ Hugging Face";
 "Downloaded" = "Đã tải về";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "Đối số máy chủ bổ sung";
 "Failed: %@" = "Không thành công: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Với các mô hình có mô hình nháp đã được công bố (Gemma 4 26B): một mô hình nhỏ bổ sung đoán trước các token, rồi mô hình chính kiểm tra chúng trong một lượt. Kết quả như cũ, nhanh hơn. Khi đó, các yêu cầu được phục vụ lần lượt từng cái.";
+"Free on disk: %@ · your models: %@" = "Còn trống trên ổ: %@ · các mô hình của bạn: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Giải phóng bộ nhớ mà mô hình đã tải đang giữ sau khoảng thời gian không có yêu cầu này. Mô hình sẽ tự động tải lại ở yêu cầu tiếp theo, với độ trễ tải như thường lệ.";
 "Full" = "Đầy đủ";
 "General" = "Chung";
@@ -111,6 +114,7 @@
 "Model card" = "Thẻ mô hình";
 "Models" = "Mô hình";
 "Models folder" = "Thư mục mô hình";
+"Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "Network" = "Mạng";
 "Never" = "Không bao giờ";
 "New Profile…" = "Hồ sơ mới…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "Không tìm thấy mô hình nào trong thư mục này.";
 "No runs yet." = "Chưa có lần chạy nào.";
 "No saved sessions" = "Không có phiên đã lưu";
+"Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
 "OK" = "OK";
 "Off" = "Tắt";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Hiển thị các tệp hồ sơ trong Finder — JSON thuần, có thể sửa bằng tay và sao chép sang máy Mac khác.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
 "Sort by" = "Sắp xếp theo";
+"Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
 "Speculative decoding (MTP)" = "Giải mã suy đoán (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Thời gian chờ khi ngưng phản hồi: %lld giây";

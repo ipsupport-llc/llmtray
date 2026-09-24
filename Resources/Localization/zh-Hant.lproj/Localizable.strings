@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "刪除此描述檔（使用它的模型會改回 Default）。";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "刪除已下載的 mlx-lm 執行環境（以及影像生成執行環境）。下次啟動伺服器時會重新從頭設定。已儲存的對話和描述檔會保留。";
 "Diagnostics" = "診斷";
+"Disk usage" = "磁碟使用量";
 "Download" = "下載";
 "Download and Enable" = "下載並啟用";
+"Download into the models folder" = "下載至 models 資料夾";
 "Download models" = "下載模型";
 "Download models from Hugging Face" = "從 Hugging Face 下載模型";
 "Downloaded" = "已下載";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "額外伺服器引數";
 "Failed: %@" = "失敗：%@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "適用於有發布 drafter 的模型（Gemma 4 26B）：一個額外的小模型會預先猜測 token，主模型再一次檢查。輸出相同，但速度更快。接著要求會一次處理一個。";
+"Free on disk: %@ · your models: %@" = "磁碟可用空間：%@ · 您的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "載入的模型在這段時間內沒有要求後，會釋放其占用的記憶體。下次收到要求時會自動重新載入，並有一般的載入延遲。";
 "Full" = "完整";
 "General" = "一般";
@@ -111,6 +114,7 @@
 "Model card" = "模型卡";
 "Models" = "模型";
 "Models folder" = "模型檔案夾";
+"Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "Network" = "網路";
 "Never" = "永不";
 "New Profile…" = "新增設定檔…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "在此檔案夾中找不到模型。";
 "No runs yet." = "尚未執行。";
 "No saved sessions" = "沒有已儲存的工作階段";
+"Not enough free disk space for this model." = "此模型所需的磁碟空間不足。";
 "OK" = "好";
 "Off" = "關閉";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "關閉時，只有這部 Mac 可以連線到伺服器。開啟時，你網路上的其他裝置也可以連線（網路上的任何人都可以），因此請只在信任的網路上使用。";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "在 Finder 顯示描述檔檔案；純 JSON，可手動編輯，也可拷貝到另一台 Mac。";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方顯示模型的思考內容（可收合的「思考過程」區塊）。";
 "Sort by" = "排序方式";
+"Space the models in this folder take, and what's still free on its disk." = "此資料夾中模型佔用的空間，以及磁碟剩餘可用空間。";
 "Speculative decoding (MTP)" = "推測性解碼 (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "停滯逾時：%lld 秒";
