@@ -94,6 +94,7 @@ struct GeneralPane: View {
 // MARK: - Models
 
 struct ModelsPane: View {
+    @EnvironmentObject var benchmark: BenchmarkRunner
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var navigation: SettingsNavigation
     @ObservedObject private var profiles = ProfileManager.shared
@@ -158,7 +159,9 @@ struct ModelsPane: View {
                 }
                 .labelsHidden()
                 .frame(width: 140)
-                .disabled(server.loadedModelPath == m.id && (server.isBusy || isStarting))
+                // Auto-tune writes into the loaded model's profile and
+                // restarts it between measurements.
+                .disabled(benchmark.isRunning || server.loadedModelPath == m.id && (server.isBusy || isStarting))
             }
         } label: {
             VStack(alignment: .leading) {
@@ -241,10 +244,10 @@ struct ProfilesPane: View {
                         }
                     }
                     .tag(p.id)
-                    .onTapGesture(count: 2) {
-                        guard !p.isDefault else { return }
-                        nameDraft = p.name
-                        renaming = p.id
+                    .contextMenu {
+                        if !p.isDefault {
+                            Button("Rename") { startRenaming(p) }
+                        }
                     }
                 }
             }
@@ -258,9 +261,12 @@ struct ProfilesPane: View {
                     .disabled(isDefault || busy)
                     .help(Text("Delete this profile (models using it go back to Default)"))
                 Button {
-                    navigation.profileID = profiles.create(name: selected.name + " " + NSLocalizedString("copy", comment: ""), copying: selected).id
+                    navigation.profileID = profiles.create(name: selected.name + " " + NSLocalizedString("copy", comment: "suffix of a duplicated profile's name"), copying: selected).id
                 } label: { Image(systemName: "plus.square.on.square") }
                     .help(Text("Duplicate this profile"))
+                Button { startRenaming(selected) } label: { Image(systemName: "pencil") }
+                    .disabled(isDefault)
+                    .help(Text("Rename this profile"))
                 Spacer()
                 Button {
                     NSWorkspace.shared.open(URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles"))
@@ -273,6 +279,12 @@ struct ProfilesPane: View {
     }
 
     private var busy: Bool { server.isBusy || chat.isBusy || benchmark.isRunning }
+
+    private func startRenaming(_ p: Profile) {
+        guard !p.isDefault else { return }
+        nameDraft = p.name
+        renaming = p.id
+    }
 
     private func deleteSelected() {
         let p = selected
@@ -295,6 +307,31 @@ struct ProfilesPane: View {
 
     private var editor: some View {
         Form {
+            if !profiles.loadErrors.isEmpty {
+                Section {
+                    ForEach(profiles.loadErrors, id: \.self) { error in
+                        Label(error, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
+                    }
+                    Button("Show the profile files in Finder") {
+                        NSWorkspace.shared.open(URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles"))
+                    }
+                }
+            }
+            if !profiles.isEditable(id: selectedID) {
+                Text("This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.")
+                    .foregroundStyle(.secondary)
+            } else if benchmark.isRunning {
+                Text("Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes.")
+                    .foregroundStyle(.secondary)
+            }
+            editorSections
+                .disabled(!profiles.isEditable(id: selectedID) || benchmark.isRunning)
+        }
+        .formStyle(.grouped)
+    }
+
+    @ViewBuilder
+    private var editorSections: some View {
             Section {
                 LabeledContent {
                     Toggle("Show only overrides", isOn: $onlyOverrides).disabled(isDefault)
@@ -318,7 +355,10 @@ struct ProfilesPane: View {
                     }
                 }
                 row(\.request.maxTokens, "Max tokens", "The longest answer the model may write. Also capped by the model's own context length.") {
-                    TextField("", value: b(\.request.maxTokens), format: .number).frame(width: 90)
+                    TextField("", value: Binding(
+                        get: { profiles.value(\.request.maxTokens, profileID: selectedID) },
+                        set: { profiles.set(\.request.maxTokens, max(1, $0), profileID: selectedID) }
+                    ), format: .number).frame(width: 90)
                 }
             }
             Section("Prompt & tools") {
@@ -396,8 +436,6 @@ struct ProfilesPane: View {
                     TextField("", text: b(\.launch.extraServerArgs)).font(.system(.body, design: .monospaced))
                 }
             }
-        }
-        .formStyle(.grouped)
     }
 
     private var subtitle: String {
@@ -535,8 +573,9 @@ struct ServerPane: View {
     @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold = 3
     @AppStorage("llmtray.verboseServerLogging") private var verboseLogging = false
 
+    /// Idle-unloaded counts as running: the listener still holds the port.
     private var isStopped: Bool {
-        switch server.state { case .stopped, .failed: return true; default: return false }
+        switch server.state { case .stopped, .failed: return !server.isIdleUnloaded; default: return false }
     }
 
     var body: some View {
@@ -587,8 +626,9 @@ struct BenchmarkPane: View {
     @AppStorage("llmtray.port") private var port = 8765
 
     private var alias: String {
-        let a = server.loadedModelPath.map(ModelAliasStore.alias(for:)) ?? ""
-        return a.isEmpty ? "default" : a
+        guard let path = server.loadedModelPath else { return "default" }
+        let a = ModelAliasStore.alias(for: path)
+        return a.isEmpty ? (path as NSString).lastPathComponent : a
     }
 
     var body: some View {
@@ -618,9 +658,13 @@ struct UpdatesPane: View {
     @AppStorage("llmtray.checkUpdatesAtLaunch") private var checkAtLaunch = true
     @AppStorage("llmtray.betaUpdates") private var beta = false
 
+    /// Anything that could start the model process mid-update: running,
+    /// starting, or idle-unloaded (the next request reloads it).
     private var isRunning: Bool {
-        if case .running = server.state { return true }
-        return false
+        switch server.state {
+        case .stopped, .failed: return server.isIdleUnloaded
+        default: return true
+        }
     }
 
     private var version: String {
@@ -662,6 +706,7 @@ struct UpdatesPane: View {
             Section("Maintenance") {
                 LabeledContent {
                     Button("Uninstall Runtime Data…", role: .destructive, action: uninstallRuntime)
+                        .disabled(isRunning)
                 } label: {
                     SettingLabel(title: "Runtime data", help: "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept.")
                 }

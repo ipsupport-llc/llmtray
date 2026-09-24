@@ -27,7 +27,15 @@ struct ContentView: View {
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
     // selectedModelID) below, which loads/saves it on every switch).
-    @State private var alias: String = ""
+    /// The `model` name requests use, read from the store every time (the
+    /// alias can be renamed in Settings meanwhile). Without an alias, the
+    /// model's folder name -- ModelRouter resolves that too, where
+    /// "default" would resolve to nothing.
+    private var requestModelName: String {
+        guard let id = selectedModelID else { return "default" }
+        let alias = ModelAliasStore.alias(for: id)
+        return alias.isEmpty ? (id as NSString).lastPathComponent : alias
+    }
     @State private var draft: String = ""
     // Backs the History menu -- refreshed on appear and whenever
     // ChatSessionStore posts .sessionsDidChange (save/delete), rather than
@@ -79,16 +87,10 @@ struct ContentView: View {
             if selectedModelID == nil || !models.contains(where: { $0.id == selectedModelID }) {
                 selectedModelID = models.first?.id
             }
-            if let selectedModelID {
-                alias = ModelAliasStore.alias(for: selectedModelID)
-            }
             updateModelMaxContext(for: selectedModelID)
             isInputFocused = true
         }
         .onChange(of: selectedModelID) { newID in
-            // Swap in that model's own remembered alias instead of leaving
-            // whatever was typed for the previous model still in the field.
-            alias = newID.map(ModelAliasStore.alias(for:)) ?? ""
             updateModelMaxContext(for: newID)
         }
         .onChange(of: modelsRoot) { newRoot in
@@ -115,7 +117,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
             sessionHistory = ChatSessionStore.list()
         }
-        .onChange(of: chat.isBusy) { busy in
+        .onChange(of: chat.isTurnInProgress) { busy in
             // Fires once a turn (streaming + any tool calls) fully settles,
             // not right when it starts -- send()/regenerate() themselves
             // don't await that, so this is the one reliable "a turn just
@@ -365,7 +367,7 @@ struct ContentView: View {
 
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-        server.start(modelPath: model.path, port: port, alias: alias)
+        server.start(modelPath: model.path, port: port, alias: ModelAliasStore.alias(for: model.id))
     }
 
     /// Re-reads the newly-selected model's own context ceiling so the "Max
@@ -408,10 +410,16 @@ struct ContentView: View {
 
     private var statusText: String {
         switch server.state {
-        case .stopped: return "Stopped"
-        case .starting: return "Starting…"
-        case .running(let port, let model): return "Running — \(model) on :\(port)"
-        case .failed(let msg): return "Failed: \(msg)"
+        case .stopped:
+            return server.isIdleUnloaded
+                ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
+                : NSLocalizedString("Stopped", comment: "server status")
+        case .starting:
+            return NSLocalizedString("Starting…", comment: "server status")
+        case .running(let port, let model):
+            return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
+        case .failed(let msg):
+            return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
         }
     }
 
@@ -826,7 +834,7 @@ struct ContentView: View {
         draft = ""
         pendingAttachments = []
         let settings = chatSettings
-        chat.send(prompt: text, images: attachments, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+        chat.send(prompt: text, images: attachments, port: port, modelAlias: requestModelName, settings: settings, server: server)
         isInputFocused = true
     }
 
@@ -914,7 +922,7 @@ struct ContentView: View {
 
     private func regenerate() {
         let settings = chatSettings
-        chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+        chat.regenerate(port: port, modelAlias: requestModelName, settings: settings, server: server)
     }
 
     // Only worth offering once there's actually a meaningful middle to
@@ -926,7 +934,7 @@ struct ContentView: View {
     private func compact() async {
         let settings = chatSettings
         await chat.compactSession(
-            port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings,
+            port: port, modelAlias: requestModelName, settings: settings,
             keepStart: compactKeepStart, keepEnd: compactKeepEnd
         )
     }

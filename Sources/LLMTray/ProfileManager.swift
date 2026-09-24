@@ -179,6 +179,9 @@ final class ProfileManager: ObservableObject {
                 p.launch = source.launch
             }
         }
+        // Pending debounced edits first: re-reading from disk would
+        // otherwise replace them with the older on-disk values.
+        flushPendingWrites()
         profiles.append(p)
         persist(p)
         profiles = store.loadAll()

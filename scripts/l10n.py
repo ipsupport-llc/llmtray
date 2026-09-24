@@ -39,7 +39,7 @@ BASE = LOC / "en.lproj" / "Localizable.strings"
 # Call sites whose string-literal arguments are localized.
 CALL = re.compile(
     r"\b(Text|Toggle|Button|Section|Menu|LabeledContent|Picker|TextField|Label|"
-    r"SettingLabel|SettingHelp|NSLocalizedString|row)\s*\("
+    r"SettingLabel|SettingHelp|NSLocalizedString|row|help|accessibilityLabel)\s*\("
 )
 STRING_ISH = re.compile(r"(name|Name|Ref\(|lastPathComponent|displayName|title|message|Text|path)")
 LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')
@@ -124,7 +124,9 @@ def _unescape(s: str) -> str:
     return s.replace('\\"', '"').replace("\\n", "\n").replace("\\\\", "\\")
 
 
-def _to_key(literal: str) -> str | None:
+def _to_key(literal: str, explicit: bool = False) -> str | None:
+    """`explicit`: from NSLocalizedString, i.e. marked localizable on
+    purpose -- then even a lowercase word ("copy") is UI text."""
     out, i = [], 0
     while i < len(literal):
         if literal.startswith("\\(", i):
@@ -147,7 +149,7 @@ def _to_key(literal: str) -> str | None:
     # Not UI text: empty, pure placeholders/format strings, identifiers.
     if not key.strip() or re.fullmatch(r"[\s%@lldf.\d/→·()x,:-]*", key):
         return None
-    if key.startswith(("llmtray.", "http", "/")) or re.fullmatch(r"[a-z_]+", key):
+    if key.startswith(("llmtray.", "http", "/")) or (not explicit and re.fullmatch(r"[a-z_]+", key)):
         return None
     if re.fullmatch(r"[a-z0-9]+(\.[a-z0-9]+)+", key) or len(key.strip()) < 2:  # SF Symbol names, "★", "…"
         return None
@@ -160,6 +162,7 @@ CONTEXT = {
     "TextField": "text field placeholder", "Label": "label", "SettingLabel": "setting title or its tooltip",
     "SettingHelp": "tooltip explaining a setting", "NSLocalizedString": "dialog / menu text",
     "row": "profile setting title or its tooltip", "help": "tooltip",
+    "accessibilityLabel": "VoiceOver label",
 }
 
 
@@ -170,14 +173,9 @@ def extract_with_context() -> dict[str, str]:
         src = f.read_text()
         for m in CALL.finditer(src):
             for lit in _literals(_args(src, m.end())):
-                key = _to_key(lit)
+                key = _to_key(lit, explicit=m.group(1) == "NSLocalizedString")
                 if key:
                     keys.setdefault(key, CONTEXT.get(m.group(1), "UI text"))
-        for m in re.finditer(r"\.help\(\s*Text\(", src):
-            for lit in _literals(_args(src, m.end())):
-                key = _to_key(lit)
-                if key:
-                    keys.setdefault(key, "tooltip")
     return keys
 
 

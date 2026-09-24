@@ -47,6 +47,19 @@ final class ProfileTests: XCTestCase {
         XCTAssertEqual(r.kvGroupSize, 32)
     }
 
+    func testResolutionClampsSamplingValues() {
+        var base = Profile(id: Profile.defaultID, name: "Default")
+        base.request.maxTokens = -1     // a typo in the editor or the JSON
+        base.request.temperature = -0.5
+        base.request.topP = 3
+        base.request.topK = -8
+        let r = ProfileResolver.resolve(overlay: nil, base: base)
+        XCTAssertEqual(r.maxTokens, 1)
+        XCTAssertEqual(r.temperature, 0)
+        XCTAssertEqual(r.topP, 1)
+        XCTAssertEqual(r.topK, 0)
+    }
+
     func testOldFileWithRemovedFieldDecodes() throws {
         let json = #"{"id":"x","name":"Old","launch":{"verboseServerLogging":true,"kvBits":4}}"#
         let p = try JSONDecoder().decode(Profile.self, from: Data(json.utf8))

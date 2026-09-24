@@ -1,4 +1,6 @@
-/* Ukrainian. Keys are the English text (Resources/Localization/en.lproj); a key missing here shows in English. */
+/* Ukrainian. Keys are the English text (en.lproj); a key missing here shows in English.
+   Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
+   speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "Доступно: %@ → %@";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
@@ -16,13 +18,16 @@
 "Also check when LLMTray starts" = "Також перевіряти під час запуску LLMTray";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Будь-які інші прапорці mlx_lm.server через пробіл, наприклад --draft-model <шлях>.";
+"App language" = "Мова застосунку";
 "Apply to profile" = "Застосувати до профілю";
 "Assistant" = "Асистент";
+"Attach image(s) for the model to see" = "Прикріпити зображення, щоб модель їх побачила";
 "Auto-compact" = "Автостиснення";
 "Auto-restart after %lld stalls" = "Перезапуск після %lld зависань";
 "Auto-restart: off" = "Автоперезапуск: вимк.";
 "Auto-tune" = "Автопідбір";
 "Auto-tune found faster settings" = "Автопідбір знайшов швидші налаштування";
+"Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "Триває автоналаштування, воно записує результати в профіль завантаженої моделі -- редагування призупинено до його завершення.";
 "Auto-tune performance" = "Підібрати продуктивність";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усереднюються в один результат нижче. Перед ними завжди йде пробний прогін, тож компіляція Metal-ядер під час першого виклику не спотворює цифри.";
 "Benchmark" = "Бенчмарк";
@@ -33,6 +38,7 @@
 "Can't change models while auto-tune is running" = "Не можна змінювати модель під час автопідбору";
 "Can't switch profiles while a request or the auto-tune is running" = "Не можна змінити профіль, поки триває запит або автопідбір";
 "Cancel" = "Скасувати";
+"Cancel download" = "Скасувати завантаження";
 "Canvas size" = "Розмір полотна";
 "Chat" = "Чат";
 "Check Again" = "Перевірити знову";
@@ -64,6 +70,7 @@
 "Enable image generation" = "Генерація зображень";
 "Enable image generation?" = "Увімкнути генерацію зображень?";
 "Extra server arguments" = "Дод. аргументи сервера";
+"Failed: %@" = "Помилка: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей з опублікованим драфтером (Gemma 4 26B): маленька модель вгадує токени наперед, а основна перевіряє їх за один прохід. Відповідь та сама, але швидше. Запити при цьому обробляються по одному.";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
 "Full" = "Повний";
@@ -73,6 +80,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
+"Idle -- the model reloads on the next message" = "Простій -- модель завантажиться з наступним повідомленням";
 "Image generation" = "Генерація зображень";
 "Image model" = "Модель зображень";
 "Installed" = "Встановлено";
@@ -82,6 +90,8 @@
 "Keep first messages: %lld" = "Перших повідомлень зберігати: %lld";
 "Keep last messages: %lld" = "Останніх повідомлень зберігати: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
+"Language" = "Мова";
+"Later" = "Пізніше";
 "Launch at login" = "Запускати під час входу";
 "Library" = "Бібліотека";
 "Live output of the model process: loading, errors, requests." = "Живий вивід процесу моделі: завантаження, помилки, запити.";
@@ -101,8 +111,10 @@
 "Never" = "Ніколи";
 "New Profile…" = "Новий профіль…";
 "New chat" = "Новий чат";
+"New chat (saved)" = "Новий чат (зберігається)";
 "New profile" = "Новий профіль";
 "New profile (inherits everything from Default)" = "Новий профіль (усе успадковує від Default)";
+"New temporary chat -- nothing about it is ever saved" = "Новий тимчасовий чат -- нічого з нього не зберігається";
 "No auto-tune run yet." = "Автопідбір ще не запускався.";
 "No messages yet" = "Повідомлень поки немає";
 "No model uses it." = "Жодна модель його не використовує.";
@@ -114,7 +126,10 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Вимк. — до сервера підключається лише цей Mac. Увімк. — будь-які пристрої у вашій мережі, тому вмикайте лише в довірених мережах.";
 "Open" = "Відкрити";
 "Open Server Log…" = "Відкрити лог сервера…";
+"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "Past %lld messages" = "Понад %lld повідомлень";
+"Past chats" = "Попередні чати";
+"Pause download" = "Призупинити завантаження";
 "Performance" = "Продуктивність";
 "Port" = "Порт";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точність кешу уваги. 8 біт — майже без втрат, удвічі менше пам'яті. 4 біти — вчетверо менше, але помітно гірше на довгому контексті. Повний — найкраще, але найбільше пам'яті.";
@@ -133,17 +148,24 @@
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Випадковість. Нижче — точніше й повторюваніше, вище — різноманітніше. Код: 0.2–0.6; чат: 0.7–1.0.";
 "Recovery" = "Відновлення";
 "Regenerate" = "Згенерувати знову";
+"Remove attachment" = "Прибрати вкладення";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Видаляє завантажений рантайм mlx-lm з %@. Під час наступного запуску сервера він встановиться заново. Збережені чати й профілі залишаються.";
+"Rename" = "Перейменувати";
+"Rename this profile" = "Перейменувати цей профіль";
 "Rescan" = "Оновити список";
 "Rescan Models" = "Оновити список моделей";
 "Rescan, download or manage models" = "Оновити, завантажити або налаштувати моделі";
 "Reset: inherit this setting from Default" = "Скинути: брати значення з Default";
+"Restart LLMTray to change the language?" = "Перезапустити LLMTray, щоб змінити мову?";
+"Restart Now" = "Перезапустити";
 "Restart Server" = "Перезапустити сервер";
 "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Перезапускає процес моделі після стількох завислих запитів поспіль, щоб він не висів. 0 — вимкнено.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Перезапускає процес моделі з новими налаштуваннями (завантаження займе кілька секунд).";
+"Resume download" = "Продовжити завантаження";
 "Retry" = "Повторити";
 "Run benchmark" = "Запустити бенчмарк";
 "Running" = "Запущена";
+"Running — %@ on :%lld" = "Працює — %@ на :%lld";
 "Running…" = "Виконується…";
 "Runtime data" = "Дані рантайму";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Вибирає лише з найімовірніших токенів, сумарна ймовірність яких не більша за це значення. 1.0 — вимкнено.";
@@ -153,16 +175,20 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Масштабує ширину й висоту, які просить модель. Balanced залишає 1024x1024 як є.";
 "Search" = "Пошук";
 "Search Hugging Face (mlx models)…" = "Пошук на Hugging Face (моделі mlx)…";
+"Send" = "Надіслати";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Надсилається першим у кожному запиті вбудованого чату. У Default уже є короткий стартовий промпт — доповніть його або замініть. До зовнішніх API-клієнтів не застосовується.";
 "Server" = "Сервер";
 "Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Налаштування сервера змінилися — перезапустіть, щоб застосувати.";
+"Settings" = "Налаштування";
+"Settings (⌘,)" = "Налаштування (⌘,)";
 "Settings profile for this model" = "Профіль налаштувань цієї моделі";
 "Settings this profile overrides; everything else comes from Default." = "Скільки налаштувань перевизначає профіль; решта береться з Default.";
 "Settings…" = "Налаштування…";
 "Show only overrides" = "Лише перевизначені";
 "Show reasoning" = "Показувати міркування";
+"Show the profile files in Finder" = "Показати файли профілів у Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Sort by" = "Сортування";
@@ -171,13 +197,19 @@
 "Stall timeout: %lld s" = "Таймаут зависання: %lld с";
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
+"Start server" = "Запустити сервер";
 "Start the server first." = "Спершу запустіть сервер.";
 "Start the server when LLMTray opens" = "Запускати сервер під час відкриття LLMTray";
+"Starting…" = "Запуск…";
 "Startup" = "Запуск";
 "Step %lld/%lld" = "Крок %lld/%lld";
 "Stop Server" = "Зупинити сервер";
+"Stop generating" = "Зупинити генерацію";
+"Stop server (unload model)" = "Зупинити сервер (вивантажити модель)";
 "Stop the server to update the runtime." = "Щоб оновити рантайм, зупиніть сервер.";
+"Stopped" = "Зупинено";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель на час генерації зображення, а потім завантажує знову. Дві моделі одночасно можуть не вміститися в пам'ять цього Mac.";
+"System" = "Системна";
 "System prompt" = "Системний промпт";
 "Target: %@ · profile %@" = "Ціль: %@ · профіль %@";
 "Temperature" = "Температура";
@@ -188,9 +220,11 @@
 "The longest answer the model may write. Also capped by the model's own context length." = "Максимальна довжина відповіді. Також обмежена довжиною контексту моделі.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Версія mlx-lm (коміт власного форку LLMTray), на якій працюють моделі. Оновлюється окремо від застосунку.";
 "The model name API clients send." = "Ім'я моделі, яке надсилають API-клієнти.";
+"The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "Thinking…" = "Думаю…";
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
+"This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
 "Thought process" = "Хід міркувань";
 "Tool-use rule" = "Правило інструментів";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирає decode-concurrency (1/2/4/8) і prefill-step-size (64/128/256/512) на запущеній моделі, перезапускаючи сервер між спробами, і залишає найшвидше.";
@@ -207,17 +241,11 @@
 "Use LM Studio's folder" = "Тека LM Studio";
 "Verbose server logging" = "Докладний лог сервера";
 "Version" = "Версія";
-"Wait for the current request to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту — перезапуск його обірве.";
+"View model card" = "Картка моделі";
+"Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
 "You" = "Ви";
+"copy" = "копія";
 "not used by any model" = "не використовується жодною моделлю";
 "used by %@" = "використовують: %@";
-"Language" = "Мова";
-"System" = "Системна";
-"App language" = "Мова застосунку";
-"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
-"Restart LLMTray to change the language?" = "Перезапустити LLMTray, щоб змінити мову?";
-"The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
-"Restart Now" = "Перезапустити";
-"Later" = "Пізніше";

@@ -19,17 +19,33 @@ final class ModelProxyServer {
     private let server: ServerManager
     private var listener: NWListener?
     private(set) var publicPort: Int?
-    private var currentModelPath: String?
+
+    /// Largest request body accepted -- chat requests with a few inline
+    /// images stay far below this; anything bigger is refused before it's
+    /// buffered in memory.
+    static let maxBodyBytes = 256 * 1024 * 1024
 
     init(server: ServerManager) {
         self.server = server
     }
 
-    func start(publicPort: Int, internalPort: Int) throws {
-        guard listener == nil else { return }
-        guard let port = NWEndpoint.Port(rawValue: UInt16(publicPort)) else {
-            throw NSError(domain: "ModelProxyServer", code: 1, userInfo: [NSLocalizedDescriptionKey: "invalid port \(publicPort)"])
+    /// `completion` gets .success once the listener is actually listening,
+    /// or .failure if it can't (port taken, invalid) -- also later, if a
+    /// listening listener fails. Called on the main actor.
+    func start(publicPort: Int, internalPort: Int, completion: @escaping @MainActor (Result<Void, Error>) -> Void) {
+        guard listener == nil else { return completion(.success(())) }
+        guard (1...65_535).contains(publicPort), let port = NWEndpoint.Port(rawValue: UInt16(publicPort)) else {
+            return completion(.failure(NSError(domain: "ModelProxyServer", code: 1, userInfo: [NSLocalizedDescriptionKey: "invalid port \(publicPort)"])))
         }
+        do {
+            try startListener(port: port, internalPort: internalPort, completion: completion)
+            self.publicPort = publicPort
+        } catch {
+            completion(.failure(error))
+        }
+    }
+
+    private func startListener(port: NWEndpoint.Port, internalPort: Int, completion: @escaping @MainActor (Result<Void, Error>) -> Void) throws {
         // NWListener binds every interface (confirmed live: `lsof` showed
         // "*:8765", reachable from any device on the same network) unless
         // explicitly constrained -- default here is loopback-only, opt-in
@@ -56,23 +72,29 @@ final class ModelProxyServer {
                 self?.accept(connection, internalPort: internalPort)
             }
         }
+        listener.stateUpdateHandler = { [weak self, weak listener] state in
+            Task { @MainActor [weak self] in
+                // Ignore a listener that was already replaced / stopped.
+                guard let self, let listener, self.listener === listener else { return }
+                switch state {
+                case .ready:
+                    completion(.success(()))
+                case .failed(let error):
+                    self.stop()
+                    completion(.failure(error))
+                default:
+                    break
+                }
+            }
+        }
         listener.start(queue: .main)
         self.listener = listener
-        self.publicPort = publicPort
     }
 
     func stop() {
         listener?.cancel()
         listener = nil
         publicPort = nil
-    }
-
-    /// Set once by ServerManager right after its own initial launch --
-    /// without this, the very first request would see currentModelPath as
-    /// nil and (harmlessly, but pointlessly) trigger a "switch" to the
-    /// model that's already loaded.
-    func noteCurrentModel(_ path: String) {
-        currentModelPath = path
     }
 
     // MARK: - Connection handling
@@ -127,7 +149,20 @@ final class ModelProxyServer {
             headers[key] = value
         }
 
-        let contentLength = Int(headers["content-length"] ?? "") ?? 0
+        // Validated before it's used for slicing: a negative value would
+        // trap in prefix(), a huge one would buffer unbounded memory.
+        let contentLength: Int
+        if let raw = headers["content-length"] {
+            guard let value = Int(raw), value >= 0 else {
+                return sendError(connection: connection, status: "400 Bad Request", message: "invalid Content-Length")
+            }
+            guard value <= Self.maxBodyBytes else {
+                return sendError(connection: connection, status: "413 Payload Too Large", message: "request body too large")
+            }
+            contentLength = value
+        } else {
+            contentLength = 0
+        }
         let bodySoFar = Data(buf[headerEnd.upperBound...])
         if bodySoFar.count >= contentLength {
             route(method: method, path: path, headers: headers, body: bodySoFar.prefix(contentLength), connection: connection, internalPort: internalPort)
@@ -178,23 +213,13 @@ final class ModelProxyServer {
             let modelName = Self.extractModelField(from: bodyData)
             let targetPath = modelName.flatMap(ModelRouter.resolve(modelName:))
             do {
-                if let targetPath, targetPath != self.currentModelPath {
-                    // switchModel() already handles "nothing was actually
-                    // running" gracefully (terminateAndWaitForExit() no-ops
-                    // if there's no live process) -- covers both a genuine
-                    // model switch and a switch requested while idle-unloaded.
-                    try await self.server.switchModel(modelPath: targetPath, alias: modelName ?? "")
-                    self.currentModelPath = targetPath
-                } else {
-                    // Same model (or none specified) as last time -- if the
-                    // server is idle-unloaded (see ServerManager.idleUnload),
-                    // this transparently reloads it instead of the caller
-                    // just getting connection-refused. A no-op if it's
-                    // already running.
-                    try await self.server.ensureModelLoaded()
-                }
+                // Switches to the requested model (or reloads the last one
+                // if it was idle-unloaded), serialized with every other
+                // transition; the request then counts as in flight on the
+                // model until forward() ends it.
+                try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "")
             } catch {
-                self.server.endRequest()
+                self.server.endRequest(forwarded: false)
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
                 return
             }
@@ -239,10 +264,10 @@ final class ModelProxyServer {
         session.dataTask(with: request).resume()
     }
 
-    private func sendError(connection: NWConnection, message: String) {
+    private func sendError(connection: NWConnection, status: String = "502 Bad Gateway", message: String) {
         let escaped = message.replacingOccurrences(of: "\"", with: "'")
         let body = "{\"error\":\"\(escaped)\"}"
-        let response = "HTTP/1.1 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
+        let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
         connection.send(content: response.data(using: .utf8), completion: .contentProcessed { _ in
             connection.cancel()
         })

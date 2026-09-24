@@ -101,7 +101,14 @@ jobs:
           # Someone may push to main between the fetch and this push; the
           # commit only touches appcast.xml, so a rebase onto the new tip is
           # safe. Retried a few times rather than failing the release.
+          # Fails the job after the last attempt: a published release with
+          # no appcast entry would never reach anyone through auto-update.
+          pushed=0
           for i in 1 2 3; do
-            git push origin main && break
-            git pull --rebase origin main
+            if git push origin main; then pushed=1; break; fi
+            git pull --rebase origin main || true
           done
+          if [ "$pushed" != 1 ]; then
+            echo "::error::could not push the appcast to main after 3 attempts"
+            exit 1
+          fi

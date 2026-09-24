@@ -119,7 +119,15 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
 
-    var isBusy: Bool { isStreaming || isGeneratingImage }
+    /// A compaction summary is being written (see compactSession).
+    @Published private(set) var isCompacting: Bool = false
+    private var compactionTask: Task<Void, Never>?
+
+    /// A chat turn (streaming + any tool calls) is in progress.
+    var isTurnInProgress: Bool { isStreaming || isGeneratingImage }
+    /// Anything that changes `messages` is running: compaction too, so a
+    /// second Compact (or a send) can't work on a stale message range.
+    var isBusy: Bool { isTurnInProgress || isCompacting }
 
     private let mfluxManager = MfluxManager()
     private var mfluxStatusCancellable: AnyCancellable?
@@ -129,24 +137,11 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     private var session: URLSession!
     private var task: URLSessionDataTask?
     private var sseBuffer: String = ""
-    // Set directly in the nonisolated URLSession delegate callback below, at
-    // the real moment the first byte arrives on the network -- not inside
-    // the `Task { @MainActor in ... }` that processes it. That dispatched
-    // Task can lag behind the actual network event when the main thread is
-    // busy (e.g. re-rendering the chat bubble on every streamed delta), and
-    // measuring from a delayed dispatch point silently compresses the
-    // apparent elapsed time toward zero, which is what was inflating tok/s
-    // to nonsense values.
-    nonisolated(unsafe) private var firstByteDate: Date?
-    // HTTP status of the in-flight chat response, and its body when that
-    // status isn't 2xx. mlx_lm.server reports request errors (e.g. an image
-    // sent to a model without vision) as a plain JSON `{"error": ...}` body,
-    // not SSE -- previously those bytes went into the SSE parser, matched no
-    // `data:` line, and the turn silently ended with an empty assistant
-    // bubble and no error shown. Set in the nonisolated delegate callbacks,
-    // same as firstByteDate (URLSession serializes those per task).
-    nonisolated(unsafe) private var responseStatusCode: Int?
-    nonisolated(unsafe) private var errorResponseBody = Data()
+    /// Per-request state the URLSession delegate callbacks write, off the
+    /// main actor (status, error body, first-byte time, undecoded bytes) --
+    /// keyed by task so a cancelled request's late callbacks can't touch
+    /// the next request's state. See StreamStates.
+    private nonisolated let streams = StreamStates()
     // See resetConversationState(): async continuations capture this and
     // drop their result if the conversation was replaced meanwhile.
     private var conversationEpoch = 0
@@ -168,6 +163,10 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     // tries, resetting whenever a real new turn starts (send/regenerate).
     private var imagesGeneratedThisTurn = 0
     private let maxImagesPerTurn = 1
+    // A model that keeps calling a tool after being refused (cap reached,
+    // tool off) would otherwise loop request -> refusal -> request forever.
+    private var toolRoundsThisTurn = 0
+    private let maxToolRoundsPerTurn = 4
 
     private static let generateImageTool: [String: Any] = [
         "type": "function",
@@ -265,6 +264,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         errorText = nil
         lastTokensPerSecond = nil
         imagesGeneratedThisTurn = 0
+        toolRoundsThisTurn = 0
     }
 
     func loadSession(_ file: ChatSessionFile) {
@@ -348,6 +348,17 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     /// compacting. See ContentView for the keepStart/keepEnd Settings.
     func compactSession(port: Int, modelAlias: String, settings: ChatSettings, keepStart: Int, keepEnd: Int) async {
         guard !isBusy else { return }
+        isCompacting = true
+        let work = Task { @MainActor in
+            await self.runCompaction(port: port, modelAlias: modelAlias, keepStart: keepStart, keepEnd: keepEnd)
+        }
+        compactionTask = work
+        await work.value
+        compactionTask = nil
+        isCompacting = false
+    }
+
+    private func runCompaction(port: Int, modelAlias: String, keepStart: Int, keepEnd: Int) async {
         guard messages.count > keepStart + keepEnd + 1 else { return }
         let middleRange = keepStart..<(messages.count - keepEnd)
         let middle = Array(messages[middleRange])
@@ -371,11 +382,11 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
             // written: middleRange indexes the OLD message list -- splicing
             // it into the new one would inject (and persist) the old
             // conversation's summary there.
-            guard epoch == conversationEpoch else { return }
+            guard epoch == conversationEpoch, !Task.isCancelled, middleRange.upperBound <= messages.count else { return }
             messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
             persistCurrentSession()
         } catch {
-            guard epoch == conversationEpoch else { return }
+            guard epoch == conversationEpoch, !Task.isCancelled else { return }
             errorText = "Compaction failed: \(error.localizedDescription)"
         }
     }
@@ -420,6 +431,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     ) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
         imagesGeneratedThisTurn = 0
+        toolRoundsThisTurn = 0
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
         startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
@@ -431,6 +443,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
         imagesGeneratedThisTurn = 0
+        toolRoundsThisTurn = 0
         if messages.last?.role == "assistant" {
             messages.removeLast()
         }
@@ -502,13 +515,12 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         sseBuffer = ""
         approxCompletionTokens = 0
         usageCompletionTokens = nil
-        firstByteDate = nil
-        responseStatusCode = nil
-        errorResponseBody = Data()
         isStreaming = true
 
-        task = session.dataTask(with: request)
-        task?.resume()
+        let newTask = session.dataTask(with: request)
+        streams.begin(newTask.taskIdentifier)
+        task = newTask
+        newTask.resume()
     }
 
     /// Serializes one message for the request body, matching whichever of
@@ -550,6 +562,7 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     func cancel() {
         task?.cancel()
         isStreaming = false
+        compactionTask?.cancel()
     }
 
     // MARK: - URLSessionDataDelegate (incremental SSE parsing)
@@ -560,53 +573,47 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         didReceive response: URLResponse,
         completionHandler: @escaping @Sendable (URLSession.ResponseDisposition) -> Void
     ) {
-        responseStatusCode = (response as? HTTPURLResponse)?.statusCode
+        streams.setStatus((response as? HTTPURLResponse)?.statusCode, for: dataTask.taskIdentifier)
         completionHandler(.allow)
     }
 
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        if let code = responseStatusCode, !(200..<300).contains(code) {
-            errorResponseBody.append(data)
-            return
-        }
-        if firstByteDate == nil {
-            firstByteDate = Date()
-        }
-        guard let chunk = String(data: data, encoding: .utf8) else { return }
         let taskID = dataTask.taskIdentifier
+        guard let lines = streams.receive(data, for: taskID) else { return }
         Task { @MainActor in
             // A cancelled stream from a conversation that was since replaced
             // can still have chunks queued -- they must not land in the new
             // one (see resetConversationState).
             guard self.task?.taskIdentifier == taskID else { return }
-            self.handleChunk(chunk)
+            self.handleChunk(lines)
         }
     }
 
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        // Captured here, synchronously in the real delegate callback, for
-        // the same reason as firstByteDate above -- not inside the
-        // dispatched Task, which could run late.
+        // Captured here, synchronously in the real delegate callback -- the
+        // dispatched Task can run late when the main thread is busy, which
+        // would compress the measured generation time (inflated tok/s).
         let completionDate = Date()
-        let statusCode = responseStatusCode
-        let errorBody = errorResponseBody
         let taskID = task.taskIdentifier
+        let result = streams.finish(taskID)
         Task { @MainActor in
             // Completion of a stream abandoned by switching conversations:
             // nothing of it (error text, tool-call continuation, persisting)
             // belongs to the conversation now on screen.
             guard self.task?.taskIdentifier == taskID else { return }
             self.isStreaming = false
-            if let statusCode, !(200..<300).contains(statusCode) {
-                self.errorText = Self.serverErrorMessage(statusCode: statusCode, body: errorBody)
+            if let statusCode = result.statusCode, !(200..<300).contains(statusCode) {
+                self.errorText = Self.serverErrorMessage(statusCode: statusCode, body: result.errorBody)
                 self.dropEmptyAssistantPlaceholder()
                 self.persistCurrentSession()
                 return
             }
+            // A last line without a trailing newline.
+            if !result.rest.isEmpty { self.handleChunk(result.rest + "\n") }
             if let error, (error as NSError).code != NSURLErrorCancelled {
                 self.errorText = error.localizedDescription
             }
-            self.finalizeTokensPerSecond(endDate: completionDate)
+            self.finalizeTokensPerSecond(firstByte: result.firstByteDate, endDate: completionDate)
             if error == nil {
                 await self.continueWithPendingToolCalls()
             }
@@ -675,12 +682,12 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // something else needs the GPU right now," so the chat model is
         // stopped first and reloaded after, unless the user has said their
         // Mac comfortably fits both at once. Reuses ServerManager's own
-        // idle-unload/reload pair (stop() + ensureModelLoaded()), which
+        // idle-unload/reload pair (unloadModel() + ensureModelLoaded()), which
         // already remembers the last-loaded model/alias for exactly this
         // "stopped, but not forgotten" case.
         let shouldUnload = context.settings.unloadModelDuringImageGen && willActuallyGenerate
         if shouldUnload {
-            context.server.stop()
+            context.server.unloadModel()
         }
 
         // Session switched mid-call (see resetConversationState): stop
@@ -789,6 +796,12 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         // ...but never send the old conversation's follow-up request from
         // the new one.
         guard epoch == conversationEpoch else { return }
+        toolRoundsThisTurn += 1
+        guard toolRoundsThisTurn < maxToolRoundsPerTurn else {
+            errorText = "Stopped: the model kept calling tools (\(maxToolRoundsPerTurn) rounds in one turn)."
+            persistCurrentSession()
+            return
+        }
 
         startAssistantResponse(
             port: context.port, modelAlias: context.modelAlias, settings: context.settings, server: context.server
@@ -801,8 +814,8 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
         return obj
     }
 
-    private func finalizeTokensPerSecond(endDate: Date) {
-        guard let start = firstByteDate else { return }
+    private func finalizeTokensPerSecond(firstByte: Date?, endDate: Date) {
+        guard let start = firstByte else { return }
         let elapsed = endDate.timeIntervalSince(start)
         // Sub-50ms is measurement noise (SSE framing, a one-word reply),
         // not a real generation rate -- dividing by it is what produced
@@ -924,5 +937,71 @@ final class ChatClient: NSObject, ObservableObject, URLSessionDataDelegate {
     private func appendToAssistant(toolCall: ToolCall) {
         guard let idx = assistantMessageIndex, idx < messages.count else { return }
         messages[idx].toolCalls.append(toolCall)
+    }
+}
+
+/// Per-request state for ChatClient's streaming requests, written from the
+/// URLSession delegate queue and read on the main actor -- lock-protected
+/// and keyed by task identifier, so callbacks of a cancelled request can't
+/// clobber the next one's.
+private final class StreamStates: @unchecked Sendable {
+    struct Result {
+        var statusCode: Int?
+        var errorBody = Data()
+        var firstByteDate: Date?
+        /// Bytes after the last newline, decoded (normally empty).
+        var rest = ""
+    }
+
+    private struct State {
+        var statusCode: Int?
+        var errorBody = Data()
+        var firstByteDate: Date?
+        /// Undecoded bytes: a network chunk can end inside a UTF-8
+        /// character, so only complete lines are decoded.
+        var pending = Data()
+    }
+
+    private let lock = NSLock()
+    private var states: [Int: State] = [:]
+
+    func begin(_ id: Int) {
+        lock.lock(); defer { lock.unlock() }
+        states[id] = State()
+    }
+
+    func setStatus(_ code: Int?, for id: Int) {
+        lock.lock(); defer { lock.unlock() }
+        states[id]?.statusCode = code
+    }
+
+    /// The complete lines received so far (newline-terminated), or nil
+    /// when there's nothing to parse yet (or the response is an error body).
+    func receive(_ data: Data, for id: Int) -> String? {
+        lock.lock(); defer { lock.unlock() }
+        guard var state = states[id] else { return nil }
+        defer { states[id] = state }
+        if let code = state.statusCode, !(200..<300).contains(code) {
+            state.errorBody.append(data)
+            return nil
+        }
+        if state.firstByteDate == nil { state.firstByteDate = Date() }
+        state.pending.append(data)
+        // 0x0A never occurs inside a multi-byte UTF-8 sequence.
+        guard let newline = state.pending.lastIndex(of: 0x0A) else { return nil }
+        let end = state.pending.index(after: newline)
+        let complete = state.pending[state.pending.startIndex..<end]
+        let text = String(decoding: complete, as: UTF8.self)
+        state.pending = Data(state.pending[end...])
+        return text
+    }
+
+    func finish(_ id: Int) -> Result {
+        lock.lock(); defer { lock.unlock() }
+        guard let state = states.removeValue(forKey: id) else { return Result() }
+        return Result(
+            statusCode: state.statusCode, errorBody: state.errorBody,
+            firstByteDate: state.firstByteDate, rest: String(decoding: state.pending, as: UTF8.self)
+        )
     }
 }

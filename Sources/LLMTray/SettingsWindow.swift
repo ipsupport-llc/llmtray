@@ -147,13 +147,11 @@ struct SettingLabel: View {
 struct RestartBanner: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
-    @ObservedObject private var profiles = ProfileManager.shared
-    @AppStorage("llmtray.verboseServerLogging") private var verboseLogging = false
+    @EnvironmentObject var benchmark: BenchmarkRunner
+
+    private var blocked: Bool { server.isBusy || chat.isBusy || benchmark.isRunning }
 
     var body: some View {
-        // profiles / verboseLogging are observed so this re-evaluates on
-        // every edit; the comparison itself lives in ServerManager.
-        let _ = (profiles.profiles, verboseLogging)
         if server.pendingLaunchChange {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
@@ -162,9 +160,9 @@ struct RestartBanner: View {
                 Button("Restart Server") {
                     Task { try? await server.restartToApplyLaunchSettings() }
                 }
-                .disabled(server.isBusy || chat.isBusy)
-                .help(Text(server.isBusy || chat.isBusy
-                           ? "Wait for the current request to finish -- a restart would cut it off."
+                .disabled(blocked)
+                .help(Text(blocked
+                           ? "Wait for the current request or benchmark to finish -- a restart would cut it off."
                            : "Restarts the model process with the new settings (a few seconds to reload)."))
             }
             .font(.callout)

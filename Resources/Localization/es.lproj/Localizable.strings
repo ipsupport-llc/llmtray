@@ -1,4 +1,6 @@
-/* Spanish. Keys are the English text (Resources/Localization/en.lproj); a key missing here shows in English. */
+/* Spanish. Keys are the English text (en.lproj); a key missing here shows in English.
+   Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
+   speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "Disponible: %@ → %@";
 "%d overridden, rest from Default · %@" = "%d modificados, el resto de Default · %@";
@@ -16,13 +18,16 @@
 "Also check when LLMTray starts" = "Comprobar también al iniciar LLMTray";
 "Another model already uses this alias." = "Otro modelo ya usa este alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Cualquier otra opción de mlx_lm.server, separadas por espacios, p. ej. --draft-model <ruta>.";
+"App language" = "Idioma de la app";
 "Apply to profile" = "Aplicar al perfil";
 "Assistant" = "Asistente";
+"Attach image(s) for the model to see" = "Adjuntar imágenes para que el modelo las vea";
 "Auto-compact" = "Compactar automáticamente";
 "Auto-restart after %lld stalls" = "Reiniciar tras %lld bloqueos";
 "Auto-restart: off" = "Reinicio automático: no";
 "Auto-tune" = "Ajuste automático";
 "Auto-tune found faster settings" = "El ajuste automático encontró ajustes más rápidos";
+"Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "El ajuste automático está en curso y escribe en el perfil del modelo cargado; la edición queda en pausa hasta que termine.";
 "Auto-tune performance" = "Ajustar rendimiento";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Se promedian en un resultado abajo. Siempre hay antes una ejecución de calentamiento, así que la compilación de kernels de Metal no distorsiona los números.";
 "Benchmark" = "Rendimiento";
@@ -33,6 +38,7 @@
 "Can't change models while auto-tune is running" = "No se puede cambiar de modelo durante el ajuste automático";
 "Can't switch profiles while a request or the auto-tune is running" = "No se puede cambiar de perfil mientras hay una solicitud o un ajuste automático en curso";
 "Cancel" = "Cancelar";
+"Cancel download" = "Cancelar descarga";
 "Canvas size" = "Tamaño del lienzo";
 "Chat" = "Chat";
 "Check Again" = "Comprobar de nuevo";
@@ -64,6 +70,7 @@
 "Enable image generation" = "Generación de imágenes";
 "Enable image generation?" = "¿Activar la generación de imágenes?";
 "Extra server arguments" = "Argumentos extra del servidor";
+"Failed: %@" = "Error: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Para modelos con un drafter publicado (Gemma 4 26B): un modelo pequeño adivina tokens por adelantado y el principal los verifica en una pasada. Misma salida, más rápido. Las solicitudes se atienden de una en una.";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Libera la memoria del modelo cargado tras este tiempo sin solicitudes. Se vuelve a cargar solo en la siguiente solicitud, con el retraso habitual.";
 "Full" = "Completa";
@@ -73,6 +80,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Cuántos tokens del prompt se procesan por paso. Más es más rápido con prompts largos pero usa más memoria. El ajuste automático puede elegirlo.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Cuántas solicitudes se agrupan en un paso de GPU. Solo ayuda si varios clientes usan el servidor a la vez; usa más memoria.";
 "How many tokens it generates per trial." = "Cuántos tokens genera en cada prueba.";
+"Idle -- the model reloads on the next message" = "Inactivo: el modelo se recarga con el siguiente mensaje";
 "Image generation" = "Generación de imágenes";
 "Image model" = "Modelo de imágenes";
 "Installed" = "Instalado";
@@ -82,6 +90,8 @@
 "Keep first messages: %lld" = "Conservar primeros mensajes: %lld";
 "Keep last messages: %lld" = "Conservar últimos mensajes: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene los primeros N tokens del contexto en precisión completa antes de cuantizar. Más gana precisión en prompts largos a costa de ahorro de memoria.";
+"Language" = "Idioma";
+"Later" = "Más tarde";
 "Launch at login" = "Abrir al iniciar sesión";
 "Library" = "Biblioteca";
 "Live output of the model process: loading, errors, requests." = "Salida en vivo del proceso del modelo: carga, errores, solicitudes.";
@@ -101,8 +111,10 @@
 "Never" = "Nunca";
 "New Profile…" = "Nuevo perfil…";
 "New chat" = "Nuevo chat";
+"New chat (saved)" = "Nuevo chat (se guarda)";
 "New profile" = "Nuevo perfil";
 "New profile (inherits everything from Default)" = "Nuevo perfil (hereda todo de Default)";
+"New temporary chat -- nothing about it is ever saved" = "Nuevo chat temporal: no se guarda nada de él";
 "No auto-tune run yet." = "Aún no se ha hecho ningún ajuste automático.";
 "No messages yet" = "Aún no hay mensajes";
 "No model uses it." = "Ningún modelo lo usa.";
@@ -114,7 +126,10 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "No: solo este Mac puede conectarse. Sí: también cualquier dispositivo de tu red, así que solo en redes de confianza.";
 "Open" = "Abrir";
 "Open Server Log…" = "Abrir registro del servidor…";
+"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Cambia el idioma solo para LLMTray, por encima del de macOS. Surte efecto al reiniciar LLMTray. El texto sin traducir se muestra en inglés.";
 "Past %lld messages" = "Más de %lld mensajes";
+"Past chats" = "Chats anteriores";
+"Pause download" = "Pausar descarga";
 "Performance" = "Rendimiento";
 "Port" = "Puerto";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precisión de la caché de atención. 8 bits: casi sin pérdida, la mitad de memoria. 4 bits: una cuarta parte, notablemente peor con contexto largo. Completa: la mejor, más memoria.";
@@ -133,17 +148,24 @@
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Aleatoriedad. Más bajo es más preciso y repetible, más alto más variado. Código: 0.2-0.6; chat: 0.7-1.0.";
 "Recovery" = "Recuperación";
 "Regenerate" = "Regenerar";
+"Remove attachment" = "Quitar adjunto";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Elimina el runtime de mlx-lm descargado de %@. Se instala de nuevo al próximo inicio del servidor. Los chats y perfiles se conservan.";
+"Rename" = "Renombrar";
+"Rename this profile" = "Renombrar este perfil";
 "Rescan" = "Volver a buscar";
 "Rescan Models" = "Volver a buscar modelos";
 "Rescan, download or manage models" = "Buscar, descargar o gestionar modelos";
 "Reset: inherit this setting from Default" = "Restablecer: heredar este ajuste de Default";
+"Restart LLMTray to change the language?" = "¿Reiniciar LLMTray para cambiar el idioma?";
+"Restart Now" = "Reiniciar ahora";
 "Restart Server" = "Reiniciar servidor";
 "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Reinicia el proceso del modelo tras este número de solicitudes bloqueadas seguidas, en vez de dejarlo colgado. 0 lo desactiva.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Reinicia el proceso del modelo con los nuevos ajustes (unos segundos de recarga).";
+"Resume download" = "Reanudar descarga";
 "Retry" = "Reintentar";
 "Run benchmark" = "Ejecutar prueba";
 "Running" = "En ejecución";
+"Running — %@ on :%lld" = "En marcha — %@ en :%lld";
 "Running…" = "Ejecutando…";
 "Runtime data" = "Datos del runtime";
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Elige solo entre los tokens más probables cuya probabilidad suma este valor. 1.0 lo desactiva.";
@@ -153,16 +175,20 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Escala el ancho/alto que pida el modelo. Balanced deja 1024x1024 tal cual.";
 "Search" = "Buscar";
 "Search Hugging Face (mlx models)…" = "Buscar en Hugging Face (modelos mlx)…";
+"Send" = "Enviar";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Se envía primero en cada solicitud del chat integrado. Default trae un prompt inicial corto: amplíalo o reemplázalo. No se aplica a clientes externos de la API.";
 "Server" = "Servidor";
 "Server Log" = "Registro del servidor";
 "Server log" = "Registro del servidor";
 "Server settings changed -- restart to apply them." = "Los ajustes del servidor cambiaron: reinicia para aplicarlos.";
+"Settings" = "Ajustes";
+"Settings (⌘,)" = "Ajustes (⌘,)";
 "Settings profile for this model" = "Perfil de ajustes de este modelo";
 "Settings this profile overrides; everything else comes from Default." = "Ajustes que este perfil modifica; el resto viene de Default.";
 "Settings…" = "Ajustes…";
 "Show only overrides" = "Solo modificados";
 "Show reasoning" = "Mostrar razonamiento";
+"Show the profile files in Finder" = "Mostrar los archivos de perfiles en el Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Mostrar los archivos de perfil en Finder: JSON normal, editable a mano y copiable a otro Mac";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Muestra el razonamiento del modelo (el bloque plegable «Thought process») encima de su respuesta.";
 "Sort by" = "Ordenar por";
@@ -171,13 +197,19 @@
 "Stall timeout: %lld s" = "Tiempo de bloqueo: %lld s";
 "Start LLMTray automatically when you log in to this Mac." = "Abrir LLMTray automáticamente al iniciar sesión en este Mac.";
 "Start Server" = "Iniciar servidor";
+"Start server" = "Iniciar servidor";
 "Start the server first." = "Inicia primero el servidor.";
 "Start the server when LLMTray opens" = "Iniciar el servidor al abrir LLMTray";
+"Starting…" = "Iniciando…";
 "Startup" = "Inicio";
 "Step %lld/%lld" = "Paso %lld/%lld";
 "Stop Server" = "Detener servidor";
+"Stop generating" = "Detener la generación";
+"Stop server (unload model)" = "Detener el servidor (descargar el modelo)";
 "Stop the server to update the runtime." = "Detén el servidor para actualizar el runtime.";
+"Stopped" = "Detenido";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Detiene el modelo de chat mientras se genera una imagen y luego lo recarga. Ambos a la vez pueden superar la memoria de este Mac.";
+"System" = "Del sistema";
 "System prompt" = "Prompt del sistema";
 "Target: %@ · profile %@" = "Objetivo: %@ · perfil %@";
 "Temperature" = "Temperatura";
@@ -188,9 +220,11 @@
 "The longest answer the model may write. Also capped by the model's own context length." = "La respuesta más larga que puede escribir el modelo. También limitada por su longitud de contexto.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "La versión de mlx-lm (un commit del fork propio de LLMTray) que ejecuta los modelos. Se actualiza aparte de la app.";
 "The model name API clients send." = "El nombre de modelo que envían los clientes de la API.";
+"The running model server is stopped and started again." = "El servidor del modelo se detiene y se vuelve a iniciar.";
 "These models go back to Default: %@." = "Estos modelos vuelven a Default: %@.";
 "Thinking…" = "Pensando…";
 "This many of the most recent messages are kept word for word when compacting." = "Estos mensajes más recientes se conservan tal cual al compactar.";
+"This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "El archivo de este perfil no se puede leer, así que no se puede editar aquí. Corrige o elimina el archivo y vuelve a abrir Ajustes.";
 "Thought process" = "Razonamiento";
 "Tool-use rule" = "Regla de herramientas";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Prueba decode-concurrency (1/2/4/8) y prefill-step-size (64/128/256/512) con el modelo en ejecución, reiniciando el servidor entre cada uno, y se queda con lo más rápido.";
@@ -207,17 +241,11 @@
 "Use LM Studio's folder" = "Carpeta de LM Studio";
 "Verbose server logging" = "Registro detallado del servidor";
 "Version" = "Versión";
-"Wait for the current request to finish -- a restart would cut it off." = "Espera a que termine la solicitud actual: un reinicio la cortaría.";
+"View model card" = "Ver la ficha del modelo";
+"Wait for the current request or benchmark to finish -- a restart would cut it off." = "Espera a que termine la solicitud o el benchmark en curso; un reinicio lo cortaría.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Dónde busca LLMTray los modelos MLX (una carpeta por modelo, p. ej. <org>/<name>). Usa ~/.lmstudio/models para compartir modelos con LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Qué cuantización de Z-Image-Turbo genera las imágenes.";
 "You" = "Tú";
+"copy" = "copia";
 "not used by any model" = "no lo usa ningún modelo";
 "used by %@" = "lo usan: %@";
-"Language" = "Idioma";
-"System" = "Del sistema";
-"App language" = "Idioma de la app";
-"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Cambia el idioma solo para LLMTray, por encima del de macOS. Surte efecto al reiniciar LLMTray. El texto sin traducir se muestra en inglés.";
-"Restart LLMTray to change the language?" = "¿Reiniciar LLMTray para cambiar el idioma?";
-"The running model server is stopped and started again." = "El servidor del modelo se detiene y se vuelve a iniciar.";
-"Restart Now" = "Reiniciar ahora";
-"Later" = "Más tarde";

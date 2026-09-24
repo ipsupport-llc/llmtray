@@ -166,10 +166,12 @@ public enum ProfileResolver {
         return ResolvedProfile(
             profileID: overlay?.id ?? base.id,
             profileName: overlay?.name ?? base.name,
-            temperature: v(\.request.temperature),
-            topP: v(\.request.topP),
-            topK: v(\.request.topK),
-            maxTokens: v(\.request.maxTokens),
+            // Clamped like the launch values below: a hand-edited or
+            // mistyped value must not reach the server as-is.
+            temperature: min(max(0, v(\.request.temperature)), 2),
+            topP: min(max(0, v(\.request.topP)), 1),
+            topK: max(0, v(\.request.topK)),
+            maxTokens: max(1, v(\.request.maxTokens)),
             systemPrompt: v(\.request.systemPrompt),
             enableImageGeneration: v(\.tools.enableImageGeneration),
             imageGenModel: v(\.tools.imageGenModel),

@@ -136,7 +136,7 @@ final class MfluxManager: ObservableObject {
         RuntimePaths.externalRuntimeDir + "/mflux_models/\(model.rawValue)"
     }
 
-    // Same candidate list/version check as ServerManager.findModernPython3 --
+    // Same candidate list/version check as ServerManager.pythonCandidates + isModernPython --
     // duplicated rather than shared, matching this codebase's existing
     // precedent of each manager owning its own small runProcess/Python-
     // discovery helpers (see RuntimeManager.swift) instead of a shared base.
