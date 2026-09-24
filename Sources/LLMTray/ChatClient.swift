@@ -15,6 +15,9 @@ final class ChatClient: ObservableObject {
     // the follow-up request (with the tool's result) starting. isBusy
     // covers both for UI gating.
     @Published private(set) var isGeneratingImage: Bool = false
+    /// A tool round is running (any tool, not only image generation): the
+    /// turn is still in progress -- no second message may interleave.
+    @Published private(set) var isRunningTools: Bool = false
     @Published private(set) var mfluxStatusText: String = ""
     // Mirrored from MfluxManager (see its stepProgress/previewImage docs)
     // for the same reason mfluxStatusText is -- ContentView only imports
@@ -41,7 +44,7 @@ final class ChatClient: ObservableObject {
     private var compactionTask: Task<Void, Never>?
 
     /// A chat turn (streaming + any tool calls) is in progress.
-    var isTurnInProgress: Bool { isStreaming || isGeneratingImage }
+    var isTurnInProgress: Bool { isStreaming || isGeneratingImage || isRunningTools }
     /// Anything that changes `messages` is running: compaction too, so a
     /// second Compact (or a send) can't work on a stale message range.
     var isBusy: Bool { isTurnInProgress || isCompacting }
@@ -71,6 +74,9 @@ final class ChatClient: ObservableObject {
         var server: ServerManager
     }
     private var pendingRequestContext: RequestContext?
+    /// The running tool round -- Stop cancels it.
+    private var toolTask: Task<Void, Never>?
+    private let maxToolCallsPerRound = 8
     // A model that keeps calling a tool after being refused (cap reached,
     // tool off) would otherwise loop request -> refusal -> request forever.
     private var toolRoundsThisTurn = 0
@@ -280,7 +286,9 @@ final class ChatClient: ObservableObject {
         guard !isBusy else { return }
         toolbox.startTurn()
         toolRoundsThisTurn = 0
-        if messages.last?.role == "assistant" {
+        // The whole last response: assistant turns, tool results and the
+        // hidden view_image message, back to the user's own message.
+        while let last = messages.last, !(last.role == "user" && !last.isToolContext) {
             messages.removeLast()
         }
         guard messages.last?.role == "user" else { return }
@@ -304,7 +312,8 @@ final class ChatClient: ObservableObject {
         }
     }
 
-    private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
+    /// `offerTools: false` for the answer after the last allowed tool round.
+    private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager, offerTools: Bool = true) {
         errorText = nil
         pendingRequestContext = RequestContext(port: port, modelAlias: modelAlias, settings: settings, server: server)
         messages.append(ChatMessage(role: "assistant"))
@@ -313,7 +322,7 @@ final class ChatClient: ObservableObject {
         guard let request = ChatRequestBuilder.streaming(
             port: port, modelAlias: modelAlias, settings: settings,
             history: Array(messages.dropLast(1)),
-            tools: toolbox.definitions(for: settings)
+            tools: offerTools ? toolbox.definitions(for: settings) : []
         ) else {
             errorText = "failed to build request"
             return
@@ -335,7 +344,35 @@ final class ChatClient: ObservableObject {
         transport.cancel()
         turnToken += 1
         isStreaming = false
+        toolTask?.cancel()
+        toolTask = nil
+        isRunningTools = false
         compactionTask?.cancel()
+        closeDanglingToolCalls()
+    }
+
+    /// Every tool call in the history must be answered by a tool result
+    /// (OpenAI protocol): a Stop between a tool-calling response and its
+    /// results would otherwise leave the next request malformed.
+    private func closeDanglingToolCalls() {
+        guard let idx = messages.lastIndex(where: { $0.role == "assistant" && !$0.toolCalls.isEmpty }) else { return }
+        let answered = Set(messages[(idx + 1)...].compactMap(\.toolCallID))
+        var insertAt = idx + 1
+        while insertAt < messages.count, messages[insertAt].role == "tool" { insertAt += 1 }
+        for call in messages[idx].toolCalls where !answered.contains(call.id) {
+            messages.insert(ChatMessage(role: "tool", content: "Cancelled by the user.", toolCallID: call.id), at: insertAt)
+            insertAt += 1
+        }
+    }
+
+    /// The settings as they are *now* (a tool switched off mid-turn stops
+    /// at once), for the model the turn started with.
+    private func currentSettings(_ start: ChatSettings) -> ChatSettings {
+        guard let modelPath = start.modelPath else { return start }
+        var now = ChatSettings(profile: ProfileManager.shared.resolved(for: modelPath), maxTokensCap: start.maxTokensCap)
+        now.modelPath = modelPath
+        now.modelSupportsVision = start.modelSupportsVision
+        return now
     }
 
     private func streamDidComplete(_ completion: ChatTransport.Completion) {
@@ -383,9 +420,11 @@ final class ChatClient: ObservableObject {
         }
         let toolCalls = messages[idx].toolCalls
         let token = turnToken
-        Task {
+        isRunningTools = true   // set before isStreaming drops: never an idle gap
+        toolTask = Task {
+            defer { if token == self.turnToken { self.isRunningTools = false } }
             guard token == self.turnToken else { return }
-            await self.executeToolCalls(toolCalls, sourceIndex: idx, context: context)
+            await self.executeToolCalls(toolCalls, sourceIndex: idx, context: context, token: token)
         }
     }
 
@@ -396,33 +435,55 @@ final class ChatClient: ObservableObject {
         }
     }
 
-    private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext) async {
-        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: context.settings)
+    private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
+        // Captured before the first suspension: a conversation switch or a
+        // Stop during any await below ends this round.
+        let epoch = conversationEpoch
+        func stillCurrent() -> Bool { epoch == conversationEpoch && token == turnToken && !Task.isCancelled }
+
+        // Tool calls in the answer that was requested *without* tools (the
+        // model repeating them from history): refused, the turn ends.
+        if toolRoundsThisTurn >= maxToolRoundsPerTurn {
+            for call in toolCalls {
+                messages.append(ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id))
+            }
+            errorText = "Stopped: the model kept calling tools (\(maxToolRoundsPerTurn) rounds in one turn)."
+            isRunningTools = false
+            isStreaming = false
+            persistCurrentSession()
+            return
+        }
+
+        var settings = currentSettings(context.settings)
+        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: settings)
         // Only when mflux will actually run -- a refused call shouldn't
-        // flash the "Generating image…" UI / pulse. Set together with
-        // clearing isStreaming, so the turn never looks finished between.
+        // flash the "Generating image…" UI / pulse.
         isGeneratingImage = willActuallyGenerate
         isStreaming = false
         defer { isGeneratingImage = false }
 
         // A diffusion model's own peak memory can rival or exceed a loaded
-        // chat model's (confirmed live: Z-Image Turbo alone peaked near
-        // 25GB on a 24GB Mac) -- mlx_lm.server has no notion of "make room",
-        // so the chat model is unloaded first and reloaded after, unless
-        // the user has said their Mac comfortably fits both at once.
-        let shouldUnload = context.settings.unloadModelDuringImageGen && willActuallyGenerate
+        // chat model's (Z-Image Turbo alone peaked near 25 GB on a 24 GB
+        // Mac), so the chat model is unloaded first and reloaded after,
+        // unless the user has said their Mac fits both.
+        let shouldUnload = settings.unloadModelDuringImageGen && willActuallyGenerate
         if shouldUnload {
             await context.server.unloadModel()
         }
 
-        // Session switched mid-call (see resetConversationState): stop
-        // touching `messages` -- it now belongs to another conversation.
-        let epoch = conversationEpoch
         var pendingModelImages: [Data] = []
-        for call in toolCalls {
-            guard epoch == conversationEpoch else { break }
-            let result = await toolbox.run(call, context: ToolContext(settings: context.settings, generatedImages: generatedImages))
-            guard epoch == conversationEpoch else { break }
+        for (i, call) in toolCalls.enumerated() {
+            guard stillCurrent() else { break }
+            guard i < maxToolCallsPerRound else {
+                messages.append(ChatMessage(
+                    role: "tool", content: "Not run: at most \(maxToolCallsPerRound) tool calls per response.",
+                    toolCallID: call.id
+                ))
+                continue
+            }
+            settings = currentSettings(context.settings)
+            let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages))
+            guard stillCurrent() else { break }
             switch result {
             case .text(let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
@@ -441,15 +502,15 @@ final class ChatClient: ObservableObject {
 
         // Images a tool put in front of the model (view_image) follow the
         // tool results as one hidden user message: tool results are text.
-        if epoch == conversationEpoch, !pendingModelImages.isEmpty {
+        if stillCurrent(), !pendingModelImages.isEmpty {
             messages.append(ChatMessage(
                 role: "user", content: "(The image(s) you asked to look at.)",
                 images: pendingModelImages, isToolContext: true
             ))
         }
 
-        // Reload even if the conversation was switched meanwhile -- the new
-        // one needs the chat model too.
+        // Reload even after a Stop or a conversation switch -- the chat
+        // model is needed either way.
         if shouldUnload {
             do {
                 try await context.server.ensureModelLoaded()
@@ -459,18 +520,17 @@ final class ChatClient: ObservableObject {
             }
         }
 
-        // ...but never send the old conversation's follow-up request from
-        // the new one.
-        guard epoch == conversationEpoch else { return }
+        // ...but never send the old conversation's (or a stopped turn's)
+        // follow-up request.
+        guard stillCurrent() else { return }
         toolRoundsThisTurn += 1
-        guard toolRoundsThisTurn < maxToolRoundsPerTurn else {
-            errorText = "Stopped: the model kept calling tools (\(maxToolRoundsPerTurn) rounds in one turn)."
-            persistCurrentSession()
-            return
-        }
-
+        // The last allowed round's answer is requested without tools, so the
+        // turn ends with a reply instead of an error.
+        let offerTools = toolRoundsThisTurn < maxToolRoundsPerTurn
+        isRunningTools = false
         startAssistantResponse(
-            port: context.port, modelAlias: context.modelAlias, settings: context.settings, server: context.server
+            port: context.port, modelAlias: context.modelAlias, settings: currentSettings(context.settings),
+            server: context.server, offerTools: offerTools
         )
     }
 

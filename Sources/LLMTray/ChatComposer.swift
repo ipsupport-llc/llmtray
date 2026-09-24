@@ -139,9 +139,6 @@ struct ChatComposer: View {
                     Button { chat.cancel() } label: { Image(systemName: "stop.fill") }
                         .help("Stop generating")
                         .accessibilityLabel("Stop generating")
-                        // mflux itself can't be interrupted yet; don't imply
-                        // a generation on the GPU stops instantly.
-                        .disabled(chat.isGeneratingImage)
                 } else {
                     Button(action: send) { Image(systemName: "arrow.up.circle.fill") }
                         .help("Send")

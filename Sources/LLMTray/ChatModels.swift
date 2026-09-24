@@ -68,6 +68,10 @@ struct ChatSettings {
     var imageGenModel: ImageGenModel = .gptqMixed
     var unloadModelDuringImageGen: Bool = true
     var imageQuality: ImageQuality = .balanced
+    /// The model the turn is for, and its max-tokens cap -- so the settings
+    /// can be re-resolved mid-turn (a tool switched off stops at once).
+    var modelPath: String?
+    var maxTokensCap: Int = 32768
     /// The chat model accepts images (view_image is offered only then).
     var modelSupportsVision: Bool = false
     /// Appended to the system prompt whenever tools are offered.
@@ -79,6 +83,7 @@ struct ChatSettings {
         topP = p.topP
         topK = p.topK
         maxTokens = min(p.maxTokens, maxTokensCap)
+        self.maxTokensCap = maxTokensCap
         systemPrompt = p.systemPrompt
         enableImageGeneration = p.enableImageGeneration
         enabledTools = Set(p.enabledTools)

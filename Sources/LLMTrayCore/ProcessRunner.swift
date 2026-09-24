@@ -73,16 +73,24 @@ public enum ProcessRunner {
     /// order, from a background thread -- for a child that reports through
     /// a line protocol. Returns once every line has been delivered and the
     /// process has exited. stderr is kept apart; its tail goes into the error.
+    /// `stdin`: written to the child's standard input (e.g. a prompt kept out
+    /// of the argument list, which `ps` shows); `environment`: added to it.
+    /// Cancelling the calling task terminates the child.
     public static func runStreaming(
         _ executable: String, _ arguments: [String],
+        stdin: Data? = nil, environment: [String: String]? = nil,
         onLine: @escaping @Sendable (String) -> Void
     ) async throws {
         let tail = OutputTail()
+        let running = RunningProcess()
+        try await withTaskCancellationHandler {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             let task = Process()
             task.executableURL = URL(fileURLWithPath: executable)
             task.arguments = arguments
-            task.standardInput = FileHandle.nullDevice
+            if let environment { task.environment = ProcessInfo.processInfo.environment.merging(environment) { $1 } }
+            let input = Pipe()
+            task.standardInput = stdin == nil ? FileHandle.nullDevice : input
             let out = Pipe(), err = Pipe()
             task.standardOutput = out
             task.standardError = err
@@ -102,6 +110,15 @@ public enum ProcessRunner {
                 continuation.resume(throwing: error)
                 return
             }
+            running.set(task)
+            if let stdin {
+                // Written and closed off the reader threads; a child that
+                // exits early just makes the write fail.
+                DispatchQueue.global().async {
+                    try? input.fileHandleForWriting.write(contentsOf: stdin)
+                    try? input.fileHandleForWriting.close()
+                }
+            }
             DispatchQueue.global(qos: .userInitiated).async {
                 let lines = LineSplitter()
                 let handle = out.fileHandleForReading
@@ -118,10 +135,15 @@ public enum ProcessRunner {
                 if let rest = try? err.fileHandleForReading.readToEnd() { tail.append(rest) }
                 if task.terminationStatus == 0 {
                     continuation.resume()
+                } else if running.wasCancelled {
+                    continuation.resume(throwing: CancellationError())
                 } else {
                     continuation.resume(throwing: Failure(executable: executable, status: task.terminationStatus, outputTail: tail.text))
                 }
             }
+        }
+        } onCancel: {
+            running.cancel()   // the task's cancellation ends the child
         }
     }
 
@@ -234,5 +256,30 @@ public final class LineSplitter: @unchecked Sendable {
         pending = Data(pending[start...])
         scanned = pending.count   // only new bytes are searched next time
         return lines
+    }
+}
+
+/// The child of a runStreaming call, for cancellation from another thread.
+private final class RunningProcess: @unchecked Sendable {
+    private let lock = NSLock()
+    private var process: Process?
+    private var cancelled = false
+
+    var wasCancelled: Bool { lock.lock(); defer { lock.unlock() }; return cancelled }
+
+    func set(_ p: Process) {
+        lock.lock()
+        process = p
+        let cancelNow = cancelled
+        lock.unlock()
+        if cancelNow { p.terminate() }
+    }
+
+    func cancel() {
+        lock.lock()
+        cancelled = true
+        let p = process
+        lock.unlock()
+        if let p, p.isRunning { p.terminate() }
     }
 }

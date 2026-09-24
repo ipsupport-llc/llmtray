@@ -245,7 +245,7 @@ struct ChatHeaderView: View {
         .menuStyle(.borderlessButton)
         .fixedSize()
         .disabled(selectedModelID == nil)
-        .help(Text("Chat tools for this model: \(enabled.count) on"))
+        .help(Text(String(format: NSLocalizedString("Chat tools of the profile \u{201C}%@\u{201D} (%lld on) -- applies to every model using it", comment: "wrench menu tooltip"), profiles.profile(for: selectedModelID).name, enabled.count)))
         .accessibilityLabel(Text("Chat tools"))
     }
 

@@ -108,11 +108,12 @@ final class ViewImageTool: ChatTool {
         guard !images.isEmpty else {
             return .text("No image has been generated in this conversation yet.")
         }
+        // Model-supplied: compared, never subtracted from (Int.min - 1 traps).
         let requested = arguments["index"] as? Int
-        let index = requested.map { $0 - 1 } ?? images.count - 1
-        guard images.indices.contains(index) else {
+        guard requested.map({ (1...images.count).contains($0) }) ?? true else {
             return .text("There are \(images.count) generated image(s) in this conversation; index must be 1...\(images.count).")
         }
+        let index = (requested ?? images.count) - 1
         let image = images[index]
         return .imageForModel(
             image.data,

@@ -43,7 +43,7 @@
 "Canvas size" = "Canvas size";
 "Chat" = "Chat";
 "Chat tools" = "Chat tools";
-"Chat tools for this model: %lld on" = "Chat tools for this model: %lld on";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Chat tools of the profile “%@” (%lld on) -- applies to every model using it";
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
 "Check for Runtime Updates" = "Check for Runtime Updates";

@@ -163,6 +163,18 @@ enum WebFetch {
         return userAgent
     }
 
+    /// Ephemeral: no disk cache, no cookies -- the model's queries (and the
+    /// answers) must not end up on disk, least of all from a temporary chat.
+    static let session: URLSession = {
+        let config = URLSessionConfiguration.ephemeral
+        config.urlCache = nil
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.httpCookieStorage = nil
+        config.httpShouldSetCookies = false
+        config.httpCookieAcceptPolicy = .never
+        return URLSession(configuration: config)
+    }()
+
     struct HTTPError: LocalizedError {
         let status: Int
         let service: String
@@ -187,7 +199,7 @@ enum WebFetch {
             request.httpBody = body.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B").data(using: .utf8)
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         }
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
             throw HTTPError(status: http.statusCode, service: url.host ?? base)
         }
