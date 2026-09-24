@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "Controlla anche all’avvio di LLMTray";
 "Another model already uses this alias." = "Un altro modello usa già questo alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Altri flag di mlx_lm.server, separati da spazi, ad es. --draft-model <path>.";
+"Apache License 2.0" = "Licenza Apache 2.0";
 "App language" = "Lingua app";
 "Apply to profile" = "Applica al profilo";
 "Assistant" = "Assistente";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "Esci da LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Casualità delle risposte (parte del profilo del modello). Più bassa è più mirata, più alta è più varia.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Casualità. Più bassa è più mirata e ripetibile, più alta è più varia. Programmazione: 0.2-0.6; chat: 0.7-1.0.";
+"Reading what's installed…" = "Verifica dei componenti installati…";
 "Recovery" = "Ripristino";
 "Regenerate" = "Rigenera";
 "Remove attachment" = "Rimuovi l’allegato.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Ridimensiona qualunque larghezza/altezza richiesta dal modello. Bilanciato mantiene 1024x1024 invariato.";
 "Search" = "Cerca";
 "Search Hugging Face (mlx models)…" = "Cerca su Hugging Face (modelli mlx)…";
+"Select a component to see its license." = "Seleziona un componente per vedere la licenza.";
 "Send" = "Invia il messaggio.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Inviato per primo in ogni richiesta di chat nell’app. Default include un breve prompt iniziale: estendilo o sostituiscilo. Non si applica ai client API esterni.";
 "Server" = "Server";
@@ -270,6 +273,7 @@
 "Uses the internet" = "Usa Internet";
 "Verbose server logging" = "Log dettagliati del server";
 "Version" = "Versione";
+"Version %@" = "Versione %@";
 "View model card" = "Visualizza la scheda del modello.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Attendi che la richiesta o il benchmark corrente termini: un riavvio lo interromperebbe.";
 "Web search" = "Ricerca web";

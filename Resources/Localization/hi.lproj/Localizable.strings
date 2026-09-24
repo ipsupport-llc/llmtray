@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "LLMTray शुरू होने पर भी जाँचें";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "कोई अन्य mlx_lm.server फ़्लैग, स्पेस से अलग किए हुए, जैसे --draft-model <path>।";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "ऐप की भाषा";
 "Apply to profile" = "प्रोफ़ाइल पर लागू करें";
 "Assistant" = "सहायक";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "LLMTray छोड़ें";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "जवाबों की रैंडमनेस (मॉडल की प्रोफ़ाइल का हिस्सा)। कम मान अधिक केंद्रित, अधिक मान अधिक विविध होता है।";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "रैंडमनेस। कम मान अधिक केंद्रित और दोहराने योग्य, अधिक मान अधिक विविध होता है। कोडिंग: 0.2-0.6; चैट: 0.7-1.0।";
+"Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Recovery" = "रिकवरी";
 "Regenerate" = "फिर से जनरेट करें";
 "Remove attachment" = "अटैचमेंट हटाएँ।";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "मॉडल जो भी चौड़ाई/ऊँचाई माँगता है, उसे स्केल करता है। संतुलित 1024x1024 को वैसा ही रखता है।";
 "Search" = "खोजें";
 "Search Hugging Face (mlx models)…" = "Hugging Face में खोजें (mlx मॉडल)…";
+"Select a component to see its license." = "लाइसेंस देखने के लिए किसी घटक का चयन करें।";
 "Send" = "संदेश भेजें।";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "हर इन-ऐप चैट अनुरोध में सबसे पहले भेजा जाता है। Default में एक छोटा शुरुआती प्रॉम्प्ट शामिल है — उसे बढ़ाएँ या बदलें। बाहरी API क्लाइंट पर लागू नहीं होता।";
 "Server" = "सर्वर";
@@ -270,6 +273,7 @@
 "Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
 "Version" = "संस्करण";
+"Version %@" = "संस्करण %@";
 "View model card" = "मॉडल कार्ड देखें।";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "मौजूदा अनुरोध या बेंचमार्क पूरा होने तक प्रतीक्षा करें — रीस्टार्ट करने से यह अधूरा रह जाएगा।";
 "Web search" = "वेब खोज";

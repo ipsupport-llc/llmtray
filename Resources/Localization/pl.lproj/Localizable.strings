@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "Sprawdzaj też przy uruchamianiu LLMTray";
 "Another model already uses this alias." = "Inny model używa już tego aliasu.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Inne flagi mlx_lm.server, rozdzielone spacjami, np. --draft-model <path>.";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "Język aplikacji";
 "Apply to profile" = "Zastosuj do profilu";
 "Assistant" = "Asystent";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "Zakończ LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Losowość odpowiedzi (część profilu modelu). Niższa wartość daje większe skupienie, wyższa większą różnorodność.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Losowość. Niższa wartość daje większe skupienie i powtarzalność, wyższa większą różnorodność. Programowanie: 0.2-0.6; czat: 0.7-1.0.";
+"Reading what's installed…" = "Odczytywanie zainstalowanych elementów…";
 "Recovery" = "Odzyskiwanie";
 "Regenerate" = "Wygeneruj ponownie";
 "Remove attachment" = "Usuń załącznik";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Skaluje dowolną szerokość i wysokość żądaną przez model. Balanced pozostawia 1024x1024 bez zmian.";
 "Search" = "Szukaj";
 "Search Hugging Face (mlx models)…" = "Szukaj w Hugging Face (modele mlx)…";
+"Select a component to see its license." = "Wybierz składnik, aby zobaczyć jego licencję.";
 "Send" = "Wyślij.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Wysyłany jako pierwszy w każdym żądaniu czatu w aplikacji. Default zawiera krótkie polecenie początkowe — rozszerz je albo zastąp. Nie dotyczy zewnętrznych klientów API.";
 "Server" = "Serwer";
@@ -270,6 +273,7 @@
 "Uses the internet" = "Korzysta z internetu";
 "Verbose server logging" = "Szczegółowe logowanie serwera";
 "Version" = "Wersja";
+"Version %@" = "Wersja %@";
 "View model card" = "Wyświetl kartę modelu.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Poczekaj, aż bieżące żądanie lub test wydajności się zakończy — ponowne uruchomienie by je przerwało.";
 "Web search" = "Wyszukiwanie w sieci";

@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "דגלי mlx_lm.server נוספים, מופרדים ברווחים, למשל --draft-model <path>.";
+"Apache License 2.0" = "רישיון Apache 2.0";
 "App language" = "שפת היישום";
 "Apply to profile" = "החל על הפרופיל";
 "Assistant" = "העוזר";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "צא מ-LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "מידת האקראיות של התשובות (חלק מפרופיל המודל). ערך נמוך ממוקד יותר, ערך גבוה מגוון יותר.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "אקראיות. ערך נמוך ממוקד ועקבי יותר, ערך גבוה מגוון יותר. קידוד: 0.2-0.6; צ׳אט: 0.7-1.0.";
+"Reading what's installed…" = "קורא מה מותקן…";
 "Recovery" = "התאוששות";
 "Regenerate" = "צור מחדש";
 "Remove attachment" = "מסיר את הקובץ המצורף.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "משנה את קנה המידה של כל רוחב/גובה שהמודל מבקש. ״מאוזן״ משאיר 1024x1024 כפי שהוא.";
 "Search" = "חיפוש";
 "Search Hugging Face (mlx models)…" = "חיפוש ב-Hugging Face (מודלים של mlx)…";
+"Select a component to see its license." = "בחר רכיב כדי לראות את הרישיון שלו.";
 "Send" = "שליחה";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "נשלח ראשון בכל בקשת צ׳אט בתוך היישום. Default כולל הנחיית פתיחה קצרה -- אפשר להרחיב אותה או להחליף אותה. לא חל על לקוחות API חיצוניים.";
 "Server" = "שרת";
@@ -270,6 +273,7 @@
 "Uses the internet" = "משתמש באינטרנט";
 "Verbose server logging" = "רישום שרת מפורט";
 "Version" = "גרסה";
+"Version %@" = "גרסה %@";
 "View model card" = "הצג את כרטיס המודל.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
 "Web search" = "חיפוש באינטרנט";

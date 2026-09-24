@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Diğer mlx_lm.server flag’leri; boşlukla ayrılmış, örn. --draft-model <path>.";
+"Apache License 2.0" = "Apache Lisansı 2.0";
 "App language" = "Uygulama dili";
 "Apply to profile" = "Profile uygula";
 "Assistant" = "Asistan";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "LLMTray’den Çık";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Yanıtların rastlantısallığı (model profilinin parçası). Daha düşük değer daha odaklı, daha yüksek değer daha çeşitli yanıtlar üretir.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Rastlantısallık. Daha düşük değer daha odaklı ve tekrarlanabilir, daha yüksek değer daha çeşitlidir. Kodlama: 0.2-0.6; sohbet: 0.7-1.0.";
+"Reading what's installed…" = "Yüklüler okunuyor…";
 "Recovery" = "Kurtarma";
 "Regenerate" = "Yeniden oluştur";
 "Remove attachment" = "Eki kaldırır.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Modelin istediği genişliği/yüksekliği ölçekler. Dengeli, 1024x1024 boyutunu olduğu gibi korur.";
 "Search" = "Ara";
 "Search Hugging Face (mlx models)…" = "Hugging Face’de ara (mlx modelleri)…";
+"Select a component to see its license." = "Lisansını görmek için bir bileşen seçin.";
 "Send" = "Gönder.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Uygulama içindeki her sohbet isteğinde ilk olarak gönderilir. Default, kısa bir başlangıç istemiyle gelir; bunu genişletin veya değiştirin. Harici API istemcilerine uygulanmaz.";
 "Server" = "Sunucu";
@@ -270,6 +273,7 @@
 "Uses the internet" = "İnterneti kullanır";
 "Verbose server logging" = "Ayrıntılı sunucu günlüklemesi";
 "Version" = "Sürüm";
+"Version %@" = "Sürüm %@";
 "View model card" = "Model kartını görüntüle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
 "Web search" = "Web araması";

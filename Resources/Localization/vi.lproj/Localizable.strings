@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Bất kỳ cờ mlx_lm.server nào khác, phân tách bằng dấu cách, ví dụ --draft-model <path>.";
+"Apache License 2.0" = "Giấy phép Apache 2.0";
 "App language" = "Ngôn ngữ ứng dụng";
 "Apply to profile" = "Áp dụng cho hồ sơ";
 "Assistant" = "Trợ lý";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "Thoát LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Độ ngẫu nhiên của câu trả lời (một phần trong hồ sơ của mô hình). Thấp hơn thì tập trung hơn, cao hơn thì đa dạng hơn.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Độ ngẫu nhiên. Thấp hơn thì tập trung và dễ lặp lại hơn, cao hơn thì đa dạng hơn. Lập trình: 0.2-0.6; trò chuyện: 0.7-1.0.";
+"Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Recovery" = "Khôi phục";
 "Regenerate" = "Tạo lại";
 "Remove attachment" = "Xóa tệp đính kèm.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Điều chỉnh tỷ lệ mọi chiều rộng/chiều cao mà mô hình yêu cầu. Cân bằng giữ nguyên 1024x1024.";
 "Search" = "Tìm kiếm";
 "Search Hugging Face (mlx models)…" = "Tìm kiếm Hugging Face (mô hình MLX)…";
+"Select a component to see its license." = "Chọn một thành phần để xem giấy phép.";
 "Send" = "Gửi tin nhắn.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Được gửi đầu tiên trong mọi yêu cầu trò chuyện trong ứng dụng. Default có sẵn một lời nhắc mở đầu ngắn — hãy mở rộng hoặc thay thế lời nhắc đó. Không áp dụng cho ứng dụng khách API bên ngoài.";
 "Server" = "Máy chủ";
@@ -270,6 +273,7 @@
 "Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
 "Version" = "Phiên bản";
+"Version %@" = "Phiên bản %@";
 "View model card" = "Xem thẻ mô hình.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
 "Web search" = "Tìm web";

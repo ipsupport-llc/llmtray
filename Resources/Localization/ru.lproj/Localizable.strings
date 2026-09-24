@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "Также проверять при запуске LLMTray";
 "Another model already uses this alias." = "Этот алиас уже занят другой моделью.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Любые другие флаги mlx_lm.server через пробел, например --draft-model <путь>.";
+"Apache License 2.0" = "Лицензия Apache 2.0";
 "App language" = "Язык приложения";
 "Apply to profile" = "Применить к профилю";
 "Assistant" = "Ассистент";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "Выйти из LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Случайность ответов (часть профиля модели). Ниже — точнее, выше — разнообразнее.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Случайность. Ниже — точнее и повторяемее, выше — разнообразнее. Код: 0.2–0.6; чат: 0.7–1.0.";
+"Reading what's installed…" = "Чтение установленных компонентов…";
 "Recovery" = "Восстановление";
 "Regenerate" = "Сгенерировать заново";
 "Remove attachment" = "Убрать вложение";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Масштабирует ширину и высоту, которые просит модель. Balanced оставляет 1024x1024 как есть.";
 "Search" = "Поиск";
 "Search Hugging Face (mlx models)…" = "Поиск на Hugging Face (модели mlx)…";
+"Select a component to see its license." = "Выберите компонент, чтобы просмотреть его лицензию.";
 "Send" = "Отправить";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Отправляется первым в каждом запросе встроенного чата. В Default уже есть короткий стартовый промпт — дополните его или замените. К внешним API-клиентам не применяется.";
 "Server" = "Сервер";
@@ -270,6 +273,7 @@
 "Uses the internet" = "Использует интернет";
 "Verbose server logging" = "Подробный лог сервера";
 "Version" = "Версия";
+"Version %@" = "Версия %@";
 "View model card" = "Карточка модели";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дождитесь окончания текущего запроса или бенчмарка -- перезапуск его оборвёт.";
 "Web search" = "Веб‑поиск";

@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "LLMTray 시작 시에도 확인";
 "Another model already uses this alias." = "다른 모델이 이미 이 별칭을 사용합니다.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "그 밖의 mlx_lm.server 플래그를 공백으로 구분해 입력합니다. 예: --draft-model <path>.";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "앱 언어";
 "Apply to profile" = "프로필에 적용";
 "Assistant" = "어시스턴트";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "LLMTray 종료";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "답변의 무작위성입니다(모델 프로필의 일부). 낮을수록 더 집중된 답변을, 높을수록 더 다양한 답변을 생성합니다.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "무작위성입니다. 낮을수록 더 집중적이고 반복 가능하며, 높을수록 더 다양합니다. 코딩: 0.2~0.6, 채팅: 0.7~1.0.";
+"Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Recovery" = "복구";
 "Regenerate" = "다시 생성";
 "Remove attachment" = "첨부 파일을 제거합니다.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "모델이 요청하는 너비/높이에 관계없이 배율을 조정합니다. 균형 모드는 1024x1024를 그대로 유지합니다.";
 "Search" = "검색";
 "Search Hugging Face (mlx models)…" = "Hugging Face 검색(mlx 모델)…";
+"Select a component to see its license." = "컴포넌트를 선택하면 라이선스를 확인할 수 있습니다.";
 "Send" = "보냅니다.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "앱 내 모든 채팅 요청에서 가장 먼저 전송됩니다. Default에는 짧은 시작 프롬프트가 포함되어 있습니다. 이를 확장하거나 대체할 수 있습니다. 외부 API 클라이언트에는 적용되지 않습니다.";
 "Server" = "서버";
@@ -270,6 +273,7 @@
 "Uses the internet" = "인터넷 사용";
 "Verbose server logging" = "자세한 서버 로깅";
 "Version" = "버전";
+"Version %@" = "버전 %@";
 "View model card" = "모델 카드를 엽니다.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "현재 요청 또는 벤치마크가 끝날 때까지 기다리십시오. 재시작하면 중단됩니다.";
 "Web search" = "웹 검색";
