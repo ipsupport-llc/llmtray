@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "Доступно: %@ → %@";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Переопределено: %d, остальное из Default · %@";
 "%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld загрузок";
@@ -36,12 +37,15 @@
 "Beta" = "Бета";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Бета — предварительные сборки с функциями, которые ещё тестируются, и обновления рантайма из бета-ветки mlx-lm. Возврат на Stable не откатывает установленную бету: её заменит следующий стабильный релиз.";
 "Browse Hugging Face…" = "Открыть Hugging Face…";
+"Calculator" = "Калькулятор";
 "Can't change models while auto-tune is running" = "Нельзя менять модель во время автоподбора";
 "Can't switch profiles while a request or the auto-tune is running" = "Нельзя сменить профиль, пока идёт запрос или автоподбор";
 "Cancel" = "Отмена";
 "Cancel download" = "Отменить загрузку";
 "Canvas size" = "Размер холста";
 "Chat" = "Чат";
+"Chat tools" = "Инструменты чата";
+"Chat tools for this model: %lld on" = "Инструменты чата для этой модели: %lld включены";
 "Check Again" = "Проверить снова";
 "Check Now" = "Проверить сейчас";
 "Check for Runtime Updates" = "Проверить обновления рантайма";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Сжимает чат автоматически, когда в нём становится больше сообщений. Кнопка «Сжать» в чате работает в любом случае.";
 "Concurrent requests" = "Параллельные запросы";
 "Copy" = "Копировать";
+"Country facts" = "Факты о стране";
+"Currency rates" = "Курсы валют";
 "Current settings are already fastest" = "Текущие настройки уже самые быстрые";
+"Date & time" = "Дата и время";
 "Delete" = "Удалить";
 "Delete profile “%@”?" = "Удалить профиль «%@»?";
 "Delete this profile (models using it go back to Default)" = "Удалить профиль (его модели вернутся на Default)";
@@ -83,6 +90,7 @@
 "General" = "Основные";
 "Generating image…" = "Генерирую картинку…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Даёт модели инструмент generate_image (нужна модель, умеющая вызывать инструменты). В первый раз скачивается модель для картинок.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Сколько токенов промпта обрабатывается за шаг. Больше — быстрее на длинных промптах, но нужно больше памяти. Может подобрать автоподбор в бенчмарке.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Сколько запросов объединяется в один шаг GPU. Помогает, только когда к серверу обращаются несколько клиентов сразу; расходует больше памяти.";
 "How many tokens it generates per trial." = "Сколько токенов генерируется за прогон.";
@@ -123,6 +131,7 @@
 "New profile" = "Новый профиль";
 "New profile (inherits everything from Default)" = "Новый профиль (всё наследует от Default)";
 "New temporary chat -- nothing about it is ever saved" = "Новый временный чат -- ничего из него не сохраняется";
+"News" = "Новости";
 "No auto-tune run yet." = "Автоподбор ещё не запускался.";
 "No messages yet" = "Сообщений пока нет";
 "No model uses it." = "Ни одна модель его не использует.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "Кэш промптов";
 "Prompt size" = "Размер промпта";
 "Prompt size (input sent to the model):" = "Размер промпта (что отправляется модели):";
+"Public holidays" = "Праздничные дни";
 "Quantization group size for the KV cache. 64 is a good default." = "Размер группы квантования KV-кэша. 64 — хороший вариант по умолчанию.";
 "Quantize KV from token" = "Квантовать KV с токена";
 "Quick benchmark" = "Быстрый бенчмарк";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Столько последних сообщений при сжатии сохраняются дословно.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл этого профиля не читается, поэтому редактировать его здесь нельзя. Исправьте или удалите файл, затем снова откройте Настройки.";
 "Thought process" = "Ход размышлений";
+"Time in a city" = "Время в городе";
+"Tool Settings…" = "Настройки инструментов…";
 "Tool-use rule" = "Правило инструментов";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Инструменты, которые модель может вызывать в чате приложения (требуется модель с поддержкой вызова инструментов). Веб‑инструменты отправляют запрос модели в соответствующий публичный сервис (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open‑Meteo); локальные инструменты никогда не покидают Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирает decode-concurrency (1/2/4/8) и prefill-step-size (64/128/256/512) на запущенной модели, перезапуская сервер между попытками, и оставляет самое быстрое.";
@@ -251,12 +264,15 @@
 "Updates" = "Обновления";
 "Use Folder" = "Выбрать папку";
 "Use LM Studio's folder" = "Папка LM Studio";
+"Uses the internet" = "Использует интернет";
 "Verbose server logging" = "Подробный лог сервера";
 "Version" = "Версия";
 "View model card" = "Карточка модели";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дождитесь окончания текущего запроса или бенчмарка -- перезапуск его оборвёт.";
+"Web search" = "Веб‑поиск";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Где LLMTray ищет MLX-модели (по папке на модель, например <org>/<name>). Укажите ~/.lmstudio/models, чтобы делить модели с LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Какая квантовка Z-Image-Turbo генерирует картинки.";
+"Wikipedia" = "Wikipedia";
 "You" = "Вы";
 "copy" = "копия";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ tersedia";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld unduhan";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: build prarilis dengan fitur yang masih diuji, serta pembaruan runtime dari cabang beta mlx-lm. Beralih kembali ke Stable tidak menurunkan versi beta yang terinstal; rilis stabil berikutnya akan menggantikannya.";
 "Browse Hugging Face…" = "Telusuri Hugging Face…";
+"Calculator" = "Kalkulator";
 "Can't change models while auto-tune is running" = "Model tidak dapat diubah saat penalaan otomatis berjalan.";
 "Can't switch profiles while a request or the auto-tune is running" = "Profil tidak dapat dialihkan saat permintaan atau penalaan otomatis sedang berjalan.";
 "Cancel" = "Batal";
 "Cancel download" = "Batalkan unduhan.";
 "Canvas size" = "Ukuran kanvas";
 "Chat" = "Obrolan";
+"Chat tools" = "Alat obrolan";
+"Chat tools for this model: %lld on" = "Alat obrolan untuk model ini: %lld aktif";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
 "Check for Runtime Updates" = "Periksa Pembaruan Runtime";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Memadatkan obrolan secara otomatis setelah melewati jumlah pesan ini. Tombol Padatkan di obrolan tetap berfungsi.";
 "Concurrent requests" = "Permintaan bersamaan";
 "Copy" = "Salin";
+"Country facts" = "Fakta negara";
+"Currency rates" = "Kurs mata uang";
 "Current settings are already fastest" = "Pengaturan saat ini sudah paling cepat";
+"Date & time" = "Tanggal & waktu";
 "Delete" = "Hapus";
 "Delete profile “%@”?" = "Hapus profil “%@”?";
 "Delete this profile (models using it go back to Default)" = "Hapus profil ini (model yang menggunakannya kembali ke Default).";
@@ -83,6 +90,7 @@
 "General" = "Umum";
 "Generating image…" = "Membuat gambar…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
@@ -123,6 +131,7 @@
 "New profile" = "Profil baru";
 "New profile (inherits everything from Default)" = "Profil baru (mewarisi semuanya dari Default)";
 "New temporary chat -- nothing about it is ever saved" = "Obrolan sementara baru — tidak ada apa pun darinya yang akan disimpan.";
+"News" = "Berita";
 "No auto-tune run yet." = "Penalaan otomatis belum pernah dijalankan.";
 "No messages yet" = "Belum ada pesan";
 "No model uses it." = "Tidak ada model yang menggunakannya.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "Cache prompt";
 "Prompt size" = "Ukuran prompt";
 "Prompt size (input sent to the model):" = "Ukuran prompt (input yang dikirim ke model):";
+"Public holidays" = "Hari libur nasional";
 "Quantization group size for the KV cache. 64 is a good default." = "Ukuran grup kuantisasi untuk cache KV. 64 adalah default yang baik.";
 "Quantize KV from token" = "Kuantisasi KV mulai token";
 "Quick benchmark" = "Benchmark cepat";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Jumlah pesan terbaru yang dipertahankan kata demi kata saat memadatkan.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
 "Thought process" = "Proses berpikir";
+"Time in a city" = "Waktu di kota";
+"Tool Settings…" = "Pengaturan Alat…";
 "Tool-use rule" = "Aturan penggunaan alat";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Alat yang dapat dipanggil model dalam obrolan aplikasi (membutuhkan model pemanggil alat). Alat web mengirim kueri model ke layanan publik tersebut (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); alat lokal tidak pernah meninggalkan Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Mencoba decode-concurrency (1/2/4/8) dan prefill-step-size (64/128/256/512) pada model yang berjalan, memulai ulang server di antara tiap percobaan, lalu menyimpan yang terukur paling cepat.";
@@ -251,12 +264,15 @@
 "Updates" = "Pembaruan";
 "Use Folder" = "Gunakan Folder";
 "Use LM Studio's folder" = "Gunakan folder LM Studio";
+"Uses the internet" = "Menggunakan internet";
 "Verbose server logging" = "Pencatatan log server mendetail";
 "Version" = "Versi";
 "View model card" = "Lihat kartu model.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
+"Web search" = "Pencarian web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Kuantisasi Z-Image-Turbo yang digunakan untuk menghasilkan gambar.";
+"Wikipedia" = "Wikipedia";
 "You" = "Anda";
 "copy" = "salin";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

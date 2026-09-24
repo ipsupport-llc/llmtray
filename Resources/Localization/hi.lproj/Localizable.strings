@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ उपलब्ध";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld डाउनलोड";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: प्री-रिलीज़ बिल्ड जिनमें सुविधाएँ अभी परीक्षण में हैं, और mlx-lm की beta ब्रांच से रनटाइम अपडेट। Stable पर वापस जाने से इंस्टॉल किया गया beta डाउनग्रेड नहीं होता; अगली stable रिलीज़ उसे बदल देती है।";
 "Browse Hugging Face…" = "Hugging Face ब्राउज़ करें…";
+"Calculator" = "कैलकुलेटर";
 "Can't change models while auto-tune is running" = "ऑटो-ट्यून चलने के दौरान मॉडल नहीं बदले जा सकते";
 "Can't switch profiles while a request or the auto-tune is running" = "किसी अनुरोध या ऑटो-ट्यून के चलने के दौरान प्रोफ़ाइल नहीं बदली जा सकती";
 "Cancel" = "रद्द करें";
 "Cancel download" = "डाउनलोड रद्द करें";
 "Canvas size" = "कैनवास आकार";
 "Chat" = "चैट";
+"Chat tools" = "चैट टूल्स";
+"Chat tools for this model: %lld on" = "इस मॉडल के लिए चैट टूल्स: %lld चालू";
 "Check Again" = "फिर से जाँचें";
 "Check Now" = "अभी जाँचें";
 "Check for Runtime Updates" = "रनटाइम अपडेट जाँचें";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "चैट में इतने से अधिक संदेश होने पर उसे अपने आप संकुचित करता है। चैट में “संकुचित करें” बटन फिर भी काम करता है।";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Copy" = "कॉपी करें";
+"Country facts" = "देश तथ्य";
+"Currency rates" = "मुद्रा दरें";
 "Current settings are already fastest" = "वर्तमान सेटिंग पहले से ही सबसे तेज़ हैं";
+"Date & time" = "तिथि और समय";
 "Delete" = "हटाएँ";
 "Delete profile “%@”?" = "प्रोफ़ाइल “%@” हटाएँ?";
 "Delete this profile (models using it go back to Default)" = "इस प्रोफ़ाइल को हटाता है (इसका उपयोग करने वाले मॉडल Default पर वापस चले जाते हैं)।";
@@ -83,6 +90,7 @@
 "General" = "सामान्य";
 "Generating image…" = "इमेज जनरेट हो रही है…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "एक GPU चरण में कितने अनुरोध बैच किए जाएँ। यह तभी मदद करता है जब कई क्लाइंट एक साथ सर्वर का उपयोग करें; ज़्यादा मेमोरी उपयोग करता है।";
 "How many tokens it generates per trial." = "हर ट्रायल में कितने टोकन जनरेट किए जाएँ।";
@@ -123,6 +131,7 @@
 "New profile" = "नई प्रोफ़ाइल";
 "New profile (inherits everything from Default)" = "नई प्रोफ़ाइल बनाएँ; यह Default से सब कुछ विरासत में लेती है।";
 "New temporary chat -- nothing about it is ever saved" = "नई अस्थायी चैट शुरू करें — इसके बारे में कुछ भी कभी सहेजा नहीं जाता।";
+"News" = "समाचार";
 "No auto-tune run yet." = "अभी तक कोई ऑटो-ट्यून रन नहीं हुआ है।";
 "No messages yet" = "अभी तक कोई संदेश नहीं";
 "No model uses it." = "कोई मॉडल इसका उपयोग नहीं करता।";
@@ -149,6 +158,7 @@
 "Prompt cache" = "प्रॉम्प्ट कैश";
 "Prompt size" = "प्रॉम्प्ट आकार";
 "Prompt size (input sent to the model):" = "प्रॉम्प्ट आकार (मॉडल को भेजा गया इनपुट):";
+"Public holidays" = "सरकारी छुट्टियाँ";
 "Quantization group size for the KV cache. 64 is a good default." = "KV कैश का क्वांटाइज़ेशन समूह आकार। 64 अच्छा Default है।";
 "Quantize KV from token" = "इस टोकन से KV क्वांटाइज़ करें";
 "Quick benchmark" = "त्वरित बेंचमार्क";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "इस प्रोफ़ाइल की फ़ाइल पढ़ी नहीं जा सकती, इसलिए इसे यहां संपादित नहीं किया जा सकता। फ़ाइल ठीक करें या हटाएं, फिर सेटिंग्स फिर से खोलें।";
 "Thought process" = "विचार प्रक्रिया";
+"Time in a city" = "किसी शहर का समय";
+"Tool Settings…" = "टूल सेटिंग्स…";
 "Tool-use rule" = "टूल उपयोग नियम";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "मॉडल इन-ऐप चैट में इन टूल्स को कॉल कर सकता है (इसके लिए tool-calling मॉडल चाहिए)। वेब टूल मॉडल के प्रश्न को सार्वजनिक सेवा पर भेजते हैं (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); स्थानीय टूल कभी भी Mac से बाहर नहीं जाते।";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "चल रहे मॉडल पर decode-concurrency (1/2/4/8) और prefill-step-size (64/128/256/512) आज़माता है, हर बार सर्वर रीस्टार्ट करता है, और जो सबसे तेज़ मापा गया उसे रखता है।";
@@ -251,12 +264,15 @@
 "Updates" = "अपडेट";
 "Use Folder" = "फ़ोल्डर उपयोग करें";
 "Use LM Studio's folder" = "LM Studio का फ़ोल्डर उपयोग करें";
+"Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
 "Version" = "संस्करण";
 "View model card" = "मॉडल कार्ड देखें।";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "मौजूदा अनुरोध या बेंचमार्क पूरा होने तक प्रतीक्षा करें — रीस्टार्ट करने से यह अधूरा रह जाएगा।";
+"Web search" = "वेब खोज";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which Z-Image-Turbo quantization generates the images." = "कौन-सा Z-Image-Turbo क्वांटाइज़ेशन छवियाँ जनरेट करता है।";
+"Wikipedia" = "Wikipedia";
 "You" = "आप";
 "copy" = "कॉपी करें";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
