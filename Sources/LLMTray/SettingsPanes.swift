@@ -375,6 +375,21 @@ struct ProfilesPane: View {
                 row(\.request.systemPrompt, "System prompt", "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.") {
                     TextEditor(text: b(\.request.systemPrompt)).frame(minHeight: 70)
                 }
+                row(\.tools.enabledTools, "Chat tools", "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.") {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(ToolCatalog.entries) { tool in
+                            Toggle(isOn: toolBinding(tool.name)) {
+                                HStack(spacing: 4) {
+                                    Text(tool.title)
+                                    if tool.usesNetwork {
+                                        Image(systemName: "globe").foregroundStyle(.secondary).imageScale(.small)
+                                            .help(Text("Uses the internet"))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 row(\.tools.toolUsePolicy, "Tool-use rule", "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.") {
                     TextEditor(text: b(\.tools.toolUsePolicy)).frame(minHeight: 50)
                 }
@@ -494,6 +509,18 @@ struct ProfilesPane: View {
         return Binding(
             get: { profiles.value(keyPath, profileID: id) },
             set: { profiles.set(keyPath, $0, profileID: id) }
+        )
+    }
+
+    private func toolBinding(_ name: String) -> Binding<Bool> {
+        let id = selectedID
+        return Binding(
+            get: { profiles.value(\.tools.enabledTools, profileID: id).contains(name) },
+            set: { on in
+                var tools = profiles.value(\.tools.enabledTools, profileID: id).filter { $0 != name }
+                if on { tools.append(name) }
+                profiles.set(\.tools.enabledTools, tools, profileID: id)
+            }
         )
     }
 

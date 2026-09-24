@@ -58,6 +58,10 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
     /// here is applied to them.
     public struct ToolSettings: Codable, Equatable, Sendable {
         public var enableImageGeneration: Bool?
+        /// Names of the chat tools offered to the model (besides image
+        /// generation, which has its own switch). Web tools send the
+        /// model's queries to public services, so they're opt-in.
+        public var enabledTools: [String]?
         /// `ImageGenModel` raw value.
         public var imageGenModel: String?
         /// `ImageQuality` raw value.
@@ -96,10 +100,22 @@ extension Profile {
     /// generate_image on a plain "привет" 10 times out of 20 -- with "No
     /// tool needed" in its own reasoning. See quant-ternary
     /// nemotron-extreme-quant/docs/FINDINGS.md §2.5.
+    /// The local tools (nothing leaves the Mac); web tools are opt-in.
+    public static let defaultEnabledTools = ["get_current_date", "calculate"]
+
     public static let defaultToolUsePolicy =
+        "Call a tool only when the user's latest message needs it: to do what they asked (for example "
+        + "draw, generate or create an image), or to get what you can't know yourself -- today's date or "
+        + "time, exact arithmetic, current news, facts you'd have to look up. For greetings, small talk and "
+        + "anything you can answer from your own knowledge, answer in text and do not call any tool."
+
+    /// Earlier built-in rules, replaced by the current one in a Default
+    /// that still has one of them unedited (see ProfileStore.ensureDefault).
+    public static let formerDefaultToolUsePolicies = [
         "Only call a tool when the user's latest message explicitly asks you to perform that action "
-        + "(for example: draw, generate or create an image). For greetings, small talk, questions and "
-        + "anything else, answer in text and do not call any tool."
+            + "(for example: draw, generate or create an image). For greetings, small talk, questions and "
+            + "anything else, answer in text and do not call any tool.",
+    ]
 
     /// Shown (and sent) as Default's system prompt, so users see what the
     /// model gets and what they can add to it, instead of an empty box.
@@ -119,6 +135,7 @@ extension Profile {
         p.request.maxTokens = 1024
         p.request.systemPrompt = defaultSystemPrompt
         p.tools.enableImageGeneration = false
+        p.tools.enabledTools = defaultEnabledTools
         p.tools.imageGenModel = "gptqMixed"
         p.tools.imageQuality = "balanced"
         p.tools.unloadModelDuringImageGen = true
@@ -174,6 +191,7 @@ public enum ProfileResolver {
             maxTokens: max(1, v(\.request.maxTokens)),
             systemPrompt: v(\.request.systemPrompt),
             enableImageGeneration: v(\.tools.enableImageGeneration),
+            enabledTools: v(\.tools.enabledTools),
             imageGenModel: v(\.tools.imageGenModel),
             imageQuality: v(\.tools.imageQuality),
             unloadModelDuringImageGen: v(\.tools.unloadModelDuringImageGen),
@@ -200,6 +218,7 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var maxTokens: Int
     public var systemPrompt: String
     public var enableImageGeneration: Bool
+    public var enabledTools: [String]
     public var imageGenModel: String
     public var imageQuality: String
     public var unloadModelDuringImageGen: Bool
@@ -242,6 +261,7 @@ extension Profile {
         ProfileField("maxTokens", \.request.maxTokens),
         ProfileField("systemPrompt", \.request.systemPrompt),
         ProfileField("enableImageGeneration", \.tools.enableImageGeneration),
+        ProfileField("enabledTools", \.tools.enabledTools),
         ProfileField("imageGenModel", \.tools.imageGenModel),
         ProfileField("imageQuality", \.tools.imageQuality),
         ProfileField("unloadModelDuringImageGen", \.tools.unloadModelDuringImageGen),

@@ -35,7 +35,7 @@ final class ChatToolbox {
     private(set) var tools: [ChatTool] = []
 
     init() {
-        tools = [imageGeneration, ViewImageTool()]
+        tools = [imageGeneration, ViewImageTool()] + ToolCatalog.makeTools()
     }
 
     func register(_ tool: ChatTool) {

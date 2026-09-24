@@ -56,6 +56,7 @@ struct ChatHeaderView: View {
             HStack(spacing: 8) {
                 Image(systemName: "slider.horizontal.3").foregroundColor(.secondary).font(.system(size: 11))
                 profilePicker
+                toolsMenu
                 temperatureRow
             }
             RestartBanner()
@@ -220,6 +221,32 @@ struct ChatHeaderView: View {
     private func switchProfile(to id: String) {
         guard canSwitchProfile, let modelID = selectedModelID else { return }
         profiles.assign(profileID: id, to: modelID)
+    }
+
+    /// Quick on/off for the model's chat tools; edits its profile.
+    private var toolsMenu: some View {
+        let enabled = Set(profiles.value(\.tools.enabledTools, for: selectedModelID))
+        return Menu {
+            ForEach(ToolCatalog.entries) { tool in
+                Toggle(tool.usesNetwork ? "\(tool.title) 🌐" : tool.title, isOn: Binding(
+                    get: { enabled.contains(tool.name) },
+                    set: { on in
+                        var tools = profiles.value(\.tools.enabledTools, for: selectedModelID).filter { $0 != tool.name }
+                        if on { tools.append(tool.name) }
+                        profiles.set(\.tools.enabledTools, tools, for: selectedModelID)
+                    }
+                ))
+            }
+            Divider()
+            Button("Tool Settings…") { openSettings(.profiles, profileID: profiles.profileID(for: selectedModelID)) }
+        } label: {
+            Image(systemName: "wrench.and.screwdriver")
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .disabled(selectedModelID == nil)
+        .help(Text("Chat tools for this model: \(enabled.count) on"))
+        .accessibilityLabel(Text("Chat tools"))
     }
 
     /// The one sampling knob kept in the popover; edits the model's profile.

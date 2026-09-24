@@ -64,6 +64,7 @@ struct ChatSettings {
     var maxTokens: Int = 1024
     var systemPrompt: String = ""
     var enableImageGeneration: Bool = false
+    var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
     var imageGenModel: ImageGenModel = .gptqMixed
     var unloadModelDuringImageGen: Bool = true
     var imageQuality: ImageQuality = .balanced
@@ -80,6 +81,7 @@ struct ChatSettings {
         maxTokens = min(p.maxTokens, maxTokensCap)
         systemPrompt = p.systemPrompt
         enableImageGeneration = p.enableImageGeneration
+        enabledTools = Set(p.enabledTools)
         imageGenModel = ImageGenModel(rawValue: p.imageGenModel) ?? .gptqMixed
         unloadModelDuringImageGen = p.unloadModelDuringImageGen
         imageQuality = ImageQuality(rawValue: p.imageQuality) ?? .balanced

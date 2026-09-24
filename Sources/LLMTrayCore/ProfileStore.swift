@@ -86,6 +86,13 @@ public final class ProfileStore {
         if FileManager.default.fileExists(atPath: file.path) {
             var p = try JSONDecoder().decode(Profile.self, from: Data(contentsOf: file))
             p.id = Profile.defaultID
+            // A built-in text the user never edited follows the built-in:
+            // the old tool rule forbade the question-answering tools
+            // (calculator, date, search) added later.
+            if let policy = p.tools.toolUsePolicy, Profile.formerDefaultToolUsePolicies.contains(policy) {
+                p.tools.toolUsePolicy = Profile.defaultToolUsePolicy
+                try save(p)
+            }
             return p
         }
         let p = Self.migratedDefault(from: defaults)
