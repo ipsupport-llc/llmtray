@@ -72,30 +72,10 @@ final class MLXRuntimeInstaller {
         return nil
     }
 
-    /// A downloaded .app has no external venv yet on first launch -- this
-    /// does the same setup runtime/run_server.sh does for local dev, in-
-    /// process, so "download the DMG, click Start Server" works without
-    /// ever opening a terminal. Also the one place that notices a new
-    /// release bumped the pinned mlx-lm commit and upgrades the existing
-    /// external venv in place, since -- now that the venv lives outside
-    /// Contents/ specifically so updates *don't* wipe it -- nothing else
-    /// would ever pick that up otherwise.
-    // This app installs mlx_lm exclusively from our own fork,
-    // ipsupport-llc/mlx-lm -- never from PyPI. That fork carries real
-    // fixes/features upstream mlx_lm doesn't have (NemotronH Multi-Token-
-    // Prediction self-speculative decode, RotatingKVCache quantization,
-    // native prism_hadamard_qwen35 support, --model-alias/--kv-bits/
-    // /api/v0/models/disconnect-safety server flags) -- see that repo's
-    // docs/FINDINGS.md. Always a deliberately pinned commit on `main`
-    // (runtime/mlx_lm_runtime.json), bumped only via Check for Updates --
-    // there used to also be an Advanced toggle tracking the
-    // `nemotron-h-mtp` branch tip directly, for picking up in-progress
-    // work before it was merged to `main`, but that branch's own work is
-    // long since merged and every fix since has landed on `main` directly,
-    // so the toggle was just a second, easy-to-forget place a fix could
-    // land without reaching this app -- removed rather than kept as a
-    // permanent fixture with no active use.
-
+    /// Makes the venv match the pinned mlx-lm commit: first run (from the
+    /// Full build's vendored copy, or a fresh venv + pip install), or an
+    /// upgrade after a new pin. Always our fork, never PyPI -- see
+    /// adr/0001-mlx-runtime.md.
     func ensureReady() async throws {
         let runtimeDir = RuntimePaths.runtimeDir
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
@@ -190,24 +170,11 @@ final class MLXRuntimeInstaller {
         log("--- runtime ready ---\n")
     }
 
-    /// Confirmed live (copying a vendored venv out to a scratch directory,
-    /// then simulating a Sparkle update by moving the original .app aside):
-    /// without this, `Self.venvDir/bin/python3.X` still resolves fine as long as
-    /// the source .app happens to still be sitting where it was, then
-    /// starts failing with a bare "no such file or directory" -- a broken
-    /// symlink, not a Python-level error -- the moment it's gone.
-    ///
-    /// Matches by the stable "Python.framework/..." *suffix* of each
-    /// symlink's target, not by prefix against this run's own
-    /// Self.bundledFrameworkDir -- confirmed live on a real release build: the
-    /// venv's symlink was created by `python -m venv` on whatever machine
-    /// originally ran build_full_app.sh (a GitHub Actions runner, for an
-    /// actual release), which has nothing in common with wherever this
-    /// copy of the app ends up installed. Prefix-matching against the
-    /// *current* Bundle.main path silently matched nothing there, leaving
-    /// the dead runner path in place. A broken absolute symlink pointing
-    /// somewhere inside *any* Python.framework is unambiguous regardless
-    /// of what machine's path precedes that suffix.
+    /// Re-points the copied venv's interpreter symlinks (and pyvenv.cfg) at
+    /// the copied framework, matched by the "Python.framework/" suffix of
+    /// the old target -- it was created on the build machine. Without it the
+    /// venv breaks once the next update removes the original app.
+    /// adr/0001-mlx-runtime.md.
     private static func relinkVendoredInterpreter(newFrameworkDir: String) {
         if let binEntries = try? FileManager.default.contentsOfDirectory(atPath: Self.venvDir + "/bin") {
             for entry in binEntries {

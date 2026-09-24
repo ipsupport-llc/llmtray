@@ -2,19 +2,10 @@ import Foundation
 import Network
 import LLMTrayCore
 
-/// Fronts the public port with a minimal hand-rolled HTTP reverse proxy
-/// that can swap the model backing mlx_lm.server mid-flight, based on the
-/// `model` field of each incoming request -- mlx_lm.server itself is a
-/// single-model process with no hot-swap, so the public-facing port has
-/// to be something this app controls directly, not the model process
-/// itself. This is what makes "point any OpenAI-compatible client at any
-/// local model by name" (the way LM Studio's server works) possible here.
-///
-/// Scoped deliberately to what this server's actual clients send: JSON
-/// POST bodies sized by Content-Length (chat/completions clients don't
-/// send chunked request bodies), and a small number of known endpoints.
-/// No dependency was pulled in for this -- see the doc comment on
-/// ModelRouter for why that trade-off was made deliberately.
+/// The public port: a small reverse proxy that picks the model by each
+/// request's `model` field and switches mlx_lm.server (one model per
+/// process) as needed. Scoped to JSON bodies sized by Content-Length.
+/// Why it exists and the rules it keeps: adr/0002-model-proxy-and-lifecycle.md.
 @MainActor
 final class ModelProxyServer {
     private let server: ServerManager
@@ -279,18 +270,8 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     private var lastActivityAt = Date()
     private var stallTimer: Timer?
 
-    // No response headers *and* no streamed data for this long means
-    // something is actually stuck -- a hung model process, a GPU deadlock,
-    // whatever -- not just a slow one; a legitimate long prompt prefill
-    // still streams a "Starting httpd"-adjacent response and then tokens
-    // well within a minute in every case seen so far. Comfortably inside
-    // forward()'s own URLRequest.timeoutInterval (300s) so this fires
-    // first, leaving a diagnosable log line and a real error response for
-    // the caller instead of the busy indicator staying lit indefinitely
-    // and the caller hanging silently until that much longer timeout.
-    // Configurable (Advanced settings) since "comfortably inside 300s" is
-    // a judgment call that depends on how slow this machine's prefill
-    // legitimately gets on a big model/prompt.
+    // No headers and no data for this long = stuck, not slow; fires well
+    // inside the request's 300 s timeout (Settings; adr/0002).
     private let stallThreshold: TimeInterval
 
     init(connection: NWConnection, server: ServerManager) {

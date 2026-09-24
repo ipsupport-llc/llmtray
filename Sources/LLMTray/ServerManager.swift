@@ -394,28 +394,10 @@ final class ServerManager: ObservableObject {
         isIdleUnloaded = false
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }
-        // Not venvServerBinary (the "mlx_lm.server" console-script pip
-        // generates) directly -- that script's first line is a shebang
-        // hardcoding the exact absolute interpreter path that was live
-        // when pip created it. For a Full build that's a GitHub Actions
-        // runner path (/Users/runner/work/...) that exists nowhere else,
-        // and even a *correct* path here would still break: shebangs don't
-        // support spaces, and externalRuntimeDir lives under
-        // "~/Library/Application Support/..." -- guaranteed to contain
-        // one. Invoking the interpreter directly with -m sidesteps shebang
-        // parsing entirely; Process doesn't go through a shell either way.
-        // Everything launch-related comes from the model's profile (see
-        // ProfileManager / LLMTrayCore.ServerLaunch), resolved fresh on
-        // every launch: a model switch or the benchmark's auto-tune
-        // restart picks up current values without a separate code path.
-        // Notable defaults kept from before profiles:
-        // - prompt cache capped (1 GiB): uncapped, a long session's
-        //   cross-request KV cache grew until a later request's own
-        //   allocation hit METAL "Insufficient Memory";
-        // - KV quantization forced off for KV-shared models (Gemma 4
-        //   E2B/E4B), which crash with quantized KV -- now also applied
-        //   on proxy-driven model switches, which used to reuse the
-        //   first start()'s KV bits.
+        // Run as `python3 -m mlx_lm.server`, not pip's console script (its
+        // shebang breaks on relocation and on spaces -- adr/0001). Every
+        // launch setting comes from the model's profile, resolved fresh on
+        // each launch; notable defaults in adr/0003-field-lessons.md.
         let profile = ProfileManager.shared.resolved(for: modelPath)
         appendLog("--- profile: \(profile.profileName) ---\n")
         let args = ServerLaunch.arguments(profile, launchContext(
