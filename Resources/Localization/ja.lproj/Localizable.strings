@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "その他の mlx_lm.server フラグをスペース区切りで指定します（例: --draft-model <path>）。";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "アプリの言語";
 "Apply to profile" = "プロファイルに適用";
 "Assistant" = "アシスタント";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "LLMTray を終了";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "回答のランダム性（モデルのプロファイルの一部）です。低いほど焦点が定まり、高いほど多様になります。";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "ランダム性。低いほど焦点が定まり再現性が高く、高いほど多様になります。コーディング：0.2〜0.6、チャット：0.7〜1.0。";
+"Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Recovery" = "復旧";
 "Regenerate" = "再生成";
 "Remove attachment" = "添付ファイルを削除します。";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "モデルが要求する幅/高さをスケーリングします。バランスでは 1024x1024 はそのままです。";
 "Search" = "検索";
 "Search Hugging Face (mlx models)…" = "Hugging Face（mlx モデル）を検索…";
+"Select a component to see its license." = "ライセンスを確認するコンポーネントを選択してください。";
 "Send" = "送信します。";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "アプリ内チャットの各リクエストで最初に送信されます。Default には短い開始プロンプトが含まれています。追加するか、置き換えてください。外部 API クライアントには適用されません。";
 "Server" = "サーバ";
@@ -270,6 +273,7 @@
 "Uses the internet" = "インターネットを使用";
 "Verbose server logging" = "詳細なサーバログ";
 "Version" = "バージョン";
+"Version %@" = "バージョン %@";
 "View model card" = "モデルカードを表示します。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
 "Web search" = "ウェブ検索";

@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "التحقق أيضًا عند بدء LLMTray";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "أي علامات mlx_lm.server أخرى، مفصولة بمسافات، مثل --draft-model <path>.";
+"Apache License 2.0" = "رخصة Apache 2.0";
 "App language" = "لغة التطبيق";
 "Apply to profile" = "تطبيق على ملف التعريف";
 "Assistant" = "المساعد";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "إنهاء LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "عشوائية الإجابات (جزء من ملف تعريف النموذج). كلما انخفضت كانت أكثر تركيزًا، وكلما ارتفعت كانت أكثر تنوعًا.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "العشوائية. كلما انخفضت كانت أكثر تركيزًا وقابلية للتكرار، وكلما ارتفعت كانت أكثر تنوعًا. البرمجة: 0.2-0.6؛ الدردشة: 0.7-1.0.";
+"Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Recovery" = "الاسترداد";
 "Regenerate" = "إعادة التوليد";
 "Remove attachment" = "إزالة المرفق.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "يضبط مقياس أي عرض/ارتفاع يطلبه النموذج. يحافظ الوضع المتوازن على 1024x1024 كما هي.";
 "Search" = "بحث";
 "Search Hugging Face (mlx models)…" = "البحث في Hugging Face (نماذج mlx)…";
+"Select a component to see its license." = "اختر مُكوِّنًا لعرض الرخصة.";
 "Send" = "أرسل.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "تُرسل أولًا مع كل طلب دردشة داخل التطبيق. يتضمن Default مطالبة بدء قصيرة؛ يمكنك توسيعها أو استبدالها. لا تُطبَّق على عملاء API الخارجيين.";
 "Server" = "الخادم";
@@ -270,6 +273,7 @@
 "Uses the internet" = "يستخدم الإنترنت";
 "Verbose server logging" = "تسجيل مفصّل للخادم";
 "Version" = "الإصدار";
+"Version %@" = "الإصدار %@";
 "View model card" = "اعرض بطاقة النموذج.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
 "Web search" = "بحث ويب";

@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "LLMTray 啟動時也檢查";
 "Another model already uses this alias." = "另一個模型已使用此別名。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "其他任何 mlx_lm.server 旗標，以空格分隔，例如 --draft-model <path>。";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "App 語言";
 "Apply to profile" = "套用至設定檔";
 "Assistant" = "助理";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "結束 LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "回答的隨機性（模型設定檔的一部分）。較低會更聚焦，較高會更多樣。";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "隨機性。較低會更聚焦且可重複，較高會更多樣。程式碼：0.2-0.6；聊天：0.7-1.0。";
+"Reading what's installed…" = "正在讀取已安裝項目…";
 "Recovery" = "復原";
 "Regenerate" = "重新產生";
 "Remove attachment" = "移除附件。";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "縮放模型要求的任何寬度/高度。「平衡」會維持 1024x1024 不變。";
 "Search" = "搜尋";
 "Search Hugging Face (mlx models)…" = "搜尋 Hugging Face（mlx 模型）…";
+"Select a component to see its license." = "選取元件以查看其授權。";
 "Send" = "傳送。";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "在每個 App 內聊天請求中最先傳送。Default 隨附簡短的起始提示詞，可延伸或取代。不會套用至外部 API 用戶端。";
 "Server" = "伺服器";
@@ -270,6 +273,7 @@
 "Uses the internet" = "會使用網際網路";
 "Verbose server logging" = "詳細伺服器記錄";
 "Version" = "版本";
+"Version %@" = "版本 %@";
 "View model card" = "檢視模型卡。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "請等待目前的請求或基準測試完成，重新啟動會中斷它。";
 "Web search" = "網路搜尋";

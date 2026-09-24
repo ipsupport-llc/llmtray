@@ -21,6 +21,7 @@
 "Also check when LLMTray starts" = "Periksa juga saat LLMTray dimulai";
 "Another model already uses this alias." = "Model lain sudah menggunakan alias ini.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Flag mlx_lm.server lainnya, dipisahkan spasi, mis. --draft-model <path>.";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "Bahasa app";
 "Apply to profile" = "Terapkan ke profil";
 "Assistant" = "Asisten";
@@ -167,6 +168,7 @@
 "Quit LLMTray" = "Keluar dari LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Keacakan jawaban (bagian dari profil model). Lebih rendah lebih fokus, lebih tinggi lebih bervariasi.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Keacakan. Lebih rendah lebih fokus dan dapat diulang, lebih tinggi lebih bervariasi. Pemrograman: 0.2-0.6; obrolan: 0.7-1.0.";
+"Reading what's installed…" = "Membaca yang terpasang…";
 "Recovery" = "Pemulihan";
 "Regenerate" = "Buat Ulang";
 "Remove attachment" = "Hapus lampiran.";
@@ -196,6 +198,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Menskalakan lebar/tinggi apa pun yang diminta model. Seimbang mempertahankan 1024x1024 apa adanya.";
 "Search" = "Cari";
 "Search Hugging Face (mlx models)…" = "Cari di Hugging Face (model mlx)…";
+"Select a component to see its license." = "Pilih komponen untuk melihat lisensinya.";
 "Send" = "Kirim.";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Dikirim lebih dulu di setiap permintaan chat dalam app. Default disertai prompt awal singkat — perpanjang atau ganti. Tidak diterapkan ke klien API eksternal.";
 "Server" = "Server";
@@ -270,6 +273,7 @@
 "Uses the internet" = "Menggunakan internet";
 "Verbose server logging" = "Pencatatan log server mendetail";
 "Version" = "Versi";
+"Version %@" = "Versi %@";
 "View model card" = "Lihat kartu model.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
 "Web search" = "Pencarian web";
