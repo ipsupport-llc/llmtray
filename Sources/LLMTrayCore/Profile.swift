@@ -206,12 +206,15 @@ public struct ResolvedProfile: Equatable, Sendable {
 
 /// Type-erased handle on one optional field, for counting and resetting
 /// overrides generically.
-public struct ProfileField: Sendable {
+public struct ProfileField {
     public let name: String
-    let isSetFn: @Sendable (Profile) -> Bool
-    let clearFn: @Sendable (inout Profile) -> Void
+    let isSetFn: (Profile) -> Bool
+    let clearFn: (inout Profile) -> Void
 
-    init<T>(_ name: String, _ kp: WritableKeyPath<Profile, T?> & Sendable) {
+    // Plain WritableKeyPath (no `& Sendable`): older toolchains (CI's
+    // macos-14 Xcode) can't infer the key path type through that
+    // composition.
+    init<T>(_ name: String, _ kp: WritableKeyPath<Profile, T?>) {
         self.name = name
         isSetFn = { $0[keyPath: kp] != nil }
         clearFn = { $0[keyPath: kp] = nil }
