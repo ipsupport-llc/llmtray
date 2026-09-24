@@ -1,5 +1,6 @@
 import Foundation
 import Network
+import LLMTrayCore
 
 /// Fronts the public port with a minimal hand-rolled HTTP reverse proxy
 /// that can swap the model backing mlx_lm.server mid-flight, based on the
@@ -100,12 +101,26 @@ final class ModelProxyServer {
 
     // MARK: - Connection handling
 
+    /// Connections whose request hasn't been read completely yet. A client
+    /// that declares a big body and then stalls would otherwise keep its
+    /// buffer (up to maxBodyBytes) forever -- reachable from the LAN when
+    /// that's enabled.
+    private var readingConnections: Set<ObjectIdentifier> = []
+    private static let requestReadTimeout: TimeInterval = 120
+
     private func accept(_ connection: NWConnection, internalPort: Int) {
         connection.start(queue: .main)
+        let id = ObjectIdentifier(connection)
+        readingConnections.insert(id)
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.requestReadTimeout) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.readingConnections.remove(id) != nil else { return }
+                // Cancelling fails the pending receive, which drops its buffer.
+                connection.cancel()
+            }
+        }
         readHeaders(connection: connection, buffer: Data(), internalPort: internalPort)
     }
-
-    private static let headerTerminator = Data([13, 10, 13, 10]) // \r\n\r\n
 
     private func readHeaders(connection: NWConnection, buffer: Data, internalPort: Int) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { [weak self] data, _, isComplete, error in
@@ -113,64 +128,31 @@ final class ModelProxyServer {
                 guard let self else { return }
                 var buf = buffer
                 if let data { buf.append(data) }
-                if let range = buf.range(of: Self.headerTerminator) {
-                    self.finishHeaders(buf, headerEnd: range, connection: connection, internalPort: internalPort)
-                } else if isComplete || error != nil {
-                    connection.cancel()
-                } else {
-                    self.readHeaders(connection: connection, buffer: buf, internalPort: internalPort)
+                // Parsing and validation (sizes, Content-Length, request
+                // line) live in LLMTrayCore.HTTPRequestParser, unit-tested.
+                switch HTTPRequestParser.parseHead(buf, maxBodyBytes: Self.maxBodyBytes) {
+                case .request(let head, let bodyOffset):
+                    self.startBody(head, bodySoFar: Data(buf.dropFirst(bodyOffset)), connection: connection, internalPort: internalPort)
+                case .reject(let status, let message):
+                    self.sendError(connection: connection, status: status, message: message)
+                case .needMoreData:
+                    if isComplete || error != nil {
+                        connection.cancel()
+                    } else {
+                        self.readHeaders(connection: connection, buffer: buf, internalPort: internalPort)
+                    }
                 }
             }
         }
     }
 
-    private func finishHeaders(_ buf: Data, headerEnd: Range<Data.Index>, connection: NWConnection, internalPort: Int) {
-        guard let headerText = String(data: buf[..<headerEnd.lowerBound], encoding: .utf8) else {
-            connection.cancel()
-            return
-        }
-        let lines = headerText.components(separatedBy: "\r\n")
-        guard let requestLine = lines.first else {
-            connection.cancel()
-            return
-        }
-        let parts = requestLine.split(separator: " ")
-        guard parts.count >= 2 else {
-            connection.cancel()
-            return
-        }
-        let method = String(parts[0])
-        let path = String(parts[1])
-
-        var headers: [String: String] = [:]
-        for line in lines.dropFirst() {
-            guard let colon = line.firstIndex(of: ":") else { continue }
-            let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
-            let value = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
-            headers[key] = value
-        }
-
-        // Validated before it's used for slicing: a negative value would
-        // trap in prefix(), a huge one would buffer unbounded memory.
-        let contentLength: Int
-        if let raw = headers["content-length"] {
-            guard let value = Int(raw), value >= 0 else {
-                return sendError(connection: connection, status: "400 Bad Request", message: "invalid Content-Length")
-            }
-            guard value <= Self.maxBodyBytes else {
-                return sendError(connection: connection, status: "413 Payload Too Large", message: "request body too large")
-            }
-            contentLength = value
-        } else {
-            contentLength = 0
-        }
-        let bodySoFar = Data(buf[headerEnd.upperBound...])
-        if bodySoFar.count >= contentLength {
-            route(method: method, path: path, headers: headers, body: bodySoFar.prefix(contentLength), connection: connection, internalPort: internalPort)
+    private func startBody(_ head: HTTPRequestHead, bodySoFar: Data, connection: NWConnection, internalPort: Int) {
+        if bodySoFar.count >= head.contentLength {
+            route(method: head.method, path: head.path, headers: head.headers, body: bodySoFar.prefix(head.contentLength), connection: connection, internalPort: internalPort)
         } else {
             readBody(
-                connection: connection, partialBody: bodySoFar, contentLength: contentLength,
-                method: method, path: path, headers: headers, internalPort: internalPort
+                connection: connection, partialBody: bodySoFar, contentLength: head.contentLength,
+                method: head.method, path: head.path, headers: head.headers, internalPort: internalPort
             )
         }
     }
@@ -201,6 +183,7 @@ final class ModelProxyServer {
     // MARK: - Routing
 
     private func route(method: String, path: String, headers: [String: String], body: Data.SubSequence, connection: NWConnection, internalPort: Int) {
+        readingConnections.remove(ObjectIdentifier(connection))
         let bodyData = Data(body)
         // Marked busy for the whole request, not just the eventual forward()
         // below -- a model switch (stopping the old process, loading the
