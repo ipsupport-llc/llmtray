@@ -455,6 +455,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private var statusSymbol: String {
+        // Image generation unloads the chat model to make room (the server
+        // state reads .stopped meanwhile), but LLMTray is busy, not stopped.
+        if chat.isGeneratingImage { return "brain.head.profile.fill" }
         switch server.state {
         case .running: return "brain.head.profile.fill"
         case .starting: return "brain.head.profile"
