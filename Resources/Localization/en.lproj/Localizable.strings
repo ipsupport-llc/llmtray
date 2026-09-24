@@ -61,8 +61,10 @@
 "Delete this profile (models using it go back to Default)" = "Delete this profile (models using it go back to Default)";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept.";
 "Diagnostics" = "Diagnostics";
+"Disk usage" = "Disk usage";
 "Download" = "Download";
 "Download and Enable" = "Download and Enable";
+"Download into the models folder" = "Download into the models folder";
 "Download models" = "Download models";
 "Download models from Hugging Face" = "Download models from Hugging Face";
 "Downloaded" = "Downloaded";
@@ -73,6 +75,7 @@
 "Extra server arguments" = "Extra server arguments";
 "Failed: %@" = "Failed: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
+"Free on disk: %@ · your models: %@" = "Free on disk: %@ · your models: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay.";
 "Full" = "Full";
 "General" = "General";
@@ -109,6 +112,7 @@
 "Model card" = "Model card";
 "Models" = "Models";
 "Models folder" = "Models folder";
+"Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Network" = "Network";
 "Never" = "Never";
 "New Profile…" = "New Profile…";
@@ -123,6 +127,7 @@
 "No models found in this folder." = "No models found in this folder.";
 "No runs yet." = "No runs yet.";
 "No saved sessions" = "No saved sessions";
+"Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "OK" = "OK";
 "Off" = "Off";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
@@ -194,6 +199,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Sort by" = "Sort by";
+"Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Stall timeout: %lld s";

@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import LLMTrayCore
 
 /// The installed models and their aliases -- one shared, observable copy
 /// for the popover, Settings, auto-start and the proxy's request routing,
@@ -16,8 +17,16 @@ final class ModelCatalog: ObservableObject {
     @Published private(set) var models: [LocalModel] = []
     /// model id (its path) -> the `model` name API clients use for it.
     @Published private(set) var aliases: [String: String] = [:]
+    /// On-disk size of each model folder (bytes), computed in the
+    /// background after every rescan -- filled in as it arrives.
+    @Published private(set) var sizes: [String: Int64] = [:]
+    /// Free space on the models folder's volume (what macOS would make
+    /// available for an important download, incl. purgeable space).
+    @Published private(set) var freeBytes: Int64?
+    var totalBytes: Int64 { sizes.values.reduce(0, +) }
     private(set) var root: String = ModelDiscovery.currentModelsRoot()
     private var observers: [AnyCancellable] = []
+    private var usageTask: Task<Void, Never>?
     private var lastMissRescan = Date.distantPast
 
     private init() {
@@ -43,7 +52,36 @@ final class ModelCatalog: ObservableObject {
         let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
         if scanned != models { models = scanned }
         if scannedAliases != aliases { aliases = scannedAliases }
+        refreshUsage()
     }
+
+    /// Recomputes model sizes and free space off the main thread.
+    func refreshUsage() {
+        usageTask?.cancel()
+        let paths = models.map(\.path)
+        let root = root
+        usageTask = Task.detached(priority: .utility) { [weak self] in
+            let free = DiskUsage.freeSpace(at: root)
+            var sizes: [String: Int64] = [:]
+            for path in paths {
+                if Task.isCancelled { return }
+                sizes[path] = DiskUsage.directorySize(path)
+            }
+            await MainActor.run { [weak self, sizes] in
+                guard let self, !Task.isCancelled else { return }
+                if self.freeBytes != free { self.freeBytes = free }
+                if self.sizes != sizes { self.sizes = sizes }
+            }
+        }
+    }
+
+    static let byteFormatter: ByteCountFormatter = {
+        let f = ByteCountFormatter()
+        f.countStyle = .file
+        return f
+    }()
+
+    static func format(_ bytes: Int64) -> String { byteFormatter.string(fromByteCount: bytes) }
 
     func model(id: String?) -> LocalModel? {
         guard let id else { return nil }

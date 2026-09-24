@@ -114,6 +114,11 @@ struct ModelsPane: View {
                 } label: {
                     SettingLabel(title: "Models folder", help: "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.")
                 }
+                LabeledContent {
+                    Text(diskUsageText).monospacedDigit().foregroundStyle(.secondary)
+                } label: {
+                    SettingLabel(title: "Disk usage", help: "Space the models in this folder take, and what's still free on its disk.")
+                }
                 HStack {
                     Button("Use LM Studio's folder") { modelsRoot = NSString(string: "~/.lmstudio/models").expandingTildeInPath }
                     Button("Rescan", action: rescan)
@@ -167,11 +172,20 @@ struct ModelsPane: View {
         } label: {
             VStack(alignment: .leading) {
                 Text(m.displayName).lineLimit(1)
+                if let size = catalog.sizes[m.id] {
+                    Text(ModelCatalog.format(size)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                }
                 if server.loadedModelPath == m.id, case .running = server.state {
                     Text("Running").font(.caption).foregroundStyle(.green)
                 }
             }
         }
+    }
+
+    private var diskUsageText: String {
+        let used = catalog.sizes.isEmpty && !catalog.models.isEmpty ? "…" : ModelCatalog.format(catalog.totalBytes)
+        let free = catalog.freeBytes.map(ModelCatalog.format) ?? "…"
+        return String(format: NSLocalizedString("Models: %@ · free: %@", comment: "disk usage: models size, free space"), used, free)
     }
 
     private func rescan() {
