@@ -50,7 +50,10 @@ cp "$REPO_ROOT/runtime/run_server.sh" \
    "$APP/Contents/Resources/runtime/"
 
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" "$APP/Contents/Info.plist"
+# CFBundleVersion is what Sparkle compares: see sparkle_version.sh for why
+# a beta can't just reuse "X.Y.Z-beta.N" there.
+BUNDLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP/Contents/Info.plist"
 
 # The binary already carries an `@rpath/Sparkle.framework/...` load command
 # (SPM linked against it), but SPM doesn't add the standard app-bundle
