@@ -86,8 +86,8 @@ struct AboutView: View {
                     Text(String(format: NSLocalizedString("Version %@", comment: ""), version)).foregroundStyle(.secondary)
                     HStack(spacing: 12) {
                         Text("Apache License 2.0").foregroundStyle(.secondary)
-                        Link("Source on GitHub", destination: URL(string: "https://github.com/ipsupport-llc/llmtray")!)
-                        Link("ipsupport.us", destination: URL(string: "https://ipsupport.us")!)
+                        Link(destination: URL(string: "https://github.com/ipsupport-llc/llmtray")!) { Text("Source on GitHub") }
+                        Link(destination: URL(string: "https://ipsupport.us")!) { Text(verbatim: "ipsupport.us") }
                     }
                     .font(.callout)
                 }

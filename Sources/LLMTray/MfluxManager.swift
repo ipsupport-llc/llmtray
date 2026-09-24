@@ -120,6 +120,13 @@ final class MfluxManager: ObservableObject {
     @Published private(set) var stepProgress: (step: Int, total: Int)?
     @Published private(set) var previewImage: NSImage?
 
+    /// Pinned: runtime/llmtray_mflux_runner.py drives mflux's internals
+    /// (in-memory model, step callbacks), which move between releases -- a
+    /// new mflux must not silently break image generation for new installs.
+    /// (Never vendor this venv into a DMG: opencv-python in it bundles GPL
+    /// codecs; the user's own pip installs it.)
+    static let mfluxRequirement = "mflux==0.20.0"
+
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mflux_venv" }
     private var venvPython: String { venvDir + "/bin/python3" }
     private var saveBinary: String { venvDir + "/bin/mflux-save" }
@@ -146,7 +153,7 @@ final class MfluxManager: ObservableObject {
         }
         if !FileManager.default.fileExists(atPath: saveBinary) {
             statusText = "Installing mflux…"
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "mflux", "huggingface_hub"])
+            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", Self.mfluxRequirement, "huggingface_hub"])
         }
         statusText = ""
     }
