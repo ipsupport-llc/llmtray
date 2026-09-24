@@ -289,15 +289,26 @@ final class MfluxManager: ObservableObject {
                     }
                 }
                 if let best, best.step != lastStep {
-                    lastStep = best.step
                     stepProgress = (step: best.step, total: best.total)
-                    if let image = NSImage(contentsOfFile: stepDir + "/" + best.name) {
+                    // The newest step file is often still being written:
+                    // decoded then, only its top rows exist and the rest
+                    // shows black. Take it once the PNG is complete; until
+                    // then the previous step stays up and this retries.
+                    if let data = FileManager.default.contents(atPath: stepDir + "/" + best.name),
+                       Self.isCompletePNG(data), let image = NSImage(data: data) {
                         previewImage = image
+                        lastStep = best.step
                     }
                 }
             }
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
+    }
+
+    /// A PNG ends with its IEND chunk (length 0, "IEND", fixed CRC).
+    static func isCompletePNG(_ data: Data) -> Bool {
+        let iend: [UInt8] = [0, 0, 0, 0, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82]
+        return data.count > iend.count && Array(data.suffix(iend.count)) == iend
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {
