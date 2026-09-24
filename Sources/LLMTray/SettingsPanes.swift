@@ -99,8 +99,8 @@ struct ModelsPane: View {
     @EnvironmentObject var navigation: SettingsNavigation
     @ObservedObject private var profiles = ProfileManager.shared
     @AppStorage(ModelDiscovery.modelsRootDefaultsKey) private var modelsRoot: String = ModelDiscovery.defaultModelsRoot
-    @State private var models: [LocalModel] = []
-    @State private var aliases: [String: String] = [:]
+    @ObservedObject private var catalog = ModelCatalog.shared
+    private var models: [LocalModel] { catalog.models }
 
     var body: some View {
         Form {
@@ -136,16 +136,15 @@ struct ModelsPane: View {
         }
         .formStyle(.grouped)
         .onAppear(perform: rescan)
-        .onChange(of: modelsRoot) { _ in rescan() }
     }
 
     private func modelRow(_ m: LocalModel) -> some View {
-        let taken = ModelAliasStore.isAliasTaken(aliases[m.id] ?? "", excluding: m.id, among: models.map(\.id))
+        let taken = catalog.isAliasTaken(catalog.alias(for: m.id), excluding: m.id)
         return LabeledContent {
             HStack {
                 TextField("alias", text: Binding(
-                    get: { aliases[m.id] ?? "" },
-                    set: { aliases[m.id] = $0; ModelAliasStore.setAlias($0, for: m.id) }
+                    get: { catalog.alias(for: m.id) },
+                    set: { catalog.setAlias($0, for: m.id) }
                 ))
                 .textFieldStyle(.roundedBorder)
                 .frame(width: 180)
@@ -179,8 +178,7 @@ struct ModelsPane: View {
     }
 
     private func rescan() {
-        models = ModelDiscovery.scanModels(root: modelsRoot)
-        aliases = Dictionary(uniqueKeysWithValues: models.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
+        catalog.rescan()
     }
 
     private func chooseFolder() {
@@ -627,7 +625,7 @@ struct BenchmarkPane: View {
 
     private var alias: String {
         guard let path = server.loadedModelPath else { return "default" }
-        let a = ModelAliasStore.alias(for: path)
+        let a = ModelCatalog.shared.alias(for: path)
         return a.isEmpty ? (path as NSString).lastPathComponent : a
     }
 

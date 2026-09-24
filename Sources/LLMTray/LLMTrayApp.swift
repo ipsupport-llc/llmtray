@@ -255,8 +255,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func attemptStart(retriesLeft: Int) async {
         let defaults = UserDefaults.standard
         guard let savedID = defaults.string(forKey: "selectedModelID") else { return }
-        let models = ModelDiscovery.scanModels(root: ModelDiscovery.currentModelsRoot())
-        guard let model = models.first(where: { $0.id == savedID }) else {
+        // A fresh scan each attempt: the retry exists for a startup race.
+        ModelCatalog.shared.rescan()
+        guard let model = ModelCatalog.shared.model(id: savedID) else {
             if retriesLeft > 0 {
                 try? await Task.sleep(nanoseconds: 300_000_000)
                 await attemptStart(retriesLeft: retriesLeft - 1)
@@ -270,8 +271,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // KV bits, drafter etc. come from the model's profile at launch
         // (ServerManager.launchServerProcess), including the KV-shared
         // model guard auto-start used to skip.
-        let alias = ModelAliasStore.alias(for: model.id)
-        server.start(modelPath: model.path, port: port, alias: alias)
+        server.start(modelPath: model.path, port: port, alias: ModelCatalog.shared.alias(for: model.id))
     }
 
     @objc private func quickStop() {
