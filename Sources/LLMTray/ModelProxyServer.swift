@@ -57,7 +57,7 @@ final class ModelProxyServer {
         // already carries its own port -- the port must come from
         // requiredLocalEndpoint alone here, not from a separate parameter.
         let listener: NWListener
-        if UserDefaults.standard.bool(forKey: "llmtray.allowLAN") {
+        if UserDefaults.standard[Pref.allowLAN] {
             listener = try NWListener(using: .tcp, on: port)
         } else {
             let parameters = NWParameters.tcp
@@ -296,7 +296,7 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     init(connection: NWConnection, server: ServerManager) {
         self.connection = connection
         self.server = server
-        let configured = UserDefaults.standard.object(forKey: "llmtray.stallThresholdSeconds") as? Int ?? 60
+        let configured = UserDefaults.standard[Pref.stallThresholdSeconds]
         self.stallThreshold = TimeInterval(configured)
         super.init()
         // Polls rather than a single one-shot timer so activity resets the

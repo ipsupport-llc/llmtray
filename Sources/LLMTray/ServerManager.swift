@@ -347,7 +347,7 @@ final class ServerManager: ObservableObject {
             disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
             drafterRepo: drafterRepo,
             maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
-            verboseLogging: UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging")
+            verboseLogging: UserDefaults.standard[Pref.verboseServerLogging]
         )
     }
 
@@ -625,7 +625,7 @@ final class ServerManager: ObservableObject {
     /// holding memory/battery indefinitely.
     private func checkIdleStop() {
         guard case .running = state, activeRequestCount == 0 else { return }
-        let minutes = UserDefaults.standard.object(forKey: "llmtray.autoStopIdleMinutes") as? Int ?? 0
+        let minutes = UserDefaults.standard[Pref.autoStopIdleMinutes]
         guard minutes > 0, Date().timeIntervalSince(lastActivityAt) >= TimeInterval(minutes * 60) else { return }
         appendLog("--- unloading model after \(minutes) min idle (reloads automatically on the next request) ---\n")
         idleUnload()
@@ -689,7 +689,7 @@ final class ServerManager: ObservableObject {
         forwardEnded()
         consecutiveStallCount += 1
 
-        let threshold = UserDefaults.standard.object(forKey: "llmtray.autoRestartStallThreshold") as? Int ?? 3
+        let threshold = UserDefaults.standard[Pref.autoRestartStallThreshold]
         guard threshold > 0, consecutiveStallCount >= threshold else { return }
         consecutiveStallCount = 0
         Task { await restartWedgedProcess() }
