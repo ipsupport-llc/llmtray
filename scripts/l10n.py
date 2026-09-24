@@ -265,8 +265,15 @@ def _lang_name(code: str) -> str:
 def _openai(messages: list[dict], model: str, key: str) -> str:
     import json, os, time, urllib.request, urllib.error
     req_body = {"model": model, "messages": messages, "response_format": {"type": "json_object"}}
-    # Reasoning models (gpt-5.x, o-series) reject a custom temperature.
-    if not model.startswith(("gpt-5", "o1", "o3", "o4")):
+    # Reasoning models (gpt-5.x, o-series) reject a custom temperature --
+    # and bill their hidden reasoning as output tokens. Translating UI
+    # strings needs next to none: minimal effort (the first full run on
+    # gpt-5.5 at default effort cost dollars for ~9k characters of text).
+    if model.startswith("gpt-5"):
+        req_body["reasoning_effort"] = "minimal"
+    elif model.startswith(("o1", "o3", "o4")):
+        req_body["reasoning_effort"] = "low"
+    else:
         req_body["temperature"] = 0.2
     body = json.dumps(req_body).encode()
     for attempt in range(5):
@@ -312,7 +319,7 @@ def write_lang(code: str, table: dict[str, str], base_keys: list[str]) -> Path:
     return path
 
 
-def translate(codes: list[str], model: str, batch: int = 25) -> int:
+def translate(codes: list[str], model: str, batch: int = 100) -> int:
     """Fills in each language's missing keys; drops keys no longer in the
     English base (a changed English string is a new key). Never touches an
     existing translation. Batches run in parallel (L10N_JOBS, default 8):
@@ -403,7 +410,7 @@ def main() -> int:
         import argparse, os
         ap = argparse.ArgumentParser(prog="l10n.py translate")
         ap.add_argument("languages", nargs="*", help="language codes (default: every existing one)")
-        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-5.5")
+        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-5-mini")
         a = ap.parse_args(sys.argv[2:])
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         return translate(codes, a.model)
