@@ -18,6 +18,7 @@ final class ModelCatalog: ObservableObject {
     @Published private(set) var aliases: [String: String] = [:]
     private(set) var root: String = ModelDiscovery.currentModelsRoot()
     private var observers: [AnyCancellable] = []
+    private var lastMissRescan = Date.distantPast
 
     private init() {
         rescan()
@@ -34,10 +35,14 @@ final class ModelCatalog: ObservableObject {
         ]
     }
 
+    /// Publishes only what actually changed, so a rescan that finds the
+    /// same models doesn't re-render every view observing the catalog.
     func rescan() {
         root = ModelDiscovery.currentModelsRoot()
-        models = ModelDiscovery.scanModels(root: root)
-        aliases = Dictionary(uniqueKeysWithValues: models.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
+        let scanned = ModelDiscovery.scanModels(root: root)
+        let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
+        if scanned != models { models = scanned }
+        if scannedAliases != aliases { aliases = scannedAliases }
     }
 
     func model(id: String?) -> LocalModel? {
@@ -62,11 +67,20 @@ final class ModelCatalog: ObservableObject {
 
     /// The model a request's `model` field names: an alias first (the
     /// explicit mapping), then the model's own folder or display name, so
-    /// the real name works without an alias. A name not found triggers one
-    /// rescan (a model copied in by hand since the last scan).
+    /// the real name works without an alias. The cached list is re-read
+    /// when a hit's folder is gone (moved/deleted in Finder -- loading it
+    /// would unload the working model for nothing) and on a miss (copied
+    /// in by hand), the latter at most every few seconds: a client that
+    /// always sends some other name ("gpt-4o") mustn't rescan per request.
     func resolve(modelName: String) -> String? {
         guard !modelName.isEmpty else { return nil }
-        if let path = lookup(modelName) { return path }
+        if let path = lookup(modelName) {
+            if FileManager.default.fileExists(atPath: path + "/config.json") { return path }
+            rescan()
+            return lookup(modelName)
+        }
+        guard Date().timeIntervalSince(lastMissRescan) > 5 else { return nil }
+        lastMissRescan = Date()
         rescan()
         return lookup(modelName)
     }

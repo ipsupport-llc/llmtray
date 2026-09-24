@@ -54,6 +54,9 @@ struct ContentView: View {
         .frame(width: 420)
         .onAppear {
             sessionHistory = ChatSessionStore.list()
+            // Models added or removed in Finder / LM Studio since the last
+            // look show up on opening, as they used to.
+            catalog.rescan()
             keepSelectionValid()
             modelDidChange(selectedModelID)
             isInputFocused = true
@@ -64,10 +67,9 @@ struct ContentView: View {
             // A Hugging Face download finished: jump to the model that just
             // landed on disk (the catalog rescans on the same notification).
             guard let repoID = notification.object as? String else { return }
+            catalog.rescan()
             let downloaded = catalog.root + "/\(repoID)"
-            DispatchQueue.main.async {
-                if catalog.model(id: downloaded) != nil { selectedModelID = downloaded }
-            }
+            if catalog.model(id: downloaded) != nil { selectedModelID = downloaded }
         }
         .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
             sessionHistory = ChatSessionStore.list()
