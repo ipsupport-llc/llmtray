@@ -28,6 +28,7 @@ class SelectableTool: ChatTool {
 
     /// A tool result as compact JSON.
     static func json(_ value: Any) -> ToolResult {
+        let value = shortestNumbers(value)
         guard JSONSerialization.isValidJSONObject(value),
               let data = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys, .withoutEscapingSlashes]) else {
             return .text("\(value)")
@@ -36,6 +37,24 @@ class SelectableTool: ChatTool {
     }
 
     static func error(_ message: String) -> ToolResult { json(["error": message]) }
+
+    /// JSONSerialization writes a parsed 47.4 as 47.399999999999999: every
+    /// fractional number is re-encoded from its shortest form (booleans and
+    /// integers stay as they are).
+    static func shortestNumbers(_ value: Any) -> Any {
+        switch value {
+        case let dict as [String: Any]:
+            return dict.mapValues(shortestNumbers)
+        case let array as [Any]:
+            return array.map(shortestNumbers)
+        case let number as NSNumber where CFGetTypeID(number) != CFBooleanGetTypeID() && !(number is NSDecimalNumber):
+            let d = number.doubleValue
+            guard d.isFinite, d != d.rounded() else { return number }
+            return NSDecimalNumber(string: String(d))
+        default:
+            return value
+        }
+    }
 }
 
 // MARK: - Date and time
@@ -99,31 +118,61 @@ final class TimeInCityTool: SelectableTool {
             return Self.error("city is required")
         }
         do {
-            // Open-Meteo matches a non-Latin name ("Москва", "Харків") only
-            // in its language: the script's languages first, English last.
-            var found: [String: Any]?
-            for language in ScriptLanguage.wikipediaCandidates(for: city) {
-                var query = [URLQueryItem(name: "name", value: city), URLQueryItem(name: "count", value: "1"),
-                             URLQueryItem(name: "language", value: language)]
-                if let cc = arguments["country_code"] as? String, cc.count == 2, cc.allSatisfy({ $0.isASCII && $0.isLetter }) {
-                    query.append(URLQueryItem(name: "countryCode", value: cc.uppercased()))
-                }
-                let geo = try await WebFetch.json("https://geocoding-api.open-meteo.com/v1/search", query: query)
-                if let first = (geo["results"] as? [[String: Any]])?.first { found = first; break }
-            }
-            guard let place = found,
-                  let tzID = place["timezone"] as? String, let zone = TimeZone(identifier: tzID) else {
+            guard let place = try await Geocoder.find(city, countryCode: arguments["country_code"] as? String),
+                  let zone = TimeZone(identifier: place.timezone) else {
                 return Self.error("no city called \(city) found")
             }
             var result = CurrentDateTool.describe(Date(), in: zone)
-            result["city"] = place["name"] as? String ?? city
-            result["country"] = place["country"] as? String ?? ""
+            result["city"] = place.name
+            result["country"] = place.country
             // Open-Meteo's data is CC BY 4.0 (shown under the answer).
-            result["source"] = "City lookup by Open-Meteo (https://open-meteo.com), CC BY 4.0, GeoNames"
+            result["source"] = Geocoder.attribution
             return Self.json(result)
         } catch {
             return Self.error("city lookup failed: \(error.localizedDescription)")
         }
+    }
+}
+
+/// City lookup (Open-Meteo geocoding) for the time and weather tools.
+enum Geocoder {
+    struct Place {
+        let name: String
+        let country: String
+        let latitude: Double
+        let longitude: Double
+        let timezone: String
+    }
+
+    nonisolated static let attribution = "City lookup by Open-Meteo (https://open-meteo.com), CC BY 4.0, GeoNames"
+
+    /// `city` (one place name) in `countryCode` (ISO alpha-2) if given.
+    /// Open-Meteo matches a non-Latin name ("Москва", "Харків") only in its
+    /// language: the script's languages first, English last.
+    static func find(_ city: String, countryCode: String?) async throws -> Place? {
+        for language in ScriptLanguage.wikipediaCandidates(for: city) {
+            var query = [URLQueryItem(name: "name", value: city), URLQueryItem(name: "count", value: "1"),
+                         URLQueryItem(name: "language", value: language)]
+            if let cc = countryCode, cc.count == 2, cc.allSatisfy({ $0.isASCII && $0.isLetter }) {
+                query.append(URLQueryItem(name: "countryCode", value: cc.uppercased()))
+            }
+            let geo = try await WebFetch.json("https://geocoding-api.open-meteo.com/v1/search", query: query)
+            if let first = (geo["results"] as? [[String: Any]])?.first,
+               let lat = (first["latitude"] as? NSNumber)?.doubleValue, let lon = (first["longitude"] as? NSNumber)?.doubleValue,
+               let tz = first["timezone"] as? String {
+                return Place(name: first["name"] as? String ?? city, country: first["country"] as? String ?? "",
+                             latitude: lat, longitude: lon, timezone: tz)
+            }
+        }
+        return nil
+    }
+
+    /// Where the user is, as far as the Mac's own time zone tells
+    /// ("Europe/Kyiv" -> Kyiv): nothing leaves the machine to find out.
+    static func homeCity() -> (city: String, countryCode: String?, zone: String) {
+        let zone = TimeZone.current.identifier
+        let city = (zone.split(separator: "/").last.map(String.init) ?? zone).replacingOccurrences(of: "_", with: " ")
+        return (city, Locale.current.region?.identifier, zone)
     }
 }
 

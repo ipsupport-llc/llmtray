@@ -532,11 +532,18 @@ enum ToolCatalog {
         Entry(name: "get_public_holidays", title: NSLocalizedString("Public holidays", comment: "chat tool"), usesNetwork: true),
         Entry(name: "convert_currency", title: NSLocalizedString("Currency rates", comment: "chat tool"), usesNetwork: true,
               credit: CurrencyTool.attribution),
+        Entry(name: "get_weather", title: NSLocalizedString("Weather", comment: "chat tool"), usesNetwork: true,
+              credit: WeatherTool.attribution),
+        Entry(name: "get_hourly_forecast", title: NSLocalizedString("Hourly forecast", comment: "chat tool"), usesNetwork: true,
+              credit: WeatherTool.attribution),
+        Entry(name: "get_air_quality", title: NSLocalizedString("Air quality", comment: "chat tool"), usesNetwork: true),
+        Entry(name: "get_sunrise_sunset", title: NSLocalizedString("Sunrise & sunset", comment: "chat tool"), usesNetwork: true),
     ]
 
     @MainActor
     static func makeTools() -> [ChatTool] {
         [CurrentDateTool(), TimeInCityTool(), CalculateTool(), WebSearchTool(), NewsTool(), HackerNewsTool(),
-         WikipediaTool(), CountryInfoTool(), HolidaysTool(), CurrencyTool()]
+         WikipediaTool(), CountryInfoTool(), HolidaysTool(), CurrencyTool(),
+         CurrentWeatherTool(), HourlyForecastTool(), AirQualityTool(), SunTool()]
     }
 }

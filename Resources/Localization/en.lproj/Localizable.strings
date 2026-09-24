@@ -14,6 +14,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Advanced" = "Advanced";
 "After %lld min" = "After %lld min";
+"Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
 "Allow connections from the local network" = "Allow connections from the local network";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
@@ -92,6 +93,7 @@
 "Generating image…" = "Generating image…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Hourly forecast";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
@@ -233,6 +235,7 @@
 "Stop the server to update the runtime." = "Stop the server to update the runtime.";
 "Stopped" = "Stopped";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory.";
+"Sunrise & sunset" = "Sunrise & sunset";
 "System" = "System";
 "System prompt" = "System prompt";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
@@ -274,6 +277,7 @@
 "Version %@" = "Version %@";
 "View model card" = "View model card";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
+"Weather" = "Weather";
 "Web search" = "Web search";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Which Z-Image-Turbo quantization generates the images.";
