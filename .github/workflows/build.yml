@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   build:
@@ -13,3 +12,44 @@ jobs:
       - uses: actions/checkout@v4
       - name: swift build
         run: swift build
+      - name: swift test
+        # `swift test` errors out on a package with no test target.
+        run: if [ -d Tests ]; then swift test; else echo "no tests"; fi
+
+  # The release scripts only ever ran on a real tag push, so their bugs
+  # (v0.6.7's SIGPIPE in build_full_app.sh) surfaced as a failed release.
+  # This runs the same steps as release.yml on every PR, minus signing
+  # with the real key and publishing.
+  release-dry-run:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version mapping (Sparkle ordering)
+        run: |
+          set -e
+          test "$(scripts/sparkle_version.sh 0.6.8)" = 0.6.8
+          test "$(scripts/sparkle_version.sh 0.6.8-beta.3)" = 0.6.8b3
+          # (not `! cmd`: set -e ignores a negated command's failure)
+          if scripts/sparkle_version.sh 0.6.8-rc1; then echo 'rc1 should be rejected'; exit 1; fi
+      - name: Build LLMTray.app
+        run: ./scripts/build_app.sh
+        env:
+          VERSION: 0.0.0-dev
+      - name: Build DMG (thin)
+        run: ./scripts/build_dmg.sh
+      - name: Vendor full runtime into LLMTray.app
+        run: ./scripts/build_full_app.sh
+      - name: Build DMG (full)
+        run: ./scripts/build_dmg.sh LLMTray-Full.dmg
+      - name: Appcast generation (stub signature, both channels)
+        run: |
+          set -e
+          printf '#!/bin/sh\necho "sparkle:edSignature=\\"STUB\\" length=\\"1\\""\n' > /tmp/sign_update
+          chmod +x /tmp/sign_update
+          for v in 9.9.9-beta.1 9.9.9; do
+            VERSION=$v SIGN_UPDATE=/tmp/sign_update SPARKLE_PRIVATE_KEY=stub ./scripts/generate_appcast.sh > /dev/null
+          done
+          xmllint --noout docs/appcast.xml
+          grep -q '<sparkle:version>9.9.9b1</sparkle:version>' docs/appcast.xml
+          grep -q '<sparkle:version>9.9.9</sparkle:version>' docs/appcast.xml
+          test "$(grep -c '<item>' docs/appcast.xml)" = 2

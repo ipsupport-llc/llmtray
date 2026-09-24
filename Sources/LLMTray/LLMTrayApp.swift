@@ -49,9 +49,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // actually having a real Info.plist (SUFeedURL etc.) so this doesn't
     // also try (and fail) to start against the bare `.build/debug/LLMTray`
     // binary used for local dev iteration, which has none.
-    private let updaterController = SPUStandardUpdaterController(
+    private let updateChannels = UpdateChannelDelegate()
+    private lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil,
-        updaterDelegate: nil, userDriverDelegate: nil
+        updaterDelegate: updateChannels, userDriverDelegate: nil
     )
 
     private var statusItem: NSStatusItem!
@@ -63,6 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pulseTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        _ = updaterController  // lazy: created (and its background checks started) at launch
         NSApp.setActivationPolicy(.accessory)
         installSignalHandlers()
         setupStatusItem()
@@ -477,5 +479,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func killServerNow() {
         server.terminateImmediately()
+    }
+}
+
+/// Opts into Sparkle's "beta" channel when the user enabled beta updates
+/// (General settings). Pre-release builds (tags vX.Y.Z-beta.N) are
+/// published as a separate appcast item tagged <sparkle:channel>beta, which
+/// Sparkle ignores unless this returns it -- stable users never see them.
+/// Read on every check, so the toggle takes effect without a restart.
+final class UpdateChannelDelegate: NSObject, SPUUpdaterDelegate {
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        UserDefaults.standard.bool(forKey: "llmtray.betaUpdates") ? ["beta"] : []
     }
 }

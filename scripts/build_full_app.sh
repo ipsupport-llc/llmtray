@@ -28,40 +28,17 @@ if [[ ! -d "$APP" ]]; then
   exit 1
 fi
 
-echo "--- finding latest official python.org macOS release ---"
-# python.org's FTP index is the authoritative, official list of releases --
-# directory names are exactly "X.Y.Z/". Sorted descending, the first one
-# that actually published a macOS universal2 installer (not every 3.9.x
-# patch did, and a version might be too fresh to have one yet) wins. Capped
-# at the 8 newest versions and checked with a real GET (not a rapid-fire
-# --head loop) with a short pause between tries -- python.org's own server
-# started returning connection resets partway through an earlier, more
-# aggressive version of this loop, almost certainly a rate limit.
-# `sed -n '1,8p'`, not `| head -8`: head exits after 8 lines, the upstream
-# stage then dies of SIGPIPE, and under pipefail that failed the whole
-# release build ("tail: stdout: Broken pipe", v0.6.7) once python.org's
-# index got long enough not to fit in the pipe buffer.
-VERSIONS="$(curl -fsSL https://www.python.org/ftp/python/ \
-  | grep -oE 'href="3\.[0-9]+\.[0-9]+/"' \
-  | sed 's/href="//;s#/"##' \
-  | sort -t. -k1,1nr -k2,2nr -k3,3nr \
-  | sed -n '1,8p')"
-
-PY_VERSION=""
-PKG_URL=""
-for v in $VERSIONS; do
-  url="https://www.python.org/ftp/python/$v/python-$v-macos11.pkg"
-  status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
-  if [[ "$status" == "200" ]]; then
-    PY_VERSION="$v"
-    PKG_URL="$url"
-    break
-  fi
-  sleep 1
-done
-
-if [[ -z "$PY_VERSION" ]]; then
-  echo "error: none of the 8 newest versions under https://www.python.org/ftp/python/ have a macos11.pkg installer" >&2
+# Pinned in runtime/python_runtime.json rather than "newest on python.org":
+# a new CPython minor usually ships before MLX publishes wheels for it, so
+# following python.org automatically would fail the first release after
+# every CPython release (and Thin + Full are built in one job, so the whole
+# release). PY_VERSION in the environment overrides the pin (for trying a
+# bump). Checked with a real GET: python.org rate-limits rapid --head loops.
+PY_VERSION="${PY_VERSION:-$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/python_runtime.json'))['version'])")}"
+PKG_URL="https://www.python.org/ftp/python/$PY_VERSION/python-$PY_VERSION-macos11.pkg"
+status="$(curl -s -o /dev/null -w '%{http_code}' "$PKG_URL")"
+if [[ "$status" != "200" ]]; then
+  echo "error: pinned Python $PY_VERSION has no macOS installer at $PKG_URL (HTTP $status)" >&2
   exit 1
 fi
 echo "--- using official Python $PY_VERSION ($PKG_URL) ---"
