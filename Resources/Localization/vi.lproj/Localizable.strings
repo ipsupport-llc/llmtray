@@ -65,6 +65,8 @@
 "Diagnostics" = "Chẩn đoán";
 "Download" = "Tải về";
 "Download and Enable" = "Tải về và bật";
+"Download models" = "Tải mô hình";
+"Download models from Hugging Face" = "Tải mô hình từ Hugging Face";
 "Downloaded" = "Đã tải về";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "Đổi tên cấu hình này.";
 "Rescan" = "Quét lại";
 "Rescan Models" = "Quét lại mô hình";
-"Rescan, download or manage models" = "Quét lại, tải về hoặc quản lý mô hình.";
+"Rescan or manage models" = "Quét lại hoặc quản lý mô hình";
 "Reset: inherit this setting from Default" = "Đặt lại: kế thừa cài đặt này từ Default.";
 "Restart LLMTray to change the language?" = "Khởi động lại LLMTray để đổi ngôn ngữ?";
 "Restart Now" = "Khởi động lại bây giờ";

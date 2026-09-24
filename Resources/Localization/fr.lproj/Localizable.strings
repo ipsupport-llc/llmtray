@@ -65,6 +65,8 @@
 "Diagnostics" = "Diagnostic";
 "Download" = "Télécharger";
 "Download and Enable" = "Télécharger et activer";
+"Download models" = "Télécharger des modèles";
+"Download models from Hugging Face" = "Télécharger des modèles depuis Hugging Face";
 "Downloaded" = "Téléchargé";
 "Duplicate this profile" = "Dupliquer ce profil";
 "Edit Profile…" = "Modifier le profil…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "Renommer ce profil.";
 "Rescan" = "Réanalyser";
 "Rescan Models" = "Réanalyser les modèles";
-"Rescan, download or manage models" = "Réanalysez, téléchargez ou gérez les modèles.";
+"Rescan or manage models" = "Rechercher à nouveau ou gérer les modèles";
 "Reset: inherit this setting from Default" = "Réinitialiser : hériter de ce réglage depuis Default.";
 "Restart LLMTray to change the language?" = "Redémarrer LLMTray pour changer la langue ?";
 "Restart Now" = "Redémarrer maintenant";

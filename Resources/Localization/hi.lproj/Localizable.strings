@@ -65,6 +65,8 @@
 "Diagnostics" = "डायग्नॉस्टिक्स";
 "Download" = "डाउनलोड करें";
 "Download and Enable" = "डाउनलोड करें और सक्षम करें";
+"Download models" = "मॉडलों को डाउनलोड करें";
+"Download models from Hugging Face" = "Hugging Face से मॉडल डाउनलोड करें";
 "Downloaded" = "डाउनलोड किया गया";
 "Duplicate this profile" = "इस प्रोफ़ाइल की कॉपी बनाता है।";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "इस प्रोफ़ाइल का नाम बदलें।";
 "Rescan" = "फिर स्कैन करें";
 "Rescan Models" = "मॉडल फिर स्कैन करें";
-"Rescan, download or manage models" = "मॉडल फिर स्कैन करें, डाउनलोड करें या प्रबंधित करें।";
+"Rescan or manage models" = "मॉडल पुनः स्कैन या प्रबंधित करें";
 "Reset: inherit this setting from Default" = "रीसेट करें: यह सेटिंग Default से इनहेरिट करें।";
 "Restart LLMTray to change the language?" = "भाषा बदलने के लिए LLMTray रीस्टार्ट करें?";
 "Restart Now" = "अभी रीस्टार्ट करें";

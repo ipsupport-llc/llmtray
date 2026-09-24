@@ -65,6 +65,8 @@
 "Diagnostics" = "Tanılar";
 "Download" = "İndir";
 "Download and Enable" = "İndir ve Etkinleştir";
+"Download models" = "Modelleri indir";
+"Download models from Hugging Face" = "Hugging Face'ten modelleri indir";
 "Downloaded" = "İndirildi";
 "Duplicate this profile" = "Bu profili çoğalt";
 "Edit Profile…" = "Profili Düzenle…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "Bu profilin adını değiştirin.";
 "Rescan" = "Yeniden Tara";
 "Rescan Models" = "Modelleri Yeniden Tara";
-"Rescan, download or manage models" = "Modelleri yeniden tarayın, indirin veya yönetin.";
+"Rescan or manage models" = "Modelleri yeniden tara veya yönet";
 "Reset: inherit this setting from Default" = "Sıfırla: bu ayarı Default’tan devral";
 "Restart LLMTray to change the language?" = "Dili değiştirmek için LLMTray yeniden başlatılsın mı?";
 "Restart Now" = "Şimdi Yeniden Başlat";
