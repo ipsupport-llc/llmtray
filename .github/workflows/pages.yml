@@ -49,8 +49,7 @@ jobs:
         run: |
           gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases.json
           python3 scripts/render_appcast.py releases.json _site/appcast.xml
-          sudo apt-get install -y -qq libxml2-utils > /dev/null
-          xmllint --noout _site/appcast.xml
+          python3 -c "import sys, xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" _site/appcast.xml
           grep -E '<title>Version|sparkle:version>' _site/appcast.xml
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
