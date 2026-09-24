@@ -15,5 +15,16 @@
                  sparkle:edSignature="JInrry+QVwZr4xqgM3Vf82/5MD/gE3nqW6QcREuPyvI8LpfWLr12FKBXWLStt60wnywrRAAqU+ezxXTz4oMYAg==" length="2439072"
                  type="application/octet-stream"/>
     </item>
+    <item>
+      <title>Version 0.6.9-beta.1</title>
+      <pubDate>Thu, 24 Sep 2026 00:28:45 +0000</pubDate>
+      <sparkle:channel>beta</sparkle:channel>
+      <sparkle:version>0.6.9b1</sparkle:version>
+      <sparkle:shortVersionString>0.6.9-beta.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/download/v0.6.9-beta.1/LLMTray.dmg"
+                 sparkle:edSignature="FmvxNqAaOXymsMFbva5oceZAwQjUodQnPQuF7XHRS53hkLzQUk/QKGc7K5aS9MjjhXxhLslJRYh++y+za8LCDw==" length="2637484"
+                 type="application/octet-stream"/>
+    </item>
   </channel>
 </rss>
