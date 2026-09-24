@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ सीमित है: huggingface.co/%@ पर इसकी लाइसेंस शर्तें स्वीकार करें, फिर Settings → Models में एक Hugging Face token जोड़ें।";
+"%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
 "%@ → %@ available" = "%@ → %@ उपलब्ध";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "डिस्क पर खाली: %@ · आपके मॉडल: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "इतने समय तक कोई अनुरोध न आने पर लोड किए गए मॉडल द्वारा रखी गई मेमोरी खाली करता है। अगले अनुरोध पर यह अपने आप फिर लोड होता है, सामान्य लोडिंग विलंब के साथ।";
 "Full" = "पूर्ण";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
 "General" = "सामान्य";
 "Generating image…" = "इमेज जनरेट हो रही है…";
+"Get one" = "एक प्राप्त करें";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "घंटाबंद पूर्वानुमान";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "एक GPU चरण में कितने अनुरोध बैच किए जाएँ। यह तभी मदद करता है जब कई क्लाइंट एक साथ सर्वर का उपयोग करें; ज़्यादा मेमोरी उपयोग करता है।";
 "How many tokens it generates per trial." = "हर ट्रायल में कितने टोकन जनरेट किए जाएँ।";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face ने %@ के लिए HTTP %d उत्तर दिया।";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ने %@ (HTTP %d) अस्वीकार कर दिया: यह सीमित, निजी है, या मौजूद नहीं है। यदि यह सीमित है तो huggingface.co/%@ पर लाइसेंस स्वीकार करें और Settings → Models में token जाँचें।";
+"Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "निष्क्रिय — अगला संदेश आने पर मॉडल फिर लोड होगा";
 "Image generation" = "इमेज जनरेशन";
 "Image model" = "इमेज मॉडल";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "इस फ़ोल्डर में कोई मॉडल नहीं मिला।";
 "No runs yet." = "अभी तक कोई रन नहीं।";
 "No saved sessions" = "कोई सहेजा गया सत्र नहीं";
+"Non-commercial license: read it on the model card before using the model." = "गैर‑व्यावसायिक लाइसेंस: मॉडल का उपयोग करने से पहले मॉडल कार्ड पर पढ़ें।";
 "Not enough free disk space for this model." = "इस मॉडल के लिए डिस्क पर पर्याप्त खाली जगह नहीं है।";
 "OK" = "ठीक है";
 "Off" = "बंद";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "बंद होने पर, केवल यह Mac सर्वर तक पहुँच सकता है। चालू होने पर, आपके नेटवर्क पर मौजूद अन्य डिवाइस भी पहुँच सकते हैं — नेटवर्क पर कोई भी; इसलिए केवल भरोसेमंद नेटवर्क पर ही चालू करें।";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "केवल सीमित मॉडल के लिए (Llama, कुछ Gemma और FLUX रिपोज): इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें, फिर यहाँ read token चिपकाएँ। Keychain में सुरक्षित रखा जाएगा, केवल huggingface.co को भेजा जाता है।";
 "Open" = "खोलें";
 "Open Server Log…" = "सर्वर लॉग खोलें…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "केवल LLMTray के लिए macOS भाषा को ओवरराइड करता है। LLMTray के पुनः शुरू होने के बाद प्रभावी होता है। अनुवाद न किया गया टेक्स्ट अंग्रेज़ी में दिखता है।";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Recovery" = "रिकवरी";
 "Regenerate" = "फिर से जनरेट करें";
+"Remove" = "हटाएं";
 "Remove attachment" = "अटैचमेंट हटाएँ।";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम %@ से हटाता है। अगले सर्वर शुरू होने पर यह फिर सेट अप हो जाता है। सहेजी गई चैट और प्रोफ़ाइलें बनी रहती हैं।";
 "Rename" = "नाम बदलें";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "केवल उन सबसे संभावित टोकन से सैंपल करता है जिनकी संभावनाओं का योग इस मान तक होता है। 1.0 इसे बंद करता है।";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "केवल इतने सबसे संभावित टोकन से सैंपल करता है। 0 इसे बंद करता है। Gemma 4 में 64 अनुशंसित है।";
 "Sampling" = "सैंपलिंग";
+"Save" = "सहेजें";
+"Saved in your Keychain" = "आपके Keychain में सहेजा गया";
 "Save…" = "सहेजें…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "मॉडल जो भी चौड़ाई/ऊँचाई माँगता है, उसे स्केल करता है। संतुलित 1024x1024 को वैसा ही रखता है।";
 "Search" = "खोजें";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "लक्ष्य: %@ · प्रोफ़ाइल %@";
 "Temperature" = "तापमान";
 "Temporary — not saved" = "अस्थायी — सहेजा नहीं गया";
+"The Keychain refused to remove the token." = "Keychain ने token हटाने से मना कर दिया।";
+"The Keychain refused to save the token." = "Keychain ने token सहेजने से मना कर दिया।";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI-संगत API यहां चलता है (http://localhost:<port>/v1)। सर्वर रुका होने पर इसे बदलें।";
 "The base profile: every other profile inherits from it." = "मूल प्रोफ़ाइल: बाकी सभी प्रोफ़ाइल इससे इनहेरिट करती हैं।";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "पहली बार, यह %@ (%@) को इस Mac पर डाउनलोड करता है—अभी, चैट के बीच में नहीं।";
 "The longest answer the model may write. Also capped by the model's own context length." = "मॉडल द्वारा लिखा जा सकने वाला सबसे लंबा जवाब। यह मॉडल की अपनी संदर्भ लंबाई से भी सीमित होता है।";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "mlx-lm संस्करण (LLMTray के अपने fork का एक commit) जो मॉडल चलाता है। यह ऐप से अलग अपडेट होता है।";
 "The model name API clients send." = "API क्लाइंट द्वारा भेजा जाने वाला मॉडल नाम।";
+"The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
 "The running model server is stopped and started again." = "चल रहा मॉडल सर्वर रोका जाता है और फिर से शुरू किया जाता है।";
 "These models go back to Default: %@." = "ये मॉडल वापस Default पर चले जाएंगे: %@।";
 "Thinking…" = "सोच रहा है…";

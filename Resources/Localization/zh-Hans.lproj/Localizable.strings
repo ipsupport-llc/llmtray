@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 受限：请在 huggingface.co/%@ 接受其许可，然后在“设置 → 模型”中添加 Hugging Face 令牌。";
+"%@ wasn't found on Hugging Face." = "在 Hugging Face 上未找到 %@。";
 "%@ → %@ available" = "%@ → %@ 可用";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "磁盘可用：%@ · 你的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "在这么长时间没有请求后，释放已加载模型占用的内存。下次请求时会自动重新加载，并产生正常的加载延迟。";
 "Full" = "完整";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面接受许可，并在“设置 → 模型”中添加令牌。";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面申请访问（作者会审核），并在“设置 → 模型”中添加令牌。";
 "General" = "通用";
 "Generating image…" = "正在生成图像…";
+"Get one" = "获取一个";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "为模型提供 generate_image 工具（需要支持工具调用的模型）。首次使用时会下载图像模型。";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "每小时预报";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
 "How many tokens it generates per trial." = "每次试验生成的词元数。";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face 返回了 HTTP %d（%@）。";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒绝了 %@（HTTP %d）：该模型可能受限、私有或不存在。若受限，请在 huggingface.co/%@ 接受许可，并在“设置 → 模型”中检查令牌。";
+"Hugging Face token" = "Hugging Face 令牌";
 "Idle -- the model reloads on the next message" = "已闲置 -- 模型会在下一条消息时重新加载";
 "Image generation" = "图像生成";
 "Image model" = "图像模型";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "在此文件夹中未找到模型。";
 "No runs yet." = "尚无运行记录。";
 "No saved sessions" = "暂无已保存会话";
+"Non-commercial license: read it on the model card before using the model." = "非商业许可：使用前请在模型卡上阅读。";
 "Not enough free disk space for this model." = "磁盘可用空间不足，无法安装此模型。";
 "OK" = "好";
 "Off" = "关";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "关闭时，只有这台 Mac 可以访问服务器。开启时，网络中的其他设备也可以访问——包括网络上的任何人，因此仅在你信任的网络上开启。";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
 "Open" = "打开";
 "Open Server Log…" = "打开服务器日志…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "正在读取已安装内容…";
 "Recovery" = "恢复";
 "Regenerate" = "重新生成";
+"Remove" = "移除";
 "Remove attachment" = "移除附件";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "移除 %@ 中已下载的 mlx-lm 运行时。下次启动服务器时会重新设置。已保存的聊天和配置方案会保留。";
 "Rename" = "重命名";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "仅从概率累计达到此值的最可能词元中采样。1.0 表示关闭。";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "仅从此数量的最可能词元中采样。0 表示关闭。Gemma 4 建议 64。";
 "Sampling" = "采样";
+"Save" = "保存";
+"Saved in your Keychain" = "已保存在您的钥匙串中";
 "Save…" = "存储…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "根据模型要求的任意宽度/高度进行缩放。均衡会保持 1024x1024 不变。";
 "Search" = "搜索";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "目标：%@ · 配置文件 %@";
 "Temperature" = "温度";
 "Temporary — not saved" = "临时——未保存";
+"The Keychain refused to remove the token." = "钥匙串拒绝移除该令牌。";
+"The Keychain refused to save the token." = "钥匙串拒绝保存该令牌。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "兼容 OpenAI 的 API 在此处监听（http://localhost:<port>/v1）。请在服务器停止时更改。";
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "首次使用时，这会立即将 %@（%@）下载到这台 Mac，而不是等到聊天过程中下载。";
 "The longest answer the model may write. Also capped by the model's own context length." = "模型可写出的最长回答。也受模型自身上下文长度限制。";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "用于运行模型的 mlx-lm 版本（LLMTray 自有 fork 的一个提交）。它会独立于 App 更新。";
 "The model name API clients send." = "这是 API 客户端发送的模型名称。";
+"The model's license, from its card." = "来自模型卡的许可。";
 "The running model server is stopped and started again." = "正在运行的模型服务器会停止并重新启动。";
 "These models go back to Default: %@." = "这些模型会恢复为 Default：%@。";
 "Thinking…" = "正在思考…";

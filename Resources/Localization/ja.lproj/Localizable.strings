@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ は制限付きです: huggingface.co/%@ でライセンスを承諾し、設定 → Models に Hugging Face トークンを追加してください。";
+"%@ wasn't found on Hugging Face." = "Hugging Face に %@ が見つかりませんでした。";
 "%@ → %@ available" = "%@ → %@ が利用可能";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "ディスクの空き: %@ · あなたのモデル: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "リクエストがないままこの時間が経過したら、読み込まれたモデルが保持しているメモリを解放します。次のリクエスト時に自動的に再読み込みされ、通常の読み込み待ち時間が発生します。";
 "Full" = "フル";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "制限付き: その Hugging Face ページでライセンスを承諾し、設定 → Models にトークンを追加してください。";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "制限付き: その Hugging Face ページでアクセスを申請してください（著者による審査があります）。設定 → Models にトークンを追加してください。";
 "General" = "一般";
 "Generating image…" = "画像を生成中…";
+"Get one" = "入手";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "時間ごとの予報";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face が %@ に対して HTTP %d を返しました。";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
+"Hugging Face token" = "Hugging Face トークン";
 "Idle -- the model reloads on the next message" = "待機中 — 次のメッセージでモデルを再読み込み";
 "Image generation" = "画像生成";
 "Image model" = "画像モデル";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "このフォルダにモデルが見つかりません。";
 "No runs yet." = "実行履歴はまだありません。";
 "No saved sessions" = "保存済みセッションはありません";
+"Non-commercial license: read it on the model card before using the model." = "非商用ライセンス: モデルを使用する前にモデルカードで確認してください。";
 "Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
 "OK" = "OK";
 "Off" = "オフ";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "制限付きモデルのみ (Llama、一部の Gemma と FLUX リポジトリ): Hugging Face ページでライセンスを承諾し、読み取り用トークンをここに貼り付けてください。トークンは Keychain に保存され、huggingface.co にのみ送信されます。";
 "Open" = "開く";
 "Open Server Log…" = "サーバログを開く…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Recovery" = "復旧";
 "Regenerate" = "再生成";
+"Remove" = "削除";
 "Remove attachment" = "添付ファイルを削除します。";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "ダウンロード済みの mlx-lm ランタイムを %@ から削除します。次回サーバ起動時に再度セットアップされます。保存済みのチャットとプロファイルは保持されます。";
 "Rename" = "名称変更";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "確率の合計がこの値に達する、最も可能性の高いトークンからのみサンプリングします。1.0 でオフになります。";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "可能性の高い順にこの数のトークンからのみサンプリングします。0 でオフになります。Gemma 4 では 64 が推奨されます。";
 "Sampling" = "サンプリング";
+"Save" = "保存";
+"Saved in your Keychain" = "Keychain に保存されました";
 "Save…" = "保存…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "モデルが要求する幅/高さをスケーリングします。バランスでは 1024x1024 はそのままです。";
 "Search" = "検索";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "ターゲット: %@ · プロファイル %@";
 "Temperature" = "温度";
 "Temporary — not saved" = "一時的 — 保存されません";
+"The Keychain refused to remove the token." = "Keychain がトークンの削除を拒否しました。";
+"The Keychain refused to save the token." = "Keychain がトークンの保存を拒否しました。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI互換APIはここで待ち受けます（http://localhost:<port>/v1）。サーバが停止している間に変更してください。";
 "The base profile: every other profile inherits from it." = "基本プロファイルです。ほかのすべてのプロファイルはこれを継承します。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "初回は、チャットの途中ではなく今、%@（%@）をこのMacにダウンロードします。";
 "The longest answer the model may write. Also capped by the model's own context length." = "モデルが生成できる最長の回答です。モデル自身のコンテキスト長によっても制限されます。";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "モデルを実行する mlx-lm のバージョン（LLMTray 独自フォークのコミット）です。アプリとは別にアップデートされます。";
 "The model name API clients send." = "APIクライアントが送信するモデル名です。";
+"The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
 "The running model server is stopped and started again." = "実行中のモデルサーバは停止してから再起動されます。";
 "These models go back to Default: %@." = "これらのモデルは Default に戻ります：%@。";
 "Thinking…" = "考え中…";

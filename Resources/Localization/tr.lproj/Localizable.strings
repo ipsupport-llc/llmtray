@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ kısıtlı: lisansını huggingface.co/%@ adresinde kabul edin, sonra Ayarlar → Models'te bir Hugging Face tokenı ekleyin.";
+"%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
 "%@ → %@ available" = "%@ → %@ mevcut";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "Diskte boş: %@ · modelleriniz: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Yüklü bir modelin tuttuğu belleği, bu kadar süre istek gelmezse serbest bırakır. Sonraki istekte, olağan yükleme gecikmesiyle otomatik olarak yeniden yüklenir.";
 "Full" = "Tam";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasındaki lisansını kabul edin ve Ayarlar → Models bölümüne bir token ekleyin.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasından erişim isteyin (yazarlar inceler) ve Ayarlar → Models bölümüne bir token ekleyin.";
 "General" = "Genel";
 "Generating image…" = "Görüntü oluşturuluyor…";
+"Get one" = "Al";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "Saatlik tahmin";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face %@ için HTTP %d döndü.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
+"Hugging Face token" = "Hugging Face tokenı";
 "Idle -- the model reloads on the next message" = "Boşta — model sonraki iletide yeniden yüklenir";
 "Image generation" = "Görüntü oluşturma";
 "Image model" = "Görüntü modeli";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "Bu klasörde model bulunamadı.";
 "No runs yet." = "Henüz çalıştırma yok.";
 "No saved sessions" = "Kayıtlı oturum yok";
+"Non-commercial license: read it on the model card before using the model." = "Ticari olmayan lisans: modeli kullanmadan önce model kartında okuyun.";
 "Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
 "OK" = "Tamam";
 "Off" = "Kapalı";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Kapalı: sunucuya yalnızca bu Mac erişebilir. Açık: ağınızdaki diğer aygıtlar da erişebilir; ağdaki herkes erişebileceği için yalnızca güvendiğiniz ağlarda kullanın.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Sadece kısıtlı modeller için (Llama, bazı Gemma ve FLUX depoları): Hugging Face sayfasında modelin lisansını kabul edin, sonra buraya bir read token yapıştırın. Keychain'inizde saklanır, yalnızca huggingface.co'ya gönderilir.";
 "Open" = "Aç";
 "Open Server Log…" = "Sunucu Günlüğünü Aç…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Recovery" = "Kurtarma";
 "Regenerate" = "Yeniden oluştur";
+"Remove" = "Kaldır";
 "Remove attachment" = "Eki kaldırır.";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanını %@ konumundan kaldırır. Bir sonraki sunucu başlatmasında yeniden ayarlanır. Kaydedilmiş sohbetler ve profiller korunur.";
 "Rename" = "Yeniden Adlandır";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Yalnızca olasılıkları toplamı bu değere ulaşan en olası token’lardan örnekler. 1.0 devre dışı bırakır.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Yalnızca bu sayıdaki en olası token’dan örnekler. 0 devre dışı bırakır. Gemma 4, 64 önerir.";
 "Sampling" = "Örnekleme";
+"Save" = "Kaydet";
+"Saved in your Keychain" = "Keychain'inize kaydedildi";
 "Save…" = "Kaydet…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Modelin istediği genişliği/yüksekliği ölçekler. Dengeli, 1024x1024 boyutunu olduğu gibi korur.";
 "Search" = "Ara";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "Hedef: %@ · profil %@";
 "Temperature" = "Sıcaklık";
 "Temporary — not saved" = "Geçici — kaydedilmez";
+"The Keychain refused to remove the token." = "Keychain tokenı kaldırmayı reddetti.";
+"The Keychain refused to save the token." = "Keychain tokenı kaydetmeyi reddetti.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI uyumlu API burada dinler (http://localhost:<port>/v1). Sunucu durdurulmuşken değiştirin.";
 "The base profile: every other profile inherits from it." = "Temel profil: diğer tüm profiller ondan devralır.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "İlk seferinde %@ (%@) bu Mac’e sohbet sırasında değil, şimdi indirilir.";
 "The longest answer the model may write. Also capped by the model's own context length." = "Modelin yazabileceği en uzun yanıt. Modelin kendi bağlam uzunluğuyla da sınırlıdır.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Modelleri çalıştıran mlx-lm sürümü (LLMTray’in kendi fork’undaki bir commit). Uygulamadan ayrı olarak güncellenir.";
 "The model name API clients send." = "API istemcilerinin gönderdiği model adı.";
+"The model's license, from its card." = "Modelin lisansı, model kartından.";
 "The running model server is stopped and started again." = "Çalışan model sunucusu durdurulup yeniden başlatılır.";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "Thinking…" = "Düşünüyor…";
