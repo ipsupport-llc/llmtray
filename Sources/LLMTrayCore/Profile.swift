@@ -41,9 +41,9 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
     }
 
     /// Per-chat-request settings. In the in-app chat they're sent on every
-    /// request; for external clients they become mlx_lm.server's own
-    /// defaults (`--temp` etc.), which apply only when the client didn't
-    /// send a value.
+    /// request; for external clients the proxy fills them into requests
+    /// that don't set them (ServerLaunch.requestDefaults) -- so changing
+    /// them never needs a restart.
     public struct RequestSettings: Codable, Equatable, Sendable {
         public var temperature: Double?
         public var topP: Double?

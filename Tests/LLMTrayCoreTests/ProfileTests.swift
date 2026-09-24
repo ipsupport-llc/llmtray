@@ -113,7 +113,9 @@ final class ServerLaunchTests: XCTestCase {
         let a = resolved()
         XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.systemPrompt = "hi" }, context: ctx))
         XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.tools.enableImageGeneration = true }, context: ctx))
-        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.temperature = 1.0 }, context: ctx))
+        // Sampling reaches the server with every request (the proxy fills it in).
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.temperature = 1.0 }, context: ctx))
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: resolved { $0.request.topK = 20; $0.request.topP = 0.5; $0.request.maxTokens = 77 }, context: ctx))
         XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: resolved { $0.launch.kvBits = 0 }, context: ctx))
     }
 
@@ -142,6 +144,22 @@ final class ServerLaunchTests: XCTestCase {
         c.maxContext = 8192
         XCTAssertEqual(value(ServerLaunch.arguments(resolved { $0.request.maxTokens = 131072 }, c), "--max-tokens"), "8192")
         XCTAssertEqual(value(ServerLaunch.arguments(resolved { $0.request.maxTokens = 2048 }, c), "--max-tokens"), "2048")
+    }
+
+    func testRequestDefaults() {
+        let d = ServerLaunch.requestDefaults(resolved { $0.request.temperature = 0.6; $0.request.topP = 0.95; $0.request.topK = 64; $0.request.maxTokens = 131072 }, maxContext: 8192)
+        XCTAssertEqual(d.map(\.key), ["temperature", "top_p", "max_tokens", "top_k"])
+        XCTAssertEqual(d.map(\.json), ["0.6", "0.95", "8192", "64"])
+        XCTAssertEqual(ServerLaunch.requestDefaults(resolved { $0.request.topK = 0 }, maxContext: nil).first { $0.key == "top_k" }?.json, "0")
+        // A sampling flag the user put in the extra arguments stays a launch
+        // setting: not filled per request, and editing it needs a restart.
+        let manual = resolved { $0.launch.extraServerArgs = "--temp 0.2" }
+        XCTAssertFalse(ServerLaunch.requestDefaults(manual, maxContext: nil).contains { $0.key == "temperature" })
+        XCTAssertFalse(ServerLaunch.requestDefaults(resolved { $0.launch.extraServerArgs = "--top-k=5" }, maxContext: nil).contains { $0.key == "top_k" })
+        XCTAssertTrue(ServerLaunch.requestDefaults(resolved(), maxContext: nil, launchedExtraArgs: "").contains { $0.key == "temperature" })
+        XCTAssertFalse(ServerLaunch.requestDefaults(resolved(), maxContext: nil, launchedExtraArgs: "--temp 0.2").contains { $0.key == "temperature" })
+        XCTAssertTrue(ServerLaunch.needsRestart(from: manual, to: resolved { $0.launch.extraServerArgs = "--temp 0.9" }, context: ctx))
+        XCTAssertEqual(ServerLaunch.withoutSampling(["--model", "m", "--temp", "1.0", "--kv-bits", "8", "--top-k", "64"]), ["--model", "m", "--kv-bits", "8"])
     }
 
     func testTopKZeroOmitted() {
