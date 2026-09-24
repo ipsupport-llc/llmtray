@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "भाषा बदलने के लिए LLMTray रीस्टार्ट करें?";
 "Restart Now" = "अभी रीस्टार्ट करें";
 "Restart Server" = "सर्वर रीस्टार्ट करें";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "लगातार इतने अनुरोध अटकने पर मॉडल प्रक्रिया को अटका छोड़ने के बजाय रीस्टार्ट करता है। 0 इसे बंद करता है।";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "लगातार इतने बड़े रुक गए अनुरोधों के बाद मॉडल प्रक्रिया को पुनरारंभ करता है, ताकि वह अटक कर न रहे, और जब इसकी जनरेशन थ्रेड बंद हो जाती है (जैसे GPU मेमोरी खत्म होना; अधिकतम 10 मिनट में 3 बार)। 0 से यह बंद हो जाता है।";
 "Restarts the model process with the new settings (a few seconds to reload)." = "नई सेटिंग्स के साथ मॉडल प्रक्रिया रीस्टार्ट करता है (रीलोड होने में कुछ सेकंड लगेंगे)।";
 "Resume download" = "डाउनलोड फिर से शुरू करें।";
 "Retry" = "फिर कोशिश करें";

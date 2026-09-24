@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "Mulai ulang LLMTray untuk mengubah bahasa?";
 "Restart Now" = "Mulai Ulang Sekarang";
 "Restart Server" = "Mulai Ulang Server";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Memulai ulang proses model setelah sejumlah permintaan berturut-turut macet, alih-alih membiarkannya macet. 0 menonaktifkannya.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Memulai ulang proses model setelah sejumlah permintaan berturut-turut macet, daripada membiarkannya tersangkut, dan ketika thread generasinya mati (mis. kehabisan memori GPU; maksimal 3 kali dalam 10 menit). 0 mematikan fitur ini.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Memulai ulang proses model dengan pengaturan baru (perlu beberapa detik untuk memuat ulang).";
 "Resume download" = "Lanjutkan pengunduhan.";
 "Retry" = "Coba Lagi";

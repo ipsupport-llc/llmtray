@@ -180,7 +180,7 @@
 "Restart LLMTray to change the language?" = "Khởi động lại LLMTray để đổi ngôn ngữ?";
 "Restart Now" = "Khởi động lại bây giờ";
 "Restart Server" = "Khởi động lại máy chủ";
-"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Khởi động lại tiến trình mô hình sau số yêu cầu bị treo liên tiếp này, thay vì để tiến trình kẹt. 0 sẽ tắt tính năng này.";
+"Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Khởi động lại tiến trình mô hình sau khi có nhiều yêu cầu bị treo liên tiếp như vậy, thay vì để nó kẹt, và khi luồng sinh văn bản của nó chết (ví dụ: hết bộ nhớ GPU; tối đa 3 lần trong 10 phút). 0 để tắt.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Khởi động lại tiến trình mô hình với cài đặt mới (mất vài giây để tải lại).";
 "Resume download" = "Tiếp tục tải về.";
 "Retry" = "Thử lại";
