@@ -4,3 +4,4 @@ runtime/.mlx_server_venv/
 *.xcodeproj
 .DS_Store
 __pycache__/
+docs/appcast.xml
