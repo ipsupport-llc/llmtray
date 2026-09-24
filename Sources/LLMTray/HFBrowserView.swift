@@ -1,3 +1,4 @@
+import LLMTrayCore
 import SwiftUI
 
 struct HFBrowserView: View {
@@ -72,6 +73,14 @@ struct HFBrowserView: View {
                             }
                             Text(model.id)
                                 .font(.system(size: 12, weight: .medium))
+                            if case .gated(let manual)? = browser.infoByID[model.id]?.access {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(.orange)
+                                    .help(Text(manual
+                                        ? "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models."
+                                        : "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models."))
+                            }
                         }
                         HStack(spacing: 4) {
                             if let downloads = model.downloads {
@@ -82,6 +91,14 @@ struct HFBrowserView: View {
                                 Text(Self.byteFormatter.string(fromByteCount: size))
                             } else {
                                 Text("· size…")
+                            }
+                            if let info = browser.infoByID[model.id], let license = info.license {
+                                Text("·")
+                                // The license is the publisher's: shown before a
+                                // download, non-commercial ones flagged.
+                                Text(verbatim: license)
+                                    .foregroundColor(info.isNonCommercial ? .orange : .secondary)
+                                    .help(Text(info.isNonCommercial ? "Non-commercial license: read it on the model card before using the model." : "The model's license, from its card."))
                             }
                         }
                         .font(.system(size: 10))

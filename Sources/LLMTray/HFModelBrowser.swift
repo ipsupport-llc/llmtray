@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 import SwiftUI
 
 extension Notification.Name {
@@ -127,6 +128,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     // place would mean finding-and-replacing by index on every single
     // completion instead of a plain dictionary write.
     @Published var sizesByID: [String: Int64] = [:]
+    /// License and access (gated or not) of each shown result.
+    @Published var infoByID: [String: HubModelInfo] = [:]
 
     let physicalMemoryBytes = ProcessInfo.processInfo.physicalMemory
 
@@ -210,6 +213,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         isSearching = true
         searchError = nil
         sizesByID.removeAll()
+        infoByID.removeAll()
         Task {
             do {
                 var comps = URLComponents(string: "https://huggingface.co/api/models")!
@@ -234,10 +238,6 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         }
     }
 
-    private struct HFModelDetail: Decodable {
-        let usedStorage: Int64?
-    }
-
     /// Fetches each shown result's exact on-disk size from HF's per-model
     /// detail endpoint -- not available in bulk on the search/list endpoint
     /// itself (its `expand[]` allowlist doesn't include usedStorage,
@@ -251,15 +251,23 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             Task {
                 guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)") else { return }
                 guard let (data, _) = try? await URLSession.shared.data(from: url),
-                      let detail = try? JSONDecoder().decode(HFModelDetail.self, from: data),
-                      let size = detail.usedStorage else { return }
-                sizesByID[model.id] = size
+                      let info = HubModelInfo.parse(data) else { return }
+                infoByID[model.id] = info
+                if let size = info.sizeBytes { sizesByID[model.id] = size }
             }
         }
     }
 
     func download(_ model: HFModelSummary, completion: @escaping () -> Void) {
         guard downloadingID == nil else { return }
+        // A gated model's files answer 401 without a token (seen live: the
+        // listing is open, the files aren't).
+        if case .gated = infoByID[model.id]?.access, HFToken.value == nil {
+            downloadError = String(format: NSLocalizedString(
+                "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.",
+                comment: "gated model, no token"), model.id, model.id)
+            return
+        }
         downloadingID = model.id
         currentModelID = model.id
         isPaused = false
@@ -270,8 +278,14 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
         Task {
             do {
-                let treeURL = URL(string: "https://huggingface.co/api/models/\(model.id)/tree/main")!
-                let (data, _) = try await URLSession.shared.data(from: treeURL)
+                var treeRequest = URLRequest(url: URL(string: "https://huggingface.co/api/models/\(model.id)/tree/main")!)
+                HFToken.authorize(&treeRequest)
+                let (data, response) = try await URLSession.shared.data(for: treeRequest)
+                if let status = (response as? HTTPURLResponse)?.statusCode, !(200..<300).contains(status) {
+                    downloadError = Self.accessMessage(status: status, repo: model.id)
+                    downloadingID = nil
+                    return
+                }
                 let entries = try JSONDecoder().decode([HFTreeEntry].self, from: data)
                     .filter { $0.type == "file" }
                 guard !entries.isEmpty else {
@@ -377,7 +391,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 .map { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }
                 .joined(separator: "/")
             guard let url = URL(string: "https://huggingface.co/\(currentModelID)/resolve/main/\(encodedPath)") else { return }
-            task = session.downloadTask(with: url)
+            var request = URLRequest(url: url)
+            HFToken.authorize(&request)
+            task = session.downloadTask(with: request)
         }
         files[path]?.resumeData = nil
         tasksByPath[path] = task
@@ -435,6 +451,15 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
               let file = files[path] else { return }
         let dest = file.destination
         let fm = FileManager.default
+        // An error page (401 gated, 404) must not be saved as the file.
+        if let status = (downloadTask.response as? HTTPURLResponse)?.statusCode, !(200..<300).contains(status) {
+            Task { @MainActor in
+                let message = Self.accessMessage(status: status, repo: self.currentModelID)
+                self.cancelDownload()   // clears downloadError: set after
+                self.downloadError = message
+            }
+            return
+        }
         // `let`, not `var` -- assigned exactly once on every path below, so
         // it's an immutable value by the time the Task below captures it.
         // Strict concurrency checking flags a genuinely mutable var here as
@@ -479,6 +504,33 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 self.onAllDone = nil
             }
         }
+    }
+
+    /// Why Hugging Face refused a repo's files, in words.
+    nonisolated static func accessMessage(status: Int, repo: String) -> String {
+        switch status {
+        case 401, 403:
+            return String(format: NSLocalizedString(
+                "Hugging Face refused %@ (HTTP %d): it's gated -- accept its license on huggingface.co/%@ and check the token in Settings → Models.",
+                comment: "gated download refused"), repo, status, repo)
+        case 404:
+            return String(format: NSLocalizedString("%@ wasn't found on Hugging Face.", comment: ""), repo)
+        default:
+            return String(format: NSLocalizedString("Hugging Face answered HTTP %d for %@.", comment: ""), status, repo)
+        }
+    }
+
+    /// The token is for huggingface.co: a redirect to its file CDN (signed
+    /// URLs) must not carry it.
+    nonisolated func urlSession(
+        _ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void
+    ) {
+        var request = request
+        if request.url?.host != "huggingface.co" {
+            request.setValue(nil, forHTTPHeaderField: "Authorization")
+        }
+        completionHandler(request)
     }
 
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
