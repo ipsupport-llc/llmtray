@@ -81,30 +81,11 @@ if [[ ! -x "$FRAMEWORK_PYTHON" ]]; then
 fi
 echo "--- framework python: $FRAMEWORK_PYTHON ---"
 
-# python.org's installer assumes the framework lands at the standard
-# system location and bakes that absolute path into affected binaries'
-# link commands -- confirmed via otool on several: bin/python3.X, the
-# Python.app launcher stub under Resources (which bin/python3.X re-execs
-# into for some invocations), and -- less obviously -- the _ssl/_hashlib
-# extension modules and libssl/libcrypto themselves, which reference each
-# other via the same absolute .../Versions/X.Y/lib/libssl.3.dylib style
-# path. Any of these missing means a dyld "Library not loaded" crash (for
-# the ones actually exec'd) or a silently-disabled ssl module (pip's
-# "ssl module in Python is not available" -- the failure mode that first
-# exposed the lib* pair). So instead of special-casing "Python", every
-# absolute reference anywhere under this framework version is discovered
-# via otool and rewritten to an @loader_path-relative one (with the right
-# number of "../" for that binary's own depth under Versions/X.Y),
-# whatever file it happens to point at. Deliberately @loader_path, not
-# @executable_path: the latter resolves against the process's *main*
-# executable, and bin/python3.X actually re-execs into the bundled
-# Resources/Python.app/Contents/MacOS/Python launcher for some
-# invocations -- with @executable_path, a dlopen from deep inside (e.g.
-# _ssl.so loading libssl) resolved relative to *that* launcher's
-# location instead of its own, landing on a nonexistent path one
-# directory off. @loader_path always resolves relative to the file doing
-# the loading, regardless of which binary ends up as the process's entry
-# point.
+# Make the framework relocatable: rewrite every absolute
+# /Library/Frameworks/Python.framework reference under it (found with
+# otool -- incl. _ssl/_hashlib and libssl/libcrypto) to @loader_path, not
+# @executable_path (python re-execs into the Python.app stub). Why, and what
+# broke without each part: adr/0001-mlx-runtime.md.
 FRAMEWORK_ROOT="$APP/Contents/Frameworks/Python.framework"
 VERSIONS_ROOT="$FRAMEWORK_ROOT/Versions/$PY_SHORT_VERSION"
 FRAMEWORK_PREFIX="/Library/Frameworks/Python.framework/Versions/$PY_SHORT_VERSION/"

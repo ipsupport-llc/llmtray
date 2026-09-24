@@ -240,18 +240,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Task { await attemptStart(retriesLeft: 1) }
     }
 
-    /// No `?? models.first` fallback on purpose: this also runs unattended
-    /// at every launch (applicationDidFinishLaunching), and silently
-    /// substituting "whatever's alphabetically first" for a model that
-    /// can't be found is a bad failure mode to have happen with zero
-    /// visual feedback -- confirmed live after a Sparkle update, where the
-    /// saved selection briefly didn't resolve (selectedModelID and the
-    /// models root were both still correctly persisted seconds later, so
-    /// this reads as a startup-timing race rather than a lost setting) and
-    /// it silently auto-loaded an unrelated 27B model instead of the
-    /// intended one. One short retry covers exactly that kind of transient
-    /// race; if it still can't find the model after that, surfacing a
-    /// clear reason is safer than guessing.
+    /// No fallback to another model when the saved one isn't found: after an
+    /// update that once silently loaded an unrelated 27B model (a startup
+    /// race). One short retry, then a visible error -- adr/0003.
     private func attemptStart(retriesLeft: Int) async {
         let defaults = UserDefaults.standard
         guard let savedID = defaults[Pref.selectedModelID] else { return }

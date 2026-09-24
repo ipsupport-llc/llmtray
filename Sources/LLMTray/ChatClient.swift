@@ -116,20 +116,11 @@ final class ChatClient: ObservableObject {
         sessionCreatedAt = nil
     }
 
-    /// Everything that must not survive a switch to a different
-    /// conversation. The New chat / History controls stay enabled while a
-    /// turn is still running (by design -- so you can leave a slow one), and
-    /// several steps of a turn are async (mflux image generation takes tens
-    /// of seconds and can't be cancelled; compaction awaits its own
-    /// request). Those continuations used to resume into whatever
-    /// `messages` held by then: a generated image + tool result appended
-    /// into the NEW session and a follow-up request sent from it (the model
-    /// continued the old conversation there), or an old session's
-    /// compaction summary spliced into the new one and saved into its file
-    /// -- the "context leaks between chat sessions" a tester reported.
-    /// Bumping `conversationEpoch` makes every such continuation discard its
-    /// result; cancelling the transport drops every late callback of the
-    /// abandoned stream.
+    /// Everything that must not survive a switch to another conversation.
+    /// Async turn steps (image generation, compaction) outlive the switch;
+    /// bumping `conversationEpoch` makes them drop their result instead of
+    /// landing in the new chat (adr/0003), and cancelling the transport
+    /// drops the abandoned stream's late callbacks.
     private func resetConversationState() {
         cancel()
         conversationEpoch += 1
