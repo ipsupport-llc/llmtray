@@ -7,6 +7,9 @@ import SwiftUI
 struct MessageBubble: View {
     let message: ChatMessage
     let showReasoning: Bool
+    /// Debug view of the tool calls (Pref.showToolCalls): call id -> the
+    /// tool's result; nil hides them.
+    var toolResults: [String: String]?
 
     var body: some View {
         if message.isSummary {
@@ -71,6 +74,14 @@ struct MessageBubble: View {
 
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
+            }
+
+            if let toolResults, !message.toolCalls.isEmpty {
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(message.toolCalls, id: \.id) { call in
+                        ToolCallRow(call: call, result: toolResults[call.id])
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
@@ -141,5 +152,46 @@ struct ImageGenerationProgressView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// One tool call in the debug view: the call collapsed, its result expanded.
+private struct ToolCallRow: View {
+    let call: ToolCall
+    let result: String?
+    @State private var expanded = false
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $expanded) {
+            Text(result.map { $0.count > 4000 ? String($0.prefix(4000)) + "…" : $0 } ?? NSLocalizedString("(no result yet)", comment: "tool call debug view"))
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundColor(.secondary)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(6)
+                .background(Color.gray.opacity(0.08))
+                .cornerRadius(6)
+        } label: {
+            Label {
+                Text("\(call.name)(\(Self.compact(call.argumentsJSON)))")
+                    .font(.system(size: 10, design: .monospaced))
+                    .lineLimit(expanded ? nil : 1)
+                    .truncationMode(.tail)
+            } icon: {
+                Image(systemName: "wrench.and.screwdriver").imageScale(.small)
+            }
+            .foregroundColor(.secondary)
+        }
+    }
+
+    /// {"expression":"2+2"} -> expression: "2+2"
+    static func compact(_ json: String) -> String {
+        guard let data = json.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return json }
+        return obj.keys.sorted().map { key -> String in
+            let value = obj[key]!
+            if let s = value as? String { return "\(key): \"\(s)\"" }
+            return "\(key): \(value)"
+        }.joined(separator: ", ")
     }
 }
