@@ -9,7 +9,8 @@ import Foundation
 /// auto-track the branch tip on every launch -- an in-progress commit on
 /// `main` could be broken or mid-change; bumping the pin is a deliberate,
 /// visible action instead (via Check for Updates here, which compares
-/// against `main`'s current tip through the GitHub API).
+/// against `main`'s current tip -- or `beta`'s, with beta updates on --
+/// through the GitHub API).
 @MainActor
 final class RuntimeManager: ObservableObject {
     enum CheckState: Equatable {
@@ -24,7 +25,14 @@ final class RuntimeManager: ObservableObject {
     @Published private(set) var checkState: CheckState = .idle
 
     private static let repo = "ipsupport-llc/mlx-lm"
-    private static let trackedBranch = "main"
+    private static let stableBranch = "main"
+    /// With "Receive beta updates" on, runtime updates follow the fork's
+    /// `beta` branch: a runtime fix can reach beta testers without a new
+    /// app build. Falls back to main if that branch doesn't exist.
+    private static let betaBranch = "beta"
+    private static var trackedBranch: String {
+        UserDefaults.standard.bool(forKey: "llmtray.betaUpdates") ? betaBranch : stableBranch
+    }
 
     private var runtimeDir: String { RuntimePaths.runtimeDir }
     private var pinFilePath: String { runtimeDir + "/mlx_lm_runtime.json" }
@@ -52,12 +60,11 @@ final class RuntimeManager: ObservableObject {
 
         Task {
             do {
-                let url = URL(string: "https://api.github.com/repos/\(Self.repo)/commits/\(Self.trackedBranch)")!
-                var request = URLRequest(url: url)
-                request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-                let (data, _) = try await URLSession.shared.data(for: request)
-                guard let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let latest = obj["sha"] as? String else {
+                var latest = try await Self.tipCommit(of: Self.trackedBranch)
+                if latest == nil, Self.trackedBranch != Self.stableBranch {
+                    latest = try await Self.tipCommit(of: Self.stableBranch)
+                }
+                guard let latest else {
                     checkState = .failed("unexpected GitHub API response")
                     return
                 }
@@ -70,6 +77,17 @@ final class RuntimeManager: ObservableObject {
                 checkState = .failed(error.localizedDescription)
             }
         }
+    }
+
+    /// The branch tip's commit SHA, nil if the branch doesn't exist (404).
+    private static func tipCommit(of branch: String) async throws -> String? {
+        let url = URL(string: "https://api.github.com/repos/\(repo)/commits/\(branch)")!
+        var request = URLRequest(url: url)
+        request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if (response as? HTTPURLResponse)?.statusCode == 404 { return nil }
+        let obj = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        return obj?["sha"] as? String
     }
 
     /// Bumps the pin and reinstalls the venv's mlx-lm at the new commit. If
