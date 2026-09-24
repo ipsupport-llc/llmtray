@@ -13,7 +13,8 @@ jobs:
       - name: swift build
         run: swift build
       - name: swift test
-        run: swift test
+        # `swift test` errors out on a package with no test target.
+        run: if [ -d Tests ]; then swift test; else echo "no tests"; fi
 
   # The release scripts only ever ran on a real tag push, so their bugs
   # (v0.6.7's SIGPIPE in build_full_app.sh) surfaced as a failed release.
