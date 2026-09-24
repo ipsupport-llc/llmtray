@@ -133,6 +133,15 @@
     transition: transform 0.15s ease;
   }
   .btn-download:hover { transform: translateY(-1px); }
+  .cta-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 100%; }
+  .cta-buttons .btn-download { max-width: 100%; box-sizing: border-box; }
+  .btn-download .sub { display: block; font-size: 0.72rem; font-weight: 500; opacity: 0.8; }
+  .btn-download.alt {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    box-shadow: none;
+  }
   .btn-download svg { width: 20px; height: 20px; }
   .cta-meta {
     font-size: 0.8rem;
@@ -209,11 +218,17 @@
       <p class="tagline">Local LLMs from your macOS menu bar — no terminal tab required.</p>
 
       <div class="cta">
-        <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-          Download for macOS
-        </a>
-        <span class="cta-meta">~2MB · macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch<br>Installs the mlx-lm runtime (~450MB) on first launch — or get <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">LLMTray-Full.dmg</a> (~270MB) with it already inside, no Python needed.</span>
+        <div class="cta-buttons">
+          <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            <span>Download for macOS<span class="sub">~2MB · installs the mlx-lm runtime (~450MB) on first launch, needs Python 3.10+</span></span>
+          </a>
+          <a class="btn-download alt" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
+            <span>Download Full<span class="sub">~270MB · Python + mlx-lm inside, nothing else needed</span></span>
+          </a>
+        </div>
+        <span class="cta-meta">macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
 
