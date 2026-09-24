@@ -66,6 +66,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         _ = updaterController  // lazy: created (and its background checks started) at launch
+        // Sparkle's automatic checks are periodic (about once a day), not per
+        // launch. This quiet background check runs at every launch unless
+        // turned off; it only shows UI when an update actually exists.
+        if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil,
+           UserDefaults.standard.object(forKey: "llmtray.checkUpdatesAtLaunch") as? Bool ?? true {
+            updaterController.updater.checkForUpdatesInBackground()
+        }
         NSApp.setActivationPolicy(.accessory)
         installSignalHandlers()
         setupStatusItem()

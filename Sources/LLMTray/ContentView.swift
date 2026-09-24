@@ -58,6 +58,7 @@ struct ContentView: View {
     // to the updater instance (which lives in AppDelegate, not here).
     @AppStorage("SUEnableAutomaticChecks") private var autoCheckForUpdates: Bool = true
     @AppStorage("llmtray.betaUpdates") private var betaUpdates: Bool = false
+    @AppStorage("llmtray.checkUpdatesAtLaunch") private var checkUpdatesAtLaunch: Bool = true
     @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
     @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes: Int = 0
     @AppStorage("llmtray.stallThresholdSeconds") private var stallThresholdSeconds: Int = 60
@@ -115,8 +116,10 @@ struct ContentView: View {
                 Divider()
             }
             chatArea
+                .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
             Divider()
             inputBar
+                .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
         }
         .frame(width: 420)
         .onAppear {
@@ -698,6 +701,8 @@ struct ContentView: View {
             }
             Toggle("Start server automatically on launch", isOn: $autoStartOnLaunch)
             Toggle("Automatically check for updates", isOn: $autoCheckForUpdates)
+            Toggle("Check for updates when LLMTray starts", isOn: $checkUpdatesAtLaunch)
+                .help("A quiet background check at every launch, in addition to Sparkle's periodic one. Only shows anything if an update exists.")
             Toggle("Receive beta updates", isOn: $betaUpdates)
                 .help("Pre-release app builds with features still being tested, and runtime updates (Check for Updates) from mlx-lm's beta branch. Turning this off doesn't downgrade an installed beta; you move back to stable with the next stable release.")
             Toggle("Show reasoning / thinking", isOn: $showReasoning)
@@ -1623,6 +1628,8 @@ struct ContentView: View {
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...4)
                     .onSubmit(sendDraft)
+                    .onChange(of: draft) { convertDroppedImagePaths(in: $0) }
+                    .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
                     .focused($isInputFocused)
                     .disabled(!canChat)
 
@@ -1683,11 +1690,68 @@ struct ContentView: View {
         panel.allowedContentTypes = [.image]
         guard panel.runModal() == .OK else { return }
         for url in panel.urls {
-            guard let nsImage = NSImage(contentsOf: url),
-                  let tiff = nsImage.tiffRepresentation,
-                  let rep = NSBitmapImageRep(data: tiff),
-                  let png = rep.representation(using: .png, properties: [:]) else { continue }
-            pendingAttachments.append(png)
+            attachImage(NSImage(contentsOf: url))
+        }
+    }
+
+    @discardableResult
+    private func attachImage(_ nsImage: NSImage?) -> Bool {
+        guard let nsImage,
+              let tiff = nsImage.tiffRepresentation,
+              let rep = NSBitmapImageRep(data: tiff),
+              let png = rep.representation(using: .png, properties: [:]) else { return false }
+        pendingAttachments.append(png)
+        return true
+    }
+
+    /// Images dropped on the chat or the input bar: files (incl. the
+    /// floating screenshot thumbnail, which hands over a file URL) or raw
+    /// image data. Only for vision-capable models.
+    private func handleImageDrop(_ providers: [NSItemProvider]) -> Bool {
+        guard modelSupportsVision else { return false }
+        var handled = false
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                handled = true
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                    guard let url else { return }
+                    let image = NSImage(contentsOf: url)
+                    DispatchQueue.main.async { attachImage(image) }
+                }
+            } else if provider.canLoadObject(ofClass: NSImage.self) {
+                handled = true
+                _ = provider.loadObject(ofClass: NSImage.self) { obj, _ in
+                    let image = obj as? NSImage
+                    DispatchQueue.main.async { attachImage(image) }
+                }
+            }
+        }
+        return handled
+    }
+
+    /// Dropping a file onto the text field itself makes AppKit's field
+    /// editor insert its *path* as text before any SwiftUI drop handler
+    /// sees it -- which is how a dragged screenshot ended up sent as
+    /// "/var/folders/.../Screenshot ....png" and the model replied it can't
+    /// open local files. So a path to an existing image file appearing in
+    /// the draft is turned into an attachment instead.
+    private func convertDroppedImagePaths(in text: String) {
+        guard modelSupportsVision, text.contains("/") else { return }
+        var remaining = text
+        var converted = false
+        for line in text.components(separatedBy: .newlines) {
+            let candidate = line.trimmingCharacters(in: .whitespaces)
+            guard candidate.hasPrefix("/") || candidate.hasPrefix("file://") else { continue }
+            let url = candidate.hasPrefix("file://") ? URL(string: candidate) : URL(fileURLWithPath: candidate)
+            guard let url, url.isFileURL,
+                  let type = UTType(filenameExtension: url.pathExtension), type.conforms(to: .image),
+                  FileManager.default.fileExists(atPath: url.path),
+                  attachImage(NSImage(contentsOf: url)) else { continue }
+            remaining = remaining.replacingOccurrences(of: candidate, with: "")
+            converted = true
+        }
+        if converted {
+            draft = remaining.trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 
