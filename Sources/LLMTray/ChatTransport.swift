@@ -38,8 +38,6 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
         session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }
 
-    var isActive: Bool { task != nil }
-
     func stream(_ request: URLRequest, onText: @escaping (String) -> Void, onComplete: @escaping (Completion) -> Void) {
         cancel()
         let newTask = session.dataTask(with: request)

@@ -53,6 +53,8 @@ final class ChatClient: ObservableObject {
     private var mfluxPreviewCancellable: AnyCancellable?
 
     private let transport = ChatTransport()
+    /// Bumped by cancel(): a tool round scheduled before a Stop doesn't run.
+    private var turnToken = 0
     private var decoder = SSEDecoder()
     // See resetConversationState(): async continuations capture this and
     // drop their result if the conversation was replaced meanwhile.
@@ -328,6 +330,7 @@ final class ChatClient: ObservableObject {
         decoder = SSEDecoder()
         approxCompletionTokens = 0
         usageCompletionTokens = nil
+        lastTokensPerSecond = nil
         isStreaming = true
         transport.stream(request, onText: { [weak self] text in
             self?.handle(self?.decoder.feed(text) ?? [])
@@ -338,13 +341,14 @@ final class ChatClient: ObservableObject {
 
     func cancel() {
         transport.cancel()
+        turnToken += 1
         isStreaming = false
         compactionTask?.cancel()
     }
 
     private func streamDidComplete(_ completion: ChatTransport.Completion) {
-        isStreaming = false
         if let statusCode = completion.statusCode, completion.isHTTPError {
+            isStreaming = false
             errorText = ChatTransport.serverErrorMessage(statusCode: statusCode, body: completion.errorBody)
             dropEmptyAssistantPlaceholder()
             persistCurrentSession()
@@ -355,9 +359,7 @@ final class ChatClient: ObservableObject {
             errorText = error.localizedDescription
         }
         finalizeTokensPerSecond(firstByte: completion.firstByteDate, endDate: completion.endDate)
-        if completion.error == nil {
-            Task { await continueWithPendingToolCalls() }
-        }
+        continueWithPendingToolCalls(afterError: completion.error != nil)
     }
 
     /// A failed request leaves the assistant message that was appended up
@@ -376,24 +378,32 @@ final class ChatClient: ObservableObject {
     /// If the response that just finished streaming carried one or more
     /// tool calls, runs them and sends their results back as a follow-up
     /// request so the model can react -- otherwise this turn is done.
-    private func continueWithPendingToolCalls() async {
-        guard let idx = assistantMessageIndex, idx < messages.count else {
-            persistCurrentSession()
+    /// Decided synchronously, in the same main-actor turn the stream ended
+    /// in: the turn stays "in progress" (isStreaming) until the tool round
+    /// has taken over, so Send/Stop don't flicker between rounds and a Stop
+    /// in that gap (see cancel(), turnToken) stops the round.
+    private func continueWithPendingToolCalls(afterError: Bool) {
+        guard !afterError, let idx = assistantMessageIndex, idx < messages.count,
+              !messages[idx].toolCalls.isEmpty, let context = pendingRequestContext else {
+            isStreaming = false
+            if !afterError { persistCurrentSession() }
             return
         }
         let toolCalls = messages[idx].toolCalls
-        guard !toolCalls.isEmpty, let context = pendingRequestContext else {
-            persistCurrentSession()
-            return
+        let token = turnToken
+        Task {
+            guard token == self.turnToken else { return }
+            await self.executeToolCalls(toolCalls, sourceIndex: idx, context: context)
         }
-        await executeToolCalls(toolCalls, sourceIndex: idx, context: context)
     }
 
     private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext) async {
         let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: context.settings)
         // Only when mflux will actually run -- a refused call shouldn't
-        // flash the "Generating image…" UI / pulse.
+        // flash the "Generating image…" UI / pulse. Set together with
+        // clearing isStreaming, so the turn never looks finished between.
         isGeneratingImage = willActuallyGenerate
+        isStreaming = false
         defer { isGeneratingImage = false }
 
         // A diffusion model's own peak memory can rival or exceed a loaded
