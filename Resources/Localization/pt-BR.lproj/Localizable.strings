@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Adicionado ao prompt do sistema sempre que ferramentas são oferecidas. O template de ferramentas do próprio modelo só diz como chamar uma ferramenta, nunca quando não chamar. Em branco desativa isso.";
 "Advanced" = "Avançado";
 "After %lld min" = "Após %lld min";
+"Air quality" = "Qualidade do ar";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: o nome “model” que outras ferramentas enviam à API do LLMTray para obter este modelo. Perfil: qual perfil de ajustes este modelo usa.";
 "Allow connections from the local network" = "Permitir conexões da rede local";
 "Also check when LLMTray starts" = "Verificar também ao iniciar o LLMTray";
@@ -94,6 +95,7 @@
 "Generating image…" = "Gerando imagem…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Fornece ao modelo uma ferramenta generate_image (requer um modelo com chamada de ferramentas). Na primeira vez, o modelo de imagem é baixado.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Previsão horária";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Quantos tokens do prompt são processados por etapa. Valores maiores são mais rápidos em prompts longos, mas usam mais memória. O ajuste automático do benchmark pode escolher isso.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Quantas solicitações são agrupadas em uma etapa da GPU. Só ajuda quando vários clientes usam o servidor ao mesmo tempo; usa mais memória.";
 "How many tokens it generates per trial." = "Quantos tokens ele gera por teste.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "Pare o servidor para atualizar o runtime.";
 "Stopped" = "Parado";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Para o modelo de chat enquanto uma imagem é gerada e o recarrega depois. Os dois ao mesmo tempo podem exceder a memória deste Mac.";
+"Sunrise & sunset" = "Nascer e pôr do sol";
 "System" = "Sistema";
 "System prompt" = "Prompt do sistema";
 "Target: %@ · profile %@" = "Destino: %@ · perfil %@";
@@ -276,6 +279,7 @@
 "Version %@" = "Versão %@";
 "View model card" = "Veja o cartão do modelo.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Aguarde a solicitação ou o benchmark atual terminar — reiniciar interromperia o processo.";
+"Weather" = "Clima";
 "Web search" = "Busca na web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Onde o LLMTray procura modelos MLX (uma pasta por modelo, ex.: <org>/<name>). Use ~/.lmstudio/models para compartilhar modelos com LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Define qual quantização do Z-Image-Turbo gera as imagens.";

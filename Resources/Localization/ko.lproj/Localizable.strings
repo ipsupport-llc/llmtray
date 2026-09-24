@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "도구가 제공될 때마다 시스템 프롬프트에 추가됩니다. 모델 자체 도구 템플릿은 도구 호출 방법만 설명하며, 호출하지 말아야 할 때는 설명하지 않습니다. 비워 두면 비활성화됩니다.";
 "Advanced" = "고급";
 "After %lld min" = "%lld분 후";
+"Air quality" = "대기 질";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "별칭: 다른 도구가 이 모델을 사용하려고 LLMTray의 API로 보내는 “model” 이름입니다. 프로필: 이 모델이 사용하는 설정 프로필입니다.";
 "Allow connections from the local network" = "로컬 네트워크에서 연결 허용";
 "Also check when LLMTray starts" = "LLMTray 시작 시에도 확인";
@@ -94,6 +95,7 @@
 "Generating image…" = "이미지 생성 중…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "모델에 generate_image 도구를 제공합니다(도구 호출 모델 필요). 처음 사용할 때 이미지 모델이 다운로드됩니다.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "시간별 예보";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
 "How many tokens it generates per trial." = "시도당 생성 토큰 수";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "런타임을 업데이트하려면 서버를 중지하십시오.";
 "Stopped" = "중지됨";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "이미지를 생성하는 동안 채팅 모델을 중지하고, 완료 후 다시 로드합니다. 둘을 동시에 실행하면 이 Mac의 메모리를 초과할 수 있습니다.";
+"Sunrise & sunset" = "일출·일몰";
 "System" = "시스템";
 "System prompt" = "시스템 프롬프트";
 "Target: %@ · profile %@" = "대상: %@ · 프로필 %@";
@@ -276,6 +279,7 @@
 "Version %@" = "버전 %@";
 "View model card" = "모델 카드를 엽니다.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "현재 요청 또는 벤치마크가 끝날 때까지 기다리십시오. 재시작하면 중단됩니다.";
+"Weather" = "날씨";
 "Web search" = "웹 검색";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
 "Which Z-Image-Turbo quantization generates the images." = "이미지를 생성할 Z-Image-Turbo 양자화를 지정합니다.";

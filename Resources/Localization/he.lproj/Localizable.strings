@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "מתווסף להנחיית המערכת בכל פעם שמוצעים כלים. תבנית הכלים של המודל עצמו אומרת רק איך לקרוא לכלי, ולעולם לא מתי לא. שדה ריק משבית זאת.";
 "Advanced" = "מתקדם";
 "After %lld min" = "לאחר %lld דק׳";
+"Air quality" = "איכות אוויר";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "כינוי: שם ה־“model” שכלים אחרים שולחים ל־API של LLMTray כדי לקבל את המודל הזה. פרופיל: פרופיל ההגדרות שבו המודל הזה משתמש.";
 "Allow connections from the local network" = "אפשר חיבורים מהרשת המקומית";
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
@@ -94,6 +95,7 @@
 "Generating image…" = "יוצר תמונה…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "תחזית לפי שעה";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "כמה בקשות מקובצות לצעד GPU אחד. עוזר רק כשכמה לקוחות משתמשים בשרת בו־זמנית; משתמש ביותר זיכרון.";
 "How many tokens it generates per trial." = "כמה טוקנים נוצרים בכל ניסיון.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "כדי לעדכן את סביבת הריצה, יש לעצור את השרת.";
 "Stopped" = "נעצר";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן שנוצרת תמונה, וטוען אותו מחדש לאחר מכן. הפעלה של שניהם יחד עלולה לחרוג מהזיכרון של ה‑Mac הזה.";
+"Sunrise & sunset" = "שקיעה וזריחה";
 "System" = "מערכת";
 "System prompt" = "הנחיית מערכת";
 "Target: %@ · profile %@" = "יעד: %@ · פרופיל %@";
@@ -276,6 +279,7 @@
 "Version %@" = "גרסה %@";
 "View model card" = "הצג את כרטיס המודל.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
+"Weather" = "מזג אוויר";
 "Web search" = "חיפוש באינטרנט";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "הקוונטיזציה של Z-Image-Turbo שמשמשת ליצירת התמונות.";

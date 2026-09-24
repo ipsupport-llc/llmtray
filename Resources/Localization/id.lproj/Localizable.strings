@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Ditambahkan ke prompt sistem setiap kali alat ditawarkan. Templat alat bawaan model hanya menjelaskan cara memanggil alat, bukan kapan tidak memanggilnya. Kosongkan untuk menonaktifkannya.";
 "Advanced" = "Lanjutan";
 "After %lld min" = "Setelah %lld menit";
+"Air quality" = "Kualitas udara";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: nama “model” yang dikirim alat lain ke API LLMTray untuk mendapatkan model ini. Profil: profil pengaturan yang digunakan model ini.";
 "Allow connections from the local network" = "Izinkan koneksi dari jaringan lokal";
 "Also check when LLMTray starts" = "Periksa juga saat LLMTray dimulai";
@@ -94,6 +95,7 @@
 "Generating image…" = "Membuat gambar…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Prakiraan per jam";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "Hentikan server untuk memperbarui runtime.";
 "Stopped" = "Dihentikan";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Menghentikan model chat saat gambar dibuat, lalu memuatnya kembali setelah selesai. Keduanya sekaligus dapat melampaui memori Mac ini.";
+"Sunrise & sunset" = "Matahari terbit & terbenam";
 "System" = "Sistem";
 "System prompt" = "Prompt sistem";
 "Target: %@ · profile %@" = "Target: %@ · profil %@";
@@ -276,6 +279,7 @@
 "Version %@" = "Versi %@";
 "View model card" = "Lihat kartu model.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
+"Weather" = "Cuaca";
 "Web search" = "Pencarian web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Kuantisasi Z-Image-Turbo yang digunakan untuk menghasilkan gambar.";
