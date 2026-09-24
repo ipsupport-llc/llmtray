@@ -63,6 +63,9 @@ final class ServerManager: ObservableObject {
     /// profile edits since then need a restart (see pendingLaunchChange).
     private var lastLaunchArguments: [String]?
     private var currentAlias: String = ""
+    /// The --model-alias the running process was started with.
+    private var launchedAlias = ""
+    private var launchedModelPath: String?
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
     // in between -- reset to 0 by any request that actually completes.
@@ -192,6 +195,22 @@ final class ServerManager: ObservableObject {
             }
             self.forwardingCount += 1
         }
+    }
+
+    /// The name the running mlx_lm.server knows its own model by -- what
+    /// the proxy puts in every forwarded body (see ProxyRequestBody).
+    /// "default_model" is always mapped to the launch model, adapter and
+    /// drafter; an alias only when one was given at launch.
+    var backendModelName: String {
+        launchedAlias.isEmpty ? "default_model" : launchedAlias
+    }
+
+    /// The model a request name means when the catalog no longer knows it
+    /// by that name: the alias the running model was started with (it was
+    /// renamed since, and a chat or benchmark still uses the old one).
+    func modelPath(launchedAs name: String) -> String? {
+        guard !launchedAlias.isEmpty, name == launchedAlias else { return nil }
+        return launchedModelPath
     }
 
     /// Reloads the last-used model if it isn't running (idle-unloaded, or
@@ -418,6 +437,8 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         ))
         lastLaunchArguments = args
+        launchedAlias = alias
+        launchedModelPath = modelPath
 
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
         logWatch = ServerLogWatch()

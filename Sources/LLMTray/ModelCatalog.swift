@@ -83,6 +83,20 @@ final class ModelCatalog: ObservableObject {
 
     static func format(_ bytes: Int64) -> String { byteFormatter.string(fromByteCount: bytes) }
 
+    private static func canonical(_ path: String) -> String {
+        ((path as NSString).expandingTildeInPath as NSString).resolvingSymlinksInPath
+    }
+
+    /// The `model` name requests use for a model: its alias, or its folder
+    /// name when the alias was cleared.
+    func requestName(for modelID: String) -> String {
+        let alias = alias(for: modelID)
+        return alias.isEmpty ? (modelID as NSString).lastPathComponent : alias
+    }
+
+    /// The name each model is requested by, for the proxy's /v1/models.
+    var servedNames: [String] { models.map { requestName(for: $0.id) } }
+
     func model(id: String?) -> LocalModel? {
         guard let id else { return nil }
         return models.first { $0.id == id }
@@ -124,8 +138,16 @@ final class ModelCatalog: ObservableObject {
     }
 
     private func lookup(_ name: String) -> String? {
+        // An alias set in Settings wins over another model's folder name.
         if let byAlias = models.first(where: { alias(for: $0.id) == name }) {
             return byAlias.path
+        }
+        // A full path ("/Users/.../publisher/model", "~/..."): only a model
+        // in the catalog, i.e. inside the models folder -- a client must not
+        // get any directory on disk loaded.
+        if name.hasPrefix("/") || name.hasPrefix("~") {
+            let wanted = Self.canonical(name)
+            return models.first { Self.canonical($0.path) == wanted }?.path
         }
         return models.first {
             $0.displayName == name || ($0.path as NSString).lastPathComponent == name
