@@ -71,6 +71,13 @@ final class ServerManager: ObservableObject {
     // unbroken streak means the process itself is the problem.
     private var consecutiveStallCount = 0
 
+    /// Spots mlx_lm.server's generation thread dying in the current
+    /// process's output (see generationThreadDied); reset per launch.
+    private var logWatch = ServerLogWatch()
+    /// Restarts after a dead generation thread: a model that runs out of
+    /// memory again right away ends up failed, not in a restart loop.
+    private var threadDeathRestarts = RestartBudget()
+
     /// mlx_lm.server actually binds here, not to the port the user
     /// configured -- that public port is instead served by `proxy`, which
     /// is what makes switching models based on a request's `model` field
@@ -138,6 +145,7 @@ final class ServerManager: ObservableObject {
                     self.currentPublicPort = port
                     self.currentModelPath = modelPath
                     self.currentAlias = alias
+                    self.threadDeathRestarts = RestartBudget()
                     self.state = .starting
                     try await self.installer.ensureReady()
                     try self.checkNotStopped(epoch)
@@ -176,6 +184,8 @@ final class ServerManager: ObservableObject {
                 try self.checkNotStopped(epoch)
                 self.currentModelPath = target
                 self.currentAlias = alias
+                // Another model's restarts say nothing about this one.
+                self.threadDeathRestarts = RestartBudget()
                 try await self.launchAndWaitReady(modelPath: target, alias: alias, epoch: epoch)
             } else {
                 try await self.loadIfNeeded(epoch: epoch)
@@ -210,12 +220,15 @@ final class ServerManager: ObservableObject {
     /// that one thread -- the process looks alive to
     /// Process.terminationHandler, but every request after that hangs
     /// forever, since nothing left is generating anything.
-    private func restartWedgedProcess() async {
+    /// `wedged` is the process found wedged, taken when that was noticed:
+    /// the restart is queued behind other transitions, and a switch or
+    /// restart ahead of it may already have replaced that process.
+    private func restartWedgedProcess(_ wedged: ServerProcess?, because reason: String = "repeated stalls") async {
         let epoch = stopEpoch
         do {
             try await serialized(epoch: epoch) {
-                guard case .running = self.state else { return }
-                self.appendLog("--- restarting the model process after repeated stalls ---\n")
+                guard case .running = self.state, wedged != nil, self.process === wedged else { return }
+                self.appendLog("--- restarting the model process after \(reason) ---\n")
                 try await self.restartSameModel(epoch: epoch)
             }
         } catch {
@@ -407,11 +420,15 @@ final class ServerManager: ObservableObject {
         lastLaunchArguments = args
 
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
+        logWatch = ServerLogWatch()
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
             guard let self else { return }
             self.appendLog(text)
             guard let serverProcess, self.process === serverProcess else { return }
             self.checkForReadySignal(text, modelPath: modelPath)
+            for case let .generationThreadDied(reason, outOfMemory) in self.logWatch.feed(text) {
+                self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
+            }
         }
         serverProcess.onExit = { [weak self] exited in
             self?.processDidExit(exited)
@@ -461,6 +478,42 @@ final class ServerManager: ObservableObject {
         proxyStartPending = false
         state = .stopped
         process?.terminate()
+    }
+
+    /// mlx_lm.server's generation thread died (Metal out of memory, most
+    /// often) while the process lives on: every request is refused at once
+    /// from now on, so nothing stalls and the stall watchdog never fires.
+    /// A running model is restarted -- the memory it ran out of was taken by
+    /// its own caches, so a fresh process usually works again -- within
+    /// `threadDeathRestarts`; otherwise it's stopped as failed, saying why.
+    private func generationThreadDied(reason: String, outOfMemory: Bool) {
+        let why = outOfMemory ? "the model ran out of GPU memory" : "the model's generation thread crashed: \(reason)"
+        let hint = outOfMemory ? " — try a smaller model, a shorter prompt, or a smaller prompt cache in its profile" : ""
+        appendLog("--- \(why) ---\n")
+        switch state {
+        case .starting:
+            // It never served anything; loading it again would fail the same way.
+            failAndStop("failed to start: \(why)\(hint)")
+        case .running:
+            let autoRestart = UserDefaults.standard[Pref.autoRestartStallThreshold] > 0
+            if autoRestart, threadDeathRestarts.take() {
+                let dying = process
+                Task { await restartWedgedProcess(dying, because: outOfMemory ? "running out of GPU memory" : "its generation thread died") }
+            } else if autoRestart {
+                failAndStop("\(why)\(hint) (stopped after \(threadDeathRestarts.limit) automatic restarts in \(Int(threadDeathRestarts.window / 60)) minutes)")
+            } else {
+                failAndStop("\(why)\(hint)")
+            }
+        default:
+            break
+        }
+    }
+
+    /// stop(), but ending in .failed with `message`: a process that can't
+    /// generate must not keep taking requests.
+    private func failAndStop(_ message: String) {
+        stop()
+        state = .failed(message)
     }
 
     /// Unlike stop(), waits for the old process to exit (the replacement
@@ -674,7 +727,8 @@ final class ServerManager: ObservableObject {
         let threshold = UserDefaults.standard[Pref.autoRestartStallThreshold]
         guard threshold > 0, consecutiveStallCount >= threshold else { return }
         consecutiveStallCount = 0
-        Task { await restartWedgedProcess() }
+        let wedged = process
+        Task { await restartWedgedProcess(wedged) }
     }
 
 }
