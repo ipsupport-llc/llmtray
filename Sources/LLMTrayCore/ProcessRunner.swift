@@ -209,12 +209,14 @@ public final class LineSplitter: @unchecked Sendable {
     public init() {}
     private let lock = NSLock()
     private var pending = Data()
+    /// Where the newline search resumes: pending[..<scanned] has none.
+    private var scanned = 0
 
     /// What's left after the last newline, if anything (at EOF).
     public func flush() -> String? {
         lock.lock(); defer { lock.unlock() }
         guard !pending.isEmpty else { return nil }
-        defer { pending = Data() }
+        defer { pending = Data(); scanned = 0 }
         return String(decoding: pending, as: UTF8.self)
     }
 
@@ -222,10 +224,15 @@ public final class LineSplitter: @unchecked Sendable {
         lock.lock(); defer { lock.unlock() }
         pending.append(data)
         var lines: [String] = []
-        while let newline = pending.firstIndex(of: 0x0A) {
-            lines.append(String(decoding: pending[pending.startIndex..<newline], as: UTF8.self))
-            pending = Data(pending[pending.index(after: newline)...])
+        var start = pending.startIndex
+        var search = pending.startIndex + scanned
+        while let newline = pending[search...].firstIndex(of: 0x0A) {
+            lines.append(String(decoding: pending[start..<newline], as: UTF8.self))
+            start = pending.index(after: newline)
+            search = start
         }
+        pending = Data(pending[start...])
+        scanned = pending.count   // only new bytes are searched next time
         return lines
     }
 }

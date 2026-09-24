@@ -228,7 +228,7 @@ final class MfluxManager: ObservableObject {
         let result = ImageResult()
         try await ProcessRunner.runStreaming(venvPython, [
             RuntimePaths.runtimeDir + "/llmtray_mflux_runner.py",
-            "--prompt", prompt,
+            "--prompt=\(prompt)",   // "=": a prompt starting with "-" isn't an option
             "--width", String(roundedWidth),
             "--height", String(roundedHeight),
             "--steps", model.stepCount,
@@ -240,10 +240,14 @@ final class MfluxManager: ObservableObject {
             case .image(let data):
                 result.set(data)
             case .step(let step, let total):
-                Task { @MainActor in self?.stepProgress = (step: step, total: total) }
+                Task { @MainActor in
+                    guard self?.isBusy == true else { return }   // a late line after the run
+                    self?.stepProgress = (step: step, total: total)
+                }
             case .preview(let data):
                 Task { @MainActor in
-                    if let image = NSImage(data: data) { self?.previewImage = image }
+                    guard self?.isBusy == true, let image = NSImage(data: data) else { return }
+                    self?.previewImage = image
                 }
             }
         })

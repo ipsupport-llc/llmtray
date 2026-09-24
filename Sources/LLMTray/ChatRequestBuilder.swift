@@ -9,7 +9,14 @@ enum ChatRequestBuilder {
         port: Int, modelAlias: String, settings: ChatSettings,
         history: [ChatMessage], tools: [[String: Any]]
     ) -> URLRequest? {
-        var payload = history.map(serialize(message:))
+        // An image a tool put in front of the model goes with the request
+        // right after it only -- not again with every later one.
+        let lastIndex = history.indices.last
+        var payload = history.enumerated().map { i, message in
+            message.isToolContext && i != lastIndex
+                ? serialize(message: ChatMessage(role: message.role, content: message.content))
+                : serialize(message: message)
+        }
         let userSystemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
         let systemPrompt = [userSystemPrompt, tools.isEmpty ? "" : settings.toolUsePolicy]
             .filter { !$0.isEmpty }

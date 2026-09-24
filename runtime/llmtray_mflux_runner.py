@@ -1,8 +1,12 @@
 # LLMTray's in-memory mflux runner: nothing is written to disk. Progress,
 # step previews and the final PNG go to stdout as "@@LLMTRAY <KIND> <data>"
 # lines (PNG as base64); everything else mflux prints goes to stderr.
-import base64, io, sys
-protocol = sys.stdout.buffer
+import base64, io, os, sys
+# The protocol gets its own copy of fd 1; fd 1 itself (and Python's stdout)
+# then point at stderr, so nothing printed by mflux or native code can land
+# in the middle of a protocol line.
+protocol = os.fdopen(os.dup(1), "wb")
+os.dup2(2, 1)
 sys.stdout = sys.stderr
 
 def emit(kind, data=""):
