@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LLMTray — local LLM menu bar app for macOS (mlx-lm)</title>
-<meta name="description" content="LLMTray is a native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat — in a ~1MB app with no Electron, no background bloat.">
+<meta name="description" content="LLMTray is a native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat — in a ~2MB download (native Swift, no Electron); the mlx-lm runtime installs on first launch.">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="vPSnv-ACweVU7zedD6wmncgyS5txK4xSHu5ZJ_OzHII" />
 <link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LLMTray">
 <meta property="og:title" content="LLMTray — local LLM menu bar app for macOS">
-<meta property="og:description" content="A native, ~1MB macOS menu bar app for running local LLMs with mlx-lm: server control, Hugging Face model browser, and chat. No Electron, no bloat.">
+<meta property="og:description" content="A native, ~2MB macOS menu bar app for running local LLMs with mlx-lm: server control, Hugging Face model browser, and chat. No Electron.">
 <meta property="og:url" content="https://ipsupport-llc.github.io/llmtray/">
 <meta property="og:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -25,7 +25,7 @@
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="LLMTray — local LLM menu bar app for macOS">
-<meta name="twitter:description" content="A native, ~1MB macOS menu bar app for running local LLMs with mlx-lm. No Electron, no bloat.">
+<meta name="twitter:description" content="A native, ~2MB macOS menu bar app for running local LLMs with mlx-lm. No Electron.">
 <meta name="twitter:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
 
 <script type="application/ld+json">
@@ -37,9 +37,8 @@
   "description": "A native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat.",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "macOS 13+ (Apple Silicon)",
-  "softwareVersion": "0.1.1",
   "downloadUrl": "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg",
-  "fileSize": "1MB",
+  "fileSize": "2MB",
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -214,7 +213,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
           Download for macOS
         </a>
-        <span class="cta-meta">~1MB · macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch</span>
+        <span class="cta-meta">~2MB · macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch<br>Installs the mlx-lm runtime (~450MB) on first launch — or get <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">LLMTray-Full.dmg</a> (~270MB) with it already inside, no Python needed.</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
 
@@ -248,7 +247,7 @@
         </div>
         <div class="card">
           <h3>Small, fast, no bloat</h3>
-          <p>Native Swift/SwiftUI, no Electron, no bundled runtime. The whole app is a ~1MB download and sits idle at a few MB of memory until you actually start a server.</p>
+          <p>Native Swift/SwiftUI, no Electron. The app itself is a ~2MB download (~6MB on disk) and idles at around 45MB of memory; the models and the mlx-lm runtime (~450MB, installed once) are where the real size is.</p>
         </div>
       </div>
     </section>
