@@ -755,7 +755,9 @@ struct UpdatesPane: View {
 enum AppLanguage {
     /// Languages shipped in the bundle (Resources/Localization/*.lproj).
     static var available: [String] {
-        Bundle.main.localizations.filter { $0 != "Base" }.sorted { name(of: $0) < name(of: $1) }
+        // Deduplicated: Bundle.localizations reports a language once per
+        // .lproj folder and again per CFBundleLocalizations entry.
+        Set(Bundle.main.localizations).filter { $0 != "Base" }.sorted { name(of: $0) < name(of: $1) }
     }
 
     /// "" = follow the system.
