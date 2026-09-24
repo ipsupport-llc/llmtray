@@ -4,7 +4,7 @@ name: Translate
 # UI text: whenever main changes the Swift sources (new / changed strings)
 # or the localization files, missing keys are machine-translated with
 # OpenAI (secret OPENAI_API_KEY; model from repo variable OPENAI_MODEL,
-# default gpt-4.1) and the result is proposed as a pull request. Keys are
+# default gpt-5.5) and the result is proposed as a pull request. Keys are
 # the English text, so an edited English string is a new key and gets
 # translated too; keys no longer in the code are dropped. Existing
 # translations are never overwritten -- a native speaker's fix sticks.

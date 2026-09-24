@@ -265,8 +265,11 @@ def _lang_name(code: str) -> str:
 
 def _openai(messages: list[dict], model: str, key: str) -> str:
     import json, os, time, urllib.request, urllib.error
-    body = json.dumps({"model": model, "messages": messages, "temperature": 0.2,
-                       "response_format": {"type": "json_object"}}).encode()
+    req_body = {"model": model, "messages": messages, "response_format": {"type": "json_object"}}
+    # Reasoning models (gpt-5.x, o-series) reject a custom temperature.
+    if not model.startswith(("gpt-5", "o1", "o3", "o4")):
+        req_body["temperature"] = 0.2
+    body = json.dumps(req_body).encode()
     for attempt in range(5):
         base = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
         req = urllib.request.Request(f"{base}/chat/completions", body,
@@ -373,7 +376,7 @@ def main() -> int:
         import argparse, os
         ap = argparse.ArgumentParser(prog="l10n.py translate")
         ap.add_argument("languages", nargs="*", help="language codes (default: every existing one)")
-        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-4.1")
+        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-5.5")
         a = ap.parse_args(sys.argv[2:])
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         return translate(codes, a.model)
