@@ -254,3 +254,21 @@ final class ProfileStoreTests: XCTestCase {
         XCTAssertEqual(errors, 1)
     }
 }
+
+final class ToolPolicyUpgradeTests: XCTestCase {
+    func testUneditedFormerPolicyUpgradedEditedKept() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = ProfileStore(directory: dir)
+        var p = Profile.builtIn
+        p.id = Profile.defaultID
+        p.tools.toolUsePolicy = Profile.formerDefaultToolUsePolicies[0]
+        try store.save(p)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: UserDefaults()).tools.toolUsePolicy, Profile.defaultToolUsePolicy)
+        XCTAssertEqual(store.loadAll().first { $0.isDefault }?.tools.toolUsePolicy, Profile.defaultToolUsePolicy, "saved")
+
+        p.tools.toolUsePolicy = "my own rule"
+        try store.save(p)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: UserDefaults()).tools.toolUsePolicy, "my own rule")
+    }
+}
