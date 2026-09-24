@@ -16,6 +16,12 @@ final class ProfileManager: ObservableObject {
     @Published private(set) var loadErrors: [String] = []
 
     private let store: ProfileStore
+    // Edits are applied in memory at once and written to disk shortly
+    // after the last one: bindings fire per keystroke (system prompt,
+    // tool rule) and per slider tick, and a synchronous atomic file write
+    // for each of those ran on the main thread.
+    private var pendingWrites: [String: Task<Void, Never>] = [:]
+    private static let writeDelay: UInt64 = 400_000_000
 
     init(directory: URL = URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles")) {
         store = ProfileStore(directory: directory)
@@ -25,6 +31,7 @@ final class ProfileManager: ObservableObject {
     /// Re-reads everything from disk -- picks up hand edits to the JSON
     /// files (called when the settings panel opens).
     func reload() {
+        flushPendingWrites()
         var errors: [String] = []
         do {
             try store.ensureDefault(migratingFrom: .standard)
@@ -108,7 +115,28 @@ final class ProfileManager: ObservableObject {
         mutate(&p)
         guard p != profiles[i] else { return }
         profiles[i] = p
-        persist(p)
+        schedulePersist(p.id)
+    }
+
+    private func schedulePersist(_ id: String) {
+        pendingWrites[id]?.cancel()
+        pendingWrites[id] = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: Self.writeDelay)
+            guard !Task.isCancelled, let self else { return }
+            self.pendingWrites[id] = nil
+            if let p = self.profile(id: id) { self.persist(p) }
+        }
+    }
+
+    /// Writes every pending edit now (before re-reading from disk, and at
+    /// quit). Server launches read the in-memory profiles, so they never
+    /// see a stale value either way.
+    func flushPendingWrites() {
+        for (id, task) in pendingWrites {
+            task.cancel()
+            if let p = profile(id: id) { persist(p) }
+        }
+        pendingWrites.removeAll()
     }
 
     @discardableResult
@@ -137,6 +165,8 @@ final class ProfileManager: ObservableObject {
 
     func delete(id: String) {
         guard id != Profile.defaultID else { return }
+        pendingWrites[id]?.cancel()
+        pendingWrites[id] = nil
         do {
             try store.delete(id: id)
         } catch {

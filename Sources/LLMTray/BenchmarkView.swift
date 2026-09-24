@@ -28,10 +28,6 @@ struct BenchmarkView: View {
             Divider().padding(.vertical, 4)
             autoTuneSection
         }
-        .onChange(of: benchmark.pendingProposal) { proposal in
-            guard let proposal else { return }
-            showAutoTuneProposalAlert(proposal)
-        }
     }
 
     // MARK: - Quick benchmark
@@ -152,6 +148,14 @@ struct BenchmarkView: View {
                 Text(autoTuneError).font(.system(size: 10)).foregroundColor(.red)
             }
 
+            // Inline and persistent (not a one-shot alert on change): the
+            // sweep takes minutes, and an alert fired from this view was
+            // lost whenever the user had switched tabs or closed settings
+            // by the time it finished.
+            if let proposal = benchmark.pendingProposal {
+                proposalPanel(proposal)
+            }
+
             if benchmark.autoTuneLog.isEmpty {
                 Text("No auto-tune run yet.")
                     .font(.system(size: 10))
@@ -160,6 +164,29 @@ struct BenchmarkView: View {
                 autoTuneResultsTable
             }
         }
+    }
+
+    private func proposalPanel(_ proposal: AutoTuneProposal) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            if proposal.hasChanges {
+                Text("Auto-tune found faster settings").fontWeight(.medium)
+                Text("decode-concurrency: \(proposal.currentConcurrency) → \(proposal.proposedConcurrency)   prefill-step-size: \(proposal.currentPrefillStep) → \(proposal.proposedPrefillStep)")
+                    .font(.system(size: 10, design: .monospaced))
+                HStack {
+                    Button("Apply to profile") { Task { await benchmark.applyAutoTuneProposal(server: server) } }
+                        .disabled(benchmark.isRunning)
+                    Button("Keep current") { benchmark.discardAutoTuneProposal() }
+                        .disabled(benchmark.isRunning)
+                }
+            } else {
+                Text("Current settings are already fastest").fontWeight(.medium)
+                Text("decode-concurrency \(proposal.currentConcurrency), prefill-step-size \(proposal.currentPrefillStep)")
+                    .font(.system(size: 10, design: .monospaced))
+                Button("OK") { benchmark.discardAutoTuneProposal() }
+            }
+        }
+        .padding(6)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(0.12)))
     }
 
     private var autoTuneResultsTable: some View {
@@ -208,30 +235,4 @@ struct BenchmarkView: View {
         }
     }
 
-    /// Shown once the sweep finishes (server already restored to its
-    /// pre-sweep settings by then) -- applies only on explicit confirmation,
-    /// never automatically.
-    private func showAutoTuneProposalAlert(_ proposal: AutoTuneProposal) {
-        let alert = NSAlert()
-        if proposal.hasChanges {
-            alert.messageText = "Apply auto-tune results?"
-            alert.informativeText = "decode-concurrency: \(proposal.currentConcurrency) → \(proposal.proposedConcurrency)\n"
-                + "prefill-step-size: \(proposal.currentPrefillStep) → \(proposal.proposedPrefillStep)"
-            alert.addButton(withTitle: "Apply")
-            alert.addButton(withTitle: "Keep Current")
-            alert.alertStyle = .informational
-            if alert.runModal() == .alertFirstButtonReturn {
-                Task { await benchmark.applyAutoTuneProposal(server: server) }
-                return
-            }
-        } else {
-            alert.messageText = "Current settings are already fastest"
-            alert.informativeText = "decode-concurrency: \(proposal.currentConcurrency), "
-                + "prefill-step-size: \(proposal.currentPrefillStep) -- auto-tune didn't find anything faster."
-            alert.addButton(withTitle: "OK")
-            alert.alertStyle = .informational
-            alert.runModal()
-        }
-        benchmark.discardAutoTuneProposal()
-    }
 }

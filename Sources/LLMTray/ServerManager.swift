@@ -25,6 +25,10 @@ final class ServerManager: ObservableObject {
     // (dropped below) and a debounce timer to bridge gaps between lines,
     // and which never saw a model-switch as "busy" at all.
     @Published private(set) var isBusy: Bool = false
+    /// The model process was stopped by idle-unload but the proxy is still
+    /// listening, so the next request (in-app or external) reloads it.
+    /// The in-app chat stays usable in this state.
+    @Published private(set) var isIdleUnloaded: Bool = false
     private var activeRequestCount = 0
 
     private var process: Process?
@@ -297,6 +301,7 @@ final class ServerManager: ObservableObject {
     }
 
     private func launchServerProcess(modelPath: String, alias: String) {
+        isIdleUnloaded = false
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }
         let task = Process()
@@ -404,6 +409,7 @@ final class ServerManager: ObservableObject {
     }
 
     func stop() {
+        isIdleUnloaded = false
         guard let process, process.isRunning else {
             state = .stopped
             proxy.stop()
@@ -834,6 +840,7 @@ final class ServerManager: ObservableObject {
     /// currentModelPath/currentAlias are deliberately left set -- that's
     /// exactly what ensureModelLoaded() reloads.
     private func idleUnload() {
+        isIdleUnloaded = true
         guard let process, process.isRunning else {
             state = .stopped
             return

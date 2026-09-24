@@ -149,13 +149,13 @@ struct ContentView: View {
             // happened on the specific buttons, so editing the text field
             // directly and not hitting Return left the picker stale until
             // the app was restarted.
-            models = ModelDiscovery.scanModels(root: newRoot)
+            rescanModels(root: newRoot)
         }
         .onReceive(NotificationCenter.default.publisher(for: .modelsDidChange)) { notification in
             // Fires after a Hugging Face download finishes -- rescan and
             // jump straight to the model that just landed on disk instead
             // of leaving the picker on whatever was selected before.
-            models = ModelDiscovery.scanModels(root: modelsRoot)
+            rescanModels()
             if let repoID = notification.object as? String {
                 let downloadedPath = modelsRoot + "/\(repoID)"
                 if models.contains(where: { $0.id == downloadedPath }) {
@@ -190,6 +190,22 @@ struct ContentView: View {
     }
 
     private var activeProfile: Profile { profiles.profile(for: selectedModelID) }
+
+    private var benchmarkAlias: String {
+        let a = server.loadedModelPath.map(ModelAliasStore.alias(for:)) ?? alias
+        return a.isEmpty ? "default" : a
+    }
+
+    /// After any rescan: keep the selection only if that model is still
+    /// there, else fall back to the first one -- a stale selection left the
+    /// picker blank, Play enabled but silently doing nothing, and the
+    /// settings editing a model that no longer exists.
+    private func rescanModels(root: String? = nil) {
+        models = ModelDiscovery.scanModels(root: root ?? modelsRoot)
+        if selectedModelID == nil || !models.contains(where: { $0.id == selectedModelID }) {
+            selectedModelID = models.first?.id
+        }
+    }
     private var resolvedProfile: ResolvedProfile { profiles.resolved(for: selectedModelID) }
 
     private var kvBits: Int { resolvedProfile.kvBits }
@@ -205,7 +221,18 @@ struct ContentView: View {
     private var imageGenModelBinding: Binding<ImageGenModel> {
         Binding(
             get: { imageGenModel },
-            set: { profiles.set(\.tools.imageGenModel, $0.rawValue, for: selectedModelID) }
+            set: { newModel in
+                guard newModel != imageGenModel else { return }
+                profiles.set(\.tools.imageGenModel, newModel.rawValue, for: selectedModelID)
+                // Switching models while generation is on: go through the
+                // same confirm-and-download step as enabling, instead of
+                // leaving the first generate_image call to stall on a
+                // multi-GB download.
+                if enableImageGeneration {
+                    profiles.set(\.tools.enableImageGeneration, false, for: selectedModelID)
+                    confirmAndDownloadImageModel()
+                }
+            }
         )
     }
 
@@ -338,10 +365,33 @@ struct ContentView: View {
                 }
                 .help("Profiles are plain JSON files -- editable by hand, copyable to another Mac")
             }
-            .disabled(selectedModelID == nil)
             ForEach(profiles.loadErrors, id: \.self) { e in
                 Text(e).font(.system(size: 10)).foregroundColor(.red)
             }
+        }
+    }
+
+    /// Confirms (listing the models that fall back to Default), deletes,
+    /// and restarts the loaded model if it was on this profile and its
+    /// launch arguments change -- otherwise the process kept running with
+    /// the deleted profile's settings while the UI showed Default's.
+    private func deleteProfile(_ p: Profile) {
+        let affected = profiles.models(assignedTo: p.id).map { ($0 as NSString).lastPathComponent }
+        let alert = NSAlert()
+        alert.messageText = "Delete profile \u{201C}\(p.name)\u{201D}?"
+        alert.informativeText = affected.isEmpty
+            ? "No model uses it."
+            : "These models go back to Default: " + affected.joined(separator: ", ") + "."
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .warning
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        let loaded = server.loadedModelPath
+        let before = profiles.resolved(for: loaded)
+        profiles.delete(id: p.id)
+        let after = profiles.resolved(for: loaded)
+        if isRunning, let loaded, server.needsRestart(modelPath: loaded, from: before, to: after) {
+            Task { try? await server.restartToApplyLaunchSettings() }
         }
     }
 
@@ -382,7 +432,7 @@ struct ContentView: View {
                 }
                 if !p.isDefault {
                     Button {
-                        profiles.delete(id: p.id)
+                        deleteProfile(p)
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -464,9 +514,11 @@ struct ContentView: View {
                 } label: {
                     Image(systemName: "gearshape")
                 }
+                .help("Settings")
+                .accessibilityLabel("Settings")
                 .buttonStyle(.plain)
                 Button {
-                    models = ModelDiscovery.scanModels(root: modelsRoot)
+                    rescanModels()
                 } label: {
                     Image(systemName: "arrow.clockwise")
                 }
@@ -488,7 +540,8 @@ struct ContentView: View {
                     }
                 }
                 .labelsHidden()
-                .disabled(isBusy)
+                .disabled(isBusy || benchmark.isRunning)
+                .help(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model")
 
                 profilePicker
 
@@ -616,7 +669,9 @@ struct ContentView: View {
             case .profiles:
                 profilesTabContent
             case .benchmark:
-                BenchmarkView(benchmark: benchmark, port: port, modelAlias: alias.isEmpty ? "default" : alias)
+                // The loaded model's alias, not the picker's: a different
+                // selection would make the proxy switch models mid-sweep.
+                BenchmarkView(benchmark: benchmark, port: port, modelAlias: benchmarkAlias)
             case .advanced:
                 VStack(alignment: .leading, spacing: 6) {
                     editingProfileBanner
@@ -688,6 +743,7 @@ struct ContentView: View {
                         }
                         .pickerStyle(.segmented)
                         .labelsHidden()
+                        overrideMark(\.launch.kvGroupSize)
                     }
                     Stepper(
                         quantizedKVStart == 0
@@ -695,6 +751,7 @@ struct ContentView: View {
                             : "Start quantizing KV cache: after \(quantizedKVStart) tokens",
                         value: pb(\.launch.quantizedKVStart), in: 0...20000, step: 500
                     )
+                    overrideMark(\.launch.quantizedKVStart)
                     Text("Keeps the first N tokens of context at full precision before switching to quantized KV -- higher values trade some of the memory savings for accuracy on long prompts.")
                         .font(.system(size: 10))
                         .foregroundColor(.secondary)
@@ -844,7 +901,10 @@ struct ContentView: View {
     private var diagnosticsSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Diagnostics").foregroundColor(.secondary)
-            Toggle("Verbose server logging (DEBUG)", isOn: pb(\.launch.verboseServerLogging))
+            HStack {
+                Toggle("Verbose server logging (DEBUG)", isOn: pb(\.launch.verboseServerLogging))
+                overrideMark(\.launch.verboseServerLogging)
+            }
             VStack(alignment: .leading, spacing: 2) {
                 HStack {
                     Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
@@ -1002,10 +1062,14 @@ struct ContentView: View {
     private var imageGenerationSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Tools").foregroundColor(.secondary)
-            Picker("Model", selection: imageGenModelBinding) {
-                ForEach(ImageGenModel.allCases) { model in
-                    Text(model.displayName).tag(model)
+            HStack {
+                Picker("Model", selection: imageGenModelBinding) {
+                    ForEach(ImageGenModel.allCases) { model in
+                        Text(model.displayName).tag(model)
+                    }
                 }
+                .disabled(chat.isDownloadingModel)
+                overrideMark(\.tools.imageGenModel)
             }
             Text("\(imageGenModel.summary) Download: \(imageGenModel.approximateDownloadDescription).")
                 .font(.system(size: 10))
@@ -1013,18 +1077,25 @@ struct ContentView: View {
 
             HStack {
                 Toggle("Enable image generation", isOn: enableImageGenerationBinding)
+                    .disabled(chat.isDownloadingModel)
                 overrideMark(\.tools.enableImageGeneration)
             }
             if enableImageGeneration {
-                Picker("Canvas size", selection: imageQualityBinding) {
-                    ForEach(ImageQuality.allCases) { quality in
-                        Text(quality.displayName).tag(quality)
+                HStack {
+                    Picker("Canvas size", selection: imageQualityBinding) {
+                        ForEach(ImageQuality.allCases) { quality in
+                            Text(quality.displayName).tag(quality)
+                        }
                     }
+                    overrideMark(\.tools.imageQuality)
                 }
                 Text("Scales whatever width/height the model asks for -- Balanced is a 1024x1024 no-op.")
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
-                Toggle("Unload chat model during generation", isOn: pb(\.tools.unloadModelDuringImageGen))
+                HStack {
+                    Toggle("Unload chat model during generation", isOn: pb(\.tools.unloadModelDuringImageGen))
+                    overrideMark(\.tools.unloadModelDuringImageGen)
+                }
                 Text(
                     """
                     Both models resident at once can easily exceed unified memory (a diffusion \
@@ -1068,8 +1139,14 @@ struct ContentView: View {
                 Text("Tool-use rule").foregroundColor(.secondary)
                 overrideMark(\.tools.toolUsePolicy)
                 Spacer()
-                Button("Restore default") {
-                    profiles.set(\.tools.toolUsePolicy, Profile.defaultToolUsePolicy, for: selectedModelID)
+                Button(activeProfile.isDefault ? "Restore built-in" : "Inherit from Default") {
+                    // On an overlay: drop the override (writing the built-in
+                    // text would pin it and stop inheriting Default's).
+                    if activeProfile.isDefault {
+                        profiles.set(\.tools.toolUsePolicy, Profile.defaultToolUsePolicy, for: selectedModelID)
+                    } else {
+                        profiles.reset(\.tools.toolUsePolicy, for: selectedModelID)
+                    }
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.accentColor)
@@ -1108,6 +1185,7 @@ struct ContentView: View {
     /// with a visible progress row, beats silently stalling the first chat
     /// message that happens to trigger generate_image.
     private func confirmAndDownloadImageModel() {
+        guard !chat.isDownloadingModel else { return }
         let model = imageGenModel
         let alert = NSAlert()
         alert.messageText = "Enable image generation?"
@@ -1184,6 +1262,13 @@ struct ContentView: View {
     private var isRunning: Bool {
         if case .running = server.state { return true }
         return false
+    }
+
+    /// The chat can send: the server is running, or it was idle-unloaded
+    /// and the proxy will reload it on the request (the setting's own text
+    /// promises that; the chat used to stay disabled until Play).
+    private var canChat: Bool {
+        isRunning || server.isIdleUnloaded
     }
 
     // MARK: - Chat
@@ -1344,9 +1429,7 @@ struct ContentView: View {
                             .onTapGesture {
                                 openImagePreview(data, title: msg.imagePrompts[safe: i] ?? "Image")
                             }
-                            .onHover { hovering in
-                                if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                            }
+                            .pointingHandCursor()
                             .contextMenu {
                                 Button("Copy") { copyImageToClipboard(data) }
                                 Button("Save…") { saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "") }
@@ -1496,9 +1579,7 @@ struct ContentView: View {
                                         .onTapGesture {
                                             openImagePreview(data, title: "Attachment")
                                         }
-                                        .onHover { hovering in
-                                            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                                        }
+                                        .pointingHandCursor()
                                         .contextMenu {
                                             Button("Copy") { copyImageToClipboard(data) }
                                             Button("Save…") { saveImage(data, prompt: "attachment") }
@@ -1513,6 +1594,8 @@ struct ContentView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .offset(x: 4, y: -4)
+                                    .help("Remove attachment")
+                                    .accessibilityLabel("Remove attachment")
                                 }
                             }
                         }
@@ -1541,7 +1624,7 @@ struct ContentView: View {
                     .lineLimit(1...4)
                     .onSubmit(sendDraft)
                     .focused($isInputFocused)
-                    .disabled(!isRunning)
+                    .disabled(!canChat)
 
                 if chat.isBusy {
                     Button {
@@ -1549,6 +1632,8 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "stop.fill")
                     }
+                    .help("Stop generating")
+                    .accessibilityLabel("Stop generating")
                     // Cancelling mid-image-generation only stops the network
                     // side of the tool round-trip; the mflux subprocess
                     // itself isn't interruptible yet, so the button is
@@ -1561,7 +1646,9 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
                     }
-                    .disabled(!isRunning || (draft.trimmingCharacters(in: .whitespaces).isEmpty && pendingAttachments.isEmpty))
+                    .help("Send")
+                    .accessibilityLabel("Send")
+                    .disabled(!canChat || (draft.trimmingCharacters(in: .whitespaces).isEmpty && pendingAttachments.isEmpty))
                 }
             }
             .padding(.horizontal, 12)
@@ -1575,7 +1662,7 @@ struct ContentView: View {
         // send() mid-stream and stomping ChatClient's in-flight
         // assistantMessageIndex, without having to disable the field
         // itself (which would kick focus out of it every time).
-        guard isRunning, !chat.isBusy else { return }
+        guard canChat, !chat.isBusy else { return }
         let text = draft
         let attachments = pendingAttachments
         draft = ""
@@ -1607,7 +1694,7 @@ struct ContentView: View {
     // Only offered once a reply has actually finished -- mid-stream there's
     // nothing settled yet to redo.
     private var canRegenerate: Bool {
-        isRunning && !chat.isBusy && chat.messages.last?.role == "assistant"
+        canChat && !chat.isBusy && chat.messages.last?.role == "assistant"
     }
 
     private func regenerate() {
@@ -1618,7 +1705,7 @@ struct ContentView: View {
     // Only worth offering once there's actually a meaningful middle to
     // replace -- matches compactSession()'s own no-op guard.
     private var canCompact: Bool {
-        isRunning && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+        canChat && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
     }
 
     private func compact() async {
@@ -1646,4 +1733,35 @@ struct ContentView: View {
             chat.newSession()
         }
     }
+}
+
+/// Pointing-hand cursor while hovered. Balances its own push on disappear:
+/// a view removed while hovered (an attachment's remove button sits on top
+/// of it; a chat image scrolled away) never gets the hover-exit, so a bare
+/// push/pop in onHover left the cursor stuck as a hand.
+private struct PointingHandCursor: ViewModifier {
+    @State private var pushed = false
+
+    func body(content: Content) -> some View {
+        content
+            .onHover { hovering in
+                if hovering, !pushed {
+                    NSCursor.pointingHand.push()
+                    pushed = true
+                } else if !hovering, pushed {
+                    NSCursor.pop()
+                    pushed = false
+                }
+            }
+            .onDisappear {
+                if pushed {
+                    NSCursor.pop()
+                    pushed = false
+                }
+            }
+    }
+}
+
+extension View {
+    func pointingHandCursor() -> some View { modifier(PointingHandCursor()) }
 }

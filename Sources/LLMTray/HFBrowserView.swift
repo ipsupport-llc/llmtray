@@ -135,6 +135,8 @@ struct HFBrowserView: View {
                         Image(systemName: browser.isPaused ? "play.fill" : "pause.fill")
                     }
                     .buttonStyle(.plain)
+                    .help(browser.isPaused ? "Resume download" : "Pause download")
+                    .accessibilityLabel(browser.isPaused ? "Resume download" : "Pause download")
                     Button {
                         browser.cancelDownload()
                     } label: {
@@ -142,6 +144,8 @@ struct HFBrowserView: View {
                     }
                     .buttonStyle(.plain)
                     .foregroundColor(.secondary)
+                    .help("Cancel download")
+                    .accessibilityLabel("Cancel download")
                 }
                 Text(statusLine)
                     .font(.system(size: 9))
