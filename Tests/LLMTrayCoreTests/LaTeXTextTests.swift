@@ -39,6 +39,11 @@ final class LaTeXTextTests: XCTestCase {
         XCTAssertEqual(u("x^"), "x")
         XCTAssertEqual(u(String(repeating: "{", count: 500) + "x"), "x")
         XCTAssertEqual(u("\\"), "\\")
+        // Recursion through commands and \sqrt[...] stays bounded (a model
+        // stuck repeating could emit thousands).
+        _ = u(String(repeating: #"\sqrt"#, count: 20_000) + "x")
+        _ = u(String(repeating: #"\sqrt["#, count: 20_000) + "x")
+        _ = u(String(repeating: #"\frac{"#, count: 20_000))
     }
 
     func testMathSpans() {
@@ -47,6 +52,7 @@ final class LaTeXTextTests: XCTestCase {
         XCTAssertEqual(MathSpans.split(#"$$E = mc^2$$"#), [.math("E = mc^2", display: true)])
         XCTAssertEqual(MathSpans.split(#"a \(x^2\) b"#), [.text("a "), .math("x^2", display: false), .text(" b")])
         XCTAssertEqual(MathSpans.split(#"\[ \int f \]"#), [.math(#" \int f "#, display: true)])
+        XCTAssertEqual(MathSpans.split(#"see \[1\] here"#), [.text(#"see \[1\] here"#)])
         XCTAssertEqual(MathSpans.split("for $n$ items"), [.text("for "), .math("n", display: false), .text(" items")])
     }
 }

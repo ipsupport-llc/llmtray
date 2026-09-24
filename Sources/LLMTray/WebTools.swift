@@ -172,37 +172,43 @@ final class WikipediaTool: SelectableTool {
         // The title's own-script Wikipedias first (a Cyrillic or Japanese
         // title 404s on en.wiki), English last.
         let candidates = [requested].compactMap { $0 } + ScriptLanguage.wikipediaCandidates(for: title)
-        for lang in NSOrderedSet(array: candidates).compactMap({ $0 as? String }) {
+        // One budget for the whole lookup: a miss over several languages on a
+        // stalled network mustn't take minutes.
+        let deadline = Date().addingTimeInterval(20)
+        let langs = NSOrderedSet(array: candidates).compactMap { $0 as? String }
+        for (n, lang) in langs.enumerated() where Date() < deadline {
             if let summary = await summary(title, lang: lang) { return Self.json(summary) }
-            // Not an exact title: a prefix match, then full-text search --
-            // which also handles a question ("what is photosynthesis").
-            for best in await searchTitles(title, lang: lang) {
-                if let summary = await summary(best, lang: lang) { return Self.json(summary) }
+            // Not an exact title: a prefix match first...
+            if Date() < deadline, let best = await prefixMatch(title, lang: lang),
+               let summary = await summary(best, lang: lang) {
+                return Self.json(summary)
+            }
+            // ...then full text (also handles a question: "what is
+            // photosynthesis"), in the most likely language only -- it
+            // always finds *something*, often unrelated, elsewhere.
+            if n == 0, Date() < deadline, let best = await fullTextMatch(title, lang: lang),
+               let summary = await summary(best, lang: lang) {
+                return Self.json(summary)
             }
         }
         return Self.error("no Wikipedia article found for \(title)")
     }
 
-    /// Best-matching article titles: opensearch (prefix), then CirrusSearch
-    /// full text. At most two, so a miss stays cheap.
-    private func searchTitles(_ query: String, lang: String) async -> [String] {
-        let api = "https://\(lang).wikipedia.org/w/api.php"
-        var titles: [String] = []
-        if let found = try? await WebFetch.jsonArray(api, query: [
+    private func prefixMatch(_ query: String, lang: String) async -> String? {
+        guard let found = try? await WebFetch.jsonArray("https://\(lang).wikipedia.org/w/api.php", query: [
             URLQueryItem(name: "action", value: "opensearch"), URLQueryItem(name: "search", value: query),
             URLQueryItem(name: "limit", value: "1"), URLQueryItem(name: "format", value: "json"),
-        ]), found.count > 1, let best = (found[1] as? [String])?.first {
-            titles.append(best)
-        }
-        if let found = try? await WebFetch.json(api, query: [
+        ]), found.count > 1 else { return nil }
+        return (found[1] as? [String])?.first
+    }
+
+    private func fullTextMatch(_ query: String, lang: String) async -> String? {
+        let found = try? await WebFetch.json("https://\(lang).wikipedia.org/w/api.php", query: [
             URLQueryItem(name: "action", value: "query"), URLQueryItem(name: "list", value: "search"),
             URLQueryItem(name: "srsearch", value: query), URLQueryItem(name: "srlimit", value: "1"),
             URLQueryItem(name: "srnamespace", value: "0"), URLQueryItem(name: "format", value: "json"),
-        ]), let best = ((found["query"] as? [String: Any])?["search"] as? [[String: Any]])?.first?["title"] as? String,
-           !titles.contains(best) {
-            titles.append(best)
-        }
-        return titles
+        ])
+        return ((found?["query"] as? [String: Any])?["search"] as? [[String: Any]])?.first?["title"] as? String
     }
 
     private func summary(_ title: String, lang: String) async -> [String: Any]? {

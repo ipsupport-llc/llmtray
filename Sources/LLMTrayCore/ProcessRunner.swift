@@ -112,8 +112,10 @@ public enum ProcessRunner {
             }
             running.set(task)
             if let stdin {
-                // Written and closed off the reader threads; a child that
-                // exits early just makes the write fail.
+                // Written and closed off the reader threads. No SIGPIPE if
+                // the child is already gone (Stop, a crash at import): that
+                // signal would kill the whole app; the write just fails.
+                _ = fcntl(input.fileHandleForWriting.fileDescriptor, F_SETNOSIGPIPE, 1)
                 DispatchQueue.global().async {
                     try? input.fileHandleForWriting.write(contentsOf: stdin)
                     try? input.fileHandleForWriting.close()

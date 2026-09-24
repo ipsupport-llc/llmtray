@@ -152,11 +152,19 @@ public enum LaTeXText {
             while !atEnd, chars[i] != "]" { inner.append(chars[i]); i += 1 }
             if !atEnd { i += 1 }
             var nested = Parser(inner)
+            nested.depth = depth   // nested \sqrt[ ... counts toward the same limit
             return nested.parse(until: nil)
         }
 
         mutating func command() -> String {
+            depth += 1
+            defer { depth -= 1 }
             i += 1   // backslash
+            // \sqrt\sqrt\sqrt... recurses via group(): the same budget.
+            guard depth < 64 else {
+                while !atEnd, chars[i].isLetter { i += 1 }
+                return ""
+            }
             guard !atEnd else { return "\\" }
             var name = ""
             if chars[i].isLetter {
@@ -248,8 +256,11 @@ public enum MathSpans {
                 if r.location != NSNotFound { body = ns.substring(with: r); display = isDisplay; break }
             }
             guard let math = body else { continue }
-            // Single-dollar spans: only if it reads as math, not prices.
-            if match.range(at: 4).location != NSNotFound, !looksLikeMath(math) { continue }
+            // Single-dollar and \[ spans only if they read as math -- not
+            // prices ("$5 and $10") or markdown-escaped brackets ("\[1\]").
+            // \( \) is explicit LaTeX and always math.
+            let ambiguous = match.range(at: 2).location != NSNotFound || match.range(at: 4).location != NSNotFound
+            if ambiguous, !looksLikeMath(math) { continue }
             if match.range.location > last {
                 pieces.append(.text(ns.substring(with: NSRange(location: last, length: match.range.location - last))))
             }

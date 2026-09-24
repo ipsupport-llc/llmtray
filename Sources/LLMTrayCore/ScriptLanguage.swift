@@ -11,8 +11,8 @@ public enum ScriptLanguage {
         func hasAny(_ chars: String) -> Bool { text.unicodeScalars.contains { chars.unicodeScalars.contains($0) } }
 
         if has(0x0400...0x04FF) {
-            if hasAny("іїєґІЇЄҐ") { langs += ["uk", "ru"] }
-            else if hasAny("ўЎ") { langs += ["be", "ru"] }
+            if hasAny("ўЎ") { langs += ["be", "ru"] }            // Belarusian also has і: ў first
+            else if hasAny("іїєґІЇЄҐ") { langs += ["uk", "ru"] }
             else if hasAny("ёыэъЁЫЭЪ") { langs += ["ru", "uk"] }
             else { langs += ["ru", "uk", "bg", "sr"] }
         }

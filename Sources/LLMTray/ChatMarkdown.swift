@@ -115,27 +115,68 @@ enum ChatMarkdown {
 
     /// Inline markdown via Foundation (plain text if it doesn't parse), with
     /// LaTeX math ($...$, \(...\), $$...$$, \[...\]) turned into Unicode in
-    /// a serif face. `code` spans are left alone.
+    /// a serif face. The math is swapped for placeholder characters, the line
+    /// is parsed once (so **bold around $x$** still works), then the math goes
+    /// back in with the surrounding emphasis. `code` spans are left alone.
     private static func inline(_ baseSize: CGFloat, _ text: String) -> AttributedString {
         guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(text) }
-        var out = AttributedString()
-        // Odd segments are inside backticks: code, never math.
-        for (i, segment) in text.components(separatedBy: "`").enumerated() {
-            if i % 2 == 1 {
-                out.append(markdown("`" + segment + "`"))
-                continue
-            }
+        var maths: [(latex: String, display: Bool)] = []
+        var masked = ""
+        for (isCode, segment) in codeSpans(text) {
+            if isCode { masked += segment; continue }
             for piece in MathSpans.split(segment) {
                 switch piece {
                 case .text(let t):
-                    out.append(markdown(t))
+                    masked += t
                 case .math(let latex, let display):
-                    var math = AttributedString(LaTeXText.toUnicode(latex))
-                    math.font = .system(size: display ? baseSize + 2 : baseSize + 1, design: .serif)
-                    out.append(math)
+                    guard maths.count < 4096, let scalar = Unicode.Scalar(0xE000 + maths.count) else { masked += latex; continue }
+                    masked.unicodeScalars.append(scalar)   // private use: never in model text
+                    maths.append((latex, display))
                 }
             }
         }
+        var out = markdown(masked)
+        for (n, math) in maths.enumerated() {
+            guard let scalar = Unicode.Scalar(0xE000 + n), let range = out.range(of: String(Character(scalar))) else { continue }
+            let bold = out[range].inlinePresentationIntent?.contains(.stronglyEmphasized) ?? false
+            var rendered = AttributedString(LaTeXText.toUnicode(math.latex))
+            if let run = out[range].runs.first { rendered.mergeAttributes(run.attributes) }
+            rendered.font = .system(size: math.display ? baseSize + 2 : baseSize + 1, weight: bold ? .bold : .regular, design: .serif)
+            out.replaceSubrange(range, with: rendered)
+        }
+        return out
+    }
+
+    /// The line split into code spans (a run of N backticks up to the next
+    /// run of exactly N, as in CommonMark) and the text between them.
+    static func codeSpans(_ text: String) -> [(isCode: Bool, text: String)] {
+        let chars = Array(text)
+        var out: [(Bool, String)] = []
+        var plain = ""
+        var i = 0
+        while i < chars.count {
+            guard chars[i] == "`" else { plain.append(chars[i]); i += 1; continue }
+            var run = 0
+            while i + run < chars.count, chars[i + run] == "`" { run += 1 }
+            // Find a closing run of the same length.
+            var j = i + run
+            var close: Int?
+            while j < chars.count {
+                if chars[j] == "`" {
+                    var k = 0
+                    while j + k < chars.count, chars[j + k] == "`" { k += 1 }
+                    if k == run { close = j; break }
+                    j += k
+                } else {
+                    j += 1
+                }
+            }
+            guard let end = close else { plain += String(chars[i..<(i + run)]); i += run; continue }
+            if !plain.isEmpty { out.append((false, plain)); plain = "" }
+            out.append((true, String(chars[i..<(end + run)])))
+            i = end + run
+        }
+        if !plain.isEmpty { out.append((false, plain)) }
         return out
     }
 
@@ -159,18 +200,22 @@ enum ChatMarkdown {
             if pending == nil, t.hasPrefix("```") { inFence.toggle() }
             if inFence { out.append(line); continue }
             if var open = pending {
-                open.append(t)
-                if t.hasSuffix(closer) {
+                // The first closing delimiter anywhere ends the block; text
+                // after it stays a line of its own.
+                if let close = t.range(of: closer) {
+                    open.append(String(t[..<close.upperBound]))
                     out.append(open.joined(separator: " "))
+                    let rest = t[close.upperBound...].trimmingCharacters(in: .whitespaces)
+                    if !rest.isEmpty { out.append(rest) }
                     pending = nil
                 } else {
+                    open.append(t)
                     pending = open
                 }
                 continue
             }
             for (start, end) in [("$$", "$$"), ("\\[", "\\]")] where t.hasPrefix(start) {
-                let rest = t.dropFirst(start.count)
-                if !rest.contains(end) {
+                if !t.dropFirst(start.count).contains(end) {
                     pending = [t]
                     closer = end
                 }
