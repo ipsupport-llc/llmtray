@@ -44,6 +44,14 @@ enum ProcessRunner {
             }
             task.terminationHandler = { proc in
                 pipe.fileHandleForReading.readabilityHandler = nil
+                // Whatever is still in the pipe -- often pip's final
+                // "ERROR: ..." line, the part the error message needs.
+                if let rest = try? pipe.fileHandleForReading.readToEnd(), !rest.isEmpty {
+                    tail.append(rest)
+                    if let log, let text = String(data: rest, encoding: .utf8) {
+                        Task { @MainActor in log(text) }
+                    }
+                }
                 if proc.terminationStatus == 0 {
                     continuation.resume()
                 } else {
@@ -99,7 +107,7 @@ enum PythonLocator {
     /// The version probes run off the main thread.
     static func findModern(preferring preferred: [String] = []) async -> String? {
         let candidates = (preferred + commonLocations).filter { FileManager.default.isExecutableFile(atPath: $0) }
-        return try? await ProcessRunner.offMain { candidates.first(where: isModern) } ?? nil
+        return try? await ProcessRunner.offMain { candidates.first(where: isModern) }
     }
 
     /// Blocks until the probe exits -- call it off the main thread.

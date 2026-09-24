@@ -46,7 +46,14 @@ final class ServerProcess {
     var isRunning: Bool { !hasExited && task.isRunning }
 
     func run() throws {
-        try task.run()
+        do {
+            try task.run()
+        } catch {
+            // Never ran, so didExit won't break the handler <-> self cycle.
+            task.terminationHandler = nil
+            (task.standardOutput as? Pipe)?.fileHandleForReading.readabilityHandler = nil
+            throw error
+        }
     }
 
     /// SIGTERM, then SIGKILL if it's still alive 3 s later -- mlx_lm.server
