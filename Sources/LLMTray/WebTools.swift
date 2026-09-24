@@ -248,13 +248,17 @@ final class CountryInfoTool: SelectableTool {
             // Neighbours by name: labels only (their full claims made a
             // country with many borders take ~10 s).
             async let neighbourLoad = Self.entities(claims.items("P47", currentOnly: true), props: "labels")
-            let (refs, neighbourEntities) = try await (refsLoad, neighbourLoad)
+            // Only neighbours that are countries (have an ISO code): P47 also
+            // lists the EU, and the search alone includes historical states.
+            async let countryNeighbours = Self.countriesBordering(id)
+            let (refs, neighbourEntities, countries) = try await (refsLoad, neighbourLoad, countryNeighbours)
             func label(_ id: String) -> String? { WikidataClaims.label(refs[id]) }
             let currencies = claims.items("P38", currentOnly: true).compactMap { id -> String? in
                 let code = WikidataClaims(refs[id] ?? [:]).strings("P498").first
                 return [code, label(id)].compactMap { $0 }.joined(separator: " ").nilIfEmpty
             }
             let borders: [String] = claims.items("P47", currentOnly: true)
+                .filter { countries.contains($0) }
                 .compactMap { WikidataClaims.label(neighbourEntities[$0]) }.sorted()
             var capitals: [String] = []
             for name in claims.items("P36", currentOnly: true).compactMap(label) where !capitals.contains(name) {
@@ -309,6 +313,16 @@ final class CountryInfoTool: SelectableTool {
             if let entity = found[id], !WikidataClaims(entity).strings("P297").isEmpty { return (id, entity) }
         }
         return nil
+    }
+
+    /// Items that have an ISO alpha-2 code and list `id` as a neighbour.
+    static func countriesBordering(_ id: String) async throws -> Set<String> {
+        let search = try await WebFetch.json(api, query: [
+            URLQueryItem(name: "action", value: "query"), URLQueryItem(name: "list", value: "search"),
+            URLQueryItem(name: "srsearch", value: "haswbstatement:P297 haswbstatement:P47=\(id)"),
+            URLQueryItem(name: "srlimit", value: "50"), URLQueryItem(name: "format", value: "json"),
+        ])
+        return Set(((search["query"] as? [String: Any])?["search"] as? [[String: Any]] ?? []).compactMap { $0["title"] as? String })
     }
 
     static func entities(_ ids: [String], props: String) async throws -> [String: [String: Any]] {
