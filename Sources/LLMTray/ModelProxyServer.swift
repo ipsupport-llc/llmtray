@@ -219,7 +219,9 @@ final class ModelProxyServer {
             // Only now: the backend's name for its model is the one the
             // model just acquired was launched with (no switch can happen
             // while this request counts as forwarding).
-            let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName)
+            // The profile's sampling where the client set none: current
+            // values, so changing them never needs a restart.
+            let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
             self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort)
         }
     }

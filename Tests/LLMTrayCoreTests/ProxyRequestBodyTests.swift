@@ -49,6 +49,22 @@ final class ProxyRequestBodyTests: XCTestCase {
         XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(body, backendModel: "m"), as: UTF8.self), #"{"model":"m"}"#)
     }
 
+    func testDefaultsFillOnlyWhatsMissing() {
+        let d: [(key: String, json: String)] = [("temperature", "0.6"), ("top_p", "0.95"), ("max_tokens", "4096")]
+        XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(Data(#"{"model":"m","temperature":0.0}"#.utf8), backendModel: "m", defaults: d), as: UTF8.self),
+                       #"{"model":"m","temperature":0.0,"top_p":0.95,"max_tokens":4096}"#)
+        XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(Data(#"{"model":"m","max_completion_tokens":5}"#.utf8), backendModel: "m", defaults: d), as: UTF8.self),
+                       #"{"model":"m","max_completion_tokens":5,"temperature":0.6,"top_p":0.95}"#)
+        XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(Data(#"{"model":"m","max_completion_tokens":null,"temperature":0.1,"top_p":1}"#.utf8), backendModel: "m", defaults: d), as: UTF8.self),
+                       #"{"model":"m","temperature":0.1,"top_p":1,"max_tokens":4096}"#, "null is absent (and dropped)")
+        XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(Data(#"{"model":"m","temperature":null,"top_p":1,"max_tokens":2}"#.utf8), backendModel: "m", defaults: [("temperature", "0.6")]), as: UTF8.self),
+                       #"{"model":"m","top_p":1,"max_tokens":2,"temperature":0.6}"#, "a null sampling field is replaced, not duplicated")
+        XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(Data(#"{"model":"m","temperature":null}"#.utf8), backendModel: "m"), as: UTF8.self),
+                       #"{"model":"m"}"#, "null dropped even with nothing to fill in")
+        let full = Data(#"{"model":"m","temperature":1,"top_p":1,"max_tokens":1}"#.utf8)
+        XCTAssertEqual(ProxyRequestBody.rewrite(full, backendModel: "m", defaults: d), full, "nothing to add: byte for byte")
+    }
+
     func testBOM() {
         let body = Data([0xEF, 0xBB, 0xBF]) + Data(#"{"draft_model":"evil/repo","temperature":0.0}"#.utf8)
         XCTAssertEqual(String(decoding: ProxyRequestBody.rewrite(body, backendModel: "m"), as: UTF8.self), #"{"model":"m","temperature":0.0}"#)

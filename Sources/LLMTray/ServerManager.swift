@@ -59,9 +59,12 @@ final class ServerManager: ObservableObject {
     // when a client's `model` field asks for something else.
     private var currentPublicPort: Int?
     private var currentModelPath: String?
-    /// Arguments the running process was started with, to tell whether
+    /// The running process's ServerLaunch.restartKey, to tell whether
     /// profile edits since then need a restart (see pendingLaunchChange).
-    private var lastLaunchArguments: [String]?
+    private var lastRestartKey: [String]?
+    /// Its model's context length, read from its files once per launch.
+    private var launchedMaxContext: Int?
+    private var launchedExtraArgs = ""
     private var currentAlias: String = ""
     /// The --model-alias the running process was started with.
     private var launchedAlias = ""
@@ -405,13 +408,20 @@ final class ServerManager: ObservableObject {
     }
 
     private func computePendingLaunchChange() -> Bool {
-        guard case .running = state, let modelPath = currentModelPath, let last = lastLaunchArguments else { return false }
+        guard case .running = state, let modelPath = currentModelPath, let last = lastRestartKey else { return false }
         let profile = ProfileManager.shared.resolved(for: modelPath)
-        let planned = ServerLaunch.arguments(profile, launchContext(
+        let context = launchContext(
             modelPath: modelPath, alias: currentAlias,
             drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
-        ))
-        return planned != last
+        )
+        return ServerLaunch.restartKey(profile, context) != last
+    }
+
+    /// The loaded model's sampling, from its profile as it is now, for the
+    /// proxy to fill into requests that don't set it.
+    func requestDefaults() -> [(key: String, json: String)] {
+        guard let modelPath = launchedModelPath else { return [] }
+        return ServerLaunch.requestDefaults(ProfileManager.shared.resolved(for: modelPath), maxContext: launchedMaxContext, launchedExtraArgs: launchedExtraArgs)
     }
 
     /// Whether switching the loaded model from profile `a` to `b` would
@@ -432,11 +442,14 @@ final class ServerManager: ObservableObject {
         // each launch; notable defaults in adr/0003-field-lessons.md.
         let profile = ProfileManager.shared.resolved(for: modelPath)
         appendLog("--- profile: \(profile.profileName) ---\n")
-        let args = ServerLaunch.arguments(profile, launchContext(
+        let context = launchContext(
             modelPath: modelPath, alias: alias,
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
-        ))
-        lastLaunchArguments = args
+        )
+        let args = ServerLaunch.arguments(profile, context)
+        lastRestartKey = ServerLaunch.restartKey(profile, context)
+        launchedMaxContext = context.maxContext
+        launchedExtraArgs = profile.extraServerArgs
         launchedAlias = alias
         launchedModelPath = modelPath
 

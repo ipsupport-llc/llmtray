@@ -18,6 +18,10 @@ public enum ProxyRequestBody {
         return ["", "default", "default_model"].contains(trimmed) ? nil : trimmed
     }
 
+    /// Sampling fields; a null one fails the backend's validation, so it's
+    /// dropped (its default applies).
+    static let samplingKeys: Set<String> = ["temperature", "top_p", "top_k", "min_p", "max_tokens", "max_completion_tokens"]
+
     /// Keys the backend would load models or weights from.
     static let loadingKeys = ["draft_model", "adapters"]
 
@@ -27,17 +31,34 @@ public enum ProxyRequestBody {
     /// it anyway). Every other member is copied byte for byte: parsing and
     /// re-serializing would turn a client's `0.0` into `0`, which mlx_lm
     /// refuses for its float-only parameters.
-    public static func rewrite(_ body: Data, backendModel: String) -> Data {
+    ///
+    /// `defaults` (key, JSON literal) are added where the body has no such
+    /// key -- the profile's sampling; "max_tokens" also yields to a
+    /// client's "max_completion_tokens".
+    public static func rewrite(_ body: Data, backendModel: String, defaults: [(key: String, json: String)] = []) -> Data {
         guard object(body) != nil, let members = topLevelMembers(Array(body)) else { return body }
+        // A null counts as absent, as it does for the server.
+        let bytes = Array(body)
+        let present = Set(members.filter { String(decoding: bytes[$0.valueRange], as: UTF8.self) != "null" }.map(\.key))
+        let missing = defaults.filter { d in
+            !present.contains(d.key) && !(d.key == "max_tokens" && present.contains("max_completion_tokens"))
+        }
         // Already right: one model, the backend's, and no loading keys.
         let models = members.filter { $0.key == "model" }
         if models.count == 1, requestedModelValue(body, models[0]) == backendModel,
-           !members.contains(where: { loadingKeys.contains($0.key) }) { return body }
+           !members.contains(where: { loadingKeys.contains($0.key) }), missing.isEmpty,
+           !members.contains(where: { m in (samplingKeys.contains(m.key) || defaults.contains { $0.key == m.key }) && String(decoding: Array(body)[m.valueRange], as: UTF8.self) == "null" }) { return body }
         guard let name = try? JSONSerialization.data(withJSONObject: [backendModel], options: [.withoutEscapingSlashes]) else { return body }
-        let bytes = Array(body)
         var out = Array("{\"model\":".utf8) + Array(name.dropFirst().dropLast())   // the string out of ["..."]
-        for m in members where m.key != "model" && !loadingKeys.contains(m.key) {
+        // A null sampling field: the server would fail its validation --
+        // dropped, so the default (filled in or the server's own) applies.
+        let defaultKeys = samplingKeys.union(defaults.map(\.key))
+        func isNull(_ m: Member) -> Bool { String(decoding: bytes[m.valueRange], as: UTF8.self) == "null" }
+        for m in members where m.key != "model" && !loadingKeys.contains(m.key) && !(defaultKeys.contains(m.key) && isNull(m)) {
             out += Array(",".utf8) + bytes[m.range]
+        }
+        for d in missing {
+            out += Array(",\"\(d.key)\":\(d.json)".utf8)
         }
         out += Array("}".utf8)
         return Data(out)
