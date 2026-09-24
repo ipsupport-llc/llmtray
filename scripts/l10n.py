@@ -281,6 +281,12 @@ def _openai(messages: list[dict], model: str, key: str) -> str:
                 time.sleep(2 ** attempt * 3)
                 continue
             raise RuntimeError(f"OpenAI HTTP {e.code}: {e.read().decode()[:300]}")
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            # A dropped connection or a timeout: transient, retry too.
+            if attempt < 4:
+                time.sleep(2 ** attempt * 3)
+                continue
+            raise RuntimeError(f"OpenAI request failed: {e}")
     raise RuntimeError("OpenAI: out of retries")
 
 
@@ -309,23 +315,31 @@ def write_lang(code: str, table: dict[str, str], base_keys: list[str]) -> Path:
 def translate(codes: list[str], model: str, batch: int = 25) -> int:
     """Fills in each language's missing keys; drops keys no longer in the
     English base (a changed English string is a new key). Never touches an
-    existing translation."""
-    import json, os
+    existing translation. Batches run in parallel (L10N_JOBS, default 8):
+    one at a time, a run adding many languages took over an hour."""
+    import json, os, threading
+    from concurrent.futures import ThreadPoolExecutor
     key = os.environ.get("OPENAI_API_KEY")
     if not key:
         print("error: OPENAI_API_KEY is not set")
         return 1
     ctx = extract_with_context()
     base_keys = sorted(load(BASE))
-    failed = 0
+    tables: dict[str, dict[str, str]] = {}
+    jobs: list[tuple[str, list[str]]] = []
     for code in codes:
         path = LOC / f"{code}.lproj" / "Localizable.strings"
         table = load(path) if path.exists() else {}
-        table = {k: v for k, v in table.items() if k in base_keys}  # prune obsolete
-        todo = [k for k in base_keys if k not in table]
-        print(f"{code}: {len(todo)} to translate")
-        lang = _lang_name(code)
-        system = (
+        tables[code] = {k: v for k, v in table.items() if k in base_keys}  # prune obsolete
+        todo = [k for k in base_keys if k not in tables[code]]
+        print(f"{code}: {len(todo)} to translate", flush=True)
+        jobs += [(code, todo[i:i + batch]) for i in range(0, len(todo), batch)]
+        write_lang(code, tables[code], base_keys)  # creates new languages, prunes
+    lock = threading.Lock()
+    failed = 0
+
+    def system_prompt(lang: str) -> str:
+        return (
             f"You translate the UI of LLMTray, a macOS menu-bar app for running local LLMs, from English "
             f"into {lang}. Write natural, concise {lang} as used in macOS system UI (System Settings wording). "
             f"Rules: keep every format specifier (%@, %lld, %d, %1$@...) exactly, in a grammatical position; "
@@ -334,31 +348,45 @@ def translate(codes: list[str], model: str, batch: int = 25) -> int:
             f"are full sentences, labels and buttons short. Reply with a JSON object mapping each English "
             f"string (exactly as given) to its translation."
         )
-        for i in range(0, len(todo), batch):
-            chunk = todo[i:i + batch]
-            items = [{"text": k, "where": ctx.get(k, "UI text")} for k in chunk]
-            pending = chunk
-            for attempt in range(2):
+
+    def run(job: tuple[str, list[str]]) -> None:
+        nonlocal failed
+        code, chunk = job
+        system = system_prompt(_lang_name(code))
+        items = [{"text": k, "where": ctx.get(k, "UI text")} for k in chunk]
+        pending, done = chunk, {}
+        for attempt in range(2):
+            try:
                 reply = json.loads(_openai([
                     {"role": "system", "content": system},
                     {"role": "user", "content": json.dumps([it for it in items if it["text"] in pending], ensure_ascii=False)},
                 ], model, key))
-                retry = []
-                for k in pending:
-                    v = reply.get(k)
-                    why = _valid(k, v) if isinstance(v, str) else "missing in reply"
-                    if why:
-                        retry.append(k)
-                        if attempt == 1:
+            except Exception as e:  # one bad batch must not lose the rest
+                print(f"  {code}: request failed ({e}), attempt {attempt + 1}", flush=True)
+                reply = {}
+            retry = []
+            for k in pending:
+                v = reply.get(k)
+                why = _valid(k, v) if isinstance(v, str) else "missing in reply"
+                if why:
+                    retry.append(k)
+                    if attempt == 1:
+                        with lock:
                             failed += 1
-                            print(f"  {code}: left in English ({why}): {k[:70]!r}")
-                    else:
-                        table[k] = v
-                pending = retry
-                if not pending:
-                    break
-            write_lang(code, table, base_keys)  # save as we go
-        print(f"{code}: {sum(k in table for k in base_keys)}/{len(base_keys)}")
+                        print(f"  {code}: left in English ({why}): {k[:70]!r}", flush=True)
+                else:
+                    done[k] = v
+            pending = retry
+            if not pending:
+                break
+        with lock:
+            tables[code].update(done)
+            write_lang(code, tables[code], base_keys)  # save as we go
+
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("L10N_JOBS", "8"))) as pool:
+        list(pool.map(run, jobs))
+    for code in codes:
+        print(f"{code}: {sum(k in tables[code] for k in base_keys)}/{len(base_keys)}")
     return 0
 
 
