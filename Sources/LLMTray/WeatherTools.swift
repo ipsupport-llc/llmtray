@@ -19,9 +19,13 @@ enum WeatherPlace {
             guard let place = try await Geocoder.find(city, countryCode: arguments["country_code"] as? String) else {
                 throw Failure.notFound("no city called \(city) found")
             }
-            return Resolved(place: place, note: ["location": "\(place.name), \(place.country)"])
+            return Resolved(place: place, note: ["location": label(place)])
         }
         let home = Geocoder.homeCity()
+        // GMT / UTC / Etc/GMT+3 name no city.
+        if home.zone == "GMT" || home.zone == "UTC" || home.zone.hasPrefix("Etc/") || !home.zone.contains("/") {
+            throw Failure.notFound("the user's city isn't known (time zone \(home.zone)): ask them which city")
+        }
         // The Mac's region may not be the country of its time zone (region
         // Canada, zone Europe/London: not London, Ontario): the place must
         // be in that zone.
@@ -34,9 +38,14 @@ enum WeatherPlace {
             throw Failure.notFound("the user's city isn't known (time zone \(home.zone)): ask them which city")
         }
         return Resolved(place: place, note: [
-            "location": "\(place.name), \(place.country)",
+            "location": label(place),
             "location_source": "the Mac's time zone (\(home.zone)); if the user may be elsewhere, say which city this is for",
         ])
+    }
+
+    /// "Kyiv, Ukraine"; just the name where the geocoder has no country.
+    static func label(_ place: Geocoder.Place) -> String {
+        [place.name, place.country].filter { !$0.isEmpty }.joined(separator: ", ")
     }
 
     static func message(_ error: Error) -> String {
@@ -72,7 +81,7 @@ class WeatherTool: SelectableTool {
     nonisolated static let attribution = "Weather data by Open-Meteo (https://open-meteo.com), CC BY 4.0"
 
     static let placeProperties: [String: Any] = [
-        "city": string("A single city name, e.g. \"Kyiv\". Omit for the user's own location."),
+        "city": string("A single city name, e.g. \"Kyiv\" -- never a comma-separated address. Omit for the user's own location."),
         "country_code": string("Optional ISO-3166 alpha-2 code, e.g. \"UA\", to pick the right city."),
         "units": string("\"metric\" or \"imperial\". Omit for the user's usual units."),
     ]
@@ -90,8 +99,9 @@ class WeatherTool: SelectableTool {
         let f = DateFormatter()
         f.locale = Locale(identifier: "en_US_POSIX")
         f.timeZone = zone
-        f.dateFormat = "yyyy-MM-dd"
-        guard let day = f.date(from: ymd) else { return "" }
+        // Noon: a DST change at midnight (Santiago, Havana) has no 00:00.
+        f.dateFormat = "yyyy-MM-dd HH:mm"
+        guard let day = f.date(from: String(ymd.prefix(10)) + " 12:00") else { return "" }
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = zone
         if calendar.isDateInToday(day) { return "today" }
@@ -106,11 +116,12 @@ final class CurrentWeatherTool: WeatherTool {
 
     override var definition: [String: Any] {
         var properties = Self.placeProperties
-        properties["days"] = Self.integer("Days of daily forecast, 1-16 (default 3; 1 = just today).")
+        properties["days"] = Self.integer("Days of daily forecast, 1-16 (default 3; 1 = just today, 7 for \"this weekend\" or \"this week\").")
         return Self.function(
             name,
             "Current weather and the daily forecast for a city (\"what's the weather in Lviv?\", \"will it rain "
-                + "tomorrow?\", \"weather this weekend\"). Without `city` it's for the user's own location.",
+                + "tomorrow?\", \"weather this weekend\"). Without `city` it's for the user's own location. Days come "
+                + "labelled today / tomorrow / weekday in the city's time zone: no need to get the date first.",
             properties: properties
         )
     }
@@ -168,7 +179,8 @@ final class HourlyForecastTool: WeatherTool {
         return Self.function(
             name,
             "Hour-by-hour forecast for the next hours (\"will it rain this evening?\", \"when does the rain stop?\"). "
-                + "Without `city` it's for the user's own location.",
+                + "Without `city` it's for the user's own location. Hours come labelled with their day (today / tomorrow) in "
+                + "the city's time zone.",
             properties: properties
         )
     }
@@ -185,10 +197,15 @@ final class HourlyForecastTool: WeatherTool {
             var result = resolved.note
             result["timezone"] = resolved.place.timezone
             result["units"] = WeatherUnits.describe(imperial)
+            let zone = TimeZone(identifier: resolved.place.timezone) ?? .current
             result["hourly"] = OpenMeteoFormat.rows(data, section: "hourly", names: [
                 "temperature_2m": "temperature", "precipitation_probability": "precipitation_chance_percent",
                 "precipitation": "precipitation", "weather_code": "conditions", "wind_speed_10m": "wind_speed",
-            ], limit: hours)
+            ], limit: hours).map { row -> [String: Any] in
+                var row = row
+                if let time = row["time"] as? String { row["day"] = Self.dayLabel(time, zone: zone) }
+                return row
+            }
             result["source"] = Self.attribution
             return Self.json(result)
         } catch {
@@ -199,6 +216,8 @@ final class HourlyForecastTool: WeatherTool {
 
 final class AirQualityTool: WeatherTool {
     init() { super.init(name: "get_air_quality") }
+
+    nonisolated static let airAttribution = "Air quality by Open-Meteo (https://open-meteo.com), CAMS, CC BY 4.0"
 
     override var definition: [String: Any] {
         var properties = Self.placeProperties
@@ -221,13 +240,14 @@ final class AirQualityTool: WeatherTool {
                 URLQueryItem(name: "current", value: "european_aqi,us_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,uv_index"),
             ])
             var result = resolved.note
+            result["timezone"] = resolved.place.timezone
             result["current"] = OpenMeteoFormat.current(data, names: [
                 "time": "time", "european_aqi": "european_aqi", "us_aqi": "us_aqi", "pm2_5": "pm2_5_ug_m3",
                 "pm10": "pm10_ug_m3", "ozone": "ozone_ug_m3", "nitrogen_dioxide": "no2_ug_m3", "uv_index": "uv_index",
             ])
             result["scale"] = "European AQI: 0-20 good, 20-40 fair, 40-60 moderate, 60-80 poor, 80-100 very poor, 100+ extremely poor. "
                 + "US AQI: 0-50 good, 51-100 moderate, 101-150 unhealthy for sensitive groups, 151-200 unhealthy, 201-300 very unhealthy, 301+ hazardous."
-            result["source"] = "Air quality by Open-Meteo (https://open-meteo.com), CAMS, CC BY 4.0"
+            result["source"] = Self.airAttribution
             return Self.json(result)
         } catch {
             return Self.error(WeatherPlace.message(error))
@@ -245,7 +265,8 @@ final class SunTool: WeatherTool {
         return Self.function(
             name,
             "Sunrise, sunset, solar noon, civil twilight and day length for a city on a date (\"when is sunset in "
-                + "Rome?\", \"how long is the day on December 21 in Oslo?\"). Without `city` it's for the user's own location.",
+                + "Rome?\", \"how long is the day on December 21 in Oslo?\"). Without `city` it's for the user's own location; "
+                + "without `date`, today there (no need to get the date first). Years 1900-2100.",
             properties: properties
         )
     }
@@ -259,29 +280,53 @@ final class SunTool: WeatherTool {
             f.timeZone = zone
             f.dateFormat = "yyyy-MM-dd HH:mm"
             var date = Date()
-            if let text = arguments["date"] as? String, !text.isEmpty {
-                guard let parsed = f.date(from: text + " 12:00") else { return Self.error("date must be yyyy-MM-dd") }
+            if let text = (arguments["date"] as? String)?.trimmingCharacters(in: .whitespaces), !text.isEmpty {
+                // Strict: "26-09-24" isn't year 26, and the formulas drift
+                // far from the present (a 14 h December day in Rome in 9999).
+                let check = DateFormatter()
+                check.locale = Locale(identifier: "en_US_POSIX")
+                check.timeZone = zone
+                check.dateFormat = "yyyy-MM-dd"
+                guard text.range(of: #"^\d{4}-\d{2}-\d{2}$"#, options: .regularExpression) != nil,
+                      let year = Int(text.prefix(4)), (1900...2100).contains(year),
+                      let parsed = f.date(from: text + " 12:00"), check.string(from: parsed) == text else {
+                    return Self.error("date must be yyyy-MM-dd, years 1900-2100")
+                }
                 date = parsed
             }
             let day = SolarCalculator.day(date, latitude: resolved.place.latitude, longitude: resolved.place.longitude, zone: zone)
-            f.dateFormat = "HH:mm"
+            f.dateFormat = "yyyy-MM-dd"
+            let asked = f.string(from: date)
+            /// HH:mm, with the date when it falls on another day (a sunset
+            /// after midnight in Reykjavik in June).
+            func time(_ t: Date) -> String {
+                f.dateFormat = "yyyy-MM-dd"
+                let day = f.string(from: t)
+                f.dateFormat = "HH:mm"
+                return day == asked ? f.string(from: t) : "\(f.string(from: t)) (\(day))"
+            }
             func text(_ event: SolarCalculator.Event) -> String {
                 switch event {
-                case .time(let t): return f.string(from: t)
+                case .time(let t): return time(t)
                 case .alwaysAbove: return "none (the sun stays up all day)"
                 case .alwaysBelow: return "none (the sun stays down all day)"
                 }
             }
+            func twilight(_ event: SolarCalculator.Event) -> String {
+                switch event {
+                case .time(let t): return time(t)
+                case .alwaysAbove: return "none (it never gets darker than civil twilight)"
+                case .alwaysBelow: return "none (it stays darker than civil twilight all day)"
+                }
+            }
             var result = resolved.note
-            f.dateFormat = "yyyy-MM-dd"
-            result["date"] = f.string(from: date)
-            f.dateFormat = "HH:mm"
+            result["date"] = asked
             result["timezone"] = resolved.place.timezone
             result["sunrise"] = text(day.sunrise)
             result["sunset"] = text(day.sunset)
-            result["solar_noon"] = f.string(from: day.solarNoon)
-            result["civil_dawn"] = text(day.civilDawn)
-            result["civil_dusk"] = text(day.civilDusk)
+            result["solar_noon"] = time(day.solarNoon)
+            result["civil_dawn"] = twilight(day.civilDawn)
+            result["civil_dusk"] = twilight(day.civilDusk)
             let minutes = Int((day.daylight / 60).rounded())
             result["day_length"] = "\(minutes / 60)h \(minutes % 60)m"
             result["source"] = Geocoder.attribution

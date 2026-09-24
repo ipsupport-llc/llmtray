@@ -536,8 +536,10 @@ enum ToolCatalog {
               credit: WeatherTool.attribution),
         Entry(name: "get_hourly_forecast", title: NSLocalizedString("Hourly forecast", comment: "chat tool"), usesNetwork: true,
               credit: WeatherTool.attribution),
-        Entry(name: "get_air_quality", title: NSLocalizedString("Air quality", comment: "chat tool"), usesNetwork: true),
-        Entry(name: "get_sunrise_sunset", title: NSLocalizedString("Sunrise & sunset", comment: "chat tool"), usesNetwork: true),
+        Entry(name: "get_air_quality", title: NSLocalizedString("Air quality", comment: "chat tool"), usesNetwork: true,
+              credit: AirQualityTool.airAttribution),
+        Entry(name: "get_sunrise_sunset", title: NSLocalizedString("Sunrise & sunset", comment: "chat tool"), usesNetwork: true,
+              credit: Geocoder.attribution),
     ]
 
     @MainActor
