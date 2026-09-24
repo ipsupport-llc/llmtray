@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ має обмеження: прийміть ліцензію на huggingface.co/%@, потім додайте токен Hugging Face у Налаштування → Models.";
+"%@ wasn't found on Hugging Face." = "%@ не знайдено на Hugging Face.";
 "%@ → %@ available" = "Доступно: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "Вільно на диску: %@ · ваші моделі: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
 "Full" = "Повний";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Обмежено: прийміть ліцензію на сторінці Hugging Face моделі й додайте токен у Налаштування → Models.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Обмежено: запросіть доступ на сторінці моделі на Hugging Face (автори переглядають запити) і додайте токен у Налаштування → Models.";
 "General" = "Основні";
 "Generating image…" = "Генерую зображення…";
+"Get one" = "Отримати";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Дає моделі інструмент generate_image (потрібна модель, що вміє викликати інструменти). Першого разу завантажується модель для зображень.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "Погодинний прогноз";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face відповів HTTP %d для %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face відхилив %@ (HTTP %d): модель обмежена, приватна або не існує. Якщо вона обмежена, прийміть ліцензію на huggingface.co/%@ і перевірте токен у Налаштування → Models.";
+"Hugging Face token" = "Токен Hugging Face";
 "Idle -- the model reloads on the next message" = "Простій -- модель завантажиться з наступним повідомленням";
 "Image generation" = "Генерація зображень";
 "Image model" = "Модель зображень";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "У цій теці моделей немає.";
 "No runs yet." = "Прогонів ще не було.";
 "No saved sessions" = "Збережених чатів немає";
+"Non-commercial license: read it on the model card before using the model." = "Некомерційна ліцензія: ознайомтеся з нею на картці моделі перед використанням.";
 "Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
 "OK" = "OK";
 "Off" = "Вимк.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Вимк. — до сервера підключається лише цей Mac. Увімк. — будь-які пристрої у вашій мережі, тому вмикайте лише в довірених мережах.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Лише для обмежених моделей (Llama, деякі Gemma і репозиторії FLUX): прийміть ліцензію на сторінці моделі на Hugging Face, потім вставте тут токен для читання. Зберігається в Keychain, надсилається лише на huggingface.co.";
 "Open" = "Відкрити";
 "Open Server Log…" = "Відкрити лог сервера…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
 "Recovery" = "Відновлення";
 "Regenerate" = "Згенерувати знову";
+"Remove" = "Вилучити";
 "Remove attachment" = "Прибрати вкладення";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Видаляє завантажений рантайм mlx-lm з %@. Під час наступного запуску сервера він встановиться заново. Збережені чати й профілі залишаються.";
 "Rename" = "Перейменувати";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Вибирає лише з найімовірніших токенів, сумарна ймовірність яких не більша за це значення. 1.0 — вимкнено.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Вибирає лише зі стількох найімовірніших токенів. 0 — вимкнено. Для Gemma 4 рекомендують 64.";
 "Sampling" = "Семплінг";
+"Save" = "Зберегти";
+"Saved in your Keychain" = "Збережено в Keychain";
 "Save…" = "Зберегти…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Масштабує ширину й висоту, які просить модель. Balanced залишає 1024x1024 як є.";
 "Search" = "Пошук";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "Ціль: %@ · профіль %@";
 "Temperature" = "Температура";
 "Temporary — not saved" = "Тимчасовий — не зберігається";
+"The Keychain refused to remove the token." = "Keychain відмовив у видаленні токена.";
+"The Keychain refused to save the token." = "Keychain відмовив у збереженні токена.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "Тут слухає OpenAI-сумісний API (http://localhost:<порт>/v1). Змінюється, коли сервер зупинено.";
 "The base profile: every other profile inherits from it." = "Базовий профіль: усі інші успадковуються від нього.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Першого разу на цей Mac завантажиться %@ (%@) — зараз, а не посеред розмови.";
 "The longest answer the model may write. Also capped by the model's own context length." = "Максимальна довжина відповіді. Також обмежена довжиною контексту моделі.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Версія mlx-lm (коміт власного форку LLMTray), на якій працюють моделі. Оновлюється окремо від застосунку.";
 "The model name API clients send." = "Ім'я моделі, яке надсилають API-клієнти.";
+"The model's license, from its card." = "Ліцензія моделі з її картки.";
 "The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "Thinking…" = "Думаю…";

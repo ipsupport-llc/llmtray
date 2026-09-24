@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ bị hạn chế: chấp nhận giấy phép trên huggingface.co/%@, sau đó thêm token Hugging Face trong Cài đặt → Models.";
+"%@ wasn't found on Hugging Face." = "Không tìm thấy %@ trên Hugging Face.";
 "%@ → %@ available" = "Có bản %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "Còn trống trên ổ: %@ · các mô hình của bạn: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Giải phóng bộ nhớ mà mô hình đã tải đang giữ sau khoảng thời gian không có yêu cầu này. Mô hình sẽ tự động tải lại ở yêu cầu tiếp theo, với độ trễ tải như thường lệ.";
 "Full" = "Đầy đủ";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Bị hạn chế: chấp nhận giấy phép trên trang Hugging Face của mô hình, rồi thêm token trong Cài đặt → Models.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Bị hạn chế: yêu cầu quyền truy cập trên trang Hugging Face của mô hình (tác giả sẽ xem xét), rồi thêm token trong Cài đặt → Models.";
 "General" = "Chung";
 "Generating image…" = "Đang tạo ảnh…";
+"Get one" = "Lấy token";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "Dự báo theo giờ";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face trả về HTTP %d cho %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face từ chối %@ (HTTP %d): mô hình bị hạn chế hoặc riêng tư, hoặc không tồn tại. Nếu bị hạn chế, chấp nhận giấy phép trên huggingface.co/%@ và kiểm tra token trong Cài đặt → Models.";
+"Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Đang rỗi -- mô hình sẽ tải lại ở tin nhắn tiếp theo";
 "Image generation" = "Tạo hình ảnh";
 "Image model" = "Mô hình hình ảnh";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "Không tìm thấy mô hình nào trong thư mục này.";
 "No runs yet." = "Chưa có lần chạy nào.";
 "No saved sessions" = "Không có phiên đã lưu";
+"Non-commercial license: read it on the model card before using the model." = "Giấy phép phi thương mại: đọc trên model card trước khi sử dụng.";
 "Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
 "OK" = "OK";
 "Off" = "Tắt";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
 "Open" = "Mở";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Recovery" = "Khôi phục";
 "Regenerate" = "Tạo lại";
+"Remove" = "Xóa";
 "Remove attachment" = "Xóa tệp đính kèm.";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống khỏi %@. Runtime này sẽ được thiết lập lại vào lần khởi động máy chủ tiếp theo. Các cuộc trò chuyện và hồ sơ đã lưu được giữ lại.";
 "Rename" = "Đổi tên";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Chỉ lấy mẫu từ các token có khả năng cao nhất sao cho tổng xác suất bằng giá trị này. 1.0 sẽ tắt tính năng này.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Chỉ lấy mẫu từ số token có khả năng cao nhất này. 0 sẽ tắt tính năng này. Gemma 4 khuyến nghị 64.";
 "Sampling" = "Lấy mẫu";
+"Save" = "Lưu";
+"Saved in your Keychain" = "Đã lưu trong Keychain";
 "Save…" = "Lưu…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Điều chỉnh tỷ lệ mọi chiều rộng/chiều cao mà mô hình yêu cầu. Cân bằng giữ nguyên 1024x1024.";
 "Search" = "Tìm kiếm";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "Đích: %@ · hồ sơ %@";
 "Temperature" = "Nhiệt độ";
 "Temporary — not saved" = "Tạm thời — không được lưu";
+"The Keychain refused to remove the token." = "Keychain từ chối xóa token.";
+"The Keychain refused to save the token." = "Keychain từ chối lưu token.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API tương thích với OpenAI lắng nghe tại đây (http://localhost:<port>/v1). Thay đổi mục này khi máy chủ đang dừng.";
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Lần đầu, thao tác này tải %@ (%@) xuống máy Mac này ngay bây giờ, thay vì giữa lúc trò chuyện.";
 "The longest answer the model may write. Also capped by the model's own context length." = "Câu trả lời dài nhất mà mô hình có thể viết. Cũng bị giới hạn bởi độ dài ngữ cảnh riêng của mô hình.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Phiên bản mlx-lm (một commit trong bản fork riêng của LLMTray) dùng để chạy các mô hình. Phiên bản này được cập nhật riêng với ứng dụng.";
 "The model name API clients send." = "Tên mô hình mà các máy khách API gửi.";
+"The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
 "The running model server is stopped and started again." = "Máy chủ mô hình đang chạy sẽ bị dừng rồi khởi động lại.";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "Thinking…" = "Đang suy nghĩ…";

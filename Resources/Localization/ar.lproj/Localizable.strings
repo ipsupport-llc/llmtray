@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ مُقيَّد: اقبل ترخيصه على huggingface.co/%@، ثم أضف رمز Hugging Face في الإعدادات → Models.";
+"%@ wasn't found on Hugging Face." = "لم يُعثر على %@ في Hugging Face.";
 "%@ → %@ available" = "يتوفر %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d متجاوز، والباقي من Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "المساحة الحرة على القرص: %@ · نماذجك: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "يحرر الذاكرة التي يشغلها نموذج محمّل بعد هذه المدة من دون طلبات. يُعاد تحميله تلقائيًا عند الطلب التالي، مع تأخير التحميل المعتاد.";
 "Full" = "كامل";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "مقيَّد: اقبل ترخيصه في صفحته على Hugging Face، ثم أضف رمزًا في الإعدادات → Models.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "مقيَّد: اطلب الوصول من صفحته على Hugging Face (يقوم المؤلفون بمراجعته)، ثم أضف رمزًا في الإعدادات → Models.";
 "General" = "عام";
 "Generating image…" = "جارٍ إنشاء الصورة…";
+"Get one" = "الحصول على واحد";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "يمنح النموذج أداة generate_image (يتطلب نموذجًا يستدعي الأدوات). في المرة الأولى، يتم تنزيل نموذج الصور.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "توقّعات كل ساعة";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "عدد الطلبات التي تُجمع في خطوة GPU واحدة. لا يفيد إلا عند استخدام عدة عملاء للخادم في الوقت نفسه؛ ويستخدم ذاكرة أكثر.";
 "How many tokens it generates per trial." = "عدد الرموز التي يُنشئها في كل تجربة.";
+"Hugging Face answered HTTP %d for %@." = "أجاب Hugging Face برمز HTTP %d بالنسبة إلى %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "رفض Hugging Face %@ (HTTP %d): قد يكون مقيَّدًا أو خاصًا أو غير موجود. إذا كان مقيَّدًا، اقبل ترخيصه على huggingface.co/%@ وتحقق من الرمز في الإعدادات → Models.";
+"Hugging Face token" = "رمز Hugging Face";
 "Idle -- the model reloads on the next message" = "خامل -- يُعاد تحميل النموذج عند الرسالة التالية";
 "Image generation" = "إنشاء الصور";
 "Image model" = "نموذج الصور";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "لم يتم العثور على نماذج في هذا المجلد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
 "No saved sessions" = "لا توجد جلسات محفوظة";
+"Non-commercial license: read it on the model card before using the model." = "ترخيص غير تجاري: اقرأه في بطاقة النموذج قبل استخدامه.";
 "Not enough free disk space for this model." = "لا توجد مساحة قرص كافية لهذا النموذج.";
 "OK" = "موافق";
 "Off" = "إيقاف";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "إيقاف: لا يمكن إلا لهذا الـ Mac الوصول إلى الخادم. تشغيل: يمكن للأجهزة الأخرى على شبكتك الوصول إليه أيضًا — أي شخص عليها، لذا لا تستخدمه إلا على الشبكات التي تثق بها.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "خاص بالنماذج المقيَّدة فقط (Llama، بعض مستودعات Gemma وFLUX): اقبل ترخيص النموذج في صفحته على Hugging Face، ثم ألصق رمز قراءة هنا. يُخزَّن في Keychain ويُرسل فقط إلى huggingface.co.";
 "Open" = "فتح";
 "Open Server Log…" = "فتح سجل الخادم…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Recovery" = "الاسترداد";
 "Regenerate" = "إعادة التوليد";
+"Remove" = "إزالة";
 "Remove attachment" = "إزالة المرفق.";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "يزيل بيئة تشغيل mlx-lm التي تم تنزيلها من %@. تُعدّ مرة أخرى عند بدء الخادم في المرة التالية. تبقى الدردشات وملفات التعريف المحفوظة.";
 "Rename" = "إعادة تسمية";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "يأخذ عينات فقط من الرموز الأكثر احتمالًا التي يصل مجموع احتمالاتها إلى هذه القيمة. يعطّله 1.0.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "يأخذ عينات فقط من هذا العدد من الرموز الأكثر احتمالًا. يعطّله 0. يوصي Gemma 4 بالقيمة 64.";
 "Sampling" = "أخذ العينات";
+"Save" = "حفظ";
+"Saved in your Keychain" = "محفوظ في Keychain";
 "Save…" = "حفظ…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "يضبط مقياس أي عرض/ارتفاع يطلبه النموذج. يحافظ الوضع المتوازن على 1024x1024 كما هي.";
 "Search" = "بحث";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "الهدف: %@ · ملف التعريف %@";
 "Temperature" = "درجة الحرارة";
 "Temporary — not saved" = "مؤقت — غير محفوظ";
+"The Keychain refused to remove the token." = "رفض Keychain إزالة الرمز.";
+"The Keychain refused to save the token." = "رفض Keychain حفظ الرمز.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "تستمع API المتوافقة مع OpenAI هنا (http://localhost:<port>/v1). غيّرها أثناء توقف الخادم.";
 "The base profile: every other profile inherits from it." = "ملف التعريف الأساسي: ترث منه كل ملفات التعريف الأخرى.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "في المرة الأولى، يؤدي هذا إلى تنزيل %@ (%@) إلى هذا الـ Mac الآن، بدلًا من أثناء الدردشة.";
 "The longest answer the model may write. Also capped by the model's own context length." = "أطول إجابة يمكن أن يكتبها النموذج. يحدّها أيضًا طول السياق الخاص بالنموذج.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "إصدار mlx-lm (commit من fork الخاص بـ LLMTray) الذي يشغّل النماذج. يُحدَّث بشكل منفصل عن التطبيق.";
 "The model name API clients send." = "اسم النموذج الذي يرسله عملاء API.";
+"The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
 "The running model server is stopped and started again." = "يتم إيقاف خادم النموذج الجاري تشغيله ثم تشغيله مرة أخرى.";
 "These models go back to Default: %@." = "ستعود هذه النماذج إلى Default: %@.";
 "Thinking…" = "جارٍ التفكير…";

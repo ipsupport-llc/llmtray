@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
+"%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
 "%@ → %@ available" = "זמין: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "חופשי בדיסק: %@ · המודלים שלך: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "משחרר את הזיכרון שמודל טעון מחזיק אחרי פרק זמן כזה ללא בקשות. הוא נטען מחדש אוטומטית בבקשה הבאה, עם עיכוב הטעינה הרגיל.";
 "Full" = "מלא";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "מוגבל: קבל את הרישיון בעמוד ה‑Hugging Face שלו, והוסף אסימון ב‑Settings → Models.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "מוגבל: בקש גישה בעמוד ה‑Hugging Face שלו (המחברים בוחנים את הבקשה), והוסף אסימון ב‑Settings → Models.";
 "General" = "כללי";
 "Generating image…" = "יוצר תמונה…";
+"Get one" = "קבל אחד";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "תחזית לפי שעה";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "כמה בקשות מקובצות לצעד GPU אחד. עוזר רק כשכמה לקוחות משתמשים בשרת בו־זמנית; משתמש ביותר זיכרון.";
 "How many tokens it generates per trial." = "כמה טוקנים נוצרים בכל ניסיון.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face החזיר HTTP %d עבור %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face דחה את %@ (HTTP %d): הוא מוגבל, פרטי או לא קיים. אם הוא מוגבל — קבל את הרישיון ב‑huggingface.co/%@ ובדוק את האסימון ב‑Settings → Models.";
+"Hugging Face token" = "אסימון של Hugging Face";
 "Idle -- the model reloads on the next message" = "לא פעיל -- המודל ייטען מחדש בהודעה הבאה";
 "Image generation" = "יצירת תמונות";
 "Image model" = "מודל תמונה";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "לא נמצאו מודלים בתיקייה זו.";
 "No runs yet." = "עדיין אין הרצות.";
 "No saved sessions" = "אין הפעלות שמורות";
+"Non-commercial license: read it on the model card before using the model." = "רישיון לא‑מסחרי: קרא אותו בכרטיס המודל לפני השימוש.";
 "Not enough free disk space for this model." = "אין מספיק מקום פנוי בדיסק עבור המודל הזה.";
 "OK" = "אישור";
 "Off" = "כבוי";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "רק למודלים מוגבלים (Llama, חלק מהרפוזיטוריות של Gemma ו‑FLUX): קבל את רישיון המודל בעמוד ה‑Hugging Face שלו, ואז הדבק כאן אסימון קריאה. נשמר ב‑Keychain ונשלח רק ל‑huggingface.co.";
 "Open" = "פתח";
 "Open Server Log…" = "פתח את יומן השרת…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "מחליף את שפת macOS עבור LLMTray בלבד. ייכנס לתוקף לאחר הפעלה מחדש של LLMTray. טקסט שלא תורגם יוצג באנגלית.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "קורא מה מותקן…";
 "Recovery" = "התאוששות";
 "Regenerate" = "צור מחדש";
+"Remove" = "הסר";
 "Remove attachment" = "מסיר את הקובץ המצורף.";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "מסיר את סביבת ההרצה mlx-lm שהורדה מ-%@. היא תוגדר שוב בהפעלת השרת הבאה. צ׳אטים ופרופילים שמורים יישמרו.";
 "Rename" = "שינוי שם";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "דוגם רק מהטוקנים הסבירים ביותר שההסתברויות שלהם מסתכמות לערך הזה. 1.0 מכבה זאת.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "דוגם רק ממספר כזה של הטוקנים הסבירים ביותר. 0 מכבה זאת. ב-Gemma 4 מומלץ 64.";
 "Sampling" = "דגימה";
+"Save" = "שמור";
+"Saved in your Keychain" = "שמור ב‑Keychain שלך";
 "Save…" = "שמור…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "משנה את קנה המידה של כל רוחב/גובה שהמודל מבקש. ״מאוזן״ משאיר 1024x1024 כפי שהוא.";
 "Search" = "חיפוש";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "יעד: %@ · פרופיל %@";
 "Temperature" = "טמפרטורה";
 "Temporary — not saved" = "זמני — לא נשמר";
+"The Keychain refused to remove the token." = "Keychain סרב להסיר את האסימון.";
+"The Keychain refused to save the token." = "Keychain סרב לשמור את האסימון.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "ה‑API שתואם ל‑OpenAI מאזין כאן (http://localhost:<port>/v1). אפשר לשנות אותו כשהשרת עצור.";
 "The base profile: every other profile inherits from it." = "פרופיל הבסיס: כל פרופיל אחר יורש ממנו.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "בפעם הראשונה, פעולה זו מורידה את %@ (%@) ל‑Mac הזה עכשיו, במקום באמצע צ׳אט.";
 "The longest answer the model may write. Also capped by the model's own context length." = "התשובה הארוכה ביותר שהמודל רשאי לכתוב. מוגבלת גם לפי אורך ההקשר של המודל עצמו.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "גרסת mlx-lm (commit מה‑fork של LLMTray עצמו) שמריצה את המודלים. מתעדכנת בנפרד מהיישום.";
 "The model name API clients send." = "זה שם המודל שלקוחות API שולחים.";
+"The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
 "The running model server is stopped and started again." = "שרת המודלים הפועל ייעצר ויופעל מחדש.";
 "These models go back to Default: %@." = "המודלים האלה יוחזרו ל‑Default: %@.";
 "Thinking…" = "חושב…";

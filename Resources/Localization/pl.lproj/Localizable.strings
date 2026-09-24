@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ jest ograniczony: zaakceptuj jego licencję na huggingface.co/%@, a następnie dodaj token Hugging Face w Ustawieniach → Modele.";
+"%@ wasn't found on Hugging Face." = "Nie znaleziono %@ na Hugging Face.";
 "%@ → %@ available" = "Dostępne: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Nadpisane: %d, reszta z Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "Wolne na dysku: %@ · twoje modele: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Zwalnia pamięć zajmowaną przez wczytany model po tak długim czasie bez żądań. Przy następnym żądaniu model zostanie automatycznie wczytany ponownie, ze zwykłym opóźnieniem ładowania.";
 "Full" = "Pełny";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Ograniczony: zaakceptuj licencję na stronie modelu na Hugging Face i dodaj token w Ustawieniach → Modele.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Ograniczony: poproś o dostęp na stronie modelu na Hugging Face (autorzy rozpatrują zgłoszenia) i dodaj token w Ustawieniach → Modele.";
 "General" = "Ogólne";
 "Generating image…" = "Generowanie obrazu…";
+"Get one" = "Pobierz";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Udostępnia modelowi narzędzie generate_image (wymaga modelu obsługującego wywoływanie narzędzi). Przy pierwszym użyciu model obrazów zostanie pobrany.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "Prognoza godzinowa";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Ile tokenów promptu jest przetwarzanych w jednym kroku. Większa wartość przyspiesza długie prompty, ale zużywa więcej pamięci. Autostrojenie w teście wydajności może ją dobrać.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Ile żądań jest łączonych w jeden krok GPU. Pomaga tylko wtedy, gdy z serwera korzysta jednocześnie kilku klientów; zużywa więcej pamięci.";
 "How many tokens it generates per trial." = "Ile tokenów generuje w każdej próbie.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face zwrócił HTTP %d dla %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face odrzucił %@ (HTTP %d): jest ograniczony, prywatny lub nie istnieje. Jeśli jest ograniczony, zaakceptuj licencję na huggingface.co/%@ i sprawdź token w Ustawieniach → Modele.";
+"Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Bezczynny — model wczyta się ponownie przy następnej wiadomości";
 "Image generation" = "Generowanie obrazów";
 "Image model" = "Model obrazów";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "Nie znaleziono modeli w tym folderze.";
 "No runs yet." = "Nie ma jeszcze uruchomień.";
 "No saved sessions" = "Brak zapisanych sesji";
+"Non-commercial license: read it on the model card before using the model." = "Licencja niekomercyjna: przeczytaj ją na karcie modelu przed użyciem.";
 "Not enough free disk space for this model." = "Brak wystarczającej ilości wolnego miejsca na dysku dla tego modelu.";
 "OK" = "OK";
 "Off" = "Wył.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Wył.: tylko ten Mac może połączyć się z serwerem. Wł.: mogą to robić też inne urządzenia w tej sieci — każdy, kto jest do niej podłączony, więc używaj tylko w zaufanych sieciach.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Tylko dla modeli ograniczonych (Llama, niektóre repozytoria Gemma i FLUX): zaakceptuj licencję modelu na jego stronie na Hugging Face, a następnie wklej tutaj token do odczytu. Przechowywany w Keychain, wysyłany tylko do huggingface.co.";
 "Open" = "Otwórz";
 "Open Server Log…" = "Otwórz log serwera…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Zastępuje język macOS tylko w LLMTray. Zacznie obowiązywać po ponownym uruchomieniu LLMTray. Nieprzetłumaczony tekst jest wyświetlany po angielsku.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "Odczytywanie zainstalowanych elementów…";
 "Recovery" = "Odzyskiwanie";
 "Regenerate" = "Wygeneruj ponownie";
+"Remove" = "Usuń";
 "Remove attachment" = "Usuń załącznik";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Usuwa pobrane środowisko uruchomieniowe mlx-lm z lokalizacji %@. Zostanie ponownie skonfigurowane przy następnym uruchomieniu serwera. Zapisane czaty i profile zostaną zachowane.";
 "Rename" = "Zmień nazwę";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Losuje tylko spośród najbardziej prawdopodobnych tokenów, których prawdopodobieństwa sumują się do tej wartości. 1.0 wyłącza tę opcję.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Losuje tylko spośród tylu najbardziej prawdopodobnych tokenów. 0 wyłącza tę opcję. Gemma 4 zaleca 64.";
 "Sampling" = "Próbkowanie";
+"Save" = "Zapisz";
+"Saved in your Keychain" = "Zapisano w Keychain";
 "Save…" = "Zachowaj…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Skaluje dowolną szerokość i wysokość żądaną przez model. Balanced pozostawia 1024x1024 bez zmian.";
 "Search" = "Szukaj";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "Cel: %@ · profil %@";
 "Temperature" = "Temperatura";
 "Temporary — not saved" = "Tymczasowe — niezapisane";
+"The Keychain refused to remove the token." = "Keychain odmówił usunięcia tokenu.";
+"The Keychain refused to save the token." = "Keychain odmówił zapisania tokenu.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API zgodne z OpenAI nasłuchuje tutaj (http://localhost:<port>/v1). Zmień ten adres, gdy serwer jest zatrzymany.";
 "The base profile: every other profile inherits from it." = "Profil bazowy: dziedziczą po nim wszystkie pozostałe profile.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Za pierwszym razem spowoduje to pobranie %@ (%@) na tego Maca teraz, a nie w środku czatu.";
 "The longest answer the model may write. Also capped by the model's own context length." = "Najdłuższa odpowiedź, jaką model może napisać. Ogranicza ją też własna długość kontekstu modelu.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Wersja mlx-lm (commit własnego forka LLMTray), która uruchamia modele. Uaktualniana niezależnie od aplikacji.";
 "The model name API clients send." = "To nazwa modelu wysyłana przez klientów API.";
+"The model's license, from its card." = "Licencja modelu, z jego karty.";
 "The running model server is stopped and started again." = "Działający serwer modelu zostanie zatrzymany i uruchomiony ponownie.";
 "These models go back to Default: %@." = "Te modele wrócą do Default: %@.";
 "Thinking…" = "Myśli…";

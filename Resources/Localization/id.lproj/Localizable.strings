@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
+"%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
 "%@ → %@ available" = "%@ → %@ tersedia";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
@@ -91,14 +93,20 @@
 "Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
 "Full" = "Penuh";
+"Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Dibatasi: terima lisensinya di halaman Hugging Face model ini, lalu tambahkan token di Pengaturan → Models.";
+"Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Dibatasi: minta akses di halaman Hugging Face model ini (penulis meninjau), lalu tambahkan token di Pengaturan → Models.";
 "General" = "Umum";
 "Generating image…" = "Membuat gambar…";
+"Get one" = "Dapatkan";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
 "Hacker News" = "Hacker News";
 "Hourly forecast" = "Prakiraan per jam";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face merespons HTTP %d untuk %@.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face menolak %@ (HTTP %d): model dibatasi, privat, atau tidak ada. Jika dibatasi, terima lisensinya di huggingface.co/%@ dan periksa token di Pengaturan → Models.";
+"Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Idle -- model dimuat ulang pada pesan berikutnya";
 "Image generation" = "Pembuatan gambar";
 "Image model" = "Model gambar";
@@ -143,10 +151,12 @@
 "No models found in this folder." = "Tidak ada model yang ditemukan di folder ini.";
 "No runs yet." = "Belum ada yang dijalankan.";
 "No saved sessions" = "Tidak ada sesi tersimpan";
+"Non-commercial license: read it on the model card before using the model." = "Lisensi non-komersial: baca di model card sebelum menggunakan model.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "OK" = "OK";
 "Off" = "Mati";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Mati: hanya Mac ini yang dapat mengakses server. Nyala: perangkat lain di jaringan Anda juga dapat mengaksesnya — siapa pun di jaringan itu, jadi gunakan hanya di jaringan yang Anda percayai.";
+"Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
 "Open" = "Buka";
 "Open Server Log…" = "Buka Log Server…";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
@@ -173,6 +183,7 @@
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Recovery" = "Pemulihan";
 "Regenerate" = "Buat Ulang";
+"Remove" = "Hapus";
 "Remove attachment" = "Hapus lampiran.";
 "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Menghapus runtime mlx-lm yang diunduh dari %@. Runtime disiapkan lagi saat server berikutnya dimulai. Obrolan dan profil tersimpan tetap dipertahankan.";
 "Rename" = "Ubah Nama";
@@ -196,6 +207,8 @@
 "Samples only from the most likely tokens whose probabilities add up to this. 1.0 turns it off." = "Mengambil sampel hanya dari token paling mungkin yang total probabilitasnya mencapai nilai ini. 1.0 menonaktifkannya.";
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Mengambil sampel hanya dari sejumlah token yang paling mungkin. 0 menonaktifkannya. Gemma 4 merekomendasikan 64.";
 "Sampling" = "Pengambilan Sampel";
+"Save" = "Simpan";
+"Saved in your Keychain" = "Tersimpan di Keychain Anda";
 "Save…" = "Simpan…";
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Menskalakan lebar/tinggi apa pun yang diminta model. Seimbang mempertahankan 1024x1024 apa adanya.";
 "Search" = "Cari";
@@ -243,12 +256,15 @@
 "Target: %@ · profile %@" = "Target: %@ · profil %@";
 "Temperature" = "Suhu";
 "Temporary — not saved" = "Sementara — tidak disimpan";
+"The Keychain refused to remove the token." = "Keychain menolak menghapus token.";
+"The Keychain refused to save the token." = "Keychain menolak menyimpan token.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API yang kompatibel dengan OpenAI mendengarkan di sini (http://localhost:<port>/v1). Ubah saat server dihentikan.";
 "The base profile: every other profile inherits from it." = "Profil dasar: setiap profil lain mewarisinya.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Untuk pertama kali, ini mengunduh %@ (%@) ke Mac ini sekarang, bukan di tengah obrolan.";
 "The longest answer the model may write. Also capped by the model's own context length." = "Jawaban terpanjang yang boleh ditulis model. Juga dibatasi oleh panjang konteks model itu sendiri.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Versi mlx-lm (commit dari fork milik LLMTray sendiri) yang menjalankan model. Diperbarui terpisah dari app.";
 "The model name API clients send." = "Nama model yang dikirim klien API.";
+"The model's license, from its card." = "Lisensi model, dari model card.";
 "The running model server is stopped and started again." = "Server model yang berjalan dihentikan lalu dimulai lagi.";
 "These models go back to Default: %@." = "Model berikut kembali ke Default: %@.";
 "Thinking…" = "Berpikir…";
