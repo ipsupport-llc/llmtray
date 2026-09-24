@@ -141,6 +141,9 @@ struct ContentView: View {
     private var chatArea: some View {
         // Once per evaluation, not per message (it scans the whole history).
         let results = showToolCalls ? toolResults : nil
+        // The data credits of each turn's tools, under its answer whether
+        // or not the tool calls are shown.
+        let sources = ChatMessage.sourcesByAnswer(chat.messages)
         return ScrollViewReader { proxy in
             ScrollView {
                 // Not Lazy: a lazy stack estimates the height of rows it
@@ -158,7 +161,7 @@ struct ContentView: View {
                     // tool produced is attached to the assistant message
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
-                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results)
+                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [])
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {

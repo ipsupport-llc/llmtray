@@ -30,14 +30,16 @@ struct PersistedMessage: Codable {
     var imageDurations: [Double]
     // Same index alignment -- see ChatMessage.imagePrompts.
     var imagePrompts: [String]
+    // See ChatMessage.sources.
+    var sources: [String]
 
     enum CodingKeys: String, CodingKey {
-        case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts
+        case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
     }
 
     init(
         role: String, content: String, reasoning: String, isSummary: Bool,
-        imageFilenames: [String] = [], imageDurations: [Double] = [], imagePrompts: [String] = []
+        imageFilenames: [String] = [], imageDurations: [Double] = [], imagePrompts: [String] = [], sources: [String] = []
     ) {
         self.role = role
         self.content = content
@@ -46,6 +48,7 @@ struct PersistedMessage: Codable {
         self.imageFilenames = imageFilenames
         self.imageDurations = imageDurations
         self.imagePrompts = imagePrompts
+        self.sources = sources
     }
 
     // Custom init (rather than relying on synthesis) so that session files
@@ -61,6 +64,7 @@ struct PersistedMessage: Codable {
         imageFilenames = try c.decodeIfPresent([String].self, forKey: .imageFilenames) ?? []
         imageDurations = try c.decodeIfPresent([Double].self, forKey: .imageDurations) ?? []
         imagePrompts = try c.decodeIfPresent([String].self, forKey: .imagePrompts) ?? []
+        sources = try c.decodeIfPresent([String].self, forKey: .sources) ?? []
     }
 }
 

@@ -118,6 +118,8 @@ final class TimeInCityTool: SelectableTool {
             var result = CurrentDateTool.describe(Date(), in: zone)
             result["city"] = place["name"] as? String ?? city
             result["country"] = place["country"] as? String ?? ""
+            // Open-Meteo's data is CC BY 4.0 (shown under the answer).
+            result["source"] = "City lookup by Open-Meteo (https://open-meteo.com), CC BY 4.0, GeoNames"
             return Self.json(result)
         } catch {
             return Self.error("city lookup failed: \(error.localizedDescription)")
@@ -155,22 +157,16 @@ final class CalculateTool: SelectableTool {
 
 // MARK: - HTTP
 
-/// Fetching for the web tools: a timeout, a browser-like User-Agent (some
-/// services refuse a bare one), JSON or text.
+/// Fetching for the web tools: a timeout, an honest User-Agent, JSON or text.
 enum WebFetch {
-    static let userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15 LLMTray"
-
-    /// Wikimedia asks API clients for a descriptive agent with a contact
-    /// and throttles browser-like ones (HTTP 429); other services refuse a
-    /// bare one.
-    static func userAgent(for url: URL) -> String {
-        let host = url.host ?? ""
-        if host.hasSuffix("wikipedia.org") || host.hasSuffix("wikidata.org") {
-            let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
-            return "LLMTray/\(version) (https://github.com/ipsupport-llc/llmtray)"
-        }
-        return userAgent
-    }
+    /// Who's asking, with where to find out more -- what Wikimedia's
+    /// User-Agent policy asks for, and honest toward every other service
+    /// (no browser impersonation). Checked live against each tool's
+    /// service when this replaced a Safari-like agent.
+    static let userAgent: String = {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
+        return "LLMTray/\(version) (https://github.com/ipsupport-llc/llmtray)"
+    }()
 
     /// Ephemeral: no disk cache, no cookies -- the model's queries (and the
     /// answers) must not end up on disk, least of all from a temporary chat.
@@ -201,7 +197,7 @@ enum WebFetch {
         guard let url = components.url else { throw URLError(.badURL) }
         var request = URLRequest(url: url, timeoutInterval: timeout)
         request.httpMethod = method
-        request.setValue(Self.userAgent(for: url), forHTTPHeaderField: "User-Agent")
+        request.setValue(Self.userAgent, forHTTPHeaderField: "User-Agent")
         if let form {
             var body = URLComponents()
             body.queryItems = form

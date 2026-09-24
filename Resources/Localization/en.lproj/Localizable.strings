@@ -19,6 +19,7 @@
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
+"Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
 "Apply to profile" = "Apply to profile";
 "Assistant" = "Assistant";
@@ -165,6 +166,7 @@
 "Quit LLMTray" = "Quit LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0.";
+"Reading what's installed…" = "Reading what's installed…";
 "Recovery" = "Recovery";
 "Regenerate" = "Regenerate";
 "Remove attachment" = "Remove attachment";
@@ -194,6 +196,7 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is.";
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
+"Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
 "Server" = "Server";
@@ -268,6 +271,7 @@
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";
 "Version" = "Version";
+"Version %@" = "Version %@";
 "View model card" = "View model card";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Web search" = "Web search";

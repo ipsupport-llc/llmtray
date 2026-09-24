@@ -23,7 +23,7 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 - **Chat** against the running server (OpenAI-compatible `/v1/chat/completions`), with streamed `<think>` reasoning shown separately from the final answer, tok/s, and per-chat sampling settings (temperature/top-p/max tokens).
 - **Menu bar icon reflects real state**: green + pulsing while anything is generating (this app's own chat *or* an external tool hitting the server directly), orange/red on real thermal pressure (`ProcessInfo.thermalState`), pulled independently so one signal never hides the other.
 - **Live server log** in its own window, and a quick right-click menu (start/stop, quit) for when you don't need the full chat window.
-- Runs mlx-lm from **our own fork** ([`ipsupport-llc/mlx-lm`](https://github.com/ipsupport-llc/mlx-lm), see [`runtime/`](./runtime)) at a pinned commit — never installs from PyPI — with an in-app update check against the fork's `main` branch.
+- Runs mlx-lm from **our own fork** ([`ipsupport-llc/mlx-lm`](https://github.com/ipsupport-llc/mlx-lm), see [`runtime/`](./runtime)) at a pinned commit — never mlx-lm from PyPI (its dependencies do come from PyPI) — with an in-app update check against the fork's `main` branch.
 
 ## Requirements
 
@@ -86,4 +86,4 @@ Working daily driver on a MacBook Air M5. Packaged as a `.app`/`.dmg` via [`scri
 
 ## License
 
-Apache 2.0 — see [LICENSE](./LICENSE).
+Apache 2.0 — see [LICENSE](./LICENSE). Third-party licenses (Sparkle, the bundled Python runtime in the Full build, and the services the chat tools use) are generated at build time by [`scripts/generate_licenses.py`](./scripts/generate_licenses.py) and listed in **About LLMTray**, together with what's installed on your Mac and the licenses of your downloaded models.
