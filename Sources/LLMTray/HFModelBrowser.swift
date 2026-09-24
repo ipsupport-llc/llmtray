@@ -102,6 +102,9 @@ private struct FileDownload {
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
+    /// Restarted once from scratch after the file CDN refused it (its
+    /// signed link expires an hour after the redirect: a long pause).
+    var restarted = false
 }
 
 /// Searches the HF Hub for mlx-format models and downloads one straight
@@ -154,19 +157,21 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     private var currentModelID = ""
     private var currentDestRoot: URL?
 
-    // Mutated from urlSession's delegate callbacks (serialized onto one
-    // queue by URLSession's default nil delegateQueue), from download()'s
-    // setup code (which fully finishes before any task.resume()), and from
-    // pause()/resumeDownload() bridged onto the main queue via Task --
-    // never concurrently, since cancelling a task stops its delegate
-    // callbacks before the resume-data completion handler runs. Needed
-    // because didFinishDownloadingTo must move the temp file synchronously
-    // (it's deleted the instant the delegate callback returns), which rules
-    // out hopping through a MainActor Task for that part.
+    // Mutated from urlSession's delegate callbacks and from the main
+    // actor (download(), pause/resume/cancel): the session delivers its
+    // callbacks on the main queue, so the two never run at once (task
+    // cancellation is asynchronous -- a sibling's callback can still come
+    // in after cancelDownload()). nonisolated(unsafe) because
+    // didFinishDownloadingTo must move the temp file synchronously (it's
+    // deleted the instant the callback returns), not through a Task.
     nonisolated(unsafe) private var files: [String: FileDownload] = [:]
     nonisolated(unsafe) private var tasksByPath: [String: URLSessionDownloadTask] = [:]
     nonisolated(unsafe) private var pathByTaskID: [Int: String] = [:]
     nonisolated(unsafe) private var totalBytesExpected: Int64 = 0
+    /// Set on the delegate queue the moment a file comes back as an HTTP
+    /// error: later completions of the same download are ignored (none may
+    /// declare it done), until the next download() resets it.
+    nonisolated(unsafe) private var downloadFailed = false
     // Speed is measured between samples, not per didWriteData call (those
     // fire far too often for a stable rate) -- these track the last sample
     // point so publishProgress can rate-limit itself to ~2x/sec.
@@ -175,7 +180,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     override init() {
         super.init()
-        session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
     }
 
     /// Fetches a repo's README.md (the "model card") from the raw file
@@ -260,6 +265,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     func download(_ model: HFModelSummary, completion: @escaping () -> Void) {
         guard downloadingID == nil else { return }
+        HFToken.refresh()
         // A gated model's files answer 401 without a token (seen live: the
         // listing is open, the files aren't).
         if case .gated = infoByID[model.id]?.access, HFToken.value == nil {
@@ -307,6 +313,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 files.removeAll()
                 tasksByPath.removeAll()
                 pathByTaskID.removeAll()
+                downloadFailed = false
                 totalBytesExpected = entries.reduce(0) { $0 + Int64($1.size ?? 0) }
                 lastSampleDate = nil
                 lastSampleBytes = 0
@@ -447,15 +454,35 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     nonisolated func urlSession(
         _ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL
     ) {
-        guard let path = pathByTaskID[downloadTask.taskIdentifier],
+        guard !downloadFailed, let path = pathByTaskID[downloadTask.taskIdentifier],
               let file = files[path] else { return }
         let dest = file.destination
         let fm = FileManager.default
-        // An error page (401 gated, 404) must not be saved as the file.
-        if let status = (downloadTask.response as? HTTPURLResponse)?.statusCode, !(200..<300).contains(status) {
-            Task { @MainActor in
+        // An error page (401 gated, 404) must not be saved as the file, and
+        // what this attempt already saved must not pass for a model (a
+        // folder with a config.json is one to ModelDiscovery).
+        if let http = downloadTask.response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+            let status = http.statusCode
+            // The file CDN (not huggingface.co) refusing a resumed download:
+            // its signed link expired during a pause. Once, from scratch.
+            if http.url?.host != "huggingface.co", !file.restarted {
+                files[path]?.restarted = true
+                files[path]?.resumeData = nil
+                files[path]?.writtenBytes = 0
+                MainActor.assumeIsolated { self.startTask(forPath: path) }
+                return
+            }
+            downloadFailed = true
+            let written = files.values.filter(\.isDone).map(\.destination)
+            MainActor.assumeIsolated {
                 let message = Self.accessMessage(status: status, repo: self.currentModelID)
+                let root = self.currentDestRoot
                 self.cancelDownload()   // clears downloadError: set after
+                for url in written { try? FileManager.default.removeItem(at: url) }
+                // The folder this attempt made, if nothing else is in it.
+                if let root, (try? FileManager.default.contentsOfDirectory(atPath: root.path))?.isEmpty == true {
+                    try? FileManager.default.removeItem(at: root)
+                }
                 self.downloadError = message
             }
             return
@@ -485,7 +512,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         } catch {
             saveError = "Failed to save \(dest.lastPathComponent): \(error.localizedDescription)"
         }
-        let allDone = files.values.allSatisfy { $0.isDone }
+        let allDone = !downloadFailed && !files.isEmpty && files.values.allSatisfy { $0.isDone }
         Task { @MainActor in
             if let saveError {
                 self.downloadError = saveError
@@ -511,7 +538,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         switch status {
         case 401, 403:
             return String(format: NSLocalizedString(
-                "Hugging Face refused %@ (HTTP %d): it's gated -- accept its license on huggingface.co/%@ and check the token in Settings → Models.",
+                "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.",
                 comment: "gated download refused"), repo, status, repo)
         case 404:
             return String(format: NSLocalizedString("%@ wasn't found on Hugging Face.", comment: ""), repo)
@@ -526,8 +553,15 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         _ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
         newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void
     ) {
+        // URLSession drops Authorization on every redirect -- also to
+        // huggingface.co's own /api/resolve-cache/ that small files of a
+        // gated repo go through (401 without it): put back there, never
+        // anywhere else.
         var request = request
-        if request.url?.host != "huggingface.co" {
+        if request.url?.host == "huggingface.co", request.url?.scheme == "https" {
+            // On the main queue (the session's delegate queue).
+            MainActor.assumeIsolated { HFToken.authorize(&request) }
+        } else {
             request.setValue(nil, forHTTPHeaderField: "Authorization")
         }
         completionHandler(request)

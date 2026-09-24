@@ -56,7 +56,10 @@ public struct HubModelInfo: Equatable, Sendable {
     public var isNonCommercial: Bool {
         guard let l = license?.lowercased() else { return false }
         let tokens = Set(l.split { !$0.isLetter && !$0.isNumber }.map(String.init))
+        // Known ids that don't say so in their name: Mistral's
+        // non-production license, Apple's ML research license.
+        let known: Set<String> = ["mnpl", "mnpl-0.1", "apple-amlr", "apple-ascl"]
         return tokens.contains("nc") || l.contains("non-commercial") || l.contains("noncommercial")
-            || tokens.contains("research")
+            || tokens.contains("research") || known.contains(l)
     }
 }

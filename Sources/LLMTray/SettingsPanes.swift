@@ -110,10 +110,17 @@ struct ModelsPane: View {
     @State private var hfToken = ""
     @State private var hfTokenSaved = HFToken.value != nil
 
+    @State private var hfTokenError: String?
+
     private func saveToken() {
         let token = hfToken.trimmingCharacters(in: .whitespaces)
         guard !token.isEmpty else { return }
-        HFToken.set(token)
+        guard HFToken.set(token) else {
+            // Kept in the field, so it isn't lost.
+            hfTokenError = NSLocalizedString("The Keychain refused to save the token.", comment: "")
+            return
+        }
+        hfTokenError = nil
         hfTokenSaved = HFToken.value != nil
         hfToken = ""
     }
@@ -139,7 +146,7 @@ struct ModelsPane: View {
                         if hfTokenSaved {
                             Text("Saved in your Keychain").foregroundStyle(.secondary)
                             Button("Remove") {
-                                HFToken.set(nil)
+                                hfTokenError = HFToken.set(nil) ? nil : NSLocalizedString("The Keychain refused to remove the token.", comment: "")
                                 hfTokenSaved = HFToken.value != nil
                             }
                         } else {
@@ -149,7 +156,10 @@ struct ModelsPane: View {
                                 .onSubmit(saveToken)
                             Button("Save", action: saveToken)
                                 .disabled(hfToken.trimmingCharacters(in: .whitespaces).isEmpty)
-                            Link("Get one", destination: URL(string: "https://huggingface.co/settings/tokens")!)
+                            Link(destination: URL(string: "https://huggingface.co/settings/tokens")!) { Text("Get one") }
+                        }
+                        if let hfTokenError {
+                            Text(hfTokenError).font(.caption).foregroundStyle(.red)
                         }
                     }
                 } label: {

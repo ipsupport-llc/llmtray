@@ -94,13 +94,14 @@
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models.";
 "General" = "General";
 "Generating image…" = "Generating image…";
+"Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
-"Hugging Face refused %@ (HTTP %d): it's gated -- accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated -- accept its license on huggingface.co/%@ and check the token in Settings → Models.";
+"Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";
 "Image generation" = "Image generation";
@@ -250,6 +251,8 @@
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
 "Temporary — not saved" = "Temporary — not saved";
+"The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
+"The Keychain refused to save the token." = "The Keychain refused to save the token.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";

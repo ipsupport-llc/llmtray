@@ -22,7 +22,7 @@ final class HubModelInfoTests: XCTestCase {
     }
 
     func testNonCommercial() {
-        for l in ["cc-by-nc-4.0", "cc-by-nc-sa-4.0", "flux-1-dev-non-commercial-license", "research-only", "NonCommercial"] {
+        for l in ["cc-by-nc-4.0", "cc-by-nc-sa-4.0", "flux-1-dev-non-commercial-license", "research-only", "NonCommercial", "mnpl", "apple-amlr"] {
             XCTAssertTrue(HubModelInfo(license: l).isNonCommercial, l)
         }
         for l in ["apache-2.0", "mit", "llama3.2", "gemma", "openrail", "nvidia-open-model-license", "bsd-3-clause"] {
