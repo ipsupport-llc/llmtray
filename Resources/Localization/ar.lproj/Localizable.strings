@@ -8,6 +8,7 @@
 "%lld MB" = "%lld م.ب";
 "%lld downloads" = "%lld تنزيلات";
 "%lld-bit" = "%lld-بت";
+"(no result yet)" = "(لا توجد نتائج بعد)";
 "(no server output yet)" = "(لا توجد مخرجات من الخادم بعد)";
 "A quiet check at every launch. Only shows anything if an update exists." = "فحص صامت عند كل تشغيل. لا يُظهر شيئًا إلا إذا كان هناك تحديث.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "يُعدّ الطلب الذي لا ينتج شيئًا طوال هذه المدة متعثرًا. يحدث ذلك عندما يتوقف عامل الخادم (مثلًا بسبب نفاد ذاكرة GPU) مع بقاء العملية قيد التشغيل.";
@@ -45,7 +46,7 @@
 "Canvas size" = "حجم اللوحة";
 "Chat" = "الدردشة";
 "Chat tools" = "أدوات الدردشة";
-"Chat tools for this model: %lld on" = "أدوات الدردشة لهذه الموديل: %lld مفعّلة";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "أدوات الدردشة للملف الشخصي “%@” (مفعّل %lld) — تنطبق على كل نموذج يستخدمه";
 "Check Again" = "تحقق مجددًا";
 "Check Now" = "تحقق الآن";
 "Check for Runtime Updates" = "التحقق من تحديثات وقت التشغيل";
@@ -65,6 +66,7 @@
 "Currency rates" = "أسعار الصرف";
 "Current settings are already fastest" = "الإعدادات الحالية هي الأسرع بالفعل";
 "Date & time" = "التاريخ والوقت";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "التصحيح: أسفل الإجابة، الأدوات التي استدعاها النموذج ومع الوسائط المستخدمة؛ وسّع أيّ استدعاء لرؤية ما أعاد. يخصّ المحادثة الحالية فقط — الاستدعاءات لا تُحفَظ معها.";
 "Delete" = "حذف";
 "Delete profile “%@”?" = "حذف ملف التعريف «%@»؟";
 "Delete this profile (models using it go back to Default)" = "يحذف ملف التعريف هذا (تعود النماذج التي تستخدمه إلى Default).";
@@ -209,6 +211,7 @@
 "Show reasoning" = "إظهار الاستدلال";
 "Show the profile files in Finder" = "إظهار ملفات ملف التعريف في Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "اعرض ملفات ملف التعريف في Finder — بصيغة JSON عادية، قابلة للتحرير يدويًا وللنسخ إلى Mac آخر.";
+"Show tool calls" = "إظهار استدعاءات الأدوات";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
 "Sort by" = "فرز حسب";
 "Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";

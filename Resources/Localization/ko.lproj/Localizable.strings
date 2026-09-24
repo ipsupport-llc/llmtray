@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld회 다운로드";
 "%lld-bit" = "%lld비트";
+"(no result yet)" = "(아직 결과 없음)";
 "(no server output yet)" = "(아직 서버 출력 없음)";
 "A quiet check at every launch. Only shows anything if an update exists." = "실행할 때마다 조용히 확인합니다. 업데이트가 있을 때만 표시합니다.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "요청이 이 시간 동안 아무것도 생성하지 않으면 중단된 것으로 간주합니다. 프로세스는 계속 실행 중이지만 서버 워커가 종료될 때(예: GPU 메모리 부족) 발생합니다.";
@@ -45,7 +46,7 @@
 "Canvas size" = "캔버스 크기";
 "Chat" = "채팅";
 "Chat tools" = "채팅 도구";
-"Chat tools for this model: %lld on" = "이 모델의 채팅 도구: %lld개 활성화";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "프로필 “%@”의 채팅 도구(%lld개 활성화) — 이 프로필을 사용하는 모든 모델에 적용";
 "Check Again" = "다시 확인";
 "Check Now" = "지금 확인";
 "Check for Runtime Updates" = "런타임 업데이트 확인";
@@ -65,6 +66,7 @@
 "Currency rates" = "환율";
 "Current settings are already fastest" = "현재 설정이 이미 가장 빠릅니다";
 "Date & time" = "날짜 및 시간";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "디버깅: 답변 아래에서 모델이 어떤 도구를 호출했는지 및 어떤 인수를 사용했는지 확인합니다. 항목을 확장하면 반환값을 볼 수 있습니다. 현재 채팅에만 적용되며 도구 호출은 저장되지 않습니다.";
 "Delete" = "삭제";
 "Delete profile “%@”?" = "“%@” 프로파일을 삭제하겠습니까?";
 "Delete this profile (models using it go back to Default)" = "이 프로파일을 삭제합니다. 이 프로파일을 사용하는 모델은 Default로 돌아갑니다.";
@@ -209,6 +211,7 @@
 "Show reasoning" = "추론 표시";
 "Show the profile files in Finder" = "Finder에서 프로필 파일 보기";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Finder에서 프로필 파일을 표시합니다. 일반 JSON 파일이며 직접 편집하고 다른 Mac으로 복사할 수 있습니다.";
+"Show tool calls" = "도구 호출 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
 "Sort by" = "정렬 기준";
 "Space the models in this folder take, and what's still free on its disk." = "이 폴더의 모델들이 차지하는 공간과 디스크의 남은 여유 공간을 표시합니다.";

@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld indirme";
 "%lld-bit" = "%lld bit";
+"(no result yet)" = "(henüz sonuç yok)";
 "(no server output yet)" = "(henüz sunucu çıktısı yok)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Her başlatmada sessizce denetler. Yalnızca güncelleme varsa bir şey gösterir.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Bu süre boyunca hiçbir şey üretmeyen istek takılmış sayılır. Bu, işlem çalışmaya devam ederken bir sunucu çalışanı öldüğünde (örn. GPU belleği bittiğinde) olur.";
@@ -45,7 +46,7 @@
 "Canvas size" = "Tuval boyutu";
 "Chat" = "Sohbet";
 "Chat tools" = "Sohbet araçları";
-"Chat tools for this model: %lld on" = "Bu model için sohbet araçları: %lld açık";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "“%@” profiline ait sohbet araçları (%lld açık) — bunu kullanan her model için geçerlidir";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
 "Check for Runtime Updates" = "Çalışma Zamanı Güncellemelerini Denetle";
@@ -65,6 +66,7 @@
 "Currency rates" = "Döviz kurları";
 "Current settings are already fastest" = "Geçerli ayarlar zaten en hızlı";
 "Date & time" = "Tarih ve saat";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Hata ayıklama: bir yanıtın altında modelin hangi araçları çağırdığını ve hangi argümanlarla çağırdığını gösterir; birini genişleterek ne döndürdüğünü görebilirsiniz. Yalnızca geçerli sohbet içindir — araç çağrıları sohbetle birlikte kaydedilmez.";
 "Delete" = "Sil";
 "Delete profile “%@”?" = "“%@” profili silinsin mi?";
 "Delete this profile (models using it go back to Default)" = "Bu profili sil (onu kullanan modeller Default profiline döner)";
@@ -209,6 +211,7 @@
 "Show reasoning" = "Akıl yürütmeyi göster";
 "Show the profile files in Finder" = "Profil dosyalarını Finder’da göster";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Profil dosyalarını Finder’da gösterir — düz JSON, elle düzenlenebilir ve başka bir Mac’e kopyalanabilir.";
+"Show tool calls" = "Araç çağrılarını göster";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
 "Sort by" = "Sıralama ölçütü";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";

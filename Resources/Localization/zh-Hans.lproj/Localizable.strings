@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld 次下载";
 "%lld-bit" = "%lld 位";
+"(no result yet)" = "(尚无结果)";
 "(no server output yet)" = "（暂无服务器输出）";
 "A quiet check at every launch. Only shows anything if an update exists." = "每次启动时在后台静默检查。仅在有更新时显示提示。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "请求在这么长时间内没有任何输出即视为停滞。这通常发生在服务器工作进程失效（例如 GPU 内存不足）但主进程仍在运行时。";
@@ -45,7 +46,7 @@
 "Canvas size" = "画布大小";
 "Chat" = "聊天";
 "Chat tools" = "聊天工具";
-"Chat tools for this model: %lld on" = "此模型的聊天工具：已启用 %lld";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "配置文件“%@”的聊天工具（%lld 个已启用）——适用于使用该配置文件的所有模型";
 "Check Again" = "再次检查";
 "Check Now" = "立即检查";
 "Check for Runtime Updates" = "检查运行时更新";
@@ -65,6 +66,7 @@
 "Currency rates" = "汇率";
 "Current settings are already fastest" = "当前设置已是最快";
 "Date & time" = "日期与时间";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "调试：在回答下显示模型调用了哪些工具及其参数；展开某项可查看返回内容。仅适用于当前聊天——工具调用不会随聊天保存。";
 "Delete" = "删除";
 "Delete profile “%@”?" = "删除配置“%@”？";
 "Delete this profile (models using it go back to Default)" = "删除此配置（使用它的模型会改回 Default）";
@@ -209,6 +211,7 @@
 "Show reasoning" = "显示推理过程";
 "Show the profile files in Finder" = "在 Finder 中显示配置文件";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "在 Finder 中显示配置文件——纯 JSON，可手动编辑，也可复制到另一台 Mac。";
+"Show tool calls" = "显示工具调用";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
 "Sort by" = "排序方式";
 "Space the models in this folder take, and what's still free on its disk." = "该文件夹中模型占用的空间及磁盘剩余可用空间。";
