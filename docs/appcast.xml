@@ -16,14 +16,14 @@
                  type="application/octet-stream"/>
     </item>
     <item>
-      <title>Version 0.6.9-beta.6</title>
-      <pubDate>Thu, 24 Sep 2026 02:38:26 +0000</pubDate>
+      <title>Version 0.6.9-beta.7</title>
+      <pubDate>Thu, 24 Sep 2026 02:53:34 +0000</pubDate>
       <sparkle:channel>beta</sparkle:channel>
-      <sparkle:version>0.6.9b6</sparkle:version>
-      <sparkle:shortVersionString>0.6.9-beta.6</sparkle:shortVersionString>
+      <sparkle:version>0.6.9b7</sparkle:version>
+      <sparkle:shortVersionString>0.6.9-beta.7</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/download/v0.6.9-beta.6/LLMTray.dmg"
-                 sparkle:edSignature="Cfw530d3mqJ6/eTD/V7hKBP2sGnp6q5gr+4cI1JjZba9J72Oddt65m5qEFYf8Q11MbGPUUB5ZM6PBeMQ1yPKDA==" length="2756044"
+      <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/download/v0.6.9-beta.7/LLMTray.dmg"
+                 sparkle:edSignature="6DAn5Hp5J+71lbe0umNreste9QMfyf6oXbyxfrQoX93QGnHV2UL8rnzCGbEvhCflox/6vwyxqGb55v/MDVtTDQ==" length="2761266"
                  type="application/octet-stream"/>
     </item>
   </channel>
