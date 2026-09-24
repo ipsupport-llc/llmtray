@@ -45,7 +45,7 @@
 "Canvas size" = "キャンバスサイズ";
 "Chat" = "チャット";
 "Chat tools" = "チャットツール";
-"Chat tools for this model: %lld on" = "このモデルのチャットツール：%lld 個有効";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "プロファイル「%@」のチャットツール（%lld 個有効）— このプロファイルを使用するすべてのモデルに適用されます";
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
 "Check for Runtime Updates" = "ランタイムアップデートを確認";

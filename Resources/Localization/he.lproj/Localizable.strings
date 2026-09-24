@@ -45,7 +45,7 @@
 "Canvas size" = "גודל הקנבס";
 "Chat" = "צ׳אט";
 "Chat tools" = "כלי שיחה";
-"Chat tools for this model: %lld on" = "כלי שיחה עבור המודל הזה: %lld מופעלים";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "כלי צ'אט של הפרופיל “%@” (%lld מופעלים) — חל על כל מודל שמשתמש בו";
 "Check Again" = "בדוק שוב";
 "Check Now" = "בדוק כעת";
 "Check for Runtime Updates" = "בדוק עדכוני זמן ריצה";

@@ -45,7 +45,7 @@
 "Canvas size" = "حجم اللوحة";
 "Chat" = "الدردشة";
 "Chat tools" = "أدوات الدردشة";
-"Chat tools for this model: %lld on" = "أدوات الدردشة لهذه الموديل: %lld مفعّلة";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "أدوات الدردشة للملف الشخصي «%@» (مفعّل على %lld) — ينطبق على كل نموذج يستخدمه";
 "Check Again" = "تحقق مجددًا";
 "Check Now" = "تحقق الآن";
 "Check for Runtime Updates" = "التحقق من تحديثات وقت التشغيل";

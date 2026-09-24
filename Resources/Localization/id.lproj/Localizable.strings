@@ -45,7 +45,7 @@
 "Canvas size" = "Ukuran kanvas";
 "Chat" = "Obrolan";
 "Chat tools" = "Alat obrolan";
-"Chat tools for this model: %lld on" = "Alat obrolan untuk model ini: %lld aktif";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Alat obrolan untuk profil “%@” (%lld aktif) — berlaku untuk setiap model yang menggunakannya";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
 "Check for Runtime Updates" = "Periksa Pembaruan Runtime";

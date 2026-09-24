@@ -45,7 +45,7 @@
 "Canvas size" = "캔버스 크기";
 "Chat" = "채팅";
 "Chat tools" = "채팅 도구";
-"Chat tools for this model: %lld on" = "이 모델의 채팅 도구: %lld개 활성화";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "프로필 “%@”의 채팅 도구(%lld개 사용 중) — 이 프로필을 사용하는 모든 모델에 적용됩니다";
 "Check Again" = "다시 확인";
 "Check Now" = "지금 확인";
 "Check for Runtime Updates" = "런타임 업데이트 확인";

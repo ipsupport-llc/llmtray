@@ -45,7 +45,7 @@
 "Canvas size" = "Tuval boyutu";
 "Chat" = "Sohbet";
 "Chat tools" = "Sohbet araçları";
-"Chat tools for this model: %lld on" = "Bu model için sohbet araçları: %lld açık";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "“%@” profili sohbet araçları (%lld açık) — bunu kullanan her model için geçerlidir";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
 "Check for Runtime Updates" = "Çalışma Zamanı Güncellemelerini Denetle";

@@ -45,7 +45,7 @@
 "Canvas size" = "कैनवास आकार";
 "Chat" = "चैट";
 "Chat tools" = "चैट टूल्स";
-"Chat tools for this model: %lld on" = "इस मॉडल के लिए चैट टूल्स: %lld चालू";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "प्रोफ़ाइल “%@” के चैट उपकरण (%lld चालू) — यह इसे उपयोग करने वाले प्रत्येक मॉडल पर लागू होता है";
 "Check Again" = "फिर से जाँचें";
 "Check Now" = "अभी जाँचें";
 "Check for Runtime Updates" = "रनटाइम अपडेट जाँचें";

@@ -45,7 +45,7 @@
 "Canvas size" = "Dimensioni canvas";
 "Chat" = "Chat";
 "Chat tools" = "Strumenti chat";
-"Chat tools for this model: %lld on" = "Strumenti chat per questo modello: %lld attivi";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Strumenti chat del profilo “%@” (%lld attivi) — si applica a tutti i modelli che lo usano";
 "Check Again" = "Ricontrolla";
 "Check Now" = "Controlla ora";
 "Check for Runtime Updates" = "Verifica aggiornamenti del runtime";

@@ -45,7 +45,7 @@
 "Canvas size" = "畫布大小";
 "Chat" = "聊天";
 "Chat tools" = "對話工具";
-"Chat tools for this model: %lld on" = "此模型可用的對話工具：%lld 已開啟";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "個人檔案「%@」的聊天工具（%lld 已啟用）——套用於使用此個人檔案的所有模型";
 "Check Again" = "再次檢查";
 "Check Now" = "立即檢查";
 "Check for Runtime Updates" = "檢查執行階段更新";

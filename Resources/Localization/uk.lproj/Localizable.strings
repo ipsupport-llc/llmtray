@@ -45,7 +45,7 @@
 "Canvas size" = "Розмір полотна";
 "Chat" = "Чат";
 "Chat tools" = "Інструменти чату";
-"Chat tools for this model: %lld on" = "Інструменти чату для цієї моделі: %lld увімк.";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Інструменти чату профілю «%@» (увімкнено %lld) — застосовується до кожної моделі, що його використовує";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
 "Check for Runtime Updates" = "Перевірити оновлення рантайму";
