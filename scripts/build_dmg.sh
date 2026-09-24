@@ -28,7 +28,20 @@ cp -R "$APP" "$STAGING/"
 ln -s /Applications "$STAGING/Applications"
 
 echo "--- building $DMG ---"
-hdiutil create -volname "LLMTray" -srcfolder "$STAGING" -ov -format UDZO "$DMG"
+# hdiutil intermittently fails with "Resource busy" on CI runners (a
+# disk image service still holding the previous volume) -- retry a few
+# times before failing the release.
+for attempt in 1 2 3 4; do
+  if hdiutil create -volname "LLMTray" -srcfolder "$STAGING" -ov -format UDZO "$DMG"; then
+    break
+  fi
+  if [ "$attempt" = 4 ]; then
+    echo "hdiutil create failed after $attempt attempts" >&2
+    exit 1
+  fi
+  echo "hdiutil create failed (attempt $attempt), retrying in $((attempt * 10))s"
+  sleep $((attempt * 10))
+done
 
 rm -rf "$STAGING"
 echo "--- built $DMG ---"

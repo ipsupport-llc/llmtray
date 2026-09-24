@@ -40,10 +40,11 @@ final class ServerManager: ObservableObject {
     @Published private(set) var isIdleUnloaded: Bool = false
     private var activeRequestCount = 0
 
-    private var process: Process?
-    private var stdoutPipe: Pipe?
-    private var stdoutHandle: FileHandle?
+    /// The current model process. Callbacks of an older one (still on its
+    /// way out) are recognized by identity and don't touch state.
+    private var process: ServerProcess?
     private lazy var proxy = ModelProxyServer(server: self)
+    private lazy var installer = MLXRuntimeInstaller(log: { [weak self] in self?.appendLog($0) })
 
     // Last time a request actually started -- checked by the idle-stop
     // timer below (Advanced setting, 0 disables it). Only needs updating
@@ -78,56 +79,10 @@ final class ServerManager: ObservableObject {
     /// app controls, not the model process itself).
     private var internalPort: Int { (currentPublicPort ?? 8765) + 10_000 }
 
-    /// Lives outside the app bundle (see RuntimePaths.externalRuntimeDir) so
-    /// it survives Sparkle replacing Contents/ wholesale on every
-    /// auto-update. Talking to the binary directly (instead of shelling out
-    /// through run_server.sh every launch) skips a `pip install mlx-lm`
-    /// network round-trip and a re-check of both idempotent patch scripts on
-    /// every single "Start Server" click -- work that only ever needs doing
-    /// once, not once per app launch (or, prior to this, once per update).
-    private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
-    private var venvPython: String { venvDir + "/bin/python3" }
-    // Only ever used as an existence check (pip creates it as its last
-    // install step, so its presence is a reliable "setup finished" signal)
-    // -- never executed directly, see launchServerProcess's doc comment.
-    private var venvServerBinary: String { venvDir + "/bin/mlx_lm.server" }
-    private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
-
-    /// Only present in the "Full" build variant (scripts/build_full_app.sh),
-    /// which vendors a working venv straight into the bundle so first launch
-    /// never needs the network. Reused as the *source* for the one-time
-    /// external copy above rather than a copy this app ever runs from
-    /// directly -- Contents/ is exactly what the next Sparkle update wipes.
-    private var bundledVenvDir: String { RuntimePaths.runtimeDir + "/.mlx_server_venv" }
-    private var bundledVenvServerBinary: String { bundledVenvDir + "/bin/mlx_lm.server" }
-
-    /// Also Full-build-only: the self-contained Python.framework
-    /// build_full_app.sh vendored to create that venv in the first place.
-    /// Copied out alongside the venv so that if the external venv is ever
-    /// deleted (e.g. via the "Uninstall Runtime Data" menu item) and needs
-    /// recreating on a machine with no system Python 3.10+, there's still a
-    /// working interpreter to recreate it with -- without that, a Full
-    /// install would silently degrade into needing a system Python anyway,
-    /// defeating the point of "Full" in the first place.
-    private var bundledFrameworkDir: String? {
-        guard let frameworksPath = Bundle.main.privateFrameworksPath else { return nil }
-        let path = frameworksPath + "/Python.framework"
-        return FileManager.default.fileExists(atPath: path) ? path : nil
-    }
-    private var externalFrameworkDir: String { RuntimePaths.externalRuntimeDir + "/Python.framework" }
-
     // Resumed by checkForReadySignal (ready) or processDidExit (died while
     // starting) -- awaited by launchAndWaitReady, which only ever runs
     // inside a serialized transition, so there is at most one.
     private var startContinuation: CheckedContinuation<Void, Error>?
-    /// Waiters for a specific process's exit (keyed by the Process), so a
-    /// transition can wait for *its* old process without a later launch's
-    /// exit being mistaken for it.
-    private var exitWaiters: [ObjectIdentifier: [CheckedContinuation<Void, Never>]] = [:]
-    /// Bumped by every launch: callbacks of an older process compare it
-    /// before touching state, so a slow-dying old process can't mark the
-    /// new one stopped/failed or clear `process`.
-    private var launchGeneration = 0
     /// Bumped by stop(): a transition queued before an explicit Stop must
     /// not bring the server back up after it.
     private var stopEpoch = 0
@@ -184,7 +139,7 @@ final class ServerManager: ObservableObject {
                     self.currentModelPath = modelPath
                     self.currentAlias = alias
                     self.state = .starting
-                    try await self.ensureRuntimeReady()
+                    try await self.installer.ensureReady()
                     try self.checkNotStopped(epoch)
                     try await self.launchAndWaitReady(modelPath: modelPath, alias: alias, epoch: epoch)
                 }
@@ -243,7 +198,7 @@ final class ServerManager: ObservableObject {
         if case .running = state { return }
         try checkAutoLoadAllowed()
         guard let modelPath = currentModelPath else { return }
-        try await ensureRuntimeReady()
+        try await installer.ensureReady()
         try checkNotStopped(epoch)
         try await launchAndWaitReady(modelPath: modelPath, alias: currentAlias, epoch: epoch)
     }
@@ -329,19 +284,12 @@ final class ServerManager: ObservableObject {
     /// way out (Stop, idle-unload) is waited for first -- it holds the
     /// internal port.
     private func launchAndWaitReady(modelPath: String, alias: String, epoch: Int) async throws {
-        if let old = process { await waitForExit(of: old) }
+        if let old = process { await old.waitForExit() }
         try checkNotStopped(epoch)
         state = .starting
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             startContinuation = continuation
             launchServerProcess(modelPath: modelPath, alias: alias)
-        }
-    }
-
-    private func waitForExit(of process: Process) async {
-        guard process.isRunning else { return }
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            exitWaiters[ObjectIdentifier(process), default: []].append(continuation)
         }
     }
 
@@ -385,7 +333,7 @@ final class ServerManager: ObservableObject {
     /// would fail to load it and the whole server start with it.
     private func availableDrafter(forModelPath modelPath: String) -> String? {
         guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath),
-              runtimeSupportsModelType("gemma4_assistant") else { return nil }
+              MLXRuntimeInstaller.supportsModelType("gemma4_assistant") else { return nil }
         return repo
     }
 
@@ -442,19 +390,10 @@ final class ServerManager: ObservableObject {
         ))
     }
 
-    private func runtimeSupportsModelType(_ modelType: String) -> Bool {
-        let lib = venvDir + "/lib"
-        guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }
-        return pythons.contains { py in
-            FileManager.default.fileExists(atPath: "\(lib)/\(py)/site-packages/mlx_lm/models/\(modelType).py")
-        }
-    }
-
     private func launchServerProcess(modelPath: String, alias: String) {
         isIdleUnloaded = false
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }
-        let task = Process()
         // Not venvServerBinary (the "mlx_lm.server" console-script pip
         // generates) directly -- that script's first line is a shebang
         // hardcoding the exact absolute interpreter path that was live
@@ -465,7 +404,6 @@ final class ServerManager: ObservableObject {
         // "~/Library/Application Support/..." -- guaranteed to contain
         // one. Invoking the interpreter directly with -m sidesteps shebang
         // parsing entirely; Process doesn't go through a shell either way.
-        task.executableURL = URL(fileURLWithPath: venvPython)
         // Everything launch-related comes from the model's profile (see
         // ProfileManager / LLMTrayCore.ServerLaunch), resolved fresh on
         // every launch: a model switch or the benchmark's auto-tune
@@ -485,52 +423,20 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         ))
         lastLaunchArguments = args
-        task.arguments = args
-        task.standardInput = FileHandle.nullDevice
 
-        let pipe = Pipe()
-        task.standardOutput = pipe
-        task.standardError = pipe
-        self.stdoutPipe = pipe
-        self.process = task
-
-        launchGeneration += 1
-        let generation = launchGeneration
-        let handle = pipe.fileHandleForReading
-        self.stdoutHandle = handle
-        handle.readabilityHandler = { [weak self] fh in
-            let data = fh.availableData
-            guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
-            // The weak capture must be re-checked *inside* the Task's own
-            // closure, not hoisted from the outer one -- strict concurrency
-            // checking (on newer toolchains than what this was written
-            // against) treats a weak `self` threaded into a concurrently-
-            // scheduled closure from outside as an unchecked data race.
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.appendLog(text)
-                guard generation == self.launchGeneration else { return }
-                self.checkForReadySignal(text, modelPath: modelPath)
-            }
+        let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
+        serverProcess.onOutput = { [weak self, weak serverProcess] text in
+            guard let self else { return }
+            self.appendLog(text)
+            guard let serverProcess, self.process === serverProcess else { return }
+            self.checkForReadySignal(text, modelPath: modelPath)
         }
-
-        task.terminationHandler = { [weak self] proc in
-            // Must clear this HERE, not in stop()/idleUnload() -- this
-            // handler is the one place that fires no matter WHY the process
-            // exited (explicit stop, idle-unload, a crash, a model switch's
-            // replacement). Left in place, the pipe's read end stays
-            // permanently "readable" once the write end (the dead process)
-            // closes -- availableData returns empty at EOF forever, and
-            // libdispatch re-invokes the handler as fast as it can instead
-            // of ever blocking, pegging a CPU core indefinitely.
-            handle.readabilityHandler = nil
-            Task { @MainActor [weak self] in
-                self?.processDidExit(proc, generation: generation)
-            }
+        serverProcess.onExit = { [weak self] exited in
+            self?.processDidExit(exited)
         }
-
+        process = serverProcess
         do {
-            try task.run()
+            try serverProcess.run()
         } catch {
             state = .failed("failed to launch: \(error.localizedDescription)")
             process = nil
@@ -542,12 +448,10 @@ final class ServerManager: ObservableObject {
     /// Requests still being served by this process end on their own: their
     /// upstream connection fails, and the proxy calls endRequest() for each
     /// -- the request counters belong to requests, not to the process.
-    private func processDidExit(_ proc: Process, generation: Int) {
-        let waiters = exitWaiters.removeValue(forKey: ObjectIdentifier(proc)) ?? []
-        waiters.forEach { $0.resume() }
+    private func processDidExit(_ proc: ServerProcess) {
         // An older process dying after a newer one was launched: the state
         // and `process` belong to the new one now.
-        guard generation == launchGeneration else { return }
+        guard proc === process else { return }
         if case .running = state {
             state = .stopped
         } else if case .starting = state {
@@ -574,19 +478,7 @@ final class ServerManager: ObservableObject {
         proxy.stop()
         proxyStartPending = false
         state = .stopped
-        guard let process, process.isRunning else { return }
-        process.terminate()
-        killIfStillRunning(process)
-    }
-
-    /// mlx_lm.server doesn't always react to SIGTERM promptly while a
-    /// generation is in flight. Only ever signals this exact process: a
-    /// replacement is never launched before it has exited.
-    private func killIfStillRunning(_ processToKill: Process) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            guard processToKill.isRunning else { return }
-            kill(processToKill.processIdentifier, SIGKILL)
-        }
+        process?.terminate()
     }
 
     /// Unlike stop(), waits for the old process to exit (the replacement
@@ -594,8 +486,7 @@ final class ServerManager: ObservableObject {
     private func terminateAndWaitForExit() async {
         guard let process, process.isRunning else { return }
         process.terminate()
-        killIfStillRunning(process)
-        await waitForExit(of: process)
+        await process.waitForExit()
     }
 
     /// For app-quit paths only (applicationWillTerminate): there's no time
@@ -605,8 +496,7 @@ final class ServerManager: ObservableObject {
     /// "the whole app is going away right now."
     func terminateImmediately() {
         proxy.stop()
-        guard let process, process.isRunning else { return }
-        kill(process.processIdentifier, SIGKILL)
+        process?.killNow()
     }
 
     /// Lets a caller outside this type (AppDelegate's auto-start) surface
@@ -616,239 +506,6 @@ final class ServerManager: ObservableObject {
     func reportFailure(_ message: String) {
         guard case .stopped = state else { return }
         state = .failed(message)
-    }
-
-    /// GUI apps launched via Finder/LaunchServices don't inherit the
-    /// interactive shell PATH that adds a package manager's bin dir -- so a
-    /// plain "python3" (or hardcoded /usr/bin/python3) resolves to the
-    /// ancient Xcode Command Line Tools Python (3.9.6 here), whose pip
-    /// can't find wheels for a current `mlx` (needs 3.10+), and the venv
-    /// creation silently succeeds while the mlx-lm install inside it then
-    /// fails with a version-not-found error.
-    ///
-    /// Path presence alone isn't enough to trust, though -- not everyone
-    /// uses Homebrew (or the same install prefix), so this actually checks
-    /// each candidate's real version and picks the first that's modern
-    /// enough, covering Homebrew (both CPU architectures), pyenv, MacPorts,
-    /// and Anaconda/Miniconda. Deliberately does NOT fall back to
-    /// /usr/bin/python3 -- on a genuinely clean Mac with no Xcode Command
-    /// Line Tools installed yet, that path is a stub that pops a system
-    /// "Install Command Line Developer Tools" dialog the first time
-    /// anything runs it, which is a confusing thing to trigger silently
-    /// from a background bootstrap step. Returning nil here instead lets
-    /// the caller fail with a clear, actionable message up front.
-    private func pythonCandidates() -> [String] {
-        var candidates = [String]()
-        // A previously-externalized Full-build framework (see
-        // externalFrameworkDir) takes priority: it's guaranteed modern and
-        // needs no network, unlike everything else in this list.
-        if let vendored = externalFrameworkPython() { candidates.append(vendored) }
-        candidates += [
-            "/opt/homebrew/bin/python3",
-            "/usr/local/bin/python3",
-            NSString(string: "~/.pyenv/shims/python3").expandingTildeInPath,
-            "/opt/local/bin/python3",
-            NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
-            NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
-        ]
-        return candidates.filter { FileManager.default.isExecutableFile(atPath: $0) }
-    }
-
-    /// Runs blocking file / process work on a background thread.
-    nonisolated private static func offMain<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
-        try await Task.detached(priority: .userInitiated) { try work() }.value
-    }
-
-    /// Version directory name (e.g. "3.14") isn't known ahead of time, so
-    /// this just looks at whatever's actually there instead of hardcoding it.
-    private func externalFrameworkPython() -> String? {
-        let versionsDir = externalFrameworkDir + "/Versions"
-        guard let versions = try? FileManager.default.contentsOfDirectory(atPath: versionsDir) else { return nil }
-        for version in versions where version != "Current" {
-            let candidate = "\(versionsDir)/\(version)/bin/python\(version)"
-            if FileManager.default.isExecutableFile(atPath: candidate) { return candidate }
-        }
-        return nil
-    }
-
-    /// Blocks until the probe exits -- call it off the main actor.
-    nonisolated private static func isModernPython(_ path: String) -> Bool {
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: path)
-        task.arguments = ["-c", "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"]
-        task.standardOutput = FileHandle.nullDevice
-        task.standardError = FileHandle.nullDevice
-        do {
-            try task.run()
-            task.waitUntilExit()
-            return task.terminationStatus == 0
-        } catch {
-            return false
-        }
-    }
-
-    /// A downloaded .app has no external venv yet on first launch -- this
-    /// does the same setup runtime/run_server.sh does for local dev, in-
-    /// process, so "download the DMG, click Start Server" works without
-    /// ever opening a terminal. Also the one place that notices a new
-    /// release bumped the pinned mlx-lm commit and upgrades the existing
-    /// external venv in place, since -- now that the venv lives outside
-    /// Contents/ specifically so updates *don't* wipe it -- nothing else
-    /// would ever pick that up otherwise.
-    // This app installs mlx_lm exclusively from our own fork,
-    // ipsupport-llc/mlx-lm -- never from PyPI. That fork carries real
-    // fixes/features upstream mlx_lm doesn't have (NemotronH Multi-Token-
-    // Prediction self-speculative decode, RotatingKVCache quantization,
-    // native prism_hadamard_qwen35 support, --model-alias/--kv-bits/
-    // /api/v0/models/disconnect-safety server flags) -- see that repo's
-    // docs/FINDINGS.md. Always a deliberately pinned commit on `main`
-    // (runtime/mlx_lm_runtime.json), bumped only via Check for Updates --
-    // there used to also be an Advanced toggle tracking the
-    // `nemotron-h-mtp` branch tip directly, for picking up in-progress
-    // work before it was merged to `main`, but that branch's own work is
-    // long since merged and every fix since has landed on `main` directly,
-    // so the toggle was just a second, easy-to-forget place a fix could
-    // land without reaching this app -- removed rather than kept as a
-    // permanent fixture with no active use.
-
-    private func ensureRuntimeReady() async throws {
-        let runtimeDir = RuntimePaths.runtimeDir
-        guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
-              let pinObj = try? JSONSerialization.jsonObject(with: pinData) as? [String: Any],
-              let pinnedRepo = pinObj["repo"] as? String,
-              let pinnedRef = pinObj["pinned_ref"] as? String else {
-            throw NSError(
-                domain: "ServerManager", code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "could not read mlx_lm_runtime.json"]
-            )
-        }
-        let pinnedRuntimeGitURL = "git+https://github.com/\(pinnedRepo).git@\(pinnedRef)"
-        let targetVersion = pinnedRef
-
-        // The marker is only ever written after a fully successful install
-        // (see the two write sites below), so its presence -- not just the
-        // venv directory's -- is what distinguishes "ready" or "just needs
-        // a version bump" from "leftover half-built venv from a prior
-        // crashed attempt."
-        let installedVersion = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        if FileManager.default.fileExists(atPath: venvServerBinary), installedVersion == targetVersion {
-            return
-        }
-
-        try FileManager.default.createDirectory(
-            atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
-        )
-
-        // Full build, first launch: a working venv (for this exact pinned
-        // commit, since both were produced by the same build_full_app.sh
-        // run) is already sitting in the bundle -- copying it out is a fast
-        // local operation with no network, unlike everything below.
-        if !FileManager.default.fileExists(atPath: venvDir),
-           FileManager.default.fileExists(atPath: bundledVenvServerBinary) {
-            appendLog("--- first run: copying vendored runtime out of the app bundle ---\n")
-            // Hundreds of MB: copied off the main actor, the UI stays live.
-            let (venvSource, venvTarget) = (bundledVenvDir, venvDir)
-            try await Self.offMain { try FileManager.default.copyItem(atPath: venvSource, toPath: venvTarget) }
-            if let bundledFramework = bundledFrameworkDir {
-                let frameworkTarget = externalFrameworkDir
-                if !FileManager.default.fileExists(atPath: frameworkTarget) {
-                    try? await Self.offMain { try FileManager.default.copyItem(atPath: bundledFramework, toPath: frameworkTarget) }
-                }
-                // The copied venv's own bin/python3.X is a symlink pointing
-                // at the *bundled* framework by absolute path (that's how
-                // `python -m venv` created it in build_full_app.sh) -- valid
-                // only as long as that original .app sticks around. Left
-                // alone, it dangles the instant the next Sparkle update
-                // replaces Contents/, which is exactly the update this
-                // whole external-copy was supposed to survive. Repoint it at
-                // the framework copy that now lives right alongside it.
-                relinkVendoredInterpreter(newFrameworkDir: externalFrameworkDir)
-            }
-            try pinnedRef.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
-            appendLog("--- runtime ready ---\n")
-            return
-        }
-
-        appendLog("--- first run: setting up mlx-lm runtime (this can take a minute) ---\n")
-
-        if FileManager.default.fileExists(atPath: venvDir), installedVersion == nil {
-            // No marker means the previous attempt at this exact venv never
-            // finished (e.g. it was created with an incompatible Python and
-            // the mlx-lm install inside it failed) -- venv creation is
-            // cheap, so start clean rather than trying to patch up a
-            // half-working one. A venv WITH a marker just needs the pip
-            // install/patch steps below re-run against the new version, not
-            // a full recreation.
-            try? FileManager.default.removeItem(atPath: venvDir)
-        }
-
-        if !FileManager.default.fileExists(atPath: venvDir) {
-            let candidates = pythonCandidates()
-            let found = try await Self.offMain { candidates.first(where: Self.isModernPython) }
-            guard let python = found else {
-                throw NSError(
-                    domain: "ServerManager", code: 2,
-                    userInfo: [NSLocalizedDescriptionKey:
-                        "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh), then try Start Server again."]
-                )
-            }
-            try await runProcess(python, ["-m", "venv", venvDir])
-            // -m pip, not the pip console-script directly -- same
-            // shebang-can't-survive-relocation-or-spaces reasoning as
-            // launchServerProcess above.
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
-        }
-        // --force-reinstall: pip won't otherwise treat a git URL as newer
-        // than an already-satisfied "mlx-lm" (e.g. picking up a bumped pin).
-        try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", pinnedRuntimeGitURL])
-        try targetVersion.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
-        appendLog("--- runtime ready ---\n")
-    }
-
-    /// Confirmed live (copying a vendored venv out to a scratch directory,
-    /// then simulating a Sparkle update by moving the original .app aside):
-    /// without this, `venvDir/bin/python3.X` still resolves fine as long as
-    /// the source .app happens to still be sitting where it was, then
-    /// starts failing with a bare "no such file or directory" -- a broken
-    /// symlink, not a Python-level error -- the moment it's gone.
-    ///
-    /// Matches by the stable "Python.framework/..." *suffix* of each
-    /// symlink's target, not by prefix against this run's own
-    /// bundledFrameworkDir -- confirmed live on a real release build: the
-    /// venv's symlink was created by `python -m venv` on whatever machine
-    /// originally ran build_full_app.sh (a GitHub Actions runner, for an
-    /// actual release), which has nothing in common with wherever this
-    /// copy of the app ends up installed. Prefix-matching against the
-    /// *current* Bundle.main path silently matched nothing there, leaving
-    /// the dead runner path in place. A broken absolute symlink pointing
-    /// somewhere inside *any* Python.framework is unambiguous regardless
-    /// of what machine's path precedes that suffix.
-    private func relinkVendoredInterpreter(newFrameworkDir: String) {
-        if let binEntries = try? FileManager.default.contentsOfDirectory(atPath: venvDir + "/bin") {
-            for entry in binEntries {
-                let path = venvDir + "/bin/" + entry
-                guard let target = try? FileManager.default.destinationOfSymbolicLink(atPath: path),
-                      !FileManager.default.fileExists(atPath: target),
-                      let range = target.range(of: "Python.framework/") else { continue }
-                let newTarget = newFrameworkDir + "/" + target[range.upperBound...]
-                try? FileManager.default.removeItem(atPath: path)
-                try? FileManager.default.createSymbolicLink(atPath: path, withDestinationPath: newTarget)
-            }
-        }
-        // pyvenv.cfg's home/executable/command fields aren't what actually
-        // gets executed (bin/python3.X above is), but leaving them pointing
-        // at a now-deleted path would confuse any tooling that does read it.
-        // Same suffix-based approach: a regex matching "<anything non-space>
-        // ending in Python.framework/" rather than a known literal prefix.
-        let cfgPath = venvDir + "/pyvenv.cfg"
-        if let cfg = try? String(contentsOfFile: cfgPath, encoding: .utf8),
-           let regex = try? NSRegularExpression(pattern: #"\S*Python\.framework/"#) {
-            let fullRange = NSRange(cfg.startIndex..., in: cfg)
-            let replacement = NSRegularExpression.escapedTemplate(for: newFrameworkDir + "/")
-            let fixed = regex.stringByReplacingMatches(in: cfg, range: fullRange, withTemplate: replacement)
-            try? fixed.write(toFile: cfgPath, atomically: true, encoding: .utf8)
-        }
     }
 
     /// Backing the "Uninstall Runtime Data" menu item: removes the
@@ -868,45 +525,6 @@ final class ServerManager: ObservableObject {
         let keep: Set<String> = ["sessions", "profiles"]
         for item in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where !keep.contains(item) {
             try? FileManager.default.removeItem(atPath: dir + "/" + item)
-        }
-    }
-
-    /// Runs one setup step to completion, streaming its output into the
-    /// same log the server's own output goes to -- so a slow first run
-    /// (venv creation, pip install) is visible progress, not a silently
-    /// stuck spinner.
-    private func runProcess(_ executable: String, _ arguments: [String]) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let task = Process()
-            task.executableURL = URL(fileURLWithPath: executable)
-            task.arguments = arguments
-            task.standardInput = FileHandle.nullDevice
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = pipe
-            pipe.fileHandleForReading.readabilityHandler = { fh in
-                let data = fh.availableData
-                guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
-                Task { @MainActor in
-                    self.appendLog(text)
-                }
-            }
-            task.terminationHandler = { proc in
-                pipe.fileHandleForReading.readabilityHandler = nil
-                if proc.terminationStatus == 0 {
-                    continuation.resume()
-                } else {
-                    continuation.resume(throwing: NSError(
-                        domain: "ServerManager", code: Int(proc.terminationStatus),
-                        userInfo: [NSLocalizedDescriptionKey: "\(executable) exited \(proc.terminationStatus)"]
-                    ))
-                }
-            }
-            do {
-                try task.run()
-            } catch {
-                continuation.resume(throwing: error)
-            }
         }
     }
 
@@ -942,12 +560,12 @@ final class ServerManager: ObservableObject {
             return
         }
         proxyStartPending = true
-        let generation = launchGeneration
+        let owner = process
         proxy.start(publicPort: publicPort, internalPort: internalPort) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success:
-                guard generation == self.launchGeneration, self.proxyStartPending else { return }
+                guard owner != nil, self.process === owner, self.proxyStartPending else { return }
                 self.proxyStartPending = false
                 self.markRunning(port: publicPort, model: name)
             case .failure(let error):
@@ -1077,8 +695,4 @@ final class ServerManager: ObservableObject {
         Task { await restartWedgedProcess() }
     }
 
-    deinit {
-        stdoutHandle?.readabilityHandler = nil
-        process?.terminate()
-    }
 }
