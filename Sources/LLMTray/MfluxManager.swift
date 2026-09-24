@@ -125,7 +125,8 @@ final class MfluxManager: ObservableObject {
     /// new mflux must not silently break image generation for new installs.
     /// (Never vendor this venv into a DMG: opencv-python in it bundles GPL
     /// codecs; the user's own pip installs it.)
-    static let mfluxRequirement = "mflux==0.20.0"
+    static let mfluxVersion = "0.20.0"
+    static var mfluxRequirement: String { "mflux==\(mfluxVersion)" }
 
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mflux_venv" }
     private var venvPython: String { venvDir + "/bin/python3" }
@@ -151,11 +152,21 @@ final class MfluxManager: ObservableObject {
             try await runProcess(python, ["-m", "venv", venvDir])
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
-        if !FileManager.default.fileExists(atPath: saveBinary) {
+        // Also when an install from before the pin has another version.
+        if !FileManager.default.fileExists(atPath: saveBinary) || installedMfluxVersion() != Self.mfluxVersion {
             statusText = "Installing mflux…"
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", Self.mfluxRequirement, "huggingface_hub"])
         }
         statusText = ""
+    }
+
+    /// The mflux version in the venv, from its dist-info folder's name
+    /// (mflux-0.20.0.dist-info) -- no Python started for it.
+    private func installedMfluxVersion() -> String? {
+        guard let site = PythonPackageLicenses.sitePackages(venv: URL(fileURLWithPath: venvDir)),
+              let items = try? FileManager.default.contentsOfDirectory(atPath: site.path) else { return nil }
+        return items.first { $0.hasPrefix("mflux-") && $0.hasSuffix(".dist-info") }
+            .map { String($0.dropFirst("mflux-".count).dropLast(".dist-info".count)) }
     }
 
     /// Explicit, user-initiated warm-up: installs mflux if needed, then
