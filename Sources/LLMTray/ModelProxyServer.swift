@@ -212,7 +212,7 @@ final class ModelProxyServer {
         server.beginRequest()
         Task {
             let modelName = Self.extractModelField(from: bodyData)
-            let targetPath = modelName.flatMap(ModelRouter.resolve(modelName:))
+            let targetPath = modelName.flatMap(ModelCatalog.shared.resolve(modelName:))
             do {
                 // Switches to the requested model (or reloads the last one
                 // if it was idle-unloaded), serialized with every other

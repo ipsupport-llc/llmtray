@@ -1,0 +1,242 @@
+import LLMTrayCore
+import SwiftUI
+
+/// The popover's header: server status, chat session controls, the model
+/// picker with Start/Stop, the model's profile and temperature, and the
+/// restart prompt.
+struct ChatHeaderView: View {
+    @EnvironmentObject var server: ServerManager
+    @EnvironmentObject var chat: ChatClient
+    @EnvironmentObject var benchmark: BenchmarkRunner
+    @ObservedObject private var profiles = ProfileManager.shared
+    @ObservedObject private var catalog = ModelCatalog.shared
+    @AppStorage("llmtray.port") private var port: Int = 8765
+
+    @Binding var selectedModelID: String?
+    let sessionHistory: [ChatSessionFile]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Circle().fill(statusColor).frame(width: 8, height: 8)
+                Text(statusText).font(.system(size: 12, weight: .medium))
+                Spacer()
+                sessionControls
+            }
+            HStack(spacing: 6) {
+                Picker("Model", selection: $selectedModelID) {
+                    ForEach(catalog.models) { m in
+                        Text(m.displayName).tag(m.id as String?)
+                    }
+                }
+                .labelsHidden()
+                .disabled(isStarting || benchmark.isRunning)
+                .help(Text(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model"))
+
+                Menu {
+                    Button("Rescan Models") { catalog.rescan() }
+                    Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
+                    Button("Manage Models…") { openSettings(.models) }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help(Text("Rescan, download or manage models"))
+                .accessibilityLabel(Text("Model actions"))
+
+                serverToggleButton
+            }
+            HStack(spacing: 8) {
+                Image(systemName: "slider.horizontal.3").foregroundColor(.secondary).font(.system(size: 11))
+                profilePicker
+                temperatureRow
+            }
+            RestartBanner()
+        }
+        .padding(12)
+    }
+
+    // MARK: Sessions
+
+    private var sessionControls: some View {
+        HStack {
+            Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
+                .buttonStyle(.plain)
+                .help("New chat (saved)")
+                // Only disabled when there's truly nothing to start fresh
+                // from -- an empty *persistent* session. A temporary chat is
+                // empty too, but this is the way back to a saved one.
+                .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
+            Menu {
+                if sessionHistory.isEmpty {
+                    Text("No saved sessions")
+                }
+                ForEach(sessionHistory) { session in
+                    Menu(session.title.isEmpty ? "New chat" : session.title) {
+                        Button("Open") { chat.loadSession(session) }
+                        Button("Delete", role: .destructive) { deleteSession(session) }
+                    }
+                }
+            } label: {
+                Image(systemName: "clock.arrow.circlepath")
+            }
+            .menuStyle(.borderlessButton)
+            .frame(width: 16)
+            .help("Past chats")
+            Button { chat.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
+                .buttonStyle(.plain)
+                .help("New temporary chat -- nothing about it is ever saved")
+            Button { openSettings() } label: { Image(systemName: "gearshape") }
+                .keyboardShortcut(",", modifiers: .command)
+                .help("Settings (⌘,)")
+                .accessibilityLabel("Settings")
+                .buttonStyle(.plain)
+        }
+    }
+
+    private func deleteSession(_ session: ChatSessionFile) {
+        ChatSessionStore.delete(id: session.id)
+        // The session on screen was deleted: start a fresh one instead of
+        // showing a conversation whose log no longer exists.
+        if chat.currentSessionID == session.id {
+            chat.newSession()
+        }
+    }
+
+    // MARK: Server
+
+    /// Small icon, not a full-width button: the server starts on its own at
+    /// launch, so this is for "unload / reload", not the everyday path.
+    private var serverToggleButton: some View {
+        Group {
+            switch server.state {
+            case .stopped, .failed:
+                Button(action: startServer) { Image(systemName: "play.fill") }
+                    .disabled(selectedModelID == nil)
+                    .help("Start server")
+            case .starting:
+                ProgressView().controlSize(.small).help("Starting…")
+            case .running:
+                Button { server.stop() } label: { Image(systemName: "eject.fill") }
+                    .help("Stop server (unload model)")
+            }
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button("Start Server", action: startServer)
+                .disabled(!isStoppedOrFailed || selectedModelID == nil)
+            Button("Stop Server") { server.stop() }
+                .disabled(!isRunning)
+        }
+    }
+
+    private func startServer() {
+        guard let model = catalog.model(id: selectedModelID) else { return }
+        server.start(modelPath: model.path, port: port, alias: catalog.alias(for: model.id))
+    }
+
+    private var isStarting: Bool {
+        if case .starting = server.state { return true }
+        return false
+    }
+
+    private var isRunning: Bool {
+        if case .running = server.state { return true }
+        return false
+    }
+
+    private var isStoppedOrFailed: Bool {
+        switch server.state {
+        case .stopped, .failed: return true
+        default: return false
+        }
+    }
+
+    private var statusColor: Color {
+        switch server.state {
+        case .stopped: return .gray
+        case .starting: return .yellow
+        case .running: return .green
+        case .failed: return .red
+        }
+    }
+
+    private var statusText: String {
+        switch server.state {
+        case .stopped:
+            return server.isIdleUnloaded
+                ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
+                : NSLocalizedString("Stopped", comment: "server status")
+        case .starting:
+            return NSLocalizedString("Starting…", comment: "server status")
+        case .running(let port, let model):
+            return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
+        case .failed(let msg):
+            return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
+        }
+    }
+
+    // MARK: Profile
+
+    /// Switching can restart the server, which would kill an in-flight
+    /// request or race the auto-tune sweep's own restarts.
+    private var canSwitchProfile: Bool {
+        selectedModelID != nil && !isStarting && !server.isBusy && !chat.isBusy && !benchmark.isRunning
+    }
+
+    private var profilePicker: some View {
+        Menu {
+            Picker("Profile", selection: Binding(
+                get: { profiles.profileID(for: selectedModelID) },
+                set: { switchProfile(to: $0) }
+            )) {
+                ForEach(profiles.profiles) { p in Text(p.name).tag(p.id) }
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+            .disabled(!canSwitchProfile)
+            Divider()
+            Button("Edit Profile…") { openSettings(.profiles, profileID: profiles.profileID(for: selectedModelID)) }
+            Button("New Profile…") {
+                let p = profiles.create(name: NSLocalizedString("New profile", comment: ""))
+                switchProfile(to: p.id)
+                openSettings(.profiles, profileID: p.id)
+            }
+            .disabled(!canSwitchProfile)
+        } label: {
+            Text(profiles.profile(for: selectedModelID).name)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help(Text(canSwitchProfile ? "Settings profile for this model" : "Can't switch profiles while a request or the auto-tune is running"))
+    }
+
+    /// Launch-setting differences are applied by the "Restart Server"
+    /// prompt, not by restarting here (that would cut off requests).
+    private func switchProfile(to id: String) {
+        guard canSwitchProfile, let modelID = selectedModelID else { return }
+        profiles.assign(profileID: id, to: modelID)
+    }
+
+    /// The one sampling knob kept in the popover; edits the model's profile.
+    private var temperatureRow: some View {
+        HStack(spacing: 6) {
+            Text("Temperature").font(.system(size: 11)).foregroundColor(.secondary)
+            Slider(value: Binding(
+                get: { profiles.value(\.request.temperature, for: selectedModelID) },
+                set: { profiles.set(\.request.temperature, $0, for: selectedModelID) }
+            ), in: 0...2, step: 0.05).controlSize(.mini)
+            Text(String(format: "%.2f", profiles.resolved(for: selectedModelID).temperature))
+                .font(.system(size: 11)).monospacedDigit().frame(width: 32, alignment: .trailing)
+        }
+        .help(Text("Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied."))
+    }
+
+    private func openSettings(_ pane: SettingsPane? = nil, profileID: String? = nil) {
+        var info: [String: String] = [:]
+        if let pane { info["pane"] = pane.rawValue }
+        if let profileID { info["profileID"] = profileID }
+        NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: info)
+    }
+}
