@@ -230,6 +230,7 @@
 "Show tool calls" = "Show tool calls";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Sort by" = "Sort by";
+"Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
 "Stable" = "Stable";
