@@ -257,7 +257,8 @@ def _lang_name(code: str) -> str:
     names = {"ru": "Russian", "uk": "Ukrainian", "es": "Spanish", "de": "German", "fr": "French",
              "it": "Italian", "pt": "Portuguese", "pt-BR": "Brazilian Portuguese", "pl": "Polish",
              "ja": "Japanese", "ko": "Korean", "zh-Hans": "Simplified Chinese", "zh-Hant": "Traditional Chinese",
-             "tr": "Turkish", "nl": "Dutch", "cs": "Czech", "sv": "Swedish", "he": "Hebrew", "ar": "Arabic"}
+             "tr": "Turkish", "nl": "Dutch", "cs": "Czech", "sv": "Swedish", "he": "Hebrew", "ar": "Arabic",
+             "hi": "Hindi", "vi": "Vietnamese", "id": "Indonesian", "th": "Thai"}
     return names.get(code, code)
 
 
