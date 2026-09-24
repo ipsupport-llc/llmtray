@@ -19,6 +19,9 @@ name: Release
 # (and .../LLMTray-Full.dmg) are permanent links to whatever's newest --
 # used by docs/index.html's download buttons, which would otherwise need
 # editing on every release.
+# Tags vX.Y.Z (stable) or vX.Y.Z-beta.N (beta: GitHub pre-release, and an
+# appcast item on Sparkle's "beta" channel that only users with "Receive
+# beta updates" on are offered -- see generate_appcast.sh).
 on:
   push:
     tags: ["v*"]
@@ -47,6 +50,7 @@ jobs:
         run: ./scripts/generate_appcast.sh
         env:
           VERSION: ${{ env.VERSION }}
+          TAG: ${{ github.ref_name }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
       - name: Commit appcast.xml to main
         run: |
@@ -76,3 +80,6 @@ jobs:
             .build/app/LLMTray.dmg
             .build/app/LLMTray-Full.dmg
           generate_release_notes: true
+          # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
+          # (the website's download links) keeps pointing at stable.
+          prerelease: ${{ contains(github.ref_name, '-') }}

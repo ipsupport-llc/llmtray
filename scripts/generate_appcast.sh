@@ -37,27 +37,56 @@ echo "signature attrs: $SIGNATURE_ATTRS"
 
 PUB_DATE="$(date -u +"%a, %d %b %Y %H:%M:%S +0000")"
 
-cat > "$REPO_ROOT/docs/appcast.xml" <<EOF
-<?xml version="1.0" encoding="utf-8"?>
+# Two channels, one item each: a version with a pre-release suffix
+# (0.6.8-beta.1) is a beta. Its item carries <sparkle:channel>beta, which
+# Sparkle only offers to apps that opt into that channel (see
+# UpdateChannelDelegate); the stable item has no channel, so everyone gets
+# it. Each release rewrites only its own channel's item and keeps the
+# other, so a beta never replaces the stable entry (and vice versa).
+# The enclosure points at this exact tag's asset, not releases/latest
+# (which skips pre-releases, and could move to a newer file than the one
+# this signature is for).
+if [[ "$VERSION" == *-* ]]; then CHANNEL=beta; else CHANNEL=stable; fi
+SPARKLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
+TAG="${TAG:-v$VERSION}"
+URL="https://github.com/ipsupport-llc/llmtray/releases/download/$TAG/LLMTray.dmg"
+
+APPCAST="$REPO_ROOT/docs/appcast.xml" CHANNEL="$CHANNEL" VERSION="$VERSION" SPARKLE_VERSION="$SPARKLE_VERSION" PUB_DATE="$PUB_DATE" \
+URL="$URL" SIGNATURE_ATTRS="$SIGNATURE_ATTRS" python3 - <<'PY'
+import os, re
+path, channel = os.environ["APPCAST"], os.environ["CHANNEL"]
+old = open(path).read() if os.path.exists(path) else ""
+items = re.findall(r"    <item>.*?</item>\n", old, re.S)
+def is_beta(item): return "<sparkle:channel>beta</sparkle:channel>" in item
+# Keep the other channel's item. An old beta left next to a newer stable
+# is harmless: Sparkle offers the newest version the user is allowed, and
+# a beta of an older version is never newer than stable.
+kept = [i for i in items if is_beta(i) != (channel == "beta")]
+v, sv, date, url, sig = (os.environ[k] for k in ("VERSION", "SPARKLE_VERSION", "PUB_DATE", "URL", "SIGNATURE_ATTRS"))
+chan = "\n      <sparkle:channel>beta</sparkle:channel>" if channel == "beta" else ""
+item = f"""    <item>
+      <title>Version {v}</title>
+      <pubDate>{date}</pubDate>{chan}
+      <sparkle:version>{sv}</sparkle:version>
+      <sparkle:shortVersionString>{v}</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+      <enclosure url="{url}"
+                 {sig}
+                 type="application/octet-stream"/>
+    </item>
+"""
+items = ([item] + kept) if channel == "stable" else (kept + [item])
+open(path, "w").write(f"""<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
   <channel>
     <title>LLMTray</title>
     <link>https://ipsupport-llc.github.io/llmtray/appcast.xml</link>
     <description>LLMTray release updates</description>
     <language>en</language>
-    <item>
-      <title>Version $VERSION</title>
-      <pubDate>$PUB_DATE</pubDate>
-      <sparkle:version>$VERSION</sparkle:version>
-      <sparkle:shortVersionString>$VERSION</sparkle:shortVersionString>
-      <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-      <enclosure url="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg"
-                 $SIGNATURE_ATTRS
-                 type="application/octet-stream"/>
-    </item>
-  </channel>
+{''.join(items)}  </channel>
 </rss>
-EOF
+""")
+PY
 
-echo "--- wrote docs/appcast.xml ---"
+echo "--- wrote docs/appcast.xml ($CHANNEL channel) ---"
 cat "$REPO_ROOT/docs/appcast.xml"

@@ -51,6 +51,7 @@ struct ContentView: View {
     // Toggle straight to it controls Sparkle without needing a reference
     // to the updater instance (which lives in AppDelegate, not here).
     @AppStorage("SUEnableAutomaticChecks") private var autoCheckForUpdates: Bool = true
+    @AppStorage("llmtray.betaUpdates") private var betaUpdates: Bool = false
     @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
     @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes: Int = 0
     @AppStorage("llmtray.promptCacheMB") private var promptCacheMB: Int = 1024
@@ -420,6 +421,8 @@ struct ContentView: View {
             }
             Toggle("Start server automatically on launch", isOn: $autoStartOnLaunch)
             Toggle("Automatically check for updates", isOn: $autoCheckForUpdates)
+            Toggle("Receive beta updates", isOn: $betaUpdates)
+                .help("Pre-release builds with features still being tested. Turning this off doesn't downgrade an installed beta; you move back to stable with the next stable release.")
             Toggle("Show reasoning / thinking", isOn: $showReasoning)
             Stepper(
                 autoStopIdleMinutes == 0
