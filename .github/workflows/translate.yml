@@ -1,0 +1,74 @@
+name: Translate
+
+# Keeps every language in Resources/Localization in step with the English
+# UI text: whenever main changes the Swift sources (new / changed strings)
+# or the localization files, missing keys are machine-translated with
+# OpenAI (secret OPENAI_API_KEY; model from repo variable OPENAI_MODEL,
+# default gpt-4.1) and the result is proposed as a pull request. Keys are
+# the English text, so an edited English string is a new key and gets
+# translated too; keys no longer in the code are dropped. Existing
+# translations are never overwritten -- a native speaker's fix sticks.
+#
+# Manual run: Actions > Translate > Run workflow, optionally with
+# "languages" (e.g. "de fr ja") to add new languages or redo only those.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Sources/LLMTray/**"
+      - "Resources/Localization/**"
+      - "scripts/l10n.py"
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: "Language codes to translate (space-separated). Empty = every existing language. New codes are created."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: translate
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    runs-on: macos-14   # plutil (the .strings parser the checks use) is macOS-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: Refresh the English base from the sources
+        run: python3 scripts/l10n.py extract
+      - name: Translate missing strings
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::warning::OPENAI_API_KEY secret is not set -- skipping machine translation"
+            exit 0
+          fi
+          python3 scripts/l10n.py translate ${{ github.event.inputs.languages }}
+      - name: Check
+        run: python3 scripts/l10n.py check
+      - name: Open a pull request with the changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- Resources/Localization && [ -z "$(git ls-files --others --exclude-standard Resources/Localization)" ]; then
+            echo "translations already up to date"
+            exit 0
+          fi
+          branch="translations/${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add Resources/Localization
+          git commit -m "Update translations (machine-translated missing strings)"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Update translations" \
+            --body "Machine-translated the UI strings missing from one or more languages (\`scripts/l10n.py translate\`, OpenAI). Existing translations are untouched. Placeholders were checked automatically; review the wording if you speak the language.
+
+          $(python3 scripts/l10n.py check)"

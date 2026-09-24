@@ -14,6 +14,10 @@ and lists it in CFBundleLocalizations.
                               # format specifiers match; missing keys per
                               # language are reported, not an error
     scripts/l10n.py missing <lang>   # list untranslated keys (for translators)
+    scripts/l10n.py translate [lang ...] [--model M]
+                              # machine-translate missing keys via OpenAI
+                              # (OPENAI_API_KEY); a new code creates that
+                              # language. Existing entries are kept.
 
 SwiftUI turns an interpolated literal into a format key: "After \\(m) min"
 is looked up as "After %lld min" (an Int), "\\(name)" becomes %@ (a String).
@@ -150,23 +154,35 @@ def _to_key(literal: str) -> str | None:
     return key
 
 
-def extract() -> list[str]:
-    keys: dict[str, None] = {}
+CONTEXT = {
+    "Text": "label", "Toggle": "checkbox label", "Button": "button", "Section": "section header",
+    "Menu": "menu", "LabeledContent": "setting label", "Picker": "setting label / option",
+    "TextField": "text field placeholder", "Label": "label", "SettingLabel": "setting title or its tooltip",
+    "SettingHelp": "tooltip explaining a setting", "NSLocalizedString": "dialog / menu text",
+    "row": "profile setting title or its tooltip", "help": "tooltip",
+}
+
+
+def extract_with_context() -> dict[str, str]:
+    """key -> where it appears (a hint for translators and the MT prompt)."""
+    keys: dict[str, str] = {}
     for f in SOURCES:
         src = f.read_text()
         for m in CALL.finditer(src):
-            args = _args(src, m.end())
-            for lit in _literals(args):
+            for lit in _literals(_args(src, m.end())):
                 key = _to_key(lit)
                 if key:
-                    keys.setdefault(key, None)
+                    keys.setdefault(key, CONTEXT.get(m.group(1), "UI text"))
         for m in re.finditer(r"\.help\(\s*Text\(", src):
-            args = _args(src, m.end())
-            for lit in _literals(args):
+            for lit in _literals(_args(src, m.end())):
                 key = _to_key(lit)
                 if key:
-                    keys.setdefault(key, None)
-    return sorted(keys)
+                    keys.setdefault(key, "tooltip")
+    return keys
+
+
+def extract() -> list[str]:
+    return sorted(extract_with_context())
 
 
 def _escape(s: str) -> str:
@@ -232,6 +248,118 @@ def check() -> int:
     return 1 if errors else 0
 
 
+# ---------------------------------------------------------------- translate
+
+GLOSSARY = ["LLMTray", "MLX", "mlx-lm", "mlx_lm.server", "KV", "MTP", "Top-k", "Top-p", "GPU",
+            "API", "Hugging Face", "LM Studio", "Z-Image-Turbo", "Gemma", "Default", "Stable",
+            "Beta", "JSON", "Finder", "Play", "DEBUG", "generate_image", "OpenAI"]
+
+
+def _lang_name(code: str) -> str:
+    names = {"ru": "Russian", "uk": "Ukrainian", "es": "Spanish", "de": "German", "fr": "French",
+             "it": "Italian", "pt": "Portuguese", "pt-BR": "Brazilian Portuguese", "pl": "Polish",
+             "ja": "Japanese", "ko": "Korean", "zh-Hans": "Simplified Chinese", "zh-Hant": "Traditional Chinese",
+             "tr": "Turkish", "nl": "Dutch", "cs": "Czech", "sv": "Swedish", "he": "Hebrew", "ar": "Arabic"}
+    return names.get(code, code)
+
+
+def _openai(messages: list[dict], model: str, key: str) -> str:
+    import json, os, time, urllib.request, urllib.error
+    body = json.dumps({"model": model, "messages": messages, "temperature": 0.2,
+                       "response_format": {"type": "json_object"}}).encode()
+    for attempt in range(5):
+        base = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+        req = urllib.request.Request(f"{base}/chat/completions", body,
+                                     {"Content-Type": "application/json", "Authorization": f"Bearer {key}"})
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                return json.load(r)["choices"][0]["message"]["content"]
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503) and attempt < 4:
+                time.sleep(2 ** attempt * 3)
+                continue
+            raise RuntimeError(f"OpenAI HTTP {e.code}: {e.read().decode()[:300]}")
+    raise RuntimeError("OpenAI: out of retries")
+
+
+def _valid(key: str, value: str) -> str | None:
+    """Why a translation is unusable, or None."""
+    if not value.strip():
+        return "empty"
+    if sorted(specifiers(key)) != sorted(specifiers(value)):
+        return f"format specifiers {specifiers(key)} vs {specifiers(value)}"
+    if len(value) > max(40, 3 * len(key)):
+        return "far longer than the English"
+    return None
+
+
+def write_lang(code: str, table: dict[str, str], base_keys: list[str]) -> Path:
+    path = LOC / f"{code}.lproj" / "Localizable.strings"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    header = [f"/* {_lang_name(code)}. Keys are the English text (en.lproj); a key missing here shows in English.",
+              "   Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native",
+              "   speakers are welcome -- existing entries are never overwritten. */", ""]
+    lines = [f'"{_escape(k)}" = "{_escape(table[k])}";' for k in base_keys if k in table]
+    path.write_text("\n".join(header + lines) + "\n", encoding="utf-8")
+    return path
+
+
+def translate(codes: list[str], model: str, batch: int = 25) -> int:
+    """Fills in each language's missing keys; drops keys no longer in the
+    English base (a changed English string is a new key). Never touches an
+    existing translation."""
+    import json, os
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        print("error: OPENAI_API_KEY is not set")
+        return 1
+    ctx = extract_with_context()
+    base_keys = sorted(load(BASE))
+    failed = 0
+    for code in codes:
+        path = LOC / f"{code}.lproj" / "Localizable.strings"
+        table = load(path) if path.exists() else {}
+        table = {k: v for k, v in table.items() if k in base_keys}  # prune obsolete
+        todo = [k for k in base_keys if k not in table]
+        print(f"{code}: {len(todo)} to translate")
+        lang = _lang_name(code)
+        system = (
+            f"You translate the UI of LLMTray, a macOS menu-bar app for running local LLMs, from English "
+            f"into {lang}. Write natural, concise {lang} as used in macOS system UI (System Settings wording). "
+            f"Rules: keep every format specifier (%@, %lld, %d, %1$@...) exactly, in a grammatical position; "
+            f"keep these terms untranslated: {', '.join(GLOSSARY)}; keep technical flags, file paths, URLs and "
+            f"<placeholders> as they are; use the same typographic quotes style natural for {lang}; tooltips "
+            f"are full sentences, labels and buttons short. Reply with a JSON object mapping each English "
+            f"string (exactly as given) to its translation."
+        )
+        for i in range(0, len(todo), batch):
+            chunk = todo[i:i + batch]
+            items = [{"text": k, "where": ctx.get(k, "UI text")} for k in chunk]
+            pending = chunk
+            for attempt in range(2):
+                reply = json.loads(_openai([
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": json.dumps([it for it in items if it["text"] in pending], ensure_ascii=False)},
+                ], model, key))
+                retry = []
+                for k in pending:
+                    v = reply.get(k)
+                    why = _valid(k, v) if isinstance(v, str) else "missing in reply"
+                    if why:
+                        retry.append(k)
+                        if attempt == 1:
+                            failed += 1
+                            print(f"  {code}: left in English ({why}): {k[:70]!r}")
+                    else:
+                        table[k] = v
+                pending = retry
+                if not pending:
+                    break
+            write_lang(code, table, base_keys)  # save as we go
+        print(f"{code}: {sum(k in table for k in base_keys)}/{len(base_keys)}")
+    return 0
+
+
 def main() -> int:
     cmd = sys.argv[1] if len(sys.argv) > 1 else "check"
     if cmd == "extract":
@@ -241,6 +369,14 @@ def main() -> int:
         return 0
     if cmd == "check":
         return check()
+    if cmd == "translate":
+        import argparse, os
+        ap = argparse.ArgumentParser(prog="l10n.py translate")
+        ap.add_argument("languages", nargs="*", help="language codes (default: every existing one)")
+        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-4.1")
+        a = ap.parse_args(sys.argv[2:])
+        codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
+        return translate(codes, a.model)
     if cmd == "missing":
         lang = LOC / f"{sys.argv[2]}.lproj" / "Localizable.strings"
         table = load(lang) if lang.exists() else {}
