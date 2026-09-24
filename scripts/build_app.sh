@@ -42,6 +42,15 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/runtime" "$APP/Contents/
 cp "$RELEASE_DIR/LLMTray" "$APP/Contents/MacOS/LLMTray"
 cp "$REPO_ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 cp "$REPO_ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+# Localizations: every Resources/Localization/<lang>.lproj is copied into the
+# bundle and listed in CFBundleLocalizations -- adding a language is just
+# adding a folder (see scripts/l10n.py). Keys are the English text, so a
+# string a language hasn't translated shows in English.
+LANGS=()
+for lproj in "$REPO_ROOT"/Resources/Localization/*.lproj; do
+  cp -R "$lproj" "$APP/Contents/Resources/"
+  LANGS+=("$(basename "$lproj" .lproj)")
+done
 cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
 # Only the scripts + version pin -- never the venv itself, which is
 # machine-specific and gets created fresh on first run.
@@ -49,6 +58,13 @@ cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
    "$APP/Contents/Resources/runtime/"
 
+/usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$APP/Contents/Info.plist" 2>/dev/null || true
+/usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" "$APP/Contents/Info.plist"
+for lang in "${LANGS[@]}"; do
+  /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations: string $lang" "$APP/Contents/Info.plist"
+done
+/usr/libexec/PlistBuddy -c "Set :CFBundleDevelopmentRegion en" "$APP/Contents/Info.plist" 2>/dev/null \
+  || /usr/libexec/PlistBuddy -c "Add :CFBundleDevelopmentRegion string en" "$APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
 # CFBundleVersion is what Sparkle compares: see sparkle_version.sh for why
 # a beta can't just reuse "X.Y.Z-beta.N" there.

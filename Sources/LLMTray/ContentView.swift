@@ -2,19 +2,15 @@ import SwiftUI
 import AppKit
 import ServiceManagement
 import UniformTypeIdentifiers
-
-enum SettingsTab {
-    case general
-    case chat
-    case benchmark
-    case advanced
-}
+import LLMTrayCore
 
 struct ContentView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
-    @StateObject private var runtime = RuntimeManager()
-    @StateObject private var benchmark = BenchmarkRunner()
+    @EnvironmentObject var benchmark: BenchmarkRunner
+    // Chat, tool and server-launch settings live in profiles (see
+    // ProfileManager): the selected model's profile, layered on Default.
+    @ObservedObject private var profiles = ProfileManager.shared
 
     // Where models live -- ~/.llmtray/models by default (this app's own
     // namespace), not ~/.lmstudio/models. Anyone who wants to share models
@@ -28,47 +24,25 @@ struct ContentView: View {
     // Server" -- which has no settings panel of its own -- can read the
     // same values back out of UserDefaults from AppDelegate.
     @AppStorage("llmtray.port") private var port: Int = 8765
-    @AppStorage("llmtray.kvBits") private var kvBits: Int = KVSettings.defaultBits
-    @AppStorage("llmtray.kvGroupSize") private var kvGroupSize: Int = KVSettings.defaultGroupSize
-    @AppStorage("llmtray.quantizedKVStart") private var quantizedKVStart: Int = 0
     // Not @AppStorage -- remembered per selected model via ModelAliasStore
     // instead of one value shared across every model (see onChange(of:
     // selectedModelID) below, which loads/saves it on every switch).
-    @State private var alias: String = ""
-    @State private var aliasConflict: Bool = false
+    /// The `model` name requests use, read from the store every time (the
+    /// alias can be renamed in Settings meanwhile). Without an alias, the
+    /// model's folder name -- ModelRouter resolves that too, where
+    /// "default" would resolve to nothing.
+    private var requestModelName: String {
+        guard let id = selectedModelID else { return "default" }
+        let alias = ModelAliasStore.alias(for: id)
+        return alias.isEmpty ? (id as NSString).lastPathComponent : alias
+    }
     @State private var draft: String = ""
-    @State private var showSettings: Bool = false
-    @State private var settingsTab: SettingsTab = .general
     // Backs the History menu -- refreshed on appear and whenever
     // ChatSessionStore posts .sessionsDidChange (save/delete), rather than
     // read fresh from disk on every render (see that notification's own
     // doc comment for why a plain disk read wasn't reliable here).
     @State private var sessionHistory: [ChatSessionFile] = []
-    @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold: Int = 3
-    @AppStorage("llmtray.autoStartOnLaunch") private var autoStartOnLaunch: Bool = true
-    // Reuses Sparkle's own UserDefaults key directly -- SPUUpdater reads
-    // this key itself on every access rather than caching it, so binding a
-    // Toggle straight to it controls Sparkle without needing a reference
-    // to the updater instance (which lives in AppDelegate, not here).
-    @AppStorage("SUEnableAutomaticChecks") private var autoCheckForUpdates: Bool = true
-    @AppStorage("llmtray.betaUpdates") private var betaUpdates: Bool = false
     @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
-    @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes: Int = 0
-    @AppStorage("llmtray.promptCacheMB") private var promptCacheMB: Int = 1024
-    @AppStorage("llmtray.stallThresholdSeconds") private var stallThresholdSeconds: Int = 60
-    @AppStorage("llmtray.allowLAN") private var allowLAN: Bool = false
-    @AppStorage("llmtray.verboseServerLogging") private var verboseServerLogging: Bool = false
-    @AppStorage("llmtray.extraServerArgs") private var extraServerArgs: String = ""
-    @AppStorage("llmtray.decodeConcurrency") private var decodeConcurrency: Int = 1
-    @AppStorage("llmtray.mtpDrafter") private var mtpDrafter: Bool = true
-    @AppStorage("llmtray.enableImageGeneration") private var enableImageGeneration: Bool = false
-    @AppStorage("llmtray.imageGenModel") private var imageGenModel: ImageGenModel = .gptqMixed
-    // On by default -- a diffusion model's own peak memory can rival or
-    // exceed a loaded chat model's, and mlx_lm.server has no notion of
-    // "share the GPU with something else right now." Off is there for
-    // whoever has enough unified memory to comfortably hold both at once.
-    @AppStorage("llmtray.unloadModelDuringImageGen") private var unloadModelDuringImageGen: Bool = true
-    @AppStorage("llmtray.imageQuality") private var imageQuality: ImageQuality = .balanced
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -77,18 +51,7 @@ struct ContentView: View {
     // 0 disables auto-compaction -- otherwise, checked after every
     // completed turn (see sendDraft's onChange-driven autoCompactIfNeeded).
     @AppStorage("llmtray.autoCompactThreshold") private var autoCompactThreshold: Int = 0
-    @State private var imageModelDownloadError: String?
-    // SMAppService.mainApp.status is the actual source of truth (the user
-    // could also flip this from System Settings > General > Login Items
-    // directly) -- not persisted separately in UserDefaults, just read
-    // fresh on appear and updated locally after a successful toggle.
-    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
-    @State private var launchAtLoginError: String?
     @FocusState private var isInputFocused: Bool
-    @AppStorage("llmtray.temperature") private var temperature: Double = 0.6
-    @AppStorage("llmtray.topP") private var topP: Double = 0.95
-    @AppStorage("llmtray.maxTokens") private var maxTokens: Double = 1024
-    @AppStorage("llmtray.systemPrompt") private var systemPrompt: String = ""
     // The selected model's own trained context ceiling (max_position_embeddings),
     // read fresh on every model switch -- see updateModelMaxContext(for:).
     // 32768 is just the fallback for a model whose config.json doesn't
@@ -108,26 +71,11 @@ struct ContentView: View {
         VStack(spacing: 0) {
             statusHeader
             Divider()
-            if showSettings {
-                // Plain (unwrapped) settingsPanel relied on the popover's
-                // own preferredContentSize sizing to grow to fit -- fine
-                // when Settings was short, but confirmed live once enough
-                // toggles piled up in General: NSPopover has nowhere to
-                // grow past screen bounds, so the excess just got clipped
-                // with no way to scroll to it (couldn't reach the top of
-                // the panel, or the chat below it, at all). Capping the
-                // height and scrolling internally here -- same pattern
-                // chatArea already uses -- keeps the whole popover on
-                // screen regardless of how many settings end up in either tab.
-                ScrollView {
-                    settingsPanel
-                }
-                .frame(maxHeight: 380)
-                Divider()
-            }
             chatArea
+                .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
             Divider()
             inputBar
+                .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
         }
         .frame(width: 420)
         .onAppear {
@@ -139,18 +87,10 @@ struct ContentView: View {
             if selectedModelID == nil || !models.contains(where: { $0.id == selectedModelID }) {
                 selectedModelID = models.first?.id
             }
-            if let selectedModelID {
-                alias = ModelAliasStore.alias(for: selectedModelID)
-            }
             updateModelMaxContext(for: selectedModelID)
-            launchAtLogin = SMAppService.mainApp.status == .enabled
             isInputFocused = true
         }
         .onChange(of: selectedModelID) { newID in
-            // Swap in that model's own remembered alias instead of leaving
-            // whatever was typed for the previous model still in the field.
-            alias = newID.map(ModelAliasStore.alias(for:)) ?? ""
-            aliasConflict = false
             updateModelMaxContext(for: newID)
         }
         .onChange(of: modelsRoot) { newRoot in
@@ -160,13 +100,13 @@ struct ContentView: View {
             // happened on the specific buttons, so editing the text field
             // directly and not hitting Return left the picker stale until
             // the app was restarted.
-            models = ModelDiscovery.scanModels(root: newRoot)
+            rescanModels(root: newRoot)
         }
         .onReceive(NotificationCenter.default.publisher(for: .modelsDidChange)) { notification in
             // Fires after a Hugging Face download finishes -- rescan and
             // jump straight to the model that just landed on disk instead
             // of leaving the picker on whatever was selected before.
-            models = ModelDiscovery.scanModels(root: modelsRoot)
+            rescanModels()
             if let repoID = notification.object as? String {
                 let downloadedPath = modelsRoot + "/\(repoID)"
                 if models.contains(where: { $0.id == downloadedPath }) {
@@ -177,7 +117,7 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
             sessionHistory = ChatSessionStore.list()
         }
-        .onChange(of: chat.isBusy) { busy in
+        .onChange(of: chat.isTurnInProgress) { busy in
             // Fires once a turn (streaming + any tool calls) fully settles,
             // not right when it starts -- send()/regenerate() themselves
             // don't await that, so this is the one reliable "a turn just
@@ -186,6 +126,105 @@ struct ContentView: View {
                 autoCompactIfNeeded()
             }
         }
+    }
+
+
+    // MARK: - Profile-backed settings
+
+    /// Binding to a field of the selected model's profile. Writes go to
+    /// that profile (its overlay, or Default for models on Default).
+    private func pb<T>(_ keyPath: WritableKeyPath<Profile, T?>) -> Binding<T> {
+        Binding(
+            get: { profiles.value(keyPath, for: selectedModelID) },
+            set: { profiles.set(keyPath, $0, for: selectedModelID) }
+        )
+    }
+
+    private var activeProfile: Profile { profiles.profile(for: selectedModelID) }
+
+    /// After any rescan: keep the selection only if that model is still
+    /// there, else fall back to the first one -- a stale selection left the
+    /// picker blank, Play enabled but silently doing nothing, and the
+    /// settings editing a model that no longer exists.
+    private func rescanModels(root: String? = nil) {
+        models = ModelDiscovery.scanModels(root: root ?? modelsRoot)
+        if selectedModelID == nil || !models.contains(where: { $0.id == selectedModelID }) {
+            selectedModelID = models.first?.id
+        }
+    }
+    private var resolvedProfile: ResolvedProfile { profiles.resolved(for: selectedModelID) }
+
+    private var temperature: Double { resolvedProfile.temperature }
+    private var chatSettings: ChatSettings {
+        ChatSettings(profile: resolvedProfile, maxTokensCap: modelMaxContext)
+    }
+
+    // MARK: - Profiles UI
+
+    private var profilePickerBinding: Binding<String> {
+        Binding(
+            get: { profiles.profileID(for: selectedModelID) },
+            set: { switchProfile(to: $0) }
+        )
+    }
+
+    private var profilePicker: some View {
+        Menu {
+            Picker("Profile", selection: profilePickerBinding) {
+                ForEach(profiles.profiles) { p in
+                    Text(p.name).tag(p.id)
+                }
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+            .disabled(!canSwitchProfile)
+            Divider()
+            Button("Edit Profile…") { openSettings(.profiles, profileID: profiles.profileID(for: selectedModelID)) }
+            Button("New Profile…") {
+                let p = profiles.create(name: NSLocalizedString("New profile", comment: ""))
+                switchProfile(to: p.id)
+                openSettings(.profiles, profileID: p.id)
+            }
+            .disabled(!canSwitchProfile)
+        } label: {
+            Text(profiles.profile(for: selectedModelID).name)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help(Text(canSwitchProfile ? "Settings profile for this model" : "Can't switch profiles while a request or the auto-tune is running"))
+    }
+
+    /// The one sampling knob kept in the popover; edits the model's profile.
+    private var temperatureRow: some View {
+        HStack(spacing: 6) {
+            Text("Temperature").font(.system(size: 11)).foregroundColor(.secondary)
+            Slider(value: pb(\.request.temperature), in: 0...2, step: 0.05).controlSize(.mini)
+            Text(String(format: "%.2f", temperature)).font(.system(size: 11)).monospacedDigit().frame(width: 32, alignment: .trailing)
+        }
+        .help(Text("Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied."))
+    }
+
+    /// Switching can restart the server, which would kill an in-flight
+    /// request (in-app or external -- both go through the proxy, counted
+    /// by server.isBusy) or race the auto-tune sweep's own restarts and
+    /// make it write its candidates into the newly assigned profile.
+    private var canSwitchProfile: Bool {
+        selectedModelID != nil && !isBusy && !server.isBusy && !chat.isBusy && !benchmark.isRunning
+    }
+
+    /// Assigns a profile to the selected model. Launch-setting differences
+    /// are applied by the "Restart Server" prompt, not by restarting here
+    /// (that would cut off in-flight requests).
+    private func switchProfile(to id: String) {
+        guard canSwitchProfile, let modelID = selectedModelID else { return }
+        profiles.assign(profileID: id, to: modelID)
+    }
+
+    private func openSettings(_ pane: SettingsPane? = nil, profileID: String? = nil) {
+        var info: [String: String] = [:]
+        if let pane { info["pane"] = pane.rawValue }
+        if let profileID { info["profileID"] = profileID }
+        NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: info)
     }
 
     // MARK: - Status header
@@ -240,32 +279,14 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .help("New temporary chat -- nothing about it is ever saved")
                 Button {
-                    NotificationCenter.default.post(name: .showServerLog, object: nil)
-                } label: {
-                    Image(systemName: "terminal")
-                }
-                .buttonStyle(.plain)
-                .help("View server log")
-                Button {
-                    showSettings.toggle()
+                    openSettings()
                 } label: {
                     Image(systemName: "gearshape")
                 }
+                .keyboardShortcut(",", modifiers: .command)
+                .help("Settings (⌘,)")
+                .accessibilityLabel("Settings")
                 .buttonStyle(.plain)
-                Button {
-                    models = ModelDiscovery.scanModels(root: modelsRoot)
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .buttonStyle(.plain)
-                .help("Rescan \(modelsRoot)")
-                Button {
-                    NotificationCenter.default.post(name: .showHFBrowser, object: nil)
-                } label: {
-                    Image(systemName: "arrow.down.circle")
-                }
-                .buttonStyle(.plain)
-                .help("Browse & download models from Hugging Face")
             }
 
             HStack(spacing: 6) {
@@ -275,10 +296,31 @@ struct ContentView: View {
                     }
                 }
                 .labelsHidden()
-                .disabled(isBusy)
+                .disabled(isBusy || benchmark.isRunning)
+                .help(Text(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model"))
+
+                Menu {
+                    Button("Rescan Models") { rescanModels() }
+                    Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
+                    Button("Manage Models…") { openSettings(.models) }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+                .help(Text("Rescan, download or manage models"))
+                .accessibilityLabel(Text("Model actions"))
 
                 serverToggleButton
             }
+
+            HStack(spacing: 8) {
+                Image(systemName: "slider.horizontal.3").foregroundColor(.secondary).font(.system(size: 11))
+                profilePicker
+                temperatureRow
+            }
+
+            RestartBanner()
         }
         .padding(12)
     }
@@ -325,8 +367,7 @@ struct ContentView: View {
 
     private func startServer() {
         guard let id = selectedModelID, let model = models.first(where: { $0.id == id }) else { return }
-        let effectiveKVBits = ModelDiscovery.disallowsQuantizedKV(forModelPath: model.path) ? 0 : KVSettings.validBits(kvBits)
-        server.start(modelPath: model.path, port: port, kvBits: effectiveKVBits, kvGroupSize: KVSettings.validGroupSize(kvGroupSize), alias: alias)
+        server.start(modelPath: model.path, port: port, alias: ModelAliasStore.alias(for: model.id))
     }
 
     /// Re-reads the newly-selected model's own context ceiling so the "Max
@@ -340,7 +381,6 @@ struct ContentView: View {
         // 64) even in the unlikely case a config.json reports something
         // smaller than that.
         modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? fallback)
-        maxTokens = min(maxTokens, Double(modelMaxContext))
         modelSupportsVision = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
         if !modelSupportsVision {
             pendingAttachments.removeAll()
@@ -370,542 +410,29 @@ struct ContentView: View {
 
     private var statusText: String {
         switch server.state {
-        case .stopped: return "Stopped"
-        case .starting: return "Starting…"
-        case .running(let port, let model): return "Running — \(model) on :\(port)"
-        case .failed(let msg): return "Failed: \(msg)"
+        case .stopped:
+            return server.isIdleUnloaded
+                ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
+                : NSLocalizedString("Stopped", comment: "server status")
+        case .starting:
+            return NSLocalizedString("Starting…", comment: "server status")
+        case .running(let port, let model):
+            return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
+        case .failed(let msg):
+            return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
         }
-    }
-
-    // MARK: - Settings
-
-    private var settingsPanel: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Picker("", selection: $settingsTab) {
-                Text("General").tag(SettingsTab.general)
-                Text("Chat").tag(SettingsTab.chat)
-                Text("Benchmark").tag(SettingsTab.benchmark)
-                Text("Advanced").tag(SettingsTab.advanced)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .padding(.bottom, 4)
-
-            switch settingsTab {
-            case .general:
-                generalSettingsContent
-            case .chat:
-                chatTabContent
-            case .benchmark:
-                BenchmarkView(benchmark: benchmark, port: port, modelAlias: alias.isEmpty ? "default" : alias)
-            case .advanced:
-                advancedSettingsContent
-            }
-        }
-        .font(.system(size: 12))
-        .padding(12)
-    }
-
-    private var generalSettingsContent: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            VStack(alignment: .leading, spacing: 2) {
-                Toggle("Launch at Login", isOn: Binding(
-                    get: { launchAtLogin },
-                    set: { setLaunchAtLogin($0) }
-                ))
-                if let launchAtLoginError {
-                    Text(launchAtLoginError)
-                        .font(.system(size: 10))
-                        .foregroundColor(.red)
-                }
-            }
-            Toggle("Start server automatically on launch", isOn: $autoStartOnLaunch)
-            Toggle("Automatically check for updates", isOn: $autoCheckForUpdates)
-            Toggle("Receive beta updates", isOn: $betaUpdates)
-                .help("Pre-release builds with features still being tested. Turning this off doesn't downgrade an installed beta; you move back to stable with the next stable release.")
-            Toggle("Show reasoning / thinking", isOn: $showReasoning)
-            Stepper(
-                autoStopIdleMinutes == 0
-                    ? "Unload model when idle: off"
-                    : "Unload model after \(autoStopIdleMinutes) min idle",
-                value: $autoStopIdleMinutes, in: 0...180, step: 5
-            )
-            if autoStopIdleMinutes > 0 {
-                Text("Frees the memory a loaded model holds; reloads automatically on the next request (with the usual startup delay).")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-            }
-
-            Divider().padding(.vertical, 4)
-
-            modelsRootSection
-
-            Divider().padding(.vertical, 4)
-
-            Group {
-                Stepper("Port: \(port)", value: $port, in: 1024...65535)
-                HStack {
-                    Text("KV cache:")
-                    Picker("KV cache", selection: $kvBits) {
-                        ForEach(KVSettings.bitsChoices, id: \.self) { bits in
-                            Text(bits == 0 ? "full" : "\(bits)-bit").tag(bits)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                }
-                Text("8-bit: nearly lossless, half the KV memory (default). 4-bit: a quarter, but noticeably worse on long context. Full: best quality, most memory.")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-                if kvBits > 0 {
-                    HStack {
-                        Text("KV group size:")
-                        Picker("KV group size", selection: $kvGroupSize) {
-                            ForEach(KVSettings.groupSizeChoices, id: \.self) { Text("\($0)").tag($0) }
-                        }
-                        .pickerStyle(.segmented)
-                        .labelsHidden()
-                    }
-                    Stepper(
-                        quantizedKVStart == 0
-                            ? "Start quantizing KV cache: from the first token"
-                            : "Start quantizing KV cache: after \(quantizedKVStart) tokens",
-                        value: $quantizedKVStart, in: 0...20000, step: 500
-                    )
-                    Text("Keeps the first N tokens of context at full precision before switching to quantized KV -- higher values trade some of the memory savings for accuracy on long prompts.")
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                }
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack {
-                        Text("Model alias:")
-                        TextField("alias", text: $alias)
-                            .textFieldStyle(.roundedBorder)
-                            .onChange(of: alias) { newAlias in
-                                guard let selectedModelID else { return }
-                                aliasConflict = ModelAliasStore.isAliasTaken(
-                                    newAlias, excluding: selectedModelID, among: models.map(\.id)
-                                )
-                                // Still saved even when it conflicts -- the
-                                // warning is informational (whichever model
-                                // a client's `model` field matches first
-                                // wins), not a hard block, since the user
-                                // might be mid-edit toward some other value.
-                                ModelAliasStore.setAlias(newAlias, for: selectedModelID)
-                            }
-                        Button {
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(alias, forType: .string)
-                        } label: {
-                            Image(systemName: "doc.on.doc")
-                        }
-                        .buttonStyle(.plain)
-                        .help("Copy alias — this is the `model` value other tools should send")
-                    }
-                    if aliasConflict {
-                        Text("Another model already uses this alias.")
-                            .font(.system(size: 10))
-                            .foregroundColor(.orange)
-                    }
-                }
-            }
-            .disabled(isBusy || isRunning)
-
-            Divider().padding(.vertical, 4)
-            runtimeUpdateRow
-        }
-    }
-
-    // Split into one computed property per section (rather than one giant
-    // VStack) -- SwiftUI's ViewBuilder type-checking is worse than linear
-    // in the number of sibling views/modifiers in a single block, and this
-    // section had grown large enough that a release/optimized build (which
-    // type-checks more strictly than a debug build) started timing out
-    // with "unable to type-check this expression in reasonable time" on
-    // the enclosing VStack, even though `swift build` (debug) compiled it
-    // fine locally.
-    private var advancedSettingsContent: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            serverRecoverySection
-            Divider().padding(.vertical, 4)
-            memorySection
-            Divider().padding(.vertical, 4)
-            concurrencySection
-            Divider().padding(.vertical, 4)
-            networkSection
-            Divider().padding(.vertical, 4)
-            diagnosticsSection
-        }
-        .disabled(isBusy || isRunning)
-    }
-
-    private var serverRecoverySection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Server recovery").foregroundColor(.secondary)
-            Stepper("Stall timeout: \(stallThresholdSeconds)s", value: $stallThresholdSeconds, in: 10...300, step: 10)
-            Stepper(
-                autoRestartStallThreshold == 0
-                    ? "Auto-restart on repeated stalls: off"
-                    : "Auto-restart after \(autoRestartStallThreshold) consecutive stalled requests",
-                value: $autoRestartStallThreshold, in: 0...10
-            )
-            // A single multi-line literal, not `+`-joined string literals --
-            // each `+` on String forces the type-checker to consider every
-            // visible `+` overload (numeric types, arrays, ...) at every
-            // join point, which is the single most common trigger for
-            // "unable to type-check this expression in reasonable time"
-            // inside a ViewBuilder (see experimentalSection's fix).
-            Text(
-                """
-                A request can stall if mlx_lm.server's worker thread dies without crashing the whole \
-                process (e.g. a METAL out-of-memory error) -- every request after that hangs until \
-                its own timeout above, forever, since the process itself looks alive. Auto-restart \
-                kicks in after that many stalls in a row instead of leaving it wedged. 0 disables it.
-                """
-            )
-            .font(.system(size: 10))
-            .foregroundColor(.secondary)
-        }
-    }
-
-    private var memorySection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Memory").foregroundColor(.secondary)
-            Stepper("Prompt cache limit: \(promptCacheMB) MB", value: $promptCacheMB, in: 128...8192, step: 128)
-            Text("Caps mlx_lm.server's cross-conversation KV cache -- without a limit it grows forever and can crash the process on a long session.")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-        }
-    }
-
-    private var concurrencySection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Concurrency").foregroundColor(.secondary)
-            Stepper(
-                decodeConcurrency <= 1
-                    ? "Max concurrent predictions: 1 (requests queue)"
-                    : "Max concurrent predictions: \(decodeConcurrency)",
-                value: $decodeConcurrency, in: 1...16
-            )
-            Text("How many separate requests mlx_lm.server batches into one GPU step. Only helps when multiple clients/chats hit the server at the same time -- a single conversation isn't sped up by this. Higher values use more memory per loaded model.")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-            Toggle("Speculative decoding (MTP drafter) when available", isOn: $mtpDrafter)
-            Text("For models with a published Multi-Token-Prediction drafter (Gemma 4 26B-A4B): a small extra model (~450MB, downloaded on first start) guesses a few tokens ahead and the main model checks them in one pass. Same output, noticeably faster decoding. Requests are then served one at a time (no batching), and image requests decode without it. Takes effect on the next server start.")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-        }
-    }
-
-    private var networkSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Network").foregroundColor(.secondary)
-            Toggle("Allow connections from local network", isOn: $allowLAN)
-            Text(
-                allowLAN
-                    ? "The server is reachable from other devices on your network, not just this Mac."
-                    : "Loopback only (127.0.0.1) -- nothing outside this Mac can reach the server."
-            )
-            .font(.system(size: 10))
-            .foregroundColor(allowLAN ? .orange : .secondary)
-        }
-    }
-
-    private var diagnosticsSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Diagnostics").foregroundColor(.secondary)
-            Toggle("Verbose server logging (DEBUG)", isOn: $verboseServerLogging)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Extra mlx_lm.server arguments:").font(.system(size: 11))
-                TextField("e.g. --draft-model /path/to/model", text: $extraServerArgs)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 11, design: .monospaced))
-            }
-        }
-    }
-
-    private var modelsRootSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Models folder").foregroundColor(.secondary)
-            HStack {
-                // No .onSubmit rescan needed here -- the .onChange(of: modelsRoot)
-                // on the root view already rescans on every edit, live.
-                TextField("models folder", text: $modelsRoot)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 11, design: .monospaced))
-                Button("Browse…") {
-                    chooseModelsRootFolder()
-                }
-            }
-            Button("Use LM Studio's folder (~/.lmstudio/models)") {
-                modelsRoot = NSString(string: "~/.lmstudio/models").expandingTildeInPath
-            }
-            .buttonStyle(.plain)
-            .foregroundColor(.accentColor)
-            .font(.system(size: 10))
-        }
-    }
-
-    /// SMAppService.mainApp -- the modern (macOS 13+, matching this app's
-    /// own minimum) way to register a login item, requiring no separate
-    /// helper binary the way the older SMLoginItemSetEnabled API did.
-    /// Registration can fail (e.g. running from a bare, unsigned dev build
-    /// rather than a properly installed .app), so this surfaces the error
-    /// inline instead of silently leaving the toggle in the wrong state.
-    private func setLaunchAtLogin(_ enabled: Bool) {
-        do {
-            if enabled {
-                try SMAppService.mainApp.register()
-            } else {
-                try SMAppService.mainApp.unregister()
-            }
-            launchAtLogin = enabled
-            launchAtLoginError = nil
-        } catch {
-            launchAtLoginError = error.localizedDescription
-        }
-    }
-
-    private func chooseModelsRootFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        panel.allowsMultipleSelection = false
-        panel.directoryURL = URL(fileURLWithPath: modelsRoot)
-        panel.prompt = "Use Folder"
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        modelsRoot = url.path
-    }
-
-    private var chatTabContent: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("System prompt").foregroundColor(.secondary)
-                TextEditor(text: $systemPrompt)
-                    .font(.system(size: 12))
-                    .frame(height: 90)
-                    .padding(4)
-                    .background(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.3)))
-                Text("Sent as the first message on every new chat. Leave empty for none.")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-            }
-
-            Divider().padding(.vertical, 4)
-            chatSettingsSection
-        }
-    }
-
-    private var chatSettingsSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Chat sampling").foregroundColor(.secondary)
-            HStack {
-                Text("Temperature").frame(width: 90, alignment: .leading)
-                Slider(value: $temperature, in: 0...2, step: 0.05)
-                Text(String(format: "%.2f", temperature)).frame(width: 36, alignment: .trailing)
-            }
-            HStack {
-                Text("Top-p").frame(width: 90, alignment: .leading)
-                Slider(value: $topP, in: 0...1, step: 0.01)
-                Text(String(format: "%.2f", topP)).frame(width: 36, alignment: .trailing)
-            }
-            HStack {
-                Text("Max tokens").frame(width: 90, alignment: .leading)
-                Slider(value: $maxTokens, in: 64...Double(modelMaxContext), step: 256)
-                Text(String(Int(maxTokens))).frame(width: 52, alignment: .trailing)
-            }
-
-            Divider().padding(.vertical, 4)
-            sessionSettingsSection
-
-            Divider().padding(.vertical, 4)
-            imageGenerationSection
-        }
-    }
-
-    private var sessionSettingsSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Sessions").foregroundColor(.secondary)
-            Stepper("Keep first \(compactKeepStart) messages", value: $compactKeepStart, in: 1...20)
-            Stepper("Keep last \(compactKeepEnd) messages", value: $compactKeepEnd, in: 1...20)
-            Stepper(
-                "Auto-compact past: \(autoCompactThreshold == 0 ? "off" : "\(autoCompactThreshold) messages")",
-                value: $autoCompactThreshold, in: 0...200, step: 10
-            )
-            Text(
-                """
-                Compacting replaces older messages in the middle of a long chat with one \
-                model-written summary, keeping the first/last few intact -- shrinks context \
-                without losing the gist. Manual "Compact" button always available once a chat is \
-                long enough; auto-compact (off by default) triggers it for you past the threshold.
-                """
-            )
-            .font(.system(size: 10))
-            .foregroundColor(.secondary)
-        }
-    }
-
-    // Split out of chatSettingsSection -- same SwiftUI type-checker
-    // complexity reasoning as advancedSettingsContent's own split (see its
-    // comment): this section alone has a custom Binding, a Picker, and
-    // several Text/conditional views, easily enough to trip the same
-    // "unable to type-check this expression in reasonable time" seen there.
-    private var imageGenerationSection: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Tools").foregroundColor(.secondary)
-            Picker("Model", selection: $imageGenModel) {
-                ForEach(ImageGenModel.allCases) { model in
-                    Text(model.displayName).tag(model)
-                }
-            }
-            Text("\(imageGenModel.summary) Download: \(imageGenModel.approximateDownloadDescription).")
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-
-            Toggle("Enable image generation", isOn: enableImageGenerationBinding)
-            if enableImageGeneration {
-                Picker("Canvas size", selection: $imageQuality) {
-                    ForEach(ImageQuality.allCases) { quality in
-                        Text(quality.displayName).tag(quality)
-                    }
-                }
-                Text("Scales whatever width/height the model asks for -- Balanced is a 1024x1024 no-op.")
-                    .font(.system(size: 10))
-                    .foregroundColor(.secondary)
-                Toggle("Unload chat model during generation", isOn: $unloadModelDuringImageGen)
-                Text(
-                    """
-                    Both models resident at once can easily exceed unified memory (a diffusion \
-                    model's own peak can rival or exceed a loaded chat model's) -- on, the chat \
-                    model stops before generating and reloads right after, adding reload time \
-                    per image. Turn off only if this Mac comfortably fits both at once.
-                    """
-                )
-                .font(.system(size: 10))
-                .foregroundColor(.secondary)
-            }
-            if chat.isDownloadingModel {
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small)
-                    Text(chat.mfluxStatusText.isEmpty ? "Downloading…" : chat.mfluxStatusText)
-                        .font(.system(size: 10))
-                        .foregroundColor(.secondary)
-                }
-            }
-            if let imageModelDownloadError {
-                Text(imageModelDownloadError)
-                    .font(.system(size: 10))
-                    .foregroundColor(.red)
-            }
-            Text(
-                """
-                Exposes a generate_image tool to the model (needs a tool-calling-capable model \
-                to actually use it) -- when called, runs the selected model locally and shows \
-                the result inline.
-                """
-            )
-            .font(.system(size: 10))
-            .foregroundColor(.secondary)
-        }
-    }
-
-    // Extracted with an explicit `Binding<Bool>` type -- see
-    // mtpRuntimeToggleBinding's old comment (now removed along with that
-    // toggle) for why an inline Binding(get:set:) in a ViewBuilder is a
-    // type-checker trap regardless of the surrounding block's own size.
-    private var enableImageGenerationBinding: Binding<Bool> {
-        Binding<Bool>(
-            get: { enableImageGeneration },
-            set: { newValue in
-                if newValue {
-                    confirmAndDownloadImageModel()
-                } else {
-                    enableImageGeneration = false
-                }
-            }
-        )
-    }
-
-    /// Downloads (if not already cached) before actually flipping the
-    /// toggle on -- a diffusion model is tens of GB; doing this eagerly,
-    /// with a visible progress row, beats silently stalling the first chat
-    /// message that happens to trigger generate_image.
-    private func confirmAndDownloadImageModel() {
-        let model = imageGenModel
-        let alert = NSAlert()
-        alert.messageText = "Enable image generation?"
-        alert.informativeText = "The first time, this downloads \(model.displayName) "
-            + "(\(model.approximateDownloadDescription)) to this Mac. Downloading now, before "
-            + "enabling, so it doesn't stall a later chat message."
-        alert.addButton(withTitle: "Download and Enable")
-        alert.addButton(withTitle: "Cancel")
-        alert.alertStyle = .informational
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
-
-        imageModelDownloadError = nil
-        Task {
-            if let error = await chat.downloadImageModel(model) {
-                imageModelDownloadError = error.localizedDescription
-            } else {
-                enableImageGeneration = true
-            }
-        }
-    }
-
-    // The pin is a full git commit SHA now (our own fork, not a PyPI
-    // semver) -- shorten it for display the way GitHub itself does; the
-    // "mtp-runtime" branch-tip marker is already short and passes through.
-    private func shortRef(_ ref: String) -> String {
-        ref.count > 12 ? String(ref.prefix(7)) : ref
-    }
-
-    private var runtimeUpdateRow: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text("mlx-lm runtime:")
-                    .foregroundColor(.secondary)
-                Text(runtime.pinnedVersion().map(shortRef) ?? "unknown")
-                Spacer()
-                switch runtime.checkState {
-                case .checking, .updating:
-                    ProgressView().controlSize(.small)
-                default:
-                    Button("Check for Updates") {
-                        runtime.checkForUpdate()
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.accentColor)
-                    .disabled(isRunning)
-                }
-            }
-            switch runtime.checkState {
-            case .upToDate:
-                Text("Up to date.").foregroundColor(.secondary)
-            case .updateAvailable(let current, let latest):
-                HStack {
-                    Text("\(shortRef(current)) → \(shortRef(latest)) available")
-                    Button("Update") {
-                        runtime.applyUpdate(to: latest)
-                    }
-                    .disabled(isRunning)
-                }
-            case .failed(let msg):
-                Text(msg).foregroundColor(.red).lineLimit(2)
-            case .idle, .checking, .updating:
-                EmptyView()
-            }
-            if isRunning {
-                Text("Stop the server before updating the runtime.")
-                    .foregroundColor(.secondary)
-                    .font(.system(size: 10))
-            }
-        }
-        .font(.system(size: 11))
     }
 
     private var isRunning: Bool {
         if case .running = server.state { return true }
         return false
+    }
+
+    /// The chat can send: the server is running, or it was idle-unloaded
+    /// and the proxy will reload it on the request (the setting's own text
+    /// promises that; the chat used to stay disabled until Play).
+    private var canChat: Bool {
+        isRunning || server.isIdleUnloaded
     }
 
     // MARK: - Chat
@@ -1066,9 +593,7 @@ struct ContentView: View {
                             .onTapGesture {
                                 openImagePreview(data, title: msg.imagePrompts[safe: i] ?? "Image")
                             }
-                            .onHover { hovering in
-                                if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                            }
+                            .pointingHandCursor()
                             .contextMenu {
                                 Button("Copy") { copyImageToClipboard(data) }
                                 Button("Save…") { saveImage(data, prompt: msg.imagePrompts[safe: i] ?? "") }
@@ -1218,9 +743,7 @@ struct ContentView: View {
                                         .onTapGesture {
                                             openImagePreview(data, title: "Attachment")
                                         }
-                                        .onHover { hovering in
-                                            if hovering { NSCursor.pointingHand.push() } else { NSCursor.pop() }
-                                        }
+                                        .pointingHandCursor()
                                         .contextMenu {
                                             Button("Copy") { copyImageToClipboard(data) }
                                             Button("Save…") { saveImage(data, prompt: "attachment") }
@@ -1235,6 +758,8 @@ struct ContentView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .offset(x: 4, y: -4)
+                                    .help("Remove attachment")
+                                    .accessibilityLabel("Remove attachment")
                                 }
                             }
                         }
@@ -1262,8 +787,10 @@ struct ContentView: View {
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...4)
                     .onSubmit(sendDraft)
+                    .onChange(of: draft) { convertDroppedImagePaths(in: $0) }
+                    .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleImageDrop($0) }
                     .focused($isInputFocused)
-                    .disabled(!isRunning)
+                    .disabled(!canChat)
 
                 if chat.isBusy {
                     Button {
@@ -1271,6 +798,8 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "stop.fill")
                     }
+                    .help("Stop generating")
+                    .accessibilityLabel("Stop generating")
                     // Cancelling mid-image-generation only stops the network
                     // side of the tool round-trip; the mflux subprocess
                     // itself isn't interruptible yet, so the button is
@@ -1283,7 +812,9 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "arrow.up.circle.fill")
                     }
-                    .disabled(!isRunning || (draft.trimmingCharacters(in: .whitespaces).isEmpty && pendingAttachments.isEmpty))
+                    .help("Send")
+                    .accessibilityLabel("Send")
+                    .disabled(!canChat || (draft.trimmingCharacters(in: .whitespaces).isEmpty && pendingAttachments.isEmpty))
                 }
             }
             .padding(.horizontal, 12)
@@ -1297,13 +828,13 @@ struct ContentView: View {
         // send() mid-stream and stomping ChatClient's in-flight
         // assistantMessageIndex, without having to disable the field
         // itself (which would kick focus out of it every time).
-        guard isRunning, !chat.isBusy else { return }
+        guard canChat, !chat.isBusy else { return }
         let text = draft
         let attachments = pendingAttachments
         draft = ""
         pendingAttachments = []
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
-        chat.send(prompt: text, images: attachments, port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+        let settings = chatSettings
+        chat.send(prompt: text, images: attachments, port: port, modelAlias: requestModelName, settings: settings, server: server)
         isInputFocused = true
     }
 
@@ -1318,35 +849,92 @@ struct ContentView: View {
         panel.allowedContentTypes = [.image]
         guard panel.runModal() == .OK else { return }
         for url in panel.urls {
-            guard let nsImage = NSImage(contentsOf: url),
-                  let tiff = nsImage.tiffRepresentation,
-                  let rep = NSBitmapImageRep(data: tiff),
-                  let png = rep.representation(using: .png, properties: [:]) else { continue }
-            pendingAttachments.append(png)
+            attachImage(NSImage(contentsOf: url))
+        }
+    }
+
+    @discardableResult
+    private func attachImage(_ nsImage: NSImage?) -> Bool {
+        guard let nsImage,
+              let tiff = nsImage.tiffRepresentation,
+              let rep = NSBitmapImageRep(data: tiff),
+              let png = rep.representation(using: .png, properties: [:]) else { return false }
+        pendingAttachments.append(png)
+        return true
+    }
+
+    /// Images dropped on the chat or the input bar: files (incl. the
+    /// floating screenshot thumbnail, which hands over a file URL) or raw
+    /// image data. Only for vision-capable models.
+    private func handleImageDrop(_ providers: [NSItemProvider]) -> Bool {
+        guard modelSupportsVision else { return false }
+        var handled = false
+        for provider in providers {
+            if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                handled = true
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                    guard let url else { return }
+                    let image = NSImage(contentsOf: url)
+                    DispatchQueue.main.async { attachImage(image) }
+                }
+            } else if provider.canLoadObject(ofClass: NSImage.self) {
+                handled = true
+                _ = provider.loadObject(ofClass: NSImage.self) { obj, _ in
+                    let image = obj as? NSImage
+                    DispatchQueue.main.async { attachImage(image) }
+                }
+            }
+        }
+        return handled
+    }
+
+    /// Dropping a file onto the text field itself makes AppKit's field
+    /// editor insert its *path* as text before any SwiftUI drop handler
+    /// sees it -- which is how a dragged screenshot ended up sent as
+    /// "/var/folders/.../Screenshot ....png" and the model replied it can't
+    /// open local files. So a path to an existing image file appearing in
+    /// the draft is turned into an attachment instead.
+    private func convertDroppedImagePaths(in text: String) {
+        guard modelSupportsVision, text.contains("/") else { return }
+        var remaining = text
+        var converted = false
+        for line in text.components(separatedBy: .newlines) {
+            let candidate = line.trimmingCharacters(in: .whitespaces)
+            guard candidate.hasPrefix("/") || candidate.hasPrefix("file://") else { continue }
+            let url = candidate.hasPrefix("file://") ? URL(string: candidate) : URL(fileURLWithPath: candidate)
+            guard let url, url.isFileURL,
+                  let type = UTType(filenameExtension: url.pathExtension), type.conforms(to: .image),
+                  FileManager.default.fileExists(atPath: url.path),
+                  attachImage(NSImage(contentsOf: url)) else { continue }
+            remaining = remaining.replacingOccurrences(of: candidate, with: "")
+            converted = true
+        }
+        if converted {
+            draft = remaining.trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 
     // Only offered once a reply has actually finished -- mid-stream there's
     // nothing settled yet to redo.
     private var canRegenerate: Bool {
-        isRunning && !chat.isBusy && chat.messages.last?.role == "assistant"
+        canChat && !chat.isBusy && chat.messages.last?.role == "assistant"
     }
 
     private func regenerate() {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
-        chat.regenerate(port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings, server: server)
+        let settings = chatSettings
+        chat.regenerate(port: port, modelAlias: requestModelName, settings: settings, server: server)
     }
 
     // Only worth offering once there's actually a meaningful middle to
     // replace -- matches compactSession()'s own no-op guard.
     private var canCompact: Bool {
-        isRunning && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+        canChat && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
     }
 
     private func compact() async {
-        let settings = ChatSettings(temperature: temperature, topP: topP, maxTokens: Int(maxTokens), systemPrompt: systemPrompt, enableImageGeneration: enableImageGeneration, imageGenModel: imageGenModel, unloadModelDuringImageGen: unloadModelDuringImageGen, imageQuality: imageQuality)
+        let settings = chatSettings
         await chat.compactSession(
-            port: port, modelAlias: alias.isEmpty ? "default" : alias, settings: settings,
+            port: port, modelAlias: requestModelName, settings: settings,
             keepStart: compactKeepStart, keepEnd: compactKeepEnd
         )
     }
@@ -1368,4 +956,35 @@ struct ContentView: View {
             chat.newSession()
         }
     }
+}
+
+/// Pointing-hand cursor while hovered. Balances its own push on disappear:
+/// a view removed while hovered (an attachment's remove button sits on top
+/// of it; a chat image scrolled away) never gets the hover-exit, so a bare
+/// push/pop in onHover left the cursor stuck as a hand.
+private struct PointingHandCursor: ViewModifier {
+    @State private var pushed = false
+
+    func body(content: Content) -> some View {
+        content
+            .onHover { hovering in
+                if hovering, !pushed {
+                    NSCursor.pointingHand.push()
+                    pushed = true
+                } else if !hovering, pushed {
+                    NSCursor.pop()
+                    pushed = false
+                }
+            }
+            .onDisappear {
+                if pushed {
+                    NSCursor.pop()
+                    pushed = false
+                }
+            }
+    }
+}
+
+extension View {
+    func pointingHandCursor() -> some View { modifier(PointingHandCursor()) }
 }

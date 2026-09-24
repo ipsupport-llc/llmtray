@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: swift build
         run: swift build
+      - name: Localizations (valid files, en base up to date, per-language coverage)
+        run: python3 scripts/l10n.py check
       - name: swift test
         # `swift test` errors out on a package with no test target.
         run: if [ -d Tests ]; then swift test; else echo "no tests"; fi

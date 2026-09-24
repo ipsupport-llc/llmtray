@@ -8,17 +8,17 @@ import Foundation
 /// crashes the server on the first request that quantizes its cache. Of the
 /// valid values only off / 4 / 8 are worth offering: 2-3 bits visibly hurt
 /// the model, 5-6 save little over 8.
-enum KVSettings {
-    static let bitsChoices = [0, 4, 8]
-    static let groupSizeChoices = [32, 64, 128]
-    static let defaultBits = 8
-    static let defaultGroupSize = 64
+public enum KVSettings {
+    public static let bitsChoices = [0, 4, 8]
+    public static let groupSizeChoices = [32, 64, 128]
+    public static let defaultBits = 8
+    public static let defaultGroupSize = 64
 
-    static func validBits(_ bits: Int) -> Int {
+    public static func validBits(_ bits: Int) -> Int {
         bitsChoices.contains(bits) ? bits : (bits <= 0 ? 0 : (bits <= 5 ? 4 : 8))
     }
 
-    static func validGroupSize(_ size: Int) -> Int {
+    public static func validGroupSize(_ size: Int) -> Int {
         groupSizeChoices.min { abs($0 - size) < abs($1 - size) } ?? defaultGroupSize
     }
 
@@ -26,7 +26,7 @@ enum KVSettings {
     /// first token, which degrades long-context quality; 8-bit is nearly
     /// lossless and still halves KV memory, so the old default moves to 8.
     /// Anything invalid is snapped to the nearest valid value.
-    static func migrateIfNeeded(_ defaults: UserDefaults = .standard) {
+    public static func migrateIfNeeded(_ defaults: UserDefaults = .standard) {
         let key = "llmtray.kvSettingsMigrated.v1"
         guard !defaults.bool(forKey: key) else { return }
         if let bits = defaults.object(forKey: "llmtray.kvBits") as? Int {

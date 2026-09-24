@@ -37,12 +37,11 @@ struct ModelCardView: View {
         .frame(width: 560, height: 480)
     }
 
-    /// Basic GFM support (headers, bold/italic, links, lists) via
-    /// AttributedString's built-in Markdown parser -- not a full renderer
-    /// (tables, images, HTML blocks fall back to plain text), but enough to
-    /// make a model card readable rather than showing raw "## Usage" markup.
+    /// Headings, lists, quotes, code blocks and inline formatting via the
+    /// same renderer the chat bubbles use (ChatMarkdown) -- the previous
+    /// inline-only AttributedString parse left "## Usage" and list markers
+    /// as raw text. Tables and HTML still come through as plain text.
     private func renderedMarkdown(_ text: String) -> AttributedString {
-        (try? AttributedString(markdown: text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace)))
-            ?? AttributedString(text)
+        ChatMarkdown.render(text, baseSize: 12)
     }
 }

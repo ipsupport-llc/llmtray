@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 import Combine
 
 enum ServerState: Equatable {
@@ -10,7 +11,16 @@ enum ServerState: Equatable {
 
 @MainActor
 final class ServerManager: ObservableObject {
-    @Published private(set) var state: ServerState = .stopped
+    @Published private(set) var state: ServerState = .stopped {
+        didSet { if state != oldValue { refreshPendingLaunchChange() } }
+    }
+    /// The running model's current profile (or the global verbose-logging
+    /// setting) would launch it with different arguments than it's running
+    /// with: shown as a "Restart Server" prompt, never applied on its own
+    /// (a restart kills in-flight requests). Recomputed on state, profile
+    /// and defaults changes -- not per render: it reads model files.
+    @Published private(set) var pendingLaunchChange = false
+    private var pendingLaunchObservers: [AnyCancellable] = []
     @Published private(set) var log: String = ""
     // True while at least one request is in flight -- driven directly by
     // ModelProxyServer's beginRequest()/endRequest() around every request it
@@ -24,6 +34,10 @@ final class ServerManager: ObservableObject {
     // (dropped below) and a debounce timer to bridge gaps between lines,
     // and which never saw a model-switch as "busy" at all.
     @Published private(set) var isBusy: Bool = false
+    /// The model process was stopped by idle-unload but the proxy is still
+    /// listening, so the next request (in-app or external) reloads it.
+    /// The in-app chat stays usable in this state.
+    @Published private(set) var isIdleUnloaded: Bool = false
     private var activeRequestCount = 0
 
     private var process: Process?
@@ -43,9 +57,10 @@ final class ServerManager: ObservableObject {
     // the proxy, not the UI) knows what port/KV settings to keep reusing
     // when a client's `model` field asks for something else.
     private var currentPublicPort: Int?
-    private var currentKVBits: Int = 4
-    private var currentKVGroupSize: Int = 64
     private var currentModelPath: String?
+    /// Arguments the running process was started with, to tell whether
+    /// profile edits since then need a restart (see pendingLaunchChange).
+    private var lastLaunchArguments: [String]?
     private var currentAlias: String = ""
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
@@ -101,138 +116,249 @@ final class ServerManager: ObservableObject {
     }
     private var externalFrameworkDir: String { RuntimePaths.externalRuntimeDir + "/Python.framework" }
 
-    // Resumed by launchServerProcess's terminationHandler/checkForReadySignal
-    // -- only switchModel() actually awaits these (see below); the public
-    // start()/stop() keep their original fire-and-forget timing so the UI
-    // still flips to "Stopped" immediately on click rather than waiting on
-    // the process to actually exit.
-    private var processExitContinuation: CheckedContinuation<Void, Never>?
+    // Resumed by checkForReadySignal (ready) or processDidExit (died while
+    // starting) -- awaited by launchAndWaitReady, which only ever runs
+    // inside a serialized transition, so there is at most one.
     private var startContinuation: CheckedContinuation<Void, Error>?
+    /// Waiters for a specific process's exit (keyed by the Process), so a
+    /// transition can wait for *its* old process without a later launch's
+    /// exit being mistaken for it.
+    private var exitWaiters: [ObjectIdentifier: [CheckedContinuation<Void, Never>]] = [:]
+    /// Bumped by every launch: callbacks of an older process compare it
+    /// before touching state, so a slow-dying old process can't mark the
+    /// new one stopped/failed or clear `process`.
+    private var launchGeneration = 0
+    /// Bumped by stop(): a transition queued before an explicit Stop must
+    /// not bring the server back up after it.
+    private var stopEpoch = 0
+    /// Tail of the transition queue (start / switch / reload / restart):
+    /// transitions run strictly one after another, never interleaved.
+    private var transitionTail: Task<Void, Never>?
+    /// Requests currently being served by the model process. A model switch
+    /// or restart waits for these to finish instead of cutting them off.
+    private var forwardingCount = 0
+    private var drainWaiters: [CheckedContinuation<Void, Never>] = []
+    /// The public listener is being started (between the model's "ready"
+    /// line and the listener actually listening).
+    private var proxyStartPending = false
 
-    func start(modelPath: String, port: Int, kvBits: Int, kvGroupSize: Int, alias: String) {
-        guard case .stopped = state else { return }
+    /// The model the server is (or was last) running -- the auto-tune
+    /// sweep writes its results into this model's profile.
+    var loadedModelPath: String? { currentModelPath }
+
+    /// Launch settings (KV quantization, prefill, drafter...) come from the
+    /// model's profile at every launch, see launchServerProcess -- so a
+    /// proxy-driven model switch picks up the new model's own settings too.
+    /// Also the way out of `.failed` (Play after an error).
+    func start(modelPath: String, port: Int, alias: String) {
+        switch state {
+        case .stopped, .failed: break
+        default: return
+        }
         state = .starting
+        isIdleUnloaded = false
         log = ""
-        currentPublicPort = port
-        currentKVBits = kvBits
-        currentKVGroupSize = kvGroupSize
-        currentModelPath = modelPath
-        currentAlias = alias
 
         // A downloaded .app has no venv at all (only run_server.sh's dev
         // flow created one before) -- someone who just dragged LLMTray.dmg
         // to Applications has no terminal-accessible path to run that
         // script anyway, so bootstrapping it here is the only way "download
         // and click Start Server" actually works end to end.
+        let epoch = stopEpoch
         Task {
             do {
-                try await ensureRuntimeReady()
+                try await serialized(epoch: epoch) {
+                    // A transition queued ahead of this one may already have
+                    // brought exactly this model up.
+                    if case .running = self.state, self.currentModelPath == modelPath, self.currentPublicPort == port { return }
+                    // Otherwise whatever it left running is replaced (waiting
+                    // for it to exit on its own could wait forever).
+                    await self.terminateAndWaitForExit()
+                    try self.checkNotStopped(epoch)
+                    // A listener left from a failed run may be on another
+                    // port, forwarding to another internal port.
+                    if let listening = self.proxy.publicPort, listening != port {
+                        self.proxy.stop()
+                    }
+                    self.currentPublicPort = port
+                    self.currentModelPath = modelPath
+                    self.currentAlias = alias
+                    self.state = .starting
+                    try await self.ensureRuntimeReady()
+                    try self.checkNotStopped(epoch)
+                    try await self.launchAndWaitReady(modelPath: modelPath, alias: alias, epoch: epoch)
+                }
             } catch {
                 // Only report the failure if the user hasn't already hit
-                // Stop mid-bootstrap -- state would be .stopped in that
-                // case, and clobbering it back to .failed would resurrect
-                // a state they already dismissed.
+                // Stop meanwhile -- clobbering .stopped back to .failed
+                // would resurrect a state they already dismissed. Launch
+                // failures set their own, more specific .failed.
                 if case .starting = self.state {
                     self.state = .failed("runtime setup failed: \(error.localizedDescription)")
                 }
-                return
             }
-            guard case .starting = self.state else { return }
-            self.launchServerProcess(modelPath: modelPath, alias: alias)
         }
     }
 
-    /// Swaps the model backing mlx_lm.server without the caller having to
-    /// re-specify port/KV settings -- driven by ModelProxyServer when a
-    /// client's `model` field doesn't match what's currently loaded.
-    /// mlx_lm.server has no hot-swap of its own, so this really does stop
-    /// the whole process and start a fresh one; the public port stays up
-    /// throughout since that's `proxy`, not this process.
-    func switchModel(modelPath: String, alias: String) async throws {
-        guard modelPath != currentModelPath else { return }
+    /// Called by ModelProxyServer for every request before forwarding it:
+    /// makes sure `modelPath` (nil = whatever was last loaded) is the one
+    /// running -- switching models or reloading an idle-unloaded one as
+    /// needed -- and counts the request as in flight on the process until
+    /// its endRequest(). mlx_lm.server has no hot-swap, so a switch really
+    /// stops the process and starts a fresh one; the public port stays up
+    /// throughout since that's `proxy`, not this process. Transitions are
+    /// serialized, and a switch first waits for requests still being served
+    /// by the old model, so neither a concurrent switch nor someone else's
+    /// generation gets cut off.
+    func acquireModel(modelPath target: String?, alias: String) async throws {
+        let epoch = stopEpoch
+        try await serialized(epoch: epoch) {
+            try self.checkAutoLoadAllowed()
+            if let target, target != self.currentModelPath {
+                await self.waitForForwardsToDrain()
+                try self.checkNotStopped(epoch)
+                await self.terminateAndWaitForExit()
+                try self.checkNotStopped(epoch)
+                self.currentModelPath = target
+                self.currentAlias = alias
+                try await self.launchAndWaitReady(modelPath: target, alias: alias, epoch: epoch)
+            } else {
+                try await self.loadIfNeeded(epoch: epoch)
+            }
+            self.forwardingCount += 1
+        }
+    }
+
+    /// Reloads the last-used model if it isn't running (idle-unloaded, or
+    /// stopped for image generation, see unloadModel). A no-op when it's
+    /// already running.
+    func ensureModelLoaded() async throws {
+        let epoch = stopEpoch
+        try await serialized(epoch: epoch) {
+            try await self.loadIfNeeded(epoch: epoch)
+        }
+    }
+
+    private func loadIfNeeded(epoch: Int) async throws {
+        if case .running = state { return }
+        try checkAutoLoadAllowed()
+        guard let modelPath = currentModelPath else { return }
+        try await ensureRuntimeReady()
+        try checkNotStopped(epoch)
+        try await launchAndWaitReady(modelPath: modelPath, alias: currentAlias, epoch: epoch)
+    }
+
+    /// Restarts the *same* model. Triggered by endRequestStalled() below
+    /// after too many consecutive stalls: a mlx_lm.server worker thread can
+    /// die (e.g. a METAL out-of-memory error) without taking the whole
+    /// process down with it, since Python just prints a traceback and kills
+    /// that one thread -- the process looks alive to
+    /// Process.terminationHandler, but every request after that hangs
+    /// forever, since nothing left is generating anything.
+    private func restartWedgedProcess() async {
+        let epoch = stopEpoch
+        do {
+            try await serialized(epoch: epoch) {
+                guard case .running = self.state else { return }
+                self.appendLog("--- restarting the model process after repeated stalls ---\n")
+                try await self.restartSameModel(epoch: epoch)
+            }
+        } catch {
+            if case .starting = state {
+                state = .failed("auto-restart failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Restart-in-place to pick up changed launch settings (Restart banner,
+    /// the benchmark's auto-tune sweep): they're only read at process launch
+    /// (see launchServerProcess).
+    func restartToApplyLaunchSettings() async throws {
+        let epoch = stopEpoch
+        try await serialized(epoch: epoch) {
+            guard case .running = self.state else {
+                throw NSError(domain: "ServerManager", code: 5, userInfo: [NSLocalizedDescriptionKey: "server isn't running"])
+            }
+            try await self.restartSameModel(epoch: epoch)
+        }
+    }
+
+    private func restartSameModel(epoch: Int) async throws {
+        guard let modelPath = currentModelPath else { return }
+        await waitForForwardsToDrain()
+        try checkNotStopped(epoch)
         await terminateAndWaitForExit()
+        try checkNotStopped(epoch)
+        try await launchAndWaitReady(modelPath: modelPath, alias: currentAlias, epoch: epoch)
+    }
+
+    // MARK: - Transition plumbing
+
+    /// Runs `body` after every previously queued transition has finished.
+    /// Throws without running it if stop() was called since `epoch`.
+    private func serialized(epoch: Int, _ body: @escaping @MainActor () async throws -> Void) async throws {
+        let previous = transitionTail
+        let task = Task { @MainActor in
+            await previous?.value
+            try self.checkNotStopped(epoch)
+            try await body()
+        }
+        transitionTail = Task { @MainActor in _ = try? await task.value }
+        try await task.value
+    }
+
+    /// Requests may bring the model (back) up only while it's running or
+    /// idle-unloaded -- never after an explicit Stop (a connection accepted
+    /// just before it, or an image generation that unloaded the model and
+    /// reloads it afterwards) or a failure the user hasn't acted on.
+    private func checkAutoLoadAllowed() throws {
+        if case .running = state { return }
+        guard isIdleUnloaded else {
+            throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "the server isn't running"])
+        }
+    }
+
+    private func checkNotStopped(_ epoch: Int) throws {
+        guard epoch == stopEpoch else {
+            throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "the server was stopped"])
+        }
+    }
+
+    /// Launches the model and returns once it answers (or throws if it
+    /// dies first / can't be launched). A previous process still on its
+    /// way out (Stop, idle-unload) is waited for first -- it holds the
+    /// internal port.
+    private func launchAndWaitReady(modelPath: String, alias: String, epoch: Int) async throws {
+        if let old = process { await waitForExit(of: old) }
+        try checkNotStopped(epoch)
         state = .starting
-        currentModelPath = modelPath
-        currentAlias = alias
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             startContinuation = continuation
             launchServerProcess(modelPath: modelPath, alias: alias)
         }
     }
 
-    /// Called by ModelProxyServer at the top of every request: if the
-    /// model was idle-unloaded (see checkIdleStop/idleUnload below), the
-    /// proxy's public port stayed up but nothing is actually running --
-    /// this transparently reloads the last-used model before the request
-    /// gets forwarded, instead of the caller just getting connection-refused.
-    /// A no-op once something's already running. If another concurrent
-    /// request already triggered the same reload, this waits on the
-    /// existing one via the @Published state stream rather than racing a
-    /// second launchServerProcess call.
-    func ensureModelLoaded() async throws {
-        if case .running = state { return }
-        if case .stopped = state {
-            guard let modelPath = currentModelPath else { return }
-            state = .starting
-            try await ensureRuntimeReady()
-            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-                startContinuation = continuation
-                launchServerProcess(modelPath: modelPath, alias: currentAlias)
-            }
-            return
-        }
-        for await newState in $state.values {
-            switch newState {
-            case .running: return
-            case .failed(let message):
-                throw NSError(domain: "ServerManager", code: 3, userInfo: [NSLocalizedDescriptionKey: message])
-            case .stopped:
-                throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "stopped while reloading"])
-            case .starting:
-                continue
-            }
+    private func waitForExit(of process: Process) async {
+        guard process.isRunning else { return }
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            exitWaiters[ObjectIdentifier(process), default: []].append(continuation)
         }
     }
 
-    /// Restarts the *same* model -- deliberately not routed through
-    /// switchModel(), which no-ops when modelPath is unchanged. Triggered
-    /// by endRequestStalled() below after too many consecutive stalls: a
-    /// mlx_lm.server worker thread can die (e.g. a METAL out-of-memory
-    /// error) without taking the whole process down with it, since Python
-    /// just prints a traceback and kills that one thread -- the process
-    /// looks alive to Process.terminationHandler, but every request after
-    /// that hangs forever, since nothing left is generating anything.
-    private func restartWedgedProcess() async {
-        guard case .running = state else { return }
-        appendLog("--- restarting the model process after repeated stalls ---\n")
-        do {
-            try await restartSameModel()
-        } catch {
-            state = .failed("auto-restart failed: \(error.localizedDescription)")
+    private func waitForForwardsToDrain() async {
+        guard forwardingCount > 0 else { return }
+        appendLog("--- waiting for \(forwardingCount) in-flight request(s) to finish ---\n")
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            drainWaiters.append(continuation)
         }
     }
 
-    /// Public restart-in-place used by the benchmark tab's auto-tune sweep:
-    /// decode-concurrency and prefill-step-size are only read at process
-    /// launch (see launchServerProcess), so trying a new candidate value
-    /// requires a real restart even though the model itself isn't changing
-    /// -- switchModel() no-ops in that case since its guard is keyed on
-    /// modelPath, not on launch args.
-    func restartToApplyLaunchSettings() async throws {
-        guard case .running = state else {
-            throw NSError(domain: "ServerManager", code: 5, userInfo: [NSLocalizedDescriptionKey: "server isn't running"])
-        }
-        try await restartSameModel()
-    }
-
-    private func restartSameModel() async throws {
-        guard let modelPath = currentModelPath else { return }
-        await terminateAndWaitForExit()
-        state = .starting
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            startContinuation = continuation
-            launchServerProcess(modelPath: modelPath, alias: currentAlias)
-        }
+    private func forwardEnded() {
+        forwardingCount = max(0, forwardingCount - 1)
+        guard forwardingCount == 0 else { return }
+        let waiters = drainWaiters
+        drainWaiters = []
+        waiters.forEach { $0.resume() }
     }
 
     /// `--draft-model` value for the model's MTP drafter (see
@@ -243,17 +369,77 @@ final class ServerManager: ObservableObject {
     /// in a runtime that supports it. A --draft-model the user put in the
     /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
     /// Face itself (~450MB, cached after the first start).
-    private func mtpDrafterArgument(forModelPath modelPath: String) -> String? {
-        guard UserDefaults.standard.object(forKey: "llmtray.mtpDrafter") as? Bool ?? true else { return nil }
-        guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath) else { return nil }
-        let extra = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
-        if extra.contains("--draft-model") { return nil }
-        guard runtimeSupportsModelType("gemma4_assistant") else {
+    private func mtpDrafterArgument(forModelPath modelPath: String, profile: ResolvedProfile) -> String? {
+        let known = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath)
+        let drafter = ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
+        if let drafter {
+            appendLog("--- speculative decoding with MTP drafter \(drafter) ---\n")
+        } else if known != nil, profile.mtpDrafter, !ServerLaunch.extraArgsSetDrafter(profile) {
             appendLog("--- MTP drafter available for this model, but the installed mlx-lm runtime doesn't support it yet (Check for Updates) ---\n")
-            return nil
         }
-        appendLog("--- speculative decoding with MTP drafter \(repo) ---\n")
+        return drafter
+    }
+
+    /// The drafter this model can actually use: one is known for it and the
+    /// installed runtime has the architecture. An older pinned runtime
+    /// would fail to load it and the whole server start with it.
+    private func availableDrafter(forModelPath modelPath: String) -> String? {
+        guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath),
+              runtimeSupportsModelType("gemma4_assistant") else { return nil }
         return repo
+    }
+
+    /// The model-specific facts the launch arguments depend on; drafterRepo
+    /// is the drafter *available* to the model (see ServerLaunch.drafter).
+    private func launchContext(modelPath: String, alias: String, drafterRepo: String?) -> ServerLaunch.Context {
+        ServerLaunch.Context(
+            modelPath: modelPath,
+            internalPort: internalPort,
+            alias: alias,
+            disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
+            drafterRepo: drafterRepo,
+            maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
+            verboseLogging: UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging")
+        )
+    }
+
+    init() {
+        // Profile edits are debounced into files, but `profiles` changes at
+        // once; the defaults cover the global verbose-logging switch.
+        pendingLaunchObservers = [
+            ProfileManager.shared.$profiles.dropFirst()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in self?.refreshPendingLaunchChange() },
+            ProfileManager.shared.$assignments.dropFirst()
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in self?.refreshPendingLaunchChange() },
+            NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)
+                .debounce(for: .milliseconds(200), scheduler: DispatchQueue.main)
+                .sink { [weak self] _ in self?.refreshPendingLaunchChange() },
+        ]
+    }
+
+    private func refreshPendingLaunchChange() {
+        let changed = computePendingLaunchChange()
+        if changed != pendingLaunchChange { pendingLaunchChange = changed }
+    }
+
+    private func computePendingLaunchChange() -> Bool {
+        guard case .running = state, let modelPath = currentModelPath, let last = lastLaunchArguments else { return false }
+        let profile = ProfileManager.shared.resolved(for: modelPath)
+        let planned = ServerLaunch.arguments(profile, launchContext(
+            modelPath: modelPath, alias: currentAlias,
+            drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
+        ))
+        return planned != last
+    }
+
+    /// Whether switching the loaded model from profile `a` to `b` would
+    /// change its real launch arguments (so a restart is needed).
+    func needsRestart(modelPath: String, from a: ResolvedProfile, to b: ResolvedProfile) -> Bool {
+        ServerLaunch.needsRestart(from: a, to: b, context: launchContext(
+            modelPath: modelPath, alias: currentAlias, drafterRepo: availableDrafter(forModelPath: modelPath)
+        ))
     }
 
     private func runtimeSupportsModelType(_ modelType: String) -> Bool {
@@ -265,6 +451,7 @@ final class ServerManager: ObservableObject {
     }
 
     private func launchServerProcess(modelPath: String, alias: String) {
+        isIdleUnloaded = false
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }
         let task = Process()
@@ -279,54 +466,25 @@ final class ServerManager: ObservableObject {
         // one. Invoking the interpreter directly with -m sidesteps shebang
         // parsing entirely; Process doesn't go through a shell either way.
         task.executableURL = URL(fileURLWithPath: venvPython)
-        // Without a cap, mlx_lm.server's cross-request prompt cache
-        // (letting a conversation continue without re-prefilling the whole
-        // history each turn) just keeps every conversation's KV state
-        // around forever -- confirmed live: a long session's cache grew
-        // from 0.27 GB to 1.25 GB before a subsequent request's own KV
-        // allocation pushed the process into a METAL "Insufficient Memory"
-        // crash. 1 GiB is a conservative default (Advanced setting) --
-        // this evicts old cached conversations before they can pile up
-        // into exactly that kind of failure, at the cost of occasionally
-        // re-prefilling a conversation that's been idle a while (cheap
-        // compared to a crash).
-        let promptCacheMB = UserDefaults.standard.object(forKey: "llmtray.promptCacheMB") as? Int ?? 1024
-        // Read fresh on every launch (not just once) so the benchmark tab's
-        // auto-tune sweep can change this and pick it up via a plain
-        // restartToApplyLaunchSettings() -- no separate code path needed.
-        let prefillStepSize = UserDefaults.standard.object(forKey: "llmtray.prefillStepSize") as? Int ?? 128
-        var args = [
-            "-m", "mlx_lm.server",
-            "--model", modelPath, "--port", String(internalPort), "--prefill-step-size", String(prefillStepSize),
-            "--prompt-cache-bytes", String(promptCacheMB * 1_048_576),
-        ]
-        if currentKVBits > 0 {
-            let quantizedKVStart = UserDefaults.standard.object(forKey: "llmtray.quantizedKVStart") as? Int ?? 0
-            args += ["--kv-bits", String(currentKVBits), "--kv-group-size", String(currentKVGroupSize), "--quantized-kv-start", String(quantizedKVStart)]
-        }
-        let decodeConcurrency = UserDefaults.standard.object(forKey: "llmtray.decodeConcurrency") as? Int ?? 1
-        if decodeConcurrency > 1 {
-            args += ["--decode-concurrency", String(decodeConcurrency)]
-        }
-        if !alias.isEmpty {
-            args += ["--model-alias", alias]
-        }
-        if let drafter = mtpDrafterArgument(forModelPath: modelPath) {
-            args += ["--draft-model", drafter]
-        }
-        // Advanced setting: reintroduces the per-token DEBUG logging this
-        // app itself stopped needing once isBusy moved to the proxy's own
-        // request tracking (see ModelProxyServer) -- still useful as a
-        // manual diagnostic toggle when troubleshooting the model process
-        // itself, just no longer required for the app to function.
-        if UserDefaults.standard.bool(forKey: "llmtray.verboseServerLogging") {
-            args += ["--log-level", "DEBUG"]
-        }
-        // Advanced escape hatch for any mlx_lm.server flag this UI doesn't
-        // expose (--draft-model, etc.) rather than building a dedicated
-        // control for every one of them.
-        let extraArgsRaw = UserDefaults.standard.string(forKey: "llmtray.extraServerArgs") ?? ""
-        args += extraArgsRaw.split(separator: " ").map(String.init)
+        // Everything launch-related comes from the model's profile (see
+        // ProfileManager / LLMTrayCore.ServerLaunch), resolved fresh on
+        // every launch: a model switch or the benchmark's auto-tune
+        // restart picks up current values without a separate code path.
+        // Notable defaults kept from before profiles:
+        // - prompt cache capped (1 GiB): uncapped, a long session's
+        //   cross-request KV cache grew until a later request's own
+        //   allocation hit METAL "Insufficient Memory";
+        // - KV quantization forced off for KV-shared models (Gemma 4
+        //   E2B/E4B), which crash with quantized KV -- now also applied
+        //   on proxy-driven model switches, which used to reuse the
+        //   first start()'s KV bits.
+        let profile = ProfileManager.shared.resolved(for: modelPath)
+        appendLog("--- profile: \(profile.profileName) ---\n")
+        let args = ServerLaunch.arguments(profile, launchContext(
+            modelPath: modelPath, alias: alias,
+            drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
+        ))
+        lastLaunchArguments = args
         task.arguments = args
         task.standardInput = FileHandle.nullDevice
 
@@ -336,6 +494,8 @@ final class ServerManager: ObservableObject {
         self.stdoutPipe = pipe
         self.process = task
 
+        launchGeneration += 1
+        let generation = launchGeneration
         let handle = pipe.fileHandleForReading
         self.stdoutHandle = handle
         handle.readabilityHandler = { [weak self] fh in
@@ -349,6 +509,7 @@ final class ServerManager: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.appendLog(text)
+                guard generation == self.launchGeneration else { return }
                 self.checkForReadySignal(text, modelPath: modelPath)
             }
         }
@@ -356,38 +517,15 @@ final class ServerManager: ObservableObject {
         task.terminationHandler = { [weak self] proc in
             // Must clear this HERE, not in stop()/idleUnload() -- this
             // handler is the one place that fires no matter WHY the process
-            // exited (explicit stop, idle-unload, a crash, switchModel's
+            // exited (explicit stop, idle-unload, a crash, a model switch's
             // replacement). Left in place, the pipe's read end stays
             // permanently "readable" once the write end (the dead process)
             // closes -- availableData returns empty at EOF forever, and
             // libdispatch re-invokes the handler as fast as it can instead
-            // of ever blocking, pegging a CPU core indefinitely. Confirmed
-            // live: LLMTray at 100% CPU with no mlx_lm.server process left
-            // alive at all, RES a few MB, sampled straight into this
-            // closure's availableData loop.
+            // of ever blocking, pegging a CPU core indefinitely.
             handle.readabilityHandler = nil
             Task { @MainActor [weak self] in
-                guard let self else { return }
-                if case .running = self.state {
-                    self.state = .stopped
-                } else if case .starting = self.state {
-                    let error = NSError(
-                        domain: "ServerManager", code: Int(proc.terminationStatus),
-                        userInfo: [NSLocalizedDescriptionKey: "server exited during startup (code \(proc.terminationStatus))"]
-                    )
-                    self.state = .failed(error.localizedDescription)
-                    self.startContinuation?.resume(throwing: error)
-                    self.startContinuation = nil
-                }
-                self.process = nil
-                // Safety net: don't wait on the proxy's in-flight requests to
-                // notice the process died and unwind naturally -- whatever
-                // they were waiting on just went away, so there's nothing
-                // left to be busy about right now regardless.
-                self.activeRequestCount = 0
-                self.isBusy = false
-                self.processExitContinuation?.resume()
-                self.processExitContinuation = nil
+                self?.processDidExit(proc, generation: generation)
             }
         }
 
@@ -401,53 +539,63 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    func stop() {
-        guard let process, process.isRunning else {
+    /// Requests still being served by this process end on their own: their
+    /// upstream connection fails, and the proxy calls endRequest() for each
+    /// -- the request counters belong to requests, not to the process.
+    private func processDidExit(_ proc: Process, generation: Int) {
+        let waiters = exitWaiters.removeValue(forKey: ObjectIdentifier(proc)) ?? []
+        waiters.forEach { $0.resume() }
+        // An older process dying after a newer one was launched: the state
+        // and `process` belong to the new one now.
+        guard generation == launchGeneration else { return }
+        if case .running = state {
             state = .stopped
-            proxy.stop()
-            return
+        } else if case .starting = state {
+            let message = "server exited during startup (code \(proc.terminationStatus))"
+            state = .failed(message)
         }
-        let processToKill = process
-        processToKill.terminate()
-        // Give it a moment, then hard-kill if it's still alive -- mlx_lm.server
-        // doesn't always react to SIGTERM promptly while a generation is in flight.
-        // Must confirm self.process is STILL this exact instance before
-        // sending SIGKILL: if a switchModel() (or another stop()+start())
-        // already replaced it by the time this fires, self.process points
-        // at a brand new, unrelated, already-running process -- confirmed
-        // this exact bug once already (see terminateAndWaitForExit below).
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            guard let self, self.process === processToKill, processToKill.isRunning else { return }
-            kill(processToKill.processIdentifier, SIGKILL)
+        if let continuation = startContinuation {
+            startContinuation = nil
+            continuation.resume(throwing: NSError(
+                domain: "ServerManager", code: Int(proc.terminationStatus),
+                userInfo: [NSLocalizedDescriptionKey: "server exited during startup (code \(proc.terminationStatus))"]
+            ))
         }
-        state = .stopped
-        proxy.stop()
+        proxyStartPending = false
+        process = nil
     }
 
-    /// Used only by switchModel(): unlike the public stop() above, this
-    /// actually waits for the old process to exit before returning, since
-    /// launching the replacement needs the internal port free first --
-    /// stop() itself stays fire-and-forget so the UI flips to "Stopped"
-    /// immediately on click rather than waiting on the OS.
+    /// Stops the model process and the public listener. Fire-and-forget:
+    /// the UI flips to "Stopped" at once; a Start right after waits for the
+    /// old process to actually exit before launching (launchAndWaitReady).
+    func stop() {
+        stopEpoch += 1
+        isIdleUnloaded = false
+        proxy.stop()
+        proxyStartPending = false
+        state = .stopped
+        guard let process, process.isRunning else { return }
+        process.terminate()
+        killIfStillRunning(process)
+    }
+
+    /// mlx_lm.server doesn't always react to SIGTERM promptly while a
+    /// generation is in flight. Only ever signals this exact process: a
+    /// replacement is never launched before it has exited.
+    private func killIfStillRunning(_ processToKill: Process) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            guard processToKill.isRunning else { return }
+            kill(processToKill.processIdentifier, SIGKILL)
+        }
+    }
+
+    /// Unlike stop(), waits for the old process to exit (the replacement
+    /// needs the internal port) and keeps the public listener up.
     private func terminateAndWaitForExit() async {
         guard let process, process.isRunning else { return }
-        let processToKill = process
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            processExitContinuation = continuation
-            processToKill.terminate()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-                // Reference-identity check against processToKill, not just
-                // "is self.process currently running" -- by the time this
-                // fires, switchModel() has very likely already installed a
-                // freshly launched process in self.process, and the naive
-                // check would SIGKILL that brand new process instead of
-                // doing nothing. Root-caused via live trace: a model switch
-                // killed the *new* model mid-generation (status 9) exactly
-                // 3 seconds after the *old* model's graceful terminate().
-                guard let self, self.process === processToKill, processToKill.isRunning else { return }
-                kill(processToKill.processIdentifier, SIGKILL)
-            }
-        }
+        process.terminate()
+        killIfStillRunning(process)
+        await waitForExit(of: process)
     }
 
     /// For app-quit paths only (applicationWillTerminate): there's no time
@@ -489,7 +637,7 @@ final class ServerManager: ObservableObject {
     /// anything runs it, which is a confusing thing to trigger silently
     /// from a background bootstrap step. Returning nil here instead lets
     /// the caller fail with a clear, actionable message up front.
-    private func findModernPython3() -> String? {
+    private func pythonCandidates() -> [String] {
         var candidates = [String]()
         // A previously-externalized Full-build framework (see
         // externalFrameworkDir) takes priority: it's guaranteed modern and
@@ -503,7 +651,12 @@ final class ServerManager: ObservableObject {
             NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
             NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
         ]
-        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) && isModernPython($0) }
+        return candidates.filter { FileManager.default.isExecutableFile(atPath: $0) }
+    }
+
+    /// Runs blocking file / process work on a background thread.
+    nonisolated private static func offMain<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
+        try await Task.detached(priority: .userInitiated) { try work() }.value
     }
 
     /// Version directory name (e.g. "3.14") isn't known ahead of time, so
@@ -518,7 +671,8 @@ final class ServerManager: ObservableObject {
         return nil
     }
 
-    private func isModernPython(_ path: String) -> Bool {
+    /// Blocks until the probe exits -- call it off the main actor.
+    nonisolated private static func isModernPython(_ path: String) -> Bool {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: path)
         task.arguments = ["-c", "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"]
@@ -593,10 +747,13 @@ final class ServerManager: ObservableObject {
         if !FileManager.default.fileExists(atPath: venvDir),
            FileManager.default.fileExists(atPath: bundledVenvServerBinary) {
             appendLog("--- first run: copying vendored runtime out of the app bundle ---\n")
-            try FileManager.default.copyItem(atPath: bundledVenvDir, toPath: venvDir)
+            // Hundreds of MB: copied off the main actor, the UI stays live.
+            let (venvSource, venvTarget) = (bundledVenvDir, venvDir)
+            try await Self.offMain { try FileManager.default.copyItem(atPath: venvSource, toPath: venvTarget) }
             if let bundledFramework = bundledFrameworkDir {
-                if !FileManager.default.fileExists(atPath: externalFrameworkDir) {
-                    try? FileManager.default.copyItem(atPath: bundledFramework, toPath: externalFrameworkDir)
+                let frameworkTarget = externalFrameworkDir
+                if !FileManager.default.fileExists(atPath: frameworkTarget) {
+                    try? await Self.offMain { try FileManager.default.copyItem(atPath: bundledFramework, toPath: frameworkTarget) }
                 }
                 // The copied venv's own bin/python3.X is a symlink pointing
                 // at the *bundled* framework by absolute path (that's how
@@ -627,7 +784,9 @@ final class ServerManager: ObservableObject {
         }
 
         if !FileManager.default.fileExists(atPath: venvDir) {
-            guard let python = findModernPython3() else {
+            let candidates = pythonCandidates()
+            let found = try await Self.offMain { candidates.first(where: Self.isModernPython) }
+            guard let python = found else {
                 throw NSError(
                     domain: "ServerManager", code: 2,
                     userInfo: [NSLocalizedDescriptionKey:
@@ -698,9 +857,18 @@ final class ServerManager: ObservableObject {
     /// this directory (it lives outside Contents/ specifically so Sparkle
     /// updates don't wipe it) -- without an explicit way to clear it, it
     /// would just sit there forever after an uninstall.
+    ///
+    /// User data in the same directory -- saved chats (`sessions`) and
+    /// settings profiles (`profiles`) -- is kept: it's small, and losing it
+    /// to "uninstall the runtime" would be a nasty surprise (profiles would
+    /// be re-migrated from the stale pre-profiles settings).
     func removeExternalRuntime() {
         stop()
-        try? FileManager.default.removeItem(atPath: RuntimePaths.externalRuntimeDir)
+        let dir = RuntimePaths.externalRuntimeDir
+        let keep: Set<String> = ["sessions", "profiles"]
+        for item in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where !keep.contains(item) {
+            try? FileManager.default.removeItem(atPath: dir + "/" + item)
+        }
     }
 
     /// Runs one setup step to completion, streaming its output into the
@@ -761,18 +929,50 @@ final class ServerManager: ObservableObject {
         // not just "process launched" (model loading can take tens of seconds).
         guard chunk.contains("Starting httpd") || chunk.contains("Uvicorn running") || chunk.contains("http://") else { return }
 
+        guard !proxyStartPending else { return }
         let name = (modelPath as NSString).lastPathComponent
         let publicPort = currentPublicPort ?? 8765
-        state = .running(port: publicPort, model: name)
-        // Idempotent: a model switch re-enters this same "ready" path, but
-        // the proxy is already listening on the public port from the
-        // first start() and must NOT be rebound.
-        if proxy.publicPort == nil {
-            try? proxy.start(publicPort: publicPort, internalPort: internalPort)
+        // A model switch / reload re-enters this same "ready" path while the
+        // listener is already up from the first start() -- it must NOT be
+        // rebound. Otherwise "Running" is only published once the listener
+        // really listens: a taken public port is an error, not a Running
+        // server nobody can reach.
+        guard proxy.publicPort == nil else {
+            markRunning(port: publicPort, model: name)
+            return
         }
-        proxy.noteCurrentModel(modelPath)
+        proxyStartPending = true
+        let generation = launchGeneration
+        proxy.start(publicPort: publicPort, internalPort: internalPort) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                guard generation == self.launchGeneration, self.proxyStartPending else { return }
+                self.proxyStartPending = false
+                self.markRunning(port: publicPort, model: name)
+            case .failure(let error):
+                self.proxyFailed(port: publicPort, error: error)
+            }
+        }
+    }
+
+    private func markRunning(port: Int, model: String) {
+        state = .running(port: port, model: model)
         startContinuation?.resume()
         startContinuation = nil
+    }
+
+    /// The public listener couldn't bind (port taken, invalid) or died
+    /// later: nothing can reach the model, so the server is failed, not
+    /// Running.
+    private func proxyFailed(port: Int, error: Error) {
+        let message = "couldn't listen on port \(port): \(error.localizedDescription)"
+        appendLog("--- \(message) ---\n")
+        let continuation = startContinuation
+        startContinuation = nil
+        stop()
+        state = .failed(message)
+        continuation?.resume(throwing: NSError(domain: "ServerManager", code: 6, userInfo: [NSLocalizedDescriptionKey: message]))
     }
 
     /// Called by ModelProxyServer once per request it starts handling
@@ -823,31 +1023,39 @@ final class ServerManager: ObservableObject {
     /// currentModelPath/currentAlias are deliberately left set -- that's
     /// exactly what ensureModelLoaded() reloads.
     private func idleUnload() {
-        guard let process, process.isRunning else {
-            state = .stopped
-            return
-        }
-        let processToKill = process
-        processToKill.terminate()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
-            guard let self, self.process === processToKill, processToKill.isRunning else { return }
-            kill(processToKill.processIdentifier, SIGKILL)
-        }
-        state = .stopped
+        Task { await unloadModel(onlyIfIdle: true) }
     }
 
-    /// Paired with beginRequest() above, for a request that actually
-    /// completed (successfully or with a normal upstream error) -- floors
-    /// at 0 rather than going negative, since the process-death safety net
-    /// in launchServerProcess's terminationHandler can zero activeRequestCount
-    /// out before a request that was in flight at the time gets around to
-    /// calling this on its own. Resets consecutiveStallCount: any request
-    /// that actually finishes proves the process is still doing real work,
-    /// which is what should "forgive" an earlier isolated stall.
-    func endRequest() {
+    /// Frees the model's memory but keeps the public listener, so the next
+    /// request (in-app or external) reloads it -- idle-unload, and making
+    /// room for image generation. The in-app chat stays usable. Queued like
+    /// every transition, a no-op unless the model is running, and returns
+    /// once the process has actually exited (its memory is free).
+    func unloadModel(onlyIfIdle: Bool = false) async {
+        let epoch = stopEpoch
+        try? await serialized(epoch: epoch) {
+            guard case .running = self.state else { return }
+            // A request that arrived since the idle check is already
+            // counted -- don't unload the model out from under it.
+            guard !onlyIfIdle || self.activeRequestCount == 0 else { return }
+            self.isIdleUnloaded = true
+            self.state = .stopped
+            await self.terminateAndWaitForExit()
+        }
+    }
+
+    /// Paired with beginRequest() above, for a request that completed
+    /// (successfully or with a normal upstream error). `forwarded` is false
+    /// for a request that never reached the model (its load failed), so it
+    /// wasn't counted by acquireModel(). A forwarded one that finishes resets
+    /// consecutiveStallCount: it proves the process is still doing real
+    /// work, which is what should "forgive" an earlier isolated stall.
+    func endRequest(forwarded: Bool = true) {
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
+        guard forwarded else { return }
         consecutiveStallCount = 0
+        forwardEnded()
     }
 
     /// Paired with beginRequest() above, for the proxy's stall watchdog
@@ -860,6 +1068,7 @@ final class ServerManager: ObservableObject {
     func endRequestStalled() {
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
+        forwardEnded()
         consecutiveStallCount += 1
 
         let threshold = UserDefaults.standard.object(forKey: "llmtray.autoRestartStallThreshold") as? Int ?? 3
