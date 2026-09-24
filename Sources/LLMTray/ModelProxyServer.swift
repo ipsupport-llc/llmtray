@@ -72,10 +72,11 @@ final class ModelProxyServer {
                 self?.accept(connection, internalPort: internalPort)
             }
         }
-        listener.stateUpdateHandler = { [weak self, weak listener] state in
+        let listenerID = ObjectIdentifier(listener)
+        listener.stateUpdateHandler = { [weak self] state in
             Task { @MainActor [weak self] in
                 // Ignore a listener that was already replaced / stopped.
-                guard let self, let listener, self.listener === listener else { return }
+                guard let self, let current = self.listener, ObjectIdentifier(current) == listenerID else { return }
                 switch state {
                 case .ready:
                     completion(.success(()))
