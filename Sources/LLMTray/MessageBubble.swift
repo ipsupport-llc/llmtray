@@ -3,6 +3,7 @@ import SwiftUI
 
 /// One chat message: a compaction summary, or a user/assistant bubble with
 /// optional reasoning and images.
+@MainActor
 struct MessageBubble: View {
     let message: ChatMessage
     let showReasoning: Bool
