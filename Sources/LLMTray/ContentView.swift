@@ -38,6 +38,7 @@ struct ContentView: View {
     // caps max_tokens; 32768 only when its config.json doesn't say.
     @State private var modelMaxContext: Int = 32768
     @State private var followChatBottom = true
+    @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
 
     var body: some View {
@@ -119,6 +120,16 @@ struct ContentView: View {
 
     private static let chatBottomID = "chat-bottom"
 
+    /// Grows with every streamed token and new message -- cheap to compare.
+    private var streamSignal: Int {
+        chat.messages.count * 1_000_003 + (chat.messages.last?.content.count ?? 0) + (chat.messages.last?.reasoning.count ?? 0)
+    }
+
+    /// The user's latest own message (not the hidden view_image one).
+    private var lastUserMessageID: UUID? {
+        chat.messages.last { $0.role == "user" && !$0.isToolContext }?.id
+    }
+
     /// Tool results by call id, for the debug view of tool calls.
     private var toolResults: [String: String] {
         var results: [String: String] = [:]
@@ -129,7 +140,9 @@ struct ContentView: View {
     }
 
     private var chatArea: some View {
-        ScrollViewReader { proxy in
+        // Once per evaluation, not per message (it scans the whole history).
+        let results = showToolCalls ? toolResults : nil
+        return ScrollViewReader { proxy in
             ScrollView {
                 // Not Lazy: a lazy stack estimates the height of rows it
                 // hasn't laid out (long markdown answers), and the scroll
@@ -146,7 +159,7 @@ struct ContentView: View {
                     // tool produced is attached to the assistant message
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
-                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: showToolCalls ? toolResults : nil)
+                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results)
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {
@@ -160,11 +173,15 @@ struct ContentView: View {
                     // Where the bottom of the content is, relative to the
                     // viewport: tells whether the user is reading the end.
                     Color.clear.frame(height: 1).id(Self.chatBottomID)
-                        .background(GeometryReader { g in
-                            Color.clear.preference(key: ChatBottomKey.self, value: g.frame(in: .named("chatScroll")).maxY)
-                        })
                 }
                 .padding(12)
+                // The content's height and where its bottom is in the
+                // viewport: the bottom moving with the height unchanged means
+                // the user scrolled.
+                .background(GeometryReader { g in
+                    let frame = g.frame(in: .named("chatScroll"))
+                    Color.clear.preference(key: ChatBottomKey.self, value: ChatGeometry(bottom: frame.maxY, height: frame.height))
+                })
             }
             .coordinateSpace(name: "chatScroll")
             .background(GeometryReader { g in
@@ -173,20 +190,31 @@ struct ContentView: View {
             })
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
-            .onPreferenceChange(ChatBottomKey.self) { bottom in
-                followChatBottom = bottom <= chatViewportHeight + 40
+            .onPreferenceChange(ChatBottomKey.self) { geometry in
+                let heightChanged = abs(geometry.height - lastChatGeometry.height) > 0.5
+                let moved = abs(geometry.bottom - lastChatGeometry.bottom) > 0.5
+                lastChatGeometry = geometry
+                if geometry.bottom <= chatViewportHeight + 40 {
+                    followChatBottom = true
+                } else if moved && !heightChanged {
+                    // The content didn't change size but moved: the user
+                    // scrolled up -- stop following at once, even while
+                    // tokens stream fast.
+                    followChatBottom = false
+                }
             }
             // Small for an empty chat, capped so a long one scrolls inside
             // a fixed viewport instead of growing the window.
             .frame(minHeight: 48, maxHeight: chat.messages.isEmpty ? 48 : 380)
             // Cheap to compare: lengths, not the whole text, per token.
-            .onChange(of: (chat.messages.last?.content.count ?? 0) + (chat.messages.last?.reasoning.count ?? 0)) { _ in
+            .onChange(of: streamSignal) { _ in
                 if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
             }
-            .onChange(of: chat.messages.count) { _ in
-                // The user's own new message always brings the end into view.
-                if chat.messages.last?.role == "user" { followChatBottom = true }
-                if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+            .onChange(of: lastUserMessageID) { _ in
+                // The user's own new message always brings the end into view
+                // (send() appends the reply placeholder right after it).
+                followChatBottom = true
+                proxy.scrollTo(Self.chatBottomID, anchor: .bottom)
             }
         }
     }
@@ -234,8 +262,13 @@ struct ContentView: View {
     }
 }
 
-/// The chat content's bottom edge in the scroll view's coordinates.
+/// The chat content's bottom edge (in the scroll view's coordinates) and height.
+struct ChatGeometry: Equatable {
+    var bottom: CGFloat
+    var height: CGFloat
+}
+
 private struct ChatBottomKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+    static var defaultValue = ChatGeometry(bottom: 0, height: 0)
+    static func reduce(value: inout ChatGeometry, nextValue: () -> ChatGeometry) { value = nextValue() }
 }

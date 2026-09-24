@@ -380,6 +380,7 @@ final class ChatClient: ObservableObject {
             isStreaming = false
             errorText = ChatTransport.serverErrorMessage(statusCode: statusCode, body: completion.errorBody)
             dropEmptyAssistantPlaceholder()
+            closeDanglingToolCalls()
             persistCurrentSession()
             return
         }
@@ -388,6 +389,7 @@ final class ChatClient: ObservableObject {
             errorText = error.localizedDescription
         }
         finalizeTokensPerSecond(firstByte: completion.firstByteDate, endDate: completion.endDate)
+        if completion.error != nil { closeDanglingToolCalls() }   // no follow-up: keep the history valid
         continueWithPendingToolCalls(afterError: completion.error != nil)
     }
 

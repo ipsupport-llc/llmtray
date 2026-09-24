@@ -17,6 +17,9 @@ struct LLMTrayApp: App {
         // Developer entry point: `LLMTray --run-tool <name> '<json args>'`
         // runs one chat tool, prints its result and exits -- for checking
         // the tools against the live services without a model.
+        if CommandLine.arguments.contains("--dump-tool-definitions") {
+            ToolRunnerCLI.dumpDefinitions()
+        }
         if let i = CommandLine.arguments.firstIndex(of: "--run-tool"), CommandLine.arguments.count > i + 1 {
             ToolRunnerCLI.run(name: CommandLine.arguments[i + 1],
                               json: CommandLine.arguments.count > i + 2 ? CommandLine.arguments[i + 2] : "{}")
@@ -24,6 +27,9 @@ struct LLMTrayApp: App {
         // Before any view's @AppStorage or the auto-start path reads them.
         KVSettings.migrateIfNeeded()
         Self.keepNetworkCachesOffDisk()
+        // A write to a pipe or socket whose reader is gone must fail, not
+        // kill the app (SIGPIPE's default).
+        signal(SIGPIPE, SIG_IGN)
     }
 
     /// Nothing the app fetches is cached on disk (chat traffic, tool

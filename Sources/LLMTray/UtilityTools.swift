@@ -98,11 +98,20 @@ final class TimeInCityTool: SelectableTool {
         guard let city = (arguments["city"] as? String)?.trimmingCharacters(in: .whitespaces), !city.isEmpty else {
             return Self.error("city is required")
         }
-        var query = [URLQueryItem(name: "name", value: city), URLQueryItem(name: "count", value: "1")]
-        if let cc = arguments["country_code"] as? String, !cc.isEmpty { query.append(URLQueryItem(name: "countryCode", value: cc.uppercased())) }
         do {
-            let geo = try await WebFetch.json("https://geocoding-api.open-meteo.com/v1/search", query: query)
-            guard let place = (geo["results"] as? [[String: Any]])?.first,
+            // Open-Meteo matches a non-Latin name ("Москва", "Харків") only
+            // in its language: the script's languages first, English last.
+            var found: [String: Any]?
+            for language in ScriptLanguage.wikipediaCandidates(for: city) {
+                var query = [URLQueryItem(name: "name", value: city), URLQueryItem(name: "count", value: "1"),
+                             URLQueryItem(name: "language", value: language)]
+                if let cc = arguments["country_code"] as? String, cc.count == 2, cc.allSatisfy({ $0.isASCII && $0.isLetter }) {
+                    query.append(URLQueryItem(name: "countryCode", value: cc.uppercased()))
+                }
+                let geo = try await WebFetch.json("https://geocoding-api.open-meteo.com/v1/search", query: query)
+                if let first = (geo["results"] as? [[String: Any]])?.first { found = first; break }
+            }
+            guard let place = found,
                   let tzID = place["timezone"] as? String, let zone = TimeZone(identifier: tzID) else {
                 return Self.error("no city called \(city) found")
             }

@@ -161,6 +161,12 @@ private struct ToolCallRow: View {
     let result: String?
     @State private var expanded = false
 
+    /// Capped: a huge argument (a long prompt) shouldn't lay out in full.
+    private var label: String {
+        let text = Self.compact(call.argumentsJSON)
+        return text.count > 500 ? String(text.prefix(500)) + "…" : text
+    }
+
     var body: some View {
         DisclosureGroup(isExpanded: $expanded) {
             Text(result.map { $0.count > 4000 ? String($0.prefix(4000)) + "…" : $0 } ?? NSLocalizedString("(no result yet)", comment: "tool call debug view"))
@@ -173,7 +179,7 @@ private struct ToolCallRow: View {
                 .cornerRadius(6)
         } label: {
             Label {
-                Text("\(call.name)(\(Self.compact(call.argumentsJSON)))")
+                Text("\(call.name)(\(label))")
                     .font(.system(size: 10, design: .monospaced))
                     .lineLimit(expanded ? nil : 1)
                     .truncationMode(.tail)
@@ -191,6 +197,11 @@ private struct ToolCallRow: View {
         return obj.keys.sorted().map { key -> String in
             let value = obj[key]!
             if let s = value as? String { return "\(key): \"\(s)\"" }
+            // Nested values as one-line JSON, not Swift's multi-line dump.
+            if JSONSerialization.isValidJSONObject(value),
+               let data = try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys]) {
+                return "\(key): \(String(decoding: data, as: UTF8.self))"
+            }
             return "\(key): \(value)"
         }.joined(separator: ", ")
     }

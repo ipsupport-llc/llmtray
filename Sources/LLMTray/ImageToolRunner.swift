@@ -88,7 +88,7 @@ final class ImageToolRunner: ChatTool {
                     + "new message explicitly asking for a new or different image."
             )
         }
-        let prompt = (arguments["prompt"] as? String) ?? ""
+        let prompt = String(((arguments["prompt"] as? String) ?? "").prefix(4000))
         // Scales what the model asked for rather than replacing it, so a
         // deliberately non-square request keeps its aspect ratio --
         // MfluxManager.generate rounds to a multiple of 16 regardless.

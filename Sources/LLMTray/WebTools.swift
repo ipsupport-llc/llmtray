@@ -163,29 +163,52 @@ final class WikipediaTool: SelectableTool {
         guard let title = (arguments["title"] as? String)?.trimmingCharacters(in: .whitespaces), !title.isEmpty else {
             return Self.error("title is required")
         }
-        // A Cyrillic title on en.wiki 404s: try the languages it could be in.
-        let cyrillic = title.unicodeScalars.contains { (0x0400...0x04FF).contains($0.value) }
         // Goes into the host name: only a real language code (not a value a
         // prompt injection could point elsewhere with).
         let lang: String? = (arguments["lang"] as? String)?.lowercased()
         let requested: String? = lang.flatMap { code in
             code.range(of: #"^[a-z]{2,3}(-[a-z]{2,8})?$"#, options: .regularExpression) != nil ? code : nil
         }
-        var langs = [requested ?? (cyrillic ? "ru" : "en")]
-        langs += cyrillic ? ["uk", "ru", "en"] : ["en"]
-        for lang in NSOrderedSet(array: langs).compactMap({ $0 as? String }) {
+        // The title's own-script Wikipedias first (a Cyrillic or Japanese
+        // title 404s on en.wiki), English last.
+        let candidates = [requested].compactMap { $0 } + ScriptLanguage.wikipediaCandidates(for: title)
+        // One budget for the whole lookup: a miss over several languages on a
+        // stalled network mustn't take minutes.
+        let deadline = Date().addingTimeInterval(20)
+        let langs = NSOrderedSet(array: candidates).compactMap { $0 as? String }
+        for (n, lang) in langs.enumerated() where Date() < deadline {
             if let summary = await summary(title, lang: lang) { return Self.json(summary) }
-            // Not an exact page: the search's best match.
-            if let found = try? await WebFetch.jsonArray(
-                "https://\(lang).wikipedia.org/w/api.php",
-                query: [URLQueryItem(name: "action", value: "opensearch"), URLQueryItem(name: "search", value: title),
-                        URLQueryItem(name: "limit", value: "1"), URLQueryItem(name: "format", value: "json")]
-            ), found.count > 1, let best = (found[1] as? [String])?.first,
+            // Not an exact title: a prefix match first...
+            if Date() < deadline, let best = await prefixMatch(title, lang: lang),
+               let summary = await summary(best, lang: lang) {
+                return Self.json(summary)
+            }
+            // ...then full text (also handles a question: "what is
+            // photosynthesis"), in the most likely language only -- it
+            // always finds *something*, often unrelated, elsewhere.
+            if n == 0, Date() < deadline, let best = await fullTextMatch(title, lang: lang),
                let summary = await summary(best, lang: lang) {
                 return Self.json(summary)
             }
         }
         return Self.error("no Wikipedia article found for \(title)")
+    }
+
+    private func prefixMatch(_ query: String, lang: String) async -> String? {
+        guard let found = try? await WebFetch.jsonArray("https://\(lang).wikipedia.org/w/api.php", query: [
+            URLQueryItem(name: "action", value: "opensearch"), URLQueryItem(name: "search", value: query),
+            URLQueryItem(name: "limit", value: "1"), URLQueryItem(name: "format", value: "json"),
+        ]), found.count > 1 else { return nil }
+        return (found[1] as? [String])?.first
+    }
+
+    private func fullTextMatch(_ query: String, lang: String) async -> String? {
+        let found = try? await WebFetch.json("https://\(lang).wikipedia.org/w/api.php", query: [
+            URLQueryItem(name: "action", value: "query"), URLQueryItem(name: "list", value: "search"),
+            URLQueryItem(name: "srsearch", value: query), URLQueryItem(name: "srlimit", value: "1"),
+            URLQueryItem(name: "srnamespace", value: "0"), URLQueryItem(name: "format", value: "json"),
+        ])
+        return ((found?["query"] as? [String: Any])?["search"] as? [[String: Any]])?.first?["title"] as? String
     }
 
     private func summary(_ title: String, lang: String) async -> [String: Any]? {
@@ -231,13 +254,17 @@ final class CountryInfoTool: SelectableTool {
             // Neighbours by name: labels only (their full claims made a
             // country with many borders take ~10 s).
             async let neighbourLoad = Self.entities(claims.items("P47", currentOnly: true), props: "labels")
-            let (refs, neighbourEntities) = try await (refsLoad, neighbourLoad)
+            // Only neighbours that are countries (have an ISO code): P47 also
+            // lists the EU, and the search alone includes historical states.
+            async let countryNeighbours = Self.countriesBordering(id)
+            let (refs, neighbourEntities, countries) = try await (refsLoad, neighbourLoad, countryNeighbours)
             func label(_ id: String) -> String? { WikidataClaims.label(refs[id]) }
             let currencies = claims.items("P38", currentOnly: true).compactMap { id -> String? in
                 let code = WikidataClaims(refs[id] ?? [:]).strings("P498").first
                 return [code, label(id)].compactMap { $0 }.joined(separator: " ").nilIfEmpty
             }
             let borders: [String] = claims.items("P47", currentOnly: true)
+                .filter { countries.contains($0) }
                 .compactMap { WikidataClaims.label(neighbourEntities[$0]) }.sorted()
             var capitals: [String] = []
             for name in claims.items("P36", currentOnly: true).compactMap(label) where !capitals.contains(name) {
@@ -292,6 +319,16 @@ final class CountryInfoTool: SelectableTool {
             if let entity = found[id], !WikidataClaims(entity).strings("P297").isEmpty { return (id, entity) }
         }
         return nil
+    }
+
+    /// Items that have an ISO alpha-2 code and list `id` as a neighbour.
+    static func countriesBordering(_ id: String) async throws -> Set<String> {
+        let search = try await WebFetch.json(api, query: [
+            URLQueryItem(name: "action", value: "query"), URLQueryItem(name: "list", value: "search"),
+            URLQueryItem(name: "srsearch", value: "haswbstatement:P297 haswbstatement:P47=\(id)"),
+            URLQueryItem(name: "srlimit", value: "50"), URLQueryItem(name: "format", value: "json"),
+        ])
+        return Set(((search["query"] as? [String: Any])?["search"] as? [[String: Any]] ?? []).compactMap { $0["title"] as? String })
     }
 
     static func entities(_ ids: [String], props: String) async throws -> [String: [String: Any]] {
@@ -412,7 +449,9 @@ final class CurrencyTool: SelectableTool {
     override var definition: [String: Any] {
         Self.function(
             name,
-            "Convert an amount between currencies at today's rate (\"how much is 50 USD in EUR?\").",
+            "Convert an amount between currencies at today's exchange rate (\"how much is 50 USD in EUR?\"). "
+                + "Rates change every day: always call this for any currency conversion -- never assume a rate "
+                + "or compute one with `calculate`.",
             properties: [
                 "amount": Self.number("The amount to convert."),
                 "from_currency": Self.string("ISO-4217 code, e.g. \"USD\"."),
