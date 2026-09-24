@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "Supprimer ce profil (les modèles qui l’utilisent reviennent à Default)";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Supprime l’environnement d’exécution mlx-lm téléchargé (ainsi que celui de génération d’images). Il sera réinstallé de zéro au prochain démarrage du serveur. Les conversations et profils enregistrés sont conservés.";
 "Diagnostics" = "Diagnostic";
+"Disk usage" = "Utilisation du disque";
 "Download" = "Télécharger";
 "Download and Enable" = "Télécharger et activer";
+"Download into the models folder" = "Télécharger dans le dossier des modèles";
 "Download models" = "Télécharger des modèles";
 "Download models from Hugging Face" = "Télécharger des modèles depuis Hugging Face";
 "Downloaded" = "Téléchargé";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "Arguments serveur supplémentaires";
 "Failed: %@" = "Échec : %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Pour les modèles disposant d’un modèle d’ébauche publié (Gemma 4 26B) : un petit modèle supplémentaire devine les tokens à l’avance, puis le modèle principal les vérifie en une seule passe. Même résultat, plus rapide. Les requêtes sont alors traitées une par une.";
+"Free on disk: %@ · your models: %@" = "Libre sur le disque : %@ · vos modèles : %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Libère la mémoire occupée par un modèle chargé après cette durée sans requête. Il se recharge automatiquement à la requête suivante, avec le délai de chargement habituel.";
 "Full" = "Complet";
 "General" = "Général";
@@ -111,6 +114,7 @@
 "Model card" = "Fiche du modèle";
 "Models" = "Modèles";
 "Models folder" = "Dossier des modèles";
+"Models: %@ · free: %@" = "Modèles : %@ · libre : %@";
 "Network" = "Réseau";
 "Never" = "Jamais";
 "New Profile…" = "Nouveau profil…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "Aucun modèle trouvé dans ce dossier.";
 "No runs yet." = "Aucune exécution pour l’instant.";
 "No saved sessions" = "Aucune session enregistrée";
+"Not enough free disk space for this model." = "Espace disque libre insuffisant pour ce modèle.";
 "OK" = "OK";
 "Off" = "Désactivé";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Désactivé : seul ce Mac peut accéder au serveur. Activé : les autres appareils de votre réseau le peuvent aussi — n’importe qui sur ce réseau ; à n’utiliser que sur des réseaux de confiance.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Afficher les fichiers du profil dans Finder : JSON brut, modifiable à la main et copiable sur un autre Mac.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Affiche le raisonnement du modèle (le bloc repliable « Processus de réflexion ») au-dessus de sa réponse.";
 "Sort by" = "Trier par";
+"Space the models in this folder take, and what's still free on its disk." = "Espace utilisé par les modèles de ce dossier et espace encore libre sur ce disque.";
 "Speculative decoding (MTP)" = "Décodage spéculatif (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Délai d’attente en cas de blocage : %lld s";

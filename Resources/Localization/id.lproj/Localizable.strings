@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "Hapus profil ini (model yang menggunakannya kembali ke Default).";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Menghapus runtime mlx-lm yang diunduh (dan runtime pembuatan gambar). Runtime akan disiapkan lagi dari awal saat server dimulai berikutnya. Obrolan dan profil tersimpan tetap dipertahankan.";
 "Diagnostics" = "Diagnostik";
+"Disk usage" = "Penggunaan disk";
 "Download" = "Unduh";
 "Download and Enable" = "Unduh dan Aktifkan";
+"Download into the models folder" = "Unduh ke folder models";
 "Download models" = "Unduh model";
 "Download models from Hugging Face" = "Unduh model dari Hugging Face";
 "Downloaded" = "Diunduh";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "Argumen server tambahan";
 "Failed: %@" = "Gagal: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan model draf yang dipublikasikan (Gemma 4 26B): model ekstra kecil menebak token berikutnya terlebih dahulu dan model utama memeriksanya dalam satu lintasan. Output sama, lebih cepat. Permintaan kemudian dilayani satu per satu.";
+"Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
 "Full" = "Penuh";
 "General" = "Umum";
@@ -111,6 +114,7 @@
 "Model card" = "Kartu model";
 "Models" = "Model";
 "Models folder" = "Folder model";
+"Models: %@ · free: %@" = "Model: %@ · tersisa: %@";
 "Network" = "Jaringan";
 "Never" = "Tidak Pernah";
 "New Profile…" = "Profil Baru…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "Tidak ada model yang ditemukan di folder ini.";
 "No runs yet." = "Belum ada yang dijalankan.";
 "No saved sessions" = "Tidak ada sesi tersimpan";
+"Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "OK" = "OK";
 "Off" = "Mati";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Mati: hanya Mac ini yang dapat mengakses server. Nyala: perangkat lain di jaringan Anda juga dapat mengaksesnya — siapa pun di jaringan itu, jadi gunakan hanya di jaringan yang Anda percayai.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Tampilkan file profil di Finder — JSON polos, dapat diedit manual, dan dapat disalin ke Mac lain.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
 "Sort by" = "Urutkan menurut";
+"Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
 "Speculative decoding (MTP)" = "Decoding spekulatif (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Waktu tunggu mandek: %lld dtk";

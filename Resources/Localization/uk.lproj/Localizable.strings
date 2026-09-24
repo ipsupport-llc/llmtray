@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "Видалити профіль (його моделі повернуться на Default)";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Видаляє завантажений рантайм mlx-lm (і рантайм генерації зображень). Під час наступного запуску сервера він встановиться заново. Збережені чати й профілі залишаються.";
 "Diagnostics" = "Діагностика";
+"Disk usage" = "Використання диска";
 "Download" = "Завантажити";
 "Download and Enable" = "Завантажити й увімкнути";
+"Download into the models folder" = "Завантажити в папку models";
 "Download models" = "Завантажити моделі";
 "Download models from Hugging Face" = "Завантажити моделі з Hugging Face";
 "Downloaded" = "Завантажено";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "Дод. аргументи сервера";
 "Failed: %@" = "Помилка: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей з опублікованим драфтером (Gemma 4 26B): маленька модель вгадує токени наперед, а основна перевіряє їх за один прохід. Відповідь та сама, але швидше. Запити при цьому обробляються по одному.";
+"Free on disk: %@ · your models: %@" = "Вільно на диску: %@ · ваші моделі: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
 "Full" = "Повний";
 "General" = "Основні";
@@ -111,6 +114,7 @@
 "Model card" = "Картка моделі";
 "Models" = "Моделі";
 "Models folder" = "Тека моделей";
+"Models: %@ · free: %@" = "Моделі: %@ · вільно: %@";
 "Network" = "Мережа";
 "Never" = "Ніколи";
 "New Profile…" = "Новий профіль…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "У цій теці моделей немає.";
 "No runs yet." = "Прогонів ще не було.";
 "No saved sessions" = "Збережених чатів немає";
+"Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
 "OK" = "OK";
 "Off" = "Вимк.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Вимк. — до сервера підключається лише цей Mac. Увімк. — будь-які пристрої у вашій мережі, тому вмикайте лише в довірених мережах.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Sort by" = "Сортування";
+"Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
 "Speculative decoding (MTP)" = "Спекулятивне декодування (MTP)";
 "Stable" = "Стабільний";
 "Stall timeout: %lld s" = "Таймаут зависання: %lld с";

@@ -63,8 +63,10 @@
 "Delete this profile (models using it go back to Default)" = "Bu profili sil (onu kullanan modeller Default profiline döner)";
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanını (ve görüntü oluşturma çalışma zamanını) siler. Bir sonraki sunucu başlatılışında sıfırdan yeniden kurulur. Kaydedilmiş sohbetler ve profiller korunur.";
 "Diagnostics" = "Tanılar";
+"Disk usage" = "Disk kullanımı";
 "Download" = "İndir";
 "Download and Enable" = "İndir ve Etkinleştir";
+"Download into the models folder" = "Modeller klasörüne indir";
 "Download models" = "Modelleri indir";
 "Download models from Hugging Face" = "Hugging Face'ten modelleri indir";
 "Downloaded" = "İndirildi";
@@ -75,6 +77,7 @@
 "Extra server arguments" = "Ek sunucu argümanları";
 "Failed: %@" = "Başarısız oldu: %@";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış taslak modeli olan modellerde (Gemma 4 26B): küçük bir ek model ilerideki token’ları tahmin eder ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. İstekler bu durumda teker teker işlenir.";
+"Free on disk: %@ · your models: %@" = "Diskte boş: %@ · modelleriniz: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Yüklü bir modelin tuttuğu belleği, bu kadar süre istek gelmezse serbest bırakır. Sonraki istekte, olağan yükleme gecikmesiyle otomatik olarak yeniden yüklenir.";
 "Full" = "Tam";
 "General" = "Genel";
@@ -111,6 +114,7 @@
 "Model card" = "Model kartı";
 "Models" = "Modeller";
 "Models folder" = "Modeller klasörü";
+"Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "Network" = "Ağ";
 "Never" = "Asla";
 "New Profile…" = "Yeni Profil…";
@@ -125,6 +129,7 @@
 "No models found in this folder." = "Bu klasörde model bulunamadı.";
 "No runs yet." = "Henüz çalıştırma yok.";
 "No saved sessions" = "Kayıtlı oturum yok";
+"Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
 "OK" = "Tamam";
 "Off" = "Kapalı";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Kapalı: sunucuya yalnızca bu Mac erişebilir. Açık: ağınızdaki diğer aygıtlar da erişebilir; ağdaki herkes erişebileceği için yalnızca güvendiğiniz ağlarda kullanın.";
@@ -196,6 +201,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Profil dosyalarını Finder’da gösterir — düz JSON, elle düzenlenebilir ve başka bir Mac’e kopyalanabilir.";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
 "Sort by" = "Sıralama ölçütü";
+"Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
 "Speculative decoding (MTP)" = "Spekülatif kod çözme (MTP)";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Takılma zaman aşımı: %lld sn";
