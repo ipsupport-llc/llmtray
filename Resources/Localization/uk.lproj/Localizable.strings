@@ -4,6 +4,7 @@
 
 "%@ → %@ available" = "Доступно: %@ → %@";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
+"%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld завантажень";
 "%lld-bit" = "%lld біт";
 "(no server output yet)" = "(виводу сервера ще немає)";
@@ -90,6 +91,7 @@
 "Keep first messages: %lld" = "Перших повідомлень зберігати: %lld";
 "Keep last messages: %lld" = "Останніх повідомлень зберігати: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
+"LLMTray" = "LLMTray";
 "Language" = "Мова";
 "Later" = "Пізніше";
 "Launch at login" = "Запускати під час входу";
@@ -227,6 +229,8 @@
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
 "Thought process" = "Хід міркувань";
 "Tool-use rule" = "Правило інструментів";
+"Top-k" = "Top-k";
+"Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирає decode-concurrency (1/2/4/8) і prefill-step-size (64/128/256/512) на запущеній моделі, перезапускаючи сервер між спробами, і залишає найшвидше.";
 "Uninstall" = "Видалити";
 "Uninstall Runtime Data…" = "Видалити дані рантайму…";
@@ -247,5 +251,9 @@
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
 "You" = "Ви";
 "copy" = "копія";
+"decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
+"decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"mlx-lm runtime" = "Середовище виконання mlx-lm";
 "not used by any model" = "не використовується жодною моделлю";
 "used by %@" = "використовують: %@";
+"· size…" = "· розмір…";

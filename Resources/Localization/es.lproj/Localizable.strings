@@ -4,6 +4,7 @@
 
 "%@ → %@ available" = "Disponible: %@ → %@";
 "%d overridden, rest from Default · %@" = "%d modificados, el resto de Default · %@";
+"%lld MB" = "%lld MB";
 "%lld downloads" = "%lld descargas";
 "%lld-bit" = "%lld bits";
 "(no server output yet)" = "(aún no hay salida del servidor)";
@@ -90,6 +91,7 @@
 "Keep first messages: %lld" = "Conservar primeros mensajes: %lld";
 "Keep last messages: %lld" = "Conservar últimos mensajes: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene los primeros N tokens del contexto en precisión completa antes de cuantizar. Más gana precisión en prompts largos a costa de ahorro de memoria.";
+"LLMTray" = "LLMTray";
 "Language" = "Idioma";
 "Later" = "Más tarde";
 "Launch at login" = "Abrir al iniciar sesión";
@@ -227,6 +229,8 @@
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "El archivo de este perfil no se puede leer, así que no se puede editar aquí. Corrige o elimina el archivo y vuelve a abrir Ajustes.";
 "Thought process" = "Razonamiento";
 "Tool-use rule" = "Regla de herramientas";
+"Top-k" = "Top-k";
+"Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Prueba decode-concurrency (1/2/4/8) y prefill-step-size (64/128/256/512) con el modelo en ejecución, reiniciando el servidor entre cada uno, y se queda con lo más rápido.";
 "Uninstall" = "Desinstalar";
 "Uninstall Runtime Data…" = "Desinstalar datos del runtime…";
@@ -247,5 +251,9 @@
 "Which Z-Image-Turbo quantization generates the images." = "Qué cuantización de Z-Image-Turbo genera las imágenes.";
 "You" = "Tú";
 "copy" = "copia";
+"decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
+"decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"mlx-lm runtime" = "Entorno de ejecución de mlx-lm";
 "not used by any model" = "no lo usa ningún modelo";
 "used by %@" = "lo usan: %@";
+"· size…" = "· tamaño…";
