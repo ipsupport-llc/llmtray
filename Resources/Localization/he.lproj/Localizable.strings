@@ -8,6 +8,7 @@
 "%lld MB" = "%lld מ״ב";
 "%lld downloads" = "%lld הורדות";
 "%lld-bit" = "%lld סיביות";
+"(no result yet)" = "(אין תוצאה עדיין)";
 "(no server output yet)" = "(עדיין אין פלט מהשרת)";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "בקשה שלא מפיקה דבר במשך זמן כזה נחשבת תקועה. זה קורה כשעובד שרת קורס (למשל בגלל מחסור בזיכרון GPU) בזמן שהתהליך ממשיך לפעול.";
@@ -45,7 +46,7 @@
 "Canvas size" = "גודל הקנבס";
 "Chat" = "צ׳אט";
 "Chat tools" = "כלי שיחה";
-"Chat tools for this model: %lld on" = "כלי שיחה עבור המודל הזה: %lld מופעלים";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "כלי שיחה של פרופיל „%@” (הפעלת %lld) — חל על כל מודל המשתמש בו";
 "Check Again" = "בדוק שוב";
 "Check Now" = "בדוק כעת";
 "Check for Runtime Updates" = "בדוק עדכוני זמן ריצה";
@@ -65,6 +66,7 @@
 "Currency rates" = "שערי מטבע";
 "Current settings are already fastest" = "ההגדרות הנוכחיות כבר המהירות ביותר";
 "Date & time" = "תאריך ושעה";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "ניפוי שגיאות: מתחת לתשובה, אילו כלים המודל קרא ואילו ארגומנטים העביר; הרחיבו אחד כדי לראות מה הוחזר. מתייחס רק לשיחה הנוכחית — קריאות כלים אינן נשמרות איתה.";
 "Delete" = "מחק";
 "Delete profile “%@”?" = "למחוק את הפרופיל ״%@״?";
 "Delete this profile (models using it go back to Default)" = "מוחק את הפרופיל הזה (מודלים שמשתמשים בו חוזרים ל־Default).";
@@ -209,6 +211,7 @@
 "Show reasoning" = "הצגת הנמקה";
 "Show the profile files in Finder" = "הצג את קובצי הפרופיל ב-Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "מציג את קובצי הפרופיל ב-Finder -- JSON פשוט, ניתן לעריכה ידנית ולהעתקה ל-Mac אחר.";
+"Show tool calls" = "הצג קריאות כלים";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
 "Sort by" = "מיון לפי";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";

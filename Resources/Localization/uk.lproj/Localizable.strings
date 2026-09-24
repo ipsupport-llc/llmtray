@@ -8,6 +8,7 @@
 "%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld завантажень";
 "%lld-bit" = "%lld біт";
+"(no result yet)" = "(ще немає результатів)";
 "(no server output yet)" = "(виводу сервера ще немає)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Тиха перевірка під час кожного запуску. Щось показує, лише якщо є оновлення.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Запит, який стільки часу нічого не видає, вважається завислим. Так буває, коли робочий потік сервера гине (наприклад, скінчилася пам'ять GPU), а сам процес живе далі.";
@@ -45,7 +46,7 @@
 "Canvas size" = "Розмір полотна";
 "Chat" = "Чат";
 "Chat tools" = "Інструменти чату";
-"Chat tools for this model: %lld on" = "Інструменти чату для цієї моделі: %lld увімк.";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Інструменти чату профілю «%@» (увімкнено %lld) — застосовується до кожної моделі, яка його використовує";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
 "Check for Runtime Updates" = "Перевірити оновлення рантайму";
@@ -65,6 +66,7 @@
 "Currency rates" = "Курси валют";
 "Current settings are already fastest" = "Поточні налаштування вже найшвидші";
 "Date & time" = "Дата й час";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Налагодження: під відповіддю показано, які інструменти модель викликала і з якими аргументами; розгорніть виклик, щоб побачити результат. Тільки для поточної розмови — виклики інструментів не зберігаються разом із нею.";
 "Delete" = "Видалити";
 "Delete profile “%@”?" = "Видалити профіль «%@»?";
 "Delete this profile (models using it go back to Default)" = "Видалити профіль (його моделі повернуться на Default)";
@@ -209,6 +211,7 @@
 "Show reasoning" = "Показувати міркування";
 "Show the profile files in Finder" = "Показати файли профілів у Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
+"Show tool calls" = "Показувати виклики інструментів";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Sort by" = "Сортування";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";

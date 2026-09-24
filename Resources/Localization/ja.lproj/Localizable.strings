@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld回のダウンロード";
 "%lld-bit" = "%lldビット";
+"(no result yet)" = "(結果はまだありません)";
 "(no server output yet)" = "（サーバ出力はまだありません）";
 "A quiet check at every launch. Only shows anything if an update exists." = "起動するたびに静かに確認します。アップデートがある場合にのみ表示します。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "この時間内に何も生成しないリクエストは停止と見なします。これは、プロセスは動作したままサーバワーカーが停止した場合（例: GPU メモリ不足）に発生します。";
@@ -45,7 +46,7 @@
 "Canvas size" = "キャンバスサイズ";
 "Chat" = "チャット";
 "Chat tools" = "チャットツール";
-"Chat tools for this model: %lld on" = "このモデルのチャットツール：%lld 個有効";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "プロファイル「%@」のチャットツール（%lld 件オン）— これを使用する全てのモデルに適用されます";
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
 "Check for Runtime Updates" = "ランタイムアップデートを確認";
@@ -65,6 +66,7 @@
 "Currency rates" = "為替レート";
 "Current settings are already fastest" = "現在の設定はすでに最速です";
 "Date & time" = "日付と時刻";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "デバッグ：回答の下に、モデルが呼び出したツールとその引数を表示します。展開すると返り値を確認できます。現在のチャットのみ対象で、ツール呼び出しは保存されません。";
 "Delete" = "削除";
 "Delete profile “%@”?" = "プロファイル“%@”を削除しますか？";
 "Delete this profile (models using it go back to Default)" = "このプロファイルを削除します（使用中のモデルはDefaultに戻ります）。";
@@ -209,6 +211,7 @@
 "Show reasoning" = "推論を表示";
 "Show the profile files in Finder" = "プロファイルファイルを Finder に表示";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "プロファイルファイルを Finder に表示します。プレーン JSON で、手動編集や別の Mac へのコピーができます。";
+"Show tool calls" = "ツール呼び出しを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
 "Sort by" = "並べ替え";
 "Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";

@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld download";
 "%lld-bit" = "%lld bit";
+"(no result yet)" = "(ancora nessun risultato)";
 "(no server output yet)" = "(nessun output del server per ora)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Un controllo discreto a ogni avvio. Mostra qualcosa solo se è disponibile un aggiornamento.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Una richiesta che non produce nulla per questo intervallo viene considerata in stallo. Succede quando un worker del server si interrompe (ad es. per memoria GPU esaurita) mentre il processo resta attivo.";
@@ -45,7 +46,7 @@
 "Canvas size" = "Dimensioni canvas";
 "Chat" = "Chat";
 "Chat tools" = "Strumenti chat";
-"Chat tools for this model: %lld on" = "Strumenti chat per questo modello: %lld attivi";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Strumenti chat del profilo “%@” (%lld attivi) — si applica a ogni modello che lo usa";
 "Check Again" = "Ricontrolla";
 "Check Now" = "Controlla ora";
 "Check for Runtime Updates" = "Verifica aggiornamenti del runtime";
@@ -65,6 +66,7 @@
 "Currency rates" = "Tassi di cambio";
 "Current settings are already fastest" = "Le impostazioni attuali sono già le più veloci";
 "Date & time" = "Data e ora";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debug: sotto una risposta, quali strumenti il modello ha chiamato e con quali argomenti; espandi uno per vedere cosa ha restituito. Valido solo per la chat corrente — le chiamate agli strumenti non vengono salvate con essa.";
 "Delete" = "Elimina";
 "Delete profile “%@”?" = "Eliminare il profilo “%@”?";
 "Delete this profile (models using it go back to Default)" = "Elimina questo profilo (i modelli che lo usano tornano a Default).";
@@ -209,6 +211,7 @@
 "Show reasoning" = "Mostra ragionamento";
 "Show the profile files in Finder" = "Mostra i file del profilo in Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Mostra i file del profilo in Finder: JSON semplice, modificabile a mano e copiabile su un altro Mac.";
+"Show tool calls" = "Mostra chiamate agli strumenti";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Mostra il ragionamento del modello (il blocco comprimibile «Processo di pensiero») sopra la risposta.";
 "Sort by" = "Ordina per";
 "Space the models in this folder take, and what's still free on its disk." = "Spazio occupato dai modelli in questa cartella e spazio ancora libero sul relativo disco.";

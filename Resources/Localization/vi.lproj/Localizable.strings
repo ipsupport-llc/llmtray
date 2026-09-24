@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld lượt tải xuống";
 "%lld-bit" = "%lld bit";
+"(no result yet)" = "(chưa có kết quả)";
 "(no server output yet)" = "(chưa có đầu ra từ máy chủ)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Yêu cầu không tạo ra gì trong khoảng thời gian này sẽ được xem là bị kẹt. Điều này xảy ra khi một worker của máy chủ chết (ví dụ: hết bộ nhớ GPU) trong khi tiến trình vẫn chạy.";
@@ -45,7 +46,7 @@
 "Canvas size" = "Kích thước canvas";
 "Chat" = "Trò chuyện";
 "Chat tools" = "Công cụ chat";
-"Chat tools for this model: %lld on" = "Công cụ chat cho mô hình này: %lld đã bật";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Công cụ chat của hồ sơ “%@” (bật %lld) — áp dụng cho mọi mô hình dùng hồ sơ này";
 "Check Again" = "Kiểm tra lại";
 "Check Now" = "Kiểm tra ngay";
 "Check for Runtime Updates" = "Kiểm tra bản cập nhật môi trường chạy";
@@ -65,6 +66,7 @@
 "Currency rates" = "Tỷ giá tiền tệ";
 "Current settings are already fastest" = "Cài đặt hiện tại đã là nhanh nhất";
 "Date & time" = "Ngày & giờ";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Gỡ lỗi: dưới một câu trả lời, công cụ nào mô hình đã gọi và với đối số gì; mở rộng một mục để xem nó trả về gì. Chỉ cho cuộc trò chuyện hiện tại — các lần gọi công cụ không được lưu cùng cuộc trò chuyện.";
 "Delete" = "Xóa";
 "Delete profile “%@”?" = "Xóa hồ sơ “%@”?";
 "Delete this profile (models using it go back to Default)" = "Xóa hồ sơ này (các mô hình dùng hồ sơ này sẽ quay về Default)";
@@ -209,6 +211,7 @@
 "Show reasoning" = "Hiển thị suy luận";
 "Show the profile files in Finder" = "Hiển thị tệp hồ sơ trong Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Hiển thị các tệp hồ sơ trong Finder — JSON thuần, có thể sửa bằng tay và sao chép sang máy Mac khác.";
+"Show tool calls" = "Hiện lần gọi công cụ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
 "Sort by" = "Sắp xếp theo";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";

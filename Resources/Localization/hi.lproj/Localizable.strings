@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld डाउनलोड";
 "%lld-bit" = "%lld-बिट";
+"(no result yet)" = "(अब तक कोई परिणाम नहीं)";
 "(no server output yet)" = "(अभी सर्वर आउटपुट नहीं)";
 "A quiet check at every launch. Only shows anything if an update exists." = "हर लॉन्च पर चुपचाप जाँच। कुछ तभी दिखाता है जब कोई अपडेट उपलब्ध हो।";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "जो अनुरोध इतने समय तक कुछ नहीं देता, उसे रुका हुआ माना जाता है। ऐसा तब होता है जब प्रोसेस चालू रहता है लेकिन सर्वर वर्कर बंद हो जाता है, जैसे GPU मेमोरी खत्म होने पर।";
@@ -45,7 +46,7 @@
 "Canvas size" = "कैनवास आकार";
 "Chat" = "चैट";
 "Chat tools" = "चैट टूल्स";
-"Chat tools for this model: %lld on" = "इस मॉडल के लिए चैट टूल्स: %lld चालू";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "प्रोफ़ाइल “%@” के चैट टूल (%lld चालू) — यह इसे उपयोग करने वाले हर मॉडल पर लागू होता है";
 "Check Again" = "फिर से जाँचें";
 "Check Now" = "अभी जाँचें";
 "Check for Runtime Updates" = "रनटाइम अपडेट जाँचें";
@@ -65,6 +66,7 @@
 "Currency rates" = "मुद्रा दरें";
 "Current settings are already fastest" = "वर्तमान सेटिंग पहले से ही सबसे तेज़ हैं";
 "Date & time" = "तिथि और समय";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "डिबगिंग: उत्तर के नीचे दिखता है कि मॉडल ने किन टूल्स को किस आर्गुमेंट के साथ बुलाया; किसी एक को विस्तार से खोलें ताकि यह देखें कि उसने क्या लौटाया। यह केवल वर्तमान चैट के लिए है — टूल कॉल्स चैट के साथ सहेजे नहीं जाते।";
 "Delete" = "हटाएँ";
 "Delete profile “%@”?" = "प्रोफ़ाइल “%@” हटाएँ?";
 "Delete this profile (models using it go back to Default)" = "इस प्रोफ़ाइल को हटाता है (इसका उपयोग करने वाले मॉडल Default पर वापस चले जाते हैं)।";
@@ -209,6 +211,7 @@
 "Show reasoning" = "तर्क दिखाएँ";
 "Show the profile files in Finder" = "प्रोफ़ाइल फ़ाइलें Finder में दिखाएँ";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "प्रोफ़ाइल फ़ाइलें Finder में दिखाएँ — सादा JSON, हाथ से संपादित करने योग्य, और दूसरे Mac पर कॉपी करने योग्य।";
+"Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
 "Sort by" = "इसके अनुसार क्रमित करें";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";

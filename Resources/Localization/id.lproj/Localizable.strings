@@ -8,6 +8,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld unduhan";
 "%lld-bit" = "%lld-bit";
+"(no result yet)" = "(belum ada hasil)";
 "(no server output yet)" = "(belum ada output server)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Pemeriksaan senyap di setiap peluncuran. Hanya menampilkan sesuatu jika ada pembaruan.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Permintaan yang tidak menghasilkan apa pun selama ini dianggap macet. Ini terjadi saat worker server mati (misalnya karena kehabisan memori GPU) sementara proses tetap berjalan.";
@@ -45,7 +46,7 @@
 "Canvas size" = "Ukuran kanvas";
 "Chat" = "Obrolan";
 "Chat tools" = "Alat obrolan";
-"Chat tools for this model: %lld on" = "Alat obrolan untuk model ini: %lld aktif";
+"Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Alat obrolan untuk profil “%@” (%lld aktif) — berlaku untuk setiap model yang menggunakannya";
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
 "Check for Runtime Updates" = "Periksa Pembaruan Runtime";
@@ -65,6 +66,7 @@
 "Currency rates" = "Kurs mata uang";
 "Current settings are already fastest" = "Pengaturan saat ini sudah paling cepat";
 "Date & time" = "Tanggal & waktu";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: di bawah jawaban, alat mana yang dipanggil model dan dengan argumen apa; kembangkan salah satunya untuk melihat apa yang dikembalikan. Hanya untuk obrolan saat ini — pemanggilan alat tidak disimpan bersamanya.";
 "Delete" = "Hapus";
 "Delete profile “%@”?" = "Hapus profil “%@”?";
 "Delete this profile (models using it go back to Default)" = "Hapus profil ini (model yang menggunakannya kembali ke Default).";
@@ -209,6 +211,7 @@
 "Show reasoning" = "Tampilkan penalaran";
 "Show the profile files in Finder" = "Tampilkan file profil di Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Tampilkan file profil di Finder — JSON polos, dapat diedit manual, dan dapat disalin ke Mac lain.";
+"Show tool calls" = "Tampilkan pemanggilan alat";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
 "Sort by" = "Urutkan menurut";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
