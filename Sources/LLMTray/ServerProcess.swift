@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 /// One mlx_lm.server process: its output, its exit, and stopping it.
 /// ServerManager owns the lifecycle around it; an old instance's late
@@ -24,9 +25,14 @@ final class ServerProcess {
         task.standardError = pipe
 
         let handle = pipe.fileHandleForReading
+        // A chunk can end mid-character (non-ASCII text, progress bars);
+        // decoded as a whole it would fail and be dropped.
+        let decoder = UTF8StreamDecoder()
         handle.readabilityHandler = { [weak self] fh in
             let data = fh.availableData
-            guard !data.isEmpty, let text = String(data: data, encoding: .utf8) else { return }
+            guard !data.isEmpty else { return }
+            let text = decoder.decode(data)
+            guard !text.isEmpty else { return }
             Task { @MainActor [weak self] in self?.onOutput?(text) }
         }
         task.terminationHandler = { proc in

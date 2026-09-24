@@ -640,7 +640,7 @@ struct ServerPane: View {
                         SettingLabel(title: "Stall timeout: \(stallThresholdSeconds) s", help: "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.")
                     }
                     Stepper(value: $autoRestartStallThreshold, in: 0...10) {
-                        SettingLabel(title: autoRestartStallThreshold == 0 ? "Auto-restart: off" : "Auto-restart after \(autoRestartStallThreshold) stalls", help: "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off.")
+                        SettingLabel(title: autoRestartStallThreshold == 0 ? "Auto-restart: off" : "Auto-restart after \(autoRestartStallThreshold) stalls", help: "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off.")
                     }
                 }
                 Section("Diagnostics") {
