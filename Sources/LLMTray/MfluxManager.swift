@@ -136,37 +136,6 @@ final class MfluxManager: ObservableObject {
         RuntimePaths.externalRuntimeDir + "/mflux_models/\(model.rawValue)"
     }
 
-    // Same candidate list/version check as ServerManager.pythonCandidates + isModernPython --
-    // duplicated rather than shared, matching this codebase's existing
-    // precedent of each manager owning its own small runProcess/Python-
-    // discovery helpers (see RuntimeManager.swift) instead of a shared base.
-    private func findModernPython3() -> String? {
-        let candidates = [
-            "/opt/homebrew/bin/python3",
-            "/usr/local/bin/python3",
-            NSString(string: "~/.pyenv/shims/python3").expandingTildeInPath,
-            "/opt/local/bin/python3",
-            NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
-            NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
-        ]
-        return candidates.first { FileManager.default.isExecutableFile(atPath: $0) && isModernPython($0) }
-    }
-
-    private func isModernPython(_ path: String) -> Bool {
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: path)
-        task.arguments = ["-c", "import sys; exit(0 if sys.version_info >= (3, 10) else 1)"]
-        task.standardOutput = FileHandle.nullDevice
-        task.standardError = FileHandle.nullDevice
-        do {
-            try task.run()
-            task.waitUntilExit()
-            return task.terminationStatus == 0
-        } catch {
-            return false
-        }
-    }
-
     /// Installs the mflux *package* -- not the model weights, which mflux
     /// downloads itself, lazily, the first time a given model is actually
     /// loaded. Idempotent and cheap once the venv exists.
@@ -175,7 +144,7 @@ final class MfluxManager: ObservableObject {
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
         if !FileManager.default.fileExists(atPath: venvDir) {
-            guard let python = findModernPython3() else { throw MfluxError.noPython }
+            guard let python = await PythonLocator.findModern() else { throw MfluxError.noPython }
             statusText = "Setting up image generation (first time only)…"
             try await runProcess(python, ["-m", "venv", venvDir])
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
@@ -332,27 +301,10 @@ final class MfluxManager: ObservableObject {
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let task = Process()
-            task.executableURL = URL(fileURLWithPath: executable)
-            task.arguments = arguments
-            task.standardInput = FileHandle.nullDevice
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = pipe
-            task.terminationHandler = { proc in
-                if proc.terminationStatus == 0 {
-                    continuation.resume()
-                } else {
-                    let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                    continuation.resume(throwing: MfluxError.processFailed(String(output.suffix(800))))
-                }
-            }
-            do {
-                try task.run()
-            } catch {
-                continuation.resume(throwing: error)
-            }
+        do {
+            try await ProcessRunner.run(executable, arguments)
+        } catch let failure as ProcessRunner.Failure {
+            throw MfluxError.processFailed(failure.outputTail)
         }
     }
 }

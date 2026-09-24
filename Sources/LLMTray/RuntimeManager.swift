@@ -36,14 +36,11 @@ final class RuntimeManager: ObservableObject {
 
     private var runtimeDir: String { RuntimePaths.runtimeDir }
     private var pinFilePath: String { runtimeDir + "/mlx_lm_runtime.json" }
-    // The venv itself lives outside the bundle now (see ServerManager's
-    // venvDir / RuntimePaths.externalRuntimeDir) so Sparkle replacing
-    // Contents/ on every auto-update doesn't wipe it -- this has to point
-    // at the exact same place ServerManager actually runs the server from,
-    // or "Update" here would pip-install into a venv nothing ever reads.
-    private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
-    private var venvPython: String { venvDir + "/bin/python" }
-    private var versionMarkerPath: String { venvDir + "/.llmtray_pinned_version" }
+    // The exact venv ServerManager runs the server from (outside the
+    // bundle, so Sparkle updates don't wipe it) -- anything else and
+    // "Update" here would pip-install into a venv nothing ever reads.
+    private var venvPython: String { MLXRuntimeInstaller.venvPython }
+    private var versionMarkerPath: String { MLXRuntimeInstaller.versionMarkerPath }
 
     func pinnedVersion() -> String? {
         guard let data = FileManager.default.contents(atPath: pinFilePath),
@@ -100,7 +97,7 @@ final class RuntimeManager: ObservableObject {
         Task {
             do {
                 let gitURL = "git+https://github.com/\(Self.repo).git@\(commit)"
-                try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
+                try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
                 try writePinnedVersion(commit)
                 checkState = .upToDate(commit)
             } catch {
@@ -111,7 +108,7 @@ final class RuntimeManager: ObservableObject {
 
     /// Updates both the bundled pin (what a fresh install/first bootstrap
     /// will target) and the external venv's own version marker (what
-    /// ServerManager.ensureRuntimeReady compares against to decide whether
+    /// MLXRuntimeInstaller.ensureReady compares against to decide whether
     /// the venv needs touching) -- if only the bundled copy changed, the
     /// next server start would see the marker "behind" the pin and
     /// re-install right back down to the bundle's original commit,
@@ -125,30 +122,5 @@ final class RuntimeManager: ObservableObject {
         let data = try JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted])
         try data.write(to: URL(fileURLWithPath: pinFilePath))
         try commit.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
-    }
-
-    private func runProcess(_ executable: String, _ arguments: [String]) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let task = Process()
-            task.executableURL = URL(fileURLWithPath: executable)
-            task.arguments = arguments
-            task.standardInput = FileHandle.nullDevice
-            let pipe = Pipe()
-            task.standardOutput = pipe
-            task.standardError = pipe
-            task.terminationHandler = { proc in
-                if proc.terminationStatus == 0 {
-                    continuation.resume()
-                } else {
-                    let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                    continuation.resume(throwing: NSError(domain: "RuntimeManager", code: Int(proc.terminationStatus), userInfo: [NSLocalizedDescriptionKey: "\(executable) exited \(proc.terminationStatus): \(output.suffix(500))"]))
-                }
-            }
-            do {
-                try task.run()
-            } catch {
-                continuation.resume(throwing: error)
-            }
-        }
     }
 }
