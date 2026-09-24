@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ が利用可能";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld回のダウンロード";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: テスト中の機能を含むプレリリースビルドと、mlx-lmのBetaブランチからのランタイムアップデートです。Stableに戻しても、インストール済みのBetaはダウングレードされません。次のStableリリースで置き換えられます。";
 "Browse Hugging Face…" = "Hugging Faceをブラウズ…";
+"Calculator" = "計算機";
 "Can't change models while auto-tune is running" = "自動チューニングの実行中はモデルを変更できません。";
 "Can't switch profiles while a request or the auto-tune is running" = "リクエストまたは自動チューニングの実行中はプロファイルを切り替えられません。";
 "Cancel" = "キャンセル";
 "Cancel download" = "ダウンロードをキャンセルします。";
 "Canvas size" = "キャンバスサイズ";
 "Chat" = "チャット";
+"Chat tools" = "チャットツール";
+"Chat tools for this model: %lld on" = "このモデルのチャットツール：%lld 個有効";
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
 "Check for Runtime Updates" = "ランタイムアップデートを確認";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "メッセージ数がこの数を超えると、チャットを自動的に圧縮します。チャット内の「圧縮」ボタンは、この設定にかかわらず使用できます。";
 "Concurrent requests" = "同時リクエスト数";
 "Copy" = "コピー";
+"Country facts" = "国の基本情報";
+"Currency rates" = "為替レート";
 "Current settings are already fastest" = "現在の設定はすでに最速です";
+"Date & time" = "日付と時刻";
 "Delete" = "削除";
 "Delete profile “%@”?" = "プロファイル“%@”を削除しますか？";
 "Delete this profile (models using it go back to Default)" = "このプロファイルを削除します（使用中のモデルはDefaultに戻ります）。";
@@ -83,6 +90,7 @@
 "General" = "一般";
 "Generating image…" = "画像を生成中…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
@@ -123,6 +131,7 @@
 "New profile" = "新規プロファイル";
 "New profile (inherits everything from Default)" = "新規プロファイル（Default からすべてを継承）";
 "New temporary chat -- nothing about it is ever saved" = "新規一時チャット — 内容は一切保存されません";
+"News" = "ニュース";
 "No auto-tune run yet." = "自動調整はまだ実行されていません。";
 "No messages yet" = "メッセージはまだありません";
 "No model uses it." = "使用しているモデルはありません。";
@@ -149,6 +158,7 @@
 "Prompt cache" = "プロンプトキャッシュ";
 "Prompt size" = "プロンプトサイズ";
 "Prompt size (input sent to the model):" = "プロンプトサイズ（モデルに送信される入力）:";
+"Public holidays" = "祝日";
 "Quantization group size for the KV cache. 64 is a good default." = "KV キャッシュの量子化グループサイズ。64 が適切な既定値です。";
 "Quantize KV from token" = "指定トークン以降の KV を量子化";
 "Quick benchmark" = "クイックベンチマーク";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "コンパクト化するときに、直近のメッセージをこの件数だけ原文のまま保持します。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "このプロファイルのファイルを読み込めないため、ここでは編集できません。ファイルを修正または削除してから、設定を開き直してください。";
 "Thought process" = "思考プロセス";
+"Time in a city" = "都市の時刻";
+"Tool Settings…" = "ツール設定…";
 "Tool-use rule" = "ツール使用ルール";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "モデルがアプリ内チャットで呼び出せるツール（ツール呼び出し対応モデルが必要）です。Webツールはモデルの問い合わせを該当の公開サービス（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）に送信します。ローカルのツールはMac外に出ません。";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
@@ -251,12 +264,15 @@
 "Updates" = "アップデート";
 "Use Folder" = "フォルダを使用";
 "Use LM Studio's folder" = "LM Studioのフォルダを使用";
+"Uses the internet" = "インターネットを使用";
 "Verbose server logging" = "詳細なサーバログ";
 "Version" = "バージョン";
 "View model card" = "モデルカードを表示します。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
+"Web search" = "ウェブ検索";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which Z-Image-Turbo quantization generates the images." = "画像生成に使用する Z-Image-Turbo の量子化を指定します。";
+"Wikipedia" = "Wikipedia";
 "You" = "あなた";
 "copy" = "コピー";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld、prefill-step-size %lld";

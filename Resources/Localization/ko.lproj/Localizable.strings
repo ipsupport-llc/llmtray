@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ 사용 가능";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d개 재정의, 나머지는 Default에서 · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld회 다운로드";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: 아직 테스트 중인 기능이 포함된 사전 출시 빌드와 mlx-lm의 beta 브랜치 런타임 업데이트를 사용합니다. Stable로 다시 전환해도 설치된 beta는 다운그레이드되지 않으며, 다음 Stable 릴리스가 이를 대체합니다.";
 "Browse Hugging Face…" = "Hugging Face 둘러보기…";
+"Calculator" = "계산기";
 "Can't change models while auto-tune is running" = "자동 튜닝이 실행 중일 때는 모델을 변경할 수 없습니다.";
 "Can't switch profiles while a request or the auto-tune is running" = "요청 또는 자동 튜닝이 실행 중일 때는 프로파일을 전환할 수 없습니다.";
 "Cancel" = "취소";
 "Cancel download" = "다운로드를 취소합니다.";
 "Canvas size" = "캔버스 크기";
 "Chat" = "채팅";
+"Chat tools" = "채팅 도구";
+"Chat tools for this model: %lld on" = "이 모델의 채팅 도구: %lld개 활성화";
 "Check Again" = "다시 확인";
 "Check Now" = "지금 확인";
 "Check for Runtime Updates" = "런타임 업데이트 확인";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "채팅의 메시지가 이 개수를 넘으면 자동으로 압축합니다. 채팅의 압축 버튼은 이 설정과 관계없이 작동합니다.";
 "Concurrent requests" = "동시 요청 수";
 "Copy" = "복사";
+"Country facts" = "국가 정보";
+"Currency rates" = "환율";
 "Current settings are already fastest" = "현재 설정이 이미 가장 빠릅니다";
+"Date & time" = "날짜 및 시간";
 "Delete" = "삭제";
 "Delete profile “%@”?" = "“%@” 프로파일을 삭제하겠습니까?";
 "Delete this profile (models using it go back to Default)" = "이 프로파일을 삭제합니다. 이 프로파일을 사용하는 모델은 Default로 돌아갑니다.";
@@ -83,6 +90,7 @@
 "General" = "일반";
 "Generating image…" = "이미지 생성 중…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "모델에 generate_image 도구를 제공합니다(도구 호출 모델 필요). 처음 사용할 때 이미지 모델이 다운로드됩니다.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
 "How many tokens it generates per trial." = "시도당 생성 토큰 수";
@@ -123,6 +131,7 @@
 "New profile" = "새 프로파일";
 "New profile (inherits everything from Default)" = "새 프로파일(Default의 모든 항목을 상속)";
 "New temporary chat -- nothing about it is ever saved" = "새 임시 채팅입니다. 어떤 내용도 저장되지 않습니다.";
+"News" = "뉴스";
 "No auto-tune run yet." = "아직 자동 조정 실행이 없습니다.";
 "No messages yet" = "아직 메시지가 없음";
 "No model uses it." = "사용 중인 모델이 없습니다.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "프롬프트 캐시";
 "Prompt size" = "프롬프트 크기";
 "Prompt size (input sent to the model):" = "프롬프트 크기(모델로 전송되는 입력):";
+"Public holidays" = "공휴일";
 "Quantization group size for the KV cache. 64 is a good default." = "KV 캐시의 양자화 그룹 크기입니다. 64가 적절한 기본값입니다.";
 "Quantize KV from token" = "KV 양자화 시작 토큰";
 "Quick benchmark" = "빠른 벤치마크";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "압축할 때 가장 최근 메시지 중 이 개수만큼을 원문 그대로 유지합니다.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
 "Thought process" = "사고 과정";
+"Time in a city" = "도시별 시간";
+"Tool Settings…" = "도구 설정…";
 "Tool-use rule" = "도구 사용 규칙";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "모델이 앱 내 채팅에서 호출할 수 있는 도구입니다(도구 호출을 지원하는 모델 필요). 웹 도구는 모델의 질의를 해당 공개 서비스(DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo)로 전송하며, 로컬 도구는 Mac을 벗어나지 않습니다.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "실행 중인 모델에 대해 서버를 매번 재시작하며 decode-concurrency(1/2/4/8)와 prefill-step-size(64/128/256/512)를 시도하고, 측정 결과가 가장 빠른 값을 유지합니다.";
@@ -251,12 +264,15 @@
 "Updates" = "업데이트";
 "Use Folder" = "폴더 사용";
 "Use LM Studio's folder" = "LM Studio 폴더 사용";
+"Uses the internet" = "인터넷 사용";
 "Verbose server logging" = "자세한 서버 로깅";
 "Version" = "버전";
 "View model card" = "모델 카드를 엽니다.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "현재 요청 또는 벤치마크가 끝날 때까지 기다리십시오. 재시작하면 중단됩니다.";
+"Web search" = "웹 검색";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
 "Which Z-Image-Turbo quantization generates the images." = "이미지를 생성할 Z-Image-Turbo 양자화를 지정합니다.";
+"Wikipedia" = "Wikipedia";
 "You" = "나";
 "copy" = "복사";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

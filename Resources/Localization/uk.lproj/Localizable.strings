@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "Доступно: %@ → %@";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
 "%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld завантажень";
@@ -36,12 +37,15 @@
 "Beta" = "Бета";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Бета — попередні збірки з функціями, які ще тестуються, і оновлення рантайму з бета-гілки mlx-lm. Повернення на Stable не відкочує встановлену бету: її замінить наступний стабільний реліз.";
 "Browse Hugging Face…" = "Відкрити Hugging Face…";
+"Calculator" = "Калькулятор";
 "Can't change models while auto-tune is running" = "Не можна змінювати модель під час автопідбору";
 "Can't switch profiles while a request or the auto-tune is running" = "Не можна змінити профіль, поки триває запит або автопідбір";
 "Cancel" = "Скасувати";
 "Cancel download" = "Скасувати завантаження";
 "Canvas size" = "Розмір полотна";
 "Chat" = "Чат";
+"Chat tools" = "Інструменти чату";
+"Chat tools for this model: %lld on" = "Інструменти чату для цієї моделі: %lld увімк.";
 "Check Again" = "Перевірити знову";
 "Check Now" = "Перевірити зараз";
 "Check for Runtime Updates" = "Перевірити оновлення рантайму";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Стискає чат автоматично, коли в ньому стає більше повідомлень. Кнопка «Стиснути» в чаті працює в будь-якому разі.";
 "Concurrent requests" = "Паралельні запити";
 "Copy" = "Копіювати";
+"Country facts" = "Факти про країну";
+"Currency rates" = "Курси валют";
 "Current settings are already fastest" = "Поточні налаштування вже найшвидші";
+"Date & time" = "Дата й час";
 "Delete" = "Видалити";
 "Delete profile “%@”?" = "Видалити профіль «%@»?";
 "Delete this profile (models using it go back to Default)" = "Видалити профіль (його моделі повернуться на Default)";
@@ -83,6 +90,7 @@
 "General" = "Основні";
 "Generating image…" = "Генерую зображення…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Дає моделі інструмент generate_image (потрібна модель, що вміє викликати інструменти). Першого разу завантажується модель для зображень.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
@@ -123,6 +131,7 @@
 "New profile" = "Новий профіль";
 "New profile (inherits everything from Default)" = "Новий профіль (усе успадковує від Default)";
 "New temporary chat -- nothing about it is ever saved" = "Новий тимчасовий чат -- нічого з нього не зберігається";
+"News" = "Новини";
 "No auto-tune run yet." = "Автопідбір ще не запускався.";
 "No messages yet" = "Повідомлень поки немає";
 "No model uses it." = "Жодна модель його не використовує.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "Кеш промптів";
 "Prompt size" = "Розмір промпту";
 "Prompt size (input sent to the model):" = "Розмір промпту (що надсилається моделі):";
+"Public holidays" = "Державні свята";
 "Quantization group size for the KV cache. 64 is a good default." = "Розмір групи квантування KV-кешу. 64 — добрий варіант за замовчуванням.";
 "Quantize KV from token" = "Квантувати KV з токена";
 "Quick benchmark" = "Швидкий бенчмарк";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
 "Thought process" = "Хід міркувань";
+"Time in a city" = "Час у місті";
+"Tool Settings…" = "Параметри інструментів…";
 "Tool-use rule" = "Правило інструментів";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Інструменти, які модель може викликати в чаті додатка (потрібна модель із викликом інструментів). Веб‑інструменти надсилають запит моделі до відповідного публічного сервісу (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); локальні інструменти ніколи не покидають Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирає decode-concurrency (1/2/4/8) і prefill-step-size (64/128/256/512) на запущеній моделі, перезапускаючи сервер між спробами, і залишає найшвидше.";
@@ -251,12 +264,15 @@
 "Updates" = "Оновлення";
 "Use Folder" = "Вибрати теку";
 "Use LM Studio's folder" = "Тека LM Studio";
+"Uses the internet" = "Використовує інтернет";
 "Verbose server logging" = "Докладний лог сервера";
 "Version" = "Версія";
 "View model card" = "Картка моделі";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
+"Web search" = "Веб‑пошук";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
+"Wikipedia" = "Wikipedia";
 "You" = "Ви";
 "copy" = "копія";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

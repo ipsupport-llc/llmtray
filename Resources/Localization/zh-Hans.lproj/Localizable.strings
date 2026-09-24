@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ 可用";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld 次下载";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta：预发布版本，包含仍在测试的功能，并使用来自 mlx-lm 的 Beta 分支的运行时更新。切换回 Stable 不会降级已安装的 Beta；下一个 Stable 版本会替换它。";
 "Browse Hugging Face…" = "浏览 Hugging Face…";
+"Calculator" = "计算器";
 "Can't change models while auto-tune is running" = "自动调优运行时无法更改模型";
 "Can't switch profiles while a request or the auto-tune is running" = "请求或自动调优运行时无法切换配置";
 "Cancel" = "取消";
 "Cancel download" = "取消下载";
 "Canvas size" = "画布大小";
 "Chat" = "聊天";
+"Chat tools" = "聊天工具";
+"Chat tools for this model: %lld on" = "此模型的聊天工具：已启用 %lld";
 "Check Again" = "再次检查";
 "Check Now" = "立即检查";
 "Check for Runtime Updates" = "检查运行时更新";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "聊天消息数超过此数量后自动压缩。无论此设置如何，聊天中的“压缩”按钮都可使用。";
 "Concurrent requests" = "并发请求";
 "Copy" = "复制";
+"Country facts" = "国家资料";
+"Currency rates" = "汇率";
 "Current settings are already fastest" = "当前设置已是最快";
+"Date & time" = "日期与时间";
 "Delete" = "删除";
 "Delete profile “%@”?" = "删除配置“%@”？";
 "Delete this profile (models using it go back to Default)" = "删除此配置（使用它的模型会改回 Default）";
@@ -83,6 +90,7 @@
 "General" = "通用";
 "Generating image…" = "正在生成图像…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "为模型提供 generate_image 工具（需要支持工具调用的模型）。首次使用时会下载图像模型。";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
 "How many tokens it generates per trial." = "每次试验生成的词元数。";
@@ -123,6 +131,7 @@
 "New profile" = "新建配置";
 "New profile (inherits everything from Default)" = "新建配置（继承 Default 的所有设置）。";
 "New temporary chat -- nothing about it is ever saved" = "新建临时聊天；其中任何内容都不会保存。";
+"News" = "新闻";
 "No auto-tune run yet." = "尚未运行自动调优。";
 "No messages yet" = "暂无消息";
 "No model uses it." = "没有模型使用它。";
@@ -149,6 +158,7 @@
 "Prompt cache" = "提示词缓存";
 "Prompt size" = "提示词大小";
 "Prompt size (input sent to the model):" = "提示词大小（发送给模型的输入）：";
+"Public holidays" = "公共假期";
 "Quantization group size for the KV cache. 64 is a good default." = "KV 缓存的量化组大小。64 是不错的默认值。";
 "Quantize KV from token" = "KV 量化起始词元";
 "Quick benchmark" = "快速基准测试";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "压缩时会逐字保留这么多条最近消息。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
 "Thought process" = "思考过程";
+"Time in a city" = "城市时间";
+"Tool Settings…" = "工具设置…";
 "Tool-use rule" = "工具使用规则";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型可在应用内聊天中调用的工具（需支持调用工具的模型）。网页版工具会将模型的查询发送到相应的公共服务（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本地工具的数据不会离开这台 Mac。";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "对正在运行的模型尝试 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之间都会重启服务器，并保留实测最快的组合。";
@@ -251,12 +264,15 @@
 "Updates" = "更新";
 "Use Folder" = "使用文件夹";
 "Use LM Studio's folder" = "使用 LM Studio 的文件夹";
+"Uses the internet" = "使用互联网";
 "Verbose server logging" = "详细服务器日志";
 "Version" = "版本";
 "View model card" = "查看模型卡片";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "请等待当前请求或基准测试完成——重启会将其中断。";
+"Web search" = "网络搜索";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
 "Which Z-Image-Turbo quantization generates the images." = "用于生成图像的 Z-Image-Turbo 量化版本。";
+"Wikipedia" = "Wikipedia";
 "You" = "你";
 "copy" = "复制";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld，prefill-step-size %lld";

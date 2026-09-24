@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ mevcut";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld indirme";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: Hâlâ test edilen özelliklere sahip yayın öncesi derlemeler ve mlx-lm’nin beta dalından çalışma zamanı güncellemeleri. Stable’a geri dönmek yüklü bir betayı düşürmez; sonraki kararlı sürüm onun yerine geçer.";
 "Browse Hugging Face…" = "Hugging Face’e Göz At…";
+"Calculator" = "Hesap Makinesi";
 "Can't change models while auto-tune is running" = "Otomatik ayar çalışırken modeller değiştirilemez.";
 "Can't switch profiles while a request or the auto-tune is running" = "Bir istek veya otomatik ayar çalışırken profiller değiştirilemez.";
 "Cancel" = "Vazgeç";
 "Cancel download" = "İndirmeyi iptal et.";
 "Canvas size" = "Tuval boyutu";
 "Chat" = "Sohbet";
+"Chat tools" = "Sohbet araçları";
+"Chat tools for this model: %lld on" = "Bu model için sohbet araçları: %lld açık";
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
 "Check for Runtime Updates" = "Çalışma Zamanı Güncellemelerini Denetle";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Sohbet bu sayıda mesajı aşınca otomatik olarak sıkıştırılır. Sohbetteki Sıkıştır düğmesi her durumda çalışır.";
 "Concurrent requests" = "Eşzamanlı istekler";
 "Copy" = "Kopyala";
+"Country facts" = "Ülke bilgileri";
+"Currency rates" = "Döviz kurları";
 "Current settings are already fastest" = "Geçerli ayarlar zaten en hızlı";
+"Date & time" = "Tarih ve saat";
 "Delete" = "Sil";
 "Delete profile “%@”?" = "“%@” profili silinsin mi?";
 "Delete this profile (models using it go back to Default)" = "Bu profili sil (onu kullanan modeller Default profiline döner)";
@@ -83,6 +90,7 @@
 "General" = "Genel";
 "Generating image…" = "Görüntü oluşturuluyor…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
@@ -123,6 +131,7 @@
 "New profile" = "Yeni profil";
 "New profile (inherits everything from Default)" = "Yeni profil (her şeyi Default’tan devralır)";
 "New temporary chat -- nothing about it is ever saved" = "Yeni geçici sohbet — bununla ilgili hiçbir şey kaydedilmez.";
+"News" = "Haberler";
 "No auto-tune run yet." = "Henüz otomatik ayarlama çalıştırılmadı.";
 "No messages yet" = "Henüz mesaj yok";
 "No model uses it." = "Hiçbir model bunu kullanmıyor.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "İstem önbelleği";
 "Prompt size" = "İstem boyutu";
 "Prompt size (input sent to the model):" = "İstem boyutu (modele gönderilen giriş):";
+"Public holidays" = "Resmi tatiller";
 "Quantization group size for the KV cache. 64 is a good default." = "KV önbelleği için nicemleme grubu boyutu. 64 iyi bir varsayılandır.";
 "Quantize KV from token" = "KV’yi belirteçten itibaren nicemle";
 "Quick benchmark" = "Hızlı karşılaştırma testi";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Sıkıştırma sırasında en son iletilerden bu kadarı kelimesi kelimesine korunur.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";
 "Thought process" = "Düşünme süreci";
+"Time in a city" = "Şehir saati";
+"Tool Settings…" = "Araç Ayarları…";
 "Tool-use rule" = "Araç kullanma kuralı";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Modelin uygulama içi sohbette çağırabileceği araçlar (araç çağırabilen bir modele ihtiyaç vardır). Web araçları modelin sorgusunu ilgili kamu hizmetine gönderir (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); yerel araçlar asla Mac’ten çıkmaz.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Çalışan modelde decode-concurrency (1/2/4/8) ve prefill-step-size (64/128/256/512) değerlerini dener, her biri arasında sunucuyu yeniden başlatır ve ölçülen en hızlı olanı tutar.";
@@ -251,12 +264,15 @@
 "Updates" = "Güncellemeler";
 "Use Folder" = "Klasörü Kullan";
 "Use LM Studio's folder" = "LM Studio’nun klasörünü kullan";
+"Uses the internet" = "İnterneti kullanır";
 "Verbose server logging" = "Ayrıntılı sunucu günlüklemesi";
 "Version" = "Sürüm";
 "View model card" = "Model kartını görüntüle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
+"Web search" = "Web araması";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which Z-Image-Turbo quantization generates the images." = "Görüntüleri hangi Z-Image-Turbo nicemlemesinin oluşturacağını belirler.";
+"Wikipedia" = "Vikipedi";
 "You" = "Siz";
 "copy" = "kopyala";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

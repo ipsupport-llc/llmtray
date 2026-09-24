@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "%@ → %@ disponível";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Substituídos: %d, restante de Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: versões de pré-lançamento com recursos ainda em teste e atualizações de runtime do ramo beta do mlx-lm. Voltar para Stable não rebaixa uma beta instalada; a próxima versão estável a substitui.";
 "Browse Hugging Face…" = "Explorar Hugging Face…";
+"Calculator" = "Calculadora";
 "Can't change models while auto-tune is running" = "Não é possível trocar de modelo enquanto o ajuste automático está em execução.";
 "Can't switch profiles while a request or the auto-tune is running" = "Não é possível trocar de perfil enquanto uma solicitação ou o ajuste automático está em execução.";
 "Cancel" = "Cancelar";
 "Cancel download" = "Cancelar download";
 "Canvas size" = "Tamanho da tela";
 "Chat" = "Chat";
+"Chat tools" = "Ferramentas de conversa";
+"Chat tools for this model: %lld on" = "Ferramentas de conversa para este modelo: %lld ativadas";
 "Check Again" = "Verificar novamente";
 "Check Now" = "Verificar agora";
 "Check for Runtime Updates" = "Verificar atualizações do runtime";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacta a conversa automaticamente quando ela passa desta quantidade de mensagens. O botão Compactar na conversa continua funcionando de qualquer forma.";
 "Concurrent requests" = "Solicitações simultâneas";
 "Copy" = "Copiar";
+"Country facts" = "Fatos sobre países";
+"Currency rates" = "Câmbio";
 "Current settings are already fastest" = "Os ajustes atuais já são os mais rápidos";
+"Date & time" = "Data e hora";
 "Delete" = "Apagar";
 "Delete profile “%@”?" = "Apagar perfil “%@”?";
 "Delete this profile (models using it go back to Default)" = "Apaga este perfil. Modelos que o usam voltam para Default.";
@@ -83,6 +90,7 @@
 "General" = "Geral";
 "Generating image…" = "Gerando imagem…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Fornece ao modelo uma ferramenta generate_image (requer um modelo com chamada de ferramentas). Na primeira vez, o modelo de imagem é baixado.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Quantos tokens do prompt são processados por etapa. Valores maiores são mais rápidos em prompts longos, mas usam mais memória. O ajuste automático do benchmark pode escolher isso.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Quantas solicitações são agrupadas em uma etapa da GPU. Só ajuda quando vários clientes usam o servidor ao mesmo tempo; usa mais memória.";
 "How many tokens it generates per trial." = "Quantos tokens ele gera por teste.";
@@ -123,6 +131,7 @@
 "New profile" = "Novo perfil";
 "New profile (inherits everything from Default)" = "Novo perfil (herda tudo de Default)";
 "New temporary chat -- nothing about it is ever saved" = "Novo chat temporário — nada sobre ele é salvo.";
+"News" = "Notícias";
 "No auto-tune run yet." = "Nenhuma execução de ajuste automático ainda.";
 "No messages yet" = "Nenhuma mensagem ainda";
 "No model uses it." = "Nenhum modelo usa isto.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "Cache de prompt";
 "Prompt size" = "Tamanho do prompt";
 "Prompt size (input sent to the model):" = "Tamanho do prompt (entrada enviada ao modelo):";
+"Public holidays" = "Feriados";
 "Quantization group size for the KV cache. 64 is a good default." = "Tamanho do grupo de quantização para o cache KV. 64 é um bom padrão.";
 "Quantize KV from token" = "Quantizar KV a partir do token";
 "Quick benchmark" = "Benchmark rápido";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Este número de mensagens mais recentes é mantido palavra por palavra ao compactar.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "O arquivo deste perfil não pode ser lido, então ele não pode ser editado aqui. Corrija ou apague o arquivo e reabra os Ajustes.";
 "Thought process" = "Processo de raciocínio";
+"Time in a city" = "Horário na cidade";
+"Tool Settings…" = "Ajustes de ferramentas…";
 "Tool-use rule" = "Regra de uso de ferramentas";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Ferramentas que o modelo pode chamar no chat do app (requer modelo com chamada de ferramenta). Ferramentas web enviam a consulta do modelo ao serviço público correspondente (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); ferramentas locais nunca saem do Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Testa decode-concurrency (1/2/4/8) e prefill-step-size (64/128/256/512) no modelo em execução, reiniciando o servidor entre cada teste, e mantém a combinação medida como mais rápida.";
@@ -251,12 +264,15 @@
 "Updates" = "Atualizações";
 "Use Folder" = "Usar pasta";
 "Use LM Studio's folder" = "Usar pasta do LM Studio";
+"Uses the internet" = "Usa a internet";
 "Verbose server logging" = "Registro detalhado do servidor";
 "Version" = "Versão";
 "View model card" = "Veja o cartão do modelo.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Aguarde a solicitação ou o benchmark atual terminar — reiniciar interromperia o processo.";
+"Web search" = "Busca na web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Onde o LLMTray procura modelos MLX (uma pasta por modelo, ex.: <org>/<name>). Use ~/.lmstudio/models para compartilhar modelos com LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Define qual quantização do Z-Image-Turbo gera as imagens.";
+"Wikipedia" = "Wikipedia";
 "You" = "Você";
 "copy" = "copiar";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";

@@ -3,6 +3,7 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ → %@ available" = "Có bản %@ → %@";
+"%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld lượt tải xuống";
@@ -36,12 +37,15 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: bản dựng phát hành sớm với các tính năng vẫn đang được thử nghiệm và các bản cập nhật môi trường chạy từ nhánh beta của mlx-lm. Chuyển lại về Stable sẽ không hạ cấp bản beta đã cài đặt; bản Stable tiếp theo sẽ thay thế bản đó.";
 "Browse Hugging Face…" = "Duyệt Hugging Face…";
+"Calculator" = "Máy tính";
 "Can't change models while auto-tune is running" = "Không thể đổi mô hình khi tự động tinh chỉnh đang chạy.";
 "Can't switch profiles while a request or the auto-tune is running" = "Không thể chuyển cấu hình khi một yêu cầu hoặc tự động tinh chỉnh đang chạy.";
 "Cancel" = "Hủy";
 "Cancel download" = "Hủy tải về.";
 "Canvas size" = "Kích thước canvas";
 "Chat" = "Trò chuyện";
+"Chat tools" = "Công cụ chat";
+"Chat tools for this model: %lld on" = "Công cụ chat cho mô hình này: %lld đã bật";
 "Check Again" = "Kiểm tra lại";
 "Check Now" = "Kiểm tra ngay";
 "Check for Runtime Updates" = "Kiểm tra bản cập nhật môi trường chạy";
@@ -57,7 +61,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Tự động thu gọn cuộc trò chuyện khi vượt quá số tin nhắn này. Nút Thu gọn trong cuộc trò chuyện vẫn hoạt động trong mọi trường hợp.";
 "Concurrent requests" = "Yêu cầu đồng thời";
 "Copy" = "Sao chép";
+"Country facts" = "Thông tin quốc gia";
+"Currency rates" = "Tỷ giá tiền tệ";
 "Current settings are already fastest" = "Cài đặt hiện tại đã là nhanh nhất";
+"Date & time" = "Ngày & giờ";
 "Delete" = "Xóa";
 "Delete profile “%@”?" = "Xóa hồ sơ “%@”?";
 "Delete this profile (models using it go back to Default)" = "Xóa hồ sơ này (các mô hình dùng hồ sơ này sẽ quay về Default)";
@@ -83,6 +90,7 @@
 "General" = "Chung";
 "Generating image…" = "Đang tạo ảnh…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
+"Hacker News" = "Hacker News";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
@@ -123,6 +131,7 @@
 "New profile" = "Hồ sơ mới";
 "New profile (inherits everything from Default)" = "Hồ sơ mới (kế thừa mọi thứ từ Default)";
 "New temporary chat -- nothing about it is ever saved" = "Cuộc trò chuyện tạm thời mới — không lưu bất kỳ nội dung nào";
+"News" = "Tin tức";
 "No auto-tune run yet." = "Chưa có lần tự tinh chỉnh nào.";
 "No messages yet" = "Chưa có tin nhắn";
 "No model uses it." = "Không có mô hình nào sử dụng mục này.";
@@ -149,6 +158,7 @@
 "Prompt cache" = "Bộ nhớ đệm lời nhắc";
 "Prompt size" = "Kích cỡ lời nhắc";
 "Prompt size (input sent to the model):" = "Kích cỡ lời nhắc (đầu vào gửi đến mô hình):";
+"Public holidays" = "Ngày nghỉ lễ";
 "Quantization group size for the KV cache. 64 is a good default." = "Kích cỡ nhóm lượng tử hóa cho bộ nhớ đệm KV. 64 là mặc định phù hợp.";
 "Quantize KV from token" = "Lượng tử hóa KV từ token";
 "Quick benchmark" = "Kiểm chuẩn nhanh";
@@ -236,7 +246,10 @@
 "This many of the most recent messages are kept word for word when compacting." = "Khi nén, số tin nhắn gần đây nhất này được giữ nguyên từng chữ.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";
 "Thought process" = "Quá trình suy nghĩ";
+"Time in a city" = "Giờ ở thành phố";
+"Tool Settings…" = "Cài đặt Công cụ…";
 "Tool-use rule" = "Quy tắc sử dụng công cụ";
+"Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Các công cụ mà mô hình có thể gọi trong trò chuyện của ứng dụng (cần mô hình hỗ trợ gọi công cụ). Công cụ web gửi truy vấn của mô hình tới dịch vụ công cộng đó (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); công cụ cục bộ không bao giờ rời khỏi Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Thử decode-concurrency (1/2/4/8) và prefill-step-size (64/128/256/512) với mô hình đang chạy, khởi động lại máy chủ sau mỗi lần thử, rồi giữ cấu hình đo được nhanh nhất.";
@@ -251,12 +264,15 @@
 "Updates" = "Bản cập nhật";
 "Use Folder" = "Dùng thư mục";
 "Use LM Studio's folder" = "Dùng thư mục của LM Studio";
+"Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
 "Version" = "Phiên bản";
 "View model card" = "Xem thẻ mô hình.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
+"Web search" = "Tìm web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Mức lượng tử hóa Z-Image-Turbo dùng để tạo hình ảnh.";
+"Wikipedia" = "Wikipedia";
 "You" = "Bạn";
 "copy" = "sao chép";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
