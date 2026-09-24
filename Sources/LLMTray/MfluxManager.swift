@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import LLMTrayCore
 
 /// Which GPTQ-corrected Z-Image-Turbo checkpoint mflux drives. Unlike
 /// mflux's own stock `--quantize N` (naive round-to-nearest, quantized
@@ -114,20 +115,14 @@ final class MfluxManager: ObservableObject {
 
     @Published private(set) var isBusy: Bool = false
     @Published private(set) var statusText: String = ""
-    // Derived from mflux's own `--stepwise-image-output-dir` output files
-    // (named "seed_<seed>_step<N>of<TOTAL>.png") during generate() -- gives
-    // real step-accurate progress and a live-updating preview for free,
-    // instead of parsing mflux's tqdm stdout text. nil when not generating.
+    // Streamed by the runner during generate() (a decoded preview per
+    // denoising step, in memory). nil when not generating.
     @Published private(set) var stepProgress: (step: Int, total: Int)?
     @Published private(set) var previewImage: NSImage?
 
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mflux_venv" }
     private var venvPython: String { venvDir + "/bin/python3" }
     private var saveBinary: String { venvDir + "/bin/mflux-save" }
-
-    private func generateBinary(for model: ImageGenModel) -> String {
-        venvDir + "/bin/mflux-generate-z-image-turbo"
-    }
 
     /// Where a model's published HF checkpoint is downloaded to -- already
     /// GPTQ-quantized and in mflux's native MLX format, so this is used
@@ -200,28 +195,24 @@ final class MfluxManager: ObservableObject {
         }
     }
 
-    /// Generates one image and returns its raw bytes. mflux's CLI only
-    /// knows how to write a file (no stdout image option), so this writes
-    /// to a unique path under the OS temp directory and deletes it
-    /// immediately after reading the bytes back into memory -- nothing
-    /// about the result is left on disk once this call returns.
+    /// Generates one image and returns its PNG bytes -- entirely in memory:
+    /// runtime/llmtray_mflux_runner.py drives mflux's Python API and streams
+    /// progress, step previews and the result over stdout, so nothing (not
+    /// even a temporary file) touches the disk. Matters for temporary chats,
+    /// which must leave no trace.
     func generate(prompt: String, width: Int, height: Int, model: ImageGenModel) async throws -> Data {
         try await ensurePackageInstalled()
 
-        let outputPath = FileManager.default.temporaryDirectory
-            .appendingPathComponent("llmtray-mflux-\(UUID().uuidString).png").path
-        let stepDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("llmtray-mflux-steps-\(UUID().uuidString)").path
-        try FileManager.default.createDirectory(atPath: stepDir, withIntermediateDirectories: true)
-        defer {
-            try? FileManager.default.removeItem(atPath: outputPath)
-            try? FileManager.default.removeItem(atPath: stepDir)
+        let savedDir = savedModelDir(for: model)
+        guard FileManager.default.fileExists(atPath: savedDir) else {
+            // The Settings toggle only turns on after downloadModel() has
+            // succeeded; fail clearly rather than silently do something else.
+            throw MfluxError.processFailed("\(model.displayName) isn't downloaded yet -- re-enable image generation in Settings.")
         }
 
         isBusy = true
         statusText = "Generating image…"
-        let steps = Int(model.stepCount) ?? 9
-        stepProgress = (step: 0, total: steps)
+        stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
         previewImage = nil
         defer {
             isBusy = false
@@ -230,85 +221,38 @@ final class MfluxManager: ObservableObject {
             previewImage = nil
         }
 
-        let pollTask = Task { [weak self] in await self?.pollStepwiseProgress(in: stepDir) }
-        defer { pollTask.cancel() }
-
         // width/height must be multiples of 16 for the model's patch size;
-        // round rather than reject so an odd model-supplied value doesn't
-        // hard-fail a tool call.
+        // round rather than reject an odd model-supplied value.
         let roundedWidth = max(256, (width / 16) * 16)
         let roundedHeight = max(256, (height / 16) * 16)
-        let baseArgs = [
-            "--prompt", prompt,
+        let result = ImageResult()
+        try await ProcessRunner.runStreaming(venvPython, [
+            RuntimePaths.runtimeDir + "/llmtray_mflux_runner.py",
+            "--prompt=\(prompt)",   // "=": a prompt starting with "-" isn't an option
             "--width", String(roundedWidth),
             "--height", String(roundedHeight),
             "--steps", model.stepCount,
-            "--output", outputPath,
-            "--stepwise-image-output-dir", stepDir,
-        ]
-
-        let savedDir = savedModelDir(for: model)
-        guard FileManager.default.fileExists(atPath: savedDir) else {
-            // Shouldn't normally happen -- the Settings toggle only flips
-            // on after downloadModel() succeeds -- but there's no
-            // meaningful fallback for a published GPTQ checkpoint the way
-            // there was for mflux's own stock --quantize path, so fail
-            // clearly instead of silently doing something else.
-            throw MfluxError.processFailed("\(model.displayName) isn't downloaded yet -- re-enable image generation in Settings.")
-        }
-        try await runProcess(generateBinary(for: model), baseArgs + ["--model", savedDir, "--base-model", model.mfluxModelName])
-
-        guard let data = FileManager.default.contents(atPath: outputPath) else {
-            throw MfluxError.outputMissing
-        }
-        return data
-    }
-
-    /// Watches --stepwise-image-output-dir for mflux's own
-    /// "seed_<seed>_step<N>of<TOTAL>.png" files (one written per denoising
-    /// step) and publishes the latest one as a live preview, plus exact
-    /// step/total progress parsed straight from the filename -- no stdout
-    /// parsing needed. Polling (vs. FSEvents) because steps land every ~2s;
-    /// simplicity wins over the small latency. Cancelled via the caller's
-    /// Task handle once generate()'s runProcess call returns.
-    private static let stepFilePattern = try! NSRegularExpression(pattern: #"seed_\d+_step(\d+)of(\d+)\.png$"#)
-
-    private func pollStepwiseProgress(in stepDir: String) async {
-        var lastStep = -1
-        while !Task.isCancelled {
-            if let entries = try? FileManager.default.contentsOfDirectory(atPath: stepDir) {
-                var best: (step: Int, total: Int, name: String)?
-                for name in entries {
-                    let range = NSRange(name.startIndex..., in: name)
-                    guard let match = Self.stepFilePattern.firstMatch(in: name, range: range),
-                          let stepRange = Range(match.range(at: 1), in: name),
-                          let totalRange = Range(match.range(at: 2), in: name),
-                          let step = Int(name[stepRange]), let total = Int(name[totalRange]) else { continue }
-                    if best == nil || step > best!.step {
-                        best = (step, total, name)
-                    }
+            "--model", savedDir,
+            "--base-model", model.mfluxModelName,
+        ], onLine: { [weak self] line in
+            guard let message = MfluxRunnerMessage(line: line) else { return }
+            switch message {
+            case .image(let data):
+                result.set(data)
+            case .step(let step, let total):
+                Task { @MainActor [weak self] in
+                    guard let self, self.isBusy else { return }   // a late line after the run
+                    self.stepProgress = (step: step, total: total)
                 }
-                if let best, best.step != lastStep {
-                    stepProgress = (step: best.step, total: best.total)
-                    // The newest step file is often still being written:
-                    // decoded then, only its top rows exist and the rest
-                    // shows black. Take it once the PNG is complete; until
-                    // then the previous step stays up and this retries.
-                    if let data = FileManager.default.contents(atPath: stepDir + "/" + best.name),
-                       Self.isCompletePNG(data), let image = NSImage(data: data) {
-                        previewImage = image
-                        lastStep = best.step
-                    }
+            case .preview(let data):
+                Task { @MainActor [weak self] in
+                    guard let self, self.isBusy, let image = NSImage(data: data) else { return }
+                    self.previewImage = image
                 }
             }
-            try? await Task.sleep(nanoseconds: 250_000_000)
-        }
-    }
-
-    /// A PNG ends with its IEND chunk (length 0, "IEND", fixed CRC).
-    static func isCompletePNG(_ data: Data) -> Bool {
-        let iend: [UInt8] = [0, 0, 0, 0, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82]
-        return data.count > iend.count && Array(data.suffix(iend.count)) == iend
+        })
+        guard let data = result.get() else { throw MfluxError.outputMissing }
+        return data
     }
 
     private func runProcess(_ executable: String, _ arguments: [String]) async throws {
@@ -318,4 +262,12 @@ final class MfluxManager: ObservableObject {
             throw MfluxError.processFailed(failure.outputTail)
         }
     }
+}
+
+/// The final image, set from the reader thread, read after the run.
+private final class ImageResult: @unchecked Sendable {
+    private let lock = NSLock()
+    private var data: Data?
+    func set(_ d: Data) { lock.lock(); data = d; lock.unlock() }
+    func get() -> Data? { lock.lock(); defer { lock.unlock() }; return data }
 }
