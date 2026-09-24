@@ -449,7 +449,9 @@ final class CurrencyTool: SelectableTool {
     override var definition: [String: Any] {
         Self.function(
             name,
-            "Convert an amount between currencies at today's rate (\"how much is 50 USD in EUR?\").",
+            "Convert an amount between currencies at today's exchange rate (\"how much is 50 USD in EUR?\"). "
+                + "Rates change every day: always call this for any currency conversion -- never assume a rate "
+                + "or compute one with `calculate`.",
             properties: [
                 "amount": Self.number("The amount to convert."),
                 "from_currency": Self.string("ISO-4217 code, e.g. \"USD\"."),
