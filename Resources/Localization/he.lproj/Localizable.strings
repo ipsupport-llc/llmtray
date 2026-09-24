@@ -65,6 +65,8 @@
 "Diagnostics" = "אבחון";
 "Download" = "הורד";
 "Download and Enable" = "הורד והפעל";
+"Download models" = "הורדת דגמים";
+"Download models from Hugging Face" = "הורדת דגמים מ‑Hugging Face.";
 "Downloaded" = "הורד";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
 "Edit Profile…" = "עריכת פרופיל…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "משנה את שם הפרופיל הזה.";
 "Rescan" = "סרוק מחדש";
 "Rescan Models" = "סרוק מודלים מחדש";
-"Rescan, download or manage models" = "מאפשר לסרוק מחדש, להוריד או לנהל מודלים.";
+"Rescan or manage models" = "סריקה מחדש או ניהול דגמים.";
 "Reset: inherit this setting from Default" = "איפוס: ירושת ההגדרה הזו מ-Default.";
 "Restart LLMTray to change the language?" = "להפעיל מחדש את LLMTray כדי לשנות את השפה?";
 "Restart Now" = "הפעל מחדש כעת";

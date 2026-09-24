@@ -65,6 +65,8 @@
 "Diagnostics" = "诊断";
 "Download" = "下载";
 "Download and Enable" = "下载并启用";
+"Download models" = "下载模型";
+"Download models from Hugging Face" = "从 Hugging Face 下载模型";
 "Downloaded" = "已下载";
 "Duplicate this profile" = "复制此配置";
 "Edit Profile…" = "编辑配置…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "重命名此配置。";
 "Rescan" = "重新扫描";
 "Rescan Models" = "重新扫描模型";
-"Rescan, download or manage models" = "重新扫描、下载或管理模型。";
+"Rescan or manage models" = "重新扫描或管理模型";
 "Reset: inherit this setting from Default" = "还原：从 Default 继承此设置。";
 "Restart LLMTray to change the language?" = "要重启 LLMTray 以更改语言吗？";
 "Restart Now" = "立即重启";

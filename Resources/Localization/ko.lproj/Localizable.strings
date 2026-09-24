@@ -65,6 +65,8 @@
 "Diagnostics" = "진단";
 "Download" = "다운로드";
 "Download and Enable" = "다운로드하고 활성화";
+"Download models" = "모델 다운로드";
+"Download models from Hugging Face" = "Hugging Face에서 모델을 다운로드합니다.";
 "Downloaded" = "다운로드됨";
 "Duplicate this profile" = "이 프로파일을 복제합니다.";
 "Edit Profile…" = "프로파일 편집…";
@@ -156,7 +158,7 @@
 "Rename this profile" = "이 프로필의 이름을 변경합니다.";
 "Rescan" = "다시 스캔";
 "Rescan Models" = "모델 다시 스캔";
-"Rescan, download or manage models" = "모델을 다시 스캔하거나 다운로드 또는 관리합니다.";
+"Rescan or manage models" = "모델을 다시 검색하거나 관리합니다.";
 "Reset: inherit this setting from Default" = "재설정: 이 설정을 Default에서 상속합니다.";
 "Restart LLMTray to change the language?" = "언어를 변경하려면 LLMTray를 재시동할까요?";
 "Restart Now" = "지금 재시동";
