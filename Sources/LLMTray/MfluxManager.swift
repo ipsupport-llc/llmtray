@@ -201,7 +201,11 @@ final class MfluxManager: ObservableObject {
     /// even a temporary file) touches the disk. Matters for temporary chats,
     /// which must leave no trace.
     func generate(prompt: String, width: Int, height: Int, model: ImageGenModel) async throws -> Data {
-        try await ensurePackageInstalled()
+        // Set up by the download in Settings; never installed mid-chat (a
+        // temporary chat must not cause files to be written).
+        guard FileManager.default.fileExists(atPath: venvPython) else {
+            throw MfluxError.processFailed("Image generation isn't set up -- turn it on again in Settings.")
+        }
 
         let savedDir = savedModelDir(for: model)
         guard FileManager.default.fileExists(atPath: savedDir) else {
@@ -223,18 +227,17 @@ final class MfluxManager: ObservableObject {
 
         // width/height must be multiples of 16 for the model's patch size;
         // round rather than reject an odd model-supplied value.
-        let roundedWidth = max(256, (width / 16) * 16)
-        let roundedHeight = max(256, (height / 16) * 16)
+        let roundedWidth = min(max(256, (width / 16) * 16), 2048)
+        let roundedHeight = min(max(256, (height / 16) * 16), 2048)
         let result = ImageResult()
         try await ProcessRunner.runStreaming(venvPython, [
             RuntimePaths.runtimeDir + "/llmtray_mflux_runner.py",
-            "--prompt=\(prompt)",   // "=": a prompt starting with "-" isn't an option
             "--width", String(roundedWidth),
             "--height", String(roundedHeight),
             "--steps", model.stepCount,
             "--model", savedDir,
             "--base-model", model.mfluxModelName,
-        ], onLine: { [weak self] line in
+        ], stdin: Data(prompt.utf8), environment: ["PYTHONDONTWRITEBYTECODE": "1"], onLine: { [weak self] line in
             guard let message = MfluxRunnerMessage(line: line) else { return }
             switch message {
             case .image(let data):

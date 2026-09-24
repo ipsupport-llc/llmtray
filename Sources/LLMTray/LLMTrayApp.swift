@@ -23,6 +23,17 @@ struct LLMTrayApp: App {
         }
         // Before any view's @AppStorage or the auto-start path reads them.
         KVSettings.migrateIfNeeded()
+        Self.keepNetworkCachesOffDisk()
+    }
+
+    /// Nothing the app fetches is cached on disk (chat traffic, tool
+    /// queries), and what earlier versions left there -- tool requests in
+    /// the shared URL cache, DuckDuckGo / Wikipedia cookies -- is removed.
+    private static func keepNetworkCachesOffDisk() {
+        URLCache.shared.removeAllCachedResponses()
+        URLCache.shared = URLCache(memoryCapacity: 8 * 1024 * 1024, diskCapacity: 0)
+        let storage = HTTPCookieStorage.shared
+        for cookie in storage.cookies ?? [] { storage.deleteCookie(cookie) }
     }
 
     // MenuBarExtra only gives one click behavior for both mouse buttons, and

@@ -34,8 +34,8 @@ final class WebSearchTool: SelectableTool {
             )
             let html = String(decoding: data, as: UTF8.self)
             let results = WebParsing.duckDuckGoResults(html, limit: limit)
-            if results.isEmpty, !html.contains("result__a") {
-                // No result markup at all: DuckDuckGo's bot check, not "nothing found".
+            if results.isEmpty, !html.contains("result__a"), !html.contains("no-results") {
+                // Neither results nor DDG's "No results" block: its bot check.
                 return Self.error("web search is temporarily blocked by DuckDuckGo; try again later or use news / get_wikipedia_summary")
             }
             return Self.json(["query": query, "results": results.map { ["title": $0.title, "url": $0.url, "snippet": $0.snippet] }])
@@ -63,9 +63,10 @@ final class NewsTool: SelectableTool {
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
         let limit = min(max(arguments["limit"] as? Int ?? 10, 1), 20)
-        let lang = ((arguments["lang"] as? String) ?? "en").lowercased().prefix(2)
-        let (hl, gl) = lang == "en" ? ("en-US", "US") : (String(lang), String(lang).uppercased())
-        var query = [URLQueryItem(name: "hl", value: hl), URLQueryItem(name: "gl", value: gl), URLQueryItem(name: "ceid", value: "\(gl):\(lang)")]
+        let lang = String(((arguments["lang"] as? String) ?? "en").lowercased().prefix(2))
+        let edition = Self.editions[lang] ?? Self.editions["en"]!
+        var query = [URLQueryItem(name: "hl", value: edition.hl), URLQueryItem(name: "gl", value: edition.gl),
+                     URLQueryItem(name: "ceid", value: "\(edition.gl):\(edition.ceidLang)")]
         var base = "https://news.google.com/rss"
         if let q = (arguments["query"] as? String)?.trimmingCharacters(in: .whitespaces), !q.isEmpty {
             base += "/search"
@@ -80,6 +81,19 @@ final class NewsTool: SelectableTool {
             return Self.error("news failed: \(error.localizedDescription)")
         }
     }
+}
+
+extension NewsTool {
+    /// Google News editions by language: the country isn't the language
+    /// code upper-cased (uk -> UA, ja -> JP, en -> US).
+    static let editions: [String: (hl: String, gl: String, ceidLang: String)] = [
+        "en": ("en-US", "US", "en"), "ru": ("ru", "RU", "ru"), "uk": ("uk", "UA", "uk"), "de": ("de", "DE", "de"),
+        "fr": ("fr", "FR", "fr"), "es": ("es-419", "US", "es-419"), "it": ("it", "IT", "it"), "pt": ("pt-BR", "BR", "pt-419"),
+        "pl": ("pl", "PL", "pl"), "tr": ("tr", "TR", "tr"), "ja": ("ja", "JP", "ja"), "ko": ("ko", "KR", "ko"),
+        "zh": ("zh-CN", "CN", "zh-Hans"), "hi": ("hi", "IN", "hi"), "he": ("he", "IL", "he"), "ar": ("ar", "EG", "ar"),
+        "vi": ("vi", "VN", "vi"), "id": ("id", "ID", "id"), "nl": ("nl", "NL", "nl"), "cs": ("cs", "CZ", "cs"),
+        "sv": ("sv", "SE", "sv"), "th": ("th", "TH", "th"),
+    ]
 }
 
 final class HackerNewsTool: SelectableTool {
@@ -211,22 +225,26 @@ final class CountryInfoTool: SelectableTool {
         do {
             guard let (id, entity) = try await Self.findCountry(country) else { return Self.error("no country \(country)") }
             let claims = WikidataClaims(entity)
-            let linked = claims.items("P36") + claims.items("P38", currentOnly: true) + claims.items("P30")
-                + claims.items("P37") + claims.items("P47", currentOnly: true)
-            let refs = try await Self.entities(Array(Set(linked)), props: "labels|claims")
+            let linked = claims.items("P36", currentOnly: true) + claims.items("P38", currentOnly: true)
+                + claims.items("P30") + claims.items("P37")
+            async let refsLoad = Self.entities(Array(Set(linked)), props: "labels|claims")
+            // Neighbours by name: labels only (their full claims made a
+            // country with many borders take ~10 s).
+            async let neighbourLoad = Self.entities(claims.items("P47", currentOnly: true), props: "labels")
+            let (refs, neighbourEntities) = try await (refsLoad, neighbourLoad)
             func label(_ id: String) -> String? { WikidataClaims.label(refs[id]) }
             let currencies = claims.items("P38", currentOnly: true).compactMap { id -> String? in
                 let code = WikidataClaims(refs[id] ?? [:]).strings("P498").first
                 return [code, label(id)].compactMap { $0 }.joined(separator: " ").nilIfEmpty
             }
             let borders: [String] = claims.items("P47", currentOnly: true)
-                .compactMap { WikidataClaims(refs[$0] ?? [:]).strings("P297").first }.sorted()
+                .compactMap { WikidataClaims.label(neighbourEntities[$0]) }.sorted()
             var capitals: [String] = []
             for name in claims.items("P36", currentOnly: true).compactMap(label) where !capitals.contains(name) {
                 capitals.append(name)
             }
             let population: Int = claims.latestQuantity("P1082").map { Int($0) } ?? 0
-            let area: Int = claims.latestQuantity("P2046").map { Int($0.rounded()) } ?? 0
+            let area: Int = claims.areaKm2().map { Int($0.rounded()) } ?? 0
             var result: [String: Any] = [:]
             result["name"] = WikidataClaims.label(entity) ?? country
             result["code"] = claims.strings("P297").first ?? ""
@@ -324,6 +342,19 @@ struct WikidataClaims {
         statements(property).compactMap { Self.value($0) as? String }
     }
 
+    /// Area (P2046) in km², converted when stated in another unit.
+    func areaKm2() -> Double? {
+        let factors = ["Q712226": 1.0, "Q232291": 2.589988, "Q35852": 0.01, "Q25343": 1e-6]   // km², mi², ha, m²
+        for statement in statements("P2046") {
+            guard let value = Self.value(statement) as? [String: Any],
+                  let amount = (value["amount"] as? String).flatMap({ Double($0.replacingOccurrences(of: "+", with: "")) }),
+                  let unit = (value["unit"] as? String)?.components(separatedBy: "/").last,
+                  let factor = factors[unit] else { continue }
+            return amount * factor
+        }
+        return nil
+    }
+
     /// The preferred value, else the one with the latest point in time (P585).
     func latestQuantity(_ property: String) -> Double? {
         let candidates = statements(property)
@@ -393,7 +424,7 @@ final class CurrencyTool: SelectableTool {
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
         let amount = (arguments["amount"] as? Double) ?? (arguments["amount"] as? Int).map(Double.init) ?? Double(arguments["amount"] as? String ?? "")
-        guard let amount,
+        guard let amount, amount.isFinite, abs(amount) < 1e15,
               let from = (arguments["from_currency"] as? String)?.uppercased(), from.count == 3, from.allSatisfy({ $0.isASCII && $0.isLetter }),
               let to = (arguments["to_currency"] as? String)?.uppercased(), to.count == 3, to.allSatisfy({ $0.isASCII && $0.isLetter }) else {
             return Self.error("amount, from_currency and to_currency (3-letter codes) are required")

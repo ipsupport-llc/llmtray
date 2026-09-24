@@ -28,6 +28,9 @@ from mflux.models.z_image.latent_creator import ZImageLatentCreator
 from mflux.models.z_image.variants.z_image import ZImage
 from mflux.utils.image_util import ImageUtil
 
+# The prompt arrives on stdin (kept out of the argument list, which `ps`
+# shows); mflux's own parser still validates it.
+sys.argv.append("--prompt=" + sys.stdin.read())
 args = build_parser().parse_args()  # reads sys.argv
 model = ZImage(
     model_config=ConfigResolution.resolve_restricted(args.model, "z-image-turbo", model_path=args.model_path),

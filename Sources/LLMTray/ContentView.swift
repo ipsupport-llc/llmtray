@@ -108,6 +108,7 @@ struct ContentView: View {
     private var chatSettings: ChatSettings {
         var settings = ChatSettings(profile: profiles.resolved(for: selectedModelID), maxTokensCap: modelMaxContext)
         settings.modelSupportsVision = composer.acceptsImages
+        settings.modelPath = selectedModelID
         return settings
     }
 

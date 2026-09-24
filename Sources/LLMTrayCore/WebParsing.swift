@@ -20,28 +20,37 @@ public struct WebResult: Equatable, Codable {
 /// Parsing for the web tools' responses -- pure, so it's tested against
 /// captured fixtures instead of the live services.
 public enum WebParsing {
-    private static let ddgResult = try! NSRegularExpression(
-        pattern: #"<a\s+[^>]*class="[^"]*result__a[^"]*"[^>]*href="([^"]+)"[^>]*>(.*?)</a>.*?<a\s+[^>]*class="[^"]*result__snippet[^"]*"[^>]*>(.*?)</a>"#,
+    private static let ddgBlockStart = try! NSRegularExpression(pattern: #"<div[^>]*class="[^"]*\bresult\b[^"]*""#)
+    private static let ddgTitle = try! NSRegularExpression(
+        pattern: #"<a\s+[^>]*class="[^"]*result__a[^"]*"[^>]*href="([^"]+)"[^>]*>(.*?)</a>"#,
+        options: [.dotMatchesLineSeparators, .caseInsensitive]
+    )
+    private static let ddgSnippet = try! NSRegularExpression(
+        pattern: #"class="[^"]*result__snippet[^"]*"[^>]*>(.*?)</(?:a|div|td)>"#,
         options: [.dotMatchesLineSeparators, .caseInsensitive]
     )
 
     /// Results from DuckDuckGo's HTML endpoint (html.duckduckgo.com/html),
-    /// without its ads (links through duckduckgo.com/y.js).
+    /// without its ads (links through duckduckgo.com/y.js). Parsed per
+    /// result block, so a result without a snippet can't take the next one's.
     public static func duckDuckGoResults(_ html: String, limit: Int) -> [WebResult] {
-        let range = NSRange(html.startIndex..., in: html)
+        let ns = html as NSString
+        let starts = ddgBlockStart.matches(in: html, range: NSRange(location: 0, length: ns.length)).map(\.range.location)
         var results: [WebResult] = []
-        for match in ddgResult.matches(in: html, range: range) {
-            guard let hrefRange = Range(match.range(at: 1), in: html),
-                  let titleRange = Range(match.range(at: 2), in: html),
-                  let snippetRange = Range(match.range(at: 3), in: html) else { continue }
-            let href = decodeEntities(String(html[hrefRange]))
+        for (i, start) in starts.enumerated() {
+            let end = i + 1 < starts.count ? starts[i + 1] : ns.length
+            let block = ns.substring(with: NSRange(location: start, length: end - start))
+            let blockRange = NSRange(location: 0, length: (block as NSString).length)
+            guard let title = ddgTitle.firstMatch(in: block, range: blockRange),
+                  let hrefRange = Range(title.range(at: 1), in: block),
+                  let titleRange = Range(title.range(at: 2), in: block) else { continue }
+            let href = decodeEntities(String(block[hrefRange]))
             if href.contains("duckduckgo.com/y.js") { continue }   // ad
             guard let url = unwrapDuckDuckGoLink(href) else { continue }
-            results.append(WebResult(
-                title: text(String(html[titleRange]), limit: 150),
-                url: url,
-                snippet: text(String(html[snippetRange]), limit: 250)
-            ))
+            let snippet = ddgSnippet.firstMatch(in: block, range: blockRange)
+                .flatMap { Range($0.range(at: 1), in: block) }
+                .map { text(String(block[$0]), limit: 250) } ?? ""
+            results.append(WebResult(title: text(String(block[titleRange]), limit: 150), url: url, snippet: snippet))
             if results.count >= limit { break }
         }
         return results

@@ -16,6 +16,9 @@ final class WebParsingTests: XCTestCase {
       <a class="result__snippet" href="https://www.swift.org/">Swift (programming &amp; language) &#8212; fast &#x2019;safe&#x2019;</a>
     </div>
     <div class="result results_links web-result">
+      <h2 class="result__title"><a class="result__a" href="https://example.com/no-snippet">No snippet here</a></h2>
+    </div>
+    <div class="result results_links web-result">
       <h2 class="result__title"><a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FSwift&amp;rut=abc">Swift - Wikipedia</a></h2>
       <a class="result__snippet" href="//duckduckgo.com/l/?uddg=x">A general-purpose language.</a>
     </div>
@@ -23,9 +26,11 @@ final class WebParsingTests: XCTestCase {
 
     func testDuckDuckGo() {
         let r = WebParsing.duckDuckGoResults(ddgHTML, limit: 10)
-        XCTAssertEqual(r.count, 2, "the ad is dropped")
+        XCTAssertEqual(r.count, 3, "the ad is dropped")
         XCTAssertEqual(r[0], WebResult(title: "Official site", url: "https://www.swift.org/", snippet: "Swift (programming & language) — fast ’safe’"))
-        XCTAssertEqual(r[1].url, "https://en.wikipedia.org/wiki/Swift")
+        XCTAssertEqual(r[1], WebResult(title: "No snippet here", url: "https://example.com/no-snippet", snippet: ""), "doesn't take the next result's snippet")
+        XCTAssertEqual(r[2].url, "https://en.wikipedia.org/wiki/Swift")
+        XCTAssertEqual(r[2].snippet, "A general-purpose language.")
         XCTAssertEqual(WebParsing.duckDuckGoResults(ddgHTML, limit: 1).count, 1)
         XCTAssertEqual(WebParsing.duckDuckGoResults("<html>no results</html>", limit: 5), [])
     }

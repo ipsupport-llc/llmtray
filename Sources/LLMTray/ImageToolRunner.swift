@@ -60,6 +60,10 @@ final class ImageToolRunner: ChatTool {
         calls.contains { $0.name == Self.toolName } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
+    static func clampedSide(_ value: Any?) -> Int {
+        min(max((value as? Int) ?? 1024, 256), 2048)
+    }
+
     func isOffered(_ settings: ChatSettings) -> Bool {
         settings.enableImageGeneration
     }
@@ -89,8 +93,10 @@ final class ImageToolRunner: ChatTool {
         // deliberately non-square request keeps its aspect ratio --
         // MfluxManager.generate rounds to a multiple of 16 regardless.
         let scale = settings.imageQuality.scale
-        let width = Int(Double((arguments["width"] as? Int) ?? 1024) * scale)
-        let height = Int(Double((arguments["height"] as? Int) ?? 1024) * scale)
+        // Model-supplied: clamped before any arithmetic (Int.max would trap
+        // in the conversion; 20000 px would run the Mac out of memory).
+        let width = Int(Double(Self.clampedSide(arguments["width"])) * scale)
+        let height = Int(Double(Self.clampedSide(arguments["height"])) * scale)
         do {
             let start = Date()
             let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: settings.imageGenModel)
