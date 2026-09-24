@@ -106,6 +106,24 @@ struct ModelsPane: View {
     @AppStorage(ModelDiscovery.modelsRootDefaultsKey) private var modelsRoot: String = ModelDiscovery.defaultModelsRoot
     @ObservedObject private var catalog = ModelCatalog.shared
     private var models: [LocalModel] { catalog.models }
+    /// What's typed; a saved token lives in the Keychain only (HFToken).
+    @State private var hfToken = ""
+    @State private var hfTokenSaved = HFToken.value != nil
+
+    @State private var hfTokenError: String?
+
+    private func saveToken() {
+        let token = hfToken.trimmingCharacters(in: .whitespaces)
+        guard !token.isEmpty else { return }
+        guard HFToken.set(token) else {
+            // Kept in the field, so it isn't lost.
+            hfTokenError = NSLocalizedString("The Keychain refused to save the token.", comment: "")
+            return
+        }
+        hfTokenError = nil
+        hfTokenSaved = HFToken.value != nil
+        hfToken = ""
+    }
 
     var body: some View {
         Form {
@@ -122,6 +140,30 @@ struct ModelsPane: View {
                     Text(diskUsageText).monospacedDigit().foregroundStyle(.secondary)
                 } label: {
                     SettingLabel(title: "Disk usage", help: "Space the models in this folder take, and what's still free on its disk.")
+                }
+                LabeledContent {
+                    HStack {
+                        if hfTokenSaved {
+                            Text("Saved in your Keychain").foregroundStyle(.secondary)
+                            Button("Remove") {
+                                hfTokenError = HFToken.set(nil) ? nil : NSLocalizedString("The Keychain refused to remove the token.", comment: "")
+                                hfTokenSaved = HFToken.value != nil
+                            }
+                        } else {
+                            SecureField("hf_…", text: $hfToken)
+                                .textFieldStyle(.roundedBorder)
+                                .frame(width: 220)
+                                .onSubmit(saveToken)
+                            Button("Save", action: saveToken)
+                                .disabled(hfToken.trimmingCharacters(in: .whitespaces).isEmpty)
+                            Link(destination: URL(string: "https://huggingface.co/settings/tokens")!) { Text("Get one") }
+                        }
+                        if let hfTokenError {
+                            Text(hfTokenError).font(.caption).foregroundStyle(.red)
+                        }
+                    }
+                } label: {
+                    SettingLabel(title: "Hugging Face token", help: "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.")
                 }
                 HStack {
                     Button("Use LM Studio's folder") { modelsRoot = NSString(string: "~/.lmstudio/models").expandingTildeInPath }
