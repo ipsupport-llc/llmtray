@@ -19,6 +19,7 @@ struct ContentView: View {
     @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
     @AppStorage(Pref.port) private var port: Int
     @AppStorage(Pref.showReasoning) private var showReasoning: Bool
+    @AppStorage(Pref.showToolCalls) private var showToolCalls: Bool
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -36,6 +37,8 @@ struct ContentView: View {
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
     @State private var modelMaxContext: Int = 32768
+    @State private var followChatBottom = true
+    @State private var chatViewportHeight: CGFloat = 380
 
     var body: some View {
         VStack(spacing: 0) {
@@ -114,10 +117,24 @@ struct ContentView: View {
 
     // MARK: - Chat
 
+    private static let chatBottomID = "chat-bottom"
+
+    /// Tool results by call id, for the debug view of tool calls.
+    private var toolResults: [String: String] {
+        var results: [String: String] = [:]
+        for msg in chat.messages where msg.role == "tool" {
+            if let id = msg.toolCallID { results[id] = msg.content }
+        }
+        return results
+    }
+
     private var chatArea: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 10) {
+                // Not Lazy: a lazy stack estimates the height of rows it
+                // hasn't laid out (long markdown answers), and the scroll
+                // position jumped whenever the estimate was corrected.
+                VStack(alignment: .leading, spacing: 10) {
                     if chat.messages.isEmpty {
                         Text("No messages yet")
                             .font(.system(size: 12))
@@ -129,7 +146,7 @@ struct ContentView: View {
                     // tool produced is attached to the assistant message
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
-                        MessageBubble(message: msg, showReasoning: showReasoning)
+                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: showToolCalls ? toolResults : nil)
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {
@@ -140,16 +157,36 @@ struct ContentView: View {
                             .font(.system(size: 11))
                             .foregroundColor(.red)
                     }
+                    // Where the bottom of the content is, relative to the
+                    // viewport: tells whether the user is reading the end.
+                    Color.clear.frame(height: 1).id(Self.chatBottomID)
+                        .background(GeometryReader { g in
+                            Color.clear.preference(key: ChatBottomKey.self, value: g.frame(in: .named("chatScroll")).maxY)
+                        })
                 }
                 .padding(12)
+            }
+            .coordinateSpace(name: "chatScroll")
+            .background(GeometryReader { g in
+                Color.clear.onAppear { chatViewportHeight = g.size.height }
+                    .onChange(of: g.size.height) { chatViewportHeight = $0 }
+            })
+            // Follow new text only while the user is at (or near) the end;
+            // scrolled up to read something, they stay where they are.
+            .onPreferenceChange(ChatBottomKey.self) { bottom in
+                followChatBottom = bottom <= chatViewportHeight + 40
             }
             // Small for an empty chat, capped so a long one scrolls inside
             // a fixed viewport instead of growing the window.
             .frame(minHeight: 48, maxHeight: chat.messages.isEmpty ? 48 : 380)
-            .onChange(of: (chat.messages.last?.content ?? "") + (chat.messages.last?.reasoning ?? "")) { _ in
-                if let last = chat.messages.last?.id {
-                    proxy.scrollTo(last, anchor: .bottom)
-                }
+            // Cheap to compare: lengths, not the whole text, per token.
+            .onChange(of: (chat.messages.last?.content.count ?? 0) + (chat.messages.last?.reasoning.count ?? 0)) { _ in
+                if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+            }
+            .onChange(of: chat.messages.count) { _ in
+                // The user's own new message always brings the end into view.
+                if chat.messages.last?.role == "user" { followChatBottom = true }
+                if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
             }
         }
     }
@@ -195,4 +232,10 @@ struct ContentView: View {
         guard autoCompactThreshold > 0, chat.messages.count > autoCompactThreshold else { return }
         Task { await compact() }
     }
+}
+
+/// The chat content's bottom edge in the scroll view's coordinates.
+private struct ChatBottomKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }

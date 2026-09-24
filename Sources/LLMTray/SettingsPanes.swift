@@ -13,6 +13,7 @@ import SwiftUI
 struct GeneralPane: View {
     @AppStorage(Pref.autoStartOnLaunch) private var autoStartOnLaunch
     @AppStorage(Pref.showReasoning) private var showReasoning
+    @AppStorage(Pref.showToolCalls) private var showToolCalls
     @AppStorage(Pref.autoStopIdleMinutes) private var autoStopIdleMinutes
     @AppStorage(Pref.compactKeepStart) private var compactKeepStart
     @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd
@@ -49,6 +50,9 @@ struct GeneralPane: View {
             Section("Chat") {
                 Toggle(isOn: $showReasoning) {
                     SettingLabel(title: "Show reasoning", help: "Shows the model's thinking (the collapsible \u{201C}Thought process\u{201D} block) above its answer.")
+                }
+                Toggle(isOn: $showToolCalls) {
+                    SettingLabel(title: "Show tool calls", help: "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.")
                 }
                 Picker(selection: $autoStopIdleMinutes) {
                     Text("Never").tag(0)

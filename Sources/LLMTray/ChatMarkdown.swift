@@ -1,4 +1,5 @@
 import SwiftUI
+import LLMTrayCore
 
 /// Renders a chat message's markdown into a single AttributedString, so the
 /// bubble stays ONE `Text` (whole-message text selection keeps working,
@@ -26,7 +27,7 @@ enum ChatMarkdown {
             firstLine = false
         }
 
-        for rawLine in source.components(separatedBy: "\n") {
+        for rawLine in joinDisplayMath(source.components(separatedBy: "\n")) {
             let line = rawLine
             let trimmed = line.trimmingCharacters(in: .whitespaces)
 
@@ -62,7 +63,7 @@ enum ChatMarkdown {
 
             // Heading: # .. ######
             if let (level, text) = heading(trimmed) {
-                var h = inline(text)
+                var h = inline(baseSize, text)
                 let bump: CGFloat = [0, 5, 3, 2, 1, 0, 0][min(level, 6)]
                 h.font = .system(size: baseSize + bump, weight: .bold)
                 out.append(h)
@@ -84,7 +85,7 @@ enum ChatMarkdown {
                 let text = trimmed.dropFirst().trimmingCharacters(in: .whitespaces)
                 var bar = AttributedString(indent + "▍ ")
                 bar.foregroundColor = .secondary
-                var body = inline(text)
+                var body = inline(baseSize, text)
                 body.foregroundColor = .secondary
                 out.append(bar)
                 out.append(body)
@@ -96,29 +97,89 @@ enum ChatMarkdown {
             if let first = trimmed.first, "-*+".contains(first),
                trimmed.dropFirst().first == " " {
                 out.append(AttributedString(indent + "•  "))
-                out.append(inline(String(trimmed.dropFirst(2))))
+                out.append(inline(baseSize, String(trimmed.dropFirst(2))))
                 continue
             }
 
             // Numbered list: "1. x" / "1) x"
             if let (number, text) = numbered(trimmed) {
                 out.append(AttributedString(indent + number + " "))
-                out.append(inline(text))
+                out.append(inline(baseSize, text))
                 continue
             }
 
-            out.append(inline(line))
+            out.append(inline(baseSize, line))
         }
         return out
     }
 
-    /// Inline markdown via Foundation; plain text if it doesn't parse.
-    private static func inline(_ text: String) -> AttributedString {
+    /// Inline markdown via Foundation (plain text if it doesn't parse), with
+    /// LaTeX math ($...$, \(...\), $$...$$, \[...\]) turned into Unicode in
+    /// a serif face. `code` spans are left alone.
+    private static func inline(_ baseSize: CGFloat, _ text: String) -> AttributedString {
+        guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(text) }
+        var out = AttributedString()
+        // Odd segments are inside backticks: code, never math.
+        for (i, segment) in text.components(separatedBy: "`").enumerated() {
+            if i % 2 == 1 {
+                out.append(markdown("`" + segment + "`"))
+                continue
+            }
+            for piece in MathSpans.split(segment) {
+                switch piece {
+                case .text(let t):
+                    out.append(markdown(t))
+                case .math(let latex, let display):
+                    var math = AttributedString(LaTeXText.toUnicode(latex))
+                    math.font = .system(size: display ? baseSize + 2 : baseSize + 1, design: .serif)
+                    out.append(math)
+                }
+            }
+        }
+        return out
+    }
+
+    private static func markdown(_ text: String) -> AttributedString {
         let options = AttributedString.MarkdownParsingOptions(
             interpretedSyntax: .inlineOnlyPreservingWhitespace,
             failurePolicy: .returnPartiallyParsedIfPossible
         )
         return (try? AttributedString(markdown: text, options: options)) ?? AttributedString(text)
+    }
+
+    /// A display formula spread over several lines ($$ ... $$ or \[ ... \])
+    /// becomes one line, so it's converted as a whole. Code fences untouched.
+    private static func joinDisplayMath(_ lines: [String]) -> [String] {
+        var out: [String] = []
+        var pending: [String]?
+        var closer = ""
+        var inFence = false
+        for line in lines {
+            let t = line.trimmingCharacters(in: .whitespaces)
+            if pending == nil, t.hasPrefix("```") { inFence.toggle() }
+            if inFence { out.append(line); continue }
+            if var open = pending {
+                open.append(t)
+                if t.hasSuffix(closer) {
+                    out.append(open.joined(separator: " "))
+                    pending = nil
+                } else {
+                    pending = open
+                }
+                continue
+            }
+            for (start, end) in [("$$", "$$"), ("\\[", "\\]")] where t.hasPrefix(start) {
+                let rest = t.dropFirst(start.count)
+                if !rest.contains(end) {
+                    pending = [t]
+                    closer = end
+                }
+                break
+            }
+            if pending == nil { out.append(line) }
+        }
+        if let open = pending { out.append(contentsOf: open) }   // never closed: as written
+        return out
     }
 
     private static func isRule(_ s: String) -> Bool {

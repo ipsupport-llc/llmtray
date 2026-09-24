@@ -6,6 +6,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";
 "%lld-bit" = "%lld-bit";
+"(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
@@ -63,6 +64,7 @@
 "Currency rates" = "Currency rates";
 "Current settings are already fastest" = "Current settings are already fastest";
 "Date & time" = "Date & time";
+"Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.";
 "Delete" = "Delete";
 "Delete profile “%@”?" = "Delete profile “%@”?";
 "Delete this profile (models using it go back to Default)" = "Delete this profile (models using it go back to Default)";
@@ -207,6 +209,7 @@
 "Show reasoning" = "Show reasoning";
 "Show the profile files in Finder" = "Show the profile files in Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac";
+"Show tool calls" = "Show tool calls";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Sort by" = "Sort by";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";

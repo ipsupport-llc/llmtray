@@ -29,6 +29,9 @@ public enum Pref {
 
     // Chat
     public static let showReasoning = PrefKey("llmtray.showReasoning", default: true)
+    /// Debug: show each tool call (name, arguments) under the answer, with
+    /// its result when expanded.
+    public static let showToolCalls = PrefKey("llmtray.showToolCalls", default: false)
     public static let compactKeepStart = PrefKey("llmtray.compactKeepStart", default: 4)
     public static let compactKeepEnd = PrefKey("llmtray.compactKeepEnd", default: 6)
     /// 0 = off.
