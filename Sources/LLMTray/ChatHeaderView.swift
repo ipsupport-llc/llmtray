@@ -10,7 +10,7 @@ struct ChatHeaderView: View {
     @EnvironmentObject var benchmark: BenchmarkRunner
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
-    @AppStorage("llmtray.port") private var port: Int = 8765
+    @AppStorage(Pref.port) private var port: Int
 
     @Binding var selectedModelID: String?
     let sessionHistory: [ChatSessionFile]
@@ -30,19 +30,25 @@ struct ChatHeaderView: View {
                     }
                 }
                 .labelsHidden()
-                .disabled(isStarting || benchmark.isRunning)
+                .disabled(!ops.canSwitchModel)
                 .help(Text(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model"))
+
+                Button { NotificationCenter.default.post(name: .showHFBrowser, object: nil) } label: {
+                    Image(systemName: "arrow.down.circle")
+                }
+                .buttonStyle(.plain)
+                .help(Text("Download models from Hugging Face"))
+                .accessibilityLabel(Text("Download models"))
 
                 Menu {
                     Button("Rescan Models") { catalog.rescan() }
-                    Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
                     Button("Manage Models…") { openSettings(.models) }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
                 .menuStyle(.borderlessButton)
                 .fixedSize()
-                .help(Text("Rescan, download or manage models"))
+                .help(Text("Rescan or manage models"))
                 .accessibilityLabel(Text("Model actions"))
 
                 serverToggleButton
@@ -136,11 +142,6 @@ struct ChatHeaderView: View {
         server.start(modelPath: model.path, port: port, alias: catalog.alias(for: model.id))
     }
 
-    private var isStarting: Bool {
-        if case .starting = server.state { return true }
-        return false
-    }
-
     private var isRunning: Bool {
         if case .running = server.state { return true }
         return false
@@ -179,10 +180,12 @@ struct ChatHeaderView: View {
 
     // MARK: Profile
 
-    /// Switching can restart the server, which would kill an in-flight
-    /// request or race the auto-tune sweep's own restarts.
+    private var ops: OperationAvailability { OperationAvailability(server: server, chat: chat, benchmark: benchmark) }
+
+    /// For the loaded model a switch can change launch arguments -- not
+    /// while a request or the auto-tune could be cut off.
     private var canSwitchProfile: Bool {
-        selectedModelID != nil && !isStarting && !server.isBusy && !chat.isBusy && !benchmark.isRunning
+        selectedModelID != nil && ops.canAssignProfile(toLoadedModel: selectedModelID == server.loadedModelPath)
     }
 
     private var profilePicker: some View {

@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import LLMTrayCore
 
 /// The panes of the Settings window, in toolbar order.
 enum SettingsPane: String, CaseIterable {
@@ -149,7 +150,7 @@ struct RestartBanner: View {
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
 
-    private var blocked: Bool { server.isBusy || chat.isBusy || benchmark.isRunning }
+    private var blocked: Bool { !OperationAvailability(server: server, chat: chat, benchmark: benchmark).canRestartServer }
 
     var body: some View {
         if server.pendingLaunchChange {

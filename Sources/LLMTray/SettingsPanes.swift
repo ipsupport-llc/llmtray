@@ -11,12 +11,12 @@ import SwiftUI
 // MARK: - General
 
 struct GeneralPane: View {
-    @AppStorage("llmtray.autoStartOnLaunch") private var autoStartOnLaunch = true
-    @AppStorage("llmtray.showReasoning") private var showReasoning = true
-    @AppStorage("llmtray.autoStopIdleMinutes") private var autoStopIdleMinutes = 0
-    @AppStorage("llmtray.compactKeepStart") private var compactKeepStart = 4
-    @AppStorage("llmtray.compactKeepEnd") private var compactKeepEnd = 6
-    @AppStorage("llmtray.autoCompactThreshold") private var autoCompactThreshold = 0
+    @AppStorage(Pref.autoStartOnLaunch) private var autoStartOnLaunch
+    @AppStorage(Pref.showReasoning) private var showReasoning
+    @AppStorage(Pref.autoStopIdleMinutes) private var autoStopIdleMinutes
+    @AppStorage(Pref.compactKeepStart) private var compactKeepStart
+    @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd
+    @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold
     // SMAppService is the source of truth (the user can also change it in
     // System Settings > Login Items), so it's read, not stored.
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -96,6 +96,7 @@ struct GeneralPane: View {
 struct ModelsPane: View {
     @EnvironmentObject var benchmark: BenchmarkRunner
     @EnvironmentObject var server: ServerManager
+    @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var navigation: SettingsNavigation
     @ObservedObject private var profiles = ProfileManager.shared
     @AppStorage(ModelDiscovery.modelsRootDefaultsKey) private var modelsRoot: String = ModelDiscovery.defaultModelsRoot
@@ -160,7 +161,8 @@ struct ModelsPane: View {
                 .frame(width: 140)
                 // Auto-tune writes into the loaded model's profile and
                 // restarts it between measurements.
-                .disabled(benchmark.isRunning || server.loadedModelPath == m.id && (server.isBusy || isStarting))
+                .disabled(!OperationAvailability(server: server, chat: chat, benchmark: benchmark)
+                    .canAssignProfile(toLoadedModel: server.loadedModelPath == m.id))
             }
         } label: {
             VStack(alignment: .leading) {
@@ -170,11 +172,6 @@ struct ModelsPane: View {
                 }
             }
         }
-    }
-
-    private var isStarting: Bool {
-        if case .starting = server.state { return true }
-        return false
     }
 
     private func rescan() {
@@ -276,7 +273,8 @@ struct ProfilesPane: View {
         }
     }
 
-    private var busy: Bool { server.isBusy || chat.isBusy || benchmark.isRunning }
+    private var ops: OperationAvailability { OperationAvailability(server: server, chat: chat, benchmark: benchmark) }
+    private var busy: Bool { !ops.canDeleteProfile }
 
     private func startRenaming(_ p: Profile) {
         guard !p.isDefault else { return }
@@ -323,7 +321,7 @@ struct ProfilesPane: View {
                     .foregroundStyle(.secondary)
             }
             editorSections
-                .disabled(!profiles.isEditable(id: selectedID) || benchmark.isRunning)
+                .disabled(!profiles.isEditable(id: selectedID) || !ops.canEditProfiles)
         }
         .formStyle(.grouped)
     }
@@ -565,15 +563,17 @@ struct SliderValue: View {
 
 struct ServerPane: View {
     @EnvironmentObject var server: ServerManager
-    @AppStorage("llmtray.port") private var port = 8765
-    @AppStorage("llmtray.allowLAN") private var allowLAN = false
-    @AppStorage("llmtray.stallThresholdSeconds") private var stallThresholdSeconds = 60
-    @AppStorage("llmtray.autoRestartStallThreshold") private var autoRestartStallThreshold = 3
-    @AppStorage("llmtray.verboseServerLogging") private var verboseLogging = false
+    @EnvironmentObject var chat: ChatClient
+    @EnvironmentObject var benchmark: BenchmarkRunner
+    @AppStorage(Pref.port) private var port
+    @AppStorage(Pref.allowLAN) private var allowLAN
+    @AppStorage(Pref.stallThresholdSeconds) private var stallThresholdSeconds
+    @AppStorage(Pref.autoRestartStallThreshold) private var autoRestartStallThreshold
+    @AppStorage(Pref.verboseServerLogging) private var verboseLogging
 
     /// Idle-unloaded counts as running: the listener still holds the port.
     private var isStopped: Bool {
-        switch server.state { case .stopped, .failed: return !server.isIdleUnloaded; default: return false }
+        OperationAvailability(server: server, chat: chat, benchmark: benchmark).canEditNetworkSettings
     }
 
     var body: some View {
@@ -621,7 +621,7 @@ struct BenchmarkPane: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var benchmark: BenchmarkRunner
     @ObservedObject private var profiles = ProfileManager.shared
-    @AppStorage("llmtray.port") private var port = 8765
+    @AppStorage(Pref.port) private var port
 
     private var alias: String {
         guard let path = server.loadedModelPath else { return "default" }
@@ -650,19 +650,18 @@ struct BenchmarkPane: View {
 
 struct UpdatesPane: View {
     @EnvironmentObject var server: ServerManager
+    @EnvironmentObject var chat: ChatClient
+    @EnvironmentObject var benchmark: BenchmarkRunner
     @EnvironmentObject var runtime: RuntimeManager
     let checkForAppUpdates: () -> Void
-    @AppStorage("SUEnableAutomaticChecks") private var autoCheck = true
-    @AppStorage("llmtray.checkUpdatesAtLaunch") private var checkAtLaunch = true
-    @AppStorage("llmtray.betaUpdates") private var beta = false
+    @AppStorage(Pref.automaticUpdateChecks) private var autoCheck
+    @AppStorage(Pref.checkUpdatesAtLaunch) private var checkAtLaunch
+    @AppStorage(Pref.betaUpdates) private var beta
 
     /// Anything that could start the model process mid-update: running,
     /// starting, or idle-unloaded (the next request reloads it).
     private var isRunning: Bool {
-        switch server.state {
-        case .stopped, .failed: return server.isIdleUnloaded
-        default: return true
-        }
+        !OperationAvailability(server: server, chat: chat, benchmark: benchmark).canChangeRuntime
     }
 
     private var version: String {

@@ -16,17 +16,17 @@ struct ContentView: View {
 
     // Persists across launches -- picking up where you left off. Also read
     // by AppDelegate's auto-start and quick menu.
-    @AppStorage("selectedModelID") private var selectedModelID: String?
-    @AppStorage("llmtray.port") private var port: Int = 8765
-    @AppStorage("llmtray.showReasoning") private var showReasoning: Bool = true
+    @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
+    @AppStorage(Pref.port) private var port: Int
+    @AppStorage(Pref.showReasoning) private var showReasoning: Bool
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
-    @AppStorage("llmtray.compactKeepStart") private var compactKeepStart: Int = 4
-    @AppStorage("llmtray.compactKeepEnd") private var compactKeepEnd: Int = 6
+    @AppStorage(Pref.compactKeepStart) private var compactKeepStart: Int
+    @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd: Int
     // 0 disables auto-compaction -- otherwise checked after every
     // completed turn.
-    @AppStorage("llmtray.autoCompactThreshold") private var autoCompactThreshold: Int = 0
+    @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold: Int
 
     // Backs the History menu -- refreshed on appear and whenever
     // ChatSessionStore posts .sessionsDidChange, not read from disk on

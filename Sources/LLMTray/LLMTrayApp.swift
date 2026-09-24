@@ -78,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // launch. This quiet background check runs at every launch unless
         // turned off; it only shows UI when an update actually exists.
         if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil,
-           UserDefaults.standard.object(forKey: "llmtray.checkUpdatesAtLaunch") as? Bool ?? true {
+           UserDefaults.standard[Pref.checkUpdatesAtLaunch] {
             updaterController.updater.checkForUpdatesInBackground()
         }
         NSApp.setActivationPolicy(.accessory)
@@ -116,7 +116,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // true if never set) -- this has always been the behavior, so
         // making the key's *absence* mean "off" would silently change it
         // for every existing install the first time this shipped.
-        if UserDefaults.standard.object(forKey: "llmtray.autoStartOnLaunch") as? Bool ?? true {
+        if UserDefaults.standard[Pref.autoStartOnLaunch] {
             quickStart()
         }
     }
@@ -254,7 +254,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// clear reason is safer than guessing.
     private func attemptStart(retriesLeft: Int) async {
         let defaults = UserDefaults.standard
-        guard let savedID = defaults.string(forKey: "selectedModelID") else { return }
+        guard let savedID = defaults[Pref.selectedModelID] else { return }
         // A fresh scan each attempt: the retry exists for a startup race.
         ModelCatalog.shared.rescan()
         guard let model = ModelCatalog.shared.model(id: savedID) else {
@@ -267,7 +267,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let port = defaults.object(forKey: "llmtray.port") as? Int ?? 8765
+        let port = defaults[Pref.port]
         // KV bits, drafter etc. come from the model's profile at launch
         // (ServerManager.launchServerProcess), including the KV-shared
         // model guard auto-start used to skip.
@@ -506,6 +506,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// Read on every check, so the toggle takes effect without a restart.
 final class UpdateChannelDelegate: NSObject, SPUUpdaterDelegate {
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
-        UserDefaults.standard.bool(forKey: "llmtray.betaUpdates") ? ["beta"] : []
+        UserDefaults.standard[Pref.betaUpdates] ? ["beta"] : []
     }
 }

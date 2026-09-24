@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 /// Manages the pinned commit of our own mlx-lm fork (ipsupport-llc/mlx-lm,
 /// `main` branch) used by runtime/run_server.sh's venv. This app installs
@@ -31,7 +32,7 @@ final class RuntimeManager: ObservableObject {
     /// app build. Falls back to main if that branch doesn't exist.
     private static let betaBranch = "beta"
     private static var trackedBranch: String {
-        UserDefaults.standard.bool(forKey: "llmtray.betaUpdates") ? betaBranch : stableBranch
+        UserDefaults.standard[Pref.betaUpdates] ? betaBranch : stableBranch
     }
 
     private var runtimeDir: String { RuntimePaths.runtimeDir }
