@@ -101,8 +101,24 @@ final class ModelProxyServer {
 
     // MARK: - Connection handling
 
+    /// Connections whose request hasn't been read completely yet. A client
+    /// that declares a big body and then stalls would otherwise keep its
+    /// buffer (up to maxBodyBytes) forever -- reachable from the LAN when
+    /// that's enabled.
+    private var readingConnections: Set<ObjectIdentifier> = []
+    private static let requestReadTimeout: TimeInterval = 120
+
     private func accept(_ connection: NWConnection, internalPort: Int) {
         connection.start(queue: .main)
+        let id = ObjectIdentifier(connection)
+        readingConnections.insert(id)
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.requestReadTimeout) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.readingConnections.remove(id) != nil else { return }
+                // Cancelling fails the pending receive, which drops its buffer.
+                connection.cancel()
+            }
+        }
         readHeaders(connection: connection, buffer: Data(), internalPort: internalPort)
     }
 
@@ -167,6 +183,7 @@ final class ModelProxyServer {
     // MARK: - Routing
 
     private func route(method: String, path: String, headers: [String: String], body: Data.SubSequence, connection: NWConnection, internalPort: Int) {
+        readingConnections.remove(ObjectIdentifier(connection))
         let bodyData = Data(body)
         // Marked busy for the whole request, not just the eventual forward()
         // below -- a model switch (stopping the old process, loading the

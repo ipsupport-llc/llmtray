@@ -58,6 +58,20 @@ final class HTTPRequestParserTests: XCTestCase {
         XCTAssertEqual(status(parse(flood)), "431 Request Header Fields Too Large")
     }
 
+    func testHeadLimitIndependentOfSegmentation() {
+        let line = "GET / HTTP/1.1\r\nX: "
+        let head = line + String(repeating: "a", count: HTTPRequestParser.maxHeaderBytes - line.utf8.count)
+        XCTAssertEqual(head.utf8.count, HTTPRequestParser.maxHeaderBytes)
+        // Whole, or cut inside the terminator: accepted the same way.
+        if case .reject = parse(head + "\r\n\r\n") { XCTFail("complete head at the limit rejected") }
+        // Byte-level cuts ("\r\n" is one Character in Swift).
+        for cut in 1...3 {
+            let partial = Data(head.utf8) + Data([13, 10, 13, 10].prefix(cut))
+            XCTAssertEqual(HTTPRequestParser.parseHead(partial, maxBodyBytes: 1_000), .needMoreData, "cut \(cut)")
+        }
+        XCTAssertEqual(status(parse(head + "a\r\n\r\n")), "431 Request Header Fields Too Large")
+    }
+
     func testMalformedRequestLine() {
         XCTAssertEqual(status(parse("garbage\r\n\r\n")), "400 Bad Request")
         XCTAssertEqual(status(parse("GET http://evil/ HTTP/1.1\r\n\r\n")), "400 Bad Request")

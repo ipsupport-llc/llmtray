@@ -36,8 +36,11 @@ public enum HTTPRequestParser {
     private static let terminator = Data([13, 10, 13, 10]) // \r\n\r\n
 
     public static func parseHead(_ buffer: Data, maxBodyBytes: Int) -> HTTPParseResult {
+        // One limit on the head itself (the bytes before \r\n\r\n), whatever
+        // way TCP split it: an incomplete buffer may also hold up to three
+        // bytes of a terminator still arriving.
         guard let end = buffer.range(of: terminator) else {
-            return buffer.count > maxHeaderBytes
+            return buffer.count > maxHeaderBytes + terminator.count - 1
                 ? .reject(status: "431 Request Header Fields Too Large", message: "request headers too large")
                 : .needMoreData
         }
