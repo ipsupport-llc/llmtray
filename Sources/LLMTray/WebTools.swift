@@ -32,7 +32,12 @@ final class WebSearchTool: SelectableTool {
                 "https://html.duckduckgo.com/html/", method: "POST",
                 form: [URLQueryItem(name: "q", value: query), URLQueryItem(name: "kl", value: "wt-wt")]
             )
-            let results = WebParsing.duckDuckGoResults(String(decoding: data, as: UTF8.self), limit: limit)
+            let html = String(decoding: data, as: UTF8.self)
+            let results = WebParsing.duckDuckGoResults(html, limit: limit)
+            if results.isEmpty, !html.contains("result__a") {
+                // No result markup at all: DuckDuckGo's bot check, not "nothing found".
+                return Self.error("web search is temporarily blocked by DuckDuckGo; try again later or use news / get_wikipedia_summary")
+            }
             return Self.json(["query": query, "results": results.map { ["title": $0.title, "url": $0.url, "snippet": $0.snippet] }])
         } catch {
             return Self.error("search failed: \(error.localizedDescription)")
@@ -146,7 +151,13 @@ final class WikipediaTool: SelectableTool {
         }
         // A Cyrillic title on en.wiki 404s: try the languages it could be in.
         let cyrillic = title.unicodeScalars.contains { (0x0400...0x04FF).contains($0.value) }
-        var langs = [(arguments["lang"] as? String) ?? (cyrillic ? "ru" : "en")]
+        // Goes into the host name: only a real language code (not a value a
+        // prompt injection could point elsewhere with).
+        let lang: String? = (arguments["lang"] as? String)?.lowercased()
+        let requested: String? = lang.flatMap { code in
+            code.range(of: #"^[a-z]{2,3}(-[a-z]{2,8})?$"#, options: .regularExpression) != nil ? code : nil
+        }
+        var langs = [requested ?? (cyrillic ? "ru" : "en")]
         langs += cyrillic ? ["uk", "ru", "en"] : ["en"]
         for lang in NSOrderedSet(array: langs).compactMap({ $0 as? String }) {
             if let summary = await summary(title, lang: lang) { return Self.json(summary) }
@@ -208,21 +219,27 @@ final class CountryInfoTool: SelectableTool {
                 let code = WikidataClaims(refs[id] ?? [:]).strings("P498").first
                 return [code, label(id)].compactMap { $0 }.joined(separator: " ").nilIfEmpty
             }
-            let borders = claims.items("P47", currentOnly: true)
+            let borders: [String] = claims.items("P47", currentOnly: true)
                 .compactMap { WikidataClaims(refs[$0] ?? [:]).strings("P297").first }.sorted()
-            return Self.json([
-                "name": WikidataClaims.label(entity) ?? country,
-                "code": claims.strings("P297").first ?? "",
-                "capital": NSOrderedSet(array: claims.items("P36").compactMap(label)).array.compactMap { $0 as? String }.joined(separator: ", "),
-                "population": claims.latestQuantity("P1082").map { Int($0) } ?? 0,
-                "area_km2": claims.latestQuantity("P2046").map { Int($0.rounded()) } ?? 0,
-                "continent": claims.items("P30").compactMap(label).joined(separator: ", "),
-                "currencies": currencies,
-                "languages": claims.items("P37").compactMap(label),
-                "calling_code": claims.strings("P474").first ?? "",
-                "borders": borders,
-                "source": "https://www.wikidata.org/wiki/\(id)",
-            ])
+            var capitals: [String] = []
+            for name in claims.items("P36", currentOnly: true).compactMap(label) where !capitals.contains(name) {
+                capitals.append(name)
+            }
+            let population: Int = claims.latestQuantity("P1082").map { Int($0) } ?? 0
+            let area: Int = claims.latestQuantity("P2046").map { Int($0.rounded()) } ?? 0
+            var result: [String: Any] = [:]
+            result["name"] = WikidataClaims.label(entity) ?? country
+            result["code"] = claims.strings("P297").first ?? ""
+            result["capital"] = capitals.joined(separator: ", ")
+            result["population"] = population
+            result["area_km2"] = area
+            result["continent"] = claims.items("P30").compactMap(label).joined(separator: ", ")
+            result["currencies"] = currencies
+            result["languages"] = claims.items("P37").compactMap(label)
+            result["calling_code"] = claims.strings("P474").first ?? ""
+            result["borders"] = borders
+            result["source"] = "https://www.wikidata.org/wiki/\(id)"
+            return Self.json(result)
         } catch {
             return Self.error("country lookup failed: \(error.localizedDescription)")
         }
@@ -231,7 +248,7 @@ final class CountryInfoTool: SelectableTool {
     /// The country's item: by ISO code (P297 / P298) or by name in any
     /// language -- the first search hit that has an ISO alpha-2 code.
     static func findCountry(_ query: String) async throws -> (String, [String: Any])? {
-        var candidates: [String]
+        var candidates: [String] = []
         if (2...3).contains(query.count), query.allSatisfy({ $0.isASCII && $0.isLetter }), query == query.uppercased() {
             let search = try await WebFetch.json(api, query: [
                 URLQueryItem(name: "action", value: "query"), URLQueryItem(name: "list", value: "search"),
@@ -239,7 +256,9 @@ final class CountryInfoTool: SelectableTool {
                 URLQueryItem(name: "format", value: "json"),
             ])
             candidates = ((search["query"] as? [String: Any])?["search"] as? [[String: Any]] ?? []).compactMap { $0["title"] as? String }
-        } else {
+        }
+        // Not an ISO code after all ("UK", "UAE") or a name: search by label.
+        if candidates.isEmpty {
             let cyrillic = query.unicodeScalars.contains { (0x0400...0x04FF).contains($0.value) }
             let search = try await WebFetch.json(api, query: [
                 URLQueryItem(name: "action", value: "wbsearchentities"), URLQueryItem(name: "search", value: query),
@@ -338,7 +357,8 @@ final class HolidaysTool: SelectableTool {
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let code = (arguments["country_code"] as? String)?.uppercased(), code.count == 2 else {
+        guard let code = (arguments["country_code"] as? String)?.uppercased(), code.count == 2,
+              code.allSatisfy({ $0.isASCII && $0.isLetter }) else {
             return Self.error("country_code must be a 2-letter ISO code")
         }
         let year = arguments["year"] as? Int ?? Calendar.current.component(.year, from: Date())
@@ -374,8 +394,8 @@ final class CurrencyTool: SelectableTool {
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
         let amount = (arguments["amount"] as? Double) ?? (arguments["amount"] as? Int).map(Double.init) ?? Double(arguments["amount"] as? String ?? "")
         guard let amount,
-              let from = (arguments["from_currency"] as? String)?.uppercased(), from.count == 3,
-              let to = (arguments["to_currency"] as? String)?.uppercased(), to.count == 3 else {
+              let from = (arguments["from_currency"] as? String)?.uppercased(), from.count == 3, from.allSatisfy({ $0.isASCII && $0.isLetter }),
+              let to = (arguments["to_currency"] as? String)?.uppercased(), to.count == 3, to.allSatisfy({ $0.isASCII && $0.isLetter }) else {
             return Self.error("amount, from_currency and to_currency (3-letter codes) are required")
         }
         do {
@@ -383,8 +403,10 @@ final class CurrencyTool: SelectableTool {
             guard rates["result"] as? String == "success" else { return Self.error("unknown currency \(from)") }
             guard let rate = (rates["rates"] as? [String: Any])?[to] as? Double else { return Self.error("unknown currency \(to)") }
             // Decimal: a Double like 0.877372 prints as 0.87737200000000004.
-            let exactRate = NSDecimalNumber(string: String(format: "%.6f", rate))
-            let converted = NSDecimalNumber(string: String(format: "%.2f", amount * rate))
+            // Significant digits, so tiny rates (IRR -> USD) don't round to 0.
+            let exactRate = NSDecimalNumber(string: String(format: "%.6g", rate))
+            let value = amount * rate
+            let converted = NSDecimalNumber(string: abs(value) >= 1 ? String(format: "%.2f", value) : String(format: "%.4g", value))
             return Self.json([
                 "amount": amount, "from": from, "to": to, "rate": exactRate,
                 "result": converted,

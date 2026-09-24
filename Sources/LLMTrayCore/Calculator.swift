@@ -160,6 +160,9 @@ public enum Calculator {
 
         // unary := ('-' | '+') unary | power   -- so -2^2 = -4, as in Python
         mutating func unary() throws -> Double {
+            depth += 1
+            defer { depth -= 1 }
+            guard depth < 200 else { throw Failure.syntax("expression nested too deeply") }
             if case .op(let op)? = peek(), op == "-" || op == "+" {
                 position += 1
                 let v = try unary()
@@ -272,7 +275,7 @@ public enum Calculator {
             let (ox, oy) = (x, y)
             while y != 0 { (x, y) = (y, x % y) }
             if name == "gcd" { return Double(x) }
-            return x == 0 ? 0 : Double(ox / x * oy)
+            return x == 0 ? 0 : Double(ox / x) * Double(oy)   // no Int64 overflow
         default:
             throw Failure.unknown(name)
         }

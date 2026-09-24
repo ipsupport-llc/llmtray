@@ -171,7 +171,12 @@ enum WebFetch {
 
     static func data(_ base: String, query: [URLQueryItem] = [], method: String = "GET", form: [URLQueryItem]? = nil, timeout: TimeInterval = 12) async throws -> Data {
         guard var components = URLComponents(string: base) else { throw URLError(.badURL) }
-        if !query.isEmpty { components.queryItems = query }
+        // URLComponents leaves "+" as is, which servers read as a space:
+        // "C++" would arrive as "C  ".
+        if !query.isEmpty {
+            components.queryItems = query
+            components.percentEncodedQuery = components.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        }
         guard let url = components.url else { throw URLError(.badURL) }
         var request = URLRequest(url: url, timeoutInterval: timeout)
         request.httpMethod = method
@@ -179,7 +184,7 @@ enum WebFetch {
         if let form {
             var body = URLComponents()
             body.queryItems = form
-            request.httpBody = body.percentEncodedQuery?.data(using: .utf8)
+            request.httpBody = body.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B").data(using: .utf8)
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         }
         let (data, response) = try await URLSession.shared.data(for: request)

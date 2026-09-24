@@ -37,6 +37,7 @@ final class CalculatorTests: XCTestCase {
         XCTAssertEqual(try eval("max(1, 5, 3)"), 5)
         XCTAssertEqual(try eval("factorial(5)"), 120)
         XCTAssertEqual(try eval("gcd(12, 18) + lcm(4, 6)"), 18)
+        XCTAssertEqual(try eval("lcm(4000000007, 4000000009)"), 4000000007.0 * 4000000009.0, accuracy: 1e5)
         XCTAssertEqual(try eval("1e3 + 2.5E-1"), 1000.25)
         XCTAssertEqual(try eval("1_000_000 / 4"), 250_000)
         XCTAssertEqual(try eval("6 × 7 ÷ 2"), 21)
@@ -52,6 +53,8 @@ final class CalculatorTests: XCTestCase {
         XCTAssertThrowsError(try eval("1 2"))
         XCTAssertThrowsError(try eval(String(repeating: "(", count: 500) + "1" + String(repeating: ")", count: 500)))
         XCTAssertThrowsError(try eval("10^400"))   // not finite
+        XCTAssertThrowsError(try eval(String(repeating: "-", count: 5000) + "1"))
+        XCTAssertThrowsError(try eval(String(repeating: "2^-", count: 3000) + "2"))
     }
 
     func testFormat() {
