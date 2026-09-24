@@ -21,9 +21,20 @@ struct GeneralPane: View {
     // System Settings > Login Items), so it's read, not stored.
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
     @State private var launchAtLoginError: String?
+    @State private var language: String = AppLanguage.current
 
     var body: some View {
         Form {
+            Section("Language") {
+                Picker(selection: Binding(get: { language }, set: { language = $0; AppLanguage.set($0) })) {
+                    Text("System").tag("")
+                    ForEach(AppLanguage.available, id: \.self) { code in
+                        Text(AppLanguage.name(of: code)).tag(code)
+                    }
+                } label: {
+                    SettingLabel(title: "App language", help: "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.")
+                }
+            }
             Section("Startup") {
                 Toggle(isOn: Binding(get: { launchAtLogin }, set: setLaunchAtLogin)) {
                     SettingLabel(title: "Launch at login", help: "Start LLMTray automatically when you log in to this Mac.")
@@ -690,5 +701,52 @@ struct UpdatesPane: View {
         alert.alertStyle = .warning
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         server.removeExternalRuntime()
+    }
+}
+
+/// Per-app language override via the standard AppleLanguages default
+/// (what System Settings > Language & Region > Applications writes too).
+/// Read by the system at launch, so a change needs a relaunch.
+enum AppLanguage {
+    /// Languages shipped in the bundle (Resources/Localization/*.lproj).
+    static var available: [String] {
+        Bundle.main.localizations.filter { $0 != "Base" }.sorted { name(of: $0) < name(of: $1) }
+    }
+
+    /// "" = follow the system.
+    static var current: String {
+        guard let langs = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?["AppleLanguages"] as? [String],
+              let first = langs.first else { return "" }
+        return available.first { first.hasPrefix($0) } ?? ""
+    }
+
+    /// The language's own name: "Русский", "Українська", "Español".
+    static func name(of code: String) -> String {
+        Locale(identifier: code).localizedString(forLanguageCode: code)?.capitalized(with: Locale(identifier: code)) ?? code
+    }
+
+    static func set(_ code: String) {
+        if code.isEmpty {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([code], forKey: "AppleLanguages")
+        }
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Restart LLMTray to change the language?", comment: "")
+        alert.informativeText = NSLocalizedString("The running model server is stopped and started again.", comment: "")
+        alert.addButton(withTitle: NSLocalizedString("Restart Now", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Later", comment: ""))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        relaunch()
+    }
+
+    /// Starts a fresh instance once this one has exited, then quits.
+    static func relaunch() {
+        let path = Bundle.main.bundlePath
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/bin/sh")
+        task.arguments = ["-c", "while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.2; done; open \"$0\"", path]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }

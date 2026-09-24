@@ -213,3 +213,11 @@
 "You" = "Ви";
 "not used by any model" = "не використовується жодною моделлю";
 "used by %@" = "використовують: %@";
+"Language" = "Мова";
+"System" = "Системна";
+"App language" = "Мова застосунку";
+"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
+"Restart LLMTray to change the language?" = "Перезапустити LLMTray, щоб змінити мову?";
+"The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
+"Restart Now" = "Перезапустити";
+"Later" = "Пізніше";

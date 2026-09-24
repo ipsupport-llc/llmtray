@@ -17,6 +17,7 @@
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
+"App language" = "App language";
 "Apply to profile" = "Apply to profile";
 "Assistant" = "Assistant";
 "Auto-compact" = "Auto-compact";
@@ -84,6 +85,8 @@
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "LLMTray" = "LLMTray";
+"Language" = "Language";
+"Later" = "Later";
 "Launch at login" = "Launch at login";
 "Library" = "Library";
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
@@ -116,6 +119,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Open" = "Open";
 "Open Server Log…" = "Open Server Log…";
+"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "Past %lld messages" = "Past %lld messages";
 "Performance" = "Performance";
 "Port" = "Port";
@@ -140,6 +144,8 @@
 "Rescan Models" = "Rescan Models";
 "Rescan, download or manage models" = "Rescan, download or manage models";
 "Reset: inherit this setting from Default" = "Reset: inherit this setting from Default";
+"Restart LLMTray to change the language?" = "Restart LLMTray to change the language?";
+"Restart Now" = "Restart Now";
 "Restart Server" = "Restart Server";
 "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off." = "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged. 0 turns it off.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Restarts the model process with the new settings (a few seconds to reload).";
@@ -180,6 +186,7 @@
 "Stop Server" = "Stop Server";
 "Stop the server to update the runtime." = "Stop the server to update the runtime.";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory.";
+"System" = "System";
 "System prompt" = "System prompt";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
@@ -190,6 +197,7 @@
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";
+"The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";

@@ -213,3 +213,11 @@
 "You" = "Tú";
 "not used by any model" = "no lo usa ningún modelo";
 "used by %@" = "lo usan: %@";
+"Language" = "Idioma";
+"System" = "Del sistema";
+"App language" = "Idioma de la app";
+"Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Cambia el idioma solo para LLMTray, por encima del de macOS. Surte efecto al reiniciar LLMTray. El texto sin traducir se muestra en inglés.";
+"Restart LLMTray to change the language?" = "¿Reiniciar LLMTray para cambiar el idioma?";
+"The running model server is stopped and started again." = "El servidor del modelo se detiene y se vuelve a iniciar.";
+"Restart Now" = "Reiniciar ahora";
+"Later" = "Más tarde";
