@@ -32,6 +32,13 @@ final class PreferencesTests: XCTestCase {
         XCTAssertNil(defaults.object(forKey: "selectedModelID"))
     }
 
+    func testBoolReadLikeBoolForKey() {
+        defaults.set("YES", forKey: "llmtray.betaUpdates")
+        XCTAssertTrue(defaults[Pref.betaUpdates])
+        defaults.set("NO", forKey: "llmtray.checkUpdatesAtLaunch")
+        XCTAssertFalse(defaults[Pref.checkUpdatesAtLaunch])
+    }
+
     func testWrongStoredTypeFallsBackToDefault() {
         defaults.set("not a number", forKey: "llmtray.port")
         XCTAssertEqual(defaults[Pref.port], 8765)

@@ -45,7 +45,14 @@ extension UserDefaults {
     /// The stored value, or the key's default when nothing (or a value of
     /// another type) is stored.
     public subscript<Value>(key: PrefKey<Value>) -> Value {
-        get { object(forKey: key.name) as? Value ?? key.defaultValue }
+        get {
+            // bool(forKey:) semantics for Bool, as before: a "YES" / "1"
+            // written with `defaults write` (no -bool) still reads as true.
+            if Value.self == Bool.self, object(forKey: key.name) != nil {
+                return bool(forKey: key.name) as! Value
+            }
+            return object(forKey: key.name) as? Value ?? key.defaultValue
+        }
         set {
             if let optional = newValue as? OptionalProtocol, optional.isNil {
                 removeObject(forKey: key.name)
