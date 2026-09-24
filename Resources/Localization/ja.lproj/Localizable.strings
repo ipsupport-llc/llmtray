@@ -232,6 +232,7 @@
 "Show tool calls" = "ツール呼び出しを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
 "Sort by" = "並べ替え";
+"Source on GitHub" = "GitHub でソースを見る";
 "Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";
 "Speculative decoding (MTP)" = "投機的デコード（MTP）";
 "Stable" = "Stable";

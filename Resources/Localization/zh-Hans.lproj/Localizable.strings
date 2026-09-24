@@ -232,6 +232,7 @@
 "Show tool calls" = "显示工具调用";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
 "Sort by" = "排序方式";
+"Source on GitHub" = "在 GitHub 上查看源码";
 "Space the models in this folder take, and what's still free on its disk." = "该文件夹中模型占用的空间及磁盘剩余可用空间。";
 "Speculative decoding (MTP)" = "推测解码（MTP）";
 "Stable" = "Stable";

@@ -232,6 +232,7 @@
 "Show tool calls" = "הצג קריאות כלים";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
 "Sort by" = "מיון לפי";
+"Source on GitHub" = "מקור ב‑GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
 "Speculative decoding (MTP)" = "פענוח ספקולטיבי (MTP)";
 "Stable" = "Stable";

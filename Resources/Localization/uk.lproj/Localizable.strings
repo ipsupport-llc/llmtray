@@ -232,6 +232,7 @@
 "Show tool calls" = "Показувати виклики інструментів";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Sort by" = "Сортування";
+"Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
 "Speculative decoding (MTP)" = "Спекулятивне декодування (MTP)";
 "Stable" = "Стабільний";

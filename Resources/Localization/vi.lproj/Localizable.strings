@@ -232,6 +232,7 @@
 "Show tool calls" = "Hiện lần gọi công cụ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
 "Sort by" = "Sắp xếp theo";
+"Source on GitHub" = "Mã nguồn trên GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
 "Speculative decoding (MTP)" = "Giải mã suy đoán (MTP)";
 "Stable" = "Stable";
