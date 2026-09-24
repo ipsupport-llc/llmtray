@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Advanced" = "Nâng cao";
 "After %lld min" = "Sau %lld phút";
+"Air quality" = "Chất lượng không khí";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Bí danh: tên “model” mà các công cụ khác gửi đến API của LLMTray để lấy mô hình này. Hồ sơ: hồ sơ cài đặt mà mô hình này sử dụng.";
 "Allow connections from the local network" = "Cho phép kết nối từ mạng cục bộ";
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
@@ -94,6 +95,7 @@
 "Generating image…" = "Đang tạo ảnh…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Dự báo theo giờ";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "Dừng máy chủ để cập nhật môi trường chạy.";
 "Stopped" = "Đã dừng";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Dừng mô hình trò chuyện trong khi tạo hình ảnh, rồi tải lại sau đó. Chạy cả hai cùng lúc có thể vượt quá bộ nhớ của máy Mac này.";
+"Sunrise & sunset" = "Mặt trời mọc & lặn";
 "System" = "Hệ thống";
 "System prompt" = "Lời nhắc hệ thống";
 "Target: %@ · profile %@" = "Đích: %@ · hồ sơ %@";
@@ -276,6 +279,7 @@
 "Version %@" = "Phiên bản %@";
 "View model card" = "Xem thẻ mô hình.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
+"Weather" = "Thời tiết";
 "Web search" = "Tìm web";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Mức lượng tử hóa Z-Image-Turbo dùng để tạo hình ảnh.";

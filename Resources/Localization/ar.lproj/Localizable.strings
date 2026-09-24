@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "تُضاف إلى موجه النظام كلما توفرت الأدوات. لا يوضح قالب الأدوات الخاص بالنموذج إلا كيفية استدعاء أداة، وليس متى يجب عدم استخدامها. اتركه فارغًا لتعطيله.";
 "Advanced" = "متقدم";
 "After %lld min" = "بعد %lld دقيقة";
+"Air quality" = "جودة الهواء";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "الاسم المستعار: اسم «model» الذي ترسله أدوات أخرى إلى API الخاص بـ LLMTray للحصول على هذا النموذج. ملف التعريف: ملف إعدادات هذا النموذج.";
 "Allow connections from the local network" = "السماح بالاتصالات من الشبكة المحلية";
 "Also check when LLMTray starts" = "التحقق أيضًا عند بدء LLMTray";
@@ -94,6 +95,7 @@
 "Generating image…" = "جارٍ إنشاء الصورة…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "يمنح النموذج أداة generate_image (يتطلب نموذجًا يستدعي الأدوات). في المرة الأولى، يتم تنزيل نموذج الصور.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "توقّعات كل ساعة";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "عدد الطلبات التي تُجمع في خطوة GPU واحدة. لا يفيد إلا عند استخدام عدة عملاء للخادم في الوقت نفسه؛ ويستخدم ذاكرة أكثر.";
 "How many tokens it generates per trial." = "عدد الرموز التي يُنشئها في كل تجربة.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "أوقف الخادم لتحديث بيئة التشغيل.";
 "Stopped" = "متوقف";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "يوقف نموذج الدردشة أثناء إنشاء صورة، ثم يعيد تحميله بعد ذلك. تشغيل الاثنين معًا قد يتجاوز ذاكرة هذا الـ Mac.";
+"Sunrise & sunset" = "شروق وغروب الشمس";
 "System" = "النظام";
 "System prompt" = "موجه النظام";
 "Target: %@ · profile %@" = "الهدف: %@ · ملف التعريف %@";
@@ -276,6 +279,7 @@
 "Version %@" = "الإصدار %@";
 "View model card" = "اعرض بطاقة النموذج.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
+"Weather" = "الطقس";
 "Web search" = "بحث ويب";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "يحدد تكميم Z-Image-Turbo الذي يولّد الصور.";

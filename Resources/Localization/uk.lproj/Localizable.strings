@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Додається до системного промпту, коли моделі доступні інструменти. Шаблон інструментів самої моделі каже лише, як їх викликати, але не коли цього робити не треба. Порожньо — вимкнено.";
 "Advanced" = "Додатково";
 "After %lld min" = "Через %lld хв";
+"Air quality" = "Якість повітря";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Аліас — ім'я в полі «model», яке інші програми надсилають до API LLMTray, щоб отримати цю модель. Профіль — який профіль налаштувань використовує модель.";
 "Allow connections from the local network" = "Дозволити підключення з локальної мережі";
 "Also check when LLMTray starts" = "Також перевіряти під час запуску LLMTray";
@@ -94,6 +95,7 @@
 "Generating image…" = "Генерую зображення…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Дає моделі інструмент generate_image (потрібна модель, що вміє викликати інструменти). Першого разу завантажується модель для зображень.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Погодинний прогноз";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "Щоб оновити рантайм, зупиніть сервер.";
 "Stopped" = "Зупинено";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель на час генерації зображення, а потім завантажує знову. Дві моделі одночасно можуть не вміститися в пам'ять цього Mac.";
+"Sunrise & sunset" = "Схід і захід сонця";
 "System" = "Системна";
 "System prompt" = "Системний промпт";
 "Target: %@ · profile %@" = "Ціль: %@ · профіль %@";
@@ -276,6 +279,7 @@
 "Version %@" = "Версія %@";
 "View model card" = "Картка моделі";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
+"Weather" = "Погода";
 "Web search" = "Веб‑пошук";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";

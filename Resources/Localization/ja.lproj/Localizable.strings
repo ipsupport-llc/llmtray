@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "ツールが提供されるたびにシステムプロンプトへ追加されます。モデル自身のツールテンプレートはツールの呼び出し方法だけを示し、呼び出さない条件は示しません。空にすると無効になります。";
 "Advanced" = "詳細";
 "After %lld min" = "%lld分後";
+"Air quality" = "空気質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "エイリアス: ほかのツールがこのモデルを使うために LLMTray の API へ送る「model」名です。プロファイル: このモデルで使う設定プロファイルです。";
 "Allow connections from the local network" = "ローカルネットワークからの接続を許可";
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
@@ -94,6 +95,7 @@
 "Generating image…" = "画像を生成中…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "時間ごとの予報";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "ランタイムをアップデートするには、サーバを停止してください。";
 "Stopped" = "停止済み";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "画像の生成中はチャットモデルを停止し、完了後に再読み込みします。同時に実行すると、このMacのメモリを超えることがあります。";
+"Sunrise & sunset" = "日の出と日の入り";
 "System" = "システム";
 "System prompt" = "システムプロンプト";
 "Target: %@ · profile %@" = "ターゲット: %@ · プロファイル %@";
@@ -276,6 +279,7 @@
 "Version %@" = "バージョン %@";
 "View model card" = "モデルカードを表示します。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
+"Weather" = "天気";
 "Web search" = "ウェブ検索";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which Z-Image-Turbo quantization generates the images." = "画像生成に使用する Z-Image-Turbo の量子化を指定します。";

@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具時，一律加入系統提示。模型本身的工具範本只說明如何呼叫工具，從不說明何時不要呼叫。留空則停用。";
 "Advanced" = "進階";
 "After %lld min" = "%lld 分鐘後";
+"Air quality" = "空氣品質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "別名：其他工具傳送給 LLMTray API 以取得此模型的「model」名稱。設定檔：此模型使用的設定檔。";
 "Allow connections from the local network" = "允許來自區域網路的連線";
 "Also check when LLMTray starts" = "LLMTray 啟動時也檢查";
@@ -94,6 +95,7 @@
 "Generating image…" = "正在生成影像…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "為模型提供 generate_image 工具（需要支援工具呼叫的模型）。首次使用時會下載影像模型。";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "每小時預報";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "每個 GPU 步驟合併批次處理的要求數量。只有多個用戶端同時使用伺服器時才有幫助；會使用更多記憶體。";
 "How many tokens it generates per trial." = "每次試驗產生的 token 數量。";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "停止伺服器以更新執行階段。";
 "Stopped" = "已停止";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "產生影像時會停止聊天模型，完成後再重新載入。同時執行兩者可能會超出這部 Mac 的記憶體。";
+"Sunrise & sunset" = "日出與日落";
 "System" = "系統";
 "System prompt" = "系統提示詞";
 "Target: %@ · profile %@" = "目標：%@ · 設定檔 %@";
@@ -276,6 +279,7 @@
 "Version %@" = "版本 %@";
 "View model card" = "檢視模型卡。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "請等待目前的請求或基準測試完成，重新啟動會中斷它。";
+"Weather" = "天氣";
 "Web search" = "網路搜尋";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 尋找 MLX 模型的位置（每個模型一個檔案夾，例如 <org>/<name>）。將其指向 ~/.lmstudio/models 即可與 LM Studio 共用模型。";
 "Which Z-Image-Turbo quantization generates the images." = "用來產生影像的 Z-Image-Turbo 量化版本。";

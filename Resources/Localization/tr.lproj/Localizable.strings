@@ -16,6 +16,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
 "Advanced" = "İleri Düzey";
 "After %lld min" = "%lld dk sonra";
+"Air quality" = "Hava kalitesi";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Takma ad: Diğer araçların bu modeli almak için LLMTray API’sine gönderdiği “model” adı. Profil: Bu modelin kullandığı ayarlar profili.";
 "Allow connections from the local network" = "Yerel ağdan bağlantılara izin ver";
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
@@ -94,6 +95,7 @@
 "Generating image…" = "Görüntü oluşturuluyor…";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
 "Hacker News" = "Hacker News";
+"Hourly forecast" = "Saatlik tahmin";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
@@ -235,6 +237,7 @@
 "Stop the server to update the runtime." = "Çalışma zamanını güncellemek için sunucuyu durdurun.";
 "Stopped" = "Durduruldu";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Görüntü oluşturulurken sohbet modelini durdurur ve ardından yeniden yükler. İkisi aynı anda bu Mac’in belleğini aşabilir.";
+"Sunrise & sunset" = "Gün doğumu ve batımı";
 "System" = "Sistem";
 "System prompt" = "Sistem istemi";
 "Target: %@ · profile %@" = "Hedef: %@ · profil %@";
@@ -276,6 +279,7 @@
 "Version %@" = "Sürüm %@";
 "View model card" = "Model kartını görüntüle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
+"Weather" = "Hava Durumu";
 "Web search" = "Web araması";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which Z-Image-Turbo quantization generates the images." = "Görüntüleri hangi Z-Image-Turbo nicemlemesinin oluşturacağını belirler.";
