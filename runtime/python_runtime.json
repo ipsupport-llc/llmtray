@@ -1,0 +1,4 @@
+{
+  "version": "3.14.7",
+  "_comment": "Official python.org macOS framework vendored into LLMTray-Full.dmg by scripts/build_full_app.sh. Pinned (not 'newest'): a new CPython minor (e.g. 3.15.0) usually ships before MLX has wheels for it, and picking it up automatically would fail the whole release. Bump deliberately, together with a test release."
+}

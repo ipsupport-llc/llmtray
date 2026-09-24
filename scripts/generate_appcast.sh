@@ -17,7 +17,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 DMG="$REPO_ROOT/.build/app/LLMTray.dmg"
-SIGN_UPDATE="$(find "$REPO_ROOT/.build/artifacts" -iname "sign_update" | head -1)"
+# Overridable for CI dry runs (a stub that prints fixed signature attrs).
+SIGN_UPDATE="${SIGN_UPDATE:-$(find "$REPO_ROOT/.build/artifacts" -iname "sign_update" | head -1)}"
 
 : "${VERSION:?VERSION env var required}"
 : "${SPARKLE_PRIVATE_KEY:?SPARKLE_PRIVATE_KEY env var required}"

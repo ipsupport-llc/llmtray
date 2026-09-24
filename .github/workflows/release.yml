@@ -29,6 +29,13 @@ on:
 permissions:
   contents: write
 
+# One release at a time: each one reads and rewrites main's appcast.xml, so
+# two concurrent runs (a stable and a beta tag pushed together) would lose
+# one channel's item or fail the second push. Queued, never cancelled.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: macos-14
@@ -46,6 +53,29 @@ jobs:
         run: ./scripts/build_full_app.sh
       - name: Build DMG (full)
         run: ./scripts/build_dmg.sh LLMTray-Full.dmg
+      # The release (with its DMGs) is created BEFORE the appcast goes
+      # live: the appcast's enclosure points at this tag's asset, so
+      # publishing it first would offer every Sparkle client a 404 if the
+      # upload failed.
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            .build/app/LLMTray.dmg
+            .build/app/LLMTray-Full.dmg
+          generate_release_notes: true
+          # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
+          # (the website's download links) keeps pointing at stable.
+          prerelease: ${{ contains(github.ref_name, '-') }}
+      # generate_appcast.sh keeps the OTHER channel's item from the
+      # existing feed, so it must start from main's current feed -- not
+      # this tag's copy, which misses every bot commit made after the tag
+      # was cut (a beta tagged on an older commit would otherwise drop the
+      # current stable item, and vice versa).
+      - name: Start from main's current appcast.xml
+        run: |
+          git fetch origin main
+          git show origin/main:docs/appcast.xml > docs/appcast.xml
       - name: Generate signed appcast.xml
         run: ./scripts/generate_appcast.sh
         env:
@@ -62,24 +92,16 @@ jobs:
           cp docs/appcast.xml /tmp/appcast.xml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # generate_appcast.sh just rewrote docs/appcast.xml in place, so
-          # it's always dirty relative to this tag's own commit (fresh
-          # signature/pubDate every run) -- discard that before switching
-          # branches, or checkout -B refuses to touch the file.
           git checkout -- docs/appcast.xml
           git fetch origin main
           git checkout -B main origin/main
           cp /tmp/appcast.xml docs/appcast.xml
           git add docs/appcast.xml
           git diff --staged --quiet && echo "no appcast changes" || git commit -m "Update appcast.xml for ${{ github.ref_name }}"
-          git push origin main
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            .build/app/LLMTray.dmg
-            .build/app/LLMTray-Full.dmg
-          generate_release_notes: true
-          # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
-          # (the website's download links) keeps pointing at stable.
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          # Someone may push to main between the fetch and this push; the
+          # commit only touches appcast.xml, so a rebase onto the new tip is
+          # safe. Retried a few times rather than failing the release.
+          for i in 1 2 3; do
+            git push origin main && break
+            git pull --rebase origin main
+          done
