@@ -53,6 +53,7 @@ final class LaTeXTextTests: XCTestCase {
         XCTAssertEqual(MathSpans.split(#"a \(x^2\) b"#), [.text("a "), .math("x^2", display: false), .text(" b")])
         XCTAssertEqual(MathSpans.split(#"\[ \int f \]"#), [.math(#" \int f "#, display: true)])
         XCTAssertEqual(MathSpans.split(#"see \[1\] here"#), [.text(#"see \[1\] here"#)])
+        XCTAssertEqual(MathSpans.split(#"\[ a + b \]"#), [.math(" a + b ", display: true)])
         XCTAssertEqual(MathSpans.split("for $n$ items"), [.text("for "), .math("n", display: false), .text(" items")])
     }
 }

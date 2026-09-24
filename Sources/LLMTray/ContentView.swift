@@ -38,7 +38,7 @@ struct ContentView: View {
     // caps max_tokens; 32768 only when its config.json doesn't say.
     @State private var modelMaxContext: Int = 32768
     @State private var followChatBottom = true
-    @State private var signalAtLastBottom = 0
+    @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
 
     var body: some View {
@@ -173,11 +173,15 @@ struct ContentView: View {
                     // Where the bottom of the content is, relative to the
                     // viewport: tells whether the user is reading the end.
                     Color.clear.frame(height: 1).id(Self.chatBottomID)
-                        .background(GeometryReader { g in
-                            Color.clear.preference(key: ChatBottomKey.self, value: g.frame(in: .named("chatScroll")).maxY)
-                        })
                 }
                 .padding(12)
+                // The content's height and where its bottom is in the
+                // viewport: the bottom moving with the height unchanged means
+                // the user scrolled.
+                .background(GeometryReader { g in
+                    let frame = g.frame(in: .named("chatScroll"))
+                    Color.clear.preference(key: ChatBottomKey.self, value: ChatGeometry(bottom: frame.maxY, height: frame.height))
+                })
             }
             .coordinateSpace(name: "chatScroll")
             .background(GeometryReader { g in
@@ -186,14 +190,15 @@ struct ContentView: View {
             })
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
-            .onPreferenceChange(ChatBottomKey.self) { bottom in
-                let contentGrew = streamSignal != signalAtLastBottom
-                signalAtLastBottom = streamSignal
-                if bottom <= chatViewportHeight + 40 {
+            .onPreferenceChange(ChatBottomKey.self) { geometry in
+                let heightChanged = abs(geometry.height - lastChatGeometry.height) > 0.5
+                let moved = abs(geometry.bottom - lastChatGeometry.bottom) > 0.5
+                lastChatGeometry = geometry
+                if geometry.bottom <= chatViewportHeight + 40 {
                     followChatBottom = true
-                } else if !contentGrew {
-                    // The bottom moved away while nothing new arrived: the
-                    // user scrolled up -- stop following at once, even while
+                } else if moved && !heightChanged {
+                    // The content didn't change size but moved: the user
+                    // scrolled up -- stop following at once, even while
                     // tokens stream fast.
                     followChatBottom = false
                 }
@@ -257,8 +262,13 @@ struct ContentView: View {
     }
 }
 
-/// The chat content's bottom edge in the scroll view's coordinates.
+/// The chat content's bottom edge (in the scroll view's coordinates) and height.
+struct ChatGeometry: Equatable {
+    var bottom: CGFloat
+    var height: CGFloat
+}
+
 private struct ChatBottomKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
+    static var defaultValue = ChatGeometry(bottom: 0, height: 0)
+    static func reduce(value: inout ChatGeometry, nextValue: () -> ChatGeometry) { value = nextValue() }
 }

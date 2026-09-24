@@ -122,6 +122,12 @@ enum ChatMarkdown {
         guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(text) }
         var maths: [(latex: String, display: Bool)] = []
         var masked = ""
+        // Placeholders from a private-use block the text doesn't contain
+        // (so a literal one can't be mistaken for math).
+        let used = Set(text.unicodeScalars.map(\.value))
+        let base: UInt32 = [0xE000, 0xF0000, 0x100000].first { start in
+            !used.contains { $0 >= start && $0 < start + 4096 }
+        } ?? 0xE000
         for (isCode, segment) in codeSpans(text) {
             if isCode { masked += segment; continue }
             for piece in MathSpans.split(segment) {
@@ -129,7 +135,7 @@ enum ChatMarkdown {
                 case .text(let t):
                     masked += t
                 case .math(let latex, let display):
-                    guard maths.count < 4096, let scalar = Unicode.Scalar(0xE000 + maths.count) else { masked += latex; continue }
+                    guard maths.count < 4096, let scalar = Unicode.Scalar(base + UInt32(maths.count)) else { masked += latex; continue }
                     masked.unicodeScalars.append(scalar)   // private use: never in model text
                     maths.append((latex, display))
                 }
@@ -137,7 +143,7 @@ enum ChatMarkdown {
         }
         var out = markdown(masked)
         for (n, math) in maths.enumerated() {
-            guard let scalar = Unicode.Scalar(0xE000 + n), let range = out.range(of: String(Character(scalar))) else { continue }
+            guard let scalar = Unicode.Scalar(base + UInt32(n)), let range = out.range(of: String(Character(scalar))) else { continue }
             let bold = out[range].inlinePresentationIntent?.contains(.stronglyEmphasized) ?? false
             var rendered = AttributedString(LaTeXText.toUnicode(math.latex))
             if let run = out[range].runs.first { rendered.mergeAttributes(run.attributes) }

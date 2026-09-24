@@ -256,11 +256,12 @@ public enum MathSpans {
                 if r.location != NSNotFound { body = ns.substring(with: r); display = isDisplay; break }
             }
             guard let math = body else { continue }
-            // Single-dollar and \[ spans only if they read as math -- not
-            // prices ("$5 and $10") or markdown-escaped brackets ("\[1\]").
-            // \( \) is explicit LaTeX and always math.
-            let ambiguous = match.range(at: 2).location != NSNotFound || match.range(at: 4).location != NSNotFound
-            if ambiguous, !looksLikeMath(math) { continue }
+            // Single-dollar spans only if they read as math, not prices
+            // ("$5 and $10"); \[...\] unless it's a markdown-escaped
+            // reference ("\[12\]"). \( \) is explicit LaTeX: always math.
+            if match.range(at: 4).location != NSNotFound, !looksLikeMath(math) { continue }
+            if match.range(at: 2).location != NSNotFound,
+               math.trimmingCharacters(in: .whitespaces).range(of: #"^\d{1,4}$"#, options: .regularExpression) != nil { continue }
             if match.range.location > last {
                 pieces.append(.text(ns.substring(with: NSRange(location: last, length: match.range.location - last))))
             }
