@@ -19,21 +19,25 @@ name: Release
 # (and .../LLMTray-Full.dmg) are permanent links to whatever's newest --
 # used by docs/index.html's download buttons, which would otherwise need
 # editing on every release.
-# Tags vX.Y.Z (stable) or vX.Y.Z-beta.N (beta: GitHub pre-release, and an
-# appcast item on Sparkle's "beta" channel that only users with "Receive
-# beta updates" on are offered -- see generate_appcast.sh).
+# Tags vX.Y.Z (stable) or vX.Y.Z-beta.N (beta: a GitHub pre-release, and
+# the Sparkle "beta" channel that only users with beta updates on get).
+#
+# The update feed (appcast.xml) is not committed anywhere: this uploads the
+# release's own signed metadata (LLMTray.dmg.sparkle.json) and triggers
+# pages.yml, which rebuilds the whole feed from the releases.
 on:
   push:
     tags: ["v*"]
 
 permissions:
   contents: write
+  actions: write   # dispatch pages.yml
 
-# One release at a time: each one reads and rewrites main's appcast.xml, so
-# two concurrent runs (a stable and a beta tag pushed together) would lose
-# one channel's item or fail the second push. Queued, never cancelled.
+# Per tag: releases share no state any more (the feed is rebuilt from all
+# of them), so a stable and a beta can run side by side; a re-run of the
+# same tag waits for the first.
 concurrency:
-  group: release
+  group: release-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -53,62 +57,29 @@ jobs:
         run: ./scripts/build_full_app.sh
       - name: Build DMG (full)
         run: ./scripts/build_dmg.sh LLMTray-Full.dmg
-      # The release (with its DMGs) is created BEFORE the appcast goes
-      # live: the appcast's enclosure points at this tag's asset, so
-      # publishing it first would offer every Sparkle client a 404 if the
-      # upload failed.
+      - name: Sign for Sparkle (writes LLMTray.dmg.sparkle.json)
+        run: ./scripts/sign_release.sh
+        env:
+          VERSION: ${{ env.VERSION }}
+          TAG: ${{ github.ref_name }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+      # DMGs and their signature go up together: a re-run replaces both,
+      # never one without the other.
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             .build/app/LLMTray.dmg
             .build/app/LLMTray-Full.dmg
+            .build/app/LLMTray.dmg.sparkle.json
           generate_release_notes: true
           # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
           # (the website's download links) keeps pointing at stable.
           prerelease: ${{ contains(github.ref_name, '-') }}
-      # generate_appcast.sh keeps the OTHER channel's item from the
-      # existing feed, so it must start from main's current feed -- not
-      # this tag's copy, which misses every bot commit made after the tag
-      # was cut (a beta tagged on an older commit would otherwise drop the
-      # current stable item, and vice versa).
-      - name: Start from main's current appcast.xml
-        run: |
-          git fetch origin main
-          git show origin/main:docs/appcast.xml > docs/appcast.xml
-      - name: Generate signed appcast.xml
-        run: ./scripts/generate_appcast.sh
+      # A release created with GITHUB_TOKEN doesn't fire `release` events
+      # for other workflows; a dispatch does. On main: the github-pages
+      # environment only deploys from main.
+      - name: Rebuild the update feed and site
         env:
-          VERSION: ${{ env.VERSION }}
-          TAG: ${{ github.ref_name }}
-          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-      - name: Commit appcast.xml to main
-        run: |
-          # A tag push checks out that tag's commit in detached HEAD --
-          # pushing that tree straight to main would be a non-fast-forward
-          # (or worse, silently rewind main) if anything landed on main
-          # after the tag was cut. Explicitly resetting to the real tip of
-          # origin/main and applying only the appcast.xml change avoids that.
-          cp docs/appcast.xml /tmp/appcast.xml
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -- docs/appcast.xml
-          git fetch origin main
-          git checkout -B main origin/main
-          cp /tmp/appcast.xml docs/appcast.xml
-          git add docs/appcast.xml
-          git diff --staged --quiet && echo "no appcast changes" || git commit -m "Update appcast.xml for ${{ github.ref_name }}"
-          # Someone may push to main between the fetch and this push; the
-          # commit only touches appcast.xml, so a rebase onto the new tip is
-          # safe. Retried a few times rather than failing the release.
-          # Fails the job after the last attempt: a published release with
-          # no appcast entry would never reach anyone through auto-update.
-          pushed=0
-          for i in 1 2 3; do
-            if git push origin main; then pushed=1; break; fi
-            git pull --rebase origin main || true
-          done
-          if [ "$pushed" != 1 ]; then
-            echo "::error::could not push the appcast to main after 3 attempts"
-            exit 1
-          fi
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main

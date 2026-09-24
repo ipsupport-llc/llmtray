@@ -43,15 +43,11 @@ jobs:
         run: ./scripts/build_full_app.sh
       - name: Build DMG (full)
         run: ./scripts/build_dmg.sh LLMTray-Full.dmg
-      - name: Appcast generation (stub signature, both channels)
+      - name: Release metadata + feed rendering (stub signature, offline)
         run: |
           set -e
           printf '#!/bin/sh\necho "sparkle:edSignature=\\"STUB\\" length=\\"1\\""\n' > /tmp/sign_update
           chmod +x /tmp/sign_update
-          for v in 9.9.9-beta.1 9.9.9; do
-            VERSION=$v SIGN_UPDATE=/tmp/sign_update SPARKLE_PRIVATE_KEY=stub ./scripts/generate_appcast.sh > /dev/null
-          done
-          xmllint --noout docs/appcast.xml
-          grep -q '<sparkle:version>9.9.9b1</sparkle:version>' docs/appcast.xml
-          grep -q '<sparkle:version>9.9.9</sparkle:version>' docs/appcast.xml
-          test "$(grep -c '<item>' docs/appcast.xml)" = 2
+          VERSION=9.9.9-beta.1 SIGN_UPDATE=/tmp/sign_update SPARKLE_PRIVATE_KEY=stub ./scripts/sign_release.sh
+          python3 -c "import json; m = json.load(open('.build/app/LLMTray.dmg.sparkle.json')); assert m['sparkleVersion'] == '9.9.9b1' and m['channel'] == 'beta' and m['edSignature'] == 'STUB', m"
+          python3 scripts/test_render_appcast.py

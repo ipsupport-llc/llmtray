@@ -1,0 +1,68 @@
+name: Pages
+
+# Deploys the website (docs/) together with the Sparkle update feed,
+# appcast.xml, which is built here from the GitHub Releases on every run
+# (scripts/render_appcast.py) and never committed. Every run rebuilds
+# everything from current state, so re-runs are idempotent and a deleted or
+# edited release fixes itself on the next deploy.
+#
+# Triggered by release.yml after each release (releases made with
+# GITHUB_TOKEN don't fire `release` events), by releases edited or deleted
+# by hand, by site changes on main, and manually.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/render_appcast.py"
+      - ".github/workflows/pages.yml"
+  release:
+    types: [published, edited, deleted, unpublished, prereleased, released]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Serialized; a queued run supersedes an older queued one, which is fine:
+# each reads the releases only once it runs.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Site
+        run: |
+          mkdir _site
+          cp -R docs/. _site/
+          rm -f _site/appcast.xml
+      - name: Update feed from the releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" > releases.json
+          python3 scripts/render_appcast.py releases.json _site/appcast.xml
+          sudo apt-get install -y -qq libxml2-utils > /dev/null
+          xmllint --noout _site/appcast.xml
+          grep -E '<title>Version|sparkle:version>' _site/appcast.xml
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
