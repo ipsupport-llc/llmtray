@@ -56,4 +56,16 @@ final class LaTeXTextTests: XCTestCase {
         XCTAssertEqual(MathSpans.split(#"\[ a + b \]"#), [.math(" a + b ", display: true)])
         XCTAssertEqual(MathSpans.split("for $n$ items"), [.text("for "), .math("n", display: false), .text(" items")])
     }
+
+    func testMoneyInsideMath() {
+        // What a model wrote for $\$1.10 \times 2 = \mathbf{\$2.20}$.
+        XCTAssertEqual(MathSpans.split(#"цена: $$1.10 \times 2 = \mathbf{$2.20}$ за 100к"#),
+                       [.text("цена: "), .math(#"$1.10 \times 2 = \mathbf{$2.20}"#, display: false), .text(" за 100к")])
+        XCTAssertEqual(MathSpans.split(#"$\mathbf{$3.66}$ за 100к"#), [.math(#"\mathbf{$3.66}"#, display: false), .text(" за 100к")])
+        XCTAssertEqual(LaTeXText.toUnicode(#"$1.10 \times 2 = \mathbf{$2.20}"#), "$1.10 × 2 = $2.20")
+        // Prices stay text; display math that starts with a digit stays math.
+        XCTAssertEqual(MathSpans.split("from $5 to $10"), [.text("from $5 to $10")])
+        XCTAssertEqual(MathSpans.split(#"$$2x + 1 = 5$$"#), [.math("2x + 1 = 5", display: true)])
+        XCTAssertEqual(LaTeXText.toUnicode(#"\$5 \times 3"#), "$5 × 3")
+    }
 }
