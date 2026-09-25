@@ -238,7 +238,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Moves the chat out of the popover into its own window.
     private func detachChat() {
-        guard !chatPresentation.isDetached else { return showChatWindow() }
+        guard !chatPresentation.isDetached else {
+            showChatWindow()
+            return
+        }
         popover.performClose(nil)
         // The popover's chat view goes away (only one exists at a time);
         // NSPopover still wants a content controller, never shown while
