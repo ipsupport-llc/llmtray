@@ -26,6 +26,9 @@ public enum Pref {
     public static let autoStartOnLaunch = PrefKey("llmtray.autoStartOnLaunch", default: true)
     /// The model the popover (and auto-start) uses -- its path.
     public static let selectedModelID = PrefKey<String?>("selectedModelID", default: nil)
+    /// A settings pane to open on the next launch (a relaunch to change the
+    /// language, from that pane): read once, then removed.
+    public static let settingsPaneAfterRelaunch = PrefKey<String?>("llmtray.settingsPaneAfterRelaunch", default: nil)
 
     // Chat
     public static let showReasoning = PrefKey("llmtray.showReasoning", default: true)
