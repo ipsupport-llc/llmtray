@@ -9,6 +9,17 @@ enum ImageActions {
     /// opened it.
     private static var previewWindows: [NSWindow] = []
 
+    /// Drops a preview window once it closes. A delegate rather than a
+    /// block observer that removes itself: that one captured its own
+    /// non-Sendable token in a @Sendable closure.
+    private final class PreviewWindowDelegate: NSObject, NSWindowDelegate {
+        static let shared = PreviewWindowDelegate()
+
+        func windowWillClose(_ notification: Notification) {
+            ImageActions.previewWindows.removeAll { $0 === notification.object as? NSWindow }
+        }
+    }
+
     /// A full-size, resizable preview window, entirely in memory.
     static func openPreview(_ data: Data, title: String) {
         guard let nsImage = NSImage(data: data) else { return }
@@ -33,13 +44,7 @@ enum ImageActions {
         window.isRestorable = false
         previewWindows.append(window)
         // Released once closed (each holds its decoded image).
-        var observer: NSObjectProtocol?
-        observer = NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { note in
-            MainActor.assumeIsolated {
-                previewWindows.removeAll { $0 === note.object as? NSWindow }
-                if let observer { NotificationCenter.default.removeObserver(observer) }
-            }
-        }
+        window.delegate = PreviewWindowDelegate.shared
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
