@@ -70,6 +70,10 @@ struct LLMTrayApp: App {
             // Lock on and on non-Latin layouts. Only titled windows: the
             // popover's own window isn't one.
             CommandGroup(before: .windowSize) {
+                Button("New Chat") { ChatTabs.shared.newChat() }
+                    .keyboardShortcut("n")
+                Button("New Temporary Chat") { ChatTabs.shared.newTemporaryChat() }
+                    .keyboardShortcut("n", modifiers: [.command, .shift])
                 Button("New Tab") { ChatTabs.shared.newTab() }
                     .keyboardShortcut("t")
                 // In the chat window it closes the tab on screen; the window

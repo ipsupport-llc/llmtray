@@ -90,7 +90,7 @@ struct ChatSidebar: View {
                 Spacer()
                 Button { open { ChatTabs.shared.newTemporaryChat() } } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
-                    .help("New temporary chat -- nothing about it is ever saved")
+                    .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
                     .accessibilityLabel("New temporary chat")
             }
             .foregroundColor(.secondary)

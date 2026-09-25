@@ -35,6 +35,7 @@ struct ContentView: View {
     /// open), beside it in the window (remembered).
     @State private var showsSidebarOverlay = false
     @AppStorage(Pref.chatWindowSidebar) private var showsWindowSidebar: Bool
+    @AppStorage(Pref.chatWindowShowsModelControls) private var windowShowsModelControls: Bool
     @FocusState private var isInputFocused: Bool
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
@@ -107,8 +108,9 @@ struct ContentView: View {
         if !shown { isInputFocused = true }
     }
 
-    /// The chat's own window: the sidebar beside the chat, no header -- the
-    /// server, model and tool controls stay in the menu bar's popover.
+    /// The chat's own window: the sidebar beside the chat; the server, model
+    /// and tool controls stay in the menu bar's popover unless Settings asks
+    /// for them here too.
     private var windowLayout: some View {
         HStack(spacing: 0) {
             if showsWindowSidebar {
@@ -120,6 +122,10 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 windowBar
                 Divider()
+                if windowShowsModelControls {
+                    ChatHeaderView(selectedModelID: $selectedModelID, inChatWindow: true)
+                    Divider()
+                }
                 conversation
             }
             .frame(minWidth: 380)
@@ -138,8 +144,12 @@ struct ContentView: View {
                 .accessibilityLabel("Chats")
                 Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
-                    .help("New chat (saved)")
+                    .help("New chat (⌘N)")
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
+                Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
+                    .buttonStyle(.plain)
+                    .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
+                    .accessibilityLabel("New temporary chat")
             }
             ChatTabStrip()
             Spacer(minLength: 8)
@@ -240,6 +250,7 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [])
+                            .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {

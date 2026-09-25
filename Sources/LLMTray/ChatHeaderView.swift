@@ -19,13 +19,31 @@ struct ChatHeaderView: View {
     /// Shows the chats sidebar over the popover's chat. nil: the tray's
     /// controls while the chat has its own window -- no chat controls.
     var toggleSidebar: (() -> Void)?
+    /// Inside the chat window (Settings > General > Show model controls in
+    /// the chat window): the window's own bar has the status and chat
+    /// controls, so only the model, profile, tools and temperature rows.
+    var inChatWindow = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                ServerStatusLabel()
-                Spacer()
-                sessionControls
+            if !inChatWindow {
+                HStack {
+                    // While the chat has its own window, clicking the status
+                    // brings it up. In the popover it's the chat already.
+                    if presentation.isDetached {
+                        Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                            ServerStatusLabel().contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .help("Show Chat Window")
+                        .accessibilityHint(Text("Shows the chat window"))
+                        .pointingHandCursor()
+                    } else {
+                        ServerStatusLabel()
+                    }
+                    Spacer()
+                    sessionControls
+                }
             }
             HStack(spacing: 6) {
                 Picker("Model", selection: $selectedModelID) {
@@ -80,14 +98,14 @@ struct ChatHeaderView: View {
                     .accessibilityLabel("Chats")
                 Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
-                    .help("New chat (saved)")
+                    .help("New chat (⌘N)")
                     // Only disabled when there's truly nothing to start fresh
                     // from -- an empty *persistent* session. A temporary chat is
                     // empty too, but this is the way back to a saved one.
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
                 Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
-                    .help("New temporary chat -- nothing about it is ever saved")
+                    .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
                 Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
                     Image(systemName: "macwindow.on.rectangle")
                 }
