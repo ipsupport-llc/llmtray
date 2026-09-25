@@ -858,12 +858,24 @@ enum AppLanguage {
         Locale(identifier: code).localizedString(forLanguageCode: code)?.capitalized(with: Locale(identifier: code)) ?? code
     }
 
+    /// The language the UI would be in with `code` ("" = the system's).
+    static func effective(_ code: String) -> String? {
+        if !code.isEmpty { return code }
+        // The system's own order, not this app's override.
+        let system = UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["AppleLanguages"] as? [String]
+            ?? Locale.preferredLanguages
+        return Bundle.preferredLocalizations(from: available, forPreferences: system).first
+    }
+
     static func set(_ code: String) {
         if code.isEmpty {
             UserDefaults.standard.removeObject(forKey: "AppleLanguages")
         } else {
             UserDefaults.standard.set([code], forKey: "AppleLanguages")
         }
+        // "System (English)" -> "English": the UI stays as it is, nothing
+        // to restart for.
+        if let running = Bundle.main.preferredLocalizations.first, effective(code) == running { return }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Restart LLMTray to change the language?", comment: "")
         alert.informativeText = NSLocalizedString("The running model server is stopped and started again.", comment: "")
