@@ -558,7 +558,7 @@ final class ServerManager: ObservableObject {
     /// on this port with no parent left; anything else is
     /// left alone (the launch then fails on the port, saying so).
     nonisolated static func reapOrphanedServer(port: Int) async {
-        _ = try? await ProcessRunner.offMain {
+        _ = try? await ProcessRunner.offMain { () -> Bool in
             func output(_ tool: String, _ args: [String]) -> String {
                 let p = Process()
                 p.executableURL = URL(fileURLWithPath: tool)
