@@ -15,7 +15,7 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
 
     init(onClose: @escaping () -> Void) {
         self.onClose = onClose
-        let window = CloseOnCommandWWindow(
+        let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 520, height: 640),
             styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
@@ -66,19 +66,5 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
 
     func windowWillClose(_ notification: Notification) {
         onClose()
-    }
-}
-
-/// Closes on ⌘W. The app's only scene is `Settings`, so the main menu has
-/// no File > Close to send the shortcut to -- without this the red button
-/// was the only way to put the chat back in the menu bar.
-private final class CloseOnCommandWWindow: NSWindow {
-    override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        // The window's own content (a SwiftUI shortcut) goes first.
-        if super.performKeyEquivalent(with: event) { return true }
-        guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
-              event.charactersIgnoringModifiers == "w" else { return false }
-        performClose(nil)
-        return true
     }
 }

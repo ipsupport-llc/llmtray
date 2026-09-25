@@ -64,6 +64,17 @@ struct LLMTrayApp: App {
                     .keyboardShortcut(",")
             }
             CommandGroup(replacing: .help) {}
+            // No File menu (the only scene is Settings), so no Close ⌘W:
+            // the chat window, Settings and the logs close with it here. A
+            // menu shortcut, unlike a key-down check, also matches with Caps
+            // Lock on and on non-Latin layouts. Only titled windows: the
+            // popover's own window isn't one.
+            CommandGroup(before: .windowSize) {
+                Button("Close") {
+                    if let window = NSApp.keyWindow, window.styleMask.contains(.closable) { window.performClose(nil) }
+                }
+                .keyboardShortcut("w")
+            }
         }
     }
 }

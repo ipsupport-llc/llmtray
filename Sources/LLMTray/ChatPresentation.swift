@@ -27,10 +27,17 @@ final class ChatPresentation: ObservableObject {
 
     init(chat: ChatClient) {
         self.chat = chat
+        // Received a main-loop turn later: @Published emits in willSet,
+        // inside ChatClient's own state changes -- opening another chat
+        // clears the busy flags in cancel() before the epoch moves on, and a
+        // Stop clears them before the cancelled tool calls get their results.
+        // Acting there compacted the chat just opened, or checked the
+        // threshold against a history about to grow.
         Publishers.CombineLatest3(chat.$isStreaming, chat.$isGeneratingImage, chat.$isRunningTools)
             .map { $0 || $1 || $2 }
             .removeDuplicates()
             .dropFirst()
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] busy in self?.turnInProgressChanged(busy) }
             .store(in: &cancellables)
         NotificationCenter.default.publisher(for: .modelsDidChange)
@@ -46,8 +53,9 @@ final class ChatPresentation: ObservableObject {
     private func turnInProgressChanged(_ busy: Bool) {
         if busy {
             turnConversation = chat.conversationEpoch
-        } else if turnConversation == chat.conversationEpoch {
-            autoCompactIfNeeded()
+        } else if let epoch = turnConversation, epoch == chat.conversationEpoch,
+                  !chat.isTurnInProgress {  // not a tool round's hand-off
+            autoCompactIfNeeded(epoch: epoch)
         }
     }
 
@@ -63,10 +71,14 @@ final class ChatPresentation: ObservableObject {
         }
     }
 
-    private func autoCompactIfNeeded() {
+    private func autoCompactIfNeeded(epoch: Int) {
         let threshold = UserDefaults.standard[Pref.autoCompactThreshold]
         guard threshold > 0, chat.messages.count > threshold else { return }
-        Task { await compact() }
+        Task {
+            // Still that chat, still idle: the task runs later still.
+            guard chat.conversationEpoch == epoch, !chat.isBusy else { return }
+            await compact()
+        }
     }
 
     /// Compacts the current session with the selected model's settings --
@@ -77,7 +89,9 @@ final class ChatPresentation: ObservableObject {
         await chat.compactSession(
             port: defaults[Pref.port],
             modelAlias: modelID.map(ModelCatalog.shared.requestName(for:)) ?? "default",
-            settings: ChatSettings.forModel(modelID, supportsVision: composer.acceptsImages),
+            settings: ChatSettings.forModel(
+                modelID, supportsVision: modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
+            ),
             keepStart: defaults[Pref.compactKeepStart], keepEnd: defaults[Pref.compactKeepEnd]
         )
     }
