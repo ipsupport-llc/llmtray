@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
+"%@ · %@ left" = "%@ · נותרו %@";
 "%@ → %@ available" = "זמין: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "החל על הפרופיל";
 "Assistant" = "העוזר";
 "Attach image(s) for the model to see" = "צרף תמונה או תמונות כדי שהמודל יראה אותן.";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ב‑8‑bit, feed‑forward ב‑4‑bit — האיזון הטוב ביותר בין גודל ליציבות, מאומת מול 4‑bit אחיד.";
 "Auto-compact" = "דחיסה אוטומטית";
 "Auto-restart after %lld stalls" = "הפעלה מחדש אוטומטית אחרי %lld תקיעות";
 "Auto-restart: off" = "הפעלה מחדש אוטומטית: כבויה";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "הכוונון האוטומטי פועל וכותב לפרופיל של הדגם שנטען — העריכה מושהית עד לסיום.";
 "Auto-tune performance" = "כוונון ביצועים אוטומטי";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "התוצאות אוחדו לממוצע אחד למטה. לפני כל אחת מהן תמיד מתבצעת הרצת חימום חד־פעמית, כך שזמן ההידור של ליבת Metal בקריאה הראשונה אף פעם לא מעוות את המספרים.";
+"Balanced (default)" = "מאוזן (Default)";
 "Benchmark" = "מבחן ביצועים";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "מבחני הביצועים רצים מול הדגם שטעון עכשיו. הכוונון האוטומטי כותב את התוצאות לפרופיל של הדגם הזה.";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "קומפקטי";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "דחיסה מחליפה את אמצע השיחה הארוכה בסיכום אחד שנכתב על ידי המודל. זהו מספר ההודעות מתחילת השיחה שיישמרו מילה במילה.";
 "Compaction" = "דחיסה";
+"Compaction failed: %@" = "כיווץ נכשל: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "דוחס את השיחה אוטומטית כשהיא עוברת מספר הודעות זה. כפתור הדחיסה בשיחה פועל בכל מקרה.";
 "Concurrent requests" = "בקשות בו־זמניות";
 "Copy" = "העתק";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "מוחק את זמן הריצה mlx-lm שהורד (ואת זמן הריצה ליצירת תמונות). הוא יותקן מחדש מאפס בהפעלת השרת הבאה. צ׳אטים ופרופילים שמורים יישמרו.";
 "Diagnostics" = "אבחון";
 "Disk usage" = "שימוש בדיסק";
+"Done" = "בוצע";
 "Download" = "הורד";
 "Download and Enable" = "הורד והפעל";
 "Download into the models folder" = "הורדה לתיקיית models";
 "Download models" = "הורדת דגמים";
 "Download models from Hugging Face" = "הורדת דגמים מ‑Hugging Face.";
 "Downloaded" = "הורד";
+"Downloading %@…" = "מוריד/ת %@…";
+"Downloading %lld files…" = "מוריד/ת %lld קבצים…";
+"Downloading…" = "מוריד/ת…";
+"Downloads" = "הורדות";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
 "Edit Profile…" = "עריכת פרופיל…";
 "Enable image generation" = "הפעלת יצירת תמונות";
 "Enable image generation?" = "להפעיל יצירת תמונות?";
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
+"Failed to reload the chat model after image generation: %@" = "נכשל בטעינת מודל השיחה מחדש לאחר יצירת תמונה: %@";
 "Failed: %@" = "נכשל: %@";
+"Fast (smaller canvas)" = "מהיר (קנבס קטן יותר)";
+"Fetching file list…" = "מושך/ת את רשימת הקבצים…";
+"Fits comfortably" = "מתאים בנוחות";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם drafter שפורסם (Gemma 4 26B): מודל קטן נוסף מנחש מראש אסימונים, והמודל הראשי בודק אותם במעבר אחד. אותו פלט, מהר יותר. לאחר מכן הבקשות מטופלות אחת בכל פעם.";
 "Free on disk: %@ · your models: %@" = "חופשי בדיסק: %@ · המודלים שלך: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "משחרר את הזיכרון שמודל טעון מחזיק אחרי פרק זמן כזה ללא בקשות. הוא נטען מחדש אוטומטית בבקשה הבאה, עם עיכוב הטעינה הרגיל.";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "מוגבל: קבל את הרישיון בעמוד ה‑Hugging Face שלו, והוסף אסימון ב‑Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "מוגבל: בקש גישה בעמוד ה‑Hugging Face שלו (המחברים בוחנים את הבקשה), והוסף אסימון ב‑Settings → Models.";
 "General" = "כללי";
+"Generated in %.1fs" = "נוצר ב־%.1fs";
 "Generating image…" = "יוצר תמונה…";
 "Get one" = "קבל אחד";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "דיוק מקסימלי, הורדה גדולה — קו בסיס נכונות שניתן לסמוך עליו.";
 "Hourly forecast" = "תחזית לפי שעה";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "כמה בקשות מקובצות לצעד GPU אחד. עוזר רק כשכמה לקוחות משתמשים בשרת בו־זמנית; משתמש ביותר זיכרון.";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "אסימון של Hugging Face";
 "Idle -- the model reloads on the next message" = "לא פעיל -- המודל ייטען מחדש בהודעה הבאה";
 "Image generation" = "יצירת תמונות";
+"Image generation failed: %@" = "יצירת התמונה נכשלה: %@";
+"Image generation finished but produced no output file." = "יצירת התמונה הסתיימה אך לא נוצר קובץ פלט.";
+"Image generation isn't set up -- turn it on again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
+"Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image model" = "מודל תמונה";
 "Installed" = "מותקן";
+"Installing mflux…" = "מתקין/ה mflux…";
 "KV cache" = "מטמון KV";
 "KV group size" = "גודל קבוצת KV";
 "Keep current" = "השאר נוכחי";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "שומר את N הטוקנים הראשונים של ההקשר בדיוק מלא לפני קוונטיזציה. ערך גבוה יותר מחליף חיסכון בזיכרון בדיוק בהנחיות ארוכות.";
 "LLMTray" = "LLMTray";
 "Language" = "שפה";
+"Larger than this Mac's RAM -- unlikely to load" = "גדול מזיכרון ה‑RAM של ה‑Mac הזה — סביר שלא ייטען";
 "Later" = "מאוחר יותר";
 "Launch at login" = "פתח בעת ההתחברות";
 "Library" = "ספרייה";
+"Likes" = "לייקים";
 "Live output of the model process: loading, errors, requests." = "פלט חי של תהליך המודל: טעינה, שגיאות ובקשות.";
 "Loads the last-used model right away, so it's ready without pressing Play." = "טוען מיד את המודל האחרון שהיה בשימוש, כדי שיהיה מוכן בלי ללחוץ על Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "פרופיל חדש (יורש הכול מ-Default)";
 "New temporary chat -- nothing about it is ever saved" = "פותח שיחה זמנית חדשה — שום דבר לגביה לא נשמר לעולם.";
 "News" = "חדשות";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "לא נמצא Python 3.10+ . התקן/י אחד מ‑python.org או באמצעות Homebrew (https://brew.sh).";
+"No README.md in this repo." = "אין README.md במאגר הזה.";
 "No auto-tune run yet." = "עדיין לא בוצעה הרצת כוונון אוטומטי.";
 "No messages yet" = "עדיין אין הודעות";
 "No model uses it." = "אף מודל לא משתמש בו.";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "%lld ההודעות האחרונות";
 "Past chats" = "מציג צ׳אטים קודמים.";
 "Pause download" = "משהה את ההורדה.";
+"Paused" = "מושהה";
 "Performance" = "ביצועים";
 "Port" = "יציאה";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "מידת האקראיות של התשובות (חלק מפרופיל המודל). ערך נמוך ממוקד יותר, ערך גבוה מגוון יותר.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "אקראיות. ערך נמוך ממוקד ועקבי יותר, ערך גבוה מגוון יותר. קידוד: 0.2-0.6; צ׳אט: 0.7-1.0.";
 "Reading what's installed…" = "קורא מה מותקן…";
+"Recently updated" = "עודכן לאחרונה";
 "Recovery" = "התאוששות";
 "Regenerate" = "צור מחדש";
 "Remove" = "הסר";
@@ -220,6 +248,7 @@
 "Server Log" = "יומן השרת";
 "Server log" = "יומן השרת";
 "Server settings changed -- restart to apply them." = "הגדרות השרת השתנו -- יש להפעיל מחדש כדי להחיל אותן.";
+"Setting up image generation (first time only)…" = "מגדיר/ה יצירת תמונות (הפעם הראשונה בלבד)…";
 "Settings" = "הגדרות";
 "Settings (⌘,)" = "הגדרות (⌘,)";
 "Settings profile for this model" = "פרופיל ההגדרות עבור מודל זה.";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "מציג את קובצי הפרופיל ב-Finder -- JSON פשוט, ניתן לעריכה ידנית ולהעתקה ל-Mac אחר.";
 "Show tool calls" = "הצג קריאות כלים";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "הכי קטן והכי אגרסיבי — עלול לשנות באופן ניכר את הרכבת התמונה בכמה קריאות.";
 "Sort by" = "מיון לפי";
 "Source on GitHub" = "מקור ב‑GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "עוצר את השרת ופורק את המודל.";
 "Stop the server to update the runtime." = "כדי לעדכן את סביבת הריצה, יש לעצור את השרת.";
 "Stopped" = "נעצר";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "נעצר: המודל המשיך לקרוא לכלים (%lld סבבים במהלך תור אחד).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן שנוצרת תמונה, וטוען אותו מחדש לאחר מכן. הפעלה של שניהם יחד עלולה לחרוג מהזיכרון של ה‑Mac הזה.";
 "Sunrise & sunset" = "שקיעה וזריחה";
 "System" = "מערכת";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "מספר זה של ההודעות האחרונות יישמר מילה במילה בעת דחיסה.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "לא ניתן לקרוא את קובץ הפרופיל הזה, לכן אי אפשר לערוך אותו כאן. יש לתקן או למחוק את הקובץ, ואז לפתוח מחדש את ההגדרות.";
 "Thought process" = "תהליך החשיבה";
+"Tight -- may not leave room for context" = "צפוף — עשוי שלא להשאיר מקום להקשר";
 "Time in a city" = "שעה בעיר";
 "Tool Settings…" = "הגדרות כלי…";
 "Tool-use rule" = "כלל לשימוש בכלים";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "הקוונטיזציה של Z-Image-Turbo שמשמשת ליצירת התמונות.";
 "Wikipedia" = "Wikipedia";
 "You" = "את/ה";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (מומלץ)";
 "copy" = "העתק";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "בניית הבקשה נכשלה";
 "mlx-lm runtime" = "זמן ריצה של mlx-lm";
 "not used by any model" = "לא בשימוש של אף מודל";
 "used by %@" = "בשימוש על ידי %@";

@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ está restringido: acepta su licencia en huggingface.co/%@ y luego añade un token de Hugging Face en Ajustes → Models.";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ aún no está descargado: vuelve a activar la generación de imágenes en Ajustes.";
 "%@ wasn't found on Hugging Face." = "No se encontró %@ en Hugging Face.";
+"%@ · %@ left" = "%@ · quedan %@";
 "%@ → %@ available" = "Disponible: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d modificados, el resto de Default · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "Aplicar al perfil";
 "Assistant" = "Asistente";
 "Attach image(s) for the model to see" = "Adjuntar imágenes para que el modelo las vea";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Atención a 8 bits, feed‑forward a 4 bits: mejor equilibrio tamaño/estabilidad, validado frente a 4 bits uniforme.";
 "Auto-compact" = "Compactar automáticamente";
 "Auto-restart after %lld stalls" = "Reiniciar tras %lld bloqueos";
 "Auto-restart: off" = "Reinicio automático: no";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "El ajuste automático está en curso y escribe en el perfil del modelo cargado; la edición queda en pausa hasta que termine.";
 "Auto-tune performance" = "Ajustar rendimiento";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Se promedian en un resultado abajo. Siempre hay antes una ejecución de calentamiento, así que la compilación de kernels de Metal no distorsiona los números.";
+"Balanced (default)" = "Equilibrado (Default)";
 "Benchmark" = "Rendimiento";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Las pruebas se ejecutan con el modelo cargado ahora. El ajuste automático guarda el resultado en el perfil de ese modelo.";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "Compactar";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compactar reemplaza el medio de un chat largo por un resumen escrito por el modelo. Estos mensajes del principio se conservan tal cual.";
 "Compaction" = "Compactación";
+"Compaction failed: %@" = "Compactación fallida: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacta el chat automáticamente cuando supera este número de mensajes. El botón Compactar funciona siempre.";
 "Concurrent requests" = "Solicitudes simultáneas";
 "Copy" = "Copiar";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Elimina el runtime de mlx-lm descargado (y el de generación de imágenes). Se instala de nuevo al próximo inicio del servidor. Los chats guardados y los perfiles se conservan.";
 "Diagnostics" = "Diagnóstico";
 "Disk usage" = "Uso del disco";
+"Done" = "Hecho";
 "Download" = "Descargar";
 "Download and Enable" = "Descargar y activar";
 "Download into the models folder" = "Descargar en la carpeta de modelos";
 "Download models" = "Descargar modelos";
 "Download models from Hugging Face" = "Descargar modelos desde Hugging Face";
 "Downloaded" = "Descargado";
+"Downloading %@…" = "Descargando %@…";
+"Downloading %lld files…" = "Descargando %lld archivos…";
+"Downloading…" = "Descargando…";
+"Downloads" = "Descargas";
 "Duplicate this profile" = "Duplicar este perfil";
 "Edit Profile…" = "Editar perfil…";
 "Enable image generation" = "Generación de imágenes";
 "Enable image generation?" = "¿Activar la generación de imágenes?";
 "Extra server arguments" = "Argumentos extra del servidor";
+"Failed to reload the chat model after image generation: %@" = "No se pudo recargar el modelo de chat tras la generación de imagen: %@";
 "Failed: %@" = "Error: %@";
+"Fast (smaller canvas)" = "Rápido (lienzo más pequeño)";
+"Fetching file list…" = "Obteniendo lista de archivos…";
+"Fits comfortably" = "Cabe holgadamente";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Para modelos con un drafter publicado (Gemma 4 26B): un modelo pequeño adivina tokens por adelantado y el principal los verifica en una pasada. Misma salida, más rápido. Las solicitudes se atienden de una en una.";
 "Free on disk: %@ · your models: %@" = "Libre en disco: %@ · tus modelos: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Libera la memoria del modelo cargado tras este tiempo sin solicitudes. Se vuelve a cargar solo en la siguiente solicitud, con el retraso habitual.";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Restringido: acepta su licencia en su página de Hugging Face y añade un token en Ajustes → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Restringido: solicita acceso en su página de Hugging Face (los autores lo revisan) y añade un token en Ajustes → Models.";
 "General" = "General";
+"Generated in %.1fs" = "Generado en %.1fs";
 "Generating image…" = "Generando imagen…";
 "Get one" = "Conseguir uno";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Da al modelo la herramienta generate_image (requiere un modelo que use herramientas). La primera vez se descarga el modelo de imágenes.";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "Alta calidad (lienzo mayor)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "Máxima fidelidad, mayor descarga: una referencia de corrección en la que puedes confiar.";
 "Hourly forecast" = "Pronóstico por hora";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Cuántos tokens del prompt se procesan por paso. Más es más rápido con prompts largos pero usa más memoria. El ajuste automático puede elegirlo.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Cuántas solicitudes se agrupan en un paso de GPU. Solo ayuda si varios clientes usan el servidor a la vez; usa más memoria.";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Token de Hugging Face";
 "Idle -- the model reloads on the next message" = "Inactivo: el modelo se recarga con el siguiente mensaje";
 "Image generation" = "Generación de imágenes";
+"Image generation failed: %@" = "La generación de imagen falló: %@";
+"Image generation finished but produced no output file." = "La generación de imagen finalizó pero no produjo ningún archivo de salida.";
+"Image generation isn't set up -- turn it on again in Settings." = "La generación de imagen no está configurada: actívala de nuevo en Ajustes.";
+"Image generation needs an update -- turn it off and on again in Settings." = "La generación de imagen necesita una actualización: apágala y vuélvela a activar en Ajustes.";
 "Image model" = "Modelo de imágenes";
 "Installed" = "Instalado";
+"Installing mflux…" = "Instalando mflux…";
 "KV cache" = "Caché KV";
 "KV group size" = "Grupo KV";
 "Keep current" = "Mantener";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene los primeros N tokens del contexto en precisión completa antes de cuantizar. Más gana precisión en prompts largos a costa de ahorro de memoria.";
 "LLMTray" = "LLMTray";
 "Language" = "Idioma";
+"Larger than this Mac's RAM -- unlikely to load" = "Más grande que la RAM de este Mac: improbable que se cargue";
 "Later" = "Más tarde";
 "Launch at login" = "Abrir al iniciar sesión";
 "Library" = "Biblioteca";
+"Likes" = "Me gusta";
 "Live output of the model process: loading, errors, requests." = "Salida en vivo del proceso del modelo: carga, errores, solicitudes.";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Carga el último modelo de inmediato, sin tener que pulsar Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Registra cada token generado (DEBUG). Solo para diagnosticar el proceso del modelo: lo ralentiza. Surte efecto en el próximo inicio del servidor.";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "Nuevo perfil (hereda todo de Default)";
 "New temporary chat -- nothing about it is ever saved" = "Nuevo chat temporal: no se guarda nada de él";
 "News" = "Noticias";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "No se ha encontrado Python 3.10+. Instálalo desde python.org o mediante Homebrew (https://brew.sh).";
+"No README.md in this repo." = "No hay README.md en este repositorio.";
 "No auto-tune run yet." = "Aún no se ha hecho ningún ajuste automático.";
 "No messages yet" = "Aún no hay mensajes";
 "No model uses it." = "Ningún modelo lo usa.";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "Más de %lld mensajes";
 "Past chats" = "Chats anteriores";
 "Pause download" = "Pausar descarga";
+"Paused" = "Pausado";
 "Performance" = "Rendimiento";
 "Port" = "Puerto";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precisión de la caché de atención. 8 bits: casi sin pérdida, la mitad de memoria. 4 bits: una cuarta parte, notablemente peor con contexto largo. Completa: la mejor, más memoria.";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Aleatoriedad de las respuestas (parte del perfil del modelo). Más bajo es más preciso, más alto más variado.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Aleatoriedad. Más bajo es más preciso y repetible, más alto más variado. Código: 0.2-0.6; chat: 0.7-1.0.";
 "Reading what's installed…" = "Leyendo lo instalado…";
+"Recently updated" = "Actualizado recientemente";
 "Recovery" = "Recuperación";
 "Regenerate" = "Regenerar";
 "Remove" = "Eliminar";
@@ -220,6 +248,7 @@
 "Server Log" = "Registro del servidor";
 "Server log" = "Registro del servidor";
 "Server settings changed -- restart to apply them." = "Los ajustes del servidor cambiaron: reinicia para aplicarlos.";
+"Setting up image generation (first time only)…" = "Configurando la generación de imagen (solo la primera vez)…";
 "Settings" = "Ajustes";
 "Settings (⌘,)" = "Ajustes (⌘,)";
 "Settings profile for this model" = "Perfil de ajustes de este modelo";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Mostrar los archivos de perfil en Finder: JSON normal, editable a mano y copiable a otro Mac";
 "Show tool calls" = "Mostrar llamadas a herramientas";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Muestra el razonamiento del modelo (el bloque plegable «Thought process») encima de su respuesta.";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "El más pequeño y agresivo: puede desviar visiblemente la composición de una generación con algunos prompts.";
 "Sort by" = "Ordenar por";
 "Source on GitHub" = "Código fuente en GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "El espacio que ocupan los modelos en esta carpeta y lo que queda libre en el disco.";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "Detener el servidor (descargar el modelo)";
 "Stop the server to update the runtime." = "Detén el servidor para actualizar el runtime.";
 "Stopped" = "Detenido";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "Detenido: el modelo siguió llamando a herramientas (%lld rondas en una sola iteración).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Detiene el modelo de chat mientras se genera una imagen y luego lo recarga. Ambos a la vez pueden superar la memoria de este Mac.";
 "Sunrise & sunset" = "Amanecer y atardecer";
 "System" = "Del sistema";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "Estos mensajes más recientes se conservan tal cual al compactar.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "El archivo de este perfil no se puede leer, así que no se puede editar aquí. Corrige o elimina el archivo y vuelve a abrir Ajustes.";
 "Thought process" = "Razonamiento";
+"Tight -- may not leave room for context" = "Ajustado: puede no dejar espacio para el contexto";
 "Time in a city" = "Hora en una ciudad";
 "Tool Settings…" = "Ajustes de herramientas…";
 "Tool-use rule" = "Regla de herramientas";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "Qué cuantización de Z-Image-Turbo genera las imágenes.";
 "Wikipedia" = "Wikipedia";
 "You" = "Tú";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (recommended)";
 "copy" = "copia";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "no se pudo construir la solicitud";
 "mlx-lm runtime" = "Entorno de ejecución de mlx-lm";
 "not used by any model" = "no lo usa ningún modelo";
 "used by %@" = "lo usan: %@";

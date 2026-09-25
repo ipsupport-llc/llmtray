@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ має обмеження: прийміть ліцензію на huggingface.co/%@, потім додайте токен Hugging Face у Налаштування → Models.";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ще не завантажено — знову ввімкніть генерацію зображень у Налаштуваннях.";
 "%@ wasn't found on Hugging Face." = "%@ не знайдено на Hugging Face.";
+"%@ · %@ left" = "%@ · залишилось %@";
 "%@ → %@ available" = "Доступно: %@ → %@";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "Застосувати до профілю";
 "Assistant" = "Асистент";
 "Attach image(s) for the model to see" = "Прикріпити зображення, щоб модель їх побачила";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention у 8-бітах, feed‑forward у 4-бітах — найкращий баланс розміру й стабільності, перевірено на однорідному 4‑бітному режимі.";
 "Auto-compact" = "Автостиснення";
 "Auto-restart after %lld stalls" = "Перезапуск після %lld зависань";
 "Auto-restart: off" = "Автоперезапуск: вимк.";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "Триває автоналаштування, воно записує результати в профіль завантаженої моделі -- редагування призупинено до його завершення.";
 "Auto-tune performance" = "Підібрати продуктивність";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усереднюються в один результат нижче. Перед ними завжди йде пробний прогін, тож компіляція Metal-ядер під час першого виклику не спотворює цифри.";
+"Balanced (default)" = "Збалансовано (Default)";
 "Benchmark" = "Бенчмарк";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Бенчмарк проганяється на моделі, завантаженій зараз. Автопідбір записує результат у її профіль.";
 "Beta" = "Бета";
@@ -63,6 +67,7 @@
 "Compact" = "Стиснути";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Стиснення замінює середину довгого чату одним переказом, який пише модель. Стільки повідомлень на початку зберігаються дослівно.";
 "Compaction" = "Стиснення";
+"Compaction failed: %@" = "Не вдалося стиснути: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Стискає чат автоматично, коли в ньому стає більше повідомлень. Кнопка «Стиснути» в чаті працює в будь-якому разі.";
 "Concurrent requests" = "Паралельні запити";
 "Copy" = "Копіювати";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Видаляє завантажений рантайм mlx-lm (і рантайм генерації зображень). Під час наступного запуску сервера він встановиться заново. Збережені чати й профілі залишаються.";
 "Diagnostics" = "Діагностика";
 "Disk usage" = "Використання диска";
+"Done" = "Готово";
 "Download" = "Завантажити";
 "Download and Enable" = "Завантажити й увімкнути";
 "Download into the models folder" = "Завантажити в папку models";
 "Download models" = "Завантажити моделі";
 "Download models from Hugging Face" = "Завантажити моделі з Hugging Face";
 "Downloaded" = "Завантажено";
+"Downloading %@…" = "Завантаження %@…";
+"Downloading %lld files…" = "Завантаження %lld файлів…";
+"Downloading…" = "Завантаження…";
+"Downloads" = "Завантаження";
 "Duplicate this profile" = "Дублювати профіль";
 "Edit Profile…" = "Редагувати профіль…";
 "Enable image generation" = "Генерація зображень";
 "Enable image generation?" = "Увімкнути генерацію зображень?";
 "Extra server arguments" = "Дод. аргументи сервера";
+"Failed to reload the chat model after image generation: %@" = "Не вдалося перезавантажити модель чату після генерації зображення: %@";
 "Failed: %@" = "Помилка: %@";
+"Fast (smaller canvas)" = "Швидко (менше полотно)";
+"Fetching file list…" = "Отримання списку файлів…";
+"Fits comfortably" = "Впевнено вміщується";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей з опублікованим драфтером (Gemma 4 26B): маленька модель вгадує токени наперед, а основна перевіряє їх за один прохід. Відповідь та сама, але швидше. Запити при цьому обробляються по одному.";
 "Free on disk: %@ · your models: %@" = "Вільно на диску: %@ · ваші моделі: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Звільняє пам'ять, зайняту моделлю, після стількох хвилин без запитів. Модель сама завантажиться під час наступного запиту, зі звичайною затримкою.";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Обмежено: прийміть ліцензію на сторінці Hugging Face моделі й додайте токен у Налаштування → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Обмежено: запросіть доступ на сторінці моделі на Hugging Face (автори переглядають запити) і додайте токен у Налаштування → Models.";
 "General" = "Основні";
+"Generated in %.1fs" = "Згенеровано за %.1fs";
 "Generating image…" = "Генерую зображення…";
 "Get one" = "Отримати";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Дає моделі інструмент generate_image (потрібна модель, що вміє викликати інструменти). Першого разу завантажується модель для зображень.";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "Висока якість (більше полотно)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "Найвища точність, найбільше завантаження — орієнтир точності, якому можна довіряти.";
 "Hourly forecast" = "Погодинний прогноз";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Токен Hugging Face";
 "Idle -- the model reloads on the next message" = "Простій -- модель завантажиться з наступним повідомленням";
 "Image generation" = "Генерація зображень";
+"Image generation failed: %@" = "Не вдалося згенерувати зображення: %@";
+"Image generation finished but produced no output file." = "Генерація зображення завершилася, але файл не створено.";
+"Image generation isn't set up -- turn it on again in Settings." = "Генерація зображень не налаштована — знову увімкніть її в Налаштуваннях.";
+"Image generation needs an update -- turn it off and on again in Settings." = "Потрібне оновлення генерації зображень — вимкніть і ввімкніть її знову в Налаштуваннях.";
 "Image model" = "Модель зображень";
 "Installed" = "Встановлено";
+"Installing mflux…" = "Встановлення mflux…";
 "KV cache" = "KV-кеш";
 "KV group size" = "Група KV";
 "Keep current" = "Залишити як є";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Перші N токенів контексту зберігаються в повній точності, далі квантуються. Більше — точніше на довгих промптах, але менша економія пам'яті.";
 "LLMTray" = "LLMTray";
 "Language" = "Мова";
+"Larger than this Mac's RAM -- unlikely to load" = "Більше за оперативну пам'ять цього Mac — навряд чи завантажиться";
 "Later" = "Пізніше";
 "Launch at login" = "Запускати під час входу";
 "Library" = "Бібліотека";
+"Likes" = "Лайки";
 "Live output of the model process: loading, errors, requests." = "Живий вивід процесу моделі: завантаження, помилки, запити.";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Одразу завантажує останню модель, щоб не натискати Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Пише в лог кожен згенерований токен (DEBUG). Лише для налагодження процесу моделі — сповільнює роботу. Діє з наступного запуску сервера.";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "Новий профіль (усе успадковує від Default)";
 "New temporary chat -- nothing about it is ever saved" = "Новий тимчасовий чат -- нічого з нього не зберігається";
 "News" = "Новини";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "Python 3.10+ не знайдено. Встановіть з python.org або через Homebrew (https://brew.sh).";
+"No README.md in this repo." = "У цьому репозиторії немає README.md.";
 "No auto-tune run yet." = "Автопідбір ще не запускався.";
 "No messages yet" = "Повідомлень поки немає";
 "No model uses it." = "Жодна модель його не використовує.";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "Понад %lld повідомлень";
 "Past chats" = "Попередні чати";
 "Pause download" = "Призупинити завантаження";
+"Paused" = "Призупинено";
 "Performance" = "Продуктивність";
 "Port" = "Порт";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точність кешу уваги. 8 біт — майже без втрат, удвічі менше пам'яті. 4 біти — вчетверо менше, але помітно гірше на довгому контексті. Повний — найкраще, але найбільше пам'яті.";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Випадковість відповідей (частина профілю моделі). Нижче — точніше, вище — різноманітніше.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Випадковість. Нижче — точніше й повторюваніше, вище — різноманітніше. Код: 0.2–0.6; чат: 0.7–1.0.";
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
+"Recently updated" = "Нещодавно оновлено";
 "Recovery" = "Відновлення";
 "Regenerate" = "Згенерувати знову";
 "Remove" = "Вилучити";
@@ -220,6 +248,7 @@
 "Server Log" = "Лог сервера";
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Налаштування сервера змінилися — перезапустіть, щоб застосувати.";
+"Setting up image generation (first time only)…" = "Налаштування генерації зображень (тільки вперше)…";
 "Settings" = "Налаштування";
 "Settings (⌘,)" = "Налаштування (⌘,)";
 "Settings profile for this model" = "Профіль налаштувань цієї моделі";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
 "Show tool calls" = "Показувати виклики інструментів";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Найменший і найагресивніший — може помітно змінювати композицію зображення на деяких підказках.";
 "Sort by" = "Сортування";
 "Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "Зупинити сервер (вивантажити модель)";
 "Stop the server to update the runtime." = "Щоб оновити рантайм, зупиніть сервер.";
 "Stopped" = "Зупинено";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "Зупинено: модель постійно викликала інструменти (%lld раундів в одному ході).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель на час генерації зображення, а потім завантажує знову. Дві моделі одночасно можуть не вміститися в пам'ять цього Mac.";
 "Sunrise & sunset" = "Схід і захід сонця";
 "System" = "Системна";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
 "Thought process" = "Хід міркувань";
+"Tight -- may not leave room for context" = "Тісно — може не залишатися місця для контексту";
 "Time in a city" = "Час у місті";
 "Tool Settings…" = "Параметри інструментів…";
 "Tool-use rule" = "Правило інструментів";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
 "Wikipedia" = "Wikipedia";
 "You" = "Ви";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
 "copy" = "копія";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "не вдалося сформувати запит";
 "mlx-lm runtime" = "Середовище виконання mlx-lm";
 "not used by any model" = "не використовується жодною моделлю";
 "used by %@" = "використовують: %@";

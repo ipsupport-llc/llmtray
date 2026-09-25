@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 受限：请在 huggingface.co/%@ 接受其许可，然后在“设置 → 模型”中添加 Hugging Face 令牌。";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ 尚未下载 —— 请在“设置”中重新启用图像生成。";
 "%@ wasn't found on Hugging Face." = "在 Hugging Face 上未找到 %@。";
+"%@ · %@ left" = "%@ · 还剩 %@";
 "%@ → %@ available" = "%@ → %@ 可用";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "应用到配置";
 "Assistant" = "助理";
 "Attach image(s) for the model to see" = "附加图片供模型查看。";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 使用 8-bit，前馈使用 4-bit —— 在大小与稳定性间的最佳平衡，已相对于统一 4-bit 验证。";
 "Auto-compact" = "自动压缩";
 "Auto-restart after %lld stalls" = "停滞 %lld 次后自动重启";
 "Auto-restart: off" = "自动重启：关闭";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "自动调优正在运行，并会写入已载入模型的配置——完成前会暂停编辑。";
 "Auto-tune performance" = "自动调优性能";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "下面显示的是汇总后的平均结果。每次都会先进行一次不计入结果的预热运行，因此首次调用时的 Metal 内核编译时间不会影响数据。";
+"Balanced (default)" = "平衡（默认）";
 "Benchmark" = "基准测试";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "基准测试会针对当前已载入的模型运行。自动调优会将结果写入该模型的配置。";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "紧凑";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "压缩会将长聊天的中间部分替换为一段由模型编写的摘要。开头这么多条消息会逐字保留。";
 "Compaction" = "压缩";
+"Compaction failed: %@" = "压缩失败：%@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "聊天消息数超过此数量后自动压缩。无论此设置如何，聊天中的“压缩”按钮都可使用。";
 "Concurrent requests" = "并发请求";
 "Copy" = "复制";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "删除已下载的 mlx-lm 运行时（以及图像生成运行时）。下次服务器启动时会从头重新设置。已保存的聊天和配置会保留。";
 "Diagnostics" = "诊断";
 "Disk usage" = "磁盘使用情况";
+"Done" = "完成";
 "Download" = "下载";
 "Download and Enable" = "下载并启用";
 "Download into the models folder" = "下载到 models 文件夹中";
 "Download models" = "下载模型";
 "Download models from Hugging Face" = "从 Hugging Face 下载模型";
 "Downloaded" = "已下载";
+"Downloading %@…" = "正在下载 %@…";
+"Downloading %lld files…" = "正在下载 %lld 个文件…";
+"Downloading…" = "正在下载…";
+"Downloads" = "下载";
 "Duplicate this profile" = "复制此配置";
 "Edit Profile…" = "编辑配置…";
 "Enable image generation" = "启用图像生成";
 "Enable image generation?" = "要启用图像生成吗？";
 "Extra server arguments" = "额外服务器参数";
+"Failed to reload the chat model after image generation: %@" = "图像生成后重载聊天模型失败：%@";
 "Failed: %@" = "失败：%@";
+"Fast (smaller canvas)" = "快速（画布更小）";
+"Fetching file list…" = "正在获取文件列表…";
+"Fits comfortably" = "可舒适放下";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "对于发布了草稿模型的模型（Gemma 4 26B）：一个额外的小模型会提前猜测词元，主模型会在一次传递中检查它们。输出相同，速度更快。随后请求会逐个处理。";
 "Free on disk: %@ · your models: %@" = "磁盘可用：%@ · 你的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "在这么长时间没有请求后，释放已加载模型占用的内存。下次请求时会自动重新加载，并产生正常的加载延迟。";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面接受许可，并在“设置 → 模型”中添加令牌。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面申请访问（作者会审核），并在“设置 → 模型”中添加令牌。";
 "General" = "通用";
+"Generated in %.1fs" = "生成用时 %.1fs";
 "Generating image…" = "正在生成图像…";
 "Get one" = "获取一个";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "为模型提供 generate_image 工具（需要支持工具调用的模型）。首次使用时会下载图像模型。";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "高质量（画布更大）";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "最高保真，下载体积最大 —— 可信的正确性基线。";
 "Hourly forecast" = "每小时预报";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Hugging Face 令牌";
 "Idle -- the model reloads on the next message" = "已闲置 -- 模型会在下一条消息时重新加载";
 "Image generation" = "图像生成";
+"Image generation failed: %@" = "图像生成失败：%@";
+"Image generation finished but produced no output file." = "图像生成完成但未产生输出文件。";
+"Image generation isn't set up -- turn it on again in Settings." = "尚未设置图像生成功能 —— 请在“设置”中重新开启。";
+"Image generation needs an update -- turn it off and on again in Settings." = "图像生成功能需要更新 —— 请在“设置”中先关闭再重新开启。";
 "Image model" = "图像模型";
 "Installed" = "已安装";
+"Installing mflux…" = "正在安装 mflux…";
 "KV cache" = "KV 缓存";
 "KV group size" = "KV 组大小";
 "Keep current" = "保留当前";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
 "LLMTray" = "LLMTray";
 "Language" = "语言";
+"Larger than this Mac's RAM -- unlikely to load" = "大于此 Mac 的内存 —— 可能无法加载";
 "Later" = "稍后";
 "Launch at login" = "登录时打开";
 "Library" = "资料库";
+"Likes" = "点赞";
 "Live output of the model process: loading, errors, requests." = "模型进程的实时输出：加载、错误、请求。";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即加载上次使用的模型，无需点按 Play 即可就绪。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "新建配置（继承 Default 的所有设置）。";
 "New temporary chat -- nothing about it is ever saved" = "新建临时聊天；其中任何内容都不会保存。";
 "News" = "新闻";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "未检测到 Python 3.10+。请从 python.org 或使用 Homebrew (https://brew.sh) 安装。";
+"No README.md in this repo." = "此仓库中没有 README.md。";
 "No auto-tune run yet." = "尚未运行自动调优。";
 "No messages yet" = "暂无消息";
 "No model uses it." = "没有模型使用它。";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "过去 %lld 条消息";
 "Past chats" = "过往聊天";
 "Pause download" = "暂停下载";
+"Paused" = "已暂停";
 "Performance" = "性能";
 "Port" = "端口";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力缓存的精度。8-bit：几乎无损，内存占用减半。4-bit：内存占用约为四分之一，长上下文下明显变差。完整精度：效果最佳，内存占用最多。";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "答案的随机性（模型配置方案的一部分）。越低越聚焦，越高越多样。";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "随机性。越低越聚焦且可重复，越高越多样。编程：0.2-0.6；聊天：0.7-1.0。";
 "Reading what's installed…" = "正在读取已安装内容…";
+"Recently updated" = "最近更新";
 "Recovery" = "恢复";
 "Regenerate" = "重新生成";
 "Remove" = "移除";
@@ -220,6 +248,7 @@
 "Server Log" = "服务器日志";
 "Server log" = "服务器日志";
 "Server settings changed -- restart to apply them." = "服务器设置已更改，请重启服务器以应用更改。";
+"Setting up image generation (first time only)…" = "正在设置图像生成（仅首次）…";
 "Settings" = "设置";
 "Settings (⌘,)" = "打开设置（⌘,）。";
 "Settings profile for this model" = "此模型的设置配置文件。";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "在 Finder 中显示配置文件——纯 JSON，可手动编辑，也可复制到另一台 Mac。";
 "Show tool calls" = "显示工具调用";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "体积最小且最激进 —— 在某些提示下可能明显偏移生成构图。";
 "Sort by" = "排序方式";
 "Source on GitHub" = "在 GitHub 上查看源码";
 "Space the models in this folder take, and what's still free on its disk." = "该文件夹中模型占用的空间及磁盘剩余可用空间。";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "停止服务器（卸载模型）。";
 "Stop the server to update the runtime." = "停止服务器以更新运行时。";
 "Stopped" = "已停止";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "已停止：模型持续调用工具（单次回合 %lld 轮）。";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "生成图像时停止聊天模型，并在生成后重新加载。同时运行二者可能会超出此 Mac 的内存。";
 "Sunrise & sunset" = "日出与日落";
 "System" = "系统";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "压缩时会逐字保留这么多条最近消息。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
 "Thought process" = "思考过程";
+"Tight -- may not leave room for context" = "紧凑 —— 可能无足够空间放置上下文";
 "Time in a city" = "城市时间";
 "Tool Settings…" = "工具设置…";
 "Tool-use rule" = "工具使用规则";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "用于生成图像的 Z-Image-Turbo 量化版本。";
 "Wikipedia" = "Wikipedia";
 "You" = "你";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ 混合（推荐）";
 "copy" = "复制";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld，prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "构建请求失败";
 "mlx-lm runtime" = "mlx-lm 运行时";
 "not used by any model" = "未被任何模型使用";
 "used by %@" = "由 %@ 使用";

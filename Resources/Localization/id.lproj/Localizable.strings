@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
+"%@ · %@ left" = "%@ · %@ tersisa";
 "%@ → %@ available" = "%@ → %@ tersedia";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "Terapkan ke profil";
 "Assistant" = "Asisten";
 "Attach image(s) for the model to see" = "Lampirkan gambar agar dapat dilihat model.";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention pada 8-bit, feed‑forward pada 4-bit — keseimbangan ukuran/stabilitas terbaik, tervalidasi terhadap 4-bit seragam.";
 "Auto-compact" = "Ringkas otomatis";
 "Auto-restart after %lld stalls" = "Mulai ulang otomatis setelah %lld kali macet";
 "Auto-restart: off" = "Mulai ulang otomatis: mati";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "Penalaan otomatis sedang berjalan dan menulis ke profil model yang dimuat — pengeditan dijeda hingga selesai.";
 "Auto-tune performance" = "Tala kinerja otomatis";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Dirata-ratakan menjadi satu hasil di bawah. Proses pemanasan sekali pakai selalu dijalankan sebelumnya, sehingga waktu kompilasi kernel Metal pada panggilan pertama tidak pernah membiaskan angka.";
+"Balanced (default)" = "Seimbang (Default)";
 "Benchmark" = "Tolok ukur";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Tolok ukur dijalankan pada model yang sedang dimuat. Penalaan otomatis menulis hasilnya ke profil model tersebut.";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "Ringkas";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Pemadatan mengganti bagian tengah obrolan panjang dengan satu ringkasan yang ditulis model. Sebanyak ini pesan di awal dipertahankan kata demi kata.";
 "Compaction" = "Pemadatan";
+"Compaction failed: %@" = "Kompaksi gagal: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Memadatkan obrolan secara otomatis setelah melewati jumlah pesan ini. Tombol Padatkan di obrolan tetap berfungsi.";
 "Concurrent requests" = "Permintaan bersamaan";
 "Copy" = "Salin";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Menghapus runtime mlx-lm yang diunduh (dan runtime pembuatan gambar). Runtime akan disiapkan lagi dari awal saat server dimulai berikutnya. Obrolan dan profil tersimpan tetap dipertahankan.";
 "Diagnostics" = "Diagnostik";
 "Disk usage" = "Penggunaan disk";
+"Done" = "Selesai";
 "Download" = "Unduh";
 "Download and Enable" = "Unduh dan Aktifkan";
 "Download into the models folder" = "Unduh ke folder models";
 "Download models" = "Unduh model";
 "Download models from Hugging Face" = "Unduh model dari Hugging Face";
 "Downloaded" = "Diunduh";
+"Downloading %@…" = "Mengunduh %@…";
+"Downloading %lld files…" = "Mengunduh %lld berkas…";
+"Downloading…" = "Mengunduh…";
+"Downloads" = "Unduhan";
 "Duplicate this profile" = "Gandakan profil ini.";
 "Edit Profile…" = "Edit profil…";
 "Enable image generation" = "Aktifkan pembuatan gambar";
 "Enable image generation?" = "Aktifkan pembuatan gambar?";
 "Extra server arguments" = "Argumen server tambahan";
+"Failed to reload the chat model after image generation: %@" = "Gagal memuat ulang model obrolan setelah pembuatan gambar: %@";
 "Failed: %@" = "Gagal: %@";
+"Fast (smaller canvas)" = "Cepat (kanvas lebih kecil)";
+"Fetching file list…" = "Mengambil daftar berkas…";
+"Fits comfortably" = "Muatan pas";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan model draf yang dipublikasikan (Gemma 4 26B): model ekstra kecil menebak token berikutnya terlebih dahulu dan model utama memeriksanya dalam satu lintasan. Output sama, lebih cepat. Permintaan kemudian dilayani satu per satu.";
 "Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Dibatasi: terima lisensinya di halaman Hugging Face model ini, lalu tambahkan token di Pengaturan → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Dibatasi: minta akses di halaman Hugging Face model ini (penulis meninjau), lalu tambahkan token di Pengaturan → Models.";
 "General" = "Umum";
+"Generated in %.1fs" = "Dihasilkan dalam %.1fs";
 "Generating image…" = "Membuat gambar…";
 "Get one" = "Dapatkan";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Memberi model alat generate_image (memerlukan model yang dapat memanggil alat). Saat pertama kali, model gambar akan diunduh.";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "Kualitas tinggi (kanvas lebih besar)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "Fidelitas tertinggi, unduhan terbesar — tolok ukur ketepatan yang dapat Anda percayai.";
 "Hourly forecast" = "Prakiraan per jam";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Idle -- model dimuat ulang pada pesan berikutnya";
 "Image generation" = "Pembuatan gambar";
+"Image generation failed: %@" = "Pembuatan gambar gagal: %@";
+"Image generation finished but produced no output file." = "Pembuatan gambar selesai tetapi tidak menghasilkan berkas keluaran.";
+"Image generation isn't set up -- turn it on again in Settings." = "Pembuatan gambar belum disiapkan — aktifkan lagi di Pengaturan.";
+"Image generation needs an update -- turn it off and on again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
 "Image model" = "Model gambar";
 "Installed" = "Terinstal";
+"Installing mflux…" = "Menginstal mflux…";
 "KV cache" = "Cache KV";
 "KV group size" = "Ukuran grup KV";
 "Keep current" = "Pertahankan saat ini";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
 "LLMTray" = "LLMTray";
 "Language" = "Bahasa";
+"Larger than this Mac's RAM -- unlikely to load" = "Lebih besar dari RAM Mac ini — kemungkinan tidak termuat";
 "Later" = "Nanti";
 "Launch at login" = "Buka saat masuk";
 "Library" = "Perpustakaan";
+"Likes" = "Suka";
 "Live output of the model process: loading, errors, requests." = "Output langsung dari proses model: pemuatan, kesalahan, permintaan.";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Memuat model yang terakhir digunakan segera, sehingga siap tanpa menekan Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "Profil baru (mewarisi semuanya dari Default)";
 "New temporary chat -- nothing about it is ever saved" = "Obrolan sementara baru — tidak ada apa pun darinya yang akan disimpan.";
 "News" = "Berita";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "Tidak ditemukan Python 3.10+. Pasang dari python.org atau lewat Homebrew (https://brew.sh).";
+"No README.md in this repo." = "Tidak ada README.md di repositori ini.";
 "No auto-tune run yet." = "Penalaan otomatis belum pernah dijalankan.";
 "No messages yet" = "Belum ada pesan";
 "No model uses it." = "Tidak ada model yang menggunakannya.";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "%lld pesan terakhir";
 "Past chats" = "Obrolan sebelumnya.";
 "Pause download" = "Jeda pengunduhan.";
+"Paused" = "Jeda";
 "Performance" = "Kinerja";
 "Port" = "Port";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Presisi cache atensi. 8-bit: hampir tanpa kehilangan, memori separuh. 4-bit: seperempat, jauh lebih buruk pada konteks panjang. Penuh: terbaik, memori terbanyak.";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Keacakan jawaban (bagian dari profil model). Lebih rendah lebih fokus, lebih tinggi lebih bervariasi.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Keacakan. Lebih rendah lebih fokus dan dapat diulang, lebih tinggi lebih bervariasi. Pemrograman: 0.2-0.6; obrolan: 0.7-1.0.";
 "Reading what's installed…" = "Membaca yang terpasang…";
+"Recently updated" = "Baru diperbarui";
 "Recovery" = "Pemulihan";
 "Regenerate" = "Buat Ulang";
 "Remove" = "Hapus";
@@ -220,6 +248,7 @@
 "Server Log" = "Log Server";
 "Server log" = "Log server";
 "Server settings changed -- restart to apply them." = "Pengaturan server berubah — mulai ulang untuk menerapkannya.";
+"Setting up image generation (first time only)…" = "Menyiapkan pembuatan gambar (hanya pertama kali)…";
 "Settings" = "Pengaturan";
 "Settings (⌘,)" = "Pengaturan (⌘,)";
 "Settings profile for this model" = "Profil pengaturan untuk model ini.";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Tampilkan file profil di Finder — JSON polos, dapat diedit manual, dan dapat disalin ke Mac lain.";
 "Show tool calls" = "Tampilkan pemanggilan alat";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Paling kecil dan agresif — dapat menggeser komposisi hasil pada beberapa prompt.";
 "Sort by" = "Urutkan menurut";
 "Source on GitHub" = "Sumber di GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "Hentikan server (keluarkan model dari memori).";
 "Stop the server to update the runtime." = "Hentikan server untuk memperbarui runtime.";
 "Stopped" = "Dihentikan";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "Dihentikan: model terus memanggil alat (%lld putaran dalam satu giliran).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Menghentikan model chat saat gambar dibuat, lalu memuatnya kembali setelah selesai. Keduanya sekaligus dapat melampaui memori Mac ini.";
 "Sunrise & sunset" = "Matahari terbit & terbenam";
 "System" = "Sistem";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "Jumlah pesan terbaru yang dipertahankan kata demi kata saat memadatkan.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
 "Thought process" = "Proses berpikir";
+"Tight -- may not leave room for context" = "Sempit — mungkin tidak memberi ruang untuk konteks";
 "Time in a city" = "Waktu di kota";
 "Tool Settings…" = "Pengaturan Alat…";
 "Tool-use rule" = "Aturan penggunaan alat";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "Kuantisasi Z-Image-Turbo yang digunakan untuk menghasilkan gambar.";
 "Wikipedia" = "Wikipedia";
 "You" = "Anda";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ campuran (direkomendasikan)";
 "copy" = "salin";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "gagal membangun permintaan";
 "mlx-lm runtime" = "Runtime mlx-lm";
 "not used by any model" = "tidak digunakan oleh model mana pun";
 "used by %@" = "digunakan oleh %@";
