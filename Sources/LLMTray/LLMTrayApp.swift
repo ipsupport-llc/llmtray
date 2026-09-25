@@ -226,8 +226,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // true if never set) -- this has always been the behavior, so
         // making the key's *absence* mean "off" would silently change it
         // for every existing install the first time this shipped.
-        if UserDefaults.standard[Pref.autoStartOnLaunch] {
-            quickStart()
+        //
+        // First, what an earlier LLMTray that crashed or was force-quit
+        // left running is stopped (ServerManager.reapOrphans) -- also with
+        // auto-start off, and before the new model loads next to the old
+        // one's memory.
+        Task { @MainActor [weak self] in
+            await server.reapOrphans()
+            if UserDefaults.standard[Pref.autoStartOnLaunch] {
+                self?.quickStart()
+            }
         }
     }
 
