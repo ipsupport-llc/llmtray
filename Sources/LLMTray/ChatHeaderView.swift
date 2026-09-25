@@ -28,14 +28,19 @@ struct ChatHeaderView: View {
         VStack(alignment: .leading, spacing: 8) {
             if !inChatWindow {
                 HStack {
-                    // Clicking the status opens the chat in its window (or
-                    // raises it), from the popover as from its button.
-                    Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                    // While the chat has its own window, clicking the status
+                    // brings it up. In the popover it's the chat already.
+                    if presentation.isDetached {
+                        Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                            ServerStatusLabel().contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .help("Show Chat Window")
+                        .accessibilityHint(Text("Shows the chat window"))
+                        .pointingHandCursor()
+                    } else {
                         ServerStatusLabel()
                     }
-                    .buttonStyle(.plain)
-                    .help("Show Chat Window")
-                    .pointingHandCursor()
                     Spacer()
                     sessionControls
                 }
@@ -93,14 +98,14 @@ struct ChatHeaderView: View {
                     .accessibilityLabel("Chats")
                 Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
-                    .help("New chat (saved)")
+                    .help("New chat (⌘N)")
                     // Only disabled when there's truly nothing to start fresh
                     // from -- an empty *persistent* session. A temporary chat is
                     // empty too, but this is the way back to a saved one.
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
                 Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
-                    .help("New temporary chat -- nothing about it is ever saved")
+                    .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
                 Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
                     Image(systemName: "macwindow.on.rectangle")
                 }

@@ -108,8 +108,9 @@ struct ContentView: View {
         if !shown { isInputFocused = true }
     }
 
-    /// The chat's own window: the sidebar beside the chat, no header -- the
-    /// server, model and tool controls stay in the menu bar's popover.
+    /// The chat's own window: the sidebar beside the chat; the server, model
+    /// and tool controls stay in the menu bar's popover unless Settings asks
+    /// for them here too.
     private var windowLayout: some View {
         HStack(spacing: 0) {
             if showsWindowSidebar {
@@ -143,11 +144,11 @@ struct ContentView: View {
                 .accessibilityLabel("Chats")
                 Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
-                    .help("New chat (saved)")
+                    .help("New chat (⌘N)")
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
                 Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
-                    .help("New temporary chat -- nothing about it is ever saved")
+                    .help("New temporary chat (⌘⇧N) -- nothing about it is ever saved")
                     .accessibilityLabel("New temporary chat")
             }
             ChatTabStrip()
@@ -249,6 +250,7 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [])
+                            .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {

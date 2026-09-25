@@ -183,13 +183,12 @@
 "New Tab (⌘T)" = "New Tab (⌘T)";
 "New Temporary Chat" = "New Temporary Chat";
 "New chat" = "New chat";
-"New chat (saved)" = "New chat (saved)";
+"New chat (⌘N)" = "New chat (⌘N)";
 "New profile" = "New profile";
 "New profile (inherits everything from Default)" = "New profile (inherits everything from Default)";
 "New project" = "New project";
 "New temporary chat" = "New temporary chat";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "New temporary chat (⌘⇧N) -- nothing about it is ever saved";
-"New temporary chat -- nothing about it is ever saved" = "New temporary chat -- nothing about it is ever saved";
 "News" = "News";
 "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh).";
 "No README.md in this repo." = "No README.md in this repo.";
@@ -300,6 +299,7 @@
 "Show the profile files in Finder" = "Show the profile files in Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac";
 "Show tool calls" = "Show tool calls";
+"Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
 "Sort by" = "Sort by";

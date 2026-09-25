@@ -5,6 +5,8 @@ import SwiftUI
 /// optional reasoning and images.
 @MainActor
 struct MessageBubble: View {
+    /// The chat's visible height: a generated image fits in it whole.
+    @Environment(\.visibleChatHeight) private var visibleChatHeight
     let message: ChatMessage
     let showReasoning: Bool
     /// Debug view of the tool calls (Pref.showToolCalls): call id -> the
@@ -103,13 +105,18 @@ struct MessageBubble: View {
             // A generated image is the answer: large and centred, as wide as
             // the chat allows (the popover's whole width, up to 640 in the
             // window). One the user attached stays a thumbnail by their text.
-            let side: CGFloat = isUser ? 280 : Self.generatedImageSide
+            // Never taller than the chat shows at once (the popover's is
+            // short), nor enlarged past its own pixels (a small one blurs).
+            let pixels = nsImage.representations.map { CGFloat(max($0.pixelsWide, $0.pixelsHigh)) }.max() ?? 0
+            let natural = pixels > 0 ? pixels : max(nsImage.size.width, nsImage.size.height)
+            let side = min(isUser ? 280 : Self.generatedImageSide, natural)
+            let height = isUser ? side : min(side, max(160, visibleChatHeight - 56))
             VStack(alignment: isUser ? .trailing : .center, spacing: 6) {
                 Image(nsImage: nsImage)
                     .resizable()
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: side, maxHeight: side)
+                    .frame(maxWidth: side, maxHeight: height)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.primary.opacity(0.08)))
                     .shadow(color: .black.opacity(isUser ? 0 : 0.18), radius: 8, y: 3)
@@ -143,7 +150,20 @@ struct MessageBubble: View {
 }
 
 /// Step progress and the live preview while an image is being generated.
+private struct VisibleChatHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 640
+}
+
+extension EnvironmentValues {
+    /// The chat's scroll view height (ContentView), for sizing images.
+    var visibleChatHeight: CGFloat {
+        get { self[VisibleChatHeightKey.self] }
+        set { self[VisibleChatHeightKey.self] = newValue }
+    }
+}
+
 struct ImageGenerationProgressView: View {
+    @Environment(\.visibleChatHeight) private var visibleChatHeight
     @EnvironmentObject var chat: ChatClient
 
     var body: some View {
@@ -168,7 +188,8 @@ struct ImageGenerationProgressView: View {
                     .resizable()
                     .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: MessageBubble.generatedImageSide, maxHeight: MessageBubble.generatedImageSide)
+                    .frame(maxWidth: MessageBubble.generatedImageSide,
+                           maxHeight: min(MessageBubble.generatedImageSide, max(160, visibleChatHeight - 56)))
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .opacity(0.85)
                     .frame(maxWidth: .infinity, alignment: .center)
