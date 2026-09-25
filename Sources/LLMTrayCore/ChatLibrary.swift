@@ -41,13 +41,25 @@ public struct ChatLibrary: Codable, Equatable {
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        projects = try c.decodeIfPresent([Project].self, forKey: .projects) ?? []
-        pinned = try c.decodeIfPresent([UUID].self, forKey: .pinned) ?? []
-        let byChat = try c.decodeIfPresent([String: String].self, forKey: .projectOfChat) ?? [:]
-        projectOfChat = Dictionary(uniqueKeysWithValues: byChat.compactMap { chat, project in
-            guard let chat = UUID(uuidString: chat), let project = UUID(uuidString: project) else { return nil }
-            return (chat, project)
-        })
+        // Element by element: one bad entry drops itself, not the file.
+        projects = ((try? c.decodeIfPresent([Lossy<Project>].self, forKey: .projects)) ?? nil)?.compactMap(\.value) ?? []
+        pinned = ((try? c.decodeIfPresent([Lossy<UUID>].self, forKey: .pinned)) ?? nil)?.compactMap(\.value) ?? []
+        var byChat: [(String, String)] = []
+        if let object = try? c.decodeIfPresent([String: String].self, forKey: .projectOfChat) {
+            byChat = object.map { ($0.key, $0.value) }
+        } else if let flat = try? c.decodeIfPresent([String].self, forKey: .projectOfChat) {
+            // The pairs a [UUID: UUID] encodes as by default (an early build).
+            byChat = stride(from: 0, to: flat.count - 1, by: 2).map { (flat[$0], flat[$0 + 1]) }
+        }
+        projectOfChat = [:]
+        for (chat, project) in byChat {
+            if let chat = UUID(uuidString: chat), let project = UUID(uuidString: project) { projectOfChat[chat] = project }
+        }
+    }
+
+    private struct Lossy<Value: Decodable>: Decodable {
+        let value: Value?
+        init(from decoder: Decoder) throws { value = try? Value(from: decoder) }
     }
 
     public func encode(to encoder: Encoder) throws {

@@ -27,11 +27,16 @@ struct ChatSidebar: View {
     @FocusState private var searchFocused: Bool
     @FocusState private var chatRenameFocused: Bool
     @FocusState private var projectRenameFocused: Bool
+    /// The rename field got focus: losing it now commits (like Finder).
+    /// Reset when another rename starts, whose field replacing this one
+    /// drops the focus too.
+    @State private var renameHadFocus = false
 
     private static let recentsShown = 25
     /// Re-read every few minutes: a window left open overnight regroups.
     @State private var now = Date()
-    private let clock = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
+    /// One for the app: a view's own would restart with every re-render.
+    private static let clock = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -51,7 +56,9 @@ struct ChatSidebar: View {
             }
         }
         .background(.regularMaterial)
-        .onReceive(clock) { now = $0 }
+        .onReceive(Self.clock) { now = $0 }
+        // The popover's overlay: typing searches, and Esc closes it.
+        .onAppear { if closesOnOpen { searchFocused = true } }
         .confirmationDialog(
             Text("Delete this chat?"), isPresented: Binding(get: { chatToDelete != nil }, set: { if !$0 { chatToDelete = nil } }),
             presenting: chatToDelete
@@ -196,7 +203,9 @@ struct ChatSidebar: View {
                 .onSubmit { commitRename(summary.id) }
                 .onExitCommand { renaming = nil }
                 // Clicking elsewhere ends it, like Finder.
-                .onChange(of: chatRenameFocused) { if !$0 { renaming = nil } }
+                .onChange(of: chatRenameFocused) { focused in
+                    if focused { renameHadFocus = true } else if renameHadFocus { commitRename(summary.id) }
+                }
                 .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
@@ -246,12 +255,11 @@ struct ChatSidebar: View {
             TextField("Project name", text: $projectDraft)
                 .textFieldStyle(.roundedBorder)
                 .focused($projectRenameFocused)
-                .onSubmit {
-                    store.renameProject(project.id, to: projectDraft)
-                    renamingProject = nil
-                }
+                .onSubmit { commitProjectRename(project.id) }
                 .onExitCommand { renamingProject = nil }
-                .onChange(of: projectRenameFocused) { if !$0 { renamingProject = nil } }
+                .onChange(of: projectRenameFocused) { focused in
+                    if focused { renameHadFocus = true } else if renameHadFocus { commitProjectRename(project.id) }
+                }
                 .onAppear { DispatchQueue.main.async { projectRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
@@ -272,6 +280,7 @@ struct ChatSidebar: View {
             .buttonStyle(SidebarRowStyle(isSelected: false))
             .contextMenu {
                 Button("Rename…") {
+                    renameHadFocus = false
                     renaming = nil
                     projectDraft = project.name
                     renamingProject = project.id
@@ -294,14 +303,24 @@ struct ChatSidebar: View {
     }
 
     private func startRename(_ summary: ChatSummary, in section: String) {
+        renameHadFocus = false
         renamingProject = nil
         chatDraft = summary.title
         renaming = (summary.id, section)
     }
 
     private func commitRename(_ id: UUID) {
-        store.rename(id, to: chatDraft, chat: chat)
+        guard renaming?.chat == id else { return }
         renaming = nil
+        renameHadFocus = false
+        store.rename(id, to: chatDraft, chat: chat)
+    }
+
+    private func commitProjectRename(_ id: UUID) {
+        guard renamingProject == id else { return }
+        renamingProject = nil
+        renameHadFocus = false
+        store.renameProject(id, to: projectDraft)
     }
 
     /// A project named "New project" (numbered if taken), renamed in place.
@@ -312,6 +331,7 @@ struct ChatSidebar: View {
         let name = names.contains(base) ? (2...).lazy.map { "\(base) \($0)" }.first { !names.contains($0) }! : base
         guard let project = store.addProject(named: name) else { return nil }
         collapsedProjects.remove(project.id)
+        renameHadFocus = false
         renaming = nil
         projectDraft = project.name
         renamingProject = project.id

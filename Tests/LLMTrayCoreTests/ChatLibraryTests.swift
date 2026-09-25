@@ -103,6 +103,16 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(ChatLibrary.self, from: Data(partial.utf8)).pinned, [chat])
     }
 
+    func testLibraryFileSurvivesBadEntriesAndTheOldLayout() throws {
+        let chat = UUID(), project = UUID()
+        let bad = #"{"pinned":["not-a-uuid","\#(chat.uuidString)"],"projects":[{"name":"no id"},{"id":"\#(project.uuidString)","name":"ok"}]}"#
+        let library = try JSONDecoder().decode(ChatLibrary.self, from: Data(bad.utf8))
+        XCTAssertEqual(library.pinned, [chat])
+        XCTAssertEqual(library.projects.map(\.name), ["ok"])
+        let flat = #"{"projectOfChat":["\#(chat.uuidString)","\#(project.uuidString)"]}"#
+        XCTAssertEqual(try JSONDecoder().decode(ChatLibrary.self, from: Data(flat.utf8)).projectOfChat, [chat: project])
+    }
+
     func testCleanedTitle() {
         XCTAssertEqual(cleanedChatTitle("\"Где взять Apple Developer ID.\""), "Где взять Apple Developer ID")
         XCTAssertEqual(cleanedChatTitle("Title: **License comparison**\nSome explanation"), "License comparison")

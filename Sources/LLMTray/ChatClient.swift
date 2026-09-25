@@ -202,7 +202,6 @@ final class ChatClient: ObservableObject {
               let question = messages.first(where: { $0.role == "user" && !$0.isToolContext }),
               let answer = messages.last(where: { $0.role == "assistant" && !$0.content.isEmpty && !$0.isSummary })
         else { return }
-        titleIsFinal = true
         let epoch = conversationEpoch
         let revision = titleRevision
         let requestMessages: [[String: Any]] = [
@@ -210,6 +209,7 @@ final class ChatClient: ObservableObject {
             ["role": "user", "content": "User: \(question.content.prefix(1500))\n\nAssistant: \(answer.content.prefix(1500))"],
         ]
         guard let request = ChatRequestBuilder.completion(port: port, modelAlias: modelAlias, messages: requestMessages) else { return }
+        titleIsFinal = true
         titleTask = Task { [weak self] in
             guard let raw = try? await ChatTransport.completion(request), !Task.isCancelled,
                   let title = cleanedChatTitle(raw),
@@ -227,7 +227,7 @@ final class ChatClient: ObservableObject {
     /// no image (an image-only tool-call-carrier message is real content
     /// now that images are persisted, not plumbing to discard).
     private func persistCurrentSession() {
-        guard let sessionID = currentSessionID else { return }
+        guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
 
@@ -265,7 +265,6 @@ final class ChatClient: ObservableObject {
             currentSessionTitle = String(firstUser.content.prefix(48))
         }
         let title = currentSessionTitle.isEmpty ? "New chat" : currentSessionTitle
-        guard hasUnsavedChanges else { return }
         let file = ChatSessionFile(
             id: sessionID,
             title: title,
