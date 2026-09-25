@@ -135,15 +135,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         // The `Settings { EmptyView() }` scene below exists only because
         // SwiftUI's App protocol requires *some* Scene -- but macOS can
-        // still materialize it as a real, visible, empty "LLMTray Settings"
-        // window (seen via window-state restoration once anything ever
-        // triggered it, e.g. an accidental Cmd+,). Filtering by its exact
-        // title (rather than closing every NSApp.windows entry) matters:
-        // closing indiscriminately here previously took down the popover's
-        // own not-yet-shown internal window along with it, leaving the
-        // status item non-interactive for the rest of the run.
-        DispatchQueue.main.async {
-            NSApp.windows.filter { $0.title == "LLMTray Settings" }.forEach { $0.close() }
+        // still materialize it as a real, visible, empty settings window
+        // (window-state restoration, e.g. after the relaunch a language
+        // change asks for, or the app menu's Settings… item). Wherever it
+        // turns up it's replaced by the real Settings window. Matched by
+        // SwiftUI's identifier for that window, not its title: the title is
+        // localized ("LLMTray Settings" matched English only), and closing
+        // every NSApp.windows entry previously took down the popover's own
+        // not-yet-shown internal window, leaving the status item
+        // non-interactive for the rest of the run.
+        // Key, or just shown: in an accessory app it's shown without
+        // becoming key, and didUpdate is the only public notification then.
+        for name in [NSWindow.didBecomeKeyNotification, NSWindow.didUpdateNotification] {
+            NotificationCenter.default.addObserver(self, selector: #selector(replaceSettingsScene), name: name, object: nil)
+        }
+        DispatchQueue.main.async { [self] in
+            let restored = closeSettingsScene()
+            let pane = UserDefaults.standard[Pref.settingsPaneAfterRelaunch].flatMap(SettingsPane.init(rawValue:))
+            UserDefaults.standard[Pref.settingsPaneAfterRelaunch] = nil
+            if let pane {
+                settingsWindow.show(pane: pane)
+            } else if restored {
+                settingsWindow.show()
+            }
         }
 
         // Starts the server automatically instead of making "click Start
@@ -346,6 +360,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showSettingsWindow() {
         popover.performClose(nil)
         settingsWindow.show()
+    }
+
+    /// Closes the empty SwiftUI Settings scene window if it's there; true
+    /// when it was visible.
+    @discardableResult
+    private func closeSettingsScene() -> Bool {
+        let scene = NSApp.windows.filter { $0.identifier?.rawValue == "com_apple_SwiftUI_Settings_window" }
+        let visible = scene.contains { $0.isVisible }
+        scene.forEach {
+            $0.isRestorable = false
+            $0.close()
+        }
+        return visible
+    }
+
+    @objc private func replaceSettingsScene(_ note: Notification) {
+        guard let window = note.object as? NSWindow, window.isVisible,
+              window.identifier?.rawValue == "com_apple_SwiftUI_Settings_window" else { return }
+        // After the notification: closing a window inside its own
+        // didBecomeKey is asking for trouble.
+        DispatchQueue.main.async { [self] in
+            if closeSettingsScene() { settingsWindow.show() }
+        }
     }
 
     @objc private func showSettingsFromNotification(_ note: Notification) {
