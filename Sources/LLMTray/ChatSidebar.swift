@@ -27,7 +27,7 @@ struct ChatSidebar: View {
     @State private var projectToDelete: ChatLibrary.Project?
     @State private var collapsedProjects: Set<UUID> = []
     /// Where a dragged chat would land: a project's id, "pinned" or
-    /// "recents".
+    /// "recents-<age>".
     @State private var dropTarget: String?
     @FocusState private var searchFocused: Bool
     @FocusState private var chatRenameFocused: Bool
@@ -203,6 +203,9 @@ struct ChatSidebar: View {
             .padding(.horizontal, 8)
             .padding(.top, 10)
             .padding(.bottom, 2)
+            // The whole width: a drop target, not just the word.
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
     }
 
     // MARK: - Rows
@@ -304,9 +307,14 @@ struct ChatSidebar: View {
                     Spacer(minLength: 0)
                 }
             }
-            .buttonStyle(SidebarRowStyle(isSelected: dropTarget == project.id.uuidString))
+            .buttonStyle(SidebarRowStyle(isSelected: false))
             .dropZone(project.id.uuidString, $dropTarget) {
-                acceptChats($0) { store.move($0, to: project.id) }
+                // Unpinned too: a pinned chat shows under Pinned only, so it
+                // would seem not to have moved.
+                acceptChats($0) { id in
+                    store.move(id, to: project.id)
+                    store.setPinned(id, false)
+                }
             }
             .contextMenu {
                 Button("Rename…") {
