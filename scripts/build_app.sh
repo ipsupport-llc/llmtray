@@ -29,7 +29,9 @@ cd "$REPO_ROOT"
 swift build -c release
 
 RELEASE_DIR="$REPO_ROOT/.build/release"
-SPARKLE_FRAMEWORK="$(find "$REPO_ROOT/.build" -maxdepth 4 -iname "Sparkle.framework" -path "*/release/*" | head -1)"
+# -ipath: Swift 6.4+ builds into .build/out/Products/Release (capital R),
+# older toolchains into .build/<triple>/release.
+SPARKLE_FRAMEWORK="$(find "$REPO_ROOT/.build" -maxdepth 4 -iname "Sparkle.framework" -ipath "*/release/*" | head -1)"
 if [[ -z "$SPARKLE_FRAMEWORK" ]]; then
   echo "error: could not locate built Sparkle.framework under .build/" >&2
   exit 1
