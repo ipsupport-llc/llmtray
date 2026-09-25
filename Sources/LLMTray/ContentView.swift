@@ -41,7 +41,10 @@ struct ContentView: View {
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
     @State private var modelMaxContext: Int = 32768
+    // Starts true: a new view (the chat just moved between the popover and
+    // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
 
@@ -199,6 +202,16 @@ struct ContentView: View {
                 })
             }
             .coordinateSpace(name: "chatScroll")
+            // A freshly built view starts at the top of the conversation;
+            // it opens at the latest message instead, matching
+            // followChatBottom. Once per view: reopening the popover keeps
+            // the reader's place, as it always has.
+            .onAppear {
+                guard !didScrollOnAppear else { return }
+                didScrollOnAppear = true
+                // After the first layout, or there's nothing to scroll yet.
+                DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+            }
             .background(GeometryReader { g in
                 Color.clear.onAppear { chatViewportHeight = g.size.height }
                     .onChange(of: g.size.height) { chatViewportHeight = $0 }
