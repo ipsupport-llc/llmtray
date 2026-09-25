@@ -371,7 +371,7 @@ final class ServerManager: ObservableObject {
     private func launchAndWaitReady(modelPath: String, alias: String, epoch: Int) async throws {
         if let old = process { await old.waitForExit() }
         try checkNotStopped(epoch)
-        await Self.reapOrphanedServer(port: internalPort)
+        await reapOrphans()
         try checkNotStopped(epoch)
         state = .starting
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -613,44 +613,43 @@ final class ServerManager: ObservableObject {
         state = .failed(message)
     }
 
-    /// An mlx_lm.server of ours left on the internal port by an LLMTray
-    /// that crashed or was force-quit (only a normal quit / SIGTERM stops
-    /// it): it holds its model's memory and the port. Ours = mlx_lm.server
-    /// on this port, with no parent left and LLMTray's marker in its
-    /// environment (ServerProcess); anything else -- a user's own server
-    /// too -- is left alone (the launch then fails on the port, saying so).
-    nonisolated static func reapOrphanedServer(port: Int) async {
-        _ = try? await ProcessRunner.offMain { () -> Bool in
-            func output(_ tool: String, _ args: [String]) -> String {
-                let p = Process()
-                p.executableURL = URL(fileURLWithPath: tool)
-                p.arguments = args
-                let pipe = Pipe()
-                p.standardOutput = pipe
-                p.standardError = FileHandle.nullDevice
-                guard (try? p.run()) != nil else { return "" }
-                let data = pipe.fileHandleForReading.readDataToEndOfFile()
-                p.waitUntilExit()
-                return String(decoding: data, as: UTF8.self)
-            }
-            let pids = output("/usr/sbin/lsof", ["-nP", "-iTCP:\(port)", "-sTCP:LISTEN", "-t"])
-                .split(separator: "\n").compactMap { Int32($0.trimmingCharacters(in: .whitespaces)) }
-            for pid in pids where pid != getpid() {
-                // "  1 /…/Python -m mlx_lm.server --model … --port 18765 …":
-                // the venv's python execs the framework's, so the command
-                // doesn't show our folder -- ours is mlx_lm.server on our
-                // internal port, orphaned (its parent, an LLMTray, is gone).
-                // -E: with its environment (ours carries the marker).
-                let line = output("/bin/ps", ["-E", "-o", "ppid=,command=", "-p", String(pid)]).trimmingCharacters(in: .whitespaces)
-                let ppid = Int32(line.split(separator: " ").first ?? "")
-                guard ppid == 1, line.contains("mlx_lm.server"), line.contains("--port \(port)"),
-                      line.contains("\(ServerProcess.ownerMarker)=1") else { continue }
-                kill(pid, SIGTERM)
-                for _ in 0..<30 where kill(pid, 0) == 0 { usleep(100_000) }
-                if kill(pid, 0) == 0 { kill(pid, SIGKILL) }
-            }
-            return true
+    /// Stops what earlier LLMTray runs left behind -- a model server or an
+    /// image-generation runner of an LLMTray that crashed or was
+    /// force-quit (only a normal quit / SIGTERM stops them), still holding
+    /// its model's memory, on any port. Which processes count is
+    /// OrphanScan's: only ours, never a user's own mlx_lm.server. Run at
+    /// launch (before auto-start) and before every server start.
+    func reapOrphans() async {
+        for orphan in await Self.stopOrphans() {
+            let what = orphan.kind == .modelServer ? "model server" : "image-generation runner"
+            let model = orphan.model.map { ", \($0)" } ?? ""
+            let memory = ByteCountFormatter.string(fromByteCount: orphan.residentBytes, countStyle: .memory)
+            appendLog("--- stopped a leftover \(what) from an earlier LLMTray run (PID \(orphan.pid)\(model), \(memory)) ---\n")
         }
+    }
+
+    /// SIGTERM, then SIGKILL after 3 s: what `ps` shows as ours and
+    /// orphaned. Returns what it stopped.
+    nonisolated static func stopOrphans() async -> [OrphanProcess] {
+        (try? await ProcessRunner.offMain { () -> [OrphanProcess] in
+            let ps = Process()
+            ps.executableURL = URL(fileURLWithPath: "/bin/ps")
+            ps.arguments = OrphanScan.psArguments
+            let pipe = Pipe()
+            ps.standardOutput = pipe
+            ps.standardError = FileHandle.nullDevice
+            guard (try? ps.run()) != nil else { return [] }
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            ps.waitUntilExit()
+            let orphans = OrphanScan.orphans(inPSOutput: String(decoding: data, as: UTF8.self))
+                .filter { $0.pid != getpid() }
+            for orphan in orphans { kill(orphan.pid, SIGTERM) }
+            for orphan in orphans {
+                for _ in 0..<30 where kill(orphan.pid, 0) == 0 { usleep(100_000) }
+                if kill(orphan.pid, 0) == 0 { kill(orphan.pid, SIGKILL) }
+            }
+            return orphans
+        }) ?? []
     }
 
     /// Unlike stop(), waits for the old process to exit (the replacement

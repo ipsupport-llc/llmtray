@@ -16,15 +16,13 @@ final class ServerProcess {
     /// Called once, after the exit waiters are released.
     var onExit: ((ServerProcess) -> Void)?
 
-    nonisolated static let ownerMarker = "LLMTRAY_SERVER"
-
     init(executable: String, arguments: [String]) {
         task.executableURL = URL(fileURLWithPath: executable)
         task.arguments = arguments
-        // Marks the process as LLMTray's (ServerManager.reapOrphanedServer
-        // tells an orphan of ours from a user's own mlx_lm.server by it).
+        // Marks the process as LLMTray's (OrphanScan tells an orphan of ours
+        // from a user's own mlx_lm.server by it).
         var environment = ProcessInfo.processInfo.environment
-        environment[Self.ownerMarker] = "1"
+        environment[OrphanScan.serverMarker] = "1"
         task.environment = environment
         task.standardInput = FileHandle.nullDevice
         let pipe = Pipe()

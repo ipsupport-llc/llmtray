@@ -267,6 +267,9 @@ final class MfluxManager: ObservableObject {
             // The model is local: no Hub lookups (nor their cache writes,
             // from a temporary chat).
             "HF_HUB_OFFLINE": "1",
+            // Ours: a runner left behind by a crash is stopped at the
+            // next launch (OrphanScan).
+            OrphanScan.imageRunnerMarker: "1",
         ], onLine: { [weak self] line in
             guard let message = MfluxRunnerMessage(line: line) else { return }
             switch message {
