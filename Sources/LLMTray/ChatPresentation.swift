@@ -24,21 +24,32 @@ final class ChatPresentation: ObservableObject {
     /// The conversation the running turn belongs to (auto-compaction).
     private var turnConversation: Int?
     private var cancellables: Set<AnyCancellable> = []
+    /// Busy changes seen so far (see init).
+    private var busyChanges = 0
 
     init(chat: ChatClient) {
         self.chat = chat
-        // Received a main-loop turn later: @Published emits in willSet,
+        // Acted on a main-loop turn later: @Published emits in willSet,
         // inside ChatClient's own state changes -- opening another chat
         // clears the busy flags in cancel() before the epoch moves on, and a
         // Stop clears them before the cancelled tool calls get their results.
         // Acting there compacted the chat just opened, or checked the
-        // threshold against a history about to grow.
+        // threshold against a history about to grow. Each change carries the
+        // conversation it happened in, read as it happens (read later, a
+        // tool round's busy again could belong to a chat opened meanwhile),
+        // and its place in line: only the latest one acts (a Stop mid tool
+        // round delivers idle, busy, idle at once -- both idles saw idle).
+        let chat = chat
         Publishers.CombineLatest3(chat.$isStreaming, chat.$isGeneratingImage, chat.$isRunningTools)
             .map { $0 || $1 || $2 }
             .removeDuplicates()
             .dropFirst()
+            .map { [weak self] busy -> BusyChange in
+                self?.busyChanges += 1
+                return BusyChange(busy: busy, conversation: chat.conversationEpoch, number: self?.busyChanges ?? 0)
+            }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] busy in self?.turnInProgressChanged(busy) }
+            .sink { [weak self] in self?.turnInProgressChanged($0) }
             .store(in: &cancellables)
         NotificationCenter.default.publisher(for: .modelsDidChange)
             .receive(on: DispatchQueue.main)
@@ -50,13 +61,20 @@ final class ChatPresentation: ObservableObject {
     /// signal: send()/regenerate() don't await the turn. Only in the chat it
     /// started in: opening another one ends the turn too, and that one
     /// mustn't be compacted for it.
-    private func turnInProgressChanged(_ busy: Bool) {
-        if busy {
-            turnConversation = chat.conversationEpoch
-        } else if let epoch = turnConversation, epoch == chat.conversationEpoch,
+    private func turnInProgressChanged(_ change: BusyChange) {
+        if change.busy {
+            turnConversation = change.conversation
+        } else if change.number == busyChanges, turnConversation == change.conversation,
+                  change.conversation == chat.conversationEpoch,
                   !chat.isTurnInProgress {  // not a tool round's hand-off
-            autoCompactIfNeeded(epoch: epoch)
+            autoCompactIfNeeded(epoch: change.conversation)
         }
+    }
+
+    private struct BusyChange {
+        let busy: Bool
+        let conversation: Int
+        let number: Int
     }
 
     /// A Hugging Face download finished: jump to the model that just landed
