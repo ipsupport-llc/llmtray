@@ -62,7 +62,7 @@ final class ChatClient: ObservableObject {
     private var decoder = SSEDecoder()
     // See resetConversationState(): async continuations capture this and
     // drop their result if the conversation was replaced meanwhile.
-    private var conversationEpoch = 0
+    private(set) var conversationEpoch = 0
     private var approxCompletionTokens: Int = 0
     private var usageCompletionTokens: Int?
     private var assistantMessageIndex: Int?
@@ -145,11 +145,14 @@ final class ChatClient: ObservableObject {
         let imagesDir = ChatSessionStore.imagesDir(for: file.id)
         messages = file.messages.map { pm in
             let images = pm.imageFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
-            return ChatMessage(
+            var message = ChatMessage(
                 role: pm.role, content: pm.content, reasoning: pm.reasoning, images: images,
                 imageDurations: pm.imageDurations, imagePrompts: pm.imagePrompts, isSummary: pm.isSummary,
                 sources: pm.sources
             )
+            // The files they came from: saved again under the same names.
+            message.imageFilenames = images.count == pm.imageFilenames.count ? pm.imageFilenames : []
+            return message
         }
         currentSessionID = file.id
         currentSessionTitle = file.title
@@ -175,7 +178,9 @@ final class ChatClient: ObservableObject {
             // Keyed by this message's own (stable for its lifetime) id, so
             // re-persisting the same session after a later turn doesn't
             // re-derive different filenames for images already on disk.
-            let filenames = msg.images.enumerated().map { i, _ in "\(msg.id.uuidString)-\(i).png" }
+            let filenames = msg.images.enumerated().map { i, _ in
+                i < msg.imageFilenames.count ? msg.imageFilenames[i] : "\(msg.id.uuidString)-\(i).png"
+            }
             for (i, data) in msg.images.enumerated() {
                 pendingImageWrites.append((imagesDir + "/" + filenames[i], data))
             }
@@ -190,8 +195,13 @@ final class ChatClient: ObservableObject {
         if !pendingImageWrites.isEmpty {
             try? FileManager.default.createDirectory(atPath: imagesDir, withIntermediateDirectories: true)
             for (path, data) in pendingImageWrites where !FileManager.default.fileExists(atPath: path) {
-                try? data.write(to: URL(fileURLWithPath: path))
+                try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
             }
+        }
+        // Images no message refers to any more (compacted, regenerated).
+        let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
+        for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
+            try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
         }
 
         if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
@@ -235,11 +245,26 @@ final class ChatClient: ObservableObject {
         isCompacting = false
     }
 
+    /// The part compaction replaces: from the first user turn at or after
+    /// `keepStart` to the last one starting at or before `count - keepEnd`
+    /// -- whole turns only (a tool round split across the cut would leave
+    /// a tool result without its call, or a call without results), and
+    /// only up to the first turn with an image (it would be gone from the
+    /// chat). Nil when there's nothing worth it.
+    static func compactionRange(_ messages: [ChatMessage], keepStart: Int, keepEnd: Int) -> Range<Int>? {
+        func isTurnStart(_ i: Int) -> Bool { messages[i].role == "user" && !messages[i].isToolContext }
+        guard messages.count > keepStart + keepEnd + 1 else { return nil }
+        guard let start = (keepStart..<messages.count).first(where: isTurnStart) else { return nil }
+        var end = messages.count - keepEnd
+        if let image = messages.indices.first(where: { $0 >= start && !messages[$0].images.isEmpty }) { end = min(end, image) }
+        while end > start, end < messages.count, !isTurnStart(end) { end -= 1 }
+        guard end > start + 1, end < messages.count else { return nil }
+        return start..<end
+    }
+
     private func runCompaction(port: Int, modelAlias: String, keepStart: Int, keepEnd: Int) async {
-        guard messages.count > keepStart + keepEnd + 1 else { return }
-        let middleRange = keepStart..<(messages.count - keepEnd)
+        guard let middleRange = Self.compactionRange(messages, keepStart: keepStart, keepEnd: keepEnd) else { return }
         let middle = Array(messages[middleRange])
-        guard !middle.isEmpty else { return }
 
         let transcript = middle.map { msg -> String in
             let speaker = msg.role == "user" ? "User" : (msg.role == "tool" ? "Tool result" : "Assistant")
@@ -286,6 +311,9 @@ final class ChatClient: ObservableObject {
     /// previous assistant reply (if any) so the retry doesn't just pile up
     /// underneath a garbled/unhelpful one, then asks again with the exact
     /// same prompt.
+    /// Saves what's there now (app quit).
+    func saveNow() { persistCurrentSession() }
+
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
         toolbox.startTurn()
@@ -353,6 +381,10 @@ final class ChatClient: ObservableObject {
         isRunningTools = false
         compactionTask?.cancel()
         closeDanglingToolCalls()
+        // What there is so far (the user's message, a partial answer) is
+        // kept: Stop, a switch to another chat and quitting all come here.
+        dropEmptyAssistantPlaceholder()
+        persistCurrentSession()
     }
 
     /// Every tool call in the history must be answered by a tool result
@@ -391,6 +423,7 @@ final class ChatClient: ObservableObject {
         handle(decoder.finish())
         if let error = completion.error, (error as NSError).code != NSURLErrorCancelled {
             errorText = error.localizedDescription
+            dropEmptyAssistantPlaceholder()
         }
         finalizeTokensPerSecond(firstByte: completion.firstByteDate, endDate: completion.endDate)
         if completion.error != nil { closeDanglingToolCalls() }   // no follow-up: keep the history valid
@@ -421,7 +454,9 @@ final class ChatClient: ObservableObject {
         guard !afterError, let idx = assistantMessageIndex, idx < messages.count,
               !messages[idx].toolCalls.isEmpty, let context = pendingRequestContext else {
             isStreaming = false
-            if !afterError { persistCurrentSession() }
+            // After an error too: the history is valid (dangling tool calls
+            // closed), and the user's message must not be lost.
+            persistCurrentSession()
             return
         }
         let toolCalls = messages[idx].toolCalls
@@ -522,6 +557,7 @@ final class ChatClient: ObservableObject {
                 try await context.server.ensureModelLoaded()
             } catch {
                 errorText = "Failed to reload the chat model after image generation: \(error.localizedDescription)"
+                persistCurrentSession()   // the generated image is kept
                 return
             }
         }

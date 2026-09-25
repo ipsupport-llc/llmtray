@@ -86,23 +86,28 @@ public enum WebParsing {
         return collapsed.count > limit ? String(collapsed.prefix(limit - 1)) + "…" : collapsed
     }
 
+    private static let entity = try! NSRegularExpression(pattern: "&(amp|lt|gt|quot|apos|nbsp|#39|#[xX][0-9a-fA-F]+|#[0-9]+);")
+
+    /// In one pass: "&amp;lt;" is the text "&lt;", not "<".
     public static func decodeEntities(_ s: String) -> String {
         guard s.contains("&") else { return s }
-        var out = s
-        for (entity, char) in ["&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": "\"", "&#39;": "'", "&#x27;": "'", "&nbsp;": " "] {
-            out = out.replacingOccurrences(of: entity, with: char)
-        }
-        // numeric: &#8217; &#x2019;
-        let pattern = try! NSRegularExpression(pattern: "&#(x?)([0-9a-fA-F]+);")
-        let ns = out as NSString
+        let named = ["amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'", "nbsp": " ", "#39": "'"]
+        let ns = s as NSString
         var result = ""
         var last = 0
-        for m in pattern.matches(in: out, range: NSRange(location: 0, length: ns.length)) {
+        for m in entity.matches(in: s, range: NSRange(location: 0, length: ns.length)) {
             result += ns.substring(with: NSRange(location: last, length: m.range.location - last))
-            let hex = ns.substring(with: m.range(at: 1)) == "x"
-            let digits = ns.substring(with: m.range(at: 2))
-            if let code = UInt32(digits, radix: hex ? 16 : 10), let scalar = Unicode.Scalar(code) {
-                result.unicodeScalars.append(scalar)
+            let name = ns.substring(with: m.range(at: 1))
+            if let char = named[name] {
+                result += char
+            } else {
+                let hex = name.hasPrefix("#x") || name.hasPrefix("#X")
+                let digits = String(name.dropFirst(hex ? 2 : 1))
+                if let code = UInt32(digits, radix: hex ? 16 : 10), let scalar = Unicode.Scalar(code) {
+                    result.unicodeScalars.append(scalar)
+                } else {
+                    result += ns.substring(with: m.range)
+                }
             }
             last = m.range.location + m.range.length
         }

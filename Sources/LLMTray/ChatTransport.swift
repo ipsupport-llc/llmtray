@@ -65,6 +65,13 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
                 userInfo: [NSLocalizedDescriptionKey: "Unexpected response shape from the chat completion endpoint."]
             )
         }
+        // Cut off at max_tokens, or all of it spent reasoning: not an answer.
+        if choices.first?["finish_reason"] as? String == "length" {
+            throw NSError(domain: "ChatTransport", code: 2, userInfo: [NSLocalizedDescriptionKey: "the answer was cut off (token limit)"])
+        }
+        guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw NSError(domain: "ChatTransport", code: 3, userInfo: [NSLocalizedDescriptionKey: "the model returned an empty answer"])
+        }
         return content
     }
 

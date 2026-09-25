@@ -58,5 +58,6 @@ final class WebParsingTests: XCTestCase {
     func testTextLimit() {
         XCTAssertEqual(WebParsing.text("<p>hello   <b>world</b></p>", limit: 100), "hello world")
         XCTAssertEqual(WebParsing.text("abcdefghij", limit: 5), "abcd…")
+        XCTAssertEqual(WebParsing.decodeEntities("&amp;lt;b&amp;gt; &lt;i&gt; &#8217; &#x2019; &nbsp;&bogus; &#xZZ;"), "&lt;b&gt; <i> ’ ’  &bogus; &#xZZ;")
     }
 }

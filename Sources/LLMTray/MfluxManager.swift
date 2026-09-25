@@ -224,6 +224,11 @@ final class MfluxManager: ObservableObject {
         guard FileManager.default.fileExists(atPath: venvPython) else {
             throw MfluxError.processFailed("Image generation isn't set up -- turn it on again in Settings.")
         }
+        // Installed before the pin, or by an older app: its internals may
+        // not match the runner's.
+        guard installedMfluxVersion() == Self.mfluxVersion else {
+            throw MfluxError.processFailed("Image generation needs an update -- turn it off and on again in Settings.")
+        }
 
         let savedDir = savedModelDir(for: model)
         guard FileManager.default.fileExists(atPath: savedDir) else {
@@ -255,7 +260,12 @@ final class MfluxManager: ObservableObject {
             "--steps", model.stepCount,
             "--model", savedDir,
             "--base-model", model.mfluxModelName,
-        ], stdin: Data(prompt.utf8), environment: ["PYTHONDONTWRITEBYTECODE": "1"], onLine: { [weak self] line in
+        ], stdin: Data(prompt.utf8), environment: [
+            "PYTHONDONTWRITEBYTECODE": "1",
+            // The model is local: no Hub lookups (nor their cache writes,
+            // from a temporary chat).
+            "HF_HUB_OFFLINE": "1",
+        ], onLine: { [weak self] line in
             guard let message = MfluxRunnerMessage(line: line) else { return }
             switch message {
             case .image(let data):

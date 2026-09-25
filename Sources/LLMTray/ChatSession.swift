@@ -111,7 +111,8 @@ enum ChatSessionStore {
     static func save(_ file: ChatSessionFile) {
         try? FileManager.default.createDirectory(atPath: sessionsDir, withIntermediateDirectories: true)
         guard let data = try? encoder.encode(file) else { return }
-        try? data.write(to: URL(fileURLWithPath: path(for: file.id)))
+        // Atomic: a crash or a full disk mid-write mustn't lose the chat.
+        try? data.write(to: URL(fileURLWithPath: path(for: file.id)), options: .atomic)
         NotificationCenter.default.post(name: .sessionsDidChange, object: nil)
     }
 

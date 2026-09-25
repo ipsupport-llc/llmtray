@@ -826,7 +826,7 @@ struct UpdatesPane: View {
     private func uninstallRuntime() {
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Uninstall runtime data?", comment: "")
-        alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
+        alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
         alert.addButton(withTitle: NSLocalizedString("Uninstall", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         alert.alertStyle = .warning

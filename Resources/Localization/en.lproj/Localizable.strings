@@ -183,7 +183,7 @@
 "Regenerate" = "Regenerate";
 "Remove" = "Remove";
 "Remove attachment" = "Remove attachment";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.";
 "Rename" = "Rename";
 "Rename this profile" = "Rename this profile";
 "Rescan" = "Rescan";

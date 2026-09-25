@@ -28,7 +28,18 @@ enum ImageActions {
         )
         window.center()
         window.isReleasedWhenClosed = false
+        // Not in the saved window state: its title is the prompt (a
+        // temporary chat's included), and it's content, not layout.
+        window.isRestorable = false
         previewWindows.append(window)
+        // Released once closed (each holds its decoded image).
+        var observer: NSObjectProtocol?
+        observer = NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { note in
+            MainActor.assumeIsolated {
+                previewWindows.removeAll { $0 === note.object as? NSWindow }
+                if let observer { NotificationCenter.default.removeObserver(observer) }
+            }
+        }
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
