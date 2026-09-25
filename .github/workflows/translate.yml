@@ -38,18 +38,40 @@ jobs:
     runs-on: macos-14   # plutil (the .strings parser the checks use) is macOS-only
     steps:
       - uses: actions/checkout@v4
+      # One branch for the proposal: while its PR is open, what it already
+      # translated isn't translated (and paid for) again.
+      - name: Start from the open proposal's translations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Only an open one, and only keys main still lacks: a fix made on
+          # main since must not be overwritten by the proposal's version.
+          if [ -n "$(gh pr list --head translations/auto --state open --json number -q '.[].number')" ] \
+             && git fetch --quiet origin translations/auto; then
+            mkdir -p "$RUNNER_TEMP/proposal"
+            git archive FETCH_HEAD Resources/Localization | tar -x -C "$RUNNER_TEMP/proposal"
+            python3 scripts/l10n.py extract
+            python3 scripts/l10n.py import-missing "$RUNNER_TEMP/proposal/Resources/Localization"
+          fi
       - name: Refresh the English base from the sources
         run: python3 scripts/l10n.py extract
       - name: Translate missing strings
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          # Data, not shell source: the secret is in this step's environment.
+          LANGS: ${{ github.event.inputs.languages }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "::warning::OPENAI_API_KEY secret is not set -- skipping machine translation"
             exit 0
           fi
-          python3 scripts/l10n.py translate ${{ github.event.inputs.languages }}
+          if ! [[ "$LANGS" =~ ^[A-Za-z-]*( [A-Za-z-]+)*$ ]]; then
+            echo "::error::languages must be space-separated codes like 'de fr zh-Hans'"
+            exit 1
+          fi
+          # shellcheck disable=SC2086  # word splitting of the validated codes is intended
+          python3 scripts/l10n.py translate $LANGS
       - name: Check
         run: python3 scripts/l10n.py check
       - name: Open a pull request with the changes
@@ -60,13 +82,18 @@ jobs:
             echo "translations already up to date"
             exit 0
           fi
-          branch="translations/${{ github.run_id }}"
+          branch="translations/auto"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
+          git checkout -B "$branch"
           git add Resources/Localization
           git commit -m "Update translations (machine-translated missing strings)"
-          git push origin "$branch"
+          git push --force origin "$branch"
+          # The open proposal is updated by the push; only a new one is created.
+          if [ -n "$(gh pr list --head "$branch" --state open --json number -q '.[].number')" ]; then
+            echo "updated the open translations pull request"
+            exit 0
+          fi
           gh pr create --base main --head "$branch" \
             --title "Update translations" \
             --body "Machine-translated the UI strings missing from one or more languages (\`scripts/l10n.py translate\`, OpenAI). Existing translations are untouched. Placeholders were checked automatically; review the wording if you speak the language.

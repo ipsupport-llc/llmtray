@@ -14,6 +14,7 @@ and lists it in CFBundleLocalizations.
                               # format specifiers match; missing keys per
                               # language are reported, not an error
     scripts/l10n.py missing <lang>   # list untranslated keys (for translators)
+    scripts/l10n.py fix-order        # reordered translations -> positional %1$@
     scripts/l10n.py translate [lang ...] [--model M]
                               # machine-translate missing keys via OpenAI
                               # (OPENAI_API_KEY); a new code creates that
@@ -204,8 +205,67 @@ def load(path: Path) -> dict[str, str]:
     return json.loads(out.stdout)
 
 
+SPEC = re.compile(r"%(?:(\d+)\$)?(lld|ld|d|@|lf|f|\.\d+f)")
+
+
 def specifiers(s: str) -> list[str]:
-    return re.findall(r"%(?:\d+\$)?(?:lld|ld|d|@|lf|f|\.\d+f)", s)
+    return [m.group(0) for m in SPEC.finditer(s)]
+
+
+def _kind(conv: str) -> str:
+    # %d is 32-bit, %ld / %lld 64-bit: a translation mustn't narrow one.
+    if conv == "@":
+        return "object"
+    if conv.endswith("d"):
+        return "int32" if conv == "d" else "int64"
+    return "float"
+
+
+def arguments(s: str) -> dict[int, str] | None:
+    """Argument position -> kind (object / int / float), as String(format:)
+    reads them: plain specifiers take positions 1, 2, ... in order,
+    positional ones (%2$@) say theirs. None for a mix of the two, which
+    Foundation doesn't support. A translation must read the same arguments
+    as its key -- only comparing the specifiers, sorted, let a reordered
+    "%d ... %@" -> "%@ ... %d" through, and String(format:) then reads an
+    Int as an object: a crash."""
+    found = list(SPEC.finditer(s))
+    if not found:
+        return {}
+    positional = [m.group(1) is not None for m in found]
+    if any(positional) and not all(positional):
+        return None
+    if all(positional):
+        out: dict[int, str] = {}
+        for m in found:
+            pos, kind = int(m.group(1)), _kind(m.group(2))
+            if out.setdefault(pos, kind) != kind:
+                return None
+        return out
+    return {i + 1: _kind(m.group(2)) for i, m in enumerate(found)}
+
+
+def reorder_fix(key: str, value: str) -> str | None:
+    """A translation that reorders plain specifiers of different kinds,
+    rewritten with positions ("%@ ... %d" for key "%d ... %@" becomes
+    "%2$@ ... %1$d"); None if that can't be decided."""
+    want, have = arguments(key), arguments(value)
+    if want is None or have is None or want == have or sorted(want.values()) != sorted(have.values()):
+        return None
+    if any(m.group(1) for m in SPEC.finditer(value)):
+        return None
+    free = sorted(want)
+    out, last = [], 0
+    for m in SPEC.finditer(value):
+        kind = _kind(m.group(2))
+        pos = next((p for p in free if want[p] == kind), None)
+        if pos is None:
+            return None
+        free.remove(pos)
+        out.append(value[last:m.start()] + f"%{pos}${m.group(2)}")
+        last = m.end()
+    fixed = "".join(out) + value[last:]
+    return fixed if arguments(fixed) == want else None
 
 
 def languages() -> list[Path]:
@@ -235,7 +295,7 @@ def check() -> int:
             print(f"error: {e}")
             continue
         unknown = sorted(set(table) - set(base))
-        bad = [k for k, v in table.items() if k in base and sorted(specifiers(k)) != sorted(specifiers(v))]
+        bad = [k for k, v in table.items() if k in base and arguments(k) != arguments(v)]
         missing = sorted(set(base) - set(table))
         for k in bad:
             errors += 1
@@ -301,8 +361,10 @@ def _valid(key: str, value: str) -> str | None:
     """Why a translation is unusable, or None."""
     if not value.strip():
         return "empty"
-    if sorted(specifiers(key)) != sorted(specifiers(value)):
-        return f"format specifiers {specifiers(key)} vs {specifiers(value)}"
+    if arguments(key) != arguments(value):
+        fixed = reorder_fix(key, value)
+        if fixed is None:
+            return f"format specifiers {specifiers(key)} vs {specifiers(value)}"
     if len(value) > max(40, 3 * len(key)):
         return "far longer than the English"
     return None
@@ -382,7 +444,8 @@ def translate(codes: list[str], model: str, batch: int = 100) -> int:
                             failed += 1
                         print(f"  {code}: left in English ({why}): {k[:70]!r}", flush=True)
                 else:
-                    done[k] = v
+                    # A reordered translation gets positional specifiers.
+                    done[k] = reorder_fix(k, v) or v
             pending = retry
             if not pending:
                 break
@@ -414,6 +477,36 @@ def main() -> int:
         a = ap.parse_args(sys.argv[2:])
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         return translate(codes, a.model)
+    if cmd == "import-missing":
+        # Keys an open proposal (<dir>/<lang>.lproj) translated that this
+        # tree still lacks -- never overwriting what's here.
+        src = Path(sys.argv[2])
+        base_keys = sorted(load(BASE))
+        for lang in sorted(src.glob("*.lproj")):
+            theirs = lang / "Localizable.strings"
+            if not theirs.exists():
+                continue
+            code = lang.name.removesuffix(".lproj")
+            mine_path = LOC / lang.name / "Localizable.strings"
+            mine = load(mine_path) if mine_path.exists() else {}
+            added = {k: v for k, v in load(theirs).items() if k not in mine and k in base_keys and _valid(k, v) is None}
+            if added:
+                mine.update(added)
+                write_lang(code, mine, base_keys)
+                print(f"{lang.name}: {len(added)} from the open proposal")
+        return 0
+    if cmd == "fix-order":
+        # Rewrites reordered translations with positional specifiers.
+        base_keys = sorted(load(BASE))
+        for lang in languages():
+            table = load(lang / "Localizable.strings")
+            changed = {k: f for k, v in table.items() if (f := reorder_fix(k, v))}
+            if changed:
+                table.update(changed)
+                write_lang(lang.name.removesuffix(".lproj"), table, base_keys)
+                for k, v in changed.items():
+                    print(f"{lang.name}: {k!r} -> {v!r}")
+        return 0
     if cmd == "missing":
         lang = LOC / f"{sys.argv[2]}.lproj" / "Localizable.strings"
         table = load(lang) if lang.exists() else {}

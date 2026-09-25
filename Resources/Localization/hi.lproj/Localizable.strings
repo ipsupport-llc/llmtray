@@ -104,7 +104,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "एक GPU चरण में कितने अनुरोध बैच किए जाएँ। यह तभी मदद करता है जब कई क्लाइंट एक साथ सर्वर का उपयोग करें; ज़्यादा मेमोरी उपयोग करता है।";
 "How many tokens it generates per trial." = "हर ट्रायल में कितने टोकन जनरेट किए जाएँ।";
-"Hugging Face answered HTTP %d for %@." = "Hugging Face ने %@ के लिए HTTP %d उत्तर दिया।";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face ने %2$@ के लिए HTTP %1$d उत्तर दिया।";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ने %@ (HTTP %d) अस्वीकार कर दिया: यह सीमित, निजी है, या मौजूद नहीं है। यदि यह सीमित है तो huggingface.co/%@ पर लाइसेंस स्वीकार करें और Settings → Models में token जाँचें।";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "निष्क्रिय — अगला संदेश आने पर मॉडल फिर लोड होगा";

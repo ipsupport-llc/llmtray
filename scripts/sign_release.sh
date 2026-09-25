@@ -29,7 +29,11 @@ LENGTH="$(sed -n 's/.*length="\([0-9]*\)".*/\1/p' <<<"$ATTRS")"
 SPARKLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
 if [[ "$VERSION" == *-* ]]; then CHANNEL=beta; else CHANNEL=stable; fi
 
-TAG="$TAG" VERSION="$VERSION" SPARKLE_VERSION="$SPARKLE_VERSION" CHANNEL="$CHANNEL" \
+# The feed's minimum is the app's own (an older macOS must not be offered
+# an update that won't launch there).
+MIN_SYSTEM="$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$(dirname "$0")/../Resources/Info.plist")"
+
+TAG="$TAG" VERSION="$VERSION" SPARKLE_VERSION="$SPARKLE_VERSION" CHANNEL="$CHANNEL" MIN_SYSTEM="$MIN_SYSTEM" \
 SIGNATURE="$SIGNATURE" LENGTH="$LENGTH" SHA256="$(shasum -a 256 "$DMG" | cut -d' ' -f1)" OUT="$OUT" \
 python3 - <<'PY'
 import json, os
@@ -40,7 +44,7 @@ json.dump({
     "shortVersion": e["VERSION"],
     "sparkleVersion": e["SPARKLE_VERSION"],
     "channel": e["CHANNEL"],
-    "minimumSystemVersion": "13.0",
+    "minimumSystemVersion": e["MIN_SYSTEM"],
     "asset": "LLMTray.dmg",
     "length": int(e["LENGTH"]),
     "sha256": e["SHA256"],

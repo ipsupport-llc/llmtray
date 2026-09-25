@@ -98,6 +98,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pulseTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // One LLMTray at a time (the /Applications copy started at login and
+        // another from the DMG would both load a model): hand over and quit.
+        if let other = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+            .first(where: { $0 != .current && !$0.isTerminated }) {
+            other.activate()
+            NSApp.terminate(nil)
+            return
+        }
+        // Full build: the bundled runtime goes to Application Support now,
+        // not on the first Start -- an update installed before that (the
+        // feed carries the thin build) would take it away.
+        let server = self.server
+        Task { try? await MLXRuntimeInstaller.copyOutBundledRuntime(pinnedRef: nil, log: { server.appendLog($0) }) }
         _ = updaterController  // lazy: created (and its background checks started) at launch
         // Sparkle's automatic checks are periodic (about once a day), not per
         // launch. This quiet background check runs at every launch unless
@@ -501,6 +514,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // the main thread -- assumeIsolated bridges that gap for this
             // one call site.
             MainActor.assumeIsolated {
+                ProfileManager.shared.flushPendingWrites()
                 self?.killServerNow()
                 exit(0)
             }
