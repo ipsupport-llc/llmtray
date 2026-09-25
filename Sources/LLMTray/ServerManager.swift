@@ -593,8 +593,9 @@ final class ServerManager: ObservableObject {
     /// An mlx_lm.server of ours left on the internal port by an LLMTray
     /// that crashed or was force-quit (only a normal quit / SIGTERM stops
     /// it): it holds its model's memory and the port. Ours = mlx_lm.server
-    /// on this port with no parent left; anything else is
-    /// left alone (the launch then fails on the port, saying so).
+    /// on this port, with no parent left and LLMTray's marker in its
+    /// environment (ServerProcess); anything else -- a user's own server
+    /// too -- is left alone (the launch then fails on the port, saying so).
     nonisolated static func reapOrphanedServer(port: Int) async {
         _ = try? await ProcessRunner.offMain { () -> Bool in
             func output(_ tool: String, _ args: [String]) -> String {
@@ -616,9 +617,11 @@ final class ServerManager: ObservableObject {
                 // the venv's python execs the framework's, so the command
                 // doesn't show our folder -- ours is mlx_lm.server on our
                 // internal port, orphaned (its parent, an LLMTray, is gone).
-                let line = output("/bin/ps", ["-o", "ppid=,command=", "-p", String(pid)]).trimmingCharacters(in: .whitespaces)
+                // -E: with its environment (ours carries the marker).
+                let line = output("/bin/ps", ["-E", "-o", "ppid=,command=", "-p", String(pid)]).trimmingCharacters(in: .whitespaces)
                 let ppid = Int32(line.split(separator: " ").first ?? "")
-                guard ppid == 1, line.contains("mlx_lm.server"), line.contains("--port \(port)") else { continue }
+                guard ppid == 1, line.contains("mlx_lm.server"), line.contains("--port \(port)"),
+                      line.contains("\(ServerProcess.ownerMarker)=1") else { continue }
                 kill(pid, SIGTERM)
                 for _ in 0..<30 where kill(pid, 0) == 0 { usleep(100_000) }
                 if kill(pid, 0) == 0 { kill(pid, SIGKILL) }

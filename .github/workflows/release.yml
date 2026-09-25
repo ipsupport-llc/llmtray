@@ -83,10 +83,15 @@ jobs:
           # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
           # (the website's download links) keeps pointing at stable.
           prerelease: ${{ contains(github.ref_name, '-') }}
+      # make_latest has to go with the publishing request itself (GitHub
+      # applies it then; a draft's is ignored): an older maintenance
+      # release must not become "latest".
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release edit "$GITHUB_REF_NAME" --draft=false
+        run: |
+          id="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq ".[] | select(.tag_name == \"$GITHUB_REF_NAME\") | .id" | head -1)"
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$id" -F draft=false -f make_latest=legacy > /dev/null
       # A release created with GITHUB_TOKEN doesn't fire `release` events
       # for other workflows; a dispatch does. On main: the github-pages
       # environment only deploys from main.
