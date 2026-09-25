@@ -23,6 +23,9 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
         )
         window.title = NSLocalizedString("LLMTray — Chat", comment: "")
         window.isReleasedWhenClosed = false
+        // Chat content (temporary chats included: "nothing is ever saved")
+        // stays out of macOS's saved window state.
+        window.isRestorable = false
         super.init(window: window)
         window.delegate = self
         window.setFrameAutosaveName(Self.frameName)
