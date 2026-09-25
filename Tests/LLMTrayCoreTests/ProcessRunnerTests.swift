@@ -19,7 +19,7 @@ final class ProcessRunnerTests: XCTestCase {
         echo "to stderr" >&2
         printf 'last'
         """
-        try await ProcessRunner.runStreaming("/bin/sh", ["-c", script], onLine: lines.add)
+        try await ProcessRunner.runStreaming("/bin/sh", ["-c", script], onLine: { lines.add($0) })
         let got = lines.all
         XCTAssertEqual(got.count, 202, "200 short lines, the long one, and 'last' (no newline)")
         XCTAssertEqual(got.first, "line 1")
