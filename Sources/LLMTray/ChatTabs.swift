@@ -25,6 +25,8 @@ final class ChatTabs: ObservableObject {
     /// progress is shown there), not on whichever tab is open.
     private(set) lazy var imageModels = ChatClient(mflux: mflux)
     private var busyWatch: AnyCancellable?
+    /// Closed tabs still finishing something (see close).
+    private var closing: [ChatClient] = []
     private var sessionWatch: AnyCancellable?
 
     var selected: ChatClient { tabs[selectedIndex] }
@@ -44,6 +46,12 @@ final class ChatTabs: ObservableObject {
     /// (starting over here would stop its answer).
     func newChat() {
         if selected.isBusy { newTab() } else { selected.newSession() }
+    }
+
+    /// The same for a temporary chat.
+    func newTemporaryChat() {
+        if selected.isBusy { newTab() }
+        selected.newTemporaryChat()
     }
 
     /// A new tab with a new chat, selected.
@@ -67,12 +75,17 @@ final class ChatTabs: ObservableObject {
     /// a new chat (there's always one on screen).
     func close(_ index: Int) {
         guard tabs.indices.contains(index) else { return }
-        tabs[index].cancel()
         guard tabs.count > 1 else {
+            tabs[index].cancel()
             tabs[index].newSession()
             tabsChanged()
             return
         }
+        let closed = tabs[index]
+        closed.close()
+        // Still reloading the model after an image, say: counted as busy
+        // until it's done, so nothing restarts the server under it.
+        if closed.isBusy { closing.append(closed) }
         tabs.remove(at: index)
         if selectedIndex >= index, selectedIndex > 0 { selectedIndex -= 1 }
         tabsChanged()
@@ -91,7 +104,8 @@ final class ChatTabs: ObservableObject {
             return
         }
         guard let file = ChatSessionStore.load(id: sessionID) else { return }
-        if inNewTab {
+        // The tab on screen is answering: opening over it would stop that.
+        if inNewTab || selected.isBusy {
             let client = makeClient()
             client.loadSession(file)
             tabs.append(client)
@@ -105,6 +119,9 @@ final class ChatTabs: ObservableObject {
     /// Everything unsaved, before quitting.
     func saveAll() {
         tabs.forEach { $0.saveNow() }
+        // A chat first saved just now is reopened too (remember() otherwise
+        // runs a main-loop turn after the save, and there's none left).
+        remember()
     }
 
     // MARK: -
@@ -119,7 +136,7 @@ final class ChatTabs: ObservableObject {
     }
 
     private func tabsChanged() {
-        busyWatch = Publishers.MergeMany(tabs.map { tab in
+        busyWatch = Publishers.MergeMany((tabs + closing).map { tab in
             tab.objectWillChange.map { _ in () }.eraseToAnyPublisher()
         })
         .receive(on: DispatchQueue.main)
@@ -137,7 +154,12 @@ final class ChatTabs: ObservableObject {
     }
 
     private func updateBusy() {
-        let busy = tabs.contains { $0.isBusy }
+        if closing.contains(where: { !$0.isBusy }) {
+            closing.removeAll { !$0.isBusy }
+            tabsChanged()   // resubscribes without them
+            return
+        }
+        let busy = tabs.contains { $0.isBusy } || !closing.isEmpty
         if busy != isAnyBusy { isAnyBusy = busy }
         let streaming = tabs.contains { $0.isStreaming }
         if streaming != isAnyStreaming { isAnyStreaming = streaming }
@@ -163,8 +185,8 @@ final class ChatTabs: ObservableObject {
     }
 }
 
-/// The chat of the tab on screen, rebuilt when the tab changes (its scroll
-/// position, draft and state are that tab's).
+/// The chat of the tab on screen, rebuilt when the tab changes: its draft
+/// and state are that tab's; it opens at the latest message.
 struct ChatRoot: View {
     @ObservedObject private var tabs = ChatTabs.shared
     @EnvironmentObject private var presentation: ChatPresentation
@@ -174,7 +196,7 @@ struct ChatRoot: View {
         ContentView()
             .environmentObject(chat)
             .environmentObject(presentation.composer(for: chat))
-            .id(ObjectIdentifier(chat))
+            .id(chat.tabID)
     }
 }
 

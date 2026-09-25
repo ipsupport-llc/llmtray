@@ -85,7 +85,7 @@ struct ChatHeaderView: View {
                     // from -- an empty *persistent* session. A temporary chat is
                     // empty too, but this is the way back to a saved one.
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
-                Button { chat.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
+                Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
                     .help("New temporary chat -- nothing about it is ever saved")
                 Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {

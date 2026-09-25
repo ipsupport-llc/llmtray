@@ -182,15 +182,16 @@ final class MfluxManager: ObservableObject {
     /// from a confirmation flow in Settings (see ContentView) before
     /// flipping the feature on, not automatically.
     func downloadModel(_ model: ImageGenModel) async throws {
+        guard !isBusy else {
+            throw MfluxError.processFailed(NSLocalizedString("The image generator is busy -- try again once it's done.", comment: ""))
+        }
+        isBusy = true
+        defer { isBusy = false }
         try await ensurePackageInstalled()
         if FileManager.default.fileExists(atPath: savedModelDir(for: model)) { return }
 
-        isBusy = true
         statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
-        defer {
-            isBusy = false
-            statusText = ""
-        }
+        defer { statusText = "" }
 
         try FileManager.default.createDirectory(
             atPath: RuntimePaths.externalRuntimeDir + "/mflux_models", withIntermediateDirectories: true
@@ -239,6 +240,11 @@ final class MfluxManager: ObservableObject {
             throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))
         }
 
+        // Claimed before any suspension: two chat tabs (or a download) can't
+        // both run it -- each run can take most of this Mac's memory.
+        guard !isBusy else {
+            throw MfluxError.processFailed(NSLocalizedString("The image generator is busy with another chat -- try again once it's done.", comment: ""))
+        }
         isBusy = true
         statusText = NSLocalizedString("Generating image…", comment: "")
         stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)

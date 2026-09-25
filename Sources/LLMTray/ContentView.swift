@@ -13,6 +13,7 @@ struct ContentView: View {
     // ProfileManager): the selected model's profile, layered on Default.
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
+    @ObservedObject private var tabs = ChatTabs.shared
     // Owned by AppDelegate (ChatPresentation), not this view: the popover
     // and the chat window each build their own ContentView, and the draft
     // has to carry over between them.
@@ -52,7 +53,12 @@ struct ContentView: View {
         .onAppear {
             // Models added or removed in Finder / LM Studio since the last
             // look show up on opening, as they used to.
-            catalog.rescan()
+            // Not on every tab switch (the view is rebuilt per tab): a
+            // scan reads the models folder on the main thread.
+            if Date().timeIntervalSince(Self.lastRescan) > 5 {
+                Self.lastRescan = Date()
+                catalog.rescan()
+            }
             keepSelectionValid()
             modelDidChange(selectedModelID)
             isInputFocused = true
@@ -68,6 +74,11 @@ struct ContentView: View {
     private var popoverLayout: some View {
         VStack(spacing: 0) {
             ChatHeaderView(selectedModelID: $selectedModelID, toggleSidebar: { setSidebarOverlay(!showsSidebarOverlay) })
+            // More than one tab (opened from the window, the sidebar or ⌘T):
+            // shown here too, or they'd pile up out of sight.
+            if tabs.tabs.count > 1 {
+                ChatTabStrip().padding(.horizontal, 10).padding(.bottom, 6)
+            }
             Divider()
             conversation
         }
@@ -184,6 +195,7 @@ struct ContentView: View {
     // MARK: - Chat
 
     private static let chatBottomID = "chat-bottom"
+    @MainActor private static var lastRescan = Date.distantPast
 
     /// Grows with every streamed token and new message -- cheap to compare.
     private var streamSignal: Int {

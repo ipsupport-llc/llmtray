@@ -21,8 +21,8 @@ final class ChatPresentation: ObservableObject {
     private let tabs: ChatTabs
     /// Per tab: its draft (survives a detach / attach and a tab switch) and
     /// its turn tracker.
-    private var composers: [ObjectIdentifier: ComposerModel] = [:]
-    private var trackers: [ObjectIdentifier: TurnTracker] = [:]
+    private var composers: [UUID: ComposerModel] = [:]
+    private var trackers: [UUID: TurnTracker] = [:]
     private var cancellables: Set<AnyCancellable> = []
 
     init(tabs: ChatTabs) {
@@ -38,7 +38,7 @@ final class ChatPresentation: ObservableObject {
 
     /// The message being composed in that tab.
     func composer(for chat: ChatClient) -> ComposerModel {
-        let key = ObjectIdentifier(chat)
+        let key = chat.tabID
         if let composer = composers[key] { return composer }
         let composer = ComposerModel()
         composers[key] = composer
@@ -46,11 +46,11 @@ final class ChatPresentation: ObservableObject {
     }
 
     private func syncTabs(_ open: [ChatClient]) {
-        let keys = Set(open.map(ObjectIdentifier.init))
+        let keys = Set(open.map(\.tabID))
         composers = composers.filter { keys.contains($0.key) }
         trackers = trackers.filter { keys.contains($0.key) }
-        for chat in open where trackers[ObjectIdentifier(chat)] == nil {
-            trackers[ObjectIdentifier(chat)] = TurnTracker(chat) { [weak self, weak chat] epoch in
+        for chat in open where trackers[chat.tabID] == nil {
+            trackers[chat.tabID] = TurnTracker(chat) { [weak self, weak chat] epoch in
                 guard let self, let chat else { return }
                 self.autoTitleIfNeeded(chat)
                 self.autoCompactIfNeeded(chat, epoch: epoch)

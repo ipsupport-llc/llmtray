@@ -389,6 +389,17 @@ final class ChatClient: ObservableObject {
     /// The open session is being deleted: nothing of it is saved again.
     func forgetCurrentSession() { currentSessionID = nil }
 
+    /// Its tab was closed: the turn stops (saved as it is), and nothing
+    /// still running -- a title request, a tool round's tail -- may write
+    /// this chat again (the chat may be open in another tab by then).
+    func close() {
+        cancel()
+        titleTask?.cancel()
+        titleTask = nil
+        conversationEpoch += 1
+        forgetCurrentSession()
+    }
+
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
         toolbox.startTurn()

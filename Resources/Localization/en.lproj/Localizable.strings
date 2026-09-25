@@ -332,6 +332,8 @@
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
+"The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
+"The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";

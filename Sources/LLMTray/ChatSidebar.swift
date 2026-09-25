@@ -88,7 +88,7 @@ struct ChatSidebar: View {
                     .help("Hide chats")
                     .accessibilityLabel("Hide chats")
                 Spacer()
-                Button { open { chat.newTemporaryChat() } } label: { Image(systemName: "eye.slash") }
+                Button { open { ChatTabs.shared.newTemporaryChat() } } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
                     .help("New temporary chat -- nothing about it is ever saved")
                     .accessibilityLabel("New temporary chat")
