@@ -130,7 +130,8 @@ final class ChatTabs: ObservableObject {
         let client = ChatClient(mflux: mflux)
         client.isAnotherChatBusy = { [weak self, weak client] in
             guard let self, let client else { return false }
-            return self.tabs.contains { $0 !== client && $0.isBusy }
+            // A closed tab still reloading the model counts too.
+            return (self.tabs + self.closing).contains { $0 !== client && $0.isBusy }
         }
         return client
     }
@@ -161,9 +162,9 @@ final class ChatTabs: ObservableObject {
         }
         let busy = tabs.contains { $0.isBusy } || !closing.isEmpty
         if busy != isAnyBusy { isAnyBusy = busy }
-        let streaming = tabs.contains { $0.isStreaming }
+        let streaming = (tabs + closing).contains { $0.isStreaming }
         if streaming != isAnyStreaming { isAnyStreaming = streaming }
-        let generating = tabs.contains { $0.isGeneratingImage }
+        let generating = (tabs + closing).contains { $0.isGeneratingImage }
         if generating != isAnyGeneratingImage { isAnyGeneratingImage = generating }
     }
 
