@@ -185,7 +185,7 @@
 "Regenerate" = "Yeniden oluştur";
 "Remove" = "Kaldır";
 "Remove attachment" = "Eki kaldırır.";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanını %@ konumundan kaldırır. Bir sonraki sunucu başlatmasında yeniden ayarlanır. Kaydedilmiş sohbetler ve profiller korunur.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanı ve görüntü oluşturma (çalışma zamanı ve görüntü modelleri) %@ konumundan kaldırılır. Sunucu bir sonraki başlatıldığında veya görüntü oluşturma açıldığında yeniden yapılandırılır. Kaydedilmiş sohbetler ve profiller saklanır.";
 "Rename" = "Yeniden Adlandır";
 "Rename this profile" = "Bu profilin adını değiştirin.";
 "Rescan" = "Yeniden Tara";

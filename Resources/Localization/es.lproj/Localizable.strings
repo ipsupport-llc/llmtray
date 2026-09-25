@@ -185,7 +185,7 @@
 "Regenerate" = "Regenerar";
 "Remove" = "Eliminar";
 "Remove attachment" = "Quitar adjunto";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Elimina el runtime de mlx-lm descargado de %@. Se instala de nuevo al próximo inicio del servidor. Los chats y perfiles se conservan.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Elimina el runtime mlx-lm descargado y la generación de imágenes (su runtime y modelos de imagen) de %@. Se volverán a configurar en el siguiente inicio del servidor o cuando se active la generación de imágenes. Se conservan los chats y perfiles guardados.";
 "Rename" = "Renombrar";
 "Rename this profile" = "Renombrar este perfil";
 "Rescan" = "Volver a buscar";

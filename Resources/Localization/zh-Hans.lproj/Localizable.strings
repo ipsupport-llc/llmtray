@@ -185,7 +185,7 @@
 "Regenerate" = "重新生成";
 "Remove" = "移除";
 "Remove attachment" = "移除附件";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "移除 %@ 中已下载的 mlx-lm 运行时。下次启动服务器时会重新设置。已保存的聊天和配置方案会保留。";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "从 %@ 删除已下载的 mlx-lm 运行时和图像生成功能（包括运行时和图像模型）。下一次服务器启动或启用图像生成功能时会重新设置。已保存的聊天和配置档会保留。";
 "Rename" = "重命名";
 "Rename this profile" = "重命名此配置。";
 "Rescan" = "重新扫描";

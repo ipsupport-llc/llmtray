@@ -185,7 +185,7 @@
 "Regenerate" = "다시 생성";
 "Remove" = "제거";
 "Remove attachment" = "첨부 파일을 제거합니다.";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "다운로드한 mlx-lm 런타임을 %@에서 제거합니다. 다음에 서버를 시작할 때 다시 설정됩니다. 저장된 채팅과 프로필은 유지됩니다.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "mlx-lm 실행 환경과 이미지 생성(실행 환경 및 이미지 모델)을 %@에서 삭제합니다. 다음 서버 시작 시나 이미지 생성을 켤 때 다시 설치됩니다. 저장된 대화와 프로필은 유지됩니다.";
 "Rename" = "이름 변경";
 "Rename this profile" = "이 프로필의 이름을 변경합니다.";
 "Rescan" = "다시 스캔";
