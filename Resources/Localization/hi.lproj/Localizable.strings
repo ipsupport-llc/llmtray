@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ सीमित है: huggingface.co/%@ पर इसकी लाइसेंस शर्तें स्वीकार करें, फिर Settings → Models में एक Hugging Face token जोड़ें।";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ अभी डाउनलोड नहीं हुआ है — Settings में जाकर generate_image फिर से सक्षम करें।";
 "%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
+"%@ · %@ left" = "%@ · %@ बचे";
 "%@ → %@ available" = "%@ → %@ उपलब्ध";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "प्रोफ़ाइल पर लागू करें";
 "Assistant" = "सहायक";
 "Attach image(s) for the model to see" = "मॉडल को दिखाने के लिए इमेज अटैच करें";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 8-bit पर और feed-forward 4-bit पर — आकार/स्थिरता का सर्वश्रेष्ठ संतुलन, uniform 4-bit के खिलाफ सत्यापित।";
 "Auto-compact" = "अपने-आप कॉम्पैक्ट करें";
 "Auto-restart after %lld stalls" = "%lld बार रुकने के बाद अपने-आप रीस्टार्ट करें";
 "Auto-restart: off" = "अपने-आप रीस्टार्ट: बंद";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "ऑटो-ट्यून चल रहा है और लोड किए गए मॉडल की प्रोफ़ाइल में लिखता है -- इसके पूरा होने तक संपादन रुका रहेगा।";
 "Auto-tune performance" = "ऑटो-ट्यून प्रदर्शन";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "नीचे एक परिणाम में औसत किया गया है। इनके पहले हमेशा एक अस्थायी वार्मअप रन होता है, इसलिए पहली कॉल का Metal kernel compile time कभी भी संख्याओं को प्रभावित नहीं करता।";
+"Balanced (default)" = "Balanced (Default)";
 "Benchmark" = "बेंचमार्क";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "बेंचमार्क अभी लोड किए गए मॉडल पर चलते हैं। ऑटो-ट्यून अपने परिणाम उस मॉडल की प्रोफ़ाइल में लिखता है।";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "कॉम्पैक्ट";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "संकुचन लंबी चैट के बीच के हिस्से को मॉडल द्वारा लिखे गए एक सारांश से बदल देता है। शुरुआत के इतने संदेश शब्दशः रखे जाते हैं।";
 "Compaction" = "संकुचन";
+"Compaction failed: %@" = "Compaction विफल: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "चैट में इतने से अधिक संदेश होने पर उसे अपने आप संकुचित करता है। चैट में “संकुचित करें” बटन फिर भी काम करता है।";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Copy" = "कॉपी करें";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "डाउनलोड किए गए mlx-lm रनटाइम (और इमेज-जनरेशन रनटाइम) को हटाता है। अगली बार सर्वर शुरू होने पर इसे फिर से शुरू से सेट अप किया जाता है। सहेजी गई चैट और प्रोफ़ाइल रखी जाती हैं।";
 "Diagnostics" = "डायग्नॉस्टिक्स";
 "Disk usage" = "डिस्क उपयोग";
+"Done" = "완료";
 "Download" = "डाउनलोड करें";
 "Download and Enable" = "डाउनलोड करें और सक्षम करें";
 "Download into the models folder" = "मॉडल फ़ोल्डर में डाउनलोड करें";
 "Download models" = "मॉडलों को डाउनलोड करें";
 "Download models from Hugging Face" = "Hugging Face से मॉडल डाउनलोड करें";
 "Downloaded" = "डाउनलोड किया गया";
+"Downloading %@…" = "%@ डाउनलोड हो रहा है…";
+"Downloading %lld files…" = "%lld फ़ाइलें डाउनलोड हो रही हैं…";
+"Downloading…" = "डाउनलोड हो रहा है…";
+"Downloads" = "Downloads";
 "Duplicate this profile" = "इस प्रोफ़ाइल की कॉपी बनाता है।";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
 "Enable image generation" = "इमेज जनरेशन सक्षम करें";
 "Enable image generation?" = "इमेज जनरेशन सक्षम करें?";
 "Extra server arguments" = "अतिरिक्त सर्वर आर्ग्युमेंट्स";
+"Failed to reload the chat model after image generation: %@" = "Image generation के बाद chat मॉडल को पुनः लोड करना विफल रहा: %@";
 "Failed: %@" = "विफल: %@";
+"Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
+"Fetching file list…" = "फ़ाइल सूची ले जा रही है…";
+"Fits comfortably" = "आराम से फिट होता है";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "प्रकाशित ड्राफ़्टर वाले मॉडल (Gemma 4 26B) के लिए: एक छोटा अतिरिक्त मॉडल आगे के टोकन का अनुमान लगाता है और मुख्य मॉडल उन्हें एक पास में जाँचता है। वही आउटपुट, ज़्यादा तेज़। फिर अनुरोध एक-एक करके पूरे किए जाते हैं।";
 "Free on disk: %@ · your models: %@" = "डिस्क पर खाली: %@ · आपके मॉडल: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "इतने समय तक कोई अनुरोध न आने पर लोड किए गए मॉडल द्वारा रखी गई मेमोरी खाली करता है। अगले अनुरोध पर यह अपने आप फिर लोड होता है, सामान्य लोडिंग विलंब के साथ।";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
 "General" = "सामान्य";
+"Generated in %.1fs" = "%.1fs में जनरेट हुआ";
 "Generating image…" = "इमेज जनरेट हो रही है…";
 "Get one" = "एक प्राप्त करें";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "High quality (बड़ा कैनवास)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "सर्वोच्च निष्ठा, सबसे बड़ा डाउनलोड — एक विश्वसनीय correctness बेसलाइन।";
 "Hourly forecast" = "घंटाबंद पूर्वानुमान";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "एक GPU चरण में कितने अनुरोध बैच किए जाएँ। यह तभी मदद करता है जब कई क्लाइंट एक साथ सर्वर का उपयोग करें; ज़्यादा मेमोरी उपयोग करता है।";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "निष्क्रिय — अगला संदेश आने पर मॉडल फिर लोड होगा";
 "Image generation" = "इमेज जनरेशन";
+"Image generation failed: %@" = "Image generation विफल: %@";
+"Image generation finished but produced no output file." = "Image generation समाप्त हुआ पर कोई आउटपुट फ़ाइल नहीं बनी।";
+"Image generation isn't set up -- turn it on again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
+"Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image model" = "इमेज मॉडल";
 "Installed" = "इंस्टॉल किया गया";
+"Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
 "KV cache" = "KV कैश";
 "KV group size" = "KV समूह आकार";
 "Keep current" = "मौजूदा रखें";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "क्वांटाइज़ करने से पहले संदर्भ के पहले N टोकन को पूरी precision पर रखता है। ज़्यादा मान लंबे प्रॉम्प्ट पर सटीकता बढ़ाता है, लेकिन मेमोरी बचत कम करता है।";
 "LLMTray" = "LLMTray";
 "Language" = "भाषा";
+"Larger than this Mac's RAM -- unlikely to load" = "इस Mac की RAM से बड़ा — लोड होना संभावनाहीन";
 "Later" = "बाद में";
 "Launch at login" = "लॉगिन पर खोलें";
 "Library" = "लाइब्रेरी";
+"Likes" = "लाइक्स";
 "Live output of the model process: loading, errors, requests." = "मॉडल प्रोसेस का लाइव आउटपुट: लोडिंग, त्रुटियाँ, अनुरोध।";
 "Loads the last-used model right away, so it's ready without pressing Play." = "पिछली बार उपयोग किया गया मॉडल तुरंत लोड करता है, ताकि Play दबाए बिना यह तैयार हो।";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "नई प्रोफ़ाइल बनाएँ; यह Default से सब कुछ विरासत में लेती है।";
 "New temporary chat -- nothing about it is ever saved" = "नई अस्थायी चैट शुरू करें — इसके बारे में कुछ भी कभी सहेजा नहीं जाता।";
 "News" = "समाचार";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "Python 3.10+ नहीं मिला। python.org से या Homebrew (https://brew.sh) के माध्यम से इंस्टॉल करें।";
+"No README.md in this repo." = "इस repo में README.md नहीं है।";
 "No auto-tune run yet." = "अभी तक कोई ऑटो-ट्यून रन नहीं हुआ है।";
 "No messages yet" = "अभी तक कोई संदेश नहीं";
 "No model uses it." = "कोई मॉडल इसका उपयोग नहीं करता।";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "पिछले %lld संदेश";
 "Past chats" = "पिछली चैट दिखाता है।";
 "Pause download" = "डाउनलोड रोकें।";
+"Paused" = "रुका हुआ";
 "Performance" = "प्रदर्शन";
 "Port" = "पोर्ट";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "अटेंशन कैश की सटीकता। 8-bit: लगभग बिना हानि, आधी मेमोरी। 4-bit: एक-चौथाई मेमोरी, लंबे संदर्भ में स्पष्ट रूप से खराब। Full: सबसे अच्छा, सबसे अधिक मेमोरी।";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "जवाबों की रैंडमनेस (मॉडल की प्रोफ़ाइल का हिस्सा)। कम मान अधिक केंद्रित, अधिक मान अधिक विविध होता है।";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "रैंडमनेस। कम मान अधिक केंद्रित और दोहराने योग्य, अधिक मान अधिक विविध होता है। कोडिंग: 0.2-0.6; चैट: 0.7-1.0।";
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
+"Recently updated" = "हाल ही में अपडेट हुआ";
 "Recovery" = "रिकवरी";
 "Regenerate" = "फिर से जनरेट करें";
 "Remove" = "हटाएं";
@@ -220,6 +248,7 @@
 "Server Log" = "सर्वर लॉग";
 "Server log" = "सर्वर लॉग";
 "Server settings changed -- restart to apply them." = "सर्वर सेटिंग्ज़ बदल गई हैं — इन्हें लागू करने के लिए रीस्टार्ट करें।";
+"Setting up image generation (first time only)…" = "Image generation की सेटअप कर रहा है (केवल पहली बार)…";
 "Settings" = "सेटिंग्ज़";
 "Settings (⌘,)" = "सेटिंग्ज़ खोलें (⌘,)।";
 "Settings profile for this model" = "इस मॉडल के लिए सेटिंग्ज़ प्रोफ़ाइल चुनें।";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "प्रोफ़ाइल फ़ाइलें Finder में दिखाएँ — सादा JSON, हाथ से संपादित करने योग्य, और दूसरे Mac पर कॉपी करने योग्य।";
 "Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "सबसे छोटा और सबसे आक्रामक — कुछ prompts पर जनरेशन की रचना स्पष्ट रूप से बदल सकती है।";
 "Sort by" = "इसके अनुसार क्रमित करें";
 "Source on GitHub" = "GitHub पर स्रोत";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "सर्वर रोकें (मॉडल अनलोड करें)।";
 "Stop the server to update the runtime." = "रनटाइम अपडेट करने के लिए सर्वर रोकें।";
 "Stopped" = "रुका हुआ";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "रुका: मॉडल लगातार tools बुलाता रहा (%lld राउंड्स एक टर्न में)।";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "इमेज जनरेट होते समय चैट मॉडल रोकता है और बाद में उसे फिर लोड करता है। दोनों को साथ चलाने से इस Mac की मेमोरी से ज़्यादा हो सकता है।";
 "Sunrise & sunset" = "सूर्योदय और सूर्यास्त";
 "System" = "सिस्टम";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "इस प्रोफ़ाइल की फ़ाइल पढ़ी नहीं जा सकती, इसलिए इसे यहां संपादित नहीं किया जा सकता। फ़ाइल ठीक करें या हटाएं, फिर सेटिंग्स फिर से खोलें।";
 "Thought process" = "विचार प्रक्रिया";
+"Tight -- may not leave room for context" = "Tight — संदर्भ के लिए जगह न छोड़ सके";
 "Time in a city" = "किसी शहर का समय";
 "Tool Settings…" = "टूल सेटिंग्स…";
 "Tool-use rule" = "टूल उपयोग नियम";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "कौन-सा Z-Image-Turbo क्वांटाइज़ेशन छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
 "You" = "आप";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (Recommended)";
 "copy" = "कॉपी करें";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "request बनाना विफल हुआ";
 "mlx-lm runtime" = "mlx-lm रनटाइम";
 "not used by any model" = "किसी भी मॉडल द्वारा उपयोग नहीं किया गया";
 "used by %@" = "%@ द्वारा उपयोग किया गया";

@@ -3,7 +3,9 @@
    speakers are welcome -- existing entries are never overwritten. */
 
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@은(는) 접근 제한됨: huggingface.co/%@에서 사용권에 동의한 뒤 설정 → Models에 Hugging Face 토큰을 추가하세요.";
+"%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@이(가) 아직 다운로드되지 않았습니다 — 설정에서 이미지 생성을 다시 활성화하세요.";
 "%@ wasn't found on Hugging Face." = "Hugging Face에서 %@을(를) 찾을 수 없습니다.";
+"%@ · %@ left" = "%@ · %@ 남음";
 "%@ → %@ available" = "%@ → %@ 사용 가능";
 "%@ 🌐" = "%@ 🌐";
 "%d overridden, rest from Default · %@" = "%d개 재정의, 나머지는 Default에서 · %@";
@@ -29,6 +31,7 @@
 "Apply to profile" = "프로필에 적용";
 "Assistant" = "어시스턴트";
 "Attach image(s) for the model to see" = "모델이 볼 이미지를 첨부합니다.";
+"Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "어텐션은 8비트, 피드포워드는 4비트 — 균일 4비트와 비교 검증된 최적의 크기/안정성 균형입니다.";
 "Auto-compact" = "자동 압축";
 "Auto-restart after %lld stalls" = "%lld회 중단 후 자동 재시작";
 "Auto-restart: off" = "자동 재시작: 끔";
@@ -37,6 +40,7 @@
 "Auto-tune is running and writes into the loaded model's profile -- editing is paused until it finishes." = "자동 튜닝이 실행 중이며 로드된 모델의 프로파일에 기록합니다. 완료될 때까지 편집이 일시 정지됩니다.";
 "Auto-tune performance" = "성능 자동 튜닝";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "아래에는 평균 결과 하나로 표시됩니다. 매번 측정 전에 폐기용 워밍업 실행이 먼저 수행되므로, 첫 호출 시 Metal 커널 컴파일 시간이 수치에 영향을 주지 않습니다.";
+"Balanced (default)" = "균형형 (Default)";
 "Benchmark" = "벤치마크";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "벤치마크는 현재 로드된 모델로 실행됩니다. 자동 튜닝은 결과를 해당 모델의 프로파일에 기록합니다.";
 "Beta" = "Beta";
@@ -63,6 +67,7 @@
 "Compact" = "간단히";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "압축은 긴 채팅의 중간 부분을 모델이 작성한 하나의 요약으로 대체합니다. 시작 부분의 이 개수만큼의 메시지는 원문 그대로 유지됩니다.";
 "Compaction" = "대화 압축";
+"Compaction failed: %@" = "압축 실패: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "채팅의 메시지가 이 개수를 넘으면 자동으로 압축합니다. 채팅의 압축 버튼은 이 설정과 관계없이 작동합니다.";
 "Concurrent requests" = "동시 요청 수";
 "Copy" = "복사";
@@ -77,18 +82,27 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "다운로드한 mlx-lm 런타임 및 이미지 생성 런타임을 삭제합니다. 다음 서버 시작 시 처음부터 다시 설정됩니다. 저장된 채팅과 프로파일은 유지됩니다.";
 "Diagnostics" = "진단";
 "Disk usage" = "디스크 사용량";
+"Done" = "완료";
 "Download" = "다운로드";
 "Download and Enable" = "다운로드하고 활성화";
 "Download into the models folder" = "models 폴더에 다운로드합니다";
 "Download models" = "모델 다운로드";
 "Download models from Hugging Face" = "Hugging Face에서 모델을 다운로드합니다.";
 "Downloaded" = "다운로드됨";
+"Downloading %@…" = "%@ 다운로드 중…";
+"Downloading %lld files…" = "파일 %lld개 다운로드 중…";
+"Downloading…" = "다운로드 중…";
+"Downloads" = "다운로드";
 "Duplicate this profile" = "이 프로파일을 복제합니다.";
 "Edit Profile…" = "프로파일 편집…";
 "Enable image generation" = "이미지 생성 활성화";
 "Enable image generation?" = "이미지 생성을 활성화하겠습니까?";
 "Extra server arguments" = "추가 서버 인수";
+"Failed to reload the chat model after image generation: %@" = "이미지 생성 후 채팅 모델을 다시 불러오지 못했습니다: %@";
 "Failed: %@" = "실패: %@";
+"Fast (smaller canvas)" = "빠름 (캔버스 작음)";
+"Fetching file list…" = "파일 목록 가져오는 중…";
+"Fits comfortably" = "여유 있게 맞음";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "공개된 drafter가 있는 모델(Gemma 4 26B)의 경우, 작은 추가 모델이 토큰을 미리 추측하고 주 모델이 한 번에 확인합니다. 출력은 같고 속도는 더 빠릅니다. 그러면 요청은 한 번에 하나씩 처리됩니다.";
 "Free on disk: %@ · your models: %@" = "디스크 여유: %@ · 내 모델: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "요청이 없는 상태가 이 시간만큼 지속되면 로드된 모델이 점유한 메모리를 해제합니다. 다음 요청 시 자동으로 다시 로드되며 일반적인 로드 지연이 발생합니다.";
@@ -96,10 +110,13 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 사용권에 동의한 뒤 설정 → Models에 토큰을 추가하세요.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 접근을 요청하세요(저자가 검토함). 그 후 설정 → Models에 토큰을 추가하세요.";
 "General" = "일반";
+"Generated in %.1fs" = "생성 시간 %.1fs";
 "Generating image…" = "이미지 생성 중…";
 "Get one" = "토큰 받기";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "모델에 generate_image 도구를 제공합니다(도구 호출 모델 필요). 처음 사용할 때 이미지 모델이 다운로드됩니다.";
 "Hacker News" = "Hacker News";
+"High quality (larger canvas)" = "고품질 (캔버스 큼)";
+"Highest fidelity, largest download -- a correctness baseline you can trust." = "최고 충실도, 최대 다운로드 — 신뢰할 수 있는 정확성 기준입니다.";
 "Hourly forecast" = "시간별 예보";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
@@ -109,8 +126,13 @@
 "Hugging Face token" = "Hugging Face 토큰";
 "Idle -- the model reloads on the next message" = "대기 중 — 다음 메시지에서 모델 다시 로드";
 "Image generation" = "이미지 생성";
+"Image generation failed: %@" = "이미지 생성 실패: %@";
+"Image generation finished but produced no output file." = "이미지 생성이 완료되었지만 출력 파일이 생성되지 않았습니다.";
+"Image generation isn't set up -- turn it on again in Settings." = "이미지 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
+"Image generation needs an update -- turn it off and on again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
 "Image model" = "이미지 모델";
 "Installed" = "설치됨";
+"Installing mflux…" = "mflux 설치 중…";
 "KV cache" = "KV 캐시";
 "KV group size" = "KV 그룹 크기";
 "Keep current" = "현재 항목 유지";
@@ -119,9 +141,11 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "양자화하기 전에 컨텍스트의 처음 N개 토큰을 전체 정밀도로 유지합니다. 값이 높을수록 메모리 절약은 줄지만 긴 프롬프트의 정확도가 높아집니다.";
 "LLMTray" = "LLMTray";
 "Language" = "언어";
+"Larger than this Mac's RAM -- unlikely to load" = "이 Mac의 RAM보다 큽니다 — 로드될 가능성이 낮습니다";
 "Later" = "나중에";
 "Launch at login" = "로그인 시 열기";
 "Library" = "라이브러리";
+"Likes" = "좋아요";
 "Live output of the model process: loading, errors, requests." = "모델 프로세스의 실시간 출력: 로딩, 오류, 요청.";
 "Loads the last-used model right away, so it's ready without pressing Play." = "마지막으로 사용한 모델을 바로 로드하여 Play를 누르지 않아도 준비됩니다.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "생성된 모든 토큰을 기록합니다(DEBUG). 모델 프로세스 문제 해결 전용이며 속도가 느려집니다. 다음 서버 시작 시 적용됩니다.";
@@ -145,6 +169,8 @@
 "New profile (inherits everything from Default)" = "새 프로파일(Default의 모든 항목을 상속)";
 "New temporary chat -- nothing about it is ever saved" = "새 임시 채팅입니다. 어떤 내용도 저장되지 않습니다.";
 "News" = "뉴스";
+"No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "Python 3.10+이(가) 감지되지 않았습니다. python.org에서 설치하거나 Homebrew(https://brew.sh)를 사용하세요.";
+"No README.md in this repo." = "이 리포지토리에 README.md가 없습니다.";
 "No auto-tune run yet." = "아직 자동 조정 실행이 없습니다.";
 "No messages yet" = "아직 메시지가 없음";
 "No model uses it." = "사용 중인 모델이 없습니다.";
@@ -163,6 +189,7 @@
 "Past %lld messages" = "지난 %lld개 메시지";
 "Past chats" = "이전 채팅입니다.";
 "Pause download" = "다운로드를 일시 정지합니다.";
+"Paused" = "일시 중지됨";
 "Performance" = "성능";
 "Port" = "포트";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "어텐션 캐시의 정밀도입니다. 8비트: 거의 무손실이며 메모리를 절반만 사용합니다. 4비트: 1/4만 사용하지만 긴 컨텍스트에서 품질이 눈에 띄게 떨어집니다. Full: 최상의 품질, 메모리 사용량 최대.";
@@ -181,6 +208,7 @@
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "답변의 무작위성입니다(모델 프로필의 일부). 낮을수록 더 집중된 답변을, 높을수록 더 다양한 답변을 생성합니다.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "무작위성입니다. 낮을수록 더 집중적이고 반복 가능하며, 높을수록 더 다양합니다. 코딩: 0.2~0.6, 채팅: 0.7~1.0.";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
+"Recently updated" = "최근 업데이트됨";
 "Recovery" = "복구";
 "Regenerate" = "다시 생성";
 "Remove" = "제거";
@@ -220,6 +248,7 @@
 "Server Log" = "서버 로그";
 "Server log" = "서버 로그";
 "Server settings changed -- restart to apply them." = "서버 설정이 변경되었습니다. 적용하려면 재시동하십시오.";
+"Setting up image generation (first time only)…" = "이미지 생성 설정 중(첫 실행 시만)…";
 "Settings" = "설정";
 "Settings (⌘,)" = "설정(⌘,)";
 "Settings profile for this model" = "이 모델의 설정 프로필입니다.";
@@ -231,6 +260,7 @@
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Finder에서 프로필 파일을 표시합니다. 일반 JSON 파일이며 직접 편집하고 다른 Mac으로 복사할 수 있습니다.";
 "Show tool calls" = "도구 호출 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
+"Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "가장 작고 공격적임 — 일부 프롬프트에서 생성 구성이 눈에 띄게 변할 수 있습니다.";
 "Sort by" = "정렬 기준";
 "Source on GitHub" = "GitHub에서 소스 보기";
 "Space the models in this folder take, and what's still free on its disk." = "이 폴더의 모델들이 차지하는 공간과 디스크의 남은 여유 공간을 표시합니다.";
@@ -250,6 +280,7 @@
 "Stop server (unload model)" = "서버를 중지하고 모델을 언로드합니다.";
 "Stop the server to update the runtime." = "런타임을 업데이트하려면 서버를 중지하십시오.";
 "Stopped" = "중지됨";
+"Stopped: the model kept calling tools (%lld rounds in one turn)." = "중지됨: 모델이 도구를 반복 호출했습니다(한 턴에 %lld회).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "이미지를 생성하는 동안 채팅 모델을 중지하고, 완료 후 다시 로드합니다. 둘을 동시에 실행하면 이 Mac의 메모리를 초과할 수 있습니다.";
 "Sunrise & sunset" = "일출·일몰";
 "System" = "시스템";
@@ -272,6 +303,7 @@
 "This many of the most recent messages are kept word for word when compacting." = "압축할 때 가장 최근 메시지 중 이 개수만큼을 원문 그대로 유지합니다.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
 "Thought process" = "사고 과정";
+"Tight -- may not leave room for context" = "타이트함 — 문맥을 위한 여지가 없을 수 있음";
 "Time in a city" = "도시별 시간";
 "Tool Settings…" = "도구 설정…";
 "Tool-use rule" = "도구 사용 규칙";
@@ -302,9 +334,13 @@
 "Which Z-Image-Turbo quantization generates the images." = "이미지를 생성할 Z-Image-Turbo 양자화를 지정합니다.";
 "Wikipedia" = "Wikipedia";
 "You" = "나";
+"Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
+"Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
+"Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ 혼합(권장)";
 "copy" = "복사";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"failed to build request" = "요청 구성 실패";
 "mlx-lm runtime" = "mlx-lm 런타임";
 "not used by any model" = "어떤 모델에서도 사용되지 않음";
 "used by %@" = "%@에서 사용 중";
