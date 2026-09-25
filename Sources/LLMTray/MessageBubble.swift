@@ -122,7 +122,7 @@ struct MessageBubble: View {
                     }
                     .buttonStyle(.plain)
                     if let seconds = message.imageDurations[safe: i] {
-                        Text(String(format: "Generated in %.1fs", seconds)).font(.system(size: 10))
+                        Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.system(size: 10))
                     }
                 }
                 .foregroundColor(.secondary)

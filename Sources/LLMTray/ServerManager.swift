@@ -86,6 +86,26 @@ final class ServerManager: ObservableObject {
     /// Spots mlx_lm.server's generation thread dying in the current
     /// process's output (see generationThreadDied); reset per launch.
     private var logWatch = ServerLogWatch()
+
+    /// Launch values auto-tune is trying (BenchmarkRunner): applied on top
+    /// of the profile at launch, in memory only -- a quit or crash
+    /// mid-sweep leaves the profile as it was, never on a trial value.
+    struct LaunchTrial: Equatable {
+        /// The model being tuned: another one a client switches to
+        /// mid-sweep launches with its own settings.
+        var modelPath: String?
+        var decodeConcurrency: Int?
+        var prefillStepSize: Int?
+    }
+    var launchTrial = LaunchTrial()
+
+    private func withLaunchTrial(_ profile: ResolvedProfile, modelPath: String) -> ResolvedProfile {
+        guard launchTrial.modelPath == modelPath else { return profile }
+        var p = profile
+        if let v = launchTrial.decodeConcurrency { p.decodeConcurrency = v }
+        if let v = launchTrial.prefillStepSize { p.prefillStepSize = v }
+        return p
+    }
     /// The unfinished last line of the output, for the ready signal.
     private var readyLine = ""
     /// Restarts after a dead generation thread: a model that runs out of
@@ -441,7 +461,7 @@ final class ServerManager: ObservableObject {
 
     private func computePendingLaunchChange() -> Bool {
         guard case .running = state, let modelPath = currentModelPath, let last = lastRestartKey else { return false }
-        let profile = ProfileManager.shared.resolved(for: modelPath)
+        let profile = withLaunchTrial(ProfileManager.shared.resolved(for: modelPath), modelPath: modelPath)
         let context = launchContext(
             modelPath: modelPath, alias: currentAlias,
             drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
@@ -472,7 +492,7 @@ final class ServerManager: ObservableObject {
         // shebang breaks on relocation and on spaces -- adr/0001). Every
         // launch setting comes from the model's profile, resolved fresh on
         // each launch; notable defaults in adr/0003-field-lessons.md.
-        let profile = ProfileManager.shared.resolved(for: modelPath)
+        let profile = withLaunchTrial(ProfileManager.shared.resolved(for: modelPath), modelPath: modelPath)
         appendLog("--- profile: \(profile.profileName) ---\n")
         let context = launchContext(
             modelPath: modelPath, alias: alias,

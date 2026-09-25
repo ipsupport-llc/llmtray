@@ -252,12 +252,10 @@ final class BenchmarkRunner: ObservableObject {
         cancelRequested = false
         autoTuneError = nil
         autoTuneLog = []
-        defer { isRunning = false; statusText = "" }
-
-        // Candidates are written into the running model's profile (the
-        // server reads launch settings from it at every restart), and the
-        // profile's own values are restored afterwards -- including
-        // "not set here, inherited from Default" for an overlay profile.
+        // Candidates go to the server as a launch trial, in memory only:
+        // the profile itself is written just once, if the user accepts the
+        // proposal. Whatever ends the sweep, the trial ends with it.
+        defer { isRunning = false; statusText = ""; server.launchTrial = .init() }
         let profiles = ProfileManager.shared
         let modelPath = server.loadedModelPath
         // Pinned once: every candidate and the final restore go to this
@@ -270,11 +268,7 @@ final class BenchmarkRunner: ObservableObject {
             autoTuneError = "profile \u{201C}\(profiles.profile(for: modelPath).name)\u{201D} can't be saved (its file is unreadable) -- fix it first"
             return
         }
-        func setLaunch(_ keyPath: WritableKeyPath<Profile, Int?>, _ value: Int?) {
-            profiles.update(id: profileID) { $0[keyPath: keyPath] = value }
-        }
-        let originalConcurrencyField = profiles.profile(for: modelPath).launch.decodeConcurrency
-        let originalPrefillField = profiles.profile(for: modelPath).launch.prefillStepSize
+        server.launchTrial = .init(modelPath: modelPath)
         let originalConcurrency = profiles.value(\.launch.decodeConcurrency, for: modelPath)
         let originalPrefillStep = profiles.value(\.launch.prefillStepSize, for: modelPath)
 
@@ -299,7 +293,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in decodeConcurrencyCandidates {
             if cancelRequested { break }
             statusText = "Testing decode-concurrency=\(value)…"
-            setLaunch(\.launch.decodeConcurrency, value)
+            server.launchTrial.decodeConcurrency = value
             guard await restart() else { break }
 
             let batchStart = Date()
@@ -336,7 +330,7 @@ final class BenchmarkRunner: ObservableObject {
                 bestConcurrency = value
             }
         }
-        setLaunch(\.launch.decodeConcurrency, bestConcurrency)
+        server.launchTrial.decodeConcurrency = bestConcurrency
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "decode-concurrency" && $0.value == bestConcurrency }) {
             autoTuneLog[idx].isWinner = true
         }
@@ -348,7 +342,7 @@ final class BenchmarkRunner: ObservableObject {
         for value in prefillStepSizeCandidates {
             if cancelRequested { break }
             statusText = "Testing prefill-step-size=\(value)…"
-            setLaunch(\.launch.prefillStepSize, value)
+            server.launchTrial.prefillStepSize = value
             guard await restart() else { break }
 
             guard let sample = try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 2048, maxTokens: 8) else { continue }
@@ -369,8 +363,7 @@ final class BenchmarkRunner: ObservableObject {
         // not necessarily what the user had running before. The winning
         // combination is only ever applied if the user confirms it via
         // applyAutoTuneProposal(), never automatically.
-        setLaunch(\.launch.decodeConcurrency, originalConcurrencyField)
-        setLaunch(\.launch.prefillStepSize, originalPrefillField)
+        server.launchTrial = .init()   // back to the profile's own values
         if !cancelRequested {
             statusText = "Restoring original settings…"
             _ = await restart()
