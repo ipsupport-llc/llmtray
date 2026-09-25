@@ -58,7 +58,7 @@ struct ChatSidebar: View {
         .background(.regularMaterial)
         .onReceive(Self.clock) { now = $0 }
         // The popover's overlay: typing searches, and Esc closes it.
-        .onAppear { if closesOnOpen { searchFocused = true } }
+        .onAppear { if closesOnOpen { DispatchQueue.main.async { searchFocused = true } } }
         .confirmationDialog(
             Text("Delete this chat?"), isPresented: Binding(get: { chatToDelete != nil }, set: { if !$0 { chatToDelete = nil } }),
             presenting: chatToDelete
@@ -202,7 +202,7 @@ struct ChatSidebar: View {
                 .focused($chatRenameFocused)
                 .onSubmit { commitRename(summary.id) }
                 .onExitCommand { renaming = nil }
-                // Clicking elsewhere ends it, like Finder.
+                // Clicking elsewhere commits it, like Finder.
                 .onChange(of: chatRenameFocused) { focused in
                     if focused { renameHadFocus = true } else if renameHadFocus { commitRename(summary.id) }
                 }

@@ -92,6 +92,8 @@ struct ContentView: View {
 
     private func setSidebarOverlay(_ shown: Bool) {
         withAnimation(.easeOut(duration: 0.18)) { showsSidebarOverlay = shown }
+        // The overlay's search had the focus: typing goes to the chat again.
+        if !shown { isInputFocused = true }
     }
 
     /// The chat's own window: the sidebar beside the chat, no header -- the
