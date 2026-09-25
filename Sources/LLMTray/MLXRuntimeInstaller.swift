@@ -101,7 +101,7 @@ final class MLXRuntimeInstaller {
             try FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
             let (venvSource, venvTarget, framework, frameworkTarget) = (bundledVenvDir, venvDir, bundledFrameworkDir, externalFrameworkDir)
             // Hundreds of MB: off the main actor, the UI stays live.
-            try await ProcessRunner.offMain {
+            try await ProcessRunner.offMain { () -> Void in
                 try Self.stagedCopy(from: venvSource, to: venvTarget)
                 if let framework { try Self.stagedCopy(from: framework, to: frameworkTarget) }
             }
