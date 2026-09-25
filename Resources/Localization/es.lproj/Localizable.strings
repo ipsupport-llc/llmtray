@@ -232,6 +232,7 @@
 "Show tool calls" = "Mostrar llamadas a herramientas";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Muestra el razonamiento del modelo (el bloque plegable «Thought process») encima de su respuesta.";
 "Sort by" = "Ordenar por";
+"Source on GitHub" = "Código fuente en GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "El espacio que ocupan los modelos en esta carpeta y lo que queda libre en el disco.";
 "Speculative decoding (MTP)" = "Decodificación especulativa (MTP)";
 "Stable" = "Estable";

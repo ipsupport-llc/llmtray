@@ -232,6 +232,7 @@
 "Show tool calls" = "إظهار استدعاءات الأدوات";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
 "Sort by" = "فرز حسب";
+"Source on GitHub" = "المصدر على GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";
 "Speculative decoding (MTP)" = "فك الترميز التخميني (MTP)";
 "Stable" = "Stable";

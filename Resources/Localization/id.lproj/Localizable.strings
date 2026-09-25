@@ -232,6 +232,7 @@
 "Show tool calls" = "Tampilkan pemanggilan alat";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
 "Sort by" = "Urutkan menurut";
+"Source on GitHub" = "Sumber di GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
 "Speculative decoding (MTP)" = "Decoding spekulatif (MTP)";
 "Stable" = "Stable";

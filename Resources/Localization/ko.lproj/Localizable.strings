@@ -232,6 +232,7 @@
 "Show tool calls" = "도구 호출 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
 "Sort by" = "정렬 기준";
+"Source on GitHub" = "GitHub에서 소스 보기";
 "Space the models in this folder take, and what's still free on its disk." = "이 폴더의 모델들이 차지하는 공간과 디스크의 남은 여유 공간을 표시합니다.";
 "Speculative decoding (MTP)" = "추측 디코딩(MTP)";
 "Stable" = "Stable";

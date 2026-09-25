@@ -232,6 +232,7 @@
 "Show tool calls" = "Araç çağrılarını göster";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
 "Sort by" = "Sıralama ölçütü";
+"Source on GitHub" = "Kaynak GitHub'da";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
 "Speculative decoding (MTP)" = "Spekülatif kod çözme (MTP)";
 "Stable" = "Stable";

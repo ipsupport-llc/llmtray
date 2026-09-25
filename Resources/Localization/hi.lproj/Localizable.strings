@@ -232,6 +232,7 @@
 "Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
 "Sort by" = "इसके अनुसार क्रमित करें";
+"Source on GitHub" = "GitHub पर स्रोत";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";
 "Speculative decoding (MTP)" = "स्पेक्युलेटिव डिकोडिंग (MTP)";
 "Stable" = "Stable";
