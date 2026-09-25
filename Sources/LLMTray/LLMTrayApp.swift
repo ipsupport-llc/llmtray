@@ -241,6 +241,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .environmentObject(chatPresentation.composer)))
     }
 
+    /// The popover while the chat has its own window: its header alone.
+    private func makeTrayControls() -> NSViewController {
+        let hosting = NSHostingController(rootView: AnyView(TrayControlsView()
+            .environmentObject(server)
+            .environmentObject(chat)
+            .environmentObject(benchmark)
+            .environmentObject(chatPresentation)))
+        hosting.sizingOptions = [.preferredContentSize]
+        return hosting
+    }
+
     private func makePopoverChat() -> NSViewController {
         let hosting = makeChatController()
         // Tracks the SwiftUI content's own intrinsic size instead of a
@@ -268,12 +279,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         popover.performClose(nil)
-        // The popover's chat view goes away (only one exists at a time);
-        // NSPopover still wants a content controller, never shown while
-        // detached (the status item raises the window instead).
-        let placeholder = NSViewController()
-        placeholder.view = NSView()
-        popover.contentViewController = placeholder
+        // The popover's chat view goes away (only one exists at a time):
+        // while detached the popover holds the server, model and tool
+        // controls, which the chat window leaves out.
+        popover.contentViewController = makeTrayControls()
         chatPresentation.isDetached = true
         setDockIconVisible(true)
         let hosting = makeChatController()
@@ -324,9 +333,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func togglePopover() {
         guard let button = statusItem.button else { return }
-        if chatPresentation.isDetached {
-            showChatWindow()
-        } else if popover.isShown {
+        if popover.isShown {
             popover.performClose(nil)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)

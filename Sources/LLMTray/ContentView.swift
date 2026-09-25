@@ -30,10 +30,10 @@ struct ContentView: View {
     @AppStorage(Pref.compactKeepStart) private var compactKeepStart: Int
     @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd: Int
 
-    // Backs the History menu -- refreshed on appear and whenever
-    // ChatSessionStore posts .sessionsDidChange, not read from disk on
-    // every render.
-    @State private var sessionHistory: [ChatSessionFile] = []
+    /// The chats sidebar: over the chat in the popover (closed on each
+    /// open), beside it in the window (remembered).
+    @State private var showsSidebarOverlay = false
+    @AppStorage(Pref.chatWindowSidebar) private var showsWindowSidebar: Bool
     @FocusState private var isInputFocused: Bool
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
@@ -46,25 +46,10 @@ struct ContentView: View {
     @State private var chatViewportHeight: CGFloat = 380
 
     var body: some View {
-        VStack(spacing: 0) {
-            ChatHeaderView(selectedModelID: $selectedModelID, sessionHistory: sessionHistory)
-            Divider()
-            chatArea
-                .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
-            Divider()
-            ChatComposer(
-                composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
-                isFocused: $isInputFocused,
-                send: send, regenerate: regenerate, compact: { Task { await presentation.compact() } }
-            )
-            .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+        Group {
+            if presentation.isDetached { windowLayout } else { popoverLayout }
         }
-        // The popover is a fixed 420 wide; detached, the chat fills its
-        // window (ChatWindowController enforces the minimum size).
-        .frame(minWidth: 420, maxWidth: presentation.isDetached ? .infinity : 420,
-               maxHeight: presentation.isDetached ? .infinity : nil)
         .onAppear {
-            sessionHistory = ChatSessionStore.list()
             // Models added or removed in Finder / LM Studio since the last
             // look show up on opening, as they used to.
             catalog.rescan()
@@ -74,8 +59,103 @@ struct ContentView: View {
         }
         .onChange(of: selectedModelID) { modelDidChange($0) }
         .onChange(of: catalog.models) { _ in keepSelectionValid() }
-        .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
-            sessionHistory = ChatSessionStore.list()
+    }
+
+    // MARK: - Layouts
+
+    /// The popover: the header (server, model, tools) above the chat; the
+    /// chats sidebar slides in over it. A fixed 420 wide.
+    private var popoverLayout: some View {
+        VStack(spacing: 0) {
+            ChatHeaderView(selectedModelID: $selectedModelID, toggleSidebar: { setSidebarOverlay(!showsSidebarOverlay) })
+            Divider()
+            conversation
+        }
+        .frame(width: 420)
+        // The popover is as tall as its content, and an empty chat is short:
+        // room for the sidebar while it's shown.
+        .frame(minHeight: showsSidebarOverlay ? 560 : nil, alignment: .top)
+        .overlay(alignment: .leading) {
+            ZStack(alignment: .leading) {
+                if showsSidebarOverlay {
+                    Color.black.opacity(0.18)
+                        .contentShape(Rectangle())
+                        .onTapGesture { setSidebarOverlay(false) }
+                        .transition(.opacity)
+                    ChatSidebar(close: { setSidebarOverlay(false) }, closesOnOpen: true)
+                        .frame(width: 290)
+                        .transition(.move(edge: .leading))
+                }
+            }
+        }
+    }
+
+    private func setSidebarOverlay(_ shown: Bool) {
+        withAnimation(.easeOut(duration: 0.18)) { showsSidebarOverlay = shown }
+        // The overlay's search had the focus: typing goes to the chat again.
+        if !shown { isInputFocused = true }
+    }
+
+    /// The chat's own window: the sidebar beside the chat, no header -- the
+    /// server, model and tool controls stay in the menu bar's popover.
+    private var windowLayout: some View {
+        HStack(spacing: 0) {
+            if showsWindowSidebar {
+                ChatSidebar(close: { withAnimation(.easeOut(duration: 0.18)) { showsWindowSidebar = false } })
+                    .frame(width: 250)
+                    .transition(.move(edge: .leading))
+                Divider()
+            }
+            VStack(spacing: 0) {
+                windowBar
+                Divider()
+                conversation
+            }
+            .frame(minWidth: 380)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var windowBar: some View {
+        HStack(spacing: 10) {
+            if !showsWindowSidebar {
+                Button { withAnimation(.easeOut(duration: 0.18)) { showsWindowSidebar = true } } label: {
+                    Image(systemName: "sidebar.left")
+                }
+                .buttonStyle(.plain)
+                .help("Chats")
+                .accessibilityLabel("Chats")
+                Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
+                    .buttonStyle(.plain)
+                    .help("New chat (saved)")
+                    .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
+            }
+            Text(chatTitle).font(.system(size: 13, weight: .semibold)).lineLimit(1).truncationMode(.tail)
+            Spacer(minLength: 8)
+            ServerStatusLabel().foregroundColor(.secondary)
+        }
+        .foregroundColor(.secondary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+    }
+
+    private var chatTitle: String {
+        if chat.currentSessionID == nil { return NSLocalizedString("Temporary chat", comment: "") }
+        return chat.currentSessionTitle.isEmpty ? NSLocalizedString("New chat", comment: "") : chat.currentSessionTitle
+    }
+
+    /// The messages and the composer: the same in both.
+    private var conversation: some View {
+        VStack(spacing: 0) {
+            chatArea
+                .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+            Divider()
+            ChatComposer(
+                composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
+                isFocused: $isInputFocused,
+                send: send, regenerate: regenerate, compact: { Task { await presentation.compact() } }
+            )
+            .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
         }
     }
 

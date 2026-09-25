@@ -115,7 +115,8 @@ enum ChatSessionStore {
         guard let data = try? encoder.encode(file) else { return false }
         // Atomic: a crash or a full disk mid-write mustn't lose the chat.
         guard (try? data.write(to: URL(fileURLWithPath: path(for: file.id)), options: .atomic)) != nil else { return false }
-        NotificationCenter.default.post(name: .sessionsDidChange, object: nil)
+        // The chat that changed: the sidebar re-reads just that one.
+        NotificationCenter.default.post(name: .sessionsDidChange, object: file.id)
         return true
     }
 
@@ -138,9 +139,29 @@ enum ChatSessionStore {
             .sorted { $0.updatedAt > $1.updatedAt }
     }
 
+    /// The chats there are files for, whether or not they decode. nil when
+    /// the directory can't be read (pins must not be dropped for that).
+    static func ids() -> Set<UUID>? {
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return nil }
+        return Set(names.compactMap { name in
+            name.hasSuffix(".json") ? UUID(uuidString: String(name.dropLast(5))) : nil
+        })
+    }
+
+    static func exists(_ id: UUID) -> Bool {
+        FileManager.default.fileExists(atPath: path(for: id))
+    }
+
+    /// A session file's new title, without loading it into the chat.
+    static func rename(id: UUID, to title: String) {
+        guard var file = load(id: id) else { return }
+        file.title = title
+        save(file)
+    }
+
     static func delete(id: UUID) {
         try? FileManager.default.removeItem(atPath: path(for: id))
         try? FileManager.default.removeItem(atPath: imagesDir(for: id))
-        NotificationCenter.default.post(name: .sessionsDidChange, object: nil)
+        NotificationCenter.default.post(name: .sessionsDidChange, object: id)
     }
 }

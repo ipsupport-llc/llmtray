@@ -14,13 +14,14 @@ struct ChatHeaderView: View {
     @AppStorage(Pref.port) private var port: Int
 
     @Binding var selectedModelID: String?
-    let sessionHistory: [ChatSessionFile]
+    /// Shows the chats sidebar over the popover's chat. nil: the tray's
+    /// controls while the chat has its own window -- no chat controls.
+    var toggleSidebar: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Circle().fill(statusColor).frame(width: 8, height: 8)
-                Text(statusText).font(.system(size: 12, weight: .medium))
+                ServerStatusLabel()
                 Spacer()
                 sessionControls
             }
@@ -67,58 +68,52 @@ struct ChatHeaderView: View {
 
     // MARK: Sessions
 
+    @ViewBuilder
     private var sessionControls: some View {
-        HStack {
-            Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
-                .buttonStyle(.plain)
-                .help("New chat (saved)")
-                // Only disabled when there's truly nothing to start fresh
-                // from -- an empty *persistent* session. A temporary chat is
-                // empty too, but this is the way back to a saved one.
-                .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
-            Menu {
-                if sessionHistory.isEmpty {
-                    Text("No saved sessions")
-                }
-                ForEach(sessionHistory) { session in
-                    Menu(session.title.isEmpty ? "New chat" : session.title) {
-                        Button("Open") { chat.loadSession(session) }
-                        Button("Delete", role: .destructive) { deleteSession(session) }
-                    }
-                }
-            } label: {
-                Image(systemName: "clock.arrow.circlepath")
-            }
-            .menuStyle(.borderlessButton)
-            .frame(width: 16)
-            .help("Past chats")
-            Button { chat.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
-                .buttonStyle(.plain)
-                .help("New temporary chat -- nothing about it is ever saved")
-            if !presentation.isDetached {
+        if let toggleSidebar {
+            HStack {
+                Button { toggleSidebar() } label: { Image(systemName: "sidebar.left") }
+                    .buttonStyle(.plain)
+                    .help("Chats")
+                    .accessibilityLabel("Chats")
+                Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
+                    .buttonStyle(.plain)
+                    .help("New chat (saved)")
+                    // Only disabled when there's truly nothing to start fresh
+                    // from -- an empty *persistent* session. A temporary chat is
+                    // empty too, but this is the way back to a saved one.
+                    .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
+                Button { chat.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
+                    .buttonStyle(.plain)
+                    .help("New temporary chat -- nothing about it is ever saved")
                 Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
                     Image(systemName: "macwindow.on.rectangle")
                 }
                 .buttonStyle(.plain)
                 .help("Open in Window -- closing the window puts the chat back in the menu bar")
                 .accessibilityLabel("Open in Window")
+                settingsButton
             }
-            Button { openSettings() } label: { Image(systemName: "gearshape") }
-                .keyboardShortcut(",", modifiers: .command)
-                .help("Settings (⌘,)")
-                .accessibilityLabel("Settings")
+        } else {
+            HStack {
+                // The chat has its own window: this raises it.
+                Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                    Image(systemName: "macwindow")
+                }
                 .buttonStyle(.plain)
+                .help("Show Chat Window")
+                .accessibilityLabel("Show Chat Window")
+                settingsButton
+            }
         }
     }
 
-    private func deleteSession(_ session: ChatSessionFile) {
-        // The session on screen: forgotten first -- starting a new one saves
-        // the current one, which would bring the deleted chat back.
-        if chat.currentSessionID == session.id {
-            chat.forgetCurrentSession()
-            chat.newSession()
-        }
-        ChatSessionStore.delete(id: session.id)
+    private var settingsButton: some View {
+        Button { openSettings() } label: { Image(systemName: "gearshape") }
+            .keyboardShortcut(",", modifiers: .command)
+            .help("Settings (⌘,)")
+            .accessibilityLabel("Settings")
+            .buttonStyle(.plain)
     }
 
     // MARK: Server
@@ -165,29 +160,6 @@ struct ChatHeaderView: View {
         }
     }
 
-    private var statusColor: Color {
-        switch server.state {
-        case .stopped: return .gray
-        case .starting: return .yellow
-        case .running: return .green
-        case .failed: return .red
-        }
-    }
-
-    private var statusText: String {
-        switch server.state {
-        case .stopped:
-            return server.isIdleUnloaded
-                ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
-                : NSLocalizedString("Stopped", comment: "server status")
-        case .starting:
-            return NSLocalizedString("Starting…", comment: "server status")
-        case .running(let port, let model):
-            return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
-        case .failed(let msg):
-            return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
-        }
-    }
 
     // MARK: Profile
 
@@ -278,5 +250,55 @@ struct ChatHeaderView: View {
         if let pane { info["pane"] = pane.rawValue }
         if let profileID { info["profileID"] = profileID }
         NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: info)
+    }
+}
+
+/// The server's state as a dot and a line: the popover's header, and the
+/// chat window's title bar.
+struct ServerStatusLabel: View {
+    @EnvironmentObject var server: ServerManager
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Circle().fill(statusColor).frame(width: 8, height: 8)
+            Text(statusText).font(.system(size: 12, weight: .medium)).lineLimit(1).truncationMode(.middle)
+        }
+    }
+
+    private var statusColor: Color {
+        switch server.state {
+        case .stopped: return .gray
+        case .starting: return .yellow
+        case .running: return .green
+        case .failed: return .red
+        }
+    }
+
+    private var statusText: String {
+        switch server.state {
+        case .stopped:
+            return server.isIdleUnloaded
+                ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
+                : NSLocalizedString("Stopped", comment: "server status")
+        case .starting:
+            return NSLocalizedString("Starting…", comment: "server status")
+        case .running(let port, let model):
+            return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
+        case .failed(let msg):
+            return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
+        }
+    }
+}
+
+/// The menu bar's popover while the chat has its own window: the server,
+/// model and tool controls, which the window leaves out.
+struct TrayControlsView: View {
+    @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
+
+    var body: some View {
+        ChatHeaderView(selectedModelID: $selectedModelID).frame(width: 420)
+            // Models added in Finder / LM Studio since the last look, as the
+            // chat's popover does on opening.
+            .onAppear { ModelCatalog.shared.rescan() }
     }
 }

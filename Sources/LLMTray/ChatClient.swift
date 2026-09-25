@@ -5,7 +5,9 @@ import LLMTrayCore
 
 @MainActor
 final class ChatClient: ObservableObject {
-    @Published var messages: [ChatMessage] = []
+    @Published var messages: [ChatMessage] = [] {
+        didSet { hasUnsavedChanges = true }
+    }
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
@@ -38,6 +40,16 @@ final class ChatClient: ObservableObject {
     @Published private(set) var currentSessionID: UUID?
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
+    /// The title is the user's or the model's already: no auto-title.
+    private var titleIsFinal = false
+    /// Bumped by a rename: a title request still running then drops its
+    /// answer.
+    private var titleRevision = 0
+    private var titleTask: Task<Void, Never>?
+    /// The chat changed since it was loaded or last written. An unchanged
+    /// chat isn't written again: that bumped its updatedAt, so merely
+    /// opening another chat moved it to the top of the list.
+    private var hasUnsavedChanges = false
 
     /// A compaction summary is being written (see compactSession).
     @Published private(set) var isCompacting: Bool = false
@@ -110,6 +122,7 @@ final class ChatClient: ObservableObject {
         currentSessionID = UUID()
         currentSessionTitle = ""
         sessionCreatedAt = Date()
+        titleIsFinal = false
     }
 
     /// Nothing typed or generated in this chat is ever written anywhere --
@@ -130,6 +143,8 @@ final class ChatClient: ObservableObject {
     /// drops the abandoned stream's late callbacks.
     private func resetConversationState() {
         cancel()
+        titleTask?.cancel()
+        titleTask = nil
         conversationEpoch += 1
         assistantMessageIndex = nil
         pendingRequestContext = nil
@@ -157,6 +172,52 @@ final class ChatClient: ObservableObject {
         currentSessionID = file.id
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
+        titleIsFinal = true
+        hasUnsavedChanges = false
+    }
+
+    /// Renames the chat on screen: through here, not the session file --
+    /// the next turn rewrites that file with this title.
+    func renameCurrentSession(_ title: String) {
+        currentSessionTitle = title
+        titleIsFinal = true
+        titleRevision += 1
+        titleTask?.cancel()
+        hasUnsavedChanges = true
+        persistCurrentSession()
+    }
+
+    private static let titleSystemPrompt = """
+        Write a short title for this conversation: at most six words, in the language the user \
+        wrote in, no quotes, no trailing period. Reply with the title only.
+        """
+
+    /// After a new chat's first answer: the model names the chat, as the
+    /// first 48 characters of the question often don't say much. Once per
+    /// chat; a rename (or a failure) leaves it at that.
+    /// Cancelled by a rename and by leaving the chat (resetConversationState),
+    /// so it doesn't keep the one server busy for nothing.
+    func generateTitleIfNeeded(port: Int, modelAlias: String) {
+        guard currentSessionID != nil, !titleIsFinal,
+              let question = messages.first(where: { $0.role == "user" && !$0.isToolContext }),
+              let answer = messages.last(where: { $0.role == "assistant" && !$0.content.isEmpty && !$0.isSummary })
+        else { return }
+        let epoch = conversationEpoch
+        let revision = titleRevision
+        let requestMessages: [[String: Any]] = [
+            ["role": "system", "content": Self.titleSystemPrompt],
+            ["role": "user", "content": "User: \(question.content.prefix(1500))\n\nAssistant: \(answer.content.prefix(1500))"],
+        ]
+        guard let request = ChatRequestBuilder.completion(port: port, modelAlias: modelAlias, messages: requestMessages) else { return }
+        titleIsFinal = true
+        titleTask = Task { [weak self] in
+            guard let raw = try? await ChatTransport.completion(request), !Task.isCancelled,
+                  let title = cleanedChatTitle(raw),
+                  let self, epoch == self.conversationEpoch, revision == self.titleRevision else { return }
+            self.currentSessionTitle = title
+            self.hasUnsavedChanges = true
+            self.persistCurrentSession()
+        }
     }
 
     /// Called after every turn that ends with no pending tool call (see
@@ -166,7 +227,7 @@ final class ChatClient: ObservableObject {
     /// no image (an image-only tool-call-carrier message is real content
     /// now that images are persisted, not plumbing to discard).
     private func persistCurrentSession() {
-        guard let sessionID = currentSessionID else { return }
+        guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
 
@@ -203,9 +264,10 @@ final class ChatClient: ObservableObject {
         if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
             currentSessionTitle = String(firstUser.content.prefix(48))
         }
+        let title = currentSessionTitle.isEmpty ? "New chat" : currentSessionTitle
         let file = ChatSessionFile(
             id: sessionID,
-            title: currentSessionTitle.isEmpty ? "New chat" : currentSessionTitle,
+            title: title,
             createdAt: sessionCreatedAt ?? Date(),
             updatedAt: Date(),
             messages: persisted
@@ -213,6 +275,7 @@ final class ChatClient: ObservableObject {
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
         guard ChatSessionStore.save(file) else { return }
+        hasUnsavedChanges = false
         for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
             try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
         }
