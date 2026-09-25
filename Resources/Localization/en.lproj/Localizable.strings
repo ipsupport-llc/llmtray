@@ -176,16 +176,19 @@
 "Name new chats automatically" = "Name new chats automatically";
 "Network" = "Network";
 "Never" = "Never";
+"New Chat" = "New Chat";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
 "New Tab" = "New Tab";
 "New Tab (⌘T)" = "New Tab (⌘T)";
+"New Temporary Chat" = "New Temporary Chat";
 "New chat" = "New chat";
 "New chat (saved)" = "New chat (saved)";
 "New profile" = "New profile";
 "New profile (inherits everything from Default)" = "New profile (inherits everything from Default)";
 "New project" = "New project";
 "New temporary chat" = "New temporary chat";
+"New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "New temporary chat (⌘⇧N) -- nothing about it is ever saved";
 "New temporary chat -- nothing about it is ever saved" = "New temporary chat -- nothing about it is ever saved";
 "News" = "News";
 "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh).";
@@ -290,6 +293,7 @@
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
+"Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
 "Show only overrides" = "Show only overrides";
 "Show reasoning" = "Show reasoning";
@@ -337,6 +341,7 @@
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";
+"The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model's license, from its card." = "The model's license, from its card.";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "These models go back to Default: %@." = "These models go back to Default: %@.";

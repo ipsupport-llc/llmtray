@@ -19,13 +19,26 @@ struct ChatHeaderView: View {
     /// Shows the chats sidebar over the popover's chat. nil: the tray's
     /// controls while the chat has its own window -- no chat controls.
     var toggleSidebar: (() -> Void)?
+    /// Inside the chat window (Settings > General > Show model controls in
+    /// the chat window): the window's own bar has the status and chat
+    /// controls, so only the model, profile, tools and temperature rows.
+    var inChatWindow = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                ServerStatusLabel()
-                Spacer()
-                sessionControls
+            if !inChatWindow {
+                HStack {
+                    // Clicking the status opens the chat in its window (or
+                    // raises it), from the popover as from its button.
+                    Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                        ServerStatusLabel()
+                    }
+                    .buttonStyle(.plain)
+                    .help("Show Chat Window")
+                    .pointingHandCursor()
+                    Spacer()
+                    sessionControls
+                }
             }
             HStack(spacing: 6) {
                 Picker("Model", selection: $selectedModelID) {

@@ -19,6 +19,7 @@ struct GeneralPane: View {
     @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd
     @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold
     @AppStorage(Pref.autoTitleChats) private var autoTitleChats
+    @AppStorage(Pref.chatWindowShowsModelControls) private var chatWindowShowsModelControls
     // SMAppService is the source of truth (the user can also change it in
     // System Settings > Login Items), so it's read, not stored.
     @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -54,6 +55,9 @@ struct GeneralPane: View {
                 }
                 Toggle(isOn: $showToolCalls) {
                     SettingLabel(title: "Show tool calls", help: "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.")
+                }
+                Toggle(isOn: $chatWindowShowsModelControls) {
+                    SettingLabel(title: "Show model controls in the chat window", help: "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.")
                 }
                 Toggle(isOn: $autoTitleChats) {
                     SettingLabel(title: "Name new chats automatically", help: "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.")

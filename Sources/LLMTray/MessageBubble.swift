@@ -100,12 +100,19 @@ struct MessageBubble: View {
     private func image(_ data: Data, index i: Int) -> some View {
         if let nsImage = NSImage(data: data) {
             let prompt = message.imagePrompts[safe: i] ?? ""
-            VStack(alignment: .leading, spacing: 2) {
+            // A generated image is the answer: large and centred, as wide as
+            // the chat allows (the popover's whole width, up to 640 in the
+            // window). One the user attached stays a thumbnail by their text.
+            let side: CGFloat = isUser ? 280 : Self.generatedImageSide
+            VStack(alignment: isUser ? .trailing : .center, spacing: 6) {
                 Image(nsImage: nsImage)
                     .resizable()
+                    .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 320, maxHeight: 320)
-                    .cornerRadius(8)
+                    .frame(maxWidth: side, maxHeight: side)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.primary.opacity(0.08)))
+                    .shadow(color: .black.opacity(isUser ? 0 : 0.18), radius: 8, y: 3)
                     .onTapGesture { ImageActions.openPreview(data, title: prompt.isEmpty ? "Image" : prompt) }
                     .pointingHandCursor()
                     .contextMenu {
@@ -127,8 +134,12 @@ struct MessageBubble: View {
                 }
                 .foregroundColor(.secondary)
             }
+            .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .center)
+            .padding(.vertical, isUser ? 0 : 4)
         }
     }
+
+    static let generatedImageSide: CGFloat = 640
 }
 
 /// Step progress and the live preview while an image is being generated.
@@ -152,12 +163,15 @@ struct ImageGenerationProgressView: View {
                 }
             }
             if let preview = chat.mfluxPreviewImage {
+                // Where the finished image will be, at its size.
                 Image(nsImage: preview)
                     .resizable()
+                    .interpolation(.high)
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: 320, maxHeight: 320)
-                    .cornerRadius(8)
+                    .frame(maxWidth: MessageBubble.generatedImageSide, maxHeight: MessageBubble.generatedImageSide)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .opacity(0.85)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

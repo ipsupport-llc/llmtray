@@ -35,6 +35,7 @@ struct ContentView: View {
     /// open), beside it in the window (remembered).
     @State private var showsSidebarOverlay = false
     @AppStorage(Pref.chatWindowSidebar) private var showsWindowSidebar: Bool
+    @AppStorage(Pref.chatWindowShowsModelControls) private var windowShowsModelControls: Bool
     @FocusState private var isInputFocused: Bool
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
@@ -120,6 +121,10 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 windowBar
                 Divider()
+                if windowShowsModelControls {
+                    ChatHeaderView(selectedModelID: $selectedModelID, inChatWindow: true)
+                    Divider()
+                }
                 conversation
             }
             .frame(minWidth: 380)
@@ -140,6 +145,10 @@ struct ContentView: View {
                     .buttonStyle(.plain)
                     .help("New chat (saved)")
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
+                Button { ChatTabs.shared.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
+                    .buttonStyle(.plain)
+                    .help("New temporary chat -- nothing about it is ever saved")
+                    .accessibilityLabel("New temporary chat")
             }
             ChatTabStrip()
             Spacer(minLength: 8)
