@@ -185,7 +185,7 @@
 "Regenerate" = "צור מחדש";
 "Remove" = "הסר";
 "Remove attachment" = "מסיר את הקובץ המצורף.";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "מסיר את סביבת ההרצה mlx-lm שהורדה מ-%@. היא תוגדר שוב בהפעלת השרת הבאה. צ׳אטים ופרופילים שמורים יישמרו.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "מסיר את הרוץ־זמן של mlx-lm והיכולות ליצירת תמונות (הרוץ‑זמן ודגמי התמונה) שהורדו מ־%@. הם יותקנו שוב בעת הפעלת השרת הבאה, או כאשר הפעלת יצירת תמונות תופעל. שיחות ושבצים פרופיל נשמרים.";
 "Rename" = "שינוי שם";
 "Rename this profile" = "משנה את שם הפרופיל הזה.";
 "Rescan" = "סרוק מחדש";

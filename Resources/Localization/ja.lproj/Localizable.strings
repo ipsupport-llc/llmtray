@@ -185,7 +185,7 @@
 "Regenerate" = "再生成";
 "Remove" = "削除";
 "Remove attachment" = "添付ファイルを削除します。";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "ダウンロード済みの mlx-lm ランタイムを %@ から削除します。次回サーバ起動時に再度セットアップされます。保存済みのチャットとプロファイルは保持されます。";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
 "Rename" = "名称変更";
 "Rename this profile" = "このプロファイルの名前を変更します。";
 "Rescan" = "再スキャン";

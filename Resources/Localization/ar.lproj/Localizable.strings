@@ -185,7 +185,7 @@
 "Regenerate" = "إعادة التوليد";
 "Remove" = "إزالة";
 "Remove attachment" = "إزالة المرفق.";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "يزيل بيئة تشغيل mlx-lm التي تم تنزيلها من %@. تُعدّ مرة أخرى عند بدء الخادم في المرة التالية. تبقى الدردشات وملفات التعريف المحفوظة.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "يزيل وقت التشغيل mlx-lm المحمّل وتوليد الصور (وقت التشغيل ونماذج الصور) من %@. سيتم إعدادها مرة أخرى عند إعادة تشغيل الخادم أو عند تفعيل توليد الصور. المحادثات والحسابات المحفوظة تبقى محفوظة.";
 "Rename" = "إعادة تسمية";
 "Rename this profile" = "أعد تسمية ملف التعريف هذا.";
 "Rescan" = "إعادة الفحص";

@@ -185,7 +185,7 @@
 "Regenerate" = "फिर से जनरेट करें";
 "Remove" = "हटाएं";
 "Remove attachment" = "अटैचमेंट हटाएँ।";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम %@ से हटाता है। अगले सर्वर शुरू होने पर यह फिर सेट अप हो जाता है। सहेजी गई चैट और प्रोफ़ाइलें बनी रहती हैं।";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम और इमेज जनरेशन (इसका रनटाइम और इमेज मॉडल) %@ से हटाता है। अगली बार सर्वर शुरू होने पर या जब इमेज जनरेशन चालू किया जाएगा, तब इन्हें पुनः सेट किया जाएगा। सेव किए गए चैट और प्रोफ़ाइल बरकरार रखे जाएंगे।";
 "Rename" = "नाम बदलें";
 "Rename this profile" = "इस प्रोफ़ाइल का नाम बदलें।";
 "Rescan" = "फिर स्कैन करें";

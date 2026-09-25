@@ -185,7 +185,7 @@
 "Regenerate" = "Tạo lại";
 "Remove" = "Xóa";
 "Remove attachment" = "Xóa tệp đính kèm.";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống khỏi %@. Runtime này sẽ được thiết lập lại vào lần khởi động máy chủ tiếp theo. Các cuộc trò chuyện và hồ sơ đã lưu được giữ lại.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
 "Rename" = "Đổi tên";
 "Rename this profile" = "Đổi tên cấu hình này.";
 "Rescan" = "Quét lại";

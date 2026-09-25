@@ -185,7 +185,7 @@
 "Regenerate" = "Згенерувати знову";
 "Remove" = "Вилучити";
 "Remove attachment" = "Прибрати вкладення";
-"Removes the downloaded mlx-lm runtime from %@. It's set up again on the next server start. Saved chats and profiles are kept." = "Видаляє завантажений рантайм mlx-lm з %@. Під час наступного запуску сервера він встановиться заново. Збережені чати й профілі залишаються.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Видаляє завантажений runtime mlx-lm та моделі генерації зображень (runtime і моделі зображень) з %@. Вони будуть знову встановлені при наступному запуску сервера або коли генерація зображень буде увімкнена. Збережені чати та профілі зберігаються.";
 "Rename" = "Перейменувати";
 "Rename this profile" = "Перейменувати цей профіль";
 "Rescan" = "Оновити список";
