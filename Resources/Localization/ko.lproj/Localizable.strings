@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "마지막 메시지 유지: %lld개";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "양자화하기 전에 컨텍스트의 처음 N개 토큰을 전체 정밀도로 유지합니다. 값이 높을수록 메모리 절약은 줄지만 긴 프롬프트의 정확도가 높아집니다.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — 채팅";
 "Language" = "언어";
 "Larger than this Mac's RAM -- unlikely to load" = "이 Mac의 RAM보다 큽니다 — 로드될 가능성이 낮습니다";
 "Later" = "나중에";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "제한된 모델에만 적용(Llama, 일부 Gemma 및 FLUX 저장소): Hugging Face 페이지에서 사용권에 동의한 뒤 여기로 읽기 권한 토큰을 붙여넣으세요. 키체인에 저장되며 huggingface.co로만 전송됩니다.";
 "Open" = "열기";
 "Open Server Log…" = "서버 로그 열기…";
+"Open in Window" = "창에서 열기";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "창을 닫으면 채팅이 메뉴 막대로 돌아갑니다.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray에만 macOS 언어 설정을 덮어씁니다. LLMTray를 다시 시작한 후 적용됩니다. 번역되지 않은 텍스트는 영어로 표시됩니다.";
 "Past %lld messages" = "지난 %lld개 메시지";
 "Past chats" = "이전 채팅입니다.";

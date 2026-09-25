@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "Son iletileri koru: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Bağlamın ilk N token’ını nicelemeden önce tam hassasiyette tutar. Daha yüksek değer, uzun istemlerde doğruluk için bellek tasarrufundan ödün verir.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — Sohbet";
 "Language" = "Dil";
 "Larger than this Mac's RAM -- unlikely to load" = "Bu Mac'in RAM'inden büyük — yüklenmesi muhtemel değil";
 "Later" = "Daha Sonra";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Sadece kısıtlı modeller için (Llama, bazı Gemma ve FLUX depoları): Hugging Face sayfasında modelin lisansını kabul edin, sonra buraya bir read token yapıştırın. Keychain'inizde saklanır, yalnızca huggingface.co'ya gönderilir.";
 "Open" = "Aç";
 "Open Server Log…" = "Sunucu Günlüğünü Aç…";
+"Open in Window" = "Pencerede Aç";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "Pencerede Aç — pencere kapatıldığında sohbet menü çubuğuna geri gider";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "Past %lld messages" = "Son %lld mesaj";
 "Past chats" = "Geçmiş sohbetleri gösterir.";

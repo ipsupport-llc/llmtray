@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "Pertahankan pesan terakhir: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — Obrolan";
 "Language" = "Bahasa";
 "Larger than this Mac's RAM -- unlikely to load" = "Lebih besar dari RAM Mac ini — kemungkinan tidak termuat";
 "Later" = "Nanti";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
 "Open" = "Buka";
 "Open Server Log…" = "Buka Log Server…";
+"Open in Window" = "Buka di Jendela";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "Buka di Jendela — menutup jendela mengembalikan obrolan ke bar menu";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
 "Past %lld messages" = "%lld pesan terakhir";
 "Past chats" = "Obrolan sebelumnya.";
