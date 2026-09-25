@@ -90,6 +90,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private let chatPresentation = ChatPresentation()
+    private lazy var chatWindow = ChatWindowController { [weak self] in self?.attachChat() }
     private var logWindow: NSWindow?
     private var hfWindow: NSWindow?
     private var aboutWindow: NSWindow?
@@ -129,6 +131,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showHFBrowserWindow), name: .showHFBrowser, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(detachChat), name: .detachChat, object: nil
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
@@ -179,20 +184,82 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupPopover() {
         let popover = NSPopover()
         popover.behavior = .transient
-        let hosting = NSHostingController(
-            rootView: ContentView()
-                .environmentObject(server)
-                .environmentObject(chat)
-                .environmentObject(benchmark)
-        )
+        self.popover = popover
+        popover.contentViewController = makePopoverChat()
+    }
+
+    /// A fresh chat view. The popover and the chat window never share one
+    /// (see ChatPresentation); the state that must carry over lives there.
+    private func makeChatController() -> NSHostingController<AnyView> {
+        NSHostingController(rootView: AnyView(ContentView()
+            .environmentObject(server)
+            .environmentObject(chat)
+            .environmentObject(benchmark)
+            .environmentObject(chatPresentation)
+            .environmentObject(chatPresentation.composer)))
+    }
+
+    private func makePopoverChat() -> NSViewController {
+        let hosting = makeChatController()
         // Tracks the SwiftUI content's own intrinsic size instead of a
         // fixed contentSize -- ContentView's chatArea shrinks toward a
         // minimum when the chat is empty and grows (up to its own cap) as
         // messages arrive, and this is what actually lets that resize the
         // popover window instead of leaving it pinned at one fixed height.
         hosting.sizingOptions = [.preferredContentSize]
-        popover.contentViewController = hosting
-        self.popover = popover
+        return hosting
+    }
+
+    // MARK: - Detachable chat window
+
+    /// Moves the chat out of the popover into its own window.
+    @objc private func detachChat() {
+        guard !chatPresentation.isDetached else { return showChatWindow() }
+        popover.performClose(nil)
+        // The popover's chat view goes away (only one exists at a time);
+        // NSPopover still wants a content controller, never shown while
+        // detached (the status item raises the window instead).
+        let placeholder = NSViewController()
+        placeholder.view = NSView()
+        popover.contentViewController = placeholder
+        chatPresentation.isDetached = true
+        setDockIconVisible(true)
+        let hosting = makeChatController()
+        // The user sizes the window, not the content: tracking
+        // preferredContentSize (as the popover must) makes an NSWindow snap
+        // back to it. ChatWindowController enforces the minimum size.
+        hosting.sizingOptions = []
+        chatWindow.show(hosting)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// The chat window was closed: the chat goes back into the popover.
+    private func attachChat() {
+        guard chatPresentation.isDetached else { return }
+        chatWindow.removeContent()
+        chatPresentation.isDetached = false
+        popover.contentViewController = makePopoverChat()
+        setDockIconVisible(false)
+    }
+
+    private func showChatWindow() {
+        chatWindow.window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Dock icon + Cmd+Tab while the chat has its own window; menu-bar-only
+    /// (the app's normal state) otherwise -- even with Settings or the log
+    /// still open: closing the chat window is what removes the Dock icon.
+    /// (detachChat activates the app right after, which a fresh .regular
+    /// app needs before macOS shows its menu bar.)
+    private func setDockIconVisible(_ visible: Bool) {
+        NSApp.setActivationPolicy(visible ? .regular : .accessory)
+    }
+
+    /// Clicking the Dock icon (it only exists while detached) raises the chat.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if chatPresentation.isDetached { showChatWindow() }
+        return true
     }
 
     @objc private func statusItemClicked(_ sender: NSStatusBarButton) {
@@ -205,7 +272,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func togglePopover() {
         guard let button = statusItem.button else { return }
-        if popover.isShown {
+        if chatPresentation.isDetached {
+            showChatWindow()
+        } else if popover.isShown {
             popover.performClose(nil)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)

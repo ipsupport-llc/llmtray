@@ -8,11 +8,15 @@ struct ContentView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
+    @EnvironmentObject var presentation: ChatPresentation
     // Chat, tool and server-launch settings live in profiles (see
     // ProfileManager): the selected model's profile, layered on Default.
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
-    @StateObject private var composer = ComposerModel()
+    // Owned by AppDelegate (ChatPresentation), not this view: the popover
+    // and the chat window each build their own ContentView, and the draft
+    // has to carry over between them.
+    @EnvironmentObject private var composer: ComposerModel
 
     // Persists across launches -- picking up where you left off. Also read
     // by AppDelegate's auto-start and quick menu.
@@ -20,8 +24,6 @@ struct ContentView: View {
     @AppStorage(Pref.port) private var port: Int
     @AppStorage(Pref.showReasoning) private var showReasoning: Bool
     @AppStorage(Pref.showToolCalls) private var showToolCalls: Bool
-    /// The conversation the running turn belongs to (auto-compaction).
-    @State private var turnConversation: Int?
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -57,7 +59,10 @@ struct ContentView: View {
             )
             .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
         }
-        .frame(width: 420)
+        // The popover is a fixed 420 wide; detached, the chat fills its
+        // window (ChatWindowController enforces the minimum size).
+        .frame(minWidth: 420, maxWidth: presentation.isDetached ? .infinity : 420,
+               maxHeight: presentation.isDetached ? .infinity : nil)
         .onAppear {
             sessionHistory = ChatSessionStore.list()
             // Models added or removed in Finder / LM Studio since the last
@@ -86,8 +91,8 @@ struct ContentView: View {
             // Only in the chat it started in: opening another one ends the
             // turn too, and that one mustn't be compacted for it.
             if busy {
-                turnConversation = chat.conversationEpoch
-            } else if turnConversation == chat.conversationEpoch {
+                presentation.turnConversation = chat.conversationEpoch
+            } else if presentation.turnConversation == chat.conversationEpoch {
                 autoCompactIfNeeded()
             }
         }
@@ -214,8 +219,9 @@ struct ContentView: View {
                 }
             }
             // Small for an empty chat, capped so a long one scrolls inside
-            // a fixed viewport instead of growing the window.
-            .frame(minHeight: 48, maxHeight: chat.messages.isEmpty ? 48 : 380)
+            // a fixed viewport instead of growing the popover. Detached, it
+            // takes whatever height the window leaves it.
+            .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
             // Cheap to compare: lengths, not the whole text, per token.
             .onChange(of: streamSignal) { _ in
                 if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
