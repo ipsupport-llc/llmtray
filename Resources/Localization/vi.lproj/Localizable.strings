@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "Giữ các tin nhắn cuối: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Giữ N token đầu tiên của ngữ cảnh ở độ chính xác đầy đủ trước khi lượng tử hóa. Giá trị cao hơn đánh đổi mức tiết kiệm bộ nhớ để lấy độ chính xác với prompt dài.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — Trò chuyện";
 "Language" = "Ngôn ngữ";
 "Larger than this Mac's RAM -- unlikely to load" = "Lớn hơn RAM của Mac này — khó có thể tải";
 "Later" = "Để sau";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
 "Open" = "Mở";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
+"Open in Window" = "Mở trong Cửa sổ";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "Mở trong Cửa sổ — đóng cửa sổ sẽ đưa cuộc trò chuyện trở lại thanh menu";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "Past %lld messages" = "%lld tin nhắn trước đó";
 "Past chats" = "Các cuộc trò chuyện trước đây.";

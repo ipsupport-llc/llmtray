@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "Mantieni gli ultimi messaggi: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene i primi N token di contesto a precisione piena prima della quantizzazione. Un valore più alto riduce il risparmio di memoria ma aumenta l’accuratezza nei prompt lunghi.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — Chat";
 "Language" = "Lingua";
 "Larger than this Mac's RAM -- unlikely to load" = "Più grande della RAM di questo Mac — improbabile che si carichi";
 "Later" = "Più tardi";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Solo per modelli protetti (Llama, alcuni repo Gemma e FLUX): accetta la licenza sulla pagina Hugging Face del modello, poi incolla qui un token in sola lettura. Salvato nel Keychain, inviato solo a huggingface.co.";
 "Open" = "Apri";
 "Open Server Log…" = "Apri log del server…";
+"Open in Window" = "Apri nella finestra";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "Apri nella finestra — chiudendo la finestra la chat torna nella barra dei menu";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Sostituisce la lingua di macOS solo per LLMTray. Ha effetto dopo il riavvio di LLMTray. Il testo non tradotto viene mostrato in inglese.";
 "Past %lld messages" = "Ultimi %lld messaggi";
 "Past chats" = "Mostra le chat precedenti.";

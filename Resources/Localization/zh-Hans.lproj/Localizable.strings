@@ -140,6 +140,7 @@
 "Keep last messages: %lld" = "保留末尾消息：%lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — 聊天";
 "Language" = "语言";
 "Larger than this Mac's RAM -- unlikely to load" = "大于此 Mac 的内存 —— 可能无法加载";
 "Later" = "稍后";
@@ -185,6 +186,8 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
 "Open" = "打开";
 "Open Server Log…" = "打开服务器日志…";
+"Open in Window" = "在窗口中打开";
+"Open in Window -- closing the window puts the chat back in the menu bar" = "在窗口中打开 — 关闭窗口后聊天会返回菜单栏";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
 "Past %lld messages" = "过去 %lld 条消息";
 "Past chats" = "过往聊天";
