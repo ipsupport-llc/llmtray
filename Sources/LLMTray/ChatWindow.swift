@@ -7,24 +7,6 @@ extension Notification.Name {
     static let detachChat = Notification.Name("LLMTray.detachChat")
 }
 
-/// Where the chat is shown, and the chat state that has to outlive the view
-/// showing it. The popover and the window each get their own freshly built
-/// ContentView (a hosting controller that has once been shown in an
-/// NSPopover can never be made resizable in a window, and moving it froze
-/// resizing in the app's other windows too), so what used to be view state
-/// -- the draft, the turn being compacted -- lives here, owned by
-/// AppDelegate. Only one ContentView exists at a time: its side effects
-/// (auto-compaction, model switching) must not run twice.
-@MainActor
-final class ChatPresentation: ObservableObject {
-    @Published var isDetached = false
-    /// The message being composed: survives a detach / attach.
-    let composer = ComposerModel()
-    /// The conversation the running turn belongs to (auto-compaction), so a
-    /// turn still streaming when the chat moves is compacted when it ends.
-    var turnConversation: Int?
-}
-
 /// The window the chat lives in while detached. Closing it (red button,
 /// ⌘W) hands the chat back to the popover via onClose.
 @MainActor

@@ -90,7 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private let chatPresentation = ChatPresentation()
+    private lazy var chatPresentation = ChatPresentation(chat: chat)
     private lazy var chatWindow = ChatWindowController { [weak self] in self?.attachChat() }
     private var logWindow: NSWindow?
     private var hfWindow: NSWindow?

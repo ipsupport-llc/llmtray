@@ -29,9 +29,6 @@ struct ContentView: View {
     // model-generated summary (see ChatClient.compactSession).
     @AppStorage(Pref.compactKeepStart) private var compactKeepStart: Int
     @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd: Int
-    // 0 disables auto-compaction -- otherwise checked after every
-    // completed turn.
-    @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold: Int
 
     // Backs the History menu -- refreshed on appear and whenever
     // ChatSessionStore posts .sessionsDidChange, not read from disk on
@@ -58,7 +55,7 @@ struct ContentView: View {
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
                 isFocused: $isInputFocused,
-                send: send, regenerate: regenerate, compact: { Task { await compact() } }
+                send: send, regenerate: regenerate, compact: { Task { await presentation.compact() } }
             )
             .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
         }
@@ -77,27 +74,8 @@ struct ContentView: View {
         }
         .onChange(of: selectedModelID) { modelDidChange($0) }
         .onChange(of: catalog.models) { _ in keepSelectionValid() }
-        .onReceive(NotificationCenter.default.publisher(for: .modelsDidChange)) { notification in
-            // A Hugging Face download finished: jump to the model that just
-            // landed on disk (the catalog rescans on the same notification).
-            guard let repoID = notification.object as? String else { return }
-            catalog.rescan()
-            let downloaded = catalog.root + "/\(repoID)"
-            if catalog.model(id: downloaded) != nil { selectedModelID = downloaded }
-        }
         .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
             sessionHistory = ChatSessionStore.list()
-        }
-        .onChange(of: chat.isTurnInProgress) { busy in
-            // The one reliable "a turn (streaming + tool calls) just
-            // finished" signal: send()/regenerate() don't await the turn.
-            // Only in the chat it started in: opening another one ends the
-            // turn too, and that one mustn't be compacted for it.
-            if busy {
-                presentation.turnConversation = chat.conversationEpoch
-            } else if presentation.turnConversation == chat.conversationEpoch {
-                autoCompactIfNeeded()
-            }
         }
     }
 
@@ -113,7 +91,7 @@ struct ContentView: View {
     }
 
     private func modelDidChange(_ modelID: String?) {
-        modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
+        modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
     }
 
@@ -125,10 +103,7 @@ struct ContentView: View {
     }
 
     private var chatSettings: ChatSettings {
-        var settings = ChatSettings(profile: profiles.resolved(for: selectedModelID), maxTokensCap: modelMaxContext)
-        settings.modelSupportsVision = composer.acceptsImages
-        settings.modelPath = selectedModelID
-        return settings
+        ChatSettings.forModel(selectedModelID, supportsVision: composer.acceptsImages, maxContext: modelMaxContext)
     }
 
     // MARK: - Chat
@@ -279,17 +254,6 @@ struct ContentView: View {
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
-    private func compact() async {
-        await chat.compactSession(
-            port: port, modelAlias: requestModelName, settings: chatSettings,
-            keepStart: compactKeepStart, keepEnd: compactKeepEnd
-        )
-    }
-
-    private func autoCompactIfNeeded() {
-        guard autoCompactThreshold > 0, chat.messages.count > autoCompactThreshold else { return }
-        Task { await compact() }
-    }
 }
 
 /// The chat content's bottom edge (in the scroll view's coordinates) and height.
