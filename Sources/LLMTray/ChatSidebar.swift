@@ -7,6 +7,7 @@ import SwiftUI
 struct ChatSidebar: View {
     @EnvironmentObject var chat: ChatClient
     @ObservedObject private var store = ChatLibraryStore.shared
+    @ObservedObject private var tabs = ChatTabs.shared
     /// Hides the sidebar (the popover's overlay closes; the window's
     /// collapses).
     let close: () -> Void
@@ -63,7 +64,7 @@ struct ChatSidebar: View {
             Text("Delete this chat?"), isPresented: Binding(get: { chatToDelete != nil }, set: { if !$0 { chatToDelete = nil } }),
             presenting: chatToDelete
         ) { summary in
-            Button("Delete", role: .destructive) { store.delete(summary.id, chat: chat) }
+            Button("Delete", role: .destructive) { store.delete(summary.id) }
         } message: { summary in
             Text(summary.title)
         }
@@ -87,13 +88,13 @@ struct ChatSidebar: View {
                     .help("Hide chats")
                     .accessibilityLabel("Hide chats")
                 Spacer()
-                Button { open { chat.newTemporaryChat() } } label: { Image(systemName: "eye.slash") }
+                Button { open { ChatTabs.shared.newTemporaryChat() } } label: { Image(systemName: "eye.slash") }
                     .buttonStyle(.plain)
                     .help("New temporary chat -- nothing about it is ever saved")
                     .accessibilityLabel("New temporary chat")
             }
             .foregroundColor(.secondary)
-            Button { open { chat.newSession() } } label: {
+            Button { open { ChatTabs.shared.newChat() } } label: {
                 Label("New chat", systemImage: "square.and.pencil")
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -209,13 +210,22 @@ struct ChatSidebar: View {
                 .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
-            Button { open { openChat(summary.id) } } label: {
+            Button {
+                // ⌘-click: in a new tab, as in a browser.
+                let newTab = NSEvent.modifierFlags.contains(.command)
+                open { tabs.open(summary.id, inNewTab: newTab) }
+            } label: {
                 HStack(spacing: 6) {
                     if store.library.isPinned(summary.id) && !query.isEmpty {
                         Image(systemName: "pin.fill").font(.caption2).foregroundColor(.secondary)
                     }
                     Text(summary.title).lineLimit(1).truncationMode(.tail)
                     Spacer(minLength: 0)
+                    // Open in another tab.
+                    if chat.currentSessionID != summary.id, tabs.index(of: summary.id) != nil {
+                        Circle().fill(Color.secondary).frame(width: 5, height: 5)
+                            .help("Open in another tab")
+                    }
                 }
             }
             .buttonStyle(SidebarRowStyle(isSelected: chat.currentSessionID == summary.id))
@@ -226,6 +236,9 @@ struct ChatSidebar: View {
 
     @ViewBuilder
     private func chatMenu(_ summary: ChatSummary, in section: String) -> some View {
+        Button("Open in New Tab") { open { tabs.open(summary.id, inNewTab: true) } }
+            .disabled(tabs.index(of: summary.id) != nil)
+        Divider()
         Button("Rename…") { startRename(summary, in: section) }
         if store.library.isPinned(summary.id) {
             Button("Unpin") { store.setPinned(summary.id, false) }
@@ -297,11 +310,6 @@ struct ChatSidebar: View {
         if closesOnOpen { close() }
     }
 
-    private func openChat(_ id: UUID) {
-        guard chat.currentSessionID != id, let file = ChatSessionStore.load(id: id) else { return }
-        chat.loadSession(file)
-    }
-
     private func startRename(_ summary: ChatSummary, in section: String) {
         renameHadFocus = false
         renamingProject = nil
@@ -313,7 +321,7 @@ struct ChatSidebar: View {
         guard renaming?.chat == id else { return }
         renaming = nil
         renameHadFocus = false
-        store.rename(id, to: chatDraft, chat: chat)
+        store.rename(id, to: chatDraft)
     }
 
     private func commitProjectRename(_ id: UUID) {

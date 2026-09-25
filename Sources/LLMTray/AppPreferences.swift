@@ -22,9 +22,10 @@ extension AppStorage where Value == String? {
 }
 
 extension OperationAvailability {
-    /// The app's current activity, read from the objects that own it.
+    /// The app's current activity, read from the objects that own it. Any
+    /// chat tab's turn counts, not just the one on screen.
     @MainActor
-    init(server: ServerManager, chat: ChatClient, benchmark: BenchmarkRunner) {
+    init(server: ServerManager, benchmark: BenchmarkRunner) {
         let phase: ActivitySnapshot.Server
         switch server.state {
         case .stopped: phase = server.isIdleUnloaded ? .idleUnloaded : .stopped
@@ -33,7 +34,7 @@ extension OperationAvailability {
         case .failed: phase = .failed
         }
         self.init(ActivitySnapshot(
-            server: phase, serverBusy: server.isBusy, chatBusy: chat.isBusy, benchmarkRunning: benchmark.isRunning
+            server: phase, serverBusy: server.isBusy, chatBusy: ChatTabs.shared.isAnyBusy, benchmarkRunning: benchmark.isRunning
         ))
     }
 }

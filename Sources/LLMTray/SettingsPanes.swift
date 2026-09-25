@@ -102,6 +102,8 @@ struct GeneralPane: View {
 // MARK: - Models
 
 struct ModelsPane: View {
+    // A turn in any chat tab holds these back, not just the one on screen.
+    @ObservedObject private var chatTabs = ChatTabs.shared
     @EnvironmentObject var benchmark: BenchmarkRunner
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
@@ -216,7 +218,7 @@ struct ModelsPane: View {
                 .frame(width: 140)
                 // Auto-tune writes into the loaded model's profile and
                 // restarts it between measurements.
-                .disabled(!OperationAvailability(server: server, chat: chat, benchmark: benchmark)
+                .disabled(!OperationAvailability(server: server, benchmark: benchmark)
                     .canAssignProfile(toLoadedModel: server.loadedModelPath == m.id))
             }
         } label: {
@@ -256,6 +258,8 @@ struct ModelsPane: View {
 // MARK: - Profiles
 
 struct ProfilesPane: View {
+    // A turn in any chat tab holds these back, not just the one on screen.
+    @ObservedObject private var chatTabs = ChatTabs.shared
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
@@ -337,7 +341,7 @@ struct ProfilesPane: View {
         }
     }
 
-    private var ops: OperationAvailability { OperationAvailability(server: server, chat: chat, benchmark: benchmark) }
+    private var ops: OperationAvailability { OperationAvailability(server: server, benchmark: benchmark) }
     private var busy: Bool { !ops.canDeleteProfile }
 
     private func startRenaming(_ p: Profile) {
@@ -656,6 +660,8 @@ struct SliderValue: View {
 // MARK: - Server
 
 struct ServerPane: View {
+    // A turn in any chat tab holds these back, not just the one on screen.
+    @ObservedObject private var chatTabs = ChatTabs.shared
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
@@ -667,7 +673,7 @@ struct ServerPane: View {
 
     /// Idle-unloaded counts as running: the listener still holds the port.
     private var isStopped: Bool {
-        OperationAvailability(server: server, chat: chat, benchmark: benchmark).canEditNetworkSettings
+        OperationAvailability(server: server, benchmark: benchmark).canEditNetworkSettings
     }
 
     var body: some View {
@@ -742,6 +748,8 @@ struct BenchmarkPane: View {
 // MARK: - Updates
 
 struct UpdatesPane: View {
+    // A turn in any chat tab holds these back, not just the one on screen.
+    @ObservedObject private var chatTabs = ChatTabs.shared
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
@@ -754,7 +762,7 @@ struct UpdatesPane: View {
     /// Anything that could start the model process mid-update: running,
     /// starting, or idle-unloaded (the next request reloads it).
     private var isRunning: Bool {
-        !OperationAvailability(server: server, chat: chat, benchmark: benchmark).canChangeRuntime
+        !OperationAvailability(server: server, benchmark: benchmark).canChangeRuntime
     }
 
     private var version: String {

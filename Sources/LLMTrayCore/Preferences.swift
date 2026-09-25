@@ -41,6 +41,8 @@ public enum Pref {
     public static let autoCompactThreshold = PrefKey("llmtray.autoCompactThreshold", default: 0)
     /// The chat window shows the chats sidebar.
     public static let chatWindowSidebar = PrefKey("llmtray.chatWindowSidebar", default: true)
+    /// The saved chats open in tabs (UUID strings), reopened at launch.
+    public static let openChatTabs = PrefKey<[String]>("llmtray.openChatTabs", default: [])
     /// A new chat's first answer gets the model to name the chat.
     public static let autoTitleChats = PrefKey("llmtray.autoTitleChats", default: true)
 

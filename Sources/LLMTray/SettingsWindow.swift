@@ -146,11 +146,13 @@ struct SettingLabel: View {
 
 /// "The running server was started with other settings" + Restart.
 struct RestartBanner: View {
+    // A turn in any chat tab holds these back, not just the one on screen.
+    @ObservedObject private var chatTabs = ChatTabs.shared
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
 
-    private var blocked: Bool { !OperationAvailability(server: server, chat: chat, benchmark: benchmark).canRestartServer }
+    private var blocked: Bool { !OperationAvailability(server: server, benchmark: benchmark).canRestartServer }
 
     var body: some View {
         if server.pendingLaunchChange {

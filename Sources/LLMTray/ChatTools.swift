@@ -31,10 +31,12 @@ protocol ChatTool: AnyObject {
 /// The chat's tools, by name.
 @MainActor
 final class ChatToolbox {
-    let imageGeneration = ImageToolRunner()
+    let imageGeneration: ImageToolRunner
     private(set) var tools: [ChatTool] = []
 
-    init() {
+    /// `mflux`: the app's one image generator, shared by every chat tab.
+    init(mflux: MfluxManager? = nil) {
+        imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         tools = [imageGeneration, ViewImageTool()] + ToolCatalog.makeTools()
     }
 

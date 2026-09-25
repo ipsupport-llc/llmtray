@@ -66,6 +66,7 @@
 "Clear" = "Clear";
 "Clear search" = "Clear search";
 "Close" = "Close";
+"Close Tab" = "Close Tab";
 "Compact" = "Compact";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word.";
 "Compaction" = "Compaction";
@@ -177,6 +178,8 @@
 "Never" = "Never";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
+"New Tab" = "New Tab";
+"New Tab (⌘T)" = "New Tab (⌘T)";
 "New chat" = "New chat";
 "New chat (saved)" = "New chat (saved)";
 "New profile" = "New profile";
@@ -201,8 +204,10 @@
 "Older" = "Older";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Open Server Log…" = "Open Server Log…";
+"Open in New Tab" = "Open in New Tab";
 "Open in Window" = "Open in Window";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
+"Open in another tab" = "Open in another tab";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "Past %lld messages" = "Past %lld messages";
 "Pause download" = "Pause download";
@@ -268,6 +273,7 @@
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
 "Search chats" = "Search chats";
+"Select Tab" = "Select Tab";
 "Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
@@ -282,6 +288,8 @@
 "Settings this profile overrides; everything else comes from Default." = "Settings this profile overrides; everything else comes from Default.";
 "Settings…" = "Settings…";
 "Show Chat Window" = "Show Chat Window";
+"Show Next Tab" = "Show Next Tab";
+"Show Previous Tab" = "Show Previous Tab";
 "Show more" = "Show more";
 "Show only overrides" = "Show only overrides";
 "Show reasoning" = "Show reasoning";
@@ -314,6 +322,7 @@
 "Sunrise & sunset" = "Sunrise & sunset";
 "System" = "System";
 "System prompt" = "System prompt";
+"Tab %lld" = "Tab %lld";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
 "Temporary chat" = "Temporary chat";
@@ -323,6 +332,8 @@
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
+"The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
+"The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";
