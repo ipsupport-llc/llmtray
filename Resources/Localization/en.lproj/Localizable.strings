@@ -138,6 +138,7 @@
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "LLMTray" = "LLMTray";
+"LLMTray — Chat" = "LLMTray — Chat";
 "Language" = "Language";
 "Larger than this Mac's RAM -- unlikely to load" = "Larger than this Mac's RAM -- unlikely to load";
 "Later" = "Later";

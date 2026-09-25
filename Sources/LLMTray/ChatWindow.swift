@@ -21,7 +21,7 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "LLMTray — Chat"
+        window.title = NSLocalizedString("LLMTray — Chat", comment: "")
         window.isReleasedWhenClosed = false
         super.init(window: window)
         window.delegate = self
