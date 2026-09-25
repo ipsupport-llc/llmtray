@@ -202,11 +202,11 @@ struct HFBrowserView: View {
     }
 
     private var statusLine: String {
-        guard !browser.isPaused else { return "Paused" }
+        guard !browser.isPaused else { return NSLocalizedString("Paused", comment: "") }
         guard browser.downloadSpeedBytesPerSec > 0 else { return browser.downloadStatusText }
         let speed = Self.byteFormatter.string(fromByteCount: Int64(browser.downloadSpeedBytesPerSec)) + "/s"
         guard let eta = browser.downloadETASeconds else { return speed }
-        return "\(speed) · \(Self.formatETA(eta)) left"
+        return String(format: NSLocalizedString("%@ · %@ left", comment: "download speed, time left"), speed, Self.formatETA(eta))
     }
 
     private static let byteFormatter: ByteCountFormatter = {

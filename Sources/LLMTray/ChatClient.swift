@@ -295,7 +295,7 @@ final class ChatClient: ObservableObject {
             persistCurrentSession()
         } catch {
             guard epoch == conversationEpoch, !Task.isCancelled else { return }
-            errorText = "Compaction failed: \(error.localizedDescription)"
+            errorText = String(format: NSLocalizedString("Compaction failed: %@", comment: ""), error.localizedDescription)
         }
     }
 
@@ -362,7 +362,7 @@ final class ChatClient: ObservableObject {
             history: Array(messages.dropLast(1)),
             tools: offerTools ? toolbox.definitions(for: settings) : []
         ) else {
-            errorText = "failed to build request"
+            errorText = NSLocalizedString("failed to build request", comment: "")
             return
         }
 
@@ -494,7 +494,7 @@ final class ChatClient: ObservableObject {
             for call in toolCalls {
                 messages.append(ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id))
             }
-            errorText = "Stopped: the model kept calling tools (\(maxToolRoundsPerTurn) rounds in one turn)."
+            errorText = String(format: NSLocalizedString("Stopped: the model kept calling tools (%lld rounds in one turn).", comment: ""), maxToolRoundsPerTurn)
             isRunningTools = false
             isStreaming = false
             persistCurrentSession()
@@ -562,7 +562,7 @@ final class ChatClient: ObservableObject {
             do {
                 try await context.server.ensureModelLoaded()
             } catch {
-                errorText = "Failed to reload the chat model after image generation: \(error.localizedDescription)"
+                errorText = String(format: NSLocalizedString("Failed to reload the chat model after image generation: %@", comment: ""), error.localizedDescription)
                 persistCurrentSession()   // the generated image is kept
                 return
             }

@@ -18,9 +18,9 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
 
     var displayName: String {
         switch self {
-        case .gptq8bit: return "Z-Image Turbo — GPTQ 8-bit"
-        case .gptq4bit: return "Z-Image Turbo — GPTQ 4-bit"
-        case .gptqMixed: return "Z-Image Turbo — GPTQ mixed (recommended)"
+        case .gptq8bit: return NSLocalizedString("Z-Image Turbo — GPTQ 8-bit", comment: "")
+        case .gptq4bit: return NSLocalizedString("Z-Image Turbo — GPTQ 4-bit", comment: "")
+        case .gptqMixed: return NSLocalizedString("Z-Image Turbo — GPTQ mixed (recommended)", comment: "")
         }
     }
 
@@ -37,9 +37,9 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
 
     var summary: String {
         switch self {
-        case .gptq8bit: return "Highest fidelity, largest download -- a correctness baseline you can trust."
-        case .gptq4bit: return "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts."
-        case .gptqMixed: return "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit."
+        case .gptq8bit: return NSLocalizedString("Highest fidelity, largest download -- a correctness baseline you can trust.", comment: "")
+        case .gptq4bit: return NSLocalizedString("Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.", comment: "")
+        case .gptqMixed: return NSLocalizedString("Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.", comment: "")
         }
     }
 
@@ -73,9 +73,9 @@ enum ImageQuality: String, CaseIterable, Identifiable, Codable {
 
     var displayName: String {
         switch self {
-        case .fast: return "Fast (smaller canvas)"
-        case .balanced: return "Balanced (default)"
-        case .high: return "High quality (larger canvas)"
+        case .fast: return NSLocalizedString("Fast (smaller canvas)", comment: "")
+        case .balanced: return NSLocalizedString("Balanced (default)", comment: "")
+        case .high: return NSLocalizedString("High quality (larger canvas)", comment: "")
         }
     }
 
@@ -104,11 +104,11 @@ final class MfluxManager: ObservableObject {
         var errorDescription: String? {
             switch self {
             case .noPython:
-                return "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)."
+                return NSLocalizedString("No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh).", comment: "")
             case .processFailed(let detail):
-                return "Image generation failed: \(detail)"
+                return String(format: NSLocalizedString("Image generation failed: %@", comment: ""), detail)
             case .outputMissing:
-                return "Image generation finished but produced no output file."
+                return NSLocalizedString("Image generation finished but produced no output file.", comment: "")
             }
         }
     }
@@ -150,13 +150,13 @@ final class MfluxManager: ObservableObject {
             // The Full build's own Python first: a clean Mac has no other.
             guard let python = await PythonLocator.findModern(preferring: [MLXRuntimeInstaller.externalFrameworkPython()].compactMap { $0 })
             else { throw MfluxError.noPython }
-            statusText = "Setting up image generation (first time only)…"
+            statusText = NSLocalizedString("Setting up image generation (first time only)…", comment: "")
             try await runProcess(python, ["-m", "venv", venvDir])
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
         // Also when an install from before the pin has another version.
         if !FileManager.default.fileExists(atPath: saveBinary) || installedMfluxVersion() != Self.mfluxVersion {
-            statusText = "Installing mflux…"
+            statusText = NSLocalizedString("Installing mflux…", comment: "")
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", Self.mfluxRequirement, "huggingface_hub"])
         }
         statusText = ""
@@ -186,7 +186,7 @@ final class MfluxManager: ObservableObject {
         if FileManager.default.fileExists(atPath: savedModelDir(for: model)) { return }
 
         isBusy = true
-        statusText = "Downloading \(model.displayName)…"
+        statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
         defer {
             isBusy = false
             statusText = ""
@@ -224,23 +224,23 @@ final class MfluxManager: ObservableObject {
         // Set up by the download in Settings; never installed mid-chat (a
         // temporary chat must not cause files to be written).
         guard FileManager.default.fileExists(atPath: venvPython) else {
-            throw MfluxError.processFailed("Image generation isn't set up -- turn it on again in Settings.")
+            throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- turn it on again in Settings.", comment: ""))
         }
         // Installed before the pin, or by an older app: its internals may
         // not match the runner's.
         guard installedMfluxVersion() == Self.mfluxVersion else {
-            throw MfluxError.processFailed("Image generation needs an update -- turn it off and on again in Settings.")
+            throw MfluxError.processFailed(NSLocalizedString("Image generation needs an update -- turn it off and on again in Settings.", comment: ""))
         }
 
         let savedDir = savedModelDir(for: model)
         guard FileManager.default.fileExists(atPath: savedDir) else {
             // The Settings toggle only turns on after downloadModel() has
             // succeeded; fail clearly rather than silently do something else.
-            throw MfluxError.processFailed("\(model.displayName) isn't downloaded yet -- re-enable image generation in Settings.")
+            throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))
         }
 
         isBusy = true
-        statusText = "Generating image…"
+        statusText = NSLocalizedString("Generating image…", comment: "")
         stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
         previewImage = nil
         defer {

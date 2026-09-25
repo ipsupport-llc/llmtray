@@ -41,9 +41,9 @@ enum HFSortOption: String, CaseIterable, Identifiable {
     }
     var label: String {
         switch self {
-        case .downloads: return "Downloads"
-        case .likes: return "Likes"
-        case .lastModified: return "Recently updated"
+        case .downloads: return NSLocalizedString("Downloads", comment: "")
+        case .likes: return NSLocalizedString("Likes", comment: "")
+        case .lastModified: return NSLocalizedString("Recently updated", comment: "")
         }
     }
 }
@@ -72,9 +72,9 @@ enum ModelFitLevel {
 
     var label: String {
         switch self {
-        case .fits: return "Fits comfortably"
-        case .tight: return "Tight -- may not leave room for context"
-        case .unlikely: return "Larger than this Mac's RAM -- unlikely to load"
+        case .fits: return NSLocalizedString("Fits comfortably", comment: "")
+        case .tight: return NSLocalizedString("Tight -- may not leave room for context", comment: "")
+        case .unlikely: return NSLocalizedString("Larger than this Mac's RAM -- unlikely to load", comment: "")
         }
     }
 
@@ -201,7 +201,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             do {
                 let (data, response) = try await URLSession.shared.data(from: url)
                 if let http = response as? HTTPURLResponse, http.statusCode == 404 {
-                    modelCardError = "No README.md in this repo."
+                    modelCardError = NSLocalizedString("No README.md in this repo.", comment: "")
                     return
                 }
                 modelCardMarkdown = String(data: data, encoding: .utf8)
@@ -284,7 +284,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         isPaused = false
         downloadProgress = 0
         downloadError = nil
-        downloadStatusText = "Fetching file list…"
+        downloadStatusText = NSLocalizedString("Fetching file list…", comment: "")
         onAllDone = completion
 
         Task {
@@ -332,7 +332,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 totalBytesExpected = entries.reduce(0) { $0 + Int64($1.size ?? 0) }
                 lastSampleDate = nil
                 lastSampleBytes = 0
-                downloadStatusText = "Downloading \(entries.count) files…"
+                downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
                 for entry in entries {
                     files[entry.path] = FileDownload(
@@ -357,7 +357,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     func pauseDownload() {
         guard downloadingID != nil, !isPaused else { return }
         isPaused = true
-        downloadStatusText = "Paused"
+        downloadStatusText = NSLocalizedString("Paused", comment: "")
         downloadSpeedBytesPerSec = 0
         downloadETASeconds = nil
         for (path, task) in tasksByPath {
@@ -373,7 +373,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     func resumeDownload() {
         guard downloadingID != nil, isPaused else { return }
         isPaused = false
-        downloadStatusText = "Downloading…"
+        downloadStatusText = NSLocalizedString("Downloading…", comment: "")
         // Reset the speed sample so the paused interval itself isn't
         // counted as zero-throughput time in the next rate calculation.
         lastSampleDate = nil
@@ -529,7 +529,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     )
                 }
                 self.downloadingID = nil
-                self.downloadStatusText = "Done"
+                self.downloadStatusText = NSLocalizedString("Done", comment: "")
                 self.downloadSpeedBytesPerSec = 0
                 self.downloadETASeconds = nil
                 self.onAllDone?()
