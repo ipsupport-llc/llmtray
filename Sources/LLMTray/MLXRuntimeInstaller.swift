@@ -107,7 +107,8 @@ final class MLXRuntimeInstaller {
 
     /// Version directory name (e.g. "3.14") isn't known ahead of time, so
     /// this just looks at whatever's actually there instead of hardcoding it.
-    private static func externalFrameworkPython() -> String? {
+    /// The Full build's Python, once copied out (also good for mflux).
+    static func externalFrameworkPython() -> String? {
         let versionsDir = externalFrameworkDir + "/Versions"
         guard let versions = try? FileManager.default.contentsOfDirectory(atPath: versionsDir) else { return nil }
         for version in versions where version != "Current" {

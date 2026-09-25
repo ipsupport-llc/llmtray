@@ -86,6 +86,8 @@ final class ServerManager: ObservableObject {
     /// Spots mlx_lm.server's generation thread dying in the current
     /// process's output (see generationThreadDied); reset per launch.
     private var logWatch = ServerLogWatch()
+    /// The unfinished last line of the output, for the ready signal.
+    private var readyLine = ""
     /// Restarts after a dead generation thread: a model that runs out of
     /// memory again right away ends up failed, not in a restart loop.
     private var threadDeathRestarts = RestartBudget()
@@ -485,6 +487,7 @@ final class ServerManager: ObservableObject {
 
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
         logWatch = ServerLogWatch()
+        readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
             guard let self else { return }
             self.appendLog(text)
@@ -695,7 +698,12 @@ final class ServerManager: ObservableObject {
         // mlx_lm.server prints a "Starting httpd at ..." line (via werkzeug/uvicorn)
         // once it's actually accepting connections -- that's the real "ready" signal,
         // not just "process launched" (model loading can take tens of seconds).
-        guard chunk.contains("Starting httpd") || chunk.contains("Uvicorn running") || chunk.contains("http://") else { return }
+        // Whole lines (a chunk can end mid-word), and only the server's own
+        // announcement -- not any "http://" (a download URL in the log).
+        readyLine += chunk
+        let lines = readyLine.split(separator: "\n", omittingEmptySubsequences: false)
+        readyLine = String(lines.last ?? "").suffix(512).description
+        guard lines.dropLast().contains(where: { $0.contains("Starting httpd at") || $0.contains("Uvicorn running") }) else { return }
 
         guard !proxyStartPending else { return }
         let name = (modelPath as NSString).lastPathComponent

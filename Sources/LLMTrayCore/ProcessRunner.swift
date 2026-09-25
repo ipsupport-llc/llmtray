@@ -173,14 +173,21 @@ public enum ProcessRunner {
 /// the caller fail with a clear, actionable message.
 public enum PythonLocator {
     public static var commonLocations: [String] {
-        [
+        // python.org's installers: /Library/Frameworks/Python.framework,
+        // newest first (its /usr/local/bin links are optional).
+        let versions = "/Library/Frameworks/Python.framework/Versions"
+        let pythonOrg = ((try? FileManager.default.contentsOfDirectory(atPath: versions)) ?? [])
+            .filter { $0.first?.isNumber == true }
+            .sorted { $0.compare($1, options: .numeric) == .orderedDescending }
+            .map { "\(versions)/\($0)/bin/python3" }
+        return [
             "/opt/homebrew/bin/python3",
             "/usr/local/bin/python3",
             NSString(string: "~/.pyenv/shims/python3").expandingTildeInPath,
             "/opt/local/bin/python3",
             NSString(string: "~/miniconda3/bin/python3").expandingTildeInPath,
             NSString(string: "~/anaconda3/bin/python3").expandingTildeInPath,
-        ]
+        ] + pythonOrg
     }
 
     /// The first modern Python among `preferred`, then the common locations.

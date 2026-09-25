@@ -172,6 +172,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// error: later completions of the same download are ignored (none may
     /// declare it done), until the next download() resets it.
     nonisolated(unsafe) private var downloadFailed = false
+    /// Bumped by every download() and cancelDownload(): an earlier one's
+    /// steps still in flight (the file listing) see they're stale.
+    private var downloadGeneration = 0
     // Speed is measured between samples, not per didWriteData call (those
     // fire far too often for a stable rate) -- these track the last sample
     // point so publishProgress can rate-limit itself to ~2x/sec.
@@ -274,6 +277,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 comment: "gated model, no token"), model.id, model.id)
             return
         }
+        downloadGeneration += 1
+        let generation = downloadGeneration
         downloadingID = model.id
         currentModelID = model.id
         isPaused = false
@@ -284,16 +289,26 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
         Task {
             do {
-                var treeRequest = URLRequest(url: URL(string: "https://huggingface.co/api/models/\(model.id)/tree/main")!)
-                HFToken.authorize(&treeRequest)
-                let (data, response) = try await URLSession.shared.data(for: treeRequest)
-                if let status = (response as? HTTPURLResponse)?.statusCode, !(200..<300).contains(status) {
-                    downloadError = Self.accessMessage(status: status, repo: model.id)
-                    downloadingID = nil
-                    return
+                // Every file, subfolders included, over all pages (the
+                // listing is paginated by a Link header).
+                var entries: [HFTreeEntry] = []
+                var next: URL? = URL(string: "https://huggingface.co/api/models/\(model.id)/tree/main?recursive=true")
+                var pages = 0
+                while let url = next, pages < 100 {
+                    pages += 1
+                    var treeRequest = URLRequest(url: url)
+                    HFToken.authorize(&treeRequest)
+                    let (data, response) = try await URLSession.shared.data(for: treeRequest)
+                    guard generation == downloadGeneration else { return }   // cancelled meanwhile
+                    let http = response as? HTTPURLResponse
+                    if let status = http?.statusCode, !(200..<300).contains(status) {
+                        downloadError = Self.accessMessage(status: status, repo: model.id)
+                        downloadingID = nil
+                        return
+                    }
+                    entries += try JSONDecoder().decode([HFTreeEntry].self, from: data).filter { $0.type == "file" }
+                    next = Self.nextPage(http?.value(forHTTPHeaderField: "Link"))
                 }
-                let entries = try JSONDecoder().decode([HFTreeEntry].self, from: data)
-                    .filter { $0.type == "file" }
                 guard !entries.isEmpty else {
                     downloadError = "No files found in \(model.id)"
                     downloadingID = nil
@@ -373,6 +388,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// away) and clears state so the row goes back to a plain "Download"
     /// button.
     func cancelDownload() {
+        downloadGeneration += 1
         for task in tasksByPath.values {
             task.cancel()
         }
@@ -472,19 +488,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 MainActor.assumeIsolated { self.startTask(forPath: path) }
                 return
             }
-            downloadFailed = true
-            let written = files.values.filter(\.isDone).map(\.destination)
-            MainActor.assumeIsolated {
-                let message = Self.accessMessage(status: status, repo: self.currentModelID)
-                let root = self.currentDestRoot
-                self.cancelDownload()   // clears downloadError: set after
-                for url in written { try? FileManager.default.removeItem(at: url) }
-                // The folder this attempt made, if nothing else is in it.
-                if let root, (try? FileManager.default.contentsOfDirectory(atPath: root.path))?.isEmpty == true {
-                    try? FileManager.default.removeItem(at: root)
-                }
-                self.downloadError = message
-            }
+            MainActor.assumeIsolated { self.failDownload(Self.accessMessage(status: status, repo: self.currentModelID)) }
             return
         }
         // `let`, not `var` -- assigned exactly once on every path below, so
@@ -512,11 +516,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         } catch {
             saveError = "Failed to save \(dest.lastPathComponent): \(error.localizedDescription)"
         }
+        if let saveError {
+            MainActor.assumeIsolated { self.failDownload(saveError) }
+            return
+        }
         let allDone = !downloadFailed && !files.isEmpty && files.values.allSatisfy { $0.isDone }
         Task { @MainActor in
-            if let saveError {
-                self.downloadError = saveError
-            }
             if allDone {
                 if let destRoot = self.currentDestRoot {
                     FileManager.default.createFile(
@@ -531,6 +536,17 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 self.onAllDone = nil
             }
         }
+    }
+
+    /// The rel="next" URL of a Link header.
+    nonisolated static func nextPage(_ link: String?) -> URL? {
+        guard let link else { return nil }
+        for part in link.split(separator: ",") where part.contains("rel=\"next\"") {
+            if let open = part.firstIndex(of: "<"), let close = part.firstIndex(of: ">"), open < close {
+                return URL(string: String(part[part.index(after: open)..<close]))
+            }
+        }
+        return nil
     }
 
     /// Why Hugging Face refused a repo's files, in words.
@@ -568,9 +584,30 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     }
 
     nonisolated func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard let error, (error as NSError).code != NSURLErrorCancelled else { return }
-        Task { @MainActor in
-            self.downloadError = error.localizedDescription
+        guard let error, (error as NSError).code != NSURLErrorCancelled, !downloadFailed,
+              let path = pathByTaskID[task.taskIdentifier], let file = files[path] else { return }
+        // A dropped connection: once more, from where it stopped.
+        if !file.restarted, let resume = (error as NSError).userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+            files[path]?.restarted = true
+            files[path]?.resumeData = resume
+            MainActor.assumeIsolated { self.startTask(forPath: path) }
+            return
         }
+        // Otherwise the download is over, not stuck below 100% for good.
+        MainActor.assumeIsolated { self.failDownload(error.localizedDescription) }
+    }
+
+    /// Ends the whole download with `message`; what this attempt saved is
+    /// removed (a folder with a config.json would pass for a model).
+    private func failDownload(_ message: String) {
+        downloadFailed = true
+        let written = files.values.filter(\.isDone).map(\.destination)
+        let root = currentDestRoot
+        cancelDownload()   // clears downloadError: set after
+        for url in written { try? FileManager.default.removeItem(at: url) }
+        if let root, (try? FileManager.default.contentsOfDirectory(atPath: root.path))?.isEmpty == true {
+            try? FileManager.default.removeItem(at: root)
+        }
+        downloadError = message
     }
 }

@@ -63,8 +63,14 @@ public final class ProfileStore {
     }
 
     public func loadAssignments() -> [String: String] {
-        guard let data = try? Data(contentsOf: assignmentsURL),
-              let a = try? JSONDecoder().decode([String: String].self, from: data) else { return [:] }
+        guard let data = try? Data(contentsOf: assignmentsURL) else { return [:] }
+        guard let a = try? JSONDecoder().decode([String: String].self, from: data) else {
+            // Unreadable: kept aside, not overwritten by the next save that
+            // would start from an empty table.
+            let aside = assignmentsURL.deletingPathExtension().appendingPathExtension("corrupt-\(Int(Date().timeIntervalSince1970)).json")
+            try? FileManager.default.moveItem(at: assignmentsURL, to: aside)
+            return [:]
+        }
         return a
     }
 

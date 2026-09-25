@@ -147,7 +147,9 @@ final class MfluxManager: ObservableObject {
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
         if !FileManager.default.fileExists(atPath: venvDir) {
-            guard let python = await PythonLocator.findModern() else { throw MfluxError.noPython }
+            // The Full build's own Python first: a clean Mac has no other.
+            guard let python = await PythonLocator.findModern(preferring: [MLXRuntimeInstaller.externalFrameworkPython()].compactMap { $0 })
+            else { throw MfluxError.noPython }
             statusText = "Setting up image generation (first time only)…"
             try await runProcess(python, ["-m", "venv", venvDir])
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
