@@ -35,19 +35,13 @@ final class RuntimeManager: ObservableObject {
         UserDefaults.standard[Pref.betaUpdates] ? betaBranch : stableBranch
     }
 
-    private var runtimeDir: String { RuntimePaths.runtimeDir }
-    private var pinFilePath: String { runtimeDir + "/mlx_lm_runtime.json" }
     // The exact venv ServerManager runs the server from (outside the
     // bundle, so Sparkle updates don't wipe it) -- anything else and
     // "Update" here would pip-install into a venv nothing ever reads.
     private var venvPython: String { MLXRuntimeInstaller.venvPython }
     private var versionMarkerPath: String { MLXRuntimeInstaller.versionMarkerPath }
 
-    func pinnedVersion() -> String? {
-        guard let data = FileManager.default.contents(atPath: pinFilePath),
-              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-        return obj["pinned_ref"] as? String
-    }
+    func pinnedVersion() -> String? { RuntimePin.current?.ref }
 
     func checkForUpdate() {
         guard let current = pinnedVersion() else {
@@ -97,8 +91,8 @@ final class RuntimeManager: ObservableObject {
         checkState = .updating
         Task {
             do {
-                let gitURL = "git+https://github.com/\(Self.repo).git@\(commit)"
-                try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", gitURL])
+                let archive = RuntimePin.archiveURL(RuntimePin.Pin(repo: Self.repo, ref: commit))
+                try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", archive])
                 try writePinnedVersion(commit)
                 checkState = .upToDate(commit)
             } catch {
@@ -115,13 +109,9 @@ final class RuntimeManager: ObservableObject {
     /// re-install right back down to the bundle's original commit,
     /// silently undoing the update this method just applied.
     private func writePinnedVersion(_ commit: String) throws {
-        let obj: [String: Any] = [
-            "repo": Self.repo,
-            "pinned_ref": commit,
-            "_comment": "Pinned commit of our own mlx-lm fork's main branch for runtime/run_server.sh and LLMTray's runtime-update check. Bumped via LLMTray's Check for Updates action.",
-        ]
-        let data = try JSONSerialization.data(withJSONObject: obj, options: [.prettyPrinted])
-        try data.write(to: URL(fileURLWithPath: pinFilePath))
+        // In Application Support: writing into the signed bundle broke its
+        // seal, failed where the app isn't writable, and an update undid it.
+        try RuntimePin.setOverride(commit)
         try commit.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
     }
 }
