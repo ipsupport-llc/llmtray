@@ -4,6 +4,50 @@ import Foundation
 /// Installs and upgrades the mlx-lm runtime (a Python venv with LLMTray's
 /// pinned mlx-lm fork) that mlx_lm.server runs from. Split out of
 /// ServerManager, which only runs the server.
+/// Which commit of the mlx-lm fork the server runs: the one the app ships
+/// (runtime/mlx_lm_runtime.json in the bundle), or one the user updated to
+/// in the app (Application Support/runtime_pin.json -- never written into
+/// the signed bundle). The user's stands until an app update ships a new
+/// pin of its own.
+enum RuntimePin {
+    struct Pin: Equatable { let repo: String; let ref: String }
+
+    static var bundled: Pin? { read(RuntimePaths.runtimeDir + "/mlx_lm_runtime.json") }
+
+    private static var overridePath: String { RuntimePaths.externalRuntimeDir + "/runtime_pin.json" }
+
+    static var current: Pin? {
+        guard let bundled else { return nil }
+        guard let data = FileManager.default.contents(atPath: overridePath),
+              let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let ref = obj["pinned_ref"] as? String, let basedOn = obj["bundled_ref"] as? String else { return bundled }
+        // Made against an older app's pin: the new app's wins.
+        guard basedOn == bundled.ref else {
+            try? FileManager.default.removeItem(atPath: overridePath)
+            return bundled
+        }
+        return Pin(repo: bundled.repo, ref: ref)
+    }
+
+    static func setOverride(_ ref: String) throws {
+        guard let bundled else { throw CocoaError(.fileReadCorruptFile) }
+        try FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
+        let data = try JSONSerialization.data(withJSONObject: ["pinned_ref": ref, "bundled_ref": bundled.ref], options: [.prettyPrinted])
+        try data.write(to: URL(fileURLWithPath: overridePath), options: .atomic)
+    }
+
+    /// pip installs a GitHub archive without git (no Command Line Tools
+    /// prompt on a clean Mac).
+    static func archiveURL(_ pin: Pin) -> String { "https://github.com/\(pin.repo)/archive/\(pin.ref).zip" }
+
+    private static func read(_ path: String) -> Pin? {
+        guard let data = FileManager.default.contents(atPath: path),
+              let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let repo = obj["repo"] as? String, let ref = obj["pinned_ref"] as? String else { return nil }
+        return Pin(repo: repo, ref: ref)
+    }
+}
+
 @MainActor
 final class MLXRuntimeInstaller {
     /// Setup progress goes into the same log as the server's own output.
@@ -63,7 +107,8 @@ final class MLXRuntimeInstaller {
 
     /// Version directory name (e.g. "3.14") isn't known ahead of time, so
     /// this just looks at whatever's actually there instead of hardcoding it.
-    private static func externalFrameworkPython() -> String? {
+    /// The Full build's Python, once copied out (also good for mflux).
+    static func externalFrameworkPython() -> String? {
         let versionsDir = externalFrameworkDir + "/Versions"
         guard let versions = try? FileManager.default.contentsOfDirectory(atPath: versionsDir) else { return nil }
         for version in versions where version != "Current" {
@@ -93,8 +138,10 @@ final class MLXRuntimeInstaller {
         if let running = copyOut { return try await running.value }
         let task = Task { @MainActor () throws -> Bool in
             defer { copyOut = nil }
-            guard let pinnedRef = pinnedRef ?? bundledPin(),
-                  FileManager.default.fileExists(atPath: bundledVenvServerBinary) else { return false }
+            // The bundled venv is built for the bundled pin: not a
+            // replacement for a runtime the user updated to another one.
+            guard let bundled = RuntimePin.bundled?.ref, let pinnedRef = pinnedRef ?? RuntimePin.current?.ref,
+                  pinnedRef == bundled, FileManager.default.fileExists(atPath: bundledVenvServerBinary) else { return false }
             let installed = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
             if installed == pinnedRef, FileManager.default.fileExists(atPath: venvServerBinary) { return false }
             log("--- copying the bundled runtime out of the app ---\n")
@@ -124,13 +171,6 @@ final class MLXRuntimeInstaller {
         return try await task.value
     }
 
-    /// The pin this bundle ships (runtime/mlx_lm_runtime.json).
-    private static func bundledPin() -> String? {
-        guard let data = FileManager.default.contents(atPath: RuntimePaths.runtimeDir + "/mlx_lm_runtime.json"),
-              let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return nil }
-        return obj["pinned_ref"] as? String
-    }
-
     /// `source` copied to `target` via `target.new`, then swapped in.
     nonisolated private static func stagedCopy(from source: String, to target: String) throws {
         let fm = FileManager.default
@@ -146,16 +186,14 @@ final class MLXRuntimeInstaller {
 
     func ensureReady() async throws {
         let runtimeDir = RuntimePaths.runtimeDir
-        guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
-              let pinObj = try? JSONSerialization.jsonObject(with: pinData) as? [String: Any],
-              let pinnedRepo = pinObj["repo"] as? String,
-              let pinnedRef = pinObj["pinned_ref"] as? String else {
+        guard let pin = RuntimePin.current else {
             throw NSError(
                 domain: "MLXRuntimeInstaller", code: 1,
                 userInfo: [NSLocalizedDescriptionKey: "could not read mlx_lm_runtime.json"]
             )
         }
-        let pinnedRuntimeGitURL = "git+https://github.com/\(pinnedRepo).git@\(pinnedRef)"
+        let pinnedRef = pin.ref
+        let pinnedRuntimeGitURL = RuntimePin.archiveURL(pin)
         let targetVersion = pinnedRef
 
         // The marker is only ever written after a fully successful install

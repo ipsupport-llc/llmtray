@@ -49,10 +49,25 @@ final class ServerProcess {
             // handler in a tight loop, pegging a CPU core (seen live:
             // LLMTray at 100% CPU with no server process left).
             handle.readabilityHandler = nil
+            // What's still in the pipe (a startup crash's traceback, often)
+            // -- read without blocking: a grandchild may hold it open.
+            let fd = handle.fileDescriptor
+            _ = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK)
+            var rest = Data()
+            var buffer = [UInt8](repeating: 0, count: 65_536)
+            while rest.count < 1 << 20 {
+                let n = read(fd, &buffer, buffer.count)
+                guard n > 0 else { break }
+                rest.append(buffer, count: n)
+            }
+            let tail = rest.isEmpty ? "" : decoder.decode(rest)
             let status = proc.terminationStatus
             // Strong capture: the instance stays alive until its exit has
             // been handled.
-            Task { @MainActor in self.didExit(status: status) }
+            Task { @MainActor in
+                if !tail.isEmpty { self.onOutput?(tail) }
+                self.didExit(status: status)
+            }
         }
     }
 

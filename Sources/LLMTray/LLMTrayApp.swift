@@ -160,6 +160,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        chat.saveNow()
         ProfileManager.shared.flushPendingWrites()
         killServerNow()
     }

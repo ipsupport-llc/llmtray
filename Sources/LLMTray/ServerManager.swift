@@ -69,6 +69,12 @@ final class ServerManager: ObservableObject {
     /// The --model-alias the running process was started with.
     private var launchedAlias = ""
     private var launchedModelPath: String?
+    /// The process we're stopping on purpose (switch, restart, unload):
+    /// its exit is expected; any other exit of a running one is a crash.
+    private weak var terminating: ServerProcess?
+    /// Unloaded for image generation (ChatClient): requests wait for
+    /// ensureModelLoaded() instead of reloading the model next to mflux.
+    private var suspendedForImageGeneration = false
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
     // in between -- reset to 0 by any request that actually completes.
@@ -80,6 +86,8 @@ final class ServerManager: ObservableObject {
     /// Spots mlx_lm.server's generation thread dying in the current
     /// process's output (see generationThreadDied); reset per launch.
     private var logWatch = ServerLogWatch()
+    /// The unfinished last line of the output, for the ready signal.
+    private var readyLine = ""
     /// Restarts after a dead generation thread: a model that runs out of
     /// memory again right away ends up failed, not in a restart loop.
     private var threadDeathRestarts = RestartBudget()
@@ -123,6 +131,11 @@ final class ServerManager: ObservableObject {
         case .stopped, .failed: break
         default: return
         }
+        // The model server listens on port + 10000 (internalPort).
+        guard (1...55_535).contains(port) else {
+            state = .failed("port \(port) is out of range: use 1-55535")
+            return
+        }
         state = .starting
         isIdleUnloaded = false
         log = ""
@@ -145,7 +158,10 @@ final class ServerManager: ObservableObject {
                     try self.checkNotStopped(epoch)
                     // A listener left from a failed run may be on another
                     // port, forwarding to another internal port.
-                    if let listening = self.proxy.publicPort, listening != port {
+                    // Or with the LAN setting it was bound with: turning
+                    // "local network" off must close it to the network.
+                    if let listening = self.proxy.publicPort,
+                       listening != port || self.proxy.listensOnLAN != UserDefaults.standard[Pref.allowLAN] {
                         self.proxy.stop()
                     }
                     self.currentPublicPort = port
@@ -179,9 +195,19 @@ final class ServerManager: ObservableObject {
     /// serialized, and a switch first waits for requests still being served
     /// by the old model, so neither a concurrent switch nor someone else's
     /// generation gets cut off.
-    func acquireModel(modelPath target: String?, alias: String) async throws {
+    /// `loadIfUnloaded: false` (a bodyless probe like GET /health) forwards
+    /// only to a model that's already running: a health check must neither
+    /// reload a 20 GB model nor keep one from idle-unloading.
+    func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true) async throws {
         let epoch = stopEpoch
         try await serialized(epoch: epoch) {
+            if !loadIfUnloaded {
+                guard case .running = self.state else {
+                    throw NSError(domain: "ServerManager", code: 6, userInfo: [NSLocalizedDescriptionKey: "no model is loaded"])
+                }
+                self.forwardingCount += 1
+                return
+            }
             try self.checkAutoLoadAllowed()
             if let target, target != self.currentModelPath {
                 await self.waitForForwardsToDrain()
@@ -221,6 +247,7 @@ final class ServerManager: ObservableObject {
     /// already running.
     func ensureModelLoaded() async throws {
         let epoch = stopEpoch
+        suspendedForImageGeneration = false
         try await serialized(epoch: epoch) {
             try await self.loadIfNeeded(epoch: epoch)
         }
@@ -303,6 +330,9 @@ final class ServerManager: ObservableObject {
     /// reloads it afterwards) or a failure the user hasn't acted on.
     private func checkAutoLoadAllowed() throws {
         if case .running = state { return }
+        if suspendedForImageGeneration {
+            throw NSError(domain: "ServerManager", code: 7, userInfo: [NSLocalizedDescriptionKey: "the model is unloaded while an image is being generated -- try again in a moment"])
+        }
         guard isIdleUnloaded else {
             throw NSError(domain: "ServerManager", code: 4, userInfo: [NSLocalizedDescriptionKey: "the server isn't running"])
         }
@@ -457,6 +487,7 @@ final class ServerManager: ObservableObject {
 
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
         logWatch = ServerLogWatch()
+        readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
             guard let self else { return }
             self.appendLog(text)
@@ -488,7 +519,16 @@ final class ServerManager: ObservableObject {
         // and `process` belong to the new one now.
         guard proc === process else { return }
         if case .running = state {
-            state = .stopped
+            if proc === terminating {
+                state = .stopped
+            } else {
+                // A crash (Metal abort, killed for memory): an error, not a
+                // quiet "Stopped" with the listener still up.
+                appendLog("--- mlx_lm.server exited unexpectedly (code \(proc.terminationStatus)) ---\n")
+                process = nil
+                failAndStop("The model server exited unexpectedly (code \(proc.terminationStatus)) -- see the server log.")
+                return
+            }
         } else if case .starting = state {
             let message = "server exited during startup (code \(proc.terminationStatus))"
             state = .failed(message)
@@ -510,6 +550,7 @@ final class ServerManager: ObservableObject {
     func stop() {
         stopEpoch += 1
         isIdleUnloaded = false
+        suspendedForImageGeneration = false
         proxy.stop()
         proxyStartPending = false
         state = .stopped
@@ -596,6 +637,7 @@ final class ServerManager: ObservableObject {
     /// needs the internal port) and keeps the public listener up.
     private func terminateAndWaitForExit() async {
         guard let process, process.isRunning else { return }
+        terminating = process
         process.terminate()
         await process.waitForExit()
     }
@@ -656,7 +698,12 @@ final class ServerManager: ObservableObject {
         // mlx_lm.server prints a "Starting httpd at ..." line (via werkzeug/uvicorn)
         // once it's actually accepting connections -- that's the real "ready" signal,
         // not just "process launched" (model loading can take tens of seconds).
-        guard chunk.contains("Starting httpd") || chunk.contains("Uvicorn running") || chunk.contains("http://") else { return }
+        // Whole lines (a chunk can end mid-word), and only the server's own
+        // announcement -- not any "http://" (a download URL in the log).
+        readyLine += chunk
+        let lines = readyLine.split(separator: "\n", omittingEmptySubsequences: false)
+        readyLine = String(lines.last ?? "").suffix(512).description
+        guard lines.dropLast().contains(where: { $0.contains("Starting httpd at") || $0.contains("Uvicorn running") }) else { return }
 
         guard !proxyStartPending else { return }
         let name = (modelPath as NSString).lastPathComponent
@@ -709,10 +756,12 @@ final class ServerManager: ObservableObject {
     /// one's needed) -- paired 1:1 with endRequest() below. A counter, not a
     /// bool, because multiple clients can have requests in flight at once;
     /// isBusy should only drop once the *last* one finishes.
-    func beginRequest() {
+    /// `activity: false` for a bodyless probe: counted as in flight, but
+    /// not as use that keeps the model from idle-unloading.
+    func beginRequest(activity: Bool = true) {
         activeRequestCount += 1
         isBusy = true
-        lastActivityAt = Date()
+        if activity { lastActivityAt = Date() }
     }
 
     /// Started once, lazily, on the first launchServerProcess call --
@@ -767,6 +816,13 @@ final class ServerManager: ObservableObject {
             // A request that arrived since the idle check is already
             // counted -- don't unload the model out from under it.
             guard !onlyIfIdle || self.activeRequestCount == 0 else { return }
+            if !onlyIfIdle {
+                // For image generation: other clients' requests finish
+                // first, and new ones don't reload it meanwhile.
+                self.suspendedForImageGeneration = true
+                await self.waitForForwardsToDrain()
+                try self.checkNotStopped(epoch)
+            }
             self.isIdleUnloaded = true
             self.state = .stopped
             await self.terminateAndWaitForExit()
@@ -779,7 +835,9 @@ final class ServerManager: ObservableObject {
     /// wasn't counted by acquireModel(). A forwarded one that finishes resets
     /// consecutiveStallCount: it proves the process is still doing real
     /// work, which is what should "forgive" an earlier isolated stall.
-    func endRequest(forwarded: Bool = true) {
+    func endRequest(forwarded: Bool = true, activity: Bool = true) {
+        // Idle counts from the end of the last answer, not its start.
+        if activity { lastActivityAt = Date() }
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
         guard forwarded else { return }
@@ -794,7 +852,8 @@ final class ServerManager: ObservableObject {
     /// with nothing succeeding in between. After enough of them, the
     /// process itself is almost certainly wedged (see restartWedgedProcess's
     /// doc comment), not just one slow request, and gets restarted.
-    func endRequestStalled() {
+    func endRequestStalled(activity: Bool = true) {
+        if activity { lastActivityAt = Date() }
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
         forwardEnded()

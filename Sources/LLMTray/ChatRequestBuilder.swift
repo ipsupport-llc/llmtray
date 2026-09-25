@@ -13,8 +13,13 @@ enum ChatRequestBuilder {
         // right after it only -- not again with every later one.
         let lastIndex = history.indices.last
         var payload = history.enumerated().map { i, message in
-            message.isToolContext && i != lastIndex
-                ? serialize(message: ChatMessage(role: message.role, content: message.content))
+            // A model without vision refuses any request carrying an image
+            // (mlx_lm.server): a chat that had one, continued with a text
+            // model, sends just the text.
+            message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
+                ? serialize(message: ChatMessage(role: message.role,
+                                                 content: message.content.isEmpty && !settings.modelSupportsVision ? "(image)" : message.content,
+                                                 toolCalls: message.toolCalls, toolCallID: message.toolCallID))
                 : serialize(message: message)
         }
         let userSystemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -50,7 +55,8 @@ enum ChatRequestBuilder {
             "messages": messages,
             "stream": false,
             "temperature": 0.3,
-            "max_tokens": 512,
+            // Room for a thinking model's reasoning before the summary.
+            "max_tokens": 2048,
         ])
     }
 

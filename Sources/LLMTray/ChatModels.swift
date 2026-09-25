@@ -48,6 +48,9 @@ struct ChatMessage: Identifiable, Equatable {
     // e.g. ExchangeRate-API's required one). Saved with the session, where
     // the tool messages they come from aren't.
     var sources: [String] = []
+    // The files a loaded session's images came from, same order: saved
+    // again under these names (not the message's new id).
+    var imageFilenames: [String] = []
 }
 
 extension ChatMessage {

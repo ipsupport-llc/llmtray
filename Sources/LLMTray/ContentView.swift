@@ -20,6 +20,8 @@ struct ContentView: View {
     @AppStorage(Pref.port) private var port: Int
     @AppStorage(Pref.showReasoning) private var showReasoning: Bool
     @AppStorage(Pref.showToolCalls) private var showToolCalls: Bool
+    /// The conversation the running turn belongs to (auto-compaction).
+    @State private var turnConversation: Int?
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -81,7 +83,13 @@ struct ContentView: View {
         .onChange(of: chat.isTurnInProgress) { busy in
             // The one reliable "a turn (streaming + tool calls) just
             // finished" signal: send()/regenerate() don't await the turn.
-            if !busy { autoCompactIfNeeded() }
+            // Only in the chat it started in: opening another one ends the
+            // turn too, and that one mustn't be compacted for it.
+            if busy {
+                turnConversation = chat.conversationEpoch
+            } else if turnConversation == chat.conversationEpoch {
+                autoCompactIfNeeded()
+            }
         }
     }
 
@@ -230,7 +238,8 @@ struct ContentView: View {
 
     // Only once a reply has finished -- mid-stream there's nothing to redo.
     private var canRegenerate: Bool {
-        canChat && !chat.isBusy && chat.messages.last?.role == "assistant"
+        // After an error the last message is the user's: retry it.
+        canChat && !chat.isBusy && (chat.messages.last?.role == "assistant" || chat.messages.last?.role == "user")
     }
 
     // Only with a meaningful middle to replace -- compactSession's own guard.

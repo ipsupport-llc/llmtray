@@ -11,6 +11,8 @@ final class ModelProxyServer {
     private let server: ServerManager
     private var listener: NWListener?
     private(set) var publicPort: Int?
+    /// Whether the running listener takes connections from the network.
+    private(set) var listensOnLAN = false
 
     /// Largest request body accepted -- chat requests with a few inline
     /// images stay far below this; anything bigger is refused before it's
@@ -48,7 +50,8 @@ final class ModelProxyServer {
         // already carries its own port -- the port must come from
         // requiredLocalEndpoint alone here, not from a separate parameter.
         let listener: NWListener
-        if UserDefaults.standard[Pref.allowLAN] {
+        listensOnLAN = UserDefaults.standard[Pref.allowLAN]
+        if listensOnLAN {
             listener = try NWListener(using: .tcp, on: port)
         } else {
             let parameters = NWParameters.tcp
@@ -99,7 +102,16 @@ final class ModelProxyServer {
     private var readingConnections: Set<ObjectIdentifier> = []
     private static let requestReadTimeout: TimeInterval = 120
 
+    /// Connections still sending their request: each may hold a body of up
+    /// to maxBodyBytes for requestReadTimeout (with LAN on, from anyone).
+    private static let maxReadingConnections = 32
+
     private func accept(_ connection: NWConnection, internalPort: Int) {
+        guard readingConnections.count < Self.maxReadingConnections else {
+            connection.start(queue: .main)
+            sendError(connection: connection, status: "503 Service Unavailable", message: "too many requests in progress")
+            return
+        }
         connection.start(queue: .main)
         let id = ObjectIdentifier(connection)
         readingConnections.insert(id)
@@ -125,9 +137,11 @@ final class ModelProxyServer {
                 case .request(let head, let bodyOffset):
                     self.startBody(head, bodySoFar: Data(buf.dropFirst(bodyOffset)), connection: connection, internalPort: internalPort)
                 case .reject(let status, let message):
+                    self.readingConnections.remove(ObjectIdentifier(connection))
                     self.sendError(connection: connection, status: status, message: message)
                 case .needMoreData:
                     if isComplete || error != nil {
+                        self.readingConnections.remove(ObjectIdentifier(connection))
                         connection.cancel()
                     } else {
                         self.readHeaders(connection: connection, buffer: buf, internalPort: internalPort)
@@ -141,29 +155,41 @@ final class ModelProxyServer {
         if bodySoFar.count >= head.contentLength {
             route(method: head.method, path: head.path, headers: head.headers, body: bodySoFar.prefix(head.contentLength), connection: connection, internalPort: internalPort)
         } else {
+            let buffer = BodyBuffer(bodySoFar, capacity: head.contentLength)
             readBody(
-                connection: connection, partialBody: bodySoFar, contentLength: head.contentLength,
+                connection: connection, buffer: buffer, contentLength: head.contentLength,
                 method: head.method, path: head.path, headers: head.headers, internalPort: internalPort
             )
         }
     }
 
+    /// One growing buffer for a request body: appending to a Data copied
+    /// per chunk made a 50 MB image body cost gigabytes of copying on the
+    /// main thread.
+    private final class BodyBuffer {
+        var data: Data
+        init(_ start: Data, capacity: Int) {
+            data = Data(capacity: capacity)
+            data.append(start)
+        }
+    }
+
     private func readBody(
-        connection: NWConnection, partialBody: Data, contentLength: Int,
+        connection: NWConnection, buffer: BodyBuffer, contentLength: Int,
         method: String, path: String, headers: [String: String], internalPort: Int
     ) {
-        connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { [weak self] data, _, isComplete, error in
+        connection.receive(minimumIncompleteLength: 1, maximumLength: min(1 << 20, max(1, contentLength - buffer.data.count))) { [weak self] data, _, isComplete, error in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                var body = partialBody
-                if let data { body.append(data) }
-                if body.count >= contentLength {
-                    self.route(method: method, path: path, headers: headers, body: body.prefix(contentLength), connection: connection, internalPort: internalPort)
+                if let data { buffer.data.append(data) }
+                if buffer.data.count >= contentLength {
+                    self.route(method: method, path: path, headers: headers, body: buffer.data.prefix(contentLength), connection: connection, internalPort: internalPort)
                 } else if isComplete || error != nil {
+                    self.readingConnections.remove(ObjectIdentifier(connection))
                     connection.cancel()
                 } else {
                     self.readBody(
-                        connection: connection, partialBody: body, contentLength: contentLength,
+                        connection: connection, buffer: buffer, contentLength: contentLength,
                         method: method, path: path, headers: headers, internalPort: internalPort
                     )
                 }
@@ -191,6 +217,23 @@ final class ModelProxyServer {
             serveModels(route: route, method: method, headers: headers, connection: connection)
             return
         }
+        // CORS preflight: answered here (mlx_lm.server answers it the same
+        // way), not a reason to load or wait for a model.
+        if method == "OPTIONS" {
+            let asked = headers["access-control-request-headers"].map { $0.filter { $0 != "\r" && $0 != "\n" } }
+            let allowed = asked.map { "\($0), Authorization" } ?? "*, Authorization"
+            let response = "HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: \(allowed)\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+            connection.send(content: Data(response.utf8), completion: .contentProcessed { _ in connection.cancel() })
+            return
+        }
+        // A body Foundation can't read as a JSON object (NaN, a lone
+        // surrogate, 1e999: Python's json takes them) would pass unchecked
+        // -- model allowlist and rewrite skipped -- and mlx_lm.server would
+        // load whatever it names. Refused.
+        if !bodyData.isEmpty, (try? JSONSerialization.jsonObject(with: bodyData)) as? [String: Any] == nil {
+            sendError(connection: connection, status: "400 Bad Request", message: "the request body must be a JSON object")
+            return
+        }
         let modelName = ProxyRequestBody.requestedModel(bodyData)
         let targetPath = modelName.flatMap { ModelCatalog.shared.resolve(modelName: $0) ?? server.modelPath(launchedAs: $0) }
         // A name the catalog doesn't know must not reach mlx_lm.server: it
@@ -203,16 +246,19 @@ final class ModelProxyServer {
             ))
             return
         }
-        server.beginRequest()
+        // A bodyless probe (GET /health) isn't use: it mustn't keep the
+        // model from idle-unloading.
+        let activity = !bodyData.isEmpty
+        server.beginRequest(activity: activity)
         Task {
             do {
                 // Switches to the requested model (or reloads the last one
                 // if it was idle-unloaded), serialized with every other
                 // transition; the request then counts as in flight on the
                 // model until forward() ends it.
-                try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "")
+                try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "", loadIfUnloaded: !bodyData.isEmpty)
             } catch {
-                self.server.endRequest(forwarded: false)
+                self.server.endRequest(forwarded: false, activity: activity)
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
                 return
             }
@@ -222,7 +268,7 @@ final class ModelProxyServer {
             // The profile's sampling where the client set none: current
             // values, so changing them never needs a restart.
             let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
-            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort)
+            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort, activity: activity)
         }
     }
 
@@ -270,7 +316,7 @@ final class ModelProxyServer {
 
     // MARK: - Forwarding
 
-    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int) {
+    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int, activity: Bool = true) {
         guard let url = URL(string: "http://127.0.0.1:\(internalPort)\(path)") else {
             server.endRequest()
             connection.cancel()
@@ -291,7 +337,7 @@ final class ModelProxyServer {
         // *or* the stall watchdog below gives up on it, not when the last
         // byte reaches the downstream client afterward (that's just local
         // I/O, not model activity).
-        let delegate = ProxyForwardDelegate(connection: connection, server: server)
+        let delegate = ProxyForwardDelegate(connection: connection, server: server, activity: activity)
         let queue = OperationQueue()
         queue.underlyingQueue = .main
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
@@ -310,8 +356,7 @@ final class ModelProxyServer {
     }
 
     private func sendError(connection: NWConnection, status: String = "502 Bad Gateway", message: String) {
-        let escaped = message.replacingOccurrences(of: "\"", with: "'")
-        let body = "{\"error\":\"\(escaped)\"}"
+        let body = String(decoding: (try? JSONSerialization.data(withJSONObject: ["error": message])) ?? Data("{}".utf8), as: UTF8.self)
         let response = "HTTP/1.1 \(status)\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
         connection.send(content: response.data(using: .utf8), completion: .contentProcessed { _ in
             connection.cancel()
@@ -344,9 +389,13 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     // inside the request's 300 s timeout (Settings; adr/0002).
     private let stallThreshold: TimeInterval
 
-    init(connection: NWConnection, server: ServerManager) {
+    /// Counts toward idle (see ServerManager.beginRequest).
+    private let activity: Bool
+
+    init(connection: NWConnection, server: ServerManager, activity: Bool = true) {
         self.connection = connection
         self.server = server
+        self.activity = activity
         let configured = UserDefaults.standard[Pref.stallThresholdSeconds]
         self.stallThreshold = TimeInterval(configured)
         super.init()
@@ -396,7 +445,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
 
     private func checkForStall() {
         MainActor.assumeIsolated {
-            guard !finished, Date().timeIntervalSince(lastActivityAt) > stallThreshold else { return }
+            // Only once the response has started: before its headers,
+            // silence is normal -- a non-streaming request sends nothing
+            // until it's done, and one queued behind another (always, with
+            // an MTP drafter) waits. That stretch is the request timeout's
+            // (didCompleteWithError).
+            guard !finished, headersSent, Date().timeIntervalSince(lastActivityAt) > stallThreshold else { return }
             server?.appendLog(
                 "--- proxy: no response from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
             )
@@ -424,9 +478,9 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // of stalls, so a genuine completion needs to actually reset
             // that streak, not just decrement the same busy counter.
             if stalled {
-                server?.endRequestStalled()
+                server?.endRequestStalled(activity: activity)
             } else {
-                server?.endRequest()
+                server?.endRequest(activity: activity)
             }
             guard stalled else { return }
             session?.invalidateAndCancel()
@@ -435,8 +489,8 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             } else {
                 let body = "{\"error\":\"upstream stalled with no response\"}"
                 let response = "HTTP/1.1 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
-                connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
-                    self?.connection.cancel()
+                connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+                    connection.cancel()
                 })
             }
         }
@@ -486,7 +540,23 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         // to) this request -- this fires again once that watchdog's own
         // session.invalidateAndCancel() completes, and sending a second
         // response after the 504 already went out would be wrong.
+        // Nothing for the whole request timeout (before or after the
+        // headers): a stall -- it counts toward restarting a wedged process.
+        if let error, (error as NSError).code == NSURLErrorTimedOut {
+            _ = finish(stalled: true)
+            return
+        }
         guard finish(stalled: false) else { return }
+        // Done either way: a URLSession keeps its delegate (and this
+        // connection) until it's invalidated.
+        defer { session.finishTasksAndInvalidate() }
+        if error != nil, headersSent {
+            // Cut off mid-response (the process died or was switched): no
+            // clean terminator, or the client takes a truncated answer for
+            // a whole one.
+            connection.cancel()
+            return
+        }
         if let error, !headersSent {
             // Failed before ever getting a response (e.g. the internal
             // mlx_lm.server wasn't reachable) -- a bare chunk terminator
@@ -496,15 +566,15 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // status line so the failure is at least legible.
             let body = "{\"error\":\"\(error.localizedDescription.replacingOccurrences(of: "\"", with: "'"))\"}"
             let response = "HTTP/1.1 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
-            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
-                self?.connection.cancel()
-                self?.session = nil
+            // The connection strongly: invalidating the session can release
+            // this delegate before the send completes.
+            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+                connection.cancel()
             })
             return
         }
-        connection.send(content: Data("0\r\n\r\n".utf8), completion: .contentProcessed { [weak self] _ in
-            self?.connection.cancel()
-            self?.session = nil
+        connection.send(content: Data("0\r\n\r\n".utf8), completion: .contentProcessed { [connection] _ in
+            connection.cancel()
         })
     }
 }

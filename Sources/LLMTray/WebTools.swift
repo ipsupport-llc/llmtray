@@ -178,8 +178,9 @@ final class WikipediaTool: SelectableTool {
         let langs = NSOrderedSet(array: candidates).compactMap { $0 as? String }
         for (n, lang) in langs.enumerated() where Date() < deadline {
             if let summary = await summary(title, lang: lang) { return Self.json(summary) }
-            // Not an exact title: a prefix match first...
-            if Date() < deadline, let best = await prefixMatch(title, lang: lang),
+            // Not an exact title: a prefix match first (not for a question:
+            // "what is 50% of?" prefix-matched "What Is Love")...
+            if !Self.looksLikeQuestion(title), Date() < deadline, let best = await prefixMatch(title, lang: lang),
                let summary = await summary(best, lang: lang) {
                 return Self.json(summary)
             }
@@ -225,6 +226,19 @@ final class WikipediaTool: SelectableTool {
             // CC BY-SA asks for attribution and the license (shown under the answer).
             "source": "Wikipedia, CC BY-SA 4.0: \(url ?? "https://\(lang).wikipedia.org/wiki/\(slug)")",
         ]
+    }
+}
+
+extension WikipediaTool {
+    /// A question rather than a title ("what is photosynthesis?", "кто такой …").
+    static func looksLikeQuestion(_ text: String) -> Bool {
+        let t = text.lowercased().trimmingCharacters(in: .whitespaces)
+        if t.hasSuffix("?") { return true }
+        let first = t.split(separator: " ").first.map(String.init) ?? ""
+        let words: Set<String> = ["what", "who", "how", "why", "when", "where", "which", "is", "are", "does",
+                                  "что", "кто", "как", "почему", "когда", "где", "какой", "какая", "зачем",
+                                  "що", "хто", "як", "чому", "коли", "де"]
+        return words.contains(first) && t.split(separator: " ").count > 2
     }
 }
 
