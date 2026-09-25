@@ -51,6 +51,20 @@ struct LLMTrayApp: App {
         Settings {
             EmptyView()
         }
+        // The app menu only shows while the chat is detached (the app is
+        // .regular then). SwiftUI's defaults don't fit this app: Settings…
+        // would open the empty scene above, About the standard panel
+        // without the licenses, Help a "help isn't available" alert.
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About LLMTray") { NotificationCenter.default.post(name: .showAbout, object: nil) }
+            }
+            CommandGroup(replacing: .appSettings) {
+                Button("Settings…") { NotificationCenter.default.post(name: .showSettings, object: nil) }
+                    .keyboardShortcut(",")
+            }
+            CommandGroup(replacing: .help) {}
+        }
     }
 }
 
@@ -134,6 +148,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(detachChat), name: .detachChat, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showAboutPanel), name: .showAbout, object: nil
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
