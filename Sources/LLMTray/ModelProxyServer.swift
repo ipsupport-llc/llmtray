@@ -137,9 +137,11 @@ final class ModelProxyServer {
                 case .request(let head, let bodyOffset):
                     self.startBody(head, bodySoFar: Data(buf.dropFirst(bodyOffset)), connection: connection, internalPort: internalPort)
                 case .reject(let status, let message):
+                    self.readingConnections.remove(ObjectIdentifier(connection))
                     self.sendError(connection: connection, status: status, message: message)
                 case .needMoreData:
                     if isComplete || error != nil {
+                        self.readingConnections.remove(ObjectIdentifier(connection))
                         connection.cancel()
                     } else {
                         self.readHeaders(connection: connection, buffer: buf, internalPort: internalPort)
@@ -244,7 +246,10 @@ final class ModelProxyServer {
             ))
             return
         }
-        server.beginRequest()
+        // A bodyless probe (GET /health) isn't use: it mustn't keep the
+        // model from idle-unloading.
+        let activity = !bodyData.isEmpty
+        server.beginRequest(activity: activity)
         Task {
             do {
                 // Switches to the requested model (or reloads the last one
@@ -253,7 +258,7 @@ final class ModelProxyServer {
                 // model until forward() ends it.
                 try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "", loadIfUnloaded: !bodyData.isEmpty)
             } catch {
-                self.server.endRequest(forwarded: false)
+                self.server.endRequest(forwarded: false, activity: activity)
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
                 return
             }
@@ -263,7 +268,7 @@ final class ModelProxyServer {
             // The profile's sampling where the client set none: current
             // values, so changing them never needs a restart.
             let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
-            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort)
+            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort, activity: activity)
         }
     }
 
@@ -311,7 +316,7 @@ final class ModelProxyServer {
 
     // MARK: - Forwarding
 
-    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int) {
+    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int, activity: Bool = true) {
         guard let url = URL(string: "http://127.0.0.1:\(internalPort)\(path)") else {
             server.endRequest()
             connection.cancel()
@@ -332,7 +337,7 @@ final class ModelProxyServer {
         // *or* the stall watchdog below gives up on it, not when the last
         // byte reaches the downstream client afterward (that's just local
         // I/O, not model activity).
-        let delegate = ProxyForwardDelegate(connection: connection, server: server)
+        let delegate = ProxyForwardDelegate(connection: connection, server: server, activity: activity)
         let queue = OperationQueue()
         queue.underlyingQueue = .main
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
@@ -384,9 +389,13 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     // inside the request's 300 s timeout (Settings; adr/0002).
     private let stallThreshold: TimeInterval
 
-    init(connection: NWConnection, server: ServerManager) {
+    /// Counts toward idle (see ServerManager.beginRequest).
+    private let activity: Bool
+
+    init(connection: NWConnection, server: ServerManager, activity: Bool = true) {
         self.connection = connection
         self.server = server
+        self.activity = activity
         let configured = UserDefaults.standard[Pref.stallThresholdSeconds]
         self.stallThreshold = TimeInterval(configured)
         super.init()
@@ -469,9 +478,9 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // of stalls, so a genuine completion needs to actually reset
             // that streak, not just decrement the same busy counter.
             if stalled {
-                server?.endRequestStalled()
+                server?.endRequestStalled(activity: activity)
             } else {
-                server?.endRequest()
+                server?.endRequest(activity: activity)
             }
             guard stalled else { return }
             session?.invalidateAndCancel()
@@ -480,8 +489,8 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             } else {
                 let body = "{\"error\":\"upstream stalled with no response\"}"
                 let response = "HTTP/1.1 504 Gateway Timeout\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
-                connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
-                    self?.connection.cancel()
+                connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+                    connection.cancel()
                 })
             }
         }
@@ -531,9 +540,9 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         // to) this request -- this fires again once that watchdog's own
         // session.invalidateAndCancel() completes, and sending a second
         // response after the 504 already went out would be wrong.
-        // No response at all within the request timeout: that one is a
-        // stall (it counts toward restarting a wedged process).
-        if let error, !headersSent, (error as NSError).code == NSURLErrorTimedOut {
+        // Nothing for the whole request timeout (before or after the
+        // headers): a stall -- it counts toward restarting a wedged process.
+        if let error, (error as NSError).code == NSURLErrorTimedOut {
             _ = finish(stalled: true)
             return
         }
@@ -557,15 +566,15 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // status line so the failure is at least legible.
             let body = "{\"error\":\"\(error.localizedDescription.replacingOccurrences(of: "\"", with: "'"))\"}"
             let response = "HTTP/1.1 502 Bad Gateway\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
-            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [weak self] _ in
-                self?.connection.cancel()
-                self?.session = nil
+            // The connection strongly: invalidating the session can release
+            // this delegate before the send completes.
+            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+                connection.cancel()
             })
             return
         }
-        connection.send(content: Data("0\r\n\r\n".utf8), completion: .contentProcessed { [weak self] _ in
-            self?.connection.cancel()
-            self?.session = nil
+        connection.send(content: Data("0\r\n\r\n".utf8), completion: .contentProcessed { [connection] _ in
+            connection.cancel()
         })
     }
 }

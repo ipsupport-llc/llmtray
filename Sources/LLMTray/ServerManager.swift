@@ -745,10 +745,12 @@ final class ServerManager: ObservableObject {
     /// one's needed) -- paired 1:1 with endRequest() below. A counter, not a
     /// bool, because multiple clients can have requests in flight at once;
     /// isBusy should only drop once the *last* one finishes.
-    func beginRequest() {
+    /// `activity: false` for a bodyless probe: counted as in flight, but
+    /// not as use that keeps the model from idle-unloading.
+    func beginRequest(activity: Bool = true) {
         activeRequestCount += 1
         isBusy = true
-        lastActivityAt = Date()
+        if activity { lastActivityAt = Date() }
     }
 
     /// Started once, lazily, on the first launchServerProcess call --
@@ -822,9 +824,9 @@ final class ServerManager: ObservableObject {
     /// wasn't counted by acquireModel(). A forwarded one that finishes resets
     /// consecutiveStallCount: it proves the process is still doing real
     /// work, which is what should "forgive" an earlier isolated stall.
-    func endRequest(forwarded: Bool = true) {
+    func endRequest(forwarded: Bool = true, activity: Bool = true) {
         // Idle counts from the end of the last answer, not its start.
-        lastActivityAt = Date()
+        if activity { lastActivityAt = Date() }
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
         guard forwarded else { return }
@@ -839,8 +841,8 @@ final class ServerManager: ObservableObject {
     /// with nothing succeeding in between. After enough of them, the
     /// process itself is almost certainly wedged (see restartWedgedProcess's
     /// doc comment), not just one slow request, and gets restarted.
-    func endRequestStalled() {
-        lastActivityAt = Date()
+    func endRequestStalled(activity: Bool = true) {
+        if activity { lastActivityAt = Date() }
         activeRequestCount = max(0, activeRequestCount - 1)
         isBusy = activeRequestCount > 0
         forwardEnded()
