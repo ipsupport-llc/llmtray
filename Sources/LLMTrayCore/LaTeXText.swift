@@ -260,23 +260,30 @@ public enum MathSpans {
         }
     }
 
+    private static let balancedDisplay = try? NSRegularExpression(pattern: #"\$\$[^$]+?\$\$"#)
+
+    /// Money only where it can't open a span: right after another `$`
+    /// (`$$1.10 ...$`: the first opens, the second is money) or after `{` /
+    /// `(` (`\mathbf{$3.66}`). A `$` + digit elsewhere may open math
+    /// (`$2^n$`, `$10^{-3}$`) and is left to the span rules.
     static func hideMoney(_ text: String) -> String {
         guard text.contains("$") else { return text }
-        let display = (try? NSRegularExpression(pattern: #"\$\$[^$]+?\$\$"#)).map { regex in
+        let display = balancedDisplay.map { regex in
             regex.matches(in: text, range: NSRange(text.startIndex..., in: text)).compactMap { Range($0.range, in: text) }
         } ?? []
         var out = ""
         var i = text.startIndex
+        var spans = display[...]
         while i < text.endIndex {
-            if let span = display.first(where: { $0.lowerBound == i }) {
+            if let span = spans.first, span.lowerBound == i {
                 out += text[span]
                 i = span.upperBound
+                spans = spans.dropFirst()
                 continue
             }
             let next = text.index(after: i)
-            // "\$" is an escaped dollar already: left for the renderer.
-            let escaped = i > text.startIndex && text[text.index(before: i)] == "\\"
-            if text[i] == "$", !escaped, next < text.endIndex, text[next].isNumber {
+            let previous: Character? = i > text.startIndex ? text[text.index(before: i)] : nil
+            if text[i] == "$", let previous, "${(".contains(previous), next < text.endIndex, text[next].isNumber {
                 out.append(money)
             } else {
                 out.append(text[i])

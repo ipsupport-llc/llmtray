@@ -315,6 +315,23 @@ struct ChatMarkdownView: View {
 struct MarkdownTableView: View {
     let table: MarkdownTable
     let baseSize: CGFloat
+    /// Each cell parsed once (ViewThatFits lays out several grids).
+    private let header: [AttributedString]
+    private let rows: [[AttributedString]]
+
+    init(table: MarkdownTable, baseSize: CGFloat) {
+        self.table = table
+        self.baseSize = baseSize
+        header = table.header.map { text in
+            var cell = ChatMarkdown.cell(text, baseSize: baseSize)
+            // Bold where the text has no font of its own (math, code keep theirs).
+            for run in cell.runs where run.font == nil {
+                cell[run.range].font = .system(size: baseSize, weight: .semibold)
+            }
+            return cell
+        }
+        rows = table.rows.map { $0.map { ChatMarkdown.cell($0, baseSize: baseSize) } }
+    }
 
     var body: some View {
         // The widest cells that fit (text wraps inside them); sideways
@@ -332,15 +349,15 @@ struct MarkdownTableView: View {
             Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
                 GridRow {
                     ForEach(0..<table.columnCount, id: \.self) { c in
-                        cell(table.header[c], column: c, header: true, width: cellWidth)
+                        cell(header[c], column: c, width: cellWidth)
                     }
                 }
                 .background(Color.primary.opacity(0.07))
-                ForEach(Array(table.rows.enumerated()), id: \.offset) { r, row in
+                ForEach(Array(rows.enumerated()), id: \.offset) { r, row in
                     Divider().gridCellUnsizedAxes(.horizontal)
                     GridRow {
                         ForEach(0..<table.columnCount, id: \.self) { c in
-                            cell(row[c], column: c, header: false, width: cellWidth)
+                            cell(row[c], column: c, width: cellWidth)
                         }
                     }
                     .background(r % 2 == 1 ? Color.primary.opacity(0.03) : Color.clear)
@@ -350,10 +367,8 @@ struct MarkdownTableView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
-    private func cell(_ text: String, column: Int, header: Bool, width: CGFloat) -> some View {
+    private func cell(_ content: AttributedString, column: Int, width: CGFloat) -> some View {
         let alignment = table.alignments[column]
-        var content = ChatMarkdown.cell(text, baseSize: baseSize)
-        if header { content.font = .system(size: baseSize, weight: .semibold) }
         return Text(content)
             .multilineTextAlignment(alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
             .fixedSize(horizontal: false, vertical: true)
