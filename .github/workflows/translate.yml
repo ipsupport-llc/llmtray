@@ -41,9 +41,17 @@ jobs:
       # One branch for the proposal: while its PR is open, what it already
       # translated isn't translated (and paid for) again.
       - name: Start from the open proposal's translations
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if git fetch --quiet origin translations/auto 2>/dev/null; then
-            git checkout FETCH_HEAD -- Resources/Localization
+          # Only an open one, and only keys main still lacks: a fix made on
+          # main since must not be overwritten by the proposal's version.
+          if [ -n "$(gh pr list --head translations/auto --state open --json number -q '.[].number')" ] \
+             && git fetch --quiet origin translations/auto; then
+            mkdir -p "$RUNNER_TEMP/proposal"
+            git archive FETCH_HEAD Resources/Localization | tar -x -C "$RUNNER_TEMP/proposal"
+            python3 scripts/l10n.py extract
+            python3 scripts/l10n.py import-missing "$RUNNER_TEMP/proposal/Resources/Localization"
           fi
       - name: Refresh the English base from the sources
         run: python3 scripts/l10n.py extract

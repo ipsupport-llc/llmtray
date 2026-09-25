@@ -213,7 +213,12 @@ def specifiers(s: str) -> list[str]:
 
 
 def _kind(conv: str) -> str:
-    return "object" if conv == "@" else "int" if conv.endswith("d") else "float"
+    # %d is 32-bit, %ld / %lld 64-bit: a translation mustn't narrow one.
+    if conv == "@":
+        return "object"
+    if conv.endswith("d"):
+        return "int32" if conv == "d" else "int64"
+    return "float"
 
 
 def arguments(s: str) -> dict[int, str] | None:
@@ -472,6 +477,24 @@ def main() -> int:
         a = ap.parse_args(sys.argv[2:])
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         return translate(codes, a.model)
+    if cmd == "import-missing":
+        # Keys an open proposal (<dir>/<lang>.lproj) translated that this
+        # tree still lacks -- never overwriting what's here.
+        src = Path(sys.argv[2])
+        base_keys = sorted(load(BASE))
+        for lang in sorted(src.glob("*.lproj")):
+            theirs = lang / "Localizable.strings"
+            if not theirs.exists():
+                continue
+            code = lang.name.removesuffix(".lproj")
+            mine_path = LOC / lang.name / "Localizable.strings"
+            mine = load(mine_path) if mine_path.exists() else {}
+            added = {k: v for k, v in load(theirs).items() if k not in mine and k in base_keys and _valid(k, v) is None}
+            if added:
+                mine.update(added)
+                write_lang(code, mine, base_keys)
+                print(f"{lang.name}: {len(added)} from the open proposal")
+        return 0
     if cmd == "fix-order":
         # Rewrites reordered translations with positional specifiers.
         base_keys = sorted(load(BASE))
