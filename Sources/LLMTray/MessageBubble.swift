@@ -66,7 +66,7 @@ struct MessageBubble: View {
                     if isUser || message.content.isEmpty {
                         Text(message.content.isEmpty ? "…" : message.content)
                     } else {
-                        Text(ChatMarkdown.render(message.content, baseSize: 13))
+                        ChatMarkdownView(source: message.content, baseSize: 13)
                     }
                 }
                 .font(.system(size: 13))

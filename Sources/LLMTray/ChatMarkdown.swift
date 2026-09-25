@@ -118,6 +118,10 @@ enum ChatMarkdown {
     /// a serif face. The math is swapped for placeholder characters, the line
     /// is parsed once (so **bold around $x$** still works), then the math goes
     /// back in with the surrounding emphasis. `code` spans are left alone.
+    static func inlineMarkdown(_ baseSize: CGFloat, _ text: String) -> AttributedString {
+        inline(baseSize, text)
+    }
+
     private static func inline(_ baseSize: CGFloat, _ text: String) -> AttributedString {
         guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(text) }
         var maths: [(latex: String, display: Bool)] = []
@@ -267,5 +271,112 @@ enum ChatMarkdown {
             if ch == " " { spaces += 1 } else if ch == "\t" { spaces += 4 } else { break }
         }
         return min(spaces / 2, 4)
+    }
+}
+
+extension ChatMarkdown {
+    /// A table cell: inline markdown and math, no block syntax.
+    static func cell(_ text: String, baseSize: CGFloat) -> AttributedString {
+        inlineMarkdown(baseSize, text)
+    }
+}
+
+/// A message's markdown as text and, where the model wrote one, a real
+/// table (a grid, markdown in its cells). Without a table it's the one Text
+/// it always was (whole-message selection).
+struct ChatMarkdownView: View {
+    let source: String
+    let baseSize: CGFloat
+
+    var body: some View {
+        let blocks = MarkdownBlock.split(source)
+        if blocks.count == 1, case .text = blocks[0] {
+            Text(ChatMarkdown.render(source, baseSize: baseSize))
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
+                    switch block {
+                    case .text(let text):
+                        if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Text(ChatMarkdown.render(text.trimmingCharacters(in: .newlines), baseSize: baseSize))
+                        }
+                    case .table(let table):
+                        MarkdownTableView(table: table, baseSize: baseSize)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// A markdown table as a grid: a shaded bold header, hairlines between
+/// rows, the columns aligned as the separator row says. Scrolls sideways
+/// when it's wider than the chat.
+struct MarkdownTableView: View {
+    let table: MarkdownTable
+    let baseSize: CGFloat
+    /// Each cell parsed once (ViewThatFits lays out several grids).
+    private let header: [AttributedString]
+    private let rows: [[AttributedString]]
+
+    init(table: MarkdownTable, baseSize: CGFloat) {
+        self.table = table
+        self.baseSize = baseSize
+        header = table.header.map { text in
+            var cell = ChatMarkdown.cell(text, baseSize: baseSize)
+            // Bold where the text has no font of its own (math, code keep theirs).
+            for run in cell.runs where run.font == nil {
+                cell[run.range].font = .system(size: baseSize, weight: .semibold)
+            }
+            return cell
+        }
+        rows = table.rows.map { $0.map { ChatMarkdown.cell($0, baseSize: baseSize) } }
+    }
+
+    var body: some View {
+        // The widest cells that fit (text wraps inside them); sideways
+        // scrolling only when even narrow cells don't.
+        ViewThatFits(in: .horizontal) {
+            grid(cellWidth: 320)
+            grid(cellWidth: 200)
+            grid(cellWidth: 140)
+            grid(cellWidth: 100)
+            ScrollView(.horizontal, showsIndicators: false) { grid(cellWidth: 140) }
+        }
+    }
+
+    private func grid(cellWidth: CGFloat) -> some View {
+            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
+                GridRow {
+                    ForEach(0..<table.columnCount, id: \.self) { c in
+                        cell(header[c], column: c, width: cellWidth)
+                    }
+                }
+                .background(Color.primary.opacity(0.07))
+                ForEach(Array(rows.enumerated()), id: \.offset) { r, row in
+                    Divider().gridCellUnsizedAxes(.horizontal)
+                    GridRow {
+                        ForEach(0..<table.columnCount, id: \.self) { c in
+                            cell(row[c], column: c, width: cellWidth)
+                        }
+                    }
+                    .background(r % 2 == 1 ? Color.primary.opacity(0.03) : Color.clear)
+                }
+            }
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.12)))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    private func cell(_ content: AttributedString, column: Int, width: CGFloat) -> some View {
+        let alignment = table.alignments[column]
+        return Text(content)
+            .multilineTextAlignment(alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minWidth: min(60, width), maxWidth: width, alignment: alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
+            .padding(.horizontal, width < 140 ? 6 : 10)
+            .padding(.vertical, 6)
+            // The whole row's height: its shading is even across the cells.
+            .frame(maxHeight: .infinity)
+            .gridColumnAlignment(alignment == .center ? .center : alignment == .trailing ? .trailing : .leading)
     }
 }
