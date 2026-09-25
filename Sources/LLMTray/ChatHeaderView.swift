@@ -8,6 +8,7 @@ struct ChatHeaderView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
+    @EnvironmentObject var presentation: ChatPresentation
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
     @AppStorage(Pref.port) private var port: Int
@@ -94,6 +95,14 @@ struct ChatHeaderView: View {
             Button { chat.newTemporaryChat() } label: { Image(systemName: "eye.slash") }
                 .buttonStyle(.plain)
                 .help("New temporary chat -- nothing about it is ever saved")
+            if !presentation.isDetached {
+                Button { NotificationCenter.default.post(name: .detachChat, object: nil) } label: {
+                    Image(systemName: "macwindow.on.rectangle")
+                }
+                .buttonStyle(.plain)
+                .help("Open in Window -- closing the window puts the chat back in the menu bar")
+                .accessibilityLabel("Open in Window")
+            }
             Button { openSettings() } label: { Image(systemName: "gearshape") }
                 .keyboardShortcut(",", modifiers: .command)
                 .help("Settings (⌘,)")

@@ -8,11 +8,15 @@ struct ContentView: View {
     @EnvironmentObject var server: ServerManager
     @EnvironmentObject var chat: ChatClient
     @EnvironmentObject var benchmark: BenchmarkRunner
+    @EnvironmentObject var presentation: ChatPresentation
     // Chat, tool and server-launch settings live in profiles (see
     // ProfileManager): the selected model's profile, layered on Default.
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
-    @StateObject private var composer = ComposerModel()
+    // Owned by AppDelegate (ChatPresentation), not this view: the popover
+    // and the chat window each build their own ContentView, and the draft
+    // has to carry over between them.
+    @EnvironmentObject private var composer: ComposerModel
 
     // Persists across launches -- picking up where you left off. Also read
     // by AppDelegate's auto-start and quick menu.
@@ -20,16 +24,11 @@ struct ContentView: View {
     @AppStorage(Pref.port) private var port: Int
     @AppStorage(Pref.showReasoning) private var showReasoning: Bool
     @AppStorage(Pref.showToolCalls) private var showToolCalls: Bool
-    /// The conversation the running turn belongs to (auto-compaction).
-    @State private var turnConversation: Int?
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
     @AppStorage(Pref.compactKeepStart) private var compactKeepStart: Int
     @AppStorage(Pref.compactKeepEnd) private var compactKeepEnd: Int
-    // 0 disables auto-compaction -- otherwise checked after every
-    // completed turn.
-    @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold: Int
 
     // Backs the History menu -- refreshed on appear and whenever
     // ChatSessionStore posts .sessionsDidChange, not read from disk on
@@ -39,7 +38,10 @@ struct ContentView: View {
     // The selected model's trained context ceiling (max_position_embeddings)
     // caps max_tokens; 32768 only when its config.json doesn't say.
     @State private var modelMaxContext: Int = 32768
+    // Starts true: a new view (the chat just moved between the popover and
+    // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
 
@@ -53,11 +55,14 @@ struct ContentView: View {
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
                 isFocused: $isInputFocused,
-                send: send, regenerate: regenerate, compact: { Task { await compact() } }
+                send: send, regenerate: regenerate, compact: { Task { await presentation.compact() } }
             )
             .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
         }
-        .frame(width: 420)
+        // The popover is a fixed 420 wide; detached, the chat fills its
+        // window (ChatWindowController enforces the minimum size).
+        .frame(minWidth: 420, maxWidth: presentation.isDetached ? .infinity : 420,
+               maxHeight: presentation.isDetached ? .infinity : nil)
         .onAppear {
             sessionHistory = ChatSessionStore.list()
             // Models added or removed in Finder / LM Studio since the last
@@ -69,27 +74,8 @@ struct ContentView: View {
         }
         .onChange(of: selectedModelID) { modelDidChange($0) }
         .onChange(of: catalog.models) { _ in keepSelectionValid() }
-        .onReceive(NotificationCenter.default.publisher(for: .modelsDidChange)) { notification in
-            // A Hugging Face download finished: jump to the model that just
-            // landed on disk (the catalog rescans on the same notification).
-            guard let repoID = notification.object as? String else { return }
-            catalog.rescan()
-            let downloaded = catalog.root + "/\(repoID)"
-            if catalog.model(id: downloaded) != nil { selectedModelID = downloaded }
-        }
         .onReceive(NotificationCenter.default.publisher(for: .sessionsDidChange)) { _ in
             sessionHistory = ChatSessionStore.list()
-        }
-        .onChange(of: chat.isTurnInProgress) { busy in
-            // The one reliable "a turn (streaming + tool calls) just
-            // finished" signal: send()/regenerate() don't await the turn.
-            // Only in the chat it started in: opening another one ends the
-            // turn too, and that one mustn't be compacted for it.
-            if busy {
-                turnConversation = chat.conversationEpoch
-            } else if turnConversation == chat.conversationEpoch {
-                autoCompactIfNeeded()
-            }
         }
     }
 
@@ -105,7 +91,7 @@ struct ContentView: View {
     }
 
     private func modelDidChange(_ modelID: String?) {
-        modelMaxContext = max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
+        modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
     }
 
@@ -117,10 +103,7 @@ struct ContentView: View {
     }
 
     private var chatSettings: ChatSettings {
-        var settings = ChatSettings(profile: profiles.resolved(for: selectedModelID), maxTokensCap: modelMaxContext)
-        settings.modelSupportsVision = composer.acceptsImages
-        settings.modelPath = selectedModelID
-        return settings
+        ChatSettings.forModel(selectedModelID, supportsVision: composer.acceptsImages, maxContext: modelMaxContext)
     }
 
     // MARK: - Chat
@@ -194,6 +177,16 @@ struct ContentView: View {
                 })
             }
             .coordinateSpace(name: "chatScroll")
+            // A freshly built view starts at the top of the conversation;
+            // it opens at the latest message instead, matching
+            // followChatBottom. Once per view: reopening the popover keeps
+            // the reader's place, as it always has.
+            .onAppear {
+                guard !didScrollOnAppear else { return }
+                didScrollOnAppear = true
+                // After the first layout, or there's nothing to scroll yet.
+                DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+            }
             .background(GeometryReader { g in
                 Color.clear.onAppear { chatViewportHeight = g.size.height }
                     .onChange(of: g.size.height) { chatViewportHeight = $0 }
@@ -214,8 +207,9 @@ struct ContentView: View {
                 }
             }
             // Small for an empty chat, capped so a long one scrolls inside
-            // a fixed viewport instead of growing the window.
-            .frame(minHeight: 48, maxHeight: chat.messages.isEmpty ? 48 : 380)
+            // a fixed viewport instead of growing the popover. Detached, it
+            // takes whatever height the window leaves it.
+            .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
             // Cheap to compare: lengths, not the whole text, per token.
             .onChange(of: streamSignal) { _ in
                 if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
@@ -260,17 +254,6 @@ struct ContentView: View {
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
-    private func compact() async {
-        await chat.compactSession(
-            port: port, modelAlias: requestModelName, settings: chatSettings,
-            keepStart: compactKeepStart, keepEnd: compactKeepEnd
-        )
-    }
-
-    private func autoCompactIfNeeded() {
-        guard autoCompactThreshold > 0, chat.messages.count > autoCompactThreshold else { return }
-        Task { await compact() }
-    }
 }
 
 /// The chat content's bottom edge (in the scroll view's coordinates) and height.

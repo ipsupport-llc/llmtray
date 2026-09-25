@@ -129,3 +129,23 @@ struct ChatSettings {
 
     init() {}
 }
+
+extension ChatSettings {
+    /// What a request for `modelID` is sent with: its profile (layered on
+    /// Default), max tokens capped at the model's trained context. Shared by
+    /// the chat view and compaction, which also runs with no view on screen.
+    @MainActor
+    static func forModel(_ modelID: String?, supportsVision: Bool, maxContext: Int? = nil) -> ChatSettings {
+        let cap = maxContext ?? Self.maxContext(forModel: modelID)
+        var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
+        settings.modelSupportsVision = supportsVision
+        settings.modelPath = modelID
+        return settings
+    }
+
+    /// The model's trained context ceiling (max_position_embeddings);
+    /// 32768 only when its config.json doesn't say.
+    static func maxContext(forModel modelID: String?) -> Int {
+        max(64, modelID.flatMap(ModelDiscovery.maxContextLength(forModelPath:)) ?? 32768)
+    }
+}

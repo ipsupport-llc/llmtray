@@ -2,6 +2,11 @@ import AppKit
 import LLMTrayCore
 import SwiftUI
 
+extension Notification.Name {
+    /// Opens AppDelegate's About window (the app menu's About item).
+    static let showAbout = Notification.Name("LLMTray.showAbout")
+}
+
 /// About LLMTray: the app, and every license that applies -- what's
 /// bundled (Licenses.json, generated at build time by
 /// scripts/generate_licenses.py) and what's installed on this Mac (the
