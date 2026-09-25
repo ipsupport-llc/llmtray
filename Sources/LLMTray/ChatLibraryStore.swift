@@ -90,13 +90,14 @@ final class ChatLibraryStore: ObservableObject {
 
     // MARK: - Changes
 
-    /// Through ChatClient when it's the chat on screen (its next turn
+    /// Through its ChatClient when it's open in a tab (its next turn
     /// rewrites the file with the title it holds).
-    func rename(_ id: UUID, to title: String, chat: ChatClient) {
+    func rename(_ id: UUID, to title: String) {
         let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { return }
-        if chat.currentSessionID == id {
-            chat.renameCurrentSession(title)
+        let tabs = ChatTabs.shared
+        if let index = tabs.index(of: id) {
+            tabs.tabs[index].renameCurrentSession(title)
         } else {
             ChatSessionStore.rename(id: id, to: title)
         }
@@ -133,10 +134,12 @@ final class ChatLibraryStore: ObservableObject {
         saveLibrary()
     }
 
-    /// The chat on screen is forgotten first: starting a new one saves the
-    /// current one, which would bring the deleted chat back.
-    func delete(_ id: UUID, chat: ChatClient) {
-        if chat.currentSessionID == id {
+    /// A tab showing it forgets it first (starting a new chat there saves
+    /// the current one, which would bring the deleted chat back).
+    func delete(_ id: UUID) {
+        let tabs = ChatTabs.shared
+        if let index = tabs.index(of: id) {
+            let chat = tabs.tabs[index]
             chat.forgetCurrentSession()
             chat.newSession()
         }

@@ -26,6 +26,7 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
         // Chat content (temporary chats included: "nothing is ever saved")
         // stays out of macOS's saved window state.
         window.isRestorable = false
+        window.identifier = Self.identifier
         super.init(window: window)
         window.delegate = self
         window.setFrameAutosaveName(Self.frameName)
@@ -34,6 +35,8 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
     required init?(coder: NSCoder) { fatalError("init(coder:) is not used") }
 
     private static let frameName = "LLMTrayChatWindow"
+    /// The chat window's, for commands that act on it (⌘W closes a tab).
+    static let identifier = NSUserInterfaceItemIdentifier("LLMTrayChatWindow")
     // The sidebar (250) beside a usable chat, or the chat alone.
     private static let minContentSize = NSSize(width: 640, height: 360)
 

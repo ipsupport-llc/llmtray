@@ -5,6 +5,8 @@ import LLMTrayCore
 
 @MainActor
 final class ChatClient: ObservableObject {
+    /// Stable for this client's lifetime: its tab's identity.
+    let tabID = UUID()
     @Published var messages: [ChatMessage] = [] {
         didSet { hasUnsavedChanges = true }
     }
@@ -61,7 +63,10 @@ final class ChatClient: ObservableObject {
     /// second Compact (or a send) can't work on a stale message range.
     var isBusy: Bool { isTurnInProgress || isCompacting }
 
-    private let toolbox = ChatToolbox()
+    private let toolbox: ChatToolbox
+    /// Another chat tab is running a turn (ChatTabs): image generation then
+    /// doesn't unload the model under it.
+    var isAnotherChatBusy: () -> Bool = { false }
     private var imageTool: ImageToolRunner { toolbox.imageGeneration }
     private var mfluxManager: MfluxManager { imageTool.mflux }
     private var mfluxStatusCancellable: AnyCancellable?
@@ -94,7 +99,8 @@ final class ChatClient: ObservableObject {
     private var toolRoundsThisTurn = 0
     private let maxToolRoundsPerTurn = 4
 
-    init() {
+    init(mflux: MfluxManager? = nil) {
+        toolbox = ChatToolbox(mflux: mflux)
         mfluxStatusCancellable = mfluxManager.$statusText
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.mfluxStatusText = $0 }
@@ -565,7 +571,12 @@ final class ChatClient: ObservableObject {
         }
 
         var settings = currentSettings(context.settings)
-        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: settings)
+        // Another chat tab has the image generator, or would lose the model
+        // it's answering with to the unload below: this call waits for a
+        // later turn instead.
+        let imageBlocked = imageTool.willGenerate(toolCalls, settings: settings)
+            && (mfluxManager.isBusy || (settings.unloadModelDuringImageGen && isAnotherChatBusy()))
+        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: settings) && !imageBlocked
         // Only when mflux will actually run -- a refused call shouldn't
         // flash the "Generating image…" UI / pulse.
         isGeneratingImage = willActuallyGenerate
@@ -584,6 +595,14 @@ final class ChatClient: ObservableObject {
         var pendingModelImages: [Data] = []
         for (i, call) in toolCalls.enumerated() {
             guard stillCurrent() else { break }
+            if imageBlocked, call.name == ImageToolRunner.toolName {
+                messages.append(ChatMessage(
+                    role: "tool",
+                    content: "Not run: another chat is generating an image or answering with the model right now. Tell the user to ask again once it's done.",
+                    toolCallID: call.id
+                ))
+                continue
+            }
             guard i < maxToolCallsPerRound else {
                 messages.append(ChatMessage(
                     role: "tool", content: "Not run: at most \(maxToolCallsPerRound) tool calls per response.",

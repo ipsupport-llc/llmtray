@@ -70,10 +70,31 @@ struct LLMTrayApp: App {
             // Lock on and on non-Latin layouts. Only titled windows: the
             // popover's own window isn't one.
             CommandGroup(before: .windowSize) {
+                Button("New Tab") { ChatTabs.shared.newTab() }
+                    .keyboardShortcut("t")
+                // In the chat window it closes the tab on screen; the window
+                // goes with its last one.
                 Button("Close") {
-                    if let window = NSApp.keyWindow, window.styleMask.contains(.closable) { window.performClose(nil) }
+                    guard let window = NSApp.keyWindow, window.styleMask.contains(.closable) else { return }
+                    let tabs = ChatTabs.shared
+                    if window.identifier == ChatWindowController.identifier, tabs.tabs.count > 1 {
+                        tabs.close(tabs.selectedIndex)
+                    } else {
+                        window.performClose(nil)
+                    }
                 }
                 .keyboardShortcut("w")
+                Button("Show Next Tab") { ChatTabs.shared.selectNext(1) }
+                    .keyboardShortcut(.tab, modifiers: .control)
+                Button("Show Previous Tab") { ChatTabs.shared.selectNext(-1) }
+                    .keyboardShortcut(.tab, modifiers: [.control, .shift])
+                Menu("Select Tab") {
+                    ForEach(1...9, id: \.self) { n in
+                        Button("Tab \(n)") { ChatTabs.shared.select(n - 1) }
+                            .keyboardShortcut(KeyEquivalent(Character("\(n)")))
+                    }
+                }
+                Divider()
             }
         }
     }
@@ -89,7 +110,7 @@ struct LLMTrayApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let server = ServerManager()
-    private let chat = ChatClient()
+    private let tabs = ChatTabs.shared
     private let systemMonitor = SystemMonitor()
     private let hfBrowser = HFModelBrowser()
     // Shared by the popover and the Settings window (both show auto-tune /
@@ -97,7 +118,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let runtime = RuntimeManager()
     private let benchmark = BenchmarkRunner()
     private lazy var settingsWindow = SettingsWindowController(.init(
-        server: server, chat: chat, runtime: runtime, benchmark: benchmark,
+        server: server, chat: tabs.imageModels, runtime: runtime, benchmark: benchmark,
         checkForAppUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) }
     ))
     // startingUpdater begins Sparkle's own automatic background check
@@ -115,7 +136,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
-    private lazy var chatPresentation = ChatPresentation(chat: chat)
+    private lazy var chatPresentation = ChatPresentation(tabs: tabs)
     private lazy var chatWindow = ChatWindowController { [weak self] in self?.attachChat() }
     private var logWindow: NSWindow?
     private var hfWindow: NSWindow?
@@ -207,7 +228,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        chat.saveNow()
+        tabs.saveAll()
         ProfileManager.shared.flushPendingWrites()
         killServerNow()
     }
@@ -233,19 +254,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// A fresh chat view. The popover and the chat window never share one
     /// (see ChatPresentation); the state that must carry over lives there.
     private func makeChatController() -> NSHostingController<AnyView> {
-        NSHostingController(rootView: AnyView(ContentView()
+        NSHostingController(rootView: AnyView(ChatRoot()
             .environmentObject(server)
-            .environmentObject(chat)
             .environmentObject(benchmark)
-            .environmentObject(chatPresentation)
-            .environmentObject(chatPresentation.composer)))
+            .environmentObject(chatPresentation)))
     }
 
     /// The popover while the chat has its own window: its header alone.
     private func makeTrayControls() -> NSViewController {
-        let hosting = NSHostingController(rootView: AnyView(TrayControlsView()
+        let hosting = NSHostingController(rootView: AnyView(TrayRoot()
             .environmentObject(server)
-            .environmentObject(chat)
             .environmentObject(benchmark)
             .environmentObject(chatPresentation)))
         hosting.sizingOptions = [.preferredContentSize]
@@ -566,8 +584,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // already finished streaming (isStreaming == false) by the time
         // mflux is actually running, so that phase looked identical to idle.
         server.$state
-            .combineLatest(chat.$isStreaming, systemMonitor.$thermalState, server.$isBusy)
-            .combineLatest(chat.$isGeneratingImage)
+            .combineLatest(tabs.$isAnyStreaming, systemMonitor.$thermalState, server.$isBusy)
+            .combineLatest(tabs.$isAnyGeneratingImage)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] combined, isGeneratingImage in
                 let (_, isStreaming, _, isBusy) = combined
@@ -630,14 +648,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusColor: Color {
         if systemMonitor.isThrottling { return .red }
         if systemMonitor.isWarm { return .orange }
-        if chat.isStreaming || server.isBusy || chat.isGeneratingImage { return .green }
+        if tabs.isAnyStreaming || server.isBusy || tabs.isAnyGeneratingImage { return .green }
         return .primary
     }
 
     private var statusSymbol: String {
         // Image generation unloads the chat model to make room (the server
         // state reads .stopped meanwhile), but LLMTray is busy, not stopped.
-        if chat.isGeneratingImage { return "brain.head.profile.fill" }
+        if tabs.isAnyGeneratingImage { return "brain.head.profile.fill" }
         switch server.state {
         case .running: return "brain.head.profile.fill"
         case .starting: return "brain.head.profile"

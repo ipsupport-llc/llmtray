@@ -12,6 +12,8 @@ struct ChatHeaderView: View {
     @ObservedObject private var profiles = ProfileManager.shared
     @ObservedObject private var catalog = ModelCatalog.shared
     @AppStorage(Pref.port) private var port: Int
+    // A turn in any tab holds back model switches / restarts.
+    @ObservedObject private var tabs = ChatTabs.shared
 
     @Binding var selectedModelID: String?
     /// Shows the chats sidebar over the popover's chat. nil: the tray's
@@ -76,7 +78,7 @@ struct ChatHeaderView: View {
                     .buttonStyle(.plain)
                     .help("Chats")
                     .accessibilityLabel("Chats")
-                Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
+                Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
                     .help("New chat (saved)")
                     // Only disabled when there's truly nothing to start fresh
@@ -163,7 +165,7 @@ struct ChatHeaderView: View {
 
     // MARK: Profile
 
-    private var ops: OperationAvailability { OperationAvailability(server: server, chat: chat, benchmark: benchmark) }
+    private var ops: OperationAvailability { OperationAvailability(server: server, benchmark: benchmark) }
 
     /// For the loaded model a switch can change launch arguments -- not
     /// while a request or the auto-tune could be cut off.

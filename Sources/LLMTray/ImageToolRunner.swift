@@ -39,7 +39,11 @@ final class ImageToolRunner: ChatTool {
         ],
     ]
 
-    let mflux = MfluxManager()
+    let mflux: MfluxManager
+
+    init(mflux: MfluxManager) {
+        self.mflux = mflux
+    }
 
     // Small tool-calling models (this feature was built against a 4B one)
     // can fail to treat a successful tool result as "done" and call

@@ -125,23 +125,18 @@ struct ContentView: View {
                 .buttonStyle(.plain)
                 .help("Chats")
                 .accessibilityLabel("Chats")
-                Button { chat.newSession() } label: { Image(systemName: "square.and.pencil") }
+                Button { ChatTabs.shared.newChat() } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain)
                     .help("New chat (saved)")
                     .disabled(chat.currentSessionID != nil && chat.messages.isEmpty)
             }
-            Text(chatTitle).font(.system(size: 13, weight: .semibold)).lineLimit(1).truncationMode(.tail)
+            ChatTabStrip()
             Spacer(minLength: 8)
             ServerStatusLabel().foregroundColor(.secondary)
         }
         .foregroundColor(.secondary)
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-    }
-
-    private var chatTitle: String {
-        if chat.currentSessionID == nil { return NSLocalizedString("Temporary chat", comment: "") }
-        return chat.currentSessionTitle.isEmpty ? NSLocalizedString("New chat", comment: "") : chat.currentSessionTitle
     }
 
     /// The messages and the composer: the same in both.
@@ -153,7 +148,7 @@ struct ContentView: View {
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
                 isFocused: $isInputFocused,
-                send: send, regenerate: regenerate, compact: { Task { await presentation.compact() } }
+                send: send, regenerate: regenerate, compact: { Task { await presentation.compact(chat) } }
             )
             .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
         }
