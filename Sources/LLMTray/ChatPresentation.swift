@@ -77,7 +77,7 @@ final class ChatPresentation: ObservableObject {
     private func autoTitleIfNeeded() {
         guard UserDefaults.standard[Pref.autoTitleChats] else { return }
         let (port, alias) = requestTarget
-        Task { await chat.generateTitleIfNeeded(port: port, modelAlias: alias) }
+        chat.generateTitleIfNeeded(port: port, modelAlias: alias)
     }
 
     /// Where requests made outside a view go: the selected model, by the

@@ -297,5 +297,8 @@ struct TrayControlsView: View {
 
     var body: some View {
         ChatHeaderView(selectedModelID: $selectedModelID).frame(width: 420)
+            // Models added in Finder / LM Studio since the last look, as the
+            // chat's popover does on opening.
+            .onAppear { ModelCatalog.shared.rescan() }
     }
 }

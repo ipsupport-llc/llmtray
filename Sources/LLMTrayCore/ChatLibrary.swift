@@ -15,6 +15,15 @@ public struct ChatLibrary: Codable, Equatable {
             self.name = name
             self.createdAt = createdAt
         }
+
+        private enum CodingKeys: String, CodingKey { case id, name, createdAt }
+
+        public init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = try c.decode(UUID.self, forKey: .id)
+            name = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
+            createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+        }
     }
 
     public var projects: [Project] = []
@@ -24,6 +33,29 @@ public struct ChatLibrary: Codable, Equatable {
     public var projectOfChat: [UUID: UUID] = [:]
 
     public init() {}
+
+    // Written by hand: a field added later mustn't make an older file fail
+    // to decode (every pin and project would be dropped with it), and a
+    // chat's project is written as a JSON object, not a flat array.
+    private enum CodingKeys: String, CodingKey { case projects, pinned, projectOfChat }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        projects = try c.decodeIfPresent([Project].self, forKey: .projects) ?? []
+        pinned = try c.decodeIfPresent([UUID].self, forKey: .pinned) ?? []
+        let byChat = try c.decodeIfPresent([String: String].self, forKey: .projectOfChat) ?? [:]
+        projectOfChat = Dictionary(uniqueKeysWithValues: byChat.compactMap { chat, project in
+            guard let chat = UUID(uuidString: chat), let project = UUID(uuidString: project) else { return nil }
+            return (chat, project)
+        })
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(projects, forKey: .projects)
+        try c.encode(pinned, forKey: .pinned)
+        try c.encode(Dictionary(uniqueKeysWithValues: projectOfChat.map { ($0.uuidString, $1.uuidString) }), forKey: .projectOfChat)
+    }
 
     public func isPinned(_ chat: UUID) -> Bool { pinned.contains(chat) }
 

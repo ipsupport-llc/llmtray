@@ -15,16 +15,23 @@ struct ChatSidebar: View {
 
     @State private var query = ""
     @State private var showsAllRecents = false
-    @State private var renaming: UUID?
+    /// The chat being renamed, and the list it's being renamed in (a
+    /// pinned chat in a project shows twice).
+    @State private var renaming: (chat: UUID, section: String)?
     @State private var renamingProject: UUID?
-    @State private var draftName = ""
+    @State private var chatDraft = ""
+    @State private var projectDraft = ""
     @State private var chatToDelete: ChatSummary?
     @State private var projectToDelete: ChatLibrary.Project?
     @State private var collapsedProjects: Set<UUID> = []
     @FocusState private var searchFocused: Bool
-    @FocusState private var renameFocused: Bool
+    @FocusState private var chatRenameFocused: Bool
+    @FocusState private var projectRenameFocused: Bool
 
     private static let recentsShown = 25
+    /// Re-read every few minutes: a window left open overnight regroups.
+    @State private var now = Date()
+    private let clock = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -44,6 +51,7 @@ struct ChatSidebar: View {
             }
         }
         .background(.regularMaterial)
+        .onReceive(clock) { now = $0 }
         .confirmationDialog(
             Text("Delete this chat?"), isPresented: Binding(get: { chatToDelete != nil }, set: { if !$0 { chatToDelete = nil } }),
             presenting: chatToDelete
@@ -88,7 +96,7 @@ struct ChatSidebar: View {
                 TextField("Search chats", text: $query)
                     .textFieldStyle(.plain)
                     .focused($searchFocused)
-                    .onExitCommand { query = "" }
+                    .onExitCommand { if query.isEmpty { close() } else { query = "" } }
                 if !query.isEmpty {
                     Button { query = "" } label: { Image(systemName: "xmark.circle.fill") }
                         .buttonStyle(.plain)
@@ -111,7 +119,7 @@ struct ChatSidebar: View {
         if found.isEmpty {
             Text("No chats found").foregroundColor(.secondary).padding(8)
         }
-        ForEach(found) { row($0) }
+        ForEach(found) { row($0, in: "search") }
     }
 
     @ViewBuilder
@@ -119,7 +127,7 @@ struct ChatSidebar: View {
         let pinned = store.pinnedChats
         if !pinned.isEmpty {
             sectionTitle(Text("Pinned"))
-            ForEach(pinned) { row($0) }
+            ForEach(pinned) { row($0, in: "pinned") }
         }
     }
 
@@ -144,7 +152,7 @@ struct ChatSidebar: View {
                             .font(.caption).foregroundColor(.secondary)
                             .padding(.leading, 30).padding(.vertical, 3)
                     }
-                    ForEach(chats) { row($0).padding(.leading, 18) }
+                    ForEach(chats) { row($0, in: "project").padding(.leading, 18) }
                 }
             }
         }
@@ -157,9 +165,9 @@ struct ChatSidebar: View {
         if store.isLoaded && store.chats.isEmpty {
             Text("Saved chats will show up here.").foregroundColor(.secondary).font(.callout).padding(8)
         }
-        ForEach(ChatAge.group(shown, now: Date()), id: \.0) { age, chats in
+        ForEach(ChatAge.group(shown, now: now), id: \.0) { age, chats in
             sectionTitle(age.title)
-            ForEach(chats) { row($0) }
+            ForEach(chats) { row($0, in: "recents") }
         }
         if recents.count > shown.count {
             Button("Show more") { showsAllRecents = true }
@@ -180,13 +188,16 @@ struct ChatSidebar: View {
     // MARK: - Rows
 
     @ViewBuilder
-    private func row(_ summary: ChatSummary) -> some View {
-        if renaming == summary.id {
-            TextField("Chat name", text: $draftName)
+    private func row(_ summary: ChatSummary, in section: String) -> some View {
+        if renaming?.chat == summary.id, renaming?.section == section {
+            TextField("Chat name", text: $chatDraft)
                 .textFieldStyle(.roundedBorder)
-                .focused($renameFocused)
+                .focused($chatRenameFocused)
                 .onSubmit { commitRename(summary.id) }
                 .onExitCommand { renaming = nil }
+                // Clicking elsewhere ends it, like Finder.
+                .onChange(of: chatRenameFocused) { if !$0 { renaming = nil } }
+                .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
             Button { open { openChat(summary.id) } } label: {
@@ -200,13 +211,13 @@ struct ChatSidebar: View {
             }
             .buttonStyle(SidebarRowStyle(isSelected: chat.currentSessionID == summary.id))
             .help(summary.title)
-            .contextMenu { chatMenu(summary) }
+            .contextMenu { chatMenu(summary, in: section) }
         }
     }
 
     @ViewBuilder
-    private func chatMenu(_ summary: ChatSummary) -> some View {
-        Button("Rename…") { startRename(summary) }
+    private func chatMenu(_ summary: ChatSummary, in section: String) -> some View {
+        Button("Rename…") { startRename(summary, in: section) }
         if store.library.isPinned(summary.id) {
             Button("Unpin") { store.setPinned(summary.id, false) }
         } else {
@@ -232,14 +243,16 @@ struct ChatSidebar: View {
     @ViewBuilder
     private func projectRow(_ project: ChatLibrary.Project) -> some View {
         if renamingProject == project.id {
-            TextField("Project name", text: $draftName)
+            TextField("Project name", text: $projectDraft)
                 .textFieldStyle(.roundedBorder)
-                .focused($renameFocused)
+                .focused($projectRenameFocused)
                 .onSubmit {
-                    store.renameProject(project.id, to: draftName)
+                    store.renameProject(project.id, to: projectDraft)
                     renamingProject = nil
                 }
                 .onExitCommand { renamingProject = nil }
+                .onChange(of: projectRenameFocused) { if !$0 { renamingProject = nil } }
+                .onAppear { DispatchQueue.main.async { projectRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
             Button {
@@ -259,9 +272,9 @@ struct ChatSidebar: View {
             .buttonStyle(SidebarRowStyle(isSelected: false))
             .contextMenu {
                 Button("Rename…") {
-                    draftName = project.name
+                    renaming = nil
+                    projectDraft = project.name
                     renamingProject = project.id
-                    renameFocused = true
                 }
                 Button("Delete Project…", role: .destructive) { projectToDelete = project }
             }
@@ -280,14 +293,14 @@ struct ChatSidebar: View {
         chat.loadSession(file)
     }
 
-    private func startRename(_ summary: ChatSummary) {
-        draftName = summary.title
-        renaming = summary.id
-        renameFocused = true
+    private func startRename(_ summary: ChatSummary, in section: String) {
+        renamingProject = nil
+        chatDraft = summary.title
+        renaming = (summary.id, section)
     }
 
     private func commitRename(_ id: UUID) {
-        store.rename(id, to: draftName, chat: chat)
+        store.rename(id, to: chatDraft, chat: chat)
         renaming = nil
     }
 
@@ -299,9 +312,9 @@ struct ChatSidebar: View {
         let name = names.contains(base) ? (2...).lazy.map { "\(base) \($0)" }.first { !names.contains($0) }! : base
         guard let project = store.addProject(named: name) else { return nil }
         collapsedProjects.remove(project.id)
-        draftName = project.name
+        renaming = nil
+        projectDraft = project.name
         renamingProject = project.id
-        renameFocused = true
         return project
     }
 }

@@ -72,17 +72,20 @@ struct ContentView: View {
             conversation
         }
         .frame(width: 420)
+        // The popover is as tall as its content, and an empty chat is short:
+        // room for the sidebar while it's shown.
+        .frame(minHeight: showsSidebarOverlay ? 560 : nil, alignment: .top)
         .overlay(alignment: .leading) {
-            if showsSidebarOverlay {
-                ZStack(alignment: .leading) {
+            ZStack(alignment: .leading) {
+                if showsSidebarOverlay {
                     Color.black.opacity(0.18)
                         .contentShape(Rectangle())
                         .onTapGesture { setSidebarOverlay(false) }
+                        .transition(.opacity)
                     ChatSidebar(close: { setSidebarOverlay(false) }, closesOnOpen: true)
                         .frame(width: 290)
                         .transition(.move(edge: .leading))
                 }
-                .onExitCommand { setSidebarOverlay(false) }
             }
         }
     }

@@ -89,6 +89,20 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(ChatLibrary.self, from: data), library)
     }
 
+    func testLibraryFileIsReadableAndTolerant() throws {
+        var library = ChatLibrary()
+        let chat = UUID()
+        let project = library.addProject(named: "p")
+        library.move(chat, to: project.id)
+        let json = String(decoding: try JSONEncoder().encode(library), as: UTF8.self)
+        XCTAssertTrue(json.contains("\"\(chat.uuidString)\":\"\(project.id.uuidString)\""), "a chat's project as a JSON object")
+        // A later version's extra fields, or a missing one: still read.
+        let newer = #"{"pinned":[],"projects":[],"projectOfChat":{},"folders":[1,2]}"#
+        XCTAssertEqual(try JSONDecoder().decode(ChatLibrary.self, from: Data(newer.utf8)), ChatLibrary())
+        let partial = #"{"pinned":["\#(chat.uuidString)"]}"#
+        XCTAssertEqual(try JSONDecoder().decode(ChatLibrary.self, from: Data(partial.utf8)).pinned, [chat])
+    }
+
     func testCleanedTitle() {
         XCTAssertEqual(cleanedChatTitle("\"Где взять Apple Developer ID.\""), "Где взять Apple Developer ID")
         XCTAssertEqual(cleanedChatTitle("Title: **License comparison**\nSome explanation"), "License comparison")

@@ -139,6 +139,19 @@ enum ChatSessionStore {
             .sorted { $0.updatedAt > $1.updatedAt }
     }
 
+    /// The chats there are files for, whether or not they decode. nil when
+    /// the directory can't be read (pins must not be dropped for that).
+    static func ids() -> Set<UUID>? {
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return nil }
+        return Set(names.compactMap { name in
+            name.hasSuffix(".json") ? UUID(uuidString: String(name.dropLast(5))) : nil
+        })
+    }
+
+    static func exists(_ id: UUID) -> Bool {
+        FileManager.default.fileExists(atPath: path(for: id))
+    }
+
     /// A session file's new title, without loading it into the chat.
     static func rename(id: UUID, to title: String) {
         guard var file = load(id: id) else { return }

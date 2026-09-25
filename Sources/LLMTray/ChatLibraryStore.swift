@@ -16,6 +16,8 @@ final class ChatLibraryStore: ObservableObject {
 
     private var libraryPath: String { ChatSessionStore.sessionsDir + "/library.json" }
     private var observer: AnyCancellable?
+    private var isLoadingAll = false
+    private var changedWhileLoading: Set<UUID> = []
 
     private init() {
         library = Self.readLibrary(at: libraryPath)
@@ -30,16 +32,27 @@ final class ChatLibraryStore: ObservableObject {
     /// `id`: just that chat (saved or deleted); nil: all of them.
     func reload(_ id: UUID?) {
         guard let id else {
+            isLoadingAll = true
             Task.detached(priority: .utility) {
                 let all = ChatSessionStore.list().map(Self.summary)
+                let onDisk = ChatSessionStore.ids()
                 await MainActor.run {
                     self.chats = all
                     self.isLoaded = true
-                    self.pruneLibrary()
+                    self.isLoadingAll = false
+                    // Saved or deleted while the list was read: its snapshot
+                    // may be older.
+                    let changed = self.changedWhileLoading
+                    self.changedWhileLoading = []
+                    changed.forEach { self.reload($0) }
+                    if let onDisk {
+                        self.pruneLibrary(onDisk: onDisk.union(changed.filter { ChatSessionStore.exists($0) }))
+                    }
                 }
             }
             return
         }
+        if isLoadingAll { changedWhileLoading.insert(id) }
         chats.removeAll { $0.id == id }
         if let file = ChatSessionStore.load(id: id) {
             chats.append(Self.summary(file))
@@ -52,14 +65,18 @@ final class ChatLibraryStore: ObservableObject {
     nonisolated private static func summary(_ file: ChatSessionFile) -> ChatSummary {
         // Title and text, capped: a search needn't scan a book per chat.
         var text = file.title
-        for message in file.messages where text.count < 20_000 {
+        var length = text.utf8.count
+        for message in file.messages {
+            guard length < 40_000 else { break }
             text += "\n" + message.content
+            length += message.content.utf8.count + 1
         }
         return ChatSummary(id: file.id, title: file.title, updatedAt: file.updatedAt, searchText: text.lowercased())
     }
 
+    /// A pinned chat shows under Pinned only.
     func chats(inProject project: UUID) -> [ChatSummary] {
-        chats.filter { library.projectOfChat[$0.id] == project }
+        chats.filter { library.projectOfChat[$0.id] == project && !library.isPinned($0.id) }
     }
 
     var pinnedChats: [ChatSummary] {
@@ -134,9 +151,11 @@ final class ChatLibraryStore: ObservableObject {
         saveLibrary()
     }
 
-    private func pruneLibrary() {
+    /// By the files there are, not the ones that decoded: a chat that
+    /// failed to read keeps its pin and project.
+    private func pruneLibrary(onDisk: Set<UUID>) {
         var pruned = library
-        pruned.prune(existing: Set(chats.map(\.id)))
+        pruned.prune(existing: onDisk)
         guard pruned != library else { return }
         library = pruned
         saveLibrary()

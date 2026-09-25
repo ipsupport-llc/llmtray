@@ -50,6 +50,7 @@ final class ChatWindowController: NSWindowController, NSWindowDelegate {
         if saved.width < Self.minContentSize.width || saved.height < Self.minContentSize.height {
             window.setContentSize(NSSize(width: max(saved.width, Self.minContentSize.width),
                                          height: max(saved.height, Self.minContentSize.height)))
+            window.setFrame(window.constrainFrameRect(window.frame, to: window.screen ?? NSScreen.main), display: false)
         }
         // Assigning a content controller resizes the window to its view's
         // size: sized to the window first, the saved frame stays.
