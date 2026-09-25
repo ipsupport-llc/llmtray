@@ -882,11 +882,13 @@ enum AppLanguage {
         alert.addButton(withTitle: NSLocalizedString("Restart Now", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Later", comment: ""))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
-        relaunch()
+        relaunch(reopening: .general)
     }
 
-    /// Starts a fresh instance once this one has exited, then quits.
-    static func relaunch() {
+    /// Starts a fresh instance once this one has exited, then quits. The
+    /// new instance opens Settings on `pane` again.
+    static func relaunch(reopening pane: SettingsPane? = nil) {
+        UserDefaults.standard[Pref.settingsPaneAfterRelaunch] = pane?.rawValue
         let path = Bundle.main.bundlePath
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
