@@ -195,8 +195,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // SwiftUI's App protocol requires *some* Scene -- but macOS can
         // still materialize it as a real, visible, empty settings window
         // (window-state restoration, e.g. after the relaunch a language
-        // change asks for, or the app menu's Settings… item). Wherever it
-        // turns up it's replaced by the real Settings window. Matched by
+        // change asks for, or at launch on its own). Wherever it turns up
+        // it's closed. Matched by
         // SwiftUI's identifier for that window, not its title: the title is
         // localized ("LLMTray Settings" matched English only), and closing
         // every NSApp.windows entry previously took down the popover's own
@@ -208,14 +208,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NotificationCenter.default.addObserver(self, selector: #selector(replaceSettingsScene), name: name, object: nil)
         }
         DispatchQueue.main.async { [self] in
-            let restored = closeSettingsScene()
+            closeSettingsScene()
             let pane = UserDefaults.standard[Pref.settingsPaneAfterRelaunch].flatMap(SettingsPane.init(rawValue:))
             UserDefaults.standard[Pref.settingsPaneAfterRelaunch] = nil
-            if let pane {
-                settingsWindow.show(pane: pane)
-            } else if restored {
-                settingsWindow.show()
-            }
+            if let pane { settingsWindow.show(pane: pane) }
         }
 
         // Starts the server automatically instead of making "click Start
@@ -524,9 +520,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
               window.identifier?.rawValue == "com_apple_SwiftUI_Settings_window" else { return }
         // After the notification: closing a window inside its own
         // didBecomeKey is asking for trouble.
-        DispatchQueue.main.async { [self] in
-            if closeSettingsScene() { settingsWindow.show() }
-        }
+        // Just closed: SwiftUI puts it up at launch on its own (Settings
+        // opened every launch when it was replaced by the real one), and
+        // the app menu's Settings… opens the real one directly.
+        DispatchQueue.main.async { [self] in closeSettingsScene() }
     }
 
     @objc private func showSettingsFromNotification(_ note: Notification) {
