@@ -104,7 +104,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "每個 GPU 步驟合併批次處理的要求數量。只有多個用戶端同時使用伺服器時才有幫助；會使用更多記憶體。";
 "How many tokens it generates per trial." = "每次試驗產生的 token 數量。";
-"Hugging Face answered HTTP %d for %@." = "Hugging Face 對 %@ 回應 HTTP %d。";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face 對 %2$@ 回應 HTTP %1$d。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒絕 %@（HTTP %d）：可能受限制、私人或不存在。若為受限制，請在 huggingface.co/%@ 接受授權，並在「設定 → Models」檢查代幣。";
 "Hugging Face token" = "Hugging Face 代幣";
 "Idle -- the model reloads on the next message" = "閒置 — 模型會在下一則訊息時重新載入";

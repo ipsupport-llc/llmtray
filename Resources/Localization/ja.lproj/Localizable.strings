@@ -104,7 +104,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
-"Hugging Face answered HTTP %d for %@." = "Hugging Face が %@ に対して HTTP %d を返しました。";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face が %2$@ に対して HTTP %1$d を返しました。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
 "Hugging Face token" = "Hugging Face トークン";
 "Idle -- the model reloads on the next message" = "待機中 — 次のメッセージでモデルを再読み込み";

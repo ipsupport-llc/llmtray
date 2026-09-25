@@ -104,7 +104,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
 "How many tokens it generates per trial." = "시도당 생성 토큰 수";
-"Hugging Face answered HTTP %d for %@." = "Hugging Face가 %@에 대해 HTTP %d를 응답했습니다.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face가 %2$@에 대해 HTTP %1$d를 응답했습니다.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face가 %@을(를) 거부했습니다(HTTP %d): 접근 제한이 있거나 비공개이거나 존재하지 않습니다. 접근 제한이 있는 경우 huggingface.co/%@에서 사용권에 동의하고 설정 → Models의 토큰을 확인하세요.";
 "Hugging Face token" = "Hugging Face 토큰";
 "Idle -- the model reloads on the next message" = "대기 중 — 다음 메시지에서 모델 다시 로드";

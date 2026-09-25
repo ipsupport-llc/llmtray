@@ -104,7 +104,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
-"Hugging Face answered HTTP %d for %@." = "Hugging Face %@ için HTTP %d döndü.";
+"Hugging Face answered HTTP %d for %@." = "Hugging Face %2$@ için HTTP %1$d döndü.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
 "Hugging Face token" = "Hugging Face tokenı";
 "Idle -- the model reloads on the next message" = "Boşta — model sonraki iletide yeniden yüklenir";
