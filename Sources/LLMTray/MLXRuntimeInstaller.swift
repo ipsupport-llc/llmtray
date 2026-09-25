@@ -77,6 +77,73 @@ final class MLXRuntimeInstaller {
     /// Full build's vendored copy, or a fresh venv + pip install), or an
     /// upgrade after a new pin. Always our fork, never PyPI -- see
     /// adr/0001-mlx-runtime.md.
+    /// The copy-out below, at most one at a time: app launch starts it
+    /// (a Sparkle update replaces the bundle with the thin one, so the
+    /// runtime must be out of it before then) and ensureReady() waits for
+    /// the same one.
+    private static var copyOut: Task<Bool, Error>?
+
+    /// Copies the Full build's bundled runtime (venv + Python.framework) to
+    /// Application Support when the one there is missing or for another
+    /// pin. True when the external runtime is the bundled one now. Staged
+    /// into *.new folders and swapped in, so an interrupted copy never
+    /// passes for a working runtime.
+    @discardableResult
+    static func copyOutBundledRuntime(pinnedRef: String?, log: @escaping @MainActor @Sendable (String) -> Void) async throws -> Bool {
+        if let running = copyOut { return try await running.value }
+        let task = Task { @MainActor () throws -> Bool in
+            defer { copyOut = nil }
+            guard let pinnedRef = pinnedRef ?? bundledPin(),
+                  FileManager.default.fileExists(atPath: bundledVenvServerBinary) else { return false }
+            let installed = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
+            if installed == pinnedRef, FileManager.default.fileExists(atPath: venvServerBinary) { return false }
+            log("--- copying the bundled runtime out of the app ---\n")
+            try FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
+            let (venvSource, venvTarget, framework, frameworkTarget) = (bundledVenvDir, venvDir, bundledFrameworkDir, externalFrameworkDir)
+            // Hundreds of MB: off the main actor, the UI stays live.
+            try await ProcessRunner.offMain {
+                try Self.stagedCopy(from: venvSource, to: venvTarget)
+                if let framework { try Self.stagedCopy(from: framework, to: frameworkTarget) }
+            }
+            if framework != nil {
+                // The venv's bin/python3.X points at the *bundled* framework
+                // by absolute path (how build_full_app.sh's `python -m venv`
+                // made it): dangling once an update replaces the bundle.
+                relinkVendoredInterpreter(newFrameworkDir: externalFrameworkDir)
+                guard FileManager.default.isExecutableFile(atPath: venvPython) else {
+                    throw NSError(domain: "MLXRuntimeInstaller", code: 3, userInfo: [
+                        NSLocalizedDescriptionKey: "the copied runtime's Python doesn't run -- remove it (Uninstall Runtime Data) and start again",
+                    ])
+                }
+            }
+            try pinnedRef.write(toFile: versionMarkerPath, atomically: true, encoding: .utf8)
+            log("--- runtime ready ---\n")
+            return true
+        }
+        copyOut = task
+        return try await task.value
+    }
+
+    /// The pin this bundle ships (runtime/mlx_lm_runtime.json).
+    private static func bundledPin() -> String? {
+        guard let data = FileManager.default.contents(atPath: RuntimePaths.runtimeDir + "/mlx_lm_runtime.json"),
+              let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return nil }
+        return obj["pinned_ref"] as? String
+    }
+
+    /// `source` copied to `target` via `target.new`, then swapped in.
+    nonisolated private static func stagedCopy(from source: String, to target: String) throws {
+        let fm = FileManager.default
+        let staging = target + ".new"
+        try? fm.removeItem(atPath: staging)
+        try fm.copyItem(atPath: source, toPath: staging)
+        if fm.fileExists(atPath: target) {
+            _ = try fm.replaceItemAt(URL(fileURLWithPath: target), withItemAt: URL(fileURLWithPath: staging))
+        } else {
+            try fm.moveItem(atPath: staging, toPath: target)
+        }
+    }
+
     func ensureReady() async throws {
         let runtimeDir = RuntimePaths.runtimeDir
         guard let pinData = FileManager.default.contents(atPath: runtimeDir + "/mlx_lm_runtime.json"),
@@ -106,33 +173,10 @@ final class MLXRuntimeInstaller {
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
 
-        // Full build, first launch: a working venv (for this exact pinned
-        // commit, since both were produced by the same build_full_app.sh
-        // run) is already sitting in the bundle -- copying it out is a fast
-        // local operation with no network, unlike everything below.
-        if !FileManager.default.fileExists(atPath: Self.venvDir),
-           FileManager.default.fileExists(atPath: Self.bundledVenvServerBinary) {
-            log("--- first run: copying vendored runtime out of the app bundle ---\n")
-            // Hundreds of MB: copied off the main actor, the UI stays live.
-            let (venvSource, venvTarget) = (Self.bundledVenvDir, Self.venvDir)
-            try await ProcessRunner.offMain { try FileManager.default.copyItem(atPath: venvSource, toPath: venvTarget) }
-            if let bundledFramework = Self.bundledFrameworkDir {
-                let frameworkTarget = Self.externalFrameworkDir
-                if !FileManager.default.fileExists(atPath: frameworkTarget) {
-                    try? await ProcessRunner.offMain { try FileManager.default.copyItem(atPath: bundledFramework, toPath: frameworkTarget) }
-                }
-                // The copied venv's own bin/python3.X is a symlink pointing
-                // at the *bundled* framework by absolute path (that's how
-                // `python -m venv` created it in build_full_app.sh) -- valid
-                // only as long as that original .app sticks around. Left
-                // alone, it dangles the instant the next Sparkle update
-                // replaces Contents/, which is exactly the update this
-                // whole external-copy was supposed to survive. Repoint it at
-                // the framework copy that now lives right alongside it.
-                Self.relinkVendoredInterpreter(newFrameworkDir: Self.externalFrameworkDir)
-            }
-            try pinnedRef.write(toFile: Self.versionMarkerPath, atomically: true, encoding: .utf8)
-            log("--- runtime ready ---\n")
+        // Full build: the bundle's venv (built for this exact pin by the
+        // same build_full_app.sh run) is copied out -- local, no network,
+        // no git -- also after a pin bump (the update brought a new one).
+        if try await Self.copyOutBundledRuntime(pinnedRef: pinnedRef, log: log) {
             return
         }
 

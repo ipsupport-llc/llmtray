@@ -24,6 +24,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write
 
 # Serialized; a queued run supersedes an older queued one, which is fine:
 # each reads the releases only once it runs.
@@ -32,7 +33,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The github-pages environment deploys from main only, and a release
+  # event runs on its tag: it just starts a run on main.
+  redispatch:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main --repo "$GITHUB_REPOSITORY"
+
   build:
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,6 +69,7 @@ jobs:
           path: _site
 
   deploy:
+    if: github.event_name != 'release'
     needs: build
     runs-on: ubuntu-latest
     environment:

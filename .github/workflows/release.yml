@@ -3,7 +3,8 @@ name: Release
 # Builds LLMTray.app and attaches it (as a drag-to-Applications .dmg) to a
 # GitHub Release whenever a version tag is pushed. Ad-hoc signed only (no
 # Developer ID/notarization secrets configured) -- users launch it once via
-# right-click > Open to clear Gatekeeper, same as any unsigned/ad-hoc app
+# "Open Anyway" in Privacy & Security (macOS 15+; right-click > Open before)
+# to clear Gatekeeper, same as any unsigned/ad-hoc app
 # from outside the App Store.
 #
 # Produces two DMGs from the same build: LLMTray.dmg (thin -- bootstraps
@@ -63,11 +64,17 @@ jobs:
           VERSION: ${{ env.VERSION }}
           TAG: ${{ github.ref_name }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
-      # DMGs and their signature go up together: a re-run replaces both,
-      # never one without the other.
+      # DMGs and their signature go up together into a draft, published
+      # only once all are there -- the feed (which skips drafts) never sees
+      # a half-uploaded release. A re-run of a published one replaces the
+      # files; render_appcast skips a DMG that doesn't match its signature.
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
+          draft: true
+          # A hotfix on an older line must not become "latest" (the
+          # website's download links): GitHub's date + semver rule.
+          make_latest: legacy
           files: |
             .build/app/LLMTray.dmg
             .build/app/LLMTray-Full.dmg
@@ -76,6 +83,10 @@ jobs:
           # vX.Y.Z-beta.N tags: a GitHub pre-release, so releases/latest
           # (the website's download links) keeps pointing at stable.
           prerelease: ${{ contains(github.ref_name, '-') }}
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release edit "$GITHUB_REF_NAME" --draft=false
       # A release created with GITHUB_TOKEN doesn't fire `release` events
       # for other workflows; a dispatch does. On main: the github-pages
       # environment only deploys from main.

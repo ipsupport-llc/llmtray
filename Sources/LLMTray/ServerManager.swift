@@ -321,6 +321,8 @@ final class ServerManager: ObservableObject {
     private func launchAndWaitReady(modelPath: String, alias: String, epoch: Int) async throws {
         if let old = process { await old.waitForExit() }
         try checkNotStopped(epoch)
+        await Self.reapOrphanedServer(port: internalPort)
+        try checkNotStopped(epoch)
         state = .starting
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             startContinuation = continuation
@@ -548,6 +550,43 @@ final class ServerManager: ObservableObject {
     private func failAndStop(_ message: String) {
         stop()
         state = .failed(message)
+    }
+
+    /// An mlx_lm.server of ours left on the internal port by an LLMTray
+    /// that crashed or was force-quit (only a normal quit / SIGTERM stops
+    /// it): it holds its model's memory and the port. Ours = mlx_lm.server
+    /// on this port with no parent left; anything else is
+    /// left alone (the launch then fails on the port, saying so).
+    nonisolated static func reapOrphanedServer(port: Int) async {
+        _ = try? await ProcessRunner.offMain {
+            func output(_ tool: String, _ args: [String]) -> String {
+                let p = Process()
+                p.executableURL = URL(fileURLWithPath: tool)
+                p.arguments = args
+                let pipe = Pipe()
+                p.standardOutput = pipe
+                p.standardError = FileHandle.nullDevice
+                guard (try? p.run()) != nil else { return "" }
+                let data = pipe.fileHandleForReading.readDataToEndOfFile()
+                p.waitUntilExit()
+                return String(decoding: data, as: UTF8.self)
+            }
+            let pids = output("/usr/sbin/lsof", ["-nP", "-iTCP:\(port)", "-sTCP:LISTEN", "-t"])
+                .split(separator: "\n").compactMap { Int32($0.trimmingCharacters(in: .whitespaces)) }
+            for pid in pids where pid != getpid() {
+                // "  1 /…/Python -m mlx_lm.server --model … --port 18765 …":
+                // the venv's python execs the framework's, so the command
+                // doesn't show our folder -- ours is mlx_lm.server on our
+                // internal port, orphaned (its parent, an LLMTray, is gone).
+                let line = output("/bin/ps", ["-o", "ppid=,command=", "-p", String(pid)]).trimmingCharacters(in: .whitespaces)
+                let ppid = Int32(line.split(separator: " ").first ?? "")
+                guard ppid == 1, line.contains("mlx_lm.server"), line.contains("--port \(port)") else { continue }
+                kill(pid, SIGTERM)
+                for _ in 0..<30 where kill(pid, 0) == 0 { usleep(100_000) }
+                if kill(pid, 0) == 0 { kill(pid, SIGKILL) }
+            }
+            return true
+        }
     }
 
     /// Unlike stop(), waits for the old process to exit (the replacement

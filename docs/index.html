@@ -228,7 +228,7 @@
             <span>Download Full<span class="sub">~270MB · Python + mlx-lm inside, nothing else needed</span></span>
           </a>
         </div>
-        <span class="cta-meta">macOS 13+ (Apple Silicon) · unsigned, right-click → Open on first launch</span>
+        <span class="cta-meta">macOS 13+ (Apple Silicon) · not notarized: allow it once in Privacy &amp; Security</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
 
@@ -271,7 +271,7 @@
       <h2>Quick start</h2>
       <ol style="padding-left: 1.2rem; color: var(--fg-muted);">
         <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download LLMTray.dmg</a> and drag it to Applications.</li>
-        <li>First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).</li>
+        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 13–14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
         <li>Click the brain icon in the menu bar and pick a model — the server starts on its own, every launch.</li>
       </ol>
     </section>

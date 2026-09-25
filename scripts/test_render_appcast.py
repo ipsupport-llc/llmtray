@@ -60,6 +60,20 @@ check(feed.count("<item>") == 1, "stale beta dropped")
 feed = run([release("v9.9.9"), release("v9.9.8")], [meta("v9.9.8", "9.9.8")])
 check("<sparkle:version>9.9.8</sparkle:version>" in feed, "falls back when metadata is missing")
 
+# A DMG that isn't the signed one (re-run, half upload) falls back too.
+bad = release("v9.9.9")
+bad["assets"][1].update(size=999, state="uploaded")
+feed = run([bad, release("v9.9.8")], [meta("v9.9.9", "9.9.9"), meta("v9.9.8", "9.9.8")])
+check("<sparkle:version>9.9.8</sparkle:version>" in feed, "skips a DMG whose size isn't the signed length")
+half = release("v9.9.9")
+half["assets"][1].update(size=123, state="starter")
+feed = run([half, release("v9.9.8")], [meta("v9.9.9", "9.9.9"), meta("v9.9.8", "9.9.8")])
+check("<sparkle:version>9.9.8</sparkle:version>" in feed, "skips a DMG still uploading")
+good = release("v9.9.9")
+good["assets"][1].update(size=123, state="uploaded")
+feed = run([good], [meta("v9.9.9", "9.9.9")])
+check("<sparkle:version>9.9.9</sparkle:version>" in feed, "keeps a DMG of the signed length")
+
 # Paginated input is flattened.
 with tempfile.TemporaryDirectory() as d:
     p = Path(d, "r.json")

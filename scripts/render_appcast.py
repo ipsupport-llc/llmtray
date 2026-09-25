@@ -88,6 +88,14 @@ def pick(releases: list[dict], meta_dir: str | None) -> dict[str, tuple[dict, di
         if meta.get("tag") != r["tag_name"]:
             print(f"warning: {r['tag_name']}: metadata is for {meta.get('tag')}, skipped", file=sys.stderr)
             continue
+        # The DMG the feed points to must be the one that was signed: a
+        # re-run replaces the DMG and its signature separately, and an
+        # upload can fail halfway.
+        dmg = next(a for a in r["assets"] if a["name"] == DMG_ASSET)
+        if dmg.get("state", "uploaded") != "uploaded" or ("size" in dmg and int(dmg["size"]) != int(meta.get("length", -1))):
+            print(f"warning: {r['tag_name']}: {DMG_ASSET} ({dmg.get('state')}, {dmg.get('size')} bytes) "
+                  f"doesn't match its signature ({meta.get('length')} bytes), skipped", file=sys.stderr)
+            continue
         chosen[channel] = (r, meta)
     return chosen
 

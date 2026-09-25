@@ -39,7 +39,7 @@ Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtra
 - **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~260MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
 
 1. Download one of the two above and drag it to Applications.
-2. First launch: right-click the app → Open (clears Gatekeeper for this unsigned build).
+2. First launch (this build isn't notarized): open it once, then **System Settings → Privacy & Security → "Open Anyway"** (macOS 15+; on macOS 13–14, right-click the app → Open also works). Or in Terminal: `xattr -dr com.apple.quarantine /Applications/LLMTray.app`.
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
 The very first start creates the `mlx-lm` venv and installs our fork automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.
