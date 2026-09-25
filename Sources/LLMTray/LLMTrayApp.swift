@@ -147,7 +147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(showHFBrowserWindow), name: .showHFBrowser, object: nil
         )
         NotificationCenter.default.addObserver(
-            self, selector: #selector(detachChat), name: .detachChat, object: nil
+            self, selector: #selector(detachChatSoon), name: .detachChat, object: nil
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showAboutPanel), name: .showAbout, object: nil
@@ -229,8 +229,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: - Detachable chat window
 
+    /// The header button posts .detachChat synchronously, from inside the
+    /// popover's own view: detaching releases that view, so it waits until
+    /// the button's action has returned.
+    @objc private func detachChatSoon() {
+        DispatchQueue.main.async { [weak self] in self?.detachChat() }
+    }
+
     /// Moves the chat out of the popover into its own window.
-    @objc private func detachChat() {
+    private func detachChat() {
         guard !chatPresentation.isDetached else { return showChatWindow() }
         popover.performClose(nil)
         // The popover's chat view goes away (only one exists at a time);
