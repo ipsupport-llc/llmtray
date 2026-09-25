@@ -38,6 +38,8 @@ final class ChatClient: ObservableObject {
     @Published private(set) var currentSessionID: UUID?
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
+    /// The title is the user's or the model's already: no auto-title.
+    private var titleIsFinal = false
 
     /// A compaction summary is being written (see compactSession).
     @Published private(set) var isCompacting: Bool = false
@@ -110,6 +112,7 @@ final class ChatClient: ObservableObject {
         currentSessionID = UUID()
         currentSessionTitle = ""
         sessionCreatedAt = Date()
+        titleIsFinal = false
     }
 
     /// Nothing typed or generated in this chat is ever written anywhere --
@@ -157,6 +160,42 @@ final class ChatClient: ObservableObject {
         currentSessionID = file.id
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
+        titleIsFinal = true
+    }
+
+    /// Renames the chat on screen: through here, not the session file --
+    /// the next turn rewrites that file with this title.
+    func renameCurrentSession(_ title: String) {
+        currentSessionTitle = title
+        titleIsFinal = true
+        persistCurrentSession()
+    }
+
+    private static let titleSystemPrompt = """
+        Write a short title for this conversation: at most six words, in the language the user \
+        wrote in, no quotes, no trailing period. Reply with the title only.
+        """
+
+    /// After a new chat's first answer: the model names the chat, as the
+    /// first 48 characters of the question often don't say much. Once per
+    /// chat; a rename (or a failure) leaves it at that.
+    func generateTitleIfNeeded(port: Int, modelAlias: String) async {
+        guard currentSessionID != nil, !titleIsFinal,
+              let question = messages.first(where: { $0.role == "user" && !$0.isToolContext }),
+              let answer = messages.last(where: { $0.role == "assistant" && !$0.content.isEmpty && !$0.isSummary })
+        else { return }
+        titleIsFinal = true
+        let epoch = conversationEpoch
+        let requestMessages: [[String: Any]] = [
+            ["role": "system", "content": Self.titleSystemPrompt],
+            ["role": "user", "content": "User: \(question.content.prefix(1500))\n\nAssistant: \(answer.content.prefix(1500))"],
+        ]
+        guard let request = ChatRequestBuilder.completion(port: port, modelAlias: modelAlias, messages: requestMessages),
+              let raw = try? await ChatTransport.completion(request),
+              let title = cleanedChatTitle(raw),
+              epoch == conversationEpoch else { return }
+        currentSessionTitle = title
+        persistCurrentSession()
     }
 
     /// Called after every turn that ends with no pending tool call (see

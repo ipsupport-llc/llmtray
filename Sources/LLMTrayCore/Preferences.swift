@@ -39,6 +39,10 @@ public enum Pref {
     public static let compactKeepEnd = PrefKey("llmtray.compactKeepEnd", default: 6)
     /// 0 = off.
     public static let autoCompactThreshold = PrefKey("llmtray.autoCompactThreshold", default: 0)
+    /// The chat window shows the chats sidebar.
+    public static let chatWindowSidebar = PrefKey("llmtray.chatWindowSidebar", default: true)
+    /// A new chat's first answer gets the model to name the chat.
+    public static let autoTitleChats = PrefKey("llmtray.autoTitleChats", default: true)
 
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)

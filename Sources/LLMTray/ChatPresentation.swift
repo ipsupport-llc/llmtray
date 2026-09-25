@@ -67,8 +67,25 @@ final class ChatPresentation: ObservableObject {
         } else if change.number == busyChanges, turnConversation == change.conversation,
                   change.conversation == chat.conversationEpoch,
                   !chat.isTurnInProgress {  // not a tool round's hand-off
+            autoTitleIfNeeded()
             autoCompactIfNeeded(epoch: change.conversation)
         }
+    }
+
+    /// A new chat's first answer: the model names the chat (ChatClient
+    /// does it once per chat, and leaves a renamed one alone).
+    private func autoTitleIfNeeded() {
+        guard UserDefaults.standard[Pref.autoTitleChats] else { return }
+        let (port, alias) = requestTarget
+        Task { await chat.generateTitleIfNeeded(port: port, modelAlias: alias) }
+    }
+
+    /// Where requests made outside a view go: the selected model, by the
+    /// name the proxy knows it by.
+    private var requestTarget: (port: Int, modelAlias: String) {
+        let defaults = UserDefaults.standard
+        let modelID = defaults[Pref.selectedModelID]
+        return (defaults[Pref.port], modelID.map(ModelCatalog.shared.requestName(for:)) ?? "default")
     }
 
     private struct BusyChange {
@@ -104,9 +121,10 @@ final class ChatPresentation: ObservableObject {
     func compact() async {
         let defaults = UserDefaults.standard
         let modelID = defaults[Pref.selectedModelID]
+        let (port, alias) = requestTarget
         await chat.compactSession(
-            port: defaults[Pref.port],
-            modelAlias: modelID.map(ModelCatalog.shared.requestName(for:)) ?? "default",
+            port: port,
+            modelAlias: alias,
             settings: ChatSettings.forModel(
                 modelID, supportsVision: modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
             ),
