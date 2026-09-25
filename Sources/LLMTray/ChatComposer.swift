@@ -1,4 +1,5 @@
 import AppKit
+import LLMTrayCore
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -36,10 +37,12 @@ final class ComposerModel: ObservableObject {
 
     @discardableResult
     func attach(_ nsImage: NSImage?) -> Bool {
+        // The bitmap rep's CGImage has the full pixel size (a Retina
+        // image's own cgImage would be at its point size).
         guard acceptsImages, let nsImage,
               let tiff = nsImage.tiffRepresentation,
-              let rep = NSBitmapImageRep(data: tiff),
-              let png = rep.representation(using: .png, properties: [:]) else { return false }
+              let cgImage = NSBitmapImageRep(data: tiff)?.cgImage,
+              let png = ImageAttachment.pngData(cgImage) else { return false }
         attachments.append(png)
         return true
     }
