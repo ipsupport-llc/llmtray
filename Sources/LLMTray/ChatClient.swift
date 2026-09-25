@@ -198,11 +198,7 @@ final class ChatClient: ObservableObject {
                 try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
             }
         }
-        // Images no message refers to any more (compacted, regenerated).
         let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
-        for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
-            try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
-        }
 
         if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
             currentSessionTitle = String(firstUser.content.prefix(48))
@@ -214,7 +210,12 @@ final class ChatClient: ObservableObject {
             updatedAt: Date(),
             messages: persisted
         )
-        ChatSessionStore.save(file)
+        // Images no message refers to any more (compacted, regenerated):
+        // only once the chat that no longer lists them is on disk.
+        guard ChatSessionStore.save(file) else { return }
+        for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
+            try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
+        }
     }
 
     private static let compactionSystemPrompt = """
@@ -254,7 +255,9 @@ final class ChatClient: ObservableObject {
     static func compactionRange(_ messages: [ChatMessage], keepStart: Int, keepEnd: Int) -> Range<Int>? {
         func isTurnStart(_ i: Int) -> Bool { messages[i].role == "user" && !messages[i].isToolContext }
         guard messages.count > keepStart + keepEnd + 1 else { return nil }
-        guard let start = (keepStart..<messages.count).first(where: isTurnStart) else { return nil }
+        // An earlier summary is compacted again with the rest (else every
+        // compaction would leave its summary behind for good).
+        guard let start = (keepStart..<messages.count).first(where: { isTurnStart($0) || messages[$0].isSummary }) else { return nil }
         var end = messages.count - keepEnd
         if let image = messages.indices.first(where: { $0 >= start && !messages[$0].images.isEmpty }) { end = min(end, image) }
         while end > start, end < messages.count, !isTurnStart(end) { end -= 1 }
@@ -313,6 +316,9 @@ final class ChatClient: ObservableObject {
     /// same prompt.
     /// Saves what's there now (app quit).
     func saveNow() { persistCurrentSession() }
+
+    /// The open session is being deleted: nothing of it is saved again.
+    func forgetCurrentSession() { currentSessionID = nil }
 
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }

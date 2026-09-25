@@ -103,12 +103,13 @@ struct ChatHeaderView: View {
     }
 
     private func deleteSession(_ session: ChatSessionFile) {
-        ChatSessionStore.delete(id: session.id)
-        // The session on screen was deleted: start a fresh one instead of
-        // showing a conversation whose log no longer exists.
+        // The session on screen: forgotten first -- starting a new one saves
+        // the current one, which would bring the deleted chat back.
         if chat.currentSessionID == session.id {
+            chat.forgetCurrentSession()
             chat.newSession()
         }
+        ChatSessionStore.delete(id: session.id)
     }
 
     // MARK: Server
