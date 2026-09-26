@@ -221,7 +221,30 @@ final class ServerManager: ObservableObject {
     /// only to a model that's already running: a health check must neither
     /// reload a 20 GB model nor keep one from idle-unloading.
     func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true) async throws {
+        // The model unloaded for an image or a song: the request waits for it
+        // to come back instead of failing. Outside the serialized transition
+        // (the reload itself goes through it), and again if it was unloaded
+        // just as this request got in line. Up to 15 minutes; Stop ends it.
+        // A client gone meanwhile is caught when forwarding starts: the
+        // proxy's downstream watch sees the closed connection at once and
+        // cancels the request.
         let epoch = stopEpoch
+        let deadline = Date().addingTimeInterval(15 * 60)
+        while true {
+            while loadIfUnloaded, suspendedForImageGeneration, epoch == stopEpoch, Date() < deadline {
+                try? await Task.sleep(nanoseconds: 250_000_000)
+            }
+            do {
+                try await acquireModelNow(modelPath: target, alias: alias, loadIfUnloaded: loadIfUnloaded, epoch: epoch)
+                return
+            } catch let error as NSError where error.domain == "ServerManager" && error.code == 7
+                && loadIfUnloaded && epoch == stopEpoch && Date() < deadline {
+                continue
+            }
+        }
+    }
+
+    private func acquireModelNow(modelPath target: String?, alias: String, loadIfUnloaded: Bool, epoch: Int) async throws {
         try await serialized(epoch: epoch) {
             if !loadIfUnloaded {
                 guard case .running = self.state else {

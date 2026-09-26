@@ -505,6 +505,15 @@ final class ChatClient: ObservableObject {
 
     var isMusicModelReady: Bool { musicManager.isReady }
 
+    /// A model download from Settings (not in the queue) holds the image or
+    /// music generator: a granted turn waits for it rather than unloading
+    /// the chat model for a "busy" error.
+    private func waitWhileGeneratorsBusy(_ stillCurrent: () -> Bool) async {
+        while (mfluxManager.isBusy || musicManager.isBusy), stillCurrent() {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+    }
+
     /// This turn (since the user's last message) has shown something: an
     /// answer, an image, a song.
     private var turnProducedSomething: Bool {
@@ -579,11 +588,13 @@ final class ChatClient: ObservableObject {
                         isCancelled: { !stillCurrent() },
                         onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
                     )
+                    await waitWhileGeneratorsBusy(stillCurrent)
                 } catch {
                     return
                 }
             }
             defer { ticket?.release() }
+            guard stillCurrent() else { return }
             let unload = runs && settings.unloadModelDuringImageGen
             if unload {
                 isUnloadingModelForMedia = true
@@ -840,8 +851,16 @@ final class ChatClient: ObservableObject {
                     isCancelled: { !stillCurrent() },
                     onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
                 )
+                // A Settings download holds a generator too: its turn waits for that.
+                await waitWhileGeneratorsBusy(stillCurrent)
             } catch {
                 return   // Stop / another chat: cancel() and the reset tidy up
+            }
+            // Before the release's defer below: handed back here, or the
+            // queue would stay taken for good.
+            guard stillCurrent() else {
+                ticket?.release()
+                return
             }
         }
         // After the model's reload below (defers run last-in first-out, and
