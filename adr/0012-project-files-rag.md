@@ -1,6 +1,6 @@
 # 0012 — Project files: a local micro-RAG
 
-**Status: proposed** (2026-09-26). Nothing here is built yet. Numbers
+**Status: accepted** (2026-09-26, by the user). Nothing here is built yet. Numbers
 under Evidence were measured on an M5 (26 GB, macOS 27.2) or are cited.
 Revised after two architecture reviews (Codex, Claude) and the user's
 requirements (2026-09-26): a full workspace like ChatGPT's projects —
