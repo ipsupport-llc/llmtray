@@ -17,6 +17,8 @@ struct MessageBubble: View {
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.
     var regenerateMedia: ((ChatClient.MediaKind, Int, ChatClient.MediaAction) -> Void)?
+    /// A Tweak draft of one of this message's images or songs: shown under it.
+    var draft: GenerationDraft?
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
@@ -104,6 +106,7 @@ struct MessageBubble: View {
 
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
+                tweakDraft(.image, i)
             }
 
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
@@ -113,6 +116,7 @@ struct MessageBubble: View {
                               action: regenerateMedia.map { act in { act(.music, i, $0) } })
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
+                tweakDraft(.music, i)
             }
 
             ForEach(sources, id: \.self) { source in
@@ -132,6 +136,15 @@ struct MessageBubble: View {
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .onHover { hovering = $0 }
+    }
+
+    @ViewBuilder
+    private func tweakDraft(_ kind: ChatClient.MediaKind, _ i: Int) -> some View {
+        if let draft, draft.anchor?.index == i, (draft.kind == .music) == (kind == .music) {
+            GenerationDraftView(draft: draft)
+                .id(draft.id)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
     }
 
     /// Copy / Share of the message's text (the markdown as written).

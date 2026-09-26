@@ -42,6 +42,9 @@ final class GenerationDraft: ObservableObject, Identifiable {
     let id = UUID()
     let kind: Kind
     let call: ToolCall
+    /// Tweak: the image or song it remakes (message, index), shown right
+    /// under it; nil = a new one, shown at the chat's end.
+    var anchor: (message: UUID, index: Int)?
     @Published var prompt: String
     @Published var lyrics: String
     @Published var duration: Int

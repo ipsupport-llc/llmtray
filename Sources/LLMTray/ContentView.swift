@@ -245,12 +245,13 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
-                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil)
+                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
+                                      draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
-                    if let draft = chat.draft {
-                        GenerationDraftView(draft: draft)
+                    if let draft = chat.draft, draft.anchor == nil {
+                        GenerationDraftView(draft: draft).id(draft.id)
                     }
                     if chat.isGeneratingMedia {
                         if chat.generatingKind == .music {
@@ -319,6 +320,11 @@ struct ContentView: View {
             // a fixed viewport instead of growing the popover. Detached, it
             // takes whatever height the window leaves it.
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
+            // A draft wants the user's eyes: brought into view, wherever it is.
+            .onChange(of: chat.draft?.id) { id in
+                guard let id else { return }
+                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+            }
             .onChange(of: lastUserMessageID) { _ in
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
