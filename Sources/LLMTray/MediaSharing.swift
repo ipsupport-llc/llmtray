@@ -25,8 +25,6 @@ enum MediaSharing {
         pasteboard.writeObjects([item])
     }
 
-    /// From the prompt, like Save…'s (ImageActions.slugify, which is
-    /// main-actor: the share sheet asks for the file off it).
     /// PNG bytes: as they are, or re-encoded (a streamed answer's image
     /// can be a JPEG).
     static func png(_ data: Data) -> Data {
@@ -34,6 +32,8 @@ enum MediaSharing {
         return NSBitmapImageRep(data: data)?.representation(using: .png, properties: [:]) ?? data
     }
 
+    /// From the prompt, like Save…'s (ImageActions.slugify, which is
+    /// main-actor: the share sheet asks for the file off it).
     static func fileName(_ prompt: String, fallback: String) -> String {
         let slug = prompt.lowercased().map { $0.isLetter || $0.isNumber ? $0 : "-" }
         let name = String(String(slug).split(separator: "-").joined(separator: "-").prefix(48))
@@ -41,11 +41,11 @@ enum MediaSharing {
     }
 
     /// A fresh folder each time: two shares of same-named clips don't clash.
-    /// Earlier exports are removed once they're an hour old (long done
-    /// being pasted or sent).
+    /// Earlier exports are removed once they're a day old (a copied song's
+    /// file must outlive the paste).
     static func exportFile(_ data: Data, name: String, ext: String) throws -> URL {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("LLMTray-share", isDirectory: true)
-        let old = Date().addingTimeInterval(-3600)
+        let old = Date().addingTimeInterval(-86_400)
         for dir in (try? FileManager.default.contentsOfDirectory(at: root, includingPropertiesForKeys: [.creationDateKey])) ?? [] {
             if let created = try? dir.resourceValues(forKeys: [.creationDateKey]).creationDate, created < old {
                 try? FileManager.default.removeItem(at: dir)

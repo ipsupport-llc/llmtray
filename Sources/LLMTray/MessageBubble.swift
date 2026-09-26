@@ -99,8 +99,9 @@ struct MessageBubble: View {
                 .background(isUser ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.12))
                 .cornerRadius(8)
                 // An answer's always (it's what gets copied); the user's own on hover.
-                if !message.content.isEmpty, !isUser || hovering {
-                    textActions
+                if !message.content.isEmpty {
+                    // The user's own: its space kept, so hovering doesn't shift the chat.
+                    textActions.opacity(!isUser || hovering ? 1 : 0)
                 }
             }
 
@@ -197,15 +198,19 @@ struct MessageBubble: View {
                         Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    // Icons only: the row must fit the popover.
                     Button { ImageActions.copy(data) } label: {
-                        Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+                        Image(systemName: "doc.on.doc").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    .help(Text("Copy"))
                     ShareLink(item: SharedImage(data: data, prompt: prompt),
-                              preview: SharePreview(prompt.isEmpty ? "Image" : prompt, image: Image(nsImage: nsImage))) {
-                        Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
+                              preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Image", comment: "") : prompt,
+                                                    image: Image(nsImage: nsImage))) {
+                        Image(systemName: "square.and.arrow.up").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    .help(Text("Share…"))
                     if canRegenerate(.image, i) {
                         Button { regenerateMedia?(.image, i, .regenerate) } label: {
                             Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))

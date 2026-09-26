@@ -169,6 +169,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";
+"Image" = "Image";
 "Image editing" = "Image editing";
 "Image generation" = "Image generation";
 "Image generation failed: %@" = "Image generation failed: %@";
@@ -213,6 +214,7 @@
 "Models folder" = "Models folder";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Move to Project" = "Move to Project";
+"Music" = "Music";
 "Music generation" = "Music generation";
 "Music generation failed: %@" = "Music generation failed: %@";
 "Music generation finished but produced no audio." = "Music generation finished but produced no audio.";

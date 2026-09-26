@@ -43,6 +43,8 @@ struct ContentView: View {
     // Starts true: a new view (the chat just moved between the popover and
     // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    /// Following the end before a Tweak draft paused it: restored after.
+    @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
@@ -323,8 +325,19 @@ struct ContentView: View {
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
             // A draft wants the user's eyes: brought into view, wherever it is.
             .onChange(of: chat.draft?.id) { id in
-                guard let id else { return }
-                if chat.draft?.anchor != nil { followChatBottom = false }
+                guard let id else {
+                    if let before = followBeforeDraft {
+                        followChatBottom = before
+                        followBeforeDraft = nil
+                        // Generate: the progress is at the end.
+                        if before { DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) } }
+                    }
+                    return
+                }
+                if chat.draft?.anchor != nil {
+                    if followBeforeDraft == nil { followBeforeDraft = followChatBottom }
+                    followChatBottom = false
+                }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
             .onChange(of: lastUserMessageID) { _ in
