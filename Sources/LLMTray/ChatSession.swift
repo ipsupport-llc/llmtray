@@ -76,6 +76,23 @@ struct PersistedMessage: Codable {
     }
 }
 
+extension PersistedMessage {
+    /// Without the media files named (and their aligned captions): ones that
+    /// couldn't be written, so the chat doesn't list what isn't on disk.
+    func withoutFiles(_ names: Set<String>) -> PersistedMessage {
+        var copy = self
+        let keptImages = imageFilenames.indices.filter { !names.contains(imageFilenames[$0]) }
+        copy.imageFilenames = keptImages.map { imageFilenames[$0] }
+        copy.imageDurations = keptImages.compactMap { imageDurations[safe: $0] }
+        copy.imagePrompts = keptImages.compactMap { imagePrompts[safe: $0] }
+        let keptAudio = audioFilenames.indices.filter { !names.contains(audioFilenames[$0]) }
+        copy.audioFilenames = keptAudio.map { audioFilenames[$0] }
+        copy.audioDurations = keptAudio.compactMap { audioDurations[safe: $0] }
+        copy.audioPrompts = keptAudio.compactMap { audioPrompts[safe: $0] }
+        return copy
+    }
+}
+
 struct ChatSessionFile: Codable, Identifiable {
     var id: UUID
     var title: String

@@ -83,6 +83,7 @@ final class ChatTabs: ObservableObject {
             return
         }
         let closed = tabs[index]
+        AudioPlayback.shared.stop(ifAnyOf: closed.messages)
         closed.close()
         // Still reloading the model after an image, say: counted as busy
         // until it's done, so nothing restarts the server under it.

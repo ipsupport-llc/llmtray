@@ -272,7 +272,7 @@ final class ChatClient: ObservableObject {
 
         // Before the tool messages they come from are dropped.
         let sources = ChatMessage.sourcesByAnswer(messages)
-        let persisted = messages.compactMap { msg -> PersistedMessage? in
+        var persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
             if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty, msg.audios.isEmpty { return nil }
             // Keyed by this message's own (stable for its lifetime) id, so
@@ -305,14 +305,15 @@ final class ChatClient: ObservableObject {
 
         if !pendingImageWrites.isEmpty {
             try? FileManager.default.createDirectory(atPath: imagesDir, withIntermediateDirectories: true)
-            var failed = false
             for (path, data) in pendingImageWrites where !FileManager.default.fileExists(atPath: path) {
-                if (try? data.write(to: URL(fileURLWithPath: path), options: .atomic)) == nil { failed = true }
+                try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
             }
-            // A chat listing an image or song that isn't on disk would lose it
-            // on reopening: not saved this time (hasUnsavedChanges stays), tried
-            // again after the next turn.
-            if failed { return }
+            // A file that couldn't be written (a full disk): the chat is saved
+            // without it rather than listing what isn't there (the text still
+            // is); the next save tries the file again.
+            let missing = Set(pendingImageWrites.filter { !FileManager.default.fileExists(atPath: $0.path) }
+                .map { ($0.path as NSString).lastPathComponent })
+            if !missing.isEmpty { persisted = persisted.map { $0.withoutFiles(missing) } }
         }
         let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
 

@@ -58,9 +58,9 @@ final class AudioPlayback: NSObject, ObservableObject, AVAudioPlayerDelegate {
         guard let player, player.play() else { return }
         isPlaying = true
         timer?.invalidate()
-        let timer = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.tick() }
-        }
+        // Target/selector, fired on the main run loop: no closure capturing
+        // self across concurrency domains (which CI's older compiler rejects).
+        let timer = Timer(timeInterval: 0.2, target: self, selector: #selector(tick), userInfo: nil, repeats: true)
         // .common: the scrubber keeps moving while the chat is scrolled.
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
@@ -73,7 +73,7 @@ final class AudioPlayback: NSObject, ObservableObject, AVAudioPlayerDelegate {
         timer = nil
     }
 
-    private func tick() {
+    @objc private func tick() {
         position = player?.currentTime ?? 0
     }
 
