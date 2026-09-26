@@ -199,12 +199,14 @@ final class ChatClient: ObservableObject {
             )
             // The files they came from: saved again under the same names.
             message.imageFilenames = images.count == pm.imageFilenames.count ? pm.imageFilenames : []
+            if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
                 message.audios = audios
                 message.audioFilenames = pm.audioFilenames
                 message.audioPrompts = pm.audioPrompts
                 message.audioDurations = pm.audioDurations
+                if pm.audioSources.count == audios.count { message.audioSources = pm.audioSources }
             }
             return message
         }
@@ -299,6 +301,8 @@ final class ChatClient: ObservableObject {
             persisted.audioFilenames = audioNames
             persisted.audioPrompts = msg.audioPrompts
             persisted.audioDurations = msg.audioDurations
+            persisted.imageSources = msg.imageSources.count == msg.images.count ? msg.imageSources : []
+            persisted.audioSources = msg.audioSources.count == msg.audios.count ? msg.audioSources : []
             return persisted
         }
         guard !persisted.isEmpty else { return }
@@ -503,6 +507,114 @@ final class ChatClient: ObservableObject {
     }
 
     var isMusicModelReady: Bool { musicManager.isReady }
+
+    /// A call's arguments as Regenerate should run them again: edit_image's
+    /// "latest image" pinned to the image it meant then (the result itself
+    /// is the latest one afterwards).
+    static func pinnedArguments(_ call: ToolCall, chatImageCount: Int) -> String {
+        guard call.name == EditImageTool.toolName else { return call.argumentsJSON }
+        var arguments = ChatToolbox.parseArguments(call.argumentsJSON)
+        if arguments["index"] == nil { arguments["index"] = chatImageCount }
+        guard let data = try? JSONSerialization.data(withJSONObject: arguments, options: [.sortedKeys]) else { return call.argumentsJSON }
+        return String(decoding: data, as: UTF8.self)
+    }
+
+    /// The image or piece of music can be made again (it has its source).
+    func canRegenerateMedia(_ message: ChatMessage, _ kind: MediaKind, _ index: Int) -> Bool {
+        switch kind {
+        case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(index)
+        case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(index)
+        }
+    }
+
+    /// Makes one image or piece of music again -- the same tool call, a new
+    /// seed -- and puts it in place of the old one. No chat model request:
+    /// only the generator runs (with the chat model unloaded around it, as
+    /// in a turn, when that's set).
+    func regenerateMedia(messageID: UUID, kind: MediaKind, index: Int, settings baseSettings: ChatSettings, server: ServerManager) {
+        guard !isBusy, let i = messages.firstIndex(where: { $0.id == messageID }),
+              canRegenerateMedia(messages[i], kind, index) else { return }
+        let source = kind == .image ? messages[i].imageSources[index] : messages[i].audioSources[index]
+        let settings = currentSettings(baseSettings)
+        if mfluxManager.isBusy || musicManager.isBusy || isAnotherChatGeneratingMedia()
+            || (settings.unloadModelDuringImageGen && isAnotherChatBusy()) {
+            errorText = NSLocalizedString("Another chat is generating an image or music, or answering, right now -- try again once it's done.", comment: "")
+            return
+        }
+        AudioPlayback.shared.stop(ifAnyOf: [messages[i]])
+        errorText = nil
+        // The per-turn limits don't apply: nothing else is made meanwhile.
+        toolbox.startTurn()
+        let call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
+        // Only if the generator will really run (it may have been turned off
+        // since): a refusal needs no unload, nor the "Generating…" UI.
+        let runs = kind == .image
+            ? imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
+            : musicTool.willGenerate([call], settings: settings) && musicManager.isReady
+        let epoch = conversationEpoch
+        let token = turnToken
+        // Stop (cancel bumps turnToken and cancels the task) or another
+        // chat opened meanwhile: the result is dropped, errors too.
+        func stillCurrent() -> Bool { epoch == conversationEpoch && token == turnToken && !Task.isCancelled }
+        isGeneratingMedia = runs
+        generatingKind = runs ? kind : nil
+        isRunningTools = true
+        toolTask = Task {
+            defer {
+                // Only what this run set: a turn started after a Stop keeps its own.
+                if runs {
+                    isGeneratingMedia = false
+                    generatingKind = nil
+                }
+                isUnloadingModelForMedia = false
+                if token == turnToken { isRunningTools = false }
+            }
+            let unload = runs && settings.unloadModelDuringImageGen
+            if unload {
+                isUnloadingModelForMedia = true
+                await server.unloadModel()
+            }
+            let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
+            if unload {
+                do { try await server.ensureModelLoaded() } catch {
+                    if stillCurrent() {
+                        errorText = String(format: NSLocalizedString("Failed to reload the chat model after image generation: %@", comment: ""), error.localizedDescription)
+                    }
+                }
+            }
+            guard stillCurrent(), let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
+            switch result {
+            case .generatedImage(let data, let seconds, _, _) where kind == .image && messages[j].images.indices.contains(index):
+                messages[j].images[index] = data
+                if messages[j].imageDurations.indices.contains(index) { messages[j].imageDurations[index] = seconds }
+                // A new file name (a file is never overwritten): the old one
+                // goes with the save. The names the others were saved under
+                // first, for a message never loaded from disk.
+                let id = messages[j].id.uuidString
+                if messages[j].imageFilenames.count != messages[j].images.count {
+                    messages[j].imageFilenames = messages[j].images.indices.map { "\(id)-\($0).png" }
+                }
+                messages[j].imageFilenames[index] = "\(UUID().uuidString).png"
+            case .generatedAudio(let data, let seconds, _, _) where kind == .music && messages[j].audios.indices.contains(index):
+                AudioPlayback.shared.stop(ifAnyOf: [messages[j]])   // the old clip, if played meanwhile
+                messages[j].audios[index] = data
+                if messages[j].audioDurations.indices.contains(index) { messages[j].audioDurations[index] = seconds }
+                let id = messages[j].id.uuidString
+                if messages[j].audioFilenames.count != messages[j].audios.count {
+                    messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
+                }
+                messages[j].audioFilenames[index] = "\(UUID().uuidString).wav"
+            case .text(let text):
+                // The tool's words to the model, without its instructions.
+                errorText = text.components(separatedBy: " Do not ").first ?? text
+                return
+            default:
+                return
+            }
+            hasUnsavedChanges = true
+            persistCurrentSession()
+        }
+    }
 
     /// `offerTools: false` for the answer after the last allowed tool round.
     private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager, offerTools: Bool = true) {
@@ -735,6 +847,7 @@ final class ChatClient: ObservableObject {
             } else if willActuallyGenerate, ImageToolRunner.runsGenerator(call.name, settings) {
                 generatingKind = .image
             }
+            let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count))
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
             switch result {
@@ -748,6 +861,10 @@ final class ChatClient: ObservableObject {
                     messages[sourceIndex].images.append(data)
                     messages[sourceIndex].imageDurations.append(seconds)
                     messages[sourceIndex].imagePrompts.append(prompt)
+                    // Aligned, or none: an older message's images have no source.
+                    if messages[sourceIndex].imageSources.count == messages[sourceIndex].images.count - 1 {
+                        messages[sourceIndex].imageSources.append(source)
+                    }
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .generatedAudio(let data, let seconds, let prompt, let text):
@@ -755,6 +872,9 @@ final class ChatClient: ObservableObject {
                     messages[sourceIndex].audios.append(data)
                     messages[sourceIndex].audioDurations.append(seconds)
                     messages[sourceIndex].audioPrompts.append(prompt)
+                    if messages[sourceIndex].audioSources.count == messages[sourceIndex].audios.count - 1 {
+                        messages[sourceIndex].audioSources.append(source)
+                    }
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             }

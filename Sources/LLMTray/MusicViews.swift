@@ -96,6 +96,9 @@ struct AudioClipView: View {
     let id: String
     let prompt: String
     let generationSeconds: Double?
+    /// Makes it again (a new seed); nil hides the button.
+    var regenerate: (() -> Void)?
+    @EnvironmentObject private var chat: ChatClient
     @ObservedObject private var playback = AudioPlayback.shared
 
     private var isCurrent: Bool { playback.currentID == id }
@@ -144,6 +147,14 @@ struct AudioClipView: View {
                     Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
                 }
                 .buttonStyle(.plain)
+                if let regenerate {
+                    Button(action: regenerate) {
+                        Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(chat.isBusy)
+                    .help(Text("Make this music again (a new seed, the same request)"))
+                }
                 if let generationSeconds {
                     Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
                         .font(.system(size: 10))

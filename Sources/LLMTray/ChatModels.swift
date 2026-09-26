@@ -7,6 +7,13 @@ struct ToolCall: Equatable {
     var argumentsJSON: String
 }
 
+/// The tool call a generated image or piece of music came from: what
+/// Regenerate runs again (a new seed, the same request).
+struct MediaSource: Codable, Equatable {
+    var tool: String
+    var arguments: String
+}
+
 struct ChatMessage: Identifiable, Equatable {
     let id = UUID()
     var role: String   // "user" | "assistant" | "tool"
@@ -36,6 +43,10 @@ struct ChatMessage: Identifiable, Equatable {
     // Wall-clock seconds each took to generate.
     var audioDurations: [Double] = []
     var audioFilenames: [String] = []
+    // Same index alignment as images / audios; empty for ones from before
+    // Regenerate existed (or a user's attachment).
+    var imageSources: [MediaSource] = []
+    var audioSources: [MediaSource] = []
     // Present on an assistant message that called one or more tools --
     // resent verbatim in the next request's message history, per the
     // OpenAI tool-calling protocol.

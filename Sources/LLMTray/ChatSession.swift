@@ -36,10 +36,13 @@ struct PersistedMessage: Codable {
     var audioFilenames: [String] = []
     var audioPrompts: [String] = []
     var audioDurations: [Double] = []
+    // What Regenerate runs again (see ChatMessage.imageSources).
+    var imageSources: [MediaSource] = []
+    var audioSources: [MediaSource] = []
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
-        case audioFilenames, audioPrompts, audioDurations
+        case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources
     }
 
     init(
@@ -73,6 +76,8 @@ struct PersistedMessage: Codable {
         audioFilenames = try c.decodeIfPresent([String].self, forKey: .audioFilenames) ?? []
         audioPrompts = try c.decodeIfPresent([String].self, forKey: .audioPrompts) ?? []
         audioDurations = try c.decodeIfPresent([Double].self, forKey: .audioDurations) ?? []
+        imageSources = try c.decodeIfPresent([MediaSource].self, forKey: .imageSources) ?? []
+        audioSources = try c.decodeIfPresent([MediaSource].self, forKey: .audioSources) ?? []
     }
 }
 
@@ -85,10 +90,12 @@ extension PersistedMessage {
         copy.imageFilenames = keptImages.map { imageFilenames[$0] }
         copy.imageDurations = keptImages.compactMap { imageDurations[safe: $0] }
         copy.imagePrompts = keptImages.compactMap { imagePrompts[safe: $0] }
+        copy.imageSources = imageSources.count == imageFilenames.count ? keptImages.map { imageSources[$0] } : []
         let keptAudio = audioFilenames.indices.filter { !names.contains(audioFilenames[$0]) }
         copy.audioFilenames = keptAudio.map { audioFilenames[$0] }
         copy.audioDurations = keptAudio.compactMap { audioDurations[safe: $0] }
         copy.audioPrompts = keptAudio.compactMap { audioPrompts[safe: $0] }
+        copy.audioSources = audioSources.count == audioFilenames.count ? keptAudio.map { audioSources[$0] } : []
         return copy
     }
 }
