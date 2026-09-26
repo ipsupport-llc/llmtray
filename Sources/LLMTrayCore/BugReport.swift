@@ -47,46 +47,48 @@ public struct BugReport {
         return Self.redact(out, home: home)
     }
 
-    /// The home folder as "~": paths say where, not whose.
-    public static func redact(_ text: String, home: String = NSHomeDirectory()) -> String {
-        guard home.count > 1 else { return text }
-        // On a path boundary: "/Users/alice2" isn't "~2".
-        let pattern = NSRegularExpression.escapedPattern(for: home) + #"(?=[/\\"'\s:,)\]]|$)"#
-        return text.replacingOccurrences(of: pattern, with: "~", options: .regularExpression)
+    /// The home folder as "~", and the user name as "USER" where it's a
+    /// folder anywhere else (/Volumes/Models/alice/...): paths say where,
+    /// not whose.
+    public static func redact(_ text: String, home: String = NSHomeDirectory(), user: String = NSUserName()) -> String {
+        var text = text
+        if home.count > 1 {
+            // On a path boundary: "/Users/alice2" isn't "~2".
+            let pattern = NSRegularExpression.escapedPattern(for: home) + #"(?=[/\\"'\s:,)\]]|$)"#
+            text = text.replacingOccurrences(of: pattern, with: "~", options: .regularExpression)
+        }
+        if user.count > 1 {
+            let name = NSRegularExpression.escapedPattern(for: user)
+            text = text.replacingOccurrences(of: #"(?<=/)"# + name + #"(?=/|\\/|$|\s)"#, with: "USER", options: .regularExpression)
+        }
+        return text
     }
 
-    /// The server log without what a chat put in it: with verbose logging
-    /// mlx_lm.server logs each request body ("Incoming Request Body: {...}",
-    /// sometimes spread over lines) -- the conversation itself. Those, and
-    /// any other line carrying a chat's JSON fields, are replaced by a
-    /// marker.
+    /// The server log without what a chat put in it. With verbose logging
+    /// mlx_lm.server logs each request body, the generated text and the
+    /// response as DEBUG records, over several lines. Kept, as an allow
+    /// list: records that start as a record surely does (a full timestamp
+    /// with milliseconds and a level, an access line, LLMTray's own
+    /// "--- ... ---"), and the lines continuing a kept non-DEBUG record (a
+    /// traceback). A DEBUG record and whatever follows it up to the next
+    /// record go, and so does everything before the first record (a log
+    /// cut mid-record). Lines carrying a chat's JSON fields go too.
     public static func withoutChatContent(_ log: String) -> String {
+        enum State { case beforeFirstRecord, kept, dropped }
+        var state = State.beforeFirstRecord
         var out: [String] = []
-        var inBody = false
-        var inDebug = false
         for line in log.components(separatedBy: "\n") {
-            // Verbose logging's DEBUG records carry the request bodies, the
-            // generated text and the responses -- dropped whole, with the
-            // lines they continue onto, until the next record.
-            if inDebug {
-                if !startsRecord(line) { continue }
-                inDebug = false
-            }
-            if line.contains(" - DEBUG - ") {
-                if !inDebug { out.append("[verbose log record removed]") }
-                inDebug = true
+            if let level = recordLevel(line) {
+                if level == "DEBUG" {
+                    if state != .dropped { out.append("[verbose log record removed]") }
+                    state = .dropped
+                    continue
+                }
+                state = .kept
+            } else if state != .kept {
                 continue
             }
-            if inBody {
-                // A pretty-printed body's continuation: indented, or a
-                // bracket or quote first.
-                if let first = line.first, first.isWhitespace || "{}[]\"".contains(first) { continue }
-                inBody = false
-            }
-            if let range = line.range(of: "Request Body:") {
-                out.append(String(line[..<range.upperBound]) + " [removed]")
-                inBody = true
-            } else if ["\"messages\"", "\"content\"", "\"prompt\""].contains(where: line.contains) {
+            if ["\"messages\"", "\"content\"", "\"prompt\"", "Request Body:"].contains(where: line.contains) {
                 out.append("[request data removed]")
             } else {
                 out.append(line)
@@ -95,14 +97,18 @@ public struct BugReport {
         return out.joined(separator: "\n")
     }
 
-    /// A new log record: a timestamp ("2026-09-24 ..."), an access line
-    /// ("127.0.0.1 - - [...]"), a level ("INFO:", "WARNING", "ERROR") or
-    /// LLMTray's own "---" lines.
-    /// Strict on purpose: a model's text (a markdown "---", a line saying
-    /// "Error") must not end the record and leak what follows.
-    static func startsRecord(_ line: String) -> Bool {
-        let pattern = #"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}|\d{1,3}(\.\d{1,3}){3} - - \[|(INFO|WARNING|ERROR):|--- .+ ---$)"#
-        return line.range(of: pattern, options: .regularExpression) != nil
+    /// A line that starts a log record, and its level ("" for one without:
+    /// an access line, LLMTray's markers). nil for a continuation line.
+    /// Strict on purpose: a model's text (a markdown "---", a date, a line
+    /// saying "Error") mustn't pass for a record and end a DEBUG one.
+    static func recordLevel(_ line: String) -> String? {
+        let logged = #"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} - (DEBUG|INFO|WARNING|ERROR|CRITICAL) - "#
+        if line.range(of: logged, options: .regularExpression) != nil {
+            // "<date> - LEVEL - message": the second field.
+            return line.components(separatedBy: " - ").dropFirst().first ?? ""
+        }
+        let other = #"^(\d{1,3}(\.\d{1,3}){3} - - \[|--- .+ ---$)"#
+        return line.range(of: other, options: .regularExpression) != nil ? "" : nil
     }
 
     /// A macOS crash report (.ips) as attached: the home folder as "~" in

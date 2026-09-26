@@ -69,7 +69,28 @@ final class BugReportTests: XCTestCase {
     }
 
     func testRedactOnAPathBoundary() {
-        XCTAssertEqual(BugReport.redact("/Users/alice/x /Users/alice2/y /Users/alice", home: "/Users/alice"), "~/x /Users/alice2/y ~")
+        XCTAssertEqual(BugReport.redact("/Users/alice/x /Users/alice2/y /Users/alice", home: "/Users/alice", user: "alice"), "~/x /Users/alice2/y ~")
+        XCTAssertEqual(BugReport.redact("/Volumes/Models/alice/org/model", home: "/Users/alice", user: "alice"), "/Volumes/Models/USER/org/model")
+    }
+
+    func testCutLogAndLookalikeLinesDontLeak() {
+        // The log cut mid DEBUG record: its continuation comes first.
+        let cut = """
+            the tail of a private answer
+            2026-09-24 03:12:46 my private answer, with a date
+            ---
+            2026-09-24 03:12:47,000 - INFO - done
+            Traceback (most recent call last):
+              File "server.py", line 1
+            2026-09-24 03:12:48,000 - DEBUG - more private text
+            2026-09-24 03:12:46 still private
+            2026-09-24 03:12:49,000 - ERROR - boom
+            """
+        let clean = BugReport.withoutChatContent(cut)
+        XCTAssertFalse(clean.contains("private"))
+        XCTAssertTrue(clean.contains("INFO - done"))
+        XCTAssertTrue(clean.contains("Traceback (most recent call last):"), "a kept record's traceback stays")
+        XCTAssertTrue(clean.contains("ERROR - boom"))
     }
 
     func testCrashReportRedaction() {
