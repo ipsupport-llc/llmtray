@@ -106,6 +106,18 @@ final class BugReportTests: XCTestCase {
         XCTAssertTrue(clean.contains(#""crashReporterKey":"removed""#))
     }
 
+    func testSecretsLeaveTheArguments() {
+        XCTAssertEqual(
+            BugReport.withoutSecrets(["-m", "mlx_lm.server", "--api-key", "abc", "--hf-token=hf_x", "--port", "8766", "sk-abcdefghijklmn"]),
+            ["-m", "mlx_lm.server", "--api-key", "[removed]", "--hf-token=[removed]", "--port", "8766", "[removed]"]
+        )
+    }
+
+    func testUserNameAsAWord() {
+        XCTAssertEqual(BugReport.withoutUserName("Profile  alice\n--- profile: alice ---\nalicex", user: "alice"),
+                       "Profile  USER\n--- profile: USER ---\nalicex")
+    }
+
     func testTailCutsAtALineStart() {
         let log = (1...100).map { "line \($0)" }.joined(separator: "\n")
         let tail = BugReport.tail(log, maxBytes: 40)

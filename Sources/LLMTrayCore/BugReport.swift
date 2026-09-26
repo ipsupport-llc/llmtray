@@ -44,7 +44,7 @@ public struct BugReport {
                 out += key.padding(toLength: width, withPad: " ", startingAt: 0) + "  " + value + "\n"
             }
         }
-        return Self.redact(out, home: home)
+        return Self.withoutUserName(Self.redact(out, home: home))
     }
 
     /// The home folder as "~", and the user name as "USER" where it's a
@@ -138,5 +138,44 @@ public struct BugReport {
         var cut = String(decoding: data.suffix(maxBytes), as: UTF8.self)
         if let newline = cut.firstIndex(of: "\n") { cut = String(cut[cut.index(after: newline)...]) }
         return "[… earlier output cut …]\n" + cut
+    }
+}
+
+extension BugReport {
+    /// Command-line arguments without secrets: the value of any flag named
+    /// like a key, token, secret or password, and anything shaped like an
+    /// API token (sk-..., hf_..., ghp_...).
+    public static func withoutSecrets(_ arguments: [String]) -> [String] {
+        let secretFlag = #"(?i)(key|token|secret|passw)"#
+        let secretValue = #"^(sk-|hf_|ghp_|gho_|github_pat_|xox[bap]-)[A-Za-z0-9_\-]{8,}"#
+        var out: [String] = []
+        var hideNext = false
+        for argument in arguments {
+            if hideNext {
+                out.append("[removed]")
+                hideNext = false
+                continue
+            }
+            if argument.hasPrefix("-"), let eq = argument.firstIndex(of: "="),
+               argument[..<eq].range(of: secretFlag, options: .regularExpression) != nil {
+                out.append(String(argument[...eq]) + "[removed]")
+            } else if argument.hasPrefix("-"), argument.range(of: secretFlag, options: .regularExpression) != nil {
+                out.append(argument)
+                hideNext = true
+            } else if argument.range(of: secretValue, options: .regularExpression) != nil {
+                out.append("[removed]")
+            } else {
+                out.append(argument)
+            }
+        }
+        return out
+    }
+
+    /// The login name as a whole word (a profile named after it, a log
+    /// line), for names long enough not to be a common word's part.
+    public static func withoutUserName(_ text: String, user: String = NSUserName()) -> String {
+        guard user.count >= 3 else { return text }
+        let pattern = #"(?<![A-Za-z0-9._-])"# + NSRegularExpression.escapedPattern(for: user) + #"(?![A-Za-z0-9._-])"#
+        return text.replacingOccurrences(of: pattern, with: "USER", options: .regularExpression)
     }
 }

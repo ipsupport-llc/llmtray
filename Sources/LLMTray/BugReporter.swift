@@ -66,7 +66,7 @@ enum BugReporter {
             ("LAN access", defaults[Pref.allowLAN] ? "on" : "off"),
         ]
         if !server.launchedArguments.isEmpty {
-            serverLines.append(("Launched with", server.launchedArguments.joined(separator: " ")))
+            serverLines.append(("Launched with", BugReport.withoutSecrets(server.launchedArguments).joined(separator: " ")))
         }
 
         var modelLines: [(String, String)] = [("Selected", modelID ?? "none")]
@@ -182,7 +182,7 @@ enum BugReporter {
     /// The server log as it's attached: its tail, without chat content,
     /// the home folder as "~".
     static func serverLogForReport(_ server: ServerManager) -> String {
-        BugReport.redact(BugReport.withoutChatContent(BugReport.tail(server.log, maxBytes: 512 * 1024)))
+        BugReport.withoutUserName(BugReport.redact(BugReport.withoutChatContent(BugReport.tail(server.log, maxBytes: 512 * 1024))))
     }
 
     /// The server log can go: there is one, and verbose logging (which puts
@@ -226,7 +226,7 @@ enum BugReporter {
                 var unreadable: [String] = []
                 for crash in crashes {
                     guard let content = try? String(contentsOf: crash, encoding: .utf8),
-                          (try? BugReport.redactCrashReport(content).write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)) != nil
+                          (try? BugReport.withoutUserName(BugReport.redactCrashReport(content)).write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)) != nil
                     else { unreadable.append(crash.lastPathComponent); continue }
                 }
                 if !unreadable.isEmpty {
