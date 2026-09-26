@@ -44,7 +44,9 @@ if arg("--base-model") == "flux2-klein-4b":
         return im.convert("RGB")
     images = [rgb(b) for b in request.get("images", [])]
     # A side under 64 px rounds to nothing in mflux's resize: scaled up.
-    images = [im.resize((max(64, round(im.width * 64 / min(im.size))), max(64, round(im.height * 64 / min(im.size)))))
+    # The long side stays within 2048 (beyond 32:1 the image is squeezed).
+    images = [im.resize((min(2048, max(64, round(im.width * 64 / min(im.size)))),
+                         min(2048, max(64, round(im.height * 64 / min(im.size))))))
               if min(im.size) < 64 else im for im in images]
     if images:
         from mflux.models.flux2.variants.edit.flux2_klein_edit import Flux2KleinEdit as Model

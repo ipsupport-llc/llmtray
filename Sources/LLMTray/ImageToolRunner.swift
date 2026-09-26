@@ -67,7 +67,7 @@ final class ImageToolRunner: ChatTool {
     func willGenerate(_ calls: [ToolCall], settings: ChatSettings, chatImages: [(data: Data, prompt: String)] = []) -> Bool {
         calls.contains { call in
             Self.runsGenerator(call.name, settings) && (call.name != EditImageTool.toolName
-                || EditImageTool.source(ChatToolbox.parseArguments(call.argumentsJSON), in: chatImages).image != nil)
+                || EditImageTool.willRun(ChatToolbox.parseArguments(call.argumentsJSON), in: chatImages))
         } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
@@ -211,8 +211,8 @@ final class EditImageTool: ChatTool {
         }
         let (picked, refusal) = Self.source(arguments, in: context.chatImages)
         guard let source = picked else { return .text(refusal) }
-        let instruction = String(((arguments["prompt"] as? String) ?? "").prefix(4000))
-        guard !instruction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        let instruction = Self.instruction(arguments)
+        guard !instruction.isEmpty else {
             return .text("Say what to change in `prompt`.")
         }
         let pixels = NSBitmapImageRep(data: source.data).map { ($0.pixelsWide, $0.pixelsHigh) } ?? (1024, 1024)
@@ -220,6 +220,15 @@ final class EditImageTool: ChatTool {
         let note = "Edited image \(source.index) of \(context.chatImages.count) (\(source.prompt.isEmpty ? "generated" : source.prompt)). "
         return await generator.produce(prompt: instruction, width: size.width, height: size.height, model: model,
                                        images: [source.data], settings: settings, toolName: name, note: note)
+    }
+
+    /// Neither the image nor the instruction is missing.
+    static func willRun(_ arguments: [String: Any], in images: [(data: Data, prompt: String)]) -> Bool {
+        source(arguments, in: images).image != nil && !instruction(arguments).isEmpty
+    }
+
+    static func instruction(_ arguments: [String: Any]) -> String {
+        String(((arguments["prompt"] as? String) ?? "").prefix(4000)).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// The image an edit_image call picks (1-based `index` over every image
