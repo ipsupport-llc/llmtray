@@ -860,6 +860,7 @@ struct ServerPane: View {
                     } label: {
                         SettingLabel(title: "When a client asks for another model", help: "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.")
                     }
+                    .onChange(of: modelSwitchPolicy) { _ in ModelSwitchPrompter.shared.policyChanged() }
                 }
                 Section("Recovery") {
                     Stepper(value: $stallThresholdSeconds, in: 10...300, step: 10) {

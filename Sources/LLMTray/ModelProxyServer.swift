@@ -271,20 +271,35 @@ final class ModelProxyServer {
                     connection.cancel()
                     return
                 }
+                // A client that gives up while the user is asked must not
+                // get a model switched for nobody: a pending receive is how
+                // NWConnection notices the peer closing (as in forward()).
+                let gone = ClientGone()
+                connection.receive(minimumIncompleteLength: 1, maximumLength: 1) { _, _, isComplete, error in
+                    if isComplete || error != nil { Task { @MainActor in gone.value = true } }
+                }
                 // Before beginRequest: waiting for the user isn't the model at work.
                 let allowed = await prompter.ask(target: targetPath ?? "", name: modelName ?? "", client: client)
-                if allowed {
+                if gone.value {
+                    connection.cancel()
+                } else if case .running = self.server.state, !allowed {
+                    self.sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
+                } else if !allowed {
+                    // Stopped meanwhile: not a "keep".
+                    self.sendError(connection: connection, status: "503 Service Unavailable", message: "the LLMTray server was stopped")
+                } else {
                     self.forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
                                           targetPath: targetPath, connection: connection, internalPort: internalPort,
                                           mayReplaceLoaded: true)
-                } else {
-                    self.sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
                 }
             }
         }
     }
 
     /// 409: the loaded model stays (the policy, or the user's Keep).
+    /// Set when an asking client's connection closes.
+    @MainActor private final class ClientGone { var value = false }
+
     private func sendSwitchDeclined(connection: NWConnection, loaded: String?, requested: String?) {
         let current = loaded.flatMap { ModelCatalog.shared.model(id: $0)?.displayName }
             ?? loaded.map { ($0 as NSString).lastPathComponent } ?? "the loaded model"

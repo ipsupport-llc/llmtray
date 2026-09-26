@@ -70,6 +70,12 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
         resolve(false, for: nil, remember: false)
     }
 
+    /// The setting changed: an open question and remembered Keeps no longer apply.
+    func policyChanged() {
+        resolve(false, for: nil, remember: false)
+        refusedUntil = [:]
+    }
+
     private func resolve(_ allow: Bool, for id: UUID?, remember: Bool) {
         guard let current = pending, id == nil || id == current.id else { return }
         if remember { refusedUntil[current.target] = Date().addingTimeInterval(Self.refusalMemory) }
@@ -77,7 +83,9 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
         timeout?.cancel()
         timeout = nil
         if Self.canNotify {
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [current.id.uuidString])
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: [current.id.uuidString])
+            center.removeDeliveredNotifications(withIdentifiers: [current.id.uuidString])
         }
         let resumed = waiters
         waiters = []
