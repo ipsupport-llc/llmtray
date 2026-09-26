@@ -191,6 +191,15 @@ enum BugReporter {
         !server.log.isEmpty && !BugReport.hasVerboseRecords(server.log)
     }
 
+    /// The crash reports as they're attached (name, redacted text), for the
+    /// form to show.
+    static func crashReportsForReport() -> [(name: String, text: String)] {
+        recentCrashReports().compactMap { url in
+            guard let content = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+            return (url.lastPathComponent, BugReport.withoutUserName(BugReport.redactCrashReport(content)))
+        }
+    }
+
     /// The files the zip will hold besides report.txt.
     static func attachments(_ options: Options, server: ServerManager) -> [String] {
         var files: [String] = []
@@ -245,8 +254,10 @@ enum BugReporter {
     /// plain mailto, with the file shown in Finder to attach by hand.
     /// `fallback` runs in that case (the view says so).
     static func compose(_ report: BugReport, attachment: URL, fallback: @escaping () -> Void) {
+        // Redacted like the report: a pasted error's paths too.
+        let described = BugReport.withoutUserName(BugReport.redact(report.description.trimmingCharacters(in: .whitespacesAndNewlines)))
         let body = """
-            \(report.description.trimmingCharacters(in: .whitespacesAndNewlines))
+            \(described)
 
             ---
             \(report.subject). The full report is attached (\(attachment.lastPathComponent)).

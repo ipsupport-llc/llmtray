@@ -15,6 +15,8 @@ struct BugReportView: View {
     @State private var options = BugReporter.Options()
     @State private var runtimeVersions = "…"
     @State private var modelDetails: [(String, String)] = []
+    /// Read once, when the form opens.
+    @State private var crashes: [(name: String, text: String)] = []
     @State private var isWorking = false
     @State private var note: String?
     @FocusState private var descriptionFocused: Bool
@@ -73,6 +75,29 @@ struct BugReportView: View {
                 }
             }
 
+            if options.includeCrashReports {
+                if !crashes.isEmpty {
+                    DisclosureGroup {
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 10) {
+                                ForEach(crashes, id: \.name) { crash in
+                                    Text(verbatim: crash.name).font(.caption.weight(.semibold))
+                                    Text(verbatim: String(crash.text.prefix(20_000)))
+                                        .font(.system(size: 10, design: .monospaced))
+                                        .textSelection(.enabled)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(8)
+                        }
+                        .frame(minHeight: 120, maxHeight: 220)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
+                    } label: {
+                        Text("Crash reports (\(crashes.count))")
+                    }
+                }
+            }
+
             if let note {
                 Text(note).font(.callout).foregroundColor(.secondary)
             }
@@ -92,6 +117,7 @@ struct BugReportView: View {
         .frame(minWidth: 520, idealWidth: 560, minHeight: 440)
         .task {
             descriptionFocused = true
+            crashes = BugReporter.crashReportsForReport()
             modelDetails = await BugReporter.modelDetails()
             runtimeVersions = await BugReporter.runtimeVersions()
         }

@@ -78,6 +78,7 @@
 "Copy" = "Copy";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Country facts" = "Country facts";
+"Crash reports (%lld)" = "Crash reports (%lld)";
 "Create Email…" = "Create Email…";
 "Currency rates" = "Currency rates";
 "Current settings are already fastest" = "Current settings are already fastest";
