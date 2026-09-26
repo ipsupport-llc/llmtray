@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld डाउनलोड";
 "%lld-bit" = "%lld-बिट";
+"(Please attach the report file shown in Finder.)" = "(कृपया Finder में दिख रही रिपोर्ट फ़ाइल संलग्न करें।)";
 "(no result yet)" = "(अब तक कोई परिणाम नहीं)";
 "(no server output yet)" = "(अभी सर्वर आउटपुट नहीं)";
 "A quiet check at every launch. Only shows anything if an update exists." = "हर लॉन्च पर चुपचाप जाँच। कुछ तभी दिखाता है जब कोई अपडेट उपलब्ध हो।";
@@ -24,6 +25,7 @@
 "Air quality" = "वायु गुणवत्ता";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "उपनाम: इस मॉडल को पाने के लिए दूसरे टूल LLMTray के API को भेजा जाने वाला “model” नाम। प्रोफ़ाइल: यह मॉडल कौन-सी सेटिंग्स प्रोफ़ाइल इस्तेमाल करता है।";
 "Allow connections from the local network" = "स्थानीय नेटवर्क से कनेक्शन की अनुमति दें";
+"Already open in another tab" = "पहले से किसी अन्य टैब में खुला हुआ है";
 "Also check when LLMTray starts" = "LLMTray शुरू होने पर भी जाँचें";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "कोई अन्य mlx_lm.server फ़्लैग, स्पेस से अलग किए हुए, जैसे --draft-model <path>।";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "चैट में इतने से अधिक संदेश होने पर उसे अपने आप संकुचित करता है। चैट में “संकुचित करें” बटन फिर भी काम करता है।";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Copy" = "कॉपी करें";
+"Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
 "Country facts" = "देश तथ्य";
+"Crash reports (%lld)" = "क्रैश रिपोर्टें (%lld)";
+"Create Email…" = "ईमेल बनाएं…";
 "Currency rates" = "मुद्रा दरें";
 "Current settings are already fastest" = "वर्तमान सेटिंग पहले से ही सबसे तेज़ हैं";
 "Date & time" = "तिथि और समय";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image model" = "इमेज मॉडल";
+"Include LLMTray crash reports from the last two weeks" = "पिछले दो हफ्तों की LLMTray क्रैश रिपोर्टें शामिल करें";
+"Include the server log" = "सर्वर लॉग शामिल करें";
 "Installed" = "इंस्टॉल किया गया";
 "Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
 "Its chats stay, back among the recents." = "इसके चैट वहीं रहते हैं, हाल के में वापस आ जाते हैं।";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "नए टैब में खोलें";
 "Open in Window" = "विंडो में खोलें";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "विंडो में खोलें — विंडो बंद करने पर चैट फिर मेन्यू बार में लौट जाएगा";
-"Open in another tab" = "दूसरे टैब में खोलें";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray टीम को रिपोर्ट संलग्न करके ईमेल खोलता है: संस्करण, Mac, मॉडल और सर्वर सेटिंग्स, सर्वर लॉग और हाल की क्रैश रिपोर्टें। आपकी चैट कभी शामिल नहीं की जातीं, और आप पहले पूरी रिपोर्ट देखेंगे।";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "केवल LLMTray के लिए macOS भाषा को ओवरराइड करता है। LLMTray के पुनः शुरू होने के बाद प्रभावी होता है। अनुवाद न किया गया टेक्स्ट अंग्रेज़ी में दिखता है।";
 "Past %lld messages" = "पिछले %lld संदेश";
 "Pause download" = "डाउनलोड रोकें।";
@@ -250,6 +257,8 @@
 "Rename" = "नाम बदलें";
 "Rename this profile" = "इस प्रोफ़ाइल का नाम बदलें।";
 "Rename…" = "नाम बदलें…";
+"Report a Bug" = "बग रिपोर्ट करें";
+"Report a Bug…" = "बग रिपोर्ट करें…";
 "Rescan" = "फिर स्कैन करें";
 "Rescan Models" = "मॉडल फिर स्कैन करें";
 "Rescan or manage models" = "मॉडल पुनः स्कैन या प्रबंधित करें";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "चैट विंडो दिखाएँ";
 "Show Next Tab" = "अगला टैब दिखाएँ";
 "Show Previous Tab" = "पिछला टैब दिखाएँ";
+"Show in Finder" = "Finder में दिखाएं";
 "Show model controls in the chat window" = "चैट विंडो में मॉडल नियंत्रण दिखाएँ";
 "Show more" = "अधिक दिखाएँ";
 "Show only overrides" = "केवल ओवरराइड दिखाएँ";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "चैट विंडो दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "सबसे छोटा और सबसे आक्रामक — कुछ prompts पर जनरेशन की रचना स्पष्ट रूप से बदल सकती है।";
+"Something went wrong?" = "कुछ गलत हुआ?";
 "Sort by" = "इसके अनुसार क्रमित करें";
 "Source on GitHub" = "GitHub पर स्रोत";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "रुका: मॉडल लगातार tools बुलाता रहा (%lld राउंड्स एक टर्न में)।";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "इमेज जनरेट होते समय चैट मॉडल रोकता है और बाद में उसे फिर लोड करता है। दोनों को साथ चलाने से इस Mac की मेमोरी से ज़्यादा हो सकता है।";
 "Sunrise & sunset" = "सूर्योदय और सूर्यास्त";
+"Support" = "सहायता";
 "System" = "सिस्टम";
 "System prompt" = "सिस्टम प्रॉम्प्ट";
 "Tab %lld" = "टैब %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "API क्लाइंट द्वारा भेजा जाने वाला मॉडल नाम।";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "अपने अलग विंडो में चैट के ऊपर मॉडल चयन, Start/Stop, प्रोफ़ाइल, टूल और तापमान दिखाएँ। बंद होने पर: विंडो केवल चैट और बातचीत होती है — ये नियंत्रण मेन्यू बार में रहते हैं।";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
+"The report" = "रिपोर्ट";
 "The running model server is stopped and started again." = "चल रहा मॉडल सर्वर रोका जाता है और फिर से शुरू किया जाता है।";
+"The server log" = "सर्वर लॉग";
 "These models go back to Default: %@." = "ये मॉडल वापस Default पर चले जाएंगे: %@।";
 "Thinking…" = "सोच रहा है…";
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "LM Studio का फ़ोल्डर उपयोग करें";
 "Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "वर्बोज़ सर्वर लॉगिंग चालू थी, इसलिए लॉग में आपकी चैटें हैं: इसे संलग्न नहीं किया गया है। इसे शामिल करने के लिए Settings › Server में वर्बोज़ लॉगिंग बंद करें, सर्वर पुनरारंभ करें और समस्या दोहराएँ।";
 "Version" = "संस्करण";
 "Version %@" = "संस्करण %@";
 "View model card" = "मॉडल कार्ड देखें।";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "मौजूदा अनुरोध या बेंचमार्क पूरा होने तक प्रतीक्षा करें — रीस्टार्ट करने से यह अधूरा रह जाएगा।";
 "Weather" = "मौसम";
 "Web search" = "वेब खोज";
+"What happened?" = "क्या हुआ?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "आप क्या कर रहे थे, आपने क्या उम्मीद की थी, और इसके बजाय आपने क्या देखा। आपकी चैट कभी शामिल नहीं की जातीं।";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which Z-Image-Turbo quantization generates the images." = "कौन-सा Z-Image-Turbo क्वांटाइज़ेशन छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "कल";
 "You" = "आप";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "आपका मेल ऐप संलग्नक स्वीकार नहीं कर सका: रिपोर्ट Finder में दिखाई जा रही है, उसे ईमेल में संलग्न करें।";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (Recommended)";

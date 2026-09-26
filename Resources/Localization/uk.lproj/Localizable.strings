@@ -12,6 +12,7 @@
 "%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld завантажень";
 "%lld-bit" = "%lld біт";
+"(Please attach the report file shown in Finder.)" = "(Будь ласка, додайте файл звіту, показаний у Finder.)";
 "(no result yet)" = "(ще немає результатів)";
 "(no server output yet)" = "(виводу сервера ще немає)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Тиха перевірка під час кожного запуску. Щось показує, лише якщо є оновлення.";
@@ -24,6 +25,7 @@
 "Air quality" = "Якість повітря";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Аліас — ім'я в полі «model», яке інші програми надсилають до API LLMTray, щоб отримати цю модель. Профіль — який профіль налаштувань використовує модель.";
 "Allow connections from the local network" = "Дозволити підключення з локальної мережі";
+"Already open in another tab" = "Вже відкрито в іншій вкладці";
 "Also check when LLMTray starts" = "Також перевіряти під час запуску LLMTray";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Будь-які інші прапорці mlx_lm.server через пробіл, наприклад --draft-model <шлях>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Стискає чат автоматично, коли в ньому стає більше повідомлень. Кнопка «Стиснути» в чаті працює в будь-якому разі.";
 "Concurrent requests" = "Паралельні запити";
 "Copy" = "Копіювати";
+"Couldn't create the report: %@" = "Не вдалося створити звіт: %@";
 "Country facts" = "Факти про країну";
+"Crash reports (%lld)" = "Звіти про збої (%lld)";
+"Create Email…" = "Створити лист…";
 "Currency rates" = "Курси валют";
 "Current settings are already fastest" = "Поточні налаштування вже найшвидші";
 "Date & time" = "Дата й час";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Генерація зображень не налаштована — знову увімкніть її в Налаштуваннях.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Потрібне оновлення генерації зображень — вимкніть і ввімкніть її знову в Налаштуваннях.";
 "Image model" = "Модель зображень";
+"Include LLMTray crash reports from the last two weeks" = "Включити звіти про збої LLMTray за останні два тижні";
+"Include the server log" = "Включити серверний лог";
 "Installed" = "Встановлено";
 "Installing mflux…" = "Встановлення mflux…";
 "Its chats stay, back among the recents." = "Його чати залишаються — повернуться у недавно використані.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "Відкрити в новій вкладці";
 "Open in Window" = "Відкрити у вікні";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Відкрити у вікні — закриття вікна повертає чат у рядок меню";
-"Open in another tab" = "Відкрити в іншій вкладці";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Відкриває листа до команди LLMTray зі вкладеним звітом: версії, Mac, налаштування моделі та сервера, серверний лог і останні звіти про збої. Ваші чати ніколи не включаються, і ви спочатку бачите весь звіт.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "Past %lld messages" = "Понад %lld повідомлень";
 "Pause download" = "Призупинити завантаження";
@@ -250,6 +257,8 @@
 "Rename" = "Перейменувати";
 "Rename this profile" = "Перейменувати цей профіль";
 "Rename…" = "Перейменувати…";
+"Report a Bug" = "Повідомити про помилку";
+"Report a Bug…" = "Повідомити про помилку…";
 "Rescan" = "Оновити список";
 "Rescan Models" = "Оновити список моделей";
 "Rescan or manage models" = "Повторно просканувати або керувати моделями";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "Показати вікно чату";
 "Show Next Tab" = "Показати наступну вкладку";
 "Show Previous Tab" = "Показати попередню вкладку";
+"Show in Finder" = "Показати у Finder";
 "Show model controls in the chat window" = "Показувати елементи керування моделлю у вікні чату";
 "Show more" = "Показати ще";
 "Show only overrides" = "Лише перевизначені";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "Показує вікно чату";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Найменший і найагресивніший — може помітно змінювати композицію зображення на деяких підказках.";
+"Something went wrong?" = "Щось пішло не так?";
 "Sort by" = "Сортування";
 "Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Зупинено: модель постійно викликала інструменти (%lld раундів в одному ході).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель на час генерації зображення, а потім завантажує знову. Дві моделі одночасно можуть не вміститися в пам'ять цього Mac.";
 "Sunrise & sunset" = "Схід і захід сонця";
+"Support" = "Підтримка";
 "System" = "Системна";
 "System prompt" = "Системний промпт";
 "Tab %lld" = "Вкладка %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "Ім'я моделі, яке надсилають API-клієнти.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Вибір моделі, Start/Stop, профіль, інструменти та температура розташовані над чатом у власному вікні. Вимкнено: вікно містить лише чати й розмову — ці елементи залишаються в рядку меню.";
 "The model's license, from its card." = "Ліцензія моделі з її картки.";
+"The report" = "Звіт";
 "The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
+"The server log" = "Серверний лог";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "Thinking…" = "Думаю…";
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "Тека LM Studio";
 "Uses the internet" = "Використовує інтернет";
 "Verbose server logging" = "Докладний лог сервера";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Увімкнено детальний серверний лог, тому в журналі містяться ваші чати й він не додається. Щоб додати його, вимкніть детальне логування в Налаштування › Server, перезапустіть сервер і відтворіть проблему.";
 "Version" = "Версія";
 "Version %@" = "Версія %@";
 "View model card" = "Картка моделі";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
 "Weather" = "Погода";
 "Web search" = "Веб‑пошук";
+"What happened?" = "Що сталося?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "Що ви робили, чого очікували та що бачили натомість. Ваші чати ніколи не включаються.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Вчора";
 "You" = "Ви";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ваша поштова програма не змогла взяти вкладення: звіт показано у Finder, додайте його до листа.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";

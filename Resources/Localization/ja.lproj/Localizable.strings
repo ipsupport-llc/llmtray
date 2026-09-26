@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld回のダウンロード";
 "%lld-bit" = "%lldビット";
+"(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
 "(no result yet)" = "(結果はまだありません)";
 "(no server output yet)" = "（サーバ出力はまだありません）";
 "A quiet check at every launch. Only shows anything if an update exists." = "起動するたびに静かに確認します。アップデートがある場合にのみ表示します。";
@@ -24,6 +25,7 @@
 "Air quality" = "空気質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "エイリアス: ほかのツールがこのモデルを使うために LLMTray の API へ送る「model」名です。プロファイル: このモデルで使う設定プロファイルです。";
 "Allow connections from the local network" = "ローカルネットワークからの接続を許可";
+"Already open in another tab" = "別のタブですでに開かれています";
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "その他の mlx_lm.server フラグをスペース区切りで指定します（例: --draft-model <path>）。";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "メッセージ数がこの数を超えると、チャットを自動的に圧縮します。チャット内の「圧縮」ボタンは、この設定にかかわらず使用できます。";
 "Concurrent requests" = "同時リクエスト数";
 "Copy" = "コピー";
+"Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
 "Country facts" = "国の基本情報";
+"Crash reports (%lld)" = "クラッシュレポート（%lld）";
+"Create Email…" = "メールを作成…";
 "Currency rates" = "為替レート";
 "Current settings are already fastest" = "現在の設定はすでに最速です";
 "Date & time" = "日付と時刻";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
 "Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image model" = "画像モデル";
+"Include LLMTray crash reports from the last two weeks" = "過去2週間の LLMTray クラッシュレポートを含める";
+"Include the server log" = "サーバーログを含める";
 "Installed" = "インストール済み";
 "Installing mflux…" = "mflux をインストール中…";
 "Its chats stay, back among the recents." = "チャットは残り、最近の項目に戻ります。";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "新規タブで開く";
 "Open in Window" = "ウインドウで開く";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "ウインドウを閉じるとチャットはメニューバーに戻ります";
-"Open in another tab" = "別のタブで開く";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray チーム宛てのメールを開き、レポート（バージョン、Mac、モデルとサーバ設定、サーバーログ、直近のクラッシュレポート）を添付します。チャット内容は含まれません。送信前にレポート全体を確認できます。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
 "Past %lld messages" = "過去 %lld 件のメッセージ";
 "Pause download" = "ダウンロードを一時停止します。";
@@ -250,6 +257,8 @@
 "Rename" = "名称変更";
 "Rename this profile" = "このプロファイルの名前を変更します。";
 "Rename…" = "名前を変更…";
+"Report a Bug" = "不具合を報告";
+"Report a Bug…" = "不具合を報告…";
 "Rescan" = "再スキャン";
 "Rescan Models" = "モデルを再スキャン";
 "Rescan or manage models" = "モデルを再スキャンするか管理します。";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "チャットウインドウを表示";
 "Show Next Tab" = "次のタブを表示";
 "Show Previous Tab" = "前のタブを表示";
+"Show in Finder" = "Finder で表示";
 "Show model controls in the chat window" = "チャットウインドウにモデルコントロールを表示";
 "Show more" = "詳細を表示";
 "Show only overrides" = "上書きのみ表示";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "チャットウインドウを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "最小かつ最もアグレッシブ — 一部のプロンプトでは生成の構成が目に見えて変化することがあります。";
+"Something went wrong?" = "問題が発生しましたか？";
 "Sort by" = "並べ替え";
 "Source on GitHub" = "GitHub でソースを見る";
 "Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "停止: モデルがツールを呼び続けました（1ターンで %lld 回）。";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "画像の生成中はチャットモデルを停止し、完了後に再読み込みします。同時に実行すると、このMacのメモリを超えることがあります。";
 "Sunrise & sunset" = "日の出と日の入り";
+"Support" = "サポート";
 "System" = "システム";
 "System prompt" = "システムプロンプト";
 "Tab %lld" = "タブ %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "APIクライアントが送信するモデル名です。";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "チャット上部にモデルピッカー、Start/Stop、プロファイル、ツール、温度を独立ウインドウで表示します。オフの場合はウインドウにチャットと会話のみが表示され、これらのコントロールはメニューバーに残ります。";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
+"The report" = "レポート";
 "The running model server is stopped and started again." = "実行中のモデルサーバは停止してから再起動されます。";
+"The server log" = "サーバーログ";
 "These models go back to Default: %@." = "これらのモデルは Default に戻ります：%@。";
 "Thinking…" = "考え中…";
 "This many of the most recent messages are kept word for word when compacting." = "コンパクト化するときに、直近のメッセージをこの件数だけ原文のまま保持します。";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "LM Studioのフォルダを使用";
 "Uses the internet" = "インターネットを使用";
 "Verbose server logging" = "詳細なサーバログ";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "詳細なサーバーログが有効になっているため、ログにチャットが含まれています。ログは添付されていません。添付するには、設定 › Server で詳細ログをオフにし、サーバーを再起動して問題を再現してください。";
 "Version" = "バージョン";
 "Version %@" = "バージョン %@";
 "View model card" = "モデルカードを表示します。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
 "Weather" = "天気";
 "Web search" = "ウェブ検索";
+"What happened?" = "何が起きましたか？";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "実行していた操作、期待した結果、実際に見た結果を記載してください。チャット内容は含まれません。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which Z-Image-Turbo quantization generates the images." = "画像生成に使用する Z-Image-Turbo の量子化を指定します。";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "昨日";
 "You" = "あなた";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "メールアプリが添付ファイルを受け取れませんでした。レポートは Finder に表示されていますので、メールに添付してください。";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed（推奨）";

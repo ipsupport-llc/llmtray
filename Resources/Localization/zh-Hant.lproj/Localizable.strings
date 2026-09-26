@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld 次下載";
 "%lld-bit" = "%lld 位元";
+"(Please attach the report file shown in Finder.)" = "（請在 Finder 中附上報告檔案。）";
 "(no result yet)" = "(尚無結果)";
 "(no server output yet)" = "（尚無伺服器輸出）";
 "A quiet check at every launch. Only shows anything if an update exists." = "每次啟動時靜默檢查。只有在有更新時才會顯示內容。";
@@ -24,6 +25,7 @@
 "Air quality" = "空氣品質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "別名：其他工具傳送給 LLMTray API 以取得此模型的「model」名稱。設定檔：此模型使用的設定檔。";
 "Allow connections from the local network" = "允許來自區域網路的連線";
+"Already open in another tab" = "已在其他標籤頁中開啟";
 "Also check when LLMTray starts" = "LLMTray 啟動時也檢查";
 "Another model already uses this alias." = "另一個模型已使用此別名。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "其他任何 mlx_lm.server 旗標，以空格分隔，例如 --draft-model <path>。";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "當對話超過這麼多則訊息後自動壓縮。對話中的「壓縮」按鈕不受此設定影響，隨時可用。";
 "Concurrent requests" = "並行要求數";
 "Copy" = "拷貝";
+"Couldn't create the report: %@" = "無法建立報告：%@";
 "Country facts" = "國家資訊";
+"Crash reports (%lld)" = "當機報告（%lld）";
+"Create Email…" = "建立郵件…";
 "Currency rates" = "匯率";
 "Current settings are already fastest" = "目前設定已是最快";
 "Date & time" = "日期與時間";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
 "Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image model" = "影像模型";
+"Include LLMTray crash reports from the last two weeks" = "包含最近兩週的 LLMTray 當機報告";
+"Include the server log" = "包含伺服器日誌";
 "Installed" = "已安裝";
 "Installing mflux…" = "正在安裝 mflux…";
 "Its chats stay, back among the recents." = "其對話會保留，回到最近項目中。";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "在新分頁中開啟";
 "Open in Window" = "在視窗中開啟";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "在視窗中開啟——關閉視窗後聊天會回到選單列";
-"Open in another tab" = "在另一個分頁中開啟";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "會開啟寄給 LLMTray 團隊的郵件並附上報告：版本、Mac、模型與伺服器設定、伺服器日誌及近期當機報告。您的對話絕不會包含在內，且您會先看到整份報告。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "僅覆寫 LLMTray 的 macOS 語言。重新啟動 LLMTray 後生效。未翻譯的文字會以英文顯示。";
 "Past %lld messages" = "過去 %lld 則訊息";
 "Pause download" = "暫停下載。";
@@ -250,6 +257,8 @@
 "Rename" = "重新命名";
 "Rename this profile" = "重新命名此描述檔。";
 "Rename…" = "重新命名…";
+"Report a Bug" = "回報錯誤";
+"Report a Bug…" = "回報錯誤…";
 "Rescan" = "重新掃描";
 "Rescan Models" = "重新掃描模型";
 "Rescan or manage models" = "重新掃描或管理模型";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "顯示對話視窗";
 "Show Next Tab" = "顯示下一個分頁";
 "Show Previous Tab" = "顯示上一個分頁";
+"Show in Finder" = "在 Finder 中顯示";
 "Show model controls in the chat window" = "在對話視窗顯示模型控制項";
 "Show more" = "顯示更多";
 "Show only overrides" = "只顯示覆寫項目";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "顯示對話視窗";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方顯示模型的思考內容（可收合的「思考過程」區塊）。";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "最小且最激進 — 在某些提示下可能明顯改變生成構圖。";
+"Something went wrong?" = "發生問題了嗎？";
 "Sort by" = "排序方式";
 "Source on GitHub" = "GitHub 原始碼";
 "Space the models in this folder take, and what's still free on its disk." = "此資料夾中模型佔用的空間，以及磁碟剩餘可用空間。";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "已停止：模型持續呼叫工具（單回合 %lld 次）。";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "產生影像時會停止聊天模型，完成後再重新載入。同時執行兩者可能會超出這部 Mac 的記憶體。";
 "Sunrise & sunset" = "日出與日落";
+"Support" = "支援";
 "System" = "系統";
 "System prompt" = "系統提示詞";
 "Tab %lld" = "分頁 %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "API 用戶端傳送的模型名稱。";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "在獨立視窗的對話上方顯示模型選擇器、開始/停止、設定檔、工具與溫度。關閉時：視窗僅顯示對話內容；那些控制項保留在選單列。";
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
+"The report" = "報告檔案";
 "The running model server is stopped and started again." = "執行中的模型伺服器會停止並重新啟動。";
+"The server log" = "伺服器日誌";
 "These models go back to Default: %@." = "這些模型會回復為 Default：%@。";
 "Thinking…" = "思考中…";
 "This many of the most recent messages are kept word for word when compacting." = "壓縮時會逐字保留這麼多則最近訊息。";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "使用 LM Studio 的檔案夾";
 "Uses the internet" = "會使用網際網路";
 "Verbose server logging" = "詳細伺服器記錄";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "因為已啟用詳細伺服器記錄，日誌中包含您的對話，因此不會自動附上。若要附上，請在「設定 › Server」關閉詳細記錄，重新啟動伺服器並重現問題。";
 "Version" = "版本";
 "Version %@" = "版本 %@";
 "View model card" = "檢視模型卡。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "請等待目前的請求或基準測試完成，重新啟動會中斷它。";
 "Weather" = "天氣";
 "Web search" = "網路搜尋";
+"What happened?" = "發生了什麼？";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "請說明您當時的操作、預期結果及實際看到的情形。您的對話絕不會包含在內。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 尋找 MLX 模型的位置（每個模型一個檔案夾，例如 <org>/<name>）。將其指向 ~/.lmstudio/models 即可與 LM Studio 共用模型。";
 "Which Z-Image-Turbo quantization generates the images." = "用來產生影像的 Z-Image-Turbo 量化版本。";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "昨天";
 "You" = "你";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "您的郵件程式無法附加該檔案：報告已在 Finder 顯示，請手動將其附加到郵件。";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ 混合（推薦）";

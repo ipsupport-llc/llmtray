@@ -12,6 +12,7 @@
 "%lld MB" = "%lld م.ب";
 "%lld downloads" = "%lld تنزيلات";
 "%lld-bit" = "%lld-بت";
+"(Please attach the report file shown in Finder.)" = "الرجاء إرفاق ملف التقرير المعروض في Finder.";
 "(no result yet)" = "(لا توجد نتائج بعد)";
 "(no server output yet)" = "(لا توجد مخرجات من الخادم بعد)";
 "A quiet check at every launch. Only shows anything if an update exists." = "فحص صامت عند كل تشغيل. لا يُظهر شيئًا إلا إذا كان هناك تحديث.";
@@ -24,6 +25,7 @@
 "Air quality" = "جودة الهواء";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "الاسم المستعار: اسم «model» الذي ترسله أدوات أخرى إلى API الخاص بـ LLMTray للحصول على هذا النموذج. ملف التعريف: ملف إعدادات هذا النموذج.";
 "Allow connections from the local network" = "السماح بالاتصالات من الشبكة المحلية";
+"Already open in another tab" = "مفتوح بالفعل في علامة تبويب أخرى";
 "Also check when LLMTray starts" = "التحقق أيضًا عند بدء LLMTray";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "أي علامات mlx_lm.server أخرى، مفصولة بمسافات، مثل --draft-model <path>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "يضغط الدردشة تلقائيًا عندما تتجاوز هذا العدد من الرسائل. يظل زر الضغط في الدردشة يعمل في كلتا الحالتين.";
 "Concurrent requests" = "الطلبات المتزامنة";
 "Copy" = "نسخ";
+"Couldn't create the report: %@" = "تعذّر إنشاء التقرير: %@";
 "Country facts" = "حقائق عن البلد";
+"Crash reports (%lld)" = "تقارير الأعطال (%lld)";
+"Create Email…" = "إنشاء رسالة…";
 "Currency rates" = "أسعار الصرف";
 "Current settings are already fastest" = "الإعدادات الحالية هي الأسرع بالفعل";
 "Date & time" = "التاريخ والوقت";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
 "Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image model" = "نموذج الصور";
+"Include LLMTray crash reports from the last two weeks" = "تضمين تقارير أعطال LLMTray خلال الأسبوعين الماضيين";
+"Include the server log" = "تضمين سجل الخادم";
 "Installed" = "مثبّت";
 "Installing mflux…" = "جارٍ تثبيت mflux…";
 "Its chats stay, back among the recents." = "دردشاته تبقى، وتعود إلى القائمة الأخيرة.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "فتح في تبويب جديد";
 "Open in Window" = "فتح في نافذة";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "فتح في نافذة — إغلاق النافذة يعيد الدردشة إلى شريط القوائم";
-"Open in another tab" = "افتح في تبويب آخر";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "يفتح رسالة بريد إلى فريق LLMTray مع إرفاق تقرير: الإصدارات، جهاز Mac، إعدادات النموذج والخادم، سجل الخادم وتقارير الأعطال الأخيرة. المحادثات الخاصة بك لا تُضمَّن أبداً، وستعرض التقرير كاملاً أولاً.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
 "Past %lld messages" = "آخر %lld رسالة";
 "Pause download" = "أوقف التنزيل مؤقتًا.";
@@ -250,6 +257,8 @@
 "Rename" = "إعادة تسمية";
 "Rename this profile" = "أعد تسمية ملف التعريف هذا.";
 "Rename…" = "إعادة تسمية…";
+"Report a Bug" = "الإبلاغ عن خلل";
+"Report a Bug…" = "الإبلاغ عن خلل…";
 "Rescan" = "إعادة الفحص";
 "Rescan Models" = "إعادة فحص النماذج";
 "Rescan or manage models" = "إعادة فحص أو إدارة النماذج";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "إظهار نافذة الدردشة";
 "Show Next Tab" = "عرض التبويب التالي";
 "Show Previous Tab" = "عرض التبويب السابق";
+"Show in Finder" = "عرض في Finder";
 "Show model controls in the chat window" = "إظهار عناصر تحكم النموذج في نافذة الدردشة";
 "Show more" = "إظهار المزيد";
 "Show only overrides" = "إظهار التجاوزات فقط";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "يعرض نافذة الدردشة";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "الأصغر والأكثر عدوانية — قد يغيّر تكوين التوليد بشكل مرئي مع بعض المُحفِّزات.";
+"Something went wrong?" = "هل حدث خطأ؟";
 "Sort by" = "فرز حسب";
 "Source on GitHub" = "المصدر على GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "توقف: استمر النموذج في استدعاء الأدوات (%lld دورة في دور واحد).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "يوقف نموذج الدردشة أثناء إنشاء صورة، ثم يعيد تحميله بعد ذلك. تشغيل الاثنين معًا قد يتجاوز ذاكرة هذا الـ Mac.";
 "Sunrise & sunset" = "شروق وغروب الشمس";
+"Support" = "الدعم";
 "System" = "النظام";
 "System prompt" = "موجه النظام";
 "Tab %lld" = "التبويب %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "اسم النموذج الذي يرسله عملاء API.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "اختيار النموذج، بدء/إيقاف، الملف الشخصي، الأدوات ودرجة الحرارة فوق الدردشة في نافذة منفصلة. متوقف: تكون النافذة مجرد الدردشات والمحادثة — تظل عناصر التحكم تلك في شريط القوائم.";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
+"The report" = "التقرير";
 "The running model server is stopped and started again." = "يتم إيقاف خادم النموذج الجاري تشغيله ثم تشغيله مرة أخرى.";
+"The server log" = "سجل الخادم";
 "These models go back to Default: %@." = "ستعود هذه النماذج إلى Default: %@.";
 "Thinking…" = "جارٍ التفكير…";
 "This many of the most recent messages are kept word for word when compacting." = "يُحتفَظ بهذا العدد من أحدث الرسائل حرفيًا عند التكثيف.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "استخدام مجلد LM Studio";
 "Uses the internet" = "يستخدم الإنترنت";
 "Verbose server logging" = "تسجيل مفصّل للخادم";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "كان تسجيل الخادم التفصيلي مفعلًا، لذا السجل يحتوي محادثاتك: لم يُرفق. لإدراجه، أوقف التسجيل التفصيلي في الإعدادات › Server، أعد تشغيل الخادم وأعد إنتاج المشكلة.";
 "Version" = "الإصدار";
 "Version %@" = "الإصدار %@";
 "View model card" = "اعرض بطاقة النموذج.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
 "Weather" = "الطقس";
 "Web search" = "بحث ويب";
+"What happened?" = "ماذا حدث؟";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "ما الذي كنت تفعله، ماذا توقعت، وماذا رأيت بدلاً من ذلك. المحادثات الخاصة بك لا تُضمَّن أبداً.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "يحدد تكميم Z-Image-Turbo الذي يولّد الصور.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "أمس";
 "You" = "أنت";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "تطبيق البريد لا يقبل المرفق: يظهر التقرير في Finder، أرفقه بالرسالة.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (موصى به)";
