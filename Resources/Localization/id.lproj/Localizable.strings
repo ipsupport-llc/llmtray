@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Memberi model alat edit_image: mengubah gambar dari obrolan — yang Anda lampirkan atau yang dibuat di sini. Membutuhkan fitur pembuatan gambar aktif. Model tersendiri, diunduh saat Anda memilihnya.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Sembunyikan chat";
+"Hide the reasoning" = "Sembunyikan alasan";
 "High quality (larger canvas)" = "Kualitas tinggi (kanvas lebih besar)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Fidelitas tertinggi, unduhan terbesar — tolok ukur ketepatan yang dapat Anda percayai.";
 "Hourly forecast" = "Prakiraan per jam";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Pembuatan gambar belum disiapkan — aktifkan lagi di Pengaturan.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
 "Image model" = "Model gambar";
+"In the queue: %lld ahead…" = "Dalam antrean: %lld lagi…";
 "Include LLMTray crash reports from the last two weeks" = "Sertakan laporan crash LLMTray dari dua minggu terakhir";
 "Include the server log" = "Sertakan log server";
 "Installed" = "Terinstal";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Memuat model yang terakhir digunakan segera, sehingga siap tanpa menekan Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
 "Maintenance" = "Pemeliharaan";
+"Make this image again (a new seed, the same request)" = "Buat ulang gambar ini (seed baru, permintaan sama)";
+"Make this music again (a new seed, the same request)" = "Buat ulang musik ini (seed baru, permintaan sama)";
 "Manage Models…" = "Kelola Model…";
 "Max tokens" = "Token maksimum";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "Tampilkan penalaran";
 "Show the profile files in Finder" = "Tampilkan file profil di Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Tampilkan file profil di Finder — JSON polos, dapat diedit manual, dan dapat disalin ke Mac lain.";
+"Show the reasoning" = "Tampilkan alasan";
 "Show tool calls" = "Tampilkan pemanggilan alat";
 "Shows the chat window" = "Menampilkan jendela obrolan";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
@@ -414,6 +419,7 @@
 "Version %@" = "Versi %@";
 "View model card" = "Lihat kartu model.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
+"Waiting for another chat's image or music to finish…" = "Menunggu obrolan lain menyelesaikan gambar atau musik…";
 "Weather" = "Cuaca";
 "Web search" = "Pencarian web";
 "What happened?" = "Apa yang terjadi?";

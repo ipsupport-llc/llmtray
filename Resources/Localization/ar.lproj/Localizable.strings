@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "يوفر للنموذج أداة edit_image: تُغيّر صورة من المحادثة — إما واحدة أرفقتها أو تم إنشاؤها هنا. يتطلب تشغيل توليد الصور. النموذج الخاص به يُحمّل عند اختيارك له.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "إخفاء الدردشات";
+"Hide the reasoning" = "إخفاء التبرير";
 "High quality (larger canvas)" = "جودة عالية (لوحة أكبر)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "أعلى دقة، أكبر تنزيل — معيار صحة يمكنك الوثوق به.";
 "Hourly forecast" = "توقّعات كل ساعة";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
 "Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image model" = "نموذج الصور";
+"In the queue: %lld ahead…" = "في الطابور: %lld قبل…";
 "Include LLMTray crash reports from the last two weeks" = "تضمين تقارير أعطال LLMTray خلال الأسبوعين الماضيين";
 "Include the server log" = "تضمين سجل الخادم";
 "Installed" = "مثبّت";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "يحمّل آخر نموذج مستخدم فورًا، ليكون جاهزًا دون الضغط على Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "يسجّل كل رمز يتم إنشاؤه (DEBUG). مخصص فقط لاستكشاف أخطاء عملية النموذج وإصلاحها -- فهو يبطئ الأداء. يسري عند بدء تشغيل الخادم التالي.";
 "Maintenance" = "الصيانة";
+"Make this image again (a new seed, the same request)" = "إعادة إنشاء هذه الصورة (ببذرة جديدة، نفس الطلب)";
+"Make this music again (a new seed, the same request)" = "إعادة إنشاء هذه الموسيقى (ببذرة جديدة، نفس الطلب)";
 "Manage Models…" = "إدارة النماذج…";
 "Max tokens" = "الحد الأقصى للرموز";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "إظهار الاستدلال";
 "Show the profile files in Finder" = "إظهار ملفات ملف التعريف في Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "اعرض ملفات ملف التعريف في Finder — بصيغة JSON عادية، قابلة للتحرير يدويًا وللنسخ إلى Mac آخر.";
+"Show the reasoning" = "عرض التبرير";
 "Show tool calls" = "إظهار استدعاءات الأدوات";
 "Shows the chat window" = "يعرض نافذة الدردشة";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
@@ -414,6 +419,7 @@
 "Version %@" = "الإصدار %@";
 "View model card" = "اعرض بطاقة النموذج.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
+"Waiting for another chat's image or music to finish…" = "بانتظار انتهاء صورة أو مقطع موسيقي من محادثة أخرى…";
 "Weather" = "الطقس";
 "Web search" = "بحث ويب";
 "What happened?" = "ماذا حدث؟";

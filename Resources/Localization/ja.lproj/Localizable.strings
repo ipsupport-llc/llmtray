@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "モデルにedit_imageツールを追加します：チャット内の画像（添付したものまたはここで生成したもの）を変更します。画像生成を有効にする必要があります。専用モデルで、選択時にダウンロードされます。";
 "Hacker News" = "Hacker News";
 "Hide chats" = "チャットを非表示";
+"Hide the reasoning" = "推論を非表示";
 "High quality (larger canvas)" = "高品質（キャンバス大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高の忠実度、ダウンロードは最大 — 信頼できる正確性のベースラインです。";
 "Hourly forecast" = "時間ごとの予報";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
 "Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image model" = "画像モデル";
+"In the queue: %lld ahead…" = "キュー内: %lld 件前…";
 "Include LLMTray crash reports from the last two weeks" = "過去2週間の LLMTray クラッシュレポートを含める";
 "Include the server log" = "サーバーログを含める";
 "Installed" = "インストール済み";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "最後に使用したモデルをすぐに読み込み、Play を押さなくても使用できる状態にします。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
 "Maintenance" = "メンテナンス";
+"Make this image again (a new seed, the same request)" = "この画像を再生成（新しいシード、同じリクエスト）";
+"Make this music again (a new seed, the same request)" = "この音楽を再生成（新しいシード、同じリクエスト）";
 "Manage Models…" = "モデルを管理…";
 "Max tokens" = "最大トークン数";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
@@ -329,6 +333,7 @@
 "Show reasoning" = "推論を表示";
 "Show the profile files in Finder" = "プロファイルファイルを Finder に表示";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "プロファイルファイルを Finder に表示します。プレーン JSON で、手動編集や別の Mac へのコピーができます。";
+"Show the reasoning" = "推論を表示";
 "Show tool calls" = "ツール呼び出しを表示";
 "Shows the chat window" = "チャットウインドウを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
@@ -414,6 +419,7 @@
 "Version %@" = "バージョン %@";
 "View model card" = "モデルカードを表示します。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
+"Waiting for another chat's image or music to finish…" = "別のチャットの画像または音楽の処理が終わるのを待っています…";
 "Weather" = "天気";
 "Web search" = "ウェブ検索";
 "What happened?" = "何が起きましたか？";

@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "मॉडल को एक edit_image टूल देता है: यह चैट की एक छवि बदलता है — जिसे आपने जोड़ा हो या यहाँ जनरेट की गई हो। इसके लिए image generation चालू होना चाहिए। इसका अपना मॉडल है, जिसे चुनने पर डाउनलोड किया जाता है।";
 "Hacker News" = "Hacker News";
 "Hide chats" = "चैट छुपाएँ";
+"Hide the reasoning" = "तर्क छिपाएँ";
 "High quality (larger canvas)" = "High quality (बड़ा कैनवास)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "सर्वोच्च निष्ठा, सबसे बड़ा डाउनलोड — एक विश्वसनीय correctness बेसलाइन।";
 "Hourly forecast" = "घंटाबंद पूर्वानुमान";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image model" = "इमेज मॉडल";
+"In the queue: %lld ahead…" = "कतार में: %lld पहले…";
 "Include LLMTray crash reports from the last two weeks" = "पिछले दो हफ्तों की LLMTray क्रैश रिपोर्टें शामिल करें";
 "Include the server log" = "सर्वर लॉग शामिल करें";
 "Installed" = "इंस्टॉल किया गया";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "पिछली बार उपयोग किया गया मॉडल तुरंत लोड करता है, ताकि Play दबाए बिना यह तैयार हो।";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
 "Maintenance" = "रखरखाव";
+"Make this image again (a new seed, the same request)" = "इस छवि को फिर से बनाएं (नया seed, वही अनुरोध)";
+"Make this music again (a new seed, the same request)" = "इस संगीत को फिर से बनाएं (नया seed, वही अनुरोध)";
 "Manage Models…" = "मॉडल प्रबंधित करें…";
 "Max tokens" = "अधिकतम टोकन";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "पहले की बातचीत का संदर्भ फिर से इस्तेमाल करने के लिए रखी गई मेमोरी, ताकि जारी चैट अपना पूरा इतिहास दोबारा न पढ़े। इसकी सीमा तय है, ताकि यह इतनी न बढ़े कि सर्वर की मेमोरी खत्म हो जाए।";
@@ -329,6 +333,7 @@
 "Show reasoning" = "तर्क दिखाएँ";
 "Show the profile files in Finder" = "प्रोफ़ाइल फ़ाइलें Finder में दिखाएँ";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "प्रोफ़ाइल फ़ाइलें Finder में दिखाएँ — सादा JSON, हाथ से संपादित करने योग्य, और दूसरे Mac पर कॉपी करने योग्य।";
+"Show the reasoning" = "तर्क दिखाएँ";
 "Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows the chat window" = "चैट विंडो दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
@@ -414,6 +419,7 @@
 "Version %@" = "संस्करण %@";
 "View model card" = "मॉडल कार्ड देखें।";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "मौजूदा अनुरोध या बेंचमार्क पूरा होने तक प्रतीक्षा करें — रीस्टार्ट करने से यह अधूरा रह जाएगा।";
+"Waiting for another chat's image or music to finish…" = "किसी अन्य चैट की छवि या संगीत समाप्त होने की प्रतीक्षा…";
 "Weather" = "मौसम";
 "Web search" = "वेब खोज";
 "What happened?" = "क्या हुआ?";
