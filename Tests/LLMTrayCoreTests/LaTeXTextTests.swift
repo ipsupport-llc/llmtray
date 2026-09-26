@@ -61,6 +61,7 @@ final class LaTeXTextTests: XCTestCase {
         for math in ["2^n", "10^{-3}", "2x+1 = 5", #"3\times 4"#, "0.5x", #"2\pi r"#] {
             XCTAssertEqual(MathSpans.split("be $\(math)$ ok"), [.text("be "), .math(math, display: false), .text(" ok")], math)
         }
+        XCTAssertEqual(MathSpans.split("The count is ($2^n$)."), [.text("The count is ("), .math("2^n", display: false), .text(").")])
         XCTAssertEqual(MathSpans.split("between $2^n$ and $3^n$"),
                        [.text("between "), .math("2^n", display: false), .text(" and "), .math("3^n", display: false)])
     }

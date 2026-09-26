@@ -40,26 +40,70 @@ public struct MarkdownTable: Equatable {
     static func cells(_ line: String) -> [String] {
         var body = Substring(line)
         if body.hasPrefix("|") { body = body.dropFirst() }
-        if body.hasSuffix("|") && !body.hasSuffix("\\|") { body = body.dropLast() }
+        // The closing pipe, unless escaped (an odd number of backslashes).
+        if body.hasSuffix("|"), body.dropLast().reversed().prefix(while: { $0 == "\\" }).count % 2 == 0 {
+            body = body.dropLast()
+        }
+        let chars = Array(body)
+        let code = codeSpans(chars)
         var cells: [String] = []
         var current = ""
-        var escaped = false
-        for ch in body {
-            if escaped {
-                current.append(ch == "|" ? "|" : "\\\(ch)")
-                escaped = false
-            } else if ch == "\\" {
-                escaped = true
-            } else if ch == "|" {
+        var i = 0
+        while i < chars.count {
+            let ch = chars[i]
+            if ch == "\\", i + 1 < chars.count, !code[i] {
+                // "\|" is a pipe in the cell; other escapes stay as written.
+                current += chars[i + 1] == "|" ? "|" : "\\\(chars[i + 1])"
+                i += 2
+                continue
+            }
+            if ch == "|", !code[i] {
                 cells.append(current.trimmingCharacters(in: .whitespaces))
                 current = ""
             } else {
                 current.append(ch)
             }
+            i += 1
         }
-        if escaped { current.append("\\") }
         cells.append(current.trimmingCharacters(in: .whitespaces))
         return cells
+    }
+
+    /// Which characters are inside a code span: a run of N backticks opens
+    /// one, the next run of exactly N closes it (GFM); an escaped backtick
+    /// isn't a delimiter, and a run with no closing one is plain text. A
+    /// pipe inside one is part of the cell -- models rarely escape it.
+    static func codeSpans(_ chars: [Character]) -> [Bool] {
+        var inside = [Bool](repeating: false, count: chars.count)
+        func run(at i: Int) -> Int {
+            var j = i
+            while j < chars.count, chars[j] == "`" { j += 1 }
+            return j - i
+        }
+        var i = 0
+        while i < chars.count {
+            if chars[i] == "\\" { i += 2; continue }
+            guard chars[i] == "`" else { i += 1; continue }
+            let length = run(at: i)
+            var j = i + length
+            var close: Int?
+            while j < chars.count {
+                if chars[j] == "`" {
+                    let other = run(at: j)
+                    if other == length { close = j; break }
+                    j += other
+                } else {
+                    j += 1
+                }
+            }
+            if let close {
+                for k in i..<(close + length) { inside[k] = true }
+                i = close + length
+            } else {
+                i += length
+            }
+        }
+        return inside
     }
 
     /// The alignments a separator row gives (---, :--, :-:, --:), or nil if

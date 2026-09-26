@@ -74,7 +74,7 @@ final class ServerManager: ObservableObject {
     private weak var terminating: ServerProcess?
     /// Unloaded for image generation (ChatClient): requests wait for
     /// ensureModelLoaded() instead of reloading the model next to mflux.
-    private var suspendedForImageGeneration = false
+    @Published private(set) var suspendedForImageGeneration = false
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
     // in between -- reset to 0 by any request that actually completes.

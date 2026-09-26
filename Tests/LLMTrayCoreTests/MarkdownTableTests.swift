@@ -35,6 +35,16 @@ final class MarkdownTableTests: XCTestCase {
         if case .table = fenced[0] { XCTFail("a table inside a code fence stays code") }
     }
 
+    func testPipeInsideCodeStaysInTheCell() {
+        XCTAssertEqual(MarkdownTable.cells("| `a | b` | union |"), ["`a | b`", "union"])
+        XCTAssertEqual(MarkdownTable.cells("| `oops | next |"), ["`oops", "next"])
+        XCTAssertEqual(MarkdownTable.cells("| ``a | b`` | c |"), ["``a | b``", "c"])
+        XCTAssertEqual(MarkdownTable.cells(#"| \`literal` | next |"#), [#"\`literal`"#, "next"])
+        XCTAssertEqual(MarkdownTable.cells("| `x` | `y | z` |"), ["`x`", "`y | z`"])
+        XCTAssertEqual(MarkdownTable.cells(#"| a \\|"#), [#"a \\"#])
+        XCTAssertEqual(MarkdownTable.cells(#"| a \|"#), ["a |"])
+    }
+
     func testSingleRowIsText() {
         XCTAssertEqual(MarkdownBlock.split("| just one row |"), [.text("| just one row |")])
     }
