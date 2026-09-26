@@ -148,6 +148,21 @@ struct AudioClipView: View {
                     Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
                 }
                 .buttonStyle(.plain)
+                // Icons only: the row must fit the popover.
+                Button { MediaSharing.copyAudio(data, prompt: prompt) } label: {
+                    Image(systemName: "doc.on.doc").font(.system(size: 10))
+                }
+                .buttonStyle(.plain)
+                .help(Text("Copy the song as a WAV file"))
+                .accessibilityLabel(Text("Copy"))
+                ShareLink(item: SharedAudio(data: data, prompt: prompt),
+                          preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Music", comment: "") : prompt,
+                                                image: Image(systemName: "music.note"))) {
+                    Image(systemName: "square.and.arrow.up").font(.system(size: 10))
+                }
+                .buttonStyle(.plain)
+                .help(Text("Share…"))
+                .accessibilityLabel(Text("Share…"))
                 if canRegenerate {
                     Button { action?(.regenerate) } label: {
                         Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))

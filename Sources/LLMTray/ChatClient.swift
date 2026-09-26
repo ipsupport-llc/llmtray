@@ -602,6 +602,7 @@ final class ChatClient: ObservableObject {
             if tweak, let draftKind = GenerationDraft.kind(of: call, settings) {
                 guard stillCurrent() else { return }   // Stop before it started: no draft to wait on
                 let draft = GenerationDraft(kind: draftKind, call: call, settings: settings)
+                draft.anchor = (messageID, index)
                 self.draft = draft
                 let outcome = await draft.decide(countdown: 0)   // asked for: waits for Generate
                 if self.draft === draft { self.draft = nil }

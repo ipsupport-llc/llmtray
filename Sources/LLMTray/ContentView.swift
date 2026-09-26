@@ -43,6 +43,8 @@ struct ContentView: View {
     // Starts true: a new view (the chat just moved between the popover and
     // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    /// Following the end before a Tweak draft paused it: restored after.
+    @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
@@ -245,12 +247,13 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
-                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil)
+                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
+                                      draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
-                    if let draft = chat.draft {
-                        GenerationDraftView(draft: draft)
+                    if let draft = chat.draft, draft.anchor == nil {
+                        GenerationDraftView(draft: draft).id(draft.id)
                     }
                     if chat.isGeneratingMedia {
                         if chat.generatingKind == .music {
@@ -311,7 +314,8 @@ struct ContentView: View {
                 // Anything that grows the chat at the end -- tokens, an image's
                 // progress and preview, the image or song itself -- keeps the
                 // end in view while the user follows it.
-                if followChatBottom, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
+                // Not while a Tweak draft up the chat is what the user looks at.
+                if followChatBottom, chat.draft?.anchor == nil, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
                     DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
                 }
             }
@@ -319,6 +323,23 @@ struct ContentView: View {
             // a fixed viewport instead of growing the popover. Detached, it
             // takes whatever height the window leaves it.
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
+            // A draft wants the user's eyes: brought into view, wherever it is.
+            .onChange(of: chat.draft?.id) { id in
+                guard let id else {
+                    if let before = followBeforeDraft {
+                        followChatBottom = before
+                        followBeforeDraft = nil
+                        // Generate: the progress is at the end.
+                        if before { DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) } }
+                    }
+                    return
+                }
+                if chat.draft?.anchor != nil {
+                    if followBeforeDraft == nil { followBeforeDraft = followChatBottom }
+                    followChatBottom = false
+                }
+                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+            }
             .onChange(of: lastUserMessageID) { _ in
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).

@@ -17,9 +17,12 @@ struct MessageBubble: View {
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.
     var regenerateMedia: ((ChatClient.MediaKind, Int, ChatClient.MediaAction) -> Void)?
+    /// A Tweak draft of one of this message's images or songs: shown under it.
+    var draft: GenerationDraft?
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
+    @State private var hovering = false
 
     var body: some View {
         if message.isSummary {
@@ -95,10 +98,17 @@ struct MessageBubble: View {
                 .padding(8)
                 .background(isUser ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.12))
                 .cornerRadius(8)
+                // An answer's always (it's what gets copied); the user's own on hover.
+                if !message.content.isEmpty {
+                    // The user's own: its space kept, so hovering doesn't shift the chat.
+                    let shown = !isUser || hovering
+                    textActions.opacity(shown ? 1 : 0).allowsHitTesting(shown).accessibilityHidden(!shown).disabled(!shown)
+                }
             }
 
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
+                tweakDraft(.image, i)
             }
 
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
@@ -108,6 +118,7 @@ struct MessageBubble: View {
                               action: regenerateMedia.map { act in { act(.music, i, $0) } })
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
+                tweakDraft(.music, i)
             }
 
             ForEach(sources, id: \.self) { source in
@@ -126,6 +137,33 @@ struct MessageBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .onHover { hovering = $0 }
+    }
+
+    @ViewBuilder
+    private func tweakDraft(_ kind: ChatClient.MediaKind, _ i: Int) -> some View {
+        if let draft, draft.anchor?.index == i, (draft.kind == .music) == (kind == .music) {
+            GenerationDraftView(draft: draft)
+                .id(draft.id)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+
+    /// Copy / Share of the message's text (the markdown as written).
+    private var textActions: some View {
+        HStack(spacing: 8) {
+            Button { MediaSharing.copyText(message.content) } label: {
+                Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Copy the text"))
+            ShareLink(item: message.content) {
+                Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+        }
+        .foregroundColor(.secondary)
+        .padding(.horizontal, 4)
     }
 
     @ViewBuilder
@@ -161,10 +199,21 @@ struct MessageBubble: View {
                         Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    // Icons only: the row must fit the popover.
                     Button { ImageActions.copy(data) } label: {
-                        Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+                        Image(systemName: "doc.on.doc").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    .help(Text("Copy"))
+                    .accessibilityLabel(Text("Copy"))
+                    ShareLink(item: SharedImage(data: data, prompt: prompt),
+                              preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Image", comment: "") : prompt,
+                                                    image: Image(nsImage: nsImage))) {
+                        Image(systemName: "square.and.arrow.up").font(.system(size: 10))
+                    }
+                    .buttonStyle(.plain)
+                    .help(Text("Share…"))
+                    .accessibilityLabel(Text("Share…"))
                     if canRegenerate(.image, i) {
                         Button { regenerateMedia?(.image, i, .regenerate) } label: {
                             Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))

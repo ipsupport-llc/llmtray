@@ -88,6 +88,8 @@
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
+"Copy the song as a WAV file" = "Copy the song as a WAV file";
+"Copy the text" = "Copy the text";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Countdown" = "Countdown";
 "Country facts" = "Country facts";
@@ -167,6 +169,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";
+"Image" = "Image";
 "Image editing" = "Image editing";
 "Image generation" = "Image generation";
 "Image generation failed: %@" = "Image generation failed: %@";
@@ -211,6 +214,7 @@
 "Models folder" = "Models folder";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Move to Project" = "Move to Project";
+"Music" = "Music";
 "Music generation" = "Music generation";
 "Music generation failed: %@" = "Music generation failed: %@";
 "Music generation finished but produced no audio." = "Music generation finished but produced no audio.";
@@ -340,6 +344,7 @@
 "Settings this profile overrides; everything else comes from Default." = "Settings this profile overrides; everything else comes from Default.";
 "Settings…" = "Settings…";
 "Shape" = "Shape";
+"Share…" = "Share…";
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
