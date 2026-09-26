@@ -14,6 +14,9 @@ struct ChatHeaderView: View {
     @AppStorage(Pref.port) private var port: Int
     // A turn in any tab holds back model switches / restarts.
     @ObservedObject private var tabs = ChatTabs.shared
+    @ObservedObject private var switchPrompter = ModelSwitchPrompter.shared
+    /// A switch the picker or Load started, until the server reports it.
+    @State private var switchingTo: String?
 
     @Binding var selectedModelID: String?
     /// Shows the chats sidebar over the popover's chat. nil: the tray's
@@ -46,7 +49,7 @@ struct ChatHeaderView: View {
                 }
             }
             HStack(spacing: 6) {
-                Picker("Model", selection: $selectedModelID) {
+                Picker("Model", selection: Binding(get: { selectedModelID }, set: { pickModel($0) })) {
                     ForEach(catalog.models) { m in
                         Text(m.displayName).tag(m.id as String?)
                     }
@@ -81,9 +84,77 @@ struct ChatHeaderView: View {
                 toolsMenu
                 temperatureRow
             }
+            modelSwitchRow
             RestartBanner()
         }
         .padding(12)
+    }
+
+    // MARK: Model switching
+
+    /// Picking another model while one is running loads it now (as LM
+    /// Studio does); stopped or idle-unloaded, nothing loads until a
+    /// message or Start, as before.
+    private func pickModel(_ id: String?) {
+        selectedModelID = id
+        // Not mid-turn: the turn's next round would ask for its own model
+        // back. The header's Load is there once it ends.
+        guard case .running = server.state, ops.canSwitchModel, !tabs.isAnyBusy,
+              let model = catalog.model(id: id), model.path != server.loadedModelPath else { return }
+        loadModel(model)
+    }
+
+    private func loadModel(_ model: LocalModel) {
+        switchingTo = model.path
+        Task {
+            // A failure shows in the server status (the launch reports it).
+            try? await server.switchLoadedModel(to: model.path, alias: catalog.alias(for: model.id))
+            if switchingTo == model.path { switchingTo = nil }
+        }
+    }
+
+    private func shortName(_ path: String) -> String {
+        let name = catalog.model(id: path)?.displayName ?? (path as NSString).lastPathComponent
+        return name.split(separator: "/").last.map(String.init) ?? name
+    }
+
+    /// An outside client's pending "Ask first" request; otherwise, while the
+    /// loaded model isn't the selected one (a client switched it, a switch
+    /// failed), the way back.
+    @ViewBuilder
+    private var modelSwitchRow: some View {
+        if let ask = switchPrompter.pending {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.left.arrow.right").foregroundColor(.orange)
+                Text(String(format: NSLocalizedString("%1$@ asks for %2$@", comment: "model switch prompt: client, model"),
+                            ask.client, shortName(ask.target)))
+                    .lineLimit(1).truncationMode(.middle)
+                Spacer(minLength: 4)
+                Button("Keep") { switchPrompter.answer(false) }
+                    .help(server.loadedModelPath.map { Text(String(format: NSLocalizedString("Keep %@ loaded", comment: "model switch prompt"), shortName($0))) }
+                          ?? Text("Keep the loaded model"))
+                Button("Switch") { switchPrompter.answer(true) }
+            }
+            .font(.system(size: 11))
+            .controlSize(.small)
+        } else if case .running = server.state, switchingTo == nil, let loaded = server.loadedModelPath,
+                  let selected = catalog.model(id: selectedModelID), loaded != selected.path {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.arrow.triangle.2.circlepath").foregroundColor(.secondary)
+                Text(String(format: NSLocalizedString("Loaded: %1$@ · selected: %2$@", comment: "model mismatch: loaded, selected"),
+                            shortName(loaded), shortName(selected.path)))
+                    .lineLimit(1).truncationMode(.middle)
+                    .foregroundColor(.secondary)
+                Spacer(minLength: 4)
+                Button(String(format: NSLocalizedString("Load %@", comment: "load the selected model"), shortName(selected.path))) {
+                    loadModel(selected)
+                }
+                .lineLimit(1)
+                .disabled(!ops.canSwitchModel || tabs.isAnyBusy)
+            }
+            .font(.system(size: 11))
+            .controlSize(.small)
+        }
     }
 
     // MARK: Sessions

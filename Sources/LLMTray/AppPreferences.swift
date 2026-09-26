@@ -15,6 +15,12 @@ extension AppStorage where Value == Bool {
     }
 }
 
+extension AppStorage where Value == String {
+    init(_ key: PrefKey<String>, store: UserDefaults? = nil) {
+        self.init(wrappedValue: key.defaultValue, key.name, store: store)
+    }
+}
+
 extension AppStorage where Value == String? {
     init(_ key: PrefKey<String?>, store: UserDefaults? = nil) {
         self.init(key.name, store: store)

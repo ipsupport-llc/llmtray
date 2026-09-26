@@ -18,6 +18,8 @@ public enum Pref {
     // Server
     public static let port = PrefKey("llmtray.port", default: 8765)
     public static let allowLAN = PrefKey("llmtray.allowLAN", default: false)
+    /// `ModelSwitchPolicy` raw value: an outside client asking for another model.
+    public static let modelSwitchPolicy = PrefKey("llmtray.modelSwitchPolicy", default: ModelSwitchPolicy.auto.rawValue)
     public static let verboseServerLogging = PrefKey("llmtray.verboseServerLogging", default: false)
     public static let stallThresholdSeconds = PrefKey("llmtray.stallThresholdSeconds", default: 60)
     public static let autoRestartStallThreshold = PrefKey("llmtray.autoRestartStallThreshold", default: 3)
