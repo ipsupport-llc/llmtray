@@ -220,7 +220,13 @@ final class ServerManager: ObservableObject {
     /// `loadIfUnloaded: false` (a bodyless probe like GET /health) forwards
     /// only to a model that's already running: a health check must neither
     /// reload a 20 GB model nor keep one from idle-unloading.
-    func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true) async throws {
+    /// `mayReplaceLoaded` false (an outside client under Ask first / Keep,
+    /// its model loaded when it arrived): if another model is running by
+    /// the time its turn comes, it's refused (`switchDeclinedCode`) rather
+    /// than switching back.
+    static let switchDeclinedCode = 8
+
+    func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true, mayReplaceLoaded: Bool = true) async throws {
         // The model unloaded for an image or a song: the request waits for it
         // to come back instead of failing. Outside the serialized transition
         // (the reload itself goes through it), and again if it was unloaded
@@ -235,7 +241,8 @@ final class ServerManager: ObservableObject {
                 try? await Task.sleep(nanoseconds: 250_000_000)
             }
             do {
-                try await acquireModelNow(modelPath: target, alias: alias, loadIfUnloaded: loadIfUnloaded, epoch: epoch)
+                try await acquireModelNow(modelPath: target, alias: alias, loadIfUnloaded: loadIfUnloaded,
+                                          mayReplaceLoaded: mayReplaceLoaded, epoch: epoch)
                 return
             } catch let error as NSError where error.domain == "ServerManager" && error.code == 7
                 && loadIfUnloaded && epoch == stopEpoch && Date() < deadline {
@@ -244,8 +251,13 @@ final class ServerManager: ObservableObject {
         }
     }
 
-    private func acquireModelNow(modelPath target: String?, alias: String, loadIfUnloaded: Bool, epoch: Int) async throws {
+    private func acquireModelNow(modelPath target: String?, alias: String, loadIfUnloaded: Bool, mayReplaceLoaded: Bool,
+                                 epoch: Int) async throws {
         try await serialized(epoch: epoch) {
+            if !mayReplaceLoaded, let target, target != self.currentModelPath, case .running = self.state {
+                throw NSError(domain: "ServerManager", code: Self.switchDeclinedCode,
+                              userInfo: [NSLocalizedDescriptionKey: "another model is loaded"])
+            }
             if !loadIfUnloaded {
                 guard case .running = self.state else {
                     throw NSError(domain: "ServerManager", code: 6, userInfo: [NSLocalizedDescriptionKey: "no model is loaded"])
@@ -615,6 +627,8 @@ final class ServerManager: ObservableObject {
         proxyStartPending = false
         state = .stopped
         process?.terminate()
+        // Its request dies with the proxy: no Switch left to press.
+        ModelSwitchPrompter.shared.cancel()
     }
 
     /// mlx_lm.server's generation thread died (Metal out of memory, most

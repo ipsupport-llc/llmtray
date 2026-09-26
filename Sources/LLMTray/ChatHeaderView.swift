@@ -97,7 +97,9 @@ struct ChatHeaderView: View {
     /// message or Start, as before.
     private func pickModel(_ id: String?) {
         selectedModelID = id
-        guard case .running = server.state, ops.canSwitchModel,
+        // Not mid-turn: the turn's next round would ask for its own model
+        // back. The header's Load is there once it ends.
+        guard case .running = server.state, ops.canSwitchModel, !tabs.isAnyBusy,
               let model = catalog.model(id: id), model.path != server.loadedModelPath else { return }
         loadModel(model)
     }
@@ -148,7 +150,7 @@ struct ChatHeaderView: View {
                     loadModel(selected)
                 }
                 .lineLimit(1)
-                .disabled(!ops.canSwitchModel)
+                .disabled(!ops.canSwitchModel || tabs.isAnyBusy)
             }
             .font(.system(size: 11))
             .controlSize(.small)

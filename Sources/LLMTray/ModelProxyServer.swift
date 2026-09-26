@@ -258,7 +258,8 @@ final class ModelProxyServer {
                              refusedLately: targetPath.map(prompter.refusedLately) ?? false) {
         case .proceed:
             forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
-                             targetPath: targetPath, connection: connection, internalPort: internalPort)
+                             targetPath: targetPath, connection: connection, internalPort: internalPort,
+                             mayReplaceLoaded: fromApp || policy == .auto)
         case .refuse:
             sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
         case .ask:
@@ -269,7 +270,8 @@ final class ModelProxyServer {
                 let allowed = await prompter.ask(target: targetPath ?? "", name: modelName ?? "", client: client)
                 if allowed {
                     self.forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
-                                          targetPath: targetPath, connection: connection, internalPort: internalPort)
+                                          targetPath: targetPath, connection: connection, internalPort: internalPort,
+                                          mayReplaceLoaded: true)
                 } else {
                     self.sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
                 }
@@ -289,8 +291,11 @@ final class ModelProxyServer {
     }
 
     /// Switches to (or reloads) the requested model and forwards the request.
+    /// `mayReplaceLoaded` false: the policy keeps whatever runs when the
+    /// request's turn comes -- the check is repeated there, since another
+    /// request may have switched models while this one waited.
     private func forwardAcquiring(method: String, path: String, headers: [String: String], body bodyData: Data, modelName: String?,
-                                  targetPath: String?, connection: NWConnection, internalPort: Int) {
+                                  targetPath: String?, connection: NWConnection, internalPort: Int, mayReplaceLoaded: Bool) {
         // A bodyless probe (GET /health) isn't use: it mustn't keep the
         // model from idle-unloading.
         let activity = !bodyData.isEmpty
@@ -301,7 +306,13 @@ final class ModelProxyServer {
                 // if it was idle-unloaded), serialized with every other
                 // transition; the request then counts as in flight on the
                 // model until forward() ends it.
-                try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "", loadIfUnloaded: !bodyData.isEmpty)
+                try await self.server.acquireModel(modelPath: targetPath, alias: modelName ?? "", loadIfUnloaded: !bodyData.isEmpty,
+                                                   mayReplaceLoaded: mayReplaceLoaded)
+            } catch let error as NSError where error.domain == "ServerManager" && error.code == ServerManager.switchDeclinedCode {
+                // Another model got loaded while this one waited its turn.
+                self.server.endRequest(forwarded: false, activity: activity)
+                self.sendSwitchDeclined(connection: connection, loaded: self.server.loadedModelPath, requested: modelName)
+                return
             } catch {
                 self.server.endRequest(forwarded: false, activity: activity)
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")

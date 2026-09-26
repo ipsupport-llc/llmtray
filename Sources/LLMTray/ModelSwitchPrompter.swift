@@ -41,6 +41,8 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
     /// for the same answer; one for a different model while that's up is
     /// refused (one question at a time).
     func ask(target: String, name: String, client: String) async -> Bool {
+        // Kept a moment ago (between the proxy's check and now): not asked again.
+        if refusedLately(target) { return false }
         if let pending, pending.target != target { return false }
         if pending == nil {
             let request = Pending(target: target, name: name, client: client)
@@ -59,8 +61,18 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
     /// still the one pending (a late notification action for an old one is
     /// ignored).
     func answer(_ allow: Bool, for id: UUID? = nil) {
+        resolve(allow, for: id, remember: !allow)
+    }
+
+    /// The server stopped: the waiting requests are refused, nothing is
+    /// remembered (the user didn't choose).
+    func cancel() {
+        resolve(false, for: nil, remember: false)
+    }
+
+    private func resolve(_ allow: Bool, for id: UUID?, remember: Bool) {
         guard let current = pending, id == nil || id == current.id else { return }
-        if !allow { refusedUntil[current.target] = Date().addingTimeInterval(Self.refusalMemory) }
+        if remember { refusedUntil[current.target] = Date().addingTimeInterval(Self.refusalMemory) }
         pending = nil
         timeout?.cancel()
         timeout = nil
@@ -101,7 +113,9 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
         let note = UNNotificationRequest(identifier: request.id.uuidString, content: content, trigger: nil)
         Task {
             // Refused: the popover's header still asks.
-            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true,
+                  // Answered or timed out while authorization was asked: nothing to show.
+                  self.pending?.id == request.id else { return }
             try? await center.add(note)
         }
     }
