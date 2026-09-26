@@ -1,5 +1,6 @@
 import LLMTrayCore
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The saved chats, as in ChatGPT / Claude on the web: new chat and search
 /// on top, then pinned chats, projects (folders of chats) and the recents
@@ -25,6 +26,9 @@ struct ChatSidebar: View {
     @State private var chatToDelete: ChatSummary?
     @State private var projectToDelete: ChatLibrary.Project?
     @State private var collapsedProjects: Set<UUID> = []
+    /// Where a dragged chat would land: a project's id, "pinned" or
+    /// "recents-<age>".
+    @State private var dropTarget: String?
     @FocusState private var searchFocused: Bool
     @FocusState private var chatRenameFocused: Bool
     @FocusState private var projectRenameFocused: Bool
@@ -135,6 +139,7 @@ struct ChatSidebar: View {
         let pinned = store.pinnedChats
         if !pinned.isEmpty {
             sectionTitle(Text("Pinned"))
+                .dropZone("pinned", $dropTarget) { acceptChats($0) { store.setPinned($0, true) } }
             ForEach(pinned) { row($0, in: "pinned") }
         }
     }
@@ -156,7 +161,7 @@ struct ChatSidebar: View {
                 if !collapsedProjects.contains(project.id) {
                     let chats = store.chats(inProject: project.id)
                     if chats.isEmpty {
-                        Text("Move chats here from their menu")
+                        Text("Drag chats here, or use a chat's menu")
                             .font(.caption).foregroundColor(.secondary)
                             .padding(.leading, 30).padding(.vertical, 3)
                     }
@@ -175,6 +180,13 @@ struct ChatSidebar: View {
         }
         ForEach(ChatAge.group(shown, now: now), id: \.0) { age, chats in
             sectionTitle(age.title)
+                // Out of its project and unpinned: back among the recents.
+                .dropZone("recents-\(age.rawValue)", $dropTarget) {
+                    acceptChats($0) { id in
+                        store.move(id, to: nil)
+                        store.setPinned(id, false)
+                    }
+                }
             ForEach(chats) { row($0, in: "recents") }
         }
         if recents.count > shown.count {
@@ -191,6 +203,9 @@ struct ChatSidebar: View {
             .padding(.horizontal, 8)
             .padding(.top, 10)
             .padding(.bottom, 2)
+            // The whole width: a drop target, not just the word.
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
     }
 
     // MARK: - Rows
@@ -231,6 +246,8 @@ struct ChatSidebar: View {
             .buttonStyle(SidebarRowStyle(isSelected: chat.currentSessionID == summary.id))
             .help(summary.title)
             .contextMenu { chatMenu(summary, in: section) }
+            // Onto a project, Pinned, or the recents.
+            .onDrag { NSItemProvider(object: summary.id.uuidString as NSString) }
         }
     }
 
@@ -291,6 +308,14 @@ struct ChatSidebar: View {
                 }
             }
             .buttonStyle(SidebarRowStyle(isSelected: false))
+            .dropZone(project.id.uuidString, $dropTarget) {
+                // Unpinned too: a pinned chat shows under Pinned only, so it
+                // would seem not to have moved.
+                acceptChats($0) { id in
+                    store.move(id, to: project.id)
+                    store.setPinned(id, false)
+                }
+            }
             .contextMenu {
                 Button("Rename…") {
                     renameHadFocus = false
@@ -304,6 +329,20 @@ struct ChatSidebar: View {
     }
 
     // MARK: - Actions
+
+    /// The chat ids a drop carries (a chat row's drag), each handed to
+    /// `perform` on the main thread.
+    private func acceptChats(_ providers: [NSItemProvider], perform: @escaping (UUID) -> Void) -> Bool {
+        let chats = providers.filter { $0.canLoadObject(ofClass: NSString.self) }
+        guard !chats.isEmpty else { return false }
+        for provider in chats {
+            _ = provider.loadObject(ofClass: NSString.self) { object, _ in
+                guard let text = object as? String, let id = UUID(uuidString: text) else { return }
+                DispatchQueue.main.async { perform(id) }
+            }
+        }
+        return true
+    }
 
     private func open(_ action: () -> Void) {
         action()
@@ -386,5 +425,21 @@ struct SidebarRowStyle: ButtonStyle {
         var body: some View {
             content(hovered).onHover { hovered = $0 }
         }
+    }
+}
+
+private extension View {
+    /// A drop target for dragged chats, highlighted while one is over it.
+    func dropZone(_ id: String, _ target: Binding<String?>, perform: @escaping ([NSItemProvider]) -> Bool) -> some View {
+        onDrop(of: [.plainText, .text], isTargeted: Binding(
+            get: { target.wrappedValue == id },
+            set: { over in
+                if over { target.wrappedValue = id } else if target.wrappedValue == id { target.wrappedValue = nil }
+            }
+        )) { providers in
+            target.wrappedValue = nil
+            return perform(providers)
+        }
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(target.wrappedValue == id ? 0.22 : 0)))
     }
 }

@@ -101,6 +101,7 @@
 "Downloading %lld files…" = "Downloading %lld files…";
 "Downloading…" = "Downloading…";
 "Downloads" = "Downloads";
+"Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
 "Duplicate this profile" = "Duplicate this profile";
 "Edit Profile…" = "Edit Profile…";
 "Enable image generation" = "Enable image generation";
@@ -171,7 +172,6 @@
 "Models" = "Models";
 "Models folder" = "Models folder";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
-"Move chats here from their menu" = "Move chats here from their menu";
 "Move to Project" = "Move to Project";
 "Name new chats automatically" = "Name new chats automatically";
 "Network" = "Network";
