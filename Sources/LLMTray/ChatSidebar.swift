@@ -239,7 +239,7 @@ struct ChatSidebar: View {
                     // Open in another tab.
                     if chat.currentSessionID != summary.id, tabs.index(of: summary.id) != nil {
                         Circle().fill(Color.secondary).frame(width: 5, height: 5)
-                            .help("Open in another tab")
+                            .help("Already open in another tab")
                     }
                 }
             }
