@@ -13,7 +13,7 @@
   `Application Support/LLMTray/sessions/<uuid>.json` (`ChatSessionStore`,
   `ChatSessionFile`), written atomically after every completed turn and on
   Stop, a switch, a tab close and quit. Media is not inlined: images
-  (`.png`) and music (`.wav`) are files in a sibling `<uuid>-images/`.
+  (`.png`) and music (`.m4a`; older songs `.wav`) are files in a sibling `<uuid>-images/`.
   Saved is a readable transcript (`PersistedMessage`): `tool` messages,
   tool-call plumbing and hidden `view_image` context are dropped.
 - **Pins and projects live apart**, in `sessions/library.json`

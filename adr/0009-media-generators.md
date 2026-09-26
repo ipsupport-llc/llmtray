@@ -16,7 +16,7 @@
   `LLMTrayCore.MfluxRunnerMessage` (`STEP`, `PREVIEW`, `IMAGE`, base64 PNG)
   and `MusicRunnerMessage` (`STAGE`, `SEED`, `STEP`, `AUDIO`, base64 WAV).
   No file is written, not even a temporary one: a temporary chat must
-  leave no trace. A saved chat writes its media (`.png`, `.wav`) with the
+  leave no trace. A saved chat writes its media (`.png`, `.m4a` — older songs `.wav`) with the
   session; one whose media file failed to write stays unsaved rather than
   listing a missing file (23d5342, eb18dc0).
 - **Models are set up from Settings only**, never mid-chat (that would

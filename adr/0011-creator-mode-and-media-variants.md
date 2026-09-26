@@ -56,7 +56,7 @@ Most of this landed in PR #83 (20c7472, a65492f, f5d313e) and PR #85
   edit would otherwise be made again from the next image (f5d313e).
 - **Filenames are materialized before indexes shift.** A message never
   loaded from disk has no stored names; they're derived from the index
-  (`<id>-<n>.png`, `<id>-audio-<n>.wav`). Insert and Remove first write
+  (`<id>-<n>.png`, `<id>-audio-<n>.<ext>`, the extension by the sniffed format). Insert and Remove first write
   the current names out, then give a variant its own UUID name — else the
   next save would pair files with the wrong media.
 - **Playback stops before a song variant lands**: a clip's id is its
