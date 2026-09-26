@@ -78,6 +78,15 @@ chat of the project, reached by the chat model through tools.
   and the trust rules stay in code whatever it says.
 - **Document text is data, never instructions**, enforced by what the
   code declares and sends, not by asking the model.
+- **Optional, like everything heavy in the app.** Project files are off
+  until turned on in Settings, as image and music generation are
+  ([0009](0009-media-generators.md)): until then nothing is downloaded
+  or started, and a project is the group of chats it is today. Each
+  model is its own opt-in with its download shown — the embedder when
+  the feature is turned on, the OCR VLM (tier 3) and the image
+  describer separately; without them their tier is skipped and says so
+  (a scan without tier 2/3 is indexed as "no text"). Settings shows the
+  disk each takes and removes it when turned off.
 - **Everything stays on the Mac.** A temporary chat has no project; the
   "writes nothing" rule of 0006 is untouched.
 
@@ -348,6 +357,8 @@ contextual-retrieval.
 - Project instructions: yes.
 - Copies or linked folders: both, the user picks per source.
 - Embedder: bge-m3 by default, configurable, never Qwen.
+- The whole feature and each of its models are opt-in in Settings;
+  nothing is downloaded for users who don't turn it on.
 
 ## Open questions
 
