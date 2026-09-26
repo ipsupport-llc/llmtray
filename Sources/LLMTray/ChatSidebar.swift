@@ -248,6 +248,8 @@ struct ChatSidebar: View {
                 open { tabs.open(summary.id, inNewTab: newTab) }
             }
             .accessibilityAddTraits(.isButton)
+            // VoiceOver's "press", as the Button had.
+            .accessibilityAction { open { tabs.open(summary.id, inNewTab: false) } }
             .help(summary.title)
             .contextMenu { chatMenu(summary, in: section) }
             // Onto a project, Pinned, or the recents.
