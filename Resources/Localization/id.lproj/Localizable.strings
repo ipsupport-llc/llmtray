@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ meminta %2$@";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ meminta %2$@. Beralih akan memuat keluar model yang sedang dimuat.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld unduhan";
+"%lld s" = "%lld dtk";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Harap lampirkan file laporan yang ditampilkan di Finder.)";
 "(no result yet)" = "(belum ada hasil)";
 "(no server output yet)" = "(belum ada output server)";
+"A client" = "Klien";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix yang lebih penuh dan terdengar matang; lirik kurang jelas. Sekitar 20 s untuk 30 s musik.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Pemeriksaan senyap di setiap peluncuran. Hanya menampilkan sesuatu jika ada pembaruan.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Permintaan yang tidak menghasilkan apa pun selama ini dianggap macet. Ini terjadi saat worker server mati (misalnya karena kehabisan memori GPU) sementara proses tetap berjalan.";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — vokal jelas, 8-bit (direkomendasikan)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — vokal jelas, GPTQ 4-bit (lebih hemat memori)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — vokal jelas, presisi penuh";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — suara lebih penuh";
 "About LLMTray" = "Mengenai LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Ditambahkan ke prompt sistem setiap kali alat ditawarkan. Templat alat bawaan model hanya menjelaskan cara memanggil alat, bukan kapan tidak memanggilnya. Kosongkan untuk menonaktifkannya.";
 "Advanced" = "Lanjutan";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "Sudah terbuka di tab lain";
 "Also check when LLMTray starts" = "Periksa juga saat LLMTray dimulai";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Juga mengedit gambar — satu dari obrolan atau yang Anda lampirkan. Pengeditan memakan beberapa menit.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Sebuah editor, agen, atau skrip yang meminta model selain yang sedang dimuat. Beralih akan memuat keluar model yang dimuat — begitu juga chat. Tanyakan dulu: notifikasi dengan Opsi Beralih / Pertahankan; tanpa jawaban dalam satu menit dianggap Pertahankan. Pertahankan: klien menerima kesalahan yang menyebutkan model yang dimuat. Chat bawaan aplikasi selalu beralih.";
 "Another model already uses this alias." = "Model lain sudah menggunakan alias ini.";
+"Another version next to this one (a new seed, the same request)" = "Versi lain di samping ini (seed baru, permintaan sama)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Flag mlx_lm.server lainnya, dipisahkan spasi, mis. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "Bahasa app";
 "Apply to profile" = "Terapkan ke profil";
+"Ask first" = "Tanyakan dulu";
 "Assistant" = "Asisten";
 "Attach image(s) for the model to see" = "Lampirkan gambar agar dapat dilihat model.";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention pada 8-bit, feed‑forward pada 4-bit — keseimbangan ukuran/stabilitas terbaik, tervalidasi terhadap 4-bit seragam.";
+"Audio quality" = "Kualitas audio";
 "Auto-compact" = "Ringkas otomatis";
 "Auto-restart after %lld stalls" = "Mulai ulang otomatis setelah %lld kali macet";
 "Auto-restart: off" = "Mulai ulang otomatis: mati";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "Tala kinerja otomatis";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Dirata-ratakan menjadi satu hasil di bawah. Proses pemanasan sekali pakai selalu dijalankan sebelumnya, sehingga waktu kompilasi kernel Metal pada panggilan pertama tidak pernah membiaskan angka.";
 "Balanced (default)" = "Seimbang (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Sebelum gambar atau lagu dibuat, menampilkan apa yang diminta model — prompt, model, pengaturan — agar dapat diubah terlebih dulu. Akan berjalan otomatis setelah hitungan mundur kecuali Anda mengintervensi.";
 "Benchmark" = "Tolok ukur";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Tolok ukur dijalankan pada model yang sedang dimuat. Penalaan otomatis menulis hasilnya ke profil model tersebut.";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "Batal";
 "Cancel download" = "Batalkan unduhan.";
 "Canvas size" = "Ukuran kanvas";
+"Change the prompt, the model or the shape, then make another version" = "Ubah prompt, model, atau shape, lalu buat versi lain";
+"Change the style, lyrics, model or knobs, then make another version" = "Ubah gaya, lirik, model, atau pengaturan, lalu buat versi lain";
 "Chat" = "Obrolan";
 "Chat name" = "Nama chat";
 "Chat tools" = "Alat obrolan";
@@ -80,10 +97,15 @@
 "Composing…" = "Menyusun…";
 "Concurrent requests" = "Permintaan bersamaan";
 "Copy" = "Salin";
+"Copy the song as an audio file" = "Salin lagu sebagai berkas audio";
+"Copy the text" = "Salin teks";
 "Couldn't create the report: %@" = "Gagal membuat laporan: %@";
+"Countdown" = "Hitungan mundur";
 "Country facts" = "Fakta negara";
 "Crash reports (%lld)" = "Laporan crash (%lld)";
 "Create Email…" = "Buat Email…";
+"Creativity" = "Kreativitas";
+"Creator mode" = "Mode Kreator";
 "Currency rates" = "Kurs mata uang";
 "Current settings are already fastest" = "Pengaturan saat ini sudah paling cepat";
 "Date & time" = "Tanggal & waktu";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Cepat (kanvas lebih kecil)";
 "Fetching file list…" = "Mengambil daftar berkas…";
 "Fits comfortably" = "Muatan pas";
+"Follow the description" = "Ikuti deskripsi";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan model draf yang dipublikasikan (Gemma 4 26B): model ekstra kecil menebak token berikutnya terlebih dahulu dan model utama memeriksanya dalam satu lintasan. Output sama, lebih cepat. Permintaan kemudian dilayani satu per satu.";
 "Free on disk: %@ · your models: %@" = "Tersisa di disk: %@ · model Anda: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Membebaskan memori yang digunakan model termuat setelah selama ini tanpa permintaan. Model dimuat ulang secara otomatis pada permintaan berikutnya, dengan jeda pemuatan seperti biasa.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Dibatasi: terima lisensinya di halaman Hugging Face model ini, lalu tambahkan token di Pengaturan → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Dibatasi: minta akses di halaman Hugging Face model ini (penulis meninjau), lalu tambahkan token di Pengaturan → Models.";
 "General" = "Umum";
+"Generate" = "Jalankan";
 "Generated in %.1fs" = "Dihasilkan dalam %.1fs";
 "Generating image…" = "Membuat gambar…";
 "Generating music…" = "Menghasilkan musik…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "Kualitas tinggi (kanvas lebih besar)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Fidelitas tertinggi, unduhan terbesar — tolok ukur ketepatan yang dapat Anda percayai.";
 "Hourly forecast" = "Prakiraan per jam";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Seberapa berani dan tak terduga musiknya. hanya turbo: sft tidak memiliki perencana lagu untuk variasi.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Bagaimana lagu disimpan, dicadangkan, dan dibagikan. AAC 256 kbit/s: ~1 MB per 30 s, tidak bisa dibedakan pada sebagian besar pendengaran. WAV tak terkompresi: ~6 MB per 30 s.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Seberapa ketat musik mengikuti gaya yang dideskripsikan model. Lebih tinggi: lebih mendekati; lebih rendah: lebih bebas.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face merespons HTTP %d untuk %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face menolak %@ (HTTP %d): model dibatasi, privat, atau tidak ada. Jika dibatasi, terima lisensinya di huggingface.co/%@ dan periksa token di Pengaturan → Models.";
 "Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Idle -- model dimuat ulang pada pesan berikutnya";
+"Image" = "Gambar";
 "Image editing" = "Pengeditan gambar";
 "Image generation" = "Pembuatan gambar";
 "Image generation failed: %@" = "Pembuatan gambar gagal: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "Chat-nya tetap ada, kembali di antara terbaru.";
 "KV cache" = "Cache KV";
 "KV group size" = "Ukuran grup KV";
+"Keep" = "Pertahankan";
+"Keep %@ loaded" = "Pertahankan %@ dimuat";
 "Keep current" = "Pertahankan saat ini";
 "Keep first messages: %lld" = "Pertahankan pesan pertama: %lld";
 "Keep last messages: %lld" = "Pertahankan pesan terakhir: %lld";
+"Keep the loaded model" = "Pertahankan model yang dimuat";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Obrolan";
@@ -181,11 +212,11 @@
 "Library" = "Perpustakaan";
 "Likes" = "Suka";
 "Live output of the model process: loading, errors, requests." = "Output langsung dari proses model: pemuatan, kesalahan, permintaan.";
+"Load %@" = "Muat %@";
+"Loaded: %1$@ · selected: %2$@" = "Dimuat: %1$@ · dipilih: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Memuat model yang terakhir digunakan segera, sehingga siap tanpa menekan Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
 "Maintenance" = "Pemeliharaan";
-"Make this image again (a new seed, the same request)" = "Buat ulang gambar ini (seed baru, permintaan sama)";
-"Make this music again (a new seed, the same request)" = "Buat ulang musik ini (seed baru, permintaan sama)";
 "Manage Models…" = "Kelola Model…";
 "Max tokens" = "Token maksimum";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
@@ -194,14 +225,17 @@
 "Model" = "Model";
 "Model actions" = "Tindakan model";
 "Model card" = "Kartu model";
+"Model switching" = "Beralih model";
 "Models" = "Model";
 "Models folder" = "Folder model";
 "Models: %@ · free: %@" = "Model: %@ · tersisa: %@";
 "Move to Project" = "Pindah ke Proyek";
+"Music" = "Musik";
 "Music generation" = "Pembuatan musik";
 "Music generation failed: %@" = "Pembuatan musik gagal: %@";
 "Music generation finished but produced no audio." = "Pembuatan musik selesai tetapi tidak menghasilkan audio.";
 "Music generation isn't set up -- turn it on again in Settings." = "Pembuatan musik belum disiapkan — aktifkan kembali di Pengaturan.";
+"Music model" = "Model musik";
 "Name new chats automatically" = "Beri nama chat baru secara otomatis";
 "Network" = "Jaringan";
 "Never" = "Tidak Pernah";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Mati: hanya Mac ini yang dapat mengakses server. Nyala: perangkat lain di jaringan Anda juga dapat mengaksesnya — siapa pun di jaringan itu, jadi gunakan hanya di jaringan yang Anda percayai.";
 "Older" = "Lebih lama";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
+"Only turbo has this knob: sft has no song planner to vary." = "Hanya turbo yang memiliki pengaturan ini: sft tidak punya perencana lagu untuk variasi.";
 "Open Server Log…" = "Buka Log Server…";
 "Open in New Tab" = "Buka di Tab Baru";
 "Open in Window" = "Buka di Jendela";
@@ -308,6 +343,7 @@
 "Search" = "Cari";
 "Search Hugging Face (mlx models)…" = "Cari di Hugging Face (model mlx)…";
 "Search chats" = "Cari chat";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Detik sebelum draf dijalankan sebagaimana adanya. 0: tunggu sampai Anda menekan Jalankan.";
 "Select Tab" = "Pilih Tab";
 "Select a component to see its license." = "Pilih komponen untuk melihat lisensinya.";
 "Send" = "Kirim.";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "Profil pengaturan untuk model ini.";
 "Settings this profile overrides; everything else comes from Default." = "Pengaturan yang ditimpa profil ini; selebihnya berasal dari Default.";
 "Settings…" = "Pengaturan…";
+"Shape" = "Shape";
+"Share…" = "Bagikan…";
 "Show Chat Window" = "Tampilkan Jendela Chat";
 "Show Next Tab" = "Tampilkan Tab Berikutnya";
 "Show Previous Tab" = "Tampilkan Tab Sebelumnya";
@@ -337,6 +375,8 @@
 "Show tool calls" = "Tampilkan pemanggilan alat";
 "Shows the chat window" = "Menampilkan jendela obrolan";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Menyanyikan lirik dengan jelas, vokal di depan. Sekitar 40 s untuk 30 s musik.";
+"Skip" = "Lewati";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Paling kecil dan agresif — dapat menggeser komposisi hasil pada beberapa prompt.";
 "Something went wrong?" = "Ada yang salah?";
 "Sort by" = "Urutkan menurut";
@@ -350,6 +390,7 @@
 "Start server" = "Mulai server.";
 "Start the server first." = "Mulai server terlebih dahulu.";
 "Start the server when LLMTray opens" = "Mulai server saat LLMTray dibuka";
+"Starting in %.0f s…" = "Mulai dalam %.0f s…";
 "Starting…" = "Memulai…";
 "Startup" = "Saat Memulai";
 "Step %lld/%lld" = "Langkah %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Menghentikan model obrolan saat gambar atau musik sedang dibuat, lalu memuat ulang setelahnya. Menjalankan keduanya sekaligus bisa melebihi memori Mac ini.";
 "Sunrise & sunset" = "Matahari terbit & terbenam";
 "Support" = "Dukungan";
+"Switch" = "Beralih";
+"Switch at once" = "Beralih segera";
+"Switch models?" = "Beralah model?";
+"Switch the music model?" = "Ganti model musik?";
 "System" = "Sistem";
 "System prompt" = "Prompt sistem";
 "Tab %lld" = "Tab %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Mencoba decode-concurrency (1/2/4/8) dan prefill-step-size (64/128/256/512) pada model yang berjalan, memulai ulang server di antara tiap percobaan, lalu menyimpan yang terukur paling cepat.";
+"Tweak…" = "Atur…";
+"Uncompressed (WAV)" = "Tak terkompresi (WAV)";
 "Uninstall" = "Copot";
 "Uninstall Runtime Data…" = "Copot Data Runtime…";
 "Uninstall runtime data?" = "Copot data runtime?";
@@ -424,6 +471,7 @@
 "Web search" = "Pencarian web";
 "What happened?" = "Apa yang terjadi?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Apa yang Anda lakukan, apa yang Anda harapkan, dan apa yang Anda lihat sebaliknya. Obrolan Anda tidak pernah disertakan.";
+"When a client asks for another model" = "Saat klien meminta model lain";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "gagal membangun permintaan";
 "mlx-lm runtime" = "Runtime mlx-lm";
 "not used by any model" = "tidak digunakan oleh model mana pun";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: mix yang lebih penuh dan terdengar matang. sft: lirik terdengar jelas, vokal di depan, membutuhkan waktu kira-kira dua kali lebih lama untuk dibuat.";
 "used by %@" = "digunakan oleh %@";
 "· size…" = "· ukuran…";

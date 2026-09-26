@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ запрашивает %2$@";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запрашивает %2$@. Переключение выгружает текущую модель.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ закрыт: примите его лицензию на huggingface.co/%@, затем добавьте токен Hugging Face в Настройки → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ещё не загружен — снова включите генерацию изображений в Настройках.";
 "%@ wasn't found on Hugging Face." = "%@ не найден на Hugging Face.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "Переопределено: %d, остальное из Default · %@";
 "%lld MB" = "%lld МБ";
 "%lld downloads" = "%lld загрузок";
+"%lld s" = "%lld с";
 "%lld-bit" = "%lld бит";
 "(Please attach the report file shown in Finder.)" = "(Пожалуйста, прикрепите файл отчёта, показанный в Finder.)";
 "(no result yet)" = "(пока нет результатов)";
 "(no server output yet)" = "(вывода сервера пока нет)";
+"A client" = "Клиент";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Более плотный, готовый звук; слова слышны менее отчётливо. Примерно 20 с на 30 с музыки.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Тихая проверка при каждом запуске. Что-то показывает, только если есть обновление.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Запрос, который столько времени ничего не выдаёт, считается зависшим. Так бывает, когда рабочий поток сервера умирает (например, кончилась память GPU), а сам процесс продолжает жить.";
+"AAC %lld kbit/s" = "AAC %lld кбит/с";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — чистые вокалы, 8‑бит (рекомендуется)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чистые вокалы, GPTQ 4‑бит (меньше памяти)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — чистые вокалы, полная точность";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — более полный звук";
 "About LLMTray" = "О LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Добавляется к системному промпту, когда модели доступны инструменты. Шаблон инструментов самой модели говорит только, как их вызывать, но не когда этого делать не нужно. Пусто — выключено.";
 "Advanced" = "Дополнительно";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "Уже открыт в другой вкладке";
 "Also check when LLMTray starts" = "Также проверять при запуске LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Также умеет редактировать изображения — из чата или прикреплённые вами. Редактирование занимает несколько минут.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Редактор, агент или скрипт запрашивает модель, отличную от загруженной. Переключение выгружает текущую модель и связанную с ней переписку. Сначала спрашивать: уведомление с вариантами Switch / Keep; отсутствие ответа в течение минуты считается Keep. Keep: клиенту возвращается ошибка с указанием загруженной модели. Собственный чат приложения всегда переключается.";
 "Another model already uses this alias." = "Этот алиас уже занят другой моделью.";
+"Another version next to this one (a new seed, the same request)" = "Другая версия рядом с этой (новая seed, тот же запрос)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Любые другие флаги mlx_lm.server через пробел, например --draft-model <путь>.";
 "Apache License 2.0" = "Лицензия Apache 2.0";
 "App language" = "Язык приложения";
 "Apply to profile" = "Применить к профилю";
+"Ask first" = "Спрашивать сначала";
 "Assistant" = "Ассистент";
 "Attach image(s) for the model to see" = "Прикрепить изображения, чтобы модель их увидела";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention в 8‑бит, feed‑forward в 4‑бит — лучший баланс размера и устойчивости, проверено против единообразного 4‑бит.";
+"Audio quality" = "Качество аудио";
 "Auto-compact" = "Автосжатие";
 "Auto-restart after %lld stalls" = "Перезапуск после %lld зависаний";
 "Auto-restart: off" = "Автоперезапуск: выкл.";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "Подобрать производительность";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усредняются в один результат ниже. Перед ними всегда идёт пробный прогон, так что компиляция Metal-ядер при первом вызове не искажает цифры.";
 "Balanced (default)" = "Сбалансировано (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Перед созданием изображения или песни показывает, что модель запросила — подсказку, модель, настройки — чтобы вы могли изменить их в первую очередь. По истечении обратного отсчёта процесс продолжится автоматически, если вы не вмешаетесь.";
 "Benchmark" = "Бенчмарк";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Бенчмарк гоняется на загруженной сейчас модели. Автоподбор записывает результат в её профиль.";
 "Beta" = "Бета";
@@ -56,6 +71,8 @@
 "Cancel" = "Отмена";
 "Cancel download" = "Отменить загрузку";
 "Canvas size" = "Размер холста";
+"Change the prompt, the model or the shape, then make another version" = "Измените подсказку, модель или форму, затем создайте другую версию";
+"Change the style, lyrics, model or knobs, then make another version" = "Измените стиль, текст, модель или настройки, затем создайте другую версию";
 "Chat" = "Чат";
 "Chat name" = "Название чата";
 "Chat tools" = "Инструменты чата";
@@ -80,10 +97,15 @@
 "Composing…" = "Создание…";
 "Concurrent requests" = "Параллельные запросы";
 "Copy" = "Копировать";
+"Copy the song as an audio file" = "Скопировать композицию как аудиофайл";
+"Copy the text" = "Скопировать текст";
 "Couldn't create the report: %@" = "Не удалось создать отчёт: %@";
+"Countdown" = "Обратный отсчёт";
 "Country facts" = "Факты о стране";
 "Crash reports (%lld)" = "Отчёты об ошибках (%lld)";
 "Create Email…" = "Создать письмо…";
+"Creativity" = "Творчество";
+"Creator mode" = "Режим автора";
 "Currency rates" = "Курсы валют";
 "Current settings are already fastest" = "Текущие настройки уже самые быстрые";
 "Date & time" = "Дата и время";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Быстро (меньше холст)";
 "Fetching file list…" = "Получение списка файлов…";
 "Fits comfortably" = "Помещается с запасом";
+"Follow the description" = "Следовать описанию";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей с опубликованным драфтером (Gemma 4 26B): маленькая модель угадывает токены наперёд, а основная проверяет их за один проход. Ответ тот же, но быстрее. Запросы при этом обрабатываются по одному.";
 "Free on disk: %@ · your models: %@" = "Свободно на диске: %@ · ваши модели: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Освобождает память, занятую моделью, после стольких минут без запросов. Модель сама загрузится при следующем запросе, с обычной задержкой.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Закрыт: примите лицензию на странице модели на Hugging Face и добавьте токен в Настройки → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Закрыт: запросите доступ на странице модели на Hugging Face (авторы рассматривают запрос), затем добавьте токен в Настройки → Models.";
 "General" = "Основные";
+"Generate" = "Создать";
 "Generated in %.1fs" = "Сгенерировано за %.1fs";
 "Generating image…" = "Генерирую картинку…";
 "Generating music…" = "Генерация музыки…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "Высокое качество (большой холст)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Максимальная точность, самый большой объём загрузки — эталон корректности, которому можно доверять.";
 "Hourly forecast" = "Почасовой прогноз";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Насколько смелой и неожиданной будет музыка. Только для turbo: у sft нет планировщика песни для вариаций.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Сколько токенов промпта обрабатывается за шаг. Больше — быстрее на длинных промптах, но нужно больше памяти. Может подобрать автоподбор в бенчмарке.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Сколько запросов объединяется в один шаг GPU. Помогает, только когда к серверу обращаются несколько клиентов сразу; расходует больше памяти.";
 "How many tokens it generates per trial." = "Сколько токенов генерируется за прогон.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Как треки хранятся, сохраняются и расшариваются. AAC 256 кбит/с: примерно 1 МБ за 30 с, неотличимо при обычном прослушивании. Несжатый WAV: примерно 6 МБ за 30 с.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Насколько строго музыка следует описанному модели стилю. Больше — ближе к нему; меньше — свободнее.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face вернул HTTP %d для %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face отклонил %@ (HTTP %d): модель закрыта, приватна или не существует. Если она закрыта, примите лицензию на huggingface.co/%@ и проверьте токен в Настройки → Models.";
 "Hugging Face token" = "Токен Hugging Face";
 "Idle -- the model reloads on the next message" = "Простой -- модель загрузится при следующем сообщении";
+"Image" = "Изображение";
 "Image editing" = "Редактирование изображений";
 "Image generation" = "Генерация картинок";
 "Image generation failed: %@" = "Не удалось сгенерировать изображение: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "Его чаты останутся и вернутся в недавние.";
 "KV cache" = "KV-кэш";
 "KV group size" = "Группа KV";
+"Keep" = "Оставить";
+"Keep %@ loaded" = "Оставить загруженной %@";
 "Keep current" = "Оставить как есть";
 "Keep first messages: %lld" = "Первых сообщений сохранять: %lld";
 "Keep last messages: %lld" = "Последних сообщений сохранять: %lld";
+"Keep the loaded model" = "Оставить текущую модель загруженной";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Первые N токенов контекста хранятся в полной точности, дальше квантуются. Больше — точнее на длинных промптах, но меньше экономия памяти.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Чат";
@@ -181,11 +212,11 @@
 "Library" = "Библиотека";
 "Likes" = "Нравится";
 "Live output of the model process: loading, errors, requests." = "Живой вывод процесса модели: загрузка, ошибки, запросы.";
+"Load %@" = "Загрузить %@";
+"Loaded: %1$@ · selected: %2$@" = "Загружено: %1$@ · выбрано: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Сразу загружает последнюю модель, чтобы не нажимать Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Пишет в лог каждый сгенерированный токен (DEBUG). Только для отладки процесса модели — замедляет работу. Действует со следующего запуска сервера.";
 "Maintenance" = "Обслуживание";
-"Make this image again (a new seed, the same request)" = "Создать это изображение заново (новый seed, тот же запрос)";
-"Make this music again (a new seed, the same request)" = "Создать эту музыку заново (новый seed, тот же запрос)";
 "Manage Models…" = "Управлять моделями…";
 "Max tokens" = "Макс. токенов";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Память под контекст прошлых разговоров, чтобы продолженный чат не перечитывал всю историю. Ограничена, чтобы не расти, пока у сервера не кончится память.";
@@ -194,14 +225,17 @@
 "Model" = "Модель";
 "Model actions" = "Действия с моделью";
 "Model card" = "Карточка модели";
+"Model switching" = "Переключение модели";
 "Models" = "Модели";
 "Models folder" = "Папка моделей";
 "Models: %@ · free: %@" = "Модели: %@ · свободно: %@";
 "Move to Project" = "Переместить в проект";
+"Music" = "Музыка";
 "Music generation" = "Генерация музыки";
 "Music generation failed: %@" = "Генерация музыки не удалась: %@";
 "Music generation finished but produced no audio." = "Генерация музыки завершилась, но аудио не создано.";
 "Music generation isn't set up -- turn it on again in Settings." = "Генерация музыки не настроена — включите её в Настройках.";
+"Music model" = "Музыкальная модель";
 "Name new chats automatically" = "Автоматически именовать новые чаты";
 "Network" = "Сеть";
 "Never" = "Никогда";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Выкл. — к серверу подключается только этот Mac. Вкл. — любые устройства в вашей сети, поэтому включайте только в доверенных сетях.";
 "Older" = "Раньше";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Только для закрытых моделей (Llama, некоторые репозитории Gemma и FLUX): примите лицензию модели на её странице Hugging Face, затем вставьте сюда токен чтения. Хранится в Keychain, отправляется только на huggingface.co.";
+"Only turbo has this knob: sft has no song planner to vary." = "Этот регулятор есть только у turbo: у sft нет планировщика песни для вариаций.";
 "Open Server Log…" = "Открыть лог сервера…";
 "Open in New Tab" = "Открыть в новой вкладке";
 "Open in Window" = "Открыть в окне";
@@ -308,6 +343,7 @@
 "Search" = "Поиск";
 "Search Hugging Face (mlx models)…" = "Поиск на Hugging Face (модели mlx)…";
 "Search chats" = "Поиск по чатам";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Секунд до автоматического запуска черновика. 0: дождаться нажатия «Создать».";
 "Select Tab" = "Выбрать вкладку";
 "Select a component to see its license." = "Выберите компонент, чтобы просмотреть его лицензию.";
 "Send" = "Отправить";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "Профиль настроек этой модели";
 "Settings this profile overrides; everything else comes from Default." = "Сколько настроек переопределяет профиль; остальное берётся из Default.";
 "Settings…" = "Настройки…";
+"Shape" = "Форма";
+"Share…" = "Поделиться…";
 "Show Chat Window" = "Показать окно чата";
 "Show Next Tab" = "Показать следующую вкладку";
 "Show Previous Tab" = "Показать предыдущую вкладку";
@@ -337,6 +375,8 @@
 "Show tool calls" = "Показывать вызовы инструментов";
 "Shows the chat window" = "Показывает окно чата";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показывает размышления модели (сворачиваемый блок «Thought process») над ответом.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Вокал отчётливый, голос спереди. Примерно 40 с на 30 с музыки.";
+"Skip" = "Пропустить";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Самый компактный и агрессивный — на некоторых подсказках может заметно смещать композицию.";
 "Something went wrong?" = "Что-то пошло не так?";
 "Sort by" = "Сортировка";
@@ -350,6 +390,7 @@
 "Start server" = "Запустить сервер";
 "Start the server first." = "Сначала запустите сервер.";
 "Start the server when LLMTray opens" = "Запускать сервер при открытии LLMTray";
+"Starting in %.0f s…" = "Старт через %.0f с…";
 "Starting…" = "Запуск…";
 "Startup" = "Запуск";
 "Step %lld/%lld" = "Шаг %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Останавливает чат‑модель во время генерации изображения или музыки и перезагружает её после. Одновременные задачи могут превысить память этого Mac.";
 "Sunrise & sunset" = "Восход и закат";
 "Support" = "Поддержка";
+"Switch" = "Переключить";
+"Switch at once" = "Переключать сразу";
+"Switch models?" = "Переключить модель?";
+"Switch the music model?" = "Поменять музыкальную модель?";
 "System" = "Системный";
 "System prompt" = "Системный промпт";
 "Tab %lld" = "Вкладка %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирает decode-concurrency (1/2/4/8) и prefill-step-size (64/128/256/512) на запущенной модели, перезапуская сервер между попытками, и оставляет самое быстрое.";
+"Tweak…" = "Настроить…";
+"Uncompressed (WAV)" = "Несжатый (WAV)";
 "Uninstall" = "Удалить";
 "Uninstall Runtime Data…" = "Удалить данные рантайма…";
 "Uninstall runtime data?" = "Удалить данные рантайма?";
@@ -424,6 +471,7 @@
 "Web search" = "Веб‑поиск";
 "What happened?" = "Что произошло?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Что вы делали, чего ожидали и что увидели вместо этого. Ваши чаты никогда не включаются.";
+"When a client asks for another model" = "Когда клиент запрашивает другую модель";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Где LLMTray ищет MLX-модели (по папке на модель, например <org>/<name>). Укажите ~/.lmstudio/models, чтобы делить модели с LM Studio.";
 "Which model generates new images." = "Какая модель генерирует новые изображения.";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "не удалось составить запрос";
 "mlx-lm runtime" = "Среда выполнения mlx-lm";
 "not used by any model" = "не используется ни одной моделью";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: более плотный, готовый микс. sft: отчётливый вокал, голос спереди, занимает примерно вдвое больше времени.";
 "used by %@" = "используют: %@";
 "· size…" = "· размер…";
