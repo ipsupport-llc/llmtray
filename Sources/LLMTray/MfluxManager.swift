@@ -14,7 +14,8 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
     case gptq4bit
     case gptqMixed
     /// FLUX.2 klein 4B (Apache 2.0): generates and also edits an image
-    /// (edit_image). Text encoder 8-bit, transformer 4-bit.
+    /// (edit_image). Text encoder 8-bit (its 27 used layers), transformer
+    /// GPTQ 4-bit (quant-ternary flux2-quant).
     case klein4b
 
     var id: String { rawValue }
@@ -36,7 +37,7 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         case .gptq8bit: return "~10GB"
         case .gptq4bit: return "~5.5GB"
         case .gptqMixed: return "~6.3GB"
-        case .klein4b: return "~6.2GB"
+        case .klein4b: return "~5.3GB"
         }
     }
 
