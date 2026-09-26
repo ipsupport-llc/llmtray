@@ -45,14 +45,28 @@ chat of the project, reached by the chat model through tools.
 - **Extraction in tiers**, cheapest first; a page takes the first tier
   whose text passes the junk check: (1) text layer — PDFKit, docx/doc/
   odt/rtf via `NSAttributedString`, HTML via LLMTrayCore `WebParsing`,
-  plain text and code, xlsx/pptx from their XML; (2) Vision OCR for
+  plain text and code, xlsx/pptx from their XML, and the legacy binary
+  .xls / .ppt (supported: the user's call — how is a spike question,
+  below); (2) Vision OCR for
   scans and photos; (3) a document VLM for hard pages. Images get OCR
   and a short description, both indexed, so a photo is found by what it
-  shows. All three tiers are in the product's scope; the plan orders
-  them.
+  shows. The description comes from a small built-in VLM beside the
+  chat model, not the chat model itself (the user's call): candidates
+  (Florence-2, SmolVLM2, moondream2 — licences and MLX support checked
+  in the spike) are compared on the eval images. All three tiers are in
+  the product's scope; the plan orders them.
 - **Retrieval, not stuffing**: no "whole project in the request" mode.
-- **Files are immutable snapshots** copied into the project; replacing
-  one is remove + add. The UI calls them copies.
+- **Copies or linked folders — the user's choice**, per source:
+  - *added files* are immutable copies in the project; replacing one is
+    remove + add;
+  - *linked folders* stay where they are: watched with FSEvents, a
+    changed file (mtime, then hash) re-indexed, a removed one dropped
+    from search; a citation to a file that has since changed or gone
+    says so. The folder is remembered by a bookmark, so a rename or
+    move doesn't lose it.
+- **Project instructions**: text the user writes for the project, added
+  to the system prompt of every chat in it (it's the user's, trusted —
+  unlike document text).
 - **Document text is data, never instructions**, enforced by what the
   code declares and sends, not by asking the model.
 - **Everything stays on the Mac.** A temporary chat has no project; the
@@ -160,6 +174,16 @@ until it commits. At project open a reconcile pass finishes or undoes
 every state (staging leftovers, files without rows, rows without files,
 interrupted extraction, `removing`).
 
+**Linked folders.** A `sources(id, kind, bookmark, path)` table: `copy`
+or `folder`; a document of a folder source keeps its relative path and
+the mtime + hash it was indexed at. FSEvents (and a full rescan at
+project open, since events are lost while the app isn't running) queue
+changed files for re-index through the same states; a file that
+vanished goes `removing`. A document of a linked folder is read from
+the folder when quoted or opened; if it changed since indexing, the
+tool says the text may be stale. Symlinks leaving the folder and
+packages/bundles are skipped; the caps count linked files too.
+
 **Concurrency.** An app-wide `ProjectIndexRegistry` owns one writer per
 project (tabs don't: `ChatToolbox` is per tab) plus a read-only WAL
 connection for searches, so tabs don't queue behind an ingest. No
@@ -256,6 +280,9 @@ contextual-retrieval.
 1. **Spike (throwaway).** Schema, triggers, both FTS tables on a few
    hundred chunks; `--extract` on hostile samples (corrupt PDF, zip-bomb
    docx, remote-loading HTML); injection documents against the tools;
+   legacy .xls / .ppt: xlrd-style BIFF parsing for .xls, the text
+   records of .ppt's binary stream, or Quick Look rendering + OCR as the
+   fallback — whichever gives full text on sample files;
    the generic embed runner with bge-m3 on MLX, matching the reference
    (FlagEmbedding / sentence-transformers) vectors, plus a second
    registry entry of another family to prove the registry isn't bge-only.
@@ -268,12 +295,14 @@ contextual-retrieval.
    ML policy, `ProjectIndex` and the registry,
    ingestion and reconcile, tier 1 with the junk check, `--extract`,
    caps, the three tools, budget, elision, trust rules, compaction
-   exclusion, citations, the Files view, New Chat in Project, deletion,
+   exclusion, citations, the Files view, New Chat in Project, project
+   instructions, deletion,
    the tests above. Exit: text-document recall on the eval set, the
    injection tests passing.
 4. **v1b — every format**: tier 2 (Vision OCR, segmentation,
    perspective, `RecognizeDocumentsRequest` tables on macOS 26+), image
-   descriptions, xlsx/pptx. Exit: CER and recall on the scanned part of
+   descriptions (the small VLM), xlsx/pptx and .xls/.ppt, linked folders
+   with FSEvents. Exit: CER and recall on the scanned part of
    the eval set, peak memory within the Metal limit.
 5. **v2 — images as material**: project images for `edit_image` by a
    `doc` argument (pinned through Regenerate,
@@ -282,20 +311,19 @@ contextual-retrieval.
    (bge-reranker-v2-m3 or similar — not Qwen) kept only if it moves
    recall.
 
-## Open questions (the user's to decide)
+## Decided with the user (2026-09-26)
 
-- Scale: 1-2k documents per project, or tens of thousands (then a
-  vector index)?
-- Legacy binary .xls / .ppt: unsupported ("save as xlsx/pptx"), .doc is
-  read natively?
-- Spreadsheets: besides chunks, a tool that loads sheets into SQLite
-  tables for the model to query (sums, filters) — in v1 or later?
-- Image descriptions: the chat model (sees images, ~10 s each, competes
-  with generation) or a small VLM beside it?
-- Project instructions (text added to every chat of the project)?
-- Copies in the project folder, or references to the user's folders
-  with re-indexing on change (less disk for many documents, more
-  moving parts)?
+- Scale: 1-2k documents per project, brute force.
+- Legacy .xls / .ppt: supported.
+- Image descriptions: a small built-in VLM.
+- Project instructions: yes.
+- Copies or linked folders: both, the user picks per source.
+- Embedder: bge-m3 by default, configurable, never Qwen.
+
+## Open questions
+
+- Spreadsheets: besides chunks (rows with their header), a tool that
+  loads sheets into SQLite tables for the model to query (sums,
+  filters)? Undecided; proposed as a v2 experiment once the eval shows
+  whether table questions fail with chunks alone.
 - The caps' values; the budget's share of the context.
-- Whether an original's later edits should ever be offered as an update
-  (snapshots today).
