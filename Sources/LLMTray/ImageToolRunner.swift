@@ -63,11 +63,16 @@ final class ImageToolRunner: ChatTool {
     /// -- so a model stuck repeating the call doesn't make the chat model
     /// unload/reload (or the "Generating image…" UI flash) for nothing.
     /// `chatImages`: an edit_image call that will only be refused (no
-    /// image, a bad index) doesn't count.
+    /// image, a bad index) doesn't count, nor one whose model isn't set up
+    /// (mflux would refuse it only after the chat model's unload).
     func willGenerate(_ calls: [ToolCall], settings: ChatSettings, chatImages: [(data: Data, prompt: String)] = []) -> Bool {
         calls.contains { call in
-            Self.runsGenerator(call.name, settings) && (call.name != EditImageTool.toolName
-                || EditImageTool.willRun(ChatToolbox.parseArguments(call.argumentsJSON), in: chatImages))
+            guard Self.runsGenerator(call.name, settings) else { return false }
+            if call.name == EditImageTool.toolName {
+                guard let model = settings.imageEditModel, mflux.isReady(model) else { return false }
+                return EditImageTool.willRun(ChatToolbox.parseArguments(call.argumentsJSON), in: chatImages)
+            }
+            return mflux.isReady(settings.imageGenModel)
         } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
