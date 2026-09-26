@@ -16,7 +16,7 @@ struct MessageBubble: View {
     var sources: [String] = []
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.
-    var regenerateMedia: ((ChatClient.MediaKind, Int) -> Void)?
+    var regenerateMedia: ((ChatClient.MediaKind, Int, ChatClient.MediaAction) -> Void)?
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
@@ -104,7 +104,8 @@ struct MessageBubble: View {
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
                 AudioClipView(data: data, id: "\(message.id.uuidString)-\(i)", prompt: message.audioPrompts[safe: i] ?? "",
                               generationSeconds: message.audioDurations[safe: i],
-                              regenerate: canRegenerate(.music, i) && regenerateMedia != nil ? { regenerateMedia?(.music, i) } : nil)
+                              canRegenerate: canRegenerate(.music, i),
+                              action: regenerateMedia.map { act in { act(.music, i, $0) } })
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
             }
@@ -165,12 +166,25 @@ struct MessageBubble: View {
                     }
                     .buttonStyle(.plain)
                     if canRegenerate(.image, i) {
-                        Button { regenerateMedia?(.image, i) } label: {
+                        Button { regenerateMedia?(.image, i, .regenerate) } label: {
                             Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
                         }
                         .buttonStyle(.plain)
                         .disabled(regenerateMedia == nil)
-                        .help(Text("Make this image again (a new seed, the same request)"))
+                        .help(Text("Another version next to this one (a new seed, the same request)"))
+                        Button { regenerateMedia?(.image, i, .tweak) } label: {
+                            Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(regenerateMedia == nil)
+                        .help(Text("Change the prompt, the model or the shape, then make another version"))
+                    }
+                    if !isUser {
+                        Button { regenerateMedia?(.image, i, .remove) } label: {
+                            Label("Remove", systemImage: "trash").font(.system(size: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(regenerateMedia == nil)
                     }
                     if let seconds = message.imageDurations[safe: i] {
                         Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.system(size: 10))

@@ -32,6 +32,10 @@ final class ChatClient: ObservableObject {
     @Published private(set) var musicStatusText: String = ""
     @Published private(set) var musicProgress: Int?
     enum MediaKind { case image, music }
+    /// What a generated image's or song's buttons do.
+    enum MediaAction { case regenerate, tweak, remove }
+    /// Creator mode's draft on screen, waiting for the user or its countdown.
+    @Published var draft: GenerationDraft?
     /// Waiting in the app-wide generator queue: how many are ahead (the
     /// running one included); nil once it runs.
     @Published private(set) var mediaQueuePosition: Int?
@@ -492,18 +496,18 @@ final class ChatClient: ObservableObject {
 
     /// The same for music generation: mlx-audio and ACE-Step 1.5's
     /// checkpoints, before the toggle turns on.
-    func downloadMusicModel() async -> Error? {
+    func downloadMusicModel(_ model: MusicModel) async -> Error? {
         isDownloadingModel = true
         defer { isDownloadingModel = false }
         do {
-            try await musicManager.download()
+            try await musicManager.download(model)
             return nil
         } catch {
             return error
         }
     }
 
-    var isMusicModelReady: Bool { musicManager.isReady }
+    func isMusicModelReady(_ model: MusicModel) -> Bool { musicManager.isReady(model) }
 
     /// A model download from Settings (not in the queue) holds the image or
     /// music generator: a granted turn waits for it rather than unloading
@@ -534,10 +538,35 @@ final class ChatClient: ObservableObject {
         return String(decoding: data, as: UTF8.self)
     }
 
+    /// An image put in (`by` 1) at, or taken out (`by` -1) from before,
+    /// message `j`'s image `image`: the edit_image calls pinned to an image
+    /// after it (by its place among the chat's images) follow it there.
+    private func shiftPinnedEditIndices(message j: Int, image: Int, by delta: Int) {
+        func counts(_ m: ChatMessage) -> Bool { (m.role == "assistant" || m.role == "user") && !m.isToolContext }
+        guard counts(messages[j]) else { return }
+        // 1-based place of the first image that moves.
+        let first = messages[..<j].filter(counts).reduce(0) { $0 + $1.images.count } + image + 1
+        for m in messages.indices {
+            for k in messages[m].imageSources.indices where messages[m].imageSources[k].tool == EditImageTool.toolName {
+                let arguments = ChatToolbox.parseArguments(messages[m].imageSources[k].arguments)
+                guard let pinned = arguments["index"] as? Int, pinned >= first || delta < 0 && pinned == first - 1,
+                      // The removed image itself: 0, nothing to edit any more (not made again).
+                      let data = try? JSONSerialization.data(withJSONObject: arguments.merging(["index": pinned >= first ? pinned + delta : 0]) { $1 },
+                                                             options: [.sortedKeys])
+                else { continue }
+                messages[m].imageSources[k].arguments = String(decoding: data, as: UTF8.self)
+            }
+        }
+    }
+
     /// The image or piece of music can be made again (it has its source).
     func canRegenerateMedia(_ message: ChatMessage, _ kind: MediaKind, _ index: Int) -> Bool {
         switch kind {
-        case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(index)
+        case .image:
+            guard message.imageSources.count == message.images.count, message.imageSources.indices.contains(index) else { return false }
+            let source = message.imageSources[index]
+            // An edit of an image since removed.
+            return source.tool != EditImageTool.toolName || ChatToolbox.parseArguments(source.arguments)["index"] as? Int != 0
         case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(index)
         }
     }
@@ -546,30 +575,54 @@ final class ChatClient: ObservableObject {
     /// seed -- and puts it in place of the old one. No chat model request:
     /// only the generator runs (with the chat model unloaded around it, as
     /// in a turn, when that's set).
-    func regenerateMedia(messageID: UUID, kind: MediaKind, index: Int, settings baseSettings: ChatSettings, server: ServerManager) {
+    /// Makes another image or piece of music from the same tool call (a new
+    /// seed) and puts it right after the one it came from: a variant, so
+    /// the one that was there isn't lost (Remove takes either away).
+    /// `tweak`: first the Creator mode draft, prefilled, to change the
+    /// prompt, the model or the knobs. No chat model request: only the
+    /// generator runs (the chat model unloaded around it, as in a turn).
+    func regenerateMedia(messageID: UUID, kind: MediaKind, index: Int, settings baseSettings: ChatSettings,
+                         server: ServerManager, tweak: Bool = false) {
         guard !isBusy, let i = messages.firstIndex(where: { $0.id == messageID }),
               canRegenerateMedia(messages[i], kind, index) else { return }
         let source = kind == .image ? messages[i].imageSources[index] : messages[i].audioSources[index]
-        let settings = currentSettings(baseSettings)
+        let baseline = currentSettings(baseSettings)
         AudioPlayback.shared.stop(ifAnyOf: [messages[i]])
         errorText = nil
-        // The per-turn limits don't apply: nothing else is made meanwhile.
-        toolbox.startTurn()
-        let call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
-        // Only if the generator will really run (it may have been turned off
-        // since): a refusal needs no unload, nor the "Generating…" UI.
-        let runs = kind == .image
-            ? imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
-            : musicTool.willGenerate([call], settings: settings) && musicManager.isReady
         let epoch = conversationEpoch
         let token = turnToken
         // Stop (cancel bumps turnToken and cancels the task) or another
         // chat opened meanwhile: the result is dropped, errors too.
         func stillCurrent() -> Bool { epoch == conversationEpoch && token == turnToken && !Task.isCancelled }
-        isGeneratingMedia = runs
-        generatingKind = runs ? kind : nil
         isRunningTools = true
         toolTask = Task {
+            var call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
+            var settings = GenerationDraft.pinning(source.model, for: call, baseline)
+            var model = source.model
+            if tweak, let draftKind = GenerationDraft.kind(of: call, settings) {
+                guard stillCurrent() else { return }   // Stop before it started: no draft to wait on
+                let draft = GenerationDraft(kind: draftKind, call: call, settings: settings)
+                self.draft = draft
+                let outcome = await draft.decide(countdown: 0)   // asked for: waits for Generate
+                if self.draft === draft { self.draft = nil }
+                guard stillCurrent(), outcome == .run else {
+                    if token == turnToken { isRunningTools = false }
+                    return
+                }
+                call = draft.editedCall
+                // Read again: the draft may have waited long, settings may have changed.
+                settings = draft.apply(to: GenerationDraft.pinning(source.model, for: call, currentSettings(baseSettings)))
+                model = draft.modelID
+            }
+            // The per-turn limits don't apply: nothing else is made meanwhile.
+            toolbox.startTurn()
+            // Only if the generator will really run (it may have been turned
+            // off since): a refusal needs no unload, nor the "Generating…" UI.
+            let runs = kind == .image
+                ? imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
+                : musicTool.willGenerate([call], settings: settings) && musicManager.isReady(settings.musicModel)
+            isGeneratingMedia = runs
+            generatingKind = runs ? kind : nil
             defer {
                 // Only what this run set: a turn started after a Stop keeps its own.
                 if runs {
@@ -600,6 +653,7 @@ final class ChatClient: ObservableObject {
                 isUnloadingModelForMedia = true
                 await server.unloadModel()
             }
+            let variantSource = MediaSource(tool: call.name, arguments: call.argumentsJSON, model: model)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             if unload {
                 do { try await server.ensureModelLoaded() } catch {
@@ -609,28 +663,33 @@ final class ChatClient: ObservableObject {
                 }
             }
             guard stillCurrent(), let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
+            let at = index + 1
+            let id = messages[j].id.uuidString
             switch result {
-            case .generatedImage(let data, let seconds, _, _) where kind == .image && messages[j].images.indices.contains(index):
-                messages[j].images[index] = data
-                if messages[j].imageDurations.indices.contains(index) { messages[j].imageDurations[index] = seconds }
-                // A new file name (a file is never overwritten): the old one
-                // goes with the save. The names the others were saved under
-                // first, for a message never loaded from disk.
-                let id = messages[j].id.uuidString
+            case .generatedImage(let data, let seconds, let prompt, _) where kind == .image && messages[j].images.count >= at:
+                // The names the others were saved under first (a message never
+                // loaded from disk has none yet), then the variant's own.
                 if messages[j].imageFilenames.count != messages[j].images.count {
                     messages[j].imageFilenames = messages[j].images.indices.map { "\(id)-\($0).png" }
                 }
-                messages[j].imageFilenames[index] = "\(UUID().uuidString).png"
-            case .generatedAudio(let data, let seconds, _, _) where kind == .music && messages[j].audios.indices.contains(index):
-                AudioPlayback.shared.stop(ifAnyOf: [messages[j]])   // the old clip, if played meanwhile
-                messages[j].audios[index] = data
-                if messages[j].audioDurations.indices.contains(index) { messages[j].audioDurations[index] = seconds }
-                let id = messages[j].id.uuidString
+                shiftPinnedEditIndices(message: j, image: at, by: 1)
+                messages[j].images.insert(data, at: at)
+                messages[j].imageFilenames.insert("\(UUID().uuidString).png", at: at)
+                if messages[j].imageDurations.count >= at { messages[j].imageDurations.insert(seconds, at: at) }
+                if messages[j].imagePrompts.count >= at { messages[j].imagePrompts.insert(prompt, at: at) }
+                if messages[j].imageSources.count >= at { messages[j].imageSources.insert(variantSource, at: at) }
+            case .generatedAudio(let data, let seconds, let prompt, _) where kind == .music && messages[j].audios.count >= at:
                 if messages[j].audioFilenames.count != messages[j].audios.count {
                     messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
                 }
-                messages[j].audioFilenames[index] = "\(UUID().uuidString).wav"
-            case .text(let text):
+                // A clip's id is its index: one playing now would take the variant's.
+                AudioPlayback.shared.stop(ifAnyOf: [messages[j]])
+                messages[j].audios.insert(data, at: at)
+                messages[j].audioFilenames.insert("\(UUID().uuidString).wav", at: at)
+                if messages[j].audioDurations.count >= at { messages[j].audioDurations.insert(seconds, at: at) }
+                if messages[j].audioPrompts.count >= at { messages[j].audioPrompts.insert(prompt, at: at) }
+                if messages[j].audioSources.count >= at { messages[j].audioSources.insert(variantSource, at: at) }
+            case .text(let text), .refused(let text):
                 // The tool's words to the model, without its instructions.
                 errorText = text.components(separatedBy: " Do not ").first ?? text
                 return
@@ -640,6 +699,36 @@ final class ChatClient: ObservableObject {
             hasUnsavedChanges = true
             persistCurrentSession()
         }
+    }
+
+    /// Takes one generated image or piece of music out of a message (its
+    /// file goes with the next save).
+    func removeMedia(messageID: UUID, kind: MediaKind, index: Int) {
+        guard !isBusy, let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
+        func drop<T>(_ array: inout [T]) { if array.indices.contains(index) { array.remove(at: index) } }
+        // The names the rest were saved under, first: a message never loaded
+        // from disk derives them from the index, which is about to shift.
+        let id = messages[j].id.uuidString
+        switch kind {
+        case .image:
+            guard messages[j].images.indices.contains(index) else { return }
+            if messages[j].imageFilenames.count != messages[j].images.count {
+                messages[j].imageFilenames = messages[j].images.indices.map { "\(id)-\($0).png" }
+            }
+            shiftPinnedEditIndices(message: j, image: index + 1, by: -1)
+            drop(&messages[j].images); drop(&messages[j].imageFilenames); drop(&messages[j].imageDurations)
+            drop(&messages[j].imagePrompts); drop(&messages[j].imageSources)
+        case .music:
+            guard messages[j].audios.indices.contains(index) else { return }
+            AudioPlayback.shared.stop(ifAnyOf: [messages[j]])
+            if messages[j].audioFilenames.count != messages[j].audios.count {
+                messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
+            }
+            drop(&messages[j].audios); drop(&messages[j].audioFilenames); drop(&messages[j].audioDurations)
+            drop(&messages[j].audioPrompts); drop(&messages[j].audioSources)
+        }
+        hasUnsavedChanges = true
+        persistCurrentSession()
     }
 
     /// `offerTools: false` for the answer after the last allowed tool round.
@@ -687,6 +776,8 @@ final class ChatClient: ObservableObject {
     }
 
     func cancel() {
+        draft?.resolve(nil)
+        draft = nil
         transport.cancel()
         turnToken += 1
         isStreaming = false
@@ -799,7 +890,8 @@ final class ChatClient: ObservableObject {
         }
     }
 
-    private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
+    private func executeToolCalls(_ calls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
+        var toolCalls = calls
         // Captured before the first suspension: a conversation switch or a
         // Stop during any await below ends this round.
         let epoch = conversationEpoch
@@ -825,14 +917,49 @@ final class ChatClient: ObservableObject {
         }
 
         var settings = currentSettings(context.settings)
-        // Another chat tab has the image generator, or would lose the model
-        // it's answering with to the unload below: this call waits for a
-        // later turn instead.
+
+        // Creator mode: each image or song asked for is first an editable
+        // draft (prompt, model, knobs), going ahead by itself after the
+        // countdown unless the user touches it -- before the queue and the
+        // chat model's unload, which the user's editing mustn't hold.
+        var drafts: [String: GenerationDraft] = [:]
+        var skipped: Set<String> = []
+        if settings.creatorMode {
+            isStreaming = false
+            for (i, call) in toolCalls.enumerated() {
+                guard i < maxToolCallsPerRound, let kind = GenerationDraft.kind(of: call, settings),
+                      kind == .music ? musicTool.willGenerate([call], settings: settings)
+                                     : imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
+                else { continue }
+                let draft = GenerationDraft(kind: kind, call: call, settings: settings)
+                self.draft = draft
+                let outcome = await draft.decide(countdown: settings.creatorCountdown)
+                if self.draft === draft { self.draft = nil }
+                guard stillCurrent(), let outcome else { return }   // Stop / another chat: cancel() tidied up
+                if outcome == .skip {
+                    skipped.insert(call.id)
+                } else {
+                    toolCalls[i] = draft.editedCall
+                    drafts[call.id] = draft
+                }
+            }
+        }
+        // Read again: a draft may have waited long, settings may have changed.
+        settings = currentSettings(context.settings)
+        /// A call's settings: the models its draft chose.
+        func settingsFor(_ call: ToolCall, _ base: ChatSettings) -> ChatSettings {
+            drafts[call.id].map { $0.apply(to: base) } ?? base
+        }
+
         // Images and music alike: either generator takes most of this
         // Mac's memory, so neither runs beside the other.
         let images = chatImages
-        let wantsImage = imageTool.willGenerate(toolCalls, settings: settings, chatImages: images)
-        let wantsMusic = musicTool.willGenerate(toolCalls, settings: settings) && musicManager.isReady
+        let running = toolCalls.filter { !skipped.contains($0.id) }
+        let wantsImage = running.contains { imageTool.willGenerate([$0], settings: settingsFor($0, settings), chatImages: images) }
+        let wantsMusic = running.contains {
+            let s = settingsFor($0, settings)
+            return musicTool.willGenerate([$0], settings: s) && musicManager.isReady(s.musicModel)
+        }
         let willActuallyGenerate = wantsImage || wantsMusic
         // Only when a generator will actually run -- a refused call
         // shouldn't flash the "Generating…" UI / pulse.
@@ -889,13 +1016,21 @@ final class ChatClient: ObservableObject {
                 ))
                 continue
             }
-            settings = currentSettings(context.settings)
+            if skipped.contains(call.id) {
+                var note = ChatMessage(role: "tool", content: "Not run: the user chose not to make this. Don't call it again "
+                                       + "for this request; answer in text.", toolCallID: call.id)
+                note.isRefusal = true
+                messages.append(note)
+                continue
+            }
+            settings = settingsFor(call, currentSettings(context.settings))
             if willActuallyGenerate, call.name == MusicToolRunner.toolName {
                 generatingKind = .music
             } else if willActuallyGenerate, ImageToolRunner.runsGenerator(call.name, settings) {
                 generatingKind = .image
             }
-            let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count))
+            let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
+                                     model: drafts[call.id]?.modelID)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
             switch result {
