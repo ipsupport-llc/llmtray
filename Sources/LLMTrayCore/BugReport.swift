@@ -53,6 +53,33 @@ public struct BugReport {
         return text.replacingOccurrences(of: home, with: "~")
     }
 
+    /// The server log without what a chat put in it: with verbose logging
+    /// mlx_lm.server logs each request body ("Incoming Request Body: {...}",
+    /// sometimes spread over lines) -- the conversation itself. Those, and
+    /// any other line carrying a chat's JSON fields, are replaced by a
+    /// marker.
+    public static func withoutChatContent(_ log: String) -> String {
+        var out: [String] = []
+        var inBody = false
+        for line in log.components(separatedBy: "\n") {
+            if inBody {
+                // A pretty-printed body's continuation: indented, or a
+                // bracket or quote first.
+                if let first = line.first, first.isWhitespace || "{}[]\"".contains(first) { continue }
+                inBody = false
+            }
+            if let range = line.range(of: "Request Body:") {
+                out.append(String(line[..<range.upperBound]) + " [removed]")
+                inBody = true
+            } else if ["\"messages\"", "\"content\"", "\"prompt\""].contains(where: line.contains) {
+                out.append("[request data removed]")
+            } else {
+                out.append(line)
+            }
+        }
+        return out.joined(separator: "\n")
+    }
+
     /// The last `maxBytes` of a log, from a line start.
     public static func tail(_ log: String, maxBytes: Int) -> String {
         let data = Data(log.utf8)

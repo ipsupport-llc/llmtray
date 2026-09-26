@@ -14,12 +14,14 @@ struct BugReportView: View {
     @EnvironmentObject var server: ServerManager
     @State private var options = BugReporter.Options()
     @State private var runtimeVersions = "…"
+    @State private var modelDetails: [(String, String)] = []
     @State private var isWorking = false
     @State private var note: String?
     @FocusState private var descriptionFocused: Bool
 
     private var report: BugReport {
-        BugReporter.report(options, server: server, runtimeVersions: runtimeVersions)
+        BugReporter.report(options, server: server, runtimeVersions: runtimeVersions,
+                           modelDetails: modelDetails, attachments: BugReporter.attachments(options, server: server))
     }
 
     var body: some View {
@@ -36,6 +38,7 @@ struct BugReportView: View {
             Toggle("Include the server log", isOn: $options.includeServerLog)
             Toggle("Include LLMTray crash reports from the last two weeks", isOn: $options.includeCrashReports)
 
+            // Everything that goes: report.txt, and the log as attached.
             DisclosureGroup("The report") {
                 ScrollView {
                     Text(report.text())
@@ -46,6 +49,19 @@ struct BugReportView: View {
                 }
                 .frame(minHeight: 160, maxHeight: 260)
                 .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
+            }
+            if options.includeServerLog, !server.log.isEmpty {
+                DisclosureGroup("The server log") {
+                    ScrollView {
+                        Text(BugReporter.serverLogForReport(server))
+                            .font(.system(size: 10, design: .monospaced))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(8)
+                    }
+                    .frame(minHeight: 120, maxHeight: 220)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
+                }
             }
 
             if let note {
@@ -66,6 +82,7 @@ struct BugReportView: View {
         .frame(minWidth: 520, idealWidth: 560, minHeight: 440)
         .task {
             descriptionFocused = true
+            modelDetails = await BugReporter.modelDetails()
             runtimeVersions = await BugReporter.runtimeVersions()
         }
     }
@@ -78,7 +95,7 @@ struct BugReportView: View {
             let report = report
             let zip = try await BugReporter.package(report, options: options, server: server)
             if send {
-                if !BugReporter.compose(report, attachment: zip) {
+                BugReporter.compose(report, attachment: zip) {
                     note = NSLocalizedString("Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.", comment: "")
                 }
             } else {

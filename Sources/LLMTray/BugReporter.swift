@@ -27,7 +27,10 @@ enum BugReporter {
     // MARK: - Gathering
 
     /// The report's text: everything but the log and the crash reports.
-    static func report(_ options: Options, server: ServerManager, runtimeVersions: String) -> BugReport {
+    /// `modelDetails`: from modelDetails() (it reads the model's folder,
+    /// so not in a view's body). `attachments`: the other files, listed.
+    static func report(_ options: Options, server: ServerManager, runtimeVersions: String,
+                       modelDetails: [(String, String)], attachments: [String]) -> BugReport {
         let defaults = UserDefaults.standard
         let modelID = defaults[Pref.selectedModelID]
         let model = modelID.flatMap { ModelCatalog.shared.model(id: $0) }
@@ -69,7 +72,7 @@ enum BugReporter {
         var modelLines: [(String, String)] = [("Selected", modelID ?? "none")]
         if let model {
             modelLines.append(("Name", model.displayName))
-            modelLines += modelConfig(at: model.path)
+            modelLines += modelDetails
         }
         modelLines.append(("Profile", ProfileManager.shared.profile(for: modelID).name))
 
@@ -78,6 +81,7 @@ enum BugReporter {
             sections: [
                 .init("App", app), .init("System", system), .init("Runtime", runtime),
                 .init("Server", serverLines), .init("Model", modelLines),
+                .init("Attached", attachments.isEmpty ? [("Files", "report.txt only")] : attachments.map { ("File", $0) }),
             ]
         )
     }
@@ -103,9 +107,17 @@ enum BugReporter {
 
     @MainActor private final class LineCollector { var lines: [String] = [] }
 
+    /// The selected model's config fields and size, read off the main thread.
+    static func modelDetails() async -> [(String, String)] {
+        guard let id = UserDefaults.standard[Pref.selectedModelID],
+              let path = ModelCatalog.shared.model(id: id)?.path else { return [] }
+        let lines = await Task.detached(priority: .utility) { modelConfig(at: path).map { [$0.0, $0.1] } }.value
+        return lines.map { ($0[0], $0[1]) }
+    }
+
     /// A few fields of the model's config.json: what it is and how it's
-    /// quantized.
-    static func modelConfig(at path: String) -> [(String, String)] {
+    /// quantized, and its size.
+    nonisolated static func modelConfig(at path: String) -> [(String, String)] {
         let url = URL(fileURLWithPath: path).appendingPathComponent("config.json")
         guard let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [] }
@@ -144,56 +156,114 @@ enum BugReporter {
 
     // MARK: - Packaging and sending
 
-    /// The report folder, zipped, in the app's caches (removed on the next
-    /// report).
+    /// The server log as it's attached: its tail, without chat content,
+    /// the home folder as "~".
+    static func serverLogForReport(_ server: ServerManager) -> String {
+        BugReport.redact(BugReport.withoutChatContent(BugReport.tail(server.log, maxBytes: 512 * 1024)))
+    }
+
+    /// The files the zip will hold besides report.txt.
+    static func attachments(_ options: Options, server: ServerManager) -> [String] {
+        var files: [String] = []
+        if options.includeServerLog, !server.log.isEmpty { files.append("server.log") }
+        if options.includeCrashReports { files += recentCrashReports().map { "crash-reports/" + $0.lastPathComponent } }
+        return files
+    }
+
+    /// The report folder, zipped, in the app's caches. Each report its own
+    /// (an earlier one may still be attached to an unsent email); ones
+    /// older than a day are cleared.
     static func package(_ report: BugReport, options: Options, server: ServerManager) async throws -> URL {
         let fm = FileManager.default
         let root = fm.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("\(product)/BugReports")
-        try? fm.removeItem(at: root)
-        let name = "\(product)-bug-report-\(Int(report.createdAt.timeIntervalSince1970))"
+        let dayAgo = Date().addingTimeInterval(-24 * 3600)
+        for old in (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.contentModificationDateKey])) ?? [] {
+            let date = (try? old.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            if date < dayAgo { try? fm.removeItem(at: old) }
+        }
+        let stamp = ISO8601DateFormatter().string(from: report.createdAt).replacingOccurrences(of: ":", with: "")
+        let name = "\(product)-bug-report-\(stamp)-\(UUID().uuidString.prefix(6))"
         let folder = root.appendingPathComponent(name)
         try fm.createDirectory(at: folder, withIntermediateDirectories: true)
-        try report.text().write(to: folder.appendingPathComponent("report.txt"), atomically: true, encoding: .utf8)
+        var text = report.text()
         if options.includeServerLog, !server.log.isEmpty {
-            let log = BugReport.redact(BugReport.tail(server.log, maxBytes: 512 * 1024))
-            try log.write(to: folder.appendingPathComponent("server.log"), atomically: true, encoding: .utf8)
+            try serverLogForReport(server).write(to: folder.appendingPathComponent("server.log"), atomically: true, encoding: .utf8)
         }
         if options.includeCrashReports {
             let crashes = recentCrashReports()
             if !crashes.isEmpty {
                 let dir = folder.appendingPathComponent("crash-reports")
                 try fm.createDirectory(at: dir, withIntermediateDirectories: true)
+                var unreadable: [String] = []
                 for crash in crashes {
-                    let text = (try? String(contentsOf: crash, encoding: .utf8)).map { BugReport.redact($0) }
-                    try? text?.write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)
+                    guard let content = try? String(contentsOf: crash, encoding: .utf8),
+                          (try? BugReport.redact(content).write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)) != nil
+                    else { unreadable.append(crash.lastPathComponent); continue }
+                }
+                if !unreadable.isEmpty {
+                    text += "\nNot attached (couldn't be read): " + unreadable.joined(separator: ", ") + "\n"
                 }
             }
         }
+        try text.write(to: folder.appendingPathComponent("report.txt"), atomically: true, encoding: .utf8)
         let zip = root.appendingPathComponent(name + ".zip")
         try await ProcessRunner.run("/usr/bin/ditto", ["-c", "-k", "--keepParent", folder.path, zip.path])
         return zip
     }
 
     /// The mail compose sheet with the report attached. Without a mail
-    /// service that takes attachments: a plain mailto and the file shown in
-    /// Finder, to attach by hand. Returns false in that case.
-    @discardableResult
-    static func compose(_ report: BugReport, attachment: URL) -> Bool {
+    /// service that takes attachments -- or if it fails to compose -- a
+    /// plain mailto, with the file shown in Finder to attach by hand.
+    /// `fallback` runs in that case (the view says so).
+    static func compose(_ report: BugReport, attachment: URL, fallback: @escaping () -> Void) {
         let body = """
             \(report.description.trimmingCharacters(in: .whitespacesAndNewlines))
 
             ---
             \(report.subject). The full report is attached (\(attachment.lastPathComponent)).
             """
-        if let service = NSSharingService(named: .composeEmail) {
-            service.recipients = [address]
-            service.subject = report.subject
-            let items: [Any] = [body, attachment]
-            if service.canPerform(withItems: items) {
-                service.perform(withItems: items)
-                return true
+        let plain = {
+            mailto(report, body: body)
+            NSWorkspace.shared.activateFileViewerSelecting([attachment])
+            fallback()
+        }
+        guard let service = NSSharingService(named: .composeEmail) else { return plain() }
+        service.recipients = [address]
+        service.subject = report.subject
+        let items: [Any] = [body, attachment]
+        guard service.canPerform(withItems: items) else { return plain() }
+        // Kept until it reports back: a released service drops the compose.
+        let handler = ShareHandler(service: service, onFailure: plain)
+        activeShare = handler
+        service.delegate = handler
+        service.perform(withItems: items)
+    }
+
+    private static var activeShare: ShareHandler?
+
+    private final class ShareHandler: NSObject, NSSharingServiceDelegate {
+        let service: NSSharingService
+        let onFailure: () -> Void
+
+        init(service: NSSharingService, onFailure: @escaping () -> Void) {
+            self.service = service
+            self.onFailure = onFailure
+        }
+
+        func sharingService(_ sharingService: NSSharingService, didShareItems items: [Any]) {
+            Task { @MainActor in BugReporter.activeShare = nil }
+        }
+
+        func sharingService(_ sharingService: NSSharingService, didFailToShareItems items: [Any], error: Error) {
+            Task { @MainActor in
+                // Cancelled by the user: nothing to fall back to.
+                if (error as NSError).code != NSUserCancelledError { self.onFailure() }
+                BugReporter.activeShare = nil
             }
         }
+    }
+
+    private static func mailto(_ report: BugReport, body: String) {
         var mailto = URLComponents()
         mailto.scheme = "mailto"
         mailto.path = address
@@ -202,8 +272,6 @@ enum BugReporter {
             URLQueryItem(name: "body", value: body + "\n\n" + NSLocalizedString("(Please attach the report file shown in Finder.)", comment: "bug report mail")),
         ]
         if let url = mailto.url { NSWorkspace.shared.open(url) }
-        NSWorkspace.shared.activateFileViewerSelecting([attachment])
-        return false
     }
 
     // MARK: -

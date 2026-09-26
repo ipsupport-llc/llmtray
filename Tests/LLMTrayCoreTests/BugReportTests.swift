@@ -25,6 +25,28 @@ final class BugReportTests: XCTestCase {
         XCTAssertTrue(text.contains("(not described)"))
     }
 
+    func testServerLogLosesChatContent() {
+        let log = """
+            2026-09-24 03:12:44,100 - INFO - Starting httpd at 127.0.0.1 on port 8765...
+            2026-09-24 03:12:44,101 - DEBUG - Incoming Request Body: {"messages": [{"content": "my secret question"}]}
+            127.0.0.1 - - [24/Sep/2026 03:12:44] "POST /v1/chat/completions HTTP/1.1" 200 -
+            2026-09-24 03:12:45,101 - DEBUG - Incoming Request Body: {
+            \t"messages": [
+            \t\t{"role": "user", "content": "another secret"}
+            \t]
+            }
+            2026-09-24 03:12:46,000 - INFO - Prompt processing progress: 10/10
+            stray {"prompt": "leak"}
+            """
+        let clean = BugReport.withoutChatContent(log)
+        XCTAssertFalse(clean.contains("secret"))
+        XCTAssertFalse(clean.contains("leak"))
+        XCTAssertTrue(clean.contains("Incoming Request Body: [removed]"))
+        XCTAssertTrue(clean.contains("Starting httpd"))
+        XCTAssertTrue(clean.contains("\"POST /v1/chat/completions HTTP/1.1\" 200"), "the access line after a body stays")
+        XCTAssertTrue(clean.contains("Prompt processing progress: 10/10"))
+    }
+
     func testTailCutsAtALineStart() {
         let log = (1...100).map { "line \($0)" }.joined(separator: "\n")
         let tail = BugReport.tail(log, maxBytes: 40)
