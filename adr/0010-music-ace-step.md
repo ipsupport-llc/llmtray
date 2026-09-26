@@ -64,6 +64,12 @@ Whisper WER against the requested lyrics, capped at 1 per track).
 - **Chunked VAE decode**, 250 frames (10 s) with 16 frames of overlap:
   bit-identical to a whole decode, peak 5.35 vs 9.55 GB for 30 s, and no
   longer growing with the length.
+- **Kept as AAC, not the runner's WAV**: `LLMTrayCore.AudioCodec` encodes
+  it in memory (AudioToolbox file callbacks over a buffer, so a temporary
+  chat still writes nothing), off the main actor. A 30 s song: 5.76 MB
+  WAV → 0.99 MB at 256 kbit/s, 0.13 s; 120 s in ~0.7 s. The profile's
+  `musicBitrate` picks 128-320 kbit/s or WAV. Songs saved before stay WAV;
+  file names take their extension from the sniffed format (PR #86).
 - **`SEED <n>`** is emitted before generating; `MusicManager.Song.seed`
   carries it. The request can pass a seed back, but no caller does today:
   Regenerate and Tweak make a variant with a new seed
