@@ -41,6 +41,8 @@ final class MarkdownTableTests: XCTestCase {
         XCTAssertEqual(MarkdownTable.cells("| ``a | b`` | c |"), ["``a | b``", "c"])
         XCTAssertEqual(MarkdownTable.cells(#"| \`literal` | next |"#), [#"\`literal`"#, "next"])
         XCTAssertEqual(MarkdownTable.cells("| `x` | `y | z` |"), ["`x`", "`y | z`"])
+        XCTAssertEqual(MarkdownTable.cells(#"| a \\|"#), [#"a \\"#])
+        XCTAssertEqual(MarkdownTable.cells(#"| a \|"#), ["a |"])
     }
 
     func testSingleRowIsText() {

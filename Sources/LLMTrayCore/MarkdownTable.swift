@@ -40,7 +40,10 @@ public struct MarkdownTable: Equatable {
     static func cells(_ line: String) -> [String] {
         var body = Substring(line)
         if body.hasPrefix("|") { body = body.dropFirst() }
-        if body.hasSuffix("|") && !body.hasSuffix("\\|") { body = body.dropLast() }
+        // The closing pipe, unless escaped (an odd number of backslashes).
+        if body.hasSuffix("|"), body.dropLast().reversed().prefix(while: { $0 == "\\" }).count % 2 == 0 {
+            body = body.dropLast()
+        }
         let chars = Array(body)
         let code = codeSpans(chars)
         var cells: [String] = []
