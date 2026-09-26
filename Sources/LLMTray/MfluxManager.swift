@@ -13,6 +13,9 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
     case gptq8bit
     case gptq4bit
     case gptqMixed
+    /// FLUX.2 klein 4B (Apache 2.0): generates and also edits an image
+    /// (edit_image). Text encoder 8-bit, transformer 4-bit.
+    case klein4b
 
     var id: String { rawValue }
 
@@ -21,6 +24,7 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         case .gptq8bit: return NSLocalizedString("Z-Image Turbo — GPTQ 8-bit", comment: "")
         case .gptq4bit: return NSLocalizedString("Z-Image Turbo — GPTQ 4-bit", comment: "")
         case .gptqMixed: return NSLocalizedString("Z-Image Turbo — GPTQ mixed (recommended)", comment: "")
+        case .klein4b: return NSLocalizedString("FLUX.2 klein 4B — generate and edit", comment: "")
         }
     }
 
@@ -32,6 +36,7 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         case .gptq8bit: return "~10GB"
         case .gptq4bit: return "~5.5GB"
         case .gptqMixed: return "~6.3GB"
+        case .klein4b: return "~6.2GB"
         }
     }
 
@@ -40,6 +45,7 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         case .gptq8bit: return NSLocalizedString("Highest fidelity, largest download -- a correctness baseline you can trust.", comment: "")
         case .gptq4bit: return NSLocalizedString("Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.", comment: "")
         case .gptqMixed: return NSLocalizedString("Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.", comment: "")
+        case .klein4b: return NSLocalizedString("Also edits images -- one from the chat or one you attach. Edits take a few minutes.", comment: "")
         }
     }
 
@@ -51,13 +57,26 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         case .gptq8bit: return "roman220220/z-image-turbo-gptq-mlx-8bit"
         case .gptq4bit: return "roman220220/z-image-turbo-gptq-mlx-4bit"
         case .gptqMixed: return "roman220220/z-image-turbo-gptq-mlx-mixed"
+        case .klein4b: return "roman220220/flux2-klein-4b-mlx-mixed"
         }
     }
 
-    /// All three are the same Z-Image-Turbo architecture -- only the
-    /// weights' bit-width allocation differs.
-    var mfluxModelName: String { "z-image-turbo" }
-    var stepCount: String { "9" }
+    /// klein's checkpoint isn't on HF yet: it's offered only where it's
+    /// already in place (a local test copy).
+    var isPublished: Bool { self != .klein4b }
+
+    /// Where the checkpoint lives once downloaded.
+    var localDir: String { RuntimePaths.externalRuntimeDir + "/mflux_models/\(rawValue)" }
+
+    /// The models the Settings picker offers.
+    static var selectable: [ImageGenModel] {
+        allCases.filter { $0.isPublished || FileManager.default.fileExists(atPath: $0.localDir) }
+    }
+
+    var mfluxModelName: String { self == .klein4b ? "flux2-klein-4b" : "z-image-turbo" }
+    var stepCount: String { self == .klein4b ? "4" : "9" }
+    /// Can take an image to change (edit_image).
+    var supportsEditing: Bool { self == .klein4b }
 }
 
 /// Scales whatever width/height the model's own tool call requested (see
@@ -136,7 +155,7 @@ final class MfluxManager: ObservableObject {
     /// GPTQ-quantized and in mflux's native MLX format, so this is used
     /// as-is with no further on-device processing.
     private func savedModelDir(for model: ImageGenModel) -> String {
-        RuntimePaths.externalRuntimeDir + "/mflux_models/\(model.rawValue)"
+        model.localDir
     }
 
     /// Installs the mflux *package* -- not the model weights, which mflux
@@ -221,7 +240,8 @@ final class MfluxManager: ObservableObject {
     /// progress, step previews and the result over stdout, so nothing (not
     /// even a temporary file) touches the disk. Matters for temporary chats,
     /// which must leave no trace.
-    func generate(prompt: String, width: Int, height: Int, model: ImageGenModel) async throws -> Data {
+    /// `images`: the image(s) to edit (a model that supportsEditing).
+    func generate(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data] = []) async throws -> Data {
         // Set up by the download in Settings; never installed mid-chat (a
         // temporary chat must not cause files to be written).
         guard FileManager.default.fileExists(atPath: venvPython) else {
@@ -260,6 +280,15 @@ final class MfluxManager: ObservableObject {
         // round rather than reject an odd model-supplied value.
         let roundedWidth = min(max(256, (width / 16) * 16), 2048)
         let roundedHeight = min(max(256, (height / 16) * 16), 2048)
+        // klein's runner takes JSON (the prompt and the images to edit).
+        let input: Data
+        if model == .klein4b {
+            input = try JSONSerialization.data(withJSONObject: [
+                "prompt": prompt, "images": images.map { $0.base64EncodedString() },
+            ])
+        } else {
+            input = Data(prompt.utf8)
+        }
         let result = ImageResult()
         try await ProcessRunner.runStreaming(venvPython, [
             RuntimePaths.runtimeDir + "/llmtray_mflux_runner.py",
@@ -268,7 +297,7 @@ final class MfluxManager: ObservableObject {
             "--steps", model.stepCount,
             "--model", savedDir,
             "--base-model", model.mfluxModelName,
-        ], stdin: Data(prompt.utf8), environment: [
+        ], stdin: input, environment: [
             "PYTHONDONTWRITEBYTECODE": "1",
             // The model is local: no Hub lookups (nor their cache writes,
             // from a temporary chat).

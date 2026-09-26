@@ -202,8 +202,11 @@ final class ProfileStoreTests: XCTestCase {
     }
 
     func testMigrationFromOldSettings() throws {
-        let suite = "llmtray-test-\(UUID().uuidString)"
+        // One fixed name: removing a domain still leaves its (empty) plist
+        // in ~/Library/Preferences, so a new name per run piles them up.
+        let suite = "llmtray.tests.profile-migration"
         let d = UserDefaults(suiteName: suite)!
+        d.removePersistentDomain(forName: suite)
         defer { d.removePersistentDomain(forName: suite) }
         d.set(1.0, forKey: "llmtray.temperature")
         d.set(131072.0, forKey: "llmtray.maxTokens")      // stored as Double by the old slider

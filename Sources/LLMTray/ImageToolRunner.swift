@@ -1,4 +1,6 @@
+import AppKit
 import Foundation
+import LLMTrayCore
 
 /// The in-app chat's one tool, `generate_image`: its declaration, the
 /// per-turn limit, and running it through mflux. What each call returns to
@@ -61,7 +63,13 @@ final class ImageToolRunner: ChatTool {
     /// -- so a model stuck repeating the call doesn't make the chat model
     /// unload/reload (or the "Generating image…" UI flash) for nothing.
     func willGenerate(_ calls: [ToolCall], settings: ChatSettings) -> Bool {
-        calls.contains { $0.name == Self.toolName } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
+        calls.contains { Self.runsGenerator($0.name, settings) } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
+    }
+
+    /// generate_image, and edit_image with a model that edits: the calls
+    /// that run mflux.
+    static func runsGenerator(_ name: String, _ settings: ChatSettings) -> Bool {
+        name == toolName || name == EditImageTool.toolName && settings.imageGenModel.supportsEditing
     }
 
     static func clampedSide(_ value: Any?) -> Int {
@@ -101,9 +109,15 @@ final class ImageToolRunner: ChatTool {
         // in the conversion; 20000 px would run the Mac out of memory).
         let width = Int(Double(Self.clampedSide(arguments["width"])) * scale)
         let height = Int(Double(Self.clampedSide(arguments["height"])) * scale)
+        return await produce(prompt: prompt, width: width, height: height, images: [], settings: settings, toolName: Self.toolName)
+    }
+
+    /// Runs mflux for generate_image or edit_image (the per-turn limit
+    /// counts both) and words the result for the model.
+    func produce(prompt: String, width: Int, height: Int, images: [Data], settings: ChatSettings, toolName: String) async -> ToolResult {
         do {
             let start = Date()
-            let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: settings.imageGenModel)
+            let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: settings.imageGenModel, images: images)
             imagesThisTurn += 1
             return .generatedImage(
                 image, seconds: Date().timeIntervalSince(start), prompt: prompt,
@@ -113,11 +127,96 @@ final class ImageToolRunner: ChatTool {
                         : "-- you do not have the image data and cannot embed, link, or preview it yourself. ")
                     + "Do not write markdown image syntax (![...](...)) or any placeholder/fake URL for "
                     + "it. Just reply in plain text (e.g. briefly describe what you asked for), or say "
-                    + "nothing else. Do not call generate_image again for this request unless the user "
+                    + "nothing else. Do not call \(toolName) again for this request unless the user "
                     + "explicitly asks for a new or different image."
             )
         } catch {
             return .text("Image generation failed: \(error.localizedDescription)")
         }
+    }
+}
+
+/// `edit_image`: changes an image from this chat -- one the user attached
+/// or one generated here -- following an instruction, with an image model
+/// that edits (FLUX.2 klein). The result is a new image; the source stays.
+@MainActor
+final class EditImageTool: ChatTool {
+    static let toolName = "edit_image"
+    let name = EditImageTool.toolName
+    let generator: ImageToolRunner
+
+    init(generator: ImageToolRunner) {
+        self.generator = generator
+    }
+
+    var definition: [String: Any] {
+        [
+            "type": "function",
+            "function": [
+                "name": name,
+                "description": "Edit an image from this conversation (one the user attached or one generated here) "
+                    + "with a local diffusion model: change, add or remove something, restyle it, change the "
+                    + "background, and so on. Call this only when the user's latest message explicitly asks to "
+                    + "change an existing image; to make a new image from scratch use generate_image.",
+                "parameters": [
+                    "type": "object",
+                    "properties": [
+                        "prompt": [
+                            "type": "string",
+                            "description": "What to change, as a clear instruction (e.g. \"make it night, keep everything else\").",
+                        ],
+                        "index": [
+                            "type": "integer",
+                            "description": "Which image of this conversation: 1 = the first one, counting attached and generated images. Omit for the latest.",
+                        ],
+                    ],
+                    "required": ["prompt"],
+                ],
+            ],
+        ]
+    }
+
+    func isOffered(_ settings: ChatSettings) -> Bool {
+        settings.enableImageGeneration && settings.imageGenModel.supportsEditing
+    }
+
+    func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+        let settings = context.settings
+        guard settings.enableImageGeneration else {
+            return .text(
+                "Image generation is turned off in LLMTray's settings, so the image wasn't edited. Do not call "
+                    + "edit_image; answer in text, and if the user wants an edit, tell them to enable image generation in settings first."
+            )
+        }
+        guard settings.imageGenModel.supportsEditing else {
+            return .text(
+                "The image model selected in LLMTray's settings can't edit images. Do not call edit_image; tell the user "
+                    + "to choose FLUX.2 klein as the image model in settings to edit images."
+            )
+        }
+        guard generator.imagesThisTurn < generator.maxImagesPerTurn else {
+            return .text(
+                "Not editing -- an image was already made for this request and shown to the user. Do not call "
+                    + "edit_image again unless the user sends a new message asking for another change."
+            )
+        }
+        let images = context.chatImages
+        guard !images.isEmpty else {
+            return .text("There's no image in this conversation to edit. Ask the user to attach one, or use generate_image to make a new one.")
+        }
+        // Model-supplied: compared, never subtracted from (Int.min - 1 traps).
+        let requested = arguments["index"] as? Int
+        guard requested.map({ (1...images.count).contains($0) }) ?? true else {
+            return .text("There are \(images.count) image(s) in this conversation; index must be 1...\(images.count).")
+        }
+        let source = images[(requested ?? images.count) - 1]
+        let instruction = String(((arguments["prompt"] as? String) ?? "").prefix(4000))
+        guard !instruction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return .text("Say what to change in `prompt`.")
+        }
+        let pixels = NSBitmapImageRep(data: source.data).map { ($0.pixelsWide, $0.pixelsHigh) } ?? (1024, 1024)
+        let size = EditCanvas.size(sourceWidth: pixels.0, sourceHeight: pixels.1, scale: settings.imageQuality.scale)
+        return await generator.produce(prompt: instruction, width: size.width, height: size.height,
+                                       images: [source.data], settings: settings, toolName: name)
     }
 }

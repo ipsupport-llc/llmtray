@@ -584,6 +584,15 @@ final class ChatClient: ObservableObject {
         }
     }
 
+    /// Every image in this conversation, attached or generated, oldest
+    /// first (edit_image). Not the copies view_image put in front of the
+    /// model.
+    private var chatImages: [(data: Data, prompt: String)] {
+        messages.filter { ($0.role == "assistant" || $0.role == "user") && !$0.isToolContext }.flatMap { msg in
+            msg.images.enumerated().map { (data: $1, prompt: msg.role == "user" ? "attached by the user" : msg.imagePrompts[safe: $0] ?? "") }
+        }
+    }
+
     private func executeToolCalls(_ toolCalls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
         // Captured before the first suspension: a conversation switch or a
         // Stop during any await below ends this round.
@@ -630,7 +639,7 @@ final class ChatClient: ObservableObject {
         var pendingModelImages: [Data] = []
         for (i, call) in toolCalls.enumerated() {
             guard stillCurrent() else { break }
-            if imageBlocked, call.name == ImageToolRunner.toolName {
+            if imageBlocked, ImageToolRunner.runsGenerator(call.name, settings) {
                 messages.append(ChatMessage(
                     role: "tool",
                     content: "Not run: another chat is generating an image or answering with the model right now. Tell the user to ask again once it's done.",
@@ -646,7 +655,7 @@ final class ChatClient: ObservableObject {
                 continue
             }
             settings = currentSettings(context.settings)
-            let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages))
+            let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
             switch result {
             case .text(let text):

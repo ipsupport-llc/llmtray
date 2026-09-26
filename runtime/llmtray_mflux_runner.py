@@ -21,6 +21,48 @@ def png_b64(pil, max_side=None):
     pil.save(buf, format="PNG")
     return base64.b64encode(buf.getvalue()).decode()
 
+def arg(name, default=None):
+    """--name value from argv (the FLUX.2 path takes a few plain flags)."""
+    if name in sys.argv:
+        return sys.argv[sys.argv.index(name) + 1]
+    return default
+
+# FLUX.2 klein (generation and editing): the prompt and any reference
+# images (base64 PNG / JPEG) arrive as one JSON object on stdin, the images
+# decoded in memory -- no file is written, not even for editing.
+if arg("--base-model") == "flux2-klein-4b":
+    import json
+    from PIL import Image
+    from mflux.models.common.vae.tiling_config import TilingConfig
+    request = json.loads(sys.stdin.read())
+    images = [Image.open(io.BytesIO(base64.b64decode(b))).convert("RGB") for b in request.get("images", [])]
+    if images:
+        from mflux.models.flux2.variants.edit.flux2_klein_edit import Flux2KleinEdit as Model
+    else:
+        from mflux.models.flux2.variants.txt2img.flux2_klein import Flux2Klein as Model
+    model = Model(model_path=arg("--model"))
+    # Only the text encoder's hidden states 9, 18 and 27 condition the image:
+    # layers 27+ never matter (bit-identical output, ~1GB less resident),
+    # and the VAE decodes in 256 px tiles (its untiled peak doubles memory).
+    model.text_encoder.layers = model.text_encoder.layers[:27]
+    model.tiling_config = TilingConfig(vae_decode_tile_size=256)
+    steps = int(arg("--steps", "4"))
+
+    class Steps:
+        def call_before_loop(self, *_, **__):
+            emit("STEP", f"0 {steps}")
+
+        def call_in_loop(self, t, *_, **__):
+            emit("STEP", f"{t + 1} {steps}")
+
+    model.callbacks.register(Steps())
+    kwargs = dict(seed=int(arg("--seed", "0")) or int.from_bytes(os.urandom(4), "big"), prompt=request["prompt"],
+                  num_inference_steps=steps, width=int(arg("--width", "1024")), height=int(arg("--height", "1024")))
+    if images:
+        kwargs["image_paths"] = images   # mflux's loader takes PIL images as well as paths
+    emit("IMAGE", png_b64(model.generate_image(**kwargs).image))
+    sys.exit(0)
+
 from mflux.cli.parser.parsers import lora_init_kwargs_from_args
 from mflux.models.common.resolution.config_resolution import ConfigResolution
 from mflux.models.z_image.cli.z_image_turbo_generate import build_parser

@@ -25,6 +25,7 @@
 "Allow connections from the local network" = "Allow connections from the local network";
 "Already open in another tab" = "Already open in another tab";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
@@ -112,6 +113,7 @@
 "Enable image generation" = "Enable image generation";
 "Enable image generation?" = "Enable image generation?";
 "Extra server arguments" = "Extra server arguments";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
 "Failed: %@" = "Failed: %@";
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
@@ -396,7 +398,7 @@
 "What happened?" = "What happened?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "Which Z-Image-Turbo quantization generates the images.";
+"Which model generates the images. FLUX.2 klein can also edit them." = "Which model generates the images. FLUX.2 klein can also edit them.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Yesterday";
 "You" = "You";

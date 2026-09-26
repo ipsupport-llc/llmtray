@@ -16,6 +16,9 @@ struct ToolContext {
     var settings: ChatSettings
     /// Images generated earlier in this conversation, oldest first.
     var generatedImages: [(data: Data, prompt: String)]
+    /// Every image in this conversation, attached or generated, oldest
+    /// first (edit_image).
+    var chatImages: [(data: Data, prompt: String)] = []
 }
 
 /// One tool the in-app chat offers the model: its declaration, when it's
@@ -37,7 +40,7 @@ final class ChatToolbox {
     /// `mflux`: the app's one image generator, shared by every chat tab.
     init(mflux: MfluxManager? = nil) {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
-        tools = [imageGeneration, ViewImageTool()] + ToolCatalog.makeTools()
+        tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool()] + ToolCatalog.makeTools()
     }
 
     func register(_ tool: ChatTool) {
@@ -58,9 +61,9 @@ final class ChatToolbox {
         guard let tool = tools.first(where: { $0.name == call.name }) else {
             return .text("Unknown tool: \(call.name)")
         }
-        // generate_image explains its own refusals (the model often keeps
+        // generate_image and edit_image explain their own refusals (the model often keeps
         // calling it from history after it's turned off).
-        guard tool.isOffered(context.settings) || tool === imageGeneration else {
+        guard tool.isOffered(context.settings) || tool === imageGeneration || tool is EditImageTool else {
             return .text("The tool \(call.name) isn't available in this chat. Answer without it.")
         }
         return await tool.run(Self.parseArguments(call.argumentsJSON), context: context)

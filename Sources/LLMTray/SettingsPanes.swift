@@ -466,9 +466,11 @@ struct ProfilesPane: View {
                 row(\.tools.enableImageGeneration, "Enable image generation", "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.") {
                     Toggle("", isOn: enableImageGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
                 }
-                row(\.tools.imageGenModel, "Image model", "Which Z-Image-Turbo quantization generates the images.") {
+                row(\.tools.imageGenModel, "Image model", "Which model generates the images. FLUX.2 klein can also edit them.") {
                     Picker("", selection: imageGenModelBinding) {
-                        ForEach(ImageGenModel.allCases) { Text($0.displayName).tag($0) }
+                        ForEach(ImageGenModel.selectable + (ImageGenModel.selectable.contains(imageGenModel) ? [] : [imageGenModel])) {
+                            Text($0.displayName).tag($0)
+                        }
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
