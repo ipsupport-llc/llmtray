@@ -43,7 +43,7 @@ enum BugReporter {
             ("Chat tabs open", String(ChatTabs.shared.tabs.count)),
         ]
         app.append(("Image generation", profile.enableImageGeneration ? "on (\(profile.imageGenModel))" : "off"))
-        app.append(("Music generation", profile.enableMusicGeneration ? "on" : "off"))
+        app.append(("Music generation", profile.enableMusicGeneration ? "on (\(profile.musicModel))" : "off"))
         app.append(("Image editing", profile.imageEditModel.isEmpty ? "off" : profile.imageEditModel))
 
         let os = ProcessInfo.processInfo

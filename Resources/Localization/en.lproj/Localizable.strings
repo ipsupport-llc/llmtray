@@ -9,12 +9,18 @@
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";
+"%lld s" = "%lld s";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
 "(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
+"ACE-Step sft — clear vocals, 8-bit" = "ACE-Step sft — clear vocals, 8-bit";
+"ACE-Step sft — clear vocals, GPTQ 4-bit" = "ACE-Step sft — clear vocals, GPTQ 4-bit";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
 "About LLMTray" = "About LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Advanced" = "Advanced";
@@ -27,6 +33,7 @@
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
 "Another model already uses this alias." = "Another model already uses this alias.";
+"Another version next to this one (a new seed, the same request)" = "Another version next to this one (a new seed, the same request)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
@@ -43,6 +50,7 @@
 "Auto-tune performance" = "Auto-tune performance";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers.";
 "Balanced (default)" = "Balanced (default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it.";
 "Benchmark" = "Benchmark";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile.";
 "Beta" = "Beta";
@@ -54,6 +62,8 @@
 "Cancel" = "Cancel";
 "Cancel download" = "Cancel download";
 "Canvas size" = "Canvas size";
+"Change the prompt, the model or the shape, then make another version" = "Change the prompt, the model or the shape, then make another version";
+"Change the style, lyrics, model or knobs, then make another version" = "Change the style, lyrics, model or knobs, then make another version";
 "Chat" = "Chat";
 "Chat name" = "Chat name";
 "Chat tools" = "Chat tools";
@@ -79,9 +89,12 @@
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
+"Countdown" = "Countdown";
 "Country facts" = "Country facts";
 "Crash reports (%lld)" = "Crash reports (%lld)";
 "Create Email…" = "Create Email…";
+"Creativity" = "Creativity";
+"Creator mode" = "Creator mode";
 "Currency rates" = "Currency rates";
 "Current settings are already fastest" = "Current settings are already fastest";
 "Date & time" = "Date & time";
@@ -123,6 +136,7 @@
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
 "Fetching file list…" = "Fetching file list…";
 "Fits comfortably" = "Fits comfortably";
+"Follow the description" = "Follow the description";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
 "Free on disk: %@ · your models: %@" = "Free on disk: %@ · your models: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay.";
@@ -130,6 +144,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models.";
 "General" = "General";
+"Generate" = "Generate";
 "Generated in %.1fs" = "Generated in %.1fs";
 "Generating image…" = "Generating image…";
 "Generating music…" = "Generating music…";
@@ -143,9 +158,11 @@
 "High quality (larger canvas)" = "High quality (larger canvas)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Highest fidelity, largest download -- a correctness baseline you can trust.";
 "Hourly forecast" = "Hourly forecast";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
 "Hugging Face token" = "Hugging Face token";
@@ -182,8 +199,6 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Maintenance" = "Maintenance";
-"Make this image again (a new seed, the same request)" = "Make this image again (a new seed, the same request)";
-"Make this music again (a new seed, the same request)" = "Make this music again (a new seed, the same request)";
 "Manage Models…" = "Manage Models…";
 "Max tokens" = "Max tokens";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
@@ -200,6 +215,7 @@
 "Music generation failed: %@" = "Music generation failed: %@";
 "Music generation finished but produced no audio." = "Music generation finished but produced no audio.";
 "Music generation isn't set up -- turn it on again in Settings." = "Music generation isn't set up -- turn it on again in Settings.";
+"Music model" = "Music model";
 "Name new chats automatically" = "Name new chats automatically";
 "Network" = "Network";
 "Never" = "Never";
@@ -232,6 +248,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Older" = "Older";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
+"Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Open Server Log…" = "Open Server Log…";
 "Open in New Tab" = "Open in New Tab";
 "Open in Window" = "Open in Window";
@@ -306,6 +323,7 @@
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
 "Search chats" = "Search chats";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
 "Select Tab" = "Select Tab";
 "Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
@@ -321,6 +339,7 @@
 "Settings profile for this model" = "Settings profile for this model";
 "Settings this profile overrides; everything else comes from Default." = "Settings this profile overrides; everything else comes from Default.";
 "Settings…" = "Settings…";
+"Shape" = "Shape";
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
@@ -335,6 +354,8 @@
 "Show tool calls" = "Show tool calls";
 "Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music.";
+"Skip" = "Skip";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
 "Something went wrong?" = "Something went wrong?";
 "Sort by" = "Sort by";
@@ -348,6 +369,7 @@
 "Start server" = "Start server";
 "Start the server first." = "Start the server first.";
 "Start the server when LLMTray opens" = "Start the server when LLMTray opens";
+"Starting in %.0f s…" = "Starting in %.0f s…";
 "Starting…" = "Starting…";
 "Startup" = "Startup";
 "Step %lld/%lld" = "Step %lld/%lld";
@@ -360,6 +382,7 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory.";
 "Sunrise & sunset" = "Sunrise & sunset";
 "Support" = "Support";
+"Switch the music model?" = "Switch the music model?";
 "System" = "System";
 "System prompt" = "System prompt";
 "Tab %lld" = "Tab %lld";
@@ -398,6 +421,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
+"Tweak…" = "Tweak…";
 "Uninstall" = "Uninstall";
 "Uninstall Runtime Data…" = "Uninstall Runtime Data…";
 "Uninstall runtime data?" = "Uninstall runtime data?";
@@ -438,5 +462,6 @@
 "failed to build request" = "failed to build request";
 "mlx-lm runtime" = "mlx-lm runtime";
 "not used by any model" = "not used by any model";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.";
 "used by %@" = "used by %@";
 "· size…" = "· size…";

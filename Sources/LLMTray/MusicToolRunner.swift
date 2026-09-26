@@ -43,6 +43,15 @@ final class MusicToolRunner: ChatTool {
                             "type": "string",
                             "description": "Language code of the lyrics, e.g. \"en\", \"ru\", \"es\". Defaults to \"en\".",
                         ],
+                        "creativity": [
+                            "type": "number",
+                            "description": "0 to 1: how adventurous and unexpected the music is. Omit to use the user's setting; "
+                                + "raise it only when the user asks for something weird or experimental.",
+                        ],
+                        "adherence": [
+                            "type": "number",
+                            "description": "0 to 1: how strictly the music follows the style description. Omit to use the user's setting.",
+                        ],
                     ],
                     "required": ["prompt"],
                 ],
@@ -78,6 +87,12 @@ final class MusicToolRunner: ChatTool {
         min(max((value as? Int) ?? 30, 10), 120)
     }
 
+    /// A model-supplied 0...1 value, or nil.
+    static func unit(_ value: Any?) -> Double? {
+        guard let number = (value as? NSNumber)?.doubleValue, number.isFinite else { return nil }
+        return min(max(number, 0), 1)
+    }
+
     /// A language code the model gave, or "en": two or three letters only.
     static func language(_ value: Any?) -> String {
         let code = ((value as? String) ?? "").lowercased().trimmingCharacters(in: .whitespaces)
@@ -105,8 +120,14 @@ final class MusicToolRunner: ChatTool {
         let duration = Self.duration(arguments["duration"])
         do {
             let start = Date()
-            let audio = try await music.generate(caption: prompt, lyrics: lyrics, duration: duration,
-                                                 language: Self.language(arguments["language"]))
+            let settings = context.settings
+            let song = try await music.generate(
+                caption: prompt, lyrics: lyrics, duration: duration, language: Self.language(arguments["language"]),
+                model: settings.musicModel,
+                creativity: Self.unit(arguments["creativity"]) ?? settings.musicCreativity,
+                adherence: Self.unit(arguments["adherence"]) ?? settings.musicAdherence
+            )
+            let audio = song.audio
             songsThisTurn += 1
             return .generatedAudio(
                 audio, seconds: Date().timeIntervalSince(start), prompt: prompt,

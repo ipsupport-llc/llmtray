@@ -60,6 +60,18 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         public var enableImageGeneration: Bool?
         /// The generate_music tool (ACE-Step 1.5).
         public var enableMusicGeneration: Bool?
+        /// `MusicModel` raw value.
+        public var musicModel: String?
+        /// 0...1: how adventurous the music is (the planner's temperature).
+        public var musicCreativity: Double?
+        /// 0...1: how closely it follows the description (guidance).
+        public var musicAdherence: Double?
+        /// Creator mode: an image or song the model asks for is shown as an
+        /// editable draft (prompt, model, knobs) before it's made.
+        public var creatorMode: Bool?
+        /// Seconds the draft waits before going ahead as is; 0 = until the
+        /// user starts it.
+        public var creatorCountdown: Int?
         /// Names of the chat tools offered to the model (besides image
         /// generation, which has its own switch). Web tools send the
         /// model's queries to public services, so they're opt-in.
@@ -141,6 +153,11 @@ extension Profile {
         p.request.systemPrompt = defaultSystemPrompt
         p.tools.enableImageGeneration = false
         p.tools.enableMusicGeneration = false
+        p.tools.musicModel = "turbo"
+        p.tools.musicCreativity = 0.42
+        p.tools.musicAdherence = 0.5
+        p.tools.creatorMode = false
+        p.tools.creatorCountdown = 3
         p.tools.enabledTools = defaultEnabledTools
         p.tools.imageGenModel = "gptqMixed"
         p.tools.imageEditModel = ""
@@ -199,6 +216,11 @@ public enum ProfileResolver {
             systemPrompt: v(\.request.systemPrompt),
             enableImageGeneration: v(\.tools.enableImageGeneration),
             enableMusicGeneration: v(\.tools.enableMusicGeneration),
+            musicModel: v(\.tools.musicModel),
+            musicCreativity: min(max(v(\.tools.musicCreativity), 0), 1),
+            musicAdherence: min(max(v(\.tools.musicAdherence), 0), 1),
+            creatorMode: v(\.tools.creatorMode),
+            creatorCountdown: min(max(v(\.tools.creatorCountdown), 0), 30),
             enabledTools: v(\.tools.enabledTools),
             imageGenModel: v(\.tools.imageGenModel),
             imageEditModel: v(\.tools.imageEditModel),
@@ -228,6 +250,11 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var systemPrompt: String
     public var enableImageGeneration: Bool
     public var enableMusicGeneration: Bool
+    public var musicModel: String
+    public var musicCreativity: Double
+    public var musicAdherence: Double
+    public var creatorMode: Bool
+    public var creatorCountdown: Int
     public var enabledTools: [String]
     public var imageGenModel: String
     public var imageEditModel: String
@@ -273,6 +300,11 @@ extension Profile {
         ProfileField("systemPrompt", \.request.systemPrompt),
         ProfileField("enableImageGeneration", \.tools.enableImageGeneration),
         ProfileField("enableMusicGeneration", \.tools.enableMusicGeneration),
+        ProfileField("musicModel", \.tools.musicModel),
+        ProfileField("musicCreativity", \.tools.musicCreativity),
+        ProfileField("musicAdherence", \.tools.musicAdherence),
+        ProfileField("creatorMode", \.tools.creatorMode),
+        ProfileField("creatorCountdown", \.tools.creatorCountdown),
         ProfileField("enabledTools", \.tools.enabledTools),
         ProfileField("imageGenModel", \.tools.imageGenModel),
         ProfileField("imageEditModel", \.tools.imageEditModel),

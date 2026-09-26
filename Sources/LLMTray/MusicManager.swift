@@ -1,6 +1,72 @@
 import Foundation
 import LLMTrayCore
 
+/// Which ACE-Step 1.5 DiT makes the music. Two different trade-offs, both
+/// measured (quant-ternary acestep-quant/docs/FINDINGS.md): turbo's mix
+/// sounds fuller and more finished; sft sings the lyrics far more clearly
+/// (Whisper WER 0.22 vs 0.56) with the voice more upfront.
+enum MusicModel: String, CaseIterable, Identifiable, Codable {
+    case turbo
+    case sftGPTQ4
+    case sft8bit
+    case sftBF16
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .turbo: return NSLocalizedString("ACE-Step turbo — fuller sound", comment: "")
+        case .sftGPTQ4: return NSLocalizedString("ACE-Step sft — clear vocals, GPTQ 4-bit", comment: "")
+        case .sft8bit: return NSLocalizedString("ACE-Step sft — clear vocals, 8-bit", comment: "")
+        case .sftBF16: return NSLocalizedString("ACE-Step sft — clear vocals, full precision", comment: "")
+        }
+    }
+
+    var summary: String {
+        switch self {
+        case .turbo: return NSLocalizedString("A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.", comment: "")
+        default: return NSLocalizedString("Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music.", comment: "")
+        }
+    }
+
+    var approximateDownloadDescription: String {
+        switch self {
+        case .turbo: return "~9GB"
+        case .sftGPTQ4: return "~4.5GB"
+        case .sft8bit: return "~5.5GB"
+        case .sftBF16: return "~7.5GB"
+        }
+    }
+
+    /// The DiT, text encoder and VAE, in mlx-audio's ACE-Step layout.
+    var hfRepo: String {
+        switch self {
+        case .turbo: return "mlx-community/ACE-Step1.5-MLX-4bit"
+        case .sftGPTQ4: return "roman220220/ACE-Step1.5-sft-MLX-gptq-4bit"
+        case .sft8bit: return "roman220220/ACE-Step1.5-sft-MLX-8bit"
+        case .sftBF16: return "roman220220/ACE-Step1.5-sft-MLX-bf16"
+        }
+    }
+
+    /// The sft conversions aren't on HF yet: offered where they're in place.
+    var isPublished: Bool { self == .turbo }
+
+    /// turbo needs the 5 Hz LM planner; sft sings without it.
+    var usesPlanner: Bool { self == .turbo }
+    /// "Creativity" is the planner's sampling temperature (sft has no planner).
+    var hasCreativity: Bool { usesPlanner }
+    var runnerMode: String { self == .turbo ? "turbo" : "sft" }
+
+    var folderName: String {
+        switch self {
+        case .turbo: return "ace-step-1.5-4bit"
+        case .sftGPTQ4: return "ace-step-1.5-sft-gptq-4bit"
+        case .sft8bit: return "ace-step-1.5-sft-8bit"
+        case .sftBF16: return "ace-step-1.5-sft-bf16"
+        }
+    }
+}
+
 /// Bootstraps and drives ACE-Step 1.5 (MIT; text and lyrics to music with
 /// vocals, 48 kHz stereo) through mlx-audio, for the `generate_music` chat
 /// tool. Its own venv, like mflux's: mlx-audio pulls in its own
@@ -45,12 +111,9 @@ final class MusicManager: ObservableObject {
         ]
     }
 
-    /// The 4-bit DiT, text encoder and VAE (mlx-community's conversion).
-    static let ditRepo = "mlx-community/ACE-Step1.5-MLX-4bit"
     /// The 5 Hz LM planner, 1.7B: a folder of the official repo.
     static let lmRepo = "ACE-Step/Ace-Step1.5"
     static let lmFolder = "acestep-5Hz-lm-1.7B"
-    static let approximateDownloadDescription = "~9GB"
 
     static var venvDir: String { RuntimePaths.externalRuntimeDir + "/music_venv" }
     private var venvDir: String { Self.venvDir }
@@ -59,16 +122,27 @@ final class MusicManager: ObservableObject {
     private var installStamp: String { venvDir + "/llmtray-requirements.txt" }
     private static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/music_models" }
     private var modelsDir: String { Self.modelsDir }
-    private var ditDir: String { Self.modelsDir + "/ace-step-1.5-4bit" }
+    static func ditDir(_ model: MusicModel) -> String { modelsDir + "/" + model.folderName }
     private var lmDir: String { Self.modelsDir + "/ace-step-1.5-lm-1.7B" }
     /// Where the checkpoints are, with their repos (About › Licenses).
     static var modelPaths: [(String, String)] {
-        [(modelsDir + "/ace-step-1.5-4bit", ditRepo), (modelsDir + "/ace-step-1.5-lm-1.7B", lmRepo)]
+        MusicModel.allCases.map { (ditDir($0), $0.hfRepo) } + [(modelsDir + "/ace-step-1.5-lm-1.7B", lmRepo)]
     }
 
-    var isReady: Bool {
-        FileManager.default.fileExists(atPath: ditDir) && FileManager.default.fileExists(atPath: lmDir)
-            && installedRequirements() == Self.requirements.joined(separator: "\n")
+    /// The models Settings offers.
+    static var selectable: [MusicModel] {
+        MusicModel.allCases.filter { $0.isPublished || FileManager.default.fileExists(atPath: ditDir($0)) }
+    }
+
+    func isDownloaded(_ model: MusicModel) -> Bool { Self.isDownloadedStatic(model) }
+
+    static func isDownloadedStatic(_ model: MusicModel) -> Bool {
+        FileManager.default.fileExists(atPath: ditDir(model))
+            && (!model.usesPlanner || FileManager.default.fileExists(atPath: modelsDir + "/ace-step-1.5-lm-1.7B"))
+    }
+
+    func isReady(_ model: MusicModel) -> Bool {
+        isDownloaded(model) && installedRequirements() == Self.requirements.joined(separator: "\n")
     }
 
     private func installedRequirements() -> String? {
@@ -96,7 +170,7 @@ final class MusicManager: ObservableObject {
     /// Settings-initiated, before the tool is turned on: the packages and
     /// both checkpoints, each downloaded to a temporary folder and moved
     /// into place only when complete.
-    func download() async throws {
+    func download(_ model: MusicModel) async throws {
         guard !isBusy else {
             throw MusicError.processFailed(NSLocalizedString("The music generator is busy -- try again once it's done.", comment: ""))
         }
@@ -104,11 +178,11 @@ final class MusicManager: ObservableObject {
         defer { isBusy = false; statusText = "" }
         try await ensurePackagesInstalled()
         try FileManager.default.createDirectory(atPath: modelsDir, withIntermediateDirectories: true)
-        if !FileManager.default.fileExists(atPath: ditDir) {
-            statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), "ACE-Step 1.5")
-            try await fetch(repo: Self.ditRepo, patterns: nil, into: ditDir)
+        if !FileManager.default.fileExists(atPath: Self.ditDir(model)) {
+            statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
+            try await fetch(repo: model.hfRepo, patterns: nil, into: Self.ditDir(model))
         }
-        if !FileManager.default.fileExists(atPath: lmDir) {
+        if model.usesPlanner, !FileManager.default.fileExists(atPath: lmDir) {
             statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), "ACE-Step 1.5 LM")
             let temp = lmDir + ".partial-\(UUID().uuidString)"
             do {
@@ -144,8 +218,17 @@ final class MusicManager: ObservableObject {
     /// One piece of music, as 16-bit stereo WAV bytes -- in memory only: the
     /// runner reads the request from stdin and writes the audio to stdout,
     /// so nothing touches the disk (a temporary chat must leave no trace).
-    func generate(caption: String, lyrics: String, duration: Int, language: String) async throws -> Data {
-        guard isReady else {
+    /// One piece of music and the seed it was made with (Regenerate can keep it).
+    struct Song {
+        var audio: Data
+        var seed: Int?
+    }
+
+    /// `creativity` / `adherence`: 0...1, nil = the runner's defaults. `seed`:
+    /// nil = a new one.
+    func generate(caption: String, lyrics: String, duration: Int, language: String, model: MusicModel,
+                  creativity: Double? = nil, adherence: Double? = nil, seed: Int? = nil) async throws -> Song {
+        guard isReady(model) else {
             throw MusicError.processFailed(NSLocalizedString("Music generation isn't set up -- turn it on again in Settings.", comment: ""))
         }
         // Claimed before any suspension: two tabs can't both run it.
@@ -160,15 +243,19 @@ final class MusicManager: ObservableObject {
             statusText = ""
             progress = nil
         }
-        let request = try JSONSerialization.data(withJSONObject: [
-            "caption": caption, "lyrics": lyrics, "duration": duration, "language": language,
-        ])
+        var fields: [String: Any] = [
+            "caption": caption, "lyrics": lyrics, "duration": duration, "language": language, "mode": model.runnerMode,
+        ]
+        if let creativity { fields["creativity"] = min(max(creativity, 0), 1) }
+        if let adherence { fields["adherence"] = min(max(adherence, 0), 1) }
+        if let seed { fields["seed"] = seed }
+        let request = try JSONSerialization.data(withJSONObject: fields)
         let result = AudioResult()
+        let usedSeed = SeedBox()
         try await ProcessRunner.runStreaming(venvPython, [
             RuntimePaths.runtimeDir + "/llmtray_music_runner.py",
-            "--dit", ditDir,
-            "--lm", lmDir,
-        ], stdin: request, environment: [
+            "--dit", Self.ditDir(model),
+        ] + (model.usesPlanner ? ["--lm", lmDir] : []), stdin: request, environment: [
             "PYTHONDONTWRITEBYTECODE": "1",
             "HF_HUB_OFFLINE": "1",
             "TOKENIZERS_PARALLELISM": "false",
@@ -178,6 +265,8 @@ final class MusicManager: ObservableObject {
             switch message {
             case .audio(let data):
                 result.set(data)
+            case .seed(let value):
+                usedSeed.set(value)
             case .step(let step, let total):
                 Task { @MainActor [weak self] in
                     guard let self, self.isBusy, total > 0 else { return }
@@ -191,7 +280,7 @@ final class MusicManager: ObservableObject {
             }
         })
         guard let data = result.get() else { throw MusicError.outputMissing }
-        return data
+        return Song(audio: data, seed: usedSeed.get())
     }
 
     /// The runner's stage names, for the UI.
@@ -211,6 +300,13 @@ final class MusicManager: ObservableObject {
             throw MusicError.processFailed(failure.outputTail)
         }
     }
+}
+
+private final class SeedBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: Int?
+    func set(_ v: Int) { lock.lock(); value = v; lock.unlock() }
+    func get() -> Int? { lock.lock(); defer { lock.unlock() }; return value }
 }
 
 /// The audio, set from the reader thread, read after the run.

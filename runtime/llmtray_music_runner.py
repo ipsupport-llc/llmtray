@@ -8,7 +8,16 @@
 # chat requires.
 #
 #   python llmtray_music_runner.py --dit <dir> --lm <dir> < request.json
-#   request: {"caption": ..., "lyrics": "", "duration": 30, "language": "en", "seed": 0, "steps": 8}
+#   request: {"caption": ..., "lyrics": "", "duration": 30, "language": "en", "seed": 0,
+#             "mode": "turbo" | "sft", "creativity": 0...1, "adherence": 0...1}
+#
+# Two DiTs, both measured in quant-ternary acestep-quant (docs/FINDINGS.md):
+# - turbo (8 steps, the LM planner writes the song's codes): the fuller,
+#   more finished-sounding mix;
+# - sft (50 steps, CFG 7, no planner -- the LM hints mlx-audio feeds a DiT
+#   turn sft into noise): clearer vocals (Whisper WER 0.22 vs 0.56).
+# The knobs: turbo's creativity is the planner's sampling temperature,
+# adherence its CFG; sft's adherence is the DiT's CFG.
 #
 # The LM planner is prompted the way the official ACE-Step pipeline does
 # (and the LM was trained on): mlx-audio's own prompt layout makes the LM
@@ -43,10 +52,17 @@ caption = str(request.get("caption", "")).strip()
 lyrics = str(request.get("lyrics", "")).strip()
 duration = float(min(max(float(request.get("duration", 30)), 10), 180))
 language = str(request.get("language") or "unknown")
-steps = int(request.get("steps", 8))
-seed = int(request.get("seed") or 0) or int.from_bytes(os.urandom(4), "big")
+mode = "sft" if request.get("mode") == "sft" else "turbo"
+creativity = min(max(float(request.get("creativity", 0.42)), 0.0), 1.0)
+adherence = min(max(float(request.get("adherence", 0.5)), 0.0), 1.0)
+steps = int(request.get("steps", 50 if mode == "sft" else 8))
+seed = int(request.get("seed") or 0) or int.from_bytes(os.urandom(4), "big") % (2**31)
+LM_TEMPERATURE = 0.6 + 0.6 * creativity      # 0.85 at the default, the official value
+LM_CFG = 1.0 + 2.0 * adherence               # 2.0 at the default
+DIT_CFG = 3.0 + 8.0 * adherence              # 7.0 at the default (sft)
 
 import mlx.core as mx  # noqa: E402
+import mlx.nn as mlx_nn  # noqa: E402
 import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 
@@ -81,7 +97,8 @@ def load_lm(path):
         return model, load_tokenizer(local)
 
 
-def sample(logits, temperature=0.85, top_p=0.9):
+def sample(logits, temperature=None, top_p=0.9):
+    temperature = temperature or LM_TEMPERATURE
     probs = mx.softmax(logits.astype(mx.float32) / temperature, axis=-1)
     order = mx.argsort(-probs)
     sorted_p = probs[order]
@@ -165,7 +182,7 @@ def plan(model, tokenizer, on_progress):
     mask = mx.array(mask)
     need, codes = int(round(duration * 5)), []
     for n in range(need):
-        logits = uncond.logits + 2.0 * (cond.logits - uncond.logits)
+        logits = uncond.logits + LM_CFG * (cond.logits - uncond.logits)
         width = min(logits.shape[-1], mask.shape[0])
         token = sample(mx.where(mask[:width], logits[:width], -mx.inf))
         codes.append(token)
@@ -190,12 +207,15 @@ def wav_bytes(audio, rate):
 # really goes before the DiT loads.
 mx.set_cache_limit(1 << 30)
 mx.random.seed(seed)
-emit("STAGE", "Writing the song")
-emit("STEP", "0 100")
-lm, tokenizer = load_lm(arg("--lm"))
-codes, meta = plan(lm, tokenizer, lambda f: emit("STEP", f"{int(5 + 60 * f)} 100"))
-del lm, tokenizer
-mx.clear_cache()
+emit("SEED", str(seed))   # Regenerate can keep it
+codes, meta = "", {}
+if mode == "turbo":
+    emit("STAGE", "Writing the song")
+    emit("STEP", "0 100")
+    lm, tokenizer = load_lm(arg("--lm"))
+    codes, meta = plan(lm, tokenizer, lambda f: emit("STEP", f"{int(5 + 60 * f)} 100"))
+    del lm, tokenizer
+    mx.clear_cache()
 
 emit("STAGE", "Composing")
 emit("STEP", "65 100")
@@ -214,6 +234,26 @@ pick_module = audio_utils.get_model_class
 audio_utils.get_model_class = lambda model_type, model_name, category, model_remapping: pick_module(
     "ace_step", None, category, model_remapping)
 model = load(arg("--dit"))
+
+
+class NullAwareEncoder(mlx_nn.Module):
+    """CFG's unconditional branch with the trained null_condition_emb, as
+    the official pipeline does -- mlx-audio encodes all-zero text there
+    (quant-ternary acestep-quant/poc/acestep_null_cond.py)."""
+
+    def __init__(self, inner, null_emb):
+        super().__init__()
+        self.inner, self._null = inner, null_emb
+
+    def __call__(self, text_hidden_states=None, lyric_hidden_states=None, **kwargs):
+        out, mask = self.inner(text_hidden_states=text_hidden_states, lyric_hidden_states=lyric_hidden_states, **kwargs)
+        if not mx.any(text_hidden_states).item() and not mx.any(lyric_hidden_states).item():
+            out = mx.broadcast_to(self._null.astype(out.dtype), out.shape)
+        return out, mask
+
+
+if mode == "sft":
+    model.encoder = NullAwareEncoder(model.encoder, model.null_condition_emb)
 
 # The VAE decodes in 10 s windows (16 latent frames of overlap each side,
 # cut off again): bit-identical to one whole decode, about half its peak,
@@ -243,8 +283,15 @@ def decode(latents):
 model.vae.decode = decode
 sys.stdout = io.StringIO()   # mlx-audio's prints aren't protocol lines
 try:
-    results = list(model.generate(text=caption, lyrics=lyrics, duration=duration, seed=seed, num_steps=steps,
-                                  vocal_language=language, verbose=False))
+    if mode == "sft":
+        # No planner (its hints break the sft DiT); CFG on every step, the
+        # official sft sampling: shift 1, APG.
+        results = list(model.generate(text=caption, lyrics=lyrics, duration=duration, seed=seed, num_steps=steps,
+                                      vocal_language=language, verbose=False, use_lm=False, guidance_scale=DIT_CFG,
+                                      shift=1.0, guidance_interval=1.0, cfg_type="apg"))
+    else:
+        results = list(model.generate(text=caption, lyrics=lyrics, duration=duration, seed=seed, num_steps=steps,
+                                      vocal_language=language, verbose=False))
 finally:
     sys.stdout = OUT
 audio = np.array(results[-1].audio.astype(mx.float32))

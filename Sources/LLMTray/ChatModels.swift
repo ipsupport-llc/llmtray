@@ -121,6 +121,11 @@ struct ChatSettings {
     var systemPrompt: String = ""
     var enableImageGeneration: Bool = false
     var enableMusicGeneration: Bool = false
+    var musicModel: MusicModel = .turbo
+    var musicCreativity: Double = 0.42
+    var musicAdherence: Double = 0.5
+    var creatorMode: Bool = false
+    var creatorCountdown: Int = 3
     var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
     var imageGenModel: ImageGenModel = .gptqMixed
     /// The model edit_image uses; nil = no editing.
@@ -146,6 +151,11 @@ struct ChatSettings {
         systemPrompt = p.systemPrompt
         enableImageGeneration = p.enableImageGeneration
         enableMusicGeneration = p.enableMusicGeneration
+        musicModel = MusicModel(rawValue: p.musicModel) ?? .turbo
+        musicCreativity = p.musicCreativity
+        musicAdherence = p.musicAdherence
+        creatorMode = p.creatorMode
+        creatorCountdown = p.creatorCountdown
         enabledTools = Set(p.enabledTools)
         imageGenModel = ImageGenModel(rawValue: p.imageGenModel) ?? .gptqMixed
         imageEditModel = ImageGenModel(rawValue: p.imageEditModel).flatMap { $0.supportsEditing ? $0 : nil }

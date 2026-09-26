@@ -96,9 +96,10 @@ struct AudioClipView: View {
     let id: String
     let prompt: String
     let generationSeconds: Double?
-    /// Makes it again (a new seed); nil hides the button.
-    var regenerate: (() -> Void)?
-    @EnvironmentObject private var chat: ChatClient
+    /// It came from a tool call that can run again.
+    var canRegenerate: Bool = false
+    /// Regenerate / Tweak / Remove; nil while the chat can't (busy, no server).
+    var action: ((ChatClient.MediaAction) -> Void)?
     @ObservedObject private var playback = AudioPlayback.shared
 
     private var isCurrent: Bool { playback.currentID == id }
@@ -147,14 +148,25 @@ struct AudioClipView: View {
                     Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
                 }
                 .buttonStyle(.plain)
-                if let regenerate {
-                    Button(action: regenerate) {
+                if canRegenerate {
+                    Button { action?(.regenerate) } label: {
                         Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
-                    .disabled(chat.isBusy)
-                    .help(Text("Make this music again (a new seed, the same request)"))
+                    .disabled(action == nil)
+                    .help(Text("Another version next to this one (a new seed, the same request)"))
+                    Button { action?(.tweak) } label: {
+                        Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(action == nil)
+                    .help(Text("Change the style, lyrics, model or knobs, then make another version"))
                 }
+                Button { action?(.remove) } label: {
+                    Label("Remove", systemImage: "trash").font(.system(size: 10))
+                }
+                .buttonStyle(.plain)
+                .disabled(action == nil)
                 if let generationSeconds {
                     Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
                         .font(.system(size: 10))

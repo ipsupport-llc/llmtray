@@ -498,9 +498,35 @@ struct ProfilesPane: View {
                     Text(imageModelDownloadError).font(.caption).foregroundStyle(.red)
                 }
             }
+            Section("Creator mode") {
+                row(\.tools.creatorMode, "Creator mode", "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it.") {
+                    Toggle("", isOn: b(\.tools.creatorMode)).labelsHidden()
+                }
+                row(\.tools.creatorCountdown, "Countdown", "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.") {
+                    Stepper(value: b(\.tools.creatorCountdown), in: 0...30) {
+                        Text(verbatim: "\(profiles.value(\.tools.creatorCountdown, profileID: selectedID)) s")
+                    }
+                    .fixedSize()
+                }
+            }
             Section("Music generation") {
                 row(\.tools.enableMusicGeneration, "Enable music generation", "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.") {
                     Toggle("", isOn: enableMusicGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
+                }
+                row(\.tools.musicModel, "Music model", "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.") {
+                    Picker("", selection: musicModelBinding) {
+                        ForEach(MusicManager.selectable + (MusicManager.selectable.contains(musicModel) ? [] : [musicModel])) {
+                            Text($0.displayName).tag($0)
+                        }
+                    }
+                    .labelsHidden().disabled(chat.isDownloadingModel)
+                }
+                row(\.tools.musicCreativity, "Creativity", "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.") {
+                    SliderValue(value: b(\.tools.musicCreativity), range: 0...1, step: 0.05, format: "%.2f")
+                        .disabled(!musicModel.hasCreativity)
+                }
+                row(\.tools.musicAdherence, "Follow the description", "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.") {
+                    SliderValue(value: b(\.tools.musicAdherence), range: 0...1, step: 0.05, format: "%.2f")
                 }
                 if chat.isDownloadingModel, !chat.musicStatusText.isEmpty {
                     HStack { ProgressView().controlSize(.small); Text(chat.musicStatusText).font(.caption).foregroundStyle(.secondary) }
@@ -671,28 +697,58 @@ struct ProfilesPane: View {
                     profiles.set(\.tools.enableMusicGeneration, false, profileID: selectedID)
                     return
                 }
-                if chat.isMusicModelReady {
-                    profiles.set(\.tools.enableMusicGeneration, true, profileID: selectedID)
-                    return
-                }
-                guard !chat.isDownloadingModel else { return }
-                let alert = NSAlert()
-                alert.messageText = NSLocalizedString("Enable music generation?", comment: "")
-                alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), "ACE-Step 1.5", MusicManager.approximateDownloadDescription)
-                alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
-                alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
-                guard alert.runModal() == .alertFirstButtonReturn else { return }
-                musicDownloadError = nil
-                let id = selectedID
-                Task {
-                    if let error = await chat.downloadMusicModel() {
-                        musicDownloadError = error.localizedDescription
-                    } else {
-                        profiles.set(\.tools.enableMusicGeneration, true, profileID: id)
-                    }
+                confirmMusicDownload(musicModel, title: NSLocalizedString("Enable music generation?", comment: "")) { id in
+                    profiles.set(\.tools.enableMusicGeneration, true, profileID: id)
                 }
             }
         )
+    }
+
+    private var musicModel: MusicModel {
+        MusicModel(rawValue: profiles.value(\.tools.musicModel, profileID: selectedID)) ?? .turbo
+    }
+
+    /// A model not downloaded yet goes through the same confirmed download
+    /// (only when music generation is on: it's downloaded when turned on).
+    private var musicModelBinding: Binding<MusicModel> {
+        Binding(
+            get: { musicModel },
+            set: { newModel in
+                guard newModel != musicModel else { return }
+                let enabled = profiles.value(\.tools.enableMusicGeneration, profileID: selectedID)
+                guard enabled, !chat.isMusicModelReady(newModel) else {
+                    profiles.set(\.tools.musicModel, newModel.rawValue, profileID: selectedID)
+                    return
+                }
+                confirmMusicDownload(newModel, title: NSLocalizedString("Switch the music model?", comment: "")) { id in
+                    profiles.set(\.tools.musicModel, newModel.rawValue, profileID: id)
+                }
+            }
+        )
+    }
+
+    /// Installs mlx-audio and downloads `model` if needed, then `then(profile)`.
+    private func confirmMusicDownload(_ model: MusicModel, title: String, then: @escaping (String) -> Void) {
+        let id = selectedID
+        if chat.isMusicModelReady(model) {
+            then(id)
+            return
+        }
+        guard !chat.isDownloadingModel else { return }
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), model.displayName, model.approximateDownloadDescription)
+        alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        musicDownloadError = nil
+        Task {
+            if let error = await chat.downloadMusicModel(model) {
+                musicDownloadError = error.localizedDescription
+            } else {
+                then(id)
+            }
+        }
     }
 
     private var enableImageGenerationBinding: Binding<Bool> {

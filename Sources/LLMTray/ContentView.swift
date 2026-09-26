@@ -245,9 +245,12 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
-                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index in regenerateMedia(msg.id, kind, index) } : nil)
+                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
+                    }
+                    if let draft = chat.draft {
+                        GenerationDraftView(draft: draft)
                     }
                     if chat.isGeneratingMedia {
                         if chat.generatingKind == .music {
@@ -343,8 +346,14 @@ struct ContentView: View {
         canChat && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
     }
 
-    private func regenerateMedia(_ messageID: UUID, _ kind: ChatClient.MediaKind, _ index: Int) {
-        chat.regenerateMedia(messageID: messageID, kind: kind, index: index, settings: chatSettings, server: server)
+    private func mediaAction(_ messageID: UUID, _ kind: ChatClient.MediaKind, _ index: Int, _ action: ChatClient.MediaAction) {
+        switch action {
+        case .remove:
+            chat.removeMedia(messageID: messageID, kind: kind, index: index)
+        case .regenerate, .tweak:
+            chat.regenerateMedia(messageID: messageID, kind: kind, index: index, settings: chatSettings, server: server,
+                                 tweak: action == .tweak)
+        }
     }
 
     private func send() {
