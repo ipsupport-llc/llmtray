@@ -70,7 +70,8 @@ if arg("--base-model") == "flux2-klein-4b":
     predicted = {}
     scheduler_step = FlowMatchEulerDiscreteScheduler.step
     def step(self, noise, timestep, latents, **kwargs):
-        predicted["x0"] = latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise
+        if timestep + 1 < steps:   # not kept for the last step: no preview there
+            predicted["x0"] = latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise
         return scheduler_step(self, noise, timestep, latents, **kwargs)
     FlowMatchEulerDiscreteScheduler.step = step
 
@@ -81,7 +82,7 @@ if arg("--base-model") == "flux2-klein-4b":
         def call_in_loop(self, t, config=None, **_):
             emit("STEP", f"{t + 1} {steps}")
             # A preview of each step but the last (the image itself follows).
-            latents = predicted.get("x0")
+            latents = predicted.pop("x0", None)
             if latents is None or t + 1 >= steps:
                 return
             packed = latents.reshape(latents.shape[0], config.height // 16, config.width // 16, latents.shape[-1]).transpose(0, 3, 1, 2)
