@@ -22,6 +22,7 @@
 "Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
 "Allow connections from the local network" = "Allow connections from the local network";
+"Already open in another tab" = "Already open in another tab";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
@@ -209,7 +210,6 @@
 "Open in New Tab" = "Open in New Tab";
 "Open in Window" = "Open in Window";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
-"Open in another tab" = "Open in another tab";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "Past %lld messages" = "Past %lld messages";
 "Pause download" = "Pause download";
