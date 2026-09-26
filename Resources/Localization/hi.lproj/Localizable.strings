@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "स्थानीय नेटवर्क से कनेक्शन की अनुमति दें";
 "Already open in another tab" = "पहले से किसी अन्य टैब में खुला हुआ है";
 "Also check when LLMTray starts" = "LLMTray शुरू होने पर भी जाँचें";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "छवियों को भी संपादित करता है — चैट से किसी एक या आप जो जोड़ते हैं। संपादित करने में कुछ मिनट लगते हैं।";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "कोई अन्य mlx_lm.server फ़्लैग, स्पेस से अलग किए हुए, जैसे --draft-model <path>।";
 "Apache License 2.0" = "Apache License 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "संकुचन";
 "Compaction failed: %@" = "Compaction विफल: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "चैट में इतने से अधिक संदेश होने पर उसे अपने आप संकुचित करता है। चैट में “संकुचित करें” बटन फिर भी काम करता है।";
+"Composing…" = "रचना हो रही है…";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Copy" = "कॉपी करें";
 "Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "यहाँ चैट्स खींचें, या किसी चैट के मेनू का उपयोग करें";
 "Duplicate this profile" = "इस प्रोफ़ाइल की कॉपी बनाता है।";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
+"Enable image editing?" = "छवि संपादन सक्षम करें?";
 "Enable image generation" = "इमेज जनरेशन सक्षम करें";
 "Enable image generation?" = "इमेज जनरेशन सक्षम करें?";
+"Enable music generation" = "संगीत जनरेशन सक्षम करें";
+"Enable music generation?" = "संगीत जनरेशन सक्षम करें?";
 "Extra server arguments" = "अतिरिक्त सर्वर आर्ग्युमेंट्स";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — जनरेट और संपादित करें";
 "Failed to reload the chat model after image generation: %@" = "Image generation के बाद chat मॉडल को पुनः लोड करना विफल रहा: %@";
 "Failed: %@" = "विफल: %@";
 "Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
@@ -128,8 +134,11 @@
 "General" = "सामान्य";
 "Generated in %.1fs" = "%.1fs में जनरेट हुआ";
 "Generating image…" = "इमेज जनरेट हो रही है…";
+"Generating music…" = "संगीत बनाया जा रहा है…";
 "Get one" = "एक प्राप्त करें";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "मॉडल को generate_image टूल देता है (tool-calling मॉडल चाहिए)। पहली बार इमेज मॉडल डाउनलोड किया जाता है।";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "मॉडल को generate_music टूल देता है: वर्णन से गाना (गाये हुए बोल) या साधनात्मक आउटपुट (ACE-Step 1.5, MIT लाइसेंस; 30 सेकंड के संगीत के लिए लगभग 20 सेकंड)। पहली बार मॉडल डाउनलोड होगा।";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "मॉडल को एक edit_image टूल देता है: यह चैट की एक छवि बदलता है — जिसे आपने जोड़ा हो या यहाँ जनरेट की गई हो। इसके लिए image generation चालू होना चाहिए। इसका अपना मॉडल है, जिसे चुनने पर डाउनलोड किया जाता है।";
 "Hacker News" = "Hacker News";
 "Hide chats" = "चैट छुपाएँ";
 "High quality (larger canvas)" = "High quality (बड़ा कैनवास)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ने %@ (HTTP %d) अस्वीकार कर दिया: यह सीमित, निजी है, या मौजूद नहीं है। यदि यह सीमित है तो huggingface.co/%@ पर लाइसेंस स्वीकार करें और Settings → Models में token जाँचें।";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "निष्क्रिय — अगला संदेश आने पर मॉडल फिर लोड होगा";
+"Image editing" = "छवि संपादन";
 "Image generation" = "इमेज जनरेशन";
 "Image generation failed: %@" = "Image generation विफल: %@";
 "Image generation finished but produced no output file." = "Image generation समाप्त हुआ पर कोई आउटपुट फ़ाइल नहीं बनी।";
@@ -152,6 +162,7 @@
 "Include the server log" = "सर्वर लॉग शामिल करें";
 "Installed" = "इंस्टॉल किया गया";
 "Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
+"Installing mlx-audio…" = "mlx-audio इंस्टॉल किया जा रहा है…";
 "Its chats stay, back among the recents." = "इसके चैट वहीं रहते हैं, हाल के में वापस आ जाते हैं।";
 "KV cache" = "KV कैश";
 "KV group size" = "KV समूह आकार";
@@ -175,6 +186,7 @@
 "Max tokens" = "अधिकतम टोकन";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "पहले की बातचीत का संदर्भ फिर से इस्तेमाल करने के लिए रखी गई मेमोरी, ताकि जारी चैट अपना पूरा इतिहास दोबारा न पढ़े। इसकी सीमा तय है, ताकि यह इतनी न बढ़े कि सर्वर की मेमोरी खत्म हो जाए।";
 "Message…" = "संदेश…";
+"Mixing…" = "मिक्स किया जा रहा है…";
 "Model" = "मॉडल";
 "Model actions" = "मॉडल कार्रवाइयाँ";
 "Model card" = "मॉडल कार्ड";
@@ -182,6 +194,10 @@
 "Models folder" = "मॉडल फ़ोल्डर";
 "Models: %@ · free: %@" = "मॉडल: %@ · खाली: %@";
 "Move to Project" = "प्रोजेक्ट में ले जाएँ";
+"Music generation" = "संगीत जनरेशन";
+"Music generation failed: %@" = "संगीत जनरेशन विफल रहा: %@";
+"Music generation finished but produced no audio." = "संगीत जनरेशन पूरा हुआ पर कोई ऑडियो नहीं मिला।";
+"Music generation isn't set up -- turn it on again in Settings." = "संगीत जनरेशन सेटअप नहीं है — सेटिंग्स में इसे दोबारा चालू करें।";
 "Name new chats automatically" = "नई चैट का नाम स्वतः दें";
 "Network" = "नेटवर्क";
 "Never" = "कभी नहीं";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray टीम को रिपोर्ट संलग्न करके ईमेल खोलता है: संस्करण, Mac, मॉडल और सर्वर सेटिंग्स, सर्वर लॉग और हाल की क्रैश रिपोर्टें। आपकी चैट कभी शामिल नहीं की जातीं, और आप पहले पूरी रिपोर्ट देखेंगे।";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "केवल LLMTray के लिए macOS भाषा को ओवरराइड करता है। LLMTray के पुनः शुरू होने के बाद प्रभावी होता है। अनुवाद न किया गया टेक्स्ट अंग्रेज़ी में दिखता है।";
 "Past %lld messages" = "पिछले %lld संदेश";
+"Pause" = "रोकें";
 "Pause download" = "डाउनलोड रोकें।";
 "Paused" = "रुका हुआ";
 "Performance" = "प्रदर्शन";
 "Pin" = "पिन करें";
 "Pinned" = "पिन किया गया";
+"Play" = "प्ले";
 "Port" = "पोर्ट";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "अटेंशन कैश की सटीकता। 8-bit: लगभग बिना हानि, आधी मेमोरी। 4-bit: एक-चौथाई मेमोरी, लंबे संदर्भ में स्पष्ट रूप से खराब। Full: सबसे अच्छा, सबसे अधिक मेमोरी।";
 "Prefill step" = "Prefill चरण";
@@ -295,6 +313,7 @@
 "Server log" = "सर्वर लॉग";
 "Server settings changed -- restart to apply them." = "सर्वर सेटिंग्ज़ बदल गई हैं — इन्हें लागू करने के लिए रीस्टार्ट करें।";
 "Setting up image generation (first time only)…" = "Image generation की सेटअप कर रहा है (केवल पहली बार)…";
+"Setting up music generation (first time only)…" = "संगीत जनरेशन सेट किया जा रहा है (केवल पहली बार)…";
 "Settings" = "सेटिंग्ज़";
 "Settings (⌘,)" = "सेटिंग्ज़ खोलें (⌘,)।";
 "Settings profile for this model" = "इस मॉडल के लिए सेटिंग्ज़ प्रोफ़ाइल चुनें।";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "रनटाइम अपडेट करने के लिए सर्वर रोकें।";
 "Stopped" = "रुका हुआ";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "रुका: मॉडल लगातार tools बुलाता रहा (%lld राउंड्स एक टर्न में)।";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "इमेज जनरेट होते समय चैट मॉडल रोकता है और बाद में उसे फिर लोड करता है। दोनों को साथ चलाने से इस Mac की मेमोरी से ज़्यादा हो सकता है।";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "छवि या संगीत जनरेशन के दौरान चैट मॉडल रोकता है और बाद में पुनः लोड करता है। दोनों एक साथ इस Mac की मेमोरी से अधिक हो सकते हैं।";
 "Sunrise & sunset" = "सूर्योदय और सूर्यास्त";
 "Support" = "सहायता";
 "System" = "सिस्टम";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "API क्लाइंट द्वारा भेजा जाने वाला मॉडल नाम।";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "अपने अलग विंडो में चैट के ऊपर मॉडल चयन, Start/Stop, प्रोफ़ाइल, टूल और तापमान दिखाएँ। बंद होने पर: विंडो केवल चैट और बातचीत होती है — ये नियंत्रण मेन्यू बार में रहते हैं।";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
+"The music generator is busy -- try again once it's done." = "संगीत जेनरेटर व्यस्त है — पूरा होने के बाद पुनः प्रयास करें।";
+"The music generator is busy with another chat -- try again once it's done." = "संगीत जेनरेटर किसी अन्य चैट में व्यस्त है — पूरा होने पर पुनः प्रयास करें।";
 "The report" = "रिपोर्ट";
 "The running model server is stopped and started again." = "चल रहा मॉडल सर्वर रोका जाता है और फिर से शुरू किया जाता है।";
 "The server log" = "सर्वर लॉग";
@@ -398,8 +419,9 @@
 "What happened?" = "क्या हुआ?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "आप क्या कर रहे थे, आपने क्या उम्मीद की थी, और इसके बजाय आपने क्या देखा। आपकी चैट कभी शामिल नहीं की जातीं।";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
-"Which Z-Image-Turbo quantization generates the images." = "कौन-सा Z-Image-Turbo क्वांटाइज़ेशन छवियाँ जनरेट करता है।";
+"Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "गाना लिखा जा रहा है…";
 "Yesterday" = "कल";
 "You" = "आप";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "आपका मेल ऐप संलग्नक स्वीकार नहीं कर सका: रिपोर्ट Finder में दिखाई जा रही है, उसे ईमेल में संलग्न करें।";

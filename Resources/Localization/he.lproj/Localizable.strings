@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "אפשר חיבורים מהרשת המקומית";
 "Already open in another tab" = "כבר פתוח בכרטיסייה אחרת";
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "גם עורך תמונות — מתמונה מהשיחה או אחת שמצורפת. עריכות לוקחות כמה דקות.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "דגלי mlx_lm.server נוספים, מופרדים ברווחים, למשל --draft-model <path>.";
 "Apache License 2.0" = "רישיון Apache 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "דחיסה";
 "Compaction failed: %@" = "כיווץ נכשל: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "דוחס את השיחה אוטומטית כשהיא עוברת מספר הודעות זה. כפתור הדחיסה בשיחה פועל בכל מקרה.";
+"Composing…" = "מנסח…";
 "Concurrent requests" = "בקשות בו־זמניות";
 "Copy" = "העתק";
 "Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "גרור שיחות לכאן, או השתמש בתפריט של שיחה";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
 "Edit Profile…" = "עריכת פרופיל…";
+"Enable image editing?" = "להפעיל עריכת תמונות?";
 "Enable image generation" = "הפעלת יצירת תמונות";
 "Enable image generation?" = "להפעיל יצירת תמונות?";
+"Enable music generation" = "הפעל יצירת מוזיקה";
+"Enable music generation?" = "להפעיל יצירת מוזיקה?";
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — ליצור ולערוך";
 "Failed to reload the chat model after image generation: %@" = "נכשל בטעינת מודל השיחה מחדש לאחר יצירת תמונה: %@";
 "Failed: %@" = "נכשל: %@";
 "Fast (smaller canvas)" = "מהיר (קנבס קטן יותר)";
@@ -128,8 +134,11 @@
 "General" = "כללי";
 "Generated in %.1fs" = "נוצר ב־%.1fs";
 "Generating image…" = "יוצר תמונה…";
+"Generating music…" = "מוליד מוזיקה…";
 "Get one" = "קבל אחד";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "מספק למודל כלי generate_music: שיר עם מילים מושרות או יצירה אינסטרומנטלית מתוך תיאור (ACE-Step 1.5, רישיון MIT; כ‑20 שנ׳ ל‑30 שנ׳ של מוזיקה). בפעם הראשונה המודל יורד.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "נותן למודל כלי edit_image: משנה תמונה מהשיחה — אחת שצירפת או שנוצרה כאן. דורש שיהיה מופעל יצור תמונות. המודל נמצא משלו, יורד כשאתה בוחר בו.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "הסתר צ'אטים";
 "High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face דחה את %@ (HTTP %d): הוא מוגבל, פרטי או לא קיים. אם הוא מוגבל — קבל את הרישיון ב‑huggingface.co/%@ ובדוק את האסימון ב‑Settings → Models.";
 "Hugging Face token" = "אסימון של Hugging Face";
 "Idle -- the model reloads on the next message" = "לא פעיל -- המודל ייטען מחדש בהודעה הבאה";
+"Image editing" = "עריכת תמונה";
 "Image generation" = "יצירת תמונות";
 "Image generation failed: %@" = "יצירת התמונה נכשלה: %@";
 "Image generation finished but produced no output file." = "יצירת התמונה הסתיימה אך לא נוצר קובץ פלט.";
@@ -152,6 +162,7 @@
 "Include the server log" = "כלול את לוג השרת";
 "Installed" = "מותקן";
 "Installing mflux…" = "מתקין/ה mflux…";
+"Installing mlx-audio…" = "מתקין mlx-audio…";
 "Its chats stay, back among the recents." = "הצ'אטים נשארים, חוזרים לרשימת האחרונים.";
 "KV cache" = "מטמון KV";
 "KV group size" = "גודל קבוצת KV";
@@ -175,6 +186,7 @@
 "Max tokens" = "מספר טוקנים מרבי";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
 "Message…" = "הודעה…";
+"Mixing…" = "ממזג…";
 "Model" = "מודל";
 "Model actions" = "פעולות מודל";
 "Model card" = "כרטיס המודל";
@@ -182,6 +194,10 @@
 "Models folder" = "תיקיית המודלים";
 "Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
 "Move to Project" = "העבר לפרויקט";
+"Music generation" = "יצירת מוזיקה";
+"Music generation failed: %@" = "יצירת מוזיקה נכשלה: %@";
+"Music generation finished but produced no audio." = "יצירת המוזיקה הסתיימה אך לא נוצר פס קול.";
+"Music generation isn't set up -- turn it on again in Settings." = "יצירת מוזיקה לא מוגדרת — הפעל שוב בהגדרות.";
 "Name new chats automatically" = "קרא לצ'אטים חדשים אוטומטית";
 "Network" = "רשת";
 "Never" = "אף פעם";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "פותח דוא״ל לצוות LLMTray עם דוח מצורף: גרסאות, ה‑Mac, הגדרות המודל והשרת, לוג השרת ודוחות קריסה אחרונים. השיחות שלך לא ייכללו, ותוכל לעיין בדוח כולו קודם.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "מחליף את שפת macOS עבור LLMTray בלבד. ייכנס לתוקף לאחר הפעלה מחדש של LLMTray. טקסט שלא תורגם יוצג באנגלית.";
 "Past %lld messages" = "%lld ההודעות האחרונות";
+"Pause" = "השהה";
 "Pause download" = "משהה את ההורדה.";
 "Paused" = "מושהה";
 "Performance" = "ביצועים";
 "Pin" = "נעץ";
 "Pinned" = "נעוץ";
+"Play" = "נגן";
 "Port" = "יציאה";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
 "Prefill step" = "שלב מילוי מקדים";
@@ -295,6 +313,7 @@
 "Server log" = "יומן השרת";
 "Server settings changed -- restart to apply them." = "הגדרות השרת השתנו -- יש להפעיל מחדש כדי להחיל אותן.";
 "Setting up image generation (first time only)…" = "מגדיר/ה יצירת תמונות (הפעם הראשונה בלבד)…";
+"Setting up music generation (first time only)…" = "מגדיר יצירת מוזיקה (רק בפעם הראשונה)…";
 "Settings" = "הגדרות";
 "Settings (⌘,)" = "הגדרות (⌘,)";
 "Settings profile for this model" = "פרופיל ההגדרות עבור מודל זה.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "כדי לעדכן את סביבת הריצה, יש לעצור את השרת.";
 "Stopped" = "נעצר";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "נעצר: המודל המשיך לקרוא לכלים (%lld סבבים במהלך תור אחד).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן שנוצרת תמונה, וטוען אותו מחדש לאחר מכן. הפעלה של שניהם יחד עלולה לחרוג מהזיכרון של ה‑Mac הזה.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן יצירת תמונה או מוזיקה וטוען אותו מחדש אחר כך. שניהם יחד עלולים לעבור את זיכרון ה‑Mac הזה.";
 "Sunrise & sunset" = "שקיעה וזריחה";
 "Support" = "תמיכה";
 "System" = "מערכת";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "זה שם המודל שלקוחות API שולחים.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "בורר המודל, Start/Stop, פרופיל, כלי וטמפרטורה מעל הצ'אט בחלון נפרד. כבוי: החלון מציג רק את השיחות והשיחה — הבקרות האלה נשארות בסרגל התפריט.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
+"The music generator is busy -- try again once it's done." = "מחולל המוזיקה עסוק — נסה שוב כשתהליך יסתיים.";
+"The music generator is busy with another chat -- try again once it's done." = "מחולל המוזיקה עסוק בצ׳אט אחר — נסה שוב כשתהליך יסתיים.";
 "The report" = "הדוח";
 "The running model server is stopped and started again." = "שרת המודלים הפועל ייעצר ויופעל מחדש.";
 "The server log" = "לוג השרת";
@@ -398,8 +419,9 @@
 "What happened?" = "מה קרה?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "מה עשית, מה ציפית לקרות ומה ראית בפועל. השיחות שלך לא ייכללו.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "הקוונטיזציה של Z-Image-Turbo שמשמשת ליצירת התמונות.";
+"Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "כותב את השיר…";
 "Yesterday" = "אתמול";
 "You" = "את/ה";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "אפליקציית המייל לא יכלה לטפל בקובץ המצורף: הדוח מוצג ב‑Finder — צרף אותו ידנית למייל.";

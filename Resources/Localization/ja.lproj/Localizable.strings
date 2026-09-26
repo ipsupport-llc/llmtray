@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "ローカルネットワークからの接続を許可";
 "Already open in another tab" = "別のタブですでに開かれています";
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "チャット内の画像、または添付した画像を編集できます。編集には数分かかります。";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "その他の mlx_lm.server フラグをスペース区切りで指定します（例: --draft-model <path>）。";
 "Apache License 2.0" = "Apache License 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "圧縮";
 "Compaction failed: %@" = "圧縮に失敗しました: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "メッセージ数がこの数を超えると、チャットを自動的に圧縮します。チャット内の「圧縮」ボタンは、この設定にかかわらず使用できます。";
+"Composing…" = "作成中…";
 "Concurrent requests" = "同時リクエスト数";
 "Copy" = "コピー";
 "Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "ここにチャットをドラッグするか、チャットのメニューを使ってください";
 "Duplicate this profile" = "このプロファイルを複製します。";
 "Edit Profile…" = "プロファイルを編集…";
+"Enable image editing?" = "画像編集を有効にしますか？";
 "Enable image generation" = "画像生成を有効にする";
 "Enable image generation?" = "画像生成を有効にしますか？";
+"Enable music generation" = "音楽生成を有効にする";
+"Enable music generation?" = "音楽生成を有効にしますか？";
 "Extra server arguments" = "追加のサーバ引数";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成と編集";
 "Failed to reload the chat model after image generation: %@" = "画像生成後にチャットモデルの再読み込みに失敗しました: %@";
 "Failed: %@" = "失敗しました：%@";
 "Fast (smaller canvas)" = "高速（キャンバス小）";
@@ -128,8 +134,11 @@
 "General" = "一般";
 "Generated in %.1fs" = "生成時間 %.1fs";
 "Generating image…" = "画像を生成中…";
+"Generating music…" = "音楽を生成中…";
 "Get one" = "入手";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "モデルに generate_music ツールを追加します：歌詞付きの曲またはインストゥルメンタルを説明から生成します（ACE-Step 1.5, MIT license；30秒の音楽で約20秒）。初回はモデルがダウンロードされます。";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "モデルにedit_imageツールを追加します：チャット内の画像（添付したものまたはここで生成したもの）を変更します。画像生成を有効にする必要があります。専用モデルで、選択時にダウンロードされます。";
 "Hacker News" = "Hacker News";
 "Hide chats" = "チャットを非表示";
 "High quality (larger canvas)" = "高品質（キャンバス大）";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
 "Hugging Face token" = "Hugging Face トークン";
 "Idle -- the model reloads on the next message" = "待機中 — 次のメッセージでモデルを再読み込み";
+"Image editing" = "画像編集";
 "Image generation" = "画像生成";
 "Image generation failed: %@" = "画像生成に失敗しました: %@";
 "Image generation finished but produced no output file." = "画像生成は完了しましたが、出力ファイルが作成されませんでした。";
@@ -152,6 +162,7 @@
 "Include the server log" = "サーバーログを含める";
 "Installed" = "インストール済み";
 "Installing mflux…" = "mflux をインストール中…";
+"Installing mlx-audio…" = "mlx-audio をインストール中…";
 "Its chats stay, back among the recents." = "チャットは残り、最近の項目に戻ります。";
 "KV cache" = "KVキャッシュ";
 "KV group size" = "KVグループサイズ";
@@ -175,6 +186,7 @@
 "Max tokens" = "最大トークン数";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
 "Message…" = "メッセージ…";
+"Mixing…" = "ミキシング中…";
 "Model" = "モデル";
 "Model actions" = "モデルのアクション";
 "Model card" = "モデルカード";
@@ -182,6 +194,10 @@
 "Models folder" = "モデルフォルダ";
 "Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
 "Move to Project" = "プロジェクトに移動";
+"Music generation" = "音楽生成";
+"Music generation failed: %@" = "音楽生成に失敗しました：%@";
+"Music generation finished but produced no audio." = "音楽生成は完了しましたが、音声が生成されませんでした。";
+"Music generation isn't set up -- turn it on again in Settings." = "音楽生成が設定されていません。設定で再度有効にしてください。";
 "Name new chats automatically" = "新しいチャットを自動で命名";
 "Network" = "ネットワーク";
 "Never" = "しない";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray チーム宛てのメールを開き、レポート（バージョン、Mac、モデルとサーバ設定、サーバーログ、直近のクラッシュレポート）を添付します。チャット内容は含まれません。送信前にレポート全体を確認できます。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
 "Past %lld messages" = "過去 %lld 件のメッセージ";
+"Pause" = "一時停止";
 "Pause download" = "ダウンロードを一時停止します。";
 "Paused" = "一時停止";
 "Performance" = "パフォーマンス";
 "Pin" = "ピン留め";
 "Pinned" = "ピン留め済み";
+"Play" = "再生";
 "Port" = "ポート";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "attention cache の精度。8-bit：ほぼロスレスで、メモリ使用量は半分。4-bit：4分の1ですが、長いコンテキストでは著しく低下します。Full：最高品質、メモリ使用量は最大。";
 "Prefill step" = "プリフィルステップ";
@@ -295,6 +313,7 @@
 "Server log" = "サーバログ";
 "Server settings changed -- restart to apply them." = "サーバ設定が変更されました。適用するには再起動してください。";
 "Setting up image generation (first time only)…" = "画像生成を設定しています（初回のみ）…";
+"Setting up music generation (first time only)…" = "音楽生成を設定中（初回のみ）…";
 "Settings" = "設定";
 "Settings (⌘,)" = "設定を開きます（⌘,）。";
 "Settings profile for this model" = "このモデルの設定プロファイルです。";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "ランタイムをアップデートするには、サーバを停止してください。";
 "Stopped" = "停止済み";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "停止: モデルがツールを呼び続けました（1ターンで %lld 回）。";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "画像の生成中はチャットモデルを停止し、完了後に再読み込みします。同時に実行すると、このMacのメモリを超えることがあります。";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "画像や音楽を生成する間、チャットモデルを停止して生成後に再読み込みします。両方同時に行うとこの Mac のメモリを超えることがあります。";
 "Sunrise & sunset" = "日の出と日の入り";
 "Support" = "サポート";
 "System" = "システム";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "APIクライアントが送信するモデル名です。";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "チャット上部にモデルピッカー、Start/Stop、プロファイル、ツール、温度を独立ウインドウで表示します。オフの場合はウインドウにチャットと会話のみが表示され、これらのコントロールはメニューバーに残ります。";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
+"The music generator is busy -- try again once it's done." = "音楽生成が使用中です。終了後にもう一度お試しください。";
+"The music generator is busy with another chat -- try again once it's done." = "音楽生成は別のチャットで使用中です。終了後にもう一度お試しください。";
 "The report" = "レポート";
 "The running model server is stopped and started again." = "実行中のモデルサーバは停止してから再起動されます。";
 "The server log" = "サーバーログ";
@@ -398,8 +419,9 @@
 "What happened?" = "何が起きましたか？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "実行していた操作、期待した結果、実際に見た結果を記載してください。チャット内容は含まれません。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
-"Which Z-Image-Turbo quantization generates the images." = "画像生成に使用する Z-Image-Turbo の量子化を指定します。";
+"Which model generates new images." = "どのモデルが新しい画像を生成するか。";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "楽曲を作成中…";
 "Yesterday" = "昨日";
 "You" = "あなた";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "メールアプリが添付ファイルを受け取れませんでした。レポートは Finder に表示されていますので、メールに添付してください。";

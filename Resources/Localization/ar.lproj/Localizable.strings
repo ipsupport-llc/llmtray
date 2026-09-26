@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "السماح بالاتصالات من الشبكة المحلية";
 "Already open in another tab" = "مفتوح بالفعل في علامة تبويب أخرى";
 "Also check when LLMTray starts" = "التحقق أيضًا عند بدء LLMTray";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "يقوم أيضًا بتحرير الصور — إحدى الصور من المحادثة أو التي تُرفقها. تستغرق عمليات التحرير بضع دقائق.";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "أي علامات mlx_lm.server أخرى، مفصولة بمسافات، مثل --draft-model <path>.";
 "Apache License 2.0" = "رخصة Apache 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "الضغط";
 "Compaction failed: %@" = "فشل الضغط: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "يضغط الدردشة تلقائيًا عندما تتجاوز هذا العدد من الرسائل. يظل زر الضغط في الدردشة يعمل في كلتا الحالتين.";
+"Composing…" = "قيد التأليف…";
 "Concurrent requests" = "الطلبات المتزامنة";
 "Copy" = "نسخ";
 "Couldn't create the report: %@" = "تعذّر إنشاء التقرير: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "اسحب المحادثات هنا، أو استخدم قائمة المحادثة";
 "Duplicate this profile" = "ينشئ نسخة من ملف التعريف هذا.";
 "Edit Profile…" = "تحرير ملف التعريف…";
+"Enable image editing?" = "تفعيل تحرير الصور؟";
 "Enable image generation" = "تمكين إنشاء الصور";
 "Enable image generation?" = "تمكين إنشاء الصور؟";
+"Enable music generation" = "تمكين إنتاج الموسيقى";
+"Enable music generation?" = "هل تريد تمكين إنتاج الموسيقى؟";
 "Extra server arguments" = "وسيطات الخادم الإضافية";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — إنشاء وتحرير";
 "Failed to reload the chat model after image generation: %@" = "فشل إعادة تحميل نموذج المحادثة بعد توليد الصورة: %@";
 "Failed: %@" = "فشل: %@";
 "Fast (smaller canvas)" = "سريع (لوحة أصغر)";
@@ -128,8 +134,11 @@
 "General" = "عام";
 "Generated in %.1fs" = "تم التوليد في %.1fs";
 "Generating image…" = "جارٍ إنشاء الصورة…";
+"Generating music…" = "جارٍ توليد الموسيقى…";
 "Get one" = "الحصول على واحد";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "يمنح النموذج أداة generate_image (يتطلب نموذجًا يستدعي الأدوات). في المرة الأولى، يتم تنزيل نموذج الصور.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "يوفر للنموذج أداة generate_music: أغنية بكلمات مغناة أو مقطوعة موسيقية بناءً على وصف (ACE-Step 1.5، رخصة MIT؛ تقريبًا 20 ثانية من الوقت لتوليد 30 ثانية من الموسيقى). عند الاستخدام الأول، يتم تنزيل النموذج.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "يوفر للنموذج أداة edit_image: تُغيّر صورة من المحادثة — إما واحدة أرفقتها أو تم إنشاؤها هنا. يتطلب تشغيل توليد الصور. النموذج الخاص به يُحمّل عند اختيارك له.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "إخفاء الدردشات";
 "High quality (larger canvas)" = "جودة عالية (لوحة أكبر)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "رفض Hugging Face %@ (HTTP %d): قد يكون مقيَّدًا أو خاصًا أو غير موجود. إذا كان مقيَّدًا، اقبل ترخيصه على huggingface.co/%@ وتحقق من الرمز في الإعدادات → Models.";
 "Hugging Face token" = "رمز Hugging Face";
 "Idle -- the model reloads on the next message" = "خامل -- يُعاد تحميل النموذج عند الرسالة التالية";
+"Image editing" = "تحرير الصور";
 "Image generation" = "إنشاء الصور";
 "Image generation failed: %@" = "فشل توليد الصورة: %@";
 "Image generation finished but produced no output file." = "انتهى توليد الصورة لكنه لم ينتج ملفًا.";
@@ -152,6 +162,7 @@
 "Include the server log" = "تضمين سجل الخادم";
 "Installed" = "مثبّت";
 "Installing mflux…" = "جارٍ تثبيت mflux…";
+"Installing mlx-audio…" = "جارٍ تثبيت mlx-audio…";
 "Its chats stay, back among the recents." = "دردشاته تبقى، وتعود إلى القائمة الأخيرة.";
 "KV cache" = "ذاكرة KV المؤقتة";
 "KV group size" = "حجم مجموعة KV";
@@ -175,6 +186,7 @@
 "Max tokens" = "الحد الأقصى للرموز";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
 "Message…" = "رسالة…";
+"Mixing…" = "جارٍ المزج…";
 "Model" = "النموذج";
 "Model actions" = "إجراءات النموذج";
 "Model card" = "بطاقة النموذج";
@@ -182,6 +194,10 @@
 "Models folder" = "مجلد النماذج";
 "Models: %@ · free: %@" = "نماذج: %@ · مساحة حرة: %@";
 "Move to Project" = "نقل إلى المشروع";
+"Music generation" = "إنتاج الموسيقى";
+"Music generation failed: %@" = "فشل إنتاج الموسيقى: %@";
+"Music generation finished but produced no audio." = "اكتمل توليد الموسيقى لكن لم يتم إنتاج صوت.";
+"Music generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد إنتاج الموسيقى — فعّله مرة أخرى في الإعدادات.";
 "Name new chats automatically" = "تسمية الدردشات الجديدة تلقائيًا";
 "Network" = "الشبكة";
 "Never" = "أبدًا";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "يفتح رسالة بريد إلى فريق LLMTray مع إرفاق تقرير: الإصدارات، جهاز Mac، إعدادات النموذج والخادم، سجل الخادم وتقارير الأعطال الأخيرة. المحادثات الخاصة بك لا تُضمَّن أبداً، وستعرض التقرير كاملاً أولاً.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
 "Past %lld messages" = "آخر %lld رسالة";
+"Pause" = "إيقاف مؤقت";
 "Pause download" = "أوقف التنزيل مؤقتًا.";
 "Paused" = "موقوف مؤقتًا";
 "Performance" = "الأداء";
 "Pin" = "تثبيت";
 "Pinned" = "مثبّتة";
+"Play" = "تشغيل";
 "Port" = "المنفذ";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "دقة ذاكرة الانتباه المؤقتة. 8 بت: شبه عديم الفقدان، بنصف الذاكرة. 4 بت: ربع الذاكرة، وأسوأ بوضوح مع السياق الطويل. كاملة: الأفضل، وتستهلك أكبر قدر من الذاكرة.";
 "Prefill step" = "خطوة الملء المسبق";
@@ -295,6 +313,7 @@
 "Server log" = "سجل الخادم";
 "Server settings changed -- restart to apply them." = "تغيّرت إعدادات الخادم — أعد التشغيل لتطبيقها.";
 "Setting up image generation (first time only)…" = "جارٍ إعداد توليد الصور (لأول مرة فقط)…";
+"Setting up music generation (first time only)…" = "جارٍ إعداد إنتاج الموسيقى (للمرة الأولى فقط)…";
 "Settings" = "الإعدادات";
 "Settings (⌘,)" = "افتح الإعدادات (⌘,).";
 "Settings profile for this model" = "ملف إعدادات هذا النموذج.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "أوقف الخادم لتحديث بيئة التشغيل.";
 "Stopped" = "متوقف";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "توقف: استمر النموذج في استدعاء الأدوات (%lld دورة في دور واحد).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "يوقف نموذج الدردشة أثناء إنشاء صورة، ثم يعيد تحميله بعد ذلك. تشغيل الاثنين معًا قد يتجاوز ذاكرة هذا الـ Mac.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "يوقف نموذج الدردشة أثناء توليد صورة أو موسيقى ويعيد تحميله بعد ذلك. القيام بالأمرين معًا قد يتجاوز ذاكرة هذا الـ Mac.";
 "Sunrise & sunset" = "شروق وغروب الشمس";
 "Support" = "الدعم";
 "System" = "النظام";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "اسم النموذج الذي يرسله عملاء API.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "اختيار النموذج، بدء/إيقاف، الملف الشخصي، الأدوات ودرجة الحرارة فوق الدردشة في نافذة منفصلة. متوقف: تكون النافذة مجرد الدردشات والمحادثة — تظل عناصر التحكم تلك في شريط القوائم.";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
+"The music generator is busy -- try again once it's done." = "مولِّد الموسيقى مشغول — حاول مرة أخرى بعد الانتهاء.";
+"The music generator is busy with another chat -- try again once it's done." = "مولِّد الموسيقى مشغول بمحادثة أخرى — حاول مرة أخرى بعد الانتهاء.";
 "The report" = "التقرير";
 "The running model server is stopped and started again." = "يتم إيقاف خادم النموذج الجاري تشغيله ثم تشغيله مرة أخرى.";
 "The server log" = "سجل الخادم";
@@ -398,8 +419,9 @@
 "What happened?" = "ماذا حدث؟";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "ما الذي كنت تفعله، ماذا توقعت، وماذا رأيت بدلاً من ذلك. المحادثات الخاصة بك لا تُضمَّن أبداً.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "يحدد تكميم Z-Image-Turbo الذي يولّد الصور.";
+"Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "جارٍ كتابة الأغنية…";
 "Yesterday" = "أمس";
 "You" = "أنت";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "تطبيق البريد لا يقبل المرفق: يظهر التقرير في Finder، أرفقه بالرسالة.";
