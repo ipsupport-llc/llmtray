@@ -271,6 +271,20 @@ final class ServerManager: ObservableObject {
         }
     }
 
+    /// The user picked another model (the picker, or the header's Load):
+    /// the loaded one switches now, the way a request for it would -- same
+    /// serialization, same drain -- instead of on the next message.
+    func switchLoadedModel(to modelPath: String, alias: String) async throws {
+        beginRequest(activity: true)
+        do {
+            try await acquireModel(modelPath: modelPath, alias: alias)
+        } catch {
+            endRequest(forwarded: false)
+            throw error
+        }
+        endRequest(forwarded: true)
+    }
+
     /// The name the running mlx_lm.server knows its own model by -- what
     /// the proxy puts in every forwarded body (see ProxyRequestBody).
     /// "default_model" is always mapped to the launch model, adapter and

@@ -28,3 +28,11 @@ public enum ModelSwitchPolicy: String, CaseIterable, Sendable {
         }
     }
 }
+
+/// Marks the app's own requests to its proxy (the chat, the benchmark):
+/// a secret made at launch, never written anywhere, so a LAN client can't
+/// pass for the app's chat and switch models past the policy.
+public enum AppRequestToken {
+    public static let header = "X-LLMTray-App"
+    public static let value = UUID().uuidString
+}

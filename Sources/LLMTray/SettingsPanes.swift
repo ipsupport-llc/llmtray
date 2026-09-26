@@ -828,6 +828,7 @@ struct ServerPane: View {
     @EnvironmentObject var benchmark: BenchmarkRunner
     @AppStorage(Pref.port) private var port
     @AppStorage(Pref.allowLAN) private var allowLAN
+    @AppStorage(Pref.modelSwitchPolicy) private var modelSwitchPolicy
     @AppStorage(Pref.stallThresholdSeconds) private var stallThresholdSeconds
     @AppStorage(Pref.autoRestartStallThreshold) private var autoRestartStallThreshold
     @AppStorage(Pref.verboseServerLogging) private var verboseLogging
@@ -850,6 +851,15 @@ struct ServerPane: View {
                         SettingLabel(title: "Allow connections from the local network", help: "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.")
                     }
                     .disabled(!isStopped)
+                }
+                Section("Model switching") {
+                    Picker(selection: $modelSwitchPolicy) {
+                        Text("Switch at once").tag(ModelSwitchPolicy.auto.rawValue)
+                        Text("Ask first").tag(ModelSwitchPolicy.ask.rawValue)
+                        Text("Keep the loaded model").tag(ModelSwitchPolicy.keep.rawValue)
+                    } label: {
+                        SettingLabel(title: "When a client asks for another model", help: "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.")
+                    }
                 }
                 Section("Recovery") {
                     Stepper(value: $stallThresholdSeconds, in: 10...300, step: 10) {

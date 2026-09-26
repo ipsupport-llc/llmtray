@@ -143,6 +143,7 @@ final class BenchmarkRunner: ObservableObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(AppRequestToken.value, forHTTPHeaderField: AppRequestToken.header)
         request.httpBody = bodyData
         request.timeoutInterval = 300
 

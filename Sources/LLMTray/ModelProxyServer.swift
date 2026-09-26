@@ -248,6 +248,49 @@ final class ModelProxyServer {
             ))
             return
         }
+        // An outside client asking for another model than the one loaded:
+        // the user's Settings → Server → Model switching decides.
+        let fromApp = headers[AppRequestToken.header.lowercased()] == AppRequestToken.value
+        let loaded: String? = { if case .running = server.state { return server.loadedModelPath } else { return nil } }()
+        let policy = ModelSwitchPolicy(rawValue: UserDefaults.standard.string(forKey: Pref.modelSwitchPolicy.name) ?? "") ?? .auto
+        let prompter = ModelSwitchPrompter.shared
+        switch policy.decide(fromApp: fromApp, loaded: loaded, target: targetPath,
+                             refusedLately: targetPath.map(prompter.refusedLately) ?? false) {
+        case .proceed:
+            forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
+                             targetPath: targetPath, connection: connection, internalPort: internalPort)
+        case .refuse:
+            sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
+        case .ask:
+            let client = headers["user-agent"].map { String($0.prefix(60)) }.flatMap { $0.isEmpty ? nil : $0 }
+                ?? NSLocalizedString("A client", comment: "model switch: unknown client")
+            Task {
+                // Before beginRequest: waiting for the user isn't the model at work.
+                let allowed = await prompter.ask(target: targetPath ?? "", name: modelName ?? "", client: client)
+                if allowed {
+                    self.forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
+                                          targetPath: targetPath, connection: connection, internalPort: internalPort)
+                } else {
+                    self.sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
+                }
+            }
+        }
+    }
+
+    /// 409: the loaded model stays (the policy, or the user's Keep).
+    private func sendSwitchDeclined(connection: NWConnection, loaded: String?, requested: String?) {
+        let current = loaded.flatMap { ModelCatalog.shared.model(id: $0)?.displayName }
+            ?? loaded.map { ($0 as NSString).lastPathComponent } ?? "the loaded model"
+        sendJSON(connection: connection, status: "409 Conflict", ["error": [
+            "message": "LLMTray keeps '\(current)' loaded: switching to '\(requested ?? "another model")' was declined "
+                + "(Settings → Server → Model switching). Request '\(current)', or change that setting.",
+            "type": "model_switch_declined", "code": "model_switch_declined",
+        ] as [String: Any]])
+    }
+
+    /// Switches to (or reloads) the requested model and forwards the request.
+    private func forwardAcquiring(method: String, path: String, headers: [String: String], body bodyData: Data, modelName: String?,
+                                  targetPath: String?, connection: NWConnection, internalPort: Int) {
         // A bodyless probe (GET /health) isn't use: it mustn't keep the
         // model from idle-unloading.
         let activity = !bodyData.isEmpty
@@ -326,7 +369,8 @@ final class ModelProxyServer {
         }
         var request = URLRequest(url: url)
         request.httpMethod = method
-        for (key, value) in headers where key != "host" && key != "content-length" {
+        // The app's token stays here: the model server has no use for it.
+        for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased() {
             request.setValue(value, forHTTPHeaderField: key)
         }
         if !body.isEmpty {

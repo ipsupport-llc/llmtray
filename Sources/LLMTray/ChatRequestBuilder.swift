@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 /// Builds the chat-completion requests the in-app chat sends.
 enum ChatRequestBuilder {
@@ -125,6 +126,8 @@ enum ChatRequestBuilder {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        // The app's own chat: switches models whatever the switching policy.
+        request.setValue(AppRequestToken.value, forHTTPHeaderField: AppRequestToken.header)
         request.httpBody = data
         request.timeoutInterval = 300
         return request
