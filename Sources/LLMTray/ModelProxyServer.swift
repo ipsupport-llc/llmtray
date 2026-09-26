@@ -275,11 +275,10 @@ final class ModelProxyServer {
                 // get a model switched for nobody: a pending receive is how
                 // NWConnection notices the peer closing (as in forward()).
                 let gone = ClientGone()
-                connection.receive(minimumIncompleteLength: 1, maximumLength: 1) { _, _, isComplete, error in
-                    if isComplete || error != nil { Task { @MainActor in gone.value = true } }
-                }
+                Self.watchClose(connection, gone)
                 // Before beginRequest: waiting for the user isn't the model at work.
                 let allowed = await prompter.ask(target: targetPath ?? "", name: modelName ?? "", client: client)
+                gone.answered = true
                 if gone.value {
                     connection.cancel()
                 } else if case .running = self.server.state, !allowed {
@@ -298,7 +297,20 @@ final class ModelProxyServer {
 
     /// 409: the loaded model stays (the policy, or the user's Keep).
     /// Set when an asking client's connection closes.
-    @MainActor private final class ClientGone { var value = false }
+    @MainActor private final class ClientGone { var value = false; var answered = false }
+
+    /// Re-armed on stray data, until the peer closes or the answer came.
+    private static func watchClose(_ connection: NWConnection, _ gone: ClientGone) {
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 4096) { data, _, isComplete, error in
+            Task { @MainActor in
+                if isComplete || error != nil {
+                    gone.value = true
+                } else if data != nil, !gone.answered {
+                    watchClose(connection, gone)
+                }
+            }
+        }
+    }
 
     private func sendSwitchDeclined(connection: NWConnection, loaded: String?, requested: String?) {
         let current = loaded.flatMap { ModelCatalog.shared.model(id: $0)?.displayName }
