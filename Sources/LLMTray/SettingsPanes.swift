@@ -474,7 +474,7 @@ struct ProfilesPane: View {
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
-                row(\.tools.imageEditModel, "Image editing", "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Its own model, downloaded when you choose it.") {
+                row(\.tools.imageEditModel, "Image editing", "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.") {
                     Picker("", selection: imageEditModelBinding) {
                         Text("Off").tag(ImageGenModel?.none)
                         ForEach(ImageGenModel.selectable.filter(\.supportsEditing)) { Text($0.displayName).tag(Optional($0)) }

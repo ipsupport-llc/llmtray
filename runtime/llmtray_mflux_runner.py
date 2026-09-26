@@ -35,7 +35,14 @@ if arg("--base-model") == "flux2-klein-4b":
     from PIL import Image
     from mflux.models.common.vae.tiling_config import TilingConfig
     request = json.loads(sys.stdin.read())
-    images = [Image.open(io.BytesIO(base64.b64decode(b))).convert("RGB") for b in request.get("images", [])]
+    def rgb(data):
+        im = Image.open(io.BytesIO(base64.b64decode(data)))
+        if im.mode in ("RGBA", "LA", "P"):
+            # On white: transparent pixels would turn black in "RGB".
+            im = im.convert("RGBA")
+            im = Image.alpha_composite(Image.new("RGBA", im.size, "white"), im)
+        return im.convert("RGB")
+    images = [rgb(b) for b in request.get("images", [])]
     # A side under 64 px rounds to nothing in mflux's resize: scaled up.
     images = [im.resize((max(64, round(im.width * 64 / min(im.size))), max(64, round(im.height * 64 / min(im.size)))))
               if min(im.size) < 64 else im for im in images]

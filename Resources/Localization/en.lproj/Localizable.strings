@@ -131,7 +131,7 @@
 "Generating image…" = "Generating image…";
 "Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
-"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Its own model, downloaded when you choose it.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Hide chats";
 "High quality (larger canvas)" = "High quality (larger canvas)";

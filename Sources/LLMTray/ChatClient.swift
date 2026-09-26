@@ -616,9 +616,10 @@ final class ChatClient: ObservableObject {
         // Another chat tab has the image generator, or would lose the model
         // it's answering with to the unload below: this call waits for a
         // later turn instead.
-        let imageBlocked = imageTool.willGenerate(toolCalls, settings: settings)
+        let images = chatImages
+        let imageBlocked = imageTool.willGenerate(toolCalls, settings: settings, chatImages: images)
             && (mfluxManager.isBusy || (settings.unloadModelDuringImageGen && isAnotherChatBusy()))
-        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: settings) && !imageBlocked
+        let willActuallyGenerate = imageTool.willGenerate(toolCalls, settings: settings, chatImages: images) && !imageBlocked
         // Only when mflux will actually run -- a refused call shouldn't
         // flash the "Generating image…" UI / pulse.
         isGeneratingImage = willActuallyGenerate

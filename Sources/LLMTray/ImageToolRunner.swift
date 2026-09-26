@@ -62,8 +62,13 @@ final class ImageToolRunner: ChatTool {
     /// Whether this round will actually run mflux rather than only refuse
     /// -- so a model stuck repeating the call doesn't make the chat model
     /// unload/reload (or the "Generating image…" UI flash) for nothing.
-    func willGenerate(_ calls: [ToolCall], settings: ChatSettings) -> Bool {
-        calls.contains { Self.runsGenerator($0.name, settings) } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
+    /// `chatImages`: an edit_image call that will only be refused (no
+    /// image, a bad index) doesn't count.
+    func willGenerate(_ calls: [ToolCall], settings: ChatSettings, chatImages: [(data: Data, prompt: String)] = []) -> Bool {
+        calls.contains { call in
+            Self.runsGenerator(call.name, settings) && (call.name != EditImageTool.toolName
+                || EditImageTool.source(ChatToolbox.parseArguments(call.argumentsJSON), in: chatImages).image != nil)
+        } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
     /// generate_image, and edit_image with an edit model set: the calls
@@ -115,15 +120,16 @@ final class ImageToolRunner: ChatTool {
 
     /// Runs mflux for generate_image or edit_image (the per-turn limit
     /// counts both) and words the result for the model.
+    /// `note`: said first in the result (which image was edited).
     func produce(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data],
-                 settings: ChatSettings, toolName: String) async -> ToolResult {
+                 settings: ChatSettings, toolName: String, note: String = "") async -> ToolResult {
         do {
             let start = Date()
             let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: model, images: images)
             imagesThisTurn += 1
             return .generatedImage(
                 image, seconds: Date().timeIntervalSince(start), prompt: prompt,
-                text: "Image generated and already displayed to the user directly above your reply "
+                text: note + "Image generated and already displayed to the user directly above your reply "
                     + (settings.modelSupportsVision
                         ? "-- you can't embed or link it; call view_image if you need to see it. "
                         : "-- you do not have the image data and cannot embed, link, or preview it yourself. ")
@@ -203,23 +209,33 @@ final class EditImageTool: ChatTool {
                     + "edit_image again unless the user sends a new message asking for another change."
             )
         }
-        let images = context.chatImages
-        guard !images.isEmpty else {
-            return .text("There's no image in this conversation to edit. Ask the user to attach one, or use generate_image to make a new one.")
-        }
-        // Model-supplied: compared, never subtracted from (Int.min - 1 traps).
-        let requested = arguments["index"] as? Int
-        guard requested.map({ (1...images.count).contains($0) }) ?? true else {
-            return .text("There are \(images.count) image(s) in this conversation; index must be 1...\(images.count).")
-        }
-        let source = images[(requested ?? images.count) - 1]
+        let (picked, refusal) = Self.source(arguments, in: context.chatImages)
+        guard let source = picked else { return .text(refusal) }
         let instruction = String(((arguments["prompt"] as? String) ?? "").prefix(4000))
         guard !instruction.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return .text("Say what to change in `prompt`.")
         }
         let pixels = NSBitmapImageRep(data: source.data).map { ($0.pixelsWide, $0.pixelsHigh) } ?? (1024, 1024)
         let size = EditCanvas.size(sourceWidth: pixels.0, sourceHeight: pixels.1, scale: settings.imageQuality.scale)
+        let note = "Edited image \(source.index) of \(context.chatImages.count) (\(source.prompt.isEmpty ? "generated" : source.prompt)). "
         return await generator.produce(prompt: instruction, width: size.width, height: size.height, model: model,
-                                       images: [source.data], settings: settings, toolName: name)
+                                       images: [source.data], settings: settings, toolName: name, note: note)
+    }
+
+    /// The image an edit_image call picks (1-based `index` over every image
+    /// in the chat, the latest when omitted), or why there's none.
+    static func source(_ arguments: [String: Any], in images: [(data: Data, prompt: String)])
+        -> (image: (data: Data, prompt: String, index: Int)?, refusal: String) {
+        guard !images.isEmpty else {
+            return (nil, "There's no image in this conversation to edit. Ask the user to attach one, or use generate_image to make a new one.")
+        }
+        // Model-supplied: compared, never subtracted from (Int.min - 1 traps).
+        // A string or a fraction isn't silently taken as "the latest".
+        let requested = arguments["index"] as? Int
+        guard arguments["index"] == nil || requested != nil, requested.map({ (1...images.count).contains($0) }) ?? true else {
+            return (nil, "There are \(images.count) image(s) in this conversation, attached and generated; index must be an integer 1...\(images.count).")
+        }
+        let index = requested ?? images.count
+        return ((images[index - 1].data, images[index - 1].prompt, index), "")
     }
 }
