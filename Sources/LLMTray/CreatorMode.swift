@@ -55,6 +55,9 @@ final class GenerationDraft: ObservableObject, Identifiable {
     @Published private(set) var remaining: Double?
     private(set) var countdownTotal: Double = 3
     private let arguments: [String: Any]
+    /// The shape the call asked for: its exact size is kept unless the
+    /// user picks another shape.
+    private let requestedAspect: Aspect
     private var continuation: CheckedContinuation<Outcome?, Never>?
     private var ticker: Task<Void, Never>?
 
@@ -68,7 +71,9 @@ final class GenerationDraft: ObservableObject, Identifiable {
         duration = MusicToolRunner.duration(args["duration"])
         imageModel = settings.imageGenModel
         editModel = settings.imageEditModel
-        aspect = Aspect.closest(width: (args["width"] as? Int) ?? 1024, height: (args["height"] as? Int) ?? 1024)
+        let asked = Aspect.closest(width: (args["width"] as? Int) ?? 1024, height: (args["height"] as? Int) ?? 1024)
+        aspect = asked
+        requestedAspect = asked
         musicModel = settings.musicModel
         creativity = MusicToolRunner.unit(args["creativity"]) ?? settings.musicCreativity
         adherence = MusicToolRunner.unit(args["adherence"]) ?? settings.musicAdherence
@@ -77,20 +82,33 @@ final class GenerationDraft: ObservableObject, Identifiable {
     /// Waits for the user (or the countdown). nil = cancelled (Stop, another
     /// chat).
     func decide(countdown: Int) async -> Outcome? {
-        await withCheckedContinuation { (c: CheckedContinuation<Outcome?, Never>) in
-            continuation = c
-            guard countdown > 0 else { return }
-            countdownTotal = Double(countdown)
-            remaining = Double(countdown)
-            ticker = Task { [weak self] in
-                while let self, let left = self.remaining, !Task.isCancelled {
-                    if left <= 0 {
-                        self.resolve(.run)
-                        return
-                    }
-                    try? await Task.sleep(nanoseconds: 100_000_000)
-                    if self.remaining != nil { self.remaining = max(0, left - 0.1) }
+        await withTaskCancellationHandler {
+            await withCheckedContinuation { (c: CheckedContinuation<Outcome?, Never>) in
+                continuation = c
+                // Cancelled before it got here: cancel() had no draft to resolve.
+                if Task.isCancelled {
+                    resolve(nil)
+                    return
                 }
+                startCountdown(countdown)
+            }
+        } onCancel: {
+            Task { @MainActor [weak self] in self?.resolve(nil) }
+        }
+    }
+
+    private func startCountdown(_ countdown: Int) {
+        guard countdown > 0 else { return }
+        countdownTotal = Double(countdown)
+        remaining = Double(countdown)
+        ticker = Task { [weak self] in
+            while let self, let left = self.remaining, !Task.isCancelled {
+                if left <= 0 {
+                    self.resolve(.run)
+                    return
+                }
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                if self.remaining != nil { self.remaining = max(0, left - 0.1) }
             }
         }
     }
@@ -113,10 +131,10 @@ final class GenerationDraft: ObservableObject, Identifiable {
         var args = arguments
         args["prompt"] = prompt
         switch kind {
-        case .image:
+        case .image where aspect != requestedAspect:
             args["width"] = aspect.size.width
             args["height"] = aspect.size.height
-        case .edit:
+        case .image, .edit:
             break
         case .music:
             args["lyrics"] = lyrics
@@ -136,6 +154,33 @@ final class GenerationDraft: ObservableObject, Identifiable {
         case .image: s.imageGenModel = imageModel
         case .edit: s.imageEditModel = editModel
         case .music: s.musicModel = musicModel
+        }
+        return s
+    }
+
+    /// The chosen model, for the media's source.
+    var modelID: String? {
+        switch kind {
+        case .image: return imageModel.rawValue
+        case .edit: return editModel?.rawValue
+        case .music: return musicModel.rawValue
+        }
+    }
+
+    /// `settings` with the model a source recorded (`MediaSource.model`) for
+    /// this call, when there is one and it still exists.
+    static func pinning(_ model: String?, for call: ToolCall, _ settings: ChatSettings) -> ChatSettings {
+        guard let model else { return settings }
+        var s = settings
+        switch call.name {
+        case ImageToolRunner.toolName:
+            if let m = ImageGenModel(rawValue: model) { s.imageGenModel = m }
+        case EditImageTool.toolName:
+            if let m = ImageGenModel(rawValue: model), m.supportsEditing, s.imageEditModel != nil { s.imageEditModel = m }
+        case MusicToolRunner.toolName:
+            if let m = MusicModel(rawValue: model) { s.musicModel = m }
+        default:
+            break
         }
         return s
     }
@@ -179,7 +224,7 @@ struct GenerationDraftView: View {
             case .image:
                 HStack {
                     Picker("Model", selection: held($draft.imageModel)) {
-                        ForEach(ImageGenModel.selectable.filter(\.isDownloaded)) { Text($0.displayName).tag($0) }
+                        ForEach(ImageGenModel.selectable.filter { $0.isDownloaded || $0 == draft.imageModel }) { Text($0.displayName).tag($0) }
                     }
                     Picker("Shape", selection: held($draft.aspect)) {
                         ForEach(GenerationDraft.Aspect.allCases) { Text(verbatim: $0.label).tag($0) }
@@ -188,7 +233,12 @@ struct GenerationDraftView: View {
                     .frame(maxWidth: 260)
                 }
             case .edit:
-                EmptyView()
+                Picker("Model", selection: held($draft.editModel)) {
+                    ForEach(ImageGenModel.allCases.filter { $0.supportsEditing && ($0.isDownloaded || $0 == draft.editModel) }) {
+                        Text($0.displayName).tag(Optional($0))
+                    }
+                }
+                .fixedSize()
             case .music:
                 DisclosureGroup("Lyrics") {
                     TextEditor(text: held($draft.lyrics))
@@ -198,7 +248,9 @@ struct GenerationDraftView: View {
                 .font(.system(size: 11))
                 HStack {
                     Picker("Model", selection: held($draft.musicModel)) {
-                        ForEach(MusicManager.selectable.filter { MusicManager.isDownloadedStatic($0) }) { Text($0.displayName).tag($0) }
+                        ForEach(MusicManager.selectable.filter { MusicManager.isDownloadedStatic($0) || $0 == draft.musicModel }) {
+                            Text($0.displayName).tag($0)
+                        }
                     }
                     Stepper(value: held($draft.duration), in: 10...120, step: 10) {
                         Text(String(format: NSLocalizedString("%lld s", comment: "music duration"), draft.duration))

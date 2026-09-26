@@ -538,6 +538,26 @@ final class ChatClient: ObservableObject {
         return String(decoding: data, as: UTF8.self)
     }
 
+    /// An image put in (`by` 1) at, or taken out (`by` -1) from before,
+    /// message `j`'s image `image`: the edit_image calls pinned to an image
+    /// after it (by its place among the chat's images) follow it there.
+    private func shiftPinnedEditIndices(message j: Int, image: Int, by delta: Int) {
+        func counts(_ m: ChatMessage) -> Bool { (m.role == "assistant" || m.role == "user") && !m.isToolContext }
+        guard counts(messages[j]) else { return }
+        // 1-based place of the first image that moves.
+        let first = messages[..<j].filter(counts).reduce(0) { $0 + $1.images.count } + image + 1
+        for m in messages.indices {
+            for k in messages[m].imageSources.indices where messages[m].imageSources[k].tool == EditImageTool.toolName {
+                let arguments = ChatToolbox.parseArguments(messages[m].imageSources[k].arguments)
+                guard let pinned = arguments["index"] as? Int, pinned >= first,
+                      let data = try? JSONSerialization.data(withJSONObject: arguments.merging(["index": pinned + delta]) { $1 },
+                                                             options: [.sortedKeys])
+                else { continue }
+                messages[m].imageSources[k].arguments = String(decoding: data, as: UTF8.self)
+            }
+        }
+    }
+
     /// The image or piece of music can be made again (it has its source).
     func canRegenerateMedia(_ message: ChatMessage, _ kind: MediaKind, _ index: Int) -> Bool {
         switch kind {
@@ -572,8 +592,10 @@ final class ChatClient: ObservableObject {
         isRunningTools = true
         toolTask = Task {
             var call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
-            var settings = baseline
+            var settings = GenerationDraft.pinning(source.model, for: call, baseline)
+            var model = source.model
             if tweak, let draftKind = GenerationDraft.kind(of: call, settings) {
+                guard stillCurrent() else { return }   // Stop before it started: no draft to wait on
                 let draft = GenerationDraft(kind: draftKind, call: call, settings: settings)
                 self.draft = draft
                 let outcome = await draft.decide(countdown: 0)   // asked for: waits for Generate
@@ -583,7 +605,9 @@ final class ChatClient: ObservableObject {
                     return
                 }
                 call = draft.editedCall
-                settings = draft.apply(to: settings)
+                // Read again: the draft may have waited long, settings may have changed.
+                settings = draft.apply(to: GenerationDraft.pinning(source.model, for: call, currentSettings(baseSettings)))
+                model = draft.modelID
             }
             // The per-turn limits don't apply: nothing else is made meanwhile.
             toolbox.startTurn()
@@ -624,7 +648,7 @@ final class ChatClient: ObservableObject {
                 isUnloadingModelForMedia = true
                 await server.unloadModel()
             }
-            let variantSource = MediaSource(tool: call.name, arguments: call.argumentsJSON)
+            let variantSource = MediaSource(tool: call.name, arguments: call.argumentsJSON, model: model)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             if unload {
                 do { try await server.ensureModelLoaded() } catch {
@@ -643,6 +667,7 @@ final class ChatClient: ObservableObject {
                 if messages[j].imageFilenames.count != messages[j].images.count {
                     messages[j].imageFilenames = messages[j].images.indices.map { "\(id)-\($0).png" }
                 }
+                shiftPinnedEditIndices(message: j, image: at, by: 1)
                 messages[j].images.insert(data, at: at)
                 messages[j].imageFilenames.insert("\(UUID().uuidString).png", at: at)
                 if messages[j].imageDurations.count >= at { messages[j].imageDurations.insert(seconds, at: at) }
@@ -652,6 +677,8 @@ final class ChatClient: ObservableObject {
                 if messages[j].audioFilenames.count != messages[j].audios.count {
                     messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
                 }
+                // A clip's id is its index: one playing now would take the variant's.
+                AudioPlayback.shared.stop(ifAnyOf: [messages[j]])
                 messages[j].audios.insert(data, at: at)
                 messages[j].audioFilenames.insert("\(UUID().uuidString).wav", at: at)
                 if messages[j].audioDurations.count >= at { messages[j].audioDurations.insert(seconds, at: at) }
@@ -683,6 +710,7 @@ final class ChatClient: ObservableObject {
             if messages[j].imageFilenames.count != messages[j].images.count {
                 messages[j].imageFilenames = messages[j].images.indices.map { "\(id)-\($0).png" }
             }
+            shiftPinnedEditIndices(message: j, image: index + 1, by: -1)
             drop(&messages[j].images); drop(&messages[j].imageFilenames); drop(&messages[j].imageDurations)
             drop(&messages[j].imagePrompts); drop(&messages[j].imageSources)
         case .music:
@@ -894,7 +922,10 @@ final class ChatClient: ObservableObject {
         if settings.creatorMode {
             isStreaming = false
             for (i, call) in toolCalls.enumerated() {
-                guard let kind = GenerationDraft.kind(of: call, settings) else { continue }
+                guard i < maxToolCallsPerRound, let kind = GenerationDraft.kind(of: call, settings),
+                      kind == .music ? musicTool.willGenerate([call], settings: settings)
+                                     : imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
+                else { continue }
                 let draft = GenerationDraft(kind: kind, call: call, settings: settings)
                 self.draft = draft
                 let outcome = await draft.decide(countdown: settings.creatorCountdown)
@@ -908,6 +939,8 @@ final class ChatClient: ObservableObject {
                 }
             }
         }
+        // Read again: a draft may have waited long, settings may have changed.
+        settings = currentSettings(context.settings)
         /// A call's settings: the models its draft chose.
         func settingsFor(_ call: ToolCall, _ base: ChatSettings) -> ChatSettings {
             drafts[call.id].map { $0.apply(to: base) } ?? base
@@ -991,7 +1024,8 @@ final class ChatClient: ObservableObject {
             } else if willActuallyGenerate, ImageToolRunner.runsGenerator(call.name, settings) {
                 generatingKind = .image
             }
-            let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count))
+            let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
+                                     model: drafts[call.id]?.modelID)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
             switch result {

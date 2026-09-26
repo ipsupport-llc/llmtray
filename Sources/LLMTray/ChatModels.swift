@@ -12,6 +12,9 @@ struct ToolCall: Equatable {
 struct MediaSource: Codable, Equatable {
     var tool: String
     var arguments: String
+    /// The model a Creator mode draft chose for it (a rawValue), so that
+    /// making it again uses that one, not whatever the profile has now.
+    var model: String? = nil
 }
 
 struct ChatMessage: Identifiable, Equatable {

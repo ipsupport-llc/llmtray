@@ -48,9 +48,6 @@ enum MusicModel: String, CaseIterable, Identifiable, Codable {
         }
     }
 
-    /// The sft conversions aren't on HF yet: offered where they're in place.
-    var isPublished: Bool { self == .turbo }
-
     /// turbo needs the 5 Hz LM planner; sft sings without it.
     var usesPlanner: Bool { self == .turbo }
     /// "Creativity" is the planner's sampling temperature (sft has no planner).
@@ -131,7 +128,7 @@ final class MusicManager: ObservableObject {
 
     /// The models Settings offers.
     static var selectable: [MusicModel] {
-        MusicModel.allCases.filter { $0.isPublished || FileManager.default.fileExists(atPath: ditDir($0)) }
+        MusicModel.allCases
     }
 
     func isDownloaded(_ model: MusicModel) -> Bool { Self.isDownloadedStatic(model) }
