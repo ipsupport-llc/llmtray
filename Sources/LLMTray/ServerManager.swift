@@ -22,6 +22,8 @@ final class ServerManager: ObservableObject {
     @Published private(set) var pendingLaunchChange = false
     private var pendingLaunchObservers: [AnyCancellable] = []
     @Published private(set) var log: String = ""
+    /// The running server's command-line arguments (bug reports).
+    private(set) var launchedArguments: [String] = []
     // True while at least one request is in flight -- driven directly by
     // ModelProxyServer's beginRequest()/endRequest() around every request it
     // forwards (and around a model switch, which can itself take tens of
@@ -499,6 +501,7 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         )
         let args = ServerLaunch.arguments(profile, context)
+        launchedArguments = args
         lastRestartKey = ServerLaunch.restartKey(profile, context)
         launchedMaxContext = context.maxContext
         launchedExtraArgs = profile.extraServerArgs

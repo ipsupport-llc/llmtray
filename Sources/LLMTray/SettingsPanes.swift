@@ -87,6 +87,13 @@ struct GeneralPane: View {
                     SettingLabel(title: "Auto-compact", help: "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.")
                 }
             }
+            Section("Support") {
+                LabeledContent {
+                    Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
+                } label: {
+                    SettingLabel(title: "Something went wrong?", help: "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.")
+                }
+            }
         }
         .formStyle(.grouped)
         .onAppear { launchAtLogin = SMAppService.mainApp.status == .enabled }

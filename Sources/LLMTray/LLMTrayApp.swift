@@ -63,7 +63,9 @@ struct LLMTrayApp: App {
                 Button("Settings…") { NotificationCenter.default.post(name: .showSettings, object: nil) }
                     .keyboardShortcut(",")
             }
-            CommandGroup(replacing: .help) {}
+            CommandGroup(replacing: .help) {
+                Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
+            }
             // No File menu (the only scene is Settings), so no Close ⌘W:
             // the chat window, Settings and the logs close with it here. A
             // menu shortcut, unlike a key-down check, also matches with Caps
@@ -145,6 +147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var logWindow: NSWindow?
     private var hfWindow: NSWindow?
     private var aboutWindow: NSWindow?
+    private var bugReportWindow: NSWindow?
     private var cancellables: Set<AnyCancellable> = []
     private var sigtermSource: DispatchSourceSignal?
     private var pulseTimer: Timer?
@@ -187,6 +190,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showAboutPanel), name: .showAbout, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showBugReport), name: .showBugReport, object: nil
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
@@ -413,6 +419,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
+        let bugItem = NSMenuItem(title: NSLocalizedString("Report a Bug…", comment: ""), action: #selector(showBugReport), keyEquivalent: "")
+        bugItem.target = self
+        menu.addItem(bugItem)
+
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -484,6 +494,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             aboutWindow?.contentView = NSHostingView(rootView: AboutView())
         }
         aboutWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// A fresh form each time it's opened.
+    @objc private func showBugReport() {
+        if bugReportWindow == nil {
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 560, height: 520),
+                styleMask: [.titled, .closable, .resizable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = NSLocalizedString("Report a Bug", comment: "")
+            window.isReleasedWhenClosed = false
+            window.isRestorable = false
+            window.center()
+            bugReportWindow = window
+        }
+        if bugReportWindow?.isVisible != true {
+            bugReportWindow?.contentView = NSHostingView(rootView: BugReportView().environmentObject(server))
+        }
+        popover.performClose(nil)
+        bugReportWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 

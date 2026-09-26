@@ -93,6 +93,8 @@ struct AboutView: View {
                         Text("Apache License 2.0").foregroundStyle(.secondary)
                         Link(destination: URL(string: "https://github.com/ipsupport-llc/llmtray")!) { Text("Source on GitHub") }
                         Link(destination: URL(string: "https://ipsupport.us")!) { Text(verbatim: "ipsupport.us") }
+                        Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
+                            .buttonStyle(.link)
                     }
                     .font(.callout)
                 }

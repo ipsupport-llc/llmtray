@@ -10,6 +10,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";
 "%lld-bit" = "%lld-bit";
+"(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
 "(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
@@ -75,7 +76,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.";
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
+"Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Country facts" = "Country facts";
+"Crash reports (%lld)" = "Crash reports (%lld)";
+"Create Email…" = "Create Email…";
 "Currency rates" = "Currency rates";
 "Current settings are already fastest" = "Current settings are already fastest";
 "Date & time" = "Date & time";
@@ -142,6 +146,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation isn't set up -- turn it on again in Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image model" = "Image model";
+"Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
+"Include the server log" = "Include the server log";
 "Installed" = "Installed";
 "Installing mflux…" = "Installing mflux…";
 "Its chats stay, back among the recents." = "Its chats stay, back among the recents.";
@@ -210,6 +216,7 @@
 "Open in New Tab" = "Open in New Tab";
 "Open in Window" = "Open in Window";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "Past %lld messages" = "Past %lld messages";
 "Pause download" = "Pause download";
@@ -248,6 +255,8 @@
 "Rename" = "Rename";
 "Rename this profile" = "Rename this profile";
 "Rename…" = "Rename…";
+"Report a Bug" = "Report a Bug";
+"Report a Bug…" = "Report a Bug…";
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
@@ -292,6 +301,7 @@
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
+"Show in Finder" = "Show in Finder";
 "Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
 "Show only overrides" = "Show only overrides";
@@ -302,6 +312,7 @@
 "Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
+"Something went wrong?" = "Something went wrong?";
 "Sort by" = "Sort by";
 "Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
@@ -324,6 +335,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Stopped: the model kept calling tools (%lld rounds in one turn).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory.";
 "Sunrise & sunset" = "Sunrise & sunset";
+"Support" = "Support";
 "System" = "System";
 "System prompt" = "System prompt";
 "Tab %lld" = "Tab %lld";
@@ -343,7 +355,9 @@
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model's license, from its card." = "The model's license, from its card.";
+"The report" = "The report";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
+"The server log" = "The server log";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
@@ -372,17 +386,21 @@
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem.";
 "Version" = "Version";
 "Version %@" = "Version %@";
 "View model card" = "View model card";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Weather" = "Weather";
 "Web search" = "Web search";
+"What happened?" = "What happened?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Which Z-Image-Turbo quantization generates the images.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Yesterday";
 "You" = "You";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
