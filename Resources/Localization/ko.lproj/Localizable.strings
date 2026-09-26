@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "모델에 edit_image 도구를 제공합니다: 채팅의 이미지(첨부한 이미지 또는 여기서 생성한 이미지)를 변경합니다. 이미지 생성을 켜야 합니다. 선택하면 해당 모델을 내려받습니다.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "대화 숨기기";
+"Hide the reasoning" = "추론 숨기기";
 "High quality (larger canvas)" = "고품질 (캔버스 큼)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "최고 충실도, 최대 다운로드 — 신뢰할 수 있는 정확성 기준입니다.";
 "Hourly forecast" = "시간별 예보";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "이미지 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
 "Image generation needs an update -- turn it off and on again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
 "Image model" = "이미지 모델";
+"In the queue: %lld ahead…" = "대기: %lld건 앞에 있음…";
 "Include LLMTray crash reports from the last two weeks" = "지난 2주간 LLMTray 충돌 보고서 포함";
 "Include the server log" = "서버 로그 포함";
 "Installed" = "설치됨";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "마지막으로 사용한 모델을 바로 로드하여 Play를 누르지 않아도 준비됩니다.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "생성된 모든 토큰을 기록합니다(DEBUG). 모델 프로세스 문제 해결 전용이며 속도가 느려집니다. 다음 서버 시작 시 적용됩니다.";
 "Maintenance" = "유지 관리";
+"Make this image again (a new seed, the same request)" = "이 이미지를 다시 생성하기(새 시드, 동일한 요청)";
+"Make this music again (a new seed, the same request)" = "이 음악을 다시 생성하기(새 시드, 동일한 요청)";
 "Manage Models…" = "모델 관리…";
 "Max tokens" = "최대 토큰 수";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "이전 대화의 컨텍스트를 재사용하기 위해 유지하는 메모리입니다. 이어서 진행하는 채팅이 전체 기록을 다시 읽지 않도록 합니다. 서버 메모리가 부족해질 때까지 커지지 않도록 제한됩니다.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "추론 표시";
 "Show the profile files in Finder" = "Finder에서 프로필 파일 보기";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Finder에서 프로필 파일을 표시합니다. 일반 JSON 파일이며 직접 편집하고 다른 Mac으로 복사할 수 있습니다.";
+"Show the reasoning" = "추론 표시";
 "Show tool calls" = "도구 호출 표시";
 "Shows the chat window" = "채팅 창 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
@@ -414,6 +419,7 @@
 "Version %@" = "버전 %@";
 "View model card" = "모델 카드를 엽니다.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "현재 요청 또는 벤치마크가 끝날 때까지 기다리십시오. 재시작하면 중단됩니다.";
+"Waiting for another chat's image or music to finish…" = "다른 채팅의 이미지 또는 음악 생성이 완료될 때까지 대기 중…";
 "Weather" = "날씨";
 "Web search" = "웹 검색";
 "What happened?" = "무슨 일이 있었나요?";

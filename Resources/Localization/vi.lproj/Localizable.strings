@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Cung cấp cho mô hình công cụ edit_image: thay đổi ảnh từ cuộc trò chuyện — ảnh bạn đính kèm hoặc ảnh tạo tại đây. Yêu cầu bật tạo ảnh. Là một mô hình riêng, tải xuống khi bạn chọn.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Ẩn trò chuyện";
+"Hide the reasoning" = "Ẩn phần lý giải";
 "High quality (larger canvas)" = "Chất lượng cao (khung lớn hơn)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Độ trung thực cao nhất, dung lượng tải lớn nhất — cơ sở đúng đắn bạn có thể tin cậy.";
 "Hourly forecast" = "Dự báo theo giờ";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image model" = "Mô hình hình ảnh";
+"In the queue: %lld ahead…" = "Trong hàng chờ: %lld người phía trước…";
 "Include LLMTray crash reports from the last two weeks" = "Bao gồm báo cáo sự cố LLMTray trong hai tuần gần đây";
 "Include the server log" = "Bao gồm nhật ký máy chủ";
 "Installed" = "Đã cài đặt";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Tải ngay mô hình dùng gần nhất để sẵn sàng mà không cần nhấn Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
 "Maintenance" = "Bảo trì";
+"Make this image again (a new seed, the same request)" = "Tạo lại ảnh này (seed mới, yêu cầu giống)";
+"Make this music again (a new seed, the same request)" = "Tạo lại nhạc này (seed mới, yêu cầu giống)";
 "Manage Models…" = "Quản lý mô hình…";
 "Max tokens" = "Số token tối đa";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "Hiển thị suy luận";
 "Show the profile files in Finder" = "Hiển thị tệp hồ sơ trong Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Hiển thị các tệp hồ sơ trong Finder — JSON thuần, có thể sửa bằng tay và sao chép sang máy Mac khác.";
+"Show the reasoning" = "Hiện phần lý giải";
 "Show tool calls" = "Hiện lần gọi công cụ";
 "Shows the chat window" = "Hiển thị cửa sổ trò chuyện";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
@@ -414,6 +419,7 @@
 "Version %@" = "Phiên bản %@";
 "View model card" = "Xem thẻ mô hình.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
+"Waiting for another chat's image or music to finish…" = "Đang chờ chat khác hoàn thành ảnh hoặc nhạc…";
 "Weather" = "Thời tiết";
 "Web search" = "Tìm web";
 "What happened?" = "Chuyện gì đã xảy ra?";

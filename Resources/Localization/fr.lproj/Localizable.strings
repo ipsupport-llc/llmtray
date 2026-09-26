@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Ajoute au modèle un outil edit_image : il modifie une image de la conversation — une que vous avez jointe ou une générée ici. Nécessite que la génération d’images soit activée. Utilise son propre modèle, téléchargé lorsque vous le choisissez.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Masquer les conversations";
+"Hide the reasoning" = "Masquer le raisonnement";
 "High quality (larger canvas)" = "Haute qualité (toile plus grande)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Fidélité maximale, téléchargement le plus volumineux — une référence de précision fiable.";
 "Hourly forecast" = "Prévision horaire";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "La génération d’image n’est pas configurée — activez‑la à nouveau dans Réglages.";
 "Image generation needs an update -- turn it off and on again in Settings." = "La génération d’image nécessite une mise à jour — désactivez‑la puis réactivez‑la dans Réglages.";
 "Image model" = "Modèle d’image";
+"In the queue: %lld ahead…" = "Dans la file : %lld en attente…";
 "Include LLMTray crash reports from the last two weeks" = "Inclure les rapports de plantage LLMTray des deux dernières semaines";
 "Include the server log" = "Inclure le journal du serveur";
 "Installed" = "Installé";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Charge immédiatement le dernier modèle utilisé, afin qu’il soit prêt sans appuyer sur Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Consigne chaque token généré (DEBUG). À utiliser uniquement pour dépanner le processus du modèle — cela ralentit l’exécution. Prend effet au prochain démarrage du serveur.";
 "Maintenance" = "Maintenance";
+"Make this image again (a new seed, the same request)" = "Recréer cette image (nouvelle graine, même requête)";
+"Make this music again (a new seed, the same request)" = "Recréer cette musique (nouvelle graine, même requête)";
 "Manage Models…" = "Gérer les modèles…";
 "Max tokens" = "Tokens max.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Mémoire conservée pour réutiliser le contexte des conversations précédentes, afin qu’une conversation reprise ne relise pas tout son historique. Elle est limitée pour éviter que le serveur ne manque de mémoire.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "Afficher le raisonnement";
 "Show the profile files in Finder" = "Afficher les fichiers du profil dans Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Afficher les fichiers du profil dans Finder : JSON brut, modifiable à la main et copiable sur un autre Mac.";
+"Show the reasoning" = "Afficher le raisonnement";
 "Show tool calls" = "Afficher les appels d'outils";
 "Shows the chat window" = "Affiche la fenêtre de conversation";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Affiche le raisonnement du modèle (le bloc repliable « Processus de réflexion ») au-dessus de sa réponse.";
@@ -414,6 +419,7 @@
 "Version %@" = "Version %@";
 "View model card" = "Afficher la fiche du modèle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Attendez la fin de la requête ou du test de performance en cours : un redémarrage l’interromprait.";
+"Waiting for another chat's image or music to finish…" = "Attente de la fin d'une image ou d'une musique d'un autre chat…";
 "Weather" = "Météo";
 "Web search" = "Recherche web";
 "What happened?" = "Que s’est-il passé ?";

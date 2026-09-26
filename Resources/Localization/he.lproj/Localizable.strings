@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "נותן למודל כלי edit_image: משנה תמונה מהשיחה — אחת שצירפת או שנוצרה כאן. דורש שיהיה מופעל יצור תמונות. המודל נמצא משלו, יורד כשאתה בוחר בו.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "הסתר צ'אטים";
+"Hide the reasoning" = "הסתר את נימוקי ההחלטה";
 "High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "דיוק מקסימלי, הורדה גדולה — קו בסיס נכונות שניתן לסמוך עליו.";
 "Hourly forecast" = "תחזית לפי שעה";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image model" = "מודל תמונה";
+"In the queue: %lld ahead…" = "בתור: %lld לפני…";
 "Include LLMTray crash reports from the last two weeks" = "כלול דוחות קריסה של LLMTray משבועיים אחרונים";
 "Include the server log" = "כלול את לוג השרת";
 "Installed" = "מותקן";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "טוען מיד את המודל האחרון שהיה בשימוש, כדי שיהיה מוכן בלי ללחוץ על Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
 "Maintenance" = "תחזוקה";
+"Make this image again (a new seed, the same request)" = "צור שוב את התמונה הזו (זרע חדש, אותו הבקשה)";
+"Make this music again (a new seed, the same request)" = "צור שוב את המוזיקה הזו (זרע חדש, אותו הבקשה)";
 "Manage Models…" = "ניהול מודלים…";
 "Max tokens" = "מספר טוקנים מרבי";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "הצגת הנמקה";
 "Show the profile files in Finder" = "הצג את קובצי הפרופיל ב-Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "מציג את קובצי הפרופיל ב-Finder -- JSON פשוט, ניתן לעריכה ידנית ולהעתקה ל-Mac אחר.";
+"Show the reasoning" = "הצג את נימוקי ההחלטה";
 "Show tool calls" = "הצג קריאות כלים";
 "Shows the chat window" = "מציג את חלון הצ'אט";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
@@ -414,6 +419,7 @@
 "Version %@" = "גרסה %@";
 "View model card" = "הצג את כרטיס המודל.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
+"Waiting for another chat's image or music to finish…" = "מחכה לסיום יצירת תמונה או מוזיקה משיחה אחרת…";
 "Weather" = "מזג אוויר";
 "Web search" = "חיפוש באינטרנט";
 "What happened?" = "מה קרה?";

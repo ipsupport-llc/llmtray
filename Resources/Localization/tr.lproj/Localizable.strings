@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Modele edit_image aracını sağlar: sohbetten alınan, eklediğiniz veya burada oluşturulan bir resmi değiştirir. Resim oluşturma açık olmalı. Kendi modeli vardır; seçtiğinizde indirilir.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Sohbetleri gizle";
+"Hide the reasoning" = "Sebebi gizle";
 "High quality (larger canvas)" = "Yüksek kalite (büyük tuval)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "En yüksek doğruluk, en büyük indirme — güvenebileceğiniz doğruluk ölçütü.";
 "Hourly forecast" = "Saatlik tahmin";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image model" = "Görüntü modeli";
+"In the queue: %lld ahead…" = "Sırada: %lld kişi önce…";
 "Include LLMTray crash reports from the last two weeks" = "Son iki haftanın LLMTray çökme raporlarını ekle";
 "Include the server log" = "Sunucu kaydını ekle";
 "Installed" = "Yüklü";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Son kullanılan modeli hemen yükler; böylece Play’e basmadan hazır olur.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Üretilen her token’ı günlüğe yazar (DEBUG). Yalnızca model işleminde sorun gidermek içindir — işleri yavaşlatır. Bir sonraki sunucu başlangıcında etkili olur.";
 "Maintenance" = "Bakım";
+"Make this image again (a new seed, the same request)" = "Bu görüntüyü yeniden oluştur (yeni seed, aynı istek)";
+"Make this music again (a new seed, the same request)" = "Bu müziği yeniden oluştur (yeni seed, aynı istek)";
 "Manage Models…" = "Modelleri Yönet…";
 "Max tokens" = "Maksimum token";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "Akıl yürütmeyi göster";
 "Show the profile files in Finder" = "Profil dosyalarını Finder’da göster";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Profil dosyalarını Finder’da gösterir — düz JSON, elle düzenlenebilir ve başka bir Mac’e kopyalanabilir.";
+"Show the reasoning" = "Sebebi göster";
 "Show tool calls" = "Araç çağrılarını göster";
 "Shows the chat window" = "Sohbet penceresini gösterir";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
@@ -414,6 +419,7 @@
 "Version %@" = "Sürüm %@";
 "View model card" = "Model kartını görüntüle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
+"Waiting for another chat's image or music to finish…" = "Başka bir sohbetin görseli veya müziği bitiyor…";
 "Weather" = "Hava Durumu";
 "Web search" = "Web araması";
 "What happened?" = "Ne oldu?";

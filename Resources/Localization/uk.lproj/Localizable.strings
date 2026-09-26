@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Надає моделі інструмент edit_image: змінює зображення з чату — те, що ви прикріпили, або згенероване тут. Працює за умови увімкненої генерації зображень. Використовує власну модель, яку завантажують при виборі.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Сховати чати";
+"Hide the reasoning" = "Приховати обґрунтування";
 "High quality (larger canvas)" = "Висока якість (більше полотно)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Найвища точність, найбільше завантаження — орієнтир точності, якому можна довіряти.";
 "Hourly forecast" = "Погодинний прогноз";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Генерація зображень не налаштована — знову увімкніть її в Налаштуваннях.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Потрібне оновлення генерації зображень — вимкніть і ввімкніть її знову в Налаштуваннях.";
 "Image model" = "Модель зображень";
+"In the queue: %lld ahead…" = "У черзі: попереду %lld…";
 "Include LLMTray crash reports from the last two weeks" = "Включити звіти про збої LLMTray за останні два тижні";
 "Include the server log" = "Включити серверний лог";
 "Installed" = "Встановлено";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Одразу завантажує останню модель, щоб не натискати Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Пише в лог кожен згенерований токен (DEBUG). Лише для налагодження процесу моделі — сповільнює роботу. Діє з наступного запуску сервера.";
 "Maintenance" = "Обслуговування";
+"Make this image again (a new seed, the same request)" = "Згенерувати це зображення знову (новий seed, той самий запит)";
+"Make this music again (a new seed, the same request)" = "Згенерувати цю музику знову (новий seed, той самий запит)";
 "Manage Models…" = "Керувати моделями…";
 "Max tokens" = "Макс. токенів";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Пам'ять під контекст попередніх розмов, щоб продовжений чат не перечитував усю історію. Обмежена, щоб не зростати, доки в сервера не скінчиться пам'ять.";
@@ -329,6 +333,7 @@
 "Show reasoning" = "Показувати міркування";
 "Show the profile files in Finder" = "Показати файли профілів у Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Показати файли профілів у Finder — звичайний JSON, можна правити вручну й переносити на інший Mac";
+"Show the reasoning" = "Показати обґрунтування";
 "Show tool calls" = "Показувати виклики інструментів";
 "Shows the chat window" = "Показує вікно чату";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
@@ -414,6 +419,7 @@
 "Version %@" = "Версія %@";
 "View model card" = "Картка моделі";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Дочекайтеся завершення поточного запиту або бенчмарку -- перезапуск його обірве.";
+"Waiting for another chat's image or music to finish…" = "Очікування завершення створення зображення чи музики в іншому чаті…";
 "Weather" = "Погода";
 "Web search" = "Веб‑пошук";
 "What happened?" = "Що сталося?";

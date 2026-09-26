@@ -141,6 +141,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "為模型新增 edit_image 工具：可修改對話中的圖片——你附加的或在此生成的。需啟用圖片生成功能。它使用自己的模型，選擇時會下載。";
 "Hacker News" = "Hacker News";
 "Hide chats" = "隱藏對話";
+"Hide the reasoning" = "隱藏推理過程";
 "High quality (larger canvas)" = "高品質（畫布較大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高保真、下載量最大 — 可作為可靠的正確性基準。";
 "Hourly forecast" = "每小時預報";
@@ -158,6 +159,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
 "Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image model" = "影像模型";
+"In the queue: %lld ahead…" = "隊列中：前面還有 %lld 位…";
 "Include LLMTray crash reports from the last two weeks" = "包含最近兩週的 LLMTray 當機報告";
 "Include the server log" = "包含伺服器日誌";
 "Installed" = "已安裝";
@@ -182,6 +184,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即載入上次使用的模型，不必按下 Play 即可就緒。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "記錄每個產生的 token（DEBUG）。僅用於疑難排解模型程序 — 這會拖慢速度。下次啟動伺服器時生效。";
 "Maintenance" = "維護";
+"Make this image again (a new seed, the same request)" = "重新生成此影像（新 seed，相同請求）";
+"Make this music again (a new seed, the same request)" = "重新生成此音樂（新 seed，相同請求）";
 "Manage Models…" = "管理模型…";
 "Max tokens" = "token 上限";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留用來重用較早對話情境的記憶體，這樣繼續聊天時就不用重新讀取整段歷史。已設上限，避免成長到伺服器記憶體耗盡。";
@@ -329,6 +333,7 @@
 "Show reasoning" = "顯示推理";
 "Show the profile files in Finder" = "在 Finder 顯示描述檔檔案";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "在 Finder 顯示描述檔檔案；純 JSON，可手動編輯，也可拷貝到另一台 Mac。";
+"Show the reasoning" = "顯示推理過程";
 "Show tool calls" = "顯示工具呼叫";
 "Shows the chat window" = "顯示對話視窗";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方顯示模型的思考內容（可收合的「思考過程」區塊）。";
@@ -414,6 +419,7 @@
 "Version %@" = "版本 %@";
 "View model card" = "檢視模型卡。";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "請等待目前的請求或基準測試完成，重新啟動會中斷它。";
+"Waiting for another chat's image or music to finish…" = "正在等待其他對話的影像或音樂生成完成…";
 "Weather" = "天氣";
 "Web search" = "網路搜尋";
 "What happened?" = "發生了什麼？";
