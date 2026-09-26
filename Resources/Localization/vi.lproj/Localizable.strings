@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "Cho phép kết nối từ mạng cục bộ";
 "Already open in another tab" = "Đã mở ở tab khác";
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Cũng chỉnh sửa ảnh — ảnh từ cuộc trò chuyện hoặc ảnh bạn đính kèm. Việc chỉnh sửa mất vài phút.";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Bất kỳ cờ mlx_lm.server nào khác, phân tách bằng dấu cách, ví dụ --draft-model <path>.";
 "Apache License 2.0" = "Giấy phép Apache 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "Thu gọn";
 "Compaction failed: %@" = "Nén thất bại: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Tự động thu gọn cuộc trò chuyện khi vượt quá số tin nhắn này. Nút Thu gọn trong cuộc trò chuyện vẫn hoạt động trong mọi trường hợp.";
+"Composing…" = "Đang soạn…";
 "Concurrent requests" = "Yêu cầu đồng thời";
 "Copy" = "Sao chép";
 "Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "Kéo cuộc trò chuyện vào đây, hoặc dùng menu của cuộc trò chuyện";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
+"Enable image editing?" = "Bật chỉnh sửa ảnh?";
 "Enable image generation" = "Bật tạo ảnh";
 "Enable image generation?" = "Bật tạo ảnh?";
+"Enable music generation" = "Bật tạo nhạc";
+"Enable music generation?" = "Bật tính năng tạo nhạc?";
 "Extra server arguments" = "Đối số máy chủ bổ sung";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — tạo và chỉnh sửa";
 "Failed to reload the chat model after image generation: %@" = "Tải lại mô hình chat sau khi tạo ảnh thất bại: %@";
 "Failed: %@" = "Không thành công: %@";
 "Fast (smaller canvas)" = "Nhanh (khung nhỏ hơn)";
@@ -128,8 +134,11 @@
 "General" = "Chung";
 "Generated in %.1fs" = "Tạo trong %.1fs";
 "Generating image…" = "Đang tạo ảnh…";
+"Generating music…" = "Đang tạo nhạc…";
 "Get one" = "Lấy token";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Cung cấp cho mô hình công cụ generate_image (cần mô hình có khả năng gọi công cụ). Lần đầu tiên, mô hình hình ảnh sẽ được tải xuống.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Cung cấp cho mô hình công cụ generate_music: bài hát có ca từ hoặc nhạc cụ, dựa trên mô tả (ACE‑Step 1.5, giấy phép MIT; khoảng 20 giây để tạo 30 giây nhạc). Lần đầu tiên, mô hình sẽ được tải về.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Cung cấp cho mô hình công cụ edit_image: thay đổi ảnh từ cuộc trò chuyện — ảnh bạn đính kèm hoặc ảnh tạo tại đây. Yêu cầu bật tạo ảnh. Là một mô hình riêng, tải xuống khi bạn chọn.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Ẩn trò chuyện";
 "High quality (larger canvas)" = "Chất lượng cao (khung lớn hơn)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face từ chối %@ (HTTP %d): mô hình bị hạn chế hoặc riêng tư, hoặc không tồn tại. Nếu bị hạn chế, chấp nhận giấy phép trên huggingface.co/%@ và kiểm tra token trong Cài đặt → Models.";
 "Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Đang rỗi -- mô hình sẽ tải lại ở tin nhắn tiếp theo";
+"Image editing" = "Chỉnh sửa ảnh";
 "Image generation" = "Tạo hình ảnh";
 "Image generation failed: %@" = "Tạo ảnh thất bại: %@";
 "Image generation finished but produced no output file." = "Tạo ảnh hoàn tất nhưng không sinh tệp đầu ra.";
@@ -152,6 +162,7 @@
 "Include the server log" = "Bao gồm nhật ký máy chủ";
 "Installed" = "Đã cài đặt";
 "Installing mflux…" = "Đang cài mflux…";
+"Installing mlx-audio…" = "Đang cài mlx-audio…";
 "Its chats stay, back among the recents." = "Các trò chuyện vẫn được giữ, trở lại trong mục Gần đây.";
 "KV cache" = "Bộ nhớ đệm KV";
 "KV group size" = "Kích cỡ nhóm KV";
@@ -175,6 +186,7 @@
 "Max tokens" = "Số token tối đa";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
 "Message…" = "Tin nhắn…";
+"Mixing…" = "Đang trộn…";
 "Model" = "Mô hình";
 "Model actions" = "Tác vụ mô hình";
 "Model card" = "Thẻ mô hình";
@@ -182,6 +194,10 @@
 "Models folder" = "Thư mục mô hình";
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "Move to Project" = "Chuyển vào Dự án";
+"Music generation" = "Tạo nhạc";
+"Music generation failed: %@" = "Tạo nhạc thất bại: %@";
+"Music generation finished but produced no audio." = "Tạo nhạc hoàn tất nhưng không sinh ra âm thanh.";
+"Music generation isn't set up -- turn it on again in Settings." = "Tạo nhạc chưa được thiết lập — bật lại trong Cài đặt.";
 "Name new chats automatically" = "Tự đặt tên cho trò chuyện mới";
 "Network" = "Mạng";
 "Never" = "Không bao giờ";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Mở email đến nhóm LLMTray với báo cáo đính kèm: phiên bản, máy Mac, cài đặt mô hình và máy chủ, nhật ký máy chủ và báo cáo sự cố gần đây. Các cuộc trò chuyện của bạn không bao giờ được đính kèm, và bạn sẽ xem toàn bộ báo cáo trước.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "Past %lld messages" = "%lld tin nhắn trước đó";
+"Pause" = "Tạm dừng";
 "Pause download" = "Tạm dừng tải xuống.";
 "Paused" = "Tạm dừng";
 "Performance" = "Hiệu năng";
 "Pin" = "Ghim";
 "Pinned" = "Đã ghim";
+"Play" = "Phát";
 "Port" = "Cổng";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Độ chính xác của bộ nhớ đệm attention. 8-bit: gần như không mất mát, dùng một nửa bộ nhớ. 4-bit: dùng một phần tư, kém hơn rõ rệt với ngữ cảnh dài. Đầy đủ: tốt nhất, tốn bộ nhớ nhất.";
 "Prefill step" = "Bước nạp trước";
@@ -295,6 +313,7 @@
 "Server log" = "Nhật ký máy chủ";
 "Server settings changed -- restart to apply them." = "Cài đặt máy chủ đã thay đổi — hãy khởi động lại để áp dụng.";
 "Setting up image generation (first time only)…" = "Đang thiết lập tạo ảnh (chỉ lần đầu)…";
+"Setting up music generation (first time only)…" = "Thiết lập tạo nhạc (chỉ lần đầu)…";
 "Settings" = "Cài đặt";
 "Settings (⌘,)" = "Cài đặt (⌘,)";
 "Settings profile for this model" = "Hồ sơ cài đặt cho mô hình này.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "Dừng máy chủ để cập nhật môi trường chạy.";
 "Stopped" = "Đã dừng";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Đã dừng: mô hình liên tục gọi công cụ (%lld vòng trong một lượt).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Dừng mô hình trò chuyện trong khi tạo hình ảnh, rồi tải lại sau đó. Chạy cả hai cùng lúc có thể vượt quá bộ nhớ của máy Mac này.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Tạm dừng mô hình chat khi đang tạo ảnh hoặc nhạc, rồi tải lại sau. Thực hiện cùng lúc cả hai có thể vượt quá bộ nhớ của Mac này.";
 "Sunrise & sunset" = "Mặt trời mọc & lặn";
 "Support" = "Hỗ trợ";
 "System" = "Hệ thống";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "Tên mô hình mà các máy khách API gửi.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Bộ chọn mô hình, Bắt đầu/Dừng, hồ sơ, công cụ và nhiệt độ hiển thị phía trên trò chuyện trong cửa sổ riêng. Tắt: cửa sổ chỉ có các cuộc trò chuyện và nội dung — các điều khiển đó vẫn ở thanh menu.";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
+"The music generator is busy -- try again once it's done." = "Trình tạo nhạc đang bận — thử lại khi hoàn tất.";
+"The music generator is busy with another chat -- try again once it's done." = "Trình tạo nhạc đang bận với cuộc chat khác — thử lại khi hoàn tất.";
 "The report" = "Báo cáo";
 "The running model server is stopped and started again." = "Máy chủ mô hình đang chạy sẽ bị dừng rồi khởi động lại.";
 "The server log" = "Nhật ký máy chủ";
@@ -398,8 +419,9 @@
 "What happened?" = "Chuyện gì đã xảy ra?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Bạn đang làm gì, bạn mong đợi gì, và bạn thấy gì thay vì mong đợi. Các cuộc trò chuyện của bạn không bao giờ được đính kèm.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "Mức lượng tử hóa Z-Image-Turbo dùng để tạo hình ảnh.";
+"Which model generates new images." = "Mô hình dùng để tạo ảnh mới.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "Đang viết bài hát…";
 "Yesterday" = "Hôm qua";
 "You" = "Bạn";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ứng dụng mail của bạn không thể nhận tệp đính kèm: báo cáo được hiển thị trong Finder, hãy đính kèm nó vào email.";

@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "Yerel ağdan bağlantılara izin ver";
 "Already open in another tab" = "Başka bir sekmede zaten açık";
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Ayrıca resimleri düzenler — sohbetten alınan veya eklediğiniz bir resmi. Düzenlemeler birkaç dakika sürer.";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Diğer mlx_lm.server flag’leri; boşlukla ayrılmış, örn. --draft-model <path>.";
 "Apache License 2.0" = "Apache Lisansı 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "Sıkıştırma";
 "Compaction failed: %@" = "Sıkıştırma başarısız: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Sohbet bu sayıda mesajı aşınca otomatik olarak sıkıştırılır. Sohbetteki Sıkıştır düğmesi her durumda çalışır.";
+"Composing…" = "Oluşturuluyor…";
 "Concurrent requests" = "Eşzamanlı istekler";
 "Copy" = "Kopyala";
 "Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "Sohbetleri buraya sürükleyin veya bir sohbetin menüsünü kullanın";
 "Duplicate this profile" = "Bu profili çoğalt";
 "Edit Profile…" = "Profili Düzenle…";
+"Enable image editing?" = "Resim düzenlemeyi etkinleştirilsin mi?";
 "Enable image generation" = "Görüntü oluşturmayı etkinleştir";
 "Enable image generation?" = "Görüntü oluşturma etkinleştirilsin mi?";
+"Enable music generation" = "Müzik üretimini etkinleştir";
+"Enable music generation?" = "Müzik üretimini etkinleştirmek istiyor musunuz?";
 "Extra server arguments" = "Ek sunucu argümanları";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — oluştur ve düzenle";
 "Failed to reload the chat model after image generation: %@" = "Görüntü oluşturduktan sonra sohbet modeli yeniden yüklenemedi: %@";
 "Failed: %@" = "Başarısız oldu: %@";
 "Fast (smaller canvas)" = "Hızlı (küçük tuval)";
@@ -128,8 +134,11 @@
 "General" = "Genel";
 "Generated in %.1fs" = "%.1fs içinde oluşturuldu";
 "Generating image…" = "Görüntü oluşturuluyor…";
+"Generating music…" = "Müzik üretiliyor…";
 "Get one" = "Al";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Modele generate_image aracını verir (araç çağırabilen bir model gerekir). İlk seferde görüntü modeli indirilir.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Modele generate_music aracını ekler: tanıma dayalı şarkı (sözlü) veya enstrümantal parça üretir (ACE-Step 1.5, MIT lisansı; yaklaşık 30 saniye için 20 saniye). İlk kullanımda model indirilir.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Modele edit_image aracını sağlar: sohbetten alınan, eklediğiniz veya burada oluşturulan bir resmi değiştirir. Resim oluşturma açık olmalı. Kendi modeli vardır; seçtiğinizde indirilir.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Sohbetleri gizle";
 "High quality (larger canvas)" = "Yüksek kalite (büyük tuval)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
 "Hugging Face token" = "Hugging Face tokenı";
 "Idle -- the model reloads on the next message" = "Boşta — model sonraki iletide yeniden yüklenir";
+"Image editing" = "Resim düzenleme";
 "Image generation" = "Görüntü oluşturma";
 "Image generation failed: %@" = "Görüntü oluşturma başarısız: %@";
 "Image generation finished but produced no output file." = "Görüntü oluşturma tamamlandı ancak çıktı dosyası oluşturulmadı.";
@@ -152,6 +162,7 @@
 "Include the server log" = "Sunucu kaydını ekle";
 "Installed" = "Yüklü";
 "Installing mflux…" = "mflux yükleniyor…";
+"Installing mlx-audio…" = "mlx-audio yükleniyor…";
 "Its chats stay, back among the recents." = "Sohbetleri kalır, son kullanılanlar arasına döner.";
 "KV cache" = "KV önbelleği";
 "KV group size" = "KV grup boyutu";
@@ -175,6 +186,7 @@
 "Max tokens" = "Maksimum token";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
 "Message…" = "Mesaj…";
+"Mixing…" = "Miksleniyor…";
 "Model" = "Model";
 "Model actions" = "Model eylemleri";
 "Model card" = "Model kartı";
@@ -182,6 +194,10 @@
 "Models folder" = "Modeller klasörü";
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "Move to Project" = "Projeye Taşı";
+"Music generation" = "Müzik üretimi";
+"Music generation failed: %@" = "Müzik üretimi başarısız oldu: %@";
+"Music generation finished but produced no audio." = "Müzik üretimi tamamlandı ancak ses üretilmedi.";
+"Music generation isn't set up -- turn it on again in Settings." = "Müzik üretimi ayarlı değil — Açmak için Ayarlar'a gidin.";
 "Name new chats automatically" = "Yeni sohbetleri otomatik adlandır";
 "Network" = "Ağ";
 "Never" = "Asla";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray ekibine, ekli raporla bir e‑posta açar: sürümler, Mac, model ve sunucu ayarları, sunucu kaydı ve son çökme raporları. Sohbetleriniz asla eklenmez ve raporu önce tam olarak görürsünüz.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "Past %lld messages" = "Son %lld mesaj";
+"Pause" = "Duraklat";
 "Pause download" = "İndirmeyi duraklatır.";
 "Paused" = "Duraklatıldı";
 "Performance" = "Performans";
 "Pin" = "Sabitlen";
 "Pinned" = "Sabitlenen";
+"Play" = "Oynat";
 "Port" = "Bağlantı noktası";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Attention önbelleğinin hassasiyeti. 8 bit: neredeyse kayıpsız, belleğin yarısı. 4 bit: dörtte biri, uzun bağlamda belirgin biçimde daha kötü. Tam: en iyi, en fazla bellek.";
 "Prefill step" = "Ön doldurma adımı";
@@ -295,6 +313,7 @@
 "Server log" = "Sunucu günlüğü";
 "Server settings changed -- restart to apply them." = "Sunucu ayarları değişti; uygulamak için yeniden başlatın.";
 "Setting up image generation (first time only)…" = "Görüntü oluşturma ayarlanıyor (sadece ilk sefer)…";
+"Setting up music generation (first time only)…" = "Müzik üretimi kuruluyor (ilk sefer için)…";
 "Settings" = "Ayarlar";
 "Settings (⌘,)" = "Ayarlar (⌘,)";
 "Settings profile for this model" = "Bu modelin ayar profili.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "Çalışma zamanını güncellemek için sunucuyu durdurun.";
 "Stopped" = "Durduruldu";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Durduruldu: model araçları çağırmaya devam etti (%lld tur bir çevrimde).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Görüntü oluşturulurken sohbet modelini durdurur ve ardından yeniden yükler. İkisi aynı anda bu Mac’in belleğini aşabilir.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Görsel veya müzik üretilirken sohbet modelini durdurur ve sonra yeniden yükler. Aynı anda ikisi de bu Mac'in belleğini aşabilir.";
 "Sunrise & sunset" = "Gün doğumu ve batımı";
 "Support" = "Yardım";
 "System" = "Sistem";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "API istemcilerinin gönderdiği model adı.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Model seçici, Başlat/Durdur, profil, araçlar ve sıcaklık sohbetin üzerinde kendi penceresinde. Kapalı: pencere yalnızca sohbetleri ve konuşmayı içerir — bu denetimler menü çubuğunda kalır.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
+"The music generator is busy -- try again once it's done." = "Müzik oluşturucu meşgul — bitmesini bekleyip tekrar deneyin.";
+"The music generator is busy with another chat -- try again once it's done." = "Müzik oluşturucu başka bir sohbetle meşgul — bitmesini bekleyip tekrar deneyin.";
 "The report" = "Rapor";
 "The running model server is stopped and started again." = "Çalışan model sunucusu durdurulup yeniden başlatılır.";
 "The server log" = "Sunucu kaydı";
@@ -398,8 +419,9 @@
 "What happened?" = "Ne oldu?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Ne yapıyordunuz, ne bekliyordunuz, bunun yerine ne gördünüz. Sohbetleriniz asla eklenmez.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
-"Which Z-Image-Turbo quantization generates the images." = "Görüntüleri hangi Z-Image-Turbo nicemlemesinin oluşturacağını belirler.";
+"Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "Wikipedia" = "Vikipedi";
+"Writing the song…" = "Şarkı yazılıyor…";
 "Yesterday" = "Dün";
 "You" = "Siz";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "E‑posta uygulamanız eki kabul edemedi: rapor Finder’da gösteriliyor, e‑postaya ekleyin.";

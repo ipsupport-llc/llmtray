@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "로컬 네트워크에서 연결 허용";
 "Already open in another tab" = "이미 다른 탭에서 열려 있습니다";
 "Also check when LLMTray starts" = "LLMTray 시작 시에도 확인";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "채팅의 이미지나 첨부한 이미지를 편집할 수 있습니다. 편집에는 몇 분이 걸립니다.";
 "Another model already uses this alias." = "다른 모델이 이미 이 별칭을 사용합니다.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "그 밖의 mlx_lm.server 플래그를 공백으로 구분해 입력합니다. 예: --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "대화 압축";
 "Compaction failed: %@" = "압축 실패: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "채팅의 메시지가 이 개수를 넘으면 자동으로 압축합니다. 채팅의 압축 버튼은 이 설정과 관계없이 작동합니다.";
+"Composing…" = "작성 중…";
 "Concurrent requests" = "동시 요청 수";
 "Copy" = "복사";
 "Couldn't create the report: %@" = "보고서를 생성할 수 없습니다: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "여기에 채팅을 끌어다 놓하거나 채팅의 메뉴를 사용하세요";
 "Duplicate this profile" = "이 프로파일을 복제합니다.";
 "Edit Profile…" = "프로파일 편집…";
+"Enable image editing?" = "이미지 편집을 사용하시겠습니까?";
 "Enable image generation" = "이미지 생성 활성화";
 "Enable image generation?" = "이미지 생성을 활성화하겠습니까?";
+"Enable music generation" = "음악 생성 사용";
+"Enable music generation?" = "음악 생성을 사용하시겠습니까?";
 "Extra server arguments" = "추가 서버 인수";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 생성 및 편집";
 "Failed to reload the chat model after image generation: %@" = "이미지 생성 후 채팅 모델을 다시 불러오지 못했습니다: %@";
 "Failed: %@" = "실패: %@";
 "Fast (smaller canvas)" = "빠름 (캔버스 작음)";
@@ -128,8 +134,11 @@
 "General" = "일반";
 "Generated in %.1fs" = "생성 시간 %.1fs";
 "Generating image…" = "이미지 생성 중…";
+"Generating music…" = "음악 생성 중…";
 "Get one" = "토큰 받기";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "모델에 generate_image 도구를 제공합니다(도구 호출 모델 필요). 처음 사용할 때 이미지 모델이 다운로드됩니다.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "모델에 generate_music 도구를 추가합니다: 설명으로부터 가사가 있는 노래 또는 연주곡을 생성합니다 (ACE-Step 1.5, MIT 라이선스; 30초 음악 생성에 약 20초 소요). 처음 사용 시 모델을 다운로드합니다.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "모델에 edit_image 도구를 제공합니다: 채팅의 이미지(첨부한 이미지 또는 여기서 생성한 이미지)를 변경합니다. 이미지 생성을 켜야 합니다. 선택하면 해당 모델을 내려받습니다.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "대화 숨기기";
 "High quality (larger canvas)" = "고품질 (캔버스 큼)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face가 %@을(를) 거부했습니다(HTTP %d): 접근 제한이 있거나 비공개이거나 존재하지 않습니다. 접근 제한이 있는 경우 huggingface.co/%@에서 사용권에 동의하고 설정 → Models의 토큰을 확인하세요.";
 "Hugging Face token" = "Hugging Face 토큰";
 "Idle -- the model reloads on the next message" = "대기 중 — 다음 메시지에서 모델 다시 로드";
+"Image editing" = "이미지 편집";
 "Image generation" = "이미지 생성";
 "Image generation failed: %@" = "이미지 생성 실패: %@";
 "Image generation finished but produced no output file." = "이미지 생성이 완료되었지만 출력 파일이 생성되지 않았습니다.";
@@ -152,6 +162,7 @@
 "Include the server log" = "서버 로그 포함";
 "Installed" = "설치됨";
 "Installing mflux…" = "mflux 설치 중…";
+"Installing mlx-audio…" = "mlx-audio 설치 중…";
 "Its chats stay, back among the recents." = "그 프로젝트의 대화는 보관되며 최근 항목에 다시 표시됩니다.";
 "KV cache" = "KV 캐시";
 "KV group size" = "KV 그룹 크기";
@@ -175,6 +186,7 @@
 "Max tokens" = "최대 토큰 수";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "이전 대화의 컨텍스트를 재사용하기 위해 유지하는 메모리입니다. 이어서 진행하는 채팅이 전체 기록을 다시 읽지 않도록 합니다. 서버 메모리가 부족해질 때까지 커지지 않도록 제한됩니다.";
 "Message…" = "메시지…";
+"Mixing…" = "믹싱 중…";
 "Model" = "모델";
 "Model actions" = "모델 동작";
 "Model card" = "모델 카드";
@@ -182,6 +194,10 @@
 "Models folder" = "모델 폴더";
 "Models: %@ · free: %@" = "모델: %@ · 여유: %@";
 "Move to Project" = "프로젝트로 이동";
+"Music generation" = "음악 생성";
+"Music generation failed: %@" = "음악 생성 실패: %@";
+"Music generation finished but produced no audio." = "음악 생성을 완료했지만 오디오가 생성되지 않았습니다.";
+"Music generation isn't set up -- turn it on again in Settings." = "음악 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
 "Name new chats automatically" = "새 채팅 자동으로 이름 지정";
 "Network" = "네트워크";
 "Never" = "안 함";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "보고서를 첨부한 이메일을 LLMTray 팀에 엽니다: 버전, Mac, 모델 및 서버 설정, 서버 로그와 최근 충돌 보고서가 포함됩니다. 대화 내용은 절대 포함되지 않으며, 전체 보고서를 먼저 확인할 수 있습니다.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray에만 macOS 언어 설정을 덮어씁니다. LLMTray를 다시 시작한 후 적용됩니다. 번역되지 않은 텍스트는 영어로 표시됩니다.";
 "Past %lld messages" = "지난 %lld개 메시지";
+"Pause" = "일시 정지";
 "Pause download" = "다운로드를 일시 정지합니다.";
 "Paused" = "일시 중지됨";
 "Performance" = "성능";
 "Pin" = "고정";
 "Pinned" = "고정됨";
+"Play" = "재생";
 "Port" = "포트";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "어텐션 캐시의 정밀도입니다. 8비트: 거의 무손실이며 메모리를 절반만 사용합니다. 4비트: 1/4만 사용하지만 긴 컨텍스트에서 품질이 눈에 띄게 떨어집니다. Full: 최상의 품질, 메모리 사용량 최대.";
 "Prefill step" = "프리필 단계";
@@ -295,6 +313,7 @@
 "Server log" = "서버 로그";
 "Server settings changed -- restart to apply them." = "서버 설정이 변경되었습니다. 적용하려면 재시동하십시오.";
 "Setting up image generation (first time only)…" = "이미지 생성 설정 중(첫 실행 시만)…";
+"Setting up music generation (first time only)…" = "음악 생성 설정 중(최초 1회만)…";
 "Settings" = "설정";
 "Settings (⌘,)" = "설정(⌘,)";
 "Settings profile for this model" = "이 모델의 설정 프로필입니다.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "런타임을 업데이트하려면 서버를 중지하십시오.";
 "Stopped" = "중지됨";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "중지됨: 모델이 도구를 반복 호출했습니다(한 턴에 %lld회).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "이미지를 생성하는 동안 채팅 모델을 중지하고, 완료 후 다시 로드합니다. 둘을 동시에 실행하면 이 Mac의 메모리를 초과할 수 있습니다.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "이미지나 음악 생성 중 채팅 모델을 중지했다가 이후 다시 로드합니다. 둘을 동시에 사용하면 이 Mac의 메모리를 초과할 수 있습니다.";
 "Sunrise & sunset" = "일출·일몰";
 "Support" = "지원";
 "System" = "시스템";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "API 클라이언트가 보내는 모델 이름입니다.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "모델 선택기, 시작/중지, 프로필, 도구 및 온도를 채팅 위의 별도 창에 표시합니다. 끄면: 창에는 채팅과 대화만 표시되며 해당 제어기는 메뉴 막대에 남아 있습니다.";
 "The model's license, from its card." = "모델 카드에 기재된 사용권입니다.";
+"The music generator is busy -- try again once it's done." = "음악 생성기가 작업 중입니다 — 완료될 때까지 잠시 후 다시 시도하세요.";
+"The music generator is busy with another chat -- try again once it's done." = "음악 생성기가 다른 채팅 작업 중입니다 — 완료된 후 다시 시도하세요.";
 "The report" = "보고서";
 "The running model server is stopped and started again." = "실행 중인 모델 서버가 중지된 후 다시 시작됩니다.";
 "The server log" = "서버 로그";
@@ -398,8 +419,9 @@
 "What happened?" = "무슨 일이 있었나요?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "무엇을 하고 있었는지, 기대한 결과와 실제로 본 것. 대화 내용은 절대 포함되지 않습니다.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
-"Which Z-Image-Turbo quantization generates the images." = "이미지를 생성할 Z-Image-Turbo 양자화를 지정합니다.";
+"Which model generates new images." = "어떤 모델이 새 이미지를 생성할지 선택합니다.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "곡 작성 중…";
 "Yesterday" = "어제";
 "You" = "나";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "메일 앱이 첨부 파일을 처리하지 못했습니다: 보고서는 Finder에 표시되어 있으니 이메일에 첨부해 주세요.";

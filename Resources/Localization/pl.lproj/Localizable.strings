@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "Zezwalaj na połączenia z sieci lokalnej";
 "Already open in another tab" = "Już otwarte w innej karcie";
 "Also check when LLMTray starts" = "Sprawdzaj też przy uruchamianiu LLMTray";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Również edytuje obrazy — jeden z czatu lub dołączony. Edycja zajmuje kilka minut.";
 "Another model already uses this alias." = "Inny model używa już tego aliasu.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Inne flagi mlx_lm.server, rozdzielone spacjami, np. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "Kompakcja";
 "Compaction failed: %@" = "Kompakcja nie powiodła się: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Automatycznie kompaktuje czat, gdy przekroczy tę liczbę wiadomości. Przycisk Kompaktuj w czacie działa niezależnie od tego ustawienia.";
+"Composing…" = "Tworzenie…";
 "Concurrent requests" = "Równoczesne żądania";
 "Copy" = "Kopiuj";
 "Couldn't create the report: %@" = "Nie można utworzyć raportu: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "Przeciągnij czaty tutaj lub użyj menu czatu";
 "Duplicate this profile" = "Powiela ten profil.";
 "Edit Profile…" = "Edytuj profil…";
+"Enable image editing?" = "Włączyć edycję obrazów?";
 "Enable image generation" = "Włącz generowanie obrazów";
 "Enable image generation?" = "Włączyć generowanie obrazów?";
+"Enable music generation" = "Włącz generowanie muzyki";
+"Enable music generation?" = "Włączyć generowanie muzyki?";
 "Extra server arguments" = "Dodatkowe argumenty serwera";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generuj i edytuj";
 "Failed to reload the chat model after image generation: %@" = "Ponowne wczytanie modelu czatu po generowaniu obrazów nie powiodło się: %@";
 "Failed: %@" = "Nie udało się: %@";
 "Fast (smaller canvas)" = "Szybko (mniejsze pole)";
@@ -128,8 +134,11 @@
 "General" = "Ogólne";
 "Generated in %.1fs" = "Wygenerowano w %.1fs";
 "Generating image…" = "Generowanie obrazu…";
+"Generating music…" = "Generowanie muzyki…";
 "Get one" = "Pobierz";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Udostępnia modelowi narzędzie generate_image (wymaga modelu obsługującego wywoływanie narzędzi). Przy pierwszym użyciu model obrazów zostanie pobrany.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Daje modelowi narzędzie generate_music: piosenkę ze śpiewanymi tekstami albo podkład instrumentalny na podstawie opisu (ACE-Step 1.5, licencja MIT; około 20 sekund pracy na 30 sekund muzyki). Przy pierwszym użyciu model jest pobierany.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Dodaje modelowi narzędzie edit_image: zmienia obraz z czatu — dołączony albo wygenerowany tutaj. Wymaga włączonej generacji obrazów. Używa własnego modelu, pobieranego po wybraniu.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Ukryj czaty";
 "High quality (larger canvas)" = "Wysoka jakość (większe pole)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face odrzucił %@ (HTTP %d): jest ograniczony, prywatny lub nie istnieje. Jeśli jest ograniczony, zaakceptuj licencję na huggingface.co/%@ i sprawdź token w Ustawieniach → Modele.";
 "Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Bezczynny — model wczyta się ponownie przy następnej wiadomości";
+"Image editing" = "Edycja obrazów";
 "Image generation" = "Generowanie obrazów";
 "Image generation failed: %@" = "Generowanie obrazu nie powiodło się: %@";
 "Image generation finished but produced no output file." = "Generowanie obrazu zakończone, ale nie utworzono pliku wyjściowego.";
@@ -152,6 +162,7 @@
 "Include the server log" = "Dołącz log serwera";
 "Installed" = "Zainstalowane";
 "Installing mflux…" = "Instalowanie mflux…";
+"Installing mlx-audio…" = "Instalowanie mlx-audio…";
 "Its chats stay, back among the recents." = "Jego czaty pozostaną i wrócą do ostatnich.";
 "KV cache" = "Pamięć podręczna KV";
 "KV group size" = "Rozmiar grupy KV";
@@ -175,6 +186,7 @@
 "Max tokens" = "Maks. liczba tokenów";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Pamięć przechowywana do ponownego używania kontekstu wcześniejszych rozmów, dzięki czemu kontynuowany czat nie musi ponownie odczytywać całej historii. Ma limit, aby nie rosła aż do wyczerpania pamięci serwera.";
 "Message…" = "Wiadomość…";
+"Mixing…" = "Miksowanie…";
 "Model" = "Model";
 "Model actions" = "Czynności modelu";
 "Model card" = "Karta modelu";
@@ -182,6 +194,10 @@
 "Models folder" = "Folder modeli";
 "Models: %@ · free: %@" = "Modele: %@ · wolne: %@";
 "Move to Project" = "Przenieś do projektu";
+"Music generation" = "Generowanie muzyki";
+"Music generation failed: %@" = "Generowanie muzyki nie powiodło się: %@";
+"Music generation finished but produced no audio." = "Generowanie muzyki zakończone, ale nie wygenerowano dźwięku.";
+"Music generation isn't set up -- turn it on again in Settings." = "Generowanie muzyki nie jest skonfigurowane — włącz je ponownie w Ustawieniach.";
 "Name new chats automatically" = "Automatycznie nadaj nazwy nowym czatom";
 "Network" = "Sieć";
 "Never" = "Nigdy";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Otwiera e‑mail do zespołu LLMTray z dołączonym raportem: wersje, Mac, ustawienia modelu i serwera, log serwera oraz ostatnie raporty awarii. Twoje rozmowy nigdy nie są dołączane; najpierw zobaczysz cały raport.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Zastępuje język macOS tylko w LLMTray. Zacznie obowiązywać po ponownym uruchomieniu LLMTray. Nieprzetłumaczony tekst jest wyświetlany po angielsku.";
 "Past %lld messages" = "Poprzednie wiadomości: %lld";
+"Pause" = "Wstrzymaj";
 "Pause download" = "Wstrzymaj pobieranie";
 "Paused" = "Wstrzymane";
 "Performance" = "Wydajność";
 "Pin" = "Przypnij";
 "Pinned" = "Przypięte";
+"Play" = "Odtwórz";
 "Port" = "Port";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precyzja pamięci podręcznej mechanizmu uwagi. 8-bitowa: prawie bezstratna, połowa pamięci. 4-bitowa: jedna czwarta, zauważalnie gorsza przy długim kontekście. Pełna: najlepsza, zużywa najwięcej pamięci.";
 "Prefill step" = "Krok wypełniania wstępnego";
@@ -295,6 +313,7 @@
 "Server log" = "Dziennik serwera";
 "Server settings changed -- restart to apply them." = "Zmieniono ustawienia serwera — uruchom ponownie, aby je zastosować.";
 "Setting up image generation (first time only)…" = "Konfigurowanie generowania obrazów (tylko przy pierwszym uruchomieniu)…";
+"Setting up music generation (first time only)…" = "Konfigurowanie generowania muzyki (tylko przy pierwszym uruchomieniu)…";
 "Settings" = "Ustawienia";
 "Settings (⌘,)" = "Otwórz Ustawienia (⌘,).";
 "Settings profile for this model" = "Profil ustawień dla tego modelu.";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "Zatrzymaj serwer, aby uaktualnić środowisko uruchomieniowe.";
 "Stopped" = "Zatrzymano";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Zatrzymano: model ciągle wywoływał narzędzia (%lld rund w jednej turze).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Zatrzymuje model czatu podczas generowania obrazu i wczytuje go ponownie po zakończeniu. Oba jednocześnie mogą przekroczyć pamięć tego Maca.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Zatrzymuje model czatu podczas generowania obrazu lub muzyki i ładuje go ponownie po zakończeniu. Jednoczesne generowanie obu może przekroczyć pamięć tego Maca.";
 "Sunrise & sunset" = "Wschód i zachód słońca";
 "Support" = "Wsparcie";
 "System" = "System";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "To nazwa modelu wysyłana przez klientów API.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Wybór modelu, Start/Stop, profil, narzędzia i temperatura nad czatem we własnym oknie. Wyłączone: okno zawiera tylko czaty i rozmowę — te sterowniki pozostają w pasku menu.";
 "The model's license, from its card." = "Licencja modelu, z jego karty.";
+"The music generator is busy -- try again once it's done." = "Generator muzyki jest zajęty — spróbuj ponownie po zakończeniu.";
+"The music generator is busy with another chat -- try again once it's done." = "Generator muzyki jest zajęty inną rozmową — spróbuj ponownie po zakończeniu.";
 "The report" = "Raport";
 "The running model server is stopped and started again." = "Działający serwer modelu zostanie zatrzymany i uruchomiony ponownie.";
 "The server log" = "Log serwera";
@@ -398,8 +419,9 @@
 "What happened?" = "Co się stało?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Co robiłeś, czego oczekiwałeś i co widziałeś zamiast tego. Twoje rozmowy nigdy nie są dołączane.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Miejsce, w którym LLMTray szuka modeli MLX (po jednym folderze na model, np. <org>/<name>). Wskaż ~/.lmstudio/models, aby współdzielić modele z LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "Określa kwantyzację Z-Image-Turbo używaną do generowania obrazów.";
+"Which model generates new images." = "Który model generuje nowe obrazy.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "Pisanie utworu…";
 "Yesterday" = "Wczoraj";
 "You" = "Ty";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Twoja aplikacja pocztowa nie może załączyć pliku: raport jest pokazany w Finderze — dołącz go do e‑maila.";

@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "允许来自本地网络的连接";
 "Already open in another tab" = "已在另一个标签页中打开";
 "Also check when LLMTray starts" = "LLMTray 启动时也检查";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "也可编辑图像——来自聊天或你附加的一张。编辑需要几分钟。";
 "Another model already uses this alias." = "另一个模型已使用此别名。";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "其他 mlx_lm.server 标志，以空格分隔，例如 --draft-model <path>。";
 "Apache License 2.0" = "Apache 许可证 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "压缩";
 "Compaction failed: %@" = "压缩失败：%@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "聊天消息数超过此数量后自动压缩。无论此设置如何，聊天中的“压缩”按钮都可使用。";
+"Composing…" = "正在创作…";
 "Concurrent requests" = "并发请求";
 "Copy" = "复制";
 "Couldn't create the report: %@" = "无法创建报告：%@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "将聊天拖到此处，或使用聊天的菜单";
 "Duplicate this profile" = "复制此配置";
 "Edit Profile…" = "编辑配置…";
+"Enable image editing?" = "启用图像编辑？";
 "Enable image generation" = "启用图像生成";
 "Enable image generation?" = "要启用图像生成吗？";
+"Enable music generation" = "启用音乐生成";
+"Enable music generation?" = "要启用音乐生成吗？";
 "Extra server arguments" = "额外服务器参数";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成并编辑";
 "Failed to reload the chat model after image generation: %@" = "图像生成后重载聊天模型失败：%@";
 "Failed: %@" = "失败：%@";
 "Fast (smaller canvas)" = "快速（画布更小）";
@@ -128,8 +134,11 @@
 "General" = "通用";
 "Generated in %.1fs" = "生成用时 %.1fs";
 "Generating image…" = "正在生成图像…";
+"Generating music…" = "正在生成音乐…";
 "Get one" = "获取一个";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "为模型提供 generate_image 工具（需要支持工具调用的模型）。首次使用时会下载图像模型。";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "为模型提供 generate_music 工具：根据描述生成带人声歌词的歌曲或纯音乐（ACE-Step 1.5，MIT 许可；生成 30 秒音乐约需 20 秒）。首次使用会下载模型。";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "为模型提供 edit_image 工具：更改聊天中的图像——你附加的或在此生成的。需要启用图像生成。该工具使用独立模型，选择时会下载。";
 "Hacker News" = "Hacker News";
 "Hide chats" = "隐藏对话";
 "High quality (larger canvas)" = "高质量（画布更大）";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒绝了 %@（HTTP %d）：该模型可能受限、私有或不存在。若受限，请在 huggingface.co/%@ 接受许可，并在“设置 → 模型”中检查令牌。";
 "Hugging Face token" = "Hugging Face 令牌";
 "Idle -- the model reloads on the next message" = "已闲置 -- 模型会在下一条消息时重新加载";
+"Image editing" = "图像编辑";
 "Image generation" = "图像生成";
 "Image generation failed: %@" = "图像生成失败：%@";
 "Image generation finished but produced no output file." = "图像生成完成但未产生输出文件。";
@@ -152,6 +162,7 @@
 "Include the server log" = "包含服务器日志";
 "Installed" = "已安装";
 "Installing mflux…" = "正在安装 mflux…";
+"Installing mlx-audio…" = "正在安装 mlx-audio…";
 "Its chats stay, back among the recents." = "其对话会保留，返回“最近使用”。";
 "KV cache" = "KV 缓存";
 "KV group size" = "KV 组大小";
@@ -175,6 +186,7 @@
 "Max tokens" = "最大词元数";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
 "Message…" = "消息…";
+"Mixing…" = "正在混音…";
 "Model" = "模型";
 "Model actions" = "模型操作";
 "Model card" = "模型卡片";
@@ -182,6 +194,10 @@
 "Models folder" = "模型文件夹";
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "Move to Project" = "移动到项目";
+"Music generation" = "音乐生成";
+"Music generation failed: %@" = "音乐生成失败：%@";
+"Music generation finished but produced no audio." = "音乐生成完成但未生成音频。";
+"Music generation isn't set up -- turn it on again in Settings." = "未设置音乐生成功能——请在“设置”中重新开启。";
 "Name new chats automatically" = "自动命名新对话";
 "Network" = "网络";
 "Never" = "永不";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "打开一封发给 LLMTray 团队的邮件并附加报告：包括版本信息、Mac、模型与服务器设置、服务器日志和近期崩溃报告。不会包含你的聊天记录，且你可先查看完整报告。";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
 "Past %lld messages" = "过去 %lld 条消息";
+"Pause" = "暂停";
 "Pause download" = "暂停下载";
 "Paused" = "已暂停";
 "Performance" = "性能";
 "Pin" = "固定";
 "Pinned" = "已固定";
+"Play" = "播放";
 "Port" = "端口";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力缓存的精度。8-bit：几乎无损，内存占用减半。4-bit：内存占用约为四分之一，长上下文下明显变差。完整精度：效果最佳，内存占用最多。";
 "Prefill step" = "预填充步长";
@@ -295,6 +313,7 @@
 "Server log" = "服务器日志";
 "Server settings changed -- restart to apply them." = "服务器设置已更改，请重启服务器以应用更改。";
 "Setting up image generation (first time only)…" = "正在设置图像生成（仅首次）…";
+"Setting up music generation (first time only)…" = "正在设置音乐生成功能（仅首次）…";
 "Settings" = "设置";
 "Settings (⌘,)" = "打开设置（⌘,）。";
 "Settings profile for this model" = "此模型的设置配置文件。";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "停止服务器以更新运行时。";
 "Stopped" = "已停止";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "已停止：模型持续调用工具（单次回合 %lld 轮）。";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "生成图像时停止聊天模型，并在生成后重新加载。同时运行二者可能会超出此 Mac 的内存。";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "在生成图像或音乐时会停止聊天模型，生成后再重新加载。若同时生成图像与音乐，可能超出此 Mac 的内存。";
 "Sunrise & sunset" = "日出与日落";
 "Support" = "支持";
 "System" = "系统";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "这是 API 客户端发送的模型名称。";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "在独立窗口的对话上方显示模型选择器、启动/停止、资料、工具和温度。关闭时：窗口仅显示对话内容——这些控件保留在菜单栏。";
 "The model's license, from its card." = "来自模型卡的许可。";
+"The music generator is busy -- try again once it's done." = "音乐生成器正在忙碌——完成后请重试。";
+"The music generator is busy with another chat -- try again once it's done." = "音乐生成器正处理其他聊天——完成后请重试。";
 "The report" = "报告";
 "The running model server is stopped and started again." = "正在运行的模型服务器会停止并重新启动。";
 "The server log" = "服务器日志";
@@ -398,8 +419,9 @@
 "What happened?" = "发生了什么？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "你当时在做什么、你的预期以及实际看到的情况。不会包含你的聊天记录。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
-"Which Z-Image-Turbo quantization generates the images." = "用于生成图像的 Z-Image-Turbo 量化版本。";
+"Which model generates new images." = "用于生成新图像的模型。";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "正在创作歌曲…";
 "Yesterday" = "昨天";
 "You" = "你";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "你的邮件应用无法接受该附件：报告已在 Finder 中显示，请将其附加到邮件中。";

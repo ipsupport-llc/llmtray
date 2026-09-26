@@ -27,6 +27,7 @@
 "Allow connections from the local network" = "Дозволити підключення з локальної мережі";
 "Already open in another tab" = "Вже відкрито в іншій вкладці";
 "Also check when LLMTray starts" = "Також перевіряти під час запуску LLMTray";
+"Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Також редагує зображення — те, що в чаті, або яке ви додаєте. Редагування займає кілька хвилин.";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Будь-які інші прапорці mlx_lm.server через пробіл, наприклад --draft-model <шлях>.";
 "Apache License 2.0" = "Ліцензія Apache 2.0";
@@ -76,6 +77,7 @@
 "Compaction" = "Стиснення";
 "Compaction failed: %@" = "Не вдалося стиснути: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Стискає чат автоматично, коли в ньому стає більше повідомлень. Кнопка «Стиснути» в чаті працює в будь-якому разі.";
+"Composing…" = "Компонується…";
 "Concurrent requests" = "Паралельні запити";
 "Copy" = "Копіювати";
 "Couldn't create the report: %@" = "Не вдалося створити звіт: %@";
@@ -111,9 +113,13 @@
 "Drag chats here, or use a chat's menu" = "Перетягніть чати сюди або скористайтеся меню чату";
 "Duplicate this profile" = "Дублювати профіль";
 "Edit Profile…" = "Редагувати профіль…";
+"Enable image editing?" = "Увімкнути редагування зображень?";
 "Enable image generation" = "Генерація зображень";
 "Enable image generation?" = "Увімкнути генерацію зображень?";
+"Enable music generation" = "Увімкнути генерацію музики";
+"Enable music generation?" = "Увімкнути генерацію музики?";
 "Extra server arguments" = "Дод. аргументи сервера";
+"FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — генерувати та редагувати";
 "Failed to reload the chat model after image generation: %@" = "Не вдалося перезавантажити модель чату після генерації зображення: %@";
 "Failed: %@" = "Помилка: %@";
 "Fast (smaller canvas)" = "Швидко (менше полотно)";
@@ -128,8 +134,11 @@
 "General" = "Основні";
 "Generated in %.1fs" = "Згенеровано за %.1fs";
 "Generating image…" = "Генерую зображення…";
+"Generating music…" = "Генерування музики…";
 "Get one" = "Отримати";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Дає моделі інструмент generate_image (потрібна модель, що вміє викликати інструменти). Першого разу завантажується модель для зображень.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Надає моделі інструмент generate_music: пісня з вокалом або інструментальна композиція за описом (ACE-Step 1.5, ліцензія MIT; приблизно 20 секунд на 30 секунд музики). При першому використанні модель завантажується.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Надає моделі інструмент edit_image: змінює зображення з чату — те, що ви прикріпили, або згенероване тут. Працює за умови увімкненої генерації зображень. Використовує власну модель, яку завантажують при виборі.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Сховати чати";
 "High quality (larger canvas)" = "Висока якість (більше полотно)";
@@ -142,6 +151,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face відхилив %@ (HTTP %d): модель обмежена, приватна або не існує. Якщо вона обмежена, прийміть ліцензію на huggingface.co/%@ і перевірте токен у Налаштування → Models.";
 "Hugging Face token" = "Токен Hugging Face";
 "Idle -- the model reloads on the next message" = "Простій -- модель завантажиться з наступним повідомленням";
+"Image editing" = "Редагування зображень";
 "Image generation" = "Генерація зображень";
 "Image generation failed: %@" = "Не вдалося згенерувати зображення: %@";
 "Image generation finished but produced no output file." = "Генерація зображення завершилася, але файл не створено.";
@@ -152,6 +162,7 @@
 "Include the server log" = "Включити серверний лог";
 "Installed" = "Встановлено";
 "Installing mflux…" = "Встановлення mflux…";
+"Installing mlx-audio…" = "Встановлюється mlx-audio…";
 "Its chats stay, back among the recents." = "Його чати залишаються — повернуться у недавно використані.";
 "KV cache" = "KV-кеш";
 "KV group size" = "Група KV";
@@ -175,6 +186,7 @@
 "Max tokens" = "Макс. токенів";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Пам'ять під контекст попередніх розмов, щоб продовжений чат не перечитував усю історію. Обмежена, щоб не зростати, доки в сервера не скінчиться пам'ять.";
 "Message…" = "Повідомлення…";
+"Mixing…" = "Мікшування…";
 "Model" = "Модель";
 "Model actions" = "Дії з моделлю";
 "Model card" = "Картка моделі";
@@ -182,6 +194,10 @@
 "Models folder" = "Тека моделей";
 "Models: %@ · free: %@" = "Моделі: %@ · вільно: %@";
 "Move to Project" = "Перемістити в проєкт";
+"Music generation" = "Генерація музики";
+"Music generation failed: %@" = "Генерація музики не вдалася: %@";
+"Music generation finished but produced no audio." = "Генерація музики завершена, але аудіо не створено.";
+"Music generation isn't set up -- turn it on again in Settings." = "Генерація музики не налаштована — знову увімкніть її в Налаштуваннях.";
 "Name new chats automatically" = "Автоматично давати назви новим чатам";
 "Network" = "Мережа";
 "Never" = "Ніколи";
@@ -221,11 +237,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Відкриває листа до команди LLMTray зі вкладеним звітом: версії, Mac, налаштування моделі та сервера, серверний лог і останні звіти про збої. Ваші чати ніколи не включаються, і ви спочатку бачите весь звіт.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
 "Past %lld messages" = "Понад %lld повідомлень";
+"Pause" = "Призупинити";
 "Pause download" = "Призупинити завантаження";
 "Paused" = "Призупинено";
 "Performance" = "Продуктивність";
 "Pin" = "Закріпити";
 "Pinned" = "Закріплено";
+"Play" = "Відтворити";
 "Port" = "Порт";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точність кешу уваги. 8 біт — майже без втрат, удвічі менше пам'яті. 4 біти — вчетверо менше, але помітно гірше на довгому контексті. Повний — найкраще, але найбільше пам'яті.";
 "Prefill step" = "Крок префілу";
@@ -295,6 +313,7 @@
 "Server log" = "Лог сервера";
 "Server settings changed -- restart to apply them." = "Налаштування сервера змінилися — перезапустіть, щоб застосувати.";
 "Setting up image generation (first time only)…" = "Налаштування генерації зображень (тільки вперше)…";
+"Setting up music generation (first time only)…" = "Налаштовується генерація музики (лише вперше)…";
 "Settings" = "Налаштування";
 "Settings (⌘,)" = "Налаштування (⌘,)";
 "Settings profile for this model" = "Профіль налаштувань цієї моделі";
@@ -335,7 +354,7 @@
 "Stop the server to update the runtime." = "Щоб оновити рантайм, зупиніть сервер.";
 "Stopped" = "Зупинено";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Зупинено: модель постійно викликала інструменти (%lld раундів в одному ході).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель на час генерації зображення, а потім завантажує знову. Дві моделі одночасно можуть не вміститися в пам'ять цього Mac.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Зупиняє чат-модель під час створення зображення або музики та перезавантажує її після. Одночасна робота може перевантажити пам’ять цього Mac.";
 "Sunrise & sunset" = "Схід і захід сонця";
 "Support" = "Підтримка";
 "System" = "Системна";
@@ -357,6 +376,8 @@
 "The model name API clients send." = "Ім'я моделі, яке надсилають API-клієнти.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Вибір моделі, Start/Stop, профіль, інструменти та температура розташовані над чатом у власному вікні. Вимкнено: вікно містить лише чати й розмову — ці елементи залишаються в рядку меню.";
 "The model's license, from its card." = "Ліцензія моделі з її картки.";
+"The music generator is busy -- try again once it's done." = "Генератор музики зайнятий — спробуйте пізніше, коли завершиться.";
+"The music generator is busy with another chat -- try again once it's done." = "Генератор музики зайнятий іншим чатом — спробуйте пізніше, коли завершиться.";
 "The report" = "Звіт";
 "The running model server is stopped and started again." = "Запущений сервер моделі буде зупинено й запущено знову.";
 "The server log" = "Серверний лог";
@@ -398,8 +419,9 @@
 "What happened?" = "Що сталося?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Що ви робили, чого очікували та що бачили натомість. Ваші чати ніколи не включаються.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
-"Which Z-Image-Turbo quantization generates the images." = "Яка квантовка Z-Image-Turbo генерує зображення.";
+"Which model generates new images." = "Яка модель генерує нові зображення.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "Пишеться пісня…";
 "Yesterday" = "Вчора";
 "You" = "Ви";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ваша поштова програма не змогла взяти вкладення: звіт показано у Finder, додайте його до листа.";
