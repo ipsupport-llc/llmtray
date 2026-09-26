@@ -92,7 +92,7 @@ final class MusicToolRunner: ChatTool {
             )
         }
         guard songsThisTurn < maxSongsPerTurn else {
-            return .text(
+            return .refused(
                 "Not making another piece -- one was already made for this request and shown to the user. Do not call "
                     + "generate_music again unless the user sends a new message asking for different music."
             )

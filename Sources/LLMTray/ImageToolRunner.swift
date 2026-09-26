@@ -99,7 +99,7 @@ final class ImageToolRunner: ChatTool {
             )
         }
         guard imagesThisTurn < maxImagesPerTurn else {
-            return .text(
+            return .refused(
                 "Not generating another image -- one was already generated for this request "
                     + "and shown to the user. Do not call generate_image again unless the user sends a "
                     + "new message explicitly asking for a new or different image."
@@ -204,7 +204,7 @@ final class EditImageTool: ChatTool {
             )
         }
         guard generator.imagesThisTurn < generator.maxImagesPerTurn else {
-            return .text(
+            return .refused(
                 "Not editing -- an image was already made for this request and shown to the user. Do not call "
                     + "edit_image again unless the user sends a new message asking for another change."
             )

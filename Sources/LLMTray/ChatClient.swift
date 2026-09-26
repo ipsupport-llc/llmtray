@@ -505,6 +505,15 @@ final class ChatClient: ObservableObject {
 
     var isMusicModelReady: Bool { musicManager.isReady }
 
+    /// This turn (since the user's last message) has shown something: an
+    /// answer, an image, a song.
+    private var turnProducedSomething: Bool {
+        guard let start = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) else { return false }
+        return messages[(start + 1)...].contains {
+            $0.role == "assistant" && (!$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !$0.images.isEmpty || !$0.audios.isEmpty)
+        }
+    }
+
     /// A call's arguments as Regenerate should run them again: edit_image's
     /// "latest image" pinned to the image it meant then (the result itself
     /// is the latest one afterwards).
@@ -789,9 +798,15 @@ final class ChatClient: ObservableObject {
         // model repeating them from history): refused, the turn ends.
         if toolRoundsThisTurn >= maxToolRoundsPerTurn {
             for call in toolCalls {
-                messages.append(ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id))
+                var refusal = ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id)
+                refusal.isRefusal = true
+                messages.append(refusal)
             }
-            errorText = String(format: NSLocalizedString("Stopped: the model kept calling tools (%lld rounds in one turn).", comment: ""), maxToolRoundsPerTurn)
+            // Only when the turn gave the user nothing: calls repeated after
+            // the image, song or answer was already there are just dropped.
+            if !turnProducedSomething {
+                errorText = String(format: NSLocalizedString("Stopped: the model kept calling tools (%lld rounds in one turn).", comment: ""), maxToolRoundsPerTurn)
+            }
             isRunningTools = false
             isStreaming = false
             persistCurrentSession()
@@ -867,6 +882,10 @@ final class ChatClient: ObservableObject {
             switch result {
             case .text(let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .refused(let text):
+                var refusal = ChatMessage(role: "tool", content: text, toolCallID: call.id)
+                refusal.isRefusal = true
+                messages.append(refusal)
             case .imageForModel(let data, let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
                 pendingModelImages.append(data)
