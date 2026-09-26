@@ -101,7 +101,8 @@ struct MessageBubble: View {
                 // An answer's always (it's what gets copied); the user's own on hover.
                 if !message.content.isEmpty {
                     // The user's own: its space kept, so hovering doesn't shift the chat.
-                    textActions.opacity(!isUser || hovering ? 1 : 0)
+                    let shown = !isUser || hovering
+                    textActions.opacity(shown ? 1 : 0).allowsHitTesting(shown).accessibilityHidden(!shown).disabled(!shown)
                 }
             }
 
@@ -204,6 +205,7 @@ struct MessageBubble: View {
                     }
                     .buttonStyle(.plain)
                     .help(Text("Copy"))
+                    .accessibilityLabel(Text("Copy"))
                     ShareLink(item: SharedImage(data: data, prompt: prompt),
                               preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Image", comment: "") : prompt,
                                                     image: Image(nsImage: nsImage))) {
@@ -211,6 +213,7 @@ struct MessageBubble: View {
                     }
                     .buttonStyle(.plain)
                     .help(Text("Share…"))
+                    .accessibilityLabel(Text("Share…"))
                     if canRegenerate(.image, i) {
                         Button { regenerateMedia?(.image, i, .regenerate) } label: {
                             Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
