@@ -88,7 +88,7 @@
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
-"Copy the song as a WAV file" = "Copy the song as a WAV file";
+"Copy the song as an audio file" = "Copy the song as an audio file";
 "Copy the text" = "Copy the text";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Countdown" = "Countdown";

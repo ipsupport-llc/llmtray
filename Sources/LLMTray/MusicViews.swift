@@ -104,8 +104,8 @@ struct AudioClipView: View {
 
     private var isCurrent: Bool { playback.currentID == id }
 
-    /// The clip's own length, from its WAV header (no player needed).
-    private var length: TimeInterval { WAVInfo.duration(data) ?? 0 }
+    /// The clip's own length, from its header (no player needed).
+    private var length: TimeInterval { AudioCodec.duration(data) ?? 0 }
 
     var body: some View {
         let total = isCurrent ? playback.duration : length
@@ -153,7 +153,7 @@ struct AudioClipView: View {
                     Image(systemName: "doc.on.doc").font(.system(size: 10))
                 }
                 .buttonStyle(.plain)
-                .help(Text("Copy the song as a WAV file"))
+                .help(Text("Copy the song as an audio file"))
                 .accessibilityLabel(Text("Copy"))
                 ShareLink(item: SharedAudio(data: data, prompt: prompt),
                           preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Music", comment: "") : prompt,
@@ -203,10 +203,11 @@ struct AudioClipView: View {
     /// A Save panel, named after the prompt.
     static func save(_ data: Data, prompt: String) {
         let panel = NSSavePanel()
-        panel.allowedContentTypes = [.wav]
+        let format = AudioCodec.format(of: data)
+        panel.allowedContentTypes = [format == .wav ? .wav : .mpeg4Audio]
         let base = prompt.components(separatedBy: CharacterSet.alphanumerics.inverted).filter { !$0.isEmpty }
             .prefix(6).joined(separator: "-")
-        panel.nameFieldStringValue = (base.isEmpty ? "music" : base) + ".wav"
+        panel.nameFieldStringValue = (base.isEmpty ? "music" : base) + "." + format.fileExtension
         guard panel.runModal() == .OK, let url = panel.url else { return }
         try? data.write(to: url, options: .atomic)
     }

@@ -11,7 +11,7 @@ enum ToolResult {
     case refused(String)
     /// A generated image, shown to the user, plus the tool result.
     case generatedImage(Data, seconds: Double, prompt: String, text: String)
-    /// Generated music (WAV), shown to the user as a player, plus the tool result.
+    /// Generated music (.m4a), shown to the user as a player, plus the tool result.
     case generatedAudio(Data, seconds: Double, prompt: String, text: String)
     /// An image put in front of the model (view_image): sent with the next
     /// request, in memory only -- neither shown as a chat bubble nor saved.

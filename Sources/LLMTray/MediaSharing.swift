@@ -1,4 +1,5 @@
 import AppKit
+import LLMTrayCore
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -13,13 +14,20 @@ enum MediaSharing {
         pasteboard.setString(text, forType: .string)
     }
 
-    /// The WAV as a file (Finder, Messages, a DAW paste it) and as data.
+    /// A song sent out as .m4a: a WAV from before is encoded first.
+    static func m4a(_ data: Data) -> Data {
+        AudioCodec.format(of: data) == .m4a ? data : (try? AudioCodec.m4a(from: data)) ?? data
+    }
+
+    /// The song as a file (Finder, Messages, a DAW paste it) and as data.
     static func copyAudio(_ data: Data, prompt: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         let item = NSPasteboardItem()
-        item.setData(data, forType: NSPasteboard.PasteboardType(UTType.wav.identifier))
-        if let url = try? exportFile(data, name: fileName(prompt, fallback: "music"), ext: "wav") {
+        let audio = m4a(data)
+        let format = AudioCodec.format(of: audio)
+        item.setData(audio, forType: NSPasteboard.PasteboardType((format == .wav ? UTType.wav : UTType.mpeg4Audio).identifier))
+        if let url = try? exportFile(audio, name: fileName(prompt, fallback: "music"), ext: format.fileExtension) {
             item.setString(url.absoluteString, forType: .fileURL)
         }
         pasteboard.writeObjects([item])
@@ -77,8 +85,8 @@ struct SharedAudio: Transferable {
     let prompt: String
 
     static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .wav) { clip in
-            SentTransferredFile(try MediaSharing.exportFile(clip.data, name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "wav"))
+        FileRepresentation(exportedContentType: .mpeg4Audio) { clip in
+            SentTransferredFile(try MediaSharing.exportFile(MediaSharing.m4a(clip.data), name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "m4a"))
         }
     }
 }

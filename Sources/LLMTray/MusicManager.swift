@@ -214,7 +214,7 @@ final class MusicManager: ObservableObject {
         }
     }
 
-    /// One piece of music, as 16-bit stereo WAV bytes -- in memory only: the
+    /// One piece of music, as AAC (.m4a) bytes -- in memory only: the
     /// runner reads the request from stdin and writes the audio to stdout,
     /// so nothing touches the disk (a temporary chat must leave no trace).
     /// One piece of music and the seed it was made with (Regenerate can keep it).
@@ -279,7 +279,8 @@ final class MusicManager: ObservableObject {
             }
         })
         guard let data = result.get() else { throw MusicError.outputMissing }
-        return Song(audio: data, seed: usedSeed.get())
+        // Kept as AAC (.m4a): ~1 MB instead of the runner's ~6 MB WAV per 30 s.
+        return Song(audio: (try? AudioCodec.m4a(from: data)) ?? data, seed: usedSeed.get())
     }
 
     /// The runner's stage names, for the UI.

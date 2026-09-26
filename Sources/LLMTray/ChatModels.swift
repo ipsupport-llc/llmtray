@@ -38,7 +38,7 @@ struct ChatMessage: Identifiable, Equatable {
     // alignment -- used to give the Save panel a filename derived from
     // what was actually asked for instead of a generic "image.png".
     var imagePrompts: [String] = []
-    // Generated music (16-bit WAV bytes), shown as players: in memory, and
+    // Generated music (.m4a AAC bytes; WAV for songs made before), shown as players: in memory, and
     // persisted like images (a temporary chat's never touch disk). Same
     // index alignment for the three arrays after it.
     var audios: [Data] = []
