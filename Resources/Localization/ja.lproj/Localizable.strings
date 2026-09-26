@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ が %2$@ を要求しています";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ が %2$@ を要求しています。切り替えると現在読み込まれているモデルはアンロードされます。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ は制限付きです: huggingface.co/%@ でライセンスを承諾し、設定 → Models に Hugging Face トークンを追加してください。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ はまだダウンロードされていません — 設定で画像生成を再度有効にしてください。";
 "%@ wasn't found on Hugging Face." = "Hugging Face に %@ が見つかりませんでした。";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld回のダウンロード";
+"%lld s" = "%lld 秒";
 "%lld-bit" = "%lldビット";
 "(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
 "(no result yet)" = "(結果はまだありません)";
 "(no server output yet)" = "（サーバ出力はまだありません）";
+"A client" = "クライアント";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
 "A quiet check at every launch. Only shows anything if an update exists." = "起動するたびに静かに確認します。アップデートがある場合にのみ表示します。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "この時間内に何も生成しないリクエストは停止と見なします。これは、プロセスは動作したままサーバワーカーが停止した場合（例: GPU メモリ不足）に発生します。";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — 歌声が明瞭、8-bit（推奨）";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 歌声が明瞭、GPTQ 4-bit（メモリ節約）";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — 歌声が明瞭、フル精度";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — より豊かな音";
 "About LLMTray" = "LLMTrayについて";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "ツールが提供されるたびにシステムプロンプトへ追加されます。モデル自身のツールテンプレートはツールの呼び出し方法だけを示し、呼び出さない条件は示しません。空にすると無効になります。";
 "Advanced" = "詳細";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "別のタブですでに開かれています";
 "Also check when LLMTray starts" = "LLMTray の起動時にも確認";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "チャット内の画像、または添付した画像を編集できます。編集には数分かかります。";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "編集中のエディタ、エージェント、またはスクリプトが現在読み込まれているものと異なるモデルを要求する場合。切り替えると読み込まれているモデル（チャットも含む）はアンロードされます。先に確認する: 「切り替え / 維持」の通知を表示。1分間未回答なら「維持」とみなします。「維持」の場合、クライアントには読み込まれているモデル名を伝えるエラーが返ります。アプリ内のチャットは常に切り替えます。";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
+"Another version next to this one (a new seed, the same request)" = "この作品の横に並ぶ別バージョン（新しいシード、同じリクエスト）";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "その他の mlx_lm.server フラグをスペース区切りで指定します（例: --draft-model <path>）。";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "アプリの言語";
 "Apply to profile" = "プロファイルに適用";
+"Ask first" = "事前に確認";
 "Assistant" = "アシスタント";
 "Attach image(s) for the model to see" = "モデルに見せる画像を添付します。";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention を 8-bit、feed-forward を 4-bit に — サイズと安定性の最良バランス。uniform 4-bit と比較して検証済みです。";
+"Audio quality" = "オーディオ品質";
 "Auto-compact" = "自動圧縮";
 "Auto-restart after %lld stalls" = "停止が %lld 回続いたら自動再起動";
 "Auto-restart: off" = "自動再起動：オフ";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "パフォーマンスを自動チューニング";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "下の1つの結果に平均化されています。必ず破棄用のウォームアップ実行を先に行うため、初回呼び出し時のMetalカーネルのコンパイル時間が数値に影響することはありません。";
 "Balanced (default)" = "バランス（Default）";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "画像や曲が生成される前に、モデルに渡される内容（プロンプト、モデル、設定）を表示します。カウントダウン後に何も操作しなければ自動で進行します。";
 "Benchmark" = "ベンチマーク";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "ベンチマークは現在読み込まれているモデルに対して実行されます。自動チューニングは結果をそのモデルのプロファイルに書き込みます。";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "キャンセル";
 "Cancel download" = "ダウンロードをキャンセルします。";
 "Canvas size" = "キャンバスサイズ";
+"Change the prompt, the model or the shape, then make another version" = "プロンプト、モデル、Shapeを変更してから別バージョンを作成します";
+"Change the style, lyrics, model or knobs, then make another version" = "スタイル、歌詞、モデル、設定を変更してから別バージョンを作成します";
 "Chat" = "チャット";
 "Chat name" = "チャット名";
 "Chat tools" = "チャットツール";
@@ -80,10 +97,15 @@
 "Composing…" = "作成中…";
 "Concurrent requests" = "同時リクエスト数";
 "Copy" = "コピー";
+"Copy the song as an audio file" = "曲をオーディオファイルとしてコピーします";
+"Copy the text" = "テキストをコピーします";
 "Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
+"Countdown" = "カウントダウン";
 "Country facts" = "国の基本情報";
 "Crash reports (%lld)" = "クラッシュレポート（%lld）";
 "Create Email…" = "メールを作成…";
+"Creativity" = "創作性";
+"Creator mode" = "作成者モード";
 "Currency rates" = "為替レート";
 "Current settings are already fastest" = "現在の設定はすでに最速です";
 "Date & time" = "日付と時刻";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "高速（キャンバス小）";
 "Fetching file list…" = "ファイル一覧を取得しています…";
 "Fits comfortably" = "余裕あり";
+"Follow the description" = "説明に従う";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "公開済みの下書きモデルがあるモデル（Gemma 4 26B）では、小さな追加モデルが先のトークンを予測し、メインモデルが1回のパスで確認します。出力は同じで、より高速です。その場合、リクエストは1件ずつ処理されます。";
 "Free on disk: %@ · your models: %@" = "ディスクの空き: %@ · あなたのモデル: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "リクエストがないままこの時間が経過したら、読み込まれたモデルが保持しているメモリを解放します。次のリクエスト時に自動的に再読み込みされ、通常の読み込み待ち時間が発生します。";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "制限付き: その Hugging Face ページでライセンスを承諾し、設定 → Models にトークンを追加してください。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "制限付き: その Hugging Face ページでアクセスを申請してください（著者による審査があります）。設定 → Models にトークンを追加してください。";
 "General" = "一般";
+"Generate" = "生成";
 "Generated in %.1fs" = "生成時間 %.1fs";
 "Generating image…" = "画像を生成中…";
 "Generating music…" = "音楽を生成中…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "高品質（キャンバス大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高の忠実度、ダウンロードは最大 — 信頼できる正確性のベースラインです。";
 "Hourly forecast" = "時間ごとの予報";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音楽の冒険性・予測不能さ。turboのみ適用：sftには曲のプランナーがありません。";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "曲の保存・共有方法。AAC 256 kbit/s: 約30秒で1 MB、ほとんどのリスニングでは違いが分かりません。非圧縮 WAV: 約30秒で6 MB。";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "モデルが指定したスタイルにどれだけ厳密に従うか。高いほど近く、低いほど自由になります。";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face が %2$@ に対して HTTP %1$d を返しました。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
 "Hugging Face token" = "Hugging Face トークン";
 "Idle -- the model reloads on the next message" = "待機中 — 次のメッセージでモデルを再読み込み";
+"Image" = "画像";
 "Image editing" = "画像編集";
 "Image generation" = "画像生成";
 "Image generation failed: %@" = "画像生成に失敗しました: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "チャットは残り、最近の項目に戻ります。";
 "KV cache" = "KVキャッシュ";
 "KV group size" = "KVグループサイズ";
+"Keep" = "維持";
+"Keep %@ loaded" = "%@ を維持";
 "Keep current" = "現在のまま";
 "Keep first messages: %lld" = "最初のメッセージを保持: %lld";
 "Keep last messages: %lld" = "最後のメッセージを保持: %lld";
+"Keep the loaded model" = "読み込まれているモデルを維持";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量子化前に、コンテキストの先頭Nトークンをフル精度で保持します。値を高くすると、長いプロンプトの精度は上がりますが、メモリ節約効果は下がります。";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — チャット";
@@ -181,11 +212,11 @@
 "Library" = "ライブラリ";
 "Likes" = "いいね";
 "Live output of the model process: loading, errors, requests." = "モデルプロセスのライブ出力です: 読み込み、エラー、リクエスト。";
+"Load %@" = "%@ を読み込む";
+"Loaded: %1$@ · selected: %2$@" = "読み込み済み: %1$@ · 選択: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "最後に使用したモデルをすぐに読み込み、Play を押さなくても使用できる状態にします。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
 "Maintenance" = "メンテナンス";
-"Make this image again (a new seed, the same request)" = "この画像を再生成（新しいシード、同じリクエスト）";
-"Make this music again (a new seed, the same request)" = "この音楽を再生成（新しいシード、同じリクエスト）";
 "Manage Models…" = "モデルを管理…";
 "Max tokens" = "最大トークン数";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
@@ -194,14 +225,17 @@
 "Model" = "モデル";
 "Model actions" = "モデルのアクション";
 "Model card" = "モデルカード";
+"Model switching" = "モデル切り替え";
 "Models" = "モデル";
 "Models folder" = "モデルフォルダ";
 "Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
 "Move to Project" = "プロジェクトに移動";
+"Music" = "ミュージック";
 "Music generation" = "音楽生成";
 "Music generation failed: %@" = "音楽生成に失敗しました：%@";
 "Music generation finished but produced no audio." = "音楽生成は完了しましたが、音声が生成されませんでした。";
 "Music generation isn't set up -- turn it on again in Settings." = "音楽生成が設定されていません。設定で再度有効にしてください。";
+"Music model" = "音楽モデル";
 "Name new chats automatically" = "新しいチャットを自動で命名";
 "Network" = "ネットワーク";
 "Never" = "しない";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
 "Older" = "以前";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "制限付きモデルのみ (Llama、一部の Gemma と FLUX リポジトリ): Hugging Face ページでライセンスを承諾し、読み取り用トークンをここに貼り付けてください。トークンは Keychain に保存され、huggingface.co にのみ送信されます。";
+"Only turbo has this knob: sft has no song planner to vary." = "このノブはturboのみ：sftには曲のプランナーがありません。";
 "Open Server Log…" = "サーバログを開く…";
 "Open in New Tab" = "新規タブで開く";
 "Open in Window" = "ウインドウで開く";
@@ -308,6 +343,7 @@
 "Search" = "検索";
 "Search Hugging Face (mlx models)…" = "Hugging Face（mlx モデル）を検索…";
 "Search chats" = "チャットを検索";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "下書きがそのまま進行するまでの秒数。0ならGenerateを押すまで待ちます。";
 "Select Tab" = "タブを選択";
 "Select a component to see its license." = "ライセンスを確認するコンポーネントを選択してください。";
 "Send" = "送信します。";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "このモデルの設定プロファイルです。";
 "Settings this profile overrides; everything else comes from Default." = "このプロファイルで上書きする設定です。それ以外はすべて Default から取得されます。";
 "Settings…" = "設定…";
+"Shape" = "Shape";
+"Share…" = "共有…";
 "Show Chat Window" = "チャットウインドウを表示";
 "Show Next Tab" = "次のタブを表示";
 "Show Previous Tab" = "前のタブを表示";
@@ -337,6 +375,8 @@
 "Show tool calls" = "ツール呼び出しを表示";
 "Shows the chat window" = "チャットウインドウを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌詞がはっきり歌われ、ボーカルが前面に出ます。30秒の音楽に約40秒かかります。";
+"Skip" = "スキップ";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "最小かつ最もアグレッシブ — 一部のプロンプトでは生成の構成が目に見えて変化することがあります。";
 "Something went wrong?" = "問題が発生しましたか？";
 "Sort by" = "並べ替え";
@@ -350,6 +390,7 @@
 "Start server" = "サーバを起動します。";
 "Start the server first." = "先にサーバを起動してください。";
 "Start the server when LLMTray opens" = "LLMTray の起動時にサーバを起動";
+"Starting in %.0f s…" = "あと %.0f 秒で開始…";
 "Starting…" = "起動中…";
 "Startup" = "起動";
 "Step %lld/%lld" = "ステップ %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "画像や音楽を生成する間、チャットモデルを停止して生成後に再読み込みします。両方同時に行うとこの Mac のメモリを超えることがあります。";
 "Sunrise & sunset" = "日の出と日の入り";
 "Support" = "サポート";
+"Switch" = "切り替え";
+"Switch at once" = "即時切り替え";
+"Switch models?" = "モデルを切り替えますか？";
+"Switch the music model?" = "音楽モデルを切り替えますか？";
 "System" = "システム";
 "System prompt" = "システムプロンプト";
 "Tab %lld" = "タブ %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
+"Tweak…" = "調整…";
+"Uncompressed (WAV)" = "非圧縮（WAV）";
 "Uninstall" = "アンインストール";
 "Uninstall Runtime Data…" = "ランタイムデータをアンインストール…";
 "Uninstall runtime data?" = "ランタイムデータをアンインストールしますか？";
@@ -424,6 +471,7 @@
 "Web search" = "ウェブ検索";
 "What happened?" = "何が起きましたか？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "実行していた操作、期待した結果、実際に見た結果を記載してください。チャット内容は含まれません。";
+"When a client asks for another model" = "クライアントが別のモデルを要求したとき";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which model generates new images." = "どのモデルが新しい画像を生成するか。";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "リクエストの作成に失敗しました";
 "mlx-lm runtime" = "mlx-lm ランタイム";
 "not used by any model" = "どのモデルにも使用されていません";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo：より豊かで完成度の高いミックス。sft：歌詞が明瞭でボーカルが前面に出るが、生成時間はおよそ2倍になります。";
 "used by %@" = "%@で使用中";
 "· size…" = "・サイズ…";

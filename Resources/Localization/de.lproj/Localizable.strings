@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ fordert %2$@ an";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ fordert %2$@ an. Ein Wechsel entlädt das aktuell geladene Modell.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ ist eingeschränkt: Akzeptieren Sie die Lizenz auf huggingface.co/%@ und fügen Sie dann in Einstellungen → Modelle einen Hugging Face‑Token hinzu.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ist noch nicht heruntergeladen – Bildgenerierung in „Einstellungen“ wieder aktivieren.";
 "%@ wasn't found on Hugging Face." = "%@ wurde auf Hugging Face nicht gefunden.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d überschrieben, Rest von Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld Downloads";
+"%lld s" = "%lld s";
 "%lld-bit" = "%lld-Bit";
 "(Please attach the report file shown in Finder.)" = "(Bitte die im Finder angezeigte Berichtdatei anhängen.)";
 "(no result yet)" = "(noch kein Ergebnis)";
 "(no server output yet)" = "(noch keine Serverausgabe)";
+"A client" = "Ein Client";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Vollerer, fertiger klingender Mix; die Liedtexte sind weniger deutlich. Etwa 20 s für 30 s Musik.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Eine unauffällige Prüfung bei jedem Start. Zeigt nur etwas an, wenn ein Update verfügbar ist.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Eine Anfrage, die so lange nichts ausgibt, gilt als blockiert. Das passiert, wenn ein Server-Worker abstürzt (z. B. wegen zu wenig GPU-Speicher), der Prozess aber weiterläuft.";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — deutliche Vocals, 8-bit (empfohlen)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — deutliche Vocals, GPTQ 4-bit (weniger RAM)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — deutliche Vocals, volle Genauigkeit";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — vollerer Sound";
 "About LLMTray" = "Über LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Wird dem System-Prompt hinzugefügt, sobald Tools angeboten werden. Die eigene Tool-Vorlage des Modells beschreibt nur, wie ein Tool aufgerufen wird, nie, wann nicht. Leer lassen deaktiviert dies.";
 "Advanced" = "Erweitert";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "Bereits in einem anderen Tab geöffnet";
 "Also check when LLMTray starts" = "Auch beim Start von LLMTray prüfen";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Bearbeitet auch Bilder – entweder eines aus dem Chat oder ein von Ihnen angehängtes. Bearbeitungen dauern einige Minuten.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Ein Editor, ein Agent oder ein Script fragt ein anderes Modell an als das geladene. Ein Wechsel entlädt das geladene Modell – auch der Chat. Zuerst fragen: eine Mitteilung mit Wechsel / Behalten; keine Antwort innerhalb einer Minute gilt als Behalten. Behalten: der Client erhält einen Fehler mit Nennung des geladenen Modells. Der integrierte Chat der App wechselt immer.";
 "Another model already uses this alias." = "Ein anderes Modell verwendet diesen Alias bereits.";
+"Another version next to this one (a new seed, the same request)" = "Eine weitere Version daneben (neuer Seed, gleiche Anfrage)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Weitere mlx_lm.server-Flags, durch Leerzeichen getrennt, z. B. --draft-model <path>.";
 "Apache License 2.0" = "Apache‑Lizenz 2.0";
 "App language" = "App-Sprache";
 "Apply to profile" = "Auf Profil anwenden";
+"Ask first" = "Zuerst fragen";
 "Assistant" = "Assistent";
 "Attach image(s) for the model to see" = "Fügt Bild(er) hinzu, die das Modell sehen kann.";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention in 8‑Bit, Feed‑Forward in 4‑Bit – bestes Größen-/Stabilitätsverhältnis, validiert gegenüber einheitlichem 4‑Bit.";
+"Audio quality" = "Audioqualität";
 "Auto-compact" = "Automatisch verdichten";
 "Auto-restart after %lld stalls" = "Nach %lld Stillständen automatisch neu starten";
 "Auto-restart: off" = "Automatischer Neustart: aus";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "Leistung automatisch optimieren";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Unten zu einem Ergebnis gemittelt. Vorher läuft immer ein verworfener Aufwärmlauf, damit die Kompilierzeit des Metal-Kernels beim ersten Aufruf die Werte nie verfälscht.";
 "Balanced (default)" = "Ausgewogen (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Zeigt vor der Erstellung eines Bildes oder Songs, was das Modell erhalten hat – Prompt, Modell und Regler –, damit Sie es vorher ändern können. Nach dem Countdown startet es automatisch, wenn Sie nichts tun.";
 "Benchmark" = "Benchmark";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Benchmarks werden mit dem aktuell geladenen Modell ausgeführt. Die automatische Optimierung schreibt ihre Ergebnisse in das Profil dieses Modells.";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "Abbrechen";
 "Cancel download" = "Bricht den Download ab.";
 "Canvas size" = "Leinwandgröße";
+"Change the prompt, the model or the shape, then make another version" = "Ändern Sie Prompt, Modell oder Shape, und erstellen Sie dann eine weitere Version";
+"Change the style, lyrics, model or knobs, then make another version" = "Ändern Sie Stil, Lyrics, Modell oder Regler, und erstellen Sie dann eine weitere Version";
 "Chat" = "Chat";
 "Chat name" = "Chat‑Name";
 "Chat tools" = "Chat‑Werkzeuge";
@@ -80,10 +97,15 @@
 "Composing…" = "Erstelle…";
 "Concurrent requests" = "Gleichzeitige Anfragen";
 "Copy" = "Kopieren";
+"Copy the song as an audio file" = "Das Lied als Audiodatei kopieren";
+"Copy the text" = "Text kopieren";
 "Couldn't create the report: %@" = "Bericht konnte nicht erstellt werden: %@";
+"Countdown" = "Countdown";
 "Country facts" = "Länderdaten";
 "Crash reports (%lld)" = "Absturzberichte (%lld)";
 "Create Email…" = "E‑Mail erstellen…";
+"Creativity" = "Kreativität";
+"Creator mode" = "Creator‑Modus";
 "Currency rates" = "Wechselkurse";
 "Current settings are already fastest" = "Die aktuellen Einstellungen sind bereits am schnellsten";
 "Date & time" = "Datum & Uhrzeit";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Schnell (kleine Leinwand)";
 "Fetching file list…" = "Dateiliste wird abgerufen…";
 "Fits comfortably" = "Passt komfortabel";
+"Follow the description" = "Beschreibung befolgen";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Für Modelle mit veröffentlichtem Drafter (Gemma 4 26B): Ein kleines zusätzliches Modell errät Tokens im Voraus, und das Hauptmodell prüft sie in einem Durchlauf. Gleiche Ausgabe, schneller. Anfragen werden dann nacheinander verarbeitet.";
 "Free on disk: %@ · your models: %@" = "Freier Speicher: %@ · Ihre Modelle: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Gibt den Speicher frei, den ein geladenes Modell belegt, wenn so lange keine Anfragen eingehen. Bei der nächsten Anfrage wird es automatisch neu geladen, mit der üblichen Ladeverzögerung.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Eingeschränkt: Akzeptieren Sie die Lizenz auf der Hugging Face‑Seite des Modells und fügen Sie in Einstellungen → Modelle einen Token hinzu.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Eingeschränkt: Beantragen Sie Zugriff auf der Hugging Face‑Seite des Modells (Autoren prüfen Anfragen) und fügen Sie in Einstellungen → Modelle einen Token hinzu.";
 "General" = "Allgemein";
+"Generate" = "Generieren";
 "Generated in %.1fs" = "Generiert in %.1fs";
 "Generating image…" = "Bild wird generiert …";
 "Generating music…" = "Musik wird erstellt…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "Hohe Qualität (große Leinwand)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Höchste Genauigkeit, größter Download — verlässliche Korrektheits‑Baseline.";
 "Hourly forecast" = "Stündliche Vorhersage";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Wie gewagt und unerwartet die Musik ist. Nur turbo: sft hat keinen Song‑Planer zur Variation.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Wie viele Prompt-Token pro Schritt verarbeitet werden. Größer ist bei langen Prompts schneller, benötigt aber mehr Arbeitsspeicher. Die automatische Abstimmung des Benchmarks kann den Wert auswählen.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Wie viele Anfragen zu einem GPU-Schritt gebündelt werden. Hilft nur, wenn mehrere Clients den Server gleichzeitig verwenden; benötigt mehr Arbeitsspeicher.";
 "How many tokens it generates per trial." = "Token pro Durchlauf";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Wie Lieder gespeichert, gesichert und geteilt werden. AAC 256 kbit/s: etwa 1 MB pro 30 s, für die meisten Ohren nicht unterscheidbar. Unkomprimiertes WAV: etwa 6 MB pro 30 s.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Wie streng die Musik dem vom Modell beschriebenen Stil folgt. Höher: näher am Stil; niedriger: freier.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face antwortete mit HTTP %d für %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face verweigerte %@ (HTTP %d): Das Modell ist eingeschränkt, privat oder existiert nicht. Ist es eingeschränkt, akzeptieren Sie die Lizenz auf huggingface.co/%@ und prüfen Sie den Token in Einstellungen → Modelle.";
 "Hugging Face token" = "Hugging Face‑Token";
 "Idle -- the model reloads on the next message" = "Inaktiv – das Modell wird bei der nächsten Nachricht neu geladen";
+"Image" = "Bild";
 "Image editing" = "Bildbearbeitung";
 "Image generation" = "Bildgenerierung";
 "Image generation failed: %@" = "Bildgenerierung fehlgeschlagen: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "Die Chats bleiben erhalten und erscheinen wieder unter \"Zuletzt verwendet\".";
 "KV cache" = "KV-Cache";
 "KV group size" = "KV-Gruppengröße";
+"Keep" = "Behalten";
+"Keep %@ loaded" = "%@ geladen behalten";
 "Keep current" = "Aktuelles behalten";
 "Keep first messages: %lld" = "Erste %lld Nachrichten behalten";
 "Keep last messages: %lld" = "Letzte %lld Nachrichten behalten";
+"Keep the loaded model" = "Das geladene Modell behalten";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Behält die ersten N Kontext-Token vor der Quantisierung mit voller Präzision bei. Höhere Werte verringern die Arbeitsspeicherersparnis zugunsten der Genauigkeit bei langen Prompts.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Chat";
@@ -181,11 +212,11 @@
 "Library" = "Bibliothek";
 "Likes" = "Gefällt mir";
 "Live output of the model process: loading, errors, requests." = "Live-Ausgabe des Modellprozesses: Laden, Fehler, Anfragen.";
+"Load %@" = "Lade %@";
+"Loaded: %1$@ · selected: %2$@" = "Geladen: %1$@ · ausgewählt: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Lädt das zuletzt verwendete Modell sofort, damit es bereit ist, ohne Play zu drücken.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Protokolliert jedes generierte Token (DEBUG). Nur zur Fehlerbehebung des Modellprozesses – verlangsamt die Ausführung. Wird beim nächsten Serverstart wirksam.";
 "Maintenance" = "Wartung";
-"Make this image again (a new seed, the same request)" = "Bild erneut erzeugen (neue Seed‑Nummer, gleiche Anfrage)";
-"Make this music again (a new seed, the same request)" = "Musik erneut erzeugen (neue Seed‑Nummer, gleiche Anfrage)";
 "Manage Models…" = "Modelle verwalten …";
 "Max tokens" = "Max. Token";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Speicher, der zum Wiederverwenden des Kontexts früherer Konversationen behalten wird, sodass ein fortgesetzter Chat nicht den gesamten Verlauf erneut einlesen muss. Begrenzt, damit er nicht anwächst, bis dem Server der Speicher ausgeht.";
@@ -194,14 +225,17 @@
 "Model" = "Modell";
 "Model actions" = "Modellaktionen";
 "Model card" = "Modellkarte";
+"Model switching" = "Modellwechsel";
 "Models" = "Modelle";
 "Models folder" = "Modellordner";
 "Models: %@ · free: %@" = "Modelle: %@ · frei: %@";
 "Move to Project" = "In Projekt verschieben";
+"Music" = "Musik";
 "Music generation" = "Musikgenerierung";
 "Music generation failed: %@" = "Musikgenerierung fehlgeschlagen: %@";
 "Music generation finished but produced no audio." = "Musikgenerierung abgeschlossen, aber ohne Audioausgabe.";
 "Music generation isn't set up -- turn it on again in Settings." = "Musikgenerierung ist nicht eingerichtet – schalten Sie sie in den Einstellungen wieder ein.";
+"Music model" = "Musik‑Modell";
 "Name new chats automatically" = "Neue Chats automatisch benennen";
 "Network" = "Netzwerk";
 "Never" = "Nie";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Aus: Nur dieser Mac kann den Server erreichen. Ein: Auch andere Geräte in deinem Netzwerk können ihn erreichen – alle im Netzwerk. Daher nur in vertrauenswürdigen Netzwerken aktivieren.";
 "Older" = "Älter";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Nur für eingeschränkte Modelle (Llama, einige Gemma‑ und FLUX‑Repos): Akzeptieren Sie die Lizenz auf der Hugging Face‑Seite des Modells und fügen Sie hier einen Lese‑Token ein. Wird im Schlüsselbund gespeichert und nur an huggingface.co gesendet.";
+"Only turbo has this knob: sft has no song planner to vary." = "Diesen Regler hat nur turbo: sft hat keinen Song‑Planer zur Variation.";
 "Open Server Log…" = "Serverprotokoll öffnen …";
 "Open in New Tab" = "In neuem Tab öffnen";
 "Open in Window" = "Im Fenster öffnen";
@@ -308,6 +343,7 @@
 "Search" = "Suchen";
 "Search Hugging Face (mlx models)…" = "Hugging Face durchsuchen (mlx-Modelle) …";
 "Search chats" = "Chats durchsuchen";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Sekunden bis der Entwurf so gestartet wird. 0: warten, bis Sie „Generieren“ drücken.";
 "Select Tab" = "Tab auswählen";
 "Select a component to see its license." = "Wählen Sie eine Komponente, um ihre Lizenz anzuzeigen.";
 "Send" = "Sendet die Nachricht.";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "Einstellungsprofil für dieses Modell.";
 "Settings this profile overrides; everything else comes from Default." = "Einstellungen, die dieses Profil überschreibt; alles andere stammt aus Default.";
 "Settings…" = "Einstellungen …";
+"Shape" = "Shape";
+"Share…" = "Teilen…";
 "Show Chat Window" = "Chatfenster zeigen";
 "Show Next Tab" = "Nächsten Tab zeigen";
 "Show Previous Tab" = "Vorherigen Tab zeigen";
@@ -337,6 +375,8 @@
 "Show tool calls" = "Toolaufrufe anzeigen";
 "Shows the chat window" = "Zeigt das Chatfenster";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Zeigt den Gedankengang des Modells (den einklappbaren Block „Gedankengang“) über seiner Antwort.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Singt die Lyrics klar, Stimme steht vorn. Etwa 40 s für 30 s Musik.";
+"Skip" = "Überspringen";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Kleinste und aggressivste Einstellung – kann bei manchen Prompts sichtbar die Komposition verändern.";
 "Something went wrong?" = "Etwas ist schiefgelaufen?";
 "Sort by" = "Sortieren nach";
@@ -350,6 +390,7 @@
 "Start server" = "Startet den Server.";
 "Start the server first." = "Zuerst den Server starten.";
 "Start the server when LLMTray opens" = "Server beim Öffnen von LLMTray starten";
+"Starting in %.0f s…" = "Startet in %.0f s…";
 "Starting…" = "Wird gestartet …";
 "Startup" = "Start";
 "Step %lld/%lld" = "Schritt %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stoppt das Chat‑Modell, während ein Bild oder Musik erzeugt wird, und lädt es danach neu. Beides zusammen kann den Arbeitsspeicher dieses Mac überschreiten.";
 "Sunrise & sunset" = "Sonnenaufgang & Sonnenuntergang";
 "Support" = "Support";
+"Switch" = "Wechseln";
+"Switch at once" = "Sofort wechseln";
+"Switch models?" = "Modelle wechseln?";
+"Switch the music model?" = "Musik‑Modell wechseln?";
 "System" = "System";
 "System prompt" = "Systemprompt";
 "Tab %lld" = "Tab %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Testet decode-concurrency (1/2/4/8) und prefill-step-size (64/128/256/512) mit dem laufenden Modell, startet den Server dazwischen jeweils neu und behält die schnellste gemessene Kombination.";
+"Tweak…" = "Feinabstimmung…";
+"Uncompressed (WAV)" = "Unkomprimiert (WAV)";
 "Uninstall" = "Deinstallieren";
 "Uninstall Runtime Data…" = "Laufzeitdaten deinstallieren…";
 "Uninstall runtime data?" = "Laufzeitdaten deinstallieren?";
@@ -424,6 +471,7 @@
 "Web search" = "Websuche";
 "What happened?" = "Was ist passiert?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Was du getan hast, was du erwartet hast und was stattdessen passiert ist. Deine Chats werden nie mitgesendet.";
+"When a client asks for another model" = "Wenn ein Client ein anderes Modell anfordert";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Legt fest, wo LLMTray nach MLX-Modellen sucht (ein Ordner pro Modell, z. B. <org>/<name>). Wählen Sie ~/.lmstudio/models aus, um Modelle mit LM Studio zu teilen.";
 "Which model generates new images." = "Welches Modell neue Bilder erzeugt.";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "Anfrage konnte nicht erstellt werden";
 "mlx-lm runtime" = "mlx-lm-Laufzeit";
 "not used by any model" = "von keinem Modell verwendet";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: vollerer, fertiger klingender Mix. sft: singt die Lyrics klar, Stimme vorn; etwa doppelt so lange in der Erstellung.";
 "used by %@" = "verwendet von %@";
 "· size…" = "· Größe …";

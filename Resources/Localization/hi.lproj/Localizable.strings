@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ ने %2$@ मांगा है";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ ने %2$@ मांगा है। स्विच करने से अभी लोड किया गया मॉडल अनलोड हो जाएगा।";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ सीमित है: huggingface.co/%@ पर इसकी लाइसेंस शर्तें स्वीकार करें, फिर Settings → Models में एक Hugging Face token जोड़ें।";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ अभी डाउनलोड नहीं हुआ है — Settings में जाकर generate_image फिर से सक्षम करें।";
 "%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld डाउनलोड";
+"%lld s" = "%lld स";
 "%lld-bit" = "%lld-बिट";
 "(Please attach the report file shown in Finder.)" = "(कृपया Finder में दिख रही रिपोर्ट फ़ाइल संलग्न करें।)";
 "(no result yet)" = "(अब तक कोई परिणाम नहीं)";
 "(no server output yet)" = "(अभी सर्वर आउटपुट नहीं)";
+"A client" = "एक क्लाइंट";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "अधिक भरा‑पूरा, अधिक तैयार सुनाई देने वाला मिक्स; गीत की पंक्तियाँ कम स्पष्ट होंगी। 30 s संगीत के लिए लगभग 20 s।";
 "A quiet check at every launch. Only shows anything if an update exists." = "हर लॉन्च पर चुपचाप जाँच। कुछ तभी दिखाता है जब कोई अपडेट उपलब्ध हो।";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "जो अनुरोध इतने समय तक कुछ नहीं देता, उसे रुका हुआ माना जाता है। ऐसा तब होता है जब प्रोसेस चालू रहता है लेकिन सर्वर वर्कर बंद हो जाता है, जैसे GPU मेमोरी खत्म होने पर।";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — स्पष्ट वोकल, 8-bit (सिफारिश की गई)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — स्पष्ट वोकल, GPTQ 4-bit (कम मेमोरी)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — स्पष्ट वोकल, पूर्ण प्रिसिजन";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — अधिक भरा ध्वनि";
 "About LLMTray" = "LLMTray के बारे में";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "जब भी टूल दिए जाते हैं, इसे सिस्टम प्रॉम्प्ट में जोड़ा जाता है। मॉडल का अपना टूल टेम्पलेट केवल यह बताता है कि टूल कैसे कॉल करना है, कब नहीं करना है यह नहीं। खाली रखने पर यह बंद रहता है।";
 "Advanced" = "उन्नत";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "पहले से किसी अन्य टैब में खुला हुआ है";
 "Also check when LLMTray starts" = "LLMTray शुरू होने पर भी जाँचें";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "छवियों को भी संपादित करता है — चैट से किसी एक या आप जो जोड़ते हैं। संपादित करने में कुछ मिनट लगते हैं।";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "एक एडिटर, एजेंट या स्क्रिप्ट जो लोड किए गए मॉडल के अलावा किसी अन्य मॉडल की मांग करता है। स्विच करने से लोड किया गया मॉडल—and चैट भी—अनलोड हो जाएगा। पहले पूछें: एक सूचना जिसमें Switch / Keep दिखेगा; एक मिनट में अनुत्तरित रहने पर Keep माना जाएगा। Keep चुनने पर क्लाइंट को लोड किए गए मॉडल का नाम बताते हुए त्रुटि मिलती है। ऐप की अपनी चैट हमेशा स्विच होती है।";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
+"Another version next to this one (a new seed, the same request)" = "इसी के पास एक और संस्करण (नया seed, वही अनुरोध)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "कोई अन्य mlx_lm.server फ़्लैग, स्पेस से अलग किए हुए, जैसे --draft-model <path>।";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "ऐप की भाषा";
 "Apply to profile" = "प्रोफ़ाइल पर लागू करें";
+"Ask first" = "पहले पूछें";
 "Assistant" = "सहायक";
 "Attach image(s) for the model to see" = "मॉडल को दिखाने के लिए इमेज अटैच करें";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 8-bit पर और feed-forward 4-bit पर — आकार/स्थिरता का सर्वश्रेष्ठ संतुलन, uniform 4-bit के खिलाफ सत्यापित।";
+"Audio quality" = "ऑडियो गुणवत्ता";
 "Auto-compact" = "अपने-आप कॉम्पैक्ट करें";
 "Auto-restart after %lld stalls" = "%lld बार रुकने के बाद अपने-आप रीस्टार्ट करें";
 "Auto-restart: off" = "अपने-आप रीस्टार्ट: बंद";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "ऑटो-ट्यून प्रदर्शन";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "नीचे एक परिणाम में औसत किया गया है। इनके पहले हमेशा एक अस्थायी वार्मअप रन होता है, इसलिए पहली कॉल का Metal kernel compile time कभी भी संख्याओं को प्रभावित नहीं करता।";
 "Balanced (default)" = "Balanced (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "छवि या गीत बनने से पहले दिखाता है कि मॉडल ने क्या माँगा — prompt, मॉडल, और नॉब्स — ताकि आप पहले बदल सकें। काउंटडाउन के बाद यह स्वतः आगे बढ़ेगा जब तक आप हस्तक्षेप न करें।";
 "Benchmark" = "बेंचमार्क";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "बेंचमार्क अभी लोड किए गए मॉडल पर चलते हैं। ऑटो-ट्यून अपने परिणाम उस मॉडल की प्रोफ़ाइल में लिखता है।";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "रद्द करें";
 "Cancel download" = "डाउनलोड रद्द करें";
 "Canvas size" = "कैनवास आकार";
+"Change the prompt, the model or the shape, then make another version" = "prompt, मॉडल या shape बदलें, फिर एक और संस्करण बनाएं";
+"Change the style, lyrics, model or knobs, then make another version" = "शैली, गीत, मॉडल या नॉब्स बदलें, फिर एक और संस्करण बनाएं";
 "Chat" = "चैट";
 "Chat name" = "चैट का नाम";
 "Chat tools" = "चैट टूल्स";
@@ -80,10 +97,15 @@
 "Composing…" = "रचना हो रही है…";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Copy" = "कॉपी करें";
+"Copy the song as an audio file" = "गाने को ऑडियो फ़ाइल के रूप में कॉपी करें";
+"Copy the text" = "टेक्स्ट कॉपी करें";
 "Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
+"Countdown" = "काउंटडाउन";
 "Country facts" = "देश तथ्य";
 "Crash reports (%lld)" = "क्रैश रिपोर्टें (%lld)";
 "Create Email…" = "ईमेल बनाएं…";
+"Creativity" = "रचनात्मकता";
+"Creator mode" = "Creator mode";
 "Currency rates" = "मुद्रा दरें";
 "Current settings are already fastest" = "वर्तमान सेटिंग पहले से ही सबसे तेज़ हैं";
 "Date & time" = "तिथि और समय";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
 "Fetching file list…" = "फ़ाइल सूची ले जा रही है…";
 "Fits comfortably" = "आराम से फिट होता है";
+"Follow the description" = "विवरण का पालन करें";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "प्रकाशित ड्राफ़्टर वाले मॉडल (Gemma 4 26B) के लिए: एक छोटा अतिरिक्त मॉडल आगे के टोकन का अनुमान लगाता है और मुख्य मॉडल उन्हें एक पास में जाँचता है। वही आउटपुट, ज़्यादा तेज़। फिर अनुरोध एक-एक करके पूरे किए जाते हैं।";
 "Free on disk: %@ · your models: %@" = "डिस्क पर खाली: %@ · आपके मॉडल: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "इतने समय तक कोई अनुरोध न आने पर लोड किए गए मॉडल द्वारा रखी गई मेमोरी खाली करता है। अगले अनुरोध पर यह अपने आप फिर लोड होता है, सामान्य लोडिंग विलंब के साथ।";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
 "General" = "सामान्य";
+"Generate" = "Generate";
 "Generated in %.1fs" = "%.1fs में जनरेट हुआ";
 "Generating image…" = "इमेज जनरेट हो रही है…";
 "Generating music…" = "संगीत बनाया जा रहा है…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "High quality (बड़ा कैनवास)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "सर्वोच्च निष्ठा, सबसे बड़ा डाउनलोड — एक विश्वसनीय correctness बेसलाइन।";
 "Hourly forecast" = "घंटाबंद पूर्वानुमान";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "संगीत कितना साहसी और अप्रत्याशित है। केवल turbo: sft में विविधता के लिए कोई song planner नहीं है।";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "एक GPU चरण में कितने अनुरोध बैच किए जाएँ। यह तभी मदद करता है जब कई क्लाइंट एक साथ सर्वर का उपयोग करें; ज़्यादा मेमोरी उपयोग करता है।";
 "How many tokens it generates per trial." = "हर ट्रायल में कितने टोकन जनरेट किए जाएँ।";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "गानों को कैसे रखा, सहेजा और साझा किया जाता है। AAC 256 kbit/s: लगभग 30 सेकंड पर 1 MB, अधिकांश सुनने के मामलों में असंभाव्य अंतर। अनकंप्रेस्ड WAV: लगभग 30 सेकंड पर 6 MB।";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "मॉडल द्वारा बताए गए स्टाइल का संगीत कितनी कड़ाई से पालन करता है। उच्च: अधिक नज़दीक; निम्न: अधिक स्वतंत्र।";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face ने %2$@ के लिए HTTP %1$d उत्तर दिया।";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ने %@ (HTTP %d) अस्वीकार कर दिया: यह सीमित, निजी है, या मौजूद नहीं है। यदि यह सीमित है तो huggingface.co/%@ पर लाइसेंस स्वीकार करें और Settings → Models में token जाँचें।";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "निष्क्रिय — अगला संदेश आने पर मॉडल फिर लोड होगा";
+"Image" = "छवि";
 "Image editing" = "छवि संपादन";
 "Image generation" = "इमेज जनरेशन";
 "Image generation failed: %@" = "Image generation विफल: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "इसके चैट वहीं रहते हैं, हाल के में वापस आ जाते हैं।";
 "KV cache" = "KV कैश";
 "KV group size" = "KV समूह आकार";
+"Keep" = "रखें";
+"Keep %@ loaded" = "%@ को लोड रखा जाए";
 "Keep current" = "मौजूदा रखें";
 "Keep first messages: %lld" = "पहले %lld संदेश रखें";
 "Keep last messages: %lld" = "आखिरी %lld संदेश रखें";
+"Keep the loaded model" = "लोड किया गया मॉडल रखें";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "क्वांटाइज़ करने से पहले संदर्भ के पहले N टोकन को पूरी precision पर रखता है। ज़्यादा मान लंबे प्रॉम्प्ट पर सटीकता बढ़ाता है, लेकिन मेमोरी बचत कम करता है।";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — चैट";
@@ -181,11 +212,11 @@
 "Library" = "लाइब्रेरी";
 "Likes" = "लाइक्स";
 "Live output of the model process: loading, errors, requests." = "मॉडल प्रोसेस का लाइव आउटपुट: लोडिंग, त्रुटियाँ, अनुरोध।";
+"Load %@" = "%@ लोड करें";
+"Loaded: %1$@ · selected: %2$@" = "लोड हुआ: %1$@ · चयनित: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "पिछली बार उपयोग किया गया मॉडल तुरंत लोड करता है, ताकि Play दबाए बिना यह तैयार हो।";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
 "Maintenance" = "रखरखाव";
-"Make this image again (a new seed, the same request)" = "इस छवि को फिर से बनाएं (नया seed, वही अनुरोध)";
-"Make this music again (a new seed, the same request)" = "इस संगीत को फिर से बनाएं (नया seed, वही अनुरोध)";
 "Manage Models…" = "मॉडल प्रबंधित करें…";
 "Max tokens" = "अधिकतम टोकन";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "पहले की बातचीत का संदर्भ फिर से इस्तेमाल करने के लिए रखी गई मेमोरी, ताकि जारी चैट अपना पूरा इतिहास दोबारा न पढ़े। इसकी सीमा तय है, ताकि यह इतनी न बढ़े कि सर्वर की मेमोरी खत्म हो जाए।";
@@ -194,14 +225,17 @@
 "Model" = "मॉडल";
 "Model actions" = "मॉडल कार्रवाइयाँ";
 "Model card" = "मॉडल कार्ड";
+"Model switching" = "मॉडल स्विचिंग";
 "Models" = "मॉडल";
 "Models folder" = "मॉडल फ़ोल्डर";
 "Models: %@ · free: %@" = "मॉडल: %@ · खाली: %@";
 "Move to Project" = "प्रोजेक्ट में ले जाएँ";
+"Music" = "संगीत";
 "Music generation" = "संगीत जनरेशन";
 "Music generation failed: %@" = "संगीत जनरेशन विफल रहा: %@";
 "Music generation finished but produced no audio." = "संगीत जनरेशन पूरा हुआ पर कोई ऑडियो नहीं मिला।";
 "Music generation isn't set up -- turn it on again in Settings." = "संगीत जनरेशन सेटअप नहीं है — सेटिंग्स में इसे दोबारा चालू करें।";
+"Music model" = "Music model";
 "Name new chats automatically" = "नई चैट का नाम स्वतः दें";
 "Network" = "नेटवर्क";
 "Never" = "कभी नहीं";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "बंद होने पर, केवल यह Mac सर्वर तक पहुँच सकता है। चालू होने पर, आपके नेटवर्क पर मौजूद अन्य डिवाइस भी पहुँच सकते हैं — नेटवर्क पर कोई भी; इसलिए केवल भरोसेमंद नेटवर्क पर ही चालू करें।";
 "Older" = "पुराना";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "केवल सीमित मॉडल के लिए (Llama, कुछ Gemma और FLUX रिपोज): इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें, फिर यहाँ read token चिपकाएँ। Keychain में सुरक्षित रखा जाएगा, केवल huggingface.co को भेजा जाता है।";
+"Only turbo has this knob: sft has no song planner to vary." = "यह नॉब केवल turbo में है: sft में बदलने के लिए कोई song planner नहीं है।";
 "Open Server Log…" = "सर्वर लॉग खोलें…";
 "Open in New Tab" = "नए टैब में खोलें";
 "Open in Window" = "विंडो में खोलें";
@@ -308,6 +343,7 @@
 "Search" = "खोजें";
 "Search Hugging Face (mlx models)…" = "Hugging Face में खोजें (mlx मॉडल)…";
 "Search chats" = "चैट खोजें";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "यहां दिए गए सेकंड के बाद ड्राफ्ट जैसा है वैसा ही आगे बढ़ जाएगा। 0: Generate दबाने तक प्रतीक्षा करें।";
 "Select Tab" = "टैब चुनें";
 "Select a component to see its license." = "लाइसेंस देखने के लिए किसी घटक का चयन करें।";
 "Send" = "संदेश भेजें।";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "इस मॉडल के लिए सेटिंग्ज़ प्रोफ़ाइल चुनें।";
 "Settings this profile overrides; everything else comes from Default." = "वे सेटिंग्ज़ जिन्हें यह प्रोफ़ाइल ओवरराइड करती है; बाकी सब Default से आता है।";
 "Settings…" = "सेटिंग्ज़…";
+"Shape" = "Shape";
+"Share…" = "साझा करें…";
 "Show Chat Window" = "चैट विंडो दिखाएँ";
 "Show Next Tab" = "अगला टैब दिखाएँ";
 "Show Previous Tab" = "पिछला टैब दिखाएँ";
@@ -337,6 +375,8 @@
 "Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows the chat window" = "चैट विंडो दिखाएँ";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "गीत की पंक्तियाँ स्पष्ट गाता है, आवाज़ आगे रहती है। 30 s संगीत के लिए लगभग 40 s।";
+"Skip" = "Skip";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "सबसे छोटा और सबसे आक्रामक — कुछ prompts पर जनरेशन की रचना स्पष्ट रूप से बदल सकती है।";
 "Something went wrong?" = "कुछ गलत हुआ?";
 "Sort by" = "इसके अनुसार क्रमित करें";
@@ -350,6 +390,7 @@
 "Start server" = "सर्वर शुरू करें।";
 "Start the server first." = "पहले सर्वर शुरू करें।";
 "Start the server when LLMTray opens" = "LLMTray खुलने पर सर्वर शुरू करें";
+"Starting in %.0f s…" = "शुरू होगा %.0f s में…";
 "Starting…" = "शुरू हो रहा है…";
 "Startup" = "स्टार्टअप";
 "Step %lld/%lld" = "चरण %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "छवि या संगीत जनरेशन के दौरान चैट मॉडल रोकता है और बाद में पुनः लोड करता है। दोनों एक साथ इस Mac की मेमोरी से अधिक हो सकते हैं।";
 "Sunrise & sunset" = "सूर्योदय और सूर्यास्त";
 "Support" = "सहायता";
+"Switch" = "स्विच";
+"Switch at once" = "फौरन स्विच करें";
+"Switch models?" = "मॉडल स्विच करें?";
+"Switch the music model?" = "Music model बदलें?";
 "System" = "सिस्टम";
 "System prompt" = "सिस्टम प्रॉम्प्ट";
 "Tab %lld" = "टैब %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "चल रहे मॉडल पर decode-concurrency (1/2/4/8) और prefill-step-size (64/128/256/512) आज़माता है, हर बार सर्वर रीस्टार्ट करता है, और जो सबसे तेज़ मापा गया उसे रखता है।";
+"Tweak…" = "Tweak…";
+"Uncompressed (WAV)" = "अनकंप्रेस्ड (WAV)";
 "Uninstall" = "अनइंस्टॉल करें";
 "Uninstall Runtime Data…" = "रनटाइम डेटा अनइंस्टॉल करें…";
 "Uninstall runtime data?" = "रनटाइम डेटा अनइंस्टॉल करें?";
@@ -424,6 +471,7 @@
 "Web search" = "वेब खोज";
 "What happened?" = "क्या हुआ?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "आप क्या कर रहे थे, आपने क्या उम्मीद की थी, और इसके बजाय आपने क्या देखा। आपकी चैट कभी शामिल नहीं की जातीं।";
+"When a client asks for another model" = "जब कोई क्लाइंट किसी अन्य मॉडल की मांग करे";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "request बनाना विफल हुआ";
 "mlx-lm runtime" = "mlx-lm रनटाइम";
 "not used by any model" = "किसी भी मॉडल द्वारा उपयोग नहीं किया गया";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: अधिक भरा‑पूरा, अधिक तैयार सुनाई देने वाला मिक्स। sft: गीत की पंक्तियाँ स्पष्ट गाता है, आवाज़ आगे; बनाने में लगभग दोगुना समय लग सकता है।";
 "used by %@" = "%@ द्वारा उपयोग किया गया";
 "· size…" = "· आकार…";

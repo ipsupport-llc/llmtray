@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ מבקש את %2$@";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ מבקש את %2$@. החלפה תסיר את המודל הטעון כעת.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
 "%lld MB" = "%lld מ״ב";
 "%lld downloads" = "%lld הורדות";
+"%lld s" = "%lld שנ׳";
 "%lld-bit" = "%lld סיביות";
 "(Please attach the report file shown in Finder.)" = "(אנא צרפו את קובץ הדוח שמוצג ב‑Finder.)";
 "(no result yet)" = "(אין תוצאה עדיין)";
 "(no server output yet)" = "(עדיין אין פלט מהשרת)";
+"A client" = "לקוח";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "מיקס מלא ומעובד יותר; המילים נשמעות פחות בבירור. כ‑20 שנ׳ להכנת 30 שנ׳ מוזיקה.";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "בקשה שלא מפיקה דבר במשך זמן כזה נחשבת תקועה. זה קורה כשעובד שרת קורס (למשל בגלל מחסור בזיכרון GPU) בזמן שהתהליך ממשיך לפעול.";
+"AAC %lld kbit/s" = "AAC %lld קבט/ש";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — ווקל בהיר, 8‑bit (מומלץ)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — ווקל בהיר, GPTQ 4‑bit (דורש פחות זיכרון)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — ווקל בהיר, בדיוק מלא";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — צליל עשיר יותר";
 "About LLMTray" = "על LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "מתווסף להנחיית המערכת בכל פעם שמוצעים כלים. תבנית הכלים של המודל עצמו אומרת רק איך לקרוא לכלי, ולעולם לא מתי לא. שדה ריק משבית זאת.";
 "Advanced" = "מתקדם";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "כבר פתוח בכרטיסייה אחרת";
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "גם עורך תמונות — מתמונה מהשיחה או אחת שמצורפת. עריכות לוקחות כמה דקות.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "עורך, סוכן או סקריפט מבקשים מודל שונה מהטעון. החלפה תסיר את המודל הטעון — גם הצ'אט. שאל קודם: הודעה עם 'Switch' / 'Keep'; ללא תשובה בדקה נחשבת 'Keep'. 'Keep': הלקוח מקבל שגיאה שמציינת את המודל הטעון. הצ'אט של האפליקציה תמיד מחליף.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
+"Another version next to this one (a new seed, the same request)" = "גרסה נוספת לצד זו (seed חדש, אותו בקשה)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "דגלי mlx_lm.server נוספים, מופרדים ברווחים, למשל --draft-model <path>.";
 "Apache License 2.0" = "רישיון Apache 2.0";
 "App language" = "שפת היישום";
 "Apply to profile" = "החל על הפרופיל";
+"Ask first" = "שאל קודם";
 "Assistant" = "העוזר";
 "Attach image(s) for the model to see" = "צרף תמונה או תמונות כדי שהמודל יראה אותן.";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ב‑8‑bit, feed‑forward ב‑4‑bit — האיזון הטוב ביותר בין גודל ליציבות, מאומת מול 4‑bit אחיד.";
+"Audio quality" = "איכות שמע";
 "Auto-compact" = "דחיסה אוטומטית";
 "Auto-restart after %lld stalls" = "הפעלה מחדש אוטומטית אחרי %lld תקיעות";
 "Auto-restart: off" = "הפעלה מחדש אוטומטית: כבויה";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "כוונון ביצועים אוטומטי";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "התוצאות אוחדו לממוצע אחד למטה. לפני כל אחת מהן תמיד מתבצעת הרצת חימום חד־פעמית, כך שזמן ההידור של ליבת Metal בקריאה הראשונה אף פעם לא מעוות את המספרים.";
 "Balanced (default)" = "מאוזן (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "לפני יצירת תמונה או שיר, מראה מה המודל ביקש — הפרומפט, המודל, הכפתורים — לשינוי קודם. לאחר הנחסור הוא ממשיך באופן אוטומטי אחרי הספירה לאחור אלא אם תתערבו.";
 "Benchmark" = "מבחן ביצועים";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "מבחני הביצועים רצים מול הדגם שטעון עכשיו. הכוונון האוטומטי כותב את התוצאות לפרופיל של הדגם הזה.";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "ביטול";
 "Cancel download" = "ביטול ההורדה";
 "Canvas size" = "גודל הקנבס";
+"Change the prompt, the model or the shape, then make another version" = "שנה את הפרומפט, המודל או הצורה, ואז צור גרסה נוספת";
+"Change the style, lyrics, model or knobs, then make another version" = "שנה את הסגנון, המילים, המודל או הכפתורים, ואז צור גרסה נוספת";
 "Chat" = "צ׳אט";
 "Chat name" = "שם צ'אט";
 "Chat tools" = "כלי שיחה";
@@ -80,10 +97,15 @@
 "Composing…" = "מנסח…";
 "Concurrent requests" = "בקשות בו־זמניות";
 "Copy" = "העתק";
+"Copy the song as an audio file" = "העתק את השיר כקובץ שמע";
+"Copy the text" = "העתק את הטקסט";
 "Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
+"Countdown" = "ספירה לאחור";
 "Country facts" = "עובדות על מדינות";
 "Crash reports (%lld)" = "דוחות קריסה (%lld)";
 "Create Email…" = "צור דוא״ל…";
+"Creativity" = "יצירתיות";
+"Creator mode" = "מצב יוצר";
 "Currency rates" = "שערי מטבע";
 "Current settings are already fastest" = "ההגדרות הנוכחיות כבר המהירות ביותר";
 "Date & time" = "תאריך ושעה";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "מהיר (קנבס קטן יותר)";
 "Fetching file list…" = "מושך/ת את רשימת הקבצים…";
 "Fits comfortably" = "מתאים בנוחות";
+"Follow the description" = "היצמד לתיאור";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם drafter שפורסם (Gemma 4 26B): מודל קטן נוסף מנחש מראש אסימונים, והמודל הראשי בודק אותם במעבר אחד. אותו פלט, מהר יותר. לאחר מכן הבקשות מטופלות אחת בכל פעם.";
 "Free on disk: %@ · your models: %@" = "חופשי בדיסק: %@ · המודלים שלך: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "משחרר את הזיכרון שמודל טעון מחזיק אחרי פרק זמן כזה ללא בקשות. הוא נטען מחדש אוטומטית בבקשה הבאה, עם עיכוב הטעינה הרגיל.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "מוגבל: קבל את הרישיון בעמוד ה‑Hugging Face שלו, והוסף אסימון ב‑Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "מוגבל: בקש גישה בעמוד ה‑Hugging Face שלו (המחברים בוחנים את הבקשה), והוסף אסימון ב‑Settings → Models.";
 "General" = "כללי";
+"Generate" = "צור";
 "Generated in %.1fs" = "נוצר ב־%.1fs";
 "Generating image…" = "יוצר תמונה…";
 "Generating music…" = "מוליד מוזיקה…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "דיוק מקסימלי, הורדה גדולה — קו בסיס נכונות שניתן לסמוך עליו.";
 "Hourly forecast" = "תחזית לפי שעה";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "כמה הרמוני ובלתי צפוי יהיה המוזיקה. זמין רק ב‑turbo: ל‑sft אין מתכנן שירים לשונות.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "כמה בקשות מקובצות לצעד GPU אחד. עוזר רק כשכמה לקוחות משתמשים בשרת בו־זמנית; משתמש ביותר זיכרון.";
 "How many tokens it generates per trial." = "כמה טוקנים נוצרים בכל ניסיון.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "כיצד שירים נשמרים, מאוחסנים ומשותפים. AAC 256 kbit/ש: כ־1 MB לכל 30 שניות, בלתי מובחן ברוב ההאזנות. WAV ללא דחיסה: כ־6 MB לכל 30 שניות.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "כמה בקפדנות המוזיקה עוקבת אחרי הסגנון שתואר על ידי המודל. גבוה: קרוב יותר; נמוך: חופשי יותר.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face החזיר HTTP %d עבור %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face דחה את %@ (HTTP %d): הוא מוגבל, פרטי או לא קיים. אם הוא מוגבל — קבל את הרישיון ב‑huggingface.co/%@ ובדוק את האסימון ב‑Settings → Models.";
 "Hugging Face token" = "אסימון של Hugging Face";
 "Idle -- the model reloads on the next message" = "לא פעיל -- המודל ייטען מחדש בהודעה הבאה";
+"Image" = "תמונה";
 "Image editing" = "עריכת תמונה";
 "Image generation" = "יצירת תמונות";
 "Image generation failed: %@" = "יצירת התמונה נכשלה: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "הצ'אטים נשארים, חוזרים לרשימת האחרונים.";
 "KV cache" = "מטמון KV";
 "KV group size" = "גודל קבוצת KV";
+"Keep" = "החזק";
+"Keep %@ loaded" = "השאר את %@ טעון";
 "Keep current" = "השאר נוכחי";
 "Keep first messages: %lld" = "השאר הודעות ראשונות: %lld";
 "Keep last messages: %lld" = "השאר הודעות אחרונות: %lld";
+"Keep the loaded model" = "השאר את המודל הטעון";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "שומר את N הטוקנים הראשונים של ההקשר בדיוק מלא לפני קוונטיזציה. ערך גבוה יותר מחליף חיסכון בזיכרון בדיוק בהנחיות ארוכות.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — שיחה";
@@ -181,11 +212,11 @@
 "Library" = "ספרייה";
 "Likes" = "לייקים";
 "Live output of the model process: loading, errors, requests." = "פלט חי של תהליך המודל: טעינה, שגיאות ובקשות.";
+"Load %@" = "טען %@";
+"Loaded: %1$@ · selected: %2$@" = "טעון: %1$@ · נבחר: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "טוען מיד את המודל האחרון שהיה בשימוש, כדי שיהיה מוכן בלי ללחוץ על Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
 "Maintenance" = "תחזוקה";
-"Make this image again (a new seed, the same request)" = "צור שוב את התמונה הזו (זרע חדש, אותו הבקשה)";
-"Make this music again (a new seed, the same request)" = "צור שוב את המוזיקה הזו (זרע חדש, אותו הבקשה)";
 "Manage Models…" = "ניהול מודלים…";
 "Max tokens" = "מספר טוקנים מרבי";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
@@ -194,14 +225,17 @@
 "Model" = "מודל";
 "Model actions" = "פעולות מודל";
 "Model card" = "כרטיס המודל";
+"Model switching" = "החלפת מודלים";
 "Models" = "מודלים";
 "Models folder" = "תיקיית המודלים";
 "Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
 "Move to Project" = "העבר לפרויקט";
+"Music" = "מוסיקה";
 "Music generation" = "יצירת מוזיקה";
 "Music generation failed: %@" = "יצירת מוזיקה נכשלה: %@";
 "Music generation finished but produced no audio." = "יצירת המוזיקה הסתיימה אך לא נוצר פס קול.";
 "Music generation isn't set up -- turn it on again in Settings." = "יצירת מוזיקה לא מוגדרת — הפעל שוב בהגדרות.";
+"Music model" = "מודל מוזיקה";
 "Name new chats automatically" = "קרא לצ'אטים חדשים אוטומטית";
 "Network" = "רשת";
 "Never" = "אף פעם";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
 "Older" = "ישנים יותר";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "רק למודלים מוגבלים (Llama, חלק מהרפוזיטוריות של Gemma ו‑FLUX): קבל את רישיון המודל בעמוד ה‑Hugging Face שלו, ואז הדבק כאן אסימון קריאה. נשמר ב‑Keychain ונשלח רק ל‑huggingface.co.";
+"Only turbo has this knob: sft has no song planner to vary." = "רק ל‑turbo קיים הכפתור הזה: ל‑sft אין מתכנן שירים לשינויים.";
 "Open Server Log…" = "פתח את יומן השרת…";
 "Open in New Tab" = "פתח בכרטיסייה חדשה";
 "Open in Window" = "פתח בחלון";
@@ -308,6 +343,7 @@
 "Search" = "חיפוש";
 "Search Hugging Face (mlx models)…" = "חיפוש ב-Hugging Face (מודלים של mlx)…";
 "Search chats" = "חפש צ'אטים";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "שניות לפני שהטיוטה ממשיכה כפי שהיא. 0: המתן עד שתלחץ 'צור'.";
 "Select Tab" = "בחר כרטיסייה";
 "Select a component to see its license." = "בחר רכיב כדי לראות את הרישיון שלו.";
 "Send" = "שליחה";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "פרופיל ההגדרות עבור מודל זה.";
 "Settings this profile overrides; everything else comes from Default." = "הגדרות שפרופיל זה עוקף; כל השאר מגיע מ-Default.";
 "Settings…" = "הגדרות…";
+"Shape" = "צורה";
+"Share…" = "שיתוף…";
 "Show Chat Window" = "הצג חלון שיחה";
 "Show Next Tab" = "הצג כרטיסייה הבאה";
 "Show Previous Tab" = "הצג כרטיסייה הקודמת";
@@ -337,6 +375,8 @@
 "Show tool calls" = "הצג קריאות כלים";
 "Shows the chat window" = "מציג את חלון הצ'אט";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "שרה את המילים בבירור, הקול בחזית. כ‑40 שנ׳ להכנת 30 שנ׳ מוזיקה.";
+"Skip" = "דלג";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "הכי קטן והכי אגרסיבי — עלול לשנות באופן ניכר את הרכבת התמונה בכמה קריאות.";
 "Something went wrong?" = "קרה משהו לא תקין?";
 "Sort by" = "מיון לפי";
@@ -350,6 +390,7 @@
 "Start server" = "מפעיל את השרת.";
 "Start the server first." = "יש להפעיל את השרת תחילה.";
 "Start the server when LLMTray opens" = "הפעלת השרת בעת פתיחת LLMTray";
+"Starting in %.0f s…" = "מתחיל בעוד %.0f שנ׳…";
 "Starting…" = "מתחיל…";
 "Startup" = "הפעלה";
 "Step %lld/%lld" = "שלב %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן יצירת תמונה או מוזיקה וטוען אותו מחדש אחר כך. שניהם יחד עלולים לעבור את זיכרון ה‑Mac הזה.";
 "Sunrise & sunset" = "שקיעה וזריחה";
 "Support" = "תמיכה";
+"Switch" = "החלף";
+"Switch at once" = "החלף מיד";
+"Switch models?" = "להחליף מודלים?";
+"Switch the music model?" = "להחליף את מודל המוזיקה?";
 "System" = "מערכת";
 "System prompt" = "הנחיית מערכת";
 "Tab %lld" = "כרטיסייה %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "בודק את decode-concurrency (1/2/4/8) ואת prefill-step-size (64/128/256/512) מול המודל הפעיל, מפעיל מחדש את השרת בין כל בדיקה, ושומר את האפשרות שנמדדה כמהירה ביותר.";
+"Tweak…" = "כוונן…";
+"Uncompressed (WAV)" = "ללא דחיסה (WAV)";
 "Uninstall" = "הסר";
 "Uninstall Runtime Data…" = "הסר נתוני זמן ריצה…";
 "Uninstall runtime data?" = "להסיר את נתוני זמן הריצה?";
@@ -424,6 +471,7 @@
 "Web search" = "חיפוש באינטרנט";
 "What happened?" = "מה קרה?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "מה עשית, מה ציפית לקרות ומה ראית בפועל. השיחות שלך לא ייכללו.";
+"When a client asks for another model" = "כשלקוח מבקש מודל אחר";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "בניית הבקשה נכשלה";
 "mlx-lm runtime" = "זמן ריצה של mlx-lm";
 "not used by any model" = "לא בשימוש של אף מודל";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: מיקס מלא ומעובד יותר. sft: שר את המילים בבירור, הקול בחזית, לוקח בערך פי שניים להכנה.";
 "used by %@" = "בשימוש על ידי %@";
 "· size…" = "· גודל…";

@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 受限：请在 huggingface.co/%@ 接受其许可，然后在“设置 → 模型”中添加 Hugging Face 令牌。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ 尚未下载 —— 请在“设置”中重新启用图像生成。";
 "%@ wasn't found on Hugging Face." = "在 Hugging Face 上未找到 %@。";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld 次下载";
+"%lld s" = "%lld 秒";
 "%lld-bit" = "%lld 位";
 "(Please attach the report file shown in Finder.)" = "（请在 Finder 中附加显示的报告文件。）";
 "(no result yet)" = "(尚无结果)";
 "(no server output yet)" = "（暂无服务器输出）";
+"A client" = "客户端";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "更饱满、更成品感的混音；歌词听得不那么清晰。制作约需 30 秒音乐的 20 秒。";
 "A quiet check at every launch. Only shows anything if an update exists." = "每次启动时在后台静默检查。仅在有更新时显示提示。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "请求在这么长时间内没有任何输出即视为停滞。这通常发生在服务器工作进程失效（例如 GPU 内存不足）但主进程仍在运行时。";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — 清晰人声，8-bit（推荐）";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 清晰人声，GPTQ 4-bit（更省内存）";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — 清晰人声，全精度";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — 更饱满的音色";
 "About LLMTray" = "关于 LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具时会添加到系统提示词中。模型自带的工具模板只说明如何调用工具，从不说明何时不应调用。留空则停用。";
 "Advanced" = "高级";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "已在另一个标签页中打开";
 "Also check when LLMTray starts" = "LLMTray 启动时也检查";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "也可编辑图像——来自聊天或你附加的一张。编辑需要几分钟。";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "当编辑器、代理或脚本请求与当前不同的模型时。切换会卸载已加载的模型——聊天也会被卸载。先询问：显示包含“切换 / 保持”的通知；一分钟内未回复视为“保持”。选择“保持”时，客户端会收到指明已加载模型的错误。应用自带的聊天始终会切换。";
 "Another model already uses this alias." = "另一个模型已使用此别名。";
+"Another version next to this one (a new seed, the same request)" = "与此相邻的另一个版本（新随机种子，相同请求）";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "其他 mlx_lm.server 标志，以空格分隔，例如 --draft-model <path>。";
 "Apache License 2.0" = "Apache 许可证 2.0";
 "App language" = "App 语言";
 "Apply to profile" = "应用到配置";
+"Ask first" = "先询问";
 "Assistant" = "助理";
 "Attach image(s) for the model to see" = "附加图片供模型查看。";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 使用 8-bit，前馈使用 4-bit —— 在大小与稳定性间的最佳平衡，已相对于统一 4-bit 验证。";
+"Audio quality" = "音频质量";
 "Auto-compact" = "自动压缩";
 "Auto-restart after %lld stalls" = "停滞 %lld 次后自动重启";
 "Auto-restart: off" = "自动重启：关闭";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "自动调优性能";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "下面显示的是汇总后的平均结果。每次都会先进行一次不计入结果的预热运行，因此首次调用时的 Metal 内核编译时间不会影响数据。";
 "Balanced (default)" = "平衡（默认）";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "在生成图像或歌曲之前，显示模型的请求内容——提示词、模型和参数——以便先行修改。倒计时结束后会自动继续，除非你进行操作。";
 "Benchmark" = "基准测试";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "基准测试会针对当前已载入的模型运行。自动调优会将结果写入该模型的配置。";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "取消";
 "Cancel download" = "取消下载";
 "Canvas size" = "画布大小";
+"Change the prompt, the model or the shape, then make another version" = "更改提示词、模型或形状，然后生成另一个版本";
+"Change the style, lyrics, model or knobs, then make another version" = "更改风格、歌词、模型或参数，然后生成另一个版本";
 "Chat" = "聊天";
 "Chat name" = "对话名称";
 "Chat tools" = "聊天工具";
@@ -80,10 +97,15 @@
 "Composing…" = "正在创作…";
 "Concurrent requests" = "并发请求";
 "Copy" = "复制";
+"Copy the song as an audio file" = "将歌曲复制为音频文件";
+"Copy the text" = "复制文本";
 "Couldn't create the report: %@" = "无法创建报告：%@";
+"Countdown" = "倒计时";
 "Country facts" = "国家资料";
 "Crash reports (%lld)" = "崩溃报告（%lld）";
 "Create Email…" = "创建邮件…";
+"Creativity" = "创造性";
+"Creator mode" = "创作者模式";
 "Currency rates" = "汇率";
 "Current settings are already fastest" = "当前设置已是最快";
 "Date & time" = "日期与时间";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "快速（画布更小）";
 "Fetching file list…" = "正在获取文件列表…";
 "Fits comfortably" = "可舒适放下";
+"Follow the description" = "遵循描述";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "对于发布了草稿模型的模型（Gemma 4 26B）：一个额外的小模型会提前猜测词元，主模型会在一次传递中检查它们。输出相同，速度更快。随后请求会逐个处理。";
 "Free on disk: %@ · your models: %@" = "磁盘可用：%@ · 你的模型：%@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "在这么长时间没有请求后，释放已加载模型占用的内存。下次请求时会自动重新加载，并产生正常的加载延迟。";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面接受许可，并在“设置 → 模型”中添加令牌。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面申请访问（作者会审核），并在“设置 → 模型”中添加令牌。";
 "General" = "通用";
+"Generate" = "生成";
 "Generated in %.1fs" = "生成用时 %.1fs";
 "Generating image…" = "正在生成图像…";
 "Generating music…" = "正在生成音乐…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "高质量（画布更大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高保真，下载体积最大 —— 可信的正确性基线。";
 "Hourly forecast" = "每小时预报";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音乐的冒险与意外程度。仅 turbo 可用：sft 无歌曲规划器以供变化。";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
 "How many tokens it generates per trial." = "每次试验生成的词元数。";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "歌曲的保存与共享方式。AAC 256 kbit/s：约每 30 秒 1 MB，在大多数听感下不可区分。未压缩 WAV：约每 30 秒 6 MB。";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "音乐遵循模型所述风格的严格程度。数值越高：越贴近；越低：越自由。";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face 返回了 HTTP %d（%@）。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒绝了 %@（HTTP %d）：该模型可能受限、私有或不存在。若受限，请在 huggingface.co/%@ 接受许可，并在“设置 → 模型”中检查令牌。";
 "Hugging Face token" = "Hugging Face 令牌";
 "Idle -- the model reloads on the next message" = "已闲置 -- 模型会在下一条消息时重新加载";
+"Image" = "图像";
 "Image editing" = "图像编辑";
 "Image generation" = "图像生成";
 "Image generation failed: %@" = "图像生成失败：%@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "其对话会保留，返回“最近使用”。";
 "KV cache" = "KV 缓存";
 "KV group size" = "KV 组大小";
+"Keep" = "保持";
+"Keep %@ loaded" = "保持已加载 %@";
 "Keep current" = "保留当前";
 "Keep first messages: %lld" = "保留开头消息：%lld";
 "Keep last messages: %lld" = "保留末尾消息：%lld";
+"Keep the loaded model" = "保持已加载的模型";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — 聊天";
@@ -181,11 +212,11 @@
 "Library" = "资料库";
 "Likes" = "点赞";
 "Live output of the model process: loading, errors, requests." = "模型进程的实时输出：加载、错误、请求。";
+"Load %@" = "加载 %@";
+"Loaded: %1$@ · selected: %2$@" = "已加载：%1$@ · 已选：%2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即加载上次使用的模型，无需点按 Play 即可就绪。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
 "Maintenance" = "维护";
-"Make this image again (a new seed, the same request)" = "重新生成此图像（新种子，相同请求）";
-"Make this music again (a new seed, the same request)" = "重新生成此音乐（新种子，相同请求）";
 "Manage Models…" = "管理模型…";
 "Max tokens" = "最大词元数";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
@@ -194,14 +225,17 @@
 "Model" = "模型";
 "Model actions" = "模型操作";
 "Model card" = "模型卡片";
+"Model switching" = "模型切换";
 "Models" = "模型";
 "Models folder" = "模型文件夹";
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "Move to Project" = "移动到项目";
+"Music" = "音乐";
 "Music generation" = "音乐生成";
 "Music generation failed: %@" = "音乐生成失败：%@";
 "Music generation finished but produced no audio." = "音乐生成完成但未生成音频。";
 "Music generation isn't set up -- turn it on again in Settings." = "未设置音乐生成功能——请在“设置”中重新开启。";
+"Music model" = "音乐模型";
 "Name new chats automatically" = "自动命名新对话";
 "Network" = "网络";
 "Never" = "永不";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "关闭时，只有这台 Mac 可以访问服务器。开启时，网络中的其他设备也可以访问——包括网络上的任何人，因此仅在你信任的网络上开启。";
 "Older" = "更早";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "仅用于受限模型（Llama、部分 Gemma 和 FLUX 仓库）：请在其 Hugging Face 页面接受许可，然后在此粘贴只读令牌。令牌保存在钥匙串，仅发送至 huggingface.co。";
+"Only turbo has this knob: sft has no song planner to vary." = "仅 turbo 有此旋钮：sft 无歌曲规划器以供变化。";
 "Open Server Log…" = "打开服务器日志…";
 "Open in New Tab" = "在新标签页中打开";
 "Open in Window" = "在窗口中打开";
@@ -308,6 +343,7 @@
 "Search" = "搜索";
 "Search Hugging Face (mlx models)…" = "搜索 Hugging Face（MLX 模型）…";
 "Search chats" = "搜索对话";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "草稿在其当前状态下继续前的秒数。0：等你按下“生成”。";
 "Select Tab" = "选择标签页";
 "Select a component to see its license." = "选择组件以查看其许可证。";
 "Send" = "发送。";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "此模型的设置配置文件。";
 "Settings this profile overrides; everything else comes from Default." = "此配置文件会覆盖的设置；其他所有设置均来自 Default。";
 "Settings…" = "设置…";
+"Shape" = "形状";
+"Share…" = "共享…";
 "Show Chat Window" = "显示对话窗口";
 "Show Next Tab" = "显示下一个标签页";
 "Show Previous Tab" = "显示上一个标签页";
@@ -337,6 +375,8 @@
 "Show tool calls" = "显示工具调用";
 "Shows the chat window" = "显示对话窗口";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌词清晰可闻，人声靠前。制作约需 30 秒音乐的 40 秒。";
+"Skip" = "跳过";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "体积最小且最激进 —— 在某些提示下可能明显偏移生成构图。";
 "Something went wrong?" = "发生了问题？";
 "Sort by" = "排序方式";
@@ -350,6 +390,7 @@
 "Start server" = "启动服务器。";
 "Start the server first." = "请先启动服务器。";
 "Start the server when LLMTray opens" = "打开 LLMTray 时启动服务器";
+"Starting in %.0f s…" = "将在 %.0f 秒后开始…";
 "Starting…" = "正在启动…";
 "Startup" = "启动";
 "Step %lld/%lld" = "第 %lld/%lld 步";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "在生成图像或音乐时会停止聊天模型，生成后再重新加载。若同时生成图像与音乐，可能超出此 Mac 的内存。";
 "Sunrise & sunset" = "日出与日落";
 "Support" = "支持";
+"Switch" = "切换";
+"Switch at once" = "立即切换";
+"Switch models?" = "要切换模型吗？";
+"Switch the music model?" = "切换音乐模型？";
 "System" = "系统";
 "System prompt" = "系统提示词";
 "Tab %lld" = "标签页 %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "对正在运行的模型尝试 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之间都会重启服务器，并保留实测最快的组合。";
+"Tweak…" = "微调…";
+"Uncompressed (WAV)" = "未压缩（WAV）";
 "Uninstall" = "卸载";
 "Uninstall Runtime Data…" = "卸载运行时数据…";
 "Uninstall runtime data?" = "要卸载运行时数据吗？";
@@ -424,6 +471,7 @@
 "Web search" = "网络搜索";
 "What happened?" = "发生了什么？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "你当时在做什么、你的预期以及实际看到的情况。不会包含你的聊天记录。";
+"When a client asks for another model" = "当客户端请求其他模型时";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
 "Which model generates new images." = "用于生成新图像的模型。";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "构建请求失败";
 "mlx-lm runtime" = "mlx-lm 运行时";
 "not used by any model" = "未被任何模型使用";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo：更饱满、更成品感的混音。sft：歌词清晰、人声靠前，制作时间约为前者的两倍。";
 "used by %@" = "由 %@ 使用";
 "· size…" = "· 大小…";

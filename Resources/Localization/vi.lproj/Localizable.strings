@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@ yêu cầu %2$@";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ yêu cầu %2$@. Chuyển sẽ tháo mô hình đang tải.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ bị hạn chế: chấp nhận giấy phép trên huggingface.co/%@, sau đó thêm token Hugging Face trong Cài đặt → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ chưa được tải xuống — bật lại tạo ảnh trong Cài đặt.";
 "%@ wasn't found on Hugging Face." = "Không tìm thấy %@ trên Hugging Face.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld lượt tải xuống";
+"%lld s" = "%lld giây";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
 "(no result yet)" = "(chưa có kết quả)";
 "(no server output yet)" = "(chưa có đầu ra từ máy chủ)";
+"A client" = "Một client";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Yêu cầu không tạo ra gì trong khoảng thời gian này sẽ được xem là bị kẹt. Điều này xảy ra khi một worker của máy chủ chết (ví dụ: hết bộ nhớ GPU) trong khi tiến trình vẫn chạy.";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — giọng rõ, 8-bit (khuyến nghị)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — giọng rõ, GPTQ 4-bit (tiết kiệm bộ nhớ)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — giọng rõ, độ chính xác đầy đủ";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — âm thanh dày hơn";
 "About LLMTray" = "Giới thiệu về LLMTray";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Advanced" = "Nâng cao";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "Đã mở ở tab khác";
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Cũng chỉnh sửa ảnh — ảnh từ cuộc trò chuyện hoặc ảnh bạn đính kèm. Việc chỉnh sửa mất vài phút.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Một trình soạn thảo, tác nhân hoặc script yêu cầu mô hình khác với mô hình đang tải. Chuyển sẽ tháo mô hình đã tải — cả cuộc trò chuyện cũng vậy. Hỏi trước: hiện thông báo với Switch / Keep; không trả lời trong một phút tính là Keep. Keep: client sẽ nhận lỗi kèm tên mô hình đang tải. Chat của app luôn chuyển.";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
+"Another version next to this one (a new seed, the same request)" = "Một phiên bản khác bên cạnh (seed mới, yêu cầu giống)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Bất kỳ cờ mlx_lm.server nào khác, phân tách bằng dấu cách, ví dụ --draft-model <path>.";
 "Apache License 2.0" = "Giấy phép Apache 2.0";
 "App language" = "Ngôn ngữ ứng dụng";
 "Apply to profile" = "Áp dụng cho hồ sơ";
+"Ask first" = "Hỏi trước";
 "Assistant" = "Trợ lý";
 "Attach image(s) for the model to see" = "Đính kèm hình ảnh để mô hình xem.";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ở 8-bit, feed‑forward ở 4-bit — cân bằng dung lượng/ổn định tốt nhất, đã xác thực so với 4-bit đồng nhất.";
+"Audio quality" = "Chất lượng âm thanh";
 "Auto-compact" = "Tự động nén gọn";
 "Auto-restart after %lld stalls" = "Tự động khởi động lại sau %lld lần bị kẹt";
 "Auto-restart: off" = "Tự động khởi động lại: tắt";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "Tự động tinh chỉnh hiệu năng";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Được lấy trung bình thành một kết quả bên dưới. Luôn có một lượt chạy làm nóng bỏ trước, nên thời gian biên dịch kernel Metal ở lần gọi đầu tiên không bao giờ làm lệch số liệu.";
 "Balanced (default)" = "Cân bằng (Default)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Trước khi tạo ảnh hoặc bài hát, hiển thị những gì mô hình được yêu cầu — prompt, mô hình, các tuỳ chỉnh — để bạn thay đổi trước. Nó sẽ tự chạy sau thời gian đếm ngược trừ khi bạn can thiệp.";
 "Benchmark" = "Đo hiệu năng";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Đo hiệu năng chạy trên mô hình hiện đang được tải. Tự động tinh chỉnh ghi kết quả vào cấu hình của mô hình đó.";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "Hủy";
 "Cancel download" = "Hủy tải về.";
 "Canvas size" = "Kích thước canvas";
+"Change the prompt, the model or the shape, then make another version" = "Thay prompt, mô hình hoặc shape, sau đó tạo phiên bản khác";
+"Change the style, lyrics, model or knobs, then make another version" = "Thay phong cách, lời, mô hình hoặc các tuỳ chỉnh, sau đó tạo phiên bản khác";
 "Chat" = "Trò chuyện";
 "Chat name" = "Tên trò chuyện";
 "Chat tools" = "Công cụ chat";
@@ -80,10 +97,15 @@
 "Composing…" = "Đang soạn…";
 "Concurrent requests" = "Yêu cầu đồng thời";
 "Copy" = "Sao chép";
+"Copy the song as an audio file" = "Sao chép bài hát dưới dạng tệp âm thanh";
+"Copy the text" = "Sao chép văn bản";
 "Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
+"Countdown" = "Đếm ngược";
 "Country facts" = "Thông tin quốc gia";
 "Crash reports (%lld)" = "Báo cáo sự cố (%lld)";
 "Create Email…" = "Tạo Email…";
+"Creativity" = "Mức sáng tạo";
+"Creator mode" = "Chế độ Người tạo";
 "Currency rates" = "Tỷ giá tiền tệ";
 "Current settings are already fastest" = "Cài đặt hiện tại đã là nhanh nhất";
 "Date & time" = "Ngày & giờ";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Nhanh (khung nhỏ hơn)";
 "Fetching file list…" = "Đang lấy danh sách tệp…";
 "Fits comfortably" = "Vừa vặn";
+"Follow the description" = "Theo sát mô tả";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Với các mô hình có mô hình nháp đã được công bố (Gemma 4 26B): một mô hình nhỏ bổ sung đoán trước các token, rồi mô hình chính kiểm tra chúng trong một lượt. Kết quả như cũ, nhanh hơn. Khi đó, các yêu cầu được phục vụ lần lượt từng cái.";
 "Free on disk: %@ · your models: %@" = "Còn trống trên ổ: %@ · các mô hình của bạn: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Giải phóng bộ nhớ mà mô hình đã tải đang giữ sau khoảng thời gian không có yêu cầu này. Mô hình sẽ tự động tải lại ở yêu cầu tiếp theo, với độ trễ tải như thường lệ.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Bị hạn chế: chấp nhận giấy phép trên trang Hugging Face của mô hình, rồi thêm token trong Cài đặt → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Bị hạn chế: yêu cầu quyền truy cập trên trang Hugging Face của mô hình (tác giả sẽ xem xét), rồi thêm token trong Cài đặt → Models.";
 "General" = "Chung";
+"Generate" = "Tạo";
 "Generated in %.1fs" = "Tạo trong %.1fs";
 "Generating image…" = "Đang tạo ảnh…";
 "Generating music…" = "Đang tạo nhạc…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "Chất lượng cao (khung lớn hơn)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Độ trung thực cao nhất, dung lượng tải lớn nhất — cơ sở đúng đắn bạn có thể tin cậy.";
 "Hourly forecast" = "Dự báo theo giờ";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Mức độ táo bạo và bất ngờ của nhạc. Chỉ turbo: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Cách bài hát được lưu, ghi và chia sẻ. AAC 256 kbit/s: khoảng 1 MB cho mỗi 30 giây, không phân biệt được với đa số người nghe. WAV không nén: khoảng 6 MB cho mỗi 30 giây.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Mức độ nhạc bám sát phong cách mô hình mô tả. Cao hơn: càng giống; thấp hơn: càng tự do.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face trả về HTTP %d cho %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face từ chối %@ (HTTP %d): mô hình bị hạn chế hoặc riêng tư, hoặc không tồn tại. Nếu bị hạn chế, chấp nhận giấy phép trên huggingface.co/%@ và kiểm tra token trong Cài đặt → Models.";
 "Hugging Face token" = "Token Hugging Face";
 "Idle -- the model reloads on the next message" = "Đang rỗi -- mô hình sẽ tải lại ở tin nhắn tiếp theo";
+"Image" = "Ảnh";
 "Image editing" = "Chỉnh sửa ảnh";
 "Image generation" = "Tạo hình ảnh";
 "Image generation failed: %@" = "Tạo ảnh thất bại: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "Các trò chuyện vẫn được giữ, trở lại trong mục Gần đây.";
 "KV cache" = "Bộ nhớ đệm KV";
 "KV group size" = "Kích cỡ nhóm KV";
+"Keep" = "Giữ";
+"Keep %@ loaded" = "Giữ %@ đang tải";
 "Keep current" = "Giữ hiện tại";
 "Keep first messages: %lld" = "Giữ các tin nhắn đầu: %lld";
 "Keep last messages: %lld" = "Giữ các tin nhắn cuối: %lld";
+"Keep the loaded model" = "Giữ mô hình đang tải";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Giữ N token đầu tiên của ngữ cảnh ở độ chính xác đầy đủ trước khi lượng tử hóa. Giá trị cao hơn đánh đổi mức tiết kiệm bộ nhớ để lấy độ chính xác với prompt dài.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Trò chuyện";
@@ -181,11 +212,11 @@
 "Library" = "Thư viện";
 "Likes" = "Thích";
 "Live output of the model process: loading, errors, requests." = "Đầu ra trực tiếp của tiến trình mô hình: tải, lỗi, yêu cầu.";
+"Load %@" = "Tải %@";
+"Loaded: %1$@ · selected: %2$@" = "Đang tải: %1$@ · đã chọn: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Tải ngay mô hình dùng gần nhất để sẵn sàng mà không cần nhấn Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
 "Maintenance" = "Bảo trì";
-"Make this image again (a new seed, the same request)" = "Tạo lại ảnh này (seed mới, yêu cầu giống)";
-"Make this music again (a new seed, the same request)" = "Tạo lại nhạc này (seed mới, yêu cầu giống)";
 "Manage Models…" = "Quản lý mô hình…";
 "Max tokens" = "Số token tối đa";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
@@ -194,14 +225,17 @@
 "Model" = "Mô hình";
 "Model actions" = "Tác vụ mô hình";
 "Model card" = "Thẻ mô hình";
+"Model switching" = "Chuyển mô hình";
 "Models" = "Mô hình";
 "Models folder" = "Thư mục mô hình";
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "Move to Project" = "Chuyển vào Dự án";
+"Music" = "Nhạc";
 "Music generation" = "Tạo nhạc";
 "Music generation failed: %@" = "Tạo nhạc thất bại: %@";
 "Music generation finished but produced no audio." = "Tạo nhạc hoàn tất nhưng không sinh ra âm thanh.";
 "Music generation isn't set up -- turn it on again in Settings." = "Tạo nhạc chưa được thiết lập — bật lại trong Cài đặt.";
+"Music model" = "Mô hình nhạc";
 "Name new chats automatically" = "Tự đặt tên cho trò chuyện mới";
 "Network" = "Mạng";
 "Never" = "Không bao giờ";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
 "Older" = "Cũ hơn";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
+"Only turbo has this knob: sft has no song planner to vary." = "Chỉ turbo có tuỳ chỉnh này: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
 "Open in New Tab" = "Mở trong tab mới";
 "Open in Window" = "Mở trong Cửa sổ";
@@ -308,6 +343,7 @@
 "Search" = "Tìm kiếm";
 "Search Hugging Face (mlx models)…" = "Tìm kiếm Hugging Face (mô hình MLX)…";
 "Search chats" = "Tìm trò chuyện";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Số giây trước khi bản nháp được thực hiện như hiện tại. 0: chờ bạn nhấn Tạo.";
 "Select Tab" = "Chọn tab";
 "Select a component to see its license." = "Chọn một thành phần để xem giấy phép.";
 "Send" = "Gửi tin nhắn.";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "Hồ sơ cài đặt cho mô hình này.";
 "Settings this profile overrides; everything else comes from Default." = "Các cài đặt mà hồ sơ này ghi đè; mọi mục khác lấy từ Default.";
 "Settings…" = "Cài đặt…";
+"Shape" = "Shape";
+"Share…" = "Chia sẻ…";
 "Show Chat Window" = "Hiển thị cửa sổ trò chuyện";
 "Show Next Tab" = "Hiện tab tiếp";
 "Show Previous Tab" = "Hiện tab trước";
@@ -337,6 +375,8 @@
 "Show tool calls" = "Hiện lần gọi công cụ";
 "Shows the chat window" = "Hiển thị cửa sổ trò chuyện";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Hát lời rõ, giọng nổi lên phía trước. Khoảng 40 giây cho 30 giây nhạc.";
+"Skip" = "Bỏ qua";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Nhỏ nhất và quyết liệt nhất — có thể làm lệch bố cục tạo ảnh với một số prompt.";
 "Something went wrong?" = "Có gì đó sai?";
 "Sort by" = "Sắp xếp theo";
@@ -350,6 +390,7 @@
 "Start server" = "Khởi động máy chủ.";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
 "Start the server when LLMTray opens" = "Khởi động máy chủ khi mở LLMTray";
+"Starting in %.0f s…" = "Bắt đầu sau %.0f giây…";
 "Starting…" = "Đang khởi động…";
 "Startup" = "Khởi động";
 "Step %lld/%lld" = "Bước %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Tạm dừng mô hình chat khi đang tạo ảnh hoặc nhạc, rồi tải lại sau. Thực hiện cùng lúc cả hai có thể vượt quá bộ nhớ của Mac này.";
 "Sunrise & sunset" = "Mặt trời mọc & lặn";
 "Support" = "Hỗ trợ";
+"Switch" = "Chuyển";
+"Switch at once" = "Chuyển ngay";
+"Switch models?" = "Chuyển mô hình?";
+"Switch the music model?" = "Chuyển mô hình nhạc?";
 "System" = "Hệ thống";
 "System prompt" = "Lời nhắc hệ thống";
 "Tab %lld" = "Tab %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Thử decode-concurrency (1/2/4/8) và prefill-step-size (64/128/256/512) với mô hình đang chạy, khởi động lại máy chủ sau mỗi lần thử, rồi giữ cấu hình đo được nhanh nhất.";
+"Tweak…" = "Tinh chỉnh…";
+"Uncompressed (WAV)" = "Không nén (WAV)";
 "Uninstall" = "Gỡ cài đặt";
 "Uninstall Runtime Data…" = "Gỡ cài đặt dữ liệu thời gian chạy…";
 "Uninstall runtime data?" = "Gỡ cài đặt dữ liệu thời gian chạy?";
@@ -424,6 +471,7 @@
 "Web search" = "Tìm web";
 "What happened?" = "Chuyện gì đã xảy ra?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Bạn đang làm gì, bạn mong đợi gì, và bạn thấy gì thay vì mong đợi. Các cuộc trò chuyện của bạn không bao giờ được đính kèm.";
+"When a client asks for another model" = "Khi client yêu cầu mô hình khác";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
 "Which model generates new images." = "Mô hình dùng để tạo ảnh mới.";
 "Wikipedia" = "Wikipedia";
@@ -440,5 +488,6 @@
 "failed to build request" = "không thể tạo yêu cầu";
 "mlx-lm runtime" = "Môi trường chạy mlx-lm";
 "not used by any model" = "không được mô hình nào dùng";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: bản dày hơn, nghe như hoàn chỉnh. sft: lời rõ, giọng nổi, thời gian tạo khoảng gấp đôi.";
 "used by %@" = "được %@ dùng";
 "· size…" = "· kích thước…";

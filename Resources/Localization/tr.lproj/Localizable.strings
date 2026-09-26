@@ -2,6 +2,8 @@
    Missing keys are machine-translated by scripts/l10n.py translate (OpenAI); fixes by native
    speakers are welcome -- existing entries are never overwritten. */
 
+"%1$@ asks for %2$@" = "%1$@, %2$@ istiyor";
+"%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@, %2$@ istiyor. Değiştirirseniz şu anda yüklü olan model boşaltılır.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ kısıtlı: lisansını huggingface.co/%@ adresinde kabul edin, sonra Ayarlar → Models'te bir Hugging Face tokenı ekleyin.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ henüz indirilmiyor — Görüntü oluşturmayı Ayarlar'dan tekrar etkinleştirin.";
 "%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
@@ -11,12 +13,20 @@
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld indirme";
+"%lld s" = "%lld sn";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Lütfen Finder’da gösterilen rapor dosyasını ekleyin.)";
 "(no result yet)" = "(henüz sonuç yok)";
 "(no server output yet)" = "(henüz sunucu çıktısı yok)";
+"A client" = "Bir istemci";
+"A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Her başlatmada sessizce denetler. Yalnızca güncelleme varsa bir şey gösterir.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Bu süre boyunca hiçbir şey üretmeyen istek takılmış sayılır. Bu, işlem çalışmaya devam ederken bir sunucu çalışanı öldüğünde (örn. GPU belleği bittiğinde) olur.";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — net vokaller, 8-bit (önerilen)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — net vokaller, GPTQ 4-bit (daha az bellek)";
+"ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — net vokaller, tam hassasiyet";
+"ACE-Step turbo — fuller sound" = "ACE-Step turbo — daha dolu ses";
 "About LLMTray" = "LLMTray Hakkında";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
 "Advanced" = "İleri Düzey";
@@ -28,14 +38,18 @@
 "Already open in another tab" = "Başka bir sekmede zaten açık";
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Ayrıca resimleri düzenler — sohbetten alınan veya eklediğiniz bir resmi. Düzenlemeler birkaç dakika sürer.";
+"An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Yüklü olandan farklı bir modeli isteyen bir düzenleyici, agent veya betik. Değiştirdiğinizde yüklü olan boşaltılır — sohbet de dahil. Önce sor: Switch / Keep içeren bir bildirim; bir dakika içinde yanıtlanmazsa Keep sayılır. Keep: istemciye, yüklü modeli belirten bir hata döner. Uygulamanın kendi sohbeti her zaman değişir.";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
+"Another version next to this one (a new seed, the same request)" = "Bunun yanında başka bir versiyon (yeni seed, aynı istek)";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Diğer mlx_lm.server flag’leri; boşlukla ayrılmış, örn. --draft-model <path>.";
 "Apache License 2.0" = "Apache Lisansı 2.0";
 "App language" = "Uygulama dili";
 "Apply to profile" = "Profile uygula";
+"Ask first" = "Önce sor";
 "Assistant" = "Asistan";
 "Attach image(s) for the model to see" = "Modelin görmesi için görsel ekleyin.";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Dikkat 8-bit, feed‑forward 4-bit — boyut/kararlılık için en iyi denge, tekdüzey 4-bit’e karşı doğrulandı.";
+"Audio quality" = "Ses kalitesi";
 "Auto-compact" = "Otomatik sıkıştırma";
 "Auto-restart after %lld stalls" = "%lld takılmadan sonra otomatik yeniden başlat";
 "Auto-restart: off" = "Otomatik yeniden başlatma: kapalı";
@@ -45,6 +59,7 @@
 "Auto-tune performance" = "Performansı otomatik ayarla";
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Aşağıda tek bir sonuç olarak ortalaması alındı. Öncesinde her zaman atılacak bir ısınma çalıştırması yapılır; bu nedenle ilk çağrıdaki Metal çekirdek derleme süresi sayıları asla çarpıtmaz.";
 "Balanced (default)" = "Dengeli (Varsayılan)";
+"Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Bir resim veya şarkı oluşturulmadan önce modelin ne istediğini — istem (prompt), model, ayarlar — değiştirmeniz için gösterir. Geri sayımdan sonra bir işlem yapmazsanız otomatik devam eder.";
 "Benchmark" = "Karşılaştırma";
 "Benchmarks run against the model that's loaded now. Auto-tune writes its results into that model's profile." = "Karşılaştırmalar şu anda yüklü olan model üzerinde çalışır. Otomatik ayar sonuçlarını bu modelin profiline yazar.";
 "Beta" = "Beta";
@@ -56,6 +71,8 @@
 "Cancel" = "Vazgeç";
 "Cancel download" = "İndirmeyi iptal et.";
 "Canvas size" = "Tuval boyutu";
+"Change the prompt, the model or the shape, then make another version" = "İstemi, modeli veya şekli değiştirin, sonra başka bir versiyon oluşturun";
+"Change the style, lyrics, model or knobs, then make another version" = "Stili, sözleri, modeli veya ayarları değiştirin, sonra başka bir versiyon oluşturun";
 "Chat" = "Sohbet";
 "Chat name" = "Sohbet adı";
 "Chat tools" = "Sohbet araçları";
@@ -80,10 +97,15 @@
 "Composing…" = "Oluşturuluyor…";
 "Concurrent requests" = "Eşzamanlı istekler";
 "Copy" = "Kopyala";
+"Copy the song as an audio file" = "Şarkıyı ses dosyası olarak kopyala";
+"Copy the text" = "Metni kopyala";
 "Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
+"Countdown" = "Geri sayım";
 "Country facts" = "Ülke bilgileri";
 "Crash reports (%lld)" = "Çökme raporları (%lld)";
 "Create Email…" = "E‑posta Oluştur…";
+"Creativity" = "Yaratıcılık";
+"Creator mode" = "Oluşturan modu";
 "Currency rates" = "Döviz kurları";
 "Current settings are already fastest" = "Geçerli ayarlar zaten en hızlı";
 "Date & time" = "Tarih ve saat";
@@ -125,6 +147,7 @@
 "Fast (smaller canvas)" = "Hızlı (küçük tuval)";
 "Fetching file list…" = "Dosya listesi alınıyor…";
 "Fits comfortably" = "Rahat sığar";
+"Follow the description" = "Açıklamayı takip et";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış taslak modeli olan modellerde (Gemma 4 26B): küçük bir ek model ilerideki token’ları tahmin eder ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. İstekler bu durumda teker teker işlenir.";
 "Free on disk: %@ · your models: %@" = "Diskte boş: %@ · modelleriniz: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Yüklü bir modelin tuttuğu belleği, bu kadar süre istek gelmezse serbest bırakır. Sonraki istekte, olağan yükleme gecikmesiyle otomatik olarak yeniden yüklenir.";
@@ -132,6 +155,7 @@
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasındaki lisansını kabul edin ve Ayarlar → Models bölümüne bir token ekleyin.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasından erişim isteyin (yazarlar inceler) ve Ayarlar → Models bölümüne bir token ekleyin.";
 "General" = "Genel";
+"Generate" = "Oluştur";
 "Generated in %.1fs" = "%.1fs içinde oluşturuldu";
 "Generating image…" = "Görüntü oluşturuluyor…";
 "Generating music…" = "Müzik üretiliyor…";
@@ -145,13 +169,17 @@
 "High quality (larger canvas)" = "Yüksek kalite (büyük tuval)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "En yüksek doğruluk, en büyük indirme — güvenebileceğiniz doğruluk ölçütü.";
 "Hourly forecast" = "Saatlik tahmin";
+"How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Müziğin ne kadar maceracı ve beklenmedik olduğu. Sadece turbo: sft’de şarkı planlayıcısı yok.";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Şarkıların nasıl saklandığı, kaydedildiği ve paylaşıldığı. AAC 256 kbit/s: yaklaşık 30 s için 1 MB, çoğu dinleme için farkedilmez. Sıkıştırılmamış WAV: yaklaşık 30 s için 6 MB.";
+"How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Müziğin modelin tanımladığı stile ne kadar sıkı uyduğu. Yüksek: daha yakın; düşük: daha serbest.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face %2$@ için HTTP %1$d döndü.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
 "Hugging Face token" = "Hugging Face tokenı";
 "Idle -- the model reloads on the next message" = "Boşta — model sonraki iletide yeniden yüklenir";
+"Image" = "Görüntü";
 "Image editing" = "Resim düzenleme";
 "Image generation" = "Görüntü oluşturma";
 "Image generation failed: %@" = "Görüntü oluşturma başarısız: %@";
@@ -168,9 +196,12 @@
 "Its chats stay, back among the recents." = "Sohbetleri kalır, son kullanılanlar arasına döner.";
 "KV cache" = "KV önbelleği";
 "KV group size" = "KV grup boyutu";
+"Keep" = "Tut";
+"Keep %@ loaded" = "%@'ı yüklü tut";
 "Keep current" = "Mevcut olanı koru";
 "Keep first messages: %lld" = "İlk iletileri koru: %lld";
 "Keep last messages: %lld" = "Son iletileri koru: %lld";
+"Keep the loaded model" = "Yüklü modeli tut";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Bağlamın ilk N token’ını nicelemeden önce tam hassasiyette tutar. Daha yüksek değer, uzun istemlerde doğruluk için bellek tasarrufundan ödün verir.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Sohbet";
@@ -181,11 +212,11 @@
 "Library" = "Kitaplık";
 "Likes" = "Beğeniler";
 "Live output of the model process: loading, errors, requests." = "Model işleminin canlı çıktısı: yükleme, hatalar, istekler.";
+"Load %@" = "%@'ı yükle";
+"Loaded: %1$@ · selected: %2$@" = "Yüklü: %1$@ · seçili: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Son kullanılan modeli hemen yükler; böylece Play’e basmadan hazır olur.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Üretilen her token’ı günlüğe yazar (DEBUG). Yalnızca model işleminde sorun gidermek içindir — işleri yavaşlatır. Bir sonraki sunucu başlangıcında etkili olur.";
 "Maintenance" = "Bakım";
-"Make this image again (a new seed, the same request)" = "Bu görüntüyü yeniden oluştur (yeni seed, aynı istek)";
-"Make this music again (a new seed, the same request)" = "Bu müziği yeniden oluştur (yeni seed, aynı istek)";
 "Manage Models…" = "Modelleri Yönet…";
 "Max tokens" = "Maksimum token";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
@@ -194,14 +225,17 @@
 "Model" = "Model";
 "Model actions" = "Model eylemleri";
 "Model card" = "Model kartı";
+"Model switching" = "Model değiştirme";
 "Models" = "Modeller";
 "Models folder" = "Modeller klasörü";
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "Move to Project" = "Projeye Taşı";
+"Music" = "Müzik";
 "Music generation" = "Müzik üretimi";
 "Music generation failed: %@" = "Müzik üretimi başarısız oldu: %@";
 "Music generation finished but produced no audio." = "Müzik üretimi tamamlandı ancak ses üretilmedi.";
 "Music generation isn't set up -- turn it on again in Settings." = "Müzik üretimi ayarlı değil — Açmak için Ayarlar'a gidin.";
+"Music model" = "Müzik modeli";
 "Name new chats automatically" = "Yeni sohbetleri otomatik adlandır";
 "Network" = "Ağ";
 "Never" = "Asla";
@@ -234,6 +268,7 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Kapalı: sunucuya yalnızca bu Mac erişebilir. Açık: ağınızdaki diğer aygıtlar da erişebilir; ağdaki herkes erişebileceği için yalnızca güvendiğiniz ağlarda kullanın.";
 "Older" = "Daha eski";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Sadece kısıtlı modeller için (Llama, bazı Gemma ve FLUX depoları): Hugging Face sayfasında modelin lisansını kabul edin, sonra buraya bir read token yapıştırın. Keychain'inizde saklanır, yalnızca huggingface.co'ya gönderilir.";
+"Only turbo has this knob: sft has no song planner to vary." = "Sadece turbo’da bu ayar var: sft’de şarkı planlayıcısı yok.";
 "Open Server Log…" = "Sunucu Günlüğünü Aç…";
 "Open in New Tab" = "Yeni Sekmede Aç";
 "Open in Window" = "Pencerede Aç";
@@ -308,6 +343,7 @@
 "Search" = "Ara";
 "Search Hugging Face (mlx models)…" = "Hugging Face’de ara (mlx modelleri)…";
 "Search chats" = "Sohbetlerde ara";
+"Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Taslağın olduğu gibi devam etmeden önceki saniye. 0: Oluştur’a basana kadar bekle.";
 "Select Tab" = "Sekmeyi Seç";
 "Select a component to see its license." = "Lisansını görmek için bir bileşen seçin.";
 "Send" = "Gönder.";
@@ -323,6 +359,8 @@
 "Settings profile for this model" = "Bu modelin ayar profili.";
 "Settings this profile overrides; everything else comes from Default." = "Bu profilin geçersiz kıldığı ayarlar; diğer her şey Default’tan gelir.";
 "Settings…" = "Ayarlar…";
+"Shape" = "Şekil";
+"Share…" = "Paylaş…";
 "Show Chat Window" = "Sohbet Penceresini Göster";
 "Show Next Tab" = "Sonraki Sekmeyi Göster";
 "Show Previous Tab" = "Önceki Sekmeyi Göster";
@@ -337,6 +375,8 @@
 "Show tool calls" = "Araç çağrılarını göster";
 "Shows the chat window" = "Sohbet penceresini gösterir";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
+"Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sözleri net söyler, vokal önde. 30 sn’lik müzik için yaklaşık 40 sn sürer.";
+"Skip" = "Atla";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "En küçük ve en agresif — bazı istemlerde oluşturulan görselin kompozisyonu belirgin şekilde kayabilir.";
 "Something went wrong?" = "Bir şey mi ters gitti?";
 "Sort by" = "Sıralama ölçütü";
@@ -350,6 +390,7 @@
 "Start server" = "Sunucuyu başlat.";
 "Start the server first." = "Önce sunucuyu başlatın.";
 "Start the server when LLMTray opens" = "LLMTray açıldığında sunucuyu başlat";
+"Starting in %.0f s…" = "%.0f sn içinde başlıyor…";
 "Starting…" = "Başlatılıyor…";
 "Startup" = "Başlangıç";
 "Step %lld/%lld" = "Adım %lld/%lld";
@@ -362,6 +403,10 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Görsel veya müzik üretilirken sohbet modelini durdurur ve sonra yeniden yükler. Aynı anda ikisi de bu Mac'in belleğini aşabilir.";
 "Sunrise & sunset" = "Gün doğumu ve batımı";
 "Support" = "Yardım";
+"Switch" = "Değiştir";
+"Switch at once" = "Hemen değiştir";
+"Switch models?" = "Modeller değiştirilsin mi?";
+"Switch the music model?" = "Müzik modelini değiştirmek istiyor musunuz?";
 "System" = "Sistem";
 "System prompt" = "Sistem istemi";
 "Tab %lld" = "Sekme %lld";
@@ -400,6 +445,8 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Çalışan modelde decode-concurrency (1/2/4/8) ve prefill-step-size (64/128/256/512) değerlerini dener, her biri arasında sunucuyu yeniden başlatır ve ölçülen en hızlı olanı tutar.";
+"Tweak…" = "Ayarla…";
+"Uncompressed (WAV)" = "Sıkıştırılmamış (WAV)";
 "Uninstall" = "Kaldır";
 "Uninstall Runtime Data…" = "Çalışma zamanı verilerini kaldır…";
 "Uninstall runtime data?" = "Çalışma zamanı verileri kaldırılsın mı?";
@@ -424,6 +471,7 @@
 "Web search" = "Web araması";
 "What happened?" = "Ne oldu?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Ne yapıyordunuz, ne bekliyordunuz, bunun yerine ne gördünüz. Sohbetleriniz asla eklenmez.";
+"When a client asks for another model" = "Bir istemci başka bir model istediğinde";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "Wikipedia" = "Vikipedi";
@@ -440,5 +488,6 @@
 "failed to build request" = "istek oluşturulamadı";
 "mlx-lm runtime" = "mlx-lm çalışma zamanı";
 "not used by any model" = "hiçbir model tarafından kullanılmıyor";
+"turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: daha dolu, daha tamamlanmış bir miks. sft: sözleri net söyler, vokal önde; yapmak yaklaşık iki kat daha uzun sürer.";
 "used by %@" = "%@ tarafından kullanılıyor";
 "· size…" = "· boyut…";
