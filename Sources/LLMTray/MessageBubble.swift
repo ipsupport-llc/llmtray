@@ -20,6 +20,7 @@ struct MessageBubble: View {
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
+    @State private var hovering = false
 
     var body: some View {
         if message.isSummary {
@@ -95,6 +96,10 @@ struct MessageBubble: View {
                 .padding(8)
                 .background(isUser ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.12))
                 .cornerRadius(8)
+                // An answer's always (it's what gets copied); the user's own on hover.
+                if !message.content.isEmpty, !isUser || hovering {
+                    textActions
+                }
             }
 
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
@@ -126,6 +131,24 @@ struct MessageBubble: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
+        .onHover { hovering = $0 }
+    }
+
+    /// Copy / Share of the message's text (the markdown as written).
+    private var textActions: some View {
+        HStack(spacing: 8) {
+            Button { MediaSharing.copyText(message.content) } label: {
+                Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Copy the text"))
+            ShareLink(item: message.content) {
+                Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+        }
+        .foregroundColor(.secondary)
+        .padding(.horizontal, 4)
     }
 
     @ViewBuilder
@@ -163,6 +186,11 @@ struct MessageBubble: View {
                     .buttonStyle(.plain)
                     Button { ImageActions.copy(data) } label: {
                         Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+                    }
+                    .buttonStyle(.plain)
+                    ShareLink(item: SharedImage(data: data, prompt: prompt),
+                              preview: SharePreview(prompt.isEmpty ? "Image" : prompt, image: Image(nsImage: nsImage))) {
+                        Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
                     if canRegenerate(.image, i) {

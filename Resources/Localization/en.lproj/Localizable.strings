@@ -88,6 +88,8 @@
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
+"Copy the song as a WAV file" = "Copy the song as a WAV file";
+"Copy the text" = "Copy the text";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Countdown" = "Countdown";
 "Country facts" = "Country facts";
@@ -340,6 +342,7 @@
 "Settings this profile overrides; everything else comes from Default." = "Settings this profile overrides; everything else comes from Default.";
 "Settings…" = "Settings…";
 "Shape" = "Shape";
+"Share…" = "Share…";
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
