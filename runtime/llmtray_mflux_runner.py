@@ -34,6 +34,7 @@ if arg("--base-model") == "flux2-klein-4b":
     import json
     from PIL import Image
     from mflux.models.common.vae.tiling_config import TilingConfig
+    from mflux.utils.image_util import ImageUtil
     request = json.loads(sys.stdin.read())
     def rgb(data):
         im = Image.open(io.BytesIO(base64.b64decode(data)))
@@ -59,17 +60,46 @@ if arg("--base-model") == "flux2-klein-4b":
     model.text_encoder.layers = model.text_encoder.layers[:27]
     model.tiling_config = TilingConfig(vae_decode_tile_size=256)
     steps = int(arg("--steps", "4"))
+    width, height = int(arg("--width", "1024")), int(arg("--height", "1024"))
+
+    # The preview shows each step's predicted clean image, x0 = x_t - sigma_t * v
+    # (flow matching): with 4 steps the latents themselves are noise until
+    # the end. mflux 0.20's FLUX.2 loop doesn't hand it to callbacks, so the
+    # scheduler step keeps it.
+    from mflux.models.common.schedulers.flow_match_euler_discrete_scheduler import FlowMatchEulerDiscreteScheduler
+    predicted = {}
+    scheduler_step = FlowMatchEulerDiscreteScheduler.step
+    def step(self, noise, timestep, latents, **kwargs):
+        if timestep + 1 < steps:   # not kept for the last step: no preview there
+            # Back to the latents' dtype: the float32 sigma promotes it, and a
+            # float32 VAE decode peaks ~0.6GB above the final one (measured).
+            predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
+        return scheduler_step(self, noise, timestep, latents, **kwargs)
+    FlowMatchEulerDiscreteScheduler.step = step
 
     class Steps:
         def call_before_loop(self, *_, **__):
             emit("STEP", f"0 {steps}")
 
-        def call_in_loop(self, t, *_, **__):
+        def call_in_loop(self, t, config=None, **_):
             emit("STEP", f"{t + 1} {steps}")
+            # A preview of each step but the last (the image itself follows).
+            latents = predicted.pop("x0", None)
+            if latents is None or t + 1 >= steps:
+                return
+            try:   # a preview is cosmetic: never the reason a generation fails
+                packed = latents.reshape(latents.shape[0], config.height // 16, config.width // 16, latents.shape[-1]).transpose(0, 3, 1, 2)
+                decoded = model.vae.decode_packed_latents(packed, tiling_config=model.tiling_config)
+                emit("PREVIEW", png_b64(ImageUtil.to_image(
+                    decoded_latents=decoded, config=config, seed=0, prompt="", quantization=model.bits,
+                    lora_paths=None, lora_scales=None, generation_time=0,
+                ).image, max_side=512))
+            except Exception:
+                pass
 
     model.callbacks.register(Steps())
     kwargs = dict(seed=int(arg("--seed", "0")) or int.from_bytes(os.urandom(4), "big"), prompt=request["prompt"],
-                  num_inference_steps=steps, width=int(arg("--width", "1024")), height=int(arg("--height", "1024")))
+                  num_inference_steps=steps, width=width, height=height)
     if images:
         kwargs["image_paths"] = images   # mflux's loader takes PIL images as well as paths
     emit("IMAGE", png_b64(model.generate_image(**kwargs).image))
