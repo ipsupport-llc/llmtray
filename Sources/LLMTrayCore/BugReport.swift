@@ -57,9 +57,10 @@ public struct BugReport {
             let pattern = NSRegularExpression.escapedPattern(for: home) + #"(?=[/\\"'\s:,)\]]|$)"#
             text = text.replacingOccurrences(of: pattern, with: "~", options: .regularExpression)
         }
-        if user.count > 1 {
+        if !user.isEmpty {
             let name = NSRegularExpression.escapedPattern(for: user)
-            text = text.replacingOccurrences(of: #"(?<=/)"# + name + #"(?=/|\\/|$|\s)"#, with: "USER", options: .regularExpression)
+            // A whole path component: anything but a name character after it.
+            text = text.replacingOccurrences(of: #"(?<=/)"# + name + #"(?![A-Za-z0-9._-])"#, with: "USER", options: .regularExpression)
         }
         return text
     }
@@ -95,6 +96,13 @@ public struct BugReport {
             }
         }
         return out.joined(separator: "\n")
+    }
+
+    /// Verbose logging was on at some point: the log holds DEBUG records,
+    /// and with them the chats (a model's answer can even look like a log
+    /// line). Such a log isn't attached at all.
+    public static func hasVerboseRecords(_ log: String) -> Bool {
+        log.range(of: #"(?m)^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} - DEBUG - "#, options: .regularExpression) != nil
     }
 
     /// A line that starts a log record, and its level ("" for one without:

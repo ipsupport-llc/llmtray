@@ -71,6 +71,10 @@ final class BugReportTests: XCTestCase {
     func testRedactOnAPathBoundary() {
         XCTAssertEqual(BugReport.redact("/Users/alice/x /Users/alice2/y /Users/alice", home: "/Users/alice", user: "alice"), "~/x /Users/alice2/y ~")
         XCTAssertEqual(BugReport.redact("/Volumes/Models/alice/org/model", home: "/Users/alice", user: "alice"), "/Volumes/Models/USER/org/model")
+        XCTAssertEqual(BugReport.redact(#"{"path":"/Volumes/Models/alice"}"#, home: "/Users/alice", user: "alice"), #"{"path":"/Volumes/Models/USER"}"#)
+        XCTAssertEqual(BugReport.redact("/Volumes/a/model", home: "/Users/a", user: "a"), "/Volumes/USER/model")
+        XCTAssertTrue(BugReport.hasVerboseRecords("x\n2026-09-24 03:12:45,000 - DEBUG - y"))
+        XCTAssertFalse(BugReport.hasVerboseRecords("2026-09-24 03:12:45,000 - INFO - y"))
     }
 
     func testCutLogAndLookalikeLinesDontLeak() {

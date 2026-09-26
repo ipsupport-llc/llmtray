@@ -185,10 +185,16 @@ enum BugReporter {
         BugReport.redact(BugReport.withoutChatContent(BugReport.tail(server.log, maxBytes: 512 * 1024)))
     }
 
+    /// The server log can go: there is one, and verbose logging (which puts
+    /// the chats in it) wasn't on while it was written.
+    static func canAttachServerLog(_ server: ServerManager) -> Bool {
+        !server.log.isEmpty && !BugReport.hasVerboseRecords(server.log)
+    }
+
     /// The files the zip will hold besides report.txt.
     static func attachments(_ options: Options, server: ServerManager) -> [String] {
         var files: [String] = []
-        if options.includeServerLog, !server.log.isEmpty { files.append("server.log") }
+        if options.includeServerLog, canAttachServerLog(server) { files.append("server.log") }
         if options.includeCrashReports { files += recentCrashReports().map { "crash-reports/" + $0.lastPathComponent } }
         return files
     }
@@ -209,7 +215,7 @@ enum BugReporter {
         let folder = root.appendingPathComponent(name)
         try fm.createDirectory(at: folder, withIntermediateDirectories: true)
         var text = report.text()
-        if options.includeServerLog, !server.log.isEmpty {
+        if options.includeServerLog, canAttachServerLog(server) {
             try serverLogForReport(server).write(to: folder.appendingPathComponent("server.log"), atomically: true, encoding: .utf8)
         }
         if options.includeCrashReports {

@@ -385,6 +385,7 @@
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem.";
 "Version" = "Version";
 "Version %@" = "Version %@";
 "View model card" = "View model card";

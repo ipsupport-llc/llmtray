@@ -36,6 +36,11 @@ struct BugReportView: View {
                 .font(.caption).foregroundColor(.secondary)
 
             Toggle("Include the server log", isOn: $options.includeServerLog)
+                .disabled(!BugReporter.canAttachServerLog(server))
+            if !server.log.isEmpty, !BugReporter.canAttachServerLog(server) {
+                Text("Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem.")
+                    .font(.caption).foregroundColor(.secondary)
+            }
             Toggle("Include LLMTray crash reports from the last two weeks", isOn: $options.includeCrashReports)
 
             // Everything that goes: report.txt, and the log as attached.
@@ -52,7 +57,7 @@ struct BugReportView: View {
             } label: {
                 Text("The report")
             }
-            if options.includeServerLog, !server.log.isEmpty {
+            if options.includeServerLog, BugReporter.canAttachServerLog(server) {
                 DisclosureGroup {
                     ScrollView {
                         Text(BugReporter.serverLogForReport(server))
