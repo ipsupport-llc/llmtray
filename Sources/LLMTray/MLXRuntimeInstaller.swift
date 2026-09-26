@@ -185,7 +185,6 @@ final class MLXRuntimeInstaller {
     }
 
     func ensureReady() async throws {
-        let runtimeDir = RuntimePaths.runtimeDir
         guard let pin = RuntimePin.current else {
             throw NSError(
                 domain: "MLXRuntimeInstaller", code: 1,

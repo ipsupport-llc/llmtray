@@ -137,7 +137,7 @@ public enum ServerLaunch {
             String($0.split(separator: "=", maxSplits: 1).first ?? $0)   // --temp=0.2 too
         })
         let flag = ["temperature": "--temp", "top_p": "--top-p", "max_tokens": "--max-tokens", "top_k": "--top-k"]
-        var fields: [(key: String, json: String)] = [
+        let fields: [(key: String, json: String)] = [
             ("temperature", number(p.temperature)),
             ("top_p", number(p.topP)),
             ("max_tokens", String(min(p.maxTokens, maxContext ?? p.maxTokens))),

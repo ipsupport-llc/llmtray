@@ -165,7 +165,9 @@ final class ModelProxyServer {
 
     /// One growing buffer for a request body: appending to a Data copied
     /// per chunk made a 50 MB image body cost gigabytes of copying on the
-    /// main thread.
+    /// main thread. Main-actor, like the proxy: receive's completion runs
+    /// on Network.framework's queue and only hands it to a main-actor task.
+    @MainActor
     private final class BodyBuffer {
         var data: Data
         init(_ start: Data, capacity: Int) {
