@@ -266,6 +266,11 @@ final class ModelProxyServer {
             let client = headers["user-agent"].map { String($0.prefix(60)) }.flatMap { $0.isEmpty ? nil : $0 }
                 ?? NSLocalizedString("A client", comment: "model switch: unknown client")
             Task {
+                // Stopped before this got to ask: no one to ask for.
+                guard case .running = self.server.state else {
+                    connection.cancel()
+                    return
+                }
                 // Before beginRequest: waiting for the user isn't the model at work.
                 let allowed = await prompter.ask(target: targetPath ?? "", name: modelName ?? "", client: client)
                 if allowed {

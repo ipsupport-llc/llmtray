@@ -117,6 +117,10 @@ final class ModelSwitchPrompter: NSObject, ObservableObject {
                   // Answered or timed out while authorization was asked: nothing to show.
                   self.pending?.id == request.id else { return }
             try? await center.add(note)
+            // Answered while it was being added: taken back.
+            if self.pending?.id != request.id {
+                center.removeDeliveredNotifications(withIdentifiers: [request.id.uuidString])
+            }
         }
     }
 }
