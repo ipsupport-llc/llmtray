@@ -62,17 +62,11 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
         }
     }
 
-    /// klein's checkpoint isn't on HF yet: it's offered only where it's
-    /// already in place (a local test copy).
-    var isPublished: Bool { self != .klein4b }
-
     /// Where the checkpoint lives once downloaded.
     var localDir: String { RuntimePaths.externalRuntimeDir + "/mflux_models/\(rawValue)" }
 
-    /// The models the Settings pickers offer.
-    static var selectable: [ImageGenModel] {
-        allCases.filter { $0.isPublished || FileManager.default.fileExists(atPath: $0.localDir) }
-    }
+    /// The models the Settings pickers offer: all are published.
+    static var selectable: [ImageGenModel] { allCases }
 
     var isDownloaded: Bool { FileManager.default.fileExists(atPath: localDir) }
 

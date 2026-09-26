@@ -14,6 +14,12 @@ struct MessageBubble: View {
     var toolResults: [String: String]?
     /// Credits of the data this answer's tools used.
     var sources: [String] = []
+    /// Makes an image or piece of music of this message again; nil while
+    /// the chat is busy.
+    var regenerateMedia: ((ChatClient.MediaKind, Int) -> Void)?
+    /// The reasoning shown or folded away: nil = automatic (open while the
+    /// model thinks, folded once the answer starts).
+    @State private var reasoningExpanded: Bool?
 
     var body: some View {
         if message.isSummary {
@@ -45,14 +51,27 @@ struct MessageBubble: View {
                 .foregroundColor(.secondary)
 
             if showReasoning && !message.reasoning.isEmpty {
+                let expanded = reasoningExpanded ?? message.content.isEmpty
                 VStack(alignment: .leading, spacing: 3) {
-                    Label(message.content.isEmpty ? "Thinking…" : "Thought process", systemImage: "brain")
+                    Button {
+                        reasoningExpanded = !expanded
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: expanded ? "chevron.down" : "chevron.right").imageScale(.small)
+                            Label(message.content.isEmpty ? "Thinking…" : "Thought process", systemImage: "brain")
+                        }
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(.secondary)
-                    Text(ChatMarkdown.render(message.reasoning, baseSize: 11))
-                        .font(.system(size: 11).italic())
-                        .foregroundColor(.secondary)
-                        .textSelection(.enabled)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .help(expanded ? Text("Hide the reasoning") : Text("Show the reasoning"))
+                    if expanded {
+                        Text(ChatMarkdown.render(message.reasoning, baseSize: 11))
+                            .font(.system(size: 11).italic())
+                            .foregroundColor(.secondary)
+                            .textSelection(.enabled)
+                    }
                 }
                 .padding(8)
                 .background(Color.gray.opacity(0.06))
@@ -82,7 +101,8 @@ struct MessageBubble: View {
 
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
                 AudioClipView(data: data, id: "\(message.id.uuidString)-\(i)", prompt: message.audioPrompts[safe: i] ?? "",
-                              generationSeconds: message.audioDurations[safe: i])
+                              generationSeconds: message.audioDurations[safe: i],
+                              regenerate: canRegenerate(.music, i) ? { regenerateMedia?(.music, i) } : nil)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
             }
@@ -142,6 +162,14 @@ struct MessageBubble: View {
                         Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
                     }
                     .buttonStyle(.plain)
+                    if canRegenerate(.image, i) {
+                        Button { regenerateMedia?(.image, i) } label: {
+                            Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(regenerateMedia == nil)
+                        .help(Text("Make this image again (a new seed, the same request)"))
+                    }
                     if let seconds = message.imageDurations[safe: i] {
                         Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.system(size: 10))
                     }
@@ -154,6 +182,15 @@ struct MessageBubble: View {
     }
 
     static let generatedImageSide: CGFloat = 640
+
+    /// It came from a tool call that can run again (not an attachment, nor
+    /// one from before Regenerate existed).
+    private func canRegenerate(_ kind: ChatClient.MediaKind, _ i: Int) -> Bool {
+        switch kind {
+        case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(i)
+        case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(i)
+        }
+    }
 }
 
 /// Step progress and the live preview while an image is being generated.

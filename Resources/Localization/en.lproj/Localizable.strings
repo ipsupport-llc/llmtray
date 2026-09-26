@@ -26,6 +26,7 @@
 "Already open in another tab" = "Already open in another tab";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
+"Another chat is generating an image or music, or answering, right now -- try again once it's done." = "Another chat is generating an image or music, or answering, right now -- try again once it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
@@ -139,6 +140,7 @@
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Hide chats";
+"Hide the reasoning" = "Hide the reasoning";
 "High quality (larger canvas)" = "High quality (larger canvas)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Highest fidelity, largest download -- a correctness baseline you can trust.";
 "Hourly forecast" = "Hourly forecast";
@@ -180,6 +182,8 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Maintenance" = "Maintenance";
+"Make this image again (a new seed, the same request)" = "Make this image again (a new seed, the same request)";
+"Make this music again (a new seed, the same request)" = "Make this music again (a new seed, the same request)";
 "Manage Models…" = "Manage Models…";
 "Max tokens" = "Max tokens";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
@@ -327,6 +331,7 @@
 "Show reasoning" = "Show reasoning";
 "Show the profile files in Finder" = "Show the profile files in Finder";
 "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac" = "Show the profile files in Finder -- plain JSON, editable by hand, copyable to another Mac";
+"Show the reasoning" = "Show the reasoning";
 "Show tool calls" = "Show tool calls";
 "Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";

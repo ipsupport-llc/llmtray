@@ -249,7 +249,8 @@ struct ContentView: View {
                     // tool produced is attached to the assistant message
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
-                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [])
+                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
+                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index in regenerateMedia(msg.id, kind, index) } : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
@@ -296,16 +297,24 @@ struct ContentView: View {
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
             .onPreferenceChange(ChatBottomKey.self) { geometry in
-                let heightChanged = abs(geometry.height - lastChatGeometry.height) > 0.5
-                let moved = abs(geometry.bottom - lastChatGeometry.bottom) > 0.5
+                let grew = geometry.height - lastChatGeometry.height
+                // Content growing by h moves its bottom down by h; anything
+                // beyond that is the user scrolling (up: the bottom goes
+                // further down). Told apart this way even while tokens stream
+                // in -- comparing "moved, same height" missed every scroll
+                // that coincided with a token, so reading back was impossible.
+                let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 2
                 lastChatGeometry = geometry
-                if geometry.bottom <= chatViewportHeight + 40 {
-                    followChatBottom = true
-                } else if moved && !heightChanged {
-                    // The content didn't change size but moved: the user
-                    // scrolled up -- stop following at once, even while
-                    // tokens stream fast.
+                if scrolledUp, geometry.bottom > chatViewportHeight + 40 {
                     followChatBottom = false
+                } else if geometry.bottom <= chatViewportHeight + 40 {
+                    followChatBottom = true
+                }
+                // Anything that grows the chat at the end -- tokens, an image's
+                // progress and preview, the image or song itself -- keeps the
+                // end in view while the user follows it.
+                if followChatBottom, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
+                    DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
                 }
             }
             // Small for an empty chat, capped so a long one scrolls inside
@@ -341,6 +350,10 @@ struct ContentView: View {
     // Only with a meaningful middle to replace -- compactSession's own guard.
     private var canCompact: Bool {
         canChat && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+    }
+
+    private func regenerateMedia(_ messageID: UUID, _ kind: ChatClient.MediaKind, _ index: Int) {
+        chat.regenerateMedia(messageID: messageID, kind: kind, index: index, settings: chatSettings, server: server)
     }
 
     private func send() {
