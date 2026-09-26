@@ -159,12 +159,12 @@ Application Support/LLMTray/projects/<projectID>/
   index.sqlite (+ -wal, -shm)
 ```
 
-- `documents(doc, name, ext, sha256, bytes, added_at, status, pages,
+- `documents(doc, source, rev, name, ext, sha256, bytes, added_at, status, pages,
   error)`; `doc` a small integer. `status`: staged → extracting →
   searchable → embedded | failed | removing.
-- `pages(doc, page, text, tier, status, error)` — the raw extracted
+- `pages(doc, rev, page, text, tier, status, error)` — the raw extracted
   text: `read_project_file` quotes it; a failed page is retried from it.
-- `chunks(id, doc, page, ord, heading, body)` — `body` normalized (NFC,
+- `chunks(id, doc, rev, page, ord, heading, body)` — `body` normalized (NFC,
   ё→е, case; look-alike Latin/Cyrillic kept distinct) with the heading
   path as prefix; 300-500 tokens by structure, no overlap, a table its
   own chunk with its header row.
