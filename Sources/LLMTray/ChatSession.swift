@@ -32,9 +32,14 @@ struct PersistedMessage: Codable {
     var imagePrompts: [String]
     // See ChatMessage.sources.
     var sources: [String]
+    // Generated music, files beside the images (see ChatMessage.audios).
+    var audioFilenames: [String] = []
+    var audioPrompts: [String] = []
+    var audioDurations: [Double] = []
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
+        case audioFilenames, audioPrompts, audioDurations
     }
 
     init(
@@ -65,6 +70,9 @@ struct PersistedMessage: Codable {
         imageDurations = try c.decodeIfPresent([Double].self, forKey: .imageDurations) ?? []
         imagePrompts = try c.decodeIfPresent([String].self, forKey: .imagePrompts) ?? []
         sources = try c.decodeIfPresent([String].self, forKey: .sources) ?? []
+        audioFilenames = try c.decodeIfPresent([String].self, forKey: .audioFilenames) ?? []
+        audioPrompts = try c.decodeIfPresent([String].self, forKey: .audioPrompts) ?? []
+        audioDurations = try c.decodeIfPresent([Double].self, forKey: .audioDurations) ?? []
     }
 }
 

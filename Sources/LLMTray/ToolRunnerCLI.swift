@@ -10,6 +10,7 @@ enum ToolRunnerCLI {
             var settings = ChatSettings()
             settings.enabledTools = Set(ToolCatalog.entries.map(\.name))
             settings.enableImageGeneration = true
+            settings.enableMusicGeneration = true
             let out: [String: Any] = ["tools": ChatToolbox().definitions(for: settings), "tool_use_policy": Profile.defaultToolUsePolicy]
             if let data = try? JSONSerialization.data(withJSONObject: out, options: [.prettyPrinted, .sortedKeys]) {
                 print(String(decoding: data, as: UTF8.self))
@@ -28,7 +29,7 @@ enum ToolRunnerCLI {
             let call = ToolCall(id: "cli", name: name, argumentsJSON: json)
             switch await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: [])) {
             case .text(let text): print(text)
-            case .generatedImage(_, _, _, let text), .imageForModel(_, let text): print(text)
+            case .generatedImage(_, _, _, let text), .generatedAudio(_, _, _, let text), .imageForModel(_, let text): print(text)
             }
             exit(0)
         }

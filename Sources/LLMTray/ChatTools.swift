@@ -6,6 +6,8 @@ enum ToolResult {
     case text(String)
     /// A generated image, shown to the user, plus the tool result.
     case generatedImage(Data, seconds: Double, prompt: String, text: String)
+    /// Generated music (WAV), shown to the user as a player, plus the tool result.
+    case generatedAudio(Data, seconds: Double, prompt: String, text: String)
     /// An image put in front of the model (view_image): sent with the next
     /// request, in memory only -- neither shown as a chat bubble nor saved.
     case imageForModel(Data, text: String)
@@ -35,12 +37,16 @@ protocol ChatTool: AnyObject {
 @MainActor
 final class ChatToolbox {
     let imageGeneration: ImageToolRunner
+    let musicGeneration: MusicToolRunner
     private(set) var tools: [ChatTool] = []
 
-    /// `mflux`: the app's one image generator, shared by every chat tab.
-    init(mflux: MfluxManager? = nil) {
+    /// `mflux`, `music`: the app's one image and one music generator, shared
+    /// by every chat tab.
+    init(mflux: MfluxManager? = nil, music: MusicManager? = nil) {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
-        tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool()] + ToolCatalog.makeTools()
+        musicGeneration = MusicToolRunner(music: music ?? MusicManager())
+        tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
+            + ToolCatalog.makeTools()
     }
 
     func register(_ tool: ChatTool) {
@@ -55,15 +61,16 @@ final class ChatToolbox {
     /// A real new user turn (per-turn limits reset).
     func startTurn() {
         imageGeneration.startTurn()
+        musicGeneration.startTurn()
     }
 
     func run(_ call: ToolCall, context: ToolContext) async -> ToolResult {
         guard let tool = tools.first(where: { $0.name == call.name }) else {
             return .text("Unknown tool: \(call.name)")
         }
-        // generate_image and edit_image explain their own refusals (the model often keeps
+        // generate_image, edit_image and generate_music explain their own refusals (the model often keeps
         // calling it from history after it's turned off).
-        guard tool.isOffered(context.settings) || tool === imageGeneration || tool is EditImageTool else {
+        guard tool.isOffered(context.settings) || tool === imageGeneration || tool is EditImageTool || tool === musicGeneration else {
             return .text("The tool \(call.name) isn't available in this chat. Answer without it.")
         }
         return await tool.run(Self.parseArguments(call.argumentsJSON), context: context)

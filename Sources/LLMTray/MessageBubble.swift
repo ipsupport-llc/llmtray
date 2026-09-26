@@ -80,6 +80,13 @@ struct MessageBubble: View {
                 image(data, index: i)
             }
 
+            ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
+                AudioClipView(data: data, id: "\(message.id.uuidString)-\(i)", prompt: message.audioPrompts[safe: i] ?? "",
+                              generationSeconds: message.audioDurations[safe: i])
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 4)
+            }
+
             ForEach(sources, id: \.self) { source in
                 Text(verbatim: source)
                     .font(.system(size: 9))

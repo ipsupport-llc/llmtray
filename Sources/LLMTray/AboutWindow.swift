@@ -27,6 +27,8 @@ final class AboutLicenses: ObservableObject {
         // Image models live under their own names; their repo is known.
         let imageModels = ImageGenModel.allCases.map { (runtimeDir + "/mflux_models/" + $0.rawValue, $0.hfRepo) }
             .filter { FileManager.default.fileExists(atPath: $0.0) }
+        let musicModels = MusicManager.modelPaths.filter { FileManager.default.fileExists(atPath: $0.0) }
+        let musicVenv = MusicManager.venvDir
         let serverVenv = MLXRuntimeInstaller.venvDir
         scanning = true
         Task.detached(priority: .userInitiated) {
@@ -40,7 +42,8 @@ final class AboutLicenses: ObservableObject {
             // or a Thin install before, runs from here instead.
             venvGroup("server-runtime", "Server runtime (installed on this Mac)", serverVenv)
             venvGroup("image-runtime", "Image generation (installed on this Mac)", runtimeDir + "/mflux_venv")
-            let models = Self.modelEntries(modelPaths + imageModels)
+            venvGroup("music-runtime", "Music generation (installed on this Mac)", musicVenv)
+            let models = Self.modelEntries(modelPaths + imageModels + musicModels)
             if !models.isEmpty { live.append(LicenseCatalog.Group(id: "models", title: "Downloaded models", entries: models)) }
             await MainActor.run { [live] in
                 self.groups += live

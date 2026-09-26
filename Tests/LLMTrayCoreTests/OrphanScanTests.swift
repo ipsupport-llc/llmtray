@@ -28,6 +28,13 @@ final class OrphanScanTests: XCTestCase {
         ])
     }
 
+    func testOrphanedMusicRunner() {
+        let line = "  978     1 9000000 \(python) /Users/me/Library/Application Support/LLMTray/runtime/llmtray_music_runner.py --dit /m/ace-step-4bit --lm /m/ace-step-lm HF_HUB_OFFLINE=1 LLMTRAY_MUSIC_RUNNER=1"
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line).map(\.kind), [.musicRunner])
+        // The image marker on the music runner isn't enough (and vice versa).
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_MUSIC_RUNNER", with: "LLMTRAY_IMAGE_RUNNER")), [])
+    }
+
     func testRunningLLMTraysChildIsKept() {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: server(pid: 4312, ppid: 2592)), [])
     }

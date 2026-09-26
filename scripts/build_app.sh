@@ -63,6 +63,7 @@ cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
 cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
    "$REPO_ROOT/runtime/llmtray_mflux_runner.py" \
+   "$REPO_ROOT/runtime/llmtray_music_runner.py" \
    "$APP/Contents/Resources/runtime/"
 
 /usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$APP/Contents/Info.plist" 2>/dev/null || true

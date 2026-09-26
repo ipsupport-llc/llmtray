@@ -28,6 +28,14 @@ struct ChatMessage: Identifiable, Equatable {
     // alignment -- used to give the Save panel a filename derived from
     // what was actually asked for instead of a generic "image.png".
     var imagePrompts: [String] = []
+    // Generated music (16-bit WAV bytes), shown as players: in memory, and
+    // persisted like images (a temporary chat's never touch disk). Same
+    // index alignment for the three arrays after it.
+    var audios: [Data] = []
+    var audioPrompts: [String] = []
+    // Wall-clock seconds each took to generate.
+    var audioDurations: [Double] = []
+    var audioFilenames: [String] = []
     // Present on an assistant message that called one or more tools --
     // resent verbatim in the next request's message history, per the
     // OpenAI tool-calling protocol.
@@ -98,6 +106,7 @@ struct ChatSettings {
     var maxTokens: Int = 1024
     var systemPrompt: String = ""
     var enableImageGeneration: Bool = false
+    var enableMusicGeneration: Bool = false
     var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
     var imageGenModel: ImageGenModel = .gptqMixed
     /// The model edit_image uses; nil = no editing.
@@ -122,6 +131,7 @@ struct ChatSettings {
         self.maxTokensCap = maxTokensCap
         systemPrompt = p.systemPrompt
         enableImageGeneration = p.enableImageGeneration
+        enableMusicGeneration = p.enableMusicGeneration
         enabledTools = Set(p.enabledTools)
         imageGenModel = ImageGenModel(rawValue: p.imageGenModel) ?? .gptqMixed
         imageEditModel = ImageGenModel(rawValue: p.imageEditModel).flatMap { $0.supportsEditing ? $0 : nil }
