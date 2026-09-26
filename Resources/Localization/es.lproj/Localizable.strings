@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld descargas";
 "%lld-bit" = "%lld bits";
+"(Please attach the report file shown in Finder.)" = "(Adjunte el archivo de informe que se muestra en Finder.)";
 "(no result yet)" = "(aún no hay resultados)";
 "(no server output yet)" = "(aún no hay salida del servidor)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Una comprobación silenciosa en cada inicio. Solo muestra algo si hay una actualización.";
@@ -24,6 +25,7 @@
 "Air quality" = "Calidad del aire";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: el nombre «model» que otras herramientas envían a la API de LLMTray para obtener este modelo. Perfil: qué perfil de ajustes usa el modelo.";
 "Allow connections from the local network" = "Permitir conexiones desde la red local";
+"Already open in another tab" = "Ya está abierto en otra pestaña";
 "Also check when LLMTray starts" = "Comprobar también al iniciar LLMTray";
 "Another model already uses this alias." = "Otro modelo ya usa este alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Cualquier otra opción de mlx_lm.server, separadas por espacios, p. ej. --draft-model <ruta>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacta el chat automáticamente cuando supera este número de mensajes. El botón Compactar funciona siempre.";
 "Concurrent requests" = "Solicitudes simultáneas";
 "Copy" = "Copiar";
+"Couldn't create the report: %@" = "No se pudo crear el informe: %@";
 "Country facts" = "Datos del país";
+"Crash reports (%lld)" = "Informes de fallos (%lld)";
+"Create Email…" = "Crear correo…";
 "Currency rates" = "Tipos de cambio";
 "Current settings are already fastest" = "Los ajustes actuales ya son los más rápidos";
 "Date & time" = "Fecha y hora";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "La generación de imagen no está configurada: actívala de nuevo en Ajustes.";
 "Image generation needs an update -- turn it off and on again in Settings." = "La generación de imagen necesita una actualización: apágala y vuélvela a activar en Ajustes.";
 "Image model" = "Modelo de imágenes";
+"Include LLMTray crash reports from the last two weeks" = "Incluir informes de fallos de LLMTray de las últimas dos semanas";
+"Include the server log" = "Incluir el registro del servidor";
 "Installed" = "Instalado";
 "Installing mflux…" = "Instalando mflux…";
 "Its chats stay, back among the recents." = "Sus chats permanecen, volverán entre los recientes.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "Abrir en nueva pestaña";
 "Open in Window" = "Abrir en ventana";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Abrir en ventana: al cerrar la ventana, el chat vuelve a la barra de menús";
-"Open in another tab" = "Abrir en otra pestaña";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Abre un correo dirigido al equipo de LLMTray con el informe adjunto: versiones, el Mac, la configuración del modelo y del servidor, el registro del servidor e informes de fallos recientes. Tus chats nunca se incluyen y verás el informe completo antes.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Cambia el idioma solo para LLMTray, por encima del de macOS. Surte efecto al reiniciar LLMTray. El texto sin traducir se muestra en inglés.";
 "Past %lld messages" = "Más de %lld mensajes";
 "Pause download" = "Pausar descarga";
@@ -250,6 +257,8 @@
 "Rename" = "Renombrar";
 "Rename this profile" = "Renombrar este perfil";
 "Rename…" = "Renombrar…";
+"Report a Bug" = "Informar un fallo";
+"Report a Bug…" = "Informar un fallo…";
 "Rescan" = "Volver a buscar";
 "Rescan Models" = "Volver a buscar modelos";
 "Rescan or manage models" = "Volver a buscar o gestionar modelos";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "Mostrar ventana de chat";
 "Show Next Tab" = "Mostrar pestaña siguiente";
 "Show Previous Tab" = "Mostrar pestaña anterior";
+"Show in Finder" = "Mostrar en Finder";
 "Show model controls in the chat window" = "Mostrar controles del modelo en la ventana de chat";
 "Show more" = "Mostrar más";
 "Show only overrides" = "Solo modificados";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "Muestra la ventana de chat";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Muestra el razonamiento del modelo (el bloque plegable «Thought process») encima de su respuesta.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "El más pequeño y agresivo: puede desviar visiblemente la composición de una generación con algunos prompts.";
+"Something went wrong?" = "¿Algo salió mal?";
 "Sort by" = "Ordenar por";
 "Source on GitHub" = "Código fuente en GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "El espacio que ocupan los modelos en esta carpeta y lo que queda libre en el disco.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Detenido: el modelo siguió llamando a herramientas (%lld rondas en una sola iteración).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Detiene el modelo de chat mientras se genera una imagen y luego lo recarga. Ambos a la vez pueden superar la memoria de este Mac.";
 "Sunrise & sunset" = "Amanecer y atardecer";
+"Support" = "Soporte";
 "System" = "Del sistema";
 "System prompt" = "Prompt del sistema";
 "Tab %lld" = "Pestaña %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "El nombre de modelo que envían los clientes de la API.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Selector de modelo, Start/Stop, perfil, herramientas y temperatura encima del chat en su propia ventana. Desactivado: la ventana solo contiene los chats y la conversación; esos controles permanecen en la barra de menús.";
 "The model's license, from its card." = "La licencia del modelo, según su card.";
+"The report" = "El informe";
 "The running model server is stopped and started again." = "El servidor del modelo se detiene y se vuelve a iniciar.";
+"The server log" = "El registro del servidor";
 "These models go back to Default: %@." = "Estos modelos vuelven a Default: %@.";
 "Thinking…" = "Pensando…";
 "This many of the most recent messages are kept word for word when compacting." = "Estos mensajes más recientes se conservan tal cual al compactar.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "Carpeta de LM Studio";
 "Uses the internet" = "Usa Internet";
 "Verbose server logging" = "Registro detallado del servidor";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "El registro detallado del servidor estaba activado, por lo que el registro contiene tus chats: no se adjunta. Para incluirlo, desactiva el registro detallado en Ajustes › Server, reinicia el servidor y reproduce el problema.";
 "Version" = "Versión";
 "Version %@" = "Versión %@";
 "View model card" = "Ver la ficha del modelo";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Espera a que termine la solicitud o el benchmark en curso; un reinicio lo cortaría.";
 "Weather" = "Tiempo";
 "Web search" = "Búsqueda web";
+"What happened?" = "¿Qué ocurrió?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "Qué estabas haciendo, qué esperabas y qué viste en su lugar. Tus chats nunca se incluyen.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Dónde busca LLMTray los modelos MLX (una carpeta por modelo, p. ej. <org>/<name>). Usa ~/.lmstudio/models para compartir modelos con LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Qué cuantización de Z-Image-Turbo genera las imágenes.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Ayer";
 "You" = "Tú";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Tu app de correo no pudo aceptar el adjunto: el informe se muestra en Finder; adjúntalo al correo.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (recommended)";

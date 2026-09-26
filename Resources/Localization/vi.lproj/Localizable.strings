@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld lượt tải xuống";
 "%lld-bit" = "%lld bit";
+"(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
 "(no result yet)" = "(chưa có kết quả)";
 "(no server output yet)" = "(chưa có đầu ra từ máy chủ)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
@@ -24,6 +25,7 @@
 "Air quality" = "Chất lượng không khí";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Bí danh: tên “model” mà các công cụ khác gửi đến API của LLMTray để lấy mô hình này. Hồ sơ: hồ sơ cài đặt mà mô hình này sử dụng.";
 "Allow connections from the local network" = "Cho phép kết nối từ mạng cục bộ";
+"Already open in another tab" = "Đã mở ở tab khác";
 "Also check when LLMTray starts" = "Cũng kiểm tra khi LLMTray khởi động";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Bất kỳ cờ mlx_lm.server nào khác, phân tách bằng dấu cách, ví dụ --draft-model <path>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Tự động thu gọn cuộc trò chuyện khi vượt quá số tin nhắn này. Nút Thu gọn trong cuộc trò chuyện vẫn hoạt động trong mọi trường hợp.";
 "Concurrent requests" = "Yêu cầu đồng thời";
 "Copy" = "Sao chép";
+"Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
 "Country facts" = "Thông tin quốc gia";
+"Crash reports (%lld)" = "Báo cáo sự cố (%lld)";
+"Create Email…" = "Tạo Email…";
 "Currency rates" = "Tỷ giá tiền tệ";
 "Current settings are already fastest" = "Cài đặt hiện tại đã là nhanh nhất";
 "Date & time" = "Ngày & giờ";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image model" = "Mô hình hình ảnh";
+"Include LLMTray crash reports from the last two weeks" = "Bao gồm báo cáo sự cố LLMTray trong hai tuần gần đây";
+"Include the server log" = "Bao gồm nhật ký máy chủ";
 "Installed" = "Đã cài đặt";
 "Installing mflux…" = "Đang cài mflux…";
 "Its chats stay, back among the recents." = "Các trò chuyện vẫn được giữ, trở lại trong mục Gần đây.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "Mở trong tab mới";
 "Open in Window" = "Mở trong Cửa sổ";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Mở trong Cửa sổ — đóng cửa sổ sẽ đưa cuộc trò chuyện trở lại thanh menu";
-"Open in another tab" = "Mở trong tab khác";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Mở email đến nhóm LLMTray với báo cáo đính kèm: phiên bản, máy Mac, cài đặt mô hình và máy chủ, nhật ký máy chủ và báo cáo sự cố gần đây. Các cuộc trò chuyện của bạn không bao giờ được đính kèm, và bạn sẽ xem toàn bộ báo cáo trước.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
 "Past %lld messages" = "%lld tin nhắn trước đó";
 "Pause download" = "Tạm dừng tải xuống.";
@@ -250,6 +257,8 @@
 "Rename" = "Đổi tên";
 "Rename this profile" = "Đổi tên cấu hình này.";
 "Rename…" = "Đổi tên…";
+"Report a Bug" = "Báo cáo Lỗi";
+"Report a Bug…" = "Báo cáo Lỗi…";
 "Rescan" = "Quét lại";
 "Rescan Models" = "Quét lại mô hình";
 "Rescan or manage models" = "Quét lại hoặc quản lý mô hình";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "Hiển thị cửa sổ trò chuyện";
 "Show Next Tab" = "Hiện tab tiếp";
 "Show Previous Tab" = "Hiện tab trước";
+"Show in Finder" = "Hiện trong Finder";
 "Show model controls in the chat window" = "Hiện điều khiển mô hình trong cửa sổ trò chuyện";
 "Show more" = "Hiện thêm";
 "Show only overrides" = "Chỉ hiển thị mục ghi đè";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "Hiển thị cửa sổ trò chuyện";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Nhỏ nhất và quyết liệt nhất — có thể làm lệch bố cục tạo ảnh với một số prompt.";
+"Something went wrong?" = "Có gì đó sai?";
 "Sort by" = "Sắp xếp theo";
 "Source on GitHub" = "Mã nguồn trên GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Đã dừng: mô hình liên tục gọi công cụ (%lld vòng trong một lượt).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Dừng mô hình trò chuyện trong khi tạo hình ảnh, rồi tải lại sau đó. Chạy cả hai cùng lúc có thể vượt quá bộ nhớ của máy Mac này.";
 "Sunrise & sunset" = "Mặt trời mọc & lặn";
+"Support" = "Hỗ trợ";
 "System" = "Hệ thống";
 "System prompt" = "Lời nhắc hệ thống";
 "Tab %lld" = "Tab %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "Tên mô hình mà các máy khách API gửi.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Bộ chọn mô hình, Bắt đầu/Dừng, hồ sơ, công cụ và nhiệt độ hiển thị phía trên trò chuyện trong cửa sổ riêng. Tắt: cửa sổ chỉ có các cuộc trò chuyện và nội dung — các điều khiển đó vẫn ở thanh menu.";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
+"The report" = "Báo cáo";
 "The running model server is stopped and started again." = "Máy chủ mô hình đang chạy sẽ bị dừng rồi khởi động lại.";
+"The server log" = "Nhật ký máy chủ";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "Thinking…" = "Đang suy nghĩ…";
 "This many of the most recent messages are kept word for word when compacting." = "Khi nén, số tin nhắn gần đây nhất này được giữ nguyên từng chữ.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "Dùng thư mục của LM Studio";
 "Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ghi nhật ký chi tiết máy chủ đang bật, nên nhật ký chứa các cuộc trò chuyện của bạn: nó không được đính kèm. Để đính kèm, tắt ghi nhật ký chi tiết trong Settings › Server, khởi động lại máy chủ và tái tạo sự cố.";
 "Version" = "Phiên bản";
 "Version %@" = "Phiên bản %@";
 "View model card" = "Xem thẻ mô hình.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Hãy chờ yêu cầu hiện tại hoặc phép đo hiệu năng hoàn tất — việc khởi động lại sẽ làm gián đoạn.";
 "Weather" = "Thời tiết";
 "Web search" = "Tìm web";
+"What happened?" = "Chuyện gì đã xảy ra?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "Bạn đang làm gì, bạn mong đợi gì, và bạn thấy gì thay vì mong đợi. Các cuộc trò chuyện của bạn không bao giờ được đính kèm.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "Mức lượng tử hóa Z-Image-Turbo dùng để tạo hình ảnh.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Hôm qua";
 "You" = "Bạn";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Ứng dụng mail của bạn không thể nhận tệp đính kèm: báo cáo được hiển thị trong Finder, hãy đính kèm nó vào email.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";

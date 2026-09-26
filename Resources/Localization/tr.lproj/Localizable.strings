@@ -12,6 +12,7 @@
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld indirme";
 "%lld-bit" = "%lld bit";
+"(Please attach the report file shown in Finder.)" = "(Lütfen Finder’da gösterilen rapor dosyasını ekleyin.)";
 "(no result yet)" = "(henüz sonuç yok)";
 "(no server output yet)" = "(henüz sunucu çıktısı yok)";
 "A quiet check at every launch. Only shows anything if an update exists." = "Her başlatmada sessizce denetler. Yalnızca güncelleme varsa bir şey gösterir.";
@@ -24,6 +25,7 @@
 "Air quality" = "Hava kalitesi";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Takma ad: Diğer araçların bu modeli almak için LLMTray API’sine gönderdiği “model” adı. Profil: Bu modelin kullandığı ayarlar profili.";
 "Allow connections from the local network" = "Yerel ağdan bağlantılara izin ver";
+"Already open in another tab" = "Başka bir sekmede zaten açık";
 "Also check when LLMTray starts" = "LLMTray başlarken de denetle";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Diğer mlx_lm.server flag’leri; boşlukla ayrılmış, örn. --draft-model <path>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Sohbet bu sayıda mesajı aşınca otomatik olarak sıkıştırılır. Sohbetteki Sıkıştır düğmesi her durumda çalışır.";
 "Concurrent requests" = "Eşzamanlı istekler";
 "Copy" = "Kopyala";
+"Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
 "Country facts" = "Ülke bilgileri";
+"Crash reports (%lld)" = "Çökme raporları (%lld)";
+"Create Email…" = "E‑posta Oluştur…";
 "Currency rates" = "Döviz kurları";
 "Current settings are already fastest" = "Geçerli ayarlar zaten en hızlı";
 "Date & time" = "Tarih ve saat";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image model" = "Görüntü modeli";
+"Include LLMTray crash reports from the last two weeks" = "Son iki haftanın LLMTray çökme raporlarını ekle";
+"Include the server log" = "Sunucu kaydını ekle";
 "Installed" = "Yüklü";
 "Installing mflux…" = "mflux yükleniyor…";
 "Its chats stay, back among the recents." = "Sohbetleri kalır, son kullanılanlar arasına döner.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "Yeni Sekmede Aç";
 "Open in Window" = "Pencerede Aç";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Pencerede Aç — pencere kapatıldığında sohbet menü çubuğuna geri gider";
-"Open in another tab" = "Başka bir sekmede aç";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "LLMTray ekibine, ekli raporla bir e‑posta açar: sürümler, Mac, model ve sunucu ayarları, sunucu kaydı ve son çökme raporları. Sohbetleriniz asla eklenmez ve raporu önce tam olarak görürsünüz.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
 "Past %lld messages" = "Son %lld mesaj";
 "Pause download" = "İndirmeyi duraklatır.";
@@ -250,6 +257,8 @@
 "Rename" = "Yeniden Adlandır";
 "Rename this profile" = "Bu profilin adını değiştirin.";
 "Rename…" = "Yeniden Adlandır…";
+"Report a Bug" = "Hata Bildir";
+"Report a Bug…" = "Hata Bildir…";
 "Rescan" = "Yeniden Tara";
 "Rescan Models" = "Modelleri Yeniden Tara";
 "Rescan or manage models" = "Modelleri yeniden tara veya yönet";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "Sohbet Penceresini Göster";
 "Show Next Tab" = "Sonraki Sekmeyi Göster";
 "Show Previous Tab" = "Önceki Sekmeyi Göster";
+"Show in Finder" = "Finder’da Göster";
 "Show model controls in the chat window" = "Sohbet penceresinde model denetimlerini göster";
 "Show more" = "Daha fazla göster";
 "Show only overrides" = "Yalnızca geçersiz kılınanları göster";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "Sohbet penceresini gösterir";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "En küçük ve en agresif — bazı istemlerde oluşturulan görselin kompozisyonu belirgin şekilde kayabilir.";
+"Something went wrong?" = "Bir şey mi ters gitti?";
 "Sort by" = "Sıralama ölçütü";
 "Source on GitHub" = "Kaynak GitHub'da";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Durduruldu: model araçları çağırmaya devam etti (%lld tur bir çevrimde).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Görüntü oluşturulurken sohbet modelini durdurur ve ardından yeniden yükler. İkisi aynı anda bu Mac’in belleğini aşabilir.";
 "Sunrise & sunset" = "Gün doğumu ve batımı";
+"Support" = "Yardım";
 "System" = "Sistem";
 "System prompt" = "Sistem istemi";
 "Tab %lld" = "Sekme %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "API istemcilerinin gönderdiği model adı.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Model seçici, Başlat/Durdur, profil, araçlar ve sıcaklık sohbetin üzerinde kendi penceresinde. Kapalı: pencere yalnızca sohbetleri ve konuşmayı içerir — bu denetimler menü çubuğunda kalır.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
+"The report" = "Rapor";
 "The running model server is stopped and started again." = "Çalışan model sunucusu durdurulup yeniden başlatılır.";
+"The server log" = "Sunucu kaydı";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "Thinking…" = "Düşünüyor…";
 "This many of the most recent messages are kept word for word when compacting." = "Sıkıştırma sırasında en son iletilerden bu kadarı kelimesi kelimesine korunur.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "LM Studio’nun klasörünü kullan";
 "Uses the internet" = "İnterneti kullanır";
 "Verbose server logging" = "Ayrıntılı sunucu günlüklemesi";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ayrıntılı sunucu kaydı açıktı, bu yüzden kayıt sohbetlerinizi içerir: eklenmemiştir. Eklemek için Ayarlar › Server’da ayrıntılı kaydı kapatın, sunucuyu yeniden başlatın ve sorunu yeniden oluşturun.";
 "Version" = "Sürüm";
 "Version %@" = "Sürüm %@";
 "View model card" = "Model kartını görüntüle.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
 "Weather" = "Hava Durumu";
 "Web search" = "Web araması";
+"What happened?" = "Ne oldu?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "Ne yapıyordunuz, ne bekliyordunuz, bunun yerine ne gördünüz. Sohbetleriniz asla eklenmez.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which Z-Image-Turbo quantization generates the images." = "Görüntüleri hangi Z-Image-Turbo nicemlemesinin oluşturacağını belirler.";
 "Wikipedia" = "Vikipedi";
 "Yesterday" = "Dün";
 "You" = "Siz";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "E‑posta uygulamanız eki kabul edemedi: rapor Finder’da gösteriliyor, e‑postaya ekleyin.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ karışık (önerilen)";

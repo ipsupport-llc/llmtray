@@ -12,6 +12,7 @@
 "%lld MB" = "%lld מ״ב";
 "%lld downloads" = "%lld הורדות";
 "%lld-bit" = "%lld סיביות";
+"(Please attach the report file shown in Finder.)" = "(אנא צרפו את קובץ הדוח שמוצג ב‑Finder.)";
 "(no result yet)" = "(אין תוצאה עדיין)";
 "(no server output yet)" = "(עדיין אין פלט מהשרת)";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
@@ -24,6 +25,7 @@
 "Air quality" = "איכות אוויר";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "כינוי: שם ה־“model” שכלים אחרים שולחים ל־API של LLMTray כדי לקבל את המודל הזה. פרופיל: פרופיל ההגדרות שבו המודל הזה משתמש.";
 "Allow connections from the local network" = "אפשר חיבורים מהרשת המקומית";
+"Already open in another tab" = "כבר פתוח בכרטיסייה אחרת";
 "Also check when LLMTray starts" = "בדוק גם בעת הפעלת LLMTray";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "דגלי mlx_lm.server נוספים, מופרדים ברווחים, למשל --draft-model <path>.";
@@ -76,7 +78,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "דוחס את השיחה אוטומטית כשהיא עוברת מספר הודעות זה. כפתור הדחיסה בשיחה פועל בכל מקרה.";
 "Concurrent requests" = "בקשות בו־זמניות";
 "Copy" = "העתק";
+"Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
 "Country facts" = "עובדות על מדינות";
+"Crash reports (%lld)" = "דוחות קריסה (%lld)";
+"Create Email…" = "צור דוא״ל…";
 "Currency rates" = "שערי מטבע";
 "Current settings are already fastest" = "ההגדרות הנוכחיות כבר המהירות ביותר";
 "Date & time" = "תאריך ושעה";
@@ -143,6 +148,8 @@
 "Image generation isn't set up -- turn it on again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image model" = "מודל תמונה";
+"Include LLMTray crash reports from the last two weeks" = "כלול דוחות קריסה של LLMTray משבועיים אחרונים";
+"Include the server log" = "כלול את לוג השרת";
 "Installed" = "מותקן";
 "Installing mflux…" = "מתקין/ה mflux…";
 "Its chats stay, back among the recents." = "הצ'אטים נשארים, חוזרים לרשימת האחרונים.";
@@ -211,7 +218,7 @@
 "Open in New Tab" = "פתח בכרטיסייה חדשה";
 "Open in Window" = "פתח בחלון";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "פתח בחלון — סגירת החלון מחזירה את השיחה לשורת התפריט";
-"Open in another tab" = "פתח בכרטיסייה אחרת";
+"Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "פותח דוא״ל לצוות LLMTray עם דוח מצורף: גרסאות, ה‑Mac, הגדרות המודל והשרת, לוג השרת ודוחות קריסה אחרונים. השיחות שלך לא ייכללו, ותוכל לעיין בדוח כולו קודם.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "מחליף את שפת macOS עבור LLMTray בלבד. ייכנס לתוקף לאחר הפעלה מחדש של LLMTray. טקסט שלא תורגם יוצג באנגלית.";
 "Past %lld messages" = "%lld ההודעות האחרונות";
 "Pause download" = "משהה את ההורדה.";
@@ -250,6 +257,8 @@
 "Rename" = "שינוי שם";
 "Rename this profile" = "משנה את שם הפרופיל הזה.";
 "Rename…" = "שנה שם…";
+"Report a Bug" = "דווח על תקלה";
+"Report a Bug…" = "דווח על תקלה…";
 "Rescan" = "סרוק מחדש";
 "Rescan Models" = "סרוק מודלים מחדש";
 "Rescan or manage models" = "סריקה מחדש או ניהול דגמים.";
@@ -294,6 +303,7 @@
 "Show Chat Window" = "הצג חלון שיחה";
 "Show Next Tab" = "הצג כרטיסייה הבאה";
 "Show Previous Tab" = "הצג כרטיסייה הקודמת";
+"Show in Finder" = "הצג ב‑Finder";
 "Show model controls in the chat window" = "הצג בקרות מודל בחלון הצ'אט";
 "Show more" = "הצג עוד";
 "Show only overrides" = "הצגת עקיפות בלבד";
@@ -304,6 +314,7 @@
 "Shows the chat window" = "מציג את חלון הצ'אט";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "הכי קטן והכי אגרסיבי — עלול לשנות באופן ניכר את הרכבת התמונה בכמה קריאות.";
+"Something went wrong?" = "קרה משהו לא תקין?";
 "Sort by" = "מיון לפי";
 "Source on GitHub" = "מקור ב‑GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
@@ -326,6 +337,7 @@
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "נעצר: המודל המשיך לקרוא לכלים (%lld סבבים במהלך תור אחד).";
 "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "עוצר את מודל הצ׳אט בזמן שנוצרת תמונה, וטוען אותו מחדש לאחר מכן. הפעלה של שניהם יחד עלולה לחרוג מהזיכרון של ה‑Mac הזה.";
 "Sunrise & sunset" = "שקיעה וזריחה";
+"Support" = "תמיכה";
 "System" = "מערכת";
 "System prompt" = "הנחיית מערכת";
 "Tab %lld" = "כרטיסייה %lld";
@@ -345,7 +357,9 @@
 "The model name API clients send." = "זה שם המודל שלקוחות API שולחים.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "בורר המודל, Start/Stop, פרופיל, כלי וטמפרטורה מעל הצ'אט בחלון נפרד. כבוי: החלון מציג רק את השיחות והשיחה — הבקרות האלה נשארות בסרגל התפריט.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
+"The report" = "הדוח";
 "The running model server is stopped and started again." = "שרת המודלים הפועל ייעצר ויופעל מחדש.";
+"The server log" = "לוג השרת";
 "These models go back to Default: %@." = "המודלים האלה יוחזרו ל‑Default: %@.";
 "Thinking…" = "חושב…";
 "This many of the most recent messages are kept word for word when compacting." = "מספר זה של ההודעות האחרונות יישמר מילה במילה בעת דחיסה.";
@@ -374,17 +388,21 @@
 "Use LM Studio's folder" = "השתמש בתיקייה של LM Studio";
 "Uses the internet" = "משתמש באינטרנט";
 "Verbose server logging" = "רישום שרת מפורט";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "לוג מפורט של השרת היה מופעל, ולכן הלוג מכיל את השיחות שלך — הוא לא מצורף. כדי לכלול אותו, כבה את הלוג המפורט ב‑Settings › Server, הפעל מחדש את השרת ושחזר את הבעיה.";
 "Version" = "גרסה";
 "Version %@" = "גרסה %@";
 "View model card" = "הצג את כרטיס המודל.";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
 "Weather" = "מזג אוויר";
 "Web search" = "חיפוש באינטרנט";
+"What happened?" = "מה קרה?";
+"What you were doing, what you expected, what you saw instead. Your chats are never included." = "מה עשית, מה ציפית לקרות ומה ראית בפועל. השיחות שלך לא ייכללו.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which Z-Image-Turbo quantization generates the images." = "הקוונטיזציה של Z-Image-Turbo שמשמשת ליצירת התמונות.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "אתמול";
 "You" = "את/ה";
+"Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "אפליקציית המייל לא יכלה לטפל בקובץ המצורף: הדוח מוצג ב‑Finder — צרף אותו ידנית למייל.";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (מומלץ)";
