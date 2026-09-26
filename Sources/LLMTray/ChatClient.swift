@@ -549,8 +549,9 @@ final class ChatClient: ObservableObject {
         for m in messages.indices {
             for k in messages[m].imageSources.indices where messages[m].imageSources[k].tool == EditImageTool.toolName {
                 let arguments = ChatToolbox.parseArguments(messages[m].imageSources[k].arguments)
-                guard let pinned = arguments["index"] as? Int, pinned >= first,
-                      let data = try? JSONSerialization.data(withJSONObject: arguments.merging(["index": pinned + delta]) { $1 },
+                guard let pinned = arguments["index"] as? Int, pinned >= first || delta < 0 && pinned == first - 1,
+                      // The removed image itself: 0, nothing to edit any more (not made again).
+                      let data = try? JSONSerialization.data(withJSONObject: arguments.merging(["index": pinned >= first ? pinned + delta : 0]) { $1 },
                                                              options: [.sortedKeys])
                 else { continue }
                 messages[m].imageSources[k].arguments = String(decoding: data, as: UTF8.self)
@@ -561,7 +562,11 @@ final class ChatClient: ObservableObject {
     /// The image or piece of music can be made again (it has its source).
     func canRegenerateMedia(_ message: ChatMessage, _ kind: MediaKind, _ index: Int) -> Bool {
         switch kind {
-        case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(index)
+        case .image:
+            guard message.imageSources.count == message.images.count, message.imageSources.indices.contains(index) else { return false }
+            let source = message.imageSources[index]
+            // An edit of an image since removed.
+            return source.tool != EditImageTool.toolName || ChatToolbox.parseArguments(source.arguments)["index"] as? Int != 0
         case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(index)
         }
     }
