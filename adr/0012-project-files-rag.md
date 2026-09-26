@@ -26,12 +26,16 @@ chat of the project, reached by the chat model through tools.
   document prefixes, max length and dimension; adding a model is adding
   an entry. A project picks its embedder once, at creation; the index
   records it, and a change re-embeds in the background while the old
-  vectors keep answering. Candidates, decided on the user's documents
-  (Plan, step 2): bge-m3 (MIT, 568M, 8k context, strong on Russian — the
-  provisional default), USER-bge-m3 (bge-m3 tuned for Russian), Snowflake
-  arctic-embed-l-v2.0 (Apache-2.0), multilingual-e5-large-instruct (MIT,
-  512-token limit), EmbeddingGemma-300m. Licences and MLX support of the
-  two not in the research yet are checked first.
+  vectors keep answering.
+- **The default embedder is bge-m3** (the user's choice): MIT, 568M
+  (XLM-RoBERTa), 8k-token context, 1024 dimensions, CLS pooling,
+  normalized, no query/document prefixes; RuBQ retrieval 71.2 against
+  mE5-large-instruct 69.2 and EmbeddingGemma 69.7; MLX conversions exist
+  (mlx-community). No MRL: vectors stay 1024-d, ~400 MB f16 at 200k
+  chunks. Its sparse and multi-vector outputs are not used in v1 — FTS5
+  covers the lexical side. Other registry entries (USER-bge-m3, tuned
+  for Russian; arctic-embed-l-v2.0; multilingual-e5-large-instruct;
+  EmbeddingGemma-300m) stay possible per project.
 - **Scale**: 1-2k documents, up to ~200k chunks per project, without a
   vector index — 200k × 1024 is ~16 ms per query in f32 (~4 ms with the
   multi-core f16 kernel); vectors kept f16 in memory (~400 MB) or at a
@@ -252,12 +256,14 @@ contextual-retrieval.
 1. **Spike (throwaway).** Schema, triggers, both FTS tables on a few
    hundred chunks; `--extract` on hostile samples (corrupt PDF, zip-bomb
    docx, remote-loading HTML); injection documents against the tools;
-   the generic embed runner with two registry entries (bge-m3 and one
-   other family) on MLX, matching reference vectors.
+   the generic embed runner with bge-m3 on MLX, matching the reference
+   (FlagEmbedding / sentence-transformers) vectors, plus a second
+   registry entry of another family to prove the registry isn't bge-only.
 2. **Eval on extracted text.** The user's 20-30 real documents through
    tier 1 (and the tier-2 prototype); 40-60 questions with the answering
-   page; recall@10 and MRR for lexical vs hybrid with each candidate
-   embedder; CER per tier. Decides the default embedder.
+   page; recall@10 and MRR, lexical vs hybrid with bge-m3 (and
+   USER-bge-m3 beside it); CER per tier. Sets the fusion weights, the
+   chunk size and the recall target for v1a.
 3. **v1a — hybrid, safe, usable.** The embed runner and registry, the
    ML policy, `ProjectIndex` and the registry,
    ingestion and reconcile, tier 1 with the junk check, `--extract`,
