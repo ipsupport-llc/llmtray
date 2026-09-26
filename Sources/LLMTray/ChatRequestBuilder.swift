@@ -9,6 +9,7 @@ enum ChatRequestBuilder {
         port: Int, modelAlias: String, settings: ChatSettings,
         history: [ChatMessage], tools: [[String: Any]]
     ) -> URLRequest? {
+        let history = withoutEarlierRefusals(history)
         // An image a tool put in front of the model goes with the request
         // right after it only -- not again with every later one.
         let lastIndex = history.indices.last
@@ -46,6 +47,28 @@ enum ChatRequestBuilder {
             body["tools"] = tools
         }
         return request(port: port, body: body)
+    }
+
+    /// The history without refused tool calls of earlier turns (the call
+    /// and its "not run" result): in the turn they happened the model needs
+    /// them, later they only read as "the image wasn't made". The current
+    /// turn -- after the user's last message -- is kept whole.
+    static func withoutEarlierRefusals(_ history: [ChatMessage]) -> [ChatMessage] {
+        guard let turnStart = history.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) else { return history }
+        let refused = Set(history[..<turnStart].compactMap { $0.isRefusal ? $0.toolCallID : nil })
+        guard !refused.isEmpty else { return history }
+        var out: [ChatMessage] = []
+        for (i, message) in history.enumerated() {
+            guard i < turnStart else { out.append(message); continue }
+            if message.role == "tool", let id = message.toolCallID, refused.contains(id) { continue }
+            var kept = message
+            kept.toolCalls.removeAll { refused.contains($0.id) }
+            // A message that was only those calls.
+            if kept.role == "assistant", kept.toolCalls.isEmpty, !message.toolCalls.isEmpty,
+               kept.content.isEmpty, kept.images.isEmpty, kept.audios.isEmpty { continue }
+            out.append(kept)
+        }
+        return out
     }
 
     /// A one-shot (non-streaming) request, e.g. for a compaction summary.

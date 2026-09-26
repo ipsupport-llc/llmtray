@@ -63,6 +63,9 @@ struct ChatMessage: Identifiable, Equatable {
     // A message the app adds for the model only -- an image view_image put
     // in front of it. Not shown as a bubble, not saved with the session.
     var isToolContext: Bool = false
+    // A "tool" result refusing a call (see ToolResult.refused): left out of
+    // the history of later turns. Not saved (tool messages never are).
+    var isRefusal: Bool = false
     // Credits of the data an answer's tools used (their results' "source",
     // e.g. ExchangeRate-API's required one). Saved with the session, where
     // the tool messages they come from aren't.

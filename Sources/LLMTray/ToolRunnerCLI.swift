@@ -28,7 +28,7 @@ enum ToolRunnerCLI {
             settings.enabledTools = Set(ToolCatalog.entries.map(\.name))
             let call = ToolCall(id: "cli", name: name, argumentsJSON: json)
             switch await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: [])) {
-            case .text(let text): print(text)
+            case .text(let text), .refused(let text): print(text)
             case .generatedImage(_, _, _, let text), .generatedAudio(_, _, _, let text), .imageForModel(_, let text): print(text)
             }
             exit(0)

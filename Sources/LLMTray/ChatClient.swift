@@ -32,6 +32,9 @@ final class ChatClient: ObservableObject {
     @Published private(set) var musicStatusText: String = ""
     @Published private(set) var musicProgress: Int?
     enum MediaKind { case image, music }
+    /// Waiting in the app-wide generator queue: how many are ahead (the
+    /// running one included); nil once it runs.
+    @Published private(set) var mediaQueuePosition: Int?
     /// What isGeneratingMedia is making (the progress view shown).
     @Published private(set) var generatingKind: MediaKind?
     // True only during the explicit, Settings-initiated warm-up download
@@ -70,15 +73,9 @@ final class ChatClient: ObservableObject {
     var isBusy: Bool { isTurnInProgress || isCompacting }
 
     private let toolbox: ChatToolbox
-    /// Another chat tab is running a turn (ChatTabs): image generation then
-    /// doesn't unload the model under it.
-    var isAnotherChatBusy: () -> Bool = { false }
     /// Another tab is unloading the model for an image, or has it unloaded
     /// (ChatTabs): an answer waits for it to come back.
     var isAnotherChatUnloadingModel: () -> Bool = { false }
-    /// Another tab has claimed a generator round (it may still be unloading
-    /// the model, before the generator itself is busy).
-    var isAnotherChatGeneratingMedia: () -> Bool = { false }
     /// This chat unloads the model for an image and reloads it after:
     /// announced before the unload, so other tabs wait from the start.
     @Published private(set) var isUnloadingModelForMedia = false
@@ -508,6 +505,24 @@ final class ChatClient: ObservableObject {
 
     var isMusicModelReady: Bool { musicManager.isReady }
 
+    /// A model download from Settings (not in the queue) holds the image or
+    /// music generator: a granted turn waits for it rather than unloading
+    /// the chat model for a "busy" error.
+    private func waitWhileGeneratorsBusy(_ stillCurrent: () -> Bool) async {
+        while (mfluxManager.isBusy || musicManager.isBusy), stillCurrent() {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+    }
+
+    /// This turn (since the user's last message) has shown something: an
+    /// answer, an image, a song.
+    private var turnProducedSomething: Bool {
+        guard let start = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) else { return false }
+        return messages[(start + 1)...].contains {
+            $0.role == "assistant" && (!$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !$0.images.isEmpty || !$0.audios.isEmpty)
+        }
+    }
+
     /// A call's arguments as Regenerate should run them again: edit_image's
     /// "latest image" pinned to the image it meant then (the result itself
     /// is the latest one afterwards).
@@ -536,11 +551,6 @@ final class ChatClient: ObservableObject {
               canRegenerateMedia(messages[i], kind, index) else { return }
         let source = kind == .image ? messages[i].imageSources[index] : messages[i].audioSources[index]
         let settings = currentSettings(baseSettings)
-        if mfluxManager.isBusy || musicManager.isBusy || isAnotherChatGeneratingMedia()
-            || (settings.unloadModelDuringImageGen && isAnotherChatBusy()) {
-            errorText = NSLocalizedString("Another chat is generating an image or music, or answering, right now -- try again once it's done.", comment: "")
-            return
-        }
         AudioPlayback.shared.stop(ifAnyOf: [messages[i]])
         errorText = nil
         // The per-turn limits don't apply: nothing else is made meanwhile.
@@ -565,10 +575,26 @@ final class ChatClient: ObservableObject {
                 if runs {
                     isGeneratingMedia = false
                     generatingKind = nil
+                    mediaQueuePosition = nil
                 }
                 isUnloadingModelForMedia = false
                 if token == turnToken { isRunningTools = false }
             }
+            // Its turn in the app-wide queue, like a chat's own generation.
+            var ticket: GenerationQueue.Ticket?
+            if runs {
+                do {
+                    ticket = try await GenerationQueue.shared.acquire(
+                        isCancelled: { !stillCurrent() },
+                        onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
+                    )
+                    await waitWhileGeneratorsBusy(stillCurrent)
+                } catch {
+                    return
+                }
+            }
+            defer { ticket?.release() }
+            guard stillCurrent() else { return }
             let unload = runs && settings.unloadModelDuringImageGen
             if unload {
                 isUnloadingModelForMedia = true
@@ -783,9 +809,15 @@ final class ChatClient: ObservableObject {
         // model repeating them from history): refused, the turn ends.
         if toolRoundsThisTurn >= maxToolRoundsPerTurn {
             for call in toolCalls {
-                messages.append(ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id))
+                var refusal = ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id)
+                refusal.isRefusal = true
+                messages.append(refusal)
             }
-            errorText = String(format: NSLocalizedString("Stopped: the model kept calling tools (%lld rounds in one turn).", comment: ""), maxToolRoundsPerTurn)
+            // Only when the turn gave the user nothing: calls repeated after
+            // the image, song or answer was already there are just dropped.
+            if !turnProducedSomething {
+                errorText = String(format: NSLocalizedString("Stopped: the model kept calling tools (%lld rounds in one turn).", comment: ""), maxToolRoundsPerTurn)
+            }
             isRunningTools = false
             isStreaming = false
             persistCurrentSession()
@@ -801,16 +833,40 @@ final class ChatClient: ObservableObject {
         let images = chatImages
         let wantsImage = imageTool.willGenerate(toolCalls, settings: settings, chatImages: images)
         let wantsMusic = musicTool.willGenerate(toolCalls, settings: settings) && musicManager.isReady
-        let imageBlocked = (wantsImage || wantsMusic)
-            && (mfluxManager.isBusy || musicManager.isBusy || isAnotherChatGeneratingMedia()
-                || (settings.unloadModelDuringImageGen && isAnotherChatBusy()))
-        let willActuallyGenerate = (wantsImage || wantsMusic) && !imageBlocked
+        let willActuallyGenerate = wantsImage || wantsMusic
         // Only when a generator will actually run -- a refused call
         // shouldn't flash the "Generating…" UI / pulse.
         isGeneratingMedia = willActuallyGenerate
         generatingKind = willActuallyGenerate ? (wantsMusic && !wantsImage ? .music : .image) : nil
         isStreaming = false
-        defer { isGeneratingMedia = false; generatingKind = nil }
+        defer { isGeneratingMedia = false; generatingKind = nil; mediaQueuePosition = nil }
+
+        // One generator at a time, app-wide: another chat's image or song
+        // first, then this one (waiting shows in the chat), rather than a
+        // refusal. Stop or leaving the chat takes it out of the queue.
+        var ticket: GenerationQueue.Ticket?
+        if willActuallyGenerate {
+            do {
+                ticket = try await GenerationQueue.shared.acquire(
+                    isCancelled: { !stillCurrent() },
+                    onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
+                )
+                // A Settings download holds a generator too: its turn waits for that.
+                await waitWhileGeneratorsBusy(stillCurrent)
+            } catch {
+                return   // Stop / another chat: cancel() and the reset tidy up
+            }
+            // Before the release's defer below: handed back here, or the
+            // queue would stay taken for good.
+            guard stillCurrent() else {
+                ticket?.release()
+                return
+            }
+        }
+        // After the model's reload below (defers run last-in first-out, and
+        // this one is declared before the reload's code runs): the next in
+        // line starts from a loaded model, as it expects.
+        defer { ticket?.release() }
 
         // A diffusion model's own peak memory can rival or exceed a loaded
         // chat model's (Z-Image Turbo alone peaked near 25 GB on a 24 GB
@@ -826,14 +882,6 @@ final class ChatClient: ObservableObject {
         var pendingModelImages: [Data] = []
         for (i, call) in toolCalls.enumerated() {
             guard stillCurrent() else { break }
-            if imageBlocked, ImageToolRunner.runsGenerator(call.name, settings) || call.name == MusicToolRunner.toolName {
-                messages.append(ChatMessage(
-                    role: "tool",
-                    content: "Not run: another chat is generating an image or music, or answering with the model, right now. Tell the user to ask again once it's done.",
-                    toolCallID: call.id
-                ))
-                continue
-            }
             guard i < maxToolCallsPerRound else {
                 messages.append(ChatMessage(
                     role: "tool", content: "Not run: at most \(maxToolCallsPerRound) tool calls per response.",
@@ -853,6 +901,10 @@ final class ChatClient: ObservableObject {
             switch result {
             case .text(let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .refused(let text):
+                var refusal = ChatMessage(role: "tool", content: text, toolCallID: call.id)
+                refusal.isRefusal = true
+                messages.append(refusal)
             case .imageForModel(let data, let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
                 pendingModelImages.append(data)

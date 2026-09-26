@@ -4,6 +4,11 @@ import Foundation
 enum ToolResult {
     /// Only a tool result for the model (an answer, a refusal, an error).
     case text(String)
+    /// A call refused because this turn already had what it asks for (one
+    /// image per request, say): shown to the model in this turn, left out
+    /// of later turns' history -- read back there, "it refused" made small
+    /// models think the image was never made, and call the tool in a loop.
+    case refused(String)
     /// A generated image, shown to the user, plus the tool result.
     case generatedImage(Data, seconds: Double, prompt: String, text: String)
     /// Generated music (WAV), shown to the user as a player, plus the tool result.
@@ -53,9 +58,16 @@ final class ChatToolbox {
         tools.append(tool)
     }
 
-    /// Declarations for the request's `tools`.
+    /// Declarations for the request's `tools`: not the generators this turn
+    /// has used up (a small model otherwise calls one again after its
+    /// result, in a loop, until the round limit).
     func definitions(for settings: ChatSettings) -> [[String: Any]] {
-        tools.filter { $0.isOffered(settings) }.map(\.definition)
+        var spent: Set<String> = []
+        if imageGeneration.imagesThisTurn >= imageGeneration.maxImagesPerTurn {
+            spent.formUnion([ImageToolRunner.toolName, EditImageTool.toolName])
+        }
+        if musicGeneration.songsThisTurn >= musicGeneration.maxSongsPerTurn { spent.insert(MusicToolRunner.toolName) }
+        return tools.filter { $0.isOffered(settings) && !spent.contains($0.name) }.map(\.definition)
     }
 
     /// A real new user turn (per-turn limits reset).
