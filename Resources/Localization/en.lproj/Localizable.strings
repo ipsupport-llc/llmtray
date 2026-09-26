@@ -17,8 +17,8 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
-"ACE-Step sft — clear vocals, 8-bit" = "ACE-Step sft — clear vocals, 8-bit";
-"ACE-Step sft — clear vocals, GPTQ 4-bit" = "ACE-Step sft — clear vocals, GPTQ 4-bit";
+"ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — clear vocals, 8-bit (recommended)";
+"ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
 "About LLMTray" = "About LLMTray";

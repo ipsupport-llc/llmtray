@@ -6,9 +6,11 @@ import LLMTrayCore
 /// sounds fuller and more finished; sft sings the lyrics far more clearly
 /// (Whisper WER 0.22 vs 0.56) with the voice more upfront.
 enum MusicModel: String, CaseIterable, Identifiable, Codable {
+    // In the order offered: 8-bit first (by ear the same as full
+    // precision), GPTQ 4-bit for a Mac short of memory.
     case turbo
-    case sftGPTQ4
     case sft8bit
+    case sftGPTQ4
     case sftBF16
 
     var id: String { rawValue }
@@ -16,8 +18,8 @@ enum MusicModel: String, CaseIterable, Identifiable, Codable {
     var displayName: String {
         switch self {
         case .turbo: return NSLocalizedString("ACE-Step turbo — fuller sound", comment: "")
-        case .sftGPTQ4: return NSLocalizedString("ACE-Step sft — clear vocals, GPTQ 4-bit", comment: "")
-        case .sft8bit: return NSLocalizedString("ACE-Step sft — clear vocals, 8-bit", comment: "")
+        case .sftGPTQ4: return NSLocalizedString("ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)", comment: "")
+        case .sft8bit: return NSLocalizedString("ACE-Step sft — clear vocals, 8-bit (recommended)", comment: "")
         case .sftBF16: return NSLocalizedString("ACE-Step sft — clear vocals, full precision", comment: "")
         }
     }
