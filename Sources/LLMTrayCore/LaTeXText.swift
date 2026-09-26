@@ -263,8 +263,8 @@ public enum MathSpans {
     private static let balancedDisplay = try? NSRegularExpression(pattern: #"\$\$[^$]+?\$\$"#)
 
     /// Money only where it can't open a span: right after another `$`
-    /// (`$$1.10 ...$`: the first opens, the second is money) or after `{` /
-    /// `(` (`\mathbf{$3.66}`). A `$` + digit elsewhere may open math
+    /// (`$$1.10 ...$`: the first opens, the second is money) or after `{`
+    /// (`\mathbf{$3.66}`) -- not after "(", which opens math: `($2^n$)`. A `$` + digit elsewhere may open math
     /// (`$2^n$`, `$10^{-3}$`) and is left to the span rules.
     static func hideMoney(_ text: String) -> String {
         guard text.contains("$") else { return text }
@@ -283,7 +283,7 @@ public enum MathSpans {
             }
             let next = text.index(after: i)
             let previous: Character? = i > text.startIndex ? text[text.index(before: i)] : nil
-            if text[i] == "$", let previous, "${(".contains(previous), next < text.endIndex, text[next].isNumber {
+            if text[i] == "$", let previous, "${".contains(previous), next < text.endIndex, text[next].isNumber {
                 out.append(money)
             } else {
                 out.append(text[i])

@@ -451,6 +451,21 @@ final class ChatClient: ObservableObject {
         usageCompletionTokens = nil
         lastTokensPerSecond = nil
         isStreaming = true
+        // Another tab unloaded the model for an image: this answer waits for
+        // it to come back (the server refuses requests meanwhile) instead
+        // of failing. Stop / leaving the chat ends the wait.
+        guard server.suspendedForImageGeneration else { return startStream(request) }
+        let token = turnToken, epoch = conversationEpoch
+        Task { [weak self] in
+            while let self, server.suspendedForImageGeneration, token == self.turnToken, epoch == self.conversationEpoch {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+            }
+            guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
+            self.startStream(request)
+        }
+    }
+
+    private func startStream(_ request: URLRequest) {
         transport.stream(request, onText: { [weak self] text in
             self?.handle(self?.decoder.feed(text) ?? [])
         }, onComplete: { [weak self] completion in

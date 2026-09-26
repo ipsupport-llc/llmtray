@@ -254,7 +254,7 @@ struct ContentView: View {
                             .id(msg.id)
                     }
                     if chat.isGeneratingImage {
-                        ImageGenerationProgressView()
+                        ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
                     }
                     if let err = chat.errorText {
                         Text(err)

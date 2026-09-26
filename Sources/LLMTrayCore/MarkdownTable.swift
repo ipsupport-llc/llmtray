@@ -44,13 +44,18 @@ public struct MarkdownTable: Equatable {
         var cells: [String] = []
         var current = ""
         var escaped = false
+        var inCode = false
         for ch in body {
             if escaped {
                 current.append(ch == "|" ? "|" : "\\\(ch)")
                 escaped = false
             } else if ch == "\\" {
                 escaped = true
-            } else if ch == "|" {
+            } else if ch == "`" {
+                // A pipe inside `code` is part of the cell, as in GFM.
+                inCode.toggle()
+                current.append(ch)
+            } else if ch == "|", !inCode {
                 cells.append(current.trimmingCharacters(in: .whitespaces))
                 current = ""
             } else {
