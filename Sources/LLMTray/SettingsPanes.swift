@@ -466,9 +466,18 @@ struct ProfilesPane: View {
                 row(\.tools.enableImageGeneration, "Enable image generation", "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.") {
                     Toggle("", isOn: enableImageGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
                 }
-                row(\.tools.imageGenModel, "Image model", "Which Z-Image-Turbo quantization generates the images.") {
+                row(\.tools.imageGenModel, "Image model", "Which model generates new images.") {
                     Picker("", selection: imageGenModelBinding) {
-                        ForEach(ImageGenModel.allCases) { Text($0.displayName).tag($0) }
+                        ForEach(ImageGenModel.selectable + (ImageGenModel.selectable.contains(imageGenModel) ? [] : [imageGenModel])) {
+                            Text($0.displayName).tag($0)
+                        }
+                    }
+                    .labelsHidden().disabled(chat.isDownloadingModel)
+                }
+                row(\.tools.imageEditModel, "Image editing", "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.") {
+                    Picker("", selection: imageEditModelBinding) {
+                        Text("Off").tag(ImageGenModel?.none)
+                        ForEach(ImageGenModel.selectable.filter(\.supportsEditing)) { Text($0.displayName).tag(Optional($0)) }
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
@@ -614,6 +623,27 @@ struct ProfilesPane: View {
         )
     }
 
+    private var imageEditModelBinding: Binding<ImageGenModel?> {
+        Binding(
+            get: { ImageGenModel(rawValue: profiles.value(\.tools.imageEditModel, profileID: selectedID)).flatMap { $0.supportsEditing ? $0 : nil } },
+            set: { newModel in
+                guard let newModel else {
+                    profiles.set(\.tools.imageEditModel, "", profileID: selectedID)
+                    return
+                }
+                // Downloaded first, like the generation model: an edit
+                // mustn't stall on a multi-GB download mid-chat.
+                guard !newModel.isDownloaded else {
+                    profiles.set(\.tools.imageEditModel, newModel.rawValue, profileID: selectedID)
+                    return
+                }
+                confirmAndDownload(newModel, title: NSLocalizedString("Enable image editing?", comment: "")) { id in
+                    profiles.set(\.tools.imageEditModel, newModel.rawValue, profileID: id)
+                }
+            }
+        )
+    }
+
     private var imageQualityBinding: Binding<ImageQuality> {
         Binding(
             get: { ImageQuality(rawValue: profiles.value(\.tools.imageQuality, profileID: selectedID)) ?? .balanced },
@@ -633,10 +663,17 @@ struct ProfilesPane: View {
     /// Downloads the image model (if not cached yet) before enabling -- tens
     /// of GB, better with visible progress now than a stalled chat later.
     private func confirmAndDownloadImageModel() {
+        confirmAndDownload(imageGenModel, title: NSLocalizedString("Enable image generation?", comment: "")) { id in
+            profiles.set(\.tools.enableImageGeneration, true, profileID: id)
+        }
+    }
+
+    /// `then`: with the profile the choice was made for, once the model is
+    /// in place.
+    private func confirmAndDownload(_ model: ImageGenModel, title: String, then: @escaping (String) -> Void) {
         guard !chat.isDownloadingModel else { return }
-        let model = imageGenModel
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Enable image generation?", comment: "")
+        alert.messageText = title
         alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), model.displayName, model.approximateDownloadDescription)
         alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
@@ -647,7 +684,7 @@ struct ProfilesPane: View {
             if let error = await chat.downloadImageModel(model) {
                 imageModelDownloadError = error.localizedDescription
             } else {
-                profiles.set(\.tools.enableImageGeneration, true, profileID: id)
+                then(id)
             }
         }
     }

@@ -64,6 +64,9 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         public var enabledTools: [String]?
         /// `ImageGenModel` raw value.
         public var imageGenModel: String?
+        /// `ImageGenModel` raw value of the model edit_image uses; "" = no
+        /// editing.
+        public var imageEditModel: String?
         /// `ImageQuality` raw value.
         public var imageQuality: String?
         public var unloadModelDuringImageGen: Bool?
@@ -137,6 +140,7 @@ extension Profile {
         p.tools.enableImageGeneration = false
         p.tools.enabledTools = defaultEnabledTools
         p.tools.imageGenModel = "gptqMixed"
+        p.tools.imageEditModel = ""
         p.tools.imageQuality = "balanced"
         p.tools.unloadModelDuringImageGen = true
         p.tools.toolUsePolicy = defaultToolUsePolicy
@@ -193,6 +197,7 @@ public enum ProfileResolver {
             enableImageGeneration: v(\.tools.enableImageGeneration),
             enabledTools: v(\.tools.enabledTools),
             imageGenModel: v(\.tools.imageGenModel),
+            imageEditModel: v(\.tools.imageEditModel),
             imageQuality: v(\.tools.imageQuality),
             unloadModelDuringImageGen: v(\.tools.unloadModelDuringImageGen),
             toolUsePolicy: v(\.tools.toolUsePolicy),
@@ -220,6 +225,7 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var enableImageGeneration: Bool
     public var enabledTools: [String]
     public var imageGenModel: String
+    public var imageEditModel: String
     public var imageQuality: String
     public var unloadModelDuringImageGen: Bool
     public var toolUsePolicy: String
@@ -263,6 +269,7 @@ extension Profile {
         ProfileField("enableImageGeneration", \.tools.enableImageGeneration),
         ProfileField("enabledTools", \.tools.enabledTools),
         ProfileField("imageGenModel", \.tools.imageGenModel),
+        ProfileField("imageEditModel", \.tools.imageEditModel),
         ProfileField("imageQuality", \.tools.imageQuality),
         ProfileField("unloadModelDuringImageGen", \.tools.unloadModelDuringImageGen),
         ProfileField("toolUsePolicy", \.tools.toolUsePolicy),
