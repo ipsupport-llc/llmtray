@@ -17,5 +17,6 @@ here; this is where the history lives.
 | [0009](0009-media-generators.md) | Image and music generators: Python runners, the queue, the proxy's wait |
 | [0010](0010-music-ace-step.md) | Music: ACE-Step 1.5 turbo and sft on MLX |
 | [0011](0011-creator-mode-and-media-variants.md) | Creator mode, Regenerate / Tweak / Remove, media sources |
+| [0012](0012-project-files-rag.md) | **Proposed**: project files, a local micro-RAG (SQLite FTS5 + vectors, Qwen3-Embedding, tiered OCR) |
 
 New ADR: next number, one topic, the decision first, then why.
