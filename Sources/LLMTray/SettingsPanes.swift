@@ -528,6 +528,19 @@ struct ProfilesPane: View {
                 row(\.tools.musicAdherence, "Follow the description", "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.") {
                     SliderValue(value: b(\.tools.musicAdherence), range: 0...1, step: 0.05, format: "%.2f")
                 }
+                row(\.tools.musicBitrate, "Audio quality", "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.") {
+                    Picker("", selection: b(\.tools.musicBitrate)) {
+                        ForEach(ResolvedProfile.musicBitrates, id: \.self) { rate in
+                            if rate == 0 {
+                                Text("Uncompressed (WAV)").tag(rate)
+                            } else {
+                                Text(String(format: NSLocalizedString("AAC %lld kbit/s", comment: "audio bit rate"), rate)).tag(rate)
+                            }
+                        }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                }
                 if chat.isDownloadingModel, !chat.musicStatusText.isEmpty {
                     HStack { ProgressView().controlSize(.small); Text(chat.musicStatusText).font(.caption).foregroundStyle(.secondary) }
                 }

@@ -125,7 +125,8 @@ final class MusicToolRunner: ChatTool {
                 caption: prompt, lyrics: lyrics, duration: duration, language: Self.language(arguments["language"]),
                 model: settings.musicModel,
                 creativity: Self.unit(arguments["creativity"]) ?? settings.musicCreativity,
-                adherence: Self.unit(arguments["adherence"]) ?? settings.musicAdherence
+                adherence: Self.unit(arguments["adherence"]) ?? settings.musicAdherence,
+                bitrate: settings.musicBitrate
             )
             let audio = song.audio
             songsThisTurn += 1

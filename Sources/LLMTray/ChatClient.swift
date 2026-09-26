@@ -287,9 +287,9 @@ final class ChatClient: ObservableObject {
             for (i, data) in msg.images.enumerated() {
                 pendingImageWrites.append((imagesDir + "/" + filenames[i], data))
             }
-            // Music beside the images, as .wav.
-            let audioNames = msg.audios.enumerated().map { i, _ in
-                i < msg.audioFilenames.count ? msg.audioFilenames[i] : "\(msg.id.uuidString)-audio-\(i).wav"
+            // Music beside the images (.m4a; songs from before are .wav).
+            let audioNames = msg.audios.enumerated().map { i, data in
+                i < msg.audioFilenames.count ? msg.audioFilenames[i] : Self.audioFilename(msg.id, i, data)
             }
             for (i, data) in msg.audios.enumerated() {
                 pendingImageWrites.append((imagesDir + "/" + audioNames[i], data))
@@ -538,6 +538,12 @@ final class ChatClient: ObservableObject {
         return String(decoding: data, as: UTF8.self)
     }
 
+    /// A song's name on disk when the message has none yet: by its index,
+    /// with its format's extension.
+    static func audioFilename(_ messageID: UUID, _ index: Int, _ data: Data) -> String {
+        "\(messageID.uuidString)-audio-\(index).\(AudioCodec.format(of: data).fileExtension)"
+    }
+
     /// An image put in (`by` 1) at, or taken out (`by` -1) from before,
     /// message `j`'s image `image`: the edit_image calls pinned to an image
     /// after it (by its place among the chat's images) follow it there.
@@ -681,12 +687,12 @@ final class ChatClient: ObservableObject {
                 if messages[j].imageSources.count >= at { messages[j].imageSources.insert(variantSource, at: at) }
             case .generatedAudio(let data, let seconds, let prompt, _) where kind == .music && messages[j].audios.count >= at:
                 if messages[j].audioFilenames.count != messages[j].audios.count {
-                    messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
+                    messages[j].audioFilenames = messages[j].audios.enumerated().map { Self.audioFilename(messages[j].id, $0, $1) }
                 }
                 // A clip's id is its index: one playing now would take the variant's.
                 AudioPlayback.shared.stop(ifAnyOf: [messages[j]])
                 messages[j].audios.insert(data, at: at)
-                messages[j].audioFilenames.insert("\(UUID().uuidString).wav", at: at)
+                messages[j].audioFilenames.insert("\(UUID().uuidString).\(AudioCodec.format(of: data).fileExtension)", at: at)
                 if messages[j].audioDurations.count >= at { messages[j].audioDurations.insert(seconds, at: at) }
                 if messages[j].audioPrompts.count >= at { messages[j].audioPrompts.insert(prompt, at: at) }
                 if messages[j].audioSources.count >= at { messages[j].audioSources.insert(variantSource, at: at) }
@@ -723,7 +729,7 @@ final class ChatClient: ObservableObject {
             guard messages[j].audios.indices.contains(index) else { return }
             AudioPlayback.shared.stop(ifAnyOf: [messages[j]])
             if messages[j].audioFilenames.count != messages[j].audios.count {
-                messages[j].audioFilenames = messages[j].audios.indices.map { "\(id)-audio-\($0).wav" }
+                messages[j].audioFilenames = messages[j].audios.enumerated().map { Self.audioFilename(messages[j].id, $0, $1) }
             }
             drop(&messages[j].audios); drop(&messages[j].audioFilenames); drop(&messages[j].audioDurations)
             drop(&messages[j].audioPrompts); drop(&messages[j].audioSources)

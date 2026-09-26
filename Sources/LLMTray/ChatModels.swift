@@ -38,7 +38,7 @@ struct ChatMessage: Identifiable, Equatable {
     // alignment -- used to give the Save panel a filename derived from
     // what was actually asked for instead of a generic "image.png".
     var imagePrompts: [String] = []
-    // Generated music (16-bit WAV bytes), shown as players: in memory, and
+    // Generated music (.m4a AAC bytes; WAV for songs made before), shown as players: in memory, and
     // persisted like images (a temporary chat's never touch disk). Same
     // index alignment for the three arrays after it.
     var audios: [Data] = []
@@ -127,6 +127,7 @@ struct ChatSettings {
     var musicModel: MusicModel = .turbo
     var musicCreativity: Double = 0.42
     var musicAdherence: Double = 0.5
+    var musicBitrate: Int = 256
     var creatorMode: Bool = false
     var creatorCountdown: Int = 3
     var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
@@ -157,6 +158,7 @@ struct ChatSettings {
         musicModel = MusicModel(rawValue: p.musicModel) ?? .turbo
         musicCreativity = p.musicCreativity
         musicAdherence = p.musicAdherence
+        musicBitrate = p.musicBitrate
         creatorMode = p.creatorMode
         creatorCountdown = p.creatorCountdown
         enabledTools = Set(p.enabledTools)

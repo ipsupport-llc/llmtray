@@ -1,4 +1,5 @@
 import AppKit
+import LLMTrayCore
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -13,13 +14,14 @@ enum MediaSharing {
         pasteboard.setString(text, forType: .string)
     }
 
-    /// The WAV as a file (Finder, Messages, a DAW paste it) and as data.
+    /// The song as a file (Finder, Messages, a DAW paste it) and as data.
     static func copyAudio(_ data: Data, prompt: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         let item = NSPasteboardItem()
-        item.setData(data, forType: NSPasteboard.PasteboardType(UTType.wav.identifier))
-        if let url = try? exportFile(data, name: fileName(prompt, fallback: "music"), ext: "wav") {
+        let format = AudioCodec.format(of: data)
+        item.setData(data, forType: NSPasteboard.PasteboardType((format == .wav ? UTType.wav : UTType.mpeg4Audio).identifier))
+        if let url = try? exportFile(data, name: fileName(prompt, fallback: "music"), ext: format.fileExtension) {
             item.setString(url.absoluteString, forType: .fileURL)
         }
         pasteboard.writeObjects([item])
@@ -77,8 +79,19 @@ struct SharedAudio: Transferable {
     let prompt: String
 
     static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .wav) { clip in
-            SentTransferredFile(try MediaSharing.exportFile(clip.data, name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "wav"))
+        // Sent as it is: .m4a, or .wav (older songs, or WAV chosen in Settings).
+        FileRepresentation(exportedContentType: .mpeg4Audio) { clip in
+            SentTransferredFile(try clip.file())
         }
+        .exportingCondition { AudioCodec.format(of: $0.data) != .wav }
+        FileRepresentation(exportedContentType: .wav) { clip in
+            SentTransferredFile(try clip.file())
+        }
+        .exportingCondition { AudioCodec.format(of: $0.data) == .wav }
+    }
+
+    private func file() throws -> URL {
+        try MediaSharing.exportFile(data, name: MediaSharing.fileName(prompt, fallback: "music"),
+                                    ext: AudioCodec.format(of: data).fileExtension)
     }
 }
