@@ -76,6 +76,9 @@ final class ChatClient: ObservableObject {
     /// Another tab is unloading the model for an image, or has it unloaded
     /// (ChatTabs): an answer waits for it to come back.
     var isAnotherChatUnloadingModel: () -> Bool = { false }
+    /// Another tab has claimed a generator round (it may still be unloading
+    /// the model, before the generator itself is busy).
+    var isAnotherChatGeneratingMedia: () -> Bool = { false }
     /// This chat unloads the model for an image and reloads it after:
     /// announced before the unload, so other tabs wait from the start.
     @Published private(set) var isUnloadingModelForMedia = false
@@ -170,6 +173,7 @@ final class ChatClient: ObservableObject {
     /// landing in the new chat (adr/0003), and cancelling the transport
     /// drops the abandoned stream's late callbacks.
     private func resetConversationState() {
+        AudioPlayback.shared.stop(ifAnyOf: messages)   // this chat's song leaves the screen
         cancel()
         titleTask?.cancel()
         titleTask = nil
@@ -301,9 +305,14 @@ final class ChatClient: ObservableObject {
 
         if !pendingImageWrites.isEmpty {
             try? FileManager.default.createDirectory(atPath: imagesDir, withIntermediateDirectories: true)
+            var failed = false
             for (path, data) in pendingImageWrites where !FileManager.default.fileExists(atPath: path) {
-                try? data.write(to: URL(fileURLWithPath: path), options: .atomic)
+                if (try? data.write(to: URL(fileURLWithPath: path), options: .atomic)) == nil { failed = true }
             }
+            // A chat listing an image or song that isn't on disk would lose it
+            // on reopening: not saved this time (hasUnsavedChanges stays), tried
+            // again after the next turn.
+            if failed { return }
         }
         let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
 
@@ -359,8 +368,8 @@ final class ChatClient: ObservableObject {
     /// `keepStart` to the last one starting at or before `count - keepEnd`
     /// -- whole turns only (a tool round split across the cut would leave
     /// a tool result without its call, or a call without results), and
-    /// only up to the first turn with an image (it would be gone from the
-    /// chat). Nil when there's nothing worth it.
+    /// only up to the first turn with an image or music (it would be gone
+    /// from the chat, and its file deleted). Nil when there's nothing worth it.
     static func compactionRange(_ messages: [ChatMessage], keepStart: Int, keepEnd: Int) -> Range<Int>? {
         func isTurnStart(_ i: Int) -> Bool { messages[i].role == "user" && !messages[i].isToolContext }
         guard messages.count > keepStart + keepEnd + 1 else { return nil }
@@ -368,7 +377,9 @@ final class ChatClient: ObservableObject {
         // compaction would leave its summary behind for good).
         guard let start = (keepStart..<messages.count).first(where: { isTurnStart($0) || messages[$0].isSummary }) else { return nil }
         var end = messages.count - keepEnd
-        if let image = messages.indices.first(where: { $0 >= start && !messages[$0].images.isEmpty }) { end = min(end, image) }
+        if let media = messages.indices.first(where: { $0 >= start && (!messages[$0].images.isEmpty || !messages[$0].audios.isEmpty) }) {
+            end = min(end, media)
+        }
         while end > start, end < messages.count, !isTurnStart(end) { end -= 1 }
         guard end > start + 1, end < messages.count else { return nil }
         return start..<end
@@ -442,6 +453,7 @@ final class ChatClient: ObservableObject {
 
     func regenerate(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         guard !isBusy else { return }
+        AudioPlayback.shared.stop(ifAnyOf: messages)   // the song being played may be the one replaced
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         // The whole last response: assistant turns, tool results and the
@@ -669,9 +681,10 @@ final class ChatClient: ObservableObject {
         // Mac's memory, so neither runs beside the other.
         let images = chatImages
         let wantsImage = imageTool.willGenerate(toolCalls, settings: settings, chatImages: images)
-        let wantsMusic = musicTool.willGenerate(toolCalls, settings: settings)
+        let wantsMusic = musicTool.willGenerate(toolCalls, settings: settings) && musicManager.isReady
         let imageBlocked = (wantsImage || wantsMusic)
-            && (mfluxManager.isBusy || musicManager.isBusy || (settings.unloadModelDuringImageGen && isAnotherChatBusy()))
+            && (mfluxManager.isBusy || musicManager.isBusy || isAnotherChatGeneratingMedia()
+                || (settings.unloadModelDuringImageGen && isAnotherChatBusy()))
         let willActuallyGenerate = (wantsImage || wantsMusic) && !imageBlocked
         // Only when a generator will actually run -- a refused call
         // shouldn't flash the "Generating…" UI / pulse.
@@ -710,6 +723,11 @@ final class ChatClient: ObservableObject {
                 continue
             }
             settings = currentSettings(context.settings)
+            if willActuallyGenerate, call.name == MusicToolRunner.toolName {
+                generatingKind = .music
+            } else if willActuallyGenerate, ImageToolRunner.runsGenerator(call.name, settings) {
+                generatingKind = .image
+            }
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
             switch result {

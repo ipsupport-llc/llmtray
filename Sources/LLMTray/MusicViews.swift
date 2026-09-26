@@ -37,6 +37,13 @@ final class AudioPlayback: NSObject, ObservableObject, AVAudioPlayerDelegate {
         position = player.currentTime
     }
 
+    /// Stops the clip if it's one of these messages' (AudioClipView ids are
+    /// "<message id>-<index>").
+    func stop(ifAnyOf messages: [ChatMessage]) {
+        guard let currentID, messages.contains(where: { currentID.hasPrefix($0.id.uuidString + "-") }) else { return }
+        stop()
+    }
+
     func stop() {
         player?.stop()
         player = nil
@@ -51,9 +58,12 @@ final class AudioPlayback: NSObject, ObservableObject, AVAudioPlayerDelegate {
         guard let player, player.play() else { return }
         isPlaying = true
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.2, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
+        // .common: the scrubber keeps moving while the chat is scrolled.
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 
     private func pause() {
@@ -69,6 +79,8 @@ final class AudioPlayback: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
     nonisolated func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         Task { @MainActor in
+            // A clip started since: not its end.
+            guard player === self.player else { return }
             self.isPlaying = false
             self.position = 0
             self.timer?.invalidate()

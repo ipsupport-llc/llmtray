@@ -58,8 +58,15 @@ final class MusicToolRunner: ChatTool {
     }
 
     /// This round will actually run the generator (see ImageToolRunner's).
+    /// A call with no style to make is refused without the chat model's
+    /// unload/reload (nor is one while the model isn't installed: see ChatClient).
     func willGenerate(_ calls: [ToolCall], settings: ChatSettings) -> Bool {
-        calls.contains { $0.name == Self.toolName } && songsThisTurn < maxSongsPerTurn && settings.enableMusicGeneration
+        calls.contains { $0.name == Self.toolName && !Self.prompt(ChatToolbox.parseArguments($0.argumentsJSON)).isEmpty }
+            && songsThisTurn < maxSongsPerTurn && settings.enableMusicGeneration
+    }
+
+    static func prompt(_ arguments: [String: Any]) -> String {
+        String(((arguments["prompt"] as? String) ?? "").prefix(1000)).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     func isOffered(_ settings: ChatSettings) -> Bool {
@@ -90,7 +97,7 @@ final class MusicToolRunner: ChatTool {
                     + "generate_music again unless the user sends a new message asking for different music."
             )
         }
-        let prompt = String(((arguments["prompt"] as? String) ?? "").prefix(1000)).trimmingCharacters(in: .whitespacesAndNewlines)
+        let prompt = Self.prompt(arguments)
         guard !prompt.isEmpty else {
             return .text("Describe the style in `prompt` (genre, mood, instruments, voice).")
         }

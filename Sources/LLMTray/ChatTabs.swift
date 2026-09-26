@@ -138,6 +138,10 @@ final class ChatTabs: ObservableObject {
             guard let self, let client else { return false }
             return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForMedia }
         }
+        client.isAnotherChatGeneratingMedia = { [weak self, weak client] in
+            guard let self, let client else { return false }
+            return (self.tabs + self.closing).contains { $0 !== client && $0.isGeneratingMedia }
+        }
         return client
     }
 

@@ -491,7 +491,7 @@ struct ProfilesPane: View {
                 row(\.tools.unloadModelDuringImageGen, "Unload chat model during generation", "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory.") {
                     Toggle("", isOn: b(\.tools.unloadModelDuringImageGen)).labelsHidden()
                 }
-                if chat.isDownloadingModel {
+                if chat.isDownloadingModel, !chat.mfluxStatusText.isEmpty {
                     HStack { ProgressView().controlSize(.small); Text(chat.mfluxStatusText).font(.caption).foregroundStyle(.secondary) }
                 }
                 if let imageModelDownloadError {
