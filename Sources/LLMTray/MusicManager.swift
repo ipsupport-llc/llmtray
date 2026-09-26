@@ -282,7 +282,16 @@ final class MusicManager: ObservableObject {
         guard let data = result.get() else { throw MusicError.outputMissing }
         // Kept as AAC (.m4a): ~1 MB at 256 kbit/s instead of the runner's
         // ~6 MB WAV per 30 s. `bitrate` 0: the WAV as is.
-        let audio = bitrate > 0 ? (try? AudioCodec.m4a(from: data, bitRate: UInt32(bitrate) * 1000)) ?? data : data
+        // Off the main actor: ~0.7 s for a 120 s song.
+        var audio = data
+        if bitrate > 0 {
+            let rate = UInt32(bitrate) * 1000
+            do {
+                audio = try await Task.detached(priority: .userInitiated) { try AudioCodec.m4a(from: data, bitRate: rate) }.value
+            } catch {
+                NSLog("LLMTray: AAC encoding failed, the song is kept as WAV: %@", String(describing: error))
+            }
+        }
         return Song(audio: audio, seed: usedSeed.get())
     }
 

@@ -79,11 +79,19 @@ struct SharedAudio: Transferable {
     let prompt: String
 
     static var transferRepresentation: some TransferRepresentation {
-        // Audio in general: .m4a, or .wav (older songs, or WAV chosen in
-        // Settings) -- sent as it is, its file named with its own extension.
-        FileRepresentation(exportedContentType: .audio) { clip in
-            SentTransferredFile(try MediaSharing.exportFile(clip.data, name: MediaSharing.fileName(clip.prompt, fallback: "music"),
-                                                            ext: AudioCodec.format(of: clip.data).fileExtension))
+        // Sent as it is: .m4a, or .wav (older songs, or WAV chosen in Settings).
+        FileRepresentation(exportedContentType: .mpeg4Audio) { clip in
+            SentTransferredFile(try clip.file())
         }
+        .exportingCondition { AudioCodec.format(of: $0.data) != .wav }
+        FileRepresentation(exportedContentType: .wav) { clip in
+            SentTransferredFile(try clip.file())
+        }
+        .exportingCondition { AudioCodec.format(of: $0.data) == .wav }
+    }
+
+    private func file() throws -> URL {
+        try MediaSharing.exportFile(data, name: MediaSharing.fileName(prompt, fallback: "music"),
+                                    ext: AudioCodec.format(of: data).fileExtension)
     }
 }
