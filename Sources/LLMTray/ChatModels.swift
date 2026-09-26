@@ -127,6 +127,7 @@ struct ChatSettings {
     var musicModel: MusicModel = .turbo
     var musicCreativity: Double = 0.42
     var musicAdherence: Double = 0.5
+    var musicBitrate: Int = 256
     var creatorMode: Bool = false
     var creatorCountdown: Int = 3
     var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
@@ -157,6 +158,7 @@ struct ChatSettings {
         musicModel = MusicModel(rawValue: p.musicModel) ?? .turbo
         musicCreativity = p.musicCreativity
         musicAdherence = p.musicAdherence
+        musicBitrate = p.musicBitrate
         creatorMode = p.creatorMode
         creatorCountdown = p.creatorCountdown
         enabledTools = Set(p.enabledTools)

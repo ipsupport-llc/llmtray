@@ -14,20 +14,14 @@ enum MediaSharing {
         pasteboard.setString(text, forType: .string)
     }
 
-    /// A song sent out as .m4a: a WAV from before is encoded first.
-    static func m4a(_ data: Data) -> Data {
-        AudioCodec.format(of: data) == .m4a ? data : (try? AudioCodec.m4a(from: data)) ?? data
-    }
-
     /// The song as a file (Finder, Messages, a DAW paste it) and as data.
     static func copyAudio(_ data: Data, prompt: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         let item = NSPasteboardItem()
-        let audio = m4a(data)
-        let format = AudioCodec.format(of: audio)
-        item.setData(audio, forType: NSPasteboard.PasteboardType((format == .wav ? UTType.wav : UTType.mpeg4Audio).identifier))
-        if let url = try? exportFile(audio, name: fileName(prompt, fallback: "music"), ext: format.fileExtension) {
+        let format = AudioCodec.format(of: data)
+        item.setData(data, forType: NSPasteboard.PasteboardType((format == .wav ? UTType.wav : UTType.mpeg4Audio).identifier))
+        if let url = try? exportFile(data, name: fileName(prompt, fallback: "music"), ext: format.fileExtension) {
             item.setString(url.absoluteString, forType: .fileURL)
         }
         pasteboard.writeObjects([item])
@@ -85,10 +79,11 @@ struct SharedAudio: Transferable {
     let prompt: String
 
     static var transferRepresentation: some TransferRepresentation {
-        FileRepresentation(exportedContentType: .mpeg4Audio) { clip in
-            // An old WAV that won't encode fails the share rather than go out mislabelled.
-            let audio = AudioCodec.format(of: clip.data) == .m4a ? clip.data : try AudioCodec.m4a(from: clip.data)
-            return SentTransferredFile(try MediaSharing.exportFile(audio, name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "m4a"))
+        // Audio in general: .m4a, or .wav (older songs, or WAV chosen in
+        // Settings) -- sent as it is, its file named with its own extension.
+        FileRepresentation(exportedContentType: .audio) { clip in
+            SentTransferredFile(try MediaSharing.exportFile(clip.data, name: MediaSharing.fileName(clip.prompt, fallback: "music"),
+                                                            ext: AudioCodec.format(of: clip.data).fileExtension))
         }
     }
 }

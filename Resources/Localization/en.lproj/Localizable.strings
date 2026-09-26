@@ -17,6 +17,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
+"AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — clear vocals, 8-bit (recommended)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
@@ -41,6 +42,7 @@
 "Assistant" = "Assistant";
 "Attach image(s) for the model to see" = "Attach image(s) for the model to see";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
+"Audio quality" = "Audio quality";
 "Auto-compact" = "Auto-compact";
 "Auto-restart after %lld stalls" = "Auto-restart after %lld stalls";
 "Auto-restart: off" = "Auto-restart: off";
@@ -164,6 +166,7 @@
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
+"How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
@@ -427,6 +430,7 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Tweak…" = "Tweak…";
+"Uncompressed (WAV)" = "Uncompressed (WAV)";
 "Uninstall" = "Uninstall";
 "Uninstall Runtime Data…" = "Uninstall Runtime Data…";
 "Uninstall runtime data?" = "Uninstall runtime data?";

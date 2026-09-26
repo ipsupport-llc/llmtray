@@ -66,6 +66,8 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         public var musicCreativity: Double?
         /// 0...1: how closely it follows the description (guidance).
         public var musicAdherence: Double?
+        /// AAC bit rate of the songs kept, kbit/s; 0 = uncompressed WAV.
+        public var musicBitrate: Int?
         /// Creator mode: an image or song the model asks for is shown as an
         /// editable draft (prompt, model, knobs) before it's made.
         public var creatorMode: Bool?
@@ -156,6 +158,7 @@ extension Profile {
         p.tools.musicModel = "turbo"
         p.tools.musicCreativity = 0.42
         p.tools.musicAdherence = 0.5
+        p.tools.musicBitrate = 256
         p.tools.creatorMode = false
         p.tools.creatorCountdown = 3
         p.tools.enabledTools = defaultEnabledTools
@@ -219,6 +222,7 @@ public enum ProfileResolver {
             musicModel: v(\.tools.musicModel),
             musicCreativity: min(max(v(\.tools.musicCreativity), 0), 1),
             musicAdherence: min(max(v(\.tools.musicAdherence), 0), 1),
+            musicBitrate: ResolvedProfile.musicBitrates.contains(v(\.tools.musicBitrate)) ? v(\.tools.musicBitrate) : 256,
             creatorMode: v(\.tools.creatorMode),
             creatorCountdown: min(max(v(\.tools.creatorCountdown), 0), 30),
             enabledTools: v(\.tools.enabledTools),
@@ -253,6 +257,9 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var musicModel: String
     public var musicCreativity: Double
     public var musicAdherence: Double
+    public var musicBitrate: Int
+    /// The bit rates offered (kbit/s); 0 = WAV.
+    public static let musicBitrates = [128, 192, 256, 320, 0]
     public var creatorMode: Bool
     public var creatorCountdown: Int
     public var enabledTools: [String]
@@ -303,6 +310,7 @@ extension Profile {
         ProfileField("musicModel", \.tools.musicModel),
         ProfileField("musicCreativity", \.tools.musicCreativity),
         ProfileField("musicAdherence", \.tools.musicAdherence),
+        ProfileField("musicBitrate", \.tools.musicBitrate),
         ProfileField("creatorMode", \.tools.creatorMode),
         ProfileField("creatorCountdown", \.tools.creatorCountdown),
         ProfileField("enabledTools", \.tools.enabledTools),

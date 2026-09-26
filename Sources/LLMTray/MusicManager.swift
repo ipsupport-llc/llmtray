@@ -226,7 +226,8 @@ final class MusicManager: ObservableObject {
     /// `creativity` / `adherence`: 0...1, nil = the runner's defaults. `seed`:
     /// nil = a new one.
     func generate(caption: String, lyrics: String, duration: Int, language: String, model: MusicModel,
-                  creativity: Double? = nil, adherence: Double? = nil, seed: Int? = nil) async throws -> Song {
+                  creativity: Double? = nil, adherence: Double? = nil, seed: Int? = nil,
+                  bitrate: Int = 256) async throws -> Song {
         guard isReady(model) else {
             throw MusicError.processFailed(NSLocalizedString("Music generation isn't set up -- turn it on again in Settings.", comment: ""))
         }
@@ -279,8 +280,10 @@ final class MusicManager: ObservableObject {
             }
         })
         guard let data = result.get() else { throw MusicError.outputMissing }
-        // Kept as AAC (.m4a): ~1 MB instead of the runner's ~6 MB WAV per 30 s.
-        return Song(audio: (try? AudioCodec.m4a(from: data)) ?? data, seed: usedSeed.get())
+        // Kept as AAC (.m4a): ~1 MB at 256 kbit/s instead of the runner's
+        // ~6 MB WAV per 30 s. `bitrate` 0: the WAV as is.
+        let audio = bitrate > 0 ? (try? AudioCodec.m4a(from: data, bitRate: UInt32(bitrate) * 1000)) ?? data : data
+        return Song(audio: audio, seed: usedSeed.get())
     }
 
     /// The runner's stage names, for the UI.
