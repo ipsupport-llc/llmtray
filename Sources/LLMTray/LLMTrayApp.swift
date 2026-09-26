@@ -619,7 +619,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// green/red actually show. That constraint carries over even though
     /// this is now a plain NSStatusItem button rather than MenuBarExtra.
     private func observeStateForIcon() {
-        // combineLatest tops out at 4 publishers per call -- isGeneratingImage
+        // combineLatest tops out at 4 publishers per call -- isGeneratingMedia
         // is folded in via a second, nested combineLatest instead of trying
         // to cram a 5th into one. Without it, the icon stopped pulsing
         // during image generation: the tool-call-carrying response has
@@ -627,9 +627,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // mflux is actually running, so that phase looked identical to idle.
         server.$state
             .combineLatest(tabs.$isAnyStreaming, systemMonitor.$thermalState, server.$isBusy)
-            .combineLatest(tabs.$isAnyGeneratingImage)
+            .combineLatest(tabs.$isAnyGeneratingMedia)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] combined, isGeneratingImage in
+            .sink { [weak self] combined, isGeneratingMedia in
                 let (_, isStreaming, _, isBusy) = combined
                 guard let self else { return }
                 self.statusItem.button?.image = self.coloredStatusImage
@@ -637,7 +637,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 // chat UI; isBusy is a ~1s-latency CPU-poll fallback that
                 // also catches an external tool hitting the OpenAI-compatible
                 // endpoint directly, which never touches ChatClient at all.
-                self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingImage)
+                self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingMedia)
             }
             .store(in: &cancellables)
     }
@@ -690,14 +690,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusColor: Color {
         if systemMonitor.isThrottling { return .red }
         if systemMonitor.isWarm { return .orange }
-        if tabs.isAnyStreaming || server.isBusy || tabs.isAnyGeneratingImage { return .green }
+        if tabs.isAnyStreaming || server.isBusy || tabs.isAnyGeneratingMedia { return .green }
         return .primary
     }
 
     private var statusSymbol: String {
         // Image generation unloads the chat model to make room (the server
         // state reads .stopped meanwhile), but LLMTray is busy, not stopped.
-        if tabs.isAnyGeneratingImage { return "brain.head.profile.fill" }
+        if tabs.isAnyGeneratingMedia { return "brain.head.profile.fill" }
         switch server.state {
         case .running: return "brain.head.profile.fill"
         case .starting: return "brain.head.profile"

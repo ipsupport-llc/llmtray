@@ -75,6 +75,7 @@
 "Compaction" = "Compaction";
 "Compaction failed: %@" = "Compaction failed: %@";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.";
+"Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
 "Copy" = "Copy";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
@@ -113,6 +114,8 @@
 "Enable image editing?" = "Enable image editing?";
 "Enable image generation" = "Enable image generation";
 "Enable image generation?" = "Enable image generation?";
+"Enable music generation" = "Enable music generation";
+"Enable music generation?" = "Enable music generation?";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
@@ -129,8 +132,10 @@
 "General" = "General";
 "Generated in %.1fs" = "Generated in %.1fs";
 "Generating image…" = "Generating image…";
+"Generating music…" = "Generating music…";
 "Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
+"Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Hide chats";
@@ -155,6 +160,7 @@
 "Include the server log" = "Include the server log";
 "Installed" = "Installed";
 "Installing mflux…" = "Installing mflux…";
+"Installing mlx-audio…" = "Installing mlx-audio…";
 "Its chats stay, back among the recents." = "Its chats stay, back among the recents.";
 "KV cache" = "KV cache";
 "KV group size" = "KV group size";
@@ -178,6 +184,7 @@
 "Max tokens" = "Max tokens";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Message…" = "Message…";
+"Mixing…" = "Mixing…";
 "Model" = "Model";
 "Model actions" = "Model actions";
 "Model card" = "Model card";
@@ -185,6 +192,10 @@
 "Models folder" = "Models folder";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Move to Project" = "Move to Project";
+"Music generation" = "Music generation";
+"Music generation failed: %@" = "Music generation failed: %@";
+"Music generation finished but produced no audio." = "Music generation finished but produced no audio.";
+"Music generation isn't set up -- turn it on again in Settings." = "Music generation isn't set up -- turn it on again in Settings.";
 "Name new chats automatically" = "Name new chats automatically";
 "Network" = "Network";
 "Never" = "Never";
@@ -224,11 +235,13 @@
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "Past %lld messages" = "Past %lld messages";
+"Pause" = "Pause";
 "Pause download" = "Pause download";
 "Paused" = "Paused";
 "Performance" = "Performance";
 "Pin" = "Pin";
 "Pinned" = "Pinned";
+"Play" = "Play";
 "Port" = "Port";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory.";
 "Prefill step" = "Prefill step";
@@ -298,6 +311,7 @@
 "Server log" = "Server log";
 "Server settings changed -- restart to apply them." = "Server settings changed -- restart to apply them.";
 "Setting up image generation (first time only)…" = "Setting up image generation (first time only)…";
+"Setting up music generation (first time only)…" = "Setting up music generation (first time only)…";
 "Settings" = "Settings";
 "Settings (⌘,)" = "Settings (⌘,)";
 "Settings profile for this model" = "Settings profile for this model";
@@ -338,7 +352,7 @@
 "Stop the server to update the runtime." = "Stop the server to update the runtime.";
 "Stopped" = "Stopped";
 "Stopped: the model kept calling tools (%lld rounds in one turn)." = "Stopped: the model kept calling tools (%lld rounds in one turn).";
-"Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image generates, and reloads it after. Both at once can exceed this Mac's memory.";
+"Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory.";
 "Sunrise & sunset" = "Sunrise & sunset";
 "Support" = "Support";
 "System" = "System";
@@ -360,6 +374,8 @@
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model's license, from its card." = "The model's license, from its card.";
+"The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
+"The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
 "The report" = "The report";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "The server log" = "The server log";
@@ -403,6 +419,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";
 "Wikipedia" = "Wikipedia";
+"Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
 "You" = "You";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";

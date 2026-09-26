@@ -141,7 +141,7 @@ private final class TurnTracker {
 
     init(_ chat: ChatClient, turnEnded: @escaping (_ epoch: Int) -> Void) {
         self.chat = chat
-        subscription = Publishers.CombineLatest3(chat.$isStreaming, chat.$isGeneratingImage, chat.$isRunningTools)
+        subscription = Publishers.CombineLatest3(chat.$isStreaming, chat.$isGeneratingMedia, chat.$isRunningTools)
             .map { $0 || $1 || $2 }
             .removeDuplicates()
             .dropFirst()

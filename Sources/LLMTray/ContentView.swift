@@ -253,8 +253,12 @@ struct ContentView: View {
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }
-                    if chat.isGeneratingImage {
-                        ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
+                    if chat.isGeneratingMedia {
+                        if chat.generatingKind == .music {
+                            MusicGenerationProgressView()
+                        } else {
+                            ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
+                        }
                     }
                     if let err = chat.errorText {
                         Text(err)

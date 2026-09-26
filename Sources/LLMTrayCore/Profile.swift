@@ -58,6 +58,8 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
     /// here is applied to them.
     public struct ToolSettings: Codable, Equatable, Sendable {
         public var enableImageGeneration: Bool?
+        /// The generate_music tool (ACE-Step 1.5).
+        public var enableMusicGeneration: Bool?
         /// Names of the chat tools offered to the model (besides image
         /// generation, which has its own switch). Web tools send the
         /// model's queries to public services, so they're opt-in.
@@ -138,6 +140,7 @@ extension Profile {
         p.request.maxTokens = 1024
         p.request.systemPrompt = defaultSystemPrompt
         p.tools.enableImageGeneration = false
+        p.tools.enableMusicGeneration = false
         p.tools.enabledTools = defaultEnabledTools
         p.tools.imageGenModel = "gptqMixed"
         p.tools.imageEditModel = ""
@@ -195,6 +198,7 @@ public enum ProfileResolver {
             maxTokens: max(1, v(\.request.maxTokens)),
             systemPrompt: v(\.request.systemPrompt),
             enableImageGeneration: v(\.tools.enableImageGeneration),
+            enableMusicGeneration: v(\.tools.enableMusicGeneration),
             enabledTools: v(\.tools.enabledTools),
             imageGenModel: v(\.tools.imageGenModel),
             imageEditModel: v(\.tools.imageEditModel),
@@ -223,6 +227,7 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var maxTokens: Int
     public var systemPrompt: String
     public var enableImageGeneration: Bool
+    public var enableMusicGeneration: Bool
     public var enabledTools: [String]
     public var imageGenModel: String
     public var imageEditModel: String
@@ -267,6 +272,7 @@ extension Profile {
         ProfileField("maxTokens", \.request.maxTokens),
         ProfileField("systemPrompt", \.request.systemPrompt),
         ProfileField("enableImageGeneration", \.tools.enableImageGeneration),
+        ProfileField("enableMusicGeneration", \.tools.enableMusicGeneration),
         ProfileField("enabledTools", \.tools.enabledTools),
         ProfileField("imageGenModel", \.tools.imageGenModel),
         ProfileField("imageEditModel", \.tools.imageEditModel),

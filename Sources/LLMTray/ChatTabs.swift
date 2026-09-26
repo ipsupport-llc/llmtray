@@ -18,12 +18,13 @@ final class ChatTabs: ObservableObject {
     @Published private(set) var isAnyBusy = false
     /// For the menu bar icon's pulse: any tab streaming / making an image.
     @Published private(set) var isAnyStreaming = false
-    @Published private(set) var isAnyGeneratingImage = false
+    @Published private(set) var isAnyGeneratingMedia = false
 
     let mflux = MfluxManager()
-    /// Settings' image-model download runs on a client of its own (its
-    /// progress is shown there), not on whichever tab is open.
-    private(set) lazy var imageModels = ChatClient(mflux: mflux)
+    let music = MusicManager()
+    /// Settings' image- and music-model downloads run on a client of their
+    /// own (their progress is shown there), not on whichever tab is open.
+    private(set) lazy var imageModels = ChatClient(mflux: mflux, music: music)
     private var busyWatch: AnyCancellable?
     /// Closed tabs still finishing something (see close).
     private var closing: [ChatClient] = []
@@ -82,6 +83,7 @@ final class ChatTabs: ObservableObject {
             return
         }
         let closed = tabs[index]
+        AudioPlayback.shared.stop(ifAnyOf: closed.messages)
         closed.close()
         // Still reloading the model after an image, say: counted as busy
         // until it's done, so nothing restarts the server under it.
@@ -127,7 +129,7 @@ final class ChatTabs: ObservableObject {
     // MARK: -
 
     private func makeClient() -> ChatClient {
-        let client = ChatClient(mflux: mflux)
+        let client = ChatClient(mflux: mflux, music: music)
         client.isAnotherChatBusy = { [weak self, weak client] in
             guard let self, let client else { return false }
             // A closed tab still reloading the model counts too.
@@ -135,7 +137,11 @@ final class ChatTabs: ObservableObject {
         }
         client.isAnotherChatUnloadingModel = { [weak self, weak client] in
             guard let self, let client else { return false }
-            return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForImage }
+            return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForMedia }
+        }
+        client.isAnotherChatGeneratingMedia = { [weak self, weak client] in
+            guard let self, let client else { return false }
+            return (self.tabs + self.closing).contains { $0 !== client && $0.isGeneratingMedia }
         }
         return client
     }
@@ -168,8 +174,8 @@ final class ChatTabs: ObservableObject {
         if busy != isAnyBusy { isAnyBusy = busy }
         let streaming = (tabs + closing).contains { $0.isStreaming }
         if streaming != isAnyStreaming { isAnyStreaming = streaming }
-        let generating = (tabs + closing).contains { $0.isGeneratingImage }
-        if generating != isAnyGeneratingImage { isAnyGeneratingImage = generating }
+        let generating = (tabs + closing).contains { $0.isGeneratingMedia }
+        if generating != isAnyGeneratingMedia { isAnyGeneratingMedia = generating }
     }
 
     /// The saved chats open in tabs. A temporary one isn't kept, nor a new

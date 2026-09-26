@@ -624,7 +624,12 @@ final class ServerManager: ObservableObject {
     /// launch (before auto-start) and before every server start.
     func reapOrphans() async {
         for orphan in await Self.stopOrphans() {
-            let what = orphan.kind == .modelServer ? "model server" : "image-generation runner"
+            let what: String
+            switch orphan.kind {
+            case .modelServer: what = "model server"
+            case .imageRunner: what = "image-generation runner"
+            case .musicRunner: what = "music-generation runner"
+            }
             let model = orphan.model.map { ", \($0)" } ?? ""
             let memory = ByteCountFormatter.string(fromByteCount: orphan.residentBytes, countStyle: .memory)
             appendLog("--- stopped a leftover \(what) from an earlier LLMTray run (PID \(orphan.pid)\(model), \(memory)) ---\n")

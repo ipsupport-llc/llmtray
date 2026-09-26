@@ -32,9 +32,14 @@ struct PersistedMessage: Codable {
     var imagePrompts: [String]
     // See ChatMessage.sources.
     var sources: [String]
+    // Generated music, files beside the images (see ChatMessage.audios).
+    var audioFilenames: [String] = []
+    var audioPrompts: [String] = []
+    var audioDurations: [Double] = []
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
+        case audioFilenames, audioPrompts, audioDurations
     }
 
     init(
@@ -65,6 +70,26 @@ struct PersistedMessage: Codable {
         imageDurations = try c.decodeIfPresent([Double].self, forKey: .imageDurations) ?? []
         imagePrompts = try c.decodeIfPresent([String].self, forKey: .imagePrompts) ?? []
         sources = try c.decodeIfPresent([String].self, forKey: .sources) ?? []
+        audioFilenames = try c.decodeIfPresent([String].self, forKey: .audioFilenames) ?? []
+        audioPrompts = try c.decodeIfPresent([String].self, forKey: .audioPrompts) ?? []
+        audioDurations = try c.decodeIfPresent([Double].self, forKey: .audioDurations) ?? []
+    }
+}
+
+extension PersistedMessage {
+    /// Without the media files named (and their aligned captions): ones that
+    /// couldn't be written, so the chat doesn't list what isn't on disk.
+    func withoutFiles(_ names: Set<String>) -> PersistedMessage {
+        var copy = self
+        let keptImages = imageFilenames.indices.filter { !names.contains(imageFilenames[$0]) }
+        copy.imageFilenames = keptImages.map { imageFilenames[$0] }
+        copy.imageDurations = keptImages.compactMap { imageDurations[safe: $0] }
+        copy.imagePrompts = keptImages.compactMap { imagePrompts[safe: $0] }
+        let keptAudio = audioFilenames.indices.filter { !names.contains(audioFilenames[$0]) }
+        copy.audioFilenames = keptAudio.map { audioFilenames[$0] }
+        copy.audioDurations = keptAudio.compactMap { audioDurations[safe: $0] }
+        copy.audioPrompts = keptAudio.compactMap { audioPrompts[safe: $0] }
+        return copy
     }
 }
 
