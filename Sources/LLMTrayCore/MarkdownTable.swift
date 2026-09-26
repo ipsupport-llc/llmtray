@@ -45,6 +45,10 @@ public struct MarkdownTable: Equatable {
         var current = ""
         var escaped = false
         var inCode = false
+        // An unmatched backtick is a plain character: it mustn't swallow
+        // the rest of the row's pipes.
+        var ticksLeft = body.filter { $0 == "`" }.count
+        if ticksLeft % 2 == 1 { ticksLeft -= 1 }
         for ch in body {
             if escaped {
                 current.append(ch == "|" ? "|" : "\\\(ch)")
@@ -53,7 +57,10 @@ public struct MarkdownTable: Equatable {
                 escaped = true
             } else if ch == "`" {
                 // A pipe inside `code` is part of the cell, as in GFM.
-                inCode.toggle()
+                if ticksLeft > 0 {
+                    inCode.toggle()
+                    ticksLeft -= 1
+                }
                 current.append(ch)
             } else if ch == "|", !inCode {
                 cells.append(current.trimmingCharacters(in: .whitespaces))

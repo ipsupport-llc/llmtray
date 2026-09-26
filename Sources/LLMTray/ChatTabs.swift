@@ -133,6 +133,10 @@ final class ChatTabs: ObservableObject {
             // A closed tab still reloading the model counts too.
             return (self.tabs + self.closing).contains { $0 !== client && $0.isBusy }
         }
+        client.isAnotherChatUnloadingModel = { [weak self, weak client] in
+            guard let self, let client else { return false }
+            return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForImage }
+        }
         return client
     }
 

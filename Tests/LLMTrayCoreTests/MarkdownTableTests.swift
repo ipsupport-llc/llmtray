@@ -37,6 +37,7 @@ final class MarkdownTableTests: XCTestCase {
 
     func testPipeInsideCodeStaysInTheCell() {
         XCTAssertEqual(MarkdownTable.cells("| `a | b` | union |"), ["`a | b`", "union"])
+        XCTAssertEqual(MarkdownTable.cells("| `oops | next |"), ["`oops", "next"])
     }
 
     func testSingleRowIsText() {

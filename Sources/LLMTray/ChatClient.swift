@@ -67,6 +67,12 @@ final class ChatClient: ObservableObject {
     /// Another chat tab is running a turn (ChatTabs): image generation then
     /// doesn't unload the model under it.
     var isAnotherChatBusy: () -> Bool = { false }
+    /// Another tab is unloading the model for an image, or has it unloaded
+    /// (ChatTabs): an answer waits for it to come back.
+    var isAnotherChatUnloadingModel: () -> Bool = { false }
+    /// This chat unloads the model for an image and reloads it after:
+    /// announced before the unload, so other tabs wait from the start.
+    @Published private(set) var isUnloadingModelForImage = false
     private var imageTool: ImageToolRunner { toolbox.imageGeneration }
     private var mfluxManager: MfluxManager { imageTool.mflux }
     private var mfluxStatusCancellable: AnyCancellable?
@@ -454,10 +460,11 @@ final class ChatClient: ObservableObject {
         // Another tab unloaded the model for an image: this answer waits for
         // it to come back (the server refuses requests meanwhile) instead
         // of failing. Stop / leaving the chat ends the wait.
-        guard server.suspendedForImageGeneration else { return startStream(request) }
+        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() }
+        guard modelAway() else { return startStream(request) }
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
-            while let self, server.suspendedForImageGeneration, token == self.turnToken, epoch == self.conversationEpoch {
+            while let self, modelAway(), token == self.turnToken, epoch == self.conversationEpoch {
                 try? await Task.sleep(nanoseconds: 300_000_000)
             }
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
@@ -615,8 +622,10 @@ final class ChatClient: ObservableObject {
         // unless the user has said their Mac fits both.
         let shouldUnload = settings.unloadModelDuringImageGen && willActuallyGenerate
         if shouldUnload {
+            isUnloadingModelForImage = true
             await context.server.unloadModel()
         }
+        defer { isUnloadingModelForImage = false }
 
         var pendingModelImages: [Data] = []
         for (i, call) in toolCalls.enumerated() {
