@@ -71,7 +71,9 @@ if arg("--base-model") == "flux2-klein-4b":
     scheduler_step = FlowMatchEulerDiscreteScheduler.step
     def step(self, noise, timestep, latents, **kwargs):
         if timestep + 1 < steps:   # not kept for the last step: no preview there
-            predicted["x0"] = latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise
+            # Back to the latents' dtype: the float32 sigma promotes it, and a
+            # float32 VAE decode peaks ~0.6GB above the final one (measured).
+            predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
         return scheduler_step(self, noise, timestep, latents, **kwargs)
     FlowMatchEulerDiscreteScheduler.step = step
 
@@ -85,12 +87,15 @@ if arg("--base-model") == "flux2-klein-4b":
             latents = predicted.pop("x0", None)
             if latents is None or t + 1 >= steps:
                 return
-            packed = latents.reshape(latents.shape[0], config.height // 16, config.width // 16, latents.shape[-1]).transpose(0, 3, 1, 2)
-            decoded = model.vae.decode_packed_latents(packed, tiling_config=model.tiling_config)
-            emit("PREVIEW", png_b64(ImageUtil.to_image(
-                decoded_latents=decoded, config=config, seed=0, prompt="", quantization=model.bits,
-                lora_paths=None, lora_scales=None, generation_time=0,
-            ).image, max_side=512))
+            try:   # a preview is cosmetic: never the reason a generation fails
+                packed = latents.reshape(latents.shape[0], config.height // 16, config.width // 16, latents.shape[-1]).transpose(0, 3, 1, 2)
+                decoded = model.vae.decode_packed_latents(packed, tiling_config=model.tiling_config)
+                emit("PREVIEW", png_b64(ImageUtil.to_image(
+                    decoded_latents=decoded, config=config, seed=0, prompt="", quantization=model.bits,
+                    lora_paths=None, lora_scales=None, generation_time=0,
+                ).image, max_side=512))
+            except Exception:
+                pass
 
     model.callbacks.register(Steps())
     kwargs = dict(seed=int(arg("--seed", "0")) or int.from_bytes(os.urandom(4), "big"), prompt=request["prompt"],
