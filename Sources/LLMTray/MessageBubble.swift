@@ -51,7 +51,9 @@ struct MessageBubble: View {
                 .foregroundColor(.secondary)
 
             if showReasoning && !message.reasoning.isEmpty {
-                let expanded = reasoningExpanded ?? message.content.isEmpty
+                // Folded once anything follows it: the answer, a tool call, media.
+                let expanded = reasoningExpanded ?? (message.content.isEmpty && message.toolCalls.isEmpty
+                    && message.images.isEmpty && message.audios.isEmpty)
                 VStack(alignment: .leading, spacing: 3) {
                     Button {
                         reasoningExpanded = !expanded
@@ -102,7 +104,7 @@ struct MessageBubble: View {
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
                 AudioClipView(data: data, id: "\(message.id.uuidString)-\(i)", prompt: message.audioPrompts[safe: i] ?? "",
                               generationSeconds: message.audioDurations[safe: i],
-                              regenerate: canRegenerate(.music, i) ? { regenerateMedia?(.music, i) } : nil)
+                              regenerate: canRegenerate(.music, i) && regenerateMedia != nil ? { regenerateMedia?(.music, i) } : nil)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
             }

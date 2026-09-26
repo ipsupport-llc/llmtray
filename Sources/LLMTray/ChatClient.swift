@@ -543,31 +543,46 @@ final class ChatClient: ObservableObject {
         }
         AudioPlayback.shared.stop(ifAnyOf: [messages[i]])
         errorText = nil
+        // The per-turn limits don't apply: nothing else is made meanwhile.
+        toolbox.startTurn()
+        let call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
+        // Only if the generator will really run (it may have been turned off
+        // since): a refusal needs no unload, nor the "Generating…" UI.
+        let runs = kind == .image
+            ? imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
+            : musicTool.willGenerate([call], settings: settings) && musicManager.isReady
         let epoch = conversationEpoch
-        isGeneratingMedia = true
-        generatingKind = kind
+        let token = turnToken
+        // Stop (cancel bumps turnToken and cancels the task) or another
+        // chat opened meanwhile: the result is dropped, errors too.
+        func stillCurrent() -> Bool { epoch == conversationEpoch && token == turnToken && !Task.isCancelled }
+        isGeneratingMedia = runs
+        generatingKind = runs ? kind : nil
+        isRunningTools = true
         toolTask = Task {
             defer {
-                isGeneratingMedia = false
-                generatingKind = nil
+                // Only what this run set: a turn started after a Stop keeps its own.
+                if runs {
+                    isGeneratingMedia = false
+                    generatingKind = nil
+                }
                 isUnloadingModelForMedia = false
+                if token == turnToken { isRunningTools = false }
             }
-            let unload = settings.unloadModelDuringImageGen
+            let unload = runs && settings.unloadModelDuringImageGen
             if unload {
                 isUnloadingModelForMedia = true
                 await server.unloadModel()
             }
-            // Only the image being remade: an edit's own result doesn't count
-            // as the image it edits.
-            toolbox.startTurn()
-            let call = ToolCall(id: "regenerate", name: source.tool, argumentsJSON: source.arguments)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             if unload {
                 do { try await server.ensureModelLoaded() } catch {
-                    errorText = String(format: NSLocalizedString("Failed to reload the chat model after image generation: %@", comment: ""), error.localizedDescription)
+                    if stillCurrent() {
+                        errorText = String(format: NSLocalizedString("Failed to reload the chat model after image generation: %@", comment: ""), error.localizedDescription)
+                    }
                 }
             }
-            guard epoch == conversationEpoch, let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
+            guard stillCurrent(), let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
             switch result {
             case .generatedImage(let data, let seconds, _, _) where kind == .image && messages[j].images.indices.contains(index):
                 messages[j].images[index] = data
@@ -581,6 +596,7 @@ final class ChatClient: ObservableObject {
                 }
                 messages[j].imageFilenames[index] = "\(UUID().uuidString).png"
             case .generatedAudio(let data, let seconds, _, _) where kind == .music && messages[j].audios.indices.contains(index):
+                AudioPlayback.shared.stop(ifAnyOf: [messages[j]])   // the old clip, if played meanwhile
                 messages[j].audios[index] = data
                 if messages[j].audioDurations.indices.contains(index) { messages[j].audioDurations[index] = seconds }
                 let id = messages[j].id.uuidString

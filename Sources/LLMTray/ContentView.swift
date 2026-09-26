@@ -207,11 +207,6 @@ struct ContentView: View {
     private static let chatBottomID = "chat-bottom"
     @MainActor private static var lastRescan = Date.distantPast
 
-    /// Grows with every streamed token and new message -- cheap to compare.
-    private var streamSignal: Int {
-        chat.messages.count * 1_000_003 + (chat.messages.last?.content.count ?? 0) + (chat.messages.last?.reasoning.count ?? 0)
-    }
-
     /// The user's latest own message (not the hidden view_image one).
     private var lastUserMessageID: UUID? {
         chat.messages.last { $0.role == "user" && !$0.isToolContext }?.id
@@ -303,7 +298,7 @@ struct ContentView: View {
                 // further down). Told apart this way even while tokens stream
                 // in -- comparing "moved, same height" missed every scroll
                 // that coincided with a token, so reading back was impossible.
-                let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 2
+                let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 0.5
                 lastChatGeometry = geometry
                 if scrolledUp, geometry.bottom > chatViewportHeight + 40 {
                     followChatBottom = false
@@ -321,10 +316,6 @@ struct ContentView: View {
             // a fixed viewport instead of growing the popover. Detached, it
             // takes whatever height the window leaves it.
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
-            // Cheap to compare: lengths, not the whole text, per token.
-            .onChange(of: streamSignal) { _ in
-                if followChatBottom { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
-            }
             .onChange(of: lastUserMessageID) { _ in
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
