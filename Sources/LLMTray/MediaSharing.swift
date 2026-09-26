@@ -86,7 +86,9 @@ struct SharedAudio: Transferable {
 
     static var transferRepresentation: some TransferRepresentation {
         FileRepresentation(exportedContentType: .mpeg4Audio) { clip in
-            SentTransferredFile(try MediaSharing.exportFile(MediaSharing.m4a(clip.data), name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "m4a"))
+            // An old WAV that won't encode fails the share rather than go out mislabelled.
+            let audio = AudioCodec.format(of: clip.data) == .m4a ? clip.data : try AudioCodec.m4a(from: clip.data)
+            return SentTransferredFile(try MediaSharing.exportFile(audio, name: MediaSharing.fileName(clip.prompt, fallback: "music"), ext: "m4a"))
         }
     }
 }

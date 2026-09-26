@@ -77,21 +77,23 @@ public enum AudioCodec {
                 var writer: ExtAudioFileRef?
                 try check("ExtAudioFileWrapAudioFileID (write)", ExtAudioFileWrapAudioFileID(outFile, true, &writer))
                 guard let writer else { throw CodecError(step: "writer", status: -1) }
-                defer { ExtAudioFileDispose(writer) }
+                // Disposing flushes the encoder's last packets: checked, not deferred.
+                var disposed = false
+                defer { if !disposed { ExtAudioFileDispose(writer) } }
                 try check("writer client format", ExtAudioFileSetProperty(writer, kExtAudioFileProperty_ClientDataFormat,
                                                                           UInt32(MemoryLayout<AudioStreamBasicDescription>.size), &pcm))
                 // The bit rate is the encoder's (the converter behind the writer).
                 var converter: AudioConverterRef?
                 var converterSize = UInt32(MemoryLayout<AudioConverterRef?>.size)
-                if ExtAudioFileGetProperty(writer, kExtAudioFileProperty_AudioConverter, &converterSize, &converter) == noErr,
-                   let converter {
-                    var rate = bitRate
-                    AudioConverterSetProperty(converter, kAudioConverterEncodeBitRate, UInt32(MemoryLayout<UInt32>.size), &rate)
-                    // A null config: the writer re-reads the converter's settings.
-                    var none: UnsafeRawPointer?
-                    ExtAudioFileSetProperty(writer, kExtAudioFileProperty_ConverterConfig,
-                                            UInt32(MemoryLayout<UnsafeRawPointer?>.size), &none)
-                }
+                try check("converter", ExtAudioFileGetProperty(writer, kExtAudioFileProperty_AudioConverter, &converterSize, &converter))
+                guard let converter else { throw CodecError(step: "converter", status: -1) }
+                var rate = bitRate
+                try check("bit rate", AudioConverterSetProperty(converter, kAudioConverterEncodeBitRate,
+                                                                UInt32(MemoryLayout<UInt32>.size), &rate))
+                // A null config: the writer re-reads the converter's settings.
+                var none: UnsafeRawPointer?
+                try check("converter config", ExtAudioFileSetProperty(writer, kExtAudioFileProperty_ConverterConfig,
+                                                                      UInt32(MemoryLayout<UnsafeRawPointer?>.size), &none))
 
                 let framesPerChunk: UInt32 = 8192
                 var samples = [Float](repeating: 0, count: Int(framesPerChunk * channels))
@@ -108,6 +110,8 @@ public enum AudioCodec {
                     try check("encode", status)
                     if frames == 0 { break }
                 }
+                disposed = true
+                try check("finish", ExtAudioFileDispose(writer))
             }
         }
         guard format(of: output.data) == .m4a else { throw CodecError(step: "container", status: -1) }
@@ -126,29 +130,34 @@ private final class MemoryAudioFile {
     init(_ data: Data) { self.data = data }
 
     func withReader<T>(_ body: (AudioFileID) throws -> T) throws -> T {
-        var file: AudioFileID?
-        let status = AudioFileOpenWithCallbacks(Unmanaged.passUnretained(self).toOpaque(),
-                                                Self.read, nil, Self.getSize, nil, 0, &file)
-        guard status == noErr, let file else { throw AudioCodec.CodecError(step: "open", status: status) }
-        defer { AudioFileClose(file) }
-        return try body(file)
+        // Alive until the file is closed: the callbacks reach it unretained.
+        try withExtendedLifetime(self) {
+            var file: AudioFileID?
+            let status = AudioFileOpenWithCallbacks(Unmanaged.passUnretained(self).toOpaque(),
+                                                    Self.read, nil, Self.getSize, nil, 0, &file)
+            guard status == noErr, let file else { throw AudioCodec.CodecError(step: "open", status: status) }
+            defer { AudioFileClose(file) }
+            return try body(file)
+        }
     }
 
     /// The container is finished (its index written) when the file closes.
     func withWriter(type: AudioFileTypeID, format: inout AudioStreamBasicDescription, _ body: (AudioFileID) throws -> Void) throws {
-        var file: AudioFileID?
-        let status = AudioFileInitializeWithCallbacks(Unmanaged.passUnretained(self).toOpaque(),
-                                                      Self.read, Self.write, Self.getSize, Self.setSize,
-                                                      type, &format, [], &file)
-        guard status == noErr, let file else { throw AudioCodec.CodecError(step: "create", status: status) }
-        do {
-            try body(file)
-        } catch {
-            AudioFileClose(file)
-            throw error
+        try withExtendedLifetime(self) {
+            var file: AudioFileID?
+            let status = AudioFileInitializeWithCallbacks(Unmanaged.passUnretained(self).toOpaque(),
+                                                          Self.read, Self.write, Self.getSize, Self.setSize,
+                                                          type, &format, [], &file)
+            guard status == noErr, let file else { throw AudioCodec.CodecError(step: "create", status: status) }
+            do {
+                try body(file)
+            } catch {
+                AudioFileClose(file)
+                throw error
+            }
+            let closed = AudioFileClose(file)
+            if closed != noErr { throw AudioCodec.CodecError(step: "close", status: closed) }
         }
-        let closed = AudioFileClose(file)
-        if closed != noErr { throw AudioCodec.CodecError(step: "close", status: closed) }
     }
 
     private static func me(_ p: UnsafeMutableRawPointer) -> MemoryAudioFile {
@@ -157,8 +166,8 @@ private final class MemoryAudioFile {
 
     private static let read: AudioFile_ReadProc = { client, position, count, buffer, actual in
         let file = me(client)
+        guard position >= 0, position <= Int64(file.data.count) else { actual.pointee = 0; return kAudioFilePositionError }
         let start = Int(position)
-        guard start >= 0, start <= file.data.count else { actual.pointee = 0; return kAudioFileInvalidPacketOffsetError }
         let n = min(Int(count), file.data.count - start)
         file.data.withUnsafeBytes { src in
             if n > 0 { buffer.copyMemory(from: src.baseAddress! + start, byteCount: n) }
@@ -169,6 +178,8 @@ private final class MemoryAudioFile {
 
     private static let write: AudioFile_WriteProc = { client, position, count, buffer, actual in
         let file = me(client)
+        // Offsets from Core Audio, checked: a bad one is an error, not a trap.
+        guard position >= 0, position <= Int64(Int.max) - Int64(count) else { actual.pointee = 0; return kAudioFilePositionError }
         let start = Int(position)
         let end = start + Int(count)
         if end > file.data.count { file.data.append(Data(count: end - file.data.count)) }
@@ -183,6 +194,7 @@ private final class MemoryAudioFile {
 
     private static let setSize: AudioFile_SetSizeProc = { client, size in
         let file = me(client)
+        guard size >= 0 else { return kAudioFilePositionError }
         let n = Int(size)
         if n < file.data.count {
             file.data.removeSubrange(n..<file.data.count)
