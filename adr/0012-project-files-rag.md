@@ -2,7 +2,10 @@
 
 **Status: proposed** (2026-09-26). Nothing here is built yet. Numbers
 under Evidence were measured on an M5 (26 GB, macOS 27.2) or are cited.
-Revised after two architecture reviews (Codex, Claude).
+Revised after two architecture reviews (Codex, Claude) and the user's
+requirements (2026-09-26): a full workspace like ChatGPT's projects —
+many documents, vector search from v1, sources from the tool, office,
+PDF and images all processed.
 
 ## Decision
 
@@ -13,20 +16,36 @@ chat of the project, reached by the chat model through tools.
 - **Engine: the system SQLite, no extensions.** One `index.sqlite` per
   project. Apple's SQLite has FTS5 but `OMIT_LOAD_EXTENSION` (no
   sqlite-vec); LLMTrayCore links `sqlite3` (`linkerSettings`).
-- **v1 is lexical.** FTS5 twice: `unicode61` (words, BM25) and `trigram`
-  (substrings — the stand-in for the Russian stemmer FTS5 lacks:
-  "договор" finds "договора"). No embedder, no runner, no ML resource
-  question in v1.
-- **Dense retrieval is v1.1, if it earns it.** f16 vectors brute-forced
-  with Accelerate, fused with the lexical list by RRF (k = 60) — built
-  only if the eval on the user's documents (Plan, step 2) shows it
-  raises recall@10 over lexical. The candidates are measured there:
-  Qwen3-Embedding-0.6B, bge-m3, Apple's in-process NLContextualEmbedding
-  as the no-subprocess baseline.
+- **Hybrid from v1.** FTS5 twice — `unicode61` (words, BM25) and
+  `trigram` (substrings, the stand-in for the Russian stemmer FTS5
+  lacks: "договор" finds "договора") — plus dense vectors, f16,
+  brute-forced with Accelerate; the three lists fused by RRF (k = 60).
+- **The embedder is configuration, not code**, and never Qwen (the
+  user's call). A registry entry names the HF repo, the architecture
+  family, pooling (CLS / mean / last token), normalization, query and
+  document prefixes, max length and dimension; adding a model is adding
+  an entry. A project picks its embedder once, at creation; the index
+  records it, and a change re-embeds in the background while the old
+  vectors keep answering. Candidates, decided on the user's documents
+  (Plan, step 2): bge-m3 (MIT, 568M, 8k context, strong on Russian — the
+  provisional default), USER-bge-m3 (bge-m3 tuned for Russian), Snowflake
+  arctic-embed-l-v2.0 (Apache-2.0), multilingual-e5-large-instruct (MIT,
+  512-token limit), EmbeddingGemma-300m. Licences and MLX support of the
+  two not in the research yet are checked first.
+- **Scale**: 1-2k documents, up to ~200k chunks per project, without a
+  vector index — 200k × 1024 is ~16 ms per query in f32 (~4 ms with the
+  multi-core f16 kernel); vectors kept f16 in memory (~400 MB) or at a
+  smaller dimension where the model supports it. Indexing 1,000 documents
+  × 20 pages is hours of background work at most: it shows progress,
+  pauses for chat generation, resumes after a relaunch.
 - **Extraction in tiers**, cheapest first; a page takes the first tier
   whose text passes the junk check: (1) text layer — PDFKit, docx/doc/
   odt/rtf via `NSAttributedString`, HTML via LLMTrayCore `WebParsing`,
-  plain text and code; (2) Vision OCR, v2; (3) a document VLM, v3.
+  plain text and code, xlsx/pptx from their XML; (2) Vision OCR for
+  scans and photos; (3) a document VLM for hard pages. Images get OCR
+  and a short description, both indexed, so a photo is found by what it
+  shows. All three tiers are in the product's scope; the plan orders
+  them.
 - **Retrieval, not stuffing**: no "whole project in the request" mode.
 - **Files are immutable snapshots** copied into the project; replacing
   one is remove + add. The UI calls them copies.
@@ -113,7 +132,7 @@ Application Support/LLMTray/projects/<projectID>/
 
 - `documents(doc, name, ext, sha256, bytes, added_at, status, pages,
   error)`; `doc` a small integer. `status`: staged → extracting →
-  searchable (→ embedded, v1.1) | failed | removing.
+  searchable → embedded | failed | removing.
 - `pages(doc, page, text, tier, status, error)` — the raw extracted
   text: `read_project_file` quotes it; a failed page is retried from it.
 - `chunks(id, doc, page, ord, heading, body)` — `body` normalized (NFC,
@@ -172,7 +191,7 @@ and a free-space check before a copy are in v1.
   `GenerationQueue` client like the generators
   ([0009](0009-media-generators.md)).
 
-## Dense retrieval (v1.1, if the eval says so)
+## Dense retrieval
 
 - Vectors `(chunk, model, dim, v f16)`, widened to f32 in memory for
   open projects only; `model` recorded, so a change re-embeds.
@@ -186,6 +205,9 @@ and a free-space check before a copy are in v1.
   Its fit is measured against the Metal limit (~19 GB by default on this
   Mac), not the 26 GB of RAM.
 - A query while it can't run falls back to lexical, and says so.
+- The runner is generic over the registry's families (XLM-R for the
+  bge-m3 line and e5, Gemma for EmbeddingGemma, …) on MLX; each entry
+  ships with reference vectors so a conversion is checked on load.
 
 ## Tests (LLMTrayCore)
 
@@ -206,8 +228,8 @@ tabs; opening a previous schema.
   checked at runtime (`sqlite_compileoption_used('ENABLE_FTS5')`).
 - Brute force, 1 query, top-20, f32 `cblas_sgemv`: 50k × 1024 2.7 ms,
   500k × 1024 40 ms. No vector index at project scale.
-- Qwen3-Embedding-0.6B under upstream mlx-lm's `qwen3` model: ~6,400
-  tokens/s at batch 16, 1.8 GB peak. RuBQ retrieval: 0.6B 66.9, bge-m3
+- Qwen3-Embedding-0.6B (measured before Qwen was ruled out, kept as a
+  speed reference) under mlx-lm: ~6,400 tokens/s at batch 16, 1.8 GB peak. RuBQ retrieval: 0.6B 66.9, bge-m3
   71.2, mE5-large 74.1, Qwen3-4B 73.7 (MTEB results repository).
 - Vision rev3 `.accurate`, a clean Russian page: body near perfect,
   table cells column-wise; `RecognizeDocumentsRequest` (macOS 26+)
@@ -230,28 +252,44 @@ contextual-retrieval.
 1. **Spike (throwaway).** Schema, triggers, both FTS tables on a few
    hundred chunks; `--extract` on hostile samples (corrupt PDF, zip-bomb
    docx, remote-loading HTML); injection documents against the tools;
-   the embedder on the pinned mlx-lm fork, matching reference vectors.
+   the generic embed runner with two registry entries (bge-m3 and one
+   other family) on MLX, matching reference vectors.
 2. **Eval on extracted text.** The user's 20-30 real documents through
    tier 1 (and the tier-2 prototype); 40-60 questions with the answering
-   page; recall@10 and MRR for lexical vs lexical + dense (each
-   candidate embedder, dims 1024/512); CER per tier. Decides whether
-   dense ships and which embedder.
-3. **v1a — lexical, safe, usable.** `ProjectIndex` and the registry,
+   page; recall@10 and MRR for lexical vs hybrid with each candidate
+   embedder; CER per tier. Decides the default embedder.
+3. **v1a — hybrid, safe, usable.** The embed runner and registry, the
+   ML policy, `ProjectIndex` and the registry,
    ingestion and reconcile, tier 1 with the junk check, `--extract`,
    caps, the three tools, budget, elision, trust rules, compaction
    exclusion, citations, the Files view, New Chat in Project, deletion,
    the tests above. Exit: text-document recall on the eval set, the
    injection tests passing.
-4. **v1b — dense**, if step 2 said so: the runner, the queue client, RRF.
-   Exit: its recall gain reproduced, peak memory within the Metal limit.
-5. **v2 — scans and photos**: tier 2, xlsx/pptx from their XML, project
-   images for `edit_image` by a `doc` argument (pinned through
-   Regenerate, [0011](0011-creator-mode-and-media-variants.md)).
+4. **v1b — every format**: tier 2 (Vision OCR, segmentation,
+   perspective, `RecognizeDocumentsRequest` tables on macOS 26+), image
+   descriptions, xlsx/pptx. Exit: CER and recall on the scanned part of
+   the eval set, peak memory within the Metal limit.
+5. **v2 — images as material**: project images for `edit_image` by a
+   `doc` argument (pinned through Regenerate,
+   [0011](0011-creator-mode-and-media-variants.md)).
 6. **v3 — hard pages**: tier 3 benchmarked on the eval pages; a reranker
-   (Qwen3-Reranker-0.6B) kept only if it moves recall.
+   (bge-reranker-v2-m3 or similar — not Qwen) kept only if it moves
+   recall.
 
-## Open questions
+## Open questions (the user's to decide)
 
+- Scale: 1-2k documents per project, or tens of thousands (then a
+  vector index)?
+- Legacy binary .xls / .ppt: unsupported ("save as xlsx/pptx"), .doc is
+  read natively?
+- Spreadsheets: besides chunks, a tool that loads sheets into SQLite
+  tables for the model to query (sums, filters) — in v1 or later?
+- Image descriptions: the chat model (sees images, ~10 s each, competes
+  with generation) or a small VLM beside it?
+- Project instructions (text added to every chat of the project)?
+- Copies in the project folder, or references to the user's folders
+  with re-indexing on change (less disk for many documents, more
+  moving parts)?
 - The caps' values; the budget's share of the context.
 - Whether an original's later edits should ever be offered as an update
   (snapshots today).
