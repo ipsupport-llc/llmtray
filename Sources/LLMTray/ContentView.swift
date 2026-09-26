@@ -312,7 +312,8 @@ struct ContentView: View {
                 // Anything that grows the chat at the end -- tokens, an image's
                 // progress and preview, the image or song itself -- keeps the
                 // end in view while the user follows it.
-                if followChatBottom, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
+                // Not while a Tweak draft up the chat is what the user looks at.
+                if followChatBottom, chat.draft?.anchor == nil, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
                     DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
                 }
             }
@@ -323,6 +324,7 @@ struct ContentView: View {
             // A draft wants the user's eyes: brought into view, wherever it is.
             .onChange(of: chat.draft?.id) { id in
                 guard let id else { return }
+                if chat.draft?.anchor != nil { followChatBottom = false }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
             .onChange(of: lastUserMessageID) { _ in
