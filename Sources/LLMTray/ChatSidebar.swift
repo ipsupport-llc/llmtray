@@ -225,11 +225,10 @@ struct ChatSidebar: View {
                 .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
-            Button {
-                // ⌘-click: in a new tab, as in a browser.
-                let newTab = NSEvent.modifierFlags.contains(.command)
-                open { tabs.open(summary.id, inNewTab: newTab) }
-            } label: {
+            // Not a Button: built with the SDK CI uses, a Button keeps the
+            // mouse drag to itself, so the row never started dragging (it
+            // did in a local build).
+            SidebarRow(isSelected: chat.currentSessionID == summary.id) {
                 HStack(spacing: 6) {
                     if store.library.isPinned(summary.id) && !query.isEmpty {
                         Image(systemName: "pin.fill").font(.caption2).foregroundColor(.secondary)
@@ -243,7 +242,14 @@ struct ChatSidebar: View {
                     }
                 }
             }
-            .buttonStyle(SidebarRowStyle(isSelected: chat.currentSessionID == summary.id))
+            .onTapGesture {
+                // ⌘-click: in a new tab, as in a browser.
+                let newTab = NSEvent.modifierFlags.contains(.command)
+                open { tabs.open(summary.id, inNewTab: newTab) }
+            }
+            .accessibilityAddTraits(.isButton)
+            // VoiceOver's "press", as the Button had.
+            .accessibilityAction { open { tabs.open(summary.id, inNewTab: false) } }
             .help(summary.title)
             .contextMenu { chatMenu(summary, in: section) }
             // Onto a project, Pinned, or the recents.
@@ -395,6 +401,28 @@ extension ChatAge {
         case .previous30Days: return Text("Previous 30 Days")
         case .older: return Text("Older")
         }
+    }
+}
+
+/// A chat's row: looks like SidebarRowStyle's, but a plain view (tapped,
+/// and draggable -- a Button would swallow the drag).
+struct SidebarRow<Content: View>: View {
+    let isSelected: Bool
+    @ViewBuilder let content: () -> Content
+    @State private var hovered = false
+
+    var body: some View {
+        content()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .background(
+                RoundedRectangle(cornerRadius: 6).fill(
+                    isSelected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(hovered ? 0.06 : 0)
+                )
+            )
+            .onHover { hovered = $0 }
     }
 }
 
