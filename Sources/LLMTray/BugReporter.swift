@@ -98,26 +98,38 @@ enum BugReporter {
             """
         let collected = LineCollector()
         do {
-            try await ProcessRunner.run(MLXRuntimeInstaller.venvPython, ["-c", script]) { line in collected.lines.append(line) }
+            // Line by line, in order (run()'s log chunks can arrive after it returns).
+            try await ProcessRunner.runStreaming(MLXRuntimeInstaller.venvPython, ["-c", script]) { line in collected.add(line) }
         } catch {
             return "not available (\(error.localizedDescription))"
         }
-        return collected.lines.last { !$0.isEmpty } ?? "?"
+        return collected.last ?? "?"
     }
 
-    @MainActor private final class LineCollector { var lines: [String] = [] }
+    private final class LineCollector: @unchecked Sendable {
+        private let lock = NSLock()
+        private var lines: [String] = []
+        func add(_ line: String) { lock.withLock { lines.append(line) } }
+        var last: String? {
+            lock.withLock { lines.last { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty } }?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
 
     /// The selected model's config fields and size, read off the main thread.
     static func modelDetails() async -> [(String, String)] {
         guard let id = UserDefaults.standard[Pref.selectedModelID],
               let path = ModelCatalog.shared.model(id: id)?.path else { return [] }
-        let lines = await Task.detached(priority: .utility) { modelConfig(at: path).map { [$0.0, $0.1] } }.value
+        // The catalog has the size already (counted off the main thread,
+        // symlinks followed).
+        let known = ModelCatalog.shared.sizes[path]
+        let lines = await Task.detached(priority: .utility) { modelConfig(at: path, size: known).map { [$0.0, $0.1] } }.value
         return lines.map { ($0[0], $0[1]) }
     }
 
     /// A few fields of the model's config.json: what it is and how it's
     /// quantized, and its size.
-    nonisolated static func modelConfig(at path: String) -> [(String, String)] {
+    nonisolated static func modelConfig(at path: String, size known: Int64? = nil) -> [(String, String)] {
         let url = URL(fileURLWithPath: path).appendingPathComponent("config.json")
         guard let data = try? Data(contentsOf: url),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [] }
@@ -130,7 +142,7 @@ enum BugReporter {
             let mode = (quant["mode"] ?? quant["quant_method"]).map { "\($0)" } ?? ""
             out.append(("Quantization", [bits, group, mode].filter { !$0.isEmpty }.joined(separator: ", ")))
         }
-        let size = (try? FileManager.default.subpathsOfDirectory(atPath: path))?.reduce(Int64(0)) { total, sub in
+        let size = known ?? (try? FileManager.default.subpathsOfDirectory(atPath: path))?.reduce(Int64(0)) { total, sub in
             let attrs = try? FileManager.default.attributesOfItem(atPath: path + "/" + sub)
             return total + ((attrs?[.size] as? NSNumber)?.int64Value ?? 0)
         }
@@ -146,12 +158,23 @@ enum BugReporter {
         for dir in dirs {
             let url = URL(fileURLWithPath: dir)
             let files = (try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.contentModificationDateKey])) ?? []
-            for file in files where file.lastPathComponent.hasPrefix(product) {
+            for file in files where file.pathExtension == "ips" {
+                let name = file.lastPathComponent
                 let date = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
-                if date > cutoff { found.append((file, date)) }
+                guard date > cutoff else { continue }
+                // The model server's crashes are Python's: ours when the
+                // runtime under LLMTray's Application Support is loaded.
+                if name.hasPrefix(product) || (name.hasPrefix("Python") && isOurPython(file)) {
+                    found.append((file, date))
+                }
             }
         }
         return found.sorted { $0.1 > $1.1 }.prefix(limit).map(\.0)
+    }
+
+    private static func isOurPython(_ file: URL) -> Bool {
+        guard let text = try? String(contentsOf: file, encoding: .utf8) else { return false }
+        return text.contains("Application Support/LLMTray/") || text.contains("Application Support\\/LLMTray\\/")
     }
 
     // MARK: - Packaging and sending
@@ -197,7 +220,7 @@ enum BugReporter {
                 var unreadable: [String] = []
                 for crash in crashes {
                     guard let content = try? String(contentsOf: crash, encoding: .utf8),
-                          (try? BugReport.redact(content).write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)) != nil
+                          (try? BugReport.redactCrashReport(content).write(to: dir.appendingPathComponent(crash.lastPathComponent), atomically: true, encoding: .utf8)) != nil
                     else { unreadable.append(crash.lastPathComponent); continue }
                 }
                 if !unreadable.isEmpty {
@@ -271,6 +294,8 @@ enum BugReporter {
             URLQueryItem(name: "subject", value: report.subject),
             URLQueryItem(name: "body", value: body + "\n\n" + NSLocalizedString("(Please attach the report file shown in Finder.)", comment: "bug report mail")),
         ]
+        // A literal "+" reads as a space to some mail apps.
+        mailto.percentEncodedQuery = mailto.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
         if let url = mailto.url { NSWorkspace.shared.open(url) }
     }
 

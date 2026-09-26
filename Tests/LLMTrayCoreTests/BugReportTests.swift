@@ -41,10 +41,44 @@ final class BugReportTests: XCTestCase {
         let clean = BugReport.withoutChatContent(log)
         XCTAssertFalse(clean.contains("secret"))
         XCTAssertFalse(clean.contains("leak"))
-        XCTAssertTrue(clean.contains("Incoming Request Body: [removed]"))
+        XCTAssertTrue(clean.contains("[verbose log record removed]"))
         XCTAssertTrue(clean.contains("Starting httpd"))
         XCTAssertTrue(clean.contains("\"POST /v1/chat/completions HTTP/1.1\" 200"), "the access line after a body stays")
         XCTAssertTrue(clean.contains("Prompt processing progress: 10/10"))
+    }
+
+    func testVerboseRecordsDroppedWhole() {
+        let log = """
+            2026-09-24 03:12:45,000 - DEBUG - my answer starts
+            and the generated text goes on
+            ---
+            Error: still the answer
+            over lines
+            2026-09-24 03:12:46,000 - DEBUG - Outgoing Response: {"choices": [1]}
+            127.0.0.1 - - [24/Sep/2026 03:12:46] "POST /v1/chat/completions HTTP/1.1" 200 -
+            2026-09-24 03:12:47,000 - INFO - done
+            """
+        let clean = BugReport.withoutChatContent(log)
+        XCTAssertFalse(clean.contains("answer"))
+        XCTAssertFalse(clean.contains("generated text"))
+        XCTAssertFalse(clean.contains("still the answer"), "a markdown rule or 'Error:' in the answer doesn't end the record")
+        XCTAssertFalse(clean.contains("choices"))
+        XCTAssertTrue(clean.contains("[verbose log record removed]"))
+        XCTAssertTrue(clean.contains("\"POST /v1/chat/completions HTTP/1.1\" 200"))
+        XCTAssertTrue(clean.contains("INFO - done"))
+    }
+
+    func testRedactOnAPathBoundary() {
+        XCTAssertEqual(BugReport.redact("/Users/alice/x /Users/alice2/y /Users/alice", home: "/Users/alice"), "~/x /Users/alice2/y ~")
+    }
+
+    func testCrashReportRedaction() {
+        let ips = #"{"crashReporterKey" : "ABC-123", "sleepWakeUUID":"X-Y", "path":"\/Users\/alice\/Library\/x.so", "userID" : 501}"#
+        let clean = BugReport.redactCrashReport(ips, home: "/Users/alice")
+        XCTAssertFalse(clean.contains("ABC-123"))
+        XCTAssertFalse(clean.contains("X-Y"))
+        XCTAssertFalse(clean.contains("alice"))
+        XCTAssertTrue(clean.contains(#""crashReporterKey":"removed""#))
     }
 
     func testTailCutsAtALineStart() {

@@ -39,7 +39,7 @@ struct BugReportView: View {
             Toggle("Include LLMTray crash reports from the last two weeks", isOn: $options.includeCrashReports)
 
             // Everything that goes: report.txt, and the log as attached.
-            DisclosureGroup("The report") {
+            DisclosureGroup {
                 ScrollView {
                     Text(report.text())
                         .font(.system(size: 11, design: .monospaced))
@@ -49,9 +49,11 @@ struct BugReportView: View {
                 }
                 .frame(minHeight: 160, maxHeight: 260)
                 .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
+            } label: {
+                Text("The report")
             }
             if options.includeServerLog, !server.log.isEmpty {
-                DisclosureGroup("The server log") {
+                DisclosureGroup {
                     ScrollView {
                         Text(BugReporter.serverLogForReport(server))
                             .font(.system(size: 10, design: .monospaced))
@@ -61,6 +63,8 @@ struct BugReportView: View {
                     }
                     .frame(minHeight: 120, maxHeight: 220)
                     .background(RoundedRectangle(cornerRadius: 6).fill(Color.primary.opacity(0.05)))
+                } label: {
+                    Text("The server log")
                 }
             }
 
@@ -75,7 +79,8 @@ struct BugReportView: View {
                     .disabled(isWorking)
                 Button("Create Email…") { Task { await make(send: true) } }
                     .keyboardShortcut(.defaultAction)
-                    .disabled(isWorking)
+                    // Once the runtime versions are in.
+                    .disabled(isWorking || runtimeVersions == "…")
             }
         }
         .padding(18)

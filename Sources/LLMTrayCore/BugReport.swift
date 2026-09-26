@@ -50,7 +50,9 @@ public struct BugReport {
     /// The home folder as "~": paths say where, not whose.
     public static func redact(_ text: String, home: String = NSHomeDirectory()) -> String {
         guard home.count > 1 else { return text }
-        return text.replacingOccurrences(of: home, with: "~")
+        // On a path boundary: "/Users/alice2" isn't "~2".
+        let pattern = NSRegularExpression.escapedPattern(for: home) + #"(?=[/\\"'\s:,)\]]|$)"#
+        return text.replacingOccurrences(of: pattern, with: "~", options: .regularExpression)
     }
 
     /// The server log without what a chat put in it: with verbose logging
@@ -61,7 +63,20 @@ public struct BugReport {
     public static func withoutChatContent(_ log: String) -> String {
         var out: [String] = []
         var inBody = false
+        var inDebug = false
         for line in log.components(separatedBy: "\n") {
+            // Verbose logging's DEBUG records carry the request bodies, the
+            // generated text and the responses -- dropped whole, with the
+            // lines they continue onto, until the next record.
+            if inDebug {
+                if !startsRecord(line) { continue }
+                inDebug = false
+            }
+            if line.contains(" - DEBUG - ") {
+                if !inDebug { out.append("[verbose log record removed]") }
+                inDebug = true
+                continue
+            }
             if inBody {
                 // A pretty-printed body's continuation: indented, or a
                 // bracket or quote first.
@@ -78,6 +93,28 @@ public struct BugReport {
             }
         }
         return out.joined(separator: "\n")
+    }
+
+    /// A new log record: a timestamp ("2026-09-24 ..."), an access line
+    /// ("127.0.0.1 - - [...]"), a level ("INFO:", "WARNING", "ERROR") or
+    /// LLMTray's own "---" lines.
+    /// Strict on purpose: a model's text (a markdown "---", a line saying
+    /// "Error") must not end the record and leak what follows.
+    static func startsRecord(_ line: String) -> Bool {
+        let pattern = #"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}|\d{1,3}(\.\d{1,3}){3} - - \[|(INFO|WARNING|ERROR):|--- .+ ---$)"#
+        return line.range(of: pattern, options: .regularExpression) != nil
+    }
+
+    /// A macOS crash report (.ips) as attached: the home folder as "~" in
+    /// its JSON-escaped paths too, and the IDs that identify this Mac
+    /// across reports (crashReporterKey, sleepWakeUUID...) removed.
+    public static func redactCrashReport(_ text: String, home: String = NSHomeDirectory()) -> String {
+        var out = redact(text, home: home)
+        out = redact(out, home: home.replacingOccurrences(of: "/", with: "\\/"))
+        for key in ["crashReporterKey", "sleepWakeUUID", "deviceIdentifierForVendor", "incident_id", "incident"] {
+            out = out.replacingOccurrences(of: #""\#(key)"\s*:\s*"[^"]*""#, with: "\"\(key)\":\"removed\"", options: .regularExpression)
+        }
+        return out
     }
 
     /// The last `maxBytes` of a log, from a line start.
