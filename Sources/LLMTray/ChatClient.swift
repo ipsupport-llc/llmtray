@@ -303,6 +303,7 @@ final class ChatClient: ObservableObject {
         }
         guard !persisted.isEmpty else { return }
 
+        var mediaMissing = false
         if !pendingImageWrites.isEmpty {
             try? FileManager.default.createDirectory(atPath: imagesDir, withIntermediateDirectories: true)
             for (path, data) in pendingImageWrites where !FileManager.default.fileExists(atPath: path) {
@@ -313,7 +314,10 @@ final class ChatClient: ObservableObject {
             // is); the next save tries the file again.
             let missing = Set(pendingImageWrites.filter { !FileManager.default.fileExists(atPath: $0.path) }
                 .map { ($0.path as NSString).lastPathComponent })
-            if !missing.isEmpty { persisted = persisted.map { $0.withoutFiles(missing) } }
+            if !missing.isEmpty {
+                persisted = persisted.map { $0.withoutFiles(missing) }
+                mediaMissing = true
+            }
         }
         let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
 
@@ -331,7 +335,9 @@ final class ChatClient: ObservableObject {
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
         guard ChatSessionStore.save(file) else { return }
-        hasUnsavedChanges = false
+        // Still to write: the next save (a later turn, leaving the chat)
+        // tries the media again.
+        hasUnsavedChanges = mediaMissing
         for name in (try? FileManager.default.contentsOfDirectory(atPath: imagesDir)) ?? [] where !referenced.contains(name) {
             try? FileManager.default.removeItem(atPath: imagesDir + "/" + name)
         }
