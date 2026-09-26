@@ -130,18 +130,9 @@ final class ChatTabs: ObservableObject {
 
     private func makeClient() -> ChatClient {
         let client = ChatClient(mflux: mflux, music: music)
-        client.isAnotherChatBusy = { [weak self, weak client] in
-            guard let self, let client else { return false }
-            // A closed tab still reloading the model counts too.
-            return (self.tabs + self.closing).contains { $0 !== client && $0.isBusy }
-        }
         client.isAnotherChatUnloadingModel = { [weak self, weak client] in
             guard let self, let client else { return false }
             return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForMedia }
-        }
-        client.isAnotherChatGeneratingMedia = { [weak self, weak client] in
-            guard let self, let client else { return false }
-            return (self.tabs + self.closing).contains { $0 !== client && $0.isGeneratingMedia }
         }
         return client
     }

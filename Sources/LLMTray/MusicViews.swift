@@ -185,11 +185,37 @@ struct AudioClipView: View {
     }
 }
 
+/// Waiting for another chat's image or song (the app-wide generator queue).
+struct MediaQueueView: View {
+    let ahead: Int
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ProgressView().controlSize(.small)
+            Image(systemName: "hourglass").foregroundColor(.secondary)
+            Text(ahead == 1
+                 ? NSLocalizedString("Waiting for another chat's image or music to finish…", comment: "generator queue")
+                 : String(format: NSLocalizedString("In the queue: %lld ahead…", comment: "generator queue"), ahead))
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 /// Stage and progress while music is being generated.
 struct MusicGenerationProgressView: View {
     @EnvironmentObject var chat: ChatClient
 
     var body: some View {
+        if let ahead = chat.mediaQueuePosition {
+            MediaQueueView(ahead: ahead)
+        } else {
+            progress
+        }
+    }
+
+    private var progress: some View {
         HStack(spacing: 8) {
             if let progress = chat.musicProgress {
                 ProgressView(value: Double(progress), total: 100).frame(width: 100)

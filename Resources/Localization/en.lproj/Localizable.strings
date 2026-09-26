@@ -26,7 +26,6 @@
 "Already open in another tab" = "Already open in another tab";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
-"Another chat is generating an image or music, or answering, right now -- try again once it's done." = "Another chat is generating an image or music, or answering, right now -- try again once it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
@@ -158,6 +157,7 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation isn't set up -- turn it on again in Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image model" = "Image model";
+"In the queue: %lld ahead…" = "In the queue: %lld ahead…";
 "Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
 "Include the server log" = "Include the server log";
 "Installed" = "Installed";
@@ -417,6 +417,7 @@
 "Version %@" = "Version %@";
 "View model card" = "View model card";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
+"Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
 "Weather" = "Weather";
 "Web search" = "Web search";
 "What happened?" = "What happened?";

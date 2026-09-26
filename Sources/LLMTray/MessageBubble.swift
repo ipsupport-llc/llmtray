@@ -213,6 +213,14 @@ struct ImageGenerationProgressView: View {
     @EnvironmentObject var chat: ChatClient
 
     var body: some View {
+        if let ahead = chat.mediaQueuePosition {
+            MediaQueueView(ahead: ahead)
+        } else {
+            progress
+        }
+    }
+
+    private var progress: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 if let progress = chat.mfluxStepProgress, progress.total > 0 {
