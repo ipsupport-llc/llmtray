@@ -10,7 +10,13 @@ public enum EditCanvas {
         let aspect = Double(sourceWidth) / Double(sourceHeight)
         // At most 8:1 either way: a strip image doesn't make a 16 px side.
         let clamped = min(max(aspect, 1.0 / 8), 8)
+        var width = (area * clamped).squareRoot(), height = (area / clamped).squareRoot()
+        // Scaled as a whole, not per side: clamping one side alone would
+        // change the aspect ratio. Up to 8:1 fits 256...2048 both ways.
+        let fit = min(2048 / max(width, height), 1) * max(256 / min(width, height), 1)
+        width *= fit
+        height *= fit
         func side(_ v: Double) -> Int { min(max(Int((v / 16).rounded()) * 16, 256), 2048) }
-        return (side((area * clamped).squareRoot()), side((area / clamped).squareRoot()))
+        return (side(width), side(height))
     }
 }

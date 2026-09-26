@@ -66,10 +66,10 @@ final class ImageToolRunner: ChatTool {
         calls.contains { Self.runsGenerator($0.name, settings) } && imagesThisTurn < maxImagesPerTurn && settings.enableImageGeneration
     }
 
-    /// generate_image, and edit_image with a model that edits: the calls
+    /// generate_image, and edit_image with an edit model set: the calls
     /// that run mflux.
     static func runsGenerator(_ name: String, _ settings: ChatSettings) -> Bool {
-        name == toolName || name == EditImageTool.toolName && settings.imageGenModel.supportsEditing
+        name == toolName || name == EditImageTool.toolName && settings.imageEditModel != nil
     }
 
     static func clampedSide(_ value: Any?) -> Int {
@@ -109,15 +109,17 @@ final class ImageToolRunner: ChatTool {
         // in the conversion; 20000 px would run the Mac out of memory).
         let width = Int(Double(Self.clampedSide(arguments["width"])) * scale)
         let height = Int(Double(Self.clampedSide(arguments["height"])) * scale)
-        return await produce(prompt: prompt, width: width, height: height, images: [], settings: settings, toolName: Self.toolName)
+        return await produce(prompt: prompt, width: width, height: height, model: settings.imageGenModel, images: [],
+                             settings: settings, toolName: Self.toolName)
     }
 
     /// Runs mflux for generate_image or edit_image (the per-turn limit
     /// counts both) and words the result for the model.
-    func produce(prompt: String, width: Int, height: Int, images: [Data], settings: ChatSettings, toolName: String) async -> ToolResult {
+    func produce(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data],
+                 settings: ChatSettings, toolName: String) async -> ToolResult {
         do {
             let start = Date()
-            let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: settings.imageGenModel, images: images)
+            let image = try await mflux.generate(prompt: prompt, width: width, height: height, model: model, images: images)
             imagesThisTurn += 1
             return .generatedImage(
                 image, seconds: Date().timeIntervalSince(start), prompt: prompt,
@@ -137,8 +139,9 @@ final class ImageToolRunner: ChatTool {
 }
 
 /// `edit_image`: changes an image from this chat -- one the user attached
-/// or one generated here -- following an instruction, with an image model
-/// that edits (FLUX.2 klein). The result is a new image; the source stays.
+/// or one generated here -- following an instruction, with the profile's
+/// edit model (FLUX.2 klein), which is separate from the one generating
+/// new images. The result is a new image; the source stays.
 @MainActor
 final class EditImageTool: ChatTool {
     static let toolName = "edit_image"
@@ -177,7 +180,7 @@ final class EditImageTool: ChatTool {
     }
 
     func isOffered(_ settings: ChatSettings) -> Bool {
-        settings.enableImageGeneration && settings.imageGenModel.supportsEditing
+        settings.enableImageGeneration && settings.imageEditModel != nil
     }
 
     func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
@@ -188,10 +191,10 @@ final class EditImageTool: ChatTool {
                     + "edit_image; answer in text, and if the user wants an edit, tell them to enable image generation in settings first."
             )
         }
-        guard settings.imageGenModel.supportsEditing else {
+        guard let model = settings.imageEditModel else {
             return .text(
-                "The image model selected in LLMTray's settings can't edit images. Do not call edit_image; tell the user "
-                    + "to choose FLUX.2 klein as the image model in settings to edit images."
+                "Image editing is turned off in LLMTray's settings. Do not call edit_image; tell the user "
+                    + "to choose an image editing model in settings to edit images."
             )
         }
         guard generator.imagesThisTurn < generator.maxImagesPerTurn else {
@@ -216,7 +219,7 @@ final class EditImageTool: ChatTool {
         }
         let pixels = NSBitmapImageRep(data: source.data).map { ($0.pixelsWide, $0.pixelsHigh) } ?? (1024, 1024)
         let size = EditCanvas.size(sourceWidth: pixels.0, sourceHeight: pixels.1, scale: settings.imageQuality.scale)
-        return await generator.produce(prompt: instruction, width: size.width, height: size.height,
+        return await generator.produce(prompt: instruction, width: size.width, height: size.height, model: model,
                                        images: [source.data], settings: settings, toolName: name)
     }
 }

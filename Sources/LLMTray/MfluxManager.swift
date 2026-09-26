@@ -68,10 +68,12 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
     /// Where the checkpoint lives once downloaded.
     var localDir: String { RuntimePaths.externalRuntimeDir + "/mflux_models/\(rawValue)" }
 
-    /// The models the Settings picker offers.
+    /// The models the Settings pickers offer.
     static var selectable: [ImageGenModel] {
         allCases.filter { $0.isPublished || FileManager.default.fileExists(atPath: $0.localDir) }
     }
+
+    var isDownloaded: Bool { FileManager.default.fileExists(atPath: localDir) }
 
     var mfluxModelName: String { self == .klein4b ? "flux2-klein-4b" : "z-image-turbo" }
     var stepCount: String { self == .klein4b ? "4" : "9" }

@@ -22,6 +22,8 @@ final class EditCanvasTests: XCTestCase {
         let strip = EditCanvas.size(sourceWidth: 10000, sourceHeight: 10, scale: 1.5)
         XCTAssertLessThanOrEqual(strip.width, 2048)
         XCTAssertGreaterThanOrEqual(strip.height, 256)
+        let wide = EditCanvas.size(sourceWidth: 2048, sourceHeight: 512, scale: 1.5)
+        XCTAssertEqual(Double(wide.width) / Double(wide.height), 4, accuracy: 0.1)
         let empty = EditCanvas.size(sourceWidth: 0, sourceHeight: 0, scale: 1)
         XCTAssertEqual(empty.width, 1024)
     }

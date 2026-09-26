@@ -36,6 +36,9 @@ if arg("--base-model") == "flux2-klein-4b":
     from mflux.models.common.vae.tiling_config import TilingConfig
     request = json.loads(sys.stdin.read())
     images = [Image.open(io.BytesIO(base64.b64decode(b))).convert("RGB") for b in request.get("images", [])]
+    # A side under 64 px rounds to nothing in mflux's resize: scaled up.
+    images = [im.resize((max(64, round(im.width * 64 / min(im.size))), max(64, round(im.height * 64 / min(im.size)))))
+              if min(im.size) < 64 else im for im in images]
     if images:
         from mflux.models.flux2.variants.edit.flux2_klein_edit import Flux2KleinEdit as Model
     else:

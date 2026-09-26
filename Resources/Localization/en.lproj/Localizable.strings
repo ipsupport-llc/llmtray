@@ -110,6 +110,7 @@
 "Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
 "Duplicate this profile" = "Duplicate this profile";
 "Edit Profile…" = "Edit Profile…";
+"Enable image editing?" = "Enable image editing?";
 "Enable image generation" = "Enable image generation";
 "Enable image generation?" = "Enable image generation?";
 "Extra server arguments" = "Extra server arguments";
@@ -130,6 +131,7 @@
 "Generating image…" = "Generating image…";
 "Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
+"Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Its own model, downloaded when you choose it.";
 "Hacker News" = "Hacker News";
 "Hide chats" = "Hide chats";
 "High quality (larger canvas)" = "High quality (larger canvas)";
@@ -142,6 +144,7 @@
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
 "Hugging Face token" = "Hugging Face token";
 "Idle -- the model reloads on the next message" = "Idle -- the model reloads on the next message";
+"Image editing" = "Image editing";
 "Image generation" = "Image generation";
 "Image generation failed: %@" = "Image generation failed: %@";
 "Image generation finished but produced no output file." = "Image generation finished but produced no output file.";
@@ -398,7 +401,7 @@
 "What happened?" = "What happened?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
-"Which model generates the images. FLUX.2 klein can also edit them." = "Which model generates the images. FLUX.2 klein can also edit them.";
+"Which model generates new images." = "Which model generates new images.";
 "Wikipedia" = "Wikipedia";
 "Yesterday" = "Yesterday";
 "You" = "You";

@@ -100,6 +100,8 @@ struct ChatSettings {
     var enableImageGeneration: Bool = false
     var enabledTools: Set<String> = Set(Profile.defaultEnabledTools)
     var imageGenModel: ImageGenModel = .gptqMixed
+    /// The model edit_image uses; nil = no editing.
+    var imageEditModel: ImageGenModel?
     var unloadModelDuringImageGen: Bool = true
     var imageQuality: ImageQuality = .balanced
     /// The model the turn is for, and its max-tokens cap -- so the settings
@@ -122,6 +124,7 @@ struct ChatSettings {
         enableImageGeneration = p.enableImageGeneration
         enabledTools = Set(p.enabledTools)
         imageGenModel = ImageGenModel(rawValue: p.imageGenModel) ?? .gptqMixed
+        imageEditModel = ImageGenModel(rawValue: p.imageEditModel).flatMap { $0.supportsEditing ? $0 : nil }
         unloadModelDuringImageGen = p.unloadModelDuringImageGen
         imageQuality = ImageQuality(rawValue: p.imageQuality) ?? .balanced
         toolUsePolicy = p.toolUsePolicy
