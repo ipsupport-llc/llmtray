@@ -935,7 +935,7 @@ final class ChatClient: ObservableObject {
             isStreaming = false
             for (i, call) in toolCalls.enumerated() {
                 guard i < maxToolCallsPerRound, let kind = GenerationDraft.kind(of: call, settings),
-                      kind == .music ? musicTool.willGenerate([call], settings: settings)
+                      kind == .music ? musicTool.willGenerate([call], settings: settings) && musicManager.isReady(settings.musicModel)
                                      : imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
                 else { continue }
                 let draft = GenerationDraft(kind: kind, call: call, settings: settings)

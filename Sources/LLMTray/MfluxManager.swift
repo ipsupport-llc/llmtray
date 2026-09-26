@@ -180,6 +180,12 @@ final class MfluxManager: ObservableObject {
 
     /// The mflux version in the venv, from its dist-info folder's name
     /// (mflux-0.20.0.dist-info) -- no Python started for it.
+    /// Set up for this model: the venv at the pinned mflux, the checkpoint
+    /// in place -- what generate() will otherwise refuse.
+    func isReady(_ model: ImageGenModel) -> Bool {
+        FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded && installedMfluxVersion() == Self.mfluxVersion
+    }
+
     private func installedMfluxVersion() -> String? {
         guard let site = PythonPackageLicenses.sitePackages(venv: URL(fileURLWithPath: venvDir)),
               let items = try? FileManager.default.contentsOfDirectory(atPath: site.path) else { return nil }
