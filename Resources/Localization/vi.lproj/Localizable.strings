@@ -140,6 +140,7 @@
 "Enable image generation?" = "Bật tạo ảnh?";
 "Enable music generation" = "Bật tạo nhạc";
 "Enable music generation?" = "Bật tính năng tạo nhạc?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
 "Extra server arguments" = "Đối số máy chủ bổ sung";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — tạo và chỉnh sửa";
 "Failed to reload the chat model after image generation: %@" = "Tải lại mô hình chat sau khi tạo ảnh thất bại: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image model" = "Mô hình hình ảnh";
+"In project %@" = "Trong dự án %@";
 "In the queue: %lld ahead…" = "Trong hàng chờ: %lld người phía trước…";
 "Include LLMTray crash reports from the last two weeks" = "Bao gồm báo cáo sự cố LLMTray trong hai tuần gần đây";
 "Include the server log" = "Bao gồm nhật ký máy chủ";
 "Installed" = "Đã cài đặt";
 "Installing mflux…" = "Đang cài mflux…";
 "Installing mlx-audio…" = "Đang cài mlx-audio…";
-"Its chats stay, back among the recents." = "Các trò chuyện vẫn được giữ, trở lại trong mục Gần đây.";
+"Instructions for %@" = "Hướng dẫn cho %@";
+"Instructions…" = "Hướng dẫn…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Các cuộc trò chuyện được giữ, trở lại mục Gần đây; hướng dẫn và tệp của dự án bị xóa.";
 "KV cache" = "Bộ nhớ đệm KV";
 "KV group size" = "Kích cỡ nhóm KV";
 "Keep" = "Giữ";
@@ -240,6 +244,7 @@
 "Network" = "Mạng";
 "Never" = "Không bao giờ";
 "New Chat" = "Trò chuyện mới";
+"New Chat in Project" = "Cuộc trò chuyện mới trong dự án";
 "New Profile…" = "Hồ sơ mới…";
 "New Project…" = "Dự án Mới…";
 "New Tab" = "Tab mới";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Trò chuyện tạm thời mới";
 "New chat" = "Cuộc trò chuyện mới";
 "New chat (⌘N)" = "Trò chuyện mới (⌘N)";
+"New chat in this project" = "Bắt đầu cuộc trò chuyện mới trong dự án này";
 "New profile" = "Hồ sơ mới";
 "New profile (inherits everything from Default)" = "Hồ sơ mới (kế thừa mọi thứ từ Default)";
 "New project" = "Dự án mới";
@@ -282,6 +288,7 @@
 "Performance" = "Hiệu năng";
 "Pin" = "Ghim";
 "Pinned" = "Đã ghim";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Không tải được ghim và dự án. Các thay đổi sẽ không được lưu cho đến khi LLMTray khởi động lại; một bản sao tệp được lưu bên cạnh.";
 "Play" = "Phát";
 "Port" = "Cổng";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Độ chính xác của bộ nhớ đệm attention. 8-bit: gần như không mất mát, dùng một nửa bộ nhớ. 4-bit: dùng một phần tư, kém hơn rõ rệt với ngữ cảnh dài. Đầy đủ: tốt nhất, tốn bộ nhớ nhất.";

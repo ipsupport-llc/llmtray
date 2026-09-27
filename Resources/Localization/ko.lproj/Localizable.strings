@@ -140,6 +140,7 @@
 "Enable image generation?" = "이미지 생성을 활성화하겠습니까?";
 "Enable music generation" = "음악 생성 사용";
 "Enable music generation?" = "음악 생성을 사용하시겠습니까?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "이 프로젝트의 모든 채팅은 모델 프로필의 시스템 프롬프트 뒤에 이 지침을 받습니다. 변경 내용은 다음 메시지부터 적용됩니다.";
 "Extra server arguments" = "추가 서버 인수";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 생성 및 편집";
 "Failed to reload the chat model after image generation: %@" = "이미지 생성 후 채팅 모델을 다시 불러오지 못했습니다: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "이미지 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
 "Image generation needs an update -- turn it off and on again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
 "Image model" = "이미지 모델";
+"In project %@" = "%@ 프로젝트에서";
 "In the queue: %lld ahead…" = "대기: %lld건 앞에 있음…";
 "Include LLMTray crash reports from the last two weeks" = "지난 2주간 LLMTray 충돌 보고서 포함";
 "Include the server log" = "서버 로그 포함";
 "Installed" = "설치됨";
 "Installing mflux…" = "mflux 설치 중…";
 "Installing mlx-audio…" = "mlx-audio 설치 중…";
-"Its chats stay, back among the recents." = "그 프로젝트의 대화는 보관되며 최근 항목에 다시 표시됩니다.";
+"Instructions for %@" = "%@용 지침";
+"Instructions…" = "지침…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "채팅은 유지되어 최근 항목에 남아 있으며, 프로젝트의 지침과 파일은 삭제됩니다.";
 "KV cache" = "KV 캐시";
 "KV group size" = "KV 그룹 크기";
 "Keep" = "유지";
@@ -240,6 +244,7 @@
 "Network" = "네트워크";
 "Never" = "안 함";
 "New Chat" = "새 채팅";
+"New Chat in Project" = "프로젝트에 새 채팅";
 "New Profile…" = "새 프로파일…";
 "New Project…" = "새 프로젝트…";
 "New Tab" = "새 탭";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "새 임시 채팅";
 "New chat" = "새 채팅";
 "New chat (⌘N)" = "새 채팅(⌘N)";
+"New chat in this project" = "이 프로젝트에 새 채팅";
 "New profile" = "새 프로파일";
 "New profile (inherits everything from Default)" = "새 프로파일(Default의 모든 항목을 상속)";
 "New project" = "새 프로젝트";
@@ -282,6 +288,7 @@
 "Performance" = "성능";
 "Pin" = "고정";
 "Pinned" = "고정됨";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "핀과 프로젝트를 로드할 수 없습니다. LLMTray를 다시 시작할 때까지 변경 내용이 저장되지 않으며, 파일의 복사본이 옆에 보관됩니다.";
 "Play" = "재생";
 "Port" = "포트";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "어텐션 캐시의 정밀도입니다. 8비트: 거의 무손실이며 메모리를 절반만 사용합니다. 4비트: 1/4만 사용하지만 긴 컨텍스트에서 품질이 눈에 띄게 떨어집니다. Full: 최상의 품질, 메모리 사용량 최대.";

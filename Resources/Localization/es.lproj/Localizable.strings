@@ -140,6 +140,7 @@
 "Enable image generation?" = "¿Activar la generación de imágenes?";
 "Enable music generation" = "Activar generación de música";
 "Enable music generation?" = "¿Activar generación de música?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversación de este proyecto recibe estas instrucciones después del prompt de sistema del perfil del modelo. Los cambios se aplican a partir del siguiente mensaje.";
 "Extra server arguments" = "Argumentos extra del servidor";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generar y editar";
 "Failed to reload the chat model after image generation: %@" = "No se pudo recargar el modelo de chat tras la generación de imagen: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "La generación de imagen no está configurada: actívala de nuevo en Ajustes.";
 "Image generation needs an update -- turn it off and on again in Settings." = "La generación de imagen necesita una actualización: apágala y vuélvela a activar en Ajustes.";
 "Image model" = "Modelo de imágenes";
+"In project %@" = "En el proyecto %@";
 "In the queue: %lld ahead…" = "En la cola: %lld por delante…";
 "Include LLMTray crash reports from the last two weeks" = "Incluir informes de fallos de LLMTray de las últimas dos semanas";
 "Include the server log" = "Incluir el registro del servidor";
 "Installed" = "Instalado";
 "Installing mflux…" = "Instalando mflux…";
 "Installing mlx-audio…" = "Instalando mlx-audio…";
-"Its chats stay, back among the recents." = "Sus chats permanecen, volverán entre los recientes.";
+"Instructions for %@" = "Instrucciones para %@";
+"Instructions…" = "Instrucciones…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Sus conversaciones permanecen, de nuevo entre las recientes; las instrucciones y archivos del proyecto se eliminan.";
 "KV cache" = "Caché KV";
 "KV group size" = "Grupo KV";
 "Keep" = "Mantener";
@@ -240,6 +244,7 @@
 "Network" = "Red";
 "Never" = "Nunca";
 "New Chat" = "Nuevo chat";
+"New Chat in Project" = "Nueva conversación en proyecto";
 "New Profile…" = "Nuevo perfil…";
 "New Project…" = "Nuevo proyecto…";
 "New Tab" = "Nueva pestaña";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Nuevo chat temporal";
 "New chat" = "Nuevo chat";
 "New chat (⌘N)" = "Nuevo chat (⌘N)";
+"New chat in this project" = "Nueva conversación en este proyecto";
 "New profile" = "Nuevo perfil";
 "New profile (inherits everything from Default)" = "Nuevo perfil (hereda todo de Default)";
 "New project" = "Nuevo proyecto";
@@ -282,6 +288,7 @@
 "Performance" = "Rendimiento";
 "Pin" = "Fijar";
 "Pinned" = "Fijado";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "No se pudieron cargar los fijadores y proyectos. Los cambios no se guardan hasta que LLMTray se reinicie; se guarda una copia del archivo junto a él.";
 "Play" = "Reproducir";
 "Port" = "Puerto";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precisión de la caché de atención. 8 bits: casi sin pérdida, la mitad de memoria. 4 bits: una cuarta parte, notablemente peor con contexto largo. Completa: la mejor, más memoria.";

@@ -140,6 +140,7 @@
 "Enable image generation?" = "Aktifkan pembuatan gambar?";
 "Enable music generation" = "Aktifkan pembuatan musik";
 "Enable music generation?" = "Aktifkan pembuatan musik?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Extra server arguments" = "Argumen server tambahan";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — buat dan edit";
 "Failed to reload the chat model after image generation: %@" = "Gagal memuat ulang model obrolan setelah pembuatan gambar: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Pembuatan gambar belum disiapkan — aktifkan lagi di Pengaturan.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
 "Image model" = "Model gambar";
+"In project %@" = "Di proyek %@";
 "In the queue: %lld ahead…" = "Dalam antrean: %lld lagi…";
 "Include LLMTray crash reports from the last two weeks" = "Sertakan laporan crash LLMTray dari dua minggu terakhir";
 "Include the server log" = "Sertakan log server";
 "Installed" = "Terinstal";
 "Installing mflux…" = "Menginstal mflux…";
 "Installing mlx-audio…" = "Menginstal mlx-audio…";
-"Its chats stay, back among the recents." = "Chat-nya tetap ada, kembali di antara terbaru.";
+"Instructions for %@" = "Instruksi untuk %@";
+"Instructions…" = "Instruksi…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Chat-nya tetap ada, kembali ke daftar baru-baru ini; instruksi dan file proyek dihapus.";
 "KV cache" = "Cache KV";
 "KV group size" = "Ukuran grup KV";
 "Keep" = "Pertahankan";
@@ -240,6 +244,7 @@
 "Network" = "Jaringan";
 "Never" = "Tidak Pernah";
 "New Chat" = "Obrolan Baru";
+"New Chat in Project" = "Chat Baru di Proyek";
 "New Profile…" = "Profil Baru…";
 "New Project…" = "Proyek Baru…";
 "New Tab" = "Tab Baru";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Obrolan Sementara Baru";
 "New chat" = "Obrolan baru";
 "New chat (⌘N)" = "Obrolan baru (⌘N)";
+"New chat in this project" = "Mulai chat baru di proyek ini";
 "New profile" = "Profil baru";
 "New profile (inherits everything from Default)" = "Profil baru (mewarisi semuanya dari Default)";
 "New project" = "Proyek baru";
@@ -282,6 +288,7 @@
 "Performance" = "Kinerja";
 "Pin" = "Sematkan";
 "Pinned" = "Tersemat";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins dan proyek tidak dapat dimuat. Perubahan tidak disimpan sampai LLMTray dimulai ulang; salinan file disimpan di sampingnya.";
 "Play" = "Putar";
 "Port" = "Port";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Presisi cache atensi. 8-bit: hampir tanpa kehilangan, memori separuh. 4-bit: seperempat, jauh lebih buruk pada konteks panjang. Penuh: terbaik, memori terbanyak.";

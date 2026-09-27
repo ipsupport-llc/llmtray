@@ -140,6 +140,7 @@
 "Enable image generation?" = "Включить генерацию картинок?";
 "Enable music generation" = "Включить генерацию музыки";
 "Enable music generation?" = "Включить генерацию музыки?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Каждый чат в этом проекте получает эти инструкции после системного запроса профиля модели. Изменение вступает в силу с следующего сообщения.";
 "Extra server arguments" = "Доп. аргументы сервера";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — генерация и редактирование";
 "Failed to reload the chat model after image generation: %@" = "Не удалось перезагрузить модель чата после генерации изображения: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Генерация изображений не настроена — включите её снова в Настройках.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
 "Image model" = "Модель картинок";
+"In project %@" = "В проекте %@";
 "In the queue: %lld ahead…" = "В очереди: %lld впереди…";
 "Include LLMTray crash reports from the last two weeks" = "Включить отчёты LLMTray за последние две недели";
 "Include the server log" = "Включить журнал сервера";
 "Installed" = "Установлен";
 "Installing mflux…" = "Установка mflux…";
 "Installing mlx-audio…" = "Установка mlx-audio…";
-"Its chats stay, back among the recents." = "Его чаты останутся и вернутся в недавние.";
+"Instructions for %@" = "Инструкции для %@";
+"Instructions…" = "Инструкции…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Чаты остаются и возвращаются в «Недавние»; инструкции и файлы проекта удаляются.";
 "KV cache" = "KV-кэш";
 "KV group size" = "Группа KV";
 "Keep" = "Оставить";
@@ -240,6 +244,7 @@
 "Network" = "Сеть";
 "Never" = "Никогда";
 "New Chat" = "Новый чат";
+"New Chat in Project" = "Новый чат в проекте";
 "New Profile…" = "Новый профиль…";
 "New Project…" = "Новый проект…";
 "New Tab" = "Новая вкладка";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Новый временный чат";
 "New chat" = "Новый чат";
 "New chat (⌘N)" = "Новый чат (⌘N)";
+"New chat in this project" = "Новый чат в этом проекте";
 "New profile" = "Новый профиль";
 "New profile (inherits everything from Default)" = "Новый профиль (всё наследует от Default)";
 "New project" = "Новый проект";
@@ -282,6 +288,7 @@
 "Performance" = "Производительность";
 "Pin" = "Закрепить";
 "Pinned" = "Закреплённые";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Закрепления и проекты не удалось загрузить. Изменения не сохраняются до перезапуска LLMTray; копия файла сохраняется рядом с ним.";
 "Play" = "Воспроизвести";
 "Port" = "Порт";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точность кэша внимания. 8 бит — почти без потерь, вдвое меньше памяти. 4 бита — вчетверо меньше, но заметно хуже на длинном контексте. Полный — лучше всего, но больше всего памяти.";

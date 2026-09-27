@@ -140,6 +140,7 @@
 "Enable image generation?" = "画像生成を有効にしますか？";
 "Enable music generation" = "音楽生成を有効にする";
 "Enable music generation?" = "音楽生成を有効にしますか？";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
 "Extra server arguments" = "追加のサーバ引数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成と編集";
 "Failed to reload the chat model after image generation: %@" = "画像生成後にチャットモデルの再読み込みに失敗しました: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
 "Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image model" = "画像モデル";
+"In project %@" = "プロジェクト %@ にて";
 "In the queue: %lld ahead…" = "キュー内: %lld 件前…";
 "Include LLMTray crash reports from the last two weeks" = "過去2週間の LLMTray クラッシュレポートを含める";
 "Include the server log" = "サーバーログを含める";
 "Installed" = "インストール済み";
 "Installing mflux…" = "mflux をインストール中…";
 "Installing mlx-audio…" = "mlx-audio をインストール中…";
-"Its chats stay, back among the recents." = "チャットは残り、最近の項目に戻ります。";
+"Instructions for %@" = "%@ の指示";
+"Instructions…" = "指示…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "チャットは「最近」に残ります。プロジェクトの指示とファイルは削除されます。";
 "KV cache" = "KVキャッシュ";
 "KV group size" = "KVグループサイズ";
 "Keep" = "維持";
@@ -240,6 +244,7 @@
 "Network" = "ネットワーク";
 "Never" = "しない";
 "New Chat" = "新しいチャット";
+"New Chat in Project" = "プロジェクトで新規チャット";
 "New Profile…" = "新規プロファイル…";
 "New Project…" = "新しいプロジェクト…";
 "New Tab" = "新規タブ";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "新しい一時チャット";
 "New chat" = "新規チャット";
 "New chat (⌘N)" = "新しいチャット（⌘N）";
+"New chat in this project" = "このプロジェクトで新規チャット";
 "New profile" = "新規プロファイル";
 "New profile (inherits everything from Default)" = "新規プロファイル（Default からすべてを継承）";
 "New project" = "新しいプロジェクト";
@@ -282,6 +288,7 @@
 "Performance" = "パフォーマンス";
 "Pin" = "ピン留め";
 "Pinned" = "ピン留め済み";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "ピンとプロジェクトを読み込めませんでした。変更は LLMTray を再起動するまで保存されません。ファイルのコピーが隣に保持されます。";
 "Play" = "再生";
 "Port" = "ポート";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "attention cache の精度。8-bit：ほぼロスレスで、メモリ使用量は半分。4-bit：4分の1ですが、長いコンテキストでは著しく低下します。Full：最高品質、メモリ使用量は最大。";

@@ -140,6 +140,7 @@
 "Enable image generation?" = "تمكين إنشاء الصور؟";
 "Enable music generation" = "تمكين إنتاج الموسيقى";
 "Enable music generation?" = "هل تريد تمكين إنتاج الموسيقى؟";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
 "Extra server arguments" = "وسيطات الخادم الإضافية";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — إنشاء وتحرير";
 "Failed to reload the chat model after image generation: %@" = "فشل إعادة تحميل نموذج المحادثة بعد توليد الصورة: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
 "Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image model" = "نموذج الصور";
+"In project %@" = "في المشروع %@";
 "In the queue: %lld ahead…" = "في الطابور: %lld قبل…";
 "Include LLMTray crash reports from the last two weeks" = "تضمين تقارير أعطال LLMTray خلال الأسبوعين الماضيين";
 "Include the server log" = "تضمين سجل الخادم";
 "Installed" = "مثبّت";
 "Installing mflux…" = "جارٍ تثبيت mflux…";
 "Installing mlx-audio…" = "جارٍ تثبيت mlx-audio…";
-"Its chats stay, back among the recents." = "دردشاته تبقى، وتعود إلى القائمة الأخيرة.";
+"Instructions for %@" = "تعليمات لـ %@";
+"Instructions…" = "تعليمات…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "تظل محادثاته ضمن الأخيرة؛ تُحذف تعليمات المشروع وملفاته.";
 "KV cache" = "ذاكرة KV المؤقتة";
 "KV group size" = "حجم مجموعة KV";
 "Keep" = "احتفاظ";
@@ -240,6 +244,7 @@
 "Network" = "الشبكة";
 "Never" = "أبدًا";
 "New Chat" = "دردشة جديدة";
+"New Chat in Project" = "محادثة جديدة في المشروع";
 "New Profile…" = "ملف تعريف جديد…";
 "New Project…" = "مشروع جديد…";
 "New Tab" = "تبويب جديد";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "دردشة مؤقتة جديدة";
 "New chat" = "محادثة جديدة";
 "New chat (⌘N)" = "دردشة جديدة (⌘N)";
+"New chat in this project" = "محادثة جديدة في هذا المشروع";
 "New profile" = "ملف تعريف جديد";
 "New profile (inherits everything from Default)" = "ملف تعريف جديد (يرث كل شيء من Default)";
 "New project" = "مشروع جديد";
@@ -282,6 +288,7 @@
 "Performance" = "الأداء";
 "Pin" = "تثبيت";
 "Pinned" = "مثبّتة";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "تعذر تحميل الدبابيس والمشروعات. لن تُحفظ التغييرات عليها حتى إعادة تشغيل LLMTray؛ يتم الاحتفاظ بنسخة من الملف بجانب التطبيق.";
 "Play" = "تشغيل";
 "Port" = "المنفذ";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "دقة ذاكرة الانتباه المؤقتة. 8 بت: شبه عديم الفقدان، بنصف الذاكرة. 4 بت: ربع الذاكرة، وأسوأ بوضوح مع السياق الطويل. كاملة: الأفضل، وتستهلك أكبر قدر من الذاكرة.";

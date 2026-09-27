@@ -140,6 +140,7 @@
 "Enable image generation?" = "להפעיל יצירת תמונות?";
 "Enable music generation" = "הפעל יצירת מוזיקה";
 "Enable music generation?" = "להפעיל יצירת מוזיקה?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — ליצור ולערוך";
 "Failed to reload the chat model after image generation: %@" = "נכשל בטעינת מודל השיחה מחדש לאחר יצירת תמונה: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image model" = "מודל תמונה";
+"In project %@" = "בפרויקט %@";
 "In the queue: %lld ahead…" = "בתור: %lld לפני…";
 "Include LLMTray crash reports from the last two weeks" = "כלול דוחות קריסה של LLMTray משבועיים אחרונים";
 "Include the server log" = "כלול את לוג השרת";
 "Installed" = "מותקן";
 "Installing mflux…" = "מתקין/ה mflux…";
 "Installing mlx-audio…" = "מתקין mlx-audio…";
-"Its chats stay, back among the recents." = "הצ'אטים נשארים, חוזרים לרשימת האחרונים.";
+"Instructions for %@" = "הוראות עבור %@";
+"Instructions…" = "הוראות…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "הצ'אטים שלו נשארים ומופיעים שוב ברשימת האחרונים; ההוראות והקבצים של הפרויקט יימחקו.";
 "KV cache" = "מטמון KV";
 "KV group size" = "גודל קבוצת KV";
 "Keep" = "החזק";
@@ -240,6 +244,7 @@
 "Network" = "רשת";
 "Never" = "אף פעם";
 "New Chat" = "שיחה חדשה";
+"New Chat in Project" = "צ'אט חדש בפרויקט";
 "New Profile…" = "פרופיל חדש…";
 "New Project…" = "פרויקט חדש…";
 "New Tab" = "כרטיסייה חדשה";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "שיחה זמנית חדשה";
 "New chat" = "שיחה חדשה";
 "New chat (⌘N)" = "שיחה חדשה (⌘N)";
+"New chat in this project" = "צ'אט חדש בפרויקט זה";
 "New profile" = "פרופיל חדש";
 "New profile (inherits everything from Default)" = "פרופיל חדש (יורש הכול מ-Default)";
 "New project" = "פרויקט חדש";
@@ -282,6 +288,7 @@
 "Performance" = "ביצועים";
 "Pin" = "נעץ";
 "Pinned" = "נעוץ";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "לא ניתן היה לטעון קבצי Pins ו־projects. שינויים לא יישמרו עד להפעלת LLMTray מחדש; עותק של הקובץ נשמר לצד התוכנית.";
 "Play" = "נגן";
 "Port" = "יציאה";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
