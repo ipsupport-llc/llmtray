@@ -168,7 +168,10 @@ public enum ProjectTextBudget {
     }
 
     /// Those tokens as bytes of file text, at the estimator's conservative
-    /// ratio (the next estimate counts the new text at it).
+    /// ratio (the next estimate counts the new text at it). Text denser
+    /// than 2 bytes a token (long digit or base64 runs) is undercounted;
+    /// the margin and the 50% share are what cover it, until the next
+    /// response's count.
     public static func bytes(forTokens tokens: Int) -> Int {
         Int(Double(tokens) * PromptTokenEstimator.defaultBytesPerToken)
     }

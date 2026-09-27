@@ -125,10 +125,13 @@ extension ChatMessage {
                 returned = []
             case "tool":
                 returned += msg.returnedCitations
-            case "assistant" where msg.toolCalls.isEmpty && !msg.content.isEmpty:
+            case "assistant" where !msg.content.isEmpty:
+                // Text beside a tool call too ("the deadline is ten days
+                // [1:2]", then a read): it's shown and saved as well. The
+                // turn's pages stay citable until its last answer.
                 let all = CitationMarkers.unique(msg.citations + CitationMarkers.resolve(msg.content, returned: returned))
                 if !all.isEmpty { out[msg.id] = all }
-                returned = []
+                if msg.toolCalls.isEmpty { returned = [] }
             default:
                 break
             }
