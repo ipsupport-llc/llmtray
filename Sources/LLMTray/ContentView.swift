@@ -548,12 +548,26 @@ struct ChatGeometry: Equatable {
 /// neither, so they can't be mistaken for the user's.
 @MainActor
 final class UserScrollWatch: ObservableObject {
+    private final class Live {
+        weak var view: NSScrollView?
+        var last: Date
+        init(_ view: NSScrollView) { self.view = view; last = Date() }
+    }
+
     private var lastWheel = Date.distantPast
-    private var live = 0
+    /// Scroll views in a live scroll, weakly: one rebuilt or gone mid-scroll
+    /// (a code block re-rendered while streaming) never sends its end, and
+    /// a counter would then say "scrolling" for good -- following dead
+    /// until relaunch. Gone, off-window or silent for 2 s: not scrolling.
+    private var live: [ObjectIdentifier: Live] = [:]
     private var monitor: Any?
     private var observers: [NSObjectProtocol] = []
 
-    var isScrolling: Bool { live > 0 || Date().timeIntervalSince(lastWheel) < 0.35 }
+    var isScrolling: Bool {
+        let now = Date()
+        live = live.filter { $0.value.view?.window != nil && now.timeIntervalSince($0.value.last) < 2 }
+        return !live.isEmpty || now.timeIntervalSince(lastWheel) < 0.35
+    }
 
     func start() {
         guard monitor == nil else { return }
@@ -563,13 +577,22 @@ final class UserScrollWatch: ObservableObject {
         }
         let center = NotificationCenter.default
         observers = [
-            center.addObserver(forName: NSScrollView.willStartLiveScrollNotification, object: nil, queue: .main) { [weak self] _ in
-                MainActor.assumeIsolated { self?.live += 1 }
-            },
-            center.addObserver(forName: NSScrollView.didEndLiveScrollNotification, object: nil, queue: .main) { [weak self] _ in
+            center.addObserver(forName: NSScrollView.willStartLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
                 MainActor.assumeIsolated {
-                    guard let self else { return }
-                    self.live = max(0, self.live - 1)
+                    guard let view = note.object as? NSScrollView else { return }
+                    self?.live[ObjectIdentifier(view)] = Live(view)
+                }
+            },
+            center.addObserver(forName: NSScrollView.didLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
+                MainActor.assumeIsolated {
+                    guard let view = note.object as? NSScrollView else { return }
+                    self?.live[ObjectIdentifier(view)]?.last = Date()
+                }
+            },
+            center.addObserver(forName: NSScrollView.didEndLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
+                MainActor.assumeIsolated {
+                    guard let self, let view = note.object as? NSScrollView else { return }
+                    self.live[ObjectIdentifier(view)] = nil
                     // Its last movement lands just after the end.
                     self.lastWheel = Date()
                 }
