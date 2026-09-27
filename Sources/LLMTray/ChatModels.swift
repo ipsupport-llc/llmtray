@@ -80,7 +80,8 @@ struct ChatMessage: Identifiable, Equatable {
     // turn's tool messages, where they come from, aren't saved.
     var citations: [Citation] = []
     // A project tool's result: the pages it showed the model, what the
-    // turn's answer may cite. In memory only, like the tool message.
+    // turn's answer may cite. In memory only, like the tool message. On a
+    // user message: the pages its turn's requests carry pinned.
     var returnedCitations: [Citation] = []
 }
 
@@ -122,7 +123,8 @@ extension ChatMessage {
         for msg in messages {
             switch msg.role {
             case "user" where !msg.isToolContext:
-                returned = []
+                // The pages its turn's requests carried pinned.
+                returned = msg.returnedCitations
             case "tool":
                 returned += msg.returnedCitations
             case "assistant" where !msg.content.isEmpty:

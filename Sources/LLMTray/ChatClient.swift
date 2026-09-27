@@ -603,10 +603,10 @@ final class ChatClient: ObservableObject {
         if folderPlan?.isReviewing == true { folderPlan = nil }
     }
 
-    /// The turn's first request, with its project and that project's file
-    /// counts (which project_files modes it declares) -- read first, off the
-    /// main thread, while the turn already shows as busy. A Stop or another
-    /// chat meanwhile drops it.
+    /// The turn's first request, with its project, that project's file
+    /// counts (which project_files modes it declares) and its pinned files
+    /// -- read first, off the main thread, while the turn already shows as
+    /// busy. A Stop or another chat meanwhile drops it.
     private func startTurn(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
         let base = withProject(settings)
         guard let project = base.project, ProjectIndexer.shared.isEnabled else {
@@ -616,11 +616,41 @@ final class ChatClient: ObservableObject {
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             let files = await ProjectIndexer.shared.summary(for: project.id)
+            let pinned = await ProjectIndexer.shared.pinnedFiles(for: project.id)
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
             var settings = base
             settings.project?.files = files
+            settings = self.withPinnedFiles(pinned, settings, port: port, modelAlias: modelAlias, server: server)
             self.startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
         }
+    }
+
+    /// The pinned files the turn's requests carry (adr/0012, "Pinned
+    /// files"), fixed for the turn: in pin order, each while it fits what's
+    /// left of the model's limit and the request's room (the conversation
+    /// counted, the answer and the margin kept free); a line for the rest.
+    /// Their pages are what the turn's answers may cite, and file text in
+    /// the request drops the trust barrier from the turn's start.
+    private func withPinnedFiles(_ pinned: (files: [PinnedFileText], notes: [PinnedFileNote]), _ base: ChatSettings,
+                                 port: Int, modelAlias: String, server: ServerManager) -> ChatSettings {
+        guard var project = base.project, !pinned.files.isEmpty || !pinned.notes.isEmpty else { return base }
+        toolbox.notePinnedText()
+        let context = RequestContext(port: port, modelAlias: modelAlias, settings: base, server: server)
+        let margin = Int((Double(base.maxTokensCap) * ProjectTextBudget.margin).rounded(.up))
+        func settings(_ files: [PinnedFileText], _ left: [PinnedFileNote]) -> ChatSettings {
+            var s = base
+            project.pinned = files
+            project.pinnedLeftOut = pinned.notes + left
+            s.project = project
+            return s
+        }
+        let chosen = PinnedFiles.select(pinned.files, limitTokens: ProjectIndexer.pinLimit(for: base).tokens) { files in
+            requestTokenEstimate(context, settings(files, [])) + base.maxTokens + margin <= base.maxTokensCap
+        }
+        if let user = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) {
+            messages[user].returnedCitations = PinnedFiles.citations(chosen.files, project: project.id)
+        }
+        return settings(chosen.files, chosen.left)
     }
 
     /// Re-runs the last user turn with a fresh generation -- drops the

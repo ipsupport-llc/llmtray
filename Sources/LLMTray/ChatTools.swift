@@ -254,6 +254,13 @@ final class ChatToolbox {
         prepared = [:]
     }
 
+    /// The turn's request carries pinned file text (adr/0012, "Pinned
+    /// files"): the barrier is down from its start, as after a project
+    /// tool's result.
+    func notePinnedText() {
+        turnTrust.record(.project)
+    }
+
     /// The names of the tools that return project or folder text: their
     /// calls and results are left out of later turns' requests.
     var projectToolNames: Set<String> {
