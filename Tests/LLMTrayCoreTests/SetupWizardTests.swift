@@ -67,7 +67,7 @@ final class SetupWizardTests: XCTestCase {
         progress.choices.imageModel = "gptqMixed"
         progress.choices.webTools = true
         progress.choices.port = 9000   // another step's choice stays
-        progress.skip()
+        XCTAssertEqual(progress.skip(), [], "nothing was applied early")
         XCTAssertEqual(progress.step, .apps)
         XCTAssertNil(progress.choices.imageModel)
         XCTAssertFalse(progress.choices.webTools)
@@ -167,5 +167,42 @@ final class SetupWizardTests: XCTestCase {
         var c = base
         c.creatorCountdown = -2
         XCTAssertEqual(SetupPlan.actions(from: c, baseline: base, startsServer: false), [.setCreatorCountdown(0)])
+    }
+
+    func testSkipUndoesAPickedDownload() {
+        var progress = SetupProgress(step: .chatModel, choices: base, startedAutomatically: true)
+        progress.choices.chatModel = .download(repo: "org/model", approxBytes: 5)
+        progress.startsServer = true
+        _ = progress.applyEarly(.chatModel)
+        XCTAssertEqual(progress.skip(), [.cancelChatDownload(repo: "org/model")])
+        XCTAssertNil(progress.choices.chatModel)
+        XCTAssertFalse(progress.startsServer, "no server start for a pick that was undone")
+        XCTAssertEqual(SetupPlan.actions(from: progress.choices, baseline: progress.baseline, startsServer: progress.startsServer), [])
+    }
+
+    func testSkipPutsTheOpeningSelectionBack() {
+        var opened = base
+        opened.chatModel = .local(path: "/m/a")
+        var progress = SetupProgress(step: .chatModel, choices: opened, startedAutomatically: false)
+        progress.choices.chatModel = .local(path: "/m/b")
+        progress.startsServer = true
+        XCTAssertEqual(progress.applyEarly(.chatModel), [.selectModel(path: "/m/b")])
+        XCTAssertEqual(progress.skip(), [.selectModel(path: "/m/a")])
+        XCTAssertFalse(progress.startsServer)
+
+        var fresh = SetupProgress(step: .chatModel, choices: base, startedAutomatically: true)
+        fresh.choices.chatModel = .local(path: "/m/b")
+        _ = fresh.applyEarly(.chatModel)
+        XCTAssertEqual(fresh.skip(), [.clearModelSelection])
+    }
+
+    func testSkipPutsAnAppliedFolderBack() {
+        var progress = SetupProgress(step: .modelsFolder, choices: base, startedAutomatically: true)
+        progress.choices.modelsFolder = "/lm"
+        _ = progress.applyEarly(.modelsFolder)
+        progress.step = .modelsFolder   // back to it
+        XCTAssertEqual(progress.skip(), [.setModelsFolder(base.modelsFolder)])
+        XCTAssertEqual(progress.choices.modelsFolder, base.modelsFolder)
+        XCTAssertEqual(progress.baseline.modelsFolder, base.modelsFolder)
     }
 }

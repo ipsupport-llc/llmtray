@@ -33,6 +33,7 @@ final class SetupWizardModel: ObservableObject {
     @Published private(set) var isFinished = false
 
     let queue: DownloadQueue
+    let server: ServerManager
     private let setup = FeatureSetup.shared
     private let profiles = ProfileManager.shared
     private let startServer: () -> Void
@@ -56,9 +57,10 @@ final class SetupWizardModel: ObservableObject {
     /// `automatic`: opened by itself on a first run (it then resumes where
     /// a relaunch left it); otherwise from the current settings.
     /// `startServer`: the app's own start path (the saved model).
-    init(queue: DownloadQueue, automatic: Bool, startServer: @escaping () -> Void,
+    init(queue: DownloadQueue, server: ServerManager, automatic: Bool, startServer: @escaping () -> Void,
          serverLog: @escaping @MainActor @Sendable (String) -> Void) {
         self.queue = queue
+        self.server = server
         self.startServer = startServer
         self.serverLog = serverLog
         let saved = Self.loadSaved()
@@ -131,14 +133,26 @@ final class SetupWizardModel: ObservableObject {
             close?()
             return
         }
-        progress.skip()
+        perform(progress.skip())
     }
 
     /// Done, without applying what's still unapplied: the window was
-    /// closed. A chat model download already started goes on (and the
-    /// server starts with it, as it was picked).
+    /// closed. The chat model picked on step 4 is kept, so the server
+    /// starts with it: now if it's here, else once its download is done.
     func complete() {
-        guard !isFinished else { return }
+        guard !isFinished else {
+            // Finish ran (the window stayed open for its errors): a chat
+            // model that arrived meanwhile waited for the window to close.
+            if case .download = progress.choices.chatModel, UserDefaults.standard[Pref.onboardingStartServerFor] != nil {
+                startChosenModel()
+            }
+            return
+        }
+        if progress.startsServer { startChosenModel() }
+        markDone()
+    }
+
+    private func markDone() {
         isFinished = true
         runtimeTask = nil
         sizesTask?.cancel()
@@ -149,8 +163,9 @@ final class SetupWizardModel: ObservableObject {
     /// Everything chosen, applied; the downloads queued (the chat model
     /// first). The window stays open to show what failed, if anything.
     func finish() {
+        guard !isFinished else { return }
         finishErrors = actions.compactMap(perform)
-        complete()
+        markDone()
         if finishErrors.isEmpty { close?() }
     }
 
@@ -176,7 +191,11 @@ final class SetupWizardModel: ObservableObject {
         runtimeTask = Task { [weak self] in
             // Python makes the venv; with one in place (an update) or the
             // Full build's, none is needed.
-            let needsPython = !MLXRuntimeInstaller.isFullBuild && !FileManager.default.fileExists(atPath: MLXRuntimeInstaller.venvDir)
+            // (A venv without its marker is from a failed attempt: it's made
+            // again.)
+            let needsPython = !MLXRuntimeInstaller.isFullBuild
+                && (!FileManager.default.fileExists(atPath: MLXRuntimeInstaller.venvDir)
+                    || !FileManager.default.fileExists(atPath: MLXRuntimeInstaller.versionMarkerPath))
             if needsPython {
                 let python = await PythonLocator.findModern(preferring: [MLXRuntimeInstaller.externalFrameworkPython()].compactMap { $0 })
                 guard let self else { return }
@@ -279,11 +298,30 @@ final class SetupWizardModel: ObservableObject {
         progress.startsServer = true
         UserDefaults.standard[Pref.onboardingStartServerFor] = repo
         perform(progress.applyEarly(.chatModel))
+        // Picked again after it was cancelled or failed (the queue keeps
+        // one of each).
+        queue.addChatModel(repo: repo, approxBytes: pick.sizeBytes)
+    }
+
+    /// The wizard's chat download is waiting or running.
+    var isWizardDownloadActive: Bool {
+        guard let repo = selectedDownloadRepo else { return false }
+        return queue.state.items.contains { $0.kind == .chatModel && $0.target == repo && !$0.status.isFinished }
+    }
+
+    /// The picked download is here.
+    var isWizardDownloadComplete: Bool {
+        guard let repo = selectedDownloadRepo else { return false }
+        return DownloadQueue.isComplete(repo, root: ModelDiscovery.currentModelsRoot())
     }
 
     /// A download this wizard started for another pick is cancelled.
     private func stopWizardDownload(keeping repo: String?) {
         guard case .download(let started, _) = progress.baseline.chatModel, started != repo else { return }
+        cancelDownload(started)
+    }
+
+    private func cancelDownload(_ started: String) {
         if let item = queue.state.items.first(where: { $0.kind == .chatModel && $0.target == started && !$0.status.isFinished }) {
             queue.cancel(item.id)
         }
@@ -320,7 +358,7 @@ final class SetupWizardModel: ObservableObject {
 
     /// The network settings change only while the server is stopped, as in
     /// Settings.
-    func canEditNetwork(_ server: ServerManager) -> Bool {
+    var canEditNetwork: Bool {
         if case .stopped = server.state { return true }
         if case .failed = server.state { return true }
         return false
@@ -348,9 +386,17 @@ final class SetupWizardModel: ObservableObject {
             setup.setModelsFolder(path)
         case .selectModel(let path):
             defaults[Pref.selectedModelID] = path
+        case .clearModelSelection:
+            defaults[Pref.selectedModelID] = nil
+        case .cancelChatDownload(let repo):
+            cancelDownload(repo)
         case .setPort(let port):
+            // As in Settings: the listener keeps its port and binding
+            // until the server stops.
+            guard canEditNetwork else { return NSLocalizedString("The port and network access can change only while the server is stopped.", comment: "setup error") }
             defaults[Pref.port] = port
         case .setAllowLAN(let on):
+            guard canEditNetwork else { return NSLocalizedString("The port and network access can change only while the server is stopped.", comment: "setup error") }
             defaults[Pref.allowLAN] = on
         case .setModelSwitchPolicy(let policy):
             defaults[Pref.modelSwitchPolicy] = policy
@@ -418,6 +464,7 @@ final class SetupWizardModel: ObservableObject {
                 return
             }
             UserDefaults.standard[Pref.onboardingStartServerFor] = nil
+            ModelCatalog.shared.rescan()
             UserDefaults.standard[Pref.selectedModelID] = root + "/" + repo
             startServer()
         case nil:
@@ -436,6 +483,8 @@ final class SetupWizardModel: ObservableObject {
                 return String(format: NSLocalizedString("Models folder: %@", comment: "setup summary"), (path as NSString).abbreviatingWithTildeInPath)
             case .selectModel(let path):
                 return String(format: NSLocalizedString("Chat model: %@", comment: "setup summary"), LocalModel(path: path).displayName)
+            case .clearModelSelection, .cancelChatDownload:
+                return nil
             case .setPort(let port):
                 return String(format: NSLocalizedString("Port: %lld", comment: "setup summary"), port)
             case .setAllowLAN(let on):

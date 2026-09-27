@@ -573,6 +573,7 @@
 "The app's language (the language only, not the region)." = "The app's language (the language only, not the region).";
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
+"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "The chat model is downloading into this folder. Change it once that's done, here or in Settings.";
 "The day the counts are for." = "The day the counts are for.";
 "The download didn't start." = "The download didn't start.";
 "The download stopped." = "The download stopped.";
@@ -600,6 +601,7 @@
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it.";
+"The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The report" = "The report";
 "The reports" = "The reports";
 "The review has characters that can't be sent (control characters)." = "The review has characters that can't be sent (control characters).";
@@ -610,6 +612,7 @@
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "The runtime" = "The runtime";
 "The runtime couldn't be set up." = "The runtime couldn't be set up.";
+"The runtime is being set up." = "The runtime is being set up.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
 "The server log" = "The server log";
@@ -639,6 +642,7 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Try Again" = "Try Again";
+"Try again once that's done." = "Try again once that's done.";
 "Turn on project files?" = "Turn on project files?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";

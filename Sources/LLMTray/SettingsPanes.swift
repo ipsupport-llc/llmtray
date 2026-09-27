@@ -1227,6 +1227,14 @@ struct UpdatesPane: View {
     private func shortRef(_ ref: String) -> String { ref.count > 12 ? String(ref.prefix(7)) : ref }
 
     private func uninstallRuntime() {
+        // The setup wizard (or a Start) is making the venv this deletes.
+        guard !MLXRuntimeInstaller.isSettingUp else {
+            let busy = NSAlert()
+            busy.messageText = NSLocalizedString("The runtime is being set up.", comment: "")
+            busy.informativeText = NSLocalizedString("Try again once that's done.", comment: "")
+            busy.runModal()
+            return
+        }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Uninstall runtime data?", comment: "")
         alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)

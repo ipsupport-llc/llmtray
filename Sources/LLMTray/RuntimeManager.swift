@@ -90,6 +90,7 @@ final class RuntimeManager: ObservableObject {
     func applyUpdate(to commit: String) {
         checkState = .updating
         Task {
+            await MLXRuntimeInstaller.waitForSetup()
             do {
                 let archive = RuntimePin.archiveURL(RuntimePin.Pin(repo: Self.repo, ref: commit))
                 try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", archive])

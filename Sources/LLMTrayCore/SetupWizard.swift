@@ -147,6 +147,9 @@ public struct SetupProgress: Codable, Equatable, Sendable {
     /// what it has already applied (the models folder, the chat model).
     /// Finish applies only what differs from it.
     public var baseline: SetupChoices
+    /// The settings when the wizard opened: what Skip goes back to, also
+    /// for a step already applied.
+    public var original: SetupChoices
     /// Opened by itself on a first run (not from Settings or the menu):
     /// only that one resumes after a relaunch.
     public var startedAutomatically: Bool
@@ -159,14 +162,21 @@ public struct SetupProgress: Codable, Equatable, Sendable {
         self.step = step
         self.choices = choices
         self.baseline = baseline ?? choices
+        self.original = baseline ?? choices
         self.startedAutomatically = startedAutomatically
         self.startsServer = startsServer
     }
 
-    /// Skip: the step goes back to how it was, and on to the next one.
-    public mutating func skip() {
-        choices = choices.merging(step, from: baseline)
+    /// Skip: the step goes back to how it was when the wizard opened, and
+    /// on to the next one. What it had already applied (the folder, a
+    /// picked chat model) is undone by the actions returned.
+    public mutating func skip() -> [SetupAction] {
+        let actions = SetupPlan.revert(step, applied: baseline, original: original)
+        choices = choices.merging(step, from: original)
+        baseline = baseline.merging(step, from: original)
+        if step == .chatModel, choices.chatModel == original.chatModel { startsServer = false }
         if let next = step.next { step = next }
+        return actions
     }
 
     /// The actions that apply `step`'s choices now (the models folder, so
@@ -184,6 +194,10 @@ public struct SetupProgress: Codable, Equatable, Sendable {
 public enum SetupAction: Equatable, Sendable {
     case setModelsFolder(String)
     case selectModel(path: String)
+    /// Undoing a pick: no model selected, as before the wizard.
+    case clearModelSelection
+    /// Undoing a picked download: it's cancelled if it hasn't finished.
+    case cancelChatDownload(repo: String)
     case setPort(Int)
     case setAllowLAN(Bool)
     case setModelSwitchPolicy(String)
@@ -219,6 +233,27 @@ public enum SetupAction: Equatable, Sendable {
 }
 
 public enum SetupPlan {
+    /// What undoes `step`'s early actions: `applied` (the baseline, with
+    /// them) back to `original`. Only the early steps have any.
+    public static func revert(_ step: SetupStep, applied: SetupChoices, original: SetupChoices) -> [SetupAction] {
+        switch step {
+        case .modelsFolder:
+            return applied.modelsFolder == original.modelsFolder ? [] : [.setModelsFolder(original.modelsFolder)]
+        case .chatModel:
+            guard applied.chatModel != original.chatModel else { return [] }
+            var actions: [SetupAction] = []
+            if case .download(let repo, _) = applied.chatModel { actions.append(.cancelChatDownload(repo: repo)) }
+            switch original.chatModel {
+            case .local(let path): actions.append(.selectModel(path: path))
+            case nil: if case .local = applied.chatModel { actions.append(.clearModelSelection) }
+            case .download: break   // never the opening state (a selection is local)
+            }
+            return actions
+        default:
+            return []
+        }
+    }
+
     /// What turns `baseline` (the settings now) into `choices`, in order:
     /// the models folder and the chat model first, then the settings, then
     /// the downloads (each feature turned on once its model is in place),

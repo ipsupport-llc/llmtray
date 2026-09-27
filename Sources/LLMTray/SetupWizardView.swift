@@ -9,17 +9,20 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private var model: SetupWizardModel?
 
-    var isVisible: Bool { window?.isVisible == true }
+    /// Open, minimized or not.
+    var isOpen: Bool { window != nil }
 
     /// Brings it up (already open: to the front). `automatic`: the first
     /// run, resumed where a relaunch left it; else from the settings now.
     func show(automatic: Bool, queue: DownloadQueue, server: ServerManager, startServer: @escaping () -> Void) {
-        if let window, window.isVisible {
+        // Open (minimized too): that one, not a second wizard.
+        if let window {
+            if window.isMiniaturized { window.deminiaturize(nil) }
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
-        let model = SetupWizardModel(queue: queue, automatic: automatic, startServer: startServer,
+        let model = SetupWizardModel(queue: queue, server: server, automatic: automatic, startServer: startServer,
                                      serverLog: { [weak server] in server?.appendLog($0) })
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 680, height: 520),
@@ -41,11 +44,12 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
+        guard let closing = notification.object as? NSWindow, closing === window else { return }
         model?.complete()
         model = nil
-        // The view goes with its model (the runtime and size tasks hold it
-        // only weakly).
-        window?.contentView = nil
+        // The view goes now; the model lives on only while a runtime setup
+        // it started is still running.
+        closing.contentView = nil
         window = nil
     }
 }
@@ -338,7 +342,14 @@ private struct ModelsFolderStep: View {
             }
             .pickerStyle(.radioGroup)
             .labelsHidden()
+            .disabled(model.isWizardDownloadActive)
             Button("Choose Another Folder…") { model.chooseModelsFolder() }
+                .disabled(model.isWizardDownloadActive)
+            if model.isWizardDownloadActive {
+                // The download goes on into the folder it started in.
+                Text("The chat model is downloading into this folder. Change it once that's done, here or in Settings.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             Divider()
             if found.isEmpty {
                 Text("No models in this folder yet. The next step offers some to download.").foregroundStyle(.secondary)
@@ -363,13 +374,27 @@ private struct ModelsFolderStep: View {
 private struct ChatModelStep: View {
     @ObservedObject var model: SetupWizardModel
     @ObservedObject private var catalog = ModelCatalog.shared
+    // The picked download's state (cancelled from the popover, done).
+    @ObservedObject private var queue: DownloadQueue
+
+    init(model: SetupWizardModel) {
+        self.model = model
+        queue = model.queue
+    }
+
+    /// Without the wizard's download while it's still coming in (its
+    /// folder shows up before all its files are there).
+    private var localModels: [LocalModel] {
+        guard let repo = model.selectedDownloadRepo, !model.isWizardDownloadComplete else { return catalog.models }
+        return catalog.models.filter { $0.path != catalog.root + "/" + repo }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             StepHeader(Text("A chat model"), Text("Pick one to chat with. A download starts right away and goes on in the background."))
-            if !catalog.models.isEmpty {
+            if !localModels.isEmpty {
                 Text("Already on this Mac").font(.headline)
-                ForEach(catalog.models) { local in
+                ForEach(localModels) { local in
                     HStack {
                         Text(verbatim: local.displayName).lineLimit(1).truncationMode(.middle)
                         if let size = catalog.sizes[local.id] {
@@ -419,7 +444,9 @@ private struct ChatModelStep: View {
                 }
             }
             Spacer()
-            if model.selectedDownloadRepo == pick.model.repo {
+            if model.selectedDownloadRepo == pick.model.repo, model.isWizardDownloadComplete {
+                Label("Downloaded", systemImage: "checkmark").foregroundStyle(.green)
+            } else if model.selectedDownloadRepo == pick.model.repo, model.isWizardDownloadActive {
                 Label("Downloading", systemImage: "arrow.down.circle").foregroundStyle(.green)
             } else {
                 Button("Download") { model.pick(download: pick) }
@@ -537,10 +564,11 @@ private struct ExtrasStep: View {
 
 private struct AppsStep: View {
     @ObservedObject var model: SetupWizardModel
+    // Re-rendered when the server starts or stops (the locked fields).
     @EnvironmentObject private var server: ServerManager
 
     var body: some View {
-        let editable = model.canEditNetwork(server)
+        let editable = model.canEditNetwork
         VStack(alignment: .leading, spacing: 14) {
             StepHeader(Text("Apps and agents"), Text("Other apps reach your models through an OpenAI-compatible API on this Mac."))
             LabeledContent("Port") {

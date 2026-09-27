@@ -202,6 +202,15 @@ final class MLXRuntimeInstaller {
     /// the same venv at the same time.
     private static var setup: Task<Void, Error>?
 
+    /// A setup is running (the wizard's, a Start's).
+    static var isSettingUp: Bool { setup != nil }
+
+    /// Returns once no setup runs (whatever its outcome): the runtime
+    /// update mustn't pip into the venv a setup is making.
+    static func waitForSetup() async {
+        while let running = setup { _ = try? await running.value }
+    }
+
     func ensureReady() async throws {
         if let running = Self.setup { return try await running.value }
         let task = Task { @MainActor in

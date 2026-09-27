@@ -142,8 +142,15 @@ final class DownloadQueue: ObservableObject {
     /// Done and cancelled items leave the list; failed ones stay.
     func removeFinished() { state.removeFinished() }
 
-    /// A finished (failed) item leaves the list.
-    func dismiss(_ id: UUID) { state.dismiss(id) }
+    /// A finished (failed) item leaves the list; if it was the wizard's
+    /// chat model, the server start waiting for it is dropped too.
+    func dismiss(_ id: UUID) {
+        if let item = state.item(id), item.status.isFinished, item.kind == .chatModel,
+           UserDefaults.standard[Pref.onboardingStartServerFor] == item.target {
+            UserDefaults.standard[Pref.onboardingStartServerFor] = nil
+        }
+        state.dismiss(id)
+    }
 
     private func stopRunning(_ id: UUID) {
         guard let item = state.item(id), item.kind == .chatModel else { return }

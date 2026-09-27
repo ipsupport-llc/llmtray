@@ -215,10 +215,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
         )
-        // What the wizard queued and a relaunch interrupted goes on; its
-        // chat model starts the server once it's in place.
+        // The wizard's chat model starts the server once it's in place.
         downloadQueue.onFinished = { [weak self] in self?.downloadFinished($0) }
-        downloadQueue.resume()
         ReviewPrompter.shared.recordLaunch()
         // Project files (adr/0012): nothing unless turned on in Settings.
         ProjectIndexer.shared.start(server: server)
@@ -273,6 +271,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // one's memory.
         Task { @MainActor [weak self] in
             await server.reapOrphans()
+            // What the wizard queued and a relaunch interrupted goes on --
+            // after the reap: a chat model already in place starts the
+            // server at once.
+            self?.downloadQueue.resume()
             if UserDefaults.standard[Pref.autoStartOnLaunch] {
                 self?.quickStart()
             }
@@ -525,7 +527,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func openSetupWizard(automatic: Bool) {
         popover.performClose(nil)
-        setupWizard.show(automatic: automatic, queue: downloadQueue, server: server) { [weak self] in self?.quickStart() }
+        setupWizard.show(automatic: automatic, queue: downloadQueue, server: server) { [weak self] in self?.startSelectedModel() }
+    }
+
+    /// The selected model, started -- or, with another one running, loaded
+    /// in its place (as picking it in the popover does).
+    private func startSelectedModel() {
+        switch server.state {
+        case .stopped, .failed:
+            Task { await attemptStart(retriesLeft: 1) }
+        case .running:
+            guard let model = ModelCatalog.shared.model(id: UserDefaults.standard[Pref.selectedModelID]),
+                  model.path != server.loadedModelPath, !tabs.isAnyBusy else { return }
+            let server = self.server
+            Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
+        default:
+            break
+        }
     }
 
     /// The chat model the wizard picked is in place: selected, and the
@@ -534,6 +552,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func downloadFinished(_ item: DownloadQueueState.Item) {
         let defaults = UserDefaults.standard
         guard item.kind == .chatModel, item.target == defaults[Pref.onboardingStartServerFor] else { return }
+        // Not under the open wizard (its Apps step changes the port): it
+        // starts the model when it's closed or finished.
+        guard !setupWizard.isOpen else { return }
         switch item.status {
         case .done:
             defaults[Pref.onboardingStartServerFor] = nil
@@ -541,7 +562,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let path = ModelCatalog.shared.root + "/" + item.target
             guard ModelCatalog.shared.model(id: path) != nil else { return }
             defaults[Pref.selectedModelID] = path
-            quickStart()
+            startSelectedModel()
         case .cancelled:
             defaults[Pref.onboardingStartServerFor] = nil
         default:
