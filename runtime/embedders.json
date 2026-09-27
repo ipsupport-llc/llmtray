@@ -1,0 +1,52 @@
+{
+  "_comment": "Embedders for project files (adr/0012). Configuration, not code: adding a model is adding an entry (its family module must exist in llmtray_embed/). Pooling, prefixes and dtype come from here, never from a model card. Every file is pinned by revision and sha256; reference vectors (sentence-transformers, torch CPU fp32) are re-embedded at load and the model refused below min_cosine. Never a Qwen model (the user's rule).",
+  "registry_version": 1,
+  "default": "bge-m3",
+  "embedders": [
+    {
+      "id": "bge-m3",
+      "display_name": "BGE-M3",
+      "license": "MIT",
+      "family": "xlm-roberta",
+      "source": {
+        "repo": "mlx-community/bge-m3-mlx-fp16",
+        "revision": "a37eddded9a6a1273a87fb8b0da0d1cdbd98aeec",
+        "files": {
+          "config.json": "2f0b6a5c00cf8653f67d93dd611b119f57e9199f876e137de63090dab4dfb426",
+          "tokenizer.json": "5df1f55d60c9705a501ab9a75550728625740741fe4be308dac4806c16b7d51d",
+          "model.safetensors": "e8028acb2e77e0010d35ef75832d823edb5851c95682deef2bde86a45bd4441d"
+        },
+        "bytes": 1152653009,
+        "upstream": "BAAI/bge-m3@5617a9f61b028005a4858fdac845db406aefb181"
+      },
+      "weights": {
+        "compute_dtype": "float16",
+        "quantization": null
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 8192,
+        "pad_id": 1
+      },
+      "prefixes": {
+        "query": "",
+        "document": ""
+      },
+      "pooling": "cls",
+      "dense": [],
+      "normalize": true,
+      "dim": 1024,
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 4096,
+        "max_batch": 16
+      },
+      "memory_bytes": 1880000000,
+      "reference": {
+        "file": "embedders/bge-m3.reference.json",
+        "sha256": "8eaec2fe5ac203602329585e75c15a6fc9b88f1598d90a44cc24e17dbefc1548",
+        "min_cosine": 0.999
+      }
+    }
+  ]
+}

@@ -48,20 +48,9 @@ enum HFSortOption: String, CaseIterable, Identifiable {
     }
 }
 
-/// A rough, honest heuristic -- not a promise. Compares a repo's on-disk
-/// size against total (not currently-free) physical memory, since "will
-/// this machine ever run this comfortably" is the more useful question
-/// while browsing than "is there room for it this exact second," and free
-/// memory fluctuates with whatever else happens to be running. Doesn't
-/// account for KV-cache/activation overhead on top of the weights
-/// themselves, which is real but depends on context length and isn't
-/// knowable in advance -- the thresholds leave headroom for it, but a
-/// model right at the "fits" boundary can still fail on a long context.
-enum ModelFitLevel {
-    case fits
-    case tight
-    case unlikely
-
+/// The fit estimate itself is LLMTrayCore's (the wizard's recommendations
+/// use it too); its dot and words are here.
+extension ModelFitLevel {
     var color: Color {
         switch self {
         case .fits: return .green
@@ -77,19 +66,17 @@ enum ModelFitLevel {
         case .unlikely: return NSLocalizedString("Larger than this Mac's RAM -- unlikely to load", comment: "")
         }
     }
-
-    static func estimate(sizeBytes: Int64, physicalMemoryBytes: UInt64) -> ModelFitLevel {
-        let ratio = Double(sizeBytes) / Double(physicalMemoryBytes)
-        if ratio < 0.45 { return .fits }
-        if ratio < 0.70 { return .tight }
-        return .unlikely
-    }
 }
 
 private struct HFTreeEntry: Decodable {
+    struct LFS: Decodable { let oid: String? }
     let type: String
     let path: String
     let size: Int?
+    let oid: String?
+    let lfs: LFS?
+    /// The file's revision identity: the LFS sha256, else the git blob id.
+    var revision: String? { lfs?.oid ?? oid }
 }
 
 /// Per-file bookkeeping keyed by repo-relative path (not URLSessionTask
@@ -99,9 +86,15 @@ private struct FileDownload {
     let path: String
     let destination: URL
     let expectedBytes: Int64
+    /// The Hub's id for this file's content (see HFTreeEntry.revision).
+    var revision: String?
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
+    /// Already on disk at its expected size when the download started (a
+    /// relaunch mid-download, or a copy put there by hand): not fetched
+    /// again, and never removed if this attempt fails -- it isn't ours.
+    var preexisting = false
     /// Restarted once from scratch after the file CDN refused it (its
     /// signed link expires an hour after the redirect: a long pause).
     var restarted = false
@@ -118,6 +111,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// ModelDiscovery.isDownloaded), not just config.json's existence,
     /// which would false-positive on a download interrupted partway through.
     static let completionMarkerName = ".llmtray-complete"
+    /// Which revision of each file is on disk: a file is picked up after a
+    /// relaunch only if its size AND its Hub id still match.
+    static let manifestName = ".llmtray-files.json"
 
     @Published var query: String = ""
     @Published var results: [HFModelSummary] = []
@@ -266,7 +262,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         }
     }
 
-    func download(_ model: HFModelSummary, completion: @escaping () -> Void) {
+    /// `root`: the models folder to download into, fixed by the caller;
+    /// nil: the one set when the file list arrives.
+    func download(_ model: HFModelSummary, root: String? = nil, completion: @escaping () -> Void) {
         guard downloadingID == nil else { return }
         HFToken.refresh()
         // A gated model's files answer 401 without a token (seen live: the
@@ -315,7 +313,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     return
                 }
 
-                let modelsRoot = ModelDiscovery.currentModelsRoot()
+                let modelsRoot = root ?? ModelDiscovery.currentModelsRoot()
                 let destRoot = URL(fileURLWithPath: modelsRoot).appendingPathComponent(model.id)
                 try FileManager.default.createDirectory(at: destRoot, withIntermediateDirectories: true)
                 // Any marker from a previous, incomplete attempt at this
@@ -325,6 +323,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 try? FileManager.default.removeItem(at: destRoot.appendingPathComponent(Self.completionMarkerName))
                 currentDestRoot = destRoot
 
+                let manifestURL = destRoot.appendingPathComponent(Self.manifestName)
+                let manifest = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL))) ?? [:]
                 files.removeAll()
                 tasksByPath.removeAll()
                 pathByTaskID.removeAll()
@@ -335,13 +335,22 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
                 for entry in entries {
-                    files[entry.path] = FileDownload(
-                        path: entry.path,
-                        destination: destRoot.appendingPathComponent(entry.path),
-                        expectedBytes: Int64(entry.size ?? 0)
-                    )
-                    startTask(forPath: entry.path)
+                    let destination = destRoot.appendingPathComponent(entry.path)
+                    let expected = Int64(entry.size ?? 0)
+                    var file = FileDownload(path: entry.path, destination: destination, expectedBytes: expected, revision: entry.revision)
+                    // Picked up, not restarted: a file already there at its
+                    // expected size and the same Hub revision (a download
+                    // interrupted by quitting).
+                    let onDisk = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? NSNumber)?.int64Value
+                    if expected > 0, onDisk == expected, let revision = entry.revision, manifest[entry.path] == revision {
+                        file.isDone = true
+                        file.preexisting = true
+                        file.writtenBytes = expected
+                    }
+                    files[entry.path] = file
+                    if !file.isDone { startTask(forPath: entry.path) }
                 }
+                if files.values.allSatisfy(\.isDone) { finishIfComplete() }
             } catch {
                 downloadError = error.localizedDescription
                 downloadingID = nil
@@ -512,6 +521,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             } else {
                 files[path]?.isDone = true
                 saveError = nil
+                MainActor.assumeIsolated { self.recordRevision(path) }
             }
         } catch {
             saveError = "Failed to save \(dest.lastPathComponent): \(error.localizedDescription)"
@@ -520,23 +530,31 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             MainActor.assumeIsolated { self.failDownload(saveError) }
             return
         }
-        let allDone = !downloadFailed && !files.isEmpty && files.values.allSatisfy { $0.isDone }
-        Task { @MainActor in
-            if allDone {
-                if let destRoot = self.currentDestRoot {
-                    FileManager.default.createFile(
-                        atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil
-                    )
-                }
-                self.downloadingID = nil
-                UsageTelemetry.shared.record(.modelDownload)   // a count: not which model
-                self.downloadStatusText = NSLocalizedString("Done", comment: "")
-                self.downloadSpeedBytesPerSec = 0
-                self.downloadETASeconds = nil
-                self.onAllDone?()
-                self.onAllDone = nil
-            }
+        Task { @MainActor in self.finishIfComplete() }
+    }
+
+    /// Notes a finished file's Hub revision in the folder's manifest.
+    private func recordRevision(_ path: String) {
+        guard let root = currentDestRoot, let revision = files[path]?.revision else { return }
+        let url = root.appendingPathComponent(Self.manifestName)
+        var manifest = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: url))) ?? [:]
+        manifest[path] = revision
+        if let data = try? JSONEncoder().encode(manifest) { try? data.write(to: url, options: .atomic) }
+    }
+
+    /// Every file in place: the marker, and the download is over.
+    private func finishIfComplete() {
+        guard !downloadFailed, !files.isEmpty, files.values.allSatisfy(\.isDone), downloadingID != nil else { return }
+        if let destRoot = currentDestRoot {
+            FileManager.default.createFile(atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil)
         }
+        downloadingID = nil
+        UsageTelemetry.shared.record(.modelDownload)   // a count: not which model
+        downloadStatusText = NSLocalizedString("Done", comment: "")
+        downloadSpeedBytesPerSec = 0
+        downloadETASeconds = nil
+        onAllDone?()
+        onAllDone = nil
     }
 
     /// The rel="next" URL of a Link header.
@@ -602,7 +620,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// removed (a folder with a config.json would pass for a model).
     private func failDownload(_ message: String) {
         downloadFailed = true
-        let written = files.values.filter(\.isDone).map(\.destination)
+        let written = files.values.filter { $0.isDone && !$0.preexisting }.map(\.destination)
         let root = currentDestRoot
         cancelDownload()   // clears downloadError: set after
         for url in written { try? FileManager.default.removeItem(at: url) }

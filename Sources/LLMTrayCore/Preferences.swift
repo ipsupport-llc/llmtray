@@ -51,6 +51,11 @@ public enum Pref {
     /// A new chat's first answer gets the model to name the chat.
     public static let autoTitleChats = PrefKey("llmtray.autoTitleChats", default: true)
 
+    /// The download queue (DownloadQueueState as JSON): what the first-run
+    /// wizard chose that is still to download or failed, kept across a
+    /// relaunch.
+    public static let downloadQueue = PrefKey<String?>("llmtray.downloadQueue", default: nil)
+
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)
     public static let checkUpdatesAtLaunch = PrefKey("llmtray.checkUpdatesAtLaunch", default: true)
