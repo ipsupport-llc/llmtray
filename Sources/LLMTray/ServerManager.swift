@@ -456,8 +456,9 @@ final class ServerManager: ObservableObject {
     /// runtime would fail to load it and the whole server start with it,
     /// so the setting simply has no effect until Check for Updates brings
     /// in a runtime that supports it. A --draft-model the user put in the
-    /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
-    /// Face itself (~450MB, cached after the first start).
+    /// extra arguments wins. mlx_lm.server downloads the drafter from
+    /// Hugging Face on the first start (~450MB); later starts get the
+    /// cached folder (availableDrafter).
     private func mtpDrafterArgument(forModelPath modelPath: String, profile: ResolvedProfile) -> String? {
         let known = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath)
         let drafter = ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
@@ -475,7 +476,9 @@ final class ServerManager: ObservableObject {
     private func availableDrafter(forModelPath modelPath: String) -> String? {
         guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath),
               MLXRuntimeInstaller.supportsModelType("gemma4_assistant") else { return nil }
-        return repo
+        // Downloaded once: its folder, so a start doesn't ask the Hub (and
+        // works offline).
+        return HFHubCache.localSnapshot(repo: repo) ?? repo
     }
 
     /// The model-specific facts the launch arguments depend on; drafterRepo
