@@ -476,19 +476,26 @@ final class ChangePlanTests: FolderTestCase {
     }
 
     /// Past every check, inside the Trash call (one that moves by path
-    /// without verifying): the item's name is given to another file.
-    private func swapInIntruder() {
-        try? fm.moveItem(atPath: grant + "/a.txt", toPath: base + "/a-original.txt")
-        write("a.txt", "intruder")
+    /// without verifying): the item is taken from where it was staged and
+    /// another file put in its place.
+    private func swapInIntruder(_ url: URL) {
+        try? fm.moveItem(atPath: url.path, toPath: base + "/a-original.txt")
+        fm.createFile(atPath: url.path, contents: Data("intruder".utf8))
     }
 
     func testATrashSwapIsPutBack() throws {
         write("a.txt", "mine")
         let plan = try approved([rm("a.txt")])
+        var staged = ""
         let exec = ChangeExecutor(denylist: denylist, journal: journal,
-                                  trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: swapInIntruder))
-        XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
-        XCTAssertEqual(try String(contentsOfFile: grant + "/a.txt"), "intruder")
+                                  trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: {
+                                      staged = $0.path
+                                      self.swapInIntruder($0)
+                                  }))
+        // What went isn't the item: it goes back where it was taken from; the
+        // item itself was taken by someone else, and that is said.
+        XCTAssertEqual(statuses(exec.execute(plan)), ["uncertain"])
+        XCTAssertEqual(try String(contentsOfFile: staged), "intruder")
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/RacyTrash"), [])
     }
 
@@ -499,7 +506,7 @@ final class ChangePlanTests: FolderTestCase {
         // it can't be put back, and that is said, not hidden.
         let exec = ChangeExecutor(denylist: denylist, journal: journal,
                                   trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: swapInIntruder,
-                                                       after: { self.write("a.txt", "third") }))
+                                                       after: { self.fm.createFile(atPath: $0.path, contents: Data("third".utf8)) }))
         let report = exec.execute(plan)
         XCTAssertEqual(statuses(report), ["uncertain"])
         let record = try XCTUnwrap(journal.record(plan.id))
@@ -666,22 +673,41 @@ final class ChangePlanTests: FolderTestCase {
 
     // MARK: Review round 5: the Trash path, undo containment, rename-backs
 
-    /// Runs `before` inside the Trash call, before it verifies and moves;
-    /// `after` once it has moved.
+    /// Runs `before` inside the Trash call, with the URL it was given, before
+    /// it verifies and moves; `after` once it has moved.
     private final class HookedTrash: Trasher {
         let inner: Trasher
-        let before: () -> Void
-        let after: () -> Void
-        init(_ inner: Trasher, before: @escaping () -> Void = {}, after: @escaping () -> Void = {}) {
+        let before: (URL) -> Void
+        let after: (URL) -> Void
+        init(_ inner: Trasher, before: @escaping (URL) -> Void = { _ in }, after: @escaping (URL) -> Void = { _ in }) {
             self.inner = inner
             self.before = before
             self.after = after
         }
         func trash(_ url: URL, coordinated: Bool, verify: (URL) -> Bool) throws -> URL? {
-            before()
+            before(url)
             let out = try inner.trash(url, coordinated: coordinated, verify: verify)
-            after()
+            after(url)
             return out
+        }
+    }
+
+    /// Verifies, then runs `between`, then moves by path -- the window
+    /// between `verify` and `trashItem`'s own path lookup.
+    private final class VerifyThenMove: Trasher {
+        let dir: String
+        let between: (URL) -> Void
+        init(dir: String, between: @escaping (URL) -> Void) {
+            self.dir = dir
+            self.between = between
+            try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+        }
+        func trash(_ url: URL, coordinated: Bool, verify: (URL) -> Bool) throws -> URL? {
+            guard verify(url) else { throw FolderAccessError.changed(url.path) }
+            between(url)
+            let dest = dir + "/" + url.lastPathComponent
+            try FileManager.default.moveItem(atPath: url.path, toPath: dest)
+            return URL(fileURLWithPath: dest)
         }
     }
 
@@ -699,29 +725,77 @@ final class ChangePlanTests: FolderTestCase {
         exec.beforeOperation = { _ in self.swapForSymlink("t") }
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
         XCTAssertEqual(trash.coordinated, [], "the Trash isn't asked")
-        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"], "nothing made there")
     }
 
     func testTheTrashPathIsCheckedAgainInsideTheCall() throws {
         write("t/x.txt", "x")
         let plan = try approved([rm("t/x.txt")])
         let exec = ChangeExecutor(denylist: denylist, journal: journal,
-                                  trasher: HookedTrash(trash, before: { self.swapForSymlink("t") }))
+                                  trasher: HookedTrash(trash, before: { _ in self.swapForSymlink("t") }))
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"], "back under its name, staging gone")
         XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash"), [])
+    }
+
+    func testAPathRedirectedAfterVerifyingCantTrashAnythingElse() throws {
+        write("t/x.txt", "mine")
+        let plan = try approved([rm("t/x.txt")])
+        var staging = ""
+        // Between verify and the move: the folder leaves, and a symlink under
+        // its name leads to a copy of the staging folder's path elsewhere.
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: VerifyThenMove(dir: base + "/Trash2") { url in
+            staging = url.deletingLastPathComponent().lastPathComponent
+            try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t")
+            self.write("victim/\(staging)/x.txt", "victim", in: self.outside)
+            try? self.fm.createSymbolicLink(atPath: self.grant + "/t", withDestinationPath: self.outside + "/victim")
+        })
+        XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
+        XCTAssertTrue(staging.hasPrefix(".llmtray-trash-"), staging)
+        XCTAssertEqual(try String(contentsOfFile: outside + "/victim/\(staging)/x.txt"), "victim", "what went is put back")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"])
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "mine")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash2"), [])
     }
 
     func testATrashWhoseFolderLeftTheGrantIsPutBack() throws {
         write("t/x.txt", "x")
         let plan = try approved([rm("t/x.txt")])
-        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: HookedTrash(trash, after: {
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: HookedTrash(trash, after: { _ in
             try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t")
         }))
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
-        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x", "put back where it came from")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"], "put back where it came from")
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash"), [])
         XCTAssertFalse(journal.record(plan.id)!.isIncomplete)
+    }
+
+    func testATrashLeavesNoStagingFolder() throws {
+        write("t/x.txt", "x")
+        XCTAssertEqual(statuses(executor.execute(try approved([rm("t/x.txt")]))), ["done"])
+        XCTAssertEqual(names("t"), [])
+        trash.fail = true
+        write("t/y.txt", "y")
+        XCTAssertEqual(statuses(executor.execute(try approved([rm("t/y.txt")]))), ["failed"])
+        XCTAssertEqual(names("t"), ["y.txt"])
+    }
+
+    func testAHardLinkMadeAfterReviewInvalidatesTheItem() throws {
+        write("a.txt", "a")
+        store.add(try planner.plan([rm("a.txt")]).items, chatID: "c")
+        // The review showed one name; now there are two.
+        try fm.linkItem(atPath: grant + "/a.txt", toPath: outside + "/a-link.txt")
+        XCTAssertThrowsError(try approveNow()) {
+            guard case ChangePlanError.invalidated = $0 else { return XCTFail("\($0)") }
+        }
+        // Approved while it had one name, linked before it runs.
+        try fm.removeItem(atPath: outside + "/a-link.txt")
+        let plan = try approveNow()
+        try fm.linkItem(atPath: grant + "/a.txt", toPath: outside + "/a-link.txt")
+        XCTAssertEqual(statuses(executor.execute(plan)), ["failed"])
+        XCTAssertTrue(exists("a.txt"))
     }
 
     private func assertStoppedPlainly(_ r: ChangeUndo.Report, _ planID: UUID, file: StaticString = #filePath, line: UInt = #line) {

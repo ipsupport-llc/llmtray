@@ -58,6 +58,21 @@ public struct CapturedSource: Codable, Equatable, Sendable {
     public var fileProvider: Bool
 }
 
+extension CapturedSource {
+    /// What the review warned about (Hardening 5, 6) must still be so: a
+    /// hard link made (or removed) since, or an item that turned file-provider
+    /// managed (or stopped being), invalidates the approval.
+    func checkReviewedFlags(_ st: EntryStat, parent: Descriptor) throws {
+        if st.isHardLinked != hardLinked {
+            throw FolderAccessError.changed("\(location.relativePath) \(st.isHardLinked ? "has another name (a hard link) since" : "lost its other names since")")
+        }
+        let path = parent.currentPath.map { $0 + "/" + location.name }
+        if (path.map(SafeFolderWalker.isFileProviderItem) ?? false) != fileProvider {
+            throw FolderAccessError.changed("\(location.relativePath) changed whether a file provider manages it")
+        }
+    }
+}
+
 /// Where a make_dir or move lands: the existing part of the parent path by
 /// identity; the rest is made by earlier make_dir items of the plan.
 public struct CapturedDestination: Codable, Equatable, Sendable {
@@ -298,7 +313,8 @@ public struct ChangePlanner {
                 if let s = item.source {
                     let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
                     let r = try walker.resolve(s.location.components, expectedParents: s.parentChain)
-                    if r.entry?.identity != s.identity { throw FolderAccessError.changed(s.location.relativePath) }
+                    guard let e = r.entry, e.identity == s.identity else { throw FolderAccessError.changed(s.location.relativePath) }
+                    try s.checkReviewedFlags(e.stat, parent: r.parent.descriptor)
                 }
                 if let d = item.destination {
                     let walker = SafeFolderWalker(root: d.location.root, denylist: denylist)

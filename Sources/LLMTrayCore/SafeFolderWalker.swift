@@ -232,6 +232,9 @@ public struct SafeFolderWalker {
             // A name that vanished (or turned denied) since readdir is skipped.
             if let e = try? entry(in: dir, name) { out.append(e) }
         }
+        // Listed through a held descriptor: the folder must still be inside
+        // the grant now that it has been read, else nothing of it is shown.
+        guard stillInside(dir) else { throw FolderAccessError.changed(display(dir.components)) }
         return out
     }
 
@@ -255,6 +258,9 @@ public struct SafeFolderWalker {
             throw error
         }
         guard d.stat.isRegularFile, d.identity == e.identity else { throw FolderAccessError.changed(shown) }
+        // Opened through a held parent: it must still be inside the grant
+        // once the file is open, else the file isn't read.
+        guard stillInside(item.parent) else { throw FolderAccessError.changed(shown) }
         return d
     }
 

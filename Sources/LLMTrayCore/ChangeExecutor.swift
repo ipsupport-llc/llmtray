@@ -258,49 +258,121 @@ public struct ChangeExecutor {
             throw Uncertain(description: "moved \(s.location.relativePath), but what arrived isn't the item")
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("trash without a path") }
-            let parent = try openSourceParent(s)
-            let parentIdentity = parent.descriptor.identity
-            beforeOperation?(item)
-            // Foundation trashes by path, so no path is trusted: it is
-            // established again from the grant root right before the call,
-            // and once more where the call is about to move (a coordinator
-            // may hand over another URL: it must be the same path).
-            guard let path = trashPath(s, parentIdentity: parentIdentity) else {
-                throw FolderAccessError.changed(s.location.relativePath)
-            }
-            let out: URL?
-            do {
-                out = try trasher.trash(URL(fileURLWithPath: path), coordinated: s.fileProvider) { u in
-                    u.path == path && trashPath(s, parentIdentity: parentIdentity) == path
-                }
-            } catch {
-                // The Trash said no: nothing moved -- unless the item is gone.
-                if (try? Posix.lstatAt(parent.descriptor.fd, s.location.name))?.identity == s.identity { throw error }
-                throw Uncertain(description: "the Trash failed (\(error)) and \(s.location.relativePath) isn't where it was")
-            }
-            guard let out else { throw Uncertain(description: "the Trash didn't say where it put \(s.location.relativePath)") }
-            // Foundation moves by path: what went must be the item, else
-            // what was swapped in is put back.
-            guard let trashed = Posix.lstatPath(out.path) else {
-                throw Uncertain(description: "\(out.path) isn't in the Trash")
-            }
-            if trashed.identity == s.identity {
-                // It must have gone from inside the grant: its folder still in
-                // its place after the call, else it is put back.
-                if stillInside(parent, root: s.location.root) {
-                    return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
-                                         destinationChain: nil, trashURL: out.path, components: nil)
-                }
-                if Self.renameBack(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, expecting: s.identity) {
-                    throw FolderAccessError.changed(s.location.relativePath)
-                }
-                throw Uncertain(description: "trashed \(s.location.relativePath) while its folder left the grant: it is at \(out.path)")
-            }
-            if Self.renameBack(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, expecting: trashed.identity) {
-                throw FolderAccessError.changed(s.location.relativePath)
-            }
-            throw Uncertain(description: "something other than \(s.location.relativePath) went to the Trash: \(out.path)")
+            return try trash(item, s)
         }
+    }
+
+    /// Trash (Hardening 1, 6). Foundation trashes by path, and a path can be
+    /// redirected between any check and the call. So the item is first moved
+    /// by descriptors, exclusively, into a private folder made for this call
+    /// next to it (same volume, a random name, ours, 0700); only a path into
+    /// that folder goes to the Trash, established again from the grant root
+    /// right before the call and inside its verify callback. Redirecting it
+    /// would take a copy of that random folder's path elsewhere; and what went
+    /// is checked afterwards and put back if it isn't the item, or if the
+    /// item's folder is no longer inside the grant.
+    private func trash(_ item: PlanItem, _ s: CapturedSource) throws -> JournalResult {
+        let parent = try openSourceParent(s)
+        let pfd = parent.descriptor.fd
+        let name = s.location.name
+        let rel = s.location.relativePath
+        beforeOperation?(item)
+        guard stillInside(parent, root: s.location.root) else { throw FolderAccessError.changed(rel) }
+        let stagingName = ".llmtray-trash-\(UUID().uuidString)"
+        guard mkdirat(pfd, stagingName, 0o700) == 0 else { throw FolderAccessError.system("trash \(name)", errno) }
+        let sfd = openat(pfd, stagingName, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard sfd >= 0, let staging = try? Descriptor(fd: sfd, stat: Posix.fstat(sfd)) else {
+            if sfd >= 0 { close(sfd) }
+            throw Uncertain(description: "made \(stagingName), then couldn't open it")
+        }
+        defer { withExtendedLifetime((parent, staging)) {} }
+        // Still the folder mkdirat made, as far as can be told (as for
+        // make_dir): ours, private, empty.
+        guard staging.stat.isDirectory, staging.identity.device == parent.descriptor.identity.device,
+              staging.stat.mode & 0o077 == 0, Self.ownedByUs(staging),
+              (try? ChangeUndo.isEmptyDirectory(parent.descriptor, stagingName)) == true else {
+            throw Uncertain(description: "\(stagingName) isn't the folder just made")
+        }
+        /// The staging folder goes, if it is still ours and empty.
+        func dropStaging() -> Bool {
+            (try? Posix.lstatAt(pfd, stagingName))?.identity == staging.identity && unlinkat(pfd, stagingName, AT_REMOVEDIR) == 0
+        }
+        /// The item back from the staging folder under its name, the folder
+        /// gone: then `why` is a plain failure.
+        func unstage(_ why: Error) throws -> Never {
+            if Self.renameBack(staging.fd, name, pfd, name, expecting: s.identity), dropStaging() { throw why }
+            throw Uncertain(description: "\(why); \(rel) may be left in \(stagingName)")
+        }
+        if renameatx_np(pfd, name, staging.fd, name, UInt32(RENAME_EXCL)) != 0 {
+            let e = errno
+            if dropStaging() { throw FolderAccessError.system("trash \(name)", e) }
+            throw Uncertain(description: "\(stagingName) was left behind")
+        }
+        // A rename moves whatever has the name: it must have been the item.
+        guard let staged = try? Posix.lstatAt(staging.fd, name) else {
+            throw Uncertain(description: "moved \(rel) aside, then couldn't look at it")
+        }
+        if staged.identity != s.identity {
+            if Self.renameBack(staging.fd, name, pfd, name, expecting: staged.identity), dropStaging() {
+                throw FolderAccessError.changed(rel)
+            }
+            throw Uncertain(description: "something other than \(rel) was moved into \(stagingName)")
+        }
+        // Moved through a held folder: it must still be inside the grant.
+        guard let path = stagedPath(s, parent: parent, staging: staging) else { try unstage(FolderAccessError.changed(rel)) }
+        let out: URL?
+        do {
+            out = try trasher.trash(URL(fileURLWithPath: path), coordinated: s.fileProvider) { u in
+                u.path == path && stagedPath(s, parent: parent, staging: staging) == path
+            }
+        } catch {
+            // The Trash said no: back under its name -- unless it is gone.
+            if (try? Posix.lstatAt(staging.fd, name))?.identity == s.identity { try unstage(error) }
+            throw Uncertain(description: "the Trash failed (\(error)) and \(rel) isn't where it was")
+        }
+        guard let out else { throw Uncertain(description: "the Trash didn't say where it put \(rel)") }
+        guard let trashed = Posix.lstatPath(out.path) else {
+            throw Uncertain(description: "\(out.path) isn't in the Trash")
+        }
+        if trashed.identity == s.identity {
+            // It must have gone from inside the grant: its folder still in its
+            // place after the call, else it is put back under its name.
+            if stillInside(parent, root: s.location.root) {
+                // An empty private folder left behind is harmless; the item
+                // is in the Trash either way.
+                _ = dropStaging()
+                return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
+                                     destinationChain: nil, trashURL: out.path, components: nil)
+            }
+            if Self.renameBack(AT_FDCWD, out.path, pfd, name, expecting: s.identity), dropStaging() {
+                throw FolderAccessError.changed(rel)
+            }
+            throw Uncertain(description: "trashed \(rel) while its folder left the grant: it is at \(out.path)")
+        }
+        // Something else went (the path was redirected): back where it was
+        // taken from, by the same path; then the item back under its name.
+        if Self.renameBack(AT_FDCWD, out.path, AT_FDCWD, path, expecting: trashed.identity),
+           (try? Posix.lstatAt(staging.fd, name))?.identity == s.identity {
+            try unstage(FolderAccessError.changed(rel))
+        }
+        throw Uncertain(description: "something other than \(rel) went to the Trash: \(out.path)")
+    }
+
+    /// The path into the staging folder the Trash gets, established again
+    /// each time it is asked: the item's folder still the held one, in its
+    /// place in the grant (walked from the root by descriptors); the staging
+    /// folder's path as the file system has it now, inside the grant root's
+    /// path, with no symlink on the way (its realpath is itself), naming the
+    /// staging folder, its parent the item's folder; the item in it. Nil when
+    /// any of that doesn't hold.
+    private func stagedPath(_ s: CapturedSource, parent: OpenedDirectory, staging: Descriptor) -> String? {
+        guard stillInside(parent, root: s.location.root), let dir = staging.currentPath, Posix.realpath(dir) == dir,
+              dir.hasPrefix(s.location.root.path + "/"),
+              Posix.lstatPath(dir)?.identity == staging.identity,
+              Posix.lstatPath((dir as NSString).deletingLastPathComponent)?.identity == parent.descriptor.identity
+        else { return nil }
+        let path = dir + "/" + s.location.name
+        return Posix.lstatPath(path)?.identity == s.identity ? path : nil
     }
 
     /// An exclusive rename back, confirmed: the name then holds `expecting`.
@@ -311,22 +383,6 @@ public struct ChangeExecutor {
 
     private func stillInside(_ dir: OpenedDirectory, root: FolderRoot) -> Bool {
         SafeFolderWalker(root: root, denylist: denylist).stillInside(dir)
-    }
-
-    /// The path the Trash gets, established again each time it is asked:
-    /// the item's folder walked from the grant root by descriptors (still
-    /// the held one, still in its place, the item in it by identity), spelled
-    /// as the file system has it now, inside the grant root's path, with no
-    /// symlink on the way (its realpath is itself). Nil when any of that
-    /// doesn't hold.
-    private func trashPath(_ s: CapturedSource, parentIdentity: FileIdentity) -> String? {
-        guard let again = try? openSourceParent(s), again.descriptor.identity == parentIdentity,
-              let dir = again.descriptor.currentPath, Posix.realpath(dir) == dir,
-              dir == s.location.root.path || dir.hasPrefix(s.location.root.path + "/"),
-              Posix.lstatPath(dir)?.identity == parentIdentity else { return nil }
-        let path = dir + "/" + s.location.name
-        guard Posix.lstatPath(path)?.identity == s.identity else { return nil }
-        return withExtendedLifetime(again) { path }
     }
 
     static func ownedByUs(_ d: Descriptor) -> Bool {
@@ -343,6 +399,7 @@ public struct ChangeExecutor {
         if st.identity != s.identity || denylist.isDenied(identity: st.identity, name: s.location.name) {
             throw FolderAccessError.changed(s.location.relativePath)
         }
+        try s.checkReviewedFlags(st, parent: parent.descriptor)
         return parent
     }
 

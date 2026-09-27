@@ -34,6 +34,19 @@ final class SafeFolderWalkerTests: FolderTestCase {
         XCTAssertFalse(walker.stillInside(held))
     }
 
+    func testReadsThroughAHeldFolderThatLeftTheGrantAreRefused() throws {
+        write("a/f.txt", "inside")
+        let dir = try walker.openDirectory(["a"])
+        let item = try walker.resolve(["a", "f.txt"])
+        try fm.moveItem(atPath: grant + "/a", toPath: outside + "/a")
+        XCTAssertThrowsError(try walker.entries(of: dir))
+        XCTAssertThrowsError(try walker.openFile(item))
+        // Back in its place: readable again.
+        try fm.moveItem(atPath: outside + "/a", toPath: grant + "/a")
+        XCTAssertEqual(try walker.entries(of: dir).map(\.name), ["f.txt"])
+        XCTAssertNoThrow(try walker.openFile(item))
+    }
+
     func testASymlinkedFolderIsNeverEntered() throws {
         write("secret.txt", "outside", in: outside)
         try fm.createSymbolicLink(atPath: grant + "/link", withDestinationPath: outside)
