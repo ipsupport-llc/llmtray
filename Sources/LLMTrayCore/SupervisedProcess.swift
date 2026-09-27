@@ -188,7 +188,9 @@ private struct SupervisedChild {
 
         func fire(_ why: ProcessRunner.SupervisedLimit) {
             if limit == nil { limit = why }
-            Darwin.kill(-pid, SIGKILL)   // the whole group
+            // The whole group -- only while it's ours: once the child is
+            // reaped its pgid can belong to someone else.
+            if reapedAt == nil { Darwin.kill(-pid, SIGKILL) }
         }
 
         while true {
@@ -226,9 +228,15 @@ private struct SupervisedChild {
                 // Exited? Looked at without reaping, so the group can still be
                 // killed by the child's pid (its grandchildren, if any).
                 var info = siginfo_t()
-                if waitid(P_PID, id_t(pid), &info, WEXITED | WNOHANG | WNOWAIT) == 0, info.si_pid == pid {
+                let waited = waitid(P_PID, id_t(pid), &info, WEXITED | WNOHANG | WNOWAIT)
+                if waited == 0, info.si_pid == pid {
                     Darwin.kill(-pid, SIGKILL)
                     while waitpid(pid, &status, 0) < 0 && errno == EINTR {}
+                    reapedAt = now
+                } else if waited < 0, errno == ECHILD {
+                    // Reaped by someone else (nothing in the app does that
+                    // today): no status to read, but no spinning either.
+                    if limit == nil { limit = .stoppedByCaller }
                     reapedAt = now
                 } else {
                     if now - lastFootprintCheck >= UInt64(pollMs) * 1_000_000 {

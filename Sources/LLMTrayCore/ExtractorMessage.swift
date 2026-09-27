@@ -34,12 +34,15 @@ public struct ExtractionSummary: Codable, Equatable, Sendable {
     public var pages: Int
     public var milliseconds: Int
     public var failure: ExtractionError?
+    /// Whether the no-network sandbox was on (nil: an older child).
+    public var networkIsolated: Bool?
 
-    public init(kind: DocumentKind, pages: Int, milliseconds: Int, failure: ExtractionError? = nil) {
+    public init(kind: DocumentKind, pages: Int, milliseconds: Int, failure: ExtractionError? = nil, networkIsolated: Bool? = nil) {
         self.kind = kind
         self.pages = pages
         self.milliseconds = milliseconds
         self.failure = failure
+        self.networkIsolated = networkIsolated
     }
 }
 

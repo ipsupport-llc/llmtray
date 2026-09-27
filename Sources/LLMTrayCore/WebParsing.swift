@@ -113,7 +113,7 @@ public enum WebParsing {
         for m in entity.matches(in: s, range: NSRange(location: 0, length: ns.length)) {
             result += ns.substring(with: NSRange(location: last, length: m.range.location - last))
             let name = ns.substring(with: m.range(at: 1))
-            if !name.hasPrefix("#"), let char = namedEntities[name] ?? namedEntities[name.lowercased()] {
+            if !name.hasPrefix("#"), let char = namedEntities[name] {
                 result += char
             } else if name.hasPrefix("#") {
                 let hex = name.hasPrefix("#x") || name.hasPrefix("#X")

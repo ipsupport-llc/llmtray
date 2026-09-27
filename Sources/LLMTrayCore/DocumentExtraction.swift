@@ -21,7 +21,7 @@ public enum DocumentExtraction {
             maxFootprintBytes: UInt64(max(0, caps.memoryBytes)),
             jetsamLimitBytes: useJetsam ? caps.memoryBytes : nil)
         let exit = try await ProcessRunner.runSupervised(
-            executable, ["--extract", url.path, "--caps", caps.json] + extraArguments,
+            executable, ["--extract", url.path, "--caps", caps.json, "--parent", String(getpid())] + extraArguments,
             supervision: supervision, onLine: { collector.consume($0) })
         return try collector.finish(exit)
     }

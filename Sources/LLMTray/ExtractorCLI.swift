@@ -36,7 +36,9 @@ enum ExtractorCLI {
         let path = arguments[i + 1]
 
         limitSelf(cpuSeconds: caps.cpuSeconds)
-        exitWithParent()
+        exitWithParent(expected: arguments.firstIndex(of: "--parent").flatMap { i in
+            i + 1 < arguments.count ? pid_t(arguments[i + 1]) : nil
+        })
         let sandboxed = !arguments.contains("--simulate-sandbox-failure") && denyNetwork()
 
         var pages = 0
@@ -67,7 +69,7 @@ enum ExtractorCLI {
             failure = .unreadable(error.localizedDescription)
         }
         let ms = Int(Date().timeIntervalSince(started) * 1000)
-        emit(.summary(ExtractionSummary(kind: kind, pages: pages, milliseconds: ms, failure: failure)))
+        emit(.summary(ExtractionSummary(kind: kind, pages: pages, milliseconds: ms, failure: failure, networkIsolated: sandboxed)))
         exit(0)
     }
 
@@ -81,9 +83,12 @@ enum ExtractorCLI {
         setrlimit(RLIMIT_CORE, &core)
     }
 
-    /// A crashed or force-quit app leaves no extractor behind.
-    private static func exitWithParent() {
-        let parent = getppid()
+    /// A crashed or force-quit app leaves no extractor behind. `expected`:
+    /// the app's pid (`--parent`), so a parent already gone before this
+    /// looked (the child adopted by launchd) is caught too.
+    private static func exitWithParent(expected: pid_t?) {
+        let parent = expected ?? getppid()
+        if getppid() != parent { _exit(0) }
         Thread.detachNewThread {
             while true {
                 sleep(1)
@@ -154,7 +159,9 @@ private struct Extractor {
     /// The file, mapped read-only through the one descriptor its size was
     /// checked on: a path swapped in between can't bring a bigger file.
     private static func map(_ path: String, maxBytes: Int) throws -> Data {
-        let fd = open(path, O_RDONLY)
+        // Non-blocking: a FIFO in the path fails at once instead of waiting
+        // for a writer.
+        let fd = open(path, O_RDONLY | O_NONBLOCK)
         guard fd >= 0 else { throw ExtractionError.unreadable(String(cString: strerror(errno))) }
         defer { close(fd) }
         var st = stat()
