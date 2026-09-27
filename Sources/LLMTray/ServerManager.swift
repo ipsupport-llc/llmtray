@@ -683,6 +683,7 @@ final class ServerManager: ObservableObject {
             case .modelServer: what = "model server"
             case .imageRunner: what = "image-generation runner"
             case .musicRunner: what = "music-generation runner"
+            case .embedRunner: what = "embed runner"
             }
             let model = orphan.model.map { ", \($0)" } ?? ""
             let memory = ByteCountFormatter.string(fromByteCount: orphan.residentBytes, countStyle: .memory)

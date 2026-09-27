@@ -506,11 +506,20 @@ adds ~20 ms.
   ids, bounded messages, timeouts, cancellation, restart, the orphan
   marker) — `ProcessRunner.runStreaming` is one-shot.
 - **Scheduling.** Indexing is a background job in bounded slices (one
-  embed request ≤ 256 chunks, ≤ ~3 s); it holds no `GenerationQueue`
+  embed request ≤ 256 chunks and ≤ 10k estimated tokens — `EmbedRunner`
+  refuses a larger one and `documentBatches` splits a document to fit;
+  the runner's own 262k-token limit is only a backstop — ≤ ~3 s); it
+  holds no `GenerationQueue`
   ticket across slices. `GenerationQueue` gains a background lane below
   the interactive one: an image or music generation that wants the queue
   gets it at the next slice boundary, and the embed runner exits then
-  (its ~1.7 GB freed); indexing resumes after. Slices also wait while
+  (its ~1.7 GB freed) — at every generation grant, since a search's
+  query may have started it too; indexing resumes after. While a
+  generation holds or waits for the queue the runner is paused: a query
+  embedding gets `.paused` at once and the search goes lexical-only
+  instead of loading the embedder next to the generation's model (the
+  demand hook is told the current state when it's set, so a runner wired
+  up mid-generation starts paused). Slices also wait while
   the chat model generates. A query embedding is interactive: it jumps
   ahead of queued index batches in the runner. At most two projects'
   vectors are resident (LRU, a ~800 MB budget); a search in a third
@@ -524,11 +533,24 @@ adds ~20 ms.
   ~150 lines, `gemma3-bidir`): only `mlx`, `tokenizers`, `numpy` — all in
   the app's venv already; not `mlx-embeddings` (36 more packages), not
   mlx-lm (the fork pin doesn't matter). Spike: branch `spike/rag-embed`.
+  It runs in **the mlx-lm server's venv** (`mlx_server_venv`), not a venv
+  of its own like mflux's or music's: those exist because their stacks
+  pull conflicting transformers/tokenizers versions, while the runner
+  needs nothing the server venv lacks, and its own venv would download the
+  same ~200 MB of wheels again. The coupling to the fork pin's versions is
+  guarded rather than assumed: every load re-embeds the reference vectors
+  (below), so an mlx or tokenizers bump that changed the vectors refuses
+  the model instead of mixing old and new vectors in one set.
 - **bge-m3 weights**: `mlx-community/bge-m3-mlx-fp16` (1.1 GB, MIT),
   pinned by revision and per-file sha256, tokenizer.json pinned by hash
   (BAAI's older file adds a token before `</s>` after trailing
   whitespace). fp16 is the default; 8-bit (592 MB) is allowed but saves
-  memory only, not time; 4-bit is refused (min cosine 0.915).
+  memory only, not time; 4-bit is refused (min cosine 0.915). A download
+  hashes what is already installed and fetches only the missing or
+  damaged files (a revision stamp alone isn't trusted); a load failure
+  re-verifies the folder and unstamps it if a file no longer matches.
+  One runner per entry is shared by every caller, so removing the
+  weights stops the only one.
 - **Pooling, prefixes, dtype come from the registry**, never a model
   card (mlx-community's card says mean pooling for bge-m3; it's CLS).
   An entry: id, licence, family, source {repo, revision, files → sha256},
@@ -549,7 +571,9 @@ adds ~20 ms.
   too_large | timeout | cancelled | internal}`; `cancel`, `ping`,
   `shutdown`; limits 8 MiB a line, 256 texts, 262k tokens a request.
   Cancel and timeouts act at batch boundaries of ≤ 4,096 tokens (≤ ~2 s),
-  so the client adds a grace period, then kills. stdin EOF is the normal
+  so the client adds a grace period, then kills. A protocol violation (an
+  unreadable line, an answer of the wrong shape) fails every request in
+  flight on that process and drops all its later lines. stdin EOF is the normal
   stop; the runner exits within 0.1 s if the app dies. Large requests
   (up to 256 texts): many small concurrent ones ran at 3-4k tokens/s.
 - EmbeddingGemma is gated on Hugging Face (Gemma licence): its entry
@@ -703,10 +727,11 @@ contextual-retrieval.
       `withoutEarlierProjectResults`, compaction without tool text,
       citations in `ChatMessage`/`PersistedMessage` (with project and
       rev) and their chips, the per-call trust barrier.
-   4. **The index and tools**: `ProjectIndex` + `ProjectIndexRegistry`
-      (schema, FTS, packed vectors, staging/reconcile, maintenance), the
-      embed runner and registry (bge-m3), the background lane of
-      `GenerationQueue`, the three tools.
+   4. **The index and tools**, in two PRs: 4a `ProjectIndex` +
+      `ProjectIndexRegistry` (schema, FTS, packed vectors,
+      staging/reconcile, maintenance), the embed runner and registry
+      (bge-m3), the background lane of `GenerationQueue`; 4b, after the
+      chat plumbing, the indexing job and the three tools.
    5. **Files UI**: the Files view, the sidebar ring with Pause / Stop,
       the menu-bar dot, Settings opt-in.
 
