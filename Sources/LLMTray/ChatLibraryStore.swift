@@ -146,6 +146,7 @@ final class ChatLibraryStore: ObservableObject {
         library.renameProject(id, to: name)
         saveLibrary()
         ProjectInstructionsWindow.retitle(id, name)
+        ProjectFilesWindow.retitle(id, name)
     }
 
     /// Applies from the next message of its chats.
@@ -169,6 +170,7 @@ final class ChatLibraryStore: ObservableObject {
             return
         }
         ProjectInstructionsWindow.close(id)
+        ProjectFilesWindow.close(id)
         library.deleteProject(id)
         // Not saved (a full disk): the project would come back at the next
         // launch without its directory. The record finishes it then.

@@ -86,6 +86,7 @@ struct ContentView: View {
             }
             Divider()
             ReviewPromptRow()
+            if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
             conversation
         }
         .frame(width: 420)
@@ -132,6 +133,7 @@ struct ContentView: View {
                     Divider()
                 }
                 ReviewPromptRow()
+                if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
                 conversation
             }
             .frame(minWidth: 380)
@@ -445,6 +447,46 @@ private struct EmptyChatProjectNote: View {
             Label(String(format: NSLocalizedString("In project %@", comment: ""), project.name), systemImage: "folder")
                 .font(.system(size: 11))
                 .lineLimit(1)
+        }
+    }
+}
+
+/// "Searches N files" above a project chat whose project has searchable
+/// files (adr/0012); clicking it shows them. Nothing while Project files are
+/// off or nothing is searchable yet.
+private struct ProjectChatFilesRow: View {
+    let sessionID: UUID
+    @ObservedObject private var store = ChatLibraryStore.shared
+    @ObservedObject private var indexer = ProjectIndexer.shared
+
+    var body: some View {
+        if indexer.isEnabled, let project = store.library.projectContext(forChat: sessionID) {
+            let searchable = ProjectFileTotals(indexer.documents[project.id] ?? []).searchable
+            if searchable > 0 {
+                VStack(spacing: 0) {
+                    Button { ProjectFilesWindow.show(project.id) } label: {
+                        HStack(spacing: 6) {
+                            ProjectRingIcon(ring: indexer.ring(for: project.id))
+                            Text(project.name).lineLimit(1).truncationMode(.tail)
+                            Text(verbatim: "·")
+                            Text(String(format: NSLocalizedString("Searches %lld files", comment: "a project chat's header: how many files its tools search"),
+                                        Int64(searchable)))
+                                .lineLimit(1)
+                                // The name truncates first, not the count.
+                                .layoutPriority(1)
+                            Spacer(minLength: 0)
+                        }
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .help(indexer.statusText(for: project.id) ?? NSLocalizedString("Show the project's files", comment: ""))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    Divider()
+                }
+            }
         }
     }
 }

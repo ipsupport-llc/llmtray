@@ -345,14 +345,27 @@ struct ModelsPane: View {
 }
 
 /// Project files (adr/0012): the feature's opt-in and its embedding model,
-/// with its size. Off, nothing is indexed, downloaded or started. The
-/// Files view with each project's documents comes with PR 3.5.
+/// with its size, and the disk every project's files and index take. Off,
+/// nothing is indexed, downloaded or started. Each project's files are in
+/// its Files window (the project's menu in the chats sidebar).
 @MainActor
 struct ProjectFilesSection: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var embedders = ProjectIndexer.shared.embedders
     @State private var error: String?
+    @State private var diskTotal: Int64?
     private var setup: FeatureSetup { .shared }
+
+    /// Re-measured when a project's documents change: added, removed,
+    /// re-indexed, embedded (the vectors are most of an index), and when a
+    /// project's indexing moves on or ends (its last slices, the checkpoint).
+    private var diskKey: String {
+        let docs = indexer.documents.map { project, docs in
+            "\(project):\(docs.count):\(docs.map(\.rev).reduce(0, +)):\(docs.filter { $0.status == .embedded }.count)"
+        }
+        let runs = indexer.progress.map { "\($0.key)=\($0.value.state.rawValue):\($0.value.done):\($0.value.total)" }
+        return (docs + runs).sorted().joined(separator: ",")
+    }
 
     var body: some View {
         Section("Project files") {
@@ -377,8 +390,33 @@ struct ProjectFilesSection: View {
                 Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
                     .font(.caption).foregroundStyle(.secondary)
             }
+            if let diskTotal, diskTotal > 0 {
+                LabeledContent {
+                    Text(ModelCatalog.format(diskTotal)).foregroundStyle(.secondary)
+                } label: {
+                    SettingLabel(title: "Projects' files on disk", help: "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.")
+                }
+            }
             if let error {
                 Text(error).font(.caption).foregroundStyle(.red)
+            }
+        }
+        .task(id: diskKey) {
+            // Debounced: the documents change after every indexing step,
+            // so a run is measured once it pauses or ends.
+            if diskTotal != nil { try? await Task.sleep(nanoseconds: 3_000_000_000) }
+            guard !Task.isCancelled else { return }
+            let total = await ProjectIndexer.totalDiskUsage()
+            if !Task.isCancelled { diskTotal = total }
+        }
+        .task(id: !indexer.progress.isEmpty) {
+            // Indexing on: measured every 10 s besides the debounced changes
+            // (their task restarts at each step; this one doesn't).
+            while !Task.isCancelled, !indexer.progress.isEmpty {
+                try? await Task.sleep(nanoseconds: 10_000_000_000)
+                guard !Task.isCancelled else { return }
+                let total = await ProjectIndexer.totalDiskUsage()
+                if !Task.isCancelled { diskTotal = total }
             }
         }
     }
