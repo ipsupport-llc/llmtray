@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: अभी समर्थित नहीं है";
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld को अभी भी Settings > Folders से पूर्ववत किया जा सकता है।";
+"%lld can still be undone from Settings > Files." = "%lld को अभी भी Settings > Files से पूर्ववत किया जा सकता है।";
 "%lld downloads" = "%lld डाउनलोड";
 "%lld failed" = "%lld असफल";
 "%lld files couldn't be indexed" = "%lld फाइलों को अनुक्रमित नहीं किया जा सका";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "एक एडिटर, एजेंट या स्क्रिप्ट जो लोड किए गए मॉडल के अलावा किसी अन्य मॉडल की मांग करता है। स्विच करने से लोड किया गया मॉडल—and चैट भी—अनलोड हो जाएगा। पहले पूछें: एक सूचना जिसमें Switch / Keep दिखेगा; एक मिनट में अनुत्तरित रहने पर Keep माना जाएगा। Keep चुनने पर क्लाइंट को लोड किए गए मॉडल का नाम बताते हुए त्रुटि मिलती है। ऐप की अपनी चैट हमेशा स्विच होती है।";
 "An hour" = "एक घंटे";
 "An item needs the new folder it goes into: tick that folder too." = "किसी आइटम को जिस नए फ़ोल्डर में जाना है वह चाहिए: उस फ़ोल्डर को भी टिक करें।";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "एक अनिश्चित आइटम बदला हो या न हो: इसे Finder में देखें। Settings > Folders जर्नल रखता है।";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "एक अनिश्चित आइटम बदला भी हो सकता है और नहीं भी — इसे Finder में देखें। Settings > Files जर्नल रखता है।";
 "Another folder change is running: try again when it's done." = "एक और फ़ोल्डर परिवर्तन चल रहा है: समाप्त होने पर पुनः प्रयास करें।";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
 "Another version next to this one (a new seed, the same request)" = "इसी के पास एक और संस्करण (नया seed, वही अनुरोध)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "LLMTray पसंद आ रहा है?";
 "Errors" = "त्रुटियाँ";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "इस प्रोजेक्ट की हर चैट को मॉडल प्रोफ़ाइल के सिस्टम प्रॉम्प्ट के बाद ये निर्देश मिलेंगे। बदलाव अगले संदेश से लागू होंगे।";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "प्रोजेक्ट की हर चैट को पूरी फ़ाइल का पाठ मिल जाएगा; फ़ाइल पिन की होने पर उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद हो जाएगा।";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray द्वारा ipsupport.us को भेजे जाने वाले बिल्कुल वही डेटा, फ़ील्ड दर फ़ील्ड। कुछ भी आपका Mac नहीं छोड़ता।";
 "Extra server arguments" = "अतिरिक्त सर्वर आर्ग्युमेंट्स";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — जनरेट और संपादित करें";
@@ -255,6 +256,8 @@
 "Failed: %@" = "विफल: %@";
 "Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
 "Fetching file list…" = "फ़ाइल सूची ले जा रही है…";
+"Files" = "Files";
+"Files Settings…" = "Files Settings…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "यहाँ जोड़ी गई फाइलें प्रोजेक्ट में कॉपी की जाती हैं और इस Mac पर अनुक्रमित होती हैं; प्रोजेक्ट की हर चैट उन्हें खोज सकती है।";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "प्रोजेक्ट में जो फ़ाइलें जोड़ी जाती हैं वे इस Mac पर इंडेक्स की जाती हैं, ताकि इसकी चैट उन्हें खोज सकें। अर्थ के आधार पर खोज के लिए एम्बेडिंग मॉडल का उपयोग होता है; बिना इसके फ़ाइलें उनके शब्दों के आधार पर ही खोजी जाती हैं।";
 "Files in %@" = "%@ में फाइलें";
@@ -263,7 +266,6 @@
 "Finish" = "समाप्त";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish आपने जो चुना वह लागू करता है। आप बाद में Settings में सब बदल सकते हैं।";
 "Fits comfortably" = "आराम से फिट होता है";
-"Folder Settings…" = "फ़ोल्डर सेटिंग्स…";
 "Folder access" = "फ़ोल्डर पहुँच";
 "Folder access is off in Settings." = "Settings में फ़ोल्डर पहुँच बंद है।";
 "Folder changes" = "फ़ोल्डर परिवर्तन";
@@ -387,6 +389,7 @@
 "Manage Models…" = "मॉडल प्रबंधित करें…";
 "Managed by iCloud Drive or another cloud provider." = "iCloud Drive या किसी अन्य क्लाउड प्रदाता द्वारा प्रबंधित।";
 "Max tokens" = "अधिकतम टोकन";
+"Measuring the file…" = "फ़ाइल मापी जा रही है…";
 "Memory" = "मेमोरी";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "पहले की बातचीत का संदर्भ फिर से इस्तेमाल करने के लिए रखी गई मेमोरी, ताकि जारी चैट अपना पूरा इतिहास दोबारा न पढ़े। इसकी सीमा तय है, ताकि यह इतनी न बढ़े कि सर्वर की मेमोरी खत्म हो जाए।";
 "Message…" = "संदेश…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "अभी तक कोई ऑटो-ट्यून रन नहीं हुआ है।";
 "No automatic update checks" = "कोई स्वचालित अपडेट जांच नहीं";
 "No chats found" = "कोई चैट नहीं मिली";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "कोई embedding मॉडल नहीं: फाइलें उनके शब्दों से खोजी जाती हैं। अर्थ के आधार पर खोजने के लिए इसे Settings > Models से डाउनलोड करें।";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "कोई embedding मॉडल नहीं: फाइलें उनके शब्दों से खोजी जाती हैं। अर्थ के आधार पर खोज के लिए इसे Settings > Files से डाउनलोड करें।";
 "No files yet" = "अभी तक फाइलें नहीं";
 "No folder changes yet." = "अभी तक कोई फ़ोल्डर परिवर्तन नहीं।";
 "No messages yet" = "अभी तक कोई संदेश नहीं";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "अभी समर्थित नहीं: %@। यह संस्करण टेक्स्ट, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF और HTML को इंडेक्स करता है।";
 "Nothing sent yet." = "अभी कुछ भी नहीं भेजा गया।";
 "Nothing to change." = "बदलने के लिए कुछ नहीं।";
+"Nothing to pin until the file has been read" = "फ़ाइल पढ़े बिना पिन करने के लिए कुछ भी नहीं";
 "OK" = "ठीक है";
 "Off" = "बंद";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "बंद होने पर, केवल यह Mac सर्वर तक पहुँच सकता है। चालू होने पर, आपके नेटवर्क पर मौजूद अन्य डिवाइस भी पहुँच सकते हैं — नेटवर्क पर कोई भी; इसलिए केवल भरोसेमंद नेटवर्क पर ही चालू करें।";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "यह नॉब केवल turbo में है: sft में बदलने के लिए कोई song planner नहीं है।";
 "Open LLMTray when you log in" = "लॉगिन करते समय LLMTray खोलें";
 "Open Server Log…" = "सर्वर लॉग खोलें…";
-"Open Settings" = "Settings खोलें";
 "Open in New Tab" = "नए टैब में खोलें";
 "Open in Preview" = "Preview में खोलें";
 "Open in Window" = "विंडो में खोलें";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "1 से 5 सितारों में रेटिंग चुनें।";
 "Pick one to chat with. A download starts right away and goes on in the background." = "चैट करने के लिए किसी एक को चुनें। डाउनलोड तुरंत शुरू होगा और बैकग्राउंड में चलता रहेगा।";
 "Pin" = "पिन करें";
+"Pin %@" = "पिन करें %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "पिन करें: प्रोजेक्ट की हर चैट को पूरी फ़ाइल मिल जाएगी (≈%@ टोकन)। फ़ाइल पिन होने के दौरान उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद रहेगा।";
 "Pinned" = "पिन किया गया";
+"Pinned · ≈%@ tokens" = "पिन की गई · ≈%@ टोकन";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "पिन की गई: %1$lld फाइलें, ≈%2$@ में से %3$@ टोकन";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins और projects लोड नहीं हो सके। इनमें किए गए बदलाव LLMTray के रीस्टार्ट होने तक सहेजे नहीं जाते; फ़ाइल की एक कॉपी इसके साथ रखी जाती है।";
 "Play" = "प्ले";
 "Point an app or agent at LLMTray:" = "किसी ऐप या एजेंट को LLMTray की ओर निर्देशित करें:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "पिछले 7 दिन";
 "Profile" = "प्रोफ़ाइल";
 "Profiles" = "प्रोफ़ाइलें";
-"Project Files: Turn On in Settings…" = "Project Files: Settings में चालू करें…";
 "Project files" = "प्रोजेक्ट फ़ाइलें";
 "Project files are turned off" = "Project files बंद हैं";
 "Project files are turned off in Settings." = "प्रोजेक्ट फ़ाइलें सेटिंग्स में बंद हैं।";
@@ -697,7 +703,8 @@
 "The app's name." = "ऐप का नाम।";
 "The base profile: every other profile inherits from it." = "मूल प्रोफ़ाइल: बाकी सभी प्रोफ़ाइल इससे इनहेरिट करती हैं।";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "चैट मॉडल उन फ़ोल्डरों में देख सकता है जिन्हें आप अनुमति देते हैं (नाम, आकार, तिथियाँ, छोटे अंश) और वहाँ परिवर्तन प्रस्तावित कर सकता है — नए फ़ोल्डर, स्थानांतरण, नाम बदलना, Trash में भेजना। हर परिवर्तन एक योजना है जिसे आप पहले मंज़ूर करते हैं, और जिसे पूर्ववत किया जा सकता है।";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "चैट मॉडल इस फ़ोल्डर में डाउनलोड हो रहा है। यह पूरा होने पर इसे यहाँ या Settings में बदलें।";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "चैट मॉडल इस फ़ोल्डर में डाउनलोड हो रहा है। सेटअप के बाद Settings में बदलें, या पहले कोई और चैट मॉडल चुनें।";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "आपने जो चैट मॉडल चुना था वह इस फ़ोल्डर में डाउनलोड किया गया है। सेटअप के बाद Settings में बदलें, या पहले कोई और चैट मॉडल चुनें।";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "प्रोजेक्ट में जोड़ी गई फाइलों की कॉपी और उनके इंडेक्स साथ होते हैं। किसी प्रोजेक्ट की अपनी कॉपियाँ उसकी Files विंडो में दिखाई जाती हैं; प्रोजेक्ट हटाने पर वे भी हट जाते हैं।";
 "The day the counts are for." = "जिस दिन के लिए काउंट हैं।";
 "The download didn't start." = "डाउनलोड शुरू नहीं हुआ।";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "डाउनलोड किए गए embedder फ़ाइलों की checksums मेल नहीं खाती हैं: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder डाउनलोड हो रहा है — पूरा होने पर पुनः प्रयास करें।";
 "The embedder list is missing or invalid: %@" = "Embedder सूची अनुपस्थित या अमान्य है: %@";
+"The embedding model couldn't be downloaded" = "Embedding मॉडल डाउनलोड नहीं किया जा सका";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray जो बिल्कुल JSON भेजता है: भेजने के लिए प्रतीक्षारत रिपोर्टें, आज तक की रिपोर्टें और अंतिम भेजी गई रिपोर्ट।";
 "The families of the models used that day (such as qwen or flux), never their names." = "उस दिन उपयोग किए गए मॉडल के परिवार (जैसे qwen या flux), कभी उनके नाम नहीं।";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "पहली बार, यह %@ (%@) को इस Mac पर डाउनलोड करता है—अभी, चैट के बीच में नहीं।";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "इसे वापस रखने के लिए LLMTray में Undo का उपयोग करें: Finder का Put Back उसका फ़ोल्डर नहीं जानता।";
 "Today" = "आज";
 "Today so far: %@ (sent once the day is over)" = "आज तक: %@ (दिन पूरा होने पर भेजा जाएगा)";
+"Too long for the selected model's room now, read by search instead: %@" = "चयनित मॉडल के रूम के लिए अब बहुत लंबा है, खोज द्वारा पढ़ा जाएगा: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "चयनित मॉडल के साथ पिन करने के लिए बहुत लंबा: ≈%1$@ टोकन, ≈%2$@ में से %3$@ शेष";
 "Too many reviews from this network. Try again in %lld min." = "इस नेटवर्क से बहुत सारी समीक्षाएँ भेजी जा चुकी हैं। %lld मिनट बाद पुनः प्रयास करें।";
 "Too many reviews from this network. Try again later." = "इस नेटवर्क से बहुत सारी समीक्षाएँ भेजी जा चुकी हैं। बाद में पुनः प्रयास करें।";
 "Tool" = "टूल";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "चल रहे मॉडल पर decode-concurrency (1/2/4/8) और prefill-step-size (64/128/256/512) आज़माता है, हर बार सर्वर रीस्टार्ट करता है, और जो सबसे तेज़ मापा गया उसे रखता है।";
 "Try Again" = "पुन: प्रयास करें";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "फाइलें किसी प्रोजेक्ट में जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Settings > Models में Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
-"Turn on Project files in Settings to add files" = "फाइलें जोड़ने के लिए Settings में Project files चालू करें";
+"Turn On Project Files…" = "Turn On Project Files…";
+"Turn On…" = "Turn On…";
+"Turn on Project files to add files" = "फाइलें जोड़ने के लिए Project files चालू करें";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
 "Turn on project files?" = "प्रोजेक्ट फ़ाइलें चालू करें?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "जनरेट करते समय चैट मॉडल अनलोड करें";
 "Unload model when idle" = "निष्क्रिय होने पर मॉडल अनलोड करें";
 "Unpin" = "पिन हटाएँ";
+"Unpin %@" = "पिन हटाएँ %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "पिन हटाएँ: प्रोजेक्ट की चैट्स पूरी फ़ाइल पाने के बजाय इसे फिर से खोजेंगी";
 "Up to date" = "अप टू डेट";
 "Up to date." = "अप टू डेट है।";
 "Update" = "अपडेट करें";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "~%1$lld घं %2$lld मि बचा";
 "~%lld h left" = "~%lld घं बचा";
 "~%lld min left" = "~%lld मि बचा";
+"· %lld pinned" = "· %lld पिन की गई";
 "· size…" = "· आकार…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” हटाया नहीं जा पाया: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: पिन बदला नहीं जा सका: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” और उसका इंडेक्स प्रोजेक्ट से हटा दिया गया है। जिस फाइल से आपने इसे जोड़ा था वह प्रभावित नहीं हुई।";

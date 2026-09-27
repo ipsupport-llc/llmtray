@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: chưa được hỗ trợ";
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld vẫn có thể hoàn tác từ Settings > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld vẫn có thể hoàn tác từ Cài đặt > Files.";
 "%lld downloads" = "%lld lượt tải xuống";
 "%lld failed" = "%lld thất bại";
 "%lld files couldn't be indexed" = "%lld tệp không thể được lập chỉ mục";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Một trình soạn thảo, tác nhân hoặc script yêu cầu mô hình khác với mô hình đang tải. Chuyển sẽ tháo mô hình đã tải — cả cuộc trò chuyện cũng vậy. Hỏi trước: hiện thông báo với Switch / Keep; không trả lời trong một phút tính là Keep. Keep: client sẽ nhận lỗi kèm tên mô hình đang tải. Chat của app luôn chuyển.";
 "An hour" = "Một giờ";
 "An item needs the new folder it goes into: tick that folder too." = "Một mục cần thư mục mới nó sẽ vào: hãy đánh dấu cả thư mục đó.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "Một mục không chắc có thể đã thay đổi hoặc không: xem nó trong Finder. Settings > Folders lưu nhật ký.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Một mục không chắc có thể đã thay đổi hoặc không: xem nó trong Finder. Cài đặt > Files lưu giữ nhật ký.";
 "Another folder change is running: try again when it's done." = "Một thay đổi thư mục khác đang chạy: thử lại khi nó xong.";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
 "Another version next to this one (a new seed, the same request)" = "Một phiên bản khác bên cạnh (seed mới, yêu cầu giống)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "Bạn đang thích LLMTray chứ?";
 "Errors" = "Lỗi";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ văn bản; tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi một tệp được ghim.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Đây là chính xác những gì LLMTray gửi tới ipsupport.us, trường từng trường. Không gì khác rời khỏi máy Mac của bạn.";
 "Extra server arguments" = "Đối số máy chủ bổ sung";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — tạo và chỉnh sửa";
@@ -255,6 +256,8 @@
 "Failed: %@" = "Không thành công: %@";
 "Fast (smaller canvas)" = "Nhanh (khung nhỏ hơn)";
 "Fetching file list…" = "Đang lấy danh sách tệp…";
+"Files" = "Files";
+"Files Settings…" = "Cài đặt Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Các tệp thêm vào đây được sao chép vào dự án và lập chỉ mục trên Mac này; mọi cuộc trò chuyện trong dự án đều có thể tìm chúng.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Các tệp thêm vào dự án được lập chỉ mục trên Mac này để các trò chuyện có thể tìm kiếm chúng. Tìm kiếm theo ý nghĩa dùng mô hình embedding; nếu không có, tệp sẽ được tìm kiếm theo từ ngữ.";
 "Files in %@" = "Tệp trong %@";
@@ -263,7 +266,6 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish áp dụng những gì bạn chọn. Bạn có thể thay đổi sau trong Settings.";
 "Fits comfortably" = "Vừa vặn";
-"Folder Settings…" = "Folder Settings…";
 "Folder access" = "Truy cập thư mục";
 "Folder access is off in Settings." = "Truy cập thư mục đang tắt trong Settings.";
 "Folder changes" = "Thay đổi thư mục";
@@ -387,6 +389,7 @@
 "Manage Models…" = "Quản lý mô hình…";
 "Managed by iCloud Drive or another cloud provider." = "Được quản lý bởi iCloud Drive hoặc nhà cung cấp đám mây khác.";
 "Max tokens" = "Số token tối đa";
+"Measuring the file…" = "Đang đo kích thước tệp…";
 "Memory" = "Bộ nhớ";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Phần bộ nhớ được giữ lại để dùng lại ngữ cảnh của các cuộc trò chuyện trước, để cuộc trò chuyện tiếp tục không phải đọc lại toàn bộ lịch sử. Có giới hạn để bộ nhớ này không tăng đến mức máy chủ hết bộ nhớ.";
 "Message…" = "Tin nhắn…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "Chưa có lần tự tinh chỉnh nào.";
 "No automatic update checks" = "Không kiểm tra cập nhật tự động";
 "No chats found" = "Không tìm thấy trò chuyện";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "Không có mô hình embedding: tệp được tìm theo từ. Tải xuống trong Cài đặt > Models để tìm theo nghĩa.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Không có mô hình embedding: Files được tìm kiếm theo từ. Tải xuống trong Cài đặt > Files để tìm theo nghĩa.";
 "No files yet" = "Chưa có tệp";
 "No folder changes yet." = "Chưa có thay đổi thư mục.";
 "No messages yet" = "Chưa có tin nhắn";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF và HTML.";
 "Nothing sent yet." = "Chưa gửi gì.";
 "Nothing to change." = "Không có gì để thay đổi.";
+"Nothing to pin until the file has been read" = "Không có gì để ghim cho đến khi tệp được đọc";
 "OK" = "OK";
 "Off" = "Tắt";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Chỉ turbo có tuỳ chỉnh này: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "Open LLMTray when you log in" = "Mở LLMTray khi đăng nhập";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
-"Open Settings" = "Mở Cài đặt";
 "Open in New Tab" = "Mở trong tab mới";
 "Open in Preview" = "Mở bằng Preview";
 "Open in Window" = "Mở trong Cửa sổ";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "Chọn đánh giá từ 1 đến 5 sao.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Chọn một để chat. Việc tải về bắt đầu ngay và chạy ở nền.";
 "Pin" = "Ghim";
+"Pin %@" = "Ghim %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Ghim: mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ tệp (≈%@ token). Tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi tệp được ghim.";
 "Pinned" = "Đã ghim";
+"Pinned · ≈%@ tokens" = "Đã ghim · ≈%@ token";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Đã ghim: %1$lld tệp, ≈%2$@ trên %3$@ token";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Không tải được ghim và dự án. Các thay đổi sẽ không được lưu cho đến khi LLMTray khởi động lại; một bản sao tệp được lưu bên cạnh.";
 "Play" = "Phát";
 "Point an app or agent at LLMTray:" = "Trỏ app hoặc agent tới LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "7 Ngày trước";
 "Profile" = "Hồ sơ";
 "Profiles" = "Hồ sơ";
-"Project Files: Turn On in Settings…" = "Tệp dự án: Bật trong Cài đặt…";
 "Project files" = "Tệp dự án";
 "Project files are turned off" = "Tệp dự án đã tắt";
 "Project files are turned off in Settings." = "Tệp dự án đang tắt trong Cài đặt.";
@@ -697,7 +703,8 @@
 "The app's name." = "Tên ứng dụng.";
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Mô hình trò chuyện có thể xem trong các thư mục bạn cho phép (tên, kích thước, ngày, đoạn trích ngắn) và đề xuất thay đổi ở đó — thư mục mới, di chuyển, đổi tên, chuyển vào Trash. Mỗi thay đổi là một kế hoạch bạn phải phê duyệt trước và có thể hoàn tác.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "Mô hình chat đang tải vào thư mục này. Thay đổi khi xong, tại đây hoặc trong Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Mô hình chat đang được tải về thư mục này. Thay đổi trong Cài đặt sau khi hoàn tất, hoặc chọn mô hình chat khác trước.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "Mô hình chat bạn chọn đã được tải về thư mục này. Thay đổi trong Cài đặt sau khi hoàn tất, hoặc chọn mô hình chat khác trước.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Bản sao các tệp thêm vào dự án và các chỉ mục của chúng, cùng nhau. Bản sao của từng dự án được hiển thị trong cửa sổ Files; xóa dự án sẽ xóa chúng.";
 "The day the counts are for." = "Ngày mà các số liệu tương ứng.";
 "The download didn't start." = "Việc tải xuống đã không bắt đầu.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "Các tệp embedder tải xuống không khớp với checksum của chúng: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder đang được tải xuống — thử lại khi quá trình hoàn tất.";
 "The embedder list is missing or invalid: %@" = "Danh sách embedder bị thiếu hoặc không hợp lệ: %@";
+"The embedding model couldn't be downloaded" = "Không thể tải xuống mô hình embedding";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "JSON chính xác mà LLMTray gửi: các báo cáo đang chờ gửi, những báo cáo hôm nay đến giờ, và báo cáo cuối cùng đã gửi.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Họ các mô hình được dùng trong ngày đó (ví dụ qwen hoặc flux), không bao giờ tên cụ thể.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Lần đầu, thao tác này tải %@ (%@) xuống máy Mac này ngay bây giờ, thay vì giữa lúc trò chuyện.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Để đặt lại, dùng Undo trong LLMTray: Finder's Put Back không biết thư mục của nó.";
 "Today" = "Hôm nay";
 "Today so far: %@ (sent once the day is over)" = "Hôm nay đến giờ: %@ (gửi khi hết ngày)";
+"Too long for the selected model's room now, read by search instead: %@" = "Quá dài cho không gian mô hình đã chọn hiện tại, sẽ đọc bằng tìm kiếm thay vào đó: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Quá dài để ghim với mô hình đã chọn: ≈%1$@ token, còn lại ≈%2$@ trong %3$@";
 "Too many reviews from this network. Try again in %lld min." = "Quá nhiều đánh giá từ mạng này. Thử lại sau %lld phút.";
 "Too many reviews from this network. Try again later." = "Quá nhiều đánh giá từ mạng này. Thử lại sau.";
 "Tool" = "Công cụ";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Thử decode-concurrency (1/2/4/8) và prefill-step-size (64/128/256/512) với mô hình đang chạy, khởi động lại máy chủ sau mỗi lần thử, rồi giữ cấu hình đo được nhanh nhất.";
 "Try Again" = "Thử lại";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Tệp dự án trong Cài đặt > Models để thêm tệp vào dự án và cho phép cuộc trò chuyện tìm chúng. Không có gì được lập chỉ mục hoặc tải xuống trước đó.";
-"Turn on Project files in Settings to add files" = "Bật Tệp dự án trong Cài đặt để thêm tệp";
+"Turn On Project Files…" = "Bật Project Files…";
+"Turn On…" = "Bật…";
+"Turn on Project files to add files" = "Bật Project Files để thêm Files";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Project Files để thêm Files vào dự án và cho phép hội thoại tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
 "Turn on project files?" = "Bật tệp dự án?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "Gỡ mô hình chat khỏi bộ nhớ trong khi tạo";
 "Unload model when idle" = "Gỡ mô hình khỏi bộ nhớ khi không hoạt động";
 "Unpin" = "Bỏ ghim";
+"Unpin %@" = "Bỏ ghim %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Bỏ ghim: các cuộc trò chuyện của dự án sẽ tìm tệp này bằng tìm kiếm thay vì nhận toàn bộ nội dung";
 "Up to date" = "Cập nhật";
 "Up to date." = "Đã cập nhật.";
 "Update" = "Cập nhật";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "còn ~%1$lld h %2$lld phút";
 "~%lld h left" = "còn ~%lld h";
 "~%lld min left" = "còn ~%lld phút";
+"· %lld pinned" = "· %lld đã ghim";
 "· size…" = "· kích thước…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” không thể gỡ: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: không thể thay đổi ghim: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” và chỉ mục của nó đã bị xóa khỏi dự án. Tệp bạn thêm từ đó không bị ảnh hưởng.";
