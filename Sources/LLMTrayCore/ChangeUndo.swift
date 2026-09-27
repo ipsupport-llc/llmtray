@@ -544,8 +544,15 @@ public struct ChangeUndo {
         /// A trash that never took the item: it is still under its name (a
         /// trashed item leaves it), so nothing changed.
         func trashNeverRan() throws -> Bool {
-            guard st.kind == .trash, let s = item.source else { return false }
-            return try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity
+            guard st.kind == .trash, let s = item.source,
+                  let here = try Posix.lstatAt(pfd, s.location.name), here.identity == s.identity else { return false }
+            // With other names, one of them could have been linked here after
+            // the Trash took the item: no proof.
+            if here.isHardLinked {
+                throw Uncertain(description: "interrupted: \(s.location.relativePath) has other names (hard links), "
+                    + "so whether the Trash took it can't be told")
+            }
+            return true
         }
         func leftGrant() -> FolderAccessError { .changed("\(comps(dir)) left the grant") }
         /// The item from `from` (in `fromFD`) back under its own name,

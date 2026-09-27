@@ -155,12 +155,13 @@ public struct FolderFiles {
         // Something left out along the way (not the cap): the listing says so.
         var incomplete = false
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
-            let (entries, skipped) = try walker.scanEntries(of: dir, limit: limits.maxScan - scanned + 1)
-            if skipped > 0 { incomplete = true }
-            for e in entries {
-                if truncated { return }
-                if isCancelled() || scanned >= limits.maxScan { truncated = true; return }
-                scanned += 1
+            // The cap counts every name looked at, shown or not.
+            let read = try walker.scanEntries(of: dir, limit: limits.maxScan - scanned)
+            scanned += read.visited
+            if read.skipped > 0 { incomplete = true }
+            if read.capped { truncated = true }
+            for e in read.entries {
+                if isCancelled() { truncated = true; return }
                 if !q.includeHidden, e.name.hasPrefix(".") { continue }
                 let comps = dir.components + [e.name]
                 if matches(e.name) {

@@ -189,6 +189,17 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(state(plan), .incomplete, "its outcome still needs a look")
     }
 
+    func testAHardLinkedItemUnderItsNameIsNoProofTheTrashDidntRun() throws {
+        write("t/h.txt", "h")
+        let plan = try crashed([rm("t/h.txt")], at: .staged)
+        // Another name of the file (as if linked back after a trash).
+        XCTAssertEqual(link(grant + "/t/h.txt", outside + "/h-link"), 0)
+        let r = undoer.recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("hard links") ?? false, "\(r)")
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
     func testATrashCrashedAfterItsCleanupNeedsALook() throws {
         write("t/w.txt", "w")
         let plan = try crashed([rm("t/w.txt")], at: .trashed)
@@ -519,6 +530,20 @@ final class FolderSecurityReviewTests: FolderTestCase {
         guard case .listing(let full) = try FolderFiles(walker: walker)
             .run(FolderQuery(components: ["deep"], recursive: true)) else { return XCTFail() }
         XCTAssertFalse(full.scanTruncated)
+    }
+
+    func testTheScanCapCountsNamesThatArentShown() throws {
+        for i in 0..<5 { write("capped/.ssh\(i == 0 ? "" : "-x\(i)")", "x") }
+        write("capped/denied.keychain", "k")
+        let dir = try walker.openDirectory(["capped"])
+        let r = try walker.scanEntries(of: dir, limit: 3)
+        XCTAssertEqual(r.visited, 3)
+        XCTAssertTrue(r.capped)
+        XCTAssertLessThanOrEqual(r.entries.count, 3)
+        let all = try walker.scanEntries(of: dir, limit: 100)
+        XCTAssertFalse(all.capped)
+        XCTAssertEqual(all.visited, 6, "denied names are looked at and counted")
+        XCTAssertEqual(all.entries.count, 4)
     }
 
     func testTheProtectedScanIsHeldToTheItemsIdentity() throws {

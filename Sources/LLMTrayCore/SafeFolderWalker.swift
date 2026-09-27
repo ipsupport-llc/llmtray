@@ -226,10 +226,20 @@ public struct SafeFolderWalker {
         try scanEntries(of: dir, limit: limit).entries
     }
 
-    /// `entries`, with how many names couldn't be looked at (changed while
-    /// read, or failing): left out, so the listing isn't complete. Names
-    /// gone or denied since readdir aren't counted.
-    public func scanEntries(of dir: OpenedDirectory, limit: Int = .max) throws -> (entries: [FolderEntry], skipped: Int) {
+    /// One directory read: the entries among the first `limit` names it
+    /// holds (denied and vanished ones left out), the names looked at
+    /// (`visited`, at most `limit`), those that couldn't be looked at
+    /// (`skipped`: changed while read, or failing -- the listing isn't
+    /// complete), and whether more names were there past `limit` (`capped`).
+    /// The limit bounds the names examined, whatever they turn out to be.
+    public struct Scan {
+        public var entries: [FolderEntry]
+        public var visited: Int
+        public var skipped: Int
+        public var capped: Bool
+    }
+
+    public func scanEntries(of dir: OpenedDirectory, limit: Int = .max) throws -> Scan {
         let dupFD = dup(dir.descriptor.fd)
         guard dupFD >= 0 else { throw FolderAccessError.system("dup", errno) }
         guard let stream = fdopendir(dupFD) else {
@@ -241,11 +251,18 @@ public struct SafeFolderWalker {
         rewinddir(stream)
         var out: [FolderEntry] = []
         var skipped = 0
-        while out.count < limit, let ent = readdir(stream) {
+        var visited = 0
+        var capped = false
+        while let ent = readdir(stream) {
             let name = withUnsafePointer(to: ent.pointee.d_name) {
                 $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
             }
             if name == "." || name == ".." { continue }
+            if visited >= max(0, limit) {
+                capped = true
+                break
+            }
+            visited += 1
             // A name that vanished (or turned denied) since readdir is
             // skipped; one that couldn't be looked at is counted.
             do {
@@ -257,7 +274,7 @@ public struct SafeFolderWalker {
         // Listed through a held descriptor: the folder must still be inside
         // the grant now that it has been read, else nothing of it is shown.
         guard stillInside(dir) else { throw FolderAccessError.changed(display(dir.components)) }
-        return (out, skipped)
+        return Scan(entries: out, visited: visited, skipped: skipped, capped: capped)
     }
 
     /// Opens a regular file for reading, held to the entry's identity. The

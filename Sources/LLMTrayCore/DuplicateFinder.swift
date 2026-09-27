@@ -76,12 +76,13 @@ public struct DuplicateFinder {
         var entriesRead = 0
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
             let room = limits.maxEntries - entriesRead
-            var entries = try walker.entries(of: dir, limit: room + 1)
-            // Over the cap: what was read is scanned, then the scan stops.
-            let capped = entries.count > room
-            if capped { entries = Array(entries.prefix(room)) }
+            // The cap counts every name looked at (denied ones too). Over
+            // it: what was read is scanned, then the scan stops.
+            let read = try walker.scanEntries(of: dir, limit: room)
+            var entries = read.entries
+            let capped = read.capped
             defer { if capped, budget.stop == nil { budget.stop = .fileLimit } }
-            entriesRead += entries.count
+            entriesRead += read.visited
             entries.sort { Array($0.name.utf8).lexicographicallyPrecedes(Array($1.name.utf8)) }
             for e in entries {
                 if budget.stop != nil { return }
