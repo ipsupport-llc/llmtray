@@ -163,13 +163,21 @@ public enum ToolArgumentParser {
     /// arguments; without one they may be the tool's fields, kept as sent.
     static func unwrap(_ dict: [String: Any], schema: ToolSchema?, repairs: inout [ToolRepair]) -> Result<[String: Any], LenientJSON.Failure> {
         let own = Set(schema?.params.flatMap { [$0.name] + $0.aliases }.map(normalizedKey) ?? [])
-        guard !dict.keys.contains(where: { own.contains(normalizedKey($0)) }) else { return .success(dict) }
+        // "name" / "type" beside a wrapper describe the call -- even when
+        // they're also a field's alias (country's "name"), if they say the
+        // tool's name or "function".
+        func describesCall(_ key: String) -> Bool {
+            guard ["name", "type"].contains(key.lowercased()) else { return false }
+            guard own.contains(normalizedKey(key)), let schema else { return true }
+            guard let value = (dict[key] as? String)?.trimmingCharacters(in: .whitespaces).lowercased() else { return false }
+            return value == schema.name.lowercased() || value == "function"
+        }
         let wrappers = dict.keys.filter { key in
-            wrapperKeys.contains(key.lowercased()) || (schema.map { key == $0.name } ?? false)
+            !own.contains(normalizedKey(key))
+                && (wrapperKeys.contains(key.lowercased()) || (schema.map { key == $0.name } ?? false))
         }.sorted()
-        // Only wrappers, or wrappers and the tool's name / type.
-        guard !wrappers.isEmpty,
-              dict.keys.allSatisfy({ wrappers.contains($0) || $0.lowercased() == "name" || $0.lowercased() == "type" })
+        // Only wrappers, or wrappers and the call's name / type.
+        guard !wrappers.isEmpty, dict.keys.allSatisfy({ wrappers.contains($0) || describesCall($0) })
         else { return .success(dict) }
         func fail(_ reason: String) -> Result<[String: Any], LenientJSON.Failure> {
             schema == nil ? .success(dict) : .failure(.init(reason: reason))
@@ -182,10 +190,12 @@ public enum ToolArgumentParser {
         switch dict[wrapper] {
         case let obj as [String: Any]:
             inner = obj
-        case is NSNull:
-            inner = [:]
         case let text as String:
-            guard case .success(let parsed) = LenientJSON.parse(text), let obj = parsed.value as? [String: Any] else {
+            // "" and "null" read as {} at the top level, not here: a
+            // wrapper that says nothing isn't the call's arguments.
+            let body = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !body.isEmpty, body != "null", case .success(let parsed) = LenientJSON.parse(body),
+                  let obj = parsed.value as? [String: Any] else {
                 return fail("\"\(wrapper)\" isn't a JSON object")
             }
             inner = obj

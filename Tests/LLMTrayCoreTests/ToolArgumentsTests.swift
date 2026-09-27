@@ -88,7 +88,16 @@ final class ToolArgumentsTests: XCTestCase {
         // A wrapper beside real fields isn't unwrapped.
         let mixed = parse(#"{"arguments": {"city": "A"}, "city": "B"}"#, weather)
         XCTAssertEqual(mixed.values["city"] as? String, "B")
-        XCTAssertTrue(parse(#"{"name": "get_weather", "arguments": null}"#, weather).isValid)
+        XCTAssertTrue(parse(#"{"name": "get_weather", "arguments": {}}"#, weather).isValid)
+        // "name" as a field's alias: the tool's name beside a wrapper still
+        // describes the call; any other value is the field.
+        let country = ToolSchema("get_country_info", "C.", [.init("country", .string, required: true, aliases: ["name"])])
+        for raw in [#"{"name": "get_country_info", "arguments": {"country": "France"}}"#,
+                    #"{"type": "function", "name": "Get_Country_Info", "parameters": "{\"country\": \"France\"}"}"#] {
+            XCTAssertEqual(parse(raw, country).values["country"] as? String, "France", raw)
+        }
+        XCTAssertEqual(parse(#"{"name": "France"}"#, country).values["country"] as? String, "France")
+        XCTAssertEqual(parse(#"{"name": "Spain", "arguments": {"country": "France"}}"#, country).values["country"] as? String, "Spain")
     }
 
     func testAmbiguousWrappersAreProblemsNotEmptyArguments() {
@@ -99,6 +108,7 @@ final class ToolArgumentsTests: XCTestCase {
         XCTAssertFalse(parse(#"{"arguments": {"city": "A"}, "get_weather": {"city": "A"}}"#, weather).isValid)
         // A wrapper that isn't an object, nested wrappers included.
         for raw in [#"{"arguments": "city=Lviv"}"#, #"{"arguments": "[1]"}"#, #"{"arguments": 5}"#,
+                    #"{"arguments": null}"#, #"{"arguments": ""}"#, #"{"name": "get_weather", "arguments": "null"}"#,
                     #"{"name": "get_weather", "arguments": {"args": "{city"}}"#] {
             let p = parse(raw, weather)
             guard case .badJSON = p.problems.first else { return XCTFail("expected badJSON for \(raw)") }
