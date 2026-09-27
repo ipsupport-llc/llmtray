@@ -10,36 +10,14 @@ import LLMTrayCore
 final class ImageToolRunner: ChatTool {
     static let toolName = "generate_image"
     let name = ImageToolRunner.toolName
-    var definition: [String: Any] { Self.declaration }
-
-    static let declaration: [String: Any] = [
-        "type": "function",
-        "function": [
-            "name": toolName,
-            "description": "Generate an image from a text description using a local diffusion "
-                + "model running on this Mac. Call this only when the user's latest message explicitly "
-                + "asks for an image (draw, create, generate, sketch, or make a picture, illustration, "
-                + "artwork, or photo). Never call it for greetings, small talk or questions.",
-            "parameters": [
-                "type": "object",
-                "properties": [
-                    "prompt": [
-                        "type": "string",
-                        "description": "A detailed visual description of the image to generate.",
-                    ],
-                    "width": [
-                        "type": "integer",
-                        "description": "Image width in pixels. Defaults to 1024.",
-                    ],
-                    "height": [
-                        "type": "integer",
-                        "description": "Image height in pixels. Defaults to 1024.",
-                    ],
-                ],
-                "required": ["prompt"],
-            ],
-        ],
-    ]
+    static let schema = ToolSchema(toolName, "Generate an image with a local diffusion model. Only when the latest message "
+                                   + "asks for a picture (draw, create, generate, sketch, photo); never for greetings, small talk or questions.", [
+        .init("prompt", .string, "Detailed visual description.", required: true, aliases: ["description", "text", "image_prompt", "query"]),
+        .init("width", .integer, "Pixels, default 1024."),
+        .init("height", .integer, "Pixels, default 1024."),
+    ])
+    var schema: ToolSchema? { Self.schema }
+    var definition: [String: Any] { Self.schema.definition }
 
     let mflux: MfluxManager
 
@@ -163,32 +141,15 @@ final class EditImageTool: ChatTool {
         self.generator = generator
     }
 
-    var definition: [String: Any] {
-        [
-            "type": "function",
-            "function": [
-                "name": name,
-                "description": "Edit an image from this conversation (one the user attached or one generated here) "
-                    + "with a local diffusion model: change, add or remove something, restyle it, change the "
-                    + "background, and so on. Call this only when the user's latest message explicitly asks to "
-                    + "change an existing image; to make a new image from scratch use generate_image.",
-                "parameters": [
-                    "type": "object",
-                    "properties": [
-                        "prompt": [
-                            "type": "string",
-                            "description": "What to change, as a clear instruction (e.g. \"make it night, keep everything else\").",
-                        ],
-                        "index": [
-                            "type": "integer",
-                            "description": "Which image of this conversation: 1 = the first one, counting attached and generated images. Omit for the latest.",
-                        ],
-                    ],
-                    "required": ["prompt"],
-                ],
-            ],
-        ]
-    }
+    static let schema = ToolSchema(toolName, "Edit an image from this chat (attached or generated): change, add or remove "
+                                   + "something, restyle it. Only when the latest message asks to change an existing image; "
+                                   + "for a new one use generate_image.", [
+        .init("prompt", .string, "What to change.", required: true, aliases: ["instruction", "description", "text", "edit"]),
+        .init("index", .integer, "1 = the chat's first image; omit for the latest.",
+              aliases: ["image", "image_index", "n", "number"]),
+    ])
+    var schema: ToolSchema? { Self.schema }
+    var definition: [String: Any] { Self.schema.definition }
 
     func isOffered(_ settings: ChatSettings) -> Bool {
         settings.enableImageGeneration && settings.imageEditModel != nil

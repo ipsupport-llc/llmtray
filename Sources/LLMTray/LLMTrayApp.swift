@@ -23,8 +23,14 @@ struct LLMTrayApp: App {
         // Developer entry point: `LLMTray --run-tool <name> '<json args>'`
         // runs one chat tool, prints its result and exits -- for checking
         // the tools against the live services without a model.
-        if CommandLine.arguments.contains("--dump-tool-definitions") {
-            ToolRunnerCLI.dumpDefinitions()
+        if let i = CommandLine.arguments.firstIndex(of: "--dump-tool-definitions") {
+            ToolRunnerCLI.dumpDefinitions(defaultToolsOnly: CommandLine.arguments.dropFirst(i + 1).first == "default")
+        }
+        // `--check-tool-call <name> '<json>'`: how the app reads a call
+        // (repairs, or the error the model would get), without running it.
+        if let i = CommandLine.arguments.firstIndex(of: "--check-tool-call"), CommandLine.arguments.count > i + 1 {
+            ToolRunnerCLI.check(name: CommandLine.arguments[i + 1],
+                                json: CommandLine.arguments.count > i + 2 ? CommandLine.arguments[i + 2] : "{}")
         }
         if let i = CommandLine.arguments.firstIndex(of: "--run-tool"), CommandLine.arguments.count > i + 1 {
             ToolRunnerCLI.run(name: CommandLine.arguments[i + 1],

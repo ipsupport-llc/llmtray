@@ -1046,9 +1046,57 @@ struct ServerPane: View {
                         SettingLabel(title: "Server log", help: "Live output of the model process: loading, errors, requests.")
                     }
                 }
+                ToolCallsSection()
             }
             .formStyle(.grouped)
             RestartBanner().padding(8)
+        }
+    }
+}
+
+/// The chat's tool calls in this version (ToolStatsStore): how often each
+/// tool was called, how often it worked, what had to be repaired, what
+/// failed. Kept on this Mac only.
+struct ToolCallsSection: View {
+    @ObservedObject private var store = ToolStatsStore.shared
+
+    var body: some View {
+        Section {
+            let rows = store.current
+            if rows.isEmpty {
+                Text("No tool calls yet in this version.").foregroundStyle(.secondary)
+            } else {
+                Grid(alignment: .trailing, horizontalSpacing: 12, verticalSpacing: 4) {
+                    GridRow {
+                        Text("Tool").gridColumnAlignment(.leading)
+                        Text("Calls")
+                        Text("OK")
+                        Text("Repaired")
+                        Text("Errors")
+                        Text("Refused")
+                    }
+                    .font(.caption).foregroundStyle(.secondary)
+                    ForEach(rows, id: \.tool) { row in
+                        GridRow {
+                            Text(verbatim: row.tool).gridColumnAlignment(.leading)
+                            Text(verbatim: "\(row.counts.calls)")
+                            Text(verbatim: "\(row.counts.successes)")
+                            Text(verbatim: "\(row.counts.repairedCalls)")
+                            Text(verbatim: "\(row.counts.errorCount)")
+                            Text(verbatim: "\(row.counts.refusals)")
+                        }
+                        .monospacedDigit()
+                        .help(Text(verbatim: ToolCallStats.summary(row.counts)))
+                    }
+                }
+            }
+            LabeledContent {
+                Button("Reset") { store.reset() }.disabled(rows.isEmpty)
+            } label: {
+                SettingLabel(title: "Tool call statistics", help: "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened.")
+            }
+        } header: {
+            Text("Tool calls")
         }
     }
 }
