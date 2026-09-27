@@ -242,12 +242,9 @@ final class ProjectIndexer: ObservableObject {
     /// said in `addNotes[project]`.
     func addFiles(_ urls: [URL], to project: UUID) async {
         guard isEnabled else { return }
-        let items = urls.map { url in
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
-            return (url: url, isDirectory: values?.isDirectory == true && values?.isPackage != true)
-        }
-        let sorted = ProjectFileDrop.sort(items)
-        guard !sorted.isEmpty else { return }
+        // Looked up off the main actor, in order.
+        let sorted = await ProjectFileDrop.sort(urls)
+        guard !sorted.isEmpty, isEnabled else { return }
         addNotes[project] = nil
         var notes: [String] = []
         if !sorted.notSupported.isEmpty {

@@ -176,6 +176,20 @@ public enum ProjectFileDrop {
         return sorted
     }
 
+    /// Dropped or chosen files sorted as `sort` does, each one looked up
+    /// (a folder, or a package that counts as a file) off the caller's
+    /// actor: on a network volume or a slow disk that can take a while.
+    /// What can't be looked up counts as a file.
+    public static func sort(_ urls: [URL]) async -> Sorted {
+        let work: @Sendable () -> Sorted = {
+            sort(urls.map { url in
+                let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
+                return (url: url, isDirectory: values?.isDirectory == true && values?.isPackage != true)
+            })
+        }
+        return (try? await ProcessRunner.offMain(work)) ?? Sorted()
+    }
+
     /// Names for a message: the first `limit`, and how many more.
     public static func names(_ urls: [URL], limit: Int = 3) -> (shown: [String], more: Int) {
         let names = urls.map(\.lastPathComponent)
@@ -190,7 +204,8 @@ public struct ProjectFileTotals: Equatable, Sendable {
     public var searchable = 0
     public var pages = 0
     public var bytes: Int64 = 0
-    /// Failed or not supported: the ring's ⚠︎.
+    /// Failed or not supported, or its last re-index failed (the earlier
+    /// revision still searchable, the error kept): the ring's ⚠︎.
     public var failed = 0
     /// Stopped before they were indexed (Index Now).
     public var notIndexed = 0
@@ -203,7 +218,7 @@ public struct ProjectFileTotals: Equatable, Sendable {
             if d.status.isSearchable { searchable += 1 }
             pages += d.pages ?? 0
             bytes += d.bytes
-            if d.status == .failed || d.status == .unsupported { failed += 1 }
+            if d.status == .failed || d.status == .unsupported || (d.status.isSearchable && d.error != nil) { failed += 1 }
             if d.status == .notIndexed { notIndexed += 1 }
         }
     }

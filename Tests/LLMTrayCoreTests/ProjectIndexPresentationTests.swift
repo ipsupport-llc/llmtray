@@ -101,6 +101,23 @@ final class ProjectIndexPresentationTests: XCTestCase {
         XCTAssertTrue(ProjectFileDrop.sort([(u(".hidden"), false)]).isEmpty)
     }
 
+    func testDroppedURLsAreLookedUpInOrder() async throws {
+        let dir = indexTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let fm = FileManager.default
+        for name in ["b.md", "a.txt", "sheet.xlsx"] {
+            try "x".write(to: dir.appendingPathComponent(name), atomically: true, encoding: .utf8)
+        }
+        try fm.createDirectory(at: dir.appendingPathComponent("Folder"), withIntermediateDirectories: true)
+        // A package is one file to the user (refused as a format, not as a folder).
+        try fm.createDirectory(at: dir.appendingPathComponent("Tool.app/Contents"), withIntermediateDirectories: true)
+        let urls = ["b.md", "Folder", "a.txt", "Tool.app", "sheet.xlsx", "missing.pdf", ".DS_Store"].map { dir.appendingPathComponent($0) }
+        let sorted = await Task { @MainActor in await ProjectFileDrop.sort(urls) }.value
+        XCTAssertEqual(sorted.accepted.map(\.lastPathComponent), ["b.md", "a.txt", "missing.pdf"], "in the order dropped")
+        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["Tool.app", "sheet.xlsx"])
+        XCTAssertEqual(sorted.folders.map(\.lastPathComponent), ["Folder"])
+    }
+
     func testNamesForAMessage() {
         let urls = ["a", "b", "c", "d", "e"].map { URL(fileURLWithPath: "/x/\($0).xlsx") }
         let n = ProjectFileDrop.names(urls)
@@ -127,6 +144,23 @@ final class ProjectIndexPresentationTests: XCTestCase {
         XCTAssertEqual(t.bytes, 126)
         XCTAssertEqual(t.failed, 2)
         XCTAssertEqual(t.notIndexed, 1)
+    }
+
+    func testAFailedReindexCountsAsFailed() throws {
+        let dir = indexTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let index = try ProjectIndex(directory: dir)
+        defer { index.close() }
+        let doc = try index.addText("Some words to search.", name: "a.txt")
+        XCTAssertEqual(ProjectFileTotals(try index.documents()).failed, 0)
+        let job = try index.beginReindex(doc: doc)
+        try index.failExtraction(job, error: "corrupt")
+        let docs = try index.documents()
+        XCTAssertTrue(docs[0].status.isSearchable, "the earlier revision still searchable")
+        XCTAssertEqual(docs[0].error, "corrupt")
+        let t = ProjectFileTotals(docs)
+        XCTAssertEqual(t.failed, 1, "the ring's ⚠︎")
+        XCTAssertEqual(t.searchable, 1)
     }
 
     func testAQueuedReindexShowsAsQueued() {

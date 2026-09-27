@@ -356,9 +356,15 @@ struct ProjectFilesSection: View {
     @State private var diskTotal: Int64?
     private var setup: FeatureSetup { .shared }
 
-    /// Re-measured when a project's documents change.
+    /// Re-measured when a project's documents change: added, removed,
+    /// re-indexed, embedded (the vectors are most of an index), and when a
+    /// project's indexing moves on or ends (its last slices, the checkpoint).
     private var diskKey: String {
-        indexer.documents.map { "\($0.key):\($0.value.count):\($0.value.map(\.rev).reduce(0, +))" }.sorted().joined(separator: ",")
+        let docs = indexer.documents.map { project, docs in
+            "\(project):\(docs.count):\(docs.map(\.rev).reduce(0, +)):\(docs.filter { $0.status == .embedded }.count)"
+        }
+        let runs = indexer.progress.map { "\($0.key)=\($0.value.state.rawValue):\($0.value.done):\($0.value.total)" }
+        return (docs + runs).sorted().joined(separator: ",")
     }
 
     var body: some View {
@@ -396,7 +402,8 @@ struct ProjectFilesSection: View {
             }
         }
         .task(id: diskKey) {
-            // Debounced: the documents change after every indexing step.
+            // Debounced: the documents change after every indexing step,
+            // so a run is measured once it pauses or ends.
             if diskTotal != nil { try? await Task.sleep(nanoseconds: 3_000_000_000) }
             guard !Task.isCancelled else { return }
             let total = await ProjectIndexer.totalDiskUsage()
