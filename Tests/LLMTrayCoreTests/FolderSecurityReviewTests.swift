@@ -309,6 +309,14 @@ final class FolderSecurityReviewTests: FolderTestCase {
         let r = undoer.recover(plan.plan.id)
         XCTAssertTrue(r.needsLook[item.id]?.contains("renamed") ?? false, "\(r)")
         XCTAssertEqual(state(plan), .incomplete)
+        // Renamed back by hand, but with another name: still no proof.
+        try fm.moveItem(atPath: grant + "/CASE.txt", toPath: grant + "/case.txt")
+        XCTAssertEqual(undoer.recover(plan.plan.id), .init(planID: plan.plan.id), "under its exact old name")
+        XCTAssertEqual(link(grant + "/case.txt", outside + "/case-link"), 0)
+        XCTAssertTrue(undoer.recover(plan.plan.id).needsLook[item.id]?.contains("hard links") ?? false)
+        // A lookup of the exact name is bounded.
+        let d = try walker.openRoot()
+        XCTAssertThrowsError(try ChangeUndo.holdsExactly(d.descriptor, "zzz-not-there", limit: 1))
     }
 
     func testARunningPlanIsntRecoveredUnderItsFeet() throws {

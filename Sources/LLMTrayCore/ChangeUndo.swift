@@ -408,8 +408,9 @@ public struct ChangeUndo {
     }
 
     /// Whether a folder has an entry named exactly `name`, byte for byte (as
-    /// `readdir` gives it, not as a lookup matches it).
-    static func holdsExactly(_ dir: Descriptor, _ name: String) throws -> Bool {
+    /// `readdir` gives it, not as a lookup matches it). At most `limit` names
+    /// are read: past it, not known (thrown as uncertain).
+    static func holdsExactly(_ dir: Descriptor, _ name: String, limit: Int = 200_000) throws -> Bool {
         let fd = dup(dir.fd)
         guard fd >= 0 else { throw FolderAccessError.system("dup", errno) }
         guard let stream = fdopendir(fd) else {
@@ -420,8 +421,11 @@ public struct ChangeUndo {
         defer { closedir(stream) }
         rewinddir(stream)
         let want = Array(name.utf8)
+        var read = 0
         while let n = try SafeFolderWalker.nextName(stream) {
             if Array(n.utf8) == want { return true }
+            read += 1
+            if read >= limit { throw Uncertain(description: "the folder is too large to look for \(name) in") }
         }
         return false
     }
@@ -626,6 +630,14 @@ public struct ChangeUndo {
             // renamed (a crash before `done`).
             // By the exact name bytes: a case-only rename's new name answers
             // to the old one on a case-insensitive volume.
+            // With other names, one could have been linked back: no proof.
+            if st.kind == .rename, let s = item.source, let d = item.destination {
+                let here = try Posix.lstatAt(pfd, s.location.name)
+                if here?.isHardLinked == true {
+                    throw Uncertain(description: "interrupted: \(s.location.relativePath) has other names (hard links), "
+                        + "so whether it was renamed to \(d.location.relativePath) can't be told")
+                }
+            }
             if st.kind == .rename, let s = item.source, let d = item.destination,
                try (Posix.lstatAt(pfd, s.location.name))?.identity != s.identity
                 || !Self.holdsExactly(dir.descriptor, s.location.name) {
