@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP 草稿器 %@";
 "1 hour" = "1 小时";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天在查看文件夹前会询问，并将每项更改以计划形式显示供你批准。私人位置（Library、keys、主目录）不会被共享。";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "聊天可以查看你允许的文件夹，并建议新文件夹、移动和重命名。你需批准每项更改且可撤销。";
 "A chat model" = "聊天模型";
 "A client" = "客户端";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "更饱满、更成品感的混音；歌词听得不那么清晰。制作约需 30 秒音乐的 20 秒。";
@@ -64,6 +65,7 @@
 "About LLMTray" = "关于 LLMTray";
 "Add" = "添加";
 "Add Files…" = "添加文件…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "向项目添加 PDF、Word 和文本文件。聊天会搜索它们并引用页码；将文件固定可将其全部保留在对话中。";
 "Added here" = "已添加到此处";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具时会添加到系统提示词中。模型自带的工具模板只说明如何调用工具，从不说明何时不应调用。留空则停用。";
 "Adding files" = "正在添加文件";
@@ -189,6 +191,7 @@
 "Composing…" = "正在创作…";
 "Concurrent requests" = "并发请求";
 "Context" = "上下文";
+"Continue" = "继续";
 "Copies %1$@ · index %2$@ on disk" = "复制 %1$@ · 在磁盘上建立索引 %2$@";
 "Copy" = "复制";
 "Copy the details as text" = "将详情复制为文本";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "图像生成后重载聊天模型失败：%@";
 "Failed: %@" = "失败：%@";
 "Fast (smaller canvas)" = "快速（画布更小）";
+"Faster long chats" = "加速长会话";
 "Fetching file list…" = "正在获取文件列表…";
 "Files" = "文件";
 "Files Settings…" = "文件设置…";
@@ -282,6 +286,7 @@
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "“完成”将应用你的选择。你可在设置中随时更改。";
 "First token" = "首个标记";
+"First-run setup" = "首次运行设置";
 "Fits comfortably" = "可舒适放下";
 "Folder" = "文件夹";
 "Folder access" = "文件夹访问";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "高质量（画布更大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高保真，下载体积最大 —— 可信的正确性基线。";
 "Hourly forecast" = "每小时预报";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "将鼠标悬停在答案下方的信息按钮上，可查看模型、速度及其使用了多少上下文。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音乐的冒险与意外程度。仅 turbo 可用：sft 无歌曲规划器以供变化。";
 "How do you like LLMTray?" = "您觉得 LLMTray 如何？";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "已加载：%1$@ · 已选：%2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即加载上次使用的模型，无需点按 Play 即可就绪。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "记录每个生成的词元（DEBUG）。仅用于排查模型进程问题 -- 会降低速度。下次启动服务器时生效。";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "长对话和已固定文件从缓存读取，无需每次都重新读取。";
 "Maintenance" = "维护";
 "Make images and edit them." = "生成并编辑图像。";
 "Make songs and instrumentals." = "生成歌曲与纯音乐。";
@@ -514,6 +521,7 @@
 "Performance" = "性能";
 "Pick a rating from 1 to 5 stars." = "请选择 1 到 5 星的评分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "选择一个进行聊天。下载会立即开始并在后台进行。";
+"Picks a model that fits your Mac and turns on only what you choose." = "为你的 Mac 选择合适的模型，仅启用你选择的功能。";
 "Pin" = "固定";
 "Pin %@" = "置顶 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "置顶：项目的每个对话都会获取整个文件（≈%@ 令牌）。文件被置顶期间，这些对话中的网页搜索和图像或音乐生成功能被禁用。";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "在独立窗口的对话上方显示模型选择器、启动/停止、资料、工具和温度。关闭时：窗口仅显示对话内容——这些控件保留在菜单栏。";
 "The model reloads when the image or song is done" = "图像或歌曲生成完成后模型将重新加载";
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型运行时尚未安装——先启动一次模型，然后重试。";
+"The model server no longer goes online when it starts." = "模型服务器启动时不再自动联网。";
 "The model's license, from its card." = "来自模型卡的许可。";
 "The music generator is busy -- try again once it's done." = "音乐生成器正在忙碌——完成后请重试。";
 "The music generator is busy with another chat -- try again once it's done." = "音乐生成器正处理其他聊天——完成后请重试。";
@@ -876,6 +885,9 @@
 "What else" = "更多信息";
 "What happened?" = "发生了什么？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "你当时在做什么、你的预期以及实际看到的情况。不会包含你的聊天记录。";
+"What's New" = "新功能";
+"What's New in LLMTray %@" = "LLMTray %@ 的新功能";
+"What's New…" = "新功能…";
 "What's sent" = "发送内容";
 "When a client asks for another model" = "当客户端请求其他模型时";
 "When an app asks for another model" = "当应用请求其他模型时";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
 "Which model generates new images." = "用于生成新图像的模型。";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "支持离线使用";
 "Writing the song…" = "正在创作歌曲…";
 "Yesterday" = "昨天";
 "You" = "你";

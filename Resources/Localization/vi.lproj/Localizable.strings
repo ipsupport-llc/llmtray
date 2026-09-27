@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 giờ";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Một cuộc trò chuyện sẽ hỏi trước khi xem trong thư mục, và hiển thị từng thay đổi dưới dạng một kế hoạch để bạn chấp thuận. Các nơi riêng tư (Library, keys, chính thư mục người dùng) không bao giờ được chia sẻ.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Cuộc trò chuyện có thể truy cập các thư mục bạn cho phép và đề xuất thư mục mới, di chuyển hoặc đổi tên. Bạn duyệt mọi thay đổi và có thể hoàn tác.";
 "A chat model" = "Mô hình trò chuyện";
 "A client" = "Một client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "Giới thiệu về LLMTray";
 "Add" = "Thêm";
 "Add Files…" = "Thêm tệp…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Thêm PDF, Word và tệp văn bản vào dự án. Các cuộc trò chuyện có thể tìm kiếm trong đó và trích dẫn trang; ghim tệp để giữ toàn bộ nội dung trong cuộc hội thoại.";
 "Added here" = "Đã thêm ở đây";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Adding files" = "Đang thêm tệp";
@@ -189,6 +191,7 @@
 "Composing…" = "Đang soạn…";
 "Concurrent requests" = "Yêu cầu đồng thời";
 "Context" = "Ngữ cảnh";
+"Continue" = "Tiếp tục";
 "Copies %1$@ · index %2$@ on disk" = "Sao chép %1$@ · lập chỉ mục %2$@ trên đĩa";
 "Copy" = "Sao chép";
 "Copy the details as text" = "Sao chép chi tiết dưới dạng văn bản";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "Tải lại mô hình chat sau khi tạo ảnh thất bại: %@";
 "Failed: %@" = "Không thành công: %@";
 "Fast (smaller canvas)" = "Nhanh (khung nhỏ hơn)";
+"Faster long chats" = "Tăng tốc trò chuyện dài";
 "Fetching file list…" = "Đang lấy danh sách tệp…";
 "Files" = "Files";
 "Files Settings…" = "Cài đặt Files…";
@@ -282,6 +286,7 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish áp dụng những gì bạn chọn. Bạn có thể thay đổi sau trong Settings.";
 "First token" = "Token đầu tiên";
+"First-run setup" = "Cài đặt lần đầu";
 "Fits comfortably" = "Vừa vặn";
 "Folder" = "Thư mục";
 "Folder access" = "Truy cập thư mục";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "Chất lượng cao (khung lớn hơn)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Độ trung thực cao nhất, dung lượng tải lớn nhất — cơ sở đúng đắn bạn có thể tin cậy.";
 "Hourly forecast" = "Dự báo theo giờ";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "Di chuột lên nút thông tin dưới câu trả lời để xem mô hình, tốc độ và lượng ngữ cảnh đã dùng.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Mức độ táo bạo và bất ngờ của nhạc. Chỉ turbo: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "How do you like LLMTray?" = "Bạn đánh giá LLMTray thế nào?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Đang tải: %1$@ · đã chọn: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Tải ngay mô hình dùng gần nhất để sẵn sàng mà không cần nhấn Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Ghi nhật ký mọi token được tạo (DEBUG). Chỉ dùng để khắc phục sự cố tiến trình mô hình -- thao tác này làm chậm hệ thống. Có hiệu lực vào lần khởi động máy chủ tiếp theo.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "Cuộc trò chuyện dài và tệp đã ghim lấy từ bộ đệm (cache) thay vì đọc lại mỗi lượt.";
 "Maintenance" = "Bảo trì";
 "Make images and edit them." = "Tạo ảnh và chỉnh sửa chúng.";
 "Make songs and instrumentals." = "Tạo bài hát và nhạc cụ.";
@@ -514,6 +521,7 @@
 "Performance" = "Hiệu năng";
 "Pick a rating from 1 to 5 stars." = "Chọn đánh giá từ 1 đến 5 sao.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Chọn một để chat. Việc tải về bắt đầu ngay và chạy ở nền.";
+"Picks a model that fits your Mac and turns on only what you choose." = "Chọn mô hình phù hợp với Mac của bạn và chỉ bật những mục bạn chọn.";
 "Pin" = "Ghim";
 "Pin %@" = "Ghim %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Ghim: mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ tệp (≈%@ token). Tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi tệp được ghim.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Bộ chọn mô hình, Bắt đầu/Dừng, hồ sơ, công cụ và nhiệt độ hiển thị phía trên trò chuyện trong cửa sổ riêng. Tắt: cửa sổ chỉ có các cuộc trò chuyện và nội dung — các điều khiển đó vẫn ở thanh menu.";
 "The model reloads when the image or song is done" = "Mô hình sẽ nạp lại khi ảnh hoặc bài hát hoàn tất";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Chưa cài runtime mô hình — khởi chạy một mô hình rồi thử lại.";
+"The model server no longer goes online when it starts." = "Máy chủ mô hình không còn tự động lên mạng khi khởi động.";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
 "The music generator is busy -- try again once it's done." = "Trình tạo nhạc đang bận — thử lại khi hoàn tất.";
 "The music generator is busy with another chat -- try again once it's done." = "Trình tạo nhạc đang bận với cuộc chat khác — thử lại khi hoàn tất.";
@@ -876,6 +885,9 @@
 "What else" = "Còn gì nữa";
 "What happened?" = "Chuyện gì đã xảy ra?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Bạn đang làm gì, bạn mong đợi gì, và bạn thấy gì thay vì mong đợi. Các cuộc trò chuyện của bạn không bao giờ được đính kèm.";
+"What's New" = "Có gì mới";
+"What's New in LLMTray %@" = "Có gì mới trong LLMTray %@";
+"What's New…" = "Có gì mới…";
 "What's sent" = "Những gì được gửi";
 "When a client asks for another model" = "Khi client yêu cầu mô hình khác";
 "When an app asks for another model" = "Khi một ứng dụng yêu cầu mô hình khác";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
 "Which model generates new images." = "Mô hình dùng để tạo ảnh mới.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "Hoạt động ngoại tuyến";
 "Writing the song…" = "Đang viết bài hát…";
 "Yesterday" = "Hôm qua";
 "You" = "Bạn";

@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "ساعة واحدة";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "يطلب الدردشة إذناً قبل النظر داخل مجلد، ويعرض كل تغيير كخطة للموافقة. الأماكن الخاصة (Library، keys، مجلد المنزل نفسه) لا تُشارك أبداً.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "يمكن للمحادثة البحث في المجلدات التي تسمح بها واقتراح مجلدات جديدة، ونقلها وإعادة تسميتها. أنت تُوافق على كل تغيير ويمكنك التراجع عنه.";
 "A chat model" = "نموذج دردشة";
 "A client" = "عميل";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "مكس أكثر امتلاءً ومظهرًا مكتملًا؛ كلمات الأغنية تبدو أقل وضوحًا. حوالي 20 s لمقطع موسيقي مدته 30 s.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "حول LLMTray";
 "Add" = "إضافة";
 "Add Files…" = "إضافة ملفات…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "أضف ملفات PDF وWord والنص إلى مشروع. محادثاته تبحث فيها وتستشهد بالصفحة؛ ثبّت ملفًا للاحتفاظ بكل محتواه في المحادثة.";
 "Added here" = "أُضيف هنا";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "تُضاف إلى موجه النظام كلما توفرت الأدوات. لا يوضح قالب الأدوات الخاص بالنموذج إلا كيفية استدعاء أداة، وليس متى يجب عدم استخدامها. اتركه فارغًا لتعطيله.";
 "Adding files" = "جارٍ إضافة الملفات";
@@ -189,6 +191,7 @@
 "Composing…" = "قيد التأليف…";
 "Concurrent requests" = "الطلبات المتزامنة";
 "Context" = "السياق";
+"Continue" = "متابعة";
 "Copies %1$@ · index %2$@ on disk" = "نسخ %1$@ · فهرس %2$@ على القرص";
 "Copy" = "نسخ";
 "Copy the details as text" = "انسخ التفاصيل كنص";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "فشل إعادة تحميل نموذج المحادثة بعد توليد الصورة: %@";
 "Failed: %@" = "فشل: %@";
 "Fast (smaller canvas)" = "سريع (لوحة أصغر)";
+"Faster long chats" = "تسريع المحادثات الطويلة";
 "Fetching file list…" = "جارٍ جلب قائمة الملفات…";
 "Files" = "Files";
 "Files Settings…" = "إعدادات Files…";
@@ -282,6 +286,7 @@
 "Finish" = "إنهاء";
 "Finish applies what you chose. You can change all of it later in Settings." = "ينفّذ Finish ما اخترتَه. يمكنك تغيير كل ذلك لاحقًا في Settings.";
 "First token" = "أول رمز";
+"First-run setup" = "إعداد التشغيل الأولي";
 "Fits comfortably" = "يناسب بشكل مريح";
 "Folder" = "المجلد";
 "Folder access" = "وصول المجلد";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "جودة عالية (لوحة أكبر)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "أعلى دقة، أكبر تنزيل — معيار صحة يمكنك الوثوق به.";
 "Hourly forecast" = "توقّعات كل ساعة";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "مرّر المؤشر فوق زر المعلومات أسفل الإجابة لرؤية النموذج والسرعة ومقدار السياق المستخدم.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "مدى جرأة الموسيقى وغرابتها. متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
 "How do you like LLMTray?" = "ما رأيك في LLMTray؟";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "محمل: %1$@ · مختار: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "يحمّل آخر نموذج مستخدم فورًا، ليكون جاهزًا دون الضغط على Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "يسجّل كل رمز يتم إنشاؤه (DEBUG). مخصص فقط لاستكشاف أخطاء عملية النموذج وإصلاحها -- فهو يبطئ الأداء. يسري عند بدء تشغيل الخادم التالي.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "المحادثات الطويلة والملفات المثبتة تُستَخدم من ذاكرة التخزين المؤقت بدل قراءتها في كل مرة.";
 "Maintenance" = "الصيانة";
 "Make images and edit them." = "إنشاء صور وتحريرها.";
 "Make songs and instrumentals." = "إنشاء أغاني ومقاطع موسيقية.";
@@ -514,6 +521,7 @@
 "Performance" = "الأداء";
 "Pick a rating from 1 to 5 stars." = "اختر تقييماً من 1 إلى 5 نجوم.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "اختر واحدًا للدردشة معه. يبدأ التنزيل فورًا ويستمر في الخلفية.";
+"Picks a model that fits your Mac and turns on only what you choose." = "يختار نموذجًا مناسبًا لجهاز Mac ويشغّل فقط الميزات التي تختارها.";
 "Pin" = "تثبيت";
 "Pin %@" = "تثبيت %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "تثبيت: تحصل كل محادثة في المشروع على الملف كاملًا (≈%@ رمزًا). البحث على الويب وتوليد الصور أو الموسيقى متوقّفان في تلك المحادثات طالما هو مثبت.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "اختيار النموذج، بدء/إيقاف، الملف الشخصي، الأدوات ودرجة الحرارة فوق الدردشة في نافذة منفصلة. متوقف: تكون النافذة مجرد الدردشات والمحادثة — تظل عناصر التحكم تلك في شريط القوائم.";
 "The model reloads when the image or song is done" = "سيُعاد تحميل النموذج عندما تكتمل الصورة أو الأغنية";
 "The model runtime isn't installed yet -- start a model once, then try again." = "بيئة تشغيل النموذج غير مثبتة بعد — شغّل نموذجًا مرة واحدة ثم أعد المحاولة.";
+"The model server no longer goes online when it starts." = "لم يعد خادم النموذج يتصل بالإنترنت عند بدء التشغيل.";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
 "The music generator is busy -- try again once it's done." = "مولِّد الموسيقى مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The music generator is busy with another chat -- try again once it's done." = "مولِّد الموسيقى مشغول بمحادثة أخرى — حاول مرة أخرى بعد الانتهاء.";
@@ -876,6 +885,9 @@
 "What else" = "ماذا أيضاً";
 "What happened?" = "ماذا حدث؟";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "ما الذي كنت تفعله، ماذا توقعت، وماذا رأيت بدلاً من ذلك. المحادثات الخاصة بك لا تُضمَّن أبداً.";
+"What's New" = "الجديد";
+"What's New in LLMTray %@" = "الجديد في LLMTray %@";
+"What's New…" = "الجديد…";
 "What's sent" = "ما يُرسل";
 "When a client asks for another model" = "عندما يطلب عميل نموذجًا آخر";
 "When an app asks for another model" = "عندما يطلب تطبيق نموذجاً آخراً";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
 "Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "يعمل دون اتصال";
 "Writing the song…" = "جارٍ كتابة الأغنية…";
 "Yesterday" = "أمس";
 "You" = "أنت";

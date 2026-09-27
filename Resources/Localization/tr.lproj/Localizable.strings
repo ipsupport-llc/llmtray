@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP taslağı %@";
 "1 hour" = "1 saat";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Sohbet bir klasöre bakmadan önce sorar ve her değişikliği onaylamanız için bir plan olarak gösterir. Özel yerler (Library, keys, ana kullanıcı klasörü) asla paylaşılmaz.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Sohbet, izin verdiğiniz klasörlerde arama yapabilir ve yeni klasörler, taşıma veya yeniden adlandırma önerilerinde bulunabilir. Her değişikliği onaylarsınız ve geri alabilirsiniz.";
 "A chat model" = "Sohbet modeli";
 "A client" = "Bir istemci";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "LLMTray Hakkında";
 "Add" = "Ekle";
 "Add Files…" = "Dosyalar Ekle…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Bir projeye PDF, Word ve metin dosyaları ekleyin. Sohbetler bunlarda arama yapar ve sayfayı referans verir; bir dosyayı sabitleyerek tüm içeriğini sohbette tutabilirsiniz.";
 "Added here" = "Buraya eklendi";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
 "Adding files" = "Dosyalar ekleniyor";
@@ -189,6 +191,7 @@
 "Composing…" = "Oluşturuluyor…";
 "Concurrent requests" = "Eşzamanlı istekler";
 "Context" = "Bağlam";
+"Continue" = "Devam";
 "Copies %1$@ · index %2$@ on disk" = "Kopyalar %1$@ · diskte %2$@ dizini";
 "Copy" = "Kopyala";
 "Copy the details as text" = "Ayrıntıları metin olarak kopyala";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "Görüntü oluşturduktan sonra sohbet modeli yeniden yüklenemedi: %@";
 "Failed: %@" = "Başarısız oldu: %@";
 "Fast (smaller canvas)" = "Hızlı (küçük tuval)";
+"Faster long chats" = "Uzun sohbetler için daha hızlı";
 "Fetching file list…" = "Dosya listesi alınıyor…";
 "Files" = "Files";
 "Files Settings…" = "Files Ayarları…";
@@ -282,6 +286,7 @@
 "Finish" = "Bitir";
 "Finish applies what you chose. You can change all of it later in Settings." = "Bitir seçiminizi uygular. Sonra Settings'ten her şeyi değiştirebilirsiniz.";
 "First token" = "İlk token";
+"First-run setup" = "İlk çalıştırma kurulumu";
 "Fits comfortably" = "Rahat sığar";
 "Folder" = "Klasör";
 "Folder access" = "Klasör erişimi";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "Yüksek kalite (büyük tuval)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "En yüksek doğruluk, en büyük indirme — güvenebileceğiniz doğruluk ölçütü.";
 "Hourly forecast" = "Saatlik tahmin";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "Bir cevabın altındaki bilgi düğmesinin üzerine gelin; modeli, hızı ve ne kadar bağlam kullandığını görebilirsiniz.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Müziğin ne kadar maceracı ve beklenmedik olduğu. Sadece turbo: sft’de şarkı planlayıcısı yok.";
 "How do you like LLMTray?" = "LLMTray’i nasıl buluyorsunuz?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Yüklü: %1$@ · seçili: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Son kullanılan modeli hemen yükler; böylece Play’e basmadan hazır olur.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Üretilen her token’ı günlüğe yazar (DEBUG). Yalnızca model işleminde sorun gidermek içindir — işleri yavaşlatır. Bir sonraki sunucu başlangıcında etkili olur.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "Uzun konuşmalar ve sabitlenmiş dosyalar her turda yeniden okunmak yerine önbellekten sunulur.";
 "Maintenance" = "Bakım";
 "Make images and edit them." = "Görüntü oluşturun ve düzenleyin.";
 "Make songs and instrumentals." = "Şarkı ve enstrümantal oluşturun.";
@@ -514,6 +521,7 @@
 "Performance" = "Performans";
 "Pick a rating from 1 to 5 stars." = "1 ile 5 yıldız arasında bir puan seçin.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Sohbet etmek için birini seçin. İndirme hemen başlar ve arka planda devam eder.";
+"Picks a model that fits your Mac and turns on only what you choose." = "Mac’inize uygun bir model seçer ve yalnızca tercih ettiklerinizi etkinleştirir.";
 "Pin" = "Sabitlen";
 "Pin %@" = "Sabitle %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Sabitle: projedeki her sohbet tüm dosyayı alır (≈%@ token). Dosya sabitliyken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapalıdır.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Model seçici, Başlat/Durdur, profil, araçlar ve sıcaklık sohbetin üzerinde kendi penceresinde. Kapalı: pencere yalnızca sohbetleri ve konuşmayı içerir — bu denetimler menü çubuğunda kalır.";
 "The model reloads when the image or song is done" = "Görüntü veya şarkı tamamlandığında model yeniden yüklenir";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Model çalışma zamanı henüz yüklü değil — bir model başlatıp sonra tekrar deneyin.";
+"The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
 "The music generator is busy -- try again once it's done." = "Müzik oluşturucu meşgul — bitmesini bekleyip tekrar deneyin.";
 "The music generator is busy with another chat -- try again once it's done." = "Müzik oluşturucu başka bir sohbetle meşgul — bitmesini bekleyip tekrar deneyin.";
@@ -876,6 +885,9 @@
 "What else" = "Başka ne var";
 "What happened?" = "Ne oldu?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Ne yapıyordunuz, ne bekliyordunuz, bunun yerine ne gördünüz. Sohbetleriniz asla eklenmez.";
+"What's New" = "Yenilikler";
+"What's New in LLMTray %@" = "LLMTray %@ — Yenilikler";
+"What's New…" = "Yenilikler…";
 "What's sent" = "Gönderilenler";
 "When a client asks for another model" = "Bir istemci başka bir model istediğinde";
 "When an app asks for another model" = "Bir uygulama başka bir model istediğinde";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "Wikipedia" = "Vikipedi";
+"Works offline" = "Çevrimdışı çalışır";
 "Writing the song…" = "Şarkı yazılıyor…";
 "Yesterday" = "Dün";
 "You" = "Siz";

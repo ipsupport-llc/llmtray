@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "שעה";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "שיחה מבקשת רשות לפני שהיא מסתכלת בתיקייה ומציגה כל שינוי כ־תכנית לאישור. מקומות פרטיים (Library, keys, תיקיית הבית עצמה) אינם משותפים לעולם.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "שיחה יכולה לחפש בתיקיות שתאשר ולהציע תיקיות חדשות, העברות ושינויים בשמות. אתה מאשר כל שינוי ויכול לבטלו.";
 "A chat model" = "מודל צ'אט";
 "A client" = "לקוח";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "מיקס מלא ומעובד יותר; המילים נשמעות פחות בבירור. כ‑20 שנ׳ להכנת 30 שנ׳ מוזיקה.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "על LLMTray";
 "Add" = "הוסף";
 "Add Files…" = "הוסף קבצים…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "הוסף קבצי PDF, Word וטקסט לפרויקט. השיחות שלו מחפשות בהם וציטטות את הדף; צמיד קובץ כדי לשמור את כל תוכנו בשיחה.";
 "Added here" = "נוסף כאן";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "מתווסף להנחיית המערכת בכל פעם שמוצעים כלים. תבנית הכלים של המודל עצמו אומרת רק איך לקרוא לכלי, ולעולם לא מתי לא. שדה ריק משבית זאת.";
 "Adding files" = "מוסיף קבצים";
@@ -189,6 +191,7 @@
 "Composing…" = "מנסח…";
 "Concurrent requests" = "בקשות בו־זמניות";
 "Context" = "הקשר";
+"Continue" = "המשך";
 "Copies %1$@ · index %2$@ on disk" = "עותקים %1$@ · אינדקס %2$@ בדיסק";
 "Copy" = "העתק";
 "Copy the details as text" = "העתק את הפרטים כטקסט";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "נכשל בטעינת מודל השיחה מחדש לאחר יצירת תמונה: %@";
 "Failed: %@" = "נכשל: %@";
 "Fast (smaller canvas)" = "מהיר (קנבס קטן יותר)";
+"Faster long chats" = "שיחות ארוכות מהירות יותר";
 "Fetching file list…" = "מושך/ת את רשימת הקבצים…";
 "Files" = "קבצים";
 "Files Settings…" = "הגדרות קבצים…";
@@ -282,6 +286,7 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish מיישם את מה שבחרתם. אפשר לשנות הכל מאוחר יותר ב‑Settings.";
 "First token" = "טוקן ראשון";
+"First-run setup" = "הגדרה ראשונית";
 "Fits comfortably" = "מתאים בנוחות";
 "Folder" = "תיקייה";
 "Folder access" = "גישה לתיקייה";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "דיוק מקסימלי, הורדה גדולה — קו בסיס נכונות שניתן לסמוך עליו.";
 "Hourly forecast" = "תחזית לפי שעה";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "העבר את הסמן מעל כפתור המידע מתחת לתשובה כדי לראות את המודל, המהירות וכמה הקשר הוא השתמש.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "כמה הרמוני ובלתי צפוי יהיה המוזיקה. זמין רק ב‑turbo: ל‑sft אין מתכנן שירים לשונות.";
 "How do you like LLMTray?" = "מה דעתך על LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "טעון: %1$@ · נבחר: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "טוען מיד את המודל האחרון שהיה בשימוש, כדי שיהיה מוכן בלי ללחוץ על Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "מתעד כל טוקן שנוצר (DEBUG). מיועד רק לפתרון בעיות בתהליך המודל -- זה מאט את הפעולה. ייכנס לתוקף בהפעלה הבאה של השרת.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "שיחות ארוכות וקבצים מצורפים נטענים מהמטמון במקום להיקרא שוב בכל פנייה.";
 "Maintenance" = "תחזוקה";
 "Make images and edit them." = "יצירת תמונות ועריכתן.";
 "Make songs and instrumentals." = "יצירת שירים ואינסטרומנטלים.";
@@ -514,6 +521,7 @@
 "Performance" = "ביצועים";
 "Pick a rating from 1 to 5 stars." = "בחר דירוג מ‑1 עד 5 כוכבים.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "בחר אחד לשיחה. הורדה תתחיל מיד ותמשיך ברקע.";
+"Picks a model that fits your Mac and turns on only what you choose." = "בוחר מודל שמתאים ל‑Mac שלך ומפעיל רק את מה שתבחר.";
 "Pin" = "נעץ";
 "Pin %@" = "סמן %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "סימון: כל צ'אט בפרויקט מקבל את הקובץ במלואו (≈%@ טוקנים). חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד הקובץ מסומן.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "בורר המודל, Start/Stop, פרופיל, כלי וטמפרטורה מעל הצ'אט בחלון נפרד. כבוי: החלון מציג רק את השיחות והשיחה — הבקרות האלה נשארות בסרגל התפריט.";
 "The model reloads when the image or song is done" = "המודל נטען מחדש כשהתמונה או השיר הושלמו";
 "The model runtime isn't installed yet -- start a model once, then try again." = "ה-runtime של המודל עדיין לא מותקן — הפעל מודל פעם אחת ואז נסה שוב.";
+"The model server no longer goes online when it starts." = "שרת המודל כבר לא מתחבר לאינטרנט כשהוא מתחיל לפעול.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
 "The music generator is busy -- try again once it's done." = "מחולל המוזיקה עסוק — נסה שוב כשתהליך יסתיים.";
 "The music generator is busy with another chat -- try again once it's done." = "מחולל המוזיקה עסוק בצ׳אט אחר — נסה שוב כשתהליך יסתיים.";
@@ -876,6 +885,9 @@
 "What else" = "מה עוד";
 "What happened?" = "מה קרה?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "מה עשית, מה ציפית לקרות ומה ראית בפועל. השיחות שלך לא ייכללו.";
+"What's New" = "מה חדש";
+"What's New in LLMTray %@" = "מה חדש ב‑LLMTray %@";
+"What's New…" = "מה חדש…";
 "What's sent" = "מה נשלח";
 "When a client asks for another model" = "כשלקוח מבקש מודל אחר";
 "When an app asks for another model" = "כשאפליקציה מבקשת מודל אחר";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "עובד ללא חיבור";
 "Writing the song…" = "כותב את השיר…";
 "Yesterday" = "אתמול";
 "You" = "את/ה";
