@@ -260,16 +260,18 @@ public struct ChangeExecutor {
             guard let s = item.source else { throw FolderAccessError.invalidPath("trash without a path") }
             let parent = try openSourceParent(s)
             let parentIdentity = parent.descriptor.identity
-            // By the grant's own spelling, not where the held folder is now
-            // (it may have been moved out of the grant): the Trash gets the
-            // item only if that path still names it.
-            let url = URL(fileURLWithPath: s.location.displayPath)
             beforeOperation?(item)
+            // Foundation trashes by path, so no path is trusted: it is
+            // established again from the grant root right before the call,
+            // and once more where the call is about to move (a coordinator
+            // may hand over another URL: it must be the same path).
+            guard let path = trashPath(s, parentIdentity: parentIdentity) else {
+                throw FolderAccessError.changed(s.location.relativePath)
+            }
             let out: URL?
             do {
-                out = try trasher.trash(url, coordinated: s.fileProvider) { u in
-                    Posix.lstatPath(u.path)?.identity == s.identity
-                        && Posix.lstatPath(u.deletingLastPathComponent().path)?.identity == parentIdentity
+                out = try trasher.trash(URL(fileURLWithPath: path), coordinated: s.fileProvider) { u in
+                    u.path == path && trashPath(s, parentIdentity: parentIdentity) == path
                 }
             } catch {
                 // The Trash said no: nothing moved -- unless the item is gone.
@@ -283,8 +285,16 @@ public struct ChangeExecutor {
                 throw Uncertain(description: "\(out.path) isn't in the Trash")
             }
             if trashed.identity == s.identity {
-                return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
-                                     destinationChain: nil, trashURL: out.path, components: nil)
+                // It must have gone from inside the grant: its folder still in
+                // its place after the call, else it is put back.
+                if stillInside(parent, root: s.location.root) {
+                    return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
+                                         destinationChain: nil, trashURL: out.path, components: nil)
+                }
+                if Self.renameBack(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, expecting: s.identity) {
+                    throw FolderAccessError.changed(s.location.relativePath)
+                }
+                throw Uncertain(description: "trashed \(s.location.relativePath) while its folder left the grant: it is at \(out.path)")
             }
             if Self.renameBack(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, expecting: trashed.identity) {
                 throw FolderAccessError.changed(s.location.relativePath)
@@ -299,12 +309,24 @@ public struct ChangeExecutor {
             && (try? Posix.lstatAt(toFD, to))?.identity == expecting
     }
 
-    /// Whether a held folder is still the one its path reaches from the
-    /// grant root.
     private func stillInside(_ dir: OpenedDirectory, root: FolderRoot) -> Bool {
-        guard let again = try? SafeFolderWalker(root: root, denylist: denylist).openDirectory(dir.components, expected: dir.chain)
-        else { return false }
-        return again.descriptor.identity == dir.descriptor.identity
+        SafeFolderWalker(root: root, denylist: denylist).stillInside(dir)
+    }
+
+    /// The path the Trash gets, established again each time it is asked:
+    /// the item's folder walked from the grant root by descriptors (still
+    /// the held one, still in its place, the item in it by identity), spelled
+    /// as the file system has it now, inside the grant root's path, with no
+    /// symlink on the way (its realpath is itself). Nil when any of that
+    /// doesn't hold.
+    private func trashPath(_ s: CapturedSource, parentIdentity: FileIdentity) -> String? {
+        guard let again = try? openSourceParent(s), again.descriptor.identity == parentIdentity,
+              let dir = again.descriptor.currentPath, Posix.realpath(dir) == dir,
+              dir == s.location.root.path || dir.hasPrefix(s.location.root.path + "/"),
+              Posix.lstatPath(dir)?.identity == parentIdentity else { return nil }
+        let path = dir + "/" + s.location.name
+        guard Posix.lstatPath(path)?.identity == s.identity else { return nil }
+        return withExtendedLifetime(again) { path }
     }
 
     static func ownedByUs(_ d: Descriptor) -> Bool {

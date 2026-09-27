@@ -22,6 +22,18 @@ final class SafeFolderWalkerTests: FolderTestCase {
         XCTAssertNil(try walker.resolve(["a", "missing"]).entry)
     }
 
+    func testAHeldFolderIsStillInsideOnlyWhileItsPathReachesIt() throws {
+        mkdir("a/b")
+        let held = try walker.openDirectory(["a", "b"])
+        XCTAssertTrue(walker.stillInside(held))
+        // Moved out while held: the descriptor follows it, the grant doesn't.
+        try fm.moveItem(atPath: grant + "/a/b", toPath: outside + "/b")
+        XCTAssertFalse(walker.stillInside(held))
+        // Another folder under the old name isn't it.
+        mkdir("a/b")
+        XCTAssertFalse(walker.stillInside(held))
+    }
+
     func testASymlinkedFolderIsNeverEntered() throws {
         write("secret.txt", "outside", in: outside)
         try fm.createSymbolicLink(atPath: grant + "/link", withDestinationPath: outside)

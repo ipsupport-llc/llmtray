@@ -157,6 +157,15 @@ public struct SafeFolderWalker {
         return dir
     }
 
+    /// Whether a held directory is still the one its components reach from
+    /// the grant root, by the identities it was reached with: a folder held
+    /// open can be moved out of the grant, and a change made through it
+    /// would then land outside.
+    public func stillInside(_ dir: OpenedDirectory) -> Bool {
+        guard let again = try? openDirectory(dir.components, expected: dir.chain) else { return false }
+        return again.descriptor.identity == dir.descriptor.identity
+    }
+
     func step(_ parent: OpenedDirectory, _ name: String) throws -> OpenedDirectory {
         try Self.validateName(name)
         let comps = parent.components + [name]

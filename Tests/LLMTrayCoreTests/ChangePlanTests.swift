@@ -475,14 +475,18 @@ final class ChangePlanTests: FolderTestCase {
         XCTAssertFalse(journal.record(plan.id)!.isIncomplete, "nothing of the plan changed: a plain failure")
     }
 
+    /// Past every check, inside the Trash call (one that moves by path
+    /// without verifying): the item's name is given to another file.
+    private func swapInIntruder() {
+        try? fm.moveItem(atPath: grant + "/a.txt", toPath: base + "/a-original.txt")
+        write("a.txt", "intruder")
+    }
+
     func testATrashSwapIsPutBack() throws {
         write("a.txt", "mine")
         let plan = try approved([rm("a.txt")])
-        var exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: RacyTrash(dir: base + "/RacyTrash"))
-        exec.beforeOperation = { _ in
-            try? self.fm.moveItem(atPath: self.grant + "/a.txt", toPath: self.base + "/a-original.txt")
-            self.write("a.txt", "intruder")
-        }
+        let exec = ChangeExecutor(denylist: denylist, journal: journal,
+                                  trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: swapInIntruder))
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
         XCTAssertEqual(try String(contentsOfFile: grant + "/a.txt"), "intruder")
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/RacyTrash"), [])
@@ -493,22 +497,9 @@ final class ChangePlanTests: FolderTestCase {
         let plan = try approved([rm("a.txt")])
         // The swapped-in item goes to the Trash and its name is taken again:
         // it can't be put back, and that is said, not hidden.
-        final class Occupy: Trasher {
-            let inner: RacyTrash
-            let occupy: () -> Void
-            init(_ inner: RacyTrash, _ occupy: @escaping () -> Void) { self.inner = inner; self.occupy = occupy }
-            func trash(_ url: URL, coordinated: Bool, verify: (URL) -> Bool) throws -> URL? {
-                let out = try inner.trash(url, coordinated: coordinated, verify: verify)
-                occupy()
-                return out
-            }
-        }
-        var exec = ChangeExecutor(denylist: denylist, journal: journal,
-                              trasher: Occupy(RacyTrash(dir: base + "/RacyTrash")) { self.write("a.txt", "third") })
-        exec.beforeOperation = { _ in
-            try? self.fm.moveItem(atPath: self.grant + "/a.txt", toPath: self.base + "/a-original.txt")
-            self.write("a.txt", "intruder")
-        }
+        let exec = ChangeExecutor(denylist: denylist, journal: journal,
+                                  trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: swapInIntruder,
+                                                       after: { self.write("a.txt", "third") }))
         let report = exec.execute(plan)
         XCTAssertEqual(statuses(report), ["uncertain"])
         let record = try XCTUnwrap(journal.record(plan.id))
@@ -671,5 +662,199 @@ final class ChangePlanTests: FolderTestCase {
         let r = try p.plan([rm("f0"), rm("f1"), rm("f2")])
         XCTAssertEqual(r.items.count, 2)
         XCTAssertEqual(r.rejected.map(\.index), [2])
+    }
+
+    // MARK: Review round 5: the Trash path, undo containment, rename-backs
+
+    /// Runs `before` inside the Trash call, before it verifies and moves;
+    /// `after` once it has moved.
+    private final class HookedTrash: Trasher {
+        let inner: Trasher
+        let before: () -> Void
+        let after: () -> Void
+        init(_ inner: Trasher, before: @escaping () -> Void = {}, after: @escaping () -> Void = {}) {
+            self.inner = inner
+            self.before = before
+            self.after = after
+        }
+        func trash(_ url: URL, coordinated: Bool, verify: (URL) -> Bool) throws -> URL? {
+            before()
+            let out = try inner.trash(url, coordinated: coordinated, verify: verify)
+            after()
+            return out
+        }
+    }
+
+    /// The item's folder leaves the grant and a symlink to it takes its
+    /// name: the grant's spelling still reaches the same folder and item.
+    private func swapForSymlink(_ name: String) {
+        try? fm.moveItem(atPath: grant + "/" + name, toPath: outside + "/" + name)
+        try? fm.createSymbolicLink(atPath: grant + "/" + name, withDestinationPath: outside + "/" + name)
+    }
+
+    func testTheTrashPathIsCheckedAgainRightBeforeTheCall() throws {
+        write("t/x.txt", "x")
+        let plan = try approved([rm("t/x.txt")])
+        var exec = executor
+        exec.beforeOperation = { _ in self.swapForSymlink("t") }
+        XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
+        XCTAssertEqual(trash.coordinated, [], "the Trash isn't asked")
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
+    }
+
+    func testTheTrashPathIsCheckedAgainInsideTheCall() throws {
+        write("t/x.txt", "x")
+        let plan = try approved([rm("t/x.txt")])
+        let exec = ChangeExecutor(denylist: denylist, journal: journal,
+                                  trasher: HookedTrash(trash, before: { self.swapForSymlink("t") }))
+        XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash"), [])
+    }
+
+    func testATrashWhoseFolderLeftTheGrantIsPutBack() throws {
+        write("t/x.txt", "x")
+        let plan = try approved([rm("t/x.txt")])
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: HookedTrash(trash, after: {
+            try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t")
+        }))
+        XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x", "put back where it came from")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash"), [])
+        XCTAssertFalse(journal.record(plan.id)!.isIncomplete)
+    }
+
+    private func assertStoppedPlainly(_ r: ChangeUndo.Report, _ planID: UUID, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(r.undone, [], file: file, line: line)
+        XCTAssertEqual(r.stopped?.id, 1, file: file, line: line)
+        XCTAssertFalse(r.stopped?.reason?.contains("needs a look") ?? true, "\(r)", file: file, line: line)
+        guard case .done = journal.record(planID)?.items.first?.state else {
+            return XCTFail("still done after a reverted undo", file: file, line: line)
+        }
+    }
+
+    func testUndoDoesntChangeThroughAFolderThatLeftTheGrant() throws {
+        var leaving = ""
+        var u = undoer
+        u.beforeOperation = { _ in try? self.fm.moveItem(atPath: self.grant + "/" + leaving, toPath: self.outside + "/" + leaving) }
+        // Move back into a source folder that left.
+        write("src/a.txt", "a")
+        mkdir("dst")
+        let p1 = try approved([mv("src/a.txt", "dst/a.txt")])
+        XCTAssertEqual(executor.execute(p1).doneCount, 1)
+        leaving = "src"
+        assertStoppedPlainly(u.undo(p1.id), p1.id)
+        XCTAssertTrue(exists("dst/a.txt"), "moved back where it was")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/src"), [])
+        // Move back out of a destination folder that left.
+        write("s2/b.txt", "b")
+        mkdir("d2")
+        let p2 = try approved([mv("s2/b.txt", "d2/b.txt")])
+        XCTAssertEqual(executor.execute(p2).doneCount, 1)
+        leaving = "d2"
+        assertStoppedPlainly(u.undo(p2.id), p2.id)
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/d2"), ["b.txt"])
+        XCTAssertEqual(names("s2"), [])
+        // Put back from the Trash into a folder that left.
+        write("t/x.txt", "x")
+        let p3 = try approved([rm("t/x.txt")])
+        guard case .done(let r3) = executor.execute(p3).outcomes[0].status, let t3 = r3.trashURL else { return XCTFail() }
+        leaving = "t"
+        assertStoppedPlainly(u.undo(p3.id), p3.id)
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), [])
+        XCTAssertEqual(try String(contentsOfFile: t3), "x", "back in the Trash")
+        // A made folder in a folder that left isn't removed.
+        mkdir("p")
+        let p4 = try approved([md("p/X")])
+        XCTAssertEqual(executor.execute(p4).doneCount, 1)
+        leaving = "p"
+        assertStoppedPlainly(u.undo(p4.id), p4.id)
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/p"), ["X"])
+    }
+
+    func testAnInterruptedMadeFolderUndoDoesntRemoveOutsideTheGrant() throws {
+        mkdir("q")
+        let plan = try approved([md("q/Y")])
+        XCTAssertEqual(executor.execute(plan).doneCount, 1)
+        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: 1), planID: plan.id)
+        try fm.moveItem(atPath: grant + "/q/Y", toPath: grant + "/q/" + ChangeUndo.asideName(planID: plan.id, item: 1))
+        var u = undoer
+        u.beforeOperation = { _ in try? self.fm.moveItem(atPath: self.grant + "/q", toPath: self.outside + "/q") }
+        let r = u.undo(plan.id)
+        XCTAssertEqual(r.undone, [])
+        XCTAssertEqual(r.stopped?.id, 1)
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/q"), ["Y"], "put back under its name, not removed")
+    }
+
+    func testUndoPutsBackWhatWasSwappedIn() throws {
+        var u = undoer
+        var swap: () -> Void = {}
+        u.beforeOperation = { _ in swap() }
+        // Move: the item at the destination swapped before it moves back.
+        write("a.txt", "mine")
+        let p1 = try approved([mv("a.txt", "b.txt")])
+        XCTAssertEqual(executor.execute(p1).doneCount, 1)
+        swap = {
+            try? self.fm.moveItem(atPath: self.grant + "/b.txt", toPath: self.base + "/b-original.txt")
+            self.write("b.txt", "intruder")
+        }
+        assertStoppedPlainly(u.undo(p1.id), p1.id)
+        XCTAssertEqual(try String(contentsOfFile: grant + "/b.txt"), "intruder", "back where it was")
+        XCTAssertFalse(exists("a.txt"))
+        // Trash: the item in the Trash swapped before it is put back.
+        write("c.txt", "mine")
+        let p2 = try approved([rm("c.txt")])
+        guard case .done(let r2) = executor.execute(p2).outcomes[0].status, let t2 = r2.trashURL else { return XCTFail() }
+        swap = {
+            try? self.fm.moveItem(atPath: t2, toPath: self.base + "/c-original.txt")
+            self.fm.createFile(atPath: t2, contents: Data("intruder".utf8))
+        }
+        assertStoppedPlainly(u.undo(p2.id), p2.id)
+        XCTAssertFalse(exists("c.txt"))
+        XCTAssertEqual(try String(contentsOfFile: t2), "intruder", "back in the Trash")
+        // make_dir: another folder swapped in under its name.
+        let p3 = try approved([md("X")])
+        XCTAssertEqual(executor.execute(p3).doneCount, 1)
+        swap = {
+            try? self.fm.moveItem(atPath: self.grant + "/X", toPath: self.outside + "/X-original")
+            self.mkdir("X")
+        }
+        assertStoppedPlainly(u.undo(p3.id), p3.id)
+        XCTAssertTrue(exists("X"), "not ours: put back, not removed")
+        XCTAssertEqual(names().filter { $0.hasPrefix(".llmtray") }, [])
+    }
+
+    func testAnInterruptedTrashUndoDoesntTakeAFailedLookForGone() throws {
+        if geteuid() == 0 { throw XCTSkip("permissions don't hold for root") }
+        write("h.txt", "h")
+        let plan = try approved([rm("h.txt")])
+        guard case .done(let r) = executor.execute(plan).outcomes[0].status, let t = r.trashURL else { return XCTFail() }
+        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: 1), planID: plan.id)
+        // Back at its place by a hard link, still in the Trash -- which
+        // can't be looked into.
+        try fm.linkItem(atPath: t, toPath: grant + "/h.txt")
+        let trashDir = base + "/Trash"
+        XCTAssertEqual(chmod(trashDir, 0), 0)
+        let undo = undoer.undo(plan.id)
+        XCTAssertEqual(chmod(trashDir, 0o755), 0)
+        XCTAssertEqual(undo.undone, [])
+        XCTAssertTrue(undo.stopped?.reason?.contains("needs a look") ?? false, "\(undo)")
+        guard case .undoIncomplete = journal.record(plan.id)!.items[0].state else { return XCTFail() }
+        XCTAssertTrue(fm.fileExists(atPath: t))
+    }
+
+    func testATruncatedJournalIsNotReversible() throws {
+        write("a.txt", "a")
+        let plan = try approved([mv("a.txt", "b.txt")])
+        XCTAssertEqual(executor.execute(plan).doneCount, 1)
+        let size = try XCTUnwrap(fm.attributesOfItem(atPath: journal.url(for: plan.id).path)[.size] as? NSNumber).intValue
+        journal.maxRecordBytes = size - 1
+        XCTAssertEqual(journal.record(plan.id)?.truncated, true)
+        let expected = [ChangeUndo.Remaining(id: 0, reversible: false, reason: "the journal is too large to read whole")]
+        XCTAssertEqual(undoer.reversibility(plan.id), expected)
+        let undo = undoer.undo(plan.id)
+        XCTAssertEqual(undo.undone, [])
+        XCTAssertEqual(undo.remaining, expected)
+        XCTAssertTrue(exists("b.txt"))
     }
 }

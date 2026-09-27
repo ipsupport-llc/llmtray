@@ -32,10 +32,19 @@ public struct ChangeUndo {
         public var remaining: [Remaining]
     }
 
+    static let tooLarge = "the journal is too large to read whole"
+
+    /// Called after an item's checks, right before its undo operation (and
+    /// before an interrupted undo's folder is removed): tests swap things
+    /// there to exercise the check-to-use window.
+    var beforeOperation: ((PlanItem) -> Void)?
+
     /// Whether each done item could be reversed now (newest first), without
-    /// changing anything. Interrupted items say so.
+    /// changing anything. Interrupted items say so; a journal too large to
+    /// read whole is one entry (id 0) saying so, as undo refuses it.
     public func reversibility(_ planID: UUID) -> [Remaining] {
         guard let record = journal.record(planID) else { return [] }
+        if record.truncated { return [Remaining(id: 0, reversible: false, reason: Self.tooLarge)] }
         return record.items.reversed().compactMap { item -> Remaining? in
             switch item.state {
             case .incomplete:
@@ -62,7 +71,8 @@ public struct ChangeUndo {
             return report
         }
         if record.truncated {
-            report.stopped = Remaining(id: 0, reversible: false, reason: "the journal is too large to read whole")
+            report.stopped = Remaining(id: 0, reversible: false, reason: Self.tooLarge)
+            report.remaining = [report.stopped!]
             return report
         }
         items: for item in record.items.reversed() {
@@ -172,62 +182,89 @@ public struct ChangeUndo {
 
     private func reverse(_ item: PlanItem, _ r: JournalResult, dryRun: Bool, planID: UUID) throws {
         let excl = UInt32(RENAME_EXCL)
+        let renameBack = ChangeExecutor.renameBack
         switch item.kind {
         case .makeDir:
+            guard let d = item.destination else { throw FolderAccessError.invalidPath("the journal has no destination") }
             let (dir, name) = try placed(item, r)
+            defer { withExtendedLifetime(dir) {} }
             if dryRun {
                 guard try Self.isEmptyDirectory(dir.descriptor, name) else { throw FolderAccessError.notEmpty(name) }
                 return
             }
+            beforeOperation?(item)
             // Taken aside under a temporary name first: the rename takes one
             // exact folder, checked before it is removed (a folder swapped in
             // by name is put back, not removed).
+            let fd = dir.descriptor.fd
             let temp = Self.asideName(planID: planID, item: item.id)
-            guard renameatx_np(dir.descriptor.fd, name, dir.descriptor.fd, temp, excl) == 0 else {
+            guard renameatx_np(fd, name, fd, temp, excl) == 0 else {
                 throw FolderAccessError.system("remove \(name)", errno)
             }
+            // Put back under its name, confirmed: whatever was taken aside.
             func restore(_ why: FolderAccessError) throws -> Never {
-                if renameatx_np(dir.descriptor.fd, temp, dir.descriptor.fd, name, excl) == 0 { throw why }
+                if let st = try? Posix.lstatAt(fd, temp), renameBack(fd, temp, fd, name, st.identity) { throw why }
                 throw Uncertain(description: "\(name) was left as \(temp)")
             }
-            if (try? Posix.lstatAt(dir.descriptor.fd, temp))?.identity != r.identity {
+            if (try? Posix.lstatAt(fd, temp))?.identity != r.identity {
                 try restore(.changed("\(name) was replaced since"))
             }
-            if unlinkat(dir.descriptor.fd, temp, AT_REMOVEDIR) != 0 {
+            // Its folder must still be inside the grant (it can be moved out
+            // while held open): else nothing is removed there.
+            if !walker(d.location.root).stillInside(dir) {
+                try restore(.changed("\(comps(dir)) left the grant"))
+            }
+            if unlinkat(fd, temp, AT_REMOVEDIR) != 0 {
                 let e = errno
                 try restore(e == ENOTEMPTY || e == EEXIST ? .notEmpty(name) : .system("remove \(name)", e))
             }
             // Removal is by name: anything still (or newly) there means it
             // may not have been the folder checked a moment ago.
-            if (try? Posix.lstatAt(dir.descriptor.fd, temp)) != nil {
+            if (try? Posix.lstatAt(fd, temp)) != nil {
                 throw Uncertain(description: "\(temp) is still there after removing it")
             }
         case .move:
-            guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
+            guard let s = item.source, let d = item.destination else {
+                throw FolderAccessError.invalidPath("the journal has no source")
+            }
             let (dir, name) = try placed(item, r)
             let back = try sourceParent(s)
+            defer { withExtendedLifetime((dir, back)) {} }
             if dryRun {
                 if try Posix.lstatAt(back.descriptor.fd, s.location.name) != nil {
                     throw FolderAccessError.exists(s.location.relativePath)
                 }
                 return
             }
+            beforeOperation?(item)
             if renameatx_np(dir.descriptor.fd, name, back.descriptor.fd, s.location.name, excl) != 0 {
                 let e = errno
                 if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
                 throw FolderAccessError.system("move back \(name)", e)
             }
             // What moved must be the item; anything swapped in goes back.
-            if (try? Posix.lstatAt(back.descriptor.fd, s.location.name))?.identity != r.identity {
-                if renameatx_np(back.descriptor.fd, s.location.name, dir.descriptor.fd, name, excl) == 0 {
+            guard let arrived = try? Posix.lstatAt(back.descriptor.fd, s.location.name) else {
+                throw Uncertain(description: "moved \(name) back, but \(s.location.relativePath) can't be looked at")
+            }
+            if arrived.identity != r.identity {
+                if renameBack(back.descriptor.fd, s.location.name, dir.descriptor.fd, name, arrived.identity) {
                     throw FolderAccessError.changed("\(name) was replaced since")
                 }
                 throw Uncertain(description: "something other than the item was moved to \(s.location.relativePath)")
+            }
+            // Both ends must still be inside the grant (either can be moved
+            // out while held open): else it goes back where it was.
+            if !walker(s.location.root).stillInside(back) || !walker(d.location.root).stillInside(dir) {
+                if renameBack(back.descriptor.fd, s.location.name, dir.descriptor.fd, name, r.identity) {
+                    throw FolderAccessError.changed("a folder of \(s.location.relativePath) left the grant")
+                }
+                throw Uncertain(description: "moved \(name) back while a folder left the grant")
             }
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
             let trashed = try inTrash(r)
             let back = try sourceParent(s)
+            defer { withExtendedLifetime(back) {} }
             if trashed.device != back.descriptor.identity.device {
                 throw FolderAccessError.crossDevice(s.location.relativePath)
             }
@@ -237,43 +274,82 @@ public struct ChangeUndo {
                 }
                 return
             }
+            beforeOperation?(item)
             if renameatx_np(AT_FDCWD, trashed.path, back.descriptor.fd, s.location.name, excl) != 0 {
                 let e = errno
                 if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
                 throw FolderAccessError.system("put back \(s.location.name)", e)
             }
             // Swapped in the Trash between the check and the move: back it goes.
-            if (try? Posix.lstatAt(back.descriptor.fd, s.location.name))?.identity != r.identity {
-                if renameatx_np(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, excl) == 0 {
+            guard let arrived = try? Posix.lstatAt(back.descriptor.fd, s.location.name) else {
+                throw Uncertain(description: "put \(s.location.relativePath) back, but it can't be looked at")
+            }
+            if arrived.identity != r.identity {
+                if renameBack(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, arrived.identity) {
                     throw FolderAccessError.changed("\(s.location.name) changed in the Trash")
                 }
                 throw Uncertain(description: "something other than the item came back to \(s.location.relativePath)")
             }
+            // Its folder must still be inside the grant: else back to the Trash.
+            if !walker(s.location.root).stillInside(back) {
+                if renameBack(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, r.identity) {
+                    throw FolderAccessError.changed("the folder of \(s.location.relativePath) left the grant")
+                }
+                throw Uncertain(description: "put \(s.location.relativePath) back while its folder left the grant")
+            }
         }
+    }
+
+    private func comps(_ dir: OpenedDirectory) -> String {
+        dir.components.isEmpty ? "the grant's folder" : dir.components.joined(separator: "/")
+    }
+
+    /// `lstat` by path, nil only when nothing is there (`ENOENT`,
+    /// `ENOTDIR`): any other failure is thrown -- a lookup that fails is no
+    /// proof that the item is gone.
+    static func lstatIfPresent(_ path: String) throws -> EntryStat? {
+        var st = Darwin.stat()
+        if Darwin.lstat(path, &st) == 0 { return EntryStat(st) }
+        let e = errno
+        if e == ENOENT || e == ENOTDIR { return nil }
+        throw FolderAccessError.system("look at \(path)", e)
     }
 
     /// After an interrupted undo: is the item where it was before the plan
     /// (or, for a made folder, gone)? A made folder found taken aside is
-    /// removed if still empty, else put back under its name.
+    /// removed if still empty and still inside the grant, else put back
+    /// under its name.
     private func isBack(_ item: PlanItem, _ r: JournalResult, planID: UUID) throws -> Bool {
         switch item.kind {
         case .makeDir:
             guard let d = item.destination, let comps = r.components, let name = comps.last, let chain = r.destinationChain else { return false }
             let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
-            if try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity { return false }
+            defer { withExtendedLifetime(dir) {} }
+            let fd = dir.descriptor.fd
+            if try Posix.lstatAt(fd, name)?.identity == r.identity { return false }
             let aside = Self.asideName(planID: planID, item: item.id)
-            guard try Posix.lstatAt(dir.descriptor.fd, aside)?.identity == r.identity else {
+            guard try Posix.lstatAt(fd, aside)?.identity == r.identity else {
                 // Removed -- or moved away by someone: can't be told apart.
                 throw Uncertain(description: "\(name) is gone from its place; if it was removed, nothing is left to undo")
             }
-            if unlinkat(dir.descriptor.fd, aside, AT_REMOVEDIR) == 0 {
-                if (try? Posix.lstatAt(dir.descriptor.fd, aside)) != nil {
+            beforeOperation?(item)
+            // Put back under its name, confirmed.
+            func restore() throws -> Bool {
+                if ChangeExecutor.renameBack(fd, aside, fd, name, expecting: r.identity) { return false }
+                throw Uncertain(description: "\(name) was left as \(aside)")
+            }
+            // Removed only inside the grant.
+            guard walker(d.location.root).stillInside(dir) else {
+                _ = try restore()
+                throw FolderAccessError.changed("\(self.comps(dir)) left the grant")
+            }
+            if unlinkat(fd, aside, AT_REMOVEDIR) == 0 {
+                if (try? Posix.lstatAt(fd, aside)) != nil {
                     throw Uncertain(description: "\(aside) is still there after removing it")
                 }
                 return true
             }
-            if renameatx_np(dir.descriptor.fd, aside, dir.descriptor.fd, name, UInt32(RENAME_EXCL)) == 0 { return false }
-            throw Uncertain(description: "\(name) was left as \(aside)")
+            return try restore()
         case .move, .trash:
             guard let s = item.source else { return false }
             // Held in a local: the descriptor closes when the value goes.
@@ -283,24 +359,28 @@ public struct ChangeUndo {
             }
             guard atSource else { return false }
             // Also gone from where the plan put it (a hard link could make it
-            // look back while still there).
+            // look back while still there). Looked at, not assumed: a lookup
+            // that fails is no proof.
             let stillPlaced: Bool
             if item.kind == .trash {
-                stillPlaced = r.trashURL.flatMap { Posix.lstatPath($0) }?.identity == r.identity
+                guard let path = r.trashURL else { throw Uncertain(description: "the journal has no Trash location") }
+                do {
+                    stillPlaced = try Self.lstatIfPresent(path)?.identity == r.identity
+                } catch {
+                    throw Uncertain(description: "can't look in the Trash for \(s.location.relativePath): \(error)")
+                }
             } else {
-                // Looked at, not assumed: a lookup that fails is no proof.
                 guard let d = item.destination, let comps = r.components, let name = comps.last,
                       let chain = r.destinationChain else {
                     throw Uncertain(description: "the journal has no destination")
                 }
-                let dir: OpenedDirectory
                 do {
-                    dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
+                    let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
+                    stillPlaced = try withExtendedLifetime(dir) {
+                        try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity
+                    }
                 } catch {
                     throw Uncertain(description: "can't look where \(s.location.relativePath) was put: \(error)")
-                }
-                stillPlaced = try withExtendedLifetime(dir) {
-                    try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity
                 }
             }
             if stillPlaced { throw Uncertain(description: "\(s.location.relativePath) is in both places (a hard link?)") }
