@@ -264,8 +264,9 @@ struct ChatFolderMenu: View {
 
 // MARK: - Settings
 
-/// Settings > Folders: the feature's opt-in, the standing grants with
-/// Revoke, Allow Folder…, the journal with Undo, what recovery found.
+/// Settings > Files: Project files (its own section), then folder access --
+/// its opt-in, the standing grants with Revoke, Allow Folder…, the journal
+/// with Undo, what recovery found.
 struct FoldersPane: View {
     @ObservedObject private var manager = FolderAccessManager.shared
     @State private var level: FolderAccessLevel = .read
@@ -275,6 +276,7 @@ struct FoldersPane: View {
 
     var body: some View {
         Form {
+            ProjectFilesSection()
             Section("Folder access") {
                 Toggle(isOn: Binding(get: { manager.isEnabled }, set: { manager.setEnabled($0) })) {
                     SettingLabel(title: "Let chats work in folders", help: "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.")

@@ -284,7 +284,6 @@ struct ModelsPane: View {
                     SettingHelp(text: "Alias: the \u{201C}model\u{201D} name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.")
                 }
             }
-            ProjectFilesSection()
         }
         .formStyle(.grouped)
         .onAppear(perform: rescan)
@@ -349,10 +348,11 @@ struct ModelsPane: View {
     }
 }
 
-/// Project files (adr/0012): the feature's opt-in and its embedding model,
-/// with its size, and the disk every project's files and index take. Off,
-/// nothing is indexed, downloaded or started. Each project's files are in
-/// its Files window (the project's menu in the chats sidebar).
+/// Project files (adr/0012), in Settings > Files: the feature's opt-in and
+/// its embedding model, with its size, and the disk every project's files
+/// and index take. Off, nothing is indexed, downloaded or started. Each
+/// project's files are in its Files window (the project's menu in the chats
+/// sidebar), which can turn the feature on too.
 @MainActor
 struct ProjectFilesSection: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
@@ -442,9 +442,18 @@ struct ProjectFilesSection: View {
             setup.disableProjectFiles()
             return
         }
+        Task { error = await Self.turnOn() }
+    }
+
+    /// Turns Project files on, asking first whether to download the
+    /// embedding model when it isn't here (the Settings switch, a project's
+    /// Files window and its menu). Returns what failed, if anything.
+    static func turnOn() async -> String? {
+        let setup = FeatureSetup.shared
+        let embedders = ProjectIndexer.shared.embedders
         guard !setup.isProjectFilesEmbedderReady, let entry = setup.projectFilesEmbedder, !embedders.isBusy else {
             setup.projectFiles.setEnabled(true)
-            return
+            return nil
         }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Turn on project files?", comment: "")
@@ -455,14 +464,13 @@ struct ProjectFilesSection: View {
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         switch alert.runModal() {
         case .alertFirstButtonReturn:
-            Task {
-                if let failure = await setup.enableProjectFiles(downloadingEmbedder: true) { error = failure.localizedDescription }
-            }
+            return await setup.enableProjectFiles(downloadingEmbedder: true)?.localizedDescription
         case .alertSecondButtonReturn:
             setup.projectFiles.setEnabled(true)
         default:
             break
         }
+        return nil
     }
 
     private func download() {

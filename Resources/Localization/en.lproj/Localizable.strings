@@ -253,6 +253,7 @@
 "Failed: %@" = "Failed: %@";
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
 "Fetching file list…" = "Fetching file list…";
+"Files" = "Files";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Files in %@" = "Files in %@";
@@ -438,7 +439,7 @@
 "No auto-tune run yet." = "No auto-tune run yet.";
 "No automatic update checks" = "No automatic update checks";
 "No chats found" = "No chats found";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.";
 "No files yet" = "No files yet";
 "No folder changes yet." = "No folder changes yet.";
 "No messages yet" = "No messages yet";
@@ -467,7 +468,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Open LLMTray when you log in" = "Open LLMTray when you log in";
 "Open Server Log…" = "Open Server Log…";
-"Open Settings" = "Open Settings";
 "Open in New Tab" = "Open in New Tab";
 "Open in Preview" = "Open in Preview";
 "Open in Window" = "Open in Window";
@@ -501,10 +501,10 @@
 "Previous 7 Days" = "Previous 7 Days";
 "Profile" = "Profile";
 "Profiles" = "Profiles";
-"Project Files: Turn On in Settings…" = "Project Files: Turn On in Settings…";
 "Project files" = "Project files";
 "Project files are turned off" = "Project files are turned off";
 "Project files are turned off in Settings." = "Project files are turned off in Settings.";
+"Project files couldn't be turned on" = "Project files couldn't be turned on";
 "Project files off" = "Project files off";
 "Project files on" = "Project files on";
 "Project name" = "Project name";
@@ -770,8 +770,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Try Again" = "Try Again";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
-"Turn on Project files in Settings to add files" = "Turn on Project files in Settings to add files";
+"Turn On Project Files…" = "Turn On Project Files…";
+"Turn On…" = "Turn On…";
+"Turn on Project files to add files" = "Turn on Project files to add files";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
 "Turn on project files?" = "Turn on project files?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
