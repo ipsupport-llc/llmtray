@@ -180,31 +180,13 @@ enum ChatSessionStore {
     /// the directory can't be read (pins must not be dropped for that).
     static func ids() -> Set<UUID>? {
         guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return nil }
-        return Set(names.compactMap { name in
-            name.hasSuffix(".json") ? UUID(uuidString: String(name.dropLast(5))) : nil
-        })
+        return Set(names.compactMap(SessionCitations.sessionID(fileName:)))
     }
 
-    /// The pages every saved chat cites in `project` (a chat that moved keeps
-    /// citing where it was made), for the tombstone sweep (adr/0012,
-    /// Retention). nil when any session file can't be read: a sweep on a
-    /// partial list would drop pages an unreadable chat still cites.
+    /// The pages every saved chat cites in `project`, for the tombstone
+    /// sweep; nil when any chat's file can't be read (`SessionCitations`).
     static func citedPages(in project: UUID) -> Set<PageRef>? {
-        let fm = FileManager.default
-        guard let names = try? fm.contentsOfDirectory(atPath: sessionsDir) else {
-            return fm.fileExists(atPath: sessionsDir) ? nil : []
-        }
-        var pages: Set<PageRef> = []
-        for name in names where name.hasSuffix(".json") {
-            guard let data = fm.contents(atPath: sessionsDir + "/" + name),
-                  let file = try? decoder.decode(ChatSessionFile.self, from: data) else { return nil }
-            for message in file.messages {
-                for c in message.citations ?? [] where c.project == project {
-                    pages.insert(PageRef(doc: Int64(c.doc), rev: Int64(c.rev), page: c.page))
-                }
-            }
-        }
-        return pages
+        SessionCitations.citedPages(inDirectory: sessionsDir, project: project)
     }
 
     static func exists(_ id: UUID) -> Bool {

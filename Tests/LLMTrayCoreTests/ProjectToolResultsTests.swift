@@ -127,4 +127,32 @@ final class ProjectToolResultsTests: XCTestCase {
         XCTAssertEqual(back, c)
         XCTAssertNil(back.chunk)
     }
+
+    // MARK: - the citation scan
+
+    func testCitedPagesReadsTheChatsNotTheLibraryNextToThem() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("sessions-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let project = UUID(), other = UUID()
+        // The library file of a normal install, not a chat.
+        try #"{"version":1,"projects":[{"id":"\#(project.uuidString)","name":"P"}]}"#
+            .write(to: dir.appendingPathComponent("library.json"), atomically: true, encoding: .utf8)
+        try "notes".write(to: dir.appendingPathComponent("README.txt"), atomically: true, encoding: .utf8)
+        let chat = """
+        {"id":"\(UUID().uuidString)","title":"t","createdAt":"2026-09-01T00:00:00Z","updatedAt":"2026-09-01T00:00:00Z",
+         "messages":[{"role":"user","content":"q"},
+                     {"role":"assistant","content":"a","citations":[
+                        {"project":"\(project.uuidString)","doc":1,"rev":2,"page":3,"name":"a.pdf"},
+                        {"project":"\(other.uuidString)","doc":9,"rev":1,"page":1,"name":"x.pdf"}]}]}
+        """
+        try chat.write(to: dir.appendingPathComponent("\(UUID().uuidString).json"), atomically: true, encoding: .utf8)
+        XCTAssertEqual(SessionCitations.citedPages(inDirectory: dir.path, project: project), [PageRef(doc: 1, rev: 2, page: 3)])
+        XCTAssertNil(SessionCitations.sessionID(fileName: "library.json"))
+
+        // A chat that can't be read: no list at all.
+        try "{".write(to: dir.appendingPathComponent("\(UUID().uuidString).json"), atomically: true, encoding: .utf8)
+        XCTAssertNil(SessionCitations.citedPages(inDirectory: dir.path, project: project))
+        XCTAssertEqual(SessionCitations.citedPages(inDirectory: dir.path + "-missing", project: project), [])
+    }
 }
