@@ -57,7 +57,8 @@
   `"5"`; enums in any case or by a declared synonym (`fahrenheit` →
   imperial); `null` as not given; unknown fields ignored. Nothing
   ambiguous is guessed (`"1,5"`, two objects, `true` for an index,
-  `calc` for calculate). A call that still can't be understood gets
+  `calc` for calculate, two wrappers, a wrapper beside fields or not
+  holding an object, an integer too big to keep exactly). A call that still can't be understood gets
   the field, what it must be and a retry built from what it sent:
   `get_weather: "kind" must be one of forecast, hourly, air, sun, not
   "rain". Retry: get_weather({"city":"Rome","kind":"forecast|hourly|air|sun"})`;

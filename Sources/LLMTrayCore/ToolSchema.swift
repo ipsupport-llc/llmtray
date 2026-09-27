@@ -176,11 +176,23 @@ public enum ToolArgumentParser {
             !own.contains(normalizedKey(key))
                 && (wrapperKeys.contains(key.lowercased()) || (schema.map { key == $0.name } ?? false))
         }.sorted()
-        // Only wrappers, or wrappers and the call's name / type.
-        guard !wrappers.isEmpty, dict.keys.allSatisfy({ wrappers.contains($0) || describesCall($0) })
-        else { return .success(dict) }
+        guard !wrappers.isEmpty else { return .success(dict) }
         func fail(_ reason: String) -> Result<[String: Any], LenientJSON.Failure> {
             schema == nil ? .success(dict) : .failure(.init(reason: reason))
+        }
+        // Only wrappers, or wrappers and the call's name / type: fields
+        // beside a wrapper leave which arguments were meant to a guess.
+        // (A wrapper name holding a plain value there is just an unknown field.)
+        let beside = dict.keys.filter { !wrappers.contains($0) && !describesCall($0) }.sorted()
+        guard beside.isEmpty else {
+            let holdsObject = wrappers.contains { key in
+                if dict[key] is [String: Any] { return true }
+                guard let text = dict[key] as? String, case .success(let parsed) = LenientJSON.parse(text) else { return false }
+                return parsed.value is [String: Any] && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                    && text.trimmingCharacters(in: .whitespacesAndNewlines) != "null"
+            }
+            guard holdsObject else { return .success(dict) }
+            return fail("\"\(wrappers[0])\" beside other fields (" + beside.map { "\"\($0)\"" }.joined(separator: ", ") + ")")
         }
         guard wrappers.count == 1 else {
             return fail("arguments wrapped twice: " + wrappers.map { "\"\($0)\"" }.joined(separator: " and "))

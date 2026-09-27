@@ -85,9 +85,15 @@ final class ToolArgumentsTests: XCTestCase {
         // A tool whose own field is called "input" keeps it.
         let own = ToolSchema("x", "X.", [.init("input", .string)])
         XCTAssertEqual(parse(#"{"input": "abc"}"#, own).values["input"] as? String, "abc")
-        // A wrapper beside real fields isn't unwrapped.
-        let mixed = parse(#"{"arguments": {"city": "A"}, "city": "B"}"#, weather)
-        XCTAssertEqual(mixed.values["city"] as? String, "B")
+        // A wrapper beside real fields: which were meant is a guess.
+        for raw in [#"{"arguments": {"city": "A"}, "city": "B"}"#, #"{"kind": "hourly", "arguments": {"city": "Paris"}}"#,
+                    #"{"arguments": "{\"city\": \"Paris\"}", "extra": 1}"#] {
+            guard case .badJSON = parse(raw, weather).problems.first else { return XCTFail("expected badJSON for \(raw)") }
+        }
+        // A wrapper's name holding a plain value is an unknown field.
+        let plain = parse(#"{"city": "Paris", "params": "metric"}"#, weather)
+        XCTAssertTrue(plain.isValid)
+        XCTAssertEqual(plain.values["city"] as? String, "Paris")
         XCTAssertTrue(parse(#"{"name": "get_weather", "arguments": {}}"#, weather).isValid)
         // "name" as a field's alias: the tool's name beside a wrapper still
         // describes the call; any other value is the field.
@@ -97,7 +103,7 @@ final class ToolArgumentsTests: XCTestCase {
             XCTAssertEqual(parse(raw, country).values["country"] as? String, "France", raw)
         }
         XCTAssertEqual(parse(#"{"name": "France"}"#, country).values["country"] as? String, "France")
-        XCTAssertEqual(parse(#"{"name": "Spain", "arguments": {"country": "France"}}"#, country).values["country"] as? String, "Spain")
+        XCTAssertFalse(parse(#"{"name": "Spain", "arguments": {"country": "France"}}"#, country).isValid)
     }
 
     func testAmbiguousWrappersAreProblemsNotEmptyArguments() {
