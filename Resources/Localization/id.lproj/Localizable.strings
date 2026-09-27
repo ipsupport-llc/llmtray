@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ Perancang MTP %@";
 "1 hour" = "1 jam";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Chat akan meminta izin sebelum melihat folder, dan setiap perubahan ditampilkan sebagai rencana untuk Anda setujui. Tempat pribadi (Library, keys, folder home sendiri) tidak pernah dibagikan.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Percakapan dapat melihat folder yang Anda izinkan dan mengusulkan folder baru, pemindahan, serta penggantian nama. Anda menyetujui setiap perubahan dan dapat membatalkannya.";
 "A chat model" = "Model obrolan";
 "A client" = "Klien";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mix yang lebih penuh dan terdengar matang; lirik kurang jelas. Sekitar 20 s untuk 30 s musik.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "Mengenai LLMTray";
 "Add" = "Tambah";
 "Add Files…" = "Tambah Berkas…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Tambahkan file PDF, Word, dan teks ke proyek. Percakapan dalam proyek akan mencari dan mengutip halaman; sematkan file untuk menyertakan seluruh isinya dalam percakapan.";
 "Added here" = "Ditambahkan di sini";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Ditambahkan ke prompt sistem setiap kali alat ditawarkan. Templat alat bawaan model hanya menjelaskan cara memanggil alat, bukan kapan tidak memanggilnya. Kosongkan untuk menonaktifkannya.";
 "Adding files" = "Menambahkan berkas";
@@ -189,6 +191,7 @@
 "Composing…" = "Menyusun…";
 "Concurrent requests" = "Permintaan bersamaan";
 "Context" = "Konteks";
+"Continue" = "Lanjutkan";
 "Copies %1$@ · index %2$@ on disk" = "Salinan %1$@ · indeks %2$@ di disk";
 "Copy" = "Salin";
 "Copy the details as text" = "Salin detail sebagai teks";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "Gagal memuat ulang model obrolan setelah pembuatan gambar: %@";
 "Failed: %@" = "Gagal: %@";
 "Fast (smaller canvas)" = "Cepat (kanvas lebih kecil)";
+"Faster long chats" = "Percakapan panjang lebih cepat";
 "Fetching file list…" = "Mengambil daftar berkas…";
 "Files" = "Files";
 "Files Settings…" = "Pengaturan Files…";
@@ -282,6 +286,7 @@
 "Finish" = "Selesai";
 "Finish applies what you chose. You can change all of it later in Settings." = "Selesai menerapkan pilihan Anda. Anda bisa mengubah semuanya nanti di Pengaturan.";
 "First token" = "Token pertama";
+"First-run setup" = "Pengaturan pertama kali";
 "Fits comfortably" = "Muatan pas";
 "Folder" = "Folder";
 "Folder access" = "Akses folder";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "Kualitas tinggi (kanvas lebih besar)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Fidelitas tertinggi, unduhan terbesar — tolok ukur ketepatan yang dapat Anda percayai.";
 "Hourly forecast" = "Prakiraan per jam";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "Arahkan penunjuk ke tombol info di bawah jawaban untuk melihat model, kecepatan, dan berapa banyak konteks yang digunakan.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Seberapa berani dan tak terduga musiknya. hanya turbo: sft tidak memiliki perencana lagu untuk variasi.";
 "How do you like LLMTray?" = "Bagaimana menurut Anda tentang LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Dimuat: %1$@ · dipilih: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Memuat model yang terakhir digunakan segera, sehingga siap tanpa menekan Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Mencatat setiap token yang dibuat (DEBUG). Hanya untuk memecahkan masalah proses model -- ini memperlambat kinerja. Berlaku saat server berikutnya dimulai.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "Percakapan panjang dan file yang disematkan diambil dari cache sehingga tidak dibaca ulang setiap giliran.";
 "Maintenance" = "Pemeliharaan";
 "Make images and edit them." = "Buat gambar dan edit mereka.";
 "Make songs and instrumentals." = "Buat lagu dan instrumental.";
@@ -514,6 +521,7 @@
 "Performance" = "Kinerja";
 "Pick a rating from 1 to 5 stars." = "Pilih penilaian dari 1 sampai 5 bintang.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pilih salah satu untuk diajak obrolan. Unduhan dimulai segera dan berlangsung di latar belakang.";
+"Picks a model that fits your Mac and turns on only what you choose." = "Memilih model yang sesuai dengan Mac Anda dan hanya mengaktifkan apa yang Anda pilih.";
 "Pin" = "Sematkan";
 "Pin %@" = "Pin %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: setiap obrolan proyek mendapatkan seluruh berkas (≈%@ token). Pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut selagi dipin.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Pemilih model, Mulai/Berhenti, profil, alat, dan suhu di atas obrolan dalam jendela terpisah. Mati: jendela hanya berisi obrolan dan percakapan — kontrol tersebut tetap di bar menu.";
 "The model reloads when the image or song is done" = "Model dimuat ulang ketika gambar atau lagu selesai";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Runtime model belum terpasang — jalankan satu model, lalu coba lagi.";
+"The model server no longer goes online when it starts." = "Server model tidak lagi online saat dimulai.";
 "The model's license, from its card." = "Lisensi model, dari model card.";
 "The music generator is busy -- try again once it's done." = "Generator musik sedang sibuk — coba lagi setelah selesai.";
 "The music generator is busy with another chat -- try again once it's done." = "Generator musik sedang sibuk dengan obrolan lain — coba lagi setelah selesai.";
@@ -876,6 +885,9 @@
 "What else" = "Lainnya";
 "What happened?" = "Apa yang terjadi?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Apa yang Anda lakukan, apa yang Anda harapkan, dan apa yang Anda lihat sebaliknya. Obrolan Anda tidak pernah disertakan.";
+"What's New" = "Apa yang Baru";
+"What's New in LLMTray %@" = "Apa yang Baru di LLMTray %@";
+"What's New…" = "Apa yang Baru…";
 "What's sent" = "Yang dikirim";
 "When a client asks for another model" = "Saat klien meminta model lain";
 "When an app asks for another model" = "Saat sebuah app meminta model lain";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "Bekerja secara offline";
 "Writing the song…" = "Menulis lagu…";
 "Yesterday" = "Kemarin";
 "You" = "Anda";

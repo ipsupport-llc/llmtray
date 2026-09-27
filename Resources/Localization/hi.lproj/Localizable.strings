@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 घंटा";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "कोई चैट फ़ोल्डर में देखने से पहले पूछता है और हर परिवर्तन को अनुमोदन के लिए एक योजना के रूप में दिखाता है। निजी स्थान (Library, keys, होम फ़ोल्डर स्वयं) कभी साझा नहीं होते।";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "एक चैट उन फ़ोल्डरों में देख सकता है जिन्हें आप अनुमति देते हैं और नए फ़ोल्डर, फ़ाइलें स्थानांतरित करने और नाम बदलने का सुझाव दे सकता है। आप हर बदलाव को अनुमोदित करते हैं और उसे पूर्ववत कर सकते हैं।";
 "A chat model" = "एक चैट मॉडल";
 "A client" = "एक क्लाइंट";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "अधिक भरा‑पूरा, अधिक तैयार सुनाई देने वाला मिक्स; गीत की पंक्तियाँ कम स्पष्ट होंगी। 30 s संगीत के लिए लगभग 20 s।";
@@ -64,6 +65,7 @@
 "About LLMTray" = "LLMTray के बारे में";
 "Add" = "जोड़ें";
 "Add Files…" = "फाइलें जोड़ें…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "एक परियोजना में PDF, Word और टेक्स्ट फ़ाइलें जोड़ें। इसकी चैट्स उन्हें खोजती हैं और पृष्ठ का हवाला देती हैं; किसी फ़ाइल को पिन करें ताकि उसकी पूरी सामग्री बातचीत में बनी रहे।";
 "Added here" = "यहाँ जोड़ा गया";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "जब भी टूल दिए जाते हैं, इसे सिस्टम प्रॉम्प्ट में जोड़ा जाता है। मॉडल का अपना टूल टेम्पलेट केवल यह बताता है कि टूल कैसे कॉल करना है, कब नहीं करना है यह नहीं। खाली रखने पर यह बंद रहता है।";
 "Adding files" = "फाइलें जोड़ रहा है";
@@ -189,6 +191,7 @@
 "Composing…" = "रचना हो रही है…";
 "Concurrent requests" = "समवर्ती अनुरोध";
 "Context" = "प्रसंग";
+"Continue" = "जारी रखें";
 "Copies %1$@ · index %2$@ on disk" = "कॉपी %1$@ · डिस्क पर इंडेक्स %2$@";
 "Copy" = "कॉपी करें";
 "Copy the details as text" = "विवरण को पाठ के रूप में कॉपी करें";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "Image generation के बाद chat मॉडल को पुनः लोड करना विफल रहा: %@";
 "Failed: %@" = "विफल: %@";
 "Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
+"Faster long chats" = "लंबी चैट तेज़ करें";
 "Fetching file list…" = "फ़ाइल सूची ले जा रही है…";
 "Files" = "Files";
 "Files Settings…" = "Files Settings…";
@@ -282,6 +286,7 @@
 "Finish" = "समाप्त";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish आपने जो चुना वह लागू करता है। आप बाद में Settings में सब बदल सकते हैं।";
 "First token" = "पहला Token";
+"First-run setup" = "पहली बार सेटअप";
 "Fits comfortably" = "आराम से फिट होता है";
 "Folder" = "फ़ोल्डर";
 "Folder access" = "फ़ोल्डर पहुँच";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "High quality (बड़ा कैनवास)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "सर्वोच्च निष्ठा, सबसे बड़ा डाउनलोड — एक विश्वसनीय correctness बेसलाइन।";
 "Hourly forecast" = "घंटाबंद पूर्वानुमान";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "उत्तर के नीचे जानकारी बटन पर होवर करें ताकि मॉडल, गति और उपयोग किया गया संदर्भ कितना था देखा जा सके।";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "संगीत कितना साहसी और अप्रत्याशित है। केवल turbo: sft में विविधता के लिए कोई song planner नहीं है।";
 "How do you like LLMTray?" = "आपको LLMTray कैसा लगा?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "हर चरण में कितने प्रॉम्प्ट टोकन प्रोसेस किए जाएँ। बड़ा मान लंबे प्रॉम्प्ट पर तेज़ होता है, लेकिन ज़्यादा मेमोरी उपयोग करता है। बेंचमार्क का auto-tune इसे चुन सकता है।";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "लोड हुआ: %1$@ · चयनित: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "पिछली बार उपयोग किया गया मॉडल तुरंत लोड करता है, ताकि Play दबाए बिना यह तैयार हो।";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "हर जनरेट किए गए टोकन को लॉग करता है (DEBUG)। केवल मॉडल प्रोसेस की समस्या सुलझाने के लिए — इससे गति धीमी होती है। अगली बार सर्वर शुरू होने पर लागू होगा।";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "लंबी बातचीत और पिन की गई फ़ाइलें हर बार फिर से पढ़ी जाने के बजाय कैश से आती हैं।";
 "Maintenance" = "रखरखाव";
 "Make images and edit them." = "इमेज बनाएं और संपादित करें।";
 "Make songs and instrumentals." = "गीत और वाद्य बनाएं।";
@@ -514,6 +521,7 @@
 "Performance" = "प्रदर्शन";
 "Pick a rating from 1 to 5 stars." = "1 से 5 सितारों में रेटिंग चुनें।";
 "Pick one to chat with. A download starts right away and goes on in the background." = "चैट करने के लिए किसी एक को चुनें। डाउनलोड तुरंत शुरू होगा और बैकग्राउंड में चलता रहेगा।";
+"Picks a model that fits your Mac and turns on only what you choose." = "आपके Mac के अनुकूल मॉडल चुनता है और केवल वही सुविधाएँ सक्रिय करता है जिन्हें आप चुनते हैं।";
 "Pin" = "पिन करें";
 "Pin %@" = "पिन करें %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "पिन करें: प्रोजेक्ट की हर चैट को पूरी फ़ाइल मिल जाएगी (≈%@ टोकन)। फ़ाइल पिन होने के दौरान उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद रहेगा।";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "अपने अलग विंडो में चैट के ऊपर मॉडल चयन, Start/Stop, प्रोफ़ाइल, टूल और तापमान दिखाएँ। बंद होने पर: विंडो केवल चैट और बातचीत होती है — ये नियंत्रण मेन्यू बार में रहते हैं।";
 "The model reloads when the image or song is done" = "इमेज या गीत पूरा होने पर मॉडल फिर से लोड होता है";
 "The model runtime isn't installed yet -- start a model once, then try again." = "मॉडल runtime अभी स्थापित नहीं है — एक बार मॉडल प्रारंभ करें, फिर पुनः प्रयास करें।";
+"The model server no longer goes online when it starts." = "मॉडल सर्वर अब शुरू होते समय ऑनलाइन नहीं जाता।";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
 "The music generator is busy -- try again once it's done." = "संगीत जेनरेटर व्यस्त है — पूरा होने के बाद पुनः प्रयास करें।";
 "The music generator is busy with another chat -- try again once it's done." = "संगीत जेनरेटर किसी अन्य चैट में व्यस्त है — पूरा होने पर पुनः प्रयास करें।";
@@ -876,6 +885,9 @@
 "What else" = "और क्या";
 "What happened?" = "क्या हुआ?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "आप क्या कर रहे थे, आपने क्या उम्मीद की थी, और इसके बजाय आपने क्या देखा। आपकी चैट कभी शामिल नहीं की जातीं।";
+"What's New" = "क्या नया है";
+"What's New in LLMTray %@" = "LLMTray %@ में क्या नया है";
+"What's New…" = "क्या नया…";
 "What's sent" = "जो भेजा जाता है";
 "When a client asks for another model" = "जब कोई क्लाइंट किसी अन्य मॉडल की मांग करे";
 "When an app asks for another model" = "जब कोई ऐप किसी अन्य मॉडल के लिए अनुरोध करे";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "ऑफ़लाइन काम करता है";
 "Writing the song…" = "गाना लिखा जा रहा है…";
 "Yesterday" = "कल";
 "You" = "आप";

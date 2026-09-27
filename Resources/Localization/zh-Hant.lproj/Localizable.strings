@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 小時";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天室在檢視資料夾前會先詢問，並將每項變更顯示為需您核可的計畫。私人位置（Library、keys、使用者主目錄本身）不會被分享。";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "對話可查看你允許的資料夾，並建議新增資料夾、移動或重新命名。你須核准每項變更，且可以復原。";
 "A chat model" = "聊天模型";
 "A client" = "用戶端";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "音色更豐滿、聽起來更完成；歌詞較不突出。生成約需 30 秒音樂的 20 秒。";
@@ -64,6 +65,7 @@
 "About LLMTray" = "關於 LLMTray";
 "Add" = "新增";
 "Add Files…" = "加入檔案…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "將 PDF、Word 與文字檔加入專案。對話會搜尋並引用頁面；將檔案釘選可將整個檔案保留在對話中。";
 "Added here" = "已新增於此處";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具時，一律加入系統提示。模型本身的工具範本只說明如何呼叫工具，從不說明何時不要呼叫。留空則停用。";
 "Adding files" = "加入檔案中";
@@ -189,6 +191,7 @@
 "Composing…" = "正在構思…";
 "Concurrent requests" = "並行要求數";
 "Context" = "上下文";
+"Continue" = "繼續";
 "Copies %1$@ · index %2$@ on disk" = "複製 %1$@ · 在磁碟上索引 %2$@";
 "Copy" = "拷貝";
 "Copy the details as text" = "將詳細資訊複製為文字";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "影像生成後重新載入聊天模型失敗：%@";
 "Failed: %@" = "失敗：%@";
 "Fast (smaller canvas)" = "快速（畫布較小）";
+"Faster long chats" = "加速長對話";
 "Fetching file list…" = "正在擷取檔案清單…";
 "Files" = "檔案";
 "Files Settings…" = "檔案設定…";
@@ -282,6 +286,7 @@
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "按「完成」會套用你的選擇。之後可在設定中變更。";
 "First token" = "首個標記";
+"First-run setup" = "初次設定";
 "Fits comfortably" = "可輕鬆容納";
 "Folder" = "資料夾";
 "Folder access" = "資料夾存取";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "高品質（畫布較大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高保真、下載量最大 — 可作為可靠的正確性基準。";
 "Hourly forecast" = "每小時預報";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "將滑鼠移至答案下方的資訊按鈕，可查看所用模型、速度與使用的上下文量。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音樂的冒險度與意外性。僅限 turbo：sft 無歌曲規劃器可變化。";
 "How do you like LLMTray?" = "您覺得 LLMTray 如何？";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "已載入：%1$@ · 已選擇：%2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "立即載入上次使用的模型，不必按下 Play 即可就緒。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "記錄每個產生的 token（DEBUG）。僅用於疑難排解模型程序 — 這會拖慢速度。下次啟動伺服器時生效。";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "長對話與釘選檔案會從快取讀取，而非每回合重新讀取。";
 "Maintenance" = "維護";
 "Make images and edit them." = "產生並編輯影像。";
 "Make songs and instrumentals." = "產生歌曲與純伴奏。";
@@ -514,6 +521,7 @@
 "Performance" = "效能";
 "Pick a rating from 1 to 5 stars." = "請選擇 1 至 5 星的評分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "選擇一個進行聊天。下載會立即開始並在背景進行。";
+"Picks a model that fits your Mac and turns on only what you choose." = "選擇適合你 Mac 的模型，並只啟用你選擇的功能。";
 "Pin" = "釘選";
 "Pin %@" = "釘選 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "釘選：專案中的每個對話會取得整個檔案（≈%@ 代幣）。檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "在獨立視窗的對話上方顯示模型選擇器、開始/停止、設定檔、工具與溫度。關閉時：視窗僅顯示對話內容；那些控制項保留在選單列。";
 "The model reloads when the image or song is done" = "影像或歌曲完成後模型會重新載入";
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型執行環境尚未安裝——請先啟動一個模型，然後再試一次。";
+"The model server no longer goes online when it starts." = "模型伺服器啟動時不再自動上線。";
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
 "The music generator is busy -- try again once it's done." = "音樂產生器正忙碌中 —— 完成後再試。";
 "The music generator is busy with another chat -- try again once it's done." = "音樂產生器正為其他聊天處理中 —— 完成後再試。";
@@ -876,6 +885,9 @@
 "What else" = "其他項目";
 "What happened?" = "發生了什麼？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "請說明您當時的操作、預期結果及實際看到的情形。您的對話絕不會包含在內。";
+"What's New" = "更新內容";
+"What's New in LLMTray %@" = "LLMTray %@ 的更新內容";
+"What's New…" = "查看更新…";
 "What's sent" = "傳送內容";
 "When a client asks for another model" = "當用戶端請求不同模型時";
 "When an app asks for another model" = "當應用程式要求其他模型時";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 尋找 MLX 模型的位置（每個模型一個檔案夾，例如 <org>/<name>）。將其指向 ~/.lmstudio/models 即可與 LM Studio 共用模型。";
 "Which model generates new images." = "用哪個模型來生成新圖片。";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "離線可用";
 "Writing the song…" = "正在譜曲與填詞…";
 "Yesterday" = "昨天";
 "You" = "你";

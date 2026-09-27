@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1時間";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "チャットはフォルダを参照する前に許可を求め、各変更を承認するための計画として表示します。Library、keys、ホームフォルダなどのプライベートな場所は共有されません。";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "チャットは許可したフォルダを参照し、新しいフォルダや移動、名前変更を提案できます。すべての変更はあなたが承認し、取り消せます。";
 "A chat model" = "チャット用モデル";
 "A client" = "クライアント";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
@@ -64,6 +65,7 @@
 "About LLMTray" = "LLMTrayについて";
 "Add" = "追加";
 "Add Files…" = "ファイルを追加…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF、Word、テキストファイルをプロジェクトに追加できます。チャットはそれらを検索してページを引用します。ファイルをピン留めすると会話内で全体を保持します。";
 "Added here" = "ここに追加済み";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "ツールが提供されるたびにシステムプロンプトへ追加されます。モデル自身のツールテンプレートはツールの呼び出し方法だけを示し、呼び出さない条件は示しません。空にすると無効になります。";
 "Adding files" = "ファイルを追加中";
@@ -189,6 +191,7 @@
 "Composing…" = "作成中…";
 "Concurrent requests" = "同時リクエスト数";
 "Context" = "コンテキスト";
+"Continue" = "続ける";
 "Copies %1$@ · index %2$@ on disk" = "コピー %1$@ · ディスク上のインデックス %2$@";
 "Copy" = "コピー";
 "Copy the details as text" = "詳細をテキストとしてコピーします。";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "画像生成後にチャットモデルの再読み込みに失敗しました: %@";
 "Failed: %@" = "失敗しました：%@";
 "Fast (smaller canvas)" = "高速（キャンバス小）";
+"Faster long chats" = "長いチャットを高速化";
 "Fetching file list…" = "ファイル一覧を取得しています…";
 "Files" = "Files";
 "Files Settings…" = "Files 設定…";
@@ -282,6 +286,7 @@
 "Finish" = "完了";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish で選択内容が適用されます。後で設定でいつでも変更できます。";
 "First token" = "最初のトークン";
+"First-run setup" = "初回設定";
 "Fits comfortably" = "余裕あり";
 "Folder" = "フォルダ";
 "Folder access" = "フォルダアクセス";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "高品質（キャンバス大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高の忠実度、ダウンロードは最大 — 信頼できる正確性のベースラインです。";
 "Hourly forecast" = "時間ごとの予報";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "回答の下にある情報ボタンにカーソルを合わせると、モデル、速度、使用したコンテキスト量が表示されます。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音楽の冒険性・予測不能さ。turboのみ適用：sftには曲のプランナーがありません。";
 "How do you like LLMTray?" = "LLMTrayのご感想をお聞かせください";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "読み込み済み: %1$@ · 選択: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "最後に使用したモデルをすぐに読み込み、Play を押さなくても使用できる状態にします。";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "生成されたすべてのトークンをログに記録します（DEBUG）。モデルプロセスのトラブルシューティング専用で、処理が遅くなります。次回のサーバ起動時に有効になります。";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "長い会話とピン留めファイルは毎ターン読み直されず、キャッシュから取得されます。";
 "Maintenance" = "メンテナンス";
 "Make images and edit them." = "画像を生成・編集します。";
 "Make songs and instrumentals." = "楽曲やインストゥルメンタルを作成します。";
@@ -514,6 +521,7 @@
 "Performance" = "パフォーマンス";
 "Pick a rating from 1 to 5 stars." = "1〜5の星から評価を選んでください。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "チャットするモデルを選んでください。選択するとすぐにダウンロードが開始され、バックグラウンドで進行します。";
+"Picks a model that fits your Mac and turns on only what you choose." = "あなたのMacに合ったモデルを選び、選択した機能だけを有効にします。";
 "Pin" = "ピン留め";
 "Pin %@" = "ピン留め %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "ピン留め: プロジェクト内のすべてのチャットがファイル全体を受け取ります（約 %@ トークン）。ピン留め中はそのチャットで Web 検索や画像・音楽生成は無効になります。";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "チャット上部にモデルピッカー、Start/Stop、プロファイル、ツール、温度を独立ウインドウで表示します。オフの場合はウインドウにチャットと会話のみが表示され、これらのコントロールはメニューバーに残ります。";
 "The model reloads when the image or song is done" = "画像または曲が完了したときにモデルを再読み込みします";
 "The model runtime isn't installed yet -- start a model once, then try again." = "モデルランタイムがまだインストールされていません。モデルを一度起動してから、もう一度お試しください。";
+"The model server no longer goes online when it starts." = "モデルサーバーは起動時にオンラインになりません。";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
 "The music generator is busy -- try again once it's done." = "音楽生成が使用中です。終了後にもう一度お試しください。";
 "The music generator is busy with another chat -- try again once it's done." = "音楽生成は別のチャットで使用中です。終了後にもう一度お試しください。";
@@ -876,6 +885,9 @@
 "What else" = "その他";
 "What happened?" = "何が起きましたか？";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "実行していた操作、期待した結果、実際に見た結果を記載してください。チャット内容は含まれません。";
+"What's New" = "新機能";
+"What's New in LLMTray %@" = "LLMTray %@ の新機能";
+"What's New…" = "新機能…";
 "What's sent" = "送信される内容";
 "When a client asks for another model" = "クライアントが別のモデルを要求したとき";
 "When an app asks for another model" = "アプリが別のモデルを要求したとき";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which model generates new images." = "どのモデルが新しい画像を生成するか。";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "オフラインで動作";
 "Writing the song…" = "楽曲を作成中…";
 "Yesterday" = "昨日";
 "You" = "あなた";

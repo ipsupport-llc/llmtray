@@ -46,6 +46,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 ora";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Una chat chiede prima di accedere a una cartella e mostra ogni modifica come un piano da approvare. Luoghi privati (Library, keys, la cartella Inizio) non sono mai condivisi.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Una chat può cercare nelle cartelle che autorizzi e proporre nuove cartelle, spostamenti e ridenominazioni. Approvi ogni modifica e puoi annullarla.";
 "A chat model" = "Un modello per chat";
 "A client" = "Un client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Un mix più pieno e rifinito; il testo risulta meno chiaro. Circa 20 s per 30 s di musica.";
@@ -64,6 +65,7 @@
 "About LLMTray" = "Informazioni su LLMTray";
 "Add" = "Aggiungi";
 "Add Files…" = "Aggiungi file…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Aggiungi PDF, file Word e file di testo a un progetto. Le chat li cercano e citano la pagina; fissa un file per mantenerlo tutto nella conversazione.";
 "Added here" = "Aggiunto qui";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Aggiunto al prompt di sistema ogni volta che vengono offerti strumenti. Il template per gli strumenti del modello indica solo come chiamare uno strumento, mai quando non farlo. Vuoto lo disabilita.";
 "Adding files" = "Aggiunta file";
@@ -189,6 +191,7 @@
 "Composing…" = "Componendo…";
 "Concurrent requests" = "Richieste simultanee";
 "Context" = "Contesto";
+"Continue" = "Continua";
 "Copies %1$@ · index %2$@ on disk" = "Copia %1$@ · indice %2$@ su disco";
 "Copy" = "Copia";
 "Copy the details as text" = "Copia i dettagli come testo";
@@ -271,6 +274,7 @@
 "Failed to reload the chat model after image generation: %@" = "Impossibile ricaricare il modello chat dopo la generazione immagini: %@";
 "Failed: %@" = "Non riuscito: %@";
 "Fast (smaller canvas)" = "Veloce (tela più piccola)";
+"Faster long chats" = "Chat lunghe più veloci";
 "Fetching file list…" = "Recupero elenco file…";
 "Files" = "Files";
 "Files Settings…" = "Impostazioni Files…";
@@ -282,6 +286,7 @@
 "Finish" = "Fine";
 "Finish applies what you chose. You can change all of it later in Settings." = "Fine applica le scelte. Potrai modificarle tutte più tardi in Impostazioni.";
 "First token" = "Primo token";
+"First-run setup" = "Configurazione iniziale";
 "Fits comfortably" = "Si adatta comodamente";
 "Folder" = "Cartella";
 "Folder access" = "Accesso cartella";
@@ -325,6 +330,7 @@
 "High quality (larger canvas)" = "Alta qualità (tela più grande)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Massima fedeltà, download più grande — baseline di correttezza di cui ti puoi fidare.";
 "Hourly forecast" = "Previsioni orarie";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "Passa il puntatore sul pulsante info sotto una risposta per vedere il modello, la velocità e quanto contesto ha usato.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Quanto la musica è audace e imprevedibile. solo turbo: sft non ha un pianificatore di brani per variare.";
 "How do you like LLMTray?" = "Come ti sembra LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Numero di token del prompt elaborati per passaggio. Un valore più alto è più veloce con prompt lunghi, ma usa più memoria. L’auto-regolazione del benchmark può sceglierlo automaticamente.";
@@ -399,6 +405,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Caricato: %1$@ · selezionato: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Carica subito il modello usato più di recente, così è pronto senza premere Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Registra ogni token generato (DEBUG). Solo per la risoluzione dei problemi del processo del modello: rallenta l’esecuzione. Ha effetto al prossimo avvio del server.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "Le conversazioni lunghe e i file fissati vengono letti dalla cache invece di essere riletti a ogni turno.";
 "Maintenance" = "Manutenzione";
 "Make images and edit them." = "Crea immagini e modificale.";
 "Make songs and instrumentals." = "Crea canzoni e brani strumentali.";
@@ -514,6 +521,7 @@
 "Performance" = "Prestazioni";
 "Pick a rating from 1 to 5 stars." = "Scegli una valutazione da 1 a 5 stelle.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Scegline uno per chattare. Il download inizia subito e prosegue in background.";
+"Picks a model that fits your Mac and turns on only what you choose." = "Sceglie un modello adatto al tuo Mac e attiva solo le opzioni che scegli.";
 "Pin" = "Fissa";
 "Pin %@" = "Appunta %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Appunta: tutte le chat del progetto ricevono il file completo (≈%@ token). La ricerca sul web e la generazione di immagini o musica sono disattivate in quelle chat finché è appuntato.";
@@ -756,6 +764,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Il selettore del modello, Start/Stop, profilo, strumenti e temperatura sopra la conversazione in una propria finestra. Off: la finestra contiene solo le conversazioni — quei controlli restano nella barra dei menu.";
 "The model reloads when the image or song is done" = "Il modello viene ricaricato quando l&apos;immagine o la canzone è completa";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Il runtime del modello non è ancora installato — avvia un modello una volta, quindi riprova.";
+"The model server no longer goes online when it starts." = "Il server del modello non va più online all'avvio.";
 "The model's license, from its card." = "La licenza del modello, dalla sua model card.";
 "The music generator is busy -- try again once it's done." = "Il generatore musicale è occupato — riprova quando avrà terminato.";
 "The music generator is busy with another chat -- try again once it's done." = "Il generatore musicale è occupato con un'altra chat — riprova quando avrà terminato.";
@@ -876,6 +885,9 @@
 "What else" = "Altro";
 "What happened?" = "Cosa è successo?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "Cosa stavi facendo, cosa ti aspettavi e cosa hai visto invece. Le tue chat non sono mai incluse.";
+"What's New" = "Novità";
+"What's New in LLMTray %@" = "Novità in LLMTray %@";
+"What's New…" = "Novità…";
 "What's sent" = "Cosa viene inviato";
 "When a client asks for another model" = "Quando un client richiede un altro modello";
 "When an app asks for another model" = "Quando un'app richiede un altro modello";
@@ -884,6 +896,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Posizione in cui LLMTray cerca i modelli MLX (una cartella per modello, ad es. <org>/<name>). Impostala su ~/.lmstudio/models per condividere i modelli con LM Studio.";
 "Which model generates new images." = "Quale modello genera nuove immagini.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "Funziona offline";
 "Writing the song…" = "Scrittura della canzone…";
 "Yesterday" = "Ieri";
 "You" = "Tu";
