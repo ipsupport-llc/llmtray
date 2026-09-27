@@ -50,12 +50,18 @@ public final class CappedZip {
     /// `allowEmbedded`: an archive under `embeddings/` passes (counted, never opened).
     @discardableResult
     public func read(_ e: Entry, keep: Bool = true, allowEmbedded: Bool = false) throws -> Data {
+        try part(e, keep: keep, allowEmbedded: allowEmbedded).data
+    }
+
+    /// The part (when `keep`) and its first bytes. `counted: false` is a
+    /// second read of a part already counted against the total.
+    private func part(_ e: Entry, keep: Bool, allowEmbedded: Bool = false, counted: Bool = true) throws -> (data: Data, head: Data) {
         if e.flags & 1 != 0 { throw ExtractionError.encrypted }
         if e.declaredSize > caps.maxZipPartBytes { throw ExtractionError.tooLarge(.zipPart) }
         let start = try dataStart(of: e)
         let end = start + e.compressedSize
         guard end <= data.count else { throw Self.corrupt("\(e.name) runs past the end (truncated?)") }
-        let room = caps.maxZipTotalBytes - inflatedTotal
+        let room = counted ? caps.maxZipTotalBytes - inflatedTotal : caps.maxZipPartBytes
         let out: Data
         let head: Data
         let produced: Int
@@ -64,33 +70,42 @@ public final class CappedZip {
             if e.compressedSize > caps.maxZipPartBytes { throw ExtractionError.tooLarge(.zipPart) }
             if e.compressedSize > room { throw ExtractionError.tooLarge(.zipTotal) }
             out = keep ? data.subdata(in: start..<end) : Data()
-            head = data.subdata(in: start..<min(end, start + 8))
+            head = data.subdata(in: start..<min(end, start + 64))
             produced = e.compressedSize
         case 8:
             (out, head, produced) = try inflate(e, from: start, to: end, room: room, keep: keep)
         default:
             throw Self.corrupt("\(e.name) uses compression method \(e.method)")
         }
-        inflatedTotal += produced
+        if counted { inflatedTotal += produced }
         if Self.isArchive(head) && !(allowEmbedded && Self.isEmbedding(e.name)) {
             throw Self.corrupt("\(e.name) is a nested archive")
         }
-        return out
+        return (out, head)
     }
 
-    /// Inflates (counting only) every part, and hands each XML part to
-    /// `XMLPartCheck` -- what has to pass before `NSAttributedString` sees it.
-    /// `allowExternalDoctype`: ODF (see XMLPartCheck).
-    public func checkAll(allowExternalDoctype: Bool = false) throws {
+    /// Inflates every part, and hands each XML part to `XMLPartCheck` --
+    /// what has to pass before `NSAttributedString` sees it. XML by its name
+    /// (.xml, .rels, .vml) or by its content (a part outside media/ starting
+    /// with "<", whatever it's called); the rest is only counted. `odf`: the manifest
+    /// may carry the bare external DOCTYPE ODF writers put there, nothing else.
+    public func checkAll(odf: Bool = false) throws {
         for e in entries {
             let lower = e.name.lowercased()
-            if lower.hasSuffix(".xml") || lower.hasSuffix(".rels") {
-                try XMLPartCheck.check(try read(e), part: e.name, maxDepth: caps.maxXMLDepth,
-                                       allowExternalDoctype: allowExternalDoctype)
-            } else {
-                try read(e, keep: false, allowEmbedded: true)
-            }
+            let named = [".xml", ".rels", ".vml"].contains { lower.hasSuffix($0) }
+            let (data, head) = try part(e, keep: named, allowEmbedded: true)
+            // Images (an SVG with its DOCTYPE) aren't parsed as XML by the importer.
+            let media = lower.split(separator: "/").dropLast().contains { $0 == "media" || $0 == "pictures" }
+            guard named || (!media && Self.looksLikeXML(head)) else { continue }
+            try XMLPartCheck.check(named ? data : try part(e, keep: true, counted: false).data, part: e.name,
+                                   maxDepth: caps.maxXMLDepth, allowExternalDoctype: odf && e.name == "META-INF/manifest.xml")
         }
+    }
+
+    static func looksLikeXML(_ head: Data) -> Bool {
+        let bytes = head.starts(with: [0xEF, 0xBB, 0xBF]) ? head.dropFirst(3) : head[...]
+        guard let first = bytes.first(where: { $0 != 0x20 && $0 != 0x09 && $0 != 0x0A && $0 != 0x0D }) else { return false }
+        return first == 0x3C
     }
 
     // MARK: Layout
@@ -147,11 +162,15 @@ public final class CappedZip {
         guard cdOffset + cdSize <= eocd else { throw corrupt("central directory past its end (truncated?)") }
         var entries: [Entry] = []
         var names = Set<String>()
+        // The records must fill the directory exactly: none past its end, none
+        // hidden after the count.
+        let cdEnd = cdOffset + cdSize
         var p = cdOffset
         for _ in 0..<count {
-            guard try u32(data, p) == 0x0201_4B50 else { throw corrupt("bad central directory entry") }
+            guard p + 46 <= cdEnd, try u32(data, p) == 0x0201_4B50 else { throw corrupt("bad central directory entry") }
             let nameLength = try u16(data, p + 28)
-            guard p + 46 + nameLength <= data.count else { throw corrupt("name past the end") }
+            let recordEnd = p + 46 + nameLength + (try u16(data, p + 30)) + (try u16(data, p + 32))
+            guard recordEnd <= cdEnd else { throw corrupt("central directory entry past its end") }
             let name = String(decoding: data[(p + 46)..<(p + 46 + nameLength)], as: UTF8.self)
             let e = Entry(name: name, method: try u16(data, p + 10), flags: try u16(data, p + 8),
                           compressedSize: try u32(data, p + 20), declaredSize: try u32(data, p + 24),
@@ -164,8 +183,9 @@ public final class CappedZip {
                 throw corrupt("zip64 is not supported")
             }
             entries.append(e)
-            p += 46 + nameLength + (try u16(data, p + 30)) + (try u16(data, p + 32))
+            p = recordEnd
         }
+        guard p == cdEnd else { throw corrupt("central directory holds more than its \(count) entries") }
         // Each entry's local header and data must lie apart from every other's:
         // overlapping entries are how a small file claims many large parts.
         let byOffset = entries.sorted { $0.localHeaderOffset < $1.localHeaderOffset }
@@ -194,7 +214,7 @@ public final class CappedZip {
         let method = try Self.u16(data, lh + 8)
         let compressed = try Self.u32(data, lh + 18)
         let declared = try Self.u32(data, lh + 22)
-        var agrees = method == e.method && (flags & 1) == (e.flags & 1)
+        var agrees = method == e.method && (flags & 9) == (e.flags & 9)   // encryption, data descriptor
         if flags & 8 == 0 { agrees = agrees && compressed == e.compressedSize && declared == e.declaredSize }
         guard agrees else { throw Self.corrupt("local header of \(e.name) disagrees with the central directory") }
         if try Self.hasZip64Extra(data, from: lh + 30 + nameLength, length: extraLength) { throw Self.corrupt("zip64 is not supported") }
@@ -234,7 +254,7 @@ public final class CappedZip {
                 let produced = chunk - stream.pointee.dst_size
                 if total + produced > limit { throw overLimit(total + produced) }
                 if keep { out.append(dst, count: produced) }
-                if head.count < 8 { head.append(dst, count: min(produced, 8 - head.count)) }
+                if head.count < 64 { head.append(dst, count: min(produced, 64 - head.count)) }
                 total += produced
                 if status == COMPRESSION_STATUS_END { break }
                 if status == COMPRESSION_STATUS_ERROR { throw Self.corrupt("\(e.name) has corrupt deflate data") }

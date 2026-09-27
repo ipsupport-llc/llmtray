@@ -166,6 +166,48 @@ final class CappedZipTests: XCTestCase {
         assertUnreadable("disagrees") { try CappedZip(data: sizes.finish(), caps: caps()).checkAll() }
     }
 
+    func testCentralDirectoryMustHoldExactlyItsEntries() {
+        // Two records, the end record claiming one: the second would go unchecked.
+        let z = TestZip()
+        z.add("a.xml", "<a/>")
+        z.add("b.xml", "<!DOCTYPE b [<!ENTITY x 'y'>]><b>&x;</b>")
+        z.endRecordCount = 1
+        assertUnreadable("more than") { _ = try CappedZip(data: z.finish(), caps: caps()) }
+    }
+
+    func testDataDescriptorBitMustAgree() {
+        let z = TestZip()
+        z.addRaw("a.xml", method: 0, payload: Data("<a/>".utf8), size: 4, crc: 0, localFlags: 8)
+        assertUnreadable("disagrees") { try CappedZip(data: z.finish(), caps: caps()).checkAll() }
+    }
+
+    func testXMLFoundByContentAndVML() {
+        let hostile = "<?xml version='1.0'?><!DOCTYPE v [<!ENTITY x 'y'>]><v>&x;</v>"
+        for name in ["word/drawing.vml", "word/strange.bin", "customXml/item1", "word/media/x.xml"] {
+            let z = TestZip()
+            z.add(name, hostile)
+            assertUnreadable("DOCTYPE") { try CappedZip(data: z.finish(), caps: caps()).checkAll() }
+        }
+        // A PNG, or an SVG with its DOCTYPE among the images, stays a counted blob.
+        let svg = TestZip()
+        svg.add("word/media/image2.svg", "<?xml version='1.0'?><!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'svg11.dtd'><svg/>")
+        XCTAssertNoThrow(try CappedZip(data: svg.finish(), caps: caps()).checkAll())
+        let png = TestZip()
+        png.add("word/media/image1.png", Data([0x89, 0x50, 0x4E, 0x47]) + Data(count: 100))
+        XCTAssertNoThrow(try CappedZip(data: png.finish(), caps: caps()).checkAll())
+    }
+
+    func testODFExternalDoctypeOnlyOnTheManifest() {
+        let doctype = "<?xml version=\"1.0\"?><!DOCTYPE m PUBLIC \"-//OpenOffice.org//DTD Manifest 1.0//EN\" \"Manifest.dtd\"><m/>"
+        let manifest = TestZip()
+        manifest.add("META-INF/manifest.xml", doctype)
+        XCTAssertNoThrow(try CappedZip(data: manifest.finish(), caps: caps()).checkAll(odf: true))
+        assertUnreadable("DOCTYPE") { try CappedZip(data: manifest.finish(), caps: caps()).checkAll() }
+        let content = TestZip()
+        content.add("content.xml", doctype)
+        assertUnreadable("DOCTYPE") { try CappedZip(data: content.finish(), caps: caps()).checkAll(odf: true) }
+    }
+
     func testZip64ExtraFieldIsRefused() {
         let z = TestZip()
         z.addRaw("a.xml", method: 0, payload: Data("<a/>".utf8), size: 4, crc: 0,

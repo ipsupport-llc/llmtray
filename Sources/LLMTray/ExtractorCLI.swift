@@ -135,7 +135,7 @@ private struct Extractor {
         case .docx, .odt:
             // NSAttributedString unzips by itself, uncapped: every part goes
             // through the capped reader (and XML parts its checks) first.
-            try CappedZip(data: data, caps: caps).checkAll(allowExternalDoctype: kind == .odt)
+            try CappedZip(data: data, caps: caps).checkAll(odf: kind == .odt)
             try attributed(data, kind: kind)
         case .doc, .rtf:
             try attributed(data, kind: kind)

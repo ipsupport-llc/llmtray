@@ -5,8 +5,9 @@ import Foundation
 /// fetches external entities, but a DOCTYPE is the only door to both: OOXML
 /// parts never carry one, so any is refused there. ODF writers (Apple's
 /// among them) do put a bare external DOCTYPE on META-INF/manifest.xml, so
-/// `allowExternalDoctype` lets one without an internal subset through -- no
-/// entity can be declared without one, and none is fetched. Parts must be
+/// `allowExternalDoctype` lets one without an internal subset through
+/// there only (CappedZip) -- the parser fetches no DTD, and the manifest
+/// isn't what the importer reads text from. Parts must be
 /// UTF-8 (a NUL byte refuses them): the writers use it, and the scan then
 /// can't be dodged by UTF-16 or UTF-32. Nesting is capped (the parser went
 /// 200,000 levels deep without complaint).
