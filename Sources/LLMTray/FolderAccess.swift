@@ -203,11 +203,12 @@ final class FolderAccessPrompt: ObservableObject, Identifiable {
     }
 
     func resolve(_ choice: GrantChoice?) {
+        error = nil
         if let choice { onAnswer?(choice) }
         continuation?.resume(returning: choice)
         continuation = nil
-        // Not while its grant failed: the card says why.
-        if error == nil { onDone?() }
+        // Not while its grant failed (the card says why); Cancel always closes it.
+        if choice == nil || error == nil { onDone?() }
     }
 }
 
