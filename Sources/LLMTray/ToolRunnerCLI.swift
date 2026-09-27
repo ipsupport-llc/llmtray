@@ -18,7 +18,12 @@ enum ToolRunnerCLI {
             }
             let toolbox = ChatToolbox()
             toolbox.stats = .inMemory()
-            let out: [String: Any] = ["tools": toolbox.definitions(for: settings), "tool_use_policy": Profile.defaultToolUsePolicy]
+            var tools = toolbox.definitions(for: settings)
+            // project_files as a project with searchable files declares it
+            // (it isn't a switch: it follows the chat's project).
+            if !defaultToolsOnly, let files = ProjectFiles.definition(for: .all) { tools.append(files) }
+            let modes = ["all": ProjectFiles.definition(for: .all) ?? [:], "listing": ProjectFiles.definition(for: .listing) ?? [:]]
+            let out: [String: Any] = ["tools": tools, "tool_use_policy": Profile.defaultToolUsePolicy, "project_files_modes": modes]
             if let data = try? JSONSerialization.data(withJSONObject: out, options: [.prettyPrinted, .sortedKeys]) {
                 print(String(decoding: data, as: UTF8.self))
             }

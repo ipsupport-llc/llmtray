@@ -137,6 +137,34 @@ is unread ("insufficient coverage") rather than summarise pages it
 hasn't seen; whole-document summaries are a later feature (per-document
 summary chunks, v3).
 
+Built (PR 3.4b-ii, `LLMTrayCore.ProjectFiles` / `ProjectFilesService`,
+the app's `ProjectFilesTool`): the turn's start reads the project's
+`ProjectIndexSummary` (read-only, a closed project not opened) into
+`ProjectContext.files`, and `ProjectFilesMode` picks none / listing /
+all. Declared: 105 tokens with every mode, 44 for the listing alone
+(Gemma 4 tokenizer, compact JSON); the tool-use rule's sentence ("Cite
+project_files text as [doc:page] and say what you haven't read") is 20
+more, an unedited Default upgraded as before. Read leniently with aliases
+(`q`, `file`/`document`, `page`, `next`...) and `top_k` (≤ 10) taken but
+never declared; `pages` is "3", "3-5", "3..5", "p. 3", "5-", "all". A read
+is sized from the room the next request has (measured before the call),
+so it stops where its cursor (`doc:page:offset:last`, code points into
+`pages.text`) continues -- never cut by the chat's fitting; the listing
+pages by `list:N` (N the next file's id, so a file removed or added
+between calls doesn't shift the rest). The cursor carries the revision (`doc:rev:page:offset:last`): a
+file indexed again meanwhile is read again from its page, and a read
+piece's id names its range, so a re-read under another budget isn't
+taken for "shown earlier". Once no room is left the tool isn't declared
+at all rather than as the listing: the request only grows within a turn,
+so the listing would find no room either. A query embeds through the shared runner (`.query`,
+ahead of index batches) within 15 s; not installed, paused by a
+generation, failing, too slow, another model's vectors, or nothing
+embedded yet (the runner then isn't started) → words only, said in the
+result. A chip opens the copy (or linked file) with `NSWorkspace` --
+macOS has no page anchor for a file opened in its app, so the chip names
+the page -- and says when the revision changed or the file is gone. A
+search hit's neighbour chunk isn't added yet.
+
 **Budget.** Nothing in the chat counts prompt tokens today (auto-compact
 counts messages). An estimator in LLMTrayCore counts the whole
 serialized request in UTF-8 bytes and converts with a ratio calibrated

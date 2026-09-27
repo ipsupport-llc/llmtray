@@ -48,6 +48,8 @@ struct ContentView: View {
     @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     @State private var chatViewportHeight: CGFloat = 380
+    /// What a citation chip found: the file changed since, or gone.
+    @State private var citationNote: String?
 
     var body: some View {
         Group {
@@ -225,6 +227,31 @@ struct ContentView: View {
         return results
     }
 
+    /// A citation chip (adr/0012): the cited file opens -- the project's
+    /// copy, or the linked file -- saying so when it changed since that
+    /// answer; one no longer there only says so. macOS has no page anchor
+    /// for a file opened in its app (Preview ignores one): it opens at its
+    /// start, the chip naming the page.
+    private func openCitation(_ c: Citation) {
+        Task { @MainActor in
+            let target: CitationTarget = ChatLibraryStore.shared.library.project(c.project) == nil
+                ? .gone : await ProjectIndexer.citationTarget(c)
+            let note: String?
+            switch target {
+            case .gone:
+                note = String(format: NSLocalizedString("\"%@\" is no longer in the project.", comment: "citation chip: the cited file was removed"), c.name)
+            case .file(let url, let page, let changed):
+                NSWorkspace.shared.open(url)
+                note = changed ? String(format: NSLocalizedString("\"%@\" has changed since this answer cited it: page %lld may read differently now.",
+                                                                  comment: "citation chip: the cited file was re-indexed"), c.name, page) : nil
+            }
+            citationNote = note
+            guard let note else { return }
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            if citationNote == note { citationNote = nil }
+        }
+    }
+
     private var chatArea: some View {
         // Once per evaluation, not per message (it scans the whole history).
         let results = showToolCalls ? toolResults : nil
@@ -256,7 +283,7 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
-                                      citations: citations[msg.id] ?? [],
+                                      citations: citations[msg.id] ?? [], openCitation: { openCitation($0) },
                                       regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
                                       draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)
@@ -276,6 +303,11 @@ struct ContentView: View {
                         Text(err)
                             .font(.system(size: 11))
                             .foregroundColor(.red)
+                    }
+                    if let note = citationNote {
+                        Text(note)
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
                     }
                     // Where the bottom of the content is, relative to the
                     // viewport: tells whether the user is reading the end.

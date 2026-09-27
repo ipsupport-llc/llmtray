@@ -42,6 +42,16 @@ struct ToolContext {
     /// Every image in this conversation, attached or generated, oldest
     /// first (edit_image).
     var chatImages: [(data: Data, prompt: String)] = []
+    /// The chat the call is for (nil: a temporary chat): a project tool
+    /// checks it's still in the turn's project.
+    var chat: UUID? = nil
+    /// Bytes of file text the next request has room for (ProjectTextBudget),
+    /// measured before the call: a project tool sizes its answer to it, so
+    /// a cut read's cursor points where the text stopped. nil: the hard cap.
+    var projectTextBytes: Int? = nil
+    /// False once a result found no room this turn: a project tool answers
+    /// with its listing only (set by ChatToolbox).
+    var fileTextAllowed = true
 }
 
 /// One tool the in-app chat offers the model: its declaration, when it's
@@ -99,6 +109,10 @@ final class ChatToolbox {
         "get_air_quality": ("get_weather", ["kind": "air"]),
         "get_sunrise_sunset": ("get_weather", ["kind": "sun"]),
         "get_public_holidays": ("get_country_info", ["about": "holidays"]),
+        // The three project tools first planned (adr/0012), one tool now.
+        "search_project_files": (ProjectFiles.toolName, [:]),
+        "read_project_file": (ProjectFiles.toolName, [:]),
+        "list_project_files": (ProjectFiles.toolName, [:]),
     ]
 
     /// A call as read: the tool it means, its arguments, what was fixed and
@@ -117,7 +131,7 @@ final class ChatToolbox {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         musicGeneration = MusicToolRunner(music: music ?? MusicManager())
         tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
-            + ToolCatalog.makeTools()
+            + ToolCatalog.makeTools() + [ProjectFilesTool()]
     }
 
     func register(_ tool: ChatTool) {
@@ -189,8 +203,10 @@ final class ChatToolbox {
         // file text once there's no room for it.
         let allowGuarded = ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn)
         return tools.compactMap { tool -> [String: Any]? in
-            guard tool.isOffered(settings), !spent.contains(tool.name),
-                  !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
+            guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
+            // project_files by its mode (none once there's no room for file text).
+            if let files = tool as? ProjectFilesTool { return files.definition(for: settings, fileTextAllowed: !fileTextRoomSpent) }
+            guard !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
             // A tool of several switches: its modes that may run now (the
             // local time stays after file text, the city lookup doesn't).
             if let selectable = tool as? SelectableTool { return selectable.definition(for: settings, allowGuarded: allowGuarded) }
@@ -245,7 +261,7 @@ final class ChatToolbox {
     /// A project tool's output as its tool result: at most its share of the
     /// room the next request has (`requestTokens`, the estimate of it so
     /// far), pieces sent earlier in this turn only named. With no safe
-    /// room, the tool says so and search/read are no longer declared.
+    /// room, the tool says so and file-text tools (project_files) are no longer declared.
     func fitProjectResult(_ output: ProjectToolOutput, tool name: String, requestTokens: Int,
                           settings: ChatSettings) -> (text: String, returned: [Citation]) {
         guard let tokens = ProjectTextBudget.allowance(contextTokens: settings.maxTokensCap, requestTokens: requestTokens,
@@ -285,6 +301,8 @@ final class ChatToolbox {
             // Whatever it answers -- file names count as file text too.
             defer { projectTextThisTurn = true }
             if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
+            var context = context
+            context.fileTextAllowed = !fileTextRoomSpent
             return finish(await tool.run(arguments.values, context: context))
         }
         // generate_image, edit_image and generate_music explain their own refusals (the model often keeps
@@ -323,7 +341,7 @@ final class ChatToolbox {
         switch result {
         case .refused: return .refused
         case .text(let text):
-            if SelectableTool.isError(text) { return .error("failed") }
+            if SelectableTool.isError(text) || text.hasPrefix(ProjectFiles.toolName + ":") { return .error("failed") }
             // The generators' and view_image's plain-text failures.
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success

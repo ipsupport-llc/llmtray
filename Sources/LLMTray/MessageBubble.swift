@@ -17,8 +17,8 @@ struct MessageBubble: View {
     var sources: [String] = []
     /// The project file pages this answer cites (adr/0012), one chip each.
     var citations: [Citation] = []
-    /// Opens a cited file at its page; nil until project files can be
-    /// opened (the chips are shown, not clickable).
+    /// Opens a cited file (ContentView.openCitation); nil: the chips are
+    /// shown, not clickable.
     var openCitation: ((Citation) -> Void)?
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.

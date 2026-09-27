@@ -11,7 +11,9 @@
   counters, the app-wide `GenerationQueue` and unloading the chat model,
   results that are an image or a song for the chat, not text.
 - **One registry.** `ChatToolbox` holds generate_image, edit_image,
-  view_image, generate_music and `ToolCatalog.makeTools()`; `ToolCatalog`
+  view_image, generate_music, `ToolCatalog.makeTools()` and project_files
+  (declared by the chat's project, not a switch:
+  [0012](0012-project-files-rag.md)); `ToolCatalog`
   lists the selectable switches for Settings and the popover (title,
   globe = network, data credit). Per profile: `tools.enabledTools`,
   default the local ones only (`get_current_date`, `calculate`). Logic

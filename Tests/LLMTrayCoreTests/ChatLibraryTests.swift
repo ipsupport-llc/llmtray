@@ -163,7 +163,7 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertNil(library.projectContext(forChat: chat), "in no project")
         library.move(chat, to: a.id)
         XCTAssertEqual(library.projectContext(forChat: chat),
-                       ProjectContext(id: a.id, name: "a", instructions: "Be brief.", hasSearchableFiles: false))
+                       ProjectContext(id: a.id, name: "a", instructions: "Be brief."))
         library.move(chat, to: b.id)
         XCTAssertEqual(library.projectContext(forChat: chat)?.id, b.id, "moved: the other project")
         XCTAssertEqual(library.projectContext(forChat: chat)?.instructions, "")
