@@ -43,10 +43,13 @@ struct PersistedMessage: Codable {
     // An answer's citations of project files (see ChatMessage.citations);
     // nil, and not written, when it has none.
     var citations: [Citation]?
+    // See ChatMessage.answerStats; nil, and not written, when unknown.
+    var answerStats: AnswerStats?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
+        case answerStats
     }
 
     init(
@@ -83,6 +86,7 @@ struct PersistedMessage: Codable {
         imageSources = try c.decodeIfPresent([MediaSource].self, forKey: .imageSources) ?? []
         audioSources = try c.decodeIfPresent([MediaSource].self, forKey: .audioSources) ?? []
         citations = try c.decodeIfPresent([Citation].self, forKey: .citations)
+        answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
     }
 }
 

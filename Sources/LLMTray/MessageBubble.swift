@@ -171,6 +171,10 @@ struct MessageBubble: View {
                 Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
             }
             .buttonStyle(.plain)
+            // How the answer was made: an LLM text answer's, when known.
+            if !isUser, let stats = message.answerStats {
+                AnswerInfoButton(id: message.id, stats: stats)
+            }
         }
         .foregroundColor(.secondary)
         .padding(.horizontal, 4)

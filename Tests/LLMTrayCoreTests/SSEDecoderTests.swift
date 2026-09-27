@@ -52,7 +52,13 @@ final class SSEDecoderTests: XCTestCase {
         var d = SSEDecoder()
         let line = #"data: {"id":"x","object":"chat.completion","choices":[],"#
             + #""usage":{"prompt_tokens":1834,"completion_tokens":57,"total_tokens":1891,"prompt_tokens_details":{"cached_tokens":1800}}}"#
-        XCTAssertEqual(d.feed(line + "\n"), [.usage(completionTokens: 57, promptTokens: 1834)])
+        XCTAssertEqual(d.feed(line + "\n"), [.usage(completionTokens: 57, promptTokens: 1834, cachedTokens: 1800)])
+    }
+
+    func testUsageChunkWithReasoningTokens() {
+        var d = SSEDecoder()
+        let line = #"data: {"choices":[],"usage":{"prompt_tokens":10,"completion_tokens":57,"completion_tokens_details":{"reasoning_tokens":40}}}"#
+        XCTAssertEqual(d.feed(line + "\n"), [.usage(completionTokens: 57, promptTokens: 10, reasoningTokens: 40)])
     }
 
     func testContentArrayWithInlineImageOnly() {

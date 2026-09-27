@@ -83,6 +83,9 @@ struct ChatMessage: Identifiable, Equatable {
     // turn's answer may cite. In memory only, like the tool message. On a
     // user message: the pages its turn's requests carry pinned.
     var returnedCitations: [Citation] = []
+    // How an LLM text answer was made (its info popover): the turn's
+    // requests, set when the turn ends. Saved with the session.
+    var answerStats: AnswerStats?
 }
 
 extension ChatMessage {
@@ -195,9 +198,12 @@ struct ChatSettings {
     /// The chat as the folder tools know it (adr/0014), set when the turn
     /// starts while the feature is on; nil: no folder tool is declared.
     var folders: FolderChat?
+    /// The profile's name, for an answer's details.
+    var profileName: String?
 
     /// The chat settings a model's profile resolves to.
     init(profile p: ResolvedProfile, maxTokensCap: Int) {
+        profileName = p.profileName
         temperature = p.temperature
         topP = p.topP
         topK = p.topK
