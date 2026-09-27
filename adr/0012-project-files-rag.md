@@ -150,7 +150,12 @@ never declared; `pages` is "3", "3-5", "3..5", "p. 3", "5-", "all". A read
 is sized from the room the next request has (measured before the call),
 so it stops where its cursor (`doc:page:offset:last`, code points into
 `pages.text`) continues -- never cut by the chat's fitting; the listing
-pages by `list:N`. A query embeds through the shared runner (`.query`,
+pages by `list:N`. The cursor carries the revision (`doc:rev:page:offset:last`): a
+file indexed again meanwhile is read again from its page, and a read
+piece's id names its range, so a re-read under another budget isn't
+taken for "shown earlier". Once no room is left the tool isn't declared
+at all rather than as the listing: the request only grows within a turn,
+so the listing would find no room either. A query embeds through the shared runner (`.query`,
 ahead of index batches) within 15 s; not installed, paused by a
 generation, failing, too slow, another model's vectors, or nothing
 embedded yet (the runner then isn't started) → words only, said in the

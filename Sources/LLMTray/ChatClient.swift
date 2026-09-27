@@ -487,15 +487,16 @@ final class ChatClient: ObservableObject {
     /// main thread, while the turn already shows as busy. A Stop or another
     /// chat meanwhile drops it.
     private func startTurn(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
-        var settings = withProject(settings)
-        guard let project = settings.project, ProjectIndexer.shared.isEnabled else {
-            return startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
+        let base = withProject(settings)
+        guard let project = base.project, ProjectIndexer.shared.isEnabled else {
+            return startAssistantResponse(port: port, modelAlias: modelAlias, settings: base, server: server)
         }
         isStreaming = true
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             let files = await ProjectIndexer.shared.summary(for: project.id)
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
+            var settings = base
             settings.project?.files = files
             self.startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
         }

@@ -24,10 +24,11 @@ final class ProjectFilesTool: ChatTool {
 
     func isOffered(_ settings: ChatSettings) -> Bool { mode(settings) != .none }
 
-    /// The turn's mode; the listing alone once no room is left for file text.
+    /// The turn's mode; not declared at all once no room is left for file
+    /// text -- the request only grows within a turn, so even the listing
+    /// would find none (a call anyway gets the no-room answer).
     func definition(for settings: ChatSettings, fileTextAllowed: Bool) -> [String: Any]? {
-        let mode = mode(settings)
-        return ProjectFiles.definition(for: fileTextAllowed || mode == .none ? mode : .listing)
+        fileTextAllowed ? ProjectFiles.definition(for: mode(settings)) : nil
     }
 
     func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {

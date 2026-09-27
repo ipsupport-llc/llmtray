@@ -66,28 +66,39 @@ public enum ProjectFiles {
         case read(ReadCursor)
     }
 
-    /// Where a read continues: `doc`, from `offset` (code points) of `page`,
-    /// through `last`. As text `3:12:450:20` -- what a cut result hands back.
+    /// Where a read continues: `doc` at revision `rev`, from `offset` (code
+    /// points) of `page`, through `last`. As text `3:1:12:450:20` -- what a
+    /// cut result hands back (`doc:page:offset:last` without the revision
+    /// reads the current one). An offset is only meaningful in the revision
+    /// it was counted in: a file re-indexed since is read again from a page.
     public struct ReadCursor: Equatable, Sendable {
         public var doc: Int64
+        public var rev: Int64?
         public var page: Int
         public var offset: Int
         public var last: Int
 
-        public init(doc: Int64, page: Int, offset: Int = 0, last: Int) {
+        public init(doc: Int64, rev: Int64? = nil, page: Int, offset: Int = 0, last: Int) {
             self.doc = doc
+            self.rev = rev
             self.page = page
             self.offset = offset
             self.last = last
         }
 
-        public var text: String { "\(doc):\(page):\(offset):\(last)" }
+        public var text: String { rev.map { "\(doc):\($0):\(page):\(offset):\(last)" } ?? "\(doc):\(page):\(offset):\(last)" }
 
         public init?(_ text: String) {
-            let parts = text.trimmingCharacters(in: .whitespaces).split(separator: ":", omittingEmptySubsequences: false)
+            var parts = text.trimmingCharacters(in: .whitespaces).split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+            var rev: Int64?
+            if parts.count == 5 {
+                guard let r = Int64(parts[1]), r > 0 else { return nil }
+                rev = r
+                parts.remove(at: 1)
+            }
             guard parts.count == 4, let doc = Int64(parts[0]), let page = Int(parts[1]), let offset = Int(parts[2]),
                   let last = Int(parts[3]), doc > 0, page > 0, offset >= 0, last >= page else { return nil }
-            self.init(doc: doc, page: page, offset: offset, last: last)
+            self.init(doc: doc, rev: rev, page: page, offset: offset, last: last)
         }
     }
 
@@ -427,6 +438,10 @@ public final class ProjectFilesService {
             return .success(vector)
         } catch EmbedRunner.Failure.paused {
             return .failure(WordsOnlyFailure(.paused))
+        } catch EmbedRunner.Failure.unresponsive {
+            return .failure(WordsOnlyFailure(.timedOut))
+        } catch EmbedRunner.Failure.runner(code: "timeout", _) {
+            return .failure(WordsOnlyFailure(.timedOut))
         } catch {
             return .failure(WordsOnlyFailure(.unavailable("\(error)")))
         }
@@ -446,6 +461,11 @@ public final class ProjectFilesService {
             return .text("File \(d.doc) (\(d.name)) is \(ProjectFiles.status(d)): it can't be read yet.")
         }
         let (doc, rev) = (d.doc, d.rev)
+        if let cited = cursor.rev, cited != rev {
+            let pages = cursor.last == Int.max ? "\(cursor.page)-" : "\(cursor.page)-\(cursor.last)"
+            return .text("File \(doc) (\(d.name)) has changed since that read (indexed again): what was shown may not match. "
+                         + "Read it again: \(ProjectFiles.toolName)({\"doc\":\(doc),\"pages\":\"\(pages)\"})")
+        }
         let requested = cursor.page...cursor.last
         let lengths = try await handle.read { try $0.pageLengths(doc: doc, rev: rev, in: requested) }
         let pageCount = d.pages ?? lengths.last?.page ?? 0
@@ -454,15 +474,17 @@ public final class ProjectFilesService {
         }
         let last = lengths.last!.page
         func cursorText(_ page: Int, _ offset: Int) -> String {
-            "Not all shown: continue with \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.ReadCursor(doc: doc, page: page, offset: offset, last: last).text)\"})."
+            "Not all shown: continue with \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.ReadCursor(doc: doc, rev: rev, page: page, offset: offset, last: last).text)\"})."
         }
         var output = ProjectToolOutput(project: project)
         if cursor.last != Int.max, cursor.last > last, cursor.offset == 0 {
             output.preamble = "\(d.name) has \(pageCount) page(s)."
         }
+        // Its id names the range it holds: a piece of another length (the
+        // same page read again under another budget) isn't "shown earlier".
         func hit(_ page: Int, _ start: Int, _ text: String) -> ProjectHit {
-            ProjectHit(id: "r\(doc).\(rev).\(page).\(start)", doc: Int(doc), rev: Int(rev), page: page, name: d.name,
-                       text: text.isEmpty ? "(no text on this page)" : text)
+            ProjectHit(id: "r\(doc).\(rev).\(page).\(start)-\(start + text.unicodeScalars.count)", doc: Int(doc), rev: Int(rev),
+                       page: page, name: d.name, text: text.isEmpty ? "(no text on this page)" : text)
         }
         for (i, entry) in lengths.enumerated() {
             let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0
@@ -491,12 +513,14 @@ public final class ProjectFilesService {
                 let mid = (lo + hi + 1) / 2
                 if trial(mid).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
             }
+            let minimum = max(1, min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4))
             var n = lo
             if n > 0, n < scalars.count, !scalars[n].properties.isWhitespace,
-               let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }), space > n / 2 {
+               let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }),
+               space > n / 2, space + 1 >= minimum {
                 n = space + 1
             }
-            if n >= min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4) && n > 0 {
+            if n >= minimum {
                 output = trial(n)
             } else {
                 output.epilogue = cursorText(entry.page, start)

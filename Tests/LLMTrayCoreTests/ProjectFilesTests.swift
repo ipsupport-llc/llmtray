@@ -106,7 +106,12 @@ final class ProjectFilesArgumentTests: XCTestCase {
         let c = ProjectFiles.ReadCursor(doc: 3, page: 12, offset: 450, last: 20)
         XCTAssertEqual(c.text, "3:12:450:20")
         XCTAssertEqual(ProjectFiles.ReadCursor(c.text), c)
-        for bad in ["3:12:450", "0:1:0:1", "3:5:0:4", "3:1:-1:2", "a:b:c:d"] { XCTAssertNil(ProjectFiles.ReadCursor(bad), bad) }
+        let withRev = ProjectFiles.ReadCursor(doc: 3, rev: 2, page: 12, offset: 450, last: 20)
+        XCTAssertEqual(withRev.text, "3:2:12:450:20")
+        XCTAssertEqual(ProjectFiles.ReadCursor(withRev.text), withRev)
+        for bad in ["3:12:450", "0:1:0:1", "3:5:0:4", "3:1:-1:2", "a:b:c:d", "3:0:1:0:2", "3:1:2:3:4:5"] {
+            XCTAssertNil(ProjectFiles.ReadCursor(bad), bad)
+        }
     }
 
     /// The trust barrier sees project_files as a project tool whatever it's
@@ -255,6 +260,20 @@ final class ProjectFilesServiceTests: XCTestCase {
         embedder = slow
         o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), service: service(timeout: 0.05)))
         XCTAssertTrue(o.preamble.contains("didn't answer in time"), o.preamble)
+        // The runner's own timeout, or killed as unresponsive: too slow too.
+        for failure in [EmbedRunner.Failure.runner(code: "timeout", message: "10 s"), .unresponsive] {
+            let timedOut = FakeQueryEmbedder()
+            timedOut.failure = failure
+            embedder = timedOut
+            o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5)))
+            XCTAssertTrue(o.preamble.contains("didn't answer in time"), o.preamble)
+        }
+        // Another failure: its description, readable.
+        let died = FakeQueryEmbedder()
+        died.failure = EmbedRunner.Failure.died("exit 9")
+        embedder = died
+        o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5)))
+        XCTAssertTrue(o.preamble.contains("meaning search is unavailable: the embedder stopped: exit 9"), o.preamble)
         // Off for this session.
         embedder = FakeQueryEmbedder()
         wordsOnlyReason = "the embedder kept failing"
@@ -343,12 +362,46 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertEqual((1...4).map { read[$0] }, pages)
     }
 
+    /// The same page read again in the turn under another budget: another
+    /// range, another id -- never taken for the piece shown earlier.
+    func testRereadUnderAnotherBudgetIsNotShownEarlier() async throws {
+        let text = (1...200).map { "word\($0)" }.joined(separator: " ")
+        let doc = try await add(text, name: "one.txt")
+        let small = output(await run(.read(.init(doc: doc, page: 1, last: 1)), budget: 900))
+        let large = output(await run(.read(.init(doc: doc, page: 1, last: 1)), budget: 4000))
+        XCTAssertLessThan(small.hits[0].text.count, large.hits[0].text.count)
+        XCTAssertNotEqual(small.hits[0].id, large.hits[0].id)
+        let sent = small.rendered(byteBudget: 900).whole
+        XCTAssertFalse(large.rendered(byteBudget: 4000, alreadySent: sent).text.contains("shown earlier"))
+        XCTAssertEqual(large.hits[0].text, text, "the whole page this time")
+    }
+
+    /// A cursor of a revision the file no longer has: read again, not
+    /// continued at an offset into other text.
+    func testCursorOfAnOlderRevision() async throws {
+        let doc = try await add((1...300).map { "old\($0)" }.joined(separator: " ") + "\u{0C}second page", name: "f.txt")
+        let first = output(await run(.read(.init(doc: doc, page: 1, last: 2)), budget: 900))
+        let range = try XCTUnwrap(first.epilogue.range(of: #"(?<="cursor":")[^"]+"#, options: .regularExpression))
+        let cursor = try XCTUnwrap(ProjectFiles.ReadCursor(String(first.epilogue[range])))
+        XCTAssertEqual(cursor.rev, 1)
+        let h = try await registry.open(project)
+        try await h.write { idx in
+            let job = try idx.beginReindex(doc: doc)
+            try idx.commitExtraction(job, pages: ProjectIndex.pages("new text\u{0C}new second"), kind: "text")
+        }
+        guard case .text(let changed) = await run(.read(cursor)) else { return XCTFail() }
+        XCTAssertEqual(changed, "File \(doc) (f.txt) has changed since that read (indexed again): what was shown may not match. "
+                       + "Read it again: project_files({\"doc\":\(doc),\"pages\":\"1-2\"})")
+        let again = await run(.read(.init(doc: doc, page: 1, last: 2)))
+        XCTAssertEqual(output(again).hits.map(\.text), ["new text", "new second"])
+    }
+
     func testReadRangeAndErrors() async throws {
         let doc = try await add("one\u{0C}two\u{0C}three", name: "three.txt")
         let o = output(await run(.read(.init(doc: doc, page: 2, last: 9))))
         XCTAssertEqual(o.hits.map(\.text), ["two", "three"])
         XCTAssertEqual(o.preamble, "three.txt has 3 page(s).")
-        XCTAssertEqual(o.hits.first?.id, "r\(doc).1.2.0")
+        XCTAssertEqual(o.hits.first?.id, "r\(doc).1.2.0-3", "the range it holds")
         guard case .text(let past) = await run(.read(.init(doc: doc, page: 7, last: 7))) else { return XCTFail() }
         XCTAssertEqual(past, "File \(doc) (three.txt) has 3 page(s); page 7 isn't one of them.")
     }

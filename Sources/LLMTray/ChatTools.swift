@@ -204,7 +204,7 @@ final class ChatToolbox {
         let allowGuarded = ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn)
         return tools.compactMap { tool -> [String: Any]? in
             guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
-            // project_files keeps its listing when there's no room for file text.
+            // project_files by its mode (none once there's no room for file text).
             if let files = tool as? ProjectFilesTool { return files.definition(for: settings, fileTextAllowed: !fileTextRoomSpent) }
             guard !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
             // A tool of several switches: its modes that may run now (the
