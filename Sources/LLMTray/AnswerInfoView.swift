@@ -3,8 +3,8 @@ import SwiftUI
 
 /// Which answer's details are open: one at a time, across the chat. Hover
 /// opens them after a short delay and closes them once the pointer has left
-/// both the icon and the popover; a click toggles them and keeps them open
-/// (the keyboard's way in).
+/// both the icon and the popover, or the chat scrolls; a click pins them
+/// open (the keyboard's way in), a click on pinned ones closes them.
 @MainActor
 final class AnswerInfoPresenter: ObservableObject {
     static let shared = AnswerInfoPresenter()
@@ -39,13 +39,19 @@ final class AnswerInfoPresenter: ObservableObject {
 
     func toggle(_ id: UUID) {
         task?.cancel()
-        if openID == id {
+        if openID == id, pinned {
             close()
             suppressed = overIcon
         } else {
             openID = id
             pinned = true
         }
+    }
+
+    /// The chat scrolled: details hover opened go (the icon moved away).
+    func chatScrolled() {
+        guard openID != nil, !pinned else { return }
+        close()
     }
 
     func close() {

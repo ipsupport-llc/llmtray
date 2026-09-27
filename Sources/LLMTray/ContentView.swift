@@ -366,6 +366,10 @@ struct ContentView: View {
                 // in -- comparing "moved, same height" missed every scroll
                 // that coincided with a token, so reading back was impossible.
                 let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 0.5
+                // The user scrolled (moved, nothing grew): hovered answer details close.
+                if abs(grew) <= 0.5, abs(geometry.bottom - lastChatGeometry.bottom) > 0.5 {
+                    AnswerInfoPresenter.shared.chatScrolled()
+                }
                 lastChatGeometry = geometry
                 if scrolledUp, geometry.bottom > chatViewportHeight + 40 {
                     followChatBottom = false

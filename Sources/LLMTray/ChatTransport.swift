@@ -183,12 +183,16 @@ private final class StreamStates: @unchecked Sendable {
             return nil
         }
         if state.firstByteDate == nil { state.firstByteDate = Date() }
-        if state.firstDataDate == nil, data.range(of: Self.dataPrefix) != nil { state.firstDataDate = Date() }
         state.pending.append(data)
         // 0x0A never occurs inside a multi-byte UTF-8 sequence.
         guard let newline = state.pending.lastIndex(of: 0x0A) else { return nil }
         let end = state.pending.index(after: newline)
         let complete = state.pending[state.pending.startIndex..<end]
+        // A whole line, so a chunk boundary can't split the prefix.
+        if state.firstDataDate == nil,
+           complete.split(separator: 0x0A).contains(where: { $0.starts(with: Self.dataPrefix) }) {
+            state.firstDataDate = Date()
+        }
         let text = String(decoding: complete, as: UTF8.self)
         state.pending = Data(state.pending[end...])
         return text
