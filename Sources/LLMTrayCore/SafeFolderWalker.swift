@@ -367,8 +367,16 @@ public struct SafeFolderWalker {
               expecting == nil || st.identity == expecting,
               let base = parent.descriptor.currentPath else { return SubtreeScan(protected: .unchecked, read: 0, size: nil) }
         if measure, st.isDataless { return SubtreeScan(protected: .unchecked, read: 0, size: FolderSize(items: 0, bytes: 0, partial: true)) }
-        return measure ? Materialization.off { walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, true) }
-            : walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, false)
+        guard measure else { return walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, false) }
+        var r = Materialization.off { walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, true) }
+        // Measured through held descriptors: the folder must still be the one
+        // at its place in the grant (the parent's chain from the root, the
+        // folder's identity under its name), else the measurement is dropped.
+        if !stillInside(parent) || (try? Posix.lstatAt(parent.descriptor.fd, name))?.identity != st.identity {
+            r.size = nil
+            if r.protected != .found { r.protected = .unchecked }
+        }
+        return r
     }
 
     private func walkSubtree(_ parent: Descriptor, _ name: String, _ st: EntryStat, _ top: String, _ budget: Int,

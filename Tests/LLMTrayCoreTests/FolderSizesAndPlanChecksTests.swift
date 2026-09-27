@@ -365,19 +365,19 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
             XCTAssertTrue(bad[id]?.contains("changed since they were compared") == true, "\(bad)")
         }
         XCTAssertTrue(exists("t (1).bin"))
-        // Compared again, then changed between approval and execution: the
-        // item fails there and nothing is trashed.
+        // Compared again; only touched between approval and execution (same
+        // file, same bytes, another mtime): execution hashes both again, and
+        // they still match (testExecutionHashesTheCopyAndItsOriginalAgain has
+        // other bytes).
         writeData("t.bin", bytes(100, 0x31))
         var again = PlanReview(plan: plan)
         again.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
         let approved = try service.approve(again)
-        // Touched in place (same file, same bytes, another mtime).
         var tv = [timeval(tv_sec: 1_000_000, tv_usec: 0), timeval(tv_sec: 1_000_000, tv_usec: 0)]
         XCTAssertEqual(utimes(grant + "/t (1).bin", &tv), 0)
         let report = service.execute(approved)
-        XCTAssertEqual(PlanOutcome(report).done, 0)
-        XCTAssertEqual(PlanOutcome(report).failed, 1)
-        XCTAssertTrue(exists("t (1).bin"), "fail closed: not trashed")
+        XCTAssertEqual(PlanOutcome(report).done, 1)
+        XCTAssertFalse(exists("t (1).bin"))
     }
 
     func testChecksKeepNothingOnceAccessEnds() async throws {
@@ -432,5 +432,70 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         try fm.removeItem(atPath: grant + "/a (1).bin")
         writeData("a (1).bin", bytes(30))
         XCTAssertEqual(service.checks(plan).notIdentical, [:])
+    }
+
+    // MARK: Round 2 of review
+
+    private func approvedAfterChecks(_ plan: ChangePlan) throws -> ApprovedPlan {
+        var review = PlanReview(plan: plan)
+        review.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
+        return try service.approve(review)
+    }
+
+    func testExecutionHashesTheCopyAndItsOriginalAgain() async throws {
+        writeData("t.bin", bytes(100, 0x31))
+        writeData("t (1).bin", bytes(100, 0x31))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/t (1).bin")])
+        let approved = try approvedAfterChecks(plan)
+        // Other bytes in place: same file, same size, the old mtime put back --
+        // only the hash can tell.
+        let path = grant + "/t.bin"
+        let mtime = try XCTUnwrap(try fm.attributesOfItem(atPath: path)[.modificationDate] as? Date)
+        let h = try XCTUnwrap(FileHandle(forWritingAtPath: path))
+        h.write(Data([0x32]))
+        h.closeFile()
+        try fm.setAttributes([.modificationDate: mtime], ofItemAtPath: path)
+        let report = service.execute(approved)
+        XCTAssertEqual(PlanOutcome(report).failed, 1)
+        XCTAssertTrue(PlanOutcome(report).problem?.contains("no longer identical") == true, "\(PlanOutcome(report))")
+        XCTAssertTrue(exists("t (1).bin"), "nothing trashed")
+    }
+
+    func testTheOriginalIsFollowedWhereAnEarlierMoveTookIt() async throws {
+        writeData("t.bin", bytes(100, 0x31))
+        writeData("t (1).bin", bytes(100, 0x31))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([
+            .init(kind: .makeDir, path: "~/grant/Keep"),
+            .init(kind: .move, path: "~/grant/t.bin", to: "~/grant/Keep"),
+            .init(kind: .trash, path: "~/grant/t (1).bin"),
+        ])
+        let report = service.execute(try approvedAfterChecks(plan))
+        XCTAssertEqual(PlanOutcome(report).done, 3, "\(PlanOutcome(report))")
+        XCTAssertFalse(exists("t (1).bin"))
+        XCTAssertTrue(exists("Keep/t.bin"))
+    }
+
+    func testACopyWhoseOriginalWasTrashedEarlierIsntTrashedAsACopy() async throws {
+        writeData("t.bin", bytes(100, 0x31))
+        writeData("t (1).bin", bytes(100, 0x31))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/t.bin"), .init(kind: .trash, path: "~/grant/t (1).bin")])
+        let report = service.execute(try approvedAfterChecks(plan))
+        XCTAssertEqual(PlanOutcome(report).done, 1)
+        XCTAssertEqual(PlanOutcome(report).failed, 1)
+        XCTAssertTrue(exists("t (1).bin"), "the last one isn't trashed on a comparison that can't be made again")
+    }
+
+    func testAMeasurementOfAFolderThatLeftTheGrantIsDropped() throws {
+        writeData("a/sub/x", bytes(10))
+        let dir = try walker.openDirectory(["a"])
+        XCTAssertEqual(walker.subtreeScan(in: dir, "sub", budget: 100, measure: true).size, FolderSize(items: 1, bytes: 10))
+        // Moved out of the grant while held: what it holds isn't shown.
+        try fm.moveItem(atPath: grant + "/a", toPath: outside + "/a")
+        let r = walker.subtreeScan(in: dir, "sub", budget: 100, measure: true)
+        XCTAssertNil(r.size)
+        XCTAssertEqual(r.protected, .unchecked)
     }
 }

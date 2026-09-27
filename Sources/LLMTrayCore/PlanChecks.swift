@@ -166,21 +166,57 @@ public struct PlanChecker {
         return CopyCheck(original: original, verdict: .identical, copy: FileStamp(copy), originalStamp: FileStamp(orig))
     }
 
-    /// Whether an "identical" verdict still holds for `item`: both files
-    /// unchanged (identity, size, modification time) since they were
-    /// compared. The original may be gone when an earlier item of `plan`
-    /// took it (by identity). False for any other verdict.
-    public func stillIdentical(_ item: PlanItem, _ check: CopyCheck, plan: ChangePlan) -> Bool {
+    /// Whether an "identical" verdict still holds for `item` at approval:
+    /// both files unchanged (identity, size, modification time) where they
+    /// were compared. False for any other verdict.
+    public func stillIdentical(_ item: PlanItem, _ check: CopyCheck) -> Bool {
         guard check.verdict == .identical, let s = item.source, let stamp = check.copy, let origStamp = check.originalStamp else {
             return false
         }
         let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
         guard let parent = try? walker.openDirectory(s.location.parentComponents, expected: s.parentChain),
-              let copy = try? walker.entry(in: parent, s.location.name), FileStamp(copy) == stamp else { return false }
-        let before = plan.items.prefix { $0.id != item.id }
-        if before.contains(where: { $0.source?.identity == origStamp.identity }) { return true }
-        guard let orig = try? walker.entry(in: parent, check.original) else { return false }
+              let copy = try? walker.entry(in: parent, s.location.name), FileStamp(copy) == stamp,
+              let orig = try? walker.entry(in: parent, check.original) else { return false }
         return FileStamp(orig) == origStamp
+    }
+
+    /// Right before a copy found identical is trashed: both hashed again
+    /// where they are now -- the original followed to where an earlier item
+    /// of `plan` moved it (by its identity) -- within the same caps and
+    /// exclusions. Throws, so the item fails, when either isn't the file
+    /// compared, can't be hashed (a trashed original included), or the
+    /// hashes differ.
+    public func verifyBeforeTrash(_ item: PlanItem, _ check: CopyCheck, plan: ChangePlan) throws {
+        let shown = item.source?.location.relativePath ?? ""
+        func fail(_ why: String) -> FolderAccessError { .changed("\(shown): \(why); not trashed as a copy") }
+        guard check.verdict == .identical, let s = item.source, let stamp = check.copy, let origStamp = check.originalStamp else {
+            throw fail("not compared")
+        }
+        // Where the original is now: in place, or where an earlier move took it.
+        var origLocation = FolderLocation(root: s.location.root, components: s.location.parentComponents + [check.original])
+        for earlier in plan.items.prefix(while: { $0.id != item.id }) where earlier.source?.identity == origStamp.identity {
+            guard earlier.kind == .move, let d = earlier.destination else { throw fail("its original was trashed") }
+            origLocation = d.location
+        }
+        let deadline = ProcessInfo.processInfo.systemUptime + limits.hashSeconds
+        func hash(_ loc: FolderLocation, _ identity: FileIdentity, expected: [FileIdentity?]) throws -> String {
+            let walker = SafeFolderWalker(root: loc.root, denylist: denylist)
+            guard let item = try? walker.resolve(loc.components, expectedParents: expected), let e = item.entry,
+                  e.kind == .file, e.identity == identity else { throw fail("changed since it was compared") }
+            let parentName = item.parent.components.last ?? (walker.root.path as NSString).lastPathComponent
+            if e.stat.isHardLinked || e.stat.isDataless || e.stat.size > limits.hashBytes
+                || FolderDenylist.looksSecret(name: e.name, parentName: parentName) { throw fail("can't be compared") }
+            let left = deadline - ProcessInfo.processInfo.systemUptime
+            guard left > 0, let fd = try? walker.openFile(item) else { throw fail("couldn't be read") }
+            var caps = FileClassifier.Caps()
+            caps.hashBytes = limits.hashBytes
+            caps.hashSeconds = left
+            guard case .sha256(let h) = FileClassifier(caps: caps).sha256(fd) else { throw fail("couldn't be hashed") }
+            return h
+        }
+        let a = try hash(s.location, stamp.identity, expected: s.parentChain)
+        let b = try hash(origLocation, origStamp.identity, expected: [])
+        if a != b { throw fail("no longer identical to its original") }
     }
 
     /// "report.pdf" for "report (1).pdf", "report copy.pdf" or

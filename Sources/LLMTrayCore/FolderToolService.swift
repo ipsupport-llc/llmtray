@@ -701,7 +701,7 @@ public final class FolderToolService: @unchecked Sendable {
                 out[item.id] = "\(name) wasn't compared with its original yet"
                 continue
             }
-            if c.verdict == .identical, !checker.stillIdentical(item, c, plan: review.plan) {
+            if c.verdict == .identical, !checker.stillIdentical(item, c) {
                 out[item.id] = "\(name) or its original changed since they were compared"
             }
         }
@@ -736,15 +736,13 @@ public final class FolderToolService: @unchecked Sendable {
         copiesLock.unlock()
         var executor = ChangeExecutor(denylist: denylist, journal: journal, trasher: trasher,
                                       canChange: grants.changeCheck(chatID: approved.plan.chatID))
-        // A copy trashed as identical must still be: either file changed
-        // since the comparison fails it (and stops the plan there).
+        // A copy trashed as identical must still be: both hashed again right
+        // before; anything else fails it (and stops the plan there).
         let checker = PlanChecker(denylist: denylist)
         let plan = approved.plan
         executor.verifyItem = { item in
             guard let c = copies[item.id] else { return }
-            if !checker.stillIdentical(item, c, plan: plan) {
-                throw FolderAccessError.changed("\(item.source?.location.relativePath ?? "") or its original, since they were compared")
-            }
+            try checker.verifyBeforeTrash(item, c, plan: plan)
         }
         return executor.execute(approved, isCancelled: isCancelled, progress: progress)
     }

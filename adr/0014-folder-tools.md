@@ -324,8 +324,13 @@ took `change_files` for a text editor and wrote a shell script.
   come in 20 s Approve is let through with those items still unticked. An
   "identical" verdict is bound to both files (identity, size, modification
   time): checked again at approval (a change refuses the approval, and the
-  plan is checked anew) and at execution (the item fails and the plan stops
-  there -- nothing is trashed on a stale verdict). A copy ticked without a
+  plan is checked anew); at execution, right before the trash, both are
+  hashed again where they are now -- the original followed to where an
+  earlier item moved it -- within the same caps and exclusions: a mismatch,
+  another identity, or no hash (an original trashed earlier included) fails
+  the item and the plan stops there; nothing is trashed on a stale verdict.
+  A folder's measurement is dropped when, after the walk, the folder isn't
+  at its place in the grant any more (parent chain and identity). A copy ticked without a
   comparison is refused at approval.
 - After its first refusal in a turn `change_files` isn't declared again
   until the user's next message (like a spent generator); the refusal says
