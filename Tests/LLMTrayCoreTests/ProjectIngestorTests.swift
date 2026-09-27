@@ -465,6 +465,18 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(statuses(i), [.embedded])
     }
 
+    func testRemovingTheLastDocumentWhileItIsEmbeddedSweepsItsPages() async throws {
+        embedder!.delay = 0.1
+        let i = ingestor()
+        _ = await i.add([try file("two.txt", "first page words\u{0C}second page words")], to: project)
+        try await waitUntil("embedding started") { self.embedder!.calls > 0 }
+        try await i.removeDocument(1, from: project)
+        try await settle(i)
+        let h = try await registry.open(project)
+        let left = try await h.write { try $0.db.scalarInt("SELECT count(*) FROM pages WHERE doc = 1") }
+        XCTAssertEqual(left, 0, "uncited tombstones swept once the dropped step ended")
+    }
+
     func testTheEstimateLeavesTheWaitsOut() async throws {
         busy = true
         let i = ingestor()

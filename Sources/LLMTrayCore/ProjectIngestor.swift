@@ -345,25 +345,50 @@ public final class ProjectIngestor {
     /// resumed. A Stop meanwhile wins: nothing is queued after it.
     public func indexNow(_ project: UUID) async {
         // Saved once its write is in: a quit before that leaves it stopped
-        // (the repair at open), never unstopped with files left `not_indexed`.
+        // (the repair at open), never unstopped with files left
+        // `not_indexed`. A write that failed leaves it stopped.
         let wasStopped = stopped.remove(project) != nil
-        await resume(project)
-        if wasStopped { persist() }
+        let e = epoch(project)
+        let resumed = await resume(project)
+        guard wasStopped else { return }
+        if !resumed, epoch(project) == e, !deleted.contains(project) {
+            stopped.insert(project)
+            changed()
+        } else if !deleted.contains(project) {
+            persist()
+        }
     }
 
-    private func resume(_ project: UUID) async {
+    /// False when the index couldn't be opened or its write failed (not
+    /// when a Stop meanwhile won).
+    private func resume(_ project: UUID) async -> Bool {
         let e = epoch(project)
         await beginTransition(project)
-        guard epoch(project) == e, let h = try? await handle(project), epoch(project) == e else {
-            return endTransition(project)
+        guard epoch(project) == e else {
+            endTransition(project)
+            return true
         }
-        let docs = (try? await h.write { try $0.resumeIndexing() }) ?? []
-        guard epoch(project) == e, !deleted.contains(project) else { return endTransition(project) }
+        guard let h = try? await handle(project) else {
+            endTransition(project)
+            return false
+        }
+        let docs: [Int64]
+        do {
+            docs = try await h.write { try $0.resumeIndexing() }
+        } catch {
+            endTransition(project)
+            return false
+        }
+        guard epoch(project) == e, !deleted.contains(project) else {
+            endTransition(project)
+            return true
+        }
         queue.enqueue(docs.map(ProjectIngestQueue.Work.extract), in: project)
         await queueEmbedding(project, h)
         endTransition(project)
         kick()
         await refreshDocuments(project, h)
+        return true
     }
 
     /// Stop's and Index Now's writes run one at a time per project, in the
@@ -486,7 +511,9 @@ public final class ProjectIngestor {
             // Work only, not the waits (the chat, a generation, a slice): the ETA's base.
             let ended = queue.finish(item, outcome, seconds: activeSeconds)
             if outcome != .interrupted { await refreshDocuments(item.project) }
-            if ended { scheduleMaintenance(item.project) }
+            // Also a dropped step that was the last (its document removed
+            // while it ran): the run's end went with the removal.
+            if ended || (outcome == .dropped && !queue.hasWork(item.project)) { scheduleMaintenance(item.project) }
             changed()
         }
         worker = nil
