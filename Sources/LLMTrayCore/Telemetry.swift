@@ -57,20 +57,45 @@ public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
 
 /// Local days as the report's `day` (yyyy-MM-dd).
 public enum TelemetryDay {
-    public static func string(for date: Date, calendar: Calendar = .current) -> String {
+    /// Gregorian in the Mac's time zone, whatever calendar the user picked:
+    /// the server parses the ISO date.
+    public static var calendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = .current
+        return c
+    }
+
+    static var utc: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "UTC")!
+        return c
+    }
+
+    /// The oldest day the server takes now: maxDaysBack before the local
+    /// day, and before the UTC day too (it counts from that; a Mac behind
+    /// UTC is a day behind it for hours).
+    public static func oldestAccepted(today: String, now: Date?, calendar: Calendar = TelemetryDay.calendar) -> String? {
+        guard let local = adding(-TelemetryCounters.maxDaysBack, to: today, calendar: calendar) else { return nil }
+        guard let now, let server = adding(-TelemetryCounters.maxDaysBack, to: string(for: now, calendar: utc), calendar: utc) else {
+            return local
+        }
+        return max(local, server)
+    }
+
+    public static func string(for date: Date, calendar: Calendar = TelemetryDay.calendar) -> String {
         let c = calendar.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
     }
 
     /// The day `days` before (negative: after) `day`; nil for a malformed one.
-    public static func adding(_ days: Int, to day: String, calendar: Calendar = .current) -> String? {
+    public static func adding(_ days: Int, to day: String, calendar: Calendar = TelemetryDay.calendar) -> String? {
         guard let date = date(day, calendar: calendar),
               let shifted = calendar.date(byAdding: .day, value: days, to: date) else { return nil }
         return string(for: shifted, calendar: calendar)
     }
 
     /// Noon of the day (clear of DST edges); nil unless exactly yyyy-MM-dd.
-    public static func date(_ day: String, calendar: Calendar = .current) -> Date? {
+    public static func date(_ day: String, calendar: Calendar = TelemetryDay.calendar) -> Date? {
         let parts = day.split(separator: "-", omittingEmptySubsequences: false)
         guard parts.count == 3, parts[0].count == 4, parts[1].count == 2, parts[2].count == 2,
               day.utf8.allSatisfy({ ($0 >= 0x30 && $0 <= 0x39) || $0 == 0x2D }),
@@ -134,8 +159,9 @@ public struct TelemetryCounters: Codable, Equatable, Sendable {
 
     /// Drops days more than maxDaysBack before today, and days after it
     /// (a clock set back): neither would be accepted.
-    public mutating func prune(today: String, calendar: Calendar = .current) {
-        guard let oldest = TelemetryDay.adding(-Self.maxDaysBack, to: today, calendar: calendar) else { return }
+    /// `now`: also by the server's UTC day (TelemetryDay.oldestAccepted).
+    public mutating func prune(today: String, now: Date? = nil, calendar: Calendar = TelemetryDay.calendar) {
+        guard let oldest = TelemetryDay.oldestAccepted(today: today, now: now, calendar: calendar) else { return }
         days = days.filter { $0.key >= oldest && $0.key <= today && TelemetryDay.date($0.key, calendar: calendar) != nil }
     }
 
@@ -232,11 +258,12 @@ public struct TelemetryReport: Codable, Equatable, Sendable {
     }
 
     /// `today`: the local day now; `day` must be one of the maxDaysBack
-    /// days before it, or it.
-    public init(installID: UUID, day: String, today: String, environment env: TelemetryEnvironment,
-                usage: TelemetryUsage, calendar: Calendar = .current) throws {
+    /// days before it, or it (and, given `now`, no older than the server
+    /// takes: TelemetryDay.oldestAccepted).
+    public init(installID: UUID, day: String, today: String, now: Date? = nil, environment env: TelemetryEnvironment,
+                usage: TelemetryUsage, calendar: Calendar = TelemetryDay.calendar) throws {
         guard TelemetryDay.date(day, calendar: calendar) != nil,
-              let oldest = TelemetryDay.adding(-TelemetryCounters.maxDaysBack, to: today, calendar: calendar),
+              let oldest = TelemetryDay.oldestAccepted(today: today, now: now, calendar: calendar),
               day >= oldest, day <= today else { throw TelemetryValidationError(code: "invalid_day") }
         let appVersion = ReviewSubmission.trimmed(env.appVersion)
         guard !appVersion.isEmpty, ReviewSubmission.sanitizedVersion(appVersion) == appVersion else {
@@ -429,7 +456,7 @@ public struct TelemetryUploader {
     public var client: TelemetryClient
     public var calendar: Calendar
 
-    public init(client: TelemetryClient, calendar: Calendar = .current) {
+    public init(client: TelemetryClient, calendar: Calendar = TelemetryDay.calendar) {
         self.client = client
         self.calendar = calendar
     }
@@ -441,14 +468,15 @@ public struct TelemetryUploader {
     public func run(store: TelemetryCounterStore, now: () -> Date = Date.init,
                     installID: () -> UUID?, environment: () -> TelemetryEnvironment) async -> [String] {
         var done: [String] = []
-        let today = TelemetryDay.string(for: now(), calendar: calendar)
-        store.update { $0.prune(today: today, calendar: calendar) }
-        if let notBefore = store.counters.notBefore, now() < notBefore { return done }
+        let started = now()
+        let today = TelemetryDay.string(for: started, calendar: calendar)
+        store.update { $0.prune(today: today, now: started, calendar: calendar) }
+        if let notBefore = store.counters.notBefore, started < notBefore { return done }
         for day in store.counters.pending(today: today) {
             guard !Task.isCancelled, let id = installID(), let usage = store.counters.days[day] else { break }
             let outcome: TelemetryOutcome
             do {
-                let report = try TelemetryReport(installID: id, day: day, today: today, environment: environment(),
+                let report = try TelemetryReport(installID: id, day: day, today: today, now: started, environment: environment(),
                                                  usage: usage, calendar: calendar)
                 outcome = await client.send(report)
             } catch let error as TelemetryValidationError {

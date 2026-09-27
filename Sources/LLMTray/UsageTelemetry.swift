@@ -61,10 +61,18 @@ final class UsageTelemetry: ObservableObject {
         }
     }
 
-    /// A new install ID; what's unsent goes with it.
+    /// A new install ID; what's unsent goes with it. A send in flight is
+    /// cancelled: nothing goes out under the old ID after this.
     func resetID() {
         guard isEnabled else { return }
+        cancelSend()
         regenerateID()
+    }
+
+    private func cancelSend() {
+        sendTask?.cancel()
+        sendTask = nil
+        sendGeneration += 1
     }
 
     private func regenerateID() {
@@ -78,9 +86,7 @@ final class UsageTelemetry: ObservableObject {
         defaults[Pref.telemetryEnabled] = false
         defaults[Pref.telemetryInstallID] = nil
         installID = nil
-        sendTask?.cancel()
-        sendTask = nil
-        sendGeneration += 1
+        cancelSend()
         timer?.invalidate()
         timer = nil
         store.erase()

@@ -139,6 +139,7 @@ struct UsageStatisticsSection: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.")
                         .fixedSize(horizontal: false, vertical: true)
+                    field("product", Text("The app's name."), value: TelemetryReport.product)
                     field("install_id", Text("A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac."),
                           value: telemetry.installID?.uuidString.lowercased())
                     field("day", Text("The day the counts are for."))

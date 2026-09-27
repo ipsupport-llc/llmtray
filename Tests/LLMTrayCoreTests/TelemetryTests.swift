@@ -165,6 +165,27 @@ final class TelemetryCountersTests: XCTestCase {
         XCTAssertEqual(c.pending(today: "2026-09-27"), ["2026-09-20", "2026-09-26"])
     }
 
+    func testOldestIsWhatTheServerTakesByItsUTCDay() {
+        var behind = Calendar(identifier: .gregorian)
+        behind.timeZone = TimeZone(secondsFromGMT: -12 * 3600)!
+        let now = Date(timeIntervalSince1970: 1_790_470_800)   // 2026-09-27 01:00 UTC, the 26th locally
+        let today = TelemetryDay.string(for: now, calendar: behind)
+        XCTAssertEqual(today, "2026-09-26")
+        XCTAssertEqual(TelemetryDay.oldestAccepted(today: today, now: now, calendar: behind), "2026-09-20")
+        XCTAssertEqual(TelemetryDay.oldestAccepted(today: today, now: nil, calendar: behind), "2026-09-19")
+        var c = TelemetryCounters()
+        c.touch("2026-09-19"); c.touch("2026-09-20")
+        c.prune(today: today, now: now, calendar: behind)
+        XCTAssertEqual(Array(c.days.keys), ["2026-09-20"])
+        XCTAssertThrowsError(try TelemetryReport(installID: installID, day: "2026-09-19", today: today, now: now,
+                                                 environment: env, usage: TelemetryUsage(), calendar: behind))
+    }
+
+    func testDaysAreGregorianWhateverTheUsersCalendar() {
+        XCTAssertEqual(TelemetryDay.calendar.identifier, .gregorian)
+        XCTAssertEqual(TelemetryDay.calendar.timeZone, TimeZone.current)
+    }
+
     func testApply() {
         let now = Date(timeIntervalSince1970: 1_000_000)
         var c = TelemetryCounters()

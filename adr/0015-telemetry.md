@@ -17,13 +17,16 @@ country of a report); the app follows them.
 - **Turning it off** stops sending at once (the send in flight is
   cancelled and its answer ignored) and deletes the unsent counters and
   the install ID. **Turning it on** makes a new random install ID; Reset
-  ID makes another.
+  ID makes another (and cancels a send in flight under the old one).
 - **One report per day, covering one local day.** Counters are kept per
   local day (`Application Support/LLMTray/telemetry.json`), at most 7
   days back. At launch (a minute in) and every 3 hours while running, the
   finished days are sent oldest first; today's only after it ends. Older
-  days, and days after today (a clock set back), are dropped unsent. A day
-  the app ran on is reported even with nothing counted.
+  days, and days after today (a clock set back), are dropped unsent. "7
+  days back" is also counted from the UTC day, as the server does: a Mac
+  behind UTC would otherwise send a day it refuses. Days are Gregorian
+  (`yyyy-MM-dd`) whatever calendar the user picked. A day the app ran on
+  is reported even with nothing counted.
 - **The fields** are the spec's: `product`, `install_id`, `day`,
   `app_version` (CFBundleShortVersionString), `os_version`
   (major.minor.patch), `chip` ("Apple M5"; anything else "other"),
@@ -38,7 +41,8 @@ country of a report); the app follows them.
   path are looked at to find its family, and only the family is kept.
 - **Nothing from temporary chats**, not even a count: `ChatClient`
   records only for a chat with a session. What counts: a chat answer that
-  came through (`chat`), a tool the model called that ran (`tool_calls`),
+  came through (`chat`), a tool the model called that ran (`tool_calls`:
+  not a refusal, nor an unknown tool or one the chat doesn't offer),
   an image made or edited and a song made (in a turn or by Regenerate /
   Tweak), a request from an outside client through the proxy
   (`api_server`: requests with the app's token are the app's own), a

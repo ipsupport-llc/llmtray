@@ -902,10 +902,12 @@ final class ChatClient: ObservableObject {
         UsageTelemetry.shared.record(feature, model: model)
     }
 
-    /// A tool that ran (not a refusal): a tool call, when the model made
-    /// it, and the image or song it made.
+    /// A tool that ran (not a refusal, an unknown tool or one this chat
+    /// doesn't offer, which answer in text): a tool call, when the model
+    /// made it, and the image or song it made.
     private func recordToolUsage(_ call: ToolCall, _ result: ToolResult, settings: ChatSettings, chatModel: String?, asToolCall: Bool) {
         if case .refused = result { return }
+        guard toolbox.tools.contains(where: { $0.name == call.name && $0.isOffered(settings) }) else { return }
         if asToolCall { recordUsage(.toolCalls, model: chatModel) }
         switch result {
         case .generatedImage:
