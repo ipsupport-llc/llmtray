@@ -60,7 +60,8 @@ public enum ProjectFiles {
 
     /// A call as the tool will run it.
     public enum Request: Equatable, Sendable {
-        /// The files, from this position in the listing (0-based).
+        /// The files whose id is `from` or more (`list:N` names the next
+        /// one's id: a file removed or added meanwhile doesn't shift it).
         case list(from: Int)
         case search(query: String, doc: Int64?, limit: Int)
         case read(ReadCursor)
@@ -204,9 +205,21 @@ public enum ProjectFiles {
         }
     }
 
+    /// A name for a result's heading: at most `maxBytes` (cut with …), nil
+    /// when it's that short already.
+    static func shortName(_ name: String, maxBytes: Int = 60) -> String? {
+        guard name.utf8.count > maxBytes else { return nil }
+        var out = ""
+        for scalar in name.unicodeScalars {
+            guard out.utf8.count + String(scalar).utf8.count + "…".utf8.count <= maxBytes else { break }
+            out.unicodeScalars.append(scalar)
+        }
+        return out + "…"
+    }
+
     /// Names, at most `limit` of them, "and N more".
     static func names(_ docs: [IndexedDocument], limit: Int = 5) -> String {
-        let shown = docs.prefix(limit).map { "\($0.doc). \($0.name)" }.joined(separator: ", ")
+        let shown = docs.prefix(limit).map { "\($0.doc). \(shortName($0.name) ?? $0.name)" }.joined(separator: ", ")
         return docs.count > limit ? shown + " and \(docs.count - limit) more" : shown
     }
 }
@@ -328,7 +341,8 @@ public final class ProjectFilesService {
         head += "\(docs.count) file(s) in this project (id. name -- pages -- status):"
         let hint = searchable && note == nil
             ? "\nSearch: \(ProjectFiles.toolName)({\"query\":\"...\"}); read: \(ProjectFiles.toolName)({\"doc\":1,\"pages\":\"1-2\"})." : ""
-        let start = min(max(0, from), docs.count)
+        // Documents come in id order.
+        let start = docs.firstIndex { $0.doc >= Int64(from) } ?? docs.count
         func row(_ d: IndexedDocument, name: String) -> String {
             let pages = d.pages.map { "\($0) page\($0 == 1 ? "" : "s")" } ?? "? pages"
             return "\(d.doc). \(name) -- \(pages) -- \(ProjectFiles.status(d))"
@@ -337,7 +351,7 @@ public final class ProjectFilesService {
             var out = ProjectToolOutput(project: project, preamble: ([head] + rows).joined(separator: "\n") + hint)
             let next = start + rows.count
             if next < docs.count {
-                out.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(next)\"})"
+                out.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(docs[next].doc)\"})"
             }
             return out
         }
@@ -364,8 +378,9 @@ public final class ProjectFilesService {
                 if lo >= 0 {
                     output = page([row(d, name: cut(lo))])
                 } else {
-                    // Not even its id fits: said so, and the rest still reachable.
-                    output = page(["\(d.doc). (no room for this file's line in this chat's context)"])
+                    // Not even its id fits: no file's line would (no cursor
+                    // past one that wasn't shown).
+                    output = ProjectToolOutput(project: project, preamble: head + "\n(no room to list them in this chat's context)")
                 }
             }
             break
@@ -446,8 +461,11 @@ public final class ProjectFilesService {
             notes.append("No match for \"\(query.prefix(80))\"" + (doc.map { " in file \($0)" } ?? "") + ".")
         }
         let hits = result.hits.map {
+            // A long name and heading cut in the result (the citation keeps
+            // the name whole): at a small budget the hit's text still fits.
             ProjectHit(id: "c\($0.chunk)", doc: Int($0.doc), rev: Int($0.rev), page: $0.page, chunk: Int($0.chunk),
-                       name: $0.name, heading: $0.heading, text: $0.text)
+                       name: $0.name, label: ProjectFiles.shortName($0.name),
+                       heading: $0.heading.map { ProjectFiles.shortName($0) ?? $0 }, text: $0.text)
         }
         return .output(ProjectToolOutput(project: project, preamble: notes.joined(separator: "\n"), hits: hits))
     }
@@ -455,26 +473,46 @@ public final class ProjectFilesService {
     /// The query's vector, or why the search goes by words: paused at once
     /// while a generation holds the GPU; given up after `timeout`.
     static func embed(_ query: String, with embedder: ProjectQueryEmbedder, timeout: TimeInterval) async -> Result<[Float], WordsOnlyFailure> {
-        do {
-            let vector: [Float]? = try await withThrowingTaskGroup(of: [Float]?.self) { group in
-                group.addTask { try await embedder.embedQuery(query) }
-                group.addTask {
-                    try await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1e9))
-                    return nil
-                }
-                defer { group.cancelAll() }
-                return try await group.next() ?? nil
+        // Raced without a task group: past the timeout the search goes on at
+        // once, not after the request's own cancellation (the runner may
+        // take a while to give it up).
+        let work = Task { try await embedder.embedQuery(query) }
+        let first = FirstResult<Result<[Float], Error>?>()
+        let outcome: Result<[Float], Error>? = await withCheckedContinuation { continuation in
+            first.continuation = continuation
+            Task { first.resume(await work.result) }
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1e9))
+                first.resume(nil)
             }
-            guard let vector else { return .failure(WordsOnlyFailure(.timedOut)) }
+        }
+        guard let outcome else {
+            work.cancel()
+            return .failure(WordsOnlyFailure(.timedOut))
+        }
+        switch outcome {
+        case .success(let vector):
             return .success(vector)
-        } catch EmbedRunner.Failure.paused {
+        case .failure(EmbedRunner.Failure.paused):
             return .failure(WordsOnlyFailure(.paused))
-        } catch EmbedRunner.Failure.unresponsive {
+        case .failure(EmbedRunner.Failure.unresponsive), .failure(EmbedRunner.Failure.runner(code: "timeout", _)):
             return .failure(WordsOnlyFailure(.timedOut))
-        } catch EmbedRunner.Failure.runner(code: "timeout", _) {
-            return .failure(WordsOnlyFailure(.timedOut))
-        } catch {
+        case .failure(let error):
             return .failure(WordsOnlyFailure(.unavailable("\(error)")))
+        }
+    }
+
+    /// The first of several racers resumes the continuation; the rest are ignored.
+    final class FirstResult<T>: @unchecked Sendable {
+        private let lock = NSLock()
+        var continuation: CheckedContinuation<T, Never>?
+
+        func resume(_ value: T) {
+            let c: CheckedContinuation<T, Never>? = lock.withLock {
+                defer { continuation = nil }
+                return continuation
+            }
+            c?.resume(returning: value)
         }
     }
 
@@ -492,72 +530,91 @@ public final class ProjectFilesService {
             return .text("File \(d.doc) (\(d.name)) is \(ProjectFiles.status(d)): it can't be read yet.")
         }
         let (doc, rev) = (d.doc, d.rev)
+        var cursor = cursor
+        var changedNote: String?
         if let cited = cursor.rev, cited != rev {
-            let pages = cursor.last == Int.max ? "\(cursor.page)-" : "\(cursor.page)-\(cursor.last)"
-            return .text("File \(doc) (\(d.name)) has changed since that read (indexed again): what was shown may not match. "
-                         + "Read it again: \(ProjectFiles.toolName)({\"doc\":\(doc),\"pages\":\"\(pages)\"})")
+            // Indexed again since: read again from that page of the current
+            // revision (an offset counts only in the one it was counted in).
+            // Short (no name): at a small budget the page's text still fits.
+            changedNote = "File \(doc) changed since that read (indexed again): page \(cursor.page) is read again from its start."
+            cursor = ProjectFiles.ReadCursor(doc: doc, rev: rev, page: cursor.page, offset: 0, last: cursor.last)
         }
         let requested = cursor.page...cursor.last
         let lengths = try await handle.read { try $0.pageLengths(doc: doc, rev: rev, in: requested) }
         let pageCount = d.pages ?? lengths.last?.page ?? 0
         guard !lengths.isEmpty else {
-            return .text("File \(d.doc) (\(d.name)) has \(pageCount) page(s); page \(cursor.page) isn't one of them.")
+            let none = "File \(d.doc) (\(d.name)) has \(pageCount) page(s); page \(cursor.page) isn't one of them."
+            return .text(changedNote.map { $0 + " " + none } ?? none)
         }
         let last = lengths.last!.page
         func cursorText(_ page: Int, _ offset: Int) -> String {
             "Not all shown: continue with \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.ReadCursor(doc: doc, rev: rev, page: page, offset: offset, last: last).text)\"})."
         }
-        var output = ProjectToolOutput(project: project)
+        // A long name cut in the result (the citation keeps it whole): at a
+        // small budget the page's text still fits, and each cursor moves on.
+        let label = ProjectFiles.shortName(d.name)
+        var notes = changedNote.map { [$0] } ?? []
         if cursor.last != Int.max, cursor.last > last, cursor.offset == 0 {
-            output.preamble = "\(d.name) has \(pageCount) page(s)."
+            notes.append("\(label ?? d.name) has \(pageCount) page(s).")
         }
         // Its id names the range it holds: a piece of another length (the
         // same page read again under another budget) isn't "shown earlier".
         func hit(_ page: Int, _ start: Int, _ text: String) -> ProjectHit {
             ProjectHit(id: "r\(doc).\(rev).\(page).\(start)-\(start + text.unicodeScalars.count)", doc: Int(doc), rev: Int(rev),
-                       page: page, name: d.name, text: text.isEmpty ? "(no text on this page)" : text)
+                       page: page, name: d.name, label: label, text: text.isEmpty ? "(no text on this page)" : text)
         }
-        for (i, entry) in lengths.enumerated() {
-            let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0
-            let remaining = entry.length - start
-            // Never more than could fit: a code point is at least a byte.
-            let text = try await handle.read { try $0.pageText(doc: doc, rev: rev, page: entry.page, offset: start, count: min(remaining, budget)) } ?? ""
-            let isLast = i == lengths.count - 1
-            var whole = output
-            whole.hits.append(hit(entry.page, start, text))
-            whole.epilogue = isLast ? "" : cursorText(lengths[i + 1].page, 0)
-            if text.unicodeScalars.count == remaining, whole.fitsWhole(byteBudget: budget) {
-                output = whole
-                continue
+        func fill(_ preamble: String) async throws -> ProjectToolOutput {
+            var output = ProjectToolOutput(project: project, preamble: preamble)
+            for (i, entry) in lengths.enumerated() {
+                let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0
+                let remaining = entry.length - start
+                // Never more than could fit: a code point is at least a byte.
+                let text = try await handle.read { try $0.pageText(doc: doc, rev: rev, page: entry.page, offset: start, count: min(remaining, budget)) } ?? ""
+                let isLast = i == lengths.count - 1
+                var whole = output
+                whole.hits.append(hit(entry.page, start, text))
+                whole.epilogue = isLast ? "" : cursorText(lengths[i + 1].page, 0)
+                if text.unicodeScalars.count == remaining, whole.fitsWhole(byteBudget: budget) {
+                    output = whole
+                    continue
+                }
+                // The page doesn't fit whole: as much as does, cut at a space,
+                // and the cursor where it stopped.
+                let scalars = Array(text.unicodeScalars)
+                func trial(_ n: Int) -> ProjectToolOutput {
+                    var t = output
+                    t.hits.append(hit(entry.page, start, String(String.UnicodeScalarView(scalars[0..<n]))))
+                    t.epilogue = cursorText(entry.page, start + n)
+                    return t
+                }
+                var lo = 0, hi = scalars.count - 1
+                while lo < hi {
+                    let mid = (lo + hi + 1) / 2
+                    if trial(mid).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
+                }
+                let minimum = max(1, min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4))
+                var n = lo
+                if n > 0, n < scalars.count, !scalars[n].properties.isWhitespace,
+                   let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }),
+                   space > n / 2, space + 1 >= minimum {
+                    n = space + 1
+                }
+                if n >= minimum {
+                    output = trial(n)
+                } else {
+                    output.epilogue = cursorText(entry.page, start)
+                    if output.hits.isEmpty { output.preamble = "No room for this page in this chat's context." }
+                }
+                break
             }
-            // The page doesn't fit whole: as much as does, cut at a space,
-            // and the cursor where it stopped.
-            let scalars = Array(text.unicodeScalars)
-            func trial(_ n: Int) -> ProjectToolOutput {
-                var t = output
-                t.hits.append(hit(entry.page, start, String(String.UnicodeScalarView(scalars[0..<n]))))
-                t.epilogue = cursorText(entry.page, start + n)
-                return t
-            }
-            var lo = 0, hi = scalars.count - 1
-            while lo < hi {
-                let mid = (lo + hi + 1) / 2
-                if trial(mid).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
-            }
-            let minimum = max(1, min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4))
-            var n = lo
-            if n > 0, n < scalars.count, !scalars[n].properties.isWhitespace,
-               let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }),
-               space > n / 2, space + 1 >= minimum {
-                n = space + 1
-            }
-            if n >= minimum {
-                output = trial(n)
-            } else {
-                output.epilogue = cursorText(entry.page, start)
-                if output.hits.isEmpty { output.preamble = "No room for this page in this chat's context." }
-            }
-            break
+            return output
+        }
+        // The notes shortened, then left out, before the text is: a read
+        // always moves on while any of it fits.
+        var output = try await fill(notes.joined(separator: "\n"))
+        if output.hits.isEmpty, !notes.isEmpty {
+            if changedNote != nil { output = try await fill("Indexed again since that read.") }
+            if output.hits.isEmpty { output = try await fill("") }
         }
         return .output(output)
     }

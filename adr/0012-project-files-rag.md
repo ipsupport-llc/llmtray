@@ -150,7 +150,8 @@ never declared; `pages` is "3", "3-5", "3..5", "p. 3", "5-", "all". A read
 is sized from the room the next request has (measured before the call),
 so it stops where its cursor (`doc:page:offset:last`, code points into
 `pages.text`) continues -- never cut by the chat's fitting; the listing
-pages by `list:N`. The cursor carries the revision (`doc:rev:page:offset:last`): a
+pages by `list:N` (N the next file's id, so a file removed or added
+between calls doesn't shift the rest). The cursor carries the revision (`doc:rev:page:offset:last`): a
 file indexed again meanwhile is read again from its page, and a read
 piece's id names its range, so a re-read under another budget isn't
 taken for "shown earlier". Once no room is left the tool isn't declared

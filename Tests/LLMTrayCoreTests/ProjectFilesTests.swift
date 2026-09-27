@@ -7,11 +7,18 @@ final class FakeQueryEmbedder: ProjectQueryEmbedder, @unchecked Sendable {
     var model = "toy-hash"
     var failure: Error?
     var delay: TimeInterval = 0
+    /// Waits out `delay` even when cancelled (a runner slow to give up).
+    var ignoresCancellation = false
     private(set) var calls = 0
 
     func embedQuery(_ text: String) async throws -> [Float] {
         calls += 1
-        if delay > 0 { try await Task.sleep(nanoseconds: UInt64(delay * 1e9)) }
+        if delay > 0, ignoresCancellation {
+            let end = Date().addingTimeInterval(delay)
+            while Date() < end { usleep(5_000) }
+        } else if delay > 0 {
+            try await Task.sleep(nanoseconds: UInt64(delay * 1e9))
+        }
         if let failure { throw failure }
         return ToyEmbedder().embed(text)
     }
@@ -403,11 +410,11 @@ final class ProjectFilesServiceTests: XCTestCase {
             let job = try idx.beginReindex(doc: doc)
             try idx.commitExtraction(job, pages: ProjectIndex.pages("new text\u{0C}new second"), kind: "text")
         }
-        guard case .text(let changed) = await run(.read(cursor)) else { return XCTFail() }
-        XCTAssertEqual(changed, "File \(doc) (f.txt) has changed since that read (indexed again): what was shown may not match. "
-                       + "Read it again: project_files({\"doc\":\(doc),\"pages\":\"1-2\"})")
-        let again = await run(.read(.init(doc: doc, page: 1, last: 2)))
-        XCTAssertEqual(output(again).hits.map(\.text), ["new text", "new second"])
+        // Read again from that page of the new revision, in the same call.
+        let changed = output(await run(.read(cursor)))
+        XCTAssertEqual(changed.preamble, "File \(doc) changed since that read (indexed again): page 1 is read again from its start.")
+        XCTAssertEqual(changed.hits.map(\.text), ["new text", "new second"])
+        XCTAssertEqual(changed.hits.map(\.rev), [2, 2])
     }
 
     func testReadRangeAndErrors() async throws {
@@ -418,6 +425,89 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertEqual(o.hits.first?.id, "r\(doc).1.2.0-3", "the range it holds")
         guard case .text(let past) = await run(.read(.init(doc: doc, page: 7, last: 7))) else { return XCTFail() }
         XCTAssertEqual(past, "File \(doc) (three.txt) has 3 page(s); page 7 isn't one of them.")
+    }
+
+    func testALongNameStillLeavesRoomForTheTextAndEveryCursorMovesOn() async throws {
+        let name = String(repeating: "n", count: 190) + ".txt"
+        let text = (1...200).map { "word\($0)" }.joined(separator: " ")
+        let doc = try await add(text, name: name)
+        let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
+        var request = ProjectFiles.Request.read(.init(doc: doc, page: 1, last: 1))
+        var read = ""
+        var cursors: [String] = []
+        for _ in 0..<60 {
+            let o = output(await run(request, budget: budget))
+            let hit = try XCTUnwrap(o.hits.first, "text every time: \(o.preamble)")
+            XCTAssertEqual(hit.name, name, "the citation keeps the whole name")
+            XCTAssertTrue(o.rendered(byteBudget: budget).text.contains(String(repeating: "n", count: 40) + "…"))
+            read += hit.text
+            guard let range = o.epilogue.range(of: #"(?<="cursor":")[^"]+"#, options: .regularExpression) else { break }
+            let next = String(o.epilogue[range])
+            XCTAssertFalse(cursors.contains(next), "a cursor that doesn't move on")
+            cursors.append(next)
+            request = .read(try XCTUnwrap(ProjectFiles.ReadCursor(next)))
+        }
+        XCTAssertEqual(read, text, "the whole page, once")
+
+        // Indexed again: the old cursor still gets text (and a cursor on).
+        let old = try XCTUnwrap(ProjectFiles.ReadCursor(try XCTUnwrap(cursors.first)))
+        let h = try await registry.open(project)
+        try await h.write { idx in
+            let job = try idx.beginReindex(doc: doc)
+            try idx.commitExtraction(job, pages: ProjectIndex.pages(text), kind: "text")
+        }
+        // At the smallest budget the text comes before the note.
+        let o = output(await run(.read(old), budget: budget))
+        XCTAssertEqual(o.hits.first?.rev, 2)
+        let roomier = output(await run(.read(old), budget: budget * 2))
+        XCTAssertTrue(roomier.rendered(byteBudget: budget * 2).text.contains("since that read"), "said where there's room")
+        XCTAssertTrue(o.hits.first.map { text.hasPrefix($0.text) } == true, "from the page's start")
+        XCTAssertTrue(o.epilogue.contains("\"cursor\":\"\(doc):2:1:"), o.epilogue)
+    }
+
+    func testASearchAtTheSmallestBudgetStillGetsText() async throws {
+        let long = (1...200).map { "payment\($0) deadline words" }.joined(separator: " ")
+        let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
+        for name in ["ordinary-file-name.txt", String(repeating: "n", count: 190) + ".txt"] {
+            try await setUp()
+            try await add(long, name: name)
+            let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
+            let r = o.rendered(byteBudget: budget)
+            XCTAssertFalse(r.returned.isEmpty, r.text)
+            XCTAssertEqual(r.returned.first?.name, name, "the citation keeps the whole name")
+            XCTAssertTrue(r.text.contains("payment"), r.text)
+            XCTAssertLessThanOrEqual(r.text.utf8.count, budget)
+            try await tearDown()
+        }
+    }
+
+    func testSearchNotesDontCrowdOutTheHitAtTheSmallestBudget() async throws {
+        try await add((1...200).map { "payment\($0) deadline words" }.joined(separator: " "), name: "a.txt")
+        let h = try await registry.open(project)
+        for i in 0..<5 {
+            let src = root.appendingPathComponent("s\(i).txt")
+            try "x\(i)".write(to: src, atomically: true, encoding: .utf8)
+            _ = try await h.write { try $0.addCopy(of: src, name: String(repeating: "p", count: 200) + "\(i).txt") }
+        }
+        let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
+        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
+        let r = o.rendered(byteBudget: budget)
+        XCTAssertTrue(o.preamble.contains("Still being indexed"), o.preamble)
+        XCTAssertFalse(r.returned.isEmpty, r.text)
+        XCTAssertTrue(r.text.contains("payment"), r.text)
+    }
+
+    func testTheTimeoutDoesntWaitForTheEmbedderToGiveUp() async throws {
+        _ = try await addCorpus()
+        let stubborn = FakeQueryEmbedder()
+        stubborn.delay = 1.5
+        stubborn.ignoresCancellation = true
+        embedder = stubborn
+        let started = Date()
+        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), service: service(timeout: 0.05)))
+        XCTAssertLessThan(Date().timeIntervalSince(started), 1)
+        XCTAssertTrue(o.preamble.contains("didn't answer in time"), o.preamble)
+        XCTAssertEqual(o.hits.first?.page, 2)
     }
 
     // MARK: listing
@@ -443,6 +533,29 @@ final class ProjectFilesServiceTests: XCTestCase {
         }
         XCTAssertEqual(seen.count, 23, "every file once")
         XCTAssertEqual(Set(seen).count, 23)
+    }
+
+    func testARemovalBetweenListingPagesSkipsNoFile() async throws {
+        for i in 0..<12 { try await add("File \(i) text", name: "file-with-a-longish-name-\(i).txt", embed: false) }
+        func rows(_ o: ProjectToolOutput) -> [String] {
+            o.preamble.split(separator: "\n").map(String.init).filter { $0.range(of: #"^\d+\. "#, options: .regularExpression) != nil }
+        }
+        let first = output(await run(.list(from: 0), budget: 700))
+        let shown = rows(first)
+        XCTAssertGreaterThan(shown.count, 1)
+        let range = try XCTUnwrap(first.epilogue.range(of: #"(?<="cursor":"list:)\d+"#, options: .regularExpression))
+        // One of the files shown is removed before the next page.
+        let h = try await registry.open(project)
+        try await h.write { try $0.remove(doc: 1) }
+        let second = output(await run(.list(from: Int(first.epilogue[range])!), budget: 700))
+        XCTAssertTrue(rows(second).first?.hasPrefix("\(shown.count + 1). ") == true, "\(rows(second))")
+    }
+
+    func testNoRoomForAnyLineGivesNoCursor() async throws {
+        for i in 0..<3 { try await add("File \(i) text", name: "f\(i).txt", embed: false) }
+        let o = output(await run(.list(from: 0), budget: 250))
+        XCTAssertTrue(o.preamble.contains("no room to list them"), o.preamble)
+        XCTAssertEqual(o.epilogue, "", "no cursor past a file that wasn't shown")
     }
 
     func testAFileLineLongerThanTheRoomStillListsTheRest() async throws {

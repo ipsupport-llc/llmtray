@@ -58,6 +58,17 @@ final class ProjectIngestQueueTests: XCTestCase {
         XCTAssertNil(q.next())
     }
 
+    func testQueuedAgainWhileItRanAndDroppedRunsAgain() {
+        var q = Q()
+        q.enqueue([.extract(1)], in: a)
+        let item = q.next()!
+        q.stop(a)                         // cancels it
+        q.enqueue([.extract(1)], in: a)   // Index Now before it ended
+        q.finish(item, .dropped)
+        XCTAssertEqual(q.next(), item, "run again")
+        XCTAssertEqual(q.progress(a).total, 1)
+    }
+
     func testPausedProjectsWaitAndOthersRun() {
         var q = Q()
         q.enqueue([.extract(1)], in: a)
