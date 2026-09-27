@@ -15,10 +15,11 @@ struct MessageBubble: View {
     var toolResults: [String: String]?
     /// Credits of the data this answer's tools used.
     var sources: [String] = []
-    /// The project file pages this answer cites (adr/0012), one chip each.
+    /// The project file pages this answer cites (adr/0012): its `[doc:page]`
+    /// markers that name one are links in the text.
     var citations: [Citation] = []
-    /// Opens a cited file (ContentView.openCitation); nil: the chips are
-    /// shown, not clickable.
+    /// Opens a cited file (ContentView.openCitation); nil: the links do
+    /// nothing.
     var openCitation: ((Citation) -> Void)?
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.
@@ -96,7 +97,23 @@ struct MessageBubble: View {
                     if isUser || message.content.isEmpty {
                         Text(message.content.isEmpty ? "…" : message.content)
                     } else {
-                        ChatMarkdownView(source: message.content, baseSize: 13)
+                        ChatMarkdownView(source: message.content, baseSize: 13, citations: citations)
+                            // A citation link opens its file here; other links as usual.
+                            .environment(\.openURL, OpenURLAction { url in
+                                guard let target = CitationMarkers.target(of: url) else { return .systemAction }
+                                if let c = citations.first(where: { $0.doc == target.doc && $0.page == target.page }) {
+                                    openCitation?(c)
+                                }
+                                return .handled
+                            })
+                            // SwiftUI's Text has no tooltip per link: the answer's sources, on hover.
+                            .help(citations.isEmpty ? Text(verbatim: "") : Text(verbatim: sourcesHelp))
+                            // VoiceOver reads a link as "[1:5]": each cited page as an action too.
+                            .accessibilityActions {
+                                ForEach(citations, id: \.self) { c in
+                                    Button { openCitation?(c) } label: { Text("Open \(c.name), page \(c.page)") }
+                                }
+                            }
                     }
                 }
                 .font(.system(size: 13))
@@ -127,10 +144,6 @@ struct MessageBubble: View {
                 tweakDraft(.music, i)
             }
 
-            if !citations.isEmpty {
-                CitationChips(citations: citations, open: openCitation)
-            }
-
             ForEach(sources, id: \.self) { source in
                 Text(verbatim: source)
                     .font(.system(size: 9))
@@ -148,6 +161,13 @@ struct MessageBubble: View {
         }
         .frame(maxWidth: .infinity, alignment: isUser ? .trailing : .leading)
         .onHover { hovering = $0 }
+    }
+
+    /// "file, p. N" per cited page, one a line.
+    private var sourcesHelp: String {
+        citations.map {
+            String(format: NSLocalizedString("%@, p. %lld", comment: "citation: file name, page"), $0.name, $0.page)
+        }.joined(separator: "\n")
     }
 
     @ViewBuilder
@@ -269,44 +289,6 @@ struct MessageBubble: View {
         case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(i)
         case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(i)
         }
-    }
-}
-
-/// An answer's citations as chips: the file and its page.
-@MainActor
-private struct CitationChips: View {
-    let citations: [Citation]
-    let open: ((Citation) -> Void)?
-
-    var body: some View {
-        // Wraps on a narrow popover: a flow of chips, not one long row.
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 4) { chips }
-            VStack(alignment: .leading, spacing: 4) { chips }
-        }
-    }
-
-    private var chips: some View {
-        ForEach(citations, id: \.self) { citation in
-            Button { open?(citation) } label: {
-                Label(Self.label(citation), systemImage: "doc.text")
-                    .font(.system(size: 10))
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(Color.gray.opacity(0.12))
-                    .cornerRadius(6)
-            }
-            .buttonStyle(.plain)
-            .foregroundColor(.secondary)
-            .disabled(open == nil)
-            .help(Text(Self.label(citation)))
-        }
-    }
-
-    static func label(_ c: Citation) -> String {
-        String(format: NSLocalizedString("%@, p. %lld", comment: "citation chip: file name, page"), c.name, c.page)
     }
 }
 

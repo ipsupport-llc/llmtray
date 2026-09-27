@@ -121,6 +121,87 @@ final class ProjectToolResultsTests: XCTestCase {
         XCTAssertEqual(CitationMarkers.unique(resolved + resolved).count, 2)
     }
 
+    // MARK: - inline citation links
+
+    private func known(_ pages: [(Int, Int)]) -> (Int, Int) -> Bool {
+        { doc, page in pages.contains { $0.0 == doc && $0.1 == page } }
+    }
+
+    /// The linked text and its (doc, page) as the chat's parser shows them.
+    private func links(_ markdown: String) throws -> [(text: String, doc: Int, page: Int)] {
+        let parsed = try AttributedString(markdown: markdown, options: .init(
+            interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible))
+        return parsed.runs.compactMap { run in
+            guard let url = run.link, let t = CitationMarkers.target(of: url) else { return nil }
+            return (String(parsed[run.range].characters), t.doc, t.page)
+        }
+    }
+
+    private func plain(_ markdown: String) throws -> String {
+        String(try AttributedString(markdown: markdown, options: .init(
+            interpretedSyntax: .inlineOnlyPreservingWhitespace, failurePolicy: .returnPartiallyParsedIfPossible)).characters)
+    }
+
+    func testLinkURLRoundTrip() {
+        let url = CitationMarkers.linkURL(doc: 12, page: 345)
+        XCTAssertEqual(url.absoluteString, "llmtray-cite://12/345")
+        XCTAssertEqual(CitationMarkers.target(of: url)?.doc, 12)
+        XCTAssertEqual(CitationMarkers.target(of: url)?.page, 345)
+        XCTAssertNil(CitationMarkers.target(of: URL(string: "https://12/345")!))
+        XCTAssertNil(CitationMarkers.target(of: URL(string: "llmtray-cite://x/1")!))
+        XCTAssertNil(CitationMarkers.target(of: URL(string: "llmtray-cite://1")!))
+        XCTAssertNil(CitationMarkers.target(of: URL(string: "llmtray-cite://1/2/3")!))
+    }
+
+    func testLinkifiedSingleMarker() throws {
+        let line = CitationMarkers.linkified("Оплата — 10 дней [1:5].", isKnown: known([(1, 5)]))
+        let found = try links(line)
+        XCTAssertEqual(found.map(\.text), ["[1:5]"], "the whole marker is the link")
+        XCTAssertEqual(found.first?.doc, 1)
+        XCTAssertEqual(found.first?.page, 5)
+        XCTAssertEqual(try plain(line), "Оплата — 10 дней [1:5].", "the text reads as written")
+    }
+
+    func testLinkifiedListWithSpaces() throws {
+        let source = "Fees [1:6, 2:4] and [ 3 : 7 ;2:9 ]"
+        let line = CitationMarkers.linkified(source, isKnown: known([(1, 6), (2, 4), (3, 7)]))
+        let found = try links(line)
+        XCTAssertEqual(found.map(\.text), ["1:6", "2:4", "3 : 7"], "in a list, each known pair")
+        XCTAssertEqual(found.map(\.page), [6, 4, 7])
+        XCTAssertEqual(try plain(line), source, "brackets, separators and an unknown pair stay text")
+    }
+
+    func testLinkifiedLeavesUnknownMarkers() {
+        let source = "No such page [9:9], [1:5, 9:1] out of range, [x:1], [1], [1:2:3]"
+        XCTAssertEqual(CitationMarkers.linkified(source, isKnown: known([(1, 6)])), source)
+        XCTAssertEqual(CitationMarkers.linkified(source, isKnown: { _, _ in false }), source)
+        XCTAssertEqual(CitationMarkers.linkified("plain text", isKnown: { _, _ in true }), "plain text")
+    }
+
+    func testLinkifiedSkipsCode() throws {
+        let source = "Call `f([1:5])` or ``x [1:5] y`` but see [1:5]"
+        let line = CitationMarkers.linkified(source, isKnown: known([(1, 5)]))
+        XCTAssertEqual(try links(line).count, 1, "only the marker outside code")
+        XCTAssertTrue(line.hasPrefix("Call `f([1:5])` or ``x [1:5] y`` but see "))
+        // An unclosed backtick is text: its marker is linked.
+        XCTAssertEqual(try links(CitationMarkers.linkified("a ` b [1:5]", isKnown: known([(1, 5)]))).count, 1)
+    }
+
+    func testLinkifiedAdjacentPunctuation() throws {
+        let line = CitationMarkers.linkified("(see [1:5]), [2:3]; «[1:5]»—[2:3]!", isKnown: known([(1, 5), (2, 3)]))
+        XCTAssertEqual(try links(line).map(\.text), ["[1:5]", "[2:3]", "[1:5]", "[2:3]"])
+        XCTAssertEqual(try plain(line), "(see [1:5]), [2:3]; «[1:5]»—[2:3]!")
+        // **bold** around it still parses.
+        XCTAssertEqual(try links(CitationMarkers.linkified("**due [1:5]**", isKnown: known([(1, 5)]))).count, 1)
+    }
+
+    func testLinkifiedLeavesLinksAndEscapes() {
+        let isKnown = known([(1, 5)])
+        for source in ["[1:5](https://example.com)", "[see [1:5]](https://example.com)", #"\[1:5]"#] {
+            XCTAssertEqual(CitationMarkers.linkified(source, isKnown: isKnown), source)
+        }
+    }
+
     func testCitationCodable() throws {
         let c = Citation(project: project, doc: 3, rev: 1, page: 12, name: "Отчёт.xlsx")
         let back = try JSONDecoder().decode(Citation.self, from: JSONEncoder().encode(c))

@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "خاص بالنماذج المقيَّدة فقط (Llama، بعض مستودعات Gemma وFLUX): اقبل ترخيص النموذج في صفحته على Hugging Face، ثم ألصق رمز قراءة هنا. يُخزَّن في Keychain ويُرسل فقط إلى huggingface.co.";
 "Only this Mac can use the server" = "هذا الـ Mac فقط يمكنه استخدام الخادم";
 "Only turbo has this knob: sft has no song planner to vary." = "هذا الضابط متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
+"Open %@, page %lld" = "فتح %1$@، الصفحة %2$lld";
 "Open LLMTray when you log in" = "فتح LLMTray عند تسجيل الدخول";
 "Open Server Log…" = "فتح سجل الخادم…";
 "Open in New Tab" = "فتح في تبويب جديد";

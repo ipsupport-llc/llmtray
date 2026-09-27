@@ -503,6 +503,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
+"Open %@, page %lld" = "Open %@, page %lld";
 "Open LLMTray when you log in" = "Open LLMTray when you log in";
 "Open Server Log…" = "Open Server Log…";
 "Open in New Tab" = "Open in New Tab";

@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "제한된 모델에만 적용(Llama, 일부 Gemma 및 FLUX 저장소): Hugging Face 페이지에서 사용권에 동의한 뒤 여기로 읽기 권한 토큰을 붙여넣으세요. 키체인에 저장되며 huggingface.co로만 전송됩니다.";
 "Only this Mac can use the server" = "서버를 사용할 수 있는 것은 이 Mac뿐";
 "Only turbo has this knob: sft has no song planner to vary." = "이 설정은 turbo만 해당합니다: sft에는 변화를 주는 곡 계획자가 없습니다.";
+"Open %@, page %lld" = "%@ 열기, %lld페이지";
 "Open LLMTray when you log in" = "로그인 시 LLMTray 열기";
 "Open Server Log…" = "서버 로그 열기…";
 "Open in New Tab" = "새 탭에서 열기";

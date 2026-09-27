@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Hanya untuk model dibatasi (Llama, beberapa repo Gemma dan FLUX): terima lisensi model di halaman Hugging Face-nya, lalu tempel token baca di sini. Disimpan di Keychain Anda, dikirim hanya ke huggingface.co.";
 "Only this Mac can use the server" = "Hanya Mac ini yang dapat menggunakan server";
 "Only turbo has this knob: sft has no song planner to vary." = "Hanya turbo yang memiliki pengaturan ini: sft tidak punya perencana lagu untuk variasi.";
+"Open %@, page %lld" = "Buka %@, halaman %lld";
 "Open LLMTray when you log in" = "Buka LLMTray saat Anda masuk";
 "Open Server Log…" = "Buka Log Server…";
 "Open in New Tab" = "Buka di Tab Baru";

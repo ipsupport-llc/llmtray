@@ -53,7 +53,7 @@ struct ContentView: View {
     /// One retry waits for the user's gesture to end, not one per token.
     @State private var followRetryPending = false
     @State private var chatViewportHeight: CGFloat = 380
-    /// What a citation chip found: the file changed since, or gone.
+    /// What a citation link found: the file changed since, or gone.
     @State private var citationNote: String?
 
     var body: some View {
@@ -270,12 +270,12 @@ struct ContentView: View {
         return results
     }
 
-    /// A citation chip (adr/0012): the cited file opens -- the project's
+    /// A citation link (adr/0012): the cited file opens -- the project's
     /// copy, or the linked file -- saying so when it changed since that
     /// answer; one no longer there only says so. A PDF opens in the app's
     /// own viewer at the cited page, the cited text highlighted when it's
     /// still there (PDFCitationViewer); other formats in their app, at
-    /// their start (macOS has no page anchor for them), the chip naming the
+    /// their start (macOS has no page anchor for them), the link naming the
     /// page.
     private func openCitation(_ c: Citation) {
         Task { @MainActor in

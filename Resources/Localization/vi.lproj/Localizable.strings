@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Chỉ dành cho mô hình bị hạn chế (Llama, một số repo Gemma và FLUX): chấp nhận giấy phép trên trang Hugging Face của mô hình, sau đó dán token read vào đây. Lưu trong Keychain của bạn, chỉ gửi tới huggingface.co.";
 "Only this Mac can use the server" = "Chỉ Mac này dùng được server";
 "Only turbo has this knob: sft has no song planner to vary." = "Chỉ turbo có tuỳ chỉnh này: sft không có bộ lập kế hoạch bài hát để thay đổi.";
+"Open %@, page %lld" = "Mở %@, trang %lld";
 "Open LLMTray when you log in" = "Mở LLMTray khi đăng nhập";
 "Open Server Log…" = "Mở nhật ký máy chủ…";
 "Open in New Tab" = "Mở trong tab mới";

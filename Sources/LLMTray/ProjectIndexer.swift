@@ -124,7 +124,7 @@ final class ProjectIndexer: ObservableObject {
         return (try? await registry.pinnedFiles(for: project)) ?? ([], [])
     }
 
-    /// Where a citation chip leads: read-only from the project's index,
+    /// Where a citation link leads: read-only from the project's index,
     /// also while the feature is off.
     static func citationTarget(_ c: Citation) async -> CitationTarget {
         let dir = URL(fileURLWithPath: ChatLibraryStore.projectStorage.directory(for: c.project))
