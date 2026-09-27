@@ -159,6 +159,17 @@ final class FeatureSetup {
         if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
     }
 
+    // MARK: - Recommended chat models
+
+    /// The curated list (runtime/recommended_models.json) filtered for this
+    /// Mac, recommended first; empty if the file can't be read.
+    /// `liveSizes`: repo -> the Hub's current size, where already read.
+    func recommendedChatModels(liveSizes: [String: Int64] = [:]) -> [ModelRecommendations.Pick] {
+        let url = URL(fileURLWithPath: RuntimePaths.runtimeDir).appendingPathComponent(ModelRecommendations.fileName)
+        guard let models = try? ModelRecommendations.load(contentsOf: url) else { return [] }
+        return ModelRecommendations.picks(from: models, for: HardwareProbe.current(), liveSizes: liveSizes)
+    }
+
     // MARK: - Models folder
 
     var modelsFolder: String { ModelDiscovery.currentModelsRoot() }

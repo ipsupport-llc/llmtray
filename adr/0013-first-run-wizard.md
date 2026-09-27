@@ -115,6 +115,27 @@ guided front end to the same code, not a second configuration path.
    a fresh first launch (a clean user account or a wiped Application
    Support folder).
 
+## Built so far (steps 1 and 2)
+
+- `FeatureSetup` (app): state and async operations; the Settings panes
+  keep their confirmation alerts and error lines. `DownloadQueue` (app)
+  over `LLMTrayCore.DownloadQueueState` (tested): one at a time, a chat
+  model ahead of what's waiting, free space (plus a 2 GB margin) checked
+  before each. An image or music download can't be stopped part way (a
+  pip / `snapshot_download` child): cancelled, it finishes and its
+  feature stays off. `HardwareProbe` (Core) also feeds the bug report.
+- `runtime/recommended_models.json`, bundled by `build_app.sh`: each
+  entry lists its memory `tiers` (a Mac's tier is its RAM: under 12 GB
+  → 8, under 20 → 16, under 32 → 24, else 32) and a `minMemoryGB`; one
+  entry per tier is `recommended`. `ModelRecommendations.picks` offers a
+  tier's models that the Mac has the memory for, whose weights fit the
+  GPU limit (the wired limit if the user set one, else Metal's working
+  set) and that `ModelFitLevel` (moved to Core) doesn't call unlikely;
+  recommended first, then the file's order. Repos were checked on the
+  Hub (exist, ungated, sizes from `?blobs=true`) and against the pinned
+  mlx-lm's model code: no gpt-oss (no harmony tool parser there), no
+  `gemma4_unified` conversions.
+
 ## Decided with the user (2026-09-26)
 
 - The curated list goes by memory tier (8 / 16 / 24 / 32+ GB), and **our

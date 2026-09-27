@@ -1,0 +1,90 @@
+{
+  "_comment": "The first-run wizard's curated chat models (adr/0013), read by LLMTrayCore.ModelRecommendations. tiers: the memory tiers (GB of RAM: 8, 16, 24, 32 = 32 and up) an entry is offered in; minMemoryGB: never offered below it; recommended: marked and listed first (one per tier). approxBytes: the repo's current files (HF API, ?blobs=true), used until the Hub's live size is read. Every repo here was checked to exist, be ungated and load with the pinned mlx-lm's model code (2026-09-26).",
+  "version": 1,
+  "models": [
+    {
+      "repo": "roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang",
+      "title": "Gemma 4 26B-A4B (GPTQ)",
+      "summary": "Google's mixture-of-experts Gemma 4 with 4B active parameters, quantized with GPTQ by LLMTray's authors; reads images and calls tools.",
+      "capabilities": ["vision", "tools", "reasoning"],
+      "languages": ["multilingual"],
+      "license": "apache-2.0",
+      "approxBytes": 15603516865,
+      "minMemoryGB": 24,
+      "recommended": true,
+      "tiers": [24, 32]
+    },
+    {
+      "repo": "roman220220/gemma-4-E4B-it-gptq-mlx-jang",
+      "title": "Gemma 4 E4B (GPTQ)",
+      "summary": "A small Gemma 4, quantized with GPTQ by LLMTray's authors, that leaves room for other apps on a 16 GB Mac; reads images and calls tools.",
+      "capabilities": ["vision", "tools", "reasoning"],
+      "languages": ["multilingual"],
+      "license": "apache-2.0",
+      "approxBytes": 6802067326,
+      "minMemoryGB": 16,
+      "recommended": true,
+      "tiers": [16]
+    },
+    {
+      "repo": "mlx-community/gemma-4-e2b-it-4bit",
+      "title": "Gemma 4 E2B (4-bit)",
+      "summary": "The smallest Gemma 4, for everyday questions and short texts on an 8 GB Mac; reads images and calls tools.",
+      "capabilities": ["vision", "tools", "reasoning"],
+      "languages": ["multilingual"],
+      "license": "apache-2.0",
+      "approxBytes": 3583088661,
+      "minMemoryGB": 8,
+      "recommended": true,
+      "tiers": [8]
+    },
+    {
+      "repo": "roman220220/NVIDIA-Nemotron-3-Nano-4B-JANG-GPTQ-ipsupport-code-lora",
+      "title": "Nemotron 3 Nano 4B, coding agent",
+      "summary": "NVIDIA's small Nemotron, fine-tuned by LLMTray's authors for tool calling in a terminal coding agent; text only.",
+      "capabilities": ["tools", "reasoning"],
+      "languages": ["en"],
+      "license": "nvidia-nemotron-open-model-license",
+      "approxBytes": 4240435549,
+      "minMemoryGB": 8,
+      "recommended": false,
+      "tiers": [8, 16]
+    },
+    {
+      "repo": "mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit",
+      "title": "Mistral Small 3.2 24B (4-bit)",
+      "summary": "Mistral's dense 24B model, slower than a mixture-of-experts model of its size, good at following instructions in many languages; text only.",
+      "capabilities": ["tools"],
+      "languages": ["en", "fr", "de", "es", "pt", "it", "ja", "ko", "ru", "zh", "ar", "hi"],
+      "license": "apache-2.0",
+      "approxBytes": 13277587940,
+      "minMemoryGB": 24,
+      "recommended": false,
+      "tiers": [24, 32]
+    },
+    {
+      "repo": "roman220220/Nemotron-3.5-Lightning-30B-A3B-JANG-GPTQ-ipsupport-code-lora",
+      "title": "Nemotron 3.5 Lightning 30B-A3B, coding agent",
+      "summary": "NVIDIA's mixture-of-experts Nemotron, fine-tuned by LLMTray's authors for tool calling in a terminal coding agent; text only.",
+      "capabilities": ["tools", "reasoning"],
+      "languages": ["en"],
+      "license": "openmdw-1.1",
+      "approxBytes": 16743201690,
+      "minMemoryGB": 32,
+      "recommended": false,
+      "tiers": [32]
+    },
+    {
+      "repo": "mlx-community/gemma-4-31b-it-4bit",
+      "title": "Gemma 4 31B (4-bit)",
+      "summary": "The largest Gemma 4, a dense model: slower than 26B-A4B, stronger on hard questions; reads images and calls tools.",
+      "capabilities": ["vision", "tools", "reasoning"],
+      "languages": ["multilingual"],
+      "license": "apache-2.0",
+      "approxBytes": 18444421751,
+      "minMemoryGB": 32,
+      "recommended": false,
+      "tiers": [32]
+    }
+  ]
+}

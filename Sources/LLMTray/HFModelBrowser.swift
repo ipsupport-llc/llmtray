@@ -48,20 +48,9 @@ enum HFSortOption: String, CaseIterable, Identifiable {
     }
 }
 
-/// A rough, honest heuristic -- not a promise. Compares a repo's on-disk
-/// size against total (not currently-free) physical memory, since "will
-/// this machine ever run this comfortably" is the more useful question
-/// while browsing than "is there room for it this exact second," and free
-/// memory fluctuates with whatever else happens to be running. Doesn't
-/// account for KV-cache/activation overhead on top of the weights
-/// themselves, which is real but depends on context length and isn't
-/// knowable in advance -- the thresholds leave headroom for it, but a
-/// model right at the "fits" boundary can still fail on a long context.
-enum ModelFitLevel {
-    case fits
-    case tight
-    case unlikely
-
+/// The fit estimate itself is LLMTrayCore's (the wizard's recommendations
+/// use it too); its dot and words are here.
+extension ModelFitLevel {
     var color: Color {
         switch self {
         case .fits: return .green
@@ -76,13 +65,6 @@ enum ModelFitLevel {
         case .tight: return NSLocalizedString("Tight -- may not leave room for context", comment: "")
         case .unlikely: return NSLocalizedString("Larger than this Mac's RAM -- unlikely to load", comment: "")
         }
-    }
-
-    static func estimate(sizeBytes: Int64, physicalMemoryBytes: UInt64) -> ModelFitLevel {
-        let ratio = Double(sizeBytes) / Double(physicalMemoryBytes)
-        if ratio < 0.45 { return .fits }
-        if ratio < 0.70 { return .tight }
-        return .unlikely
     }
 }
 
