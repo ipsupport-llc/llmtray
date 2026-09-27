@@ -12,6 +12,8 @@ final class FakeEmbedder: ProjectEmbedder, @unchecked Sendable {
     var delay: TimeInterval = 0
     /// Thrown by every request while set.
     var failure: Error?
+    /// A request with a text containing this is refused (`.runner`).
+    var refuse: String?
     private let lock = NSLock()
     private var _calls = 0
     var calls: Int { lock.withLock { _calls } }
@@ -24,6 +26,9 @@ final class FakeEmbedder: ProjectEmbedder, @unchecked Sendable {
         lock.withLock { _calls += 1 }
         if delay > 0 { try await Task.sleep(nanoseconds: UInt64(delay * 1e9)) }
         if let failure { throw failure }
+        if let refuse, texts.contains(where: { $0.contains(refuse) }) {
+            throw EmbedRunner.Failure.runner(code: "bad_request", message: "refused")
+        }
         let toy = ToyEmbedder(dim: dim)
         let v = texts.flatMap { toy.embed($0).map(Float16.init) }
         return EmbedResult(dim: dim, count: texts.count, vectors: v, tokens: texts.map { _ in 1 }, truncated: [], milliseconds: 1)
@@ -276,7 +281,7 @@ final class ProjectIngestorTests: XCTestCase {
         let callsAtGrant = embedder!.calls
         XCTAssertEqual(statuses(i), [.searchable], "granted mid-document, at a slice boundary")
         try await Task.sleep(nanoseconds: 150_000_000)
-        XCTAssertLessThanOrEqual(embedder!.calls, callsAtGrant + 1, "no new slice while the generation holds the queue")
+        XCTAssertEqual(embedder!.calls, callsAtGrant, "no new slice while the generation holds the queue")
         XCTAssertEqual(i.progress(for: project).state, .waiting)
         ticket.release()
         try await settle(i)
@@ -307,6 +312,39 @@ final class ProjectIngestorTests: XCTestCase {
         try await settle(i)
         XCTAssertEqual(statuses(i), [.searchable])
         XCTAssertTrue(i.progress(for: project).wordsOnly)
+    }
+
+    func testARefusedDocumentIsSkippedNotCountedAgainstTheEmbedder() async throws {
+        embedder!.refuse = "poisonword"
+        let i = ingestor()
+        _ = await i.add([try file("bad.txt", "poisonword and more"), try file("good.txt", "plain good words")], to: project)
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.searchable, .embedded], "the refused one stays searchable by words")
+        XCTAssertNil(i.embeddingUnavailable)
+        XCTAssertEqual(i.progress(for: project), .idle)
+    }
+
+    func testRemovingADocumentWhileItIsRead() async throws {
+        let i = ingestor()
+        _ = await i.add([try file("slow.txt", "SLOW words")] + (try corpus(1)), to: project)
+        try await waitUntil("reading") { self.extractor.calls == 1 }
+        try await i.removeDocument(1, from: project)
+        try await settle(i)
+        XCTAssertEqual(i.documents[project]?.map(\.doc), [2])
+        XCTAssertEqual(statuses(i), [.embedded])
+    }
+
+    func testTheEstimateLeavesTheWaitsOut() async throws {
+        busy = true
+        let i = ingestor()
+        _ = await i.add(try corpus(3), to: project)
+        try await Task.sleep(nanoseconds: 300_000_000)
+        busy = false
+        try await waitUntil("one finished") { i.progress(for: project).done >= 1 || i.progress(for: project).state == .idle }
+        if let eta = i.progress(for: project).remainingSeconds {
+            XCTAssertLessThan(eta, 0.3, "the 0.3 s waited for the chat isn't work")
+        }
+        try await settle(i)
     }
 
     func testAPausedEmbedderIsRetriedNotCountedAsAFailure() async throws {

@@ -255,6 +255,21 @@ final class ProjectIndexRegistryTests: XCTestCase {
         XCTAssertEqual(r.hits.count, 1)
         reg.closeAll()
     }
+
+    /// A deleted project is never opened again: the directory its deletion
+    /// removed isn't recreated by a late open.
+    func testARetiredProjectIsNeverReopened() throws {
+        let root = indexTempDir()
+        let reg = registry(root)
+        let project = UUID()
+        _ = try reg.handle(for: project)
+        reg.retire(project)
+        XCTAssertFalse(reg.openProjects.contains(project))
+        let dir = root.appendingPathComponent(project.uuidString)
+        try FileManager.default.removeItem(at: dir)
+        XCTAssertThrowsError(try reg.handle(for: project))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: dir.path))
+    }
 }
 
 /// Set once, read from any thread.
@@ -263,4 +278,5 @@ final class Flag: @unchecked Sendable {
     private var value = false
     func set() { lock.lock(); value = true; lock.unlock() }
     var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
+
 }

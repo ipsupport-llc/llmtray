@@ -222,7 +222,7 @@ final class ProjectIndexer: ObservableObject {
             await ingestor.forget(project)
         } else {
             let registry = registry
-            try? await ProcessRunner.offMain { registry.close(project) }
+            try? await ProcessRunner.offMain { registry.retire(project) }
         }
     }
 

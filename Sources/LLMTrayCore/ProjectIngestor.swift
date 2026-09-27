@@ -12,14 +12,21 @@ public protocol ProjectEmbedder: AnyObject {
     /// A document's texts split into requests of one background slice each.
     func documentBatches(_ texts: [String]) -> [Range<Int>]
     func embedDocuments(_ texts: [String]) async throws -> EmbedResult
+    /// Loads the model if it isn't (outside any background slice).
+    func prepare() async throws
+}
+
+extension ProjectEmbedder {
+    public func prepare() async throws {}
 }
 
 /// An embedder entry's shared runner, as the ingest uses it.
 public final class RunnerEmbedder: ProjectEmbedder {
     public let runner: EmbedRunner
     public let entry: EmbedderEntry
-    /// One index request, runner start included.
-    public var timeout: TimeInterval = 120
+    /// One index request, the runner already started (`prepare`): a slice
+    /// is ≤ ~3 s of work, so this is a hung runner, not a slow one.
+    public var timeout: TimeInterval = 30
 
     public init(runner: EmbedRunner, entry: EmbedderEntry) {
         self.runner = runner
@@ -31,6 +38,11 @@ public final class RunnerEmbedder: ProjectEmbedder {
     public var prepVersion: Int { entry.preprocessingVersion }
     public var maxTexts: Int { runner.configuration.maxTexts }
     public func documentBatches(_ texts: [String]) -> [Range<Int>] { runner.documentBatches(texts) }
+    public func prepare() async throws {
+        if runner.isPaused { throw EmbedRunner.Failure.paused }
+        try await runner.start()
+    }
+
     public func embedDocuments(_ texts: [String]) async throws -> EmbedResult {
         try await runner.embed(texts, kind: .document, timeout: timeout)
     }
@@ -134,6 +146,10 @@ public final class ProjectIngestor {
     private var unblock: Task<Void, Never>?
     private var maintenance: [UUID: Task<Void, Never>] = [:]
     private var isShutDown = false
+    /// The step in flight's own time so far (its waits left out).
+    private var activeSeconds: Double = 0
+    /// Held (a download or removal of its files): tried again after this.
+    private var heldRetry: TimeInterval { env.pollInterval * 10 }
 
     public init(environment: Environment, paused: Set<UUID> = [], stopped: Set<UUID> = []) {
         env = environment
@@ -189,6 +205,7 @@ public final class ProjectIngestor {
             // set, and documents made searchable before the embedder was
             // installed have none yet.
             await queueEmbedding(project, h)
+            if deleted.contains(project) { queue.remove(project) }
             kick()
         }
         return h
@@ -208,7 +225,6 @@ public final class ProjectIngestor {
     /// Copies `urls` into the project and queues them. Each file gets its
     /// own result; a format this version doesn't index is refused.
     public func add(_ urls: [URL], to project: UUID) async -> [AddResult] {
-        if stopped.remove(project) != nil { persist() }
         copying[project, default: 0] += 1
         changed()
         defer {
@@ -243,6 +259,12 @@ public final class ProjectIngestor {
                 results.append(.added(doc))
                 // A stop that came during the copy made it `not_indexed`.
                 guard epoch(project) == e else { continue }
+                if stopped.remove(project) != nil {
+                    // A new file restarts a stopped project: what the stop
+                    // left unembedded is queued again too.
+                    persist()
+                    await queueEmbedding(project, h)
+                }
                 queue.enqueue([.extract(doc)], in: project)
                 kick()
             } catch ProjectIndexError.duplicate(let existing) {
@@ -340,8 +362,10 @@ public final class ProjectIngestor {
         documents[project] = nil
         activity[project] = nil
         opened.remove(project)
+        let wasPaused = paused.remove(project) != nil
+        if stopped.remove(project) != nil || wasPaused { persist() }
         let registry = env.registry
-        try? await ProcessRunner.offMain { registry.close(project) }
+        try? await ProcessRunner.offMain { registry.retire(project) }
         changed()
     }
 
@@ -382,11 +406,12 @@ public final class ProjectIngestor {
     private func work() async {
         while !Task.isCancelled, !isShutDown, let item = queue.next() {
             changed()
-            let started = Date()
+            activeSeconds = 0
             let outcome = await perform(item)
             activity[item.project] = nil
             if isWaiting { isWaiting = false }
-            let ended = queue.finish(item, outcome, seconds: Date().timeIntervalSince(started))
+            // Work only, not the waits (the chat, a generation, a slice): the ETA's base.
+            let ended = queue.finish(item, outcome, seconds: activeSeconds)
             if outcome != .interrupted { await refreshDocuments(item.project) }
             if ended { scheduleMaintenance(item.project) }
             changed()
@@ -434,14 +459,21 @@ public final class ProjectIngestor {
         guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
         activity[item.project] = Activity(doc: doc, stage: .reading)
         changed()
+        let started = Date()
+        defer { activeSeconds += Date().timeIntervalSince(started) }
         let h: ProjectIndexHandle
         let job: IndexJob
         do {
             h = try await handle(item.project)
             job = try await h.write { try $0.beginExtraction(doc: doc) }
         } catch {
-            return .dropped   // removed or stopped meanwhile, or the project is gone
+            // Removed or stopped meanwhile, or the project is gone.
+            if Self.isStale(error) || !isCurrent(item, e) { return .dropped }
+            NSLog("LLMTray: project file %lld couldn't be read for indexing: %@", doc, "\(error)")
+            return .failed
         }
+        // Stopped while it began: not read at all.
+        guard isCurrent(item, e) else { return .dropped }
         let extract = env.extract
         let file = job.file
         let task = Task { try await extract(file) }
@@ -481,7 +513,21 @@ public final class ProjectIngestor {
                 return .failed
             }
         } catch {
-            return .dropped   // stale: stopped or removed while it was read
+            // Stopped or removed while it was read.
+            if Self.isStale(error) || !isCurrent(item, e) { return .dropped }
+            // A real write failure (a full disk, I/O): failed, with why --
+            // never left `extracting` for the rest of the session.
+            _ = try? await h.write { try $0.failExtraction(job, error: "\(error)") }
+            return .failed
+        }
+    }
+
+    /// The document or the project changed state under a step: its result doesn't count.
+    static func isStale(_ error: Error) -> Bool {
+        if error is ProjectIndexHandle.Closed { return true }
+        switch error as? ProjectIndexError {
+        case .stale?, .noSuchDocument?: return true
+        default: return false
         }
     }
 
@@ -519,6 +565,14 @@ public final class ProjectIngestor {
             let batch = Array(pending[range])
             activity[item.project] = Activity(doc: doc, stage: .embedding)
             changed()
+            // The model loads outside the slice: a slice is one request
+            // (≤ ~3 s), not a cold start a generation would wait behind.
+            do {
+                try await embedder.prepare()
+            } catch {
+                return await embedFailed(error, item, e)
+            }
+            guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
             let slice: GenerationQueue.Slice
             do {
                 slice = try await env.queue.acquireBackground(isCancelled: { [weak self] in
@@ -528,16 +582,23 @@ public final class ProjectIngestor {
             } catch {
                 return outcomeWhenCut(item, e)
             }
+            // The chat model may have started while the slice was waited for.
+            if env.isForegroundBusy() {
+                slice.release()
+                continue
+            }
             let result: EmbedResult
+            let sent = Date()
             do {
                 result = try await embedder.embedDocuments(batch.map(\.text))
                 slice.release()
+                activeSeconds += Date().timeIntervalSince(sent)
             } catch {
                 slice.release()
-                return await embedFailed(error, item, e)
+                return await embedFailed(error, item, e, doc: doc)
             }
             guard result.count == batch.count, result.dim == set.dim, result.vectors.count == batch.count * set.dim else {
-                return await embedFailed(EmbedRunner.Failure.protocolViolation("\(result.count) × \(result.dim) for \(batch.count) × \(set.dim)"), item, e)
+                return await embedFailed(EmbedRunner.Failure.protocolViolation("\(result.count) × \(result.dim) for \(batch.count) × \(set.dim)"), item, e, doc: doc)
             }
             guard isCurrent(item, e) else { return .dropped }
             do {
@@ -556,12 +617,32 @@ public final class ProjectIngestor {
     /// grant: tried again once it may run. Anything else backs off; past the
     /// last delay embedding is off for the session and documents stay
     /// searchable by words.
-    private func embedFailed(_ error: Error, _ item: Item, _ e: Int) async -> ProjectIngestQueue.Outcome {
+    private func embedFailed(_ error: Error, _ item: Item, _ e: Int, doc: Int64? = nil) async -> ProjectIngestQueue.Outcome {
         guard isCurrent(item, e) else { return .dropped }
         if error is CancellationError { return .interrupted }
-        if let failure = error as? EmbedRunner.Failure, failure == .paused || failure == .stopped {
-            try? await Task.sleep(nanoseconds: UInt64(env.pollInterval * 1e9))
+        let failure = error as? EmbedRunner.Failure
+        if failure == .paused || failure == .stopped {
+            if env.queue.hasInteractiveDemand {
+                // A generation: waited out in waitForForeground.
+                try? await Task.sleep(nanoseconds: UInt64(env.pollInterval * 1e9))
+            } else {
+                // Held while its files are replaced or removed: not polled
+                // every beat; `embedderChanged` (the download's end) lifts it.
+                blockEmbedding(for: heldRetry)
+            }
             return .interrupted
+        }
+        if let doc, let failure {
+            switch failure {
+            case .runner, .protocolViolation:
+                // This document's request was refused (a text the runner
+                // won't take, an answer of the wrong shape): it stays
+                // searchable by words, and the rest goes on.
+                NSLog("LLMTray: project file %lld not embedded: %@", doc, "\(error)")
+                return .finished
+            default:
+                break
+            }
         }
         embedFailures += 1
         let delays = env.embedRetryDelays
@@ -571,8 +652,12 @@ public final class ProjectIngestor {
             for project in queue.finishEmbeddingAsWordsOnly() { scheduleMaintenance(project) }
             return .finished
         }
+        blockEmbedding(for: delays[embedFailures - 1])
+        return .interrupted
+    }
+
+    private func blockEmbedding(for delay: TimeInterval) {
         queue.embeddingBlocked = true
-        let delay = delays[embedFailures - 1]
         unblock?.cancel()
         unblock = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(delay * 1e9))
@@ -581,7 +666,6 @@ public final class ProjectIngestor {
             self.queue.embeddingBlocked = false
             self.kick()
         }
-        return .interrupted
     }
 
     // MARK: - maintenance
