@@ -14,10 +14,13 @@ public protocol ProjectEmbedder: AnyObject {
     func embedDocuments(_ texts: [String]) async throws -> EmbedResult
     /// Loads the model if it isn't (outside any background slice).
     func prepare() async throws
+    /// Loaded: a request now is one slice's work, no cold start.
+    var isReady: Bool { get }
 }
 
 extension ProjectEmbedder {
     public func prepare() async throws {}
+    public var isReady: Bool { true }
 }
 
 /// An embedder entry's shared runner, as the ingest uses it.
@@ -42,6 +45,8 @@ public final class RunnerEmbedder: ProjectEmbedder {
         if runner.isPaused { throw EmbedRunner.Failure.paused }
         try await runner.start()
     }
+
+    public var isReady: Bool { runner.readyInfo != nil }
 
     public func embedDocuments(_ texts: [String]) async throws -> EmbedResult {
         try await runner.embed(texts, kind: .document, timeout: timeout)
@@ -470,6 +475,9 @@ public final class ProjectIngestor {
             // Removed or stopped meanwhile, or the project is gone.
             if Self.isStale(error) || !isCurrent(item, e) { return .dropped }
             NSLog("LLMTray: project file %lld couldn't be read for indexing: %@", doc, "\(error)")
+            if let h = try? await handle(item.project) {
+                _ = try? await h.write { try $0.failStaged(doc: doc, error: "\(error)") }
+            }
             return .failed
         }
         // Stopped while it began: not read at all.
@@ -565,14 +573,15 @@ public final class ProjectIngestor {
             let batch = Array(pending[range])
             activity[item.project] = Activity(doc: doc, stage: .embedding)
             changed()
-            // The model loads outside the slice: a slice is one request
-            // (≤ ~3 s), not a cold start a generation would wait behind.
+            // The model loads outside the slice (and not while the chat
+            // model generates): a slice is one request (≤ ~3 s), not a cold
+            // start a generation would wait behind.
+            guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
             do {
                 try await embedder.prepare()
             } catch {
                 return await embedFailed(error, item, e)
             }
-            guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
             let slice: GenerationQueue.Slice
             do {
                 slice = try await env.queue.acquireBackground(isCancelled: { [weak self] in
@@ -582,8 +591,10 @@ public final class ProjectIngestor {
             } catch {
                 return outcomeWhenCut(item, e)
             }
-            // The chat model may have started while the slice was waited for.
-            if env.isForegroundBusy() {
+            // The chat model may have started while the slice was waited
+            // for, or a generation's grant (or the idle timeout) ended the
+            // runner: back to the top, the model loaded outside a slice.
+            if env.isForegroundBusy() || !embedder.isReady {
                 slice.release()
                 continue
             }

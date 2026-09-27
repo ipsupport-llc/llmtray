@@ -467,6 +467,12 @@ public final class ProjectIndex {
         }
     }
 
+    /// A staged document that couldn't even begin (its copy unreadable, a
+    /// write failed): `failed` with why, rather than left queued.
+    public func failStaged(doc: Int64, error: String) throws {
+        try db.run("UPDATE documents SET status = 'failed', error = ? WHERE doc = ? AND status = 'staged'", [.text(error), .int(doc)])
+    }
+
     // MARK: - stop / resume
 
     /// Stop: whatever isn't searchable yet becomes `not_indexed`; indexed

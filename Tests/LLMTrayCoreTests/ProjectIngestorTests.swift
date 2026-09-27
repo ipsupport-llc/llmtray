@@ -340,10 +340,13 @@ final class ProjectIngestorTests: XCTestCase {
         _ = await i.add(try corpus(3), to: project)
         try await Task.sleep(nanoseconds: 300_000_000)
         busy = false
-        try await waitUntil("one finished") { i.progress(for: project).done >= 1 || i.progress(for: project).state == .idle }
-        if let eta = i.progress(for: project).remainingSeconds {
-            XCTAssertLessThan(eta, 0.3, "the 0.3 s waited for the chat isn't work")
+        embedder!.delay = 0.05   // the second file's embedding keeps the run open
+        try await waitUntil("one finished") {
+            let p = i.progress(for: project)
+            return p.done >= 1 && p.state != .idle
         }
+        let eta = try XCTUnwrap(i.progress(for: project).remainingSeconds)
+        XCTAssertLessThan(eta, 0.3, "the 0.3 s waited for the chat isn't work")
         try await settle(i)
     }
 
