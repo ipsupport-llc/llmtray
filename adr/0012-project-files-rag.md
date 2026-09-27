@@ -250,6 +250,12 @@ the copy (or the linked file) at that page, and says so when the file
 has changed since that revision or is gone. A citation also keeps the
 file's name as it was read (the chip's label, once the file is gone too);
 the chip's action is `MessageBubble.openCitation`, nil until PR 3.4/3.5.
+A PDF opens in the app's own read-only viewer (`PDFCitationViewer`,
+PDFKit): one window per file, at the cited page (clamped to the file
+now), the cited chunk highlighted when its text is found on that page
+(searched there only); "Open in Preview" and "Show in Finder" beside it.
+Other formats open in their app, at their start: macOS has no page
+anchor for a file opened elsewhere (Preview ignores one).
 
 **Retention.** The cited revision's `pages` rows are kept as tombstones
 when its document is re-indexed or removed (a linked file too), until no

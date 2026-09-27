@@ -229,9 +229,11 @@ struct ContentView: View {
 
     /// A citation chip (adr/0012): the cited file opens -- the project's
     /// copy, or the linked file -- saying so when it changed since that
-    /// answer; one no longer there only says so. macOS has no page anchor
-    /// for a file opened in its app (Preview ignores one): it opens at its
-    /// start, the chip naming the page.
+    /// answer; one no longer there only says so. A PDF opens in the app's
+    /// own viewer at the cited page, the cited text highlighted when it's
+    /// still there (PDFCitationViewer); other formats in their app, at
+    /// their start (macOS has no page anchor for them), the chip naming the
+    /// page.
     private func openCitation(_ c: Citation) {
         Task { @MainActor in
             let target: CitationTarget = ChatLibraryStore.shared.library.project(c.project) == nil
@@ -241,9 +243,14 @@ struct ContentView: View {
             case .gone:
                 note = String(format: NSLocalizedString("\"%@\" is no longer in the project.", comment: "citation chip: the cited file was removed"), c.name)
             case .file(let url, let page, let changed):
-                NSWorkspace.shared.open(url)
                 note = changed ? String(format: NSLocalizedString("\"%@\" has changed since this answer cited it: page %lld may read differently now.",
                                                                   comment: "citation chip: the cited file was re-indexed"), c.name, page) : nil
+                if CitationViewer.opensInViewer(url) {
+                    let quote = await ProjectIndexer.citationQuote(c)
+                    if !PDFCitationViewer.show(url, name: c.name, page: page, quote: quote, note: note) { NSWorkspace.shared.open(url) }
+                } else {
+                    NSWorkspace.shared.open(url)
+                }
             }
             citationNote = note
             guard let note else { return }

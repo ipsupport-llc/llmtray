@@ -656,4 +656,60 @@ public enum CitationTarget: Equatable {
               FileManager.default.fileExists(atPath: url.path) else { return .gone }
         return .file(url, page: c.page, changed: d.rev != Int64(c.rev))
     }
+
+    /// The cited chunk's text, verbatim from its page (what the PDF viewer
+    /// highlights); nil without a chunk, or once the cited revision's chunks
+    /// are gone. Read-only, like `resolve`.
+    public static func quote(_ c: Citation, projectDirectory: URL) -> String? {
+        guard let chunk = c.chunk else { return nil }
+        let path = projectDirectory.appendingPathComponent(ProjectIndex.databaseName).path
+        guard FileManager.default.fileExists(atPath: path),
+              let db = try? SQLiteConnection(path: path, readOnly: true) else { return nil }
+        defer { db.close() }
+        db.setBusyTimeout(milliseconds: 1000)
+        return (try? db.rows("""
+            SELECT substr(p.text, c.start + 1, c.len) FROM chunks c
+            JOIN pages p ON p.doc = c.doc AND p.rev = c.rev AND p.page = c.page
+            WHERE c.id = ? AND c.doc = ? AND c.rev = ? AND c.page = ?
+            """, [.int(Int64(chunk)), .int(Int64(c.doc)), .int(Int64(c.rev)), .int(Int64(c.page))]) { $0.text(0) })?.first
+    }
+}
+
+/// The in-app PDF viewer's pure part: which files it opens, the page a
+/// citation lands on, and where the cited text is on it.
+public enum CitationViewer {
+    /// PDFs open in the viewer (at the cited page); other formats in their
+    /// app, as before.
+    public static func opensInViewer(_ url: URL) -> Bool {
+        url.pathExtension.lowercased() == "pdf"
+    }
+
+    /// A citation's 1-based page as a page index of a document with
+    /// `pageCount` pages, clamped to it (a changed file may be shorter);
+    /// nil for a document without pages.
+    public static func pageIndex(_ page: Int, pageCount: Int) -> Int? {
+        guard pageCount > 0 else { return nil }
+        return min(max(page, 1), pageCount) - 1
+    }
+
+    /// Where `quote` (a chunk, as the index stored its page's text) is in
+    /// `pageText` (the page's text now), in `pageText`'s UTF-16 units:
+    /// the whole quote, else its first line (a partial highlight beats
+    /// none); nil when neither is there -- nothing is highlighted then.
+    public static func quoteRange(_ quote: String, in pageText: String) -> NSRange? {
+        let text = pageText as NSString
+        let whole = quote.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !whole.isEmpty, text.length > 0 else { return nil }
+        // Not .literal: a decomposed "é" (PDFKit on macOS 14) matches a composed one.
+        let found = text.range(of: whole)
+        if found.location != NSNotFound { return found }
+        guard let line = whole.split(whereSeparator: \.isNewline).lazy
+            .map({ $0.trimmingCharacters(in: .whitespaces) }).first(where: { $0.count >= minimumLine }) else { return nil }
+        let partial = text.range(of: String(line.prefix(maximumLine)))
+        return partial.location == NSNotFound ? nil : partial
+    }
+
+    /// A shorter first line matches too easily elsewhere on the page.
+    static let minimumLine = 8
+    static let maximumLine = 200
 }
