@@ -89,6 +89,7 @@
 "Check for Runtime Updates" = "Check for Runtime Updates";
 "Check for Updates…" = "Check for Updates…";
 "Check for updates automatically" = "Check for updates automatically";
+"Checking the download…" = "Checking the download…";
 "Checks about once a day in the background and offers new versions." = "Checks about once a day in the background and offers new versions.";
 "Choose…" = "Choose…";
 "Clear" = "Clear";
@@ -139,6 +140,7 @@
 "Downloaded" = "Downloaded";
 "Downloading %@…" = "Downloading %@…";
 "Downloading %lld files…" = "Downloading %lld files…";
+"Downloading the embedder failed: %@" = "Downloading the embedder failed: %@";
 "Downloading…" = "Downloading…";
 "Downloads" = "Downloads";
 "Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
@@ -284,6 +286,7 @@
 "No tool calls yet in this version." = "No tool calls yet in this version.";
 "Non-commercial license: read it on the model card before using the model." = "Non-commercial license: read it on the model card before using the model.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
+"Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "OK" = "OK";
 "Off" = "Off";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
@@ -451,14 +454,21 @@
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
+"The download didn't start." = "The download didn't start.";
+"The download stopped." = "The download stopped.";
+"The downloaded embedder files don't match their checksums: %@" = "The downloaded embedder files don't match their checksums: %@";
+"The embedder is being downloaded -- try again once it's done." = "The embedder is being downloaded -- try again once it's done.";
+"The embedder list is missing or invalid: %@" = "The embedder list is missing or invalid: %@";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
+"The model downloaded, but its folder couldn't be marked complete." = "The model downloaded, but its folder couldn't be marked complete.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model reloads when the image or song is done" = "The model reloads when the image or song is done";
+"The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
 "The model's license, from its card." = "The model's license, from its card.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
@@ -498,6 +508,8 @@
 "Uninstall" = "Uninstall";
 "Uninstall Runtime Data…" = "Uninstall Runtime Data…";
 "Uninstall runtime data?" = "Uninstall runtime data?";
+"Unknown image model %@" = "Unknown image model %@";
+"Unknown music model %@" = "Unknown music model %@";
 "Unload chat model during generation" = "Unload chat model during generation";
 "Unload model when idle" = "Unload model when idle";
 "Unpin" = "Unpin";

@@ -1,6 +1,5 @@
 import AppKit
 import LLMTrayCore
-import ServiceManagement
 import SwiftUI
 
 // Every user-facing string here is a LocalizedStringKey (a plain literal in
@@ -20,9 +19,9 @@ struct GeneralPane: View {
     @AppStorage(Pref.autoCompactThreshold) private var autoCompactThreshold
     @AppStorage(Pref.autoTitleChats) private var autoTitleChats
     @AppStorage(Pref.chatWindowShowsModelControls) private var chatWindowShowsModelControls
-    // SMAppService is the source of truth (the user can also change it in
-    // System Settings > Login Items), so it's read, not stored.
-    @State private var launchAtLogin = SMAppService.mainApp.status == .enabled
+    // Read from FeatureSetup (SMAppService), not stored: the user can also
+    // change it in System Settings > Login Items.
+    @State private var launchAtLogin = FeatureSetup.launchAtLogin
     @State private var launchAtLoginError: String?
     @State private var language: String = AppLanguage.current
 
@@ -101,12 +100,12 @@ struct GeneralPane: View {
             }
         }
         .formStyle(.grouped)
-        .onAppear { launchAtLogin = SMAppService.mainApp.status == .enabled }
+        .onAppear { launchAtLogin = FeatureSetup.launchAtLogin }
     }
 
     private func setLaunchAtLogin(_ enabled: Bool) {
         do {
-            if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            try FeatureSetup.setLaunchAtLogin(enabled)
             launchAtLogin = enabled
             launchAtLoginError = nil
         } catch {
@@ -188,7 +187,7 @@ struct ModelsPane: View {
                     SettingLabel(title: "Hugging Face token", help: "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.")
                 }
                 HStack {
-                    Button("Use LM Studio's folder") { modelsRoot = NSString(string: "~/.lmstudio/models").expandingTildeInPath }
+                    Button("Use LM Studio's folder") { FeatureSetup.shared.useLMStudioFolder() }
                     Button("Rescan", action: rescan)
                     Spacer()
                     Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
@@ -267,7 +266,7 @@ struct ModelsPane: View {
         panel.directoryURL = URL(fileURLWithPath: modelsRoot)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }
-        modelsRoot = url.path
+        FeatureSetup.shared.setModelsFolder(url.path)
     }
 }
 
@@ -657,23 +656,23 @@ struct ProfilesPane: View {
         )
     }
 
-    private var imageGenModel: ImageGenModel {
-        ImageGenModel(rawValue: profiles.value(\.tools.imageGenModel, profileID: selectedID)) ?? .gptqMixed
-    }
+    private var setup: FeatureSetup { .shared }
+
+    private var imageGenModel: ImageGenModel { setup.imageGenModel(profileID: selectedID) }
 
     private var imageGenModelBinding: Binding<ImageGenModel> {
         Binding(
             get: { imageGenModel },
             set: { newModel in
                 guard newModel != imageGenModel else { return }
-                profiles.set(\.tools.imageGenModel, newModel.rawValue, profileID: selectedID)
+                setup.setImageGenModel(newModel, profileID: selectedID)
                 // Switching models while generation is on goes through the
                 // same confirm-and-download step as enabling, instead of
                 // leaving the first generate_image call to stall on a
                 // multi-GB download.
-                if profiles.value(\.tools.enableImageGeneration, profileID: selectedID) {
-                    profiles.set(\.tools.enableImageGeneration, false, profileID: selectedID)
-                    confirmAndDownloadImageModel()
+                if setup.isImageGenerationEnabled(profileID: selectedID) {
+                    setup.setImageGenerationEnabled(false, profileID: selectedID)
+                    confirmAndEnableImageGeneration()
                 }
             }
         )
@@ -681,20 +680,17 @@ struct ProfilesPane: View {
 
     private var imageEditModelBinding: Binding<ImageGenModel?> {
         Binding(
-            get: { ImageGenModel(rawValue: profiles.value(\.tools.imageEditModel, profileID: selectedID)).flatMap { $0.supportsEditing ? $0 : nil } },
+            get: { setup.imageEditModel(profileID: selectedID) },
             set: { newModel in
-                guard let newModel else {
-                    profiles.set(\.tools.imageEditModel, "", profileID: selectedID)
+                // Off, or one already downloaded: set as is.
+                guard let newModel, !newModel.isDownloaded else {
+                    setup.setImageEditModel(newModel, profileID: selectedID)
                     return
                 }
                 // Downloaded first, like the generation model: an edit
                 // mustn't stall on a multi-GB download mid-chat.
-                guard !newModel.isDownloaded else {
-                    profiles.set(\.tools.imageEditModel, newModel.rawValue, profileID: selectedID)
-                    return
-                }
-                confirmAndDownload(newModel, title: NSLocalizedString("Enable image editing?", comment: "")) { id in
-                    profiles.set(\.tools.imageEditModel, newModel.rawValue, profileID: id)
+                confirmImageDownload(newModel, title: NSLocalizedString("Enable image editing?", comment: "")) { id in
+                    await setup.enableImageEditing(newModel, profileID: id)
                 }
             }
         )
@@ -709,22 +705,21 @@ struct ProfilesPane: View {
 
     private var enableMusicGenerationBinding: Binding<Bool> {
         Binding(
-            get: { profiles.value(\.tools.enableMusicGeneration, profileID: selectedID) },
+            get: { setup.isMusicGenerationEnabled(profileID: selectedID) },
             set: { on in
                 guard on else {
-                    profiles.set(\.tools.enableMusicGeneration, false, profileID: selectedID)
+                    setup.setMusicGenerationEnabled(false, profileID: selectedID)
                     return
                 }
-                confirmMusicDownload(musicModel, title: NSLocalizedString("Enable music generation?", comment: "")) { id in
-                    profiles.set(\.tools.enableMusicGeneration, true, profileID: id)
-                }
+                let model = musicModel
+                confirmMusicDownload(model, title: NSLocalizedString("Enable music generation?", comment: ""),
+                                     whenReady: { setup.setMusicGenerationEnabled(true, profileID: $0) },
+                                     download: { await setup.enableMusicGeneration(model, profileID: $0) })
             }
         )
     }
 
-    private var musicModel: MusicModel {
-        MusicModel(rawValue: profiles.value(\.tools.musicModel, profileID: selectedID)) ?? .turbo
-    }
+    private var musicModel: MusicModel { setup.musicModel(profileID: selectedID) }
 
     /// A model not downloaded yet goes through the same confirmed download
     /// (only when music generation is on: it's downloaded when turned on).
@@ -733,78 +728,77 @@ struct ProfilesPane: View {
             get: { musicModel },
             set: { newModel in
                 guard newModel != musicModel else { return }
-                let enabled = profiles.value(\.tools.enableMusicGeneration, profileID: selectedID)
-                guard enabled, !chat.isMusicModelReady(newModel) else {
-                    profiles.set(\.tools.musicModel, newModel.rawValue, profileID: selectedID)
+                guard setup.isMusicGenerationEnabled(profileID: selectedID), !setup.isMusicModelReady(newModel) else {
+                    setup.setMusicModel(newModel, profileID: selectedID)
                     return
                 }
-                confirmMusicDownload(newModel, title: NSLocalizedString("Switch the music model?", comment: "")) { id in
-                    profiles.set(\.tools.musicModel, newModel.rawValue, profileID: id)
-                }
+                confirmMusicDownload(newModel, title: NSLocalizedString("Switch the music model?", comment: ""),
+                                     whenReady: { setup.setMusicModel(newModel, profileID: $0) },
+                                     download: { await setup.switchMusicModel(to: newModel, profileID: $0) })
             }
         )
     }
 
-    /// Installs mlx-audio and downloads `model` if needed, then `then(profile)`.
-    private func confirmMusicDownload(_ model: MusicModel, title: String, then: @escaping (String) -> Void) {
+    /// `model` ready: `whenReady(profile)` at once. Otherwise, confirmed,
+    /// `download(profile)` (FeatureSetup installs mlx-audio, downloads the
+    /// model and makes the change), its error shown here.
+    private func confirmMusicDownload(_ model: MusicModel, title: String,
+                                      whenReady: (String) -> Void,
+                                      download: @escaping (String) async -> Error?) {
         let id = selectedID
-        if chat.isMusicModelReady(model) {
-            then(id)
+        if setup.isMusicModelReady(model) {
+            whenReady(id)
             return
         }
-        guard !chat.isDownloadingModel else { return }
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), model.displayName, model.approximateDownloadDescription)
-        alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
-        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        guard !setup.isDownloadingModel else { return }
+        guard confirmDownload(title: title, model: model.displayName, size: model.approximateDownloadDescription) else { return }
         musicDownloadError = nil
         Task {
-            if let error = await chat.downloadMusicModel(model) {
+            if let error = await download(id) {
                 musicDownloadError = error.localizedDescription
-            } else {
-                then(id)
             }
         }
     }
 
     private var enableImageGenerationBinding: Binding<Bool> {
         Binding(
-            get: { profiles.value(\.tools.enableImageGeneration, profileID: selectedID) },
+            get: { setup.isImageGenerationEnabled(profileID: selectedID) },
             set: { on in
-                if on { confirmAndDownloadImageModel() } else { profiles.set(\.tools.enableImageGeneration, false, profileID: selectedID) }
+                if on { confirmAndEnableImageGeneration() } else { setup.setImageGenerationEnabled(false, profileID: selectedID) }
             }
         )
     }
 
     /// Downloads the image model (if not cached yet) before enabling -- tens
     /// of GB, better with visible progress now than a stalled chat later.
-    private func confirmAndDownloadImageModel() {
-        confirmAndDownload(imageGenModel, title: NSLocalizedString("Enable image generation?", comment: "")) { id in
-            profiles.set(\.tools.enableImageGeneration, true, profileID: id)
+    private func confirmAndEnableImageGeneration() {
+        let model = imageGenModel
+        confirmImageDownload(model, title: NSLocalizedString("Enable image generation?", comment: "")) { id in
+            await setup.enableImageGeneration(model, profileID: id)
         }
     }
 
-    /// `then`: with the profile the choice was made for, once the model is
-    /// in place.
-    private func confirmAndDownload(_ model: ImageGenModel, title: String, then: @escaping (String) -> Void) {
-        guard !chat.isDownloadingModel else { return }
-        let alert = NSAlert()
-        alert.messageText = title
-        alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), model.displayName, model.approximateDownloadDescription)
-        alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
-        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
-        guard alert.runModal() == .alertFirstButtonReturn else { return }
+    /// Confirmed, `download(profile)` -- for the profile the choice was
+    /// made for -- its error shown here.
+    private func confirmImageDownload(_ model: ImageGenModel, title: String, download: @escaping (String) async -> Error?) {
+        guard !setup.isDownloadingModel else { return }
+        guard confirmDownload(title: title, model: model.displayName, size: model.approximateDownloadDescription) else { return }
         imageModelDownloadError = nil
         let id = selectedID
         Task {
-            if let error = await chat.downloadImageModel(model) {
+            if let error = await download(id) {
                 imageModelDownloadError = error.localizedDescription
-            } else {
-                then(id)
             }
         }
+    }
+
+    private func confirmDownload(title: String, model: String, size: String) -> Bool {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = String(format: NSLocalizedString("The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.", comment: ""), model, size)
+        alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        return alert.runModal() == .alertFirstButtonReturn
     }
 }
 

@@ -58,13 +58,24 @@ for lproj in "$REPO_ROOT"/Resources/Localization/*.lproj; do
   LANGS+=("$(basename "$lproj" .lproj)")
 done
 cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
-# Only the scripts + version pin -- never the venv itself, which is
-# machine-specific and gets created fresh on first run.
+# Only the scripts, the version pin and the first-run wizard's curated
+# model list -- never the venv itself, which is machine-specific and gets
+# created fresh on first run.
 cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
+   "$REPO_ROOT/runtime/recommended_models.json" \
    "$REPO_ROOT/runtime/llmtray_mflux_runner.py" \
    "$REPO_ROOT/runtime/llmtray_music_runner.py" \
+   "$REPO_ROOT/runtime/llmtray_embed_runner.py" \
+   "$REPO_ROOT/runtime/embedders.json" \
    "$APP/Contents/Resources/runtime/"
+# The embed runner's family modules and each embedder's reference vectors
+# (adr/0012); no __pycache__ (runs use PYTHONDONTWRITEBYTECODE).
+for dir in llmtray_embed embedders; do
+  mkdir -p "$APP/Contents/Resources/runtime/$dir"
+  find "$REPO_ROOT/runtime/$dir" -maxdepth 1 -type f \( -name '*.py' -o -name '*.json' \) \
+    -exec cp {} "$APP/Contents/Resources/runtime/$dir/" \;
+done
 
 /usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$APP/Contents/Info.plist" 2>/dev/null || true
 /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" "$APP/Contents/Info.plist"

@@ -49,10 +49,10 @@ enum BugReporter {
         let os = ProcessInfo.processInfo
         let system: [(String, String)] = [
             ("macOS", os.operatingSystemVersionString),
-            ("Mac", sysctl("hw.model") ?? "?"),
-            ("Chip", sysctl("machdep.cpu.brand_string") ?? "?"),
+            ("Mac", HardwareProbe.modelIdentifier ?? "?"),
+            ("Chip", HardwareProbe.chipBrand ?? "?"),
             ("Memory", ByteCountFormatter.string(fromByteCount: Int64(os.physicalMemory), countStyle: .memory)),
-            ("GPU wired limit", sysctl("iogpu.wired_limit_mb").map { $0 == "0" ? "default" : "\($0) MB" } ?? "?"),
+            ("GPU wired limit", HardwareProbe.wiredLimitMB.map { $0 == 0 ? "default" : "\($0) MB" } ?? "?"),
             ("Thermal state", thermal(os.thermalState)),
             ("Uptime", String(format: "%.1f h", os.systemUptime / 3600)),
         ]
@@ -321,25 +321,6 @@ enum BugReporter {
     }
 
     // MARK: -
-
-    private static func sysctl(_ name: String) -> String? {
-        var size = 0
-        guard sysctlbyname(name, nil, &size, nil, 0) == 0, size > 0 else { return nil }
-        // Numbers come as 4 or 8 bytes, strings as C strings.
-        if name == "iogpu.wired_limit_mb" {
-            if size == 4 {
-                var value: Int32 = 0
-                guard sysctlbyname(name, &value, &size, nil, 0) == 0 else { return nil }
-                return String(value)
-            }
-            var value: Int64 = 0
-            guard size == 8, sysctlbyname(name, &value, &size, nil, 0) == 0 else { return nil }
-            return String(value)
-        }
-        var buffer = [CChar](repeating: 0, count: size)
-        guard sysctlbyname(name, &buffer, &size, nil, 0) == 0 else { return nil }
-        return String(cString: buffer)
-    }
 
     private static func thermal(_ state: ProcessInfo.ThermalState) -> String {
         switch state {

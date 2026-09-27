@@ -8,6 +8,7 @@ public struct OrphanProcess: Equatable, Sendable {
         case modelServer
         case imageRunner
         case musicRunner
+        case embedRunner
     }
 
     public let kind: Kind
@@ -38,6 +39,9 @@ public enum OrphanScan {
     public static let imageRunnerMarker = "LLMTRAY_IMAGE_RUNNER"
     /// Set on every music-generation runner LLMTray launches (MusicManager).
     public static let musicRunnerMarker = "LLMTRAY_MUSIC_RUNNER"
+    /// Set on every embed runner (EmbedRunner). It exits by itself within
+    /// 0.1 s of its parent's death; this is the backstop.
+    public static let embedRunnerMarker = "LLMTRAY_EMBED_RUNNER"
 
     /// The arguments for `/bin/ps` whose output `orphans(inPSOutput:)` reads:
     /// every process, full width, with its environment (-E; only the
@@ -60,6 +64,8 @@ public enum OrphanScan {
             kind = .imageRunner
         } else if line.contains("llmtray_music_runner.py"), tokens.contains(musicRunnerMarker + "=1") {
             kind = .musicRunner
+        } else if line.contains("llmtray_embed_runner.py"), tokens.contains(embedRunnerMarker + "=1") {
+            kind = .embedRunner
         } else {
             return nil
         }
