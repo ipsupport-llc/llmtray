@@ -275,7 +275,7 @@ public final class ProjectFilesService {
     /// Runs `request` for `project`. `byteBudget`: what the next request
     /// has room for (ProjectTextBudget), so a read is cut where its cursor
     /// continues rather than by the chat's fitting; `fileTextAllowed`
-    /// false: no room was left earlier in the turn -- only the listing.
+    /// false: no room was left earlier in the turn -- search and read refuse (the tool is no longer declared).
     /// `stillOwned`: the chat is still in the project, and it exists.
     public func run(_ request: ProjectFiles.Request, project: UUID, byteBudget: Int, fileTextAllowed: Bool = true,
                     stillOwned: () -> Bool) async -> ProjectFilesAnswer {

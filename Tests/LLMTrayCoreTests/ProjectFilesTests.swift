@@ -444,7 +444,7 @@ final class ProjectFilesServiceTests: XCTestCase {
 
     // MARK: the room, ownership, the project
 
-    func testNoRoomLeavesOnlyTheListing() async throws {
+    func testNoRoomRefusesSearchAndRead() async throws {
         _ = try await addCorpus()
         let search = await run(.search(query: "payment", doc: nil, limit: 5), fileText: false)
         XCTAssertEqual(search, .refused(ProjectTextBudget.noRoomText))

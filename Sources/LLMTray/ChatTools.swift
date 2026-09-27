@@ -261,7 +261,7 @@ final class ChatToolbox {
     /// A project tool's output as its tool result: at most its share of the
     /// room the next request has (`requestTokens`, the estimate of it so
     /// far), pieces sent earlier in this turn only named. With no safe
-    /// room, the tool says so and search/read are no longer declared.
+    /// room, the tool says so and file-text tools (project_files) are no longer declared.
     func fitProjectResult(_ output: ProjectToolOutput, tool name: String, requestTokens: Int,
                           settings: ChatSettings) -> (text: String, returned: [Citation]) {
         guard let tokens = ProjectTextBudget.allowance(contextTokens: settings.maxTokensCap, requestTokens: requestTokens,
