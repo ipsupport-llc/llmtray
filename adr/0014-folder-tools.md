@@ -98,30 +98,32 @@ These override anything looser above.
 
 ## Tools
 
-- `list_dir(path, pattern?, recursive?, limit, cursor?)` — names, kinds
-  (file / folder / link / package), sizes, dates; paged; hidden files
-  only when asked.
-- `file_info(path)` — git-like classification: text or binary (the
-  NUL / control-byte heuristic git uses on the first 8 KB), encoding
-  (UTF-8, UTF-16 with BOM, legacy single-byte guessed), MIME / UTI,
-  size, created / modified, for images their pixel size, for text the
-  line count and a short head (bounded). Never the whole file.
-- `file_info(path, hash: true)` adds the file's SHA-256, streamed
-  through the verified descriptor, within a byte and time cap ("too
-  large to hash" rather than a stalled turn).
-- `find_duplicates(path, recursive?)` — the user's addition: files
-  grouped by size, then a quick hash of the first and last 64 KB, then a
-  full SHA-256 only for what still matches; hard links to one inode are
-  "the same file", not duplicates; bounded (files scanned, bytes
-  hashed), cancellable. It only reports groups (paths, sizes, dates);
-  removing copies is a change plan like any other, the model proposing
-  which copy to keep and the user approving.
-- `make_dir(path)`, `move(from, to)` (also renames), `delete(path)` →
-  Trash. Each change call validates both ends against the grant; name
-  collisions are never overwritten — the tool answers with the conflict,
-  or the plan offers "keep both" (a numbered name).
-- Results are bounded like project results (the chat plumbing's
-  per-request budget); a listing of 10,000 files is paged, not dumped.
+**Two tools, the user's rule** (fewer tools are understood better by
+small models and cost less context in every request):
+
+- `files(path, recursive?, pattern?, only_duplicates?, hash?, cursor?)`
+  — read-only, one tool for looking:
+  - a folder → a paged listing (names, kinds — file / folder / link /
+    package — sizes, dates; hidden files only when asked);
+  - with `only_duplicates` → a compact summary ("12 groups, 3.4 GB could
+    be freed") and the first groups, paged, paths and sizes only. Found
+    by size, then a quick hash of the first and last 64 KB, then a full
+    SHA-256 only for what still matches; hard links to one inode are
+    "the same file"; bounded and cancellable;
+  - a file → its info: git-like text or binary (the NUL / control-byte
+    heuristic on the first 8 KB), encoding, MIME / UTI, size, dates, for
+    images the pixel size, for text the line count and a short bounded
+    head; with `hash` its SHA-256, streamed within a byte and time cap.
+    Never the whole file.
+- `change_files(ops: [{op: make_dir | move | trash, …}])` — every change,
+  as one list: that list is the plan the user approves whole, in part or
+  not at all (Hardening 3). `move` also renames; `trash` goes to the
+  Trash. Both ends checked against the grant at execution; collisions
+  never overwritten ("keep both" = a numbered name the filesystem
+  decides).
+
+Results are bounded like project results (the chat plumbing's
+per-request budget): a folder of 10,000 files is paged, never dumped.
 
 ## Where it lives
 

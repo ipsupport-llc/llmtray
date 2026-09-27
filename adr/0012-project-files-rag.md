@@ -115,23 +115,21 @@ wording). Declared by what the project has, checked at each turn's
 start (the user's call — an empty project costs no tokens and gives a
 small model nothing to call in vain):
 
-- the feature off, no project, or a project without files: **none** —
-  the request is an ordinary chat's;
-- files, none searchable yet (copying, reading, embedding, failed):
-  **`list_project_files` only**, so the model can say they're still
-  being indexed;
-- at least one file searchable: **all three**.
-
-- `list_project_files()` — short ids
-  (`1`, `2`, … per project), names, pages, status;
-- `search_project_files(query, top_k = 5, ≤ 10, doc?)` — once any file
-  is searchable; hits as `[doc:page]`, heading, the chunk, a neighbour
-  only while budget remains; at most 2 hits per document unless `doc`
-  narrows the search, so a question across files isn't answered from one;
-  the result says which files are still indexing, failed, or searched
-  lexically only (no vectors yet or the embedder unavailable);
-- `read_project_file(doc, from_page, to_page, cursor?)` — bounded by
-  tokens, not pages; a cut result returns a cursor to continue.
+- the feature off, no project, or a project without files: **no tool**
+  — the request is an ordinary chat's;
+- otherwise **one tool** (the user's rule: fewer tools are understood
+  better by small models and cost less context) —
+  `project_files(query?, doc?, pages?, cursor?)`:
+  - `query` → hybrid search, `top_k` 5 (≤ 10); hits as `[doc:page]`,
+    heading, the chunk, a neighbour only while budget remains; at most
+    2 hits per document unless `doc` narrows it, so a question across
+    files isn't answered from one; the result says which files are still
+    indexing, failed, or searched lexically only;
+  - `doc` + `pages` → those pages verbatim, bounded by tokens; a cut
+    result returns a cursor to continue;
+  - no arguments → the files: short ids (`1`, `2`, … per project),
+    names, pages, status — the only mode offered while nothing is
+    searchable yet.
 
 A large document (up to 5,000 pages) can't be read through in four tool
 rounds: the policy tells the model to say what it read and that the rest
@@ -153,9 +151,9 @@ max_tokens − margin (10%)`; the result gets at most a share of it
 (≤ 50%, hard-capped), is truncated with a marker past that, and a chunk
 already returned this turn isn't sent again. With no safe room left the
 tool answers "the conversation is too long to add more file text —
-compact or start a new chat", and search/read stop being declared for
-the turn — as spent generators are ([0007](0007-chat-tools.md));
-listing stays. Tested with a long chat and repeated searches.
+compact or start a new chat", and for the rest of the turn the tool
+takes only the listing mode (its search and read modes refuse) — the
+way spent generators stop ([0007](0007-chat-tools.md)). Tested with a long chat and repeated searches.
 
 Built (PR 3.3, `PromptTokenEstimator`, `ProjectTextBudget`): the fork's
 mlx_lm.server (pin `e1a05ac`) answers `include_usage` in streams too — a
@@ -252,7 +250,7 @@ Application Support/LLMTray/projects/<projectID>/
   `unsupported` (a format this version doesn't index), `not_indexed`
   (indexing stopped by the user; Index Now resumes it).
 - `pages(doc, rev, page, text, tier, status, error)` — the raw extracted
-  text: `read_project_file` quotes it; a failed page is retried from it.
+  text: `project_files(doc:, pages:)` quotes it; a failed page is retried from it.
 - `chunks(id AUTOINCREMENT, doc, rev, page, ord, heading, start, len,
   body)` — `body` normalized for indexing only (NFC, ё→е, case, soft
   hyphens and zero-width removed; look-alike Latin/Cyrillic kept
