@@ -51,7 +51,7 @@ public enum HTMLText {
             if out.isEmpty { return }
             var have = 0
             var j = out.count - 1
-            while j >= 0, out[j] == 0x0A { have += 1; j -= 1 }
+            while j >= 0, have < count, out[j] == 0x0A { have += 1; j -= 1 }   // only up to `count`: no rescans
             for _ in have..<max(have, count) { out.append(0x0A) }
             pendingSpace = false
         }

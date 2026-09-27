@@ -66,6 +66,9 @@ final class HTMLTextTests: XCTestCase {
         let start = Date()
         XCTAssertEqual(HTMLText.text(deep), "deep")
         XCTAssertEqual(HTMLText.text("<p title=\"" + String(repeating: "x", count: 1_000_000) + "\">ok</p>"), "ok")
+        // A long run of newlines in <pre>, then many block tags: not quadratic.
+        XCTAssertEqual(HTMLText.text("<pre>x" + String(repeating: "\n", count: 1_000_000) + "</pre>" + String(repeating: "<br>", count: 100_000) + "y"),
+                       "x" + String(repeating: "\n", count: 1_000_000) + "y")
         XCTAssertLessThan(Date().timeIntervalSince(start), 10)
         XCTAssertEqual(HTMLText.text(""), "")
     }
