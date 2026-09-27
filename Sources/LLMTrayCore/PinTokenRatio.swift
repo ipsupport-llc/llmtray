@@ -89,9 +89,28 @@ public struct PinTokenSamples: Equatable {
         model.flatMap { PinTokenRatio.learned(all[$0] ?? [], pinned: pinned[$0] ?? []) }
     }
 
-    /// What `model`'s pins are sized at.
+    /// Whether pinned text of `model`'s was counted (or failed): its sizes
+    /// are the pinned text's own from then on.
+    public func isMeasured(model: String?) -> Bool {
+        model.map { !(pinned[$0] ?? []).isEmpty } ?? false
+    }
+
+    /// The probe (the user's choice): before any pinned text of `model`'s
+    /// was counted, a file that fits only past the cap is sized at the
+    /// other requests' own ratio, uncapped -- so it goes out once, and that
+    /// request's count sizes it exactly after. A failed probe adds the 2.0
+    /// sample (PinTokenRatios.recordFailure), which ends the probing. nil
+    /// when not probing: measured, nothing counted, or the cap doesn't bind.
+    public func probeBytesPerToken(model: String?) -> Double? {
+        guard let model, !isMeasured(model: model), let general = PinTokenRatio.learned(all[model] ?? []) else { return nil }
+        let uncapped = PinTokenRatio.effective(general)
+        return uncapped > PinTokenRatio.effective(learned(model: model)) ? uncapped : nil
+    }
+
+    /// What `model`'s pins are sized at: the probe's ratio while probing,
+    /// else the learned one (capped until pinned text is counted).
     public func bytesPerToken(model: String?) -> Double {
-        PinTokenRatio.effective(learned(model: model))
+        probeBytesPerToken(model: model) ?? PinTokenRatio.effective(learned(model: model))
     }
 }
 

@@ -887,13 +887,17 @@ bytes was ≈121K and 57K by Gemma 4's count, left out at an 83K limit).
 The lowest, not an average: undercounting a pin overflows the request,
 overcounting only leaves a file out; a denser text takes the ratio down
 at its first counted request. The template's tokens aren't in the bytes,
-so a sample is on the low side too. Until a request that carried pinned
-text was counted, the ratio is at most 3 (an English chat's 4.3 would
-undercount a pinned code or CSV file by 40% and more); from then on the
-pinned requests' own samples (the last 5) decide. A request carrying
+so a sample is on the low side too. The pinned requests' own samples
+(the last 5) decide once there are any; before, the other requests'
+ratio is capped at 3 (an English chat's 4.3 would undercount a pinned
+code or CSV file by 40% and more) -- except for a probe, the user's
+choice: a file that fits only past the cap is sized at that ratio
+uncapped, so it goes out once and its request's count sizes it exactly
+after (the Files window shows it fitting, "estimate"). A request carrying
 pinned text that fails without a count (refused, likely past the
 context) adds a sample of 2 to those, so the next turns size pins
-conservatively rather than overflowing again. Shown as "≈N tokens", the summary
+conservatively rather than overflowing again -- a failed probe isn't
+tried again. Shown as "≈N tokens", the summary
 saying "(measured for this model)" or "(estimate; exact after the first
 answer)". The request-level estimate keeps its 2 bytes: only pinned
 sizing uses the ratio.

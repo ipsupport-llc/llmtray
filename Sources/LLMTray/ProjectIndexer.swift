@@ -448,8 +448,9 @@ final class ProjectIndexer: ObservableObject {
         PinTokenRatios().bytesPerToken(model: model)
     }
 
-    /// Whether `model`'s ratio has been measured.
-    func isPinRatioMeasured(model: String?) -> Bool { pinTokenSamples.learned(model: model) != nil }
+    /// Whether `model`'s pinned text was counted: the Files window says
+    /// "measured", else "estimate".
+    func isPinRatioMeasured(model: String?) -> Bool { pinTokenSamples.isMeasured(model: model) }
 
     /// The server counted `promptTokens` for a request of `model`'s: a
     /// sample of its ratio when it's large enough and has no images

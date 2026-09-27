@@ -61,7 +61,7 @@ final class PinTokenRatioTests: XCTestCase {
         XCTAssertTrue(ratios.record(model: model, .init(bytes: 43_000), promptTokens: 10_000))
         XCTAssertEqual(PinTokenRatios(defaults: defaults).samples.all[model], [4.3], "persisted")
         XCTAssertEqual(ratios.learned(model: model), 3.0, "no pinned text counted yet: capped")
-        XCTAssertEqual(ratios.bytesPerToken(model: model), 3.0 * 0.9, accuracy: 1e-9)
+        XCTAssertEqual(ratios.bytesPerToken(model: model), 4.3 * 0.9, accuracy: 1e-9, "but probing, uncapped")
         XCTAssertTrue(ratios.record(model: model, .init(bytes: 44_000), promptTokens: 10_000, carriedPins: true))
         XCTAssertEqual(PinTokenRatios(defaults: defaults).samples.pinned[model], [4.4])
         XCTAssertEqual(ratios.samples.all[model], [4.3, 4.4], "a pinned request is a sample of both")
@@ -78,6 +78,41 @@ final class PinTokenRatioTests: XCTestCase {
         XCTAssertEqual(PinTokenRatio.learned([2.4, 4.3], pinned: [4.5]), 4.5, "the pinned text's own, once there")
         XCTAssertEqual(PinTokenRatio.learned([4.3], pinned: [2.8, 4.5]), 2.8)
         XCTAssertNil(PinTokenRatio.learned([], pinned: []))
+    }
+
+    /// Before any pinned text was counted, a file that fits only past the
+    /// cap goes out once at the other requests' own ratio: the book, 89.9K
+    /// at 3.0 × 0.9, is 62.7K at 4.3 × 0.9 and fits 83K.
+    func testAProbeLetsAFileThroughOnceWithoutPinnedSamples() {
+        let book: [Int64: Int] = [7: 242_712]
+        let probing = PinTokenSamples(all: [model: [4.3]])
+        XCTAssertFalse(probing.isMeasured(model: model))
+        XCTAssertEqual(try XCTUnwrap(probing.probeBytesPerToken(model: model)), 4.3 * 0.9, accuracy: 1e-9)
+        let capped = PinTokenRatio.tokens(book, bytesPerToken: PinTokenRatio.effective(probing.learned(model: model)))
+        XCTAssertEqual(PinnedFiles.fitting([7], tokens: capped, limitTokens: 83_000).tooLong, [7], "at the cap it wouldn't")
+        let sized = PinTokenRatio.tokens(book, bytesPerToken: probing.bytesPerToken(model: model))
+        XCTAssertEqual(sized[7], 62_717)
+        XCTAssertEqual(PinnedFiles.fitting([7], tokens: sized, limitTokens: 83_000).fit, [7])
+        // The probe's count ends it: the pinned text's own ratio from then on.
+        let counted = PinTokenSamples(all: [model: [4.3, 4.1]], pinned: [model: [4.1]])
+        XCTAssertNil(counted.probeBytesPerToken(model: model))
+        XCTAssertTrue(counted.isMeasured(model: model))
+        XCTAssertEqual(counted.bytesPerToken(model: model), 4.1 * 0.9, accuracy: 1e-9)
+    }
+
+    func testNoProbeAfterAFailureOrWhereTheCapDoesntBind() {
+        let ratios = PinTokenRatios(defaults: defaults)
+        ratios.record(model: model, .init(bytes: 43_000), promptTokens: 10_000)
+        XCTAssertNotNil(ratios.samples.probeBytesPerToken(model: model))
+        ratios.recordFailure(model: model)   // the probe request failed
+        XCTAssertNil(ratios.samples.probeBytesPerToken(model: model), "no probing again")
+        XCTAssertEqual(ratios.bytesPerToken(model: model), 2.0)
+        let dense = PinTokenSamples(all: [model: [2.6]])
+        XCTAssertNil(dense.probeBytesPerToken(model: model), "under the cap: nothing to probe")
+        XCTAssertEqual(dense.bytesPerToken(model: model), 2.6 * 0.9, accuracy: 1e-9)
+        XCTAssertNil(PinTokenSamples().probeBytesPerToken(model: model), "nothing counted: the estimator's 2")
+        XCTAssertEqual(PinTokenSamples().bytesPerToken(model: model), 2.0)
+        XCTAssertFalse(PinTokenSamples().isMeasured(model: model))
     }
 
     /// A failed pinned request (no count comes back) sizes pins at 2 bytes
