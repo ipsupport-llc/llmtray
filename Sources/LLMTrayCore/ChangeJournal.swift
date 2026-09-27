@@ -121,7 +121,10 @@ public final class ChangeJournal: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         try appendHook?(event)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        if Posix.lstatPath(directory.path) == nil {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try Self.syncDirectory(directory.deletingLastPathComponent().path)
+        }
         var line = try Self.encoder.encode(event)
         line.append(0x0A)
         let path = url(for: planID).path
@@ -144,13 +147,15 @@ public final class ChangeJournal: @unchecked Sendable {
             written += n
         }
         guard fsync(fd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
-        if isNew {
-            let dfd = open(directory.path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
-            if dfd >= 0 {
-                defer { close(dfd) }
-                guard fsync(dfd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
-            }
-        }
+        if isNew { try Self.syncDirectory(directory.path) }
+    }
+
+    /// A new entry in `path` is on disk only once the folder itself is synced.
+    static func syncDirectory(_ path: String) throws {
+        let dfd = open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
+        guard dfd >= 0 else { throw FolderAccessError.system("journal sync", errno) }
+        defer { close(dfd) }
+        guard fsync(dfd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
     }
 
     public func record(_ planID: UUID) -> JournalRecord? {

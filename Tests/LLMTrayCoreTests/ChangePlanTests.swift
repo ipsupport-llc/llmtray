@@ -554,4 +554,57 @@ final class ChangePlanTests: FolderTestCase {
         try journal.append(JournalEvent(kind: .end, date: Date()), planID: id)
         XCTAssertNotNil(journal.record(id)?.ended)
     }
+
+    func testAnApprovalRunsOnce() throws {
+        write("a.txt", "a")
+        let plan = try approved([mv("a.txt", "b.txt")])
+        XCTAssertEqual(statuses(executor.execute(plan)), ["done"])
+        XCTAssertEqual(undoer.undo(plan.id).undone, [1])
+        let again = executor.execute(plan)
+        XCTAssertEqual(statuses(again), ["failed"])
+        XCTAssertTrue(exists("a.txt"), "the undone change isn't redone without a new approval")
+    }
+
+    func testMakeDirLeavesNoStagingFolder() throws {
+        mkdir("taken")
+        XCTAssertEqual(statuses(executor.execute(try approved([md("new")]))), ["done"])
+        store.add(try planner.plan([md("later")]).items, chatID: "c")
+        let p = try approveNow()
+        mkdir("later")
+        XCTAssertEqual(statuses(executor.execute(p)), ["failed"], "taken since: not overwritten")
+        XCTAssertEqual(names().filter { $0.hasPrefix(".llmtray") }, [])
+        XCTAssertEqual(names(), ["denied", "later", "new", "taken"])
+    }
+
+    func testACrashDuringAMadeFolderUndoIsFinishedNextTime() throws {
+        let plan = try approved([md("X"), md("Y")])
+        XCTAssertEqual(executor.execute(plan).doneCount, 2)
+        // As a crash leaves it: undo pending, the folder taken aside.
+        for (item, name) in [(2, "Y"), (1, "X")] {
+            try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: item), planID: plan.id)
+            try fm.moveItem(atPath: grant + "/" + name, toPath: grant + "/" + ChangeUndo.asideName(planID: plan.id, item: item))
+        }
+        // X got a file meanwhile: it's put back under its name, not removed.
+        write(ChangeUndo.asideName(planID: plan.id, item: 1) + "/keep.txt", "k")
+        let undo = undoer.undo(plan.id)
+        XCTAssertEqual(undo.undone, [2])
+        XCTAssertEqual(undo.stopped?.id, 1)
+        XCTAssertEqual(names(), ["X", "denied"])
+        XCTAssertTrue(exists("X/keep.txt"))
+    }
+
+    func testUndoneIsReportedOnlyOnceJournaled() throws {
+        write("a.txt", "a")
+        let plan = try approved([mv("a.txt", "b.txt")])
+        XCTAssertEqual(executor.execute(plan).doneCount, 1)
+        journal.appendHook = { if $0.kind == .undone { throw CocoaError(.fileWriteOutOfSpace) } }
+        let first = undoer.undo(plan.id)
+        journal.appendHook = nil
+        XCTAssertEqual(first.undone, [])
+        XCTAssertEqual(first.stopped?.id, 1)
+        XCTAssertTrue(exists("a.txt"), "the move itself was undone")
+        // The next undo sees it back and records it.
+        XCTAssertEqual(undoer.undo(plan.id).undone, [1])
+        guard case .undone = journal.record(plan.id)!.items[0].state else { return XCTFail() }
+    }
 }

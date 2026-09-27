@@ -105,8 +105,16 @@ public struct ChangeExecutor {
     }
 
     public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false }) -> Report {
-        let plan = approved.plan
-        var report = Report(planID: plan.id, outcomes: [], stoppedAt: nil)
+        var report = Report(planID: approved.plan.id, outcomes: [], stoppedAt: nil)
+        // An approval runs once -- and a plan with a journal already ran.
+        guard let plan = approved.take(), journal.record(approved.plan.id) == nil else {
+            report.outcomes = approved.plan.items.map { ($0.id, .notRun) }
+            if let first = approved.plan.items.first {
+                report.outcomes[0] = (first.id, .failed("this approval was already used: approve again"))
+                report.stoppedAt = first.id
+            }
+            return report
+        }
         var made: [Key: Made] = [:]
         do {
             try journal.append(JournalEvent(kind: .begin, date: Date(), chatID: plan.chatID), planID: plan.id)
@@ -165,14 +173,34 @@ public struct ChangeExecutor {
             guard let d = item.destination else { throw FolderAccessError.invalidPath("make_dir without a path") }
             let (parent, comps) = try openDestinationParent(d, made: made)
             beforeOperation?(item)
-            let name = try Self.exclusive(d.location.name, policy: item.collision, isDirectory: true, limit: maxNumberedName) {
-                mkdirat(parent.descriptor.fd, $0, 0o755) == 0 ? 0 : errno
+            // Made under a staging name and held open, so its identity is the
+            // folder this call made; then renamed (exclusively) to the name.
+            let fd = parent.descriptor.fd
+            let staging = ".llmtray-new-\(UUID().uuidString)"
+            guard mkdirat(fd, staging, 0o700) == 0 else { throw FolderAccessError.system("make \(d.location.name)", errno) }
+            let newFD = openat(fd, staging, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+            guard newFD >= 0, let created = try? Descriptor(fd: newFD, stat: Posix.fstat(newFD)) else {
+                if newFD >= 0 { close(newFD) }
+                throw Uncertain(description: "made \(staging), then couldn't open it")
             }
-            guard let st = try? Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory else {
-                throw Uncertain(description: "made \(name), then couldn't find it")
+            _ = fchmod(created.fd, 0o755)
+            let name: String
+            do {
+                name = try Self.exclusive(d.location.name, policy: item.collision, isDirectory: true, limit: maxNumberedName) {
+                    renameatx_np(fd, staging, fd, $0, UInt32(RENAME_EXCL)) == 0 ? 0 : errno
+                }
+            } catch {
+                // Not taken: the staging folder goes, if it is still ours.
+                if (try? Posix.lstatAt(fd, staging))?.identity == created.identity, unlinkat(fd, staging, AT_REMOVEDIR) == 0 {
+                    throw error
+                }
+                throw Uncertain(description: "\(error); \(staging) was left behind")
             }
-            made[Key(root: d.location.root.identity, components: d.location.components)] = Made(identity: st.identity, name: name)
-            return JournalResult(identity: st.identity, finalName: name, destinationChain: parent.chain,
+            guard (try? Posix.lstatAt(fd, name))?.identity == created.identity else {
+                throw Uncertain(description: "made \(name), but what is there now isn't it")
+            }
+            made[Key(root: d.location.root.identity, components: d.location.components)] = Made(identity: created.identity, name: name)
+            return JournalResult(identity: created.identity, finalName: name, destinationChain: parent.chain,
                                  trashURL: nil, components: comps + [name])
         case .move:
             guard let s = item.source, let d = item.destination else { throw FolderAccessError.invalidPath("move without ends") }

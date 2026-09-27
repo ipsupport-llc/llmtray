@@ -46,7 +46,7 @@ public struct ChangeUndo {
                 return nil
             case .done(let r), .undoIncomplete(let r):
                 do {
-                    try reverse(item.planItem, r, dryRun: true)
+                    try reverse(item.planItem, r, dryRun: true, planID: planID)
                     return Remaining(id: item.planItem.id, reversible: true, reason: nil)
                 } catch {
                     return Remaining(id: item.planItem.id, reversible: false, reason: "\(error)")
@@ -61,14 +61,30 @@ public struct ChangeUndo {
             report.stopped = Remaining(id: 0, reversible: false, reason: "no journal for this plan")
             return report
         }
-        for item in record.items.reversed() {
+        items: for item in record.items.reversed() {
             let result: JournalResult
             switch item.state {
             case .done(let r): result = r
             case .undoIncomplete(let r):
-                // An undo interrupted after it moved the item back: done.
-                if (try? isBack(item.planItem, r)) == true {
-                    try? journal.append(JournalEvent(kind: .undone, date: Date(), item: item.planItem.id), planID: planID)
+                // An undo interrupted after it moved the item back (or took a
+                // made folder aside): finished, or picked up again.
+                let back: Bool
+                do {
+                    back = try isBack(item.planItem, r, planID: planID)
+                } catch let u as Uncertain {
+                    report.stopped = Remaining(id: item.planItem.id, reversible: false, reason: "needs a look: \(u.description)")
+                    break items
+                } catch {
+                    back = false
+                }
+                if back {
+                    do {
+                        try journal.append(JournalEvent(kind: .undone, date: Date(), item: item.planItem.id), planID: planID)
+                    } catch {
+                        report.stopped = Remaining(id: item.planItem.id, reversible: false,
+                                                   reason: "undone, but the journal couldn't record it: \(error)")
+                        break items
+                    }
                     report.undone.append(item.planItem.id)
                     continue
                 }
@@ -81,21 +97,27 @@ public struct ChangeUndo {
                 try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: id), planID: planID)
             } catch {
                 report.stopped = Remaining(id: id, reversible: true, reason: "journal not written, nothing changed: \(error)")
-                break
+                break items
             }
             do {
-                try reverse(item.planItem, result, dryRun: false)
-                try? journal.append(JournalEvent(kind: .undone, date: Date(), item: id), planID: planID)
-                report.undone.append(id)
+                try reverse(item.planItem, result, dryRun: false, planID: planID)
             } catch let u as Uncertain {
                 try? journal.append(JournalEvent(kind: .uncertain, date: Date(), item: id, message: u.description), planID: planID)
                 report.stopped = Remaining(id: id, reversible: false, reason: "needs a look: \(u.description)")
-                break
+                break items
             } catch {
                 try? journal.append(JournalEvent(kind: .undoFailed, date: Date(), item: id, message: "\(error)"), planID: planID)
                 report.stopped = Remaining(id: id, reversible: false, reason: "\(error)")
-                break
+                break items
             }
+            // Reported undone only once that is on disk.
+            do {
+                try journal.append(JournalEvent(kind: .undone, date: Date(), item: id), planID: planID)
+            } catch {
+                report.stopped = Remaining(id: id, reversible: false, reason: "undone, but the journal couldn't record it: \(error)")
+                break items
+            }
+            report.undone.append(id)
         }
         report.remaining = reversibility(planID)
         return report
@@ -140,7 +162,11 @@ public struct ChangeUndo {
         return (canonical, st.identity.device)
     }
 
-    private func reverse(_ item: PlanItem, _ r: JournalResult, dryRun: Bool) throws {
+    /// The name a made folder is taken aside under before it is removed:
+    /// fixed per plan item, so a crash between the two is found again.
+    static func asideName(planID: UUID, item: Int) -> String { ".llmtray-undo-\(planID.uuidString)-\(item)" }
+
+    private func reverse(_ item: PlanItem, _ r: JournalResult, dryRun: Bool, planID: UUID) throws {
         let excl = UInt32(RENAME_EXCL)
         switch item.kind {
         case .makeDir:
@@ -152,7 +178,7 @@ public struct ChangeUndo {
             // Taken aside under a temporary name first: the rename takes one
             // exact folder, checked before it is removed (a folder swapped in
             // by name is put back, not removed).
-            let temp = ".llmtray-undo-\(UUID().uuidString)"
+            let temp = Self.asideName(planID: planID, item: item.id)
             guard renameatx_np(dir.descriptor.fd, name, dir.descriptor.fd, temp, excl) == 0 else {
                 throw FolderAccessError.system("remove \(name)", errno)
             }
@@ -218,16 +244,26 @@ public struct ChangeUndo {
     }
 
     /// After an interrupted undo: is the item where it was before the plan
-    /// (or, for a made folder, gone)?
-    private func isBack(_ item: PlanItem, _ r: JournalResult) throws -> Bool {
+    /// (or, for a made folder, gone)? A made folder found taken aside is
+    /// removed if still empty, else put back under its name.
+    private func isBack(_ item: PlanItem, _ r: JournalResult, planID: UUID) throws -> Bool {
         switch item.kind {
         case .makeDir:
             guard let d = item.destination, let comps = r.components, let name = comps.last, let chain = r.destinationChain else { return false }
             let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
-            return try Posix.lstatAt(dir.descriptor.fd, name)?.identity != r.identity
+            if try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity { return false }
+            let aside = Self.asideName(planID: planID, item: item.id)
+            guard try Posix.lstatAt(dir.descriptor.fd, aside)?.identity == r.identity else { return true }
+            if unlinkat(dir.descriptor.fd, aside, AT_REMOVEDIR) == 0 { return true }
+            if renameatx_np(dir.descriptor.fd, aside, dir.descriptor.fd, name, UInt32(RENAME_EXCL)) == 0 { return false }
+            throw Uncertain(description: "\(name) was left as \(aside)")
         case .move, .trash:
             guard let s = item.source else { return false }
-            return try Posix.lstatAt(try sourceParent(s).descriptor.fd, s.location.name)?.identity == s.identity
+            // Held in a local: the descriptor closes when the value goes.
+            let parent = try sourceParent(s)
+            return try withExtendedLifetime(parent) {
+                try Posix.lstatAt(parent.descriptor.fd, s.location.name)?.identity == s.identity
+            }
         }
     }
 

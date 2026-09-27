@@ -239,7 +239,9 @@ enum Posix {
     }
 }
 
-/// An open descriptor, closed when released.
+/// An open descriptor, closed when released. Keep the owner in a named
+/// local while its `fd` is used: a temporary (`try open(...).fd`) is released
+/// -- and the descriptor closed -- before the call that takes the number.
 public final class Descriptor {
     public let fd: Int32
     public let stat: EntryStat

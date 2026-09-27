@@ -112,12 +112,24 @@ public struct ChangePlan: Codable, Equatable, Identifiable, Sendable {
 }
 
 /// A plan the user approved, as `ChangePlanStore.approve` returned it -- the
-/// only way to get one, and the only thing `ChangeExecutor` runs.
-public struct ApprovedPlan: Equatable, Sendable {
+/// only way to get one, and the only thing `ChangeExecutor` runs. One
+/// approval runs once: `take()` hands the plan out a single time.
+public final class ApprovedPlan: @unchecked Sendable {
     public let plan: ChangePlan
+    private let lock = NSLock()
+    private var taken = false
 
     init(plan: ChangePlan) {
         self.plan = plan
+    }
+
+    /// The plan, the first time; nil after.
+    func take() -> ChangePlan? {
+        lock.lock()
+        defer { lock.unlock() }
+        if taken { return nil }
+        taken = true
+        return plan
     }
 }
 
