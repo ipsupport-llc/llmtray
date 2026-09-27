@@ -652,7 +652,8 @@ public final class ProjectIngestor {
             guard let s = try await h.write({ try Self.vectorSet($0, for: embedder, create: true) }) else { return .finished }
             set = s
         } catch {
-            return .dropped
+            // The project gone (Closed) drops it; a failed write backs off.
+            return await vectorWriteFailed(error, item, e, doc: doc)
         }
         while true {
             guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
