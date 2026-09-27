@@ -86,18 +86,17 @@ public final class CappedZip {
 
     /// Inflates every part, and hands each XML part to `XMLPartCheck` --
     /// what has to pass before `NSAttributedString` sees it. XML by its name
-    /// (.xml, .rels, .vml) or by its content (a part outside media/ starting
-    /// with "<", whatever it's called); the rest is only counted. `odf`: the manifest
-    /// may carry the bare external DOCTYPE ODF writers put there, nothing else.
+    /// (.xml, .rels, .vml) or by its content (a part starting with "<", after
+    /// any whitespace, whatever it's called or wherever it is); the rest is
+    /// only counted. A bare external DOCTYPE passes only on an .svg and, with
+    /// `odf`, on the manifest ODF writers put one on.
     public func checkAll(odf: Bool = false) throws {
         for e in entries {
             let lower = e.name.lowercased()
             let named = [".xml", ".rels", ".vml"].contains { lower.hasSuffix($0) }
             let (data, head) = try part(e, keep: named, allowEmbedded: true)
-            // Images (an SVG with its DOCTYPE) aren't parsed as XML by the importer.
-            let media = lower.split(separator: "/").dropLast().contains { $0 == "media" || $0 == "pictures" }
             var xml = named ? data : nil
-            if !named && !media {
+            if !named {
                 switch Self.leadingByte(head) {
                 case 0x3C?: xml = try part(e, keep: true, counted: false).data
                 case nil where !head.isEmpty:
@@ -108,8 +107,10 @@ public final class CappedZip {
                 }
             }
             guard let xml else { continue }
-            try XMLPartCheck.check(xml, part: e.name, maxDepth: caps.maxXMLDepth,
-                                   allowExternalDoctype: odf && e.name == "META-INF/manifest.xml")
+            // SVG images carry the W3C's public DOCTYPE; an internal subset is
+            // refused there as anywhere.
+            let external = (odf && e.name == "META-INF/manifest.xml") || lower.hasSuffix(".svg")
+            try XMLPartCheck.check(xml, part: e.name, maxDepth: caps.maxXMLDepth, allowExternalDoctype: external)
         }
     }
 

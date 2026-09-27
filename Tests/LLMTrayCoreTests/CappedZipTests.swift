@@ -183,7 +183,7 @@ final class CappedZipTests: XCTestCase {
 
     func testXMLFoundByContentAndVML() {
         let hostile = "<?xml version='1.0'?><!DOCTYPE v [<!ENTITY x 'y'>]><v>&x;</v>"
-        for name in ["word/drawing.vml", "word/strange.bin", "customXml/item1", "word/media/x.xml"] {
+        for name in ["word/drawing.vml", "word/strange.bin", "customXml/item1", "word/media/x.xml", "word/media/main.bin", "word/media/evil.svg"] {
             let z = TestZip()
             z.add(name, hostile)
             assertUnreadable("DOCTYPE") { try CappedZip(data: z.finish(), caps: caps()).checkAll() }
