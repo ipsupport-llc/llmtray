@@ -669,7 +669,7 @@ public final class ProjectIngestor {
                     return chunks
                 }
             } catch {
-                return .dropped
+                return await vectorWriteFailed(error, item, e, doc: doc)
             }
             if pending.isEmpty { return .finished }
             let range = embedder.documentBatches(pending.map(\.text)).first ?? 0..<pending.count
@@ -722,9 +722,19 @@ public final class ProjectIngestor {
                 embedFailures = 0
                 if complete { return .finished }
             } catch {
-                return .dropped   // re-indexed or removed meanwhile
+                return await vectorWriteFailed(error, item, e, doc: doc)
             }
         }
+    }
+
+    /// Re-indexed, removed or stopped meanwhile: dropped. A real write
+    /// failure (a full disk, I/O) isn't lost silently: it backs off and is
+    /// tried again like an embedder failure, and past the last try
+    /// embedding is off for the session, with why.
+    private func vectorWriteFailed(_ error: Error, _ item: Item, _ e: Int, doc: Int64) async -> ProjectIngestQueue.Outcome {
+        if Self.isStale(error) || !isCurrent(item, e) { return .dropped }
+        NSLog("LLMTray: project file %lld's vectors couldn't be written: %@", doc, "\(error)")
+        return await embedFailed(error, item, e)
     }
 
     /// Paused by a generation (or held for a download), or stopped at a
