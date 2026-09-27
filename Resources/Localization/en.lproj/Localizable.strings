@@ -23,6 +23,7 @@
 "A client" = "A client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
+"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
@@ -52,6 +53,7 @@
 "Ask again in two weeks" = "Ask again in two weeks";
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
+"At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
 "Attach image(s) for the model to see" = "Attach image(s) for the model to see";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
 "Audio quality" = "Audio quality";
@@ -173,6 +175,7 @@
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
 "Hacker News" = "Hacker News";
+"Help improve LLMTray?" = "Help improve LLMTray?";
 "Hide chats" = "Hide chats";
 "Hide the reasoning" = "Hide the reasoning";
 "High quality (larger canvas)" = "High quality (larger canvas)";
@@ -182,6 +185,7 @@
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
+"How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, LoRA, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, LoRA, model downloads.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
@@ -201,12 +205,14 @@
 "In the queue: %lld ahead…" = "In the queue: %lld ahead…";
 "Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
 "Include the server log" = "Include the server log";
+"Install ID" = "Install ID";
 "Installed" = "Installed";
 "Installing mflux…" = "Installing mflux…";
 "Installing mlx-audio…" = "Installing mlx-audio…";
 "Instructions for %@" = "Instructions for %@";
 "Instructions…" = "Instructions…";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Its chats stay, back among the recents; the project's instructions and files are deleted.";
+"Its memory, in GB." = "Its memory, in GB.";
 "KV cache" = "KV cache";
 "KV group size" = "KV group size";
 "Keep" = "Keep";
@@ -218,6 +224,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "LLMTray" = "LLMTray";
 "LLMTray — Chat" = "LLMTray — Chat";
+"LLMTray's version." = "LLMTray's version.";
 "Language" = "Language";
 "Larger than this Mac's RAM -- unlikely to load" = "Larger than this Mac's RAM -- unlikely to load";
 "Later" = "Later";
@@ -232,6 +239,7 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Maintenance" = "Maintenance";
+"Makes a new random ID: later reports can't be matched to earlier ones." = "Makes a new random ID: later reports can't be matched to earlier ones.";
 "Manage Models…" = "Manage Models…";
 "Max tokens" = "Max tokens";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
@@ -341,6 +349,7 @@
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
+"Reset ID" = "Reset ID";
 "Reset: inherit this setting from Default" = "Reset: inherit this setting from Default";
 "Restart LLMTray to change the language?" = "Restart LLMTray to change the language?";
 "Restart Now" = "Restart Now";
@@ -370,6 +379,7 @@
 "Select Tab" = "Select Tab";
 "Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
+"Send an anonymous daily report: app and macOS version, Mac model, memory size, language, and which features you used. No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Send an anonymous daily report: app and macOS version, Mac model, memory size, language, and which features you used. No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.";
 "Sending…" = "Sending…";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation.";
@@ -385,6 +395,7 @@
 "Settings this profile overrides; everything else comes from Default." = "Settings this profile overrides; everything else comes from Default.";
 "Settings…" = "Settings…";
 "Shape" = "Shape";
+"Share anonymous usage statistics" = "Share anonymous usage statistics";
 "Share…" = "Share…";
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
@@ -442,12 +453,17 @@
 "Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
+"The Mac's chip." = "The Mac's chip.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
+"The app's language (the language only, not the region)." = "The app's language (the language only, not the region).";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
+"The day the counts are for." = "The day the counts are for.";
+"The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
+"The macOS version." = "The macOS version.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
@@ -465,6 +481,7 @@
 "The review service didn't accept the request (%@). Please report a bug." = "The review service didn't accept the request (%@). Please report a bug.";
 "The review wasn't accepted: it must be 1 to 2000 characters, without control characters." = "The review wasn't accepted: it must be 1 to 2000 characters, without control characters.";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
+"The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server log" = "The server log";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
@@ -495,6 +512,7 @@
 "Update" = "Update";
 "Update channel" = "Update channel";
 "Updates" = "Updates";
+"Usage statistics" = "Usage statistics";
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Uses the internet" = "Uses the internet";
@@ -509,6 +527,7 @@
 "Web search" = "Web search";
 "What happened?" = "What happened?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
+"What's sent" = "What's sent";
 "When a client asks for another model" = "When a client asks for another model";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";

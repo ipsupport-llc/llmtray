@@ -529,6 +529,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     )
                 }
                 self.downloadingID = nil
+                UsageTelemetry.shared.record(.modelDownload)   // a count: not which model
                 self.downloadStatusText = NSLocalizedString("Done", comment: "")
                 self.downloadSpeedBytesPerSec = 0
                 self.downloadETASeconds = nil
