@@ -50,8 +50,11 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
         }
         if starts(Array("{\\rtf".utf8)) { return .rtf }
         // Readers accept "%PDF-" anywhere in the first KB -- after the exact
-        // signatures, so a docx quoting it isn't taken for a PDF.
-        if data.prefix(1024).range(of: Data("%PDF-".utf8)) != nil { return .pdf }
+        // signatures (a docx may quote it), and only with a PDF's "%%EOF" in
+        // its last KB (a text file may mention it).
+        if data.prefix(1024).range(of: Data("%PDF-".utf8)) != nil, data.suffix(1024).range(of: Data("%%EOF".utf8)) != nil {
+            return .pdf
+        }
         if starts([0x89, 0x50, 0x4E, 0x47]) || starts([0xFF, 0xD8, 0xFF]) || starts(Array("GIF8".utf8))
             || starts([0x49, 0x49, 0x2A, 0x00]) || starts([0x4D, 0x4D, 0x00, 0x2A])
             || (starts(Array("ftyp".utf8), at: 4) && head.count >= 12

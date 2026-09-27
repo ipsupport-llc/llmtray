@@ -41,7 +41,8 @@ final class DocumentKindTests: XCTestCase {
 
     func testByMagic() {
         XCTAssertEqual(kind("%PDF-1.7\n..."), .pdf)
-        XCTAssertEqual(kind("junk before it %PDF-1.4"), .pdf)
+        XCTAssertEqual(kind("junk before it %PDF-1.4\n...\n%%EOF\n"), .pdf)
+        XCTAssertEqual(kind("A note on the %PDF-1.7 header and how readers find it."), .text)
         XCTAssertEqual(kind("{\\rtf1\\ansi hello}"), .rtf)
         XCTAssertEqual(DocumentKind.detect(Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])), .image)
         XCTAssertEqual(DocumentKind.detect(Data([0xFF, 0xD8, 0xFF, 0xE0])), .image)
