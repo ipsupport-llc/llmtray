@@ -295,14 +295,34 @@ final class FolderPlanModel: ObservableObject, Identifiable {
     func set(_ item: Int, selected: Bool) { review.set(item, selected: selected) }
     func setAll(_ on: Bool) { review.setAll(on) }
 
-    /// Which items no longer match: off the main thread.
+    /// The checks of the revision being checked: cancelled when a newer
+    /// one comes.
+    private var checksCancel: CancelFlag?
+    /// How long Approve waits for the checks before letting the user go on
+    /// (the copies not compared stay unticked).
+    static let checksTimeout: UInt64 = 20
+
+    /// Which items no longer match, then sizes and copies (slower, bounded):
+    /// off the main thread, for this revision only. Approve waits for them
+    /// (`PlanReview.canApprove`).
     private func checkItems() {
         let plan = review.plan
         let service = self.service
+        checksCancel?.cancel()
+        let cancel = CancelFlag()
+        checksCancel = cancel
         Task { [weak self] in
             let bad = await Task.detached { service.invalidItems(plan) }.value
             guard let self, self.review.plan.id == plan.id, self.review.plan.revision == plan.revision else { return }
             self.review.invalid = bad
+            let checks = await Task.detached { service.checks(plan, isCancelled: { cancel.isSet }) }.value
+            guard !cancel.isSet, self.phase == .review else { return }
+            self.review.apply(checks, planID: plan.id, revision: plan.revision)
+        }
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: Self.checksTimeout * 1_000_000_000)
+            guard let self, !cancel.isSet else { return }
+            self.review.checksTimedOut(planID: plan.id, revision: plan.revision)
         }
     }
 
@@ -312,7 +332,7 @@ final class FolderPlanModel: ObservableObject, Identifiable {
 
     /// Approves the ticked items of the plan as reviewed, then runs them.
     func approve() {
-        guard phase == .review, !review.approvable.isEmpty else { return }
+        guard phase == .review, review.canApprove else { return }
         // Turned off in Settings meanwhile: nothing runs.
         guard FolderAccessManager.shared.isEnabled else {
             message = NSLocalizedString("Folder access is off in Settings.", comment: "")
@@ -407,6 +427,36 @@ final class FolderPlanModel: ObservableObject, Identifiable {
         }
     }
 
+    /// "1.9 GB", or "22,484 items, 1.9 GB" for a folder, in the user's
+    /// language.
+    static func size(_ f: FolderSize, folder: Bool) -> String {
+        let bytes = ByteCountFormatter.string(fromByteCount: f.bytes, countStyle: .file)
+        guard folder else {
+            return f.partial ? String(format: NSLocalizedString("at least %@", comment: "a size"), bytes) : bytes
+        }
+        let items = NumberFormatter.localizedString(from: NSNumber(value: f.items), number: .decimal)
+        return String(format: f.partial ? NSLocalizedString("at least %1$@ items, %2$@", comment: "a folder's size")
+                      : NSLocalizedString("%1$@ items, %2$@", comment: "a folder's size"), items, bytes)
+    }
+
+    static func planWarning(_ w: PlanReview.PlanWarning) -> String {
+        switch w {
+        case .reachesIntoSubfolders(let count, let names):
+            return String(format: NSLocalizedString("Reaches into %1$lld subfolders (%2$@): their files are taken out of them.", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        case .large(let items, let bytes, let atLeast):
+            let b = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+            return String(format: atLeast ? NSLocalizedString("%1$lld items, at least %2$@.", comment: "plan warning")
+                          : NSLocalizedString("%1$lld items, %2$@.", comment: "plan warning"), items, b)
+        case .notIdentical(let count, let names):
+            return String(format: NSLocalizedString("%1$lld copies differ from their originals, so they aren't duplicates: %2$@", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        case .uncompared(let count, let names):
+            return String(format: NSLocalizedString("%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        }
+    }
+
     static func warning(_ w: PlanReview.Warning) -> String {
         switch w {
         case .hardLink: return NSLocalizedString("Has other names (a hard link): they keep the file.", comment: "plan warning")
@@ -473,8 +523,10 @@ final class FilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let ask = context.askFolderAccess ?? { _ in nil }
         let key = context.callKey
+        let changeNext = context.changeNextMessage
         let answer = await offMain { isCancelled in
-            await service.files(request, chat: chat, callKey: key, byteBudget: budget, ask: ask, isCancelled: isCancelled)
+            await service.files(request, chat: chat, callKey: key, byteBudget: budget, changeNextMessage: changeNext, ask: ask,
+                                isCancelled: isCancelled)
         }
         return answer.toolResult
     }

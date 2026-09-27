@@ -5,8 +5,13 @@
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";
+"%1$@ items, %2$@" = "%1$@ items, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld copies differ from their originals, so they aren't duplicates: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld done, %2$lld undone, %3$lld failed";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld files · %2$lld searchable · %3$lld pages";
+"%1$lld items, %2$@." = "%1$lld items, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld items, at least %2$@.";
 "%1$lld of %2$lld changes selected" = "%1$lld of %2$lld changes selected";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio's, shared with it)";
 "%@ didn't download: %@" = "%@ didn't download: %@";
@@ -484,6 +489,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "None yet. Grants for one chat or one request aren't listed here: they end with it.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
+"Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
@@ -566,6 +572,7 @@
 "Rates and first token: the last of %lld requests." = "Rates and first token: the last of %lld requests.";
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
 "Reading what's installed…" = "Reading what's installed…";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
@@ -906,6 +913,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
 "always" = "always";
 "and %lld more" = "and %lld more";
+"at least %1$@ items, %2$@" = "at least %1$@ items, %2$@";
+"at least %@" = "at least %@";
 "calls tools" = "calls tools";
 "can look" = "can look";
 "can look and propose changes" = "can look and propose changes";

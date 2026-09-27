@@ -62,6 +62,11 @@ public struct ChangeExecutor {
         self.canChange = canChange
     }
 
+    /// One more check of an item right before it runs (after its grant's):
+    /// a throw fails it, and the plan stops there. The service holds a
+    /// trashed copy to the comparison it was approved on.
+    public var verifyItem: ((PlanItem) throws -> Void)?
+
     /// Called after an item's checks, right before its operation: tests
     /// swap things there to exercise the check-to-use window.
     var beforeOperation: ((PlanItem) -> Void)?
@@ -200,6 +205,7 @@ public struct ChangeExecutor {
                 // The change grant must still cover both ends (defense in
                 // depth: approval checked it too).
                 try PlanItemGrant.check(item, canChange)
+                try verifyItem?(item)
                 result = try run(item, planID: plan.id, made: &made)
             } catch is SimulatedCrash {
                 return report

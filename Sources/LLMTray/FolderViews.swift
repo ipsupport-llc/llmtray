@@ -101,7 +101,9 @@ struct FolderPlanCard: View {
         let r = model.review
         Text(FolderPlanModel.summary(r.counts).capitalizedFirst)
             .font(.system(size: 12, weight: .medium))
-        let warned = r.items.filter { !PlanReview.warnings($0).filter { $0 != .trashRestore }.isEmpty || r.invalid[$0.id] != nil }.count
+        let warned = r.items.filter {
+            !PlanReview.warnings($0).filter { $0 != .trashRestore }.isEmpty || r.invalid[$0.id] != nil || r.checks.notIdentical[$0.id] != nil
+        }.count
         if warned > 0 {
             Text(String(format: NSLocalizedString("%lld need a look: see the list.", comment: "plan review"), warned))
                 .font(.system(size: 11)).foregroundColor(.orange)
@@ -134,6 +136,11 @@ struct FolderPlanCard: View {
                         r.approvable.count, r.items.count))
                 .font(.system(size: 11))
         }
+        // Above Approve: what the whole plan does that needs a look.
+        ForEach(Array(r.planWarnings.enumerated()), id: \.offset) { _, w in
+            Label(FolderPlanModel.planWarning(w), systemImage: "exclamationmark.triangle")
+                .font(.system(size: 11)).foregroundColor(.orange)
+        }
         HStack {
             Spacer()
             Button("Cancel") {
@@ -141,8 +148,13 @@ struct FolderPlanCard: View {
                 dismiss()
             }
             // No Return shortcut: approving is always a deliberate click.
-            Button("Approve Selected") { model.approve() }
-                .disabled(r.approvable.isEmpty || manager.isChanging)
+            if r.checksPending {
+                ProgressView().controlSize(.small)
+                Button("Checking…") {}.disabled(true)
+            } else {
+                Button("Approve Selected") { model.approve() }
+                    .disabled(!r.canApprove || manager.isChanging)
+            }
         }
         .font(.system(size: 11))
     }
@@ -150,7 +162,13 @@ struct FolderPlanCard: View {
     private func row(_ item: PlanItem, review r: PlanReview) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Toggle(isOn: Binding(get: { r.isSelected(item.id) }, set: { model.set(item.id, selected: $0) })) {
-                Text(FolderPlanModel.describe(item)).font(.system(size: 11)).lineLimit(2).truncationMode(.middle)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(FolderPlanModel.describe(item)).font(.system(size: 11)).lineLimit(2).truncationMode(.middle)
+                    if let size = r.trashSize(item) {
+                        Text(FolderPlanModel.size(size, folder: item.source?.kind == .directory))
+                            .font(.system(size: 10)).foregroundColor(.secondary)
+                    }
+                }
             }
             .toggleStyle(.checkbox)
             .disabled(r.invalid[item.id] != nil)
@@ -158,6 +176,10 @@ struct FolderPlanCard: View {
                 if let why = r.invalid[item.id] {
                     Text(String(format: NSLocalizedString("Changed since it was proposed: %@", comment: "plan item"), why))
                         .foregroundColor(.red)
+                }
+                if let original = r.checks.notIdentical[item.id] {
+                    Text(String(format: NSLocalizedString("Not identical to %@: not a duplicate.", comment: "plan item"), original))
+                        .foregroundColor(.orange)
                 }
                 ForEach(Array(PlanReview.warnings(item).enumerated()), id: \.offset) { _, w in
                     Text(FolderPlanModel.warning(w)).foregroundColor(w == .trashRestore ? .secondary : .orange)

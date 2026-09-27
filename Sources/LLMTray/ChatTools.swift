@@ -61,6 +61,10 @@ struct ToolContext {
     /// Asks the user about a folder in the chat (a folder tool's grant
     /// prompt); nil answers: Stop or another chat.
     var askFolderAccess: FolderToolService.Ask? = nil
+    /// A folder read now turns changes off for the rest of the turn, and the
+    /// user's next message turns them back on (set by ChatToolbox): `files`
+    /// then says so where the chat may propose changes.
+    var changeNextMessage = false
 }
 
 /// What a tool does in the user's folders (adr/0014).
@@ -114,6 +118,10 @@ final class ChatToolbox {
     /// The request had no room for more file text: search and read aren't
     /// declared for the rest of the turn.
     private(set) var fileTextRoomSpent = false
+    /// A change_files call was refused by the barrier this turn: it isn't
+    /// declared again until the user's next message (its refusal said how
+    /// to go on).
+    private(set) var changeRefusedThisTurn = false
     /// Ids of the file text pieces sent this turn: not sent again.
     private var sentProjectHits: Set<String> = []
     /// Calls read by `prepare` and not yet run: what their arguments came
@@ -233,7 +241,8 @@ final class ChatToolbox {
         // no room for it.
         let allowGuarded = ToolTrust.allowsGuarded(turnTrust)
         let folderTools = Set(FolderTools.declared(featureOn: settings.folders != nil, temporaryChat: settings.folders?.temporary ?? true,
-                                                   turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent))
+                                                   turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent,
+                                                   changeRefused: changeRefusedThisTurn))
         return tools.compactMap { tool -> [String: Any]? in
             guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
             // project_files by its mode (none once there's no room for file text).
@@ -253,6 +262,7 @@ final class ChatToolbox {
         musicGeneration.startTurn()
         turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
+        changeRefusedThisTurn = false
         sentProjectHits = []
         prepared = [:]
     }
@@ -308,7 +318,9 @@ final class ChatToolbox {
         let batch = calls.map { (id: $0.id, kind: trustKind(of: $0, settings: settings)) }
         batchTrust = turnTrust
         for call in batch { batchTrust.record(call.kind) }
-        return ToolTrust.refusedUpFront(batch, state: turnTrust)
+        let refused = ToolTrust.refusedUpFront(batch, state: turnTrust)
+        if batch.contains(where: { $0.kind == .folderChange && refused.contains($0.id) }) { changeRefusedThisTurn = true }
+        return refused
     }
 
     /// What the batch `trustRefusals` read would leave: what its refused
@@ -358,6 +370,7 @@ final class ChatToolbox {
         // already): an earlier call of this round may have returned file text.
         let kind = trustKind(of: call, settings: context.settings)
         if !ToolTrust.allows(kind, turnTrust) {
+            if kind == .folderChange { changeRefusedThisTurn = true }
             return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
         if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {
@@ -369,6 +382,7 @@ final class ChatToolbox {
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent
             context.pinAllowed = ToolTrust.allowsPin(turnTrust)
+            context.changeNextMessage = ToolTrust.changeWaitsForNextMessage(turnTrust)
             let result = await tool.run(arguments.values, context: context)
             // A folder read that found no room: no file text for the rest of the turn.
             if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }

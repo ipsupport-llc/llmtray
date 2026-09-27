@@ -16,9 +16,24 @@ public struct PlanReview: Equatable, Sendable {
     /// they haven't seen).
     public private(set) var added: Set<Int> = []
 
+    /// What was looked up on disk for the review (`PlanChecker`), once it's
+    /// in (`apply`).
+    public private(set) var checks = PlanChecks()
+    /// The revision the checks are in for (nil: none yet). Approve waits
+    /// for the current one (`checksPending`).
+    public private(set) var checkedRevision: Int?
+    /// Items `apply` unticked (a copy not known to be identical): never
+    /// again, so a tick the user puts back holds.
+    public private(set) var autoUnticked: Set<Int> = []
+    /// Items the user ticked or unticked themselves: `apply` never ticks
+    /// those.
+    public private(set) var touched: Set<Int> = []
+
     /// A review of `plan`; a newer revision of the plan reviewed in
     /// `previous` keeps the user's choices for the items it had, and the
-    /// new items start unticked.
+    /// new items start unticked. A trash of a file named like a copy
+    /// ("x (1).zip") starts unticked too, until the comparison with its
+    /// original says it's a real one.
     public init(plan: ChangePlan, previous: PlanReview? = nil, invalid: [Int: String] = [:]) {
         self.plan = plan
         self.invalid = invalid
@@ -27,8 +42,12 @@ public struct PlanReview: Equatable, Sendable {
             let known = Set(previous.plan.items.map(\.id))
             selected = previous.selected.intersection(ids)
             added = previous.added.intersection(ids).union(ids.subtracting(known))
+            checks = previous.checks
+            checkedRevision = previous.checkedRevision
+            autoUnticked = previous.autoUnticked
+            touched = previous.touched
         } else {
-            selected = ids
+            selected = ids.subtracting(plan.items.filter(PlanChecker.isCopyCandidate).map(\.id))
         }
         selected = closed(selected)
     }
@@ -38,12 +57,23 @@ public struct PlanReview: Equatable, Sendable {
     /// What an approval sends: ticked and still valid.
     public var approvable: Set<Int> { closed(selected.subtracting(invalid.keys)) }
 
+    /// The checks of the revision under review aren't in yet.
+    public var checksPending: Bool { checkedRevision != plan.revision }
+
+    /// Approve may be pressed: something ticked, the checks in.
+    public var canApprove: Bool { !approvable.isEmpty && !checksPending }
+
     public func isSelected(_ id: Int) -> Bool { selected.contains(id) }
 
-    /// Ticks or unticks an item. Ticking one ticks the make_dir items it
-    /// needs; unticking a make_dir unticks what goes into it.
+    /// The user ticks or unticks an item. Ticking one ticks the make_dir
+    /// items it needs; unticking a make_dir unticks what goes into it.
     public mutating func set(_ id: Int, selected on: Bool) {
         guard plan.items.contains(where: { $0.id == id }) else { return }
+        touched.insert(id)
+        select(id, on)
+    }
+
+    private mutating func select(_ id: Int, _ on: Bool) {
         added.remove(id)   // looked at now
         if on {
             var add: [Int] = [id]
@@ -60,8 +90,36 @@ public struct PlanReview: Equatable, Sendable {
         }
     }
 
+    /// The checks made on revision `revision` of plan `planID`, in -- ignored
+    /// for any other (a newer revision is being checked). A copy that differs
+    /// or couldn't be compared is unticked (once: a tick the user puts back
+    /// holds); one found identical is ticked unless the user set it.
+    public mutating func apply(_ new: PlanChecks, planID: UUID, revision: Int) {
+        guard planID == plan.id, revision == plan.revision else { return }
+        let ids = Set(plan.items.map(\.id))
+        checks.sizes.merge(new.sizes.filter { ids.contains($0.key) }) { $1 }
+        checks.copies.merge(new.copies.filter { ids.contains($0.key) }) { $1 }
+        checkedRevision = revision
+        for (id, c) in new.copies.sorted(by: { $0.key < $1.key }) where ids.contains(id) {
+            if c.verdict == .identical {
+                if !touched.contains(id), !added.contains(id) { select(id, true) }
+            } else if autoUnticked.insert(id).inserted {
+                select(id, false)
+            }
+        }
+    }
+
+    /// The checks of `revision` didn't come in time: Approve is let through,
+    /// the copies not compared staying as they are (unticked unless the user
+    /// ticked them).
+    public mutating func checksTimedOut(planID: UUID, revision: Int) {
+        guard planID == plan.id, revision == plan.revision, checksPending else { return }
+        checkedRevision = revision
+    }
+
     public mutating func setAll(_ on: Bool) {
         selected = on ? Set(plan.items.map(\.id)) : []
+        touched = Set(plan.items.map(\.id))
         added = []
     }
 
@@ -134,6 +192,105 @@ public struct PlanReview: Equatable, Sendable {
         if c.renames > 0 { parts.append("rename " + String(c.renames)) }
         if c.trashes > 0 { parts.append("trash " + String(c.trashes)) }
         return parts.isEmpty ? "no changes" : parts.joined(separator: ", ")
+    }
+
+    // MARK: The plan as a whole
+
+    /// Past this many moved or trashed items the review says how many, and
+    /// how much.
+    public static let largePlanItems = 200
+
+    /// What the review says above Approve (adr/0014, "Listing sizes and the
+    /// plan's warnings").
+    public enum PlanWarning: Equatable, Sendable {
+        /// Items taken out of subfolders of the folder the plan tidies: how
+        /// many subfolders, the first names.
+        case reachesIntoSubfolders(count: Int, names: [String])
+        /// More than `largePlanItems` items moved or trashed: how many, their
+        /// bytes (`atLeast`: a folder among them wasn't measured whole).
+        case large(items: Int, bytes: Int64, atLeast: Bool)
+        /// Trashed "copies" that differ from their originals: how many, the
+        /// first names.
+        case notIdentical(count: Int, names: [String])
+        /// Trashed "copies" that couldn't be compared with their originals.
+        case uncompared(count: Int, names: [String])
+    }
+
+    /// For what Approve would do now (the ticked, valid items), and every
+    /// copy found not identical, ticked or not.
+    public var planWarnings: [PlanWarning] {
+        let chosen = plan.items.filter { approvable.contains($0.id) }
+        var out: [PlanWarning] = []
+        let reach = Self.reachedSubfolders(chosen)
+        if !reach.isEmpty { out.append(.reachesIntoSubfolders(count: reach.count, names: Array(reach.prefix(3)))) }
+        let touched = chosen.filter { $0.kind != .makeDir }
+        if touched.count > Self.largePlanItems {
+            let size = Self.bytes(touched, checks)
+            out.append(.large(items: touched.count, bytes: size.bytes, atLeast: size.atLeast))
+        }
+        let differ = plan.items.filter { checks.notIdentical[$0.id] != nil }.compactMap { $0.source?.location.name }
+        if !differ.isEmpty { out.append(.notIdentical(count: differ.count, names: Array(differ.prefix(3)))) }
+        let unknown = plan.items.filter { checks.uncompared[$0.id] != nil }.compactMap { $0.source?.location.name }
+        if !unknown.isEmpty { out.append(.uncompared(count: unknown.count, names: Array(unknown.prefix(3)))) }
+        return out
+    }
+
+    /// The subfolders a plan reaches into, by name (sorted). Per grant: the
+    /// folder the plan tidies is the deepest one holding every moved or
+    /// trashed item (the longest common parent of their sources); when some
+    /// items sit right in it, the others -- in its subfolders -- are taken
+    /// out of those subfolders, named by the subfolder right under it. A plan
+    /// whose items all sit in subfolders (the user named them) reaches into
+    /// nothing; nor does a plan that moves a subfolder whole.
+    public static func reachedSubfolders(_ items: [PlanItem]) -> [String] {
+        var byRoot: [FolderRoot: [[String]]] = [:]
+        for item in items where item.kind != .makeDir {
+            guard let s = item.source else { continue }
+            byRoot[s.location.root, default: []].append(s.location.parentComponents)
+        }
+        var names = Set<String>()
+        for parents in byRoot.values {
+            guard var base = parents.first else { continue }
+            for p in parents.dropFirst() {
+                base = zip(base, p).prefix { $0.0 == $0.1 }.map { $0.0 }
+            }
+            guard parents.contains(base) else { continue }
+            for p in parents where p.count > base.count { names.insert(p[base.count]) }
+        }
+        return names.sorted()
+    }
+
+    /// The items' bytes: files by their size when proposed, folders as
+    /// measured (`atLeast` when one wasn't, or only partly).
+    static func bytes(_ items: [PlanItem], _ checks: PlanChecks) -> (bytes: Int64, atLeast: Bool) {
+        var total: Int64 = 0
+        var atLeast = false
+        for item in items {
+            guard let s = item.source else { continue }
+            switch s.kind {
+            case .directory, .package:
+                if let m = checks.sizes[item.id] {
+                    total += m.bytes
+                    if m.partial { atLeast = true }
+                } else {
+                    atLeast = true
+                }
+            case .file: total += s.size
+            default: break
+            }
+        }
+        return (total, atLeast)
+    }
+
+    /// A trash item's size for its row: a file's, or a folder's as measured
+    /// (nil: not measured).
+    public func trashSize(_ item: PlanItem) -> FolderSize? {
+        guard item.kind == .trash, let s = item.source else { return nil }
+        switch s.kind {
+        case .file: return FolderSize(items: 1, bytes: s.size)
+        case .directory, .package: return checks.sizes[item.id]
+        default: return nil
+        }
     }
 
     /// What the review must say about an item (Hardening 5, 6, 12).

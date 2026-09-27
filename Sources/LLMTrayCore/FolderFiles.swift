@@ -43,6 +43,9 @@ public struct ListingPage: Codable, Equatable, Sendable {
         /// (`contains_protected_items`), or too large to check (`unchecked`);
         /// nil otherwise.
         public var protectedInside: ProtectedContents? = nil
+        /// A folder's or package's items and bytes (nil: not measured -- a
+        /// subfolder's subfolders in a recursive listing, or past the budget).
+        public var folderSize: FolderSize? = nil
     }
 
     public var entries: [Entry]
@@ -77,6 +80,15 @@ public struct FolderFiles {
         /// protected items (each folder gets at most `protectedPerFolder`).
         public var protectedCheckPerPage = 50_000
         public var protectedPerFolder = 10_000
+        /// A page's folders are measured (items, bytes) in the same walk,
+        /// each up to this many entries and seconds, all of them within
+        /// `sizeEntriesPerPage` and `sizeSecondsPerPage`; past a cap a size
+        /// is "at least". In a recursive listing only the listed folder's own
+        /// subfolders are measured (their files are listed anyway).
+        public var sizePerFolder = 50_000
+        public var sizeSecondsPerFolder: TimeInterval = 0.3
+        public var sizeEntriesPerPage = 250_000
+        public var sizeSecondsPerPage: TimeInterval = 1.5
 
         public init() {}
     }
@@ -127,19 +139,34 @@ public struct FolderFiles {
     }
 
     /// Flags the page's folders and packages whose subtree holds denied
-    /// items (a move or trash of them is refused), within a budget.
-    private func flagProtected(_ page: inout [ListingPage.Entry]) {
+    /// items (a move or trash of them is refused), within a budget, and
+    /// measures those directly in the listed folder (`listed`) in the same
+    /// walk, within the size budgets.
+    private func flagProtected(_ page: inout [ListingPage.Entry], listed: [String]) {
         var budget = limits.protectedCheckPerPage
+        var sizeBudget = limits.sizeEntriesPerPage
+        let pageDeadline = ProcessInfo.processInfo.systemUptime + limits.sizeSecondsPerPage
         for i in page.indices where page[i].kind == .directory || page[i].kind == .package {
-            guard budget > 0 else { page[i].protectedInside = .unchecked; continue }
             let comps = page[i].path.split(separator: "/").map(String.init)
+            let now = ProcessInfo.processInfo.systemUptime
+            let measure = comps.count == listed.count + 1 && sizeBudget > 0 && now < pageDeadline
+            guard measure || budget > 0 else { page[i].protectedInside = .unchecked; continue }
             guard let parent = try? walker.openDirectory(Array(comps.dropLast())), let name = comps.last else {
                 page[i].protectedInside = .unchecked
                 continue
             }
-            let (found, read) = walker.protectedScan(in: parent, name, budget: min(budget, limits.protectedPerFolder))
-            budget -= read
-            page[i].protectedInside = found == .none ? nil : found
+            if measure {
+                let r = walker.subtreeScan(in: parent, name, budget: min(sizeBudget, limits.sizePerFolder),
+                                           deadline: min(pageDeadline, now + limits.sizeSecondsPerFolder), measure: true)
+                sizeBudget -= r.read
+                budget -= r.read
+                page[i].protectedInside = r.protected == .none ? nil : r.protected
+                page[i].folderSize = r.size
+            } else {
+                let (found, read) = walker.protectedScan(in: parent, name, budget: min(budget, limits.protectedPerFolder))
+                budget -= read
+                page[i].protectedInside = found == .none ? nil : found
+            }
         }
     }
 
@@ -196,7 +223,7 @@ public struct FolderFiles {
             bytes += cost
             i += 1
         }
-        flagProtected(&page)
+        flagProtected(&page, listed: q.components)
         var listed: ProtectedContents?
         if let name = q.components.last {
             let parent = try walker.openDirectory(Array(q.components.dropLast()))
