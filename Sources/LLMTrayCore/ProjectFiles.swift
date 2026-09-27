@@ -694,8 +694,9 @@ public enum CitationViewer {
 
     /// Where `quote` (a chunk, as the index stored its page's text) is in
     /// `pageText` (the page's text now), in `pageText`'s UTF-16 units:
-    /// the whole quote, else its first line (a partial highlight beats
-    /// none); nil when neither is there -- nothing is highlighted then.
+    /// the whole quote, else its first line of at least `minimumLine`
+    /// characters (a partial highlight beats none); nil when neither is
+    /// there -- nothing is highlighted then.
     public static func quoteRange(_ quote: String, in pageText: String) -> NSRange? {
         let text = pageText as NSString
         let whole = quote.trimmingCharacters(in: .whitespacesAndNewlines)

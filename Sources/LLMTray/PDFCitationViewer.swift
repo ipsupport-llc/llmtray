@@ -57,9 +57,10 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
         window.contentView = NSHostingView(rootView: PDFCitationViewerView(
             pdfView: pdfView, state: state, url: url
         ))
-        // A second file's window cascades from the last one, not on top of it.
-        if let last = Self.viewers.values.first?.window {
-            window.setFrameTopLeftPoint(window.cascadeTopLeft(from: NSPoint(x: last.frame.minX, y: last.frame.maxY)))
+        // Another file's window cascades from the frontmost viewer, not on top of it.
+        let viewerWindows = Self.viewers.values.map(\.window)
+        if let front = NSApp.orderedWindows.first(where: { w in viewerWindows.contains { $0 === w } }) {
+            window.setFrameTopLeftPoint(window.cascadeTopLeft(from: NSPoint(x: front.frame.minX, y: front.frame.maxY)))
         } else {
             window.center()
         }
