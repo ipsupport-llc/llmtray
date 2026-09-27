@@ -39,8 +39,11 @@
 "%lld s" = "%lld 秒";
 "%lld-bit" = "%lld 位";
 "(Please attach the report file shown in Finder.)" = "（请在 Finder 中附加显示的报告文件。）";
+"(estimate; exact after the first answer)" = "（估计值；首次回答后为准确值）";
+"(measured for this model)" = "（针对该模型测量）";
 "(no result yet)" = "(尚无结果)";
 "(no server output yet)" = "（暂无服务器输出）";
+"+ MTP drafter %@" = "+ MTP 草稿器 %@";
 "1 hour" = "1 小时";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天在查看文件夹前会询问，并将每项更改以计划形式显示供你批准。私人位置（Library、keys、主目录）不会被共享。";
 "A chat model" = "聊天模型";
@@ -291,6 +294,7 @@
 "Follow the description" = "遵循描述";
 "For This Chat" = "针对本聊天";
 "For an Hour" = "一小时内";
+"For faster answers (speculative decoding)" = "用于更快的回答（猜测解码）";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "对于发布了草稿模型的模型（Gemma 4 26B）：一个额外的小模型会提前猜测词元，主模型会在一次传递中检查它们。输出相同，速度更快。随后请求会逐个处理。";
 "Found after an interruption" = "中断后发现";
 "Free disk space" = "可用磁盘空间";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "该文件夹无法与聊天共享：%@";
 "The Keychain refused to remove the token." = "钥匙串拒绝移除该令牌。";
 "The Keychain refused to save the token." = "钥匙串拒绝保存该令牌。";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP 草稿器已下载——重启服务器以使用。";
 "The Mac's chip." = "Mac 的芯片。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "兼容 OpenAI 的 API 在此处监听（http://localhost:<port>/v1）。请在服务器停止时更改。";
 "The app's language (the language only, not the region)." = "应用的语言（仅语言，不含地区）。";
@@ -926,6 +931,8 @@
 "removing" = "正在移除";
 "rename %lld" = "重命名 %lld 项";
 "search by words only" = "仅按文字搜索";
+"the download finished incomplete" = "下载未完成";
+"the model runtime isn't installed yet" = "模型运行时尚未安装";
 "then" = "然后";
 "this call only" = "仅此调用";
 "tight fit" = "空间紧张";

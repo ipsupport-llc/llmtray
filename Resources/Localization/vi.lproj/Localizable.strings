@@ -39,8 +39,11 @@
 "%lld s" = "%lld giây";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
+"(estimate; exact after the first answer)" = "(ước tính; chính xác sau câu trả lời đầu tiên)";
+"(measured for this model)" = "(đã đo cho mô hình này)";
 "(no result yet)" = "(chưa có kết quả)";
 "(no server output yet)" = "(chưa có đầu ra từ máy chủ)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 giờ";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Một cuộc trò chuyện sẽ hỏi trước khi xem trong thư mục, và hiển thị từng thay đổi dưới dạng một kế hoạch để bạn chấp thuận. Các nơi riêng tư (Library, keys, chính thư mục người dùng) không bao giờ được chia sẻ.";
 "A chat model" = "Mô hình trò chuyện";
@@ -291,6 +294,7 @@
 "Follow the description" = "Theo sát mô tả";
 "For This Chat" = "Cho cuộc trò chuyện này";
 "For an Hour" = "Trong một giờ";
+"For faster answers (speculative decoding)" = "Để trả lời nhanh hơn (giải mã suy đoán)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Với các mô hình có mô hình nháp đã được công bố (Gemma 4 26B): một mô hình nhỏ bổ sung đoán trước các token, rồi mô hình chính kiểm tra chúng trong một lượt. Kết quả như cũ, nhanh hơn. Khi đó, các yêu cầu được phục vụ lần lượt từng cái.";
 "Found after an interruption" = "Tìm thấy sau khi gián đoạn";
 "Free disk space" = "Dung lượng đĩa trống";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "Thư mục đó không thể chia sẻ với cuộc trò chuyện: %@";
 "The Keychain refused to remove the token." = "Keychain từ chối xóa token.";
 "The Keychain refused to save the token." = "Keychain từ chối lưu token.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter đã tải xong — khởi động lại server để sử dụng.";
 "The Mac's chip." = "Chip của Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API tương thích với OpenAI lắng nghe tại đây (http://localhost:<port>/v1). Thay đổi mục này khi máy chủ đang dừng.";
 "The app's language (the language only, not the region)." = "Ngôn ngữ của ứng dụng (chỉ ngôn ngữ, không bao gồm vùng).";
@@ -926,6 +931,8 @@
 "removing" = "đang xóa";
 "rename %lld" = "đổi tên %lld";
 "search by words only" = "tìm theo từ";
+"the download finished incomplete" = "việc tải xuống kết thúc không hoàn chỉnh";
+"the model runtime isn't installed yet" = "chưa cài đặt runtime mô hình";
 "then" = "sau đó";
 "this call only" = "chỉ cuộc gọi này";
 "tight fit" = "khít";

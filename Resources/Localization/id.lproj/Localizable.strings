@@ -39,8 +39,11 @@
 "%lld s" = "%lld dtk";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Harap lampirkan file laporan yang ditampilkan di Finder.)";
+"(estimate; exact after the first answer)" = "(perkiraan; tepat setelah jawaban pertama)";
+"(measured for this model)" = "(diukur untuk model ini)";
 "(no result yet)" = "(belum ada hasil)";
 "(no server output yet)" = "(belum ada output server)";
+"+ MTP drafter %@" = "+ Perancang MTP %@";
 "1 hour" = "1 jam";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Chat akan meminta izin sebelum melihat folder, dan setiap perubahan ditampilkan sebagai rencana untuk Anda setujui. Tempat pribadi (Library, keys, folder home sendiri) tidak pernah dibagikan.";
 "A chat model" = "Model obrolan";
@@ -291,6 +294,7 @@
 "Follow the description" = "Ikuti deskripsi";
 "For This Chat" = "Untuk Chat Ini";
 "For an Hour" = "Untuk Satu Jam";
+"For faster answers (speculative decoding)" = "Untuk jawaban lebih cepat (spekulatif decoding)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan model draf yang dipublikasikan (Gemma 4 26B): model ekstra kecil menebak token berikutnya terlebih dahulu dan model utama memeriksanya dalam satu lintasan. Output sama, lebih cepat. Permintaan kemudian dilayani satu per satu.";
 "Found after an interruption" = "Ditemukan setelah terhenti";
 "Free disk space" = "Ruang disk tersedia";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "Folder itu tidak bisa dibagikan dengan chat: %@";
 "The Keychain refused to remove the token." = "Keychain menolak menghapus token.";
 "The Keychain refused to save the token." = "Keychain menolak menyimpan token.";
+"The MTP drafter has downloaded -- restart the server to use it." = "Perancang MTP telah diunduh — mulai ulang server untuk menggunakannya.";
 "The Mac's chip." = "Chip Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API yang kompatibel dengan OpenAI mendengarkan di sini (http://localhost:<port>/v1). Ubah saat server dihentikan.";
 "The app's language (the language only, not the region)." = "Bahasa aplikasi (hanya bahasa, bukan wilayah).";
@@ -926,6 +931,8 @@
 "removing" = "menghapus";
 "rename %lld" = "ganti nama %lld";
 "search by words only" = "cari hanya dengan kata";
+"the download finished incomplete" = "unduhan selesai tidak lengkap";
+"the model runtime isn't installed yet" = "runtime model belum terpasang";
 "then" = "lalu";
 "this call only" = "hanya panggilan ini";
 "tight fit" = "muat pas";
