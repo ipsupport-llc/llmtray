@@ -30,8 +30,10 @@ chat of the project, reached by the chat model through tools.
   set's model only; the switch to the new set is one transaction.
 - **The default embedder is bge-m3** (the user's choice): MIT, 568M
   (XLM-RoBERTa), 8k-token context, 1024 dimensions, CLS pooling,
-  normalized, no query/document prefixes; RuBQ retrieval 71.2 against
-  mE5-large-instruct 69.2 and EmbeddingGemma 69.7; MLX conversions exist
+  normalized, no query/document prefixes; RuBQ retrieval (MTEB results)
+  71.2 against multilingual-e5-large-instruct 69.2 and EmbeddingGemma
+  69.7 (plain multilingual-e5-large scores 74.1 but has a 512-token
+  limit and no instructions); MLX conversions exist
   (mlx-community). No MRL: vectors stay 1024-d, ~400 MB f16 at 200k
   chunks. Its sparse and multi-vector outputs are not used in v1 — FTS5
   covers the lexical side. Other registry entries (USER-bge-m3, tuned
@@ -190,16 +192,19 @@ Application Support/LLMTray/projects/<projectID>/
   `chunks(body)`, kept in step by insert/delete/`AFTER UPDATE OF id,
   body` triggers, `'rebuild'` as the repair. Queries shorter than 3
   characters go to `chunks_fts` only.
-- Vectors in packed blocks, not a row each (a 2 KB blob per 4 KB page
-  wastes half): `vec_blocks(set_id, doc, rev, n, chunk_ids, v)`, one row
+- Vectors in packed blocks, not a row each (one 2 KB blob per row left
+  most of each page empty in the spike, and blocks load faster): `vec_blocks(set_id, doc, rev, n, chunk_ids, v)`, one row
   per embedding batch (≤ 64 vectors), committed batch by batch —
   `embedded` flips after the last, so a crash costs one batch;
   `vec_sets(set_id, model, dim, prep_version, active)` for an embedder
   switch (one transaction flips `active`).
-- `meta(schema, ...)`. On a schema change the derived tables (`pages`,
-  `chunks`, both FTS, vectors) are dropped and rebuilt from `files/`;
-  `documents` — user state — migrates only by explicit ALTERs. 16 KB
-  pages (set before the first table), ~5% smaller.
+- `meta(schema, ...)`. On a schema change the derived tables (chunks,
+  both FTS, vectors) are rebuilt from the documents' sources — copies in
+  `files/`, linked files where their source is available; an unavailable
+  source keeps its old index until it's back — and `pages` rows kept
+  for cited revisions are migrated, not dropped. `documents` — user
+  state — migrates only by explicit ALTERs. 16 KB pages and
+  `auto_vacuum = INCREMENTAL`, both set before the first table.
 
 **Search path.** The query is normalized, split into letter/digit runs,
 each run double-quoted, joined with OR — at most 24 terms of 64
@@ -218,15 +223,17 @@ latency budget; trigram may run only when unicode61 underdelivers or
 for stemmed/identifier terms (eval). Dense: f16 blocks widened in tiles
 (vImage) into `cblas_sgemv` — f32 speed at f16 memory.
 
-**Consistency.** Add: copy to `staging/<uuid>.part`, hash, rename to
-`staging/<sha>.<ext>`, insert the `staged` row, rename to
-`files/<doc>.<ext>`; extraction writes `pages`, chunks and FTS in one
+**Consistency.** Add: insert the `staged` row (its `doc` allocated),
+copy to `staging/<doc>.part`, hash, rename to `staging/<doc>.<ext>`,
+record the hash, rename to `files/<doc>.<ext>` — every staged path
+belongs to exactly one row (two adds of the same file never share one;
+duplicates by hash are refused at add); extraction writes `pages`, chunks and FTS in one
 transaction → `searchable`. Remove: `removing` in a transaction, delete
 the file, delete the rows in a transaction. Re-index: rebuild the
 document's derived rows in one transaction; the old ones stay searchable
 until it commits. At project open a reconcile pass finishes or undoes
 every state: `.part` files and staged copies no row claims are deleted,
-a staged copy with its row is promoted by hash, `extracting` goes back
+a complete staged copy whose hash matches its row is promoted, `extracting` goes back
 to `staged`, `removing` is finished, embedding resumes. The spike
 killed a child at 16 points of add/remove/re-index: before reconcile a
 document was invisible or complete, after it no orphans or duplicates,
@@ -273,22 +280,25 @@ every project open.
 **Maintenance (vacuum).** Deletes, re-indexes and embedder switches
 leave free pages, and FTS5 segments accumulate:
 
-- The database is created with `auto_vacuum = INCREMENTAL` (it can only
-  be set before the first table, or by a full VACUUM): when ingest goes
-  idle, `PRAGMA incremental_vacuum(n)` returns free pages in small
-  steps, cheap enough to run after every batch of removals.
-- A full compaction — `VACUUM INTO` a new file, checked with
-  `integrity_check` and `quick_check`, then swapped in by rename — runs
-  in the background when the free list passes a threshold (e.g. 25% of
-  the file), or on demand: **Compact Index** in the project's ring menu
-  and in the Files view. It rewrites the whole file (~2 GB at 200k
-  chunks), so it needs the free disk space first (checked), runs only
-  with no ingest active, pauses like indexing does, and a failed or
-  interrupted run just leaves the old file in place (reconcile deletes a
-  leftover temp file).
-- FTS5 `'optimize'` (merging segments: 5-8 s at 200k, no measurable
-  query gain in the spike) runs only as part of a full compaction;
-  `'automerge'` stays at its default.
+- **Routine**: the database is created with `auto_vacuum =
+  INCREMENTAL`; when ingest goes idle, `PRAGMA incremental_vacuum(n)`
+  returns free pages to the OS in small steps. That shrinks the file but
+  doesn't defragment it or merge FTS segments.
+- **Full compaction** is triggered by fragmentation, not the free list
+  (which the routine step keeps low): after churn since the last
+  compaction passes a threshold (chunks deleted or re-indexed ≥ 30% of
+  the live ones), or on demand — **Compact Index** in the project's ring
+  menu and the Files view. Steps: FTS5 `'optimize'` on the live database
+  (5-8 s at 200k), `VACUUM INTO` a temp file, `quick_check` on it; then
+  the swap: new searches wait, readers drain, a TRUNCATE checkpoint,
+  **all** connections closed, the old file (and its `-wal`/`-shm`) moved
+  aside, the new one renamed in, connections reopened, the old one
+  deleted; a `meta`-independent marker file records the step, so a
+  crash mid-swap is finished or rolled back at the next open.
+- It rewrites the whole file (~2 GB at 200k chunks): free disk is
+  checked first; it runs only with no ingest active; it can't pause —
+  it's cancelled and restarted later (the old file stays in use until
+  the swap).
 - WAL: TRUNCATE checkpoints when idle and `journal_size_limit` (above).
 - The Files view shows the index's size on disk and how much a
   compaction would free.
@@ -352,6 +362,13 @@ loops `NSAttributedString` and `textutil` forever
   mojibake like "Äîãîâîð"), threshold 0.5 (clean text in ~10 languages
   scored ≤ 0.17), applied only where a next tier exists (PDF pages,
   images); an empty sheet or slide is "empty", not junk.
+- **The runner contract**: the child writes JSON lines (one per page,
+  sheet or slide); the parent caps the encoded stdout at the text cap
+  plus framing (~1.5×, escaping included), the page count and the wall
+  time; hitting any cap kills the group and records which one on the
+  document ("too large: text cap"), keeping the pages already received
+  only if the document is otherwise complete — never a silently
+  truncated one.
 - **Caps**: bytes per file, 5,000 pages, 32 MB of text per document,
   time per file, pixels per rendered page (a PDF page can claim 10⁹
   points); per-project files, bytes and chunks; free space checked
@@ -456,7 +473,8 @@ tabs; opening a previous schema.
   (`МЕНТАЦ` finds `Документация`); `load_extension` absent. Index spike
   (branch `spike/rag-index`, 24 tests): at 200k chunks the DB is
   2.08 GB (104 MB per 10k: trigram 32, chunks 28, vectors 20, pages 19,
-  unicode61 6); hybrid search p50 ~190 ms, p95 ~350 ms with the df gate
+  unicode61 6 — measured with 4 KB pages and no auto_vacuum; to be
+  re-measured with the final layout); hybrid search p50 ~190 ms, p95 ~350 ms with the df gate
   (232 / 700 ms without), nearly all of it trigram ranking; dense
   scoring 5-8 ms, vectors loaded in 120-300 ms; ingest ~590 chunks/s
   with both FTS tables. macOS 13.2
@@ -470,8 +488,9 @@ tabs; opening a previous schema.
   code, up to 8k tokens), retrieval order identical; 8.0-9.4k tokens/s
   on 400-token chunks at any batch size, an 8k text in 1.85 s, peak
   ≤ 1.75 GB, load < 1 s, spawn to first vector 0.76 s. 200k chunks ×
-  400 tokens ≈ 2.5 h of background indexing. RuBQ retrieval: 0.6B 66.9, bge-m3
-  71.2, mE5-large 74.1, Qwen3-4B 73.7 (MTEB results repository).
+  400 tokens ≈ 2.5 h of background indexing. RuBQ retrieval (MTEB
+  results repository): bge-m3 71.2, multilingual-e5-large 74.1,
+  multilingual-e5-large-instruct 69.2, EmbeddingGemma-300m 69.7.
 - Vision rev3 `.accurate`, a clean Russian page: body near perfect,
   table cells column-wise; `RecognizeDocumentsRequest` (macOS 26+)
   returned rows and cells. PaddleOCR-VL-1.5 (0.96B, Apache-2.0) via
@@ -491,18 +510,9 @@ contextual-retrieval.
 ## Plan
 
 1. **Spike (throwaway) — done 2026-09-26** (branches `spike/rag-index`,
-   `spike/rag-extract`, `spike/rag-embed`; results above). Left for v1a:
-   injection documents against the real tools. Schema, triggers, both FTS tables on a few
-   hundred chunks; `--extract` on hostile samples (corrupt PDF, zip-bomb
-   docx, remote-loading HTML); injection documents against the tools;
-   legacy .xls / .ppt: xlrd-style BIFF parsing for .xls, the text
-   records of .ppt's binary stream, or Quick Look rendering + OCR as the
-   fallback — whichever gives full text on sample files;
-   the generic embed runner with bge-m3 on MLX, matching the reference
-   (FlagEmbedding / sentence-transformers) vectors, plus a second
-   registry entry of another family to prove the registry isn't bge-only;
-   bge-m3's own indexing speed and peak memory measured (the speed under
-   Evidence is Qwen's).
+   `spike/rag-extract`, `spike/rag-embed`; results above). Carried into
+   v1a: injection documents against the real tools, and the index size
+   re-measured with 16 KB pages and incremental auto-vacuum.
 2. **Eval on extracted text.** The user's 20-30 real documents through
    tier 1 (and the tier-2 prototype); 40-60 questions with the answering
    page; recall@10 and MRR, lexical vs hybrid with bge-m3 (and
