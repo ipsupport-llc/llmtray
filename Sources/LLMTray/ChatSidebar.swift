@@ -78,7 +78,7 @@ struct ChatSidebar: View {
         ) { project in
             Button("Delete Project", role: .destructive) { store.deleteProject(project.id) }
         } message: { _ in
-            Text("Its chats stay, back among the recents; its instructions are deleted.")
+            Text("Its chats stay, back among the recents; the project's instructions and files are deleted.")
         }
     }
 

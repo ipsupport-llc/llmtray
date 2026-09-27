@@ -48,13 +48,16 @@ public struct ProjectStorage {
         return Self.deletionRecords(in: names)
     }
 
-    /// Step one: the record. False when it couldn't be written (the
-    /// directory is still removed, but a crash before that leaves it).
+    /// Step one: the record. False -- don't go on -- when it couldn't be
+    /// written and there is a directory: a failed removal would leave it
+    /// with no project and no record, for good. With no directory there's
+    /// nothing to leave behind.
     @discardableResult
     public func beginDeletion(_ id: UUID) -> Bool {
         let fm = FileManager.default
         try? fm.createDirectory(atPath: root, withIntermediateDirectories: true)
         return fm.createFile(atPath: recordPath(for: id), contents: Data(id.uuidString.utf8))
+            || !fm.fileExists(atPath: directory(for: id))
     }
 
     /// Removes the directory, then the record. False, the record kept for

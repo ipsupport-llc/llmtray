@@ -68,6 +68,16 @@ final class ProjectStorageTests: XCTestCase {
         XCTAssertEqual(storage.pendingDeletions(library: .missing), [id], "no library.json at all: still finished")
     }
 
+    func testNoRecordNoDeletionOfADirectory() throws {
+        let id = UUID(), empty = UUID()
+        try makeDirectory(id)
+        // The record can't be written (a read-only projects directory).
+        try fm.setAttributes([.posixPermissions: 0o555], ofItemAtPath: root)
+        defer { try? fm.setAttributes([.posixPermissions: 0o755], ofItemAtPath: root) }
+        XCTAssertFalse(storage.beginDeletion(id), "a directory, and no record: stop")
+        XCTAssertTrue(storage.beginDeletion(empty), "nothing on disk to leave behind")
+    }
+
     func testNoRootNoRecords() {
         XCTAssertEqual(storage.pendingDeletions(library: .loaded), [])
     }

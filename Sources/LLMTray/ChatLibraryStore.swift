@@ -147,8 +147,10 @@ final class ChatLibraryStore: ObservableObject {
     /// halfway is finished at the next launch.
     func deleteProject(_ id: UUID) {
         let storage = Self.projectStorage
+        // Its directory can't be deleted safely (no record could be
+        // written): the project stays, as it is.
+        guard storage.beginDeletion(id) else { return }
         ProjectInstructionsWindow.close(id)
-        storage.beginDeletion(id)
         library.deleteProject(id)
         // Not saved (a full disk): the project would come back at the next
         // launch without its directory. The record finishes it then.
