@@ -236,7 +236,7 @@ plan under review start unticked, and Approve has no Return shortcut. The
 app: `FilesTool` / `ChangeFilesTool` (`ChatTool.folderAccess`), the grant
 prompt and plan cards in the chat (`FolderViews.swift`; a call waits on the
 prompt like a Creator mode draft), the chat's folder menu (Allow Folder…, the
-chat's folders, Revoke), Settings > Folders. A chat's id for the grants
+chat's folders, Revoke), Settings > Files (with Project files). A chat's id for the grants
 is per visit (the session id plus a visit's): its per-chat grants, denies
 and pending plan end when the chat is left or its tab closed, and a call
 that outlived the visit writes nothing (`FolderToolService.hasEnded`).

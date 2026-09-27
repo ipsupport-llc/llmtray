@@ -3,7 +3,7 @@ import LLMTrayCore
 import SwiftUI
 
 // The folder tools' UI (adr/0014): the grant prompt and the plan review as
-// cards in the chat, the chat's folder menu, Settings > Folders.
+// cards in the chat, the chat's folder menu, Settings > Files.
 
 /// "Allow the chat to read ~/Downloads?" with the lifetimes; a call waits
 /// for the answer.
@@ -180,7 +180,7 @@ struct FolderPlanCard: View {
                 Text(problem).font(.system(size: 10)).foregroundColor(.secondary).lineLimit(4)
             }
             if o.uncertain > 0 {
-                Text("An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal.")
+                Text("An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.")
                     .font(.system(size: 11)).foregroundColor(.secondary)
             }
         }
@@ -204,7 +204,7 @@ struct FolderPlanCard: View {
         }
         let left = report.remaining.filter(\.reversible).count
         if left > 0 {
-            Text(String(format: NSLocalizedString("%lld can still be undone from Settings > Folders.", comment: "undo result"), left))
+            Text(String(format: NSLocalizedString("%lld can still be undone from Settings > Files.", comment: "undo result"), left))
                 .font(.system(size: 11)).foregroundColor(.secondary)
         }
         HStack {
@@ -246,7 +246,7 @@ struct ChatFolderMenu: View {
                 }
             }
             Divider()
-            Button("Folder Settings…") {
+            Button("Files Settings…") {
                 NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.folders.rawValue])
             }
         } label: {
@@ -264,8 +264,9 @@ struct ChatFolderMenu: View {
 
 // MARK: - Settings
 
-/// Settings > Folders: the feature's opt-in, the standing grants with
-/// Revoke, Allow Folder…, the journal with Undo, what recovery found.
+/// Settings > Files: Project files (its own section), then folder access --
+/// its opt-in, the standing grants with Revoke, Allow Folder…, the journal
+/// with Undo, what recovery found.
 struct FoldersPane: View {
     @ObservedObject private var manager = FolderAccessManager.shared
     @State private var level: FolderAccessLevel = .read
@@ -275,6 +276,7 @@ struct FoldersPane: View {
 
     var body: some View {
         Form {
+            ProjectFilesSection()
             Section("Folder access") {
                 Toggle(isOn: Binding(get: { manager.isEnabled }, set: { manager.setEnabled($0) })) {
                     SettingLabel(title: "Let chats work in folders", help: "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.")

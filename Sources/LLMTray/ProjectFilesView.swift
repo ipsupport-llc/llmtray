@@ -179,10 +179,17 @@ private struct ProjectFilesView: View {
     private var offNote: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Project files are turned off", systemImage: "folder.badge.questionmark").font(.headline)
-            Text("Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
+            Text("Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            Button("Open Settings") { openModelsSettings() }
+            HStack {
+                Button("Turn On…") { Task { actionError = await ProjectFilesSection.turnOn() } }
+                    .keyboardShortcut(.defaultAction)
+                Button("Settings…") { openFilesSettings() }
+            }
+            if let actionError {
+                Text(actionError).font(.caption).foregroundColor(.red).fixedSize(horizontal: false, vertical: true)
+            }
             Spacer()
         }
     }
@@ -199,7 +206,7 @@ private struct ProjectFilesView: View {
                     .font(.caption).foregroundColor(.secondary)
             }
             if indexer.isEnabled, !indexer.isEmbedderReady {
-                Text("No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning.")
+                Text("No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.")
                     .font(.caption).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
             } else if let reason = indexer.embeddingUnavailable {
                 Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
@@ -373,8 +380,8 @@ private struct ProjectFilesView: View {
 
 /// Opens Settings on the pane with the Project files switch.
 @MainActor
-func openModelsSettings() {
-    NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.models.rawValue])
+func openFilesSettings() {
+    NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.folders.rawValue])
 }
 
 /// A document's status as the user sees it (adr/0012, the one mapping).

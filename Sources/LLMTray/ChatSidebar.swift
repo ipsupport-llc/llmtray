@@ -381,7 +381,7 @@ struct ChatSidebar: View {
                         Button("Stop Indexing") { Task { await indexer.stop(project.id) } }
                     }
                 } else {
-                    Button("Project Files: Turn On in Settings…") { openModelsSettings() }
+                    Button("Turn On Project Files…") { turnOnProjectFiles() }
                 }
                 Button("Instructions…") { ProjectInstructionsWindow.show(project.id) }
                 Button("Rename…") {
@@ -401,8 +401,8 @@ struct ChatSidebar: View {
     @ViewBuilder
     private func projectFileNotes(_ project: UUID) -> some View {
         if filesOffHint == project, !indexer.isEnabled {
-            Button { openModelsSettings() } label: {
-                Label("Turn on Project files in Settings to add files", systemImage: "info.circle")
+            Button { turnOnProjectFiles() } label: {
+                Label("Turn on Project files to add files", systemImage: "info.circle")
                     .font(.caption)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -669,5 +669,19 @@ private extension View {
             return perform(providers)
         }
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(target.wrappedValue == id ? 0.22 : 0)))
+    }
+}
+
+/// Turns Project files on from the sidebar; a failed embedder download (the
+/// feature is on by then, searching by words) is shown,
+/// there being no Settings row on screen to show it in.
+@MainActor
+private func turnOnProjectFiles() {
+    Task {
+        guard let failure = await ProjectFilesSection.turnOn() else { return }
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("The embedding model couldn't be downloaded", comment: "")
+        alert.informativeText = failure
+        alert.runModal()
     }
 }
