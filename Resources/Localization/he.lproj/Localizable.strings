@@ -464,6 +464,7 @@
 "Nothing to change." = "אין דבר לשנות.";
 "Nothing to pin until the file has been read" = "אין מה לסמן עד שהקובץ ייקרא";
 "OK" = "אישור";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "מתוך הקונטקסט של המודל, ומהזיכרון שתקנוני המשקלות שלו משאירים לקונטקסט — כמה מקום קבצי הפרויקט הקבועים עלולים לתפוס ביחד. המקסימום של הטוקנים לתשובה נשאר פנוי ללא קשר להגדרה זו. יותר קבצים תופסים פחות מקום לשיחה, ותשובה ארוכה בתחילת הטעינה תתרחש בזמן שהקבצים נטענים.";
 "Off" = "כבוי";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "כבוי: רק Mac זה. דלוק: כל מי ברשת שלך, לכן הפעל רק ברשתות שאתה סומך עליהן.";
@@ -497,6 +498,7 @@
 "Pin %@" = "סמן %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "סימון: כל צ'אט בפרויקט מקבל את הקובץ במלואו (≈%@ טוקנים). חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד הקובץ מסומן.";
 "Pinned" = "נעוץ";
+"Pinned files may take" = "קבצים קבועים עשויים לתפוס";
 "Pinned · ≈%@ tokens" = "מסומן · ≈%@ טוקנים";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "מסומנים: %1$lld קבצים, ≈%2$@ מתוך %3$@ טוקנים";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "לא ניתן היה לטעון קבצי Pins ו־projects. שינויים לא יישמרו עד להפעלת LLMTray מחדש; עותק של הקובץ נשמר לצד התוכנית.";

@@ -464,6 +464,7 @@
 "Nothing to change." = "Нечего менять.";
 "Nothing to pin until the file has been read" = "Нечего закреплять, пока файл не будет прочитан";
 "OK" = "OK";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Сколько контекста модели и памяти, которую её веса оставляют для контекста, могут занимать закреплённые файлы проекта вместе. Максимальное число токенов для ответа остаётся свободным независимо от этого параметра. Чем больше значение, тем меньше места остаётся для беседы, и при чтении файлов первый ответ может быть долгим.";
 "Off" = "Выкл.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Выкл. — к серверу подключается только этот Mac. Вкл. — любые устройства в вашей сети, поэтому включайте только в доверенных сетях.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Выкл: только этот Mac. Вкл: любой в вашей сети — включайте только в доверенных сетях.";
@@ -497,6 +498,7 @@
 "Pin %@" = "Закрепить %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закрепить: каждый чат проекта получит весь файл (≈%@ токенов). В этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
 "Pinned" = "Закреплённые";
+"Pinned files may take" = "Место, которое могут занять закреплённые файлы";
 "Pinned · ≈%@ tokens" = "Закреплено · ≈%@ токенов";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Закреплено: %1$lld файлов, ≈%2$@ из %3$@ токенов";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Закрепления и проекты не удалось загрузить. Изменения не сохраняются до перезапуска LLMTray; копия файла сохраняется рядом с ним.";

@@ -464,6 +464,7 @@
 "Nothing to change." = "Niente da modificare.";
 "Nothing to pin until the file has been read" = "Nessun elemento da appuntare finché il file non è stato letto";
 "OK" = "OK";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Della capacità del contesto del modello, e della memoria che i suoi pesi lasciano al contesto, quanto possono occupare insieme i file appuntati di un progetto. I token massimi per la risposta restano liberi qualunque sia questo valore. Più spazio occupano, meno rimane per la conversazione, e la prima risposta può risultare lunga mentre i file vengono letti.";
 "Off" = "Disattivato";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Disattivato: solo questo Mac può accedere al server. Attivato: possono farlo anche altri dispositivi sulla tua rete, quindi chiunque vi sia connesso; usalo solo su reti attendibili.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Disattivato: solo questo Mac. Attivato: chiunque sulla tua rete, quindi solo su reti di fiducia.";
@@ -497,6 +498,7 @@
 "Pin %@" = "Appunta %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Appunta: tutte le chat del progetto ricevono il file completo (≈%@ token). La ricerca sul web e la generazione di immagini o musica sono disattivate in quelle chat finché è appuntato.";
 "Pinned" = "Fissata";
+"Pinned files may take" = "I file appuntati possono occupare";
 "Pinned · ≈%@ tokens" = "Appuntato · ≈%@ token";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Appuntati: %1$lld file, ≈%2$@ di %3$@ token";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Impostazioni rapide e progetti non possono essere caricati. Le modifiche non vengono salvate finché LLMTray non viene riavviato; una copia del file è conservata accanto ad esso.";

@@ -464,6 +464,7 @@
 "Nothing to change." = "変更点はありません。";
 "Nothing to pin until the file has been read" = "ファイルが読み取られるまでピン留めできません";
 "OK" = "OK";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "モデルのコンテキストおよび重みがコンテキストに残すメモリのうち、プロジェクトのピン留めファイルが占める可能性のある合計です。回答の最大トークン数はこの設定にかかわらず確保されます。値を大きくすると会話に使える領域が減り、ファイル読み込み中は最初の応答が長くなることがあります。";
 "Off" = "オフ";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "オフ：この Mac のみ。オン：ネットワーク上の全員が利用可能になるため、信頼できるネットワークでのみ有効にしてください。";
@@ -497,6 +498,7 @@
 "Pin %@" = "ピン留め %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "ピン留め: プロジェクト内のすべてのチャットがファイル全体を受け取ります（約 %@ トークン）。ピン留め中はそのチャットで Web 検索や画像・音楽生成は無効になります。";
 "Pinned" = "ピン留め済み";
+"Pinned files may take" = "ピン留めファイルが占める可能性のある容量";
 "Pinned · ≈%@ tokens" = "ピン留め済 · 約 %@ トークン";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "ピン留め済: %1$lld 件、約 %2$@ ／ %3$@ トークン";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "ピンとプロジェクトを読み込めませんでした。変更は LLMTray を再起動するまで保存されません。ファイルのコピーが隣に保持されます。";
