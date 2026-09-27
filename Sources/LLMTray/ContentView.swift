@@ -47,6 +47,9 @@ struct ContentView: View {
     @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
+    /// The user's own scrolling (wheel, trackpad, scroller): only it turns
+    /// following off -- the chat's own layout changes never do.
+    @StateObject private var userScroll = UserScrollWatch()
     @State private var chatViewportHeight: CGFloat = 380
     /// What a citation chip found: the file changed since, or gone.
     @State private var citationNote: String?
@@ -347,6 +350,7 @@ struct ContentView: View {
             // followChatBottom. Once per view: reopening the popover keeps
             // the reader's place, as it always has.
             .onAppear {
+                userScroll.start()
                 guard !didScrollOnAppear else { return }
                 didScrollOnAppear = true
                 // After the first layout, or there's nothing to scroll yet.
@@ -360,27 +364,32 @@ struct ContentView: View {
             // scrolled up to read something, they stay where they are.
             .onPreferenceChange(ChatBottomKey.self) { geometry in
                 let grew = geometry.height - lastChatGeometry.height
-                // Content growing by h moves its bottom down by h; anything
-                // beyond that is the user scrolling (up: the bottom goes
-                // further down). Told apart this way even while tokens stream
-                // in -- comparing "moved, same height" missed every scroll
-                // that coincided with a token, so reading back was impossible.
+                let moved = abs(geometry.bottom - lastChatGeometry.bottom) > 0.5
+                // What the user's scroll moved, beside the content's growth
+                // (no programmatic scroll runs meanwhile): > 0 is up, away
+                // from the end.
                 let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 0.5
-                // The user scrolled (moved, nothing grew): hovered answer details close.
-                if abs(grew) <= 0.5, abs(geometry.bottom - lastChatGeometry.bottom) > 0.5 {
-                    AnswerInfoPresenter.shared.chatScrolled()
-                }
                 lastChatGeometry = geometry
-                if scrolledUp, geometry.bottom > chatViewportHeight + 40 {
-                    followChatBottom = false
-                } else if geometry.bottom <= chatViewportHeight + 40 {
+                let atEnd = geometry.bottom <= chatViewportHeight + 40
+                // Told by the user's input, not guessed from the geometry:
+                // re-rendered Markdown, a folding reasoning block or an
+                // image's preview change the height and the offset in ways
+                // that looked like a scroll up and stopped following.
+                if userScroll.isScrolling {
+                    if moved { AnswerInfoPresenter.shared.chatScrolled() }
+                    // Up and away from the end: stop. Text arriving while the
+                    // user scrolls down to it doesn't count as leaving.
+                    if atEnd { followChatBottom = true } else if scrolledUp { followChatBottom = false }
+                } else if atEnd {
                     followChatBottom = true
                 }
                 // Anything that grows the chat at the end -- tokens, an image's
                 // progress and preview, the image or song itself -- keeps the
                 // end in view while the user follows it.
                 // Not while a Tweak draft up the chat is what the user looks at.
-                if followChatBottom, chat.draft?.anchor == nil, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
+                // Never while the user scrolls: that would take the end back from
+                // under them before they're 40 pt away.
+                if followChatBottom, !userScroll.isScrolling, chat.draft?.anchor == nil, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
                     DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
                 }
             }
@@ -531,6 +540,47 @@ private struct ProjectChatFilesRow: View {
 struct ChatGeometry: Equatable {
     var bottom: CGFloat
     var height: CGFloat
+}
+
+/// Whether the user is scrolling now: a scroll-wheel or trackpad event
+/// in the last moments, or a live scroll (a drag of the scroller, a
+/// trackpad's momentum). Programmatic scrolls (following the end) are
+/// neither, so they can't be mistaken for the user's.
+@MainActor
+final class UserScrollWatch: ObservableObject {
+    private var lastWheel = Date.distantPast
+    private var live = 0
+    private var monitor: Any?
+    private var observers: [NSObjectProtocol] = []
+
+    var isScrolling: Bool { live > 0 || Date().timeIntervalSince(lastWheel) < 0.35 }
+
+    func start() {
+        guard monitor == nil else { return }
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
+            self?.lastWheel = Date()
+            return event
+        }
+        let center = NotificationCenter.default
+        observers = [
+            center.addObserver(forName: NSScrollView.willStartLiveScrollNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.live += 1 }
+            },
+            center.addObserver(forName: NSScrollView.didEndLiveScrollNotification, object: nil, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    guard let self else { return }
+                    self.live = max(0, self.live - 1)
+                    // Its last movement lands just after the end.
+                    self.lastWheel = Date()
+                }
+            },
+        ]
+    }
+
+    deinit {
+        if let monitor { NSEvent.removeMonitor(monitor) }
+        observers.forEach(NotificationCenter.default.removeObserver)
+    }
 }
 
 private struct ChatBottomKey: PreferenceKey {
