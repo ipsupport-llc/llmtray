@@ -18,6 +18,8 @@ final class ChatLibraryStore: ObservableObject {
     private var libraryPath: String { ChatSessionStore.sessionsDir + "/library.json" }
     private var observer: AnyCancellable?
     private var isLoadingAll = false
+    /// library.json couldn't be read at launch: nothing is written to it.
+    private var isReadOnly = false
     private var changedWhileLoading: Set<UUID> = []
 
     /// Projects' own directories (adr/0012).
@@ -26,10 +28,14 @@ final class ChatLibraryStore: ObservableObject {
     private init() {
         let (library, state) = Self.readLibrary(at: libraryPath)
         self.library = library
-        // Unreadable (broken JSON, an I/O error): moved aside, not
-        // overwritten by the next save with an empty library -- projects,
-        // pins and instructions would be gone. The copy is for recovery.
-        if state == .unreadable { Self.setAside(libraryPath) }
+        // Unreadable (broken JSON, an I/O error -- maybe only for now):
+        // never overwritten this session, or the next save would replace
+        // projects, pins and instructions with an empty library. A copy is
+        // kept for recovery; the next launch reads it again.
+        if state == .unreadable {
+            isReadOnly = true
+            Self.keepCopy(libraryPath)
+        }
         finishProjectDeletions(libraryState: state)
         observer = NotificationCenter.default.publisher(for: .sessionsDidChange)
             .receive(on: DispatchQueue.main)
@@ -230,20 +236,20 @@ final class ChatLibraryStore: ObservableObject {
         return (library, .loaded)
     }
 
-    private static func setAside(_ path: String) {
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
-        let aside = path + ".unreadable-" + stamp
+    private static func keepCopy(_ path: String) {
+        let copy = path + ".unreadable-" + UUID().uuidString
         do {
-            try FileManager.default.moveItem(atPath: path, toPath: aside)
-            NSLog("LLMTray: library.json couldn't be read; kept as %@", aside)
+            try FileManager.default.copyItem(atPath: path, toPath: copy)
+            NSLog("LLMTray: library.json couldn't be read; not written this session; a copy is at %@", copy)
         } catch {
-            NSLog("LLMTray: library.json couldn't be read or set aside: %@", error.localizedDescription)
+            NSLog("LLMTray: library.json couldn't be read (not written this session): %@", error.localizedDescription)
         }
     }
 
     /// True once it's on disk.
     @discardableResult
     private func saveLibrary() -> Bool {
+        guard !isReadOnly else { return false }
         try? FileManager.default.createDirectory(atPath: ChatSessionStore.sessionsDir, withIntermediateDirectories: true)
         guard let data = try? Self.encoder.encode(library) else { return false }
         return (try? data.write(to: URL(fileURLWithPath: libraryPath), options: .atomic)) != nil

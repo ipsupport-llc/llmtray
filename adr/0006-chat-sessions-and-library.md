@@ -27,8 +27,9 @@
   its first turn. Deleting a project keeps its chats and removes
   `projects/<id>/` through a deletion record finished at launch — never
   when `library.json` couldn't be read. An unreadable `library.json` is
-  moved aside (`library.json.unreadable-<date>`) instead of being
-  overwritten by the next save with an empty library. A build older than
+  never overwritten in that session (changes to pins and projects aren't
+  saved until a launch reads it); a copy is kept as
+  `library.json.unreadable-<uuid>` for recovery. A build older than
   project instructions reads the file but drops the instructions if it
   saves it (a downgrade).
 - **A temporary chat writes nothing by itself**: `currentSessionID ==
