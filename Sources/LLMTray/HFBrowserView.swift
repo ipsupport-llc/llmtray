@@ -27,7 +27,7 @@ struct HFBrowserView: View {
                 }
                 .pickerStyle(.menu)
                 .labelsHidden()
-                .onChange(of: browser.sortOption) { _ in browser.search() }
+                .onChange(of: browser.sortOption) { browser.search() }
                 Spacer()
                 fitLegend
             }

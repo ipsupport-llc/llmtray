@@ -133,7 +133,7 @@ struct ChatComposer: View {
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...4)
                     .onSubmit(send)
-                    .onChange(of: composer.draft) { _ in composer.convertDroppedImagePaths() }
+                    .onChange(of: composer.draft) { composer.convertDroppedImagePaths() }
                     .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
                     .focused(isFocused)
                     .disabled(!canChat)

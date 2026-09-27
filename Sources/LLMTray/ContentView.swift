@@ -66,8 +66,8 @@ struct ContentView: View {
             modelDidChange(selectedModelID)
             isInputFocused = true
         }
-        .onChange(of: selectedModelID) { modelDidChange($0) }
-        .onChange(of: catalog.models) { _ in keepSelectionValid() }
+        .onChange(of: selectedModelID) { modelDidChange($1) }
+        .onChange(of: catalog.models) { keepSelectionValid() }
     }
 
     // MARK: - Layouts
@@ -298,7 +298,7 @@ struct ContentView: View {
             }
             .background(GeometryReader { g in
                 Color.clear.onAppear { chatViewportHeight = g.size.height }
-                    .onChange(of: g.size.height) { chatViewportHeight = $0 }
+                    .onChange(of: g.size.height) { chatViewportHeight = $1 }
             })
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
@@ -329,7 +329,7 @@ struct ContentView: View {
             // takes whatever height the window leaves it.
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
             // A draft wants the user's eyes: brought into view, wherever it is.
-            .onChange(of: chat.draft?.id) { id in
+            .onChange(of: chat.draft?.id) { _, id in
                 guard let id else {
                     if let before = followBeforeDraft {
                         followChatBottom = before
@@ -345,7 +345,7 @@ struct ContentView: View {
                 }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
-            .onChange(of: lastUserMessageID) { _ in
+            .onChange(of: lastUserMessageID) {
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
                 followChatBottom = true
