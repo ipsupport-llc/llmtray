@@ -719,6 +719,8 @@ public final class ProjectIndex {
             try bump("churn", by: chunks)
             try point("remove.midTransaction")
             try db.run("DELETE FROM documents WHERE doc = ?", [.int(d.doc)])
+            // Unpinned with it (adr/0012, "Pinned files").
+            try db.run("DELETE FROM meta WHERE key = ?", [.text(ProjectPins.key(d.doc))])
         }
     }
 
@@ -799,6 +801,7 @@ public final class ProjectIndex {
             if staging.remove(stagedName) != nil { try? fm.removeItem(at: stagingDirectory.appendingPathComponent(stagedName)) }
             try? fm.removeItem(at: final)
             try db.run("DELETE FROM documents WHERE doc = ?", [.int(d.doc)])
+            try db.run("DELETE FROM meta WHERE key = ?", [.text(ProjectPins.key(d.doc))])
             r.droppedStaged += 1
         }
         for name in staging {
