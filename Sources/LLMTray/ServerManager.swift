@@ -153,6 +153,9 @@ final class ServerManager: ObservableObject {
         case .stopped, .failed: break
         default: return
         }
+        // Unloaded for an image or a song: not next to the generator; it
+        // reloads when that's done (ensureModelLoaded).
+        guard !suspendedForImageGeneration else { return }
         // The model server listens on port + 10000 (internalPort).
         guard (1...55_535).contains(port) else {
             state = .failed("port \(port) is out of range: use 1-55535")

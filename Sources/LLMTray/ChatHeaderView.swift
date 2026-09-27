@@ -216,8 +216,9 @@ struct ChatHeaderView: View {
             switch server.state {
             case .stopped, .failed:
                 Button(action: startServer) { Image(systemName: "play.fill") }
-                    .disabled(selectedModelID == nil)
-                    .help("Start server")
+                    // Not beside a generator: it reloads by itself after.
+                    .disabled(selectedModelID == nil || server.suspendedForImageGeneration)
+                    .help(server.suspendedForImageGeneration ? Text("The model reloads when the image or song is done") : Text("Start server"))
             case .starting:
                 ProgressView().controlSize(.small).help("Starting…")
             case .running:
@@ -228,7 +229,7 @@ struct ChatHeaderView: View {
         .buttonStyle(.plain)
         .contextMenu {
             Button("Start Server", action: startServer)
-                .disabled(!isStoppedOrFailed || selectedModelID == nil)
+                .disabled(!isStoppedOrFailed || selectedModelID == nil || server.suspendedForImageGeneration)
             Button("Stop Server") { server.stop() }
                 .disabled(!isRunning)
         }
