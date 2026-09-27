@@ -464,6 +464,7 @@
 "Nothing to change." = "Nada a alterar.";
 "Nothing to pin until the file has been read" = "Nada para fixar até que o arquivo tenha sido lido";
 "OK" = "OK";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Do contexto do modelo, e da memória que seus pesos deixam disponível para o contexto, quanto os arquivos fixados de um projeto podem ocupar no total. O máximo de tokens da resposta permanece livre independentemente disso. Mais ocupa menos espaço para a conversa, e uma resposta inicial longa pode ocorrer enquanto os arquivos são lidos.";
 "Off" = "Desativado";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Desativado: só este Mac pode acessar o servidor. Ativado: outros dispositivos na sua rede também podem — qualquer pessoa nela, então use apenas em redes confiáveis.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Desligado: apenas este Mac. Ligado: qualquer pessoa na sua rede — só em redes de confiança.";
@@ -497,6 +498,7 @@
 "Pin %@" = "Fixar %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Fixar: todo chat do projeto recebe o arquivo completo (≈%@ tokens). Pesquisa na web e geração de imagem ou música ficam desativadas nesses chats enquanto estiver fixado.";
 "Pinned" = "Fixado";
+"Pinned files may take" = "Arquivos fixados podem ocupar";
 "Pinned · ≈%@ tokens" = "Fixado · ≈%@ tokens";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Fixados: %1$lld arquivos, ≈%2$@ de %3$@ tokens";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins e projetos não puderam ser carregados. Alterações neles não são salvas até o reinício do LLMTray; uma cópia do arquivo é mantida ao lado dele.";

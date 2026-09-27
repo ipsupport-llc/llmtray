@@ -464,6 +464,7 @@
 "Nothing to change." = "無需變更。";
 "Nothing to pin until the file has been read" = "未讀取檔案前無法釘選";
 "OK" = "好";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "模型的上下文，以及模型權重為上下文保留的記憶，與專案的固定檔案（pinned files）合計可佔用的空間。回應的最大 token 數不受此設定影響。設定越大，對話可用空間越少，且在載入檔案時第一則回應可能較長。";
 "Off" = "關閉";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "關閉時，只有這部 Mac 可以連線到伺服器。開啟時，你網路上的其他裝置也可以連線（網路上的任何人都可以），因此請只在信任的網路上使用。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "關：僅此 Mac 可存取。開：網路上的任何人皆可存取，僅在受信任網路下使用。";
@@ -497,6 +498,7 @@
 "Pin %@" = "釘選 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "釘選：專案中的每個對話會取得整個檔案（≈%@ 代幣）。檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
 "Pinned" = "已釘選";
+"Pinned files may take" = "固定檔案可能佔用";
 "Pinned · ≈%@ tokens" = "已釘選 · 約 %@ 代幣";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "已釘選：%1$lld 個檔案，約佔 %3$@ 的 %2$@ 代幣";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "無法載入固定項目與專案。對它們所做的變更在 LLMTray 重新啟動之前不會儲存；該檔案的複本會保留在旁邊。";

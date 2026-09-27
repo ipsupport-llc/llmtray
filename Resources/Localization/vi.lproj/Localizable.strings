@@ -464,6 +464,7 @@
 "Nothing to change." = "Không có gì để thay đổi.";
 "Nothing to pin until the file has been read" = "Không có gì để ghim cho đến khi tệp được đọc";
 "OK" = "OK";
+"Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Trong bối cảnh của mô hình và dung lượng bộ nhớ mà trọng số của nó để lại cho bối cảnh, tổng dung lượng các tệp được ghim của một dự án có thể chiếm. Số token tối đa cho câu trả lời vẫn được giữ miễn phí bất kể thiết lập này. Giá trị lớn hơn làm giảm không gian cho cuộc hội thoại, và một câu trả lời dài ban đầu sẽ xảy ra khi các tệp đang được đọc vào.";
 "Off" = "Tắt";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Tắt: chỉ Mac này. Bật: bất kỳ ai trên mạng của bạn, chỉ bật trên mạng bạn tin tưởng.";
@@ -497,6 +498,7 @@
 "Pin %@" = "Ghim %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Ghim: mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ tệp (≈%@ token). Tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi tệp được ghim.";
 "Pinned" = "Đã ghim";
+"Pinned files may take" = "Các tệp được ghim có thể chiếm";
 "Pinned · ≈%@ tokens" = "Đã ghim · ≈%@ token";
 "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Đã ghim: %1$lld tệp, ≈%2$@ trên %3$@ token";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Không tải được ghim và dự án. Các thay đổi sẽ không được lưu cho đến khi LLMTray khởi động lại; một bản sao tệp được lưu bên cạnh.";
