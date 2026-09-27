@@ -97,6 +97,17 @@ final class MLXRuntimeInstaller {
 
     /// Whether the installed mlx-lm has the given model architecture
     /// (models/<type>.py) -- e.g. the Gemma 4 MTP drafter's.
+    /// Whether the installed mlx_lm.server takes `flag` (an older pinned
+    /// runtime would refuse to start on an unknown one).
+    static func serverSupportsFlag(_ flag: String) -> Bool {
+        let lib = venvDir + "/lib"
+        guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }
+        return pythons.contains { py in
+            guard let text = try? String(contentsOfFile: "\(lib)/\(py)/site-packages/mlx_lm/server.py", encoding: .utf8) else { return false }
+            return text.contains("\"\(flag)\"")
+        }
+    }
+
     static func supportsModelType(_ modelType: String) -> Bool {
         let lib = venvDir + "/lib"
         guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }

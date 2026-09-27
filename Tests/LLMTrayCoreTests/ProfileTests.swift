@@ -324,3 +324,34 @@ final class ToolPolicyUpgradeTests: XCTestCase {
         XCTAssertEqual(try store.ensureDefault(migratingFrom: UserDefaults()).tools.toolUsePolicy, "my own rule")
     }
 }
+
+final class PrefillMemoryTests: XCTestCase {
+    func testTheBudgetIsHalfOfWhatTheWeightsLeave() {
+        let gib: Int64 = 1 << 30
+        // 19 GB limit, 15.6 GB of weights: (19 - 15.6 - 1.5) / 2 ≈ 0.95 GB.
+        let limit: UInt64 = 19_069_665_280
+        let weights: Int64 = 15_571_069_431
+        let margin: Int64 = 3 << 29
+        let expected = Int((Int64(limit) - weights - margin) / 2 / 1_048_576)
+        XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights), expected)
+        XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(8 * gib), weightsBytes: 8 * gib), 256)
+        XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(128 * gib), weightsBytes: 4 * gib), 4096)
+        XCTAssertNil(ServerLaunch.prefillMemoryMB(gpuLimitBytes: nil, weightsBytes: 0))
+    }
+
+    func testTheFlagGoesInUnlessTheUserSetsIt() {
+        var c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     prefillMemoryMB: 900)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prefill-memory-mb"), "900")
+        p.extraServerArgs = "--prefill-memory-mb 2000"
+        XCTAssertEqual(ServerLaunch.arguments(p, c).filter { $0 == "--prefill-memory-mb" }.count, 1)
+        c.prefillMemoryMB = nil
+        p.extraServerArgs = ""
+        XCTAssertFalse(ServerLaunch.arguments(p, c).contains("--prefill-memory-mb"))
+    }
+
+    private func argValue(_ args: [String], _ flag: String) -> String? {
+        args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
+    }
+}

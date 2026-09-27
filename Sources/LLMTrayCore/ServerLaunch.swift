@@ -23,8 +23,13 @@ public enum ServerLaunch {
         public var maxContext: Int?
         /// Global diagnostics setting (Settings > Server), not per profile.
         public var verboseLogging: Bool
+        /// `--prefill-memory-mb`: what a prefill chunk's attention scores may
+        /// take (the runtime shrinks the chunk as the context grows); nil
+        /// when the runtime has no such flag or the GPU limit isn't known.
+        public var prefillMemoryMB: Int?
 
-        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false) {
+        public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
+                    prefillMemoryMB: Int? = nil) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -32,7 +37,17 @@ public enum ServerLaunch {
             self.drafterRepo = drafterRepo
             self.maxContext = maxContext
             self.verboseLogging = verboseLogging
+            self.prefillMemoryMB = prefillMemoryMB
         }
+    }
+
+    /// The prefill chunk's memory: half of what the GPU limit leaves beside
+    /// the weights and a 1.5 GB margin, 256 MB to 4 GB (a long prompt with
+    /// a fixed big chunk ran a 26B model out of memory at a 30K offset).
+    public static func prefillMemoryMB(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int? {
+        guard let gpuLimitBytes else { return nil }
+        let free = Int64(clamping: gpuLimitBytes) - weightsBytes - (3 << 29)
+        return min(4096, max(256, Int(free / 2 / 1_048_576)))
     }
 
     public static func arguments(_ p: ResolvedProfile, _ c: Context) -> [String] {
@@ -70,6 +85,9 @@ public enum ServerLaunch {
         }
         if c.verboseLogging {
             args += ["--log-level", "DEBUG"]
+        }
+        if let mb = c.prefillMemoryMB, !p.extraServerArgs.contains("--prefill-memory-mb") {
+            args += ["--prefill-memory-mb", String(mb)]
         }
         args += p.extraServerArgs.split(separator: " ").map(String.init)
         return args
