@@ -393,19 +393,42 @@ private struct ChatModelStep: View {
         return catalog.models.filter { $0.path != catalog.root + "/" + repo }
     }
 
+    /// A pick already complete here is listed with the local models, not
+    /// offered for download again (completeness cached in the model).
+    private var offer: ModelRecommendations.Offer {
+        let complete = model.completePickFolders
+        return ModelRecommendations.offer(model.picks, localPaths: localModels.map(\.path), isComplete: complete.contains)
+    }
+
+    /// What completeness depends on: the folders, the picks, the chat
+    /// downloads' states (not their progress).
+    private var localCopiesKey: [String] {
+        catalog.models.map(\.path) + model.picks.map(\.model.repo)
+            + queue.state.items.filter { $0.kind == .chatModel }.map { "\($0.target) \($0.status)" }
+    }
+
+    /// Picked here, or the wizard's download of it is in place.
+    private func isSelected(_ local: LocalModel, _ offer: ModelRecommendations.Offer) -> Bool {
+        if model.selectedLocalPath == local.path { return true }
+        guard let repo = model.selectedDownloadRepo, model.isWizardDownloadComplete else { return false }
+        return offer.local[local.path]?.model.repo == repo
+    }
+
     var body: some View {
+        let offer = self.offer
         VStack(alignment: .leading, spacing: 12) {
             StepHeader(Text("A chat model"), Text("Pick one to chat with. A download starts right away and goes on in the background."))
             if !localModels.isEmpty {
                 Text("Already on this Mac").font(.headline)
-                ForEach(localModels) { local in
+                ForEach(offer.ordered(localModels, path: \.path)) { local in
                     HStack {
                         Text(verbatim: local.displayName).lineLimit(1).truncationMode(.middle)
+                        if offer.isRecommended(localPath: local.path) { RecommendedBadge() }
                         if let size = catalog.sizes[local.id] {
                             Text(verbatim: ModelCatalog.format(size)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
                         }
                         Spacer()
-                        if model.selectedLocalPath == local.path {
+                        if isSelected(local, offer) {
                             Label("Selected", systemImage: "checkmark").foregroundStyle(.green)
                         } else {
                             Button("Use") { model.pick(local: local) }
@@ -415,10 +438,15 @@ private struct ChatModelStep: View {
                 Divider()
             }
             Text("Download").font(.headline)
-            if model.picks.isEmpty {
-                Text("No suggestions for this Mac's memory. Browse Hugging Face for a model.").foregroundStyle(.secondary)
+            if offer.downloads.isEmpty {
+                if model.picks.isEmpty {
+                    Text("No suggestions for this Mac's memory. Browse Hugging Face for a model.").foregroundStyle(.secondary)
+                } else {
+                    Text("The suggestions for this Mac are already here. Browse Hugging Face for another model.")
+                        .foregroundStyle(.secondary)
+                }
             }
-            ForEach(model.picks) { pick in
+            ForEach(offer.downloads) { pick in
                 pickRow(pick)
             }
             HStack {
@@ -426,7 +454,11 @@ private struct ChatModelStep: View {
                 Spacer()
             }
         }
-        .onAppear { model.loadPicks() }
+        .onAppear {
+            model.loadPicks()
+            model.refreshLocalCopies(localPaths: catalog.models.map(\.path))
+        }
+        .onChange(of: localCopiesKey) { model.refreshLocalCopies(localPaths: catalog.models.map(\.path)) }
     }
 
     private func pickRow(_ pick: ModelRecommendations.Pick) -> some View {
@@ -434,10 +466,7 @@ private struct ChatModelStep: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(verbatim: pick.model.title).fontWeight(.semibold)
-                    if pick.model.recommended {
-                        Text("Recommended").font(.caption).padding(.horizontal, 5).padding(.vertical, 1)
-                            .background(Color.accentColor.opacity(0.15), in: Capsule())
-                    }
+                    if pick.model.recommended { RecommendedBadge() }
                 }
                 Text(verbatim: pick.model.summary).font(.callout).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -473,6 +502,13 @@ private struct ChatModelStep: View {
         parts += capabilities
         if let license = pick.model.license { parts.append(license) }
         return parts.joined(separator: " · ")
+    }
+}
+
+private struct RecommendedBadge: View {
+    var body: some View {
+        Text("Recommended").font(.caption).padding(.horizontal, 5).padding(.vertical, 1)
+            .background(Color.accentColor.opacity(0.15), in: Capsule())
     }
 }
 

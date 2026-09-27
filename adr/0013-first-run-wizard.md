@@ -165,6 +165,13 @@ guided front end to the same code, not a second configuration path.
   AppDelegate). The queue gained the embedder (project files) and a
   compact row in the popover.
 - Folder access (adr/0014) isn't merged: step 5 has no row for it yet.
+- A pick already complete in the models folder (its path ends in the
+  repo, case-insensitively; complete = LLMTray's completion marker, or for
+  a folder it didn't download, a config and all its weights --
+  `ModelFolder.isComplete`) isn't offered for download: it's listed with
+  the local models, the recommended ones first and marked. An incomplete
+  copy stays under Download (it resumes). The wizard is the only place the
+  curated list is offered.
 
 ## Decided with the user (2026-09-26)
 

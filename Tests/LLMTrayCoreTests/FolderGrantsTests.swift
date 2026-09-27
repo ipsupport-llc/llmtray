@@ -214,3 +214,189 @@ extension FolderGrantsTests {
         XCTAssertTrue(g.coversChange(path: downloads.path, chatID: "c", proposal: "call-3", now: t0))
     }
 }
+
+/// One row per folder in Settings: standing grants of the same folder merge
+/// -- looking for the longest given, changes never longer than given.
+extension FolderGrantsTests {
+    private var hour: GrantLifetime { .until(t0.addingTimeInterval(3600)) }
+
+    private func merge(_ a: (FolderAccessLevel, GrantLifetime), _ b: (FolderAccessLevel, GrantLifetime),
+                       store url: URL? = nil) throws -> (FolderGrants, FolderGrant) {
+        let g = FolderGrants(storeURL: url, now: t0)
+        try g.grant(docs, level: a.0, lifetime: a.1, chatID: "c", now: t0)
+        try g.grant(docs, level: b.0, lifetime: b.1, chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).count, 1, "one row")
+        return (g, try XCTUnwrap(g.standingGrants(now: t0).first))
+    }
+
+    func testChangeForAnHourPlusReadAlways() throws {
+        for order in [false, true] {
+            let a: (FolderAccessLevel, GrantLifetime) = (.change, hour), b: (FolderAccessLevel, GrantLifetime) = (.read, .always)
+            let (g, m) = try merge(order ? b : a, order ? a : b)
+            XCTAssertEqual(m.level, .change)
+            XCTAssertEqual(m.changeLifetime, hour, "change isn't widened")
+            XCTAssertEqual(m.lookLifetime, .always, "the read always isn't lost")
+            // After the hour: looking on, no changes.
+            let later = t0.addingTimeInterval(3601)
+            XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", proposal: nil, now: later))
+            XCTAssertNil(g.authorize(path: docs.path, level: .change, chatID: "c", callKey: "k", now: later))
+            XCTAssertNotNil(g.authorize(path: docs.path + "/a", level: .read, chatID: "c", callKey: "k", now: later))
+            XCTAssertTrue(g.coversRead(path: docs.path, chatID: "c", callKey: "k", now: later))
+            XCTAssertEqual(g.standingGrants(now: later).first?.level, .read)
+            XCTAssertEqual(g.standingGrants(now: later).first?.lifetime, .always)
+        }
+    }
+
+    func testReadForAnHourPlusReadAlways() throws {
+        let (_, m) = try merge((.read, hour), (.read, .always))
+        XCTAssertEqual(m.level, .read)
+        XCTAssertEqual(m.lifetime, .always)
+        XCTAssertNil(m.readLifetime)
+        XCTAssertEqual(try merge((.read, .always), (.read, hour)).1.lifetime, .always)
+    }
+
+    func testTwoChangeGrantsTakeTheLaterAndAnHourALaterHour() throws {
+        let later = GrantLifetime.until(t0.addingTimeInterval(7200))
+        var m = try merge((.change, hour), (.change, later)).1
+        XCTAssertEqual(m.lifetime, later)
+        XCTAssertNil(m.readLifetime)
+        m = try merge((.change, hour), (.change, .always)).1
+        XCTAssertEqual(m.lifetime, .always)
+        m = try merge((.read, later), (.read, hour)).1
+        XCTAssertEqual(m.lifetime, later, "an earlier end doesn't shorten it")
+        // Change for an hour + read for longer: both kept, then nothing.
+        let (g, both) = try merge((.change, hour), (.read, later))
+        XCTAssertEqual(both.changeLifetime, hour)
+        XCTAssertEqual(both.lookLifetime, later)
+        XCTAssertEqual(g.standingGrants(now: t0.addingTimeInterval(3700)).first?.level, .read)
+        XCTAssertTrue(g.standingGrants(now: t0.addingTimeInterval(7200)).isEmpty, "all of it ended")
+        XCTAssertFalse(g.coversRead(path: docs.path, chatID: "c", callKey: "k", now: t0.addingTimeInterval(7200)))
+    }
+
+    func testTheExpiryFallbackIsSavedAsARead() throws {
+        _ = try merge((.change, hour), (.read, .always), store: store)
+        let later = t0.addingTimeInterval(4000)
+        let reloaded = FolderGrants(storeURL: store, now: later).standingGrants(now: later)
+        XCTAssertEqual(reloaded.map(\.level), [.read])
+        XCTAssertEqual(reloaded.first?.lifetime, .always)
+        let stored = try JSONDecoder().decode([FolderGrant].self, from: Data(contentsOf: store))
+        XCTAssertEqual(stored.first?.level, .read, "written back as it stands")
+    }
+
+    func testMergeKeepsTheFirstOriginAndTheID() throws {
+        let g = FolderGrants(storeURL: nil)
+        let first = try g.grant(docs, level: .read, lifetime: hour, chatID: "c", origin: .chat, now: t0)
+        let merged = try g.grant(docs, level: .change, lifetime: .always, chatID: nil, origin: .settings, now: t0)
+        XCTAssertEqual(merged.id, first.id)
+        XCTAssertEqual(merged.origin, .chat)
+    }
+
+    func testAnExpiredGrantIsntMergedInto() throws {
+        let g = FolderGrants(storeURL: nil)
+        try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(60)), chatID: "c", now: t0)
+        let fresh = try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(3700)), chatID: "c", now: t0.addingTimeInterval(100))
+        XCTAssertEqual(fresh.level, .read, "the ended grant's change isn't carried over")
+        XCTAssertEqual(g.standingGrants(now: t0.addingTimeInterval(100)).count, 1)
+    }
+
+    func testParentAndChildAndPerChatGrantsStayApart() throws {
+        let g = FolderGrants(storeURL: nil)
+        let parent = FolderRoot(path: "/Users/u/Work", identity: FileIdentity(device: 1, inode: 300))
+        let child = FolderRoot(path: "/Users/u/Work/Sub", identity: FileIdentity(device: 1, inode: 301))
+        try g.grant(parent, level: .read, lifetime: .always, chatID: "c", now: t0)
+        try g.grant(child, level: .change, lifetime: .always, chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).map(\.root.path), [parent.path, child.path])
+        XCTAssertNil(g.authorize(path: parent.path + "/a", level: .change, chatID: "c", callKey: "k", now: t0),
+                     "the child's change doesn't reach its parent")
+        // Chat and once grants aren't merged, nor listed.
+        try g.grant(parent, level: .change, lifetime: .chat("c"), chatID: "c", now: t0)
+        try g.grant(parent, level: .change, lifetime: .once(callKey: "k", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).first?.level, .read)
+        XCTAssertEqual(g.allGrants(now: t0).count, 4)
+    }
+
+    func testDuplicatesOnDiskAreMergedOnLoad() throws {
+        let a = FolderGrant(root: downloads, level: .read, lifetime: .until(t0.addingTimeInterval(60)), created: t0, origin: .chat)
+        let b = FolderGrant(root: downloads, level: .read, lifetime: .until(t0.addingTimeInterval(120)), created: t0)
+        let c = FolderGrant(root: downloads, level: .change, lifetime: .until(t0.addingTimeInterval(90)), created: t0)
+        let d = FolderGrant(root: docs, level: .read, lifetime: .always, created: t0)
+        let old = FolderGrant(root: docs, level: .change, lifetime: .until(t0.addingTimeInterval(-1)), created: t0)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try JSONEncoder().encode([a, b, c, d, old]).write(to: store)
+        let g = FolderGrants(storeURL: store, now: t0)
+        let loaded = g.standingGrants(now: t0)
+        XCTAssertEqual(loaded.map(\.root.path), [downloads.path, docs.path])
+        XCTAssertEqual(loaded[0].id, a.id)
+        XCTAssertEqual(loaded[0].level, .change)
+        XCTAssertEqual(loaded[0].changeLifetime, .until(t0.addingTimeInterval(90)), "change's own end")
+        XCTAssertEqual(loaded[0].lookLifetime, .until(t0.addingTimeInterval(120)), "the longest look")
+        XCTAssertEqual(loaded[0].origin, .chat)
+        XCTAssertEqual(loaded[1].level, .read, "an expired duplicate adds nothing")
+        // Written back merged.
+        let stored = try JSONDecoder().decode([FolderGrant].self, from: Data(contentsOf: store))
+        XCTAssertEqual(stored.count, 2)
+    }
+
+    /// The file as an older build reads it: `level` and `lifetime` are the
+    /// strongest access with its own end, so it never gets more than this one
+    /// grants -- the longer look is a key it doesn't know.
+    func testTheStoreStaysReadableByOlderBuilds() throws {
+        _ = try merge((.change, hour), (.read, .always), store: store)
+        let raw = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: store)) as? [[String: Any]])
+        XCTAssertEqual(raw.count, 1)
+        XCTAssertEqual(raw[0]["level"] as? Int, FolderAccessLevel.change.rawValue)
+        XCTAssertNotNil(raw[0]["readLifetime"])
+        // What an older build decodes: the fields it knows.
+        struct OldGrant: Decodable { var id: UUID; var root: FolderRoot; var level: FolderAccessLevel; var lifetime: GrantLifetime; var created: Date }
+        let old = try JSONDecoder().decode([OldGrant].self, from: Data(contentsOf: store))
+        XCTAssertEqual(old.first?.level, .change)
+        XCTAssertEqual(old.first?.lifetime, hour, "change only as long as given")
+        // And a file from an older build: no origin, no look lifetime.
+        var legacy = raw
+        legacy[0]["origin"] = nil
+        legacy[0]["readLifetime"] = nil
+        try JSONSerialization.data(withJSONObject: legacy).write(to: store)
+        let loaded = try XCTUnwrap(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).first)
+        XCTAssertNil(loaded.origin)
+        XCTAssertNil(loaded.readLifetime)
+        XCTAssertEqual(loaded.lifetime, hour)
+    }
+
+    func testOriginRoundTrips() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        try g.grant(docs, level: .read, lifetime: .always, chatID: nil, origin: .settings, now: t0)
+        try g.grant(downloads, level: .read, lifetime: .always, chatID: "c", origin: .chat, now: t0)
+        XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).map(\.origin), [.settings, .chat])
+    }
+
+    func testRevokingAMergedRowRemovesTheFolder() throws {
+        let (g, merged) = try merge((.change, hour), (.read, .always), store: store)
+        try g.revoke(merged.id)
+        XCTAssertTrue(g.standingGrants(now: t0).isEmpty)
+        XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "c", callKey: "k", now: t0))
+        XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "c", callKey: "k", now: t0.addingTimeInterval(4000)))
+        XCTAssertTrue(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).isEmpty)
+    }
+
+    func testUpdateSetsItExactlyForTheSameFolderOnly() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        let grant = try g.grant(docs, level: .change, lifetime: .always, chatID: "c", origin: .chat, now: t0)
+        let updated = try g.update(grant.id, root: docs, level: .read, lifetime: hour, now: t0)
+        XCTAssertEqual(updated.level, .read, "lowered, unlike a merge")
+        XCTAssertEqual(updated.lifetime, hour)
+        XCTAssertEqual(updated.origin, .chat)
+        XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", proposal: nil, now: t0))
+        XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).first?.level, .read)
+        XCTAssertThrowsError(try g.update(grant.id, root: docs, level: .read, lifetime: .chat("c"), now: t0)) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .notStanding)
+        }
+        let replaced = FolderRoot(path: docs.path, identity: FileIdentity(device: 1, inode: 999))
+        XCTAssertThrowsError(try g.update(grant.id, root: replaced, level: .change, lifetime: .always, now: t0)) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .folderChanged, "another folder at the same path")
+        }
+        XCTAssertEqual(g.standingGrants(now: t0).first?.level, .read, "nothing changed")
+        XCTAssertThrowsError(try g.update(grant.id, root: docs, level: .read, lifetime: .always, now: t0.addingTimeInterval(3600))) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .gone, "ended")
+        }
+    }
+}

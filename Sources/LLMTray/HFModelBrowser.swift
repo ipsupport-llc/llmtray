@@ -110,10 +110,10 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// this is what "already downloaded" actually checks (see
     /// ModelDiscovery.isDownloaded), not just config.json's existence,
     /// which would false-positive on a download interrupted partway through.
-    static let completionMarkerName = ".llmtray-complete"
+    static let completionMarkerName = ModelFolder.completionMarkerName
     /// Which revision of each file is on disk: a file is picked up after a
     /// relaunch only if its size AND its Hub id still match.
-    static let manifestName = ".llmtray-files.json"
+    static let manifestName = ModelFolder.manifestName
 
     @Published var query: String = ""
     @Published var results: [HFModelSummary] = []

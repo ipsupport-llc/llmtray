@@ -245,6 +245,28 @@ prompt, and a missing path reads like one never grantable. Launch
 recovery runs as the one change in progress; turning the feature off
 drops the plans waiting for approval.
 
+Settings lists **one row per folder**: a standing grant (an hour, always)
+of a folder that has one merges into it, in `FolderGrants` itself, and
+duplicates stored before are merged on load. A standing grant carries two
+lifetimes: how long the chat may look (the later of all the merged grants':
+any grant looks, always wins) and, for change, how long it may propose
+changes (the later of the change grants' only -- a merge never widens
+change). Change for an hour plus read always is change for an hour, then
+look always; when the change part ends the grant is a read grant, when both
+end it's gone. Stored as `level` + `lifetime` = the strongest access with
+its own end, plus an optional `readLifetime`: an older build reading the
+file ignores the new key and so gets at most what this one grants (its look
+just ends with the change). Only the same path merges (a parent's and a
+child's grant stay two rows); once and per-chat grants and denies are
+untouched. The row edits in place -- the level ("Can look" / "Can look and
+propose changes") with its lifetime ("1 hour" from now / "Always"), and for
+a change grant that ends, what follows ("then can look · Always", an hour,
+or no access) -- the folder checked again as a new grant's is and required
+to be the same folder by identity (`FolderToolService.updateGrant`, which
+may also lower them; a failure is shown in the pane). It says where it came
+from (`GrantOrigin`: a chat, or Settings). Allow Folder… there adds "Can
+look · 1 hour".
+
 ## Plan
 
 1. Core: containment, denylist, grants, classifier, plan, journal +

@@ -265,14 +265,16 @@ struct ChatFolderMenu: View {
 // MARK: - Settings
 
 /// Settings > Files: Project files (its own section), then folder access --
-/// its opt-in, the standing grants with Revoke, Allow Folder…, the journal
+/// its opt-in, the standing grants (one row per folder, edited in place, with
+/// Revoke), Allow Folder…, the journal
 /// with Undo, what recovery found.
 struct FoldersPane: View {
     @ObservedObject private var manager = FolderAccessManager.shared
-    @State private var level: FolderAccessLevel = .read
-    @State private var always = false
     @State private var error: String?
     @State private var undoNote: String?
+    /// An hour's grant leaves the list when it ends.
+    @State private var now = Date()
+    private let tick = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
 
     var body: some View {
         Form {
@@ -294,36 +296,19 @@ struct FoldersPane: View {
         }
         .formStyle(.grouped)
         .onAppear { manager.refresh() }
+        .onReceive(tick) { now = $0 }
     }
 
     private var grantsSection: some View {
         Section("Allowed folders") {
-            if manager.standingGrants.isEmpty {
+            Text("Folders chats can use without asking. When a chat needs another folder, it asks you in the chat.")
+                .font(.caption).foregroundStyle(.secondary)
+            let grants = manager.standingGrants.compactMap { $0.current(now: now) }
+            if grants.isEmpty {
                 Text("None yet. Grants for one chat or one request aren't listed here: they end with it.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            ForEach(manager.standingGrants) { grant in
-                LabeledContent {
-                    Button("Revoke") {
-                        do { try manager.revoke(grant) } catch { self.error = FolderAccessManager.message(error) }
-                    }
-                } label: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(verbatim: FolderAccessManager.display(grant.root.path))
-                        Text(verbatim: "\(FolderAccessManager.levelText(grant.level)) · \(FolderAccessManager.lifetimeText(grant))")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-            }
-            // One row each: labelled pickers in an HStack overflow a grouped Form.
-            Picker("Access", selection: $level) {
-                Text("Look in").tag(FolderAccessLevel.read)
-                Text("Look in and propose changes").tag(FolderAccessLevel.change)
-            }
-            Picker("For", selection: $always) {
-                Text("An hour").tag(false)
-                Text("Always").tag(true)
-            }
+            ForEach(grants) { grant in grantRow(grant) }
             HStack {
                 Spacer()
                 Button("Allow Folder…", action: allowFolder)
@@ -331,6 +316,68 @@ struct FoldersPane: View {
             if let error {
                 Text(error).font(.caption).foregroundStyle(.red)
             }
+        }
+    }
+
+    /// Path and origin; the level with its lifetime, and for a change grant
+    /// that ends, what it may do after ("then can look · Always").
+    private func grantRow(_ grant: FolderGrant) -> some View {
+        LabeledContent {
+            VStack(alignment: .trailing, spacing: 4) {
+                HStack(spacing: 8) {
+                    Menu(grant.level == .change ? String(localized: "Can look and propose changes") : String(localized: "Can look")) {
+                        Button("Can look") { update(grant, .level(.read)) }
+                        Button("Can look and propose changes") { update(grant, .level(.change)) }
+                    }
+                    .fixedSize()
+                    Menu(FolderAccessManager.lifetimeTitle(grant.lifetime)) {
+                        Button("1 hour") { update(grant, .lifetime(.hour)) }
+                        Button("Always") { update(grant, .lifetime(.always)) }
+                    }
+                    .fixedSize()
+                    Button("Revoke") {
+                        error = nil
+                        do { try manager.revoke(grant) } catch { self.error = FolderAccessManager.message(error) }
+                    }
+                }
+                if grant.level == .change, grant.lifetime != .always {
+                    HStack(spacing: 6) {
+                        Text(NSLocalizedString("then", comment: "folder grant: what follows when the change part ends")).font(.caption).foregroundStyle(.secondary)
+                        Menu(lookAfterTitle(grant)) {
+                            Button("Can look · 1 hour") { update(grant, .lookAfterChange(.hour)) }
+                            Button("Can look · Always") { update(grant, .lookAfterChange(.always)) }
+                            Button("No access") { update(grant, .lookAfterChange(nil)) }
+                        }
+                        .fixedSize()
+                    }
+                }
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: FolderAccessManager.display(grant.root.path)).lineLimit(1).truncationMode(.middle)
+                switch grant.origin {
+                case .chat?: Text("Allowed in a chat").font(.caption).foregroundStyle(.secondary)
+                case .settings?: Text("Added here").font(.caption).foregroundStyle(.secondary)
+                case nil: EmptyView()
+                }
+            }
+        }
+    }
+
+    private func lookAfterTitle(_ grant: FolderGrant) -> String {
+        guard let look = grant.readLifetime else { return NSLocalizedString("No access", comment: "folder grant: after the change part ends") }
+        return String(format: NSLocalizedString("Can look · %@", comment: "folder grant: after the change part ends; a lifetime"),
+                      FolderAccessManager.lifetimeTitle(look))
+    }
+
+    /// Through the manager, as a grant is; a failure says why in the pane.
+    private func update(_ grant: FolderGrant, _ edit: FolderToolService.GrantEdit) {
+        error = nil
+        if case .level(let level) = edit, level == grant.level { return }
+        do {
+            try manager.updateGrant(grant, edit)
+        } catch {
+            self.error = FolderAccessManager.message(error)
         }
     }
 
@@ -342,8 +389,9 @@ struct FoldersPane: View {
         case .failure(let e)?:
             error = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), FolderAccessManager.message(e))
         case .success(let root)?:
+            // "Can look · 1 hour", or merged into the folder's grant: edited in its row.
             do {
-                try manager.userGrant(root, level: level, choice: always ? .always : .hour, chat: nil)
+                try manager.userGrant(root, level: .read, choice: .hour, chat: nil)
             } catch {
                 self.error = FolderAccessManager.message(error)
             }

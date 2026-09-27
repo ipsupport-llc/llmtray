@@ -115,6 +115,13 @@ final class FolderAccessManager: ObservableObject {
         refresh()
     }
 
+    /// A standing grant's row edited in Settings: its folder checked again,
+    /// as a new grant's is.
+    func updateGrant(_ grant: FolderGrant, _ edit: FolderToolService.GrantEdit) throws {
+        defer { refresh() }
+        try service.updateGrant(grant.id, edit)
+    }
+
     func endChat(_ chatID: String) {
         service.endChat(chatID)
         grantsRevision += 1
@@ -154,6 +161,10 @@ final class FolderAccessManager: ObservableObject {
             return NSLocalizedString("Some items changed on disk since they were proposed: untick them, or ask again.", comment: "folder plan error")
         case ChangePlanError.missingDependency:
             return NSLocalizedString("An item needs the new folder it goes into: tick that folder too.", comment: "folder plan error")
+        case FolderGrants.GrantError.gone:
+            return NSLocalizedString("This folder's access has ended or was revoked.", comment: "folder grant error")
+        case FolderGrants.GrantError.folderChanged:
+            return NSLocalizedString("This folder is gone or isn't the one allowed any more: revoke it and allow it again.", comment: "folder grant error")
         case FolderGrants.GrantError.temporaryChat, ChangePlanError.temporaryChat:
             return NSLocalizedString("Temporary chats can only look in folders, for that chat only.", comment: "folder grant error")
         case FolderAccessError.notGrantable, FolderAccessError.notFound, FolderAccessError.symlink:
@@ -175,9 +186,18 @@ final class FolderAccessManager: ObservableObject {
         }
     }
 
+    /// A standing lifetime as a menu's title in Settings.
+    static func lifetimeTitle(_ lifetime: GrantLifetime) -> String {
+        guard case .until(let date) = lifetime else {
+            return NSLocalizedString("Always", comment: "folder grant lifetime: menu title")
+        }
+        return String(format: NSLocalizedString("Until %@", comment: "folder grant lifetime: menu title, a time"),
+                      date.formatted(date: .omitted, time: .shortened))
+    }
+
     static func levelText(_ level: FolderAccessLevel) -> String {
-        level == .change ? NSLocalizedString("read and change", comment: "folder grant level")
-            : NSLocalizedString("read", comment: "folder grant level")
+        level == .change ? NSLocalizedString("can look and propose changes", comment: "folder grant level")
+            : NSLocalizedString("can look", comment: "folder grant level")
     }
 }
 
