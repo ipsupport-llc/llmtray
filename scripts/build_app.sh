@@ -58,10 +58,12 @@ for lproj in "$REPO_ROOT"/Resources/Localization/*.lproj; do
   LANGS+=("$(basename "$lproj" .lproj)")
 done
 cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
-# Only the scripts + version pin -- never the venv itself, which is
-# machine-specific and gets created fresh on first run.
+# Only the scripts, the version pin and the first-run wizard's curated
+# model list -- never the venv itself, which is machine-specific and gets
+# created fresh on first run.
 cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
+   "$REPO_ROOT/runtime/recommended_models.json" \
    "$REPO_ROOT/runtime/llmtray_mflux_runner.py" \
    "$REPO_ROOT/runtime/llmtray_music_runner.py" \
    "$APP/Contents/Resources/runtime/"

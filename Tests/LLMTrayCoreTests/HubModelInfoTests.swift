@@ -21,6 +21,17 @@ final class HubModelInfoTests: XCTestCase {
         XCTAssertNil(info("not json"))
     }
 
+    func testFilesSize() {
+        let json = #"{"id":"a/b","usedStorage":99999,"siblings":[{"rfilename":"config.json","size":100},{"rfilename":"model.safetensors","size":5000}]}"#
+        XCTAssertEqual(HubModelInfo.filesSize(Data(json.utf8)), 5100, "the current files, not usedStorage")
+        let partial = #"{"id":"a/b","siblings":[{"rfilename":"config.json","size":100},{"rfilename":"model.safetensors"}]}"#
+        XCTAssertNil(HubModelInfo.filesSize(Data(partial.utf8)), "a partial sum would understate it")
+        XCTAssertNil(HubModelInfo.filesSize(Data(#"{"id":"a/b","siblings":[]}"#.utf8)))
+        XCTAssertNil(HubModelInfo.filesSize(Data(#"{"id":"a/b","siblings":[{"rfilename":"x"}]}"#.utf8)), "no sizes without ?blobs=true")
+        XCTAssertNil(HubModelInfo.filesSize(Data(#"{"id":"a/b"}"#.utf8)))
+        XCTAssertNil(HubModelInfo.filesSize(Data("nope".utf8)))
+    }
+
     func testNonCommercial() {
         for l in ["cc-by-nc-4.0", "cc-by-nc-sa-4.0", "flux-1-dev-non-commercial-license", "research-only", "NonCommercial", "mnpl", "apple-amlr"] {
             XCTAssertTrue(HubModelInfo(license: l).isNonCommercial, l)
