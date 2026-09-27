@@ -50,6 +50,7 @@ final class HTMLTextTests: XCTestCase {
         XCTAssertEqual(HTMLText.text("<script>var s = '<script>';</script>after"), "after")
         XCTAssertEqual(HTMLText.text("<script>if (a <!-- b) {}</script>visible"), "visible")
         XCTAssertEqual(HTMLText.text("<style>/* <!-- */</style>visible"), "visible")
+        XCTAssertEqual(HTMLText.text("<script>s = '</scripture><style>';</script>visible"), "visible")
         XCTAssertEqual(HTMLText.text("<head><title>T</title><script>x <!-- y</script></head><body>visible</body>"), "T\n\nvisible")
         XCTAssertEqual(HTMLText.text("<head><script>var t = '</head>';</script></head>shown"), "shown")
     }

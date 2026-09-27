@@ -71,7 +71,9 @@ public enum HTMLText {
                     if i + 1 < n, b[i + 1] == 0x2F {
                         while k < raw.count, i + 2 + k < n, (b[i + 2 + k] | 0x20) == raw[k] { k += 1 }
                     }
-                    if k < raw.count { i += 1; continue }
+                    // The whole name, not a prefix: "</scripture>" doesn't end a script.
+                    let end = i + 2 + k
+                    if k < raw.count || (end < n && isNameByte(b[end])) { i += 1; continue }
                     rawUntil = nil
                 }
                 // A comment, to its "-->" (or the end).
