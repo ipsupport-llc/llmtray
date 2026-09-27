@@ -856,7 +856,9 @@ removal's transaction drops it with the document.
 **Limit**, per project, all pinned files together, in tokens: the smaller of
 
 - **A** -- half the model's context (`max_position_embeddings`, the
-  chat's `maxTokensCap`) minus the answer's `max_tokens`;
+  chat's `maxTokensCap`), at most the context less the answer's
+  `max_tokens` and the 10% margin (`max_tokens` is a ceiling, often set
+  high: subtracted from the half, 128K on a 256K model left nothing);
 - **B** -- memory: (the GPU limit -- the wired limit if the user set one,
   else Metal's `recommendedMaxWorkingSetSize` -- minus the model's weights
   on disk, the sum of its `*.safetensors`, minus 1.5 GB) / the KV cache's
