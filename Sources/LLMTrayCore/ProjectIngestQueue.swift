@@ -56,11 +56,14 @@ public struct ProjectIndexProgress: Equatable, Sendable {
 public struct ProjectIngestQueue: Sendable {
     public enum Work: Hashable, Sendable {
         case extract(Int64)
+        /// A new revision of an indexed document (the user's Re-index): in
+        /// the extraction lane, its current revision searchable meanwhile.
+        case reindex(Int64)
         case embed(Int64)
 
         public var doc: Int64 {
             switch self {
-            case .extract(let d), .embed(let d): return d
+            case .extract(let d), .reindex(let d), .embed(let d): return d
             }
         }
     }
@@ -91,6 +94,8 @@ public struct ProjectIngestQueue: Sendable {
 
     struct Project: Sendable {
         var extract: [Int64] = []
+        /// Which of `extract` are re-indexes.
+        var reindex: Set<Int64> = []
         var embed: [Int64] = []
         var paused = false
         /// This run's documents.
@@ -98,7 +103,16 @@ public struct ProjectIngestQueue: Sendable {
         var done = 0
         var failed = 0
         var workSeconds: Double = 0
+        /// How each of this run's documents counted (true: done, false:
+        /// failed): once each, and taken back when it's re-indexed.
+        var counted: [Int64: Bool] = [:]
         var hasWork: Bool { !extract.isEmpty || !embed.isEmpty }
+
+        /// Takes back how `doc` counted (re-indexed, removed, dropped).
+        mutating func uncount(_ doc: Int64) {
+            guard let wasDone = counted.removeValue(forKey: doc) else { return }
+            if wasDone { done -= 1 } else { failed -= 1 }
+        }
     }
 
     private var projects: [UUID: Project] = [:]
@@ -132,8 +146,18 @@ public struct ProjectIngestQueue: Sendable {
             }
             switch w {
             case .extract(let d):
+                // A first extraction (Index Now) supersedes a queued re-index:
+                // a staged document can't be re-indexed.
+                projects[project]!.reindex.remove(d)
                 guard !projects[project]!.extract.contains(d) else { continue }
                 projects[project]!.extract.append(d)
+            case .reindex(let d):
+                // Already queued (a first extraction, or a re-index): that one does.
+                guard !projects[project]!.extract.contains(d), inFlight != Item(project: project, work: .extract(d)) else { continue }
+                projects[project]!.extract.append(d)
+                projects[project]!.reindex.insert(d)
+                // Finished earlier this run: it counts again when it's done again.
+                projects[project]!.uncount(d)
             case .embed(let d):
                 guard !projects[project]!.embed.contains(d) else { continue }
                 projects[project]!.embed.append(d)
@@ -155,7 +179,7 @@ public struct ProjectIngestQueue: Sendable {
 
     public func queued(_ project: UUID) -> [Work] {
         guard let p = projects[project] else { return [] }
-        return p.extract.map(Work.extract) + p.embed.map(Work.embed)
+        return p.extract.map { p.reindex.contains($0) ? .reindex($0) : .extract($0) } + p.embed.map(Work.embed)
     }
 
     /// The next step, marked in flight; nil when one already runs or
@@ -168,7 +192,8 @@ public struct ProjectIngestQueue: Sendable {
                 let item: Item
                 if extracting {
                     guard !p.extract.isEmpty else { continue }
-                    item = Item(project: project, work: .extract(p.extract.removeFirst()))
+                    let doc = p.extract.removeFirst()
+                    item = Item(project: project, work: p.reindex.remove(doc) != nil ? .reindex(doc) : .extract(doc))
                 } else {
                     guard !p.embed.isEmpty else { continue }
                     item = Item(project: project, work: .embed(p.embed.removeFirst()))
@@ -191,13 +216,21 @@ public struct ProjectIngestQueue: Sendable {
         if inFlight == item { inFlight = nil }
         guard var p = projects[item.project] else { return false }
         let doc = item.work.doc
-        let counted = p.run.contains(doc)
+        // Counted once, and not while a re-index of it waits (an embedding
+        // that ends after the Re-index click counts when the new one does).
+        let counted = p.run.contains(doc) && p.counted[doc] == nil && !p.reindex.contains(doc)
         switch outcome {
         case .finished:
-            if counted { p.done += 1 }
+            if counted {
+                p.done += 1
+                p.counted[doc] = true
+            }
             p.workSeconds += seconds
         case .failed:
-            if counted { p.failed += 1 }
+            if counted {
+                p.failed += 1
+                p.counted[doc] = false
+            }
             p.workSeconds += seconds
         case .needsEmbedding:
             p.workSeconds += seconds
@@ -205,16 +238,27 @@ public struct ProjectIngestQueue: Sendable {
         case .interrupted:
             switch item.work {
             case .extract: if !p.extract.contains(doc) { p.extract.insert(doc, at: 0) }
+            case .reindex:
+                if !p.extract.contains(doc) {
+                    p.extract.insert(doc, at: 0)
+                    p.reindex.insert(doc)
+                }
             case .embed: if !p.embed.contains(doc) { p.embed.insert(doc, at: 0) }
             }
         case .dropped:
             p.run.remove(doc)
+            p.uncount(doc)
         }
         if rerun == item {
             rerun = nil
             if outcome == .dropped {
                 switch item.work {
                 case .extract: if !p.extract.contains(doc) { p.extract.append(doc) }
+                case .reindex:
+                    if !p.extract.contains(doc) {
+                        p.extract.append(doc)
+                        p.reindex.insert(doc)
+                    }
                 case .embed: if !p.embed.contains(doc) { p.embed.append(doc) }
                 }
                 p.run.insert(doc)
@@ -227,6 +271,7 @@ public struct ProjectIngestQueue: Sendable {
     private mutating func endRunIfIdle(_ project: UUID) -> Bool {
         guard var p = projects[project], !p.hasWork, inFlight?.project != project, !p.run.isEmpty else { return false }
         p.run = []
+        p.counted = [:]
         p.done = 0
         p.failed = 0
         p.workSeconds = 0
@@ -240,8 +285,10 @@ public struct ProjectIngestQueue: Sendable {
     public mutating func stop(_ project: UUID) -> Bool {
         if var p = projects[project] {
             p.extract = []
+            p.reindex = []
             p.embed = []
             p.run = []
+            p.counted = [:]
             p.done = 0
             p.failed = 0
             p.workSeconds = 0
@@ -262,8 +309,10 @@ public struct ProjectIngestQueue: Sendable {
     public mutating func drop(_ doc: Int64, in project: UUID) {
         guard var p = projects[project] else { return }
         p.extract.removeAll { $0 == doc }
+        p.reindex.remove(doc)
         p.embed.removeAll { $0 == doc }
         p.run.remove(doc)
+        p.uncount(doc)
         projects[project] = p
         if rerun?.project == project, rerun?.work.doc == doc { rerun = nil }
     }
@@ -275,7 +324,10 @@ public struct ProjectIngestQueue: Sendable {
         var ended: [UUID] = []
         for id in order {
             guard var p = projects[id], !p.embed.isEmpty else { continue }
-            p.done += p.embed.filter { p.run.contains($0) }.count
+            for d in p.embed where p.run.contains(d) && p.counted[d] == nil && !p.reindex.contains(d) {
+                p.done += 1
+                p.counted[d] = true
+            }
             p.embed = []
             projects[id] = p
             if endRunIfIdle(id) { ended.append(id) }
@@ -341,13 +393,19 @@ public enum DocumentDisplayStatus: String, Equatable, Sendable {
     case notIndexed = "not-indexed"
     case removing
 
-    public init(_ status: DocumentStatus, activity: IngestStage? = nil, embeddingQueued: Bool = false) {
+    /// `reindexQueued`: a Re-index waits its turn (the current revision
+    /// stays searchable meanwhile, but the row says what's coming).
+    public init(_ status: DocumentStatus, activity: IngestStage? = nil, embeddingQueued: Bool = false, reindexQueued: Bool = false) {
         if let activity {
             switch activity {
             case .copying: self = .copying
             case .reading: self = .reading
             case .embedding: self = .embedding
             }
+            return
+        }
+        if reindexQueued, status != .removing {
+            self = .queued
             return
         }
         switch status {

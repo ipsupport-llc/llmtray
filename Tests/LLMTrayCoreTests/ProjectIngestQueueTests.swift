@@ -168,4 +168,103 @@ final class ProjectIngestQueueTests: XCTestCase {
             XCTAssertFalse(ProjectFileFormats.isOffered(URL(fileURLWithPath: "/x/" + name)), name)
         }
     }
+
+    func testReindexGoesInTheExtractionLane() {
+        var q = Q()
+        q.enqueue([.embed(1)], in: a)
+        q.enqueue([.reindex(5)], in: a)
+        XCTAssertEqual(q.queued(a), [.reindex(5), .embed(1)])
+        let first = q.next()!
+        XCTAssertEqual(first.work, .reindex(5), "before any embedding")
+        q.finish(first, .interrupted)
+        XCTAssertEqual(q.queued(a).first, .reindex(5), "an interrupted re-index stays one")
+        let again = q.next()!
+        XCTAssertEqual(again.work, .reindex(5))
+        q.finish(again, .needsEmbedding)
+        XCTAssertEqual(q.queued(a), [.embed(1), .embed(5)])
+    }
+
+    func testAReindexOfADocumentAlreadyQueuedIsItsExtraction() {
+        var q = Q()
+        q.enqueue([.extract(2)], in: a)
+        q.enqueue([.reindex(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(2)], "a first extraction reads it anyway")
+        let item = q.next()!
+        q.enqueue([.reindex(2)], in: a)
+        XCTAssertTrue(q.queued(a).isEmpty, "nor while it's being read")
+        q.finish(item, .finished)
+        q.enqueue([.reindex(2), .reindex(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.reindex(2)])
+        q.drop(2, in: a)
+        XCTAssertTrue(q.queued(a).isEmpty)
+        q.enqueue([.reindex(2)], in: a)
+        q.stop(a)
+        q.enqueue([.extract(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(2)], "a stop forgets the re-index")
+    }
+
+    func testAFirstExtractionSupersedesAQueuedReindex() {
+        var q = Q()
+        q.enqueue([.extract(9)], in: a)
+        let busy = q.next()!
+        q.enqueue([.reindex(4)], in: a)
+        // Index Now made 4 staged again: it's extracted, not re-indexed.
+        q.enqueue([.extract(4)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(4)])
+        q.finish(busy, .finished)
+        XCTAssertEqual(q.next()?.work, .extract(4))
+    }
+
+    func testAReindexedDocumentCountsOnceInTheRun() {
+        var q = Q()
+        q.enqueue([.extract(1), .extract(2), .extract(3)], in: a)
+        let one = q.next()!
+        q.finish(one, .finished)
+        XCTAssertEqual(q.progress(a).done, 1)
+        q.enqueue([.reindex(1)], in: a)
+        XCTAssertEqual(q.progress(a).done, 0, "taken back: it's to be done again")
+        while let item = q.next() {
+            if item.work == .extract(2) { q.enqueue([.reindex(2)], in: a) }   // clicked while it's read
+            let ended = q.finish(item, .finished)
+            if ended { break }
+            let p = q.progress(a)
+            XCTAssertLessThanOrEqual(p.done + p.failed, p.total)
+        }
+        XCTAssertEqual(q.progress(a), .idle)
+    }
+
+    func testARemovedOrDroppedDocumentTakesItsCountBack() {
+        var q = Q()
+        q.enqueue([.extract(1), .extract(2), .extract(3)], in: a)
+        q.finish(q.next()!, .finished)
+        q.finish(q.next()!, .failed)
+        q.drop(1, in: a)
+        var p = q.progress(a)
+        XCTAssertEqual([p.total, p.done, p.failed], [2, 0, 1])
+        let three = q.next()!
+        q.finish(three, .needsEmbedding)
+        let embed = q.next()!
+        q.enqueue([.reindex(2)], in: a)
+        q.finish(embed, .dropped)
+        p = q.progress(a)
+        XCTAssertLessThanOrEqual(p.done + p.failed, p.total)
+        XCTAssertEqual(p.failed, 0, "2's failure taken back by its re-index")
+    }
+
+    func testAnEmbeddingEndingAfterAReindexClickIsNotCounted() {
+        var q = Q()
+        q.enqueue([.embed(7), .extract(8)], in: a)
+        let extract = q.next()!
+        q.finish(extract, .finished)
+        let embed = q.next()!
+        XCTAssertEqual(embed.work, .embed(7))
+        q.enqueue([.reindex(7)], in: a)
+        q.finish(embed, .finished)
+        XCTAssertEqual(q.progress(a).done, 1, "only 8: 7 counts when its re-index is done")
+        let re = q.next()!
+        XCTAssertEqual(re.work, .reindex(7))
+        q.finish(re, .needsEmbedding)
+        let again = q.next()!
+        XCTAssertTrue(q.finish(again, .finished))
+    }
 }

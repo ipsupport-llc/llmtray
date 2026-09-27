@@ -9,6 +9,7 @@ struct ChatSidebar: View {
     @EnvironmentObject var chat: ChatClient
     @ObservedObject private var store = ChatLibraryStore.shared
     @ObservedObject private var tabs = ChatTabs.shared
+    @ObservedObject private var indexer = ProjectIndexer.shared
     /// Hides the sidebar (the popover's overlay closes; the window's
     /// collapses).
     let close: () -> Void
@@ -29,6 +30,9 @@ struct ChatSidebar: View {
     /// Where a dragged chat would land: a project's id, "pinned" or
     /// "recents-<age>".
     @State private var dropTarget: String?
+    /// Files were dragged onto this project with Project files off: the
+    /// hint to turn them on shows under it for a while.
+    @State private var filesOffHint: UUID?
     @FocusState private var searchFocused: Bool
     @FocusState private var chatRenameFocused: Bool
     @FocusState private var projectRenameFocused: Bool
@@ -166,10 +170,11 @@ struct ChatSidebar: View {
             }
             ForEach(store.library.projects) { project in
                 projectRow(project)
+                projectFileNotes(project.id)
                 if !collapsedProjects.contains(project.id) {
                     let chats = store.chats(inProject: project.id)
                     if chats.isEmpty {
-                        Text("Drag chats here, or use a chat's menu")
+                        (indexer.isEnabled ? Text("Drag chats or files here, or use a chat's menu") : Text("Drag chats here, or use a chat's menu"))
                             .font(.caption).foregroundColor(.secondary)
                             .padding(.leading, 30).padding(.vertical, 3)
                     }
@@ -314,6 +319,8 @@ struct ChatSidebar: View {
                 .onAppear { DispatchQueue.main.async { projectRenameFocused = true } }
                 .padding(.vertical, 2)
         } else {
+            let ring = indexer.ring(for: project.id)
+            let folderOpen = !collapsedProjects.contains(project.id)
             Button {
                 if collapsedProjects.contains(project.id) {
                     collapsedProjects.remove(project.id)
@@ -322,21 +329,40 @@ struct ChatSidebar: View {
                 }
             } label: {
                 HStack(spacing: 6) {
-                    Image(systemName: collapsedProjects.contains(project.id) ? "folder" : "folder.fill")
-                        .foregroundColor(.secondary)
+                    // The ring is its own button, over this place.
+                    ProjectRingIcon(ring: ring, folderOpen: folderOpen).opacity(ring.isShown ? 0 : 1)
                     Text(project.name).lineLimit(1)
                     Spacer(minLength: 0)
                 }
             }
             .buttonStyle(SidebarRowStyle(isSelected: false))
-            .dropZone(project.id.uuidString, $dropTarget) {
-                // Unpinned too: a pinned chat shows under Pinned only, so it
-                // would seem not to have moved.
-                acceptChats($0) { id in
-                    store.move(id, to: project.id)
-                    store.setPinned(id, false)
+            .overlay(alignment: .leading) {
+                if ring.isShown {
+                    Button { ProjectRingMenu.show(for: project.id) } label: {
+                        ProjectRingIcon(ring: ring, folderOpen: folderOpen).contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.leading, 8)
+                    .help(indexer.statusText(for: project.id) ?? "")
+                    .accessibilityLabel(indexer.statusText(for: project.id) ?? project.name)
+                    .accessibilityHint(Text("Shows Pause, Stop and the project's files"))
                 }
             }
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(dropTarget == project.id.uuidString ? 0.22 : 0)))
+            // Chats moved into the project, or files added to it.
+            .onDrop(of: ProjectRowDrop.types, delegate: ProjectRowDrop(
+                id: project.id.uuidString, project: project.id, filesEnabled: indexer.isEnabled,
+                target: $dropTarget,
+                filesOff: { showFilesOffHint(project.id) },
+                chats: { providers in
+                    // Unpinned too: a pinned chat shows under Pinned only, so it
+                    // would seem not to have moved.
+                    acceptChats(providers) { id in
+                        store.move(id, to: project.id)
+                        store.setPinned(id, false)
+                    }
+                }))
+            .accessibilityHint(indexer.isEnabled ? Text("Drop chats or files here to add them to the project") : Text("Drop chats here to move them to the project"))
             .contextMenu {
                 // Saved chats only: a temporary chat is never in a project.
                 Button("New Chat in Project") {
@@ -344,6 +370,19 @@ struct ChatSidebar: View {
                     open { tabs.newChat(inProject: project.id) }
                 }
                 Divider()
+                if indexer.isEnabled {
+                    Button("Files…") { ProjectFilesWindow.show(project.id) }
+                    if ring.isActive {
+                        if indexer.isPaused(project.id) {
+                            Button("Resume Indexing") { indexer.resume(project.id) }
+                        } else {
+                            Button("Pause Indexing") { indexer.pause(project.id) }
+                        }
+                        Button("Stop Indexing") { Task { await indexer.stop(project.id) } }
+                    }
+                } else {
+                    Button("Project Files: Turn On in Settings…") { openModelsSettings() }
+                }
                 Button("Instructions…") { ProjectInstructionsWindow.show(project.id) }
                 Button("Rename…") {
                     renameHadFocus = false
@@ -354,6 +393,46 @@ struct ChatSidebar: View {
                 Divider()
                 Button("Delete Project…", role: .destructive) { projectToDelete = project }
             }
+        }
+    }
+
+    /// Under a project's row: the hint to turn Project files on (files
+    /// dragged onto it while off), or what the last add didn't take.
+    @ViewBuilder
+    private func projectFileNotes(_ project: UUID) -> some View {
+        if filesOffHint == project, !indexer.isEnabled {
+            Button { openModelsSettings() } label: {
+                Label("Turn on Project files in Settings to add files", systemImage: "info.circle")
+                    .font(.caption)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.secondary)
+            .padding(.leading, 30).padding(.vertical, 2)
+        } else if let note = indexer.addNotes[project] {
+            HStack(alignment: .top, spacing: 4) {
+                Button { ProjectFilesWindow.show(project) } label: {
+                    Text(note).font(.caption).lineLimit(3).multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.orange)
+                .help("Show Files")
+                Spacer(minLength: 0)
+                Button { indexer.dismissAddNote(project) } label: { Image(systemName: "xmark").font(.caption2) }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.secondary)
+                    .accessibilityLabel("Dismiss")
+            }
+            .padding(.leading, 30).padding(.trailing, 8).padding(.vertical, 2)
+        }
+    }
+
+    private func showFilesOffHint(_ project: UUID) {
+        filesOffHint = project
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 8_000_000_000)
+            if filesOffHint == project { filesOffHint = nil }
         }
     }
 
@@ -476,6 +555,104 @@ struct SidebarRowStyle: ButtonStyle {
         var body: some View {
             content(hovered).onHover { hovered = $0 }
         }
+    }
+}
+
+/// A project row as a drop target: chats dragged from the sidebar move into
+/// it; files dragged from Finder are added to it, the same way Add Files…
+/// does -- or, with Project files off, the hint to turn them on shows.
+private struct ProjectRowDrop: DropDelegate {
+    static let types: [UTType] = [.fileURL, .plainText, .text]
+
+    let id: String
+    let project: UUID
+    let filesEnabled: Bool
+    @Binding var target: String?
+    let filesOff: () -> Void
+    let chats: ([NSItemProvider]) -> Bool
+
+    private func carriesFiles(_ info: DropInfo) -> Bool { info.hasItemsConforming(to: [.fileURL]) }
+
+    /// Files are "valid" with the feature off too: entering is what shows
+    /// the hint, and the proposal below then forbids the drop.
+    func validateDrop(info: DropInfo) -> Bool {
+        carriesFiles(info) || info.hasItemsConforming(to: [.plainText, .text])
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        guard carriesFiles(info) else { return DropProposal(operation: .move) }
+        return DropProposal(operation: filesEnabled ? .copy : .forbidden)
+    }
+
+    func dropEntered(info: DropInfo) {
+        if carriesFiles(info), !filesEnabled {
+            filesOff()
+            return
+        }
+        target = id
+    }
+
+    func dropExited(info: DropInfo) {
+        if target == id { target = nil }
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        if target == id { target = nil }
+        if carriesFiles(info) {
+            guard filesEnabled else {
+                filesOff()
+                return false
+            }
+            let project = project
+            ProjectFileDropLoader.load(info.itemProviders(for: [.fileURL])) { urls in
+                Task { await ProjectIndexer.shared.addFiles(urls, to: project) }
+            }
+            return true
+        }
+        return chats(info.itemProviders(for: [.plainText, .text]))
+    }
+}
+
+/// The ring's menu (adr/0012: Pause / Resume, Stop, Show Files), an AppKit
+/// menu at the pointer: a SwiftUI Menu's label can't draw the ring.
+@MainActor
+enum ProjectRingMenu {
+    private final class Item: NSMenuItem {
+        private let run: () -> Void
+
+        init(_ title: String, _ run: @escaping () -> Void) {
+            self.run = run
+            super.init(title: title, action: #selector(fire), keyEquivalent: "")
+            target = self
+        }
+
+        @available(*, unavailable)
+        required init(coder: NSCoder) { fatalError() }
+
+        @objc private func fire() { run() }
+    }
+
+    static func show(for project: UUID) {
+        let indexer = ProjectIndexer.shared
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        if let text = indexer.statusText(for: project) {
+            let info = NSMenuItem(title: text, action: nil, keyEquivalent: "")
+            info.isEnabled = false
+            menu.addItem(info)
+            menu.addItem(.separator())
+        }
+        if indexer.ring(for: project).isActive {
+            if indexer.isPaused(project) {
+                menu.addItem(Item(NSLocalizedString("Resume", comment: "project indexing")) { indexer.resume(project) })
+            } else {
+                menu.addItem(Item(NSLocalizedString("Pause", comment: "project indexing")) { indexer.pause(project) })
+            }
+            menu.addItem(Item(NSLocalizedString("Stop", comment: "project indexing")) { Task { await indexer.stop(project) } })
+            menu.addItem(.separator())
+        }
+        menu.addItem(Item(NSLocalizedString("Show Files", comment: "project indexing")) { ProjectFilesWindow.show(project) })
+        menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
     }
 }
 
