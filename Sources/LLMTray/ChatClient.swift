@@ -1087,7 +1087,7 @@ final class ChatClient: ObservableObject {
             errorText = error.localizedDescription
             dropEmptyAssistantPlaceholder()
         }
-        finalizeTokensPerSecond(firstByte: completion.firstByteDate, endDate: completion.endDate)
+        finalizeTokensPerSecond(firstToken: completion.firstDataDate, endDate: completion.endDate)
         if completion.error != nil { closeDanglingToolCalls() }   // no follow-up: keep the history valid
         continueWithPendingToolCalls(afterError: completion.error != nil)
     }
@@ -1492,8 +1492,10 @@ final class ChatClient: ObservableObject {
         return Framing(base: data(base), tools: byName)
     }
 
-    private func finalizeTokensPerSecond(firstByte: Date?, endDate: Date) {
-        guard let start = firstByte else { return }
+    /// From the first token (the first "data:" line, not a prefill
+    /// keepalive), as the answer's details measure it.
+    private func finalizeTokensPerSecond(firstToken: Date?, endDate: Date) {
+        guard let start = firstToken else { return }
         let elapsed = endDate.timeIntervalSince(start)
         // Sub-50ms is measurement noise (SSE framing, a one-word reply),
         // not a real generation rate -- dividing by it is what produced

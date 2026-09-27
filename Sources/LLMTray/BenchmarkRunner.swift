@@ -161,8 +161,7 @@ final class BenchmarkRunner: ObservableObject {
             // mlx_lm.server sends ": keepalive N/M" SSE comment lines while
             // still prefilling a long prompt, to hold the connection open --
             // those arrive well before the real first token. Stamping
-            // firstByteDate on the first *line of any kind* (as ChatClient
-            // does, where it doesn't matter for a live chat) would capture
+            // firstByteDate on the first *line of any kind* would capture
             // the keepalive instead and silently deflate TTFT/prefill
             // tok/s, which is the one number this benchmark exists to get
             // right. Only a genuine "data: " payload counts.
