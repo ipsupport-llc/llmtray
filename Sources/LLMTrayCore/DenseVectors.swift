@@ -54,7 +54,12 @@ public final class DenseVectors {
     }
 
     private func append(ids: UnsafeRawBufferPointer, doc: Int64, vectors: UnsafeRawBufferPointer, count n: Int) {
-        for k in 0..<n { chunkIDs.append(Int64(littleEndian: ids.loadUnaligned(fromByteOffset: k * 8, as: Int64.self))) }
+        // Bulk copies (little-endian on disk and in memory on Apple silicon).
+        let idStart = chunkIDs.count
+        chunkIDs.append(contentsOf: repeatElement(0, count: n))
+        chunkIDs.withUnsafeMutableBytes { dst in
+            dst.baseAddress!.advanced(by: idStart * 8).copyMemory(from: ids.baseAddress!, byteCount: n * 8)
+        }
         docs.append(contentsOf: repeatElement(doc, count: n))
         let start = values.count
         values.append(contentsOf: repeatElement(0, count: n * dim))

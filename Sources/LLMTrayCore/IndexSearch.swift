@@ -76,6 +76,55 @@ public struct IndexSearchOptions: Sendable {
     }
 }
 
+/// What a project has, for deciding at a turn's start which project tools
+/// to declare (none / listing only / all three).
+public struct ProjectIndexSummary: Equatable, Sendable {
+    /// Documents the user sees (everything but `removing`).
+    public var documents: Int
+    /// `searchable` or `embedded`.
+    public var searchable: Int
+    public var embedded: Int
+    /// Still to be indexed (staged, extracting).
+    public var pending: Int
+    public var failed: Int
+
+    public static let empty = ProjectIndexSummary(documents: 0, searchable: 0, embedded: 0, pending: 0, failed: 0)
+
+    static let sql = """
+        SELECT count(*), coalesce(sum(status IN ('searchable','embedded')), 0), coalesce(sum(status = 'embedded'), 0),
+               coalesce(sum(status IN ('staged','extracting')), 0), coalesce(sum(status = 'failed'), 0)
+        FROM documents WHERE status != 'removing'
+        """
+
+    init(documents: Int, searchable: Int, embedded: Int, pending: Int, failed: Int) {
+        self.documents = documents
+        self.searchable = searchable
+        self.embedded = embedded
+        self.pending = pending
+        self.failed = failed
+    }
+
+    static func read(_ db: SQLiteConnection) throws -> ProjectIndexSummary {
+        try db.rows(sql) {
+            ProjectIndexSummary(documents: Int($0.int(0)), searchable: Int($0.int(1)), embedded: Int($0.int(2)),
+                                pending: Int($0.int(3)), failed: Int($0.int(4)))
+        }.first ?? .empty
+    }
+
+    /// Without opening the project (no reconcile, no writer): a read-only
+    /// look at its index, `.empty` when it has none yet. A `removing`
+    /// document is already left out; a crash's leftovers are at most a
+    /// staged row counted as pending.
+    public static func read(directory: URL) throws -> ProjectIndexSummary {
+        let path = directory.appendingPathComponent(ProjectIndex.databaseName).path
+        guard FileManager.default.fileExists(atPath: path) else { return .empty }
+        let db = try SQLiteConnection(path: path, readOnly: true)
+        defer { db.close() }
+        db.setBusyTimeout(milliseconds: 1000)
+        return try read(db)
+    }
+}
+
 /// A page of text as stored, current or kept for a citation.
 public struct IndexPage: Equatable, Sendable {
     public var doc: Int64
@@ -253,6 +302,8 @@ public final class IndexSearcher {
                      name: $0.text(5), text: $0.text(4), score: 0, foundBy: [])
         }.first
     }
+
+    public func summary() throws -> ProjectIndexSummary { try ProjectIndexSummary.read(db) }
 
     /// A page by (doc, rev, page) -- what a citation names -- current or a tombstone.
     public func page(doc: Int64, rev: Int64, page: Int) throws -> IndexPage? {

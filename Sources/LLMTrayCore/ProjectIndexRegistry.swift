@@ -101,6 +101,11 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         return result.0
     }
 
+    /// Document counts on the reader: one small query, never behind an ingest.
+    public func summary() async throws -> ProjectIndexSummary {
+        try await read { try $0.summary() }
+    }
+
     /// Reader queue: the active set's vectors, refreshed.
     private func currentVectors(_ db: SQLiteConnection, dim: Int) throws -> DenseVectors? {
         let active = try db.rows("SELECT set_id, dim FROM vec_sets WHERE active = 1") { ($0.int(0), Int($0.int(1))) }.first
@@ -207,6 +212,20 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
         handles[project] = h
         lock.unlock()
         return h
+    }
+
+    /// The project's counts: from its open handle, else read-only from its
+    /// file without opening it (`.empty` when it has no index).
+    public func summary(for project: UUID) async throws -> ProjectIndexSummary {
+        if let open = openHandle(project) { return try await open.summary() }
+        let dir = directory(project)
+        return try await ProcessRunner.offMain { try ProjectIndexSummary.read(directory: dir) }
+    }
+
+    private func openHandle(_ project: UUID) -> ProjectIndexHandle? {
+        lock.lock()
+        defer { lock.unlock() }
+        return handles[project]
     }
 
     public var openProjects: Set<UUID> {

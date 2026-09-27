@@ -146,6 +146,33 @@ final class ProjectIndexRegistryTests: XCTestCase {
         reg.closeAll()
     }
 
+    func testSummaryWithoutOpeningTheProject() async throws {
+        let root = indexTempDir()
+        let project = UUID()
+        let reg = registry(root)
+        let none = try await reg.summary(for: project)
+        XCTAssertEqual(none, .empty, "no index yet")
+        do {
+            let idx = try ProjectIndex.testIndex(root.appendingPathComponent(project.uuidString))
+            try idx.addText("индексированный", name: "a.txt")
+            try idx.addText("только слова", name: "b.txt", embed: false)
+            let src = idx.directory.appendingPathComponent("../c.txt").standardizedFileURL
+            try "ждёт".write(to: src, atomically: true, encoding: .utf8)
+            _ = try idx.addCopy(of: src)
+            idx.close()
+        }
+        let closed = try await reg.summary(for: project)
+        XCTAssertEqual(closed, ProjectIndexSummary(documents: 3, searchable: 2, embedded: 1, pending: 1, failed: 0))
+        XCTAssertTrue(reg.openProjects.isEmpty, "read without opening")
+        let h = try reg.handle(for: project)
+        let open = try await reg.summary(for: project)
+        XCTAssertEqual(open, closed)
+        try await h.write { idx in try idx.remove(doc: 1) }
+        let after = try await h.summary()
+        XCTAssertEqual(after.searchable, 1)
+        reg.closeAll()
+    }
+
     func testOpeningReconcilesAndReportsWork() async throws {
         let root = indexTempDir()
         let project = UUID()

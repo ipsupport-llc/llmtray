@@ -181,6 +181,8 @@ public final class ProjectIndex {
         }
     }
 
+    public func summary() throws -> ProjectIndexSummary { try ProjectIndexSummary.read(db) }
+
     public func status(_ doc: Int64) throws -> DocumentStatus? {
         try db.scalarText("SELECT status FROM documents WHERE doc = ?", [.int(doc)]).flatMap(DocumentStatus.init(rawValue:))
     }

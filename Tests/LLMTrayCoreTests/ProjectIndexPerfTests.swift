@@ -1,8 +1,9 @@
 import XCTest
 @testable import LLMTrayCore
 
-/// The spike's scale run, opt-in (minutes and ~2 GB of disk):
-/// `LLMTRAY_INDEX_PERF=200000 swift test --filter ProjectIndexPerfTests`.
+/// The spike's scale run, opt-in (minutes and ~2 GB of disk); timings
+/// mean something in release only:
+/// `LLMTRAY_INDEX_PERF=200000 swift test -c release -Xswiftc -enable-testing --filter ProjectIndexPerfTests`.
 /// Prints ingest rate, size per 10k chunks and hybrid search p50/p95.
 final class ProjectIndexPerfTests: XCTestCase {
     func testHybridSearchAtScale() throws {
@@ -17,7 +18,7 @@ final class ProjectIndexPerfTests: XCTestCase {
         let perDoc = 100
         let t0 = ContinuousClock.now
         for d in 0..<(n / perDoc) {
-            let pages = (0..<perDoc).map { ExtractedPage(page: $0 + 1, text: gen.text(words: 280)) }
+            let pages = (0..<perDoc).map { ExtractedPage(page: $0 + 1, text: gen.text(words: 200)) }
             try idx.db.run("INSERT INTO documents(name, ext, sha256, added_at, status) VALUES (?, 'txt', ?, 0, 'extracting')",
                            [.text("d\(d)"), .text("sha\(d)")])
             let doc = idx.db.lastInsertRowID
