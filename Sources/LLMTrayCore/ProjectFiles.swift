@@ -204,6 +204,18 @@ public enum ProjectFiles {
         }
     }
 
+    /// A name for a result's heading: at most `maxBytes` (cut with …), nil
+    /// when it's that short already.
+    static func shortName(_ name: String, maxBytes: Int = 60) -> String? {
+        guard name.utf8.count > maxBytes else { return nil }
+        var out = ""
+        for scalar in name.unicodeScalars {
+            guard out.utf8.count + String(scalar).utf8.count + "…".utf8.count <= maxBytes else { break }
+            out.unicodeScalars.append(scalar)
+        }
+        return out + "…"
+    }
+
     /// Names, at most `limit` of them, "and N more".
     static func names(_ docs: [IndexedDocument], limit: Int = 5) -> String {
         let shown = docs.prefix(limit).map { "\($0.doc). \($0.name)" }.joined(separator: ", ")
@@ -364,8 +376,9 @@ public final class ProjectFilesService {
                 if lo >= 0 {
                     output = page([row(d, name: cut(lo))])
                 } else {
-                    // Not even its id fits: said so, and the rest still reachable.
-                    output = page(["\(d.doc). (no room for this file's line in this chat's context)"])
+                    // Not even its id fits: no file's line would (no cursor
+                    // past one that wasn't shown).
+                    output = ProjectToolOutput(project: project, preamble: head + "\n(no room to list them in this chat's context)")
                 }
             }
             break
@@ -455,26 +468,46 @@ public final class ProjectFilesService {
     /// The query's vector, or why the search goes by words: paused at once
     /// while a generation holds the GPU; given up after `timeout`.
     static func embed(_ query: String, with embedder: ProjectQueryEmbedder, timeout: TimeInterval) async -> Result<[Float], WordsOnlyFailure> {
-        do {
-            let vector: [Float]? = try await withThrowingTaskGroup(of: [Float]?.self) { group in
-                group.addTask { try await embedder.embedQuery(query) }
-                group.addTask {
-                    try await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1e9))
-                    return nil
-                }
-                defer { group.cancelAll() }
-                return try await group.next() ?? nil
+        // Raced without a task group: past the timeout the search goes on at
+        // once, not after the request's own cancellation (the runner may
+        // take a while to give it up).
+        let work = Task { try await embedder.embedQuery(query) }
+        let first = FirstResult<Result<[Float], Error>?>()
+        let outcome: Result<[Float], Error>? = await withCheckedContinuation { continuation in
+            first.continuation = continuation
+            Task { first.resume(await work.result) }
+            Task {
+                try? await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1e9))
+                first.resume(nil)
             }
-            guard let vector else { return .failure(WordsOnlyFailure(.timedOut)) }
+        }
+        guard let outcome else {
+            work.cancel()
+            return .failure(WordsOnlyFailure(.timedOut))
+        }
+        switch outcome {
+        case .success(let vector):
             return .success(vector)
-        } catch EmbedRunner.Failure.paused {
+        case .failure(EmbedRunner.Failure.paused):
             return .failure(WordsOnlyFailure(.paused))
-        } catch EmbedRunner.Failure.unresponsive {
+        case .failure(EmbedRunner.Failure.unresponsive), .failure(EmbedRunner.Failure.runner(code: "timeout", _)):
             return .failure(WordsOnlyFailure(.timedOut))
-        } catch EmbedRunner.Failure.runner(code: "timeout", _) {
-            return .failure(WordsOnlyFailure(.timedOut))
-        } catch {
+        case .failure(let error):
             return .failure(WordsOnlyFailure(.unavailable("\(error)")))
+        }
+    }
+
+    /// The first of several racers resumes the continuation; the rest are ignored.
+    final class FirstResult<T>: @unchecked Sendable {
+        private let lock = NSLock()
+        var continuation: CheckedContinuation<T, Never>?
+
+        func resume(_ value: T) {
+            let c: CheckedContinuation<T, Never>? = lock.withLock {
+                defer { continuation = nil }
+                return continuation
+            }
+            c?.resume(returning: value)
         }
     }
 
@@ -492,30 +525,40 @@ public final class ProjectFilesService {
             return .text("File \(d.doc) (\(d.name)) is \(ProjectFiles.status(d)): it can't be read yet.")
         }
         let (doc, rev) = (d.doc, d.rev)
+        var cursor = cursor
+        var changedNote: String?
         if let cited = cursor.rev, cited != rev {
-            let pages = cursor.last == Int.max ? "\(cursor.page)-" : "\(cursor.page)-\(cursor.last)"
-            return .text("File \(doc) (\(d.name)) has changed since that read (indexed again): what was shown may not match. "
-                         + "Read it again: \(ProjectFiles.toolName)({\"doc\":\(doc),\"pages\":\"\(pages)\"})")
+            // Indexed again since: read again from that page of the current
+            // revision (an offset counts only in the one it was counted in).
+            changedNote = "File \(doc) (\(d.name)) has changed since that read (indexed again): "
+                + "page \(cursor.page) is read again from its start; what was shown before may not match."
+            cursor = ProjectFiles.ReadCursor(doc: doc, rev: rev, page: cursor.page, offset: 0, last: cursor.last)
         }
         let requested = cursor.page...cursor.last
         let lengths = try await handle.read { try $0.pageLengths(doc: doc, rev: rev, in: requested) }
         let pageCount = d.pages ?? lengths.last?.page ?? 0
         guard !lengths.isEmpty else {
-            return .text("File \(d.doc) (\(d.name)) has \(pageCount) page(s); page \(cursor.page) isn't one of them.")
+            let none = "File \(d.doc) (\(d.name)) has \(pageCount) page(s); page \(cursor.page) isn't one of them."
+            return .text(changedNote.map { $0 + " " + none } ?? none)
         }
         let last = lengths.last!.page
         func cursorText(_ page: Int, _ offset: Int) -> String {
             "Not all shown: continue with \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.ReadCursor(doc: doc, rev: rev, page: page, offset: offset, last: last).text)\"})."
         }
         var output = ProjectToolOutput(project: project)
+        var notes = changedNote.map { [$0] } ?? []
         if cursor.last != Int.max, cursor.last > last, cursor.offset == 0 {
-            output.preamble = "\(d.name) has \(pageCount) page(s)."
+            notes.append("\(d.name) has \(pageCount) page(s).")
         }
+        output.preamble = notes.joined(separator: "\n")
+        // A long name cut in the result (the citation keeps it whole): at a
+        // small budget the page's text still fits, and each cursor moves on.
+        let label = ProjectFiles.shortName(d.name)
         // Its id names the range it holds: a piece of another length (the
         // same page read again under another budget) isn't "shown earlier".
         func hit(_ page: Int, _ start: Int, _ text: String) -> ProjectHit {
             ProjectHit(id: "r\(doc).\(rev).\(page).\(start)-\(start + text.unicodeScalars.count)", doc: Int(doc), rev: Int(rev),
-                       page: page, name: d.name, text: text.isEmpty ? "(no text on this page)" : text)
+                       page: page, name: d.name, label: label, text: text.isEmpty ? "(no text on this page)" : text)
         }
         for (i, entry) in lengths.enumerated() {
             let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0

@@ -34,17 +34,23 @@ public struct ProjectHit: Equatable {
     public var rev: Int
     public var page: Int
     public var chunk: Int?
+    /// The file's name: the citation's label.
     public var name: String
+    /// Shown in the result instead of `name` when set (a long name cut, so
+    /// a read at a small budget still has room for its text).
+    public var label: String?
     public var heading: String?
     public var text: String
 
-    public init(id: String, doc: Int, rev: Int, page: Int, chunk: Int? = nil, name: String, heading: String? = nil, text: String) {
+    public init(id: String, doc: Int, rev: Int, page: Int, chunk: Int? = nil, name: String, label: String? = nil,
+                heading: String? = nil, text: String) {
         self.id = id
         self.doc = doc
         self.rev = rev
         self.page = page
         self.chunk = chunk
         self.name = name
+        self.label = label
         self.heading = heading
         self.text = text
     }
@@ -89,7 +95,7 @@ public struct ProjectToolOutput: Equatable {
         }
         var left = 0
         for (i, hit) in hits.enumerated() {
-            let head = "\n[\(hit.doc):\(hit.page)] \(hit.name)" + (hit.heading.map { " -- \($0)" } ?? "")
+            let head = "\n[\(hit.doc):\(hit.page)] \(hit.label ?? hit.name)" + (hit.heading.map { " -- \($0)" } ?? "")
             if alreadySent.contains(hit.id) {
                 let line = head + ": shown earlier in this turn.\n"
                 guard line.utf8.count <= room() else { left = hits.count - i; break }
