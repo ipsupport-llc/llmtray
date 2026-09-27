@@ -1,0 +1,219 @@
+import Darwin
+import Foundation
+
+/// Undo of a journaled plan (Hardening 7): items reversed newest first,
+/// each only if it still matches what the journal recorded by identity --
+/// moves moved back (exclusively), made folders removed if still empty,
+/// trashed items put back from where the Trash put them. Stops at the first
+/// conflict and says what remains reversible.
+public struct ChangeUndo {
+    public let denylist: FolderDenylist
+    public let journal: ChangeJournal
+
+    public init(denylist: FolderDenylist, journal: ChangeJournal) {
+        self.denylist = denylist
+        self.journal = journal
+    }
+
+    public struct Remaining: Equatable, Sendable {
+        public var id: Int
+        public var reversible: Bool
+        public var reason: String?
+    }
+
+    public struct Report: Equatable, Sendable {
+        public var planID: UUID
+        public var undone: [Int]
+        public var stopped: Remaining?
+        /// Items still done after this undo, newest first, with whether each
+        /// could still be reversed.
+        public var remaining: [Remaining]
+    }
+
+    /// Whether each done item could be reversed now (newest first), without
+    /// changing anything. Interrupted items say so.
+    public func reversibility(_ planID: UUID) -> [Remaining] {
+        guard let record = journal.record(planID) else { return [] }
+        return record.items.reversed().compactMap { item -> Remaining? in
+            switch item.state {
+            case .incomplete:
+                return Remaining(id: item.planItem.id, reversible: false, reason: "interrupted: its outcome is unknown")
+            case .failed, .undone:
+                return nil
+            case .done(let r), .undoIncomplete(let r):
+                do {
+                    try reverse(item.planItem, r, dryRun: true)
+                    return Remaining(id: item.planItem.id, reversible: true, reason: nil)
+                } catch {
+                    return Remaining(id: item.planItem.id, reversible: false, reason: "\(error)")
+                }
+            }
+        }
+    }
+
+    public func undo(_ planID: UUID) -> Report {
+        var report = Report(planID: planID, undone: [], stopped: nil, remaining: [])
+        guard let record = journal.record(planID) else {
+            report.stopped = Remaining(id: 0, reversible: false, reason: "no journal for this plan")
+            return report
+        }
+        for item in record.items.reversed() {
+            let result: JournalResult
+            switch item.state {
+            case .done(let r): result = r
+            case .undoIncomplete(let r):
+                // An undo interrupted after it moved the item back: done.
+                if (try? isBack(item.planItem, r)) == true {
+                    try? journal.append(JournalEvent(kind: .undone, date: Date(), item: item.planItem.id), planID: planID)
+                    report.undone.append(item.planItem.id)
+                    continue
+                }
+                result = r
+            case .failed, .undone, .incomplete: continue
+            }
+            let id = item.planItem.id
+            do {
+                try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: id), planID: planID)
+            } catch {
+                report.stopped = Remaining(id: id, reversible: true, reason: "journal not written, nothing changed: \(error)")
+                break
+            }
+            do {
+                try reverse(item.planItem, result, dryRun: false)
+                try? journal.append(JournalEvent(kind: .undone, date: Date(), item: id), planID: planID)
+                report.undone.append(id)
+            } catch {
+                try? journal.append(JournalEvent(kind: .undoFailed, date: Date(), item: id, message: "\(error)"), planID: planID)
+                report.stopped = Remaining(id: id, reversible: false, reason: "\(error)")
+                break
+            }
+        }
+        report.remaining = reversibility(planID)
+        return report
+    }
+
+    // MARK: Reversing one item
+
+    private func walker(_ root: FolderRoot) -> SafeFolderWalker { SafeFolderWalker(root: root, denylist: denylist) }
+
+    /// The original parent, held to the identities captured at proposal.
+    private func sourceParent(_ s: CapturedSource) throws -> OpenedDirectory {
+        try walker(s.location.root).openDirectory(s.location.parentComponents, expected: s.parentChain)
+    }
+
+    /// Where a make_dir or move put the item, held to the recorded
+    /// identities; the item there must be the recorded one.
+    private func placed(_ item: PlanItem, _ r: JournalResult) throws -> (OpenedDirectory, String) {
+        guard let d = item.destination, let comps = r.components, let name = comps.last, let chain = r.destinationChain else {
+            throw FolderAccessError.invalidPath("the journal has no destination")
+        }
+        let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
+        guard try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity else {
+            throw FolderAccessError.changed("\(comps.joined(separator: "/")) was moved or replaced since")
+        }
+        return (dir, name)
+    }
+
+    /// The item in the Trash, by its canonical path, held to the recorded
+    /// identity. By path: the Trash folder can't be opened without Full Disk
+    /// Access (TCC), though its items can be looked at and moved; the
+    /// identity is checked again after the move.
+    private func inTrash(_ r: JournalResult) throws -> (path: String, device: Int32) {
+        guard let path = r.trashURL else { throw FolderAccessError.notFound("the Trash didn't say where it put the item") }
+        let url = URL(fileURLWithPath: path)
+        guard let dirPath = Posix.realpath(url.deletingLastPathComponent().path) else {
+            throw FolderAccessError.notFound(path)
+        }
+        let canonical = dirPath + "/" + url.lastPathComponent
+        guard let st = Posix.lstatPath(canonical), st.identity == r.identity else {
+            throw FolderAccessError.changed("\(url.lastPathComponent) is no longer in the Trash")
+        }
+        return (canonical, st.identity.device)
+    }
+
+    private func reverse(_ item: PlanItem, _ r: JournalResult, dryRun: Bool) throws {
+        let excl = UInt32(RENAME_EXCL)
+        switch item.kind {
+        case .makeDir:
+            let (dir, name) = try placed(item, r)
+            if dryRun {
+                guard try Self.isEmptyDirectory(dir.descriptor, name) else { throw FolderAccessError.notEmpty(name) }
+                return
+            }
+            if unlinkat(dir.descriptor.fd, name, AT_REMOVEDIR) != 0 {
+                let e = errno
+                if e == ENOTEMPTY || e == EEXIST { throw FolderAccessError.notEmpty(name) }
+                throw FolderAccessError.system("remove \(name)", e)
+            }
+        case .move:
+            guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
+            let (dir, name) = try placed(item, r)
+            let back = try sourceParent(s)
+            if dryRun {
+                if try Posix.lstatAt(back.descriptor.fd, s.location.name) != nil {
+                    throw FolderAccessError.exists(s.location.relativePath)
+                }
+                return
+            }
+            if renameatx_np(dir.descriptor.fd, name, back.descriptor.fd, s.location.name, excl) != 0 {
+                let e = errno
+                if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
+                throw FolderAccessError.system("move back \(name)", e)
+            }
+        case .trash:
+            guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
+            let trashed = try inTrash(r)
+            let back = try sourceParent(s)
+            if trashed.device != back.descriptor.identity.device {
+                throw FolderAccessError.crossDevice(s.location.relativePath)
+            }
+            if dryRun {
+                if try Posix.lstatAt(back.descriptor.fd, s.location.name) != nil {
+                    throw FolderAccessError.exists(s.location.relativePath)
+                }
+                return
+            }
+            if renameatx_np(AT_FDCWD, trashed.path, back.descriptor.fd, s.location.name, excl) != 0 {
+                let e = errno
+                if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
+                throw FolderAccessError.system("put back \(s.location.name)", e)
+            }
+            // Swapped in the Trash between the check and the move: back it goes.
+            if try Posix.lstatAt(back.descriptor.fd, s.location.name)?.identity != r.identity {
+                _ = renameatx_np(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, excl)
+                throw FolderAccessError.changed("\(s.location.name) changed in the Trash")
+            }
+        }
+    }
+
+    /// After an interrupted undo: is the item where it was before the plan
+    /// (or, for a made folder, gone)?
+    private func isBack(_ item: PlanItem, _ r: JournalResult) throws -> Bool {
+        switch item.kind {
+        case .makeDir:
+            guard let d = item.destination, let comps = r.components, let name = comps.last, let chain = r.destinationChain else { return false }
+            let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
+            return try Posix.lstatAt(dir.descriptor.fd, name)?.identity != r.identity
+        case .move, .trash:
+            guard let s = item.source else { return false }
+            return try Posix.lstatAt(try sourceParent(s).descriptor.fd, s.location.name)?.identity == s.identity
+        }
+    }
+
+    static func isEmptyDirectory(_ parent: Descriptor, _ name: String) throws -> Bool {
+        let fd = openat(parent.fd, name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard fd >= 0 else { throw FolderAccessError.system("open \(name)", errno) }
+        guard let stream = fdopendir(fd) else {
+            close(fd)
+            throw FolderAccessError.system("fdopendir", errno)
+        }
+        defer { closedir(stream) }
+        while let ent = readdir(stream) {
+            let n = withUnsafePointer(to: ent.pointee.d_name) {
+                $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
+            }
+            if n != "." && n != ".." { return false }
+        }
+        return true
+    }
+}

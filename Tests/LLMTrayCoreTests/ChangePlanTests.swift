@@ -1,0 +1,412 @@
+import Foundation
+import XCTest
+@testable import LLMTrayCore
+
+/// A Trash in the test's temp folder: a rename, like the real one on the
+/// same volume.
+private final class FakeTrash: Trasher {
+    let dir: String
+    var fail = false
+    var coordinated: [Bool] = []
+
+    init(dir: String) {
+        self.dir = dir
+        try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
+    }
+
+    func trash(_ url: URL, coordinated: Bool, verify: (URL) -> Bool) throws -> URL? {
+        self.coordinated.append(coordinated)
+        if fail { throw CocoaError(.featureUnsupported) }
+        guard verify(url) else { throw FolderAccessError.changed(url.path) }
+        let dest = dir + "/" + url.lastPathComponent + " " + UUID().uuidString.prefix(4)
+        try FileManager.default.moveItem(atPath: url.path, toPath: dest)
+        return URL(fileURLWithPath: dest)
+    }
+}
+
+final class ChangePlanTests: FolderTestCase {
+    private var journal: ChangeJournal!
+    private var trash: FakeTrash!
+    private let store = ChangePlanStore()
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        journal = ChangeJournal(directory: URL(fileURLWithPath: base + "/journal"))
+        trash = FakeTrash(dir: base + "/Trash")
+    }
+
+    private var planner: ChangePlanner { ChangePlanner(denylist: denylist) }
+    private var executor: ChangeExecutor { ChangeExecutor(denylist: denylist, journal: journal, trasher: trash) }
+    private var undoer: ChangeUndo { ChangeUndo(denylist: denylist, journal: journal) }
+
+    private func mv(_ from: String, _ to: String) throws -> ChangeRequest { .move(from: try loc(from), to: try loc(to)) }
+    private func md(_ path: String) throws -> ChangeRequest { .makeDir(try loc(path)) }
+    private func rm(_ path: String) throws -> ChangeRequest { .trash(try loc(path)) }
+
+    /// Plans `ops` into the chat's pending plan (nothing rejected), approves.
+    private func approved(_ ops: [ChangeRequest], items: Set<Int>? = nil,
+                          collision: [Int: CollisionPolicy] = [:]) throws -> ChangePlan {
+        let r = try planner.plan(ops, after: store.pending(chatID: "c")?.items ?? [])
+        XCTAssertTrue(r.rejected.isEmpty, "\(r.rejected.map { "\($0.index): \($0.error)" })")
+        store.add(r.items, chatID: "c")
+        for (id, p) in collision { store.setCollision(p, item: id, chatID: "c") }
+        return try store.approve(chatID: "c", items: items)
+    }
+
+    private func statuses(_ r: ChangeExecutor.Report) -> [String] {
+        r.outcomes.map {
+            switch $0.status {
+            case .done: return "done"
+            case .failed: return "failed"
+            case .notRun: return "notRun"
+            }
+        }
+    }
+
+    // MARK: Planning and approval
+
+    func testOneOpsListIsThePlan() throws {
+        write("a.pdf", "a")
+        write("b.pdf", "b")
+        write("c.tmp", "c")
+        let plan = try approved([md("2024"), md("2024/q1"), mv("a.pdf", "2024/q1/a.pdf"), mv("b.pdf", "2024/b.pdf"), rm("c.tmp")])
+        XCTAssertEqual(plan.items.map(\.kind), [.makeDir, .makeDir, .move, .move, .trash])
+        XCTAssertEqual(plan.items.map(\.dependsOn), [[], [1], [1, 2], [1], []])
+        XCTAssertNil(store.pending(chatID: "c"), "approval takes the plan out")
+        let report = executor.execute(plan)
+        XCTAssertEqual(statuses(report), ["done", "done", "done", "done", "done"])
+        XCTAssertNil(report.stoppedAt)
+        XCTAssertEqual(names(), ["2024", "denied"])
+        XCTAssertEqual(names("2024"), ["b.pdf", "q1"])
+        XCTAssertEqual(names("2024/q1"), ["a.pdf"])
+        XCTAssertEqual(trash.coordinated, [false])
+        let record = try XCTUnwrap(journal.record(plan.id))
+        XCTAssertFalse(record.isIncomplete)
+        XCTAssertEqual(record.chatID, "c")
+        XCTAssertEqual(record.items.count, 5)
+        guard case .done(let r) = record.items[4].state else { return XCTFail() }
+        XCTAssertNotNil(r.trashURL)
+    }
+
+    func testBadOpsAreRejectedOneByOne() throws {
+        write("a.txt", "a")
+        write("taken/x", "x")
+        mkdir("existing")
+        let r = try planner.plan([
+            mv("missing.txt", "b.txt"),          // no source
+            mv("a.txt", "nowhere/a.txt"),        // parent neither exists nor planned
+            mv("a.txt", "a.txt"),                // where it is
+            mv("denied/secret.txt", "s.txt"),    // denied: invisible
+            md("existing"),                      // already there
+            mv("a.txt", "b.txt"),                // fine
+            rm("a.txt"),                         // already in the plan
+            mv("taken", "taken/inner"),          // into itself
+            md(".ssh"),                          // a denied name would hide it
+            mv("taken", "login.keychain")
+        ])
+        XCTAssertEqual(r.items.count, 1)
+        XCTAssertEqual(r.rejected.map(\.index), [0, 1, 2, 3, 4, 6, 7, 8, 9])
+        XCTAssertThrowsError(try loc("../outside/x"))
+        XCTAssertThrowsError(try planner.plan([mv("a.txt", "b.txt")], temporaryChat: true)) {
+            XCTAssertEqual($0 as? ChangePlanError, .temporaryChat)
+        }
+    }
+
+    func testPlansAccumulateAcrossTurnsAndApprovalCanBePartial() throws {
+        write("a.txt", "a")
+        write("b.txt", "b")
+        let turn1 = try planner.plan([md("new"), mv("a.txt", "new/a.txt")])
+        store.add(turn1.items, chatID: "c")
+        let turn2 = try planner.plan([mv("b.txt", "new/b.txt")], after: store.pending(chatID: "c")!.items)
+        XCTAssertEqual(turn2.items.map(\.id), [3])
+        XCTAssertEqual(turn2.items[0].dependsOn, [1], "a folder planned in an earlier turn")
+        store.add(turn2.items, chatID: "c")
+        XCTAssertEqual(store.pending(chatID: "c")?.items.count, 3)
+        XCTAssertThrowsError(try store.approve(chatID: "c", items: [2])) {
+            XCTAssertEqual($0 as? ChangePlanError, .missingDependency(item: 2, needs: 1))
+        }
+        XCTAssertThrowsError(try store.approve(chatID: "c", items: [9])) {
+            XCTAssertEqual($0 as? ChangePlanError, .unknownItems([9]))
+        }
+        XCTAssertNotNil(store.pending(chatID: "c"), "a refused approval leaves it pending")
+        let plan = try store.approve(chatID: "c", items: [1, 3])
+        XCTAssertEqual(plan.items.map(\.id), [1, 3])
+        XCTAssertEqual(statuses(executor.execute(plan)), ["done", "done"])
+        XCTAssertTrue(exists("a.txt"))
+        XCTAssertTrue(exists("new/b.txt"))
+        store.add(try planner.plan([rm("a.txt")]).items, chatID: "c")
+        store.cancel(chatID: "c")
+        XCTAssertThrowsError(try store.approve(chatID: "c")) { XCTAssertEqual($0 as? ChangePlanError, .nothingPending) }
+    }
+
+    func testAnItemThatChangedCantBeApproved() throws {
+        write("a.txt", "a")
+        let r = try planner.plan([rm("a.txt")])
+        store.add(r.items, chatID: "c")
+        try fm.removeItem(atPath: grant + "/a.txt")
+        write("a.txt", "another file, same name")
+        let invalid = planner.invalidItems(store.pending(chatID: "c")!)
+        XCTAssertEqual(Array(invalid.keys), [1])
+        XCTAssertThrowsError(try store.approve(chatID: "c", invalid: invalid))
+    }
+
+    // MARK: Checked at the moment of the operation
+
+    func testASourceFolderSwappedForASymlinkFailsClosed() throws {
+        write("a/file.txt", "inside")
+        mkdir("b")
+        write("file.txt", "outside", in: outside)
+        let plan = try approved([mv("a/file.txt", "b/file.txt")])
+        // Between approval and execution "a" becomes a link to outside.
+        try fm.moveItem(atPath: grant + "/a", toPath: base + "/a-moved")
+        try fm.createSymbolicLink(atPath: grant + "/a", withDestinationPath: outside)
+        let report = executor.execute(plan)
+        XCTAssertEqual(statuses(report), ["failed"])
+        XCTAssertEqual(report.stoppedAt, 1)
+        XCTAssertEqual(try String(contentsOfFile: outside + "/file.txt"), "outside")
+        XCTAssertEqual(names("b"), [])
+    }
+
+    func testADestinationSwappedForASymlinkFailsClosed() throws {
+        write("x.txt", "x")
+        mkdir("b")
+        let plan = try approved([mv("x.txt", "b/x.txt")])
+        try fm.removeItem(atPath: grant + "/b")
+        try fm.createSymbolicLink(atPath: grant + "/b", withDestinationPath: outside)
+        XCTAssertEqual(statuses(executor.execute(plan)), ["failed"])
+        XCTAssertTrue(exists("x.txt"))
+        XCTAssertEqual((try? fm.contentsOfDirectory(atPath: outside)) ?? ["?"], [])
+    }
+
+    func testAReplacedItemIsNotTouched() throws {
+        write("a.txt", "original")
+        let plan = try approved([rm("a.txt")])
+        try fm.removeItem(atPath: grant + "/a.txt")
+        write("a.txt", "a new file with the old name")
+        XCTAssertEqual(statuses(executor.execute(plan)), ["failed"])
+        XCTAssertEqual(try String(contentsOfFile: grant + "/a.txt"), "a new file with the old name")
+        XCTAssertEqual(trash.coordinated, [], "never reached the Trash")
+    }
+
+    // MARK: Names decided by the file system
+
+    func testKeepBothRetriesWithNumberedNames() throws {
+        write("in/a.txt", "new")
+        write("in/b.txt", "new b")
+        write("out/a.txt", "old")
+        write("out/a 2.txt", "old 2")
+        mkdir("2024")
+        var plan = try approved([mv("in/a.txt", "out/a.txt")])
+        let refused = executor.execute(plan)
+        XCTAssertEqual(statuses(refused), ["failed"])
+        guard case .failed(let why) = refused.outcomes[0].status else { return XCTFail() }
+        XCTAssertTrue(why.contains("already exists"), why)
+        plan = try approved([mv("in/a.txt", "out/a.txt")], collision: [1: .keepBoth])
+        guard case .done(let r) = executor.execute(plan).outcomes[0].status else { return XCTFail() }
+        XCTAssertEqual(r.finalName, "a 3.txt")
+        XCTAssertEqual(try String(contentsOfFile: grant + "/out/a.txt"), "old", "never overwritten")
+        // A folder made under a numbered name: later items follow it.
+        let p2 = try planner.plan([md("2024"), mv("in/b.txt", "2024/b.txt")])
+        XCTAssertEqual(p2.rejected.count, 1, "make_dir of an existing folder is refused when planned")
+        // Taken after planning: keep-both makes "2024 2" and the move follows.
+        try fm.removeItem(atPath: grant + "/2024")
+        store.add(try planner.plan([md("2024"), mv("in/b.txt", "2024/b.txt")]).items, chatID: "c")
+        store.setCollision(.keepBoth, item: 1, chatID: "c")
+        let p3 = try store.approve(chatID: "c")
+        mkdir("2024")
+        write("2024/b.txt", "someone else's")
+        XCTAssertEqual(statuses(executor.execute(p3)), ["done", "done"])
+        XCTAssertEqual(try String(contentsOfFile: grant + "/2024 2/b.txt"), "new b")
+        XCTAssertEqual(try String(contentsOfFile: grant + "/2024/b.txt"), "someone else's")
+    }
+
+    func testNumberedNames() {
+        XCTAssertEqual(ChangeExecutor.numberedName("a.txt", 2, isDirectory: false), "a 2.txt")
+        XCTAssertEqual(ChangeExecutor.numberedName("archive.tar.gz", 3, isDirectory: false), "archive.tar 3.gz")
+        XCTAssertEqual(ChangeExecutor.numberedName("Tool.app", 2, isDirectory: false), "Tool 2.app")
+        XCTAssertEqual(ChangeExecutor.numberedName("v1.2", 2, isDirectory: true), "v1.2 2")
+        XCTAssertEqual(ChangeExecutor.numberedName(".bashrc", 2, isDirectory: false), ".bashrc 2")
+        let long = ChangeExecutor.numberedName(String(repeating: "я", count: 127) + ".txt", 12, isDirectory: false)
+        XCTAssertLessThanOrEqual(long.utf8.count, 255)
+        XCTAssertTrue(long.hasSuffix(" 12.txt"))
+    }
+
+    func testCaseCollisionsAreTheFileSystemsCall() throws {
+        write("src/report.txt", "new")
+        write("dst/Report.txt", "old")
+        let insensitive = volumeIsCaseInsensitive
+        let report = executor.execute(try approved([mv("src/report.txt", "dst/report.txt")]))
+        if insensitive {
+            XCTAssertEqual(statuses(report), ["failed"], "Report.txt and report.txt are one name here")
+            XCTAssertEqual(try String(contentsOfFile: grant + "/dst/Report.txt"), "old")
+        } else {
+            XCTAssertEqual(statuses(report), ["done"])
+            XCTAssertEqual(names("dst"), ["Report.txt", "report.txt"])
+        }
+        // A case-only rename works either way.
+        write("notes.txt", "n")
+        XCTAssertEqual(statuses(executor.execute(try approved([mv("notes.txt", "NOTES.txt")]))), ["done"])
+        XCTAssertTrue(names().contains("NOTES.txt"))
+        XCTAssertFalse(names().contains("notes.txt"))
+    }
+
+    func testComposedAndDecomposedNames() throws {
+        let nfc = "caf\u{E9}.txt", nfd = "cafe\u{301}.txt"
+        XCTAssertEqual(nfc, nfd, "Swift calls them equal -- which is why names are compared by the file system")
+        XCTAssertNotEqual(Array(nfc.utf8), Array(nfd.utf8))
+        write("dst/" + nfc, "old")
+        write("src/" + nfd, "new")
+        // What this volume does with the other spelling, asked directly.
+        let sameName = Posix.lstatPath(grant + "/dst/" + nfd) != nil
+        let report = executor.execute(try approved([mv("src/" + nfd, "dst/" + nfd)]))
+        if sameName {
+            XCTAssertEqual(statuses(report), ["failed"])
+            XCTAssertEqual(try String(contentsOfFile: grant + "/dst/" + nfc), "old")
+        } else {
+            XCTAssertEqual(statuses(report), ["done"])
+        }
+        // A normalization-only rename: the item itself, not a collision.
+        write("n/" + nfc, "x")
+        XCTAssertEqual(statuses(executor.execute(try approved([mv("n/" + nfc, "n/" + nfd)]))), ["done"])
+        let entries = try fm.contentsOfDirectory(atPath: grant + "/n")
+        XCTAssertEqual(entries.count, 1)
+    }
+
+    // MARK: Failures, journal, undo
+
+    func testStopsAtTheFirstFailureAndUndoReversesWhatRan() throws {
+        for n in ["a", "b", "c", "d"] { write("\(n).txt", n) }
+        let plan = try approved([md("new"), mv("a.txt", "new/a.txt"), mv("b.txt", "new/b.txt"),
+                                 mv("c.txt", "new/c.txt"), rm("d.txt")])
+        try fm.removeItem(atPath: grant + "/c.txt")
+        let report = executor.execute(plan)
+        XCTAssertEqual(statuses(report), ["done", "done", "done", "failed", "notRun"])
+        XCTAssertEqual(report.stoppedAt, 4)
+        XCTAssertTrue(exists("d.txt"), "after a failure nothing more runs")
+        let record = try XCTUnwrap(journal.record(plan.id))
+        XCTAssertFalse(record.isIncomplete, "a failure is an outcome")
+        XCTAssertEqual(record.items.count, 4, "the item that never ran isn't journaled")
+        // Newest first; the made folder isn't empty until the moves are undone.
+        XCTAssertEqual(undoer.reversibility(plan.id).map(\.reversible), [true, true, false])
+        let undo = undoer.undo(plan.id)
+        XCTAssertNil(undo.stopped)
+        XCTAssertEqual(undo.undone, [3, 2, 1])
+        XCTAssertEqual(undo.remaining, [])
+        XCTAssertEqual(names(), ["a.txt", "b.txt", "d.txt", "denied"])
+        // Undone items stay undone.
+        XCTAssertEqual(undoer.undo(plan.id).undone, [])
+    }
+
+    func testUndoStopsAtAConflictAndSaysWhatRemains() throws {
+        write("a.txt", "a")
+        write("b.txt", "b")
+        let plan = try approved([md("X"), mv("a.txt", "X/a.txt"), mv("b.txt", "X/b.txt")])
+        XCTAssertEqual(executor.execute(plan).doneCount, 3)
+        write("b.txt", "a new b where the old one was")
+        let undo = undoer.undo(plan.id)
+        XCTAssertEqual(undo.undone, [])
+        XCTAssertEqual(undo.stopped?.id, 3)
+        XCTAssertEqual(undo.remaining.map(\.id), [3, 2, 1])
+        XCTAssertEqual(undo.remaining.map(\.reversible), [false, true, false])
+        XCTAssertEqual(try String(contentsOfFile: grant + "/b.txt"), "a new b where the old one was")
+        // Moved by the user since: not ours to move back.
+        try fm.removeItem(atPath: grant + "/b.txt")
+        try fm.moveItem(atPath: grant + "/X/a.txt", toPath: grant + "/elsewhere.txt")
+        let again = undoer.undo(plan.id)
+        XCTAssertEqual(again.undone, [3])
+        XCTAssertEqual(again.stopped?.id, 2)
+        XCTAssertTrue(again.stopped?.reason?.contains("moved or replaced") ?? false)
+        XCTAssertTrue(exists("elsewhere.txt"))
+    }
+
+    func testTrashFailureIsAFailureNeverADelete() throws {
+        write("keep.txt", "k")
+        trash.fail = true
+        let report = executor.execute(try approved([rm("keep.txt")]))
+        XCTAssertEqual(statuses(report), ["failed"])
+        XCTAssertEqual(try String(contentsOfFile: grant + "/keep.txt"), "k")
+    }
+
+    func testTrashAndPutBack() throws {
+        write("old.log", "log")
+        let plan = try approved([rm("old.log")])
+        guard case .done(let r) = executor.execute(plan).outcomes[0].status else { return XCTFail() }
+        XCTAssertFalse(exists("old.log"))
+        XCTAssertEqual(r.trashURL.map { (try? String(contentsOfFile: $0)) ?? "" }, "log")
+        write("old.log", "a new one")
+        XCTAssertEqual(undoer.undo(plan.id).stopped?.id, 1, "the name is taken: not overwritten")
+        try fm.removeItem(atPath: grant + "/old.log")
+        XCTAssertEqual(undoer.undo(plan.id).undone, [1])
+        XCTAssertEqual(try String(contentsOfFile: grant + "/old.log"), "log")
+    }
+
+    func testTheSystemTrashAndRestore() throws {
+        // A file made here for this test, and nothing else, goes to the
+        // user's Trash -- and is put back.
+        let name = "llmtray-test-\(UUID().uuidString).txt"
+        write(name, "trash me")
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: SystemTrasher())
+        let plan = try approved([rm(name)])
+        let report = exec.execute(plan)
+        guard case .done(let r) = report.outcomes[0].status else {
+            if case .failed(let why) = report.outcomes[0].status {
+                XCTAssertTrue(exists(name), "a failed trash leaves the file")
+                throw XCTSkip("FileManager.trashItem is unavailable here: \(why)")
+            }
+            return XCTFail()
+        }
+        defer { if let t = r.trashURL, fm.fileExists(atPath: t) { try? fm.removeItem(atPath: t) } }
+        XCTAssertFalse(exists(name))
+        let trashURL = try XCTUnwrap(r.trashURL)
+        XCTAssertEqual(Posix.lstatPath(trashURL)?.identity, r.identity)
+        let undo = undoer.undo(plan.id)
+        XCTAssertEqual(undo.undone, [1], "\(undo)")
+        XCTAssertEqual(try String(contentsOfFile: grant + "/" + name), "trash me")
+        XCTAssertFalse(fm.fileExists(atPath: trashURL))
+    }
+
+    func testACrashMidPlanShowsAsIncomplete() throws {
+        write("a.txt", "a")
+        let plan = try approved([mv("a.txt", "b.txt")])
+        try journal.append(JournalEvent(kind: .begin, date: Date(), chatID: "c"), planID: plan.id)
+        try journal.append(JournalEvent(kind: .pending, date: Date(), item: 1, planItem: plan.items[0]), planID: plan.id)
+        // A torn line from a crash mid-write.
+        let h = try FileHandle(forWritingTo: journal.url(for: plan.id))
+        h.seekToEndOfFile()
+        h.write(Data("{\"kind\":\"do".utf8))
+        try h.close()
+        let record = try XCTUnwrap(journal.record(plan.id))
+        XCTAssertTrue(record.isIncomplete)
+        XCTAssertEqual(record.items.map(\.state), [.incomplete])
+        XCTAssertEqual(undoer.reversibility(plan.id), [.init(id: 1, reversible: false, reason: "interrupted: its outcome is unknown")])
+        XCTAssertEqual(undoer.undo(plan.id).undone, [])
+        XCTAssertEqual(journal.records().map(\.planID), [plan.id])
+    }
+
+    func testNoJournalNoChange() throws {
+        write("a.txt", "a")
+        // The journal's folder can't be made: a file is in the way.
+        fm.createFile(atPath: base + "/blocked", contents: Data())
+        let exec = ChangeExecutor(denylist: denylist, journal: ChangeJournal(directory: URL(fileURLWithPath: base + "/blocked/j")),
+                                  trasher: trash)
+        let report = exec.execute(try approved([mv("a.txt", "b.txt")]))
+        XCTAssertEqual(statuses(report), ["failed"])
+        XCTAssertTrue(exists("a.txt"))
+        XCTAssertFalse(exists("b.txt"))
+    }
+
+    func testNotesForTheReview() throws {
+        let target = write("real.txt", "r", in: outside)
+        try fm.linkItem(atPath: target, toPath: grant + "/linked.txt")
+        write("Tool.app/Contents/x", "x")
+        let r = try planner.plan([rm("linked.txt"), mv("Tool.app", "Tool2.app")])
+        XCTAssertTrue(r.items[0].source!.hardLinked)
+        XCTAssertTrue(r.items[0].notes.contains { $0.contains("hard link") })
+        XCTAssertEqual(r.items[1].source?.kind, .package)
+        XCTAssertEqual(r.items[1].summary, "move Tool.app to Tool2.app")
+        store.add(r.items, chatID: "c")
+        XCTAssertEqual(statuses(executor.execute(try store.approve(chatID: "c"))), ["done", "done"])
+        XCTAssertTrue(exists("Tool2.app/Contents/x"), "a package moves as one item")
+        XCTAssertEqual(try String(contentsOfFile: target), "r", "the other name keeps the file")
+    }
+}
