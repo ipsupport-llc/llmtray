@@ -3,9 +3,9 @@ import LLMTrayCore
 import PDFKit
 import SwiftUI
 
-/// A citation chip's PDF (adr/0012, "Citations"): the project's copy or the
+/// A citation link's PDF (adr/0012, "Citations"): the project's copy or the
 /// linked file at the cited page, the cited text highlighted when it's still
-/// there. One window per file -- a chip for a file already open jumps to its
+/// there. One window per file -- a link to a file already open jumps to its
 /// page there. Read-only: the document is only ever read, never written (a
 /// highlight is the view's, not an annotation), and the window isn't in the
 /// saved window state.
@@ -19,12 +19,12 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
     private let window: NSWindow
     private let pdfView = PDFView()
     private let state = PDFCitationViewerState()
-    /// The latest chip's load: an earlier one finishing after it is dropped.
+    /// The latest link's load: an earlier one finishing after it is dropped.
     private var loads = 0
 
     /// Shows `url` at `page` (1-based, clamped to the document): false when
     /// it can't be opened as a PDF (locked, or not one) -- the caller opens it
-    /// in its app then. The file is read again for every chip, off the main
+    /// in its app then. The file is read again for every link, off the main
     /// thread (a large PDF doesn't stall the app; a file changed since, even
     /// with its date kept, isn't shown as it was).
     static func show(_ url: URL, name: String, page: Int, quote: String?, note: String?) async -> Bool {
@@ -34,7 +34,7 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
         viewer.loads += 1
         let load = viewer.loads
         let loaded = await Task.detached { read(key, page: page, quote: quote) }.value
-        // A newer chip for the file took over, or the window was closed meanwhile.
+        // A newer link for the file took over, or the window was closed meanwhile.
         guard viewer.loads == load, viewers[key] === viewer else { return true }
         guard let loaded else {
             viewer.window.close()
@@ -122,7 +122,7 @@ private final class LoadedPDF: @unchecked Sendable {
 
 @MainActor
 private final class PDFCitationViewerState: ObservableObject {
-    /// The chip's note (the file changed since the answer cited it).
+    /// The link's note (the file changed since the answer cited it).
     @Published var note: String?
 }
 

@@ -713,7 +713,7 @@ extension ProjectToolOutput {
     }
 }
 
-/// Where a citation chip leads (adr/0012, "Citations"): the file, read-only
+/// Where a citation link leads (adr/0012, "Citations"): the file, read-only
 /// from the project's index without opening it for writing -- also while
 /// project files are off.
 public enum CitationTarget: Equatable {

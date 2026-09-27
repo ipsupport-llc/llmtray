@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "僅限受限制模型（Llama、部分 Gemma 與 FLUX 倉庫）：請在 Hugging Face 頁面接受模型授權，然後在此貼上讀取代幣。代幣會儲存在您的 Keychain，並僅傳送至 huggingface.co。";
 "Only this Mac can use the server" = "僅此 Mac 可使用伺服器";
 "Only turbo has this knob: sft has no song planner to vary." = "僅 turbo 有此旋鈕：sft 無歌曲規劃器可變化。";
+"Open %@, page %lld" = "開啟 %@，第 %lld 頁";
 "Open LLMTray when you log in" = "登入時開啟 LLMTray";
 "Open Server Log…" = "打開伺服器記錄…";
 "Open in New Tab" = "在新分頁中開啟";

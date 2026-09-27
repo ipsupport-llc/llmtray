@@ -245,11 +245,14 @@ doc, rev, page, chunk?)]` (`decodeIfPresent`), collected per answer
 like `sourcesByAnswer`, from the pages search or read returned this turn
 only, and resolved against the project they were made in — never the
 chat's current one (a chat can move). A `[n:p]` in the text that matches
-none stays plain text; duplicates collapse into one chip. A chip opens
-the copy (or the linked file) at that page, and says so when the file
-has changed since that revision or is gone. A citation also keeps the
-file's name as it was read (the chip's label, once the file is gone too);
-the chip's action is `MessageBubble.openCitation`, nil until PR 3.4/3.5.
+none stays plain text. One that matches is a link in the answer itself
+(`llmtray-cite://<doc>/<page>`, `CitationMarkers.linkified`; each known
+pair of a `[1:6, 2:4]`, never inside code), with no separate list of
+sources under the answer. A link opens the copy (or the linked file) at
+that page, and says so when the file has changed since that revision or
+is gone. A citation also keeps the file's name as it was read (the
+answer's tooltip and VoiceOver action, "Open <file>, page N", once the
+file is gone too); the link's action is `MessageBubble.openCitation`.
 A PDF opens in the app's own read-only viewer (`PDFCitationViewer`,
 PDFKit): one window per file, at the cited page (clamped to the file
 now), the cited chunk highlighted when its text is found on that page

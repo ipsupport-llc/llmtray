@@ -499,6 +499,7 @@
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Tylko dla modeli ograniczonych (Llama, niektóre repozytoria Gemma i FLUX): zaakceptuj licencję modelu na jego stronie na Hugging Face, a następnie wklej tutaj token do odczytu. Przechowywany w Keychain, wysyłany tylko do huggingface.co.";
 "Only this Mac can use the server" = "Tylko ten Mac może używać serwera";
 "Only turbo has this knob: sft has no song planner to vary." = "Tylko turbo ma ten regulator: sft nie ma planera utworów do wariacji.";
+"Open %@, page %lld" = "Otwórz %@, strona %lld";
 "Open LLMTray when you log in" = "Otwórz LLMTray przy logowaniu";
 "Open Server Log…" = "Otwórz log serwera…";
 "Open in New Tab" = "Otwórz w nowej karcie";

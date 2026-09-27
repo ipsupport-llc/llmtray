@@ -10,7 +10,7 @@ public struct Citation: Codable, Hashable {
     /// A sheet or slide number for spreadsheets and decks.
     public var page: Int
     public var chunk: Int?
-    /// The file's name when it was read: the chip's label, also once the
+    /// The file's name when it was read: its tooltip and label, also once the
     /// file is gone.
     public var name: String
 
@@ -231,7 +231,79 @@ public enum CitationMarkers {
         }
     }
 
-    /// Without later duplicates of a page (one chip each).
+    /// The scheme of an inline citation link (`llmtray-cite://<doc>/<page>`):
+    /// the chat opens it itself, it never reaches the system.
+    public static let linkScheme = "llmtray-cite"
+
+    public static func linkURL(doc: Int, page: Int) -> URL {
+        URL(string: "\(linkScheme)://\(doc)/\(page)")!
+    }
+
+    /// The (doc, page) an inline citation link names; nil for any other URL.
+    public static func target(of url: URL) -> (doc: Int, page: Int)? {
+        guard url.scheme == linkScheme, let host = url.host, let doc = Int(host),
+              url.pathComponents.count == 2, let page = Int(url.pathComponents[1]) else { return nil }
+        return (doc, page)
+    }
+
+    /// One line of markdown with its known markers as links (`linkURL`), for
+    /// the chat's inline-markdown parser: `[1:5]` becomes a link as a whole,
+    /// in `[1:6, 2:4]` each known pair is one and the brackets stay text. A
+    /// pair `isKnown` rejects stays plain text, as does a marker in a code
+    /// span, an escaped one (`\[1:5]`) and one that already is a link's
+    /// text (`[1:5](...)`, `[see [1:5]](...)`).
+    public static func linkified(_ line: String, isKnown: (_ doc: Int, _ page: Int) -> Bool) -> String {
+        guard line.contains(":"), line.contains("[") else { return line }
+        let ns = line as NSString
+        let matches = bracket.matches(in: line, range: NSRange(location: 0, length: ns.length))
+        guard !matches.isEmpty else { return line }
+        let chars = Array(line)
+        let code = MarkdownTable.codeSpans(chars)
+        func offset(_ utf16: Int) -> Int {
+            line.distance(from: line.startIndex, to: String.Index(utf16Offset: utf16, in: line))
+        }
+        var out = ""
+        var copied = 0   // utf16
+        for match in matches {
+            let r = match.range
+            let first = offset(r.location), last = offset(r.location + r.length) - 1
+            if code[first...last].contains(true) { continue }
+            if first > 0, chars[first - 1] == "\\" { continue }
+            if last + 1 < chars.count, chars[last + 1] == "(" { continue }
+            if last + 2 < chars.count, chars[last + 1] == "]", chars[last + 2] == "(" { continue }
+            var pairs: [(range: NSRange, doc: Int, page: Int, known: Bool)] = []
+            for p in pair.matches(in: line, range: r) {
+                guard let doc = Int(ns.substring(with: p.range(at: 1))),
+                      let page = Int(ns.substring(with: p.range(at: 2))) else { continue }
+                pairs.append((p.range, doc, page, isKnown(doc, page)))
+            }
+            guard pairs.contains(where: \.known) else { continue }
+            out += ns.substring(with: NSRange(location: copied, length: r.location - copied))
+            if pairs.count == 1 {
+                let p = pairs[0]
+                out += "[" + escaped(ns.substring(with: r)) + "](\(linkURL(doc: p.doc, page: p.page).absoluteString))"
+            } else {
+                var at = r.location
+                for p in pairs {
+                    out += escaped(ns.substring(with: NSRange(location: at, length: p.range.location - at)))
+                    let text = ns.substring(with: p.range)
+                    out += p.known ? "[\(text)](\(linkURL(doc: p.doc, page: p.page).absoluteString))" : text
+                    at = p.range.location + p.range.length
+                }
+                out += escaped(ns.substring(with: NSRange(location: at, length: r.location + r.length - at)))
+            }
+            copied = r.location + r.length
+        }
+        out += ns.substring(from: copied)
+        return out
+    }
+
+    /// A marker's brackets as literal markdown text.
+    private static func escaped(_ s: String) -> String {
+        s.replacingOccurrences(of: "[", with: "\\[").replacingOccurrences(of: "]", with: "\\]")
+    }
+
+    /// Without later duplicates of a page (one citation each).
     public static func unique(_ citations: [Citation]) -> [Citation] {
         var out: [Citation] = []
         for c in citations where !out.contains(where: { $0.project == c.project && $0.doc == c.doc && $0.page == c.page }) {

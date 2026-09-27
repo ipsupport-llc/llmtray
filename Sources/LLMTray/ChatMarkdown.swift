@@ -17,7 +17,11 @@ import LLMTrayCore
 /// SwiftUI's Text doesn't lay out. Streaming-safe: an unclosed `**` or
 /// ``` fence just renders literally / as code until the rest arrives.
 enum ChatMarkdown {
-    static func render(_ source: String, baseSize: CGFloat) -> AttributedString {
+    /// Which `[doc:page]` markers are this answer's citations (adr/0012):
+    /// those become links (CitationMarkers.linkified), the rest stay text.
+    typealias CitationCheck = (_ doc: Int, _ page: Int) -> Bool
+
+    static func render(_ source: String, baseSize: CGFloat, cite: CitationCheck? = nil) -> AttributedString {
         var out = AttributedString()
         var inFence = false
         var firstLine = true
@@ -63,7 +67,7 @@ enum ChatMarkdown {
 
             // Heading: # .. ######
             if let (level, text) = heading(trimmed) {
-                var h = inline(baseSize, text)
+                var h = inline(baseSize, text, cite)
                 let bump: CGFloat = [0, 5, 3, 2, 1, 0, 0][min(level, 6)]
                 h.font = .system(size: baseSize + bump, weight: .bold)
                 out.append(h)
@@ -85,7 +89,7 @@ enum ChatMarkdown {
                 let text = trimmed.dropFirst().trimmingCharacters(in: .whitespaces)
                 var bar = AttributedString(indent + "▍ ")
                 bar.foregroundColor = .secondary
-                var body = inline(baseSize, text)
+                var body = inline(baseSize, text, cite)
                 body.foregroundColor = .secondary
                 out.append(bar)
                 out.append(body)
@@ -97,18 +101,18 @@ enum ChatMarkdown {
             if let first = trimmed.first, "-*+".contains(first),
                trimmed.dropFirst().first == " " {
                 out.append(AttributedString(indent + "•  "))
-                out.append(inline(baseSize, String(trimmed.dropFirst(2))))
+                out.append(inline(baseSize, String(trimmed.dropFirst(2)), cite))
                 continue
             }
 
             // Numbered list: "1. x" / "1) x"
             if let (number, text) = numbered(trimmed) {
                 out.append(AttributedString(indent + number + " "))
-                out.append(inline(baseSize, text))
+                out.append(inline(baseSize, text, cite))
                 continue
             }
 
-            out.append(inline(baseSize, line))
+            out.append(inline(baseSize, line, cite))
         }
         return out
     }
@@ -118,12 +122,15 @@ enum ChatMarkdown {
     /// a serif face. The math is swapped for placeholder characters, the line
     /// is parsed once (so **bold around $x$** still works), then the math goes
     /// back in with the surrounding emphasis. `code` spans are left alone.
-    static func inlineMarkdown(_ baseSize: CGFloat, _ text: String) -> AttributedString {
-        inline(baseSize, text)
+    /// Known citation markers become links first (not in code spans; math
+    /// is masked by then, so none inside a formula).
+    static func inlineMarkdown(_ baseSize: CGFloat, _ text: String, cite: CitationCheck? = nil) -> AttributedString {
+        inline(baseSize, text, cite)
     }
 
-    private static func inline(_ baseSize: CGFloat, _ text: String) -> AttributedString {
-        guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(text) }
+    private static func inline(_ baseSize: CGFloat, _ text: String, _ cite: CitationCheck? = nil) -> AttributedString {
+        func linked(_ s: String) -> String { cite.map { CitationMarkers.linkified(s, isKnown: $0) } ?? s }
+        guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(linked(text)) }
         var maths: [(latex: String, display: Bool)] = []
         var masked = ""
         // Placeholders from a private-use block the text doesn't contain
@@ -145,7 +152,7 @@ enum ChatMarkdown {
                 }
             }
         }
-        var out = markdown(masked)
+        var out = markdown(linked(masked))
         for (n, math) in maths.enumerated() {
             guard let scalar = Unicode.Scalar(base + UInt32(n)), let range = out.range(of: String(Character(scalar))) else { continue }
             let bold = out[range].inlinePresentationIntent?.contains(.stronglyEmphasized) ?? false
@@ -276,8 +283,8 @@ enum ChatMarkdown {
 
 extension ChatMarkdown {
     /// A table cell: inline markdown and math, no block syntax.
-    static func cell(_ text: String, baseSize: CGFloat) -> AttributedString {
-        inlineMarkdown(baseSize, text)
+    static func cell(_ text: String, baseSize: CGFloat, cite: CitationCheck? = nil) -> AttributedString {
+        inlineMarkdown(baseSize, text, cite: cite)
     }
 }
 
@@ -287,25 +294,35 @@ extension ChatMarkdown {
 struct ChatMarkdownView: View {
     let source: String
     let baseSize: CGFloat
+    /// The answer's citations: their markers in the text become links
+    /// (`llmtray-cite://`, opened by the bubble's openURL handler).
+    var citations: [Citation] = []
 
     var body: some View {
         let blocks = MarkdownBlock.split(source)
+        let cite = self.cite
         if blocks.count == 1, case .text = blocks[0] {
-            Text(ChatMarkdown.render(source, baseSize: baseSize))
+            Text(ChatMarkdown.render(source, baseSize: baseSize, cite: cite))
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
                     switch block {
                     case .text(let text):
                         if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            Text(ChatMarkdown.render(text.trimmingCharacters(in: .newlines), baseSize: baseSize))
+                            Text(ChatMarkdown.render(text.trimmingCharacters(in: .newlines), baseSize: baseSize, cite: cite))
                         }
                     case .table(let table):
-                        MarkdownTableView(table: table, baseSize: baseSize)
+                        MarkdownTableView(table: table, baseSize: baseSize, cite: cite)
                     }
                 }
             }
         }
+    }
+
+    private var cite: ChatMarkdown.CitationCheck? {
+        guard !citations.isEmpty else { return nil }
+        let pages = Set(citations.map { "\($0.doc):\($0.page)" })
+        return { doc, page in pages.contains("\(doc):\(page)") }
     }
 }
 
@@ -319,18 +336,18 @@ struct MarkdownTableView: View {
     private let header: [AttributedString]
     private let rows: [[AttributedString]]
 
-    init(table: MarkdownTable, baseSize: CGFloat) {
+    init(table: MarkdownTable, baseSize: CGFloat, cite: ChatMarkdown.CitationCheck? = nil) {
         self.table = table
         self.baseSize = baseSize
         header = table.header.map { text in
-            var cell = ChatMarkdown.cell(text, baseSize: baseSize)
+            var cell = ChatMarkdown.cell(text, baseSize: baseSize, cite: cite)
             // Bold where the text has no font of its own (math, code keep theirs).
             for run in cell.runs where run.font == nil {
                 cell[run.range].font = .system(size: baseSize, weight: .semibold)
             }
             return cell
         }
-        rows = table.rows.map { $0.map { ChatMarkdown.cell($0, baseSize: baseSize) } }
+        rows = table.rows.map { $0.map { ChatMarkdown.cell($0, baseSize: baseSize, cite: cite) } }
     }
 
     var body: some View {
