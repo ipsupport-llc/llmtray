@@ -20,5 +20,6 @@ here; this is where the history lives.
 | [0012](0012-project-files-rag.md) | Project files, a local micro-RAG (SQLite FTS5 + vectors, bge-m3, tiered OCR) |
 | [0013](0013-first-run-wizard.md) | The first-run wizard |
 | [0014](0014-folder-tools.md) | Folder tools: listing, file info, moving and deleting in folders the user grants |
+| [0015](0015-telemetry.md) | Opt-in usage telemetry: one anonymous report a day, what's counted and what never is |
 
 New ADR: next number, one topic, the decision first, then why.

@@ -86,6 +86,7 @@ struct GeneralPane: View {
                     SettingLabel(title: "Auto-compact", help: "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.")
                 }
             }
+            UsageStatisticsSection()
             Section("Support") {
                 LabeledContent {
                     Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
@@ -110,6 +111,73 @@ struct GeneralPane: View {
             launchAtLoginError = nil
         } catch {
             launchAtLoginError = error.localizedDescription
+        }
+    }
+}
+
+/// "Share anonymous usage statistics" (adr/0015): off by default, the
+/// consent text, exactly what a report holds, and the install ID's reset.
+struct UsageStatisticsSection: View {
+    @ObservedObject private var telemetry = UsageTelemetry.shared
+    @State private var showsFields = false
+    /// This Mac's values, read once (a sysctl, not in every body).
+    @State private var environment: TelemetryEnvironment?
+
+    var body: some View {
+        Section("Usage statistics") {
+            Toggle(isOn: Binding(get: { telemetry.isEnabled }, set: { telemetry.setEnabled($0) })) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Share anonymous usage statistics")
+                    Text("Help improve LLMTray?").font(.caption.bold()).foregroundStyle(.secondary)
+                    Text("Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.")
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            DisclosureGroup(isExpanded: $showsFields) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.")
+                        .fixedSize(horizontal: false, vertical: true)
+                    field("product", Text("The app's name."), value: TelemetryReport.product)
+                    field("install_id", Text("A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac."),
+                          value: telemetry.installID?.uuidString.lowercased())
+                    field("day", Text("The day the counts are for."))
+                    field("app_version", Text("LLMTray's version."), value: environment?.appVersion)
+                    field("os_version", Text("The macOS version."), value: environment?.osVersion)
+                    field("chip", Text("The Mac's chip."), value: environment?.chip)
+                    field("memory_gb", Text("Its memory, in GB."), value: environment.map { String($0.memoryGB) })
+                    field("locale", Text("The app's language (the language only, not the region)."), value: environment?.locale)
+                    field("features", Text("How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads."))
+                    field("model_families", Text("The families of the models used that day (such as qwen or flux), never their names."))
+                    Text("The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.")
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.vertical, 4)
+            } label: {
+                Text("What's sent")
+            }
+            if telemetry.isEnabled {
+                LabeledContent {
+                    Button("Reset ID") { telemetry.resetID() }
+                } label: {
+                    SettingLabel(title: "Install ID", help: "Makes a new random ID: later reports can't be matched to earlier ones.")
+                }
+            }
+        }
+        .task { if environment == nil { environment = TelemetryEnvironment.current() } }
+    }
+
+    private func field(_ name: String, _ meaning: Text, value: String? = nil) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(spacing: 6) {
+                Text(verbatim: name).font(.caption.monospaced()).foregroundStyle(.primary)
+                if let value, !value.isEmpty {
+                    Text(verbatim: value).font(.caption.monospaced()).textSelection(.enabled)
+                }
+            }
+            meaning.fixedSize(horizontal: false, vertical: true)
         }
     }
 }

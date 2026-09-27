@@ -259,7 +259,7 @@ final class ModelProxyServer {
         case .proceed:
             forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
                              targetPath: targetPath, connection: connection, internalPort: internalPort,
-                             mayReplaceLoaded: fromApp || policy == .auto)
+                             mayReplaceLoaded: fromApp || policy == .auto, fromApp: fromApp)
         case .refuse:
             sendSwitchDeclined(connection: connection, loaded: loaded, requested: modelName)
         case .ask:
@@ -289,7 +289,7 @@ final class ModelProxyServer {
                 } else {
                     self.forwardAcquiring(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
                                           targetPath: targetPath, connection: connection, internalPort: internalPort,
-                                          mayReplaceLoaded: true)
+                                          mayReplaceLoaded: true, fromApp: fromApp)
                 }
             }
         }
@@ -327,7 +327,8 @@ final class ModelProxyServer {
     /// request's turn comes -- the check is repeated there, since another
     /// request may have switched models while this one waited.
     private func forwardAcquiring(method: String, path: String, headers: [String: String], body bodyData: Data, modelName: String?,
-                                  targetPath: String?, connection: NWConnection, internalPort: Int, mayReplaceLoaded: Bool) {
+                                  targetPath: String?, connection: NWConnection, internalPort: Int, mayReplaceLoaded: Bool,
+                                  fromApp: Bool) {
         // A bodyless probe (GET /health) isn't use: it mustn't keep the
         // model from idle-unloading.
         let activity = !bodyData.isEmpty
@@ -355,6 +356,10 @@ final class ModelProxyServer {
             // while this request counts as forwarding).
             // The profile's sampling where the client set none: current
             // values, so changing them never needs a restart.
+            // An outside client's request (not the app's own chat, benchmark
+            // or titles: they carry the app's token), for the opted-in
+            // usage statistics.
+            if !fromApp, activity { UsageTelemetry.shared.record(.apiServer, model: self.server.loadedModelPath) }
             let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
             self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort, activity: activity)
         }

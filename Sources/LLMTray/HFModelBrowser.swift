@@ -549,6 +549,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             FileManager.default.createFile(atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil)
         }
         downloadingID = nil
+        UsageTelemetry.shared.record(.modelDownload)   // a count: not which model
         downloadStatusText = NSLocalizedString("Done", comment: "")
         downloadSpeedBytesPerSec = 0
         downloadETASeconds = nil
