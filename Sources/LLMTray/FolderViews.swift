@@ -313,17 +313,16 @@ struct FoldersPane: View {
                     }
                 }
             }
+            // One row each: labelled pickers in an HStack overflow a grouped Form.
+            Picker("Access", selection: $level) {
+                Text("Look in").tag(FolderAccessLevel.read)
+                Text("Look in and propose changes").tag(FolderAccessLevel.change)
+            }
+            Picker("For", selection: $always) {
+                Text("An hour").tag(false)
+                Text("Always").tag(true)
+            }
             HStack {
-                Picker("Access", selection: $level) {
-                    Text("Look in").tag(FolderAccessLevel.read)
-                    Text("Look in and propose changes").tag(FolderAccessLevel.change)
-                }
-                .fixedSize()
-                Picker("For", selection: $always) {
-                    Text("An hour").tag(false)
-                    Text("Always").tag(true)
-                }
-                .fixedSize()
                 Spacer()
                 Button("Allow Folder…", action: allowFolder)
             }
