@@ -117,6 +117,12 @@ final class ChatClient: ObservableObject {
     private(set) var conversationEpoch = 0
     private var approxCompletionTokens: Int = 0
     private var usageCompletionTokens: Int?
+    /// The turn's answer details so far: one request per round, set on its
+    /// answer when the turn ends (AnswerStats). nil between turns.
+    private var turnStats: AnswerStats?
+    private var turnStartDate: Date?
+    /// The running request's usage, as the server reports it.
+    private var requestStats = AnswerStats.Request()
     /// This chat's prompt-token estimate (adr/0012), calibrated by each
     /// response's usage against the request it answered.
     private var tokenEstimator = PromptTokenEstimator()
@@ -230,6 +236,7 @@ final class ChatClient: ObservableObject {
         lastTokensPerSecond = nil
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnStats = nil
         tokenEstimator = PromptTokenEstimator()
         lastRequest = nil
         countedRequest = nil
@@ -248,6 +255,7 @@ final class ChatClient: ObservableObject {
             // The files they came from: saved again under the same names.
             message.imageFilenames = images.count == pm.imageFilenames.count ? pm.imageFilenames : []
             message.citations = pm.citations ?? []
+            message.answerStats = pm.answerStats
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -355,6 +363,7 @@ final class ChatClient: ObservableObject {
             persisted.imageSources = msg.imageSources.count == msg.images.count ? msg.imageSources : []
             persisted.audioSources = msg.audioSources.count == msg.audios.count ? msg.audioSources : []
             persisted.citations = citations[msg.id]
+            persisted.answerStats = msg.answerStats
             return persisted
         }
         guard !persisted.isEmpty else { return }
@@ -489,6 +498,7 @@ final class ChatClient: ObservableObject {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnStats = nil
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
@@ -680,6 +690,7 @@ final class ChatClient: ObservableObject {
         AudioPlayback.shared.stop(ifAnyOf: messages)   // the song being played may be the one replaced
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnStats = nil
         // The whole last response: assistant turns, tool results and the
         // hidden view_image message, back to the user's own message.
         while let last = messages.last, !(last.role == "user" && !last.isToolContext) {
@@ -980,6 +991,14 @@ final class ChatClient: ObservableObject {
         approxCompletionTokens = 0
         usageCompletionTokens = nil
         lastTokensPerSecond = nil
+        requestStats = AnswerStats.Request()
+        if turnStats == nil {
+            let path = settings.modelPath
+            turnStats = AnswerStats(model: path.flatMap { ModelCatalog.shared.model(id: $0)?.displayName } ?? modelAlias,
+                                    modelFolder: path.map { ($0 as NSString).lastPathComponent },
+                                    profile: settings.profileName, contextTokens: settings.maxTokensCap)
+            turnStartDate = nil
+        }
         isStreaming = true
         // Another tab unloaded the model for an image: this answer waits for
         // it to come back (the server refuses requests meanwhile) instead
@@ -1063,13 +1082,26 @@ final class ChatClient: ObservableObject {
             return
         }
         handle(decoder.finish())
+        if completion.error == nil { recordRequestStats(completion) }
         if let error = completion.error, (error as NSError).code != NSURLErrorCancelled {
             errorText = error.localizedDescription
             dropEmptyAssistantPlaceholder()
         }
-        finalizeTokensPerSecond(firstByte: completion.firstByteDate, endDate: completion.endDate)
+        finalizeTokensPerSecond(firstToken: completion.firstDataDate, endDate: completion.endDate)
         if completion.error != nil { closeDanglingToolCalls() }   // no follow-up: keep the history valid
         continueWithPendingToolCalls(afterError: completion.error != nil)
+    }
+
+    /// The request that just ended, in the turn's answer details.
+    private func recordRequestStats(_ completion: ChatTransport.Completion) {
+        guard var stats = turnStats else { return }
+        var request = requestStats
+        request.time(sent: completion.startDate, firstToken: completion.firstDataDate, lastToken: completion.endDate)
+        stats.requests = (stats.requests ?? []) + [request]
+        if turnStartDate == nil { turnStartDate = completion.startDate }
+        stats.totalSeconds = turnStartDate.map { completion.endDate.timeIntervalSince($0) }
+        stats.date = completion.endDate
+        turnStats = stats
     }
 
     // MARK: - Usage statistics
@@ -1126,16 +1158,25 @@ final class ChatClient: ObservableObject {
             isStreaming = false
             if !afterError, errorText == nil, let idx = assistantMessageIndex, idx < messages.count,
                messages[idx].role == "assistant", !messages[idx].content.isEmpty || !messages[idx].images.isEmpty {
+                // An LLM text answer: how it was made, for its info popover.
+                if !messages[idx].content.isEmpty, messages[idx].toolCalls.isEmpty, let stats = turnStats {
+                    messages[idx].answerStats = stats
+                }
                 // An answer that came through: what the review prompt counts.
                 ReviewPrompter.shared.recordAnswer()
                 recordUsage(.chat, model: pendingRequestContext?.settings.modelPath)
             }
             // After an error too: the history is valid (dangling tool calls
             // closed), and the user's message must not be lost.
+            turnStats = nil
             persistCurrentSession()
             return
         }
         let toolCalls = messages[idx].toolCalls
+        if var stats = turnStats {
+            stats.toolCalls = (stats.toolCalls ?? 0) + toolCalls.count
+            turnStats = stats
+        }
         let token = turnToken
         isRunningTools = true   // set before isStreaming drops: never an idle gap
         toolTask = Task {
@@ -1451,8 +1492,10 @@ final class ChatClient: ObservableObject {
         return Framing(base: data(base), tools: byName)
     }
 
-    private func finalizeTokensPerSecond(firstByte: Date?, endDate: Date) {
-        guard let start = firstByte else { return }
+    /// From the first token (the first "data:" line, not a prefill
+    /// keepalive), as the answer's details measure it.
+    private func finalizeTokensPerSecond(firstToken: Date?, endDate: Date) {
+        guard let start = firstToken else { return }
         let elapsed = endDate.timeIntervalSince(start)
         // Sub-50ms is measurement noise (SSE framing, a one-word reply),
         // not a real generation rate -- dividing by it is what produced
@@ -1479,8 +1522,12 @@ final class ChatClient: ObservableObject {
                 appendToAssistant(image: data)
             case .toolCall(let id, let name, let argumentsJSON):
                 appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
-            case .usage(let completionTokens, let promptTokens):
+            case .usage(let completionTokens, let promptTokens, let cachedTokens, let reasoningTokens):
                 usageCompletionTokens = completionTokens
+                requestStats.completionTokens = completionTokens
+                requestStats.promptTokens = promptTokens
+                requestStats.cachedTokens = cachedTokens
+                requestStats.reasoningTokens = reasoningTokens
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
                 }

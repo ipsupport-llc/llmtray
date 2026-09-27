@@ -19,6 +19,10 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
         /// re-renders (that lag once inflated tok/s to nonsense).
         var firstByteDate: Date?
         var endDate: Date
+        /// When the request was sent, and when its first event (a "data:"
+        /// line: a token, not a prefill keepalive comment) arrived.
+        var startDate: Date?
+        var firstDataDate: Date?
 
         var isHTTPError: Bool { statusCode.map { !(200..<300).contains($0) } ?? false }
     }
@@ -31,6 +35,7 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
     private var session: URLSession!
     private var task: URLSessionDataTask?
     private var handlers: Handlers?
+    private var startDate: Date?
     private nonisolated let streams = StreamStates()
 
     override init() {
@@ -44,6 +49,7 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
         streams.begin(newTask.taskIdentifier)
         task = newTask
         handlers = Handlers(onText: onText, onComplete: onComplete)
+        startDate = Date()
         newTask.resume()
     }
 
@@ -118,7 +124,8 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
             self.handlers = nil
             let completion = Completion(
                 statusCode: result.statusCode, errorBody: result.errorBody, error: error,
-                firstByteDate: result.firstByteDate, endDate: endDate
+                firstByteDate: result.firstByteDate, endDate: endDate,
+                startDate: self.startDate, firstDataDate: result.firstDataDate
             )
             // A last line without a trailing newline.
             if !completion.isHTTPError, !result.rest.isEmpty { handlers.onText(result.rest) }
@@ -136,6 +143,7 @@ private final class StreamStates: @unchecked Sendable {
         var statusCode: Int?
         var errorBody = Data()
         var firstByteDate: Date?
+        var firstDataDate: Date?
         /// Bytes after the last newline, decoded (normally empty).
         var rest = ""
     }
@@ -144,11 +152,13 @@ private final class StreamStates: @unchecked Sendable {
         var statusCode: Int?
         var errorBody = Data()
         var firstByteDate: Date?
+        var firstDataDate: Date?
         /// Undecoded bytes: a network chunk can end inside a UTF-8
         /// character, so only complete lines are decoded.
         var pending = Data()
     }
 
+    private static let dataPrefix = Data("data:".utf8)
     private let lock = NSLock()
     private var states: [Int: State] = [:]
 
@@ -178,6 +188,11 @@ private final class StreamStates: @unchecked Sendable {
         guard let newline = state.pending.lastIndex(of: 0x0A) else { return nil }
         let end = state.pending.index(after: newline)
         let complete = state.pending[state.pending.startIndex..<end]
+        // A whole line, so a chunk boundary can't split the prefix.
+        if state.firstDataDate == nil,
+           complete.split(separator: 0x0A).contains(where: { $0.starts(with: Self.dataPrefix) }) {
+            state.firstDataDate = Date()
+        }
         let text = String(decoding: complete, as: UTF8.self)
         state.pending = Data(state.pending[end...])
         return text
@@ -188,7 +203,7 @@ private final class StreamStates: @unchecked Sendable {
         guard let state = states.removeValue(forKey: id) else { return Result() }
         return Result(
             statusCode: state.statusCode, errorBody: state.errorBody,
-            firstByteDate: state.firstByteDate, rest: String(decoding: state.pending, as: UTF8.self)
+            firstByteDate: state.firstByteDate, firstDataDate: state.firstDataDate, rest: String(decoding: state.pending, as: UTF8.self)
         )
     }
 }

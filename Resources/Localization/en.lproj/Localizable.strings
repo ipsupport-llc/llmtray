@@ -91,6 +91,9 @@
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Another version next to this one (a new seed, the same request)" = "Another version next to this one (a new seed, the same request)";
+"Answer" = "Answer";
+"Answer (all requests)" = "Answer (all requests)";
+"Answer details" = "Answer details";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
@@ -124,6 +127,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it.";
 "Beta: pre-release builds with features still being tested." = "Beta: pre-release builds with features still being tested.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
+"Cached" = "Cached";
 "Calculator" = "Calculator";
 "Calls" = "Calls";
 "Can look" = "Can look";
@@ -179,8 +183,10 @@
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.";
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
+"Context" = "Context";
 "Copies %1$@ · index %2$@ on disk" = "Copies %1$@ · index %2$@ on disk";
 "Copy" = "Copy";
+"Copy the details as text" = "Copy the details as text";
 "Copy the song as an audio file" = "Copy the song as an audio file";
 "Copy the text" = "Copy the text";
 "Copying the included runtime…" = "Copying the included runtime…";
@@ -200,6 +206,7 @@
 "Creator mode on" = "Creator mode on";
 "Currency rates" = "Currency rates";
 "Current settings are already fastest" = "Current settings are already fastest";
+"Date" = "Date";
 "Date & time" = "Date & time";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.";
 "Delete" = "Delete";
@@ -269,7 +276,9 @@
 "Files…" = "Files…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
+"First token" = "First token";
 "Fits comfortably" = "Fits comfortably";
+"Folder" = "Folder";
 "Folder access" = "Folder access";
 "Folder access is off in Settings." = "Folder access is off in Settings.";
 "Folder changes" = "Folder changes";
@@ -295,6 +304,7 @@
 "Generated in %.1fs" = "Generated in %.1fs";
 "Generating image…" = "Generating image…";
 "Generating music…" = "Generating music…";
+"Generation" = "Generation";
 "Get Started" = "Get Started";
 "Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
@@ -446,6 +456,7 @@
 "No auto-tune run yet." = "No auto-tune run yet.";
 "No automatic update checks" = "No automatic update checks";
 "No chats found" = "No chats found";
+"No details for this answer." = "No details for this answer.";
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.";
 "No files yet" = "No files yet";
 "No folder changes yet." = "No folder changes yet.";
@@ -523,8 +534,11 @@
 "Project name" = "Project name";
 "Projects" = "Projects";
 "Projects' files on disk" = "Projects' files on disk";
+"Prompt" = "Prompt";
 "Prompt & tools" = "Prompt & tools";
+"Prompt (last request)" = "Prompt (last request)";
 "Prompt cache" = "Prompt cache";
+"Prompt processing" = "Prompt processing";
 "Prompt size" = "Prompt size";
 "Prompt size (input sent to the model):" = "Prompt size (input sent to the model):";
 "Public holidays" = "Public holidays";
@@ -537,11 +551,13 @@
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0.";
 "Rate LLMTray" = "Rate LLMTray";
 "Rate LLMTray…" = "Rate LLMTray…";
+"Rates and first token: the last of %lld requests." = "Rates and first token: the last of %lld requests.";
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
 "Reading what's installed…" = "Reading what's installed…";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
+"Reasoning" = "Reasoning";
 "Recent changes" = "Recent changes";
 "Recently updated" = "Recently updated";
 "Recommended" = "Recommended";
@@ -657,6 +673,7 @@
 "Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
+"Speed" = "Speed";
 "Stable" = "Stable";
 "Stall timeout: %lld s" = "Stall timeout: %lld s";
 "Start LLMTray automatically when you log in to this Mac." = "Start LLMTray automatically when you log in to this Mac.";
@@ -776,6 +793,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder.";
 "Today" = "Today";
 "Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
+"Tokens" = "Tokens";
 "Too long for the selected model's room now, read by search instead: %@" = "Too long for the selected model's room now, read by search instead: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
@@ -788,6 +806,7 @@
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
+"Total time" = "Total time";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Try Again" = "Try Again";
 "Turn On Project Files…" = "Turn On Project Files…";
@@ -827,6 +846,7 @@
 "Use" = "Use";
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
+"Used" = "Used";
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem.";
