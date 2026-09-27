@@ -229,6 +229,11 @@ public final class ProjectIngestor {
             if !done { opened.remove(project) }
         } else {
             queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
+            // Re-indexes asked for before a quit.
+            let reindexes = (try? await h.write { try $0.pendingReindexes() }) ?? []
+            if !stopped.contains(project), !deleted.contains(project) {
+                queue.enqueue(reindexes.map(ProjectIngestQueue.Work.reindex), in: project)
+            }
         }
         // Not the report's list: that one knows only an existing vector
         // set, and documents made searchable before the embedder was
@@ -351,13 +356,20 @@ public final class ProjectIngestor {
     /// then embedded. Like an add, it restarts a stopped project; a Stop
     /// meanwhile wins.
     public func reindex(_ doc: Int64, in project: UUID) async {
-        guard let h = try? await handle(project) else { return }
+        // A Stop after the click wins, whenever it lands.
         let e = epoch(project)
+        guard let h = try? await handle(project), epoch(project) == e, !deleted.contains(project) else { return }
+        await beginTransition(project)
+        defer { endTransition(project) }
+        guard epoch(project) == e else { return }
+        // Kept in the index until it commits: a quit meanwhile doesn't lose it.
+        _ = try? await h.write { try $0.requestReindex(doc: doc) }
+        guard epoch(project) == e, !deleted.contains(project) else { return }
         if stopped.remove(project) != nil {
             persist()
             await queueEmbedding(project, h)
+            guard epoch(project) == e, !deleted.contains(project) else { return }
         }
-        guard epoch(project) == e, !deleted.contains(project) else { return }
         queue.enqueue([.reindex(doc)], in: project)
         kick()
         changed()

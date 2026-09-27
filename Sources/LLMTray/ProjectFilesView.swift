@@ -147,6 +147,14 @@ private struct ProjectFilesView: View {
             guard !Task.isCancelled else { return }
             let usage = await ProjectIndexer.diskUsage(for: projectID)
             if !Task.isCancelled { disk = usage }
+            // Indexing on (a long embedding grows the index without a step
+            // ending): measured again every 10 s until it stops.
+            while !Task.isCancelled, indexer.progress[projectID] != nil {
+                try? await Task.sleep(nanoseconds: 10_000_000_000)
+                guard !Task.isCancelled else { return }
+                let usage = await ProjectIndexer.diskUsage(for: projectID)
+                if !Task.isCancelled { disk = usage }
+            }
         }
         .confirmationDialog(
             Text("Remove this file from the project?"), isPresented: Binding(get: { toRemove != nil }, set: { if !$0 { toRemove = nil } }),

@@ -408,6 +408,14 @@ struct ProjectFilesSection: View {
             guard !Task.isCancelled else { return }
             let total = await ProjectIndexer.totalDiskUsage()
             if !Task.isCancelled { diskTotal = total }
+            // Indexing on (a long embedding grows the index without a step
+            // ending): measured again every 10 s until it stops.
+            while !Task.isCancelled, !indexer.progress.isEmpty {
+                try? await Task.sleep(nanoseconds: 10_000_000_000)
+                guard !Task.isCancelled else { return }
+                let total = await ProjectIndexer.totalDiskUsage()
+                if !Task.isCancelled { diskTotal = total }
+            }
         }
     }
 
