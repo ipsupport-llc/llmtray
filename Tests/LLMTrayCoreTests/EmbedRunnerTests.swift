@@ -117,6 +117,9 @@ final class EmbedRunnerTests: XCTestCase {
                     out.write(b"x" * 100000); out.flush()
                 time.sleep(10)
             if t == "bad": return fail(rid, "bad_request")
+            if t == "hugeline":
+                b = base64.b64encode(struct.pack("<4e", 1.0, 2.0, 3.0, 4.0)).decode()
+                return send({"id": rid, "ok": True, "dim": 4, "count": 1, "dtype": "f16", "vectors": b, "pad": "x" * 100000})
             if t == "garbage":
                 with lock:
                     out.write(b"not json\n"); out.flush()
@@ -514,5 +517,14 @@ final class EmbedRunnerTests: XCTestCase {
             _ = try await r.embed(["huge"], kind: .query)
             XCTFail("violation")
         } catch EmbedRunner.Failure.protocolViolation {}
+        // A complete (newline-terminated) line over the cap counts the same,
+        // however valid it is.
+        try await Task.sleep(nanoseconds: 200_000_000)
+        do {
+            _ = try await r.embed(["hugeline"], kind: .query)
+            XCTFail("an oversized line was parsed")
+        } catch EmbedRunner.Failure.protocolViolation(let why) {
+            XCTAssertTrue(why.contains("over 4096 bytes"), why)
+        }
     }
 }

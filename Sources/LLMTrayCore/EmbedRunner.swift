@@ -430,6 +430,12 @@ public final class EmbedRunner: @unchecked Sendable {
     public func stop() {
         lock.lock()
         guard let p = process, !p.stopping else { lock.unlock(); return }
+        stopLocked(p)
+    }
+
+    /// Lock held (released here): marks `p` stopping -- from then on it
+    /// takes no request (`isHealthy`) -- then ends it.
+    private func stopLocked(_ p: RunnerProcess) {
         p.stopping = true
         idleWork?.cancel()
         idleWork = nil
@@ -499,10 +505,12 @@ public final class EmbedRunner: @unchecked Sendable {
         idleWork?.cancel()
         let work = DispatchWorkItem { [weak self] in
             guard let self else { return }
+            // Decided and marked under one lock: a request registering
+            // meanwhile either came first (not idle) or finds it stopping
+            // (NotReady, and gets a new runner) -- never one stopped under it.
             self.lock.lock()
-            let idle = self.pending.isEmpty && self.process === p
-            self.lock.unlock()
-            if idle { self.stop() }
+            guard self.pending.isEmpty, self.process === p, !p.stopping else { self.lock.unlock(); return }
+            self.stopLocked(p)
         }
         idleWork = work
         timers.asyncAfter(deadline: .now() + configuration.idleTimeout, execute: work)
@@ -811,14 +819,21 @@ final class RunnerProcess: @unchecked Sendable {
                 if n < 0 && errno == EINTR { continue }
                 if n <= 0 { break }
                 var start = 0
+                var runaway = false
                 for i in 0..<n where buffer[i] == 0x0A {
+                    // The cap holds for complete lines too, not only for
+                    // one still being read.
+                    if line.count + (i - start) > maxLineBytes {
+                        runaway = true
+                        break
+                    }
                     line.append(buffer + start, count: i - start)
                     if !line.isEmpty { onLine(line) }
                     line = Data()
                     start = i + 1
                 }
-                line.append(buffer + start, count: n - start)
-                if line.count > maxLineBytes {
+                if !runaway { line.append(buffer + start, count: n - start) }
+                if runaway || line.count > maxLineBytes {
                     // Bounded messages: a runaway line ends the runner.
                     flagLock.withLock {
                         flags.violation = true
