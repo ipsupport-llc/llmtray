@@ -163,14 +163,16 @@ extension Profile {
         + "use Markdown (lists, code blocks) when it helps readability."
 
     /// Every field set: the last layer of resolution. Values match what the
-    /// app used before profiles existed (except the system prompt, which
-    /// used to be empty).
+    /// app used before profiles existed, except the system prompt (it used
+    /// to be empty), max_tokens (1024 cut reasoning models' answers short)
+    /// and the prefill step (128 made a long prompt's prefill several times
+    /// slower than mlx-lm's 2048).
     public static let builtIn: Profile = {
         var p = Profile(id: "builtin", name: "Built-in")
         p.request.temperature = 0.6
         p.request.topP = 0.95
         p.request.topK = 0
-        p.request.maxTokens = 1024
+        p.request.maxTokens = 16384
         p.request.systemPrompt = defaultSystemPrompt
         p.tools.enableImageGeneration = false
         p.tools.enableMusicGeneration = false
@@ -189,7 +191,7 @@ extension Profile {
         p.launch.kvBits = KVSettings.defaultBits
         p.launch.kvGroupSize = KVSettings.defaultGroupSize
         p.launch.quantizedKVStart = 0
-        p.launch.prefillStepSize = 128
+        p.launch.prefillStepSize = 2048
         p.launch.decodeConcurrency = 1
         p.launch.promptCacheMB = 1024
         p.launch.mtpDrafter = true

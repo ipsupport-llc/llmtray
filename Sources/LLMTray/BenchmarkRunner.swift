@@ -245,7 +245,7 @@ final class BenchmarkRunner: ObservableObject {
         port: Int,
         modelAlias: String,
         decodeConcurrencyCandidates: [Int] = [1, 2, 4, 8],
-        prefillStepSizeCandidates: [Int] = [64, 128, 256, 512]
+        prefillStepSizeCandidates: [Int] = [256, 512, 1024, 2048, 4096]
     ) async {
         guard !isRunning else { return }
         isRunning = true

@@ -102,7 +102,7 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertEqual(value(args, "--temp"), "1.0")
         XCTAssertEqual(value(args, "--top-p"), "0.95")
         XCTAssertEqual(value(args, "--top-k"), "64")
-        XCTAssertEqual(value(args, "--max-tokens"), "1024")
+        XCTAssertEqual(value(args, "--max-tokens"), "16384")
         XCTAssertEqual(value(args, "--kv-bits"), "8")
         XCTAssertEqual(value(args, "--model-alias"), "a")
         XCTAssertNil(value(args, "--draft-model"))
