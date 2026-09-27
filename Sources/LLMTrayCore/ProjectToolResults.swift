@@ -222,3 +222,39 @@ public enum CitationMarkers {
         return out
     }
 }
+
+/// The pages saved chats cite, for the tombstone sweep (adr/0012, Retention).
+public enum SessionCitations {
+    /// A chat's own file: `<uuid>.json` (not library.json or anything else
+    /// that lives next to them).
+    public static func sessionID(fileName name: String) -> UUID? {
+        name.hasSuffix(".json") ? UUID(uuidString: String(name.dropLast(5))) : nil
+    }
+
+    private struct File: Decodable {
+        struct Message: Decodable { var citations: [Citation]? }
+        var messages: [Message]
+    }
+
+    /// Every page the chats in `directory` cite in `project` (a chat that
+    /// moved keeps citing where it was made). nil when any chat's file
+    /// can't be read: a sweep on a partial list would drop pages an
+    /// unreadable chat still cites. No directory: none.
+    public static func citedPages(inDirectory directory: String, project: UUID) -> Set<PageRef>? {
+        let fm = FileManager.default
+        guard let names = try? fm.contentsOfDirectory(atPath: directory) else {
+            return fm.fileExists(atPath: directory) ? nil : []
+        }
+        var pages: Set<PageRef> = []
+        for name in names where sessionID(fileName: name) != nil {
+            guard let data = fm.contents(atPath: directory + "/" + name),
+                  let file = try? JSONDecoder().decode(File.self, from: data) else { return nil }
+            for message in file.messages {
+                for c in message.citations ?? [] where c.project == project {
+                    pages.insert(PageRef(doc: Int64(c.doc), rev: Int64(c.rev), page: c.page))
+                }
+            }
+        }
+        return pages
+    }
+}

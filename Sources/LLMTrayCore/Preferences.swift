@@ -56,6 +56,17 @@ public enum Pref {
     /// relaunch.
     public static let downloadQueue = PrefKey<String?>("llmtray.downloadQueue", default: nil)
 
+    // Project files (adr/0012)
+    /// Off until turned on in Settings: nothing is indexed, downloaded or
+    /// started before, and the project tools aren't declared.
+    public static let projectFilesEnabled = PrefKey("llmtray.projectFiles.enabled", default: false)
+    /// Projects whose indexing the user paused (UUID strings): the pause
+    /// survives a relaunch.
+    public static let projectIndexPaused = PrefKey<[String]>("llmtray.projectFiles.paused", default: [])
+    /// Projects whose indexing the user stopped: nothing is queued for them
+    /// at launch until Index Now (or a new file).
+    public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
+
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)
     public static let checkUpdatesAtLaunch = PrefKey("llmtray.checkUpdatesAtLaunch", default: true)

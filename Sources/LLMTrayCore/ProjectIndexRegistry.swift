@@ -253,6 +253,9 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
     /// any other project.
     private var lifecycles: [UUID: NSLock] = [:]
     private var handles: [UUID: ProjectIndexHandle] = [:]
+    /// Deleted projects: never opened again (a late open would recreate
+    /// the directory the deletion just removed).
+    private var retired: Set<UUID> = []
     private var vectorUse: [(project: UUID, bytes: Int)] = []   // most recent last
     private let directory: (UUID) -> URL
     private let idleDelay: TimeInterval
@@ -283,7 +286,9 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
         defer { lifecycle.unlock() }
         lock.lock()
         let existing = handles[project]
+        let isRetired = retired.contains(project)
         lock.unlock()
+        guard !isRetired else { throw ProjectIndexHandle.Closed() }
         if let existing {
             guard existing.isFailed else { return existing }
             existing.close()
@@ -330,6 +335,19 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
         vectorUse.removeAll { $0.project == project }
         lock.unlock()
         h?.close()
+    }
+
+    /// Closes the project for good (before its directory is deleted): an
+    /// open racing it -- already past its caller's checks -- either finishes
+    /// first and is closed here, or is refused (`Closed`) after.
+    public func retire(_ project: UUID) {
+        let lifecycle = lifecycleLock(project)
+        lifecycle.lock()
+        lock.lock()
+        retired.insert(project)
+        lock.unlock()
+        lifecycle.unlock()
+        close(project)
     }
 
     public func closeAll() {

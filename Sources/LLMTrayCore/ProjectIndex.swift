@@ -391,9 +391,11 @@ public final class ProjectIndex {
     /// For a linked file, `identity` is the hash and mtime the caller checked
     /// *after* parsing (the file may change meanwhile -- then it discards the
     /// pages and retries): the revision is recorded with the content it holds.
+    /// `note` is kept as the document's error text (why an `empty` one has
+    /// no text: "no usable text layer").
     @discardableResult
     public func commitExtraction(_ job: IndexJob, pages: [ExtractedPage], kind: String? = nil,
-                                 identity: (sha256: String, mtime: Double)? = nil) throws -> DocumentStatus {
+                                 identity: (sha256: String, mtime: Double)? = nil, note: String? = nil) throws -> DocumentStatus {
         try db.transaction {
             guard let d = try document(job.doc) else { throw ProjectIndexError.stale(job.doc) }
             if job.isReindex {
@@ -411,8 +413,9 @@ public final class ProjectIndex {
                 guard d.status == .extracting, d.rev == job.rev else { throw ProjectIndexError.stale(job.doc) }
             }
             let status = try writeDerived(doc: job.doc, rev: job.rev, pages: pages)
-            try db.run("UPDATE documents SET rev = ?, status = ?, pages = ?, kind = ?, error = NULL WHERE doc = ?",
-                       [.int(job.rev), .text(status.rawValue), .int(Int64(pages.count)), kind.map { .text($0) } ?? .null, .int(job.doc)])
+            try db.run("UPDATE documents SET rev = ?, status = ?, pages = ?, kind = ?, error = ? WHERE doc = ?",
+                       [.int(job.rev), .text(status.rawValue), .int(Int64(pages.count)), kind.map { .text($0) } ?? .null,
+                        note.map { .text($0) } ?? .null, .int(job.doc)])
             if let identity {
                 try db.run("UPDATE documents SET sha256 = ?, mtime = ? WHERE doc = ?",
                            [.text(identity.sha256), .double(identity.mtime), .int(job.doc)])
@@ -464,6 +467,12 @@ public final class ProjectIndex {
         }
     }
 
+    /// A staged document that couldn't even begin (its copy unreadable, a
+    /// write failed): `failed` with why, rather than left queued.
+    public func failStaged(doc: Int64, error: String) throws {
+        try db.run("UPDATE documents SET status = 'failed', error = ? WHERE doc = ? AND status = 'staged'", [.text(error), .int(doc)])
+    }
+
     // MARK: - stop / resume
 
     /// Stop: whatever isn't searchable yet becomes `not_indexed`; indexed
@@ -474,10 +483,11 @@ public final class ProjectIndex {
         return db.changes
     }
 
-    /// Index Now: `not_indexed` back to `staged`; returns them.
+    /// Index Now: `not_indexed` back to `staged`; returns them, and those
+    /// already staged (a Stop's write that didn't take left them unqueued).
     public func resumeIndexing() throws -> [Int64] {
         try db.transaction {
-            let docs = try db.rows("SELECT doc FROM documents WHERE status = 'not_indexed' ORDER BY doc") { $0.int(0) }
+            let docs = try db.rows("SELECT doc FROM documents WHERE status IN ('not_indexed','staged') ORDER BY doc") { $0.int(0) }
             try db.run("UPDATE documents SET status = 'staged' WHERE status = 'not_indexed'")
             return docs
         }

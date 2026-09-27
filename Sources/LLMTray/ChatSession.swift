@@ -145,9 +145,16 @@ enum ChatSessionStore {
         return d
     }()
 
+    private static let savesLock = NSLock()
+    private static var _saves = 0
+    /// Bumped by every save: a scan of the saved chats that saw it change
+    /// meanwhile may have read a file from before (the citation sweep).
+    static var saves: Int { savesLock.withLock { _saves } }
+
     /// True once it's on disk.
     @discardableResult
     static func save(_ file: ChatSessionFile) -> Bool {
+        defer { savesLock.withLock { _saves += 1 } }
         try? FileManager.default.createDirectory(atPath: sessionsDir, withIntermediateDirectories: true)
         guard let data = try? encoder.encode(file) else { return false }
         // Atomic: a crash or a full disk mid-write mustn't lose the chat.
@@ -180,9 +187,13 @@ enum ChatSessionStore {
     /// the directory can't be read (pins must not be dropped for that).
     static func ids() -> Set<UUID>? {
         guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return nil }
-        return Set(names.compactMap { name in
-            name.hasSuffix(".json") ? UUID(uuidString: String(name.dropLast(5))) : nil
-        })
+        return Set(names.compactMap(SessionCitations.sessionID(fileName:)))
+    }
+
+    /// The pages every saved chat cites in `project`, for the tombstone
+    /// sweep; nil when any chat's file can't be read (`SessionCitations`).
+    static func citedPages(in project: UUID) -> Set<PageRef>? {
+        SessionCitations.citedPages(inDirectory: sessionsDir, project: project)
     }
 
     static func exists(_ id: UUID) -> Bool {

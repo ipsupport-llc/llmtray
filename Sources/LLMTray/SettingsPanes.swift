@@ -279,6 +279,7 @@ struct ModelsPane: View {
                     SettingHelp(text: "Alias: the \u{201C}model\u{201D} name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.")
                 }
             }
+            ProjectFilesSection()
         }
         .formStyle(.grouped)
         .onAppear(perform: rescan)
@@ -340,6 +341,99 @@ struct ModelsPane: View {
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }
         FeatureSetup.shared.setModelsFolder(url.path)
+    }
+}
+
+/// Project files (adr/0012): the feature's opt-in and its embedding model,
+/// with its size. Off, nothing is indexed, downloaded or started. The
+/// Files view with each project's documents comes with PR 3.5.
+@MainActor
+struct ProjectFilesSection: View {
+    @ObservedObject private var indexer = ProjectIndexer.shared
+    @ObservedObject private var embedders = ProjectIndexer.shared.embedders
+    @State private var error: String?
+    private var setup: FeatureSetup { .shared }
+
+    var body: some View {
+        Section("Project files") {
+            Toggle(isOn: Binding(get: { indexer.isEnabled }, set: { setEnabled($0) })) {
+                SettingLabel(title: "Project files", help: "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.")
+            }
+            LabeledContent {
+                HStack {
+                    Text(embedderStatus).foregroundStyle(.secondary).lineLimit(1)
+                    if embedders.isBusy {
+                        ProgressView().controlSize(.small)
+                    } else if setup.isProjectFilesEmbedderDownloaded {
+                        Button("Remove", action: remove)
+                    } else if indexer.isEnabled, setup.projectFilesEmbedder != nil {
+                        Button("Download", action: download)
+                    }
+                }
+            } label: {
+                SettingLabel(title: "Embedding model", help: "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.")
+            }
+            if let reason = indexer.embeddingUnavailable {
+                Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            if let error {
+                Text(error).font(.caption).foregroundStyle(.red)
+            }
+        }
+    }
+
+    private var embedderStatus: String {
+        if embedders.isBusy, !embedders.statusText.isEmpty { return embedders.statusText }
+        guard let entry = setup.projectFilesEmbedder else { return NSLocalizedString("Unavailable", comment: "embedding model status") }
+        let size = ModelCatalog.format(FeatureSetup.downloadBytes(entry))
+        let state = setup.isProjectFilesEmbedderDownloaded
+            ? NSLocalizedString("downloaded", comment: "embedding model status")
+            : NSLocalizedString("not downloaded", comment: "embedding model status")
+        return "\(entry.displayName) · \(size) · \(state)"
+    }
+
+    private func setEnabled(_ on: Bool) {
+        error = nil
+        guard on else {
+            setup.disableProjectFiles()
+            return
+        }
+        guard !setup.isProjectFilesEmbedderReady, let entry = setup.projectFilesEmbedder, !embedders.isBusy else {
+            setup.projectFiles.setEnabled(true)
+            return
+        }
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("Turn on project files?", comment: "")
+        alert.informativeText = String(format: NSLocalizedString("Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.", comment: ""),
+                                       entry.displayName, ModelCatalog.format(FeatureSetup.downloadBytes(entry)))
+        alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Enable Without It", comment: ""))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            Task {
+                if let failure = await setup.enableProjectFiles(downloadingEmbedder: true) { error = failure.localizedDescription }
+            }
+        case .alertSecondButtonReturn:
+            setup.projectFiles.setEnabled(true)
+        default:
+            break
+        }
+    }
+
+    private func download() {
+        error = nil
+        Task {
+            if let failure = await setup.downloadProjectFilesEmbedder() { error = failure.localizedDescription }
+        }
+    }
+
+    private func remove() {
+        error = nil
+        Task {
+            if let failure = await setup.removeProjectFilesEmbedder() { error = failure.localizedDescription }
+        }
     }
 }
 

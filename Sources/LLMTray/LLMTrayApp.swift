@@ -210,6 +210,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(showReview), name: .showReview, object: nil
         )
         ReviewPrompter.shared.recordLaunch()
+        // Project files (adr/0012): nothing unless turned on in Settings.
+        ProjectIndexer.shared.start(server: server)
         UsageTelemetry.shared.start()   // nothing unless the user opted in
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
@@ -260,6 +262,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         tabs.saveAll()
+        ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
         killServerNow()
     }
