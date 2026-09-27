@@ -407,6 +407,25 @@ public struct ChangeUndo {
         }
     }
 
+    /// Whether a folder has an entry named exactly `name`, byte for byte (as
+    /// `readdir` gives it, not as a lookup matches it).
+    static func holdsExactly(_ dir: Descriptor, _ name: String) throws -> Bool {
+        let fd = dup(dir.fd)
+        guard fd >= 0 else { throw FolderAccessError.system("dup", errno) }
+        guard let stream = fdopendir(fd) else {
+            let e = errno
+            close(fd)
+            throw FolderAccessError.system("fdopendir", e)
+        }
+        defer { closedir(stream) }
+        rewinddir(stream)
+        let want = Array(name.utf8)
+        while let n = try SafeFolderWalker.nextName(stream) {
+            if Array(n.utf8) == want { return true }
+        }
+        return false
+    }
+
     static func isEmptyDirectory(_ parent: Descriptor, _ name: String) throws -> Bool {
         try emptiness(parent, name) == .empty
     }
@@ -424,10 +443,7 @@ public struct ChangeUndo {
         }
         defer { closedir(stream) }
         var dsStore = false
-        while let ent = readdir(stream) {
-            let n = withUnsafePointer(to: ent.pointee.d_name) {
-                $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
-            }
+        while let n = try SafeFolderWalker.nextName(stream) {
             if n == "." || n == ".." { continue }
             if Array(n.utf8) == Array(".DS_Store".utf8), !dsStore { dsStore = true; continue }
             return .notEmpty
@@ -605,6 +621,16 @@ public struct ChangeUndo {
             // may have taken it (a crash between the cleanup and `done`).
             if !out.restored, st.kind == .trash, stagingIdentity != nil, let s = item.source {
                 throw Uncertain(description: "interrupted: \(s.location.relativePath) isn't in its place; it may be in the Trash")
+            }
+            // A rename whose item is gone from both names: it may have been
+            // renamed (a crash before `done`).
+            // By the exact name bytes: a case-only rename's new name answers
+            // to the old one on a case-insensitive volume.
+            if st.kind == .rename, let s = item.source, let d = item.destination,
+               try (Posix.lstatAt(pfd, s.location.name))?.identity != s.identity
+                || !Self.holdsExactly(dir.descriptor, s.location.name) {
+                throw Uncertain(description: "interrupted: \(s.location.relativePath) may have been renamed to "
+                    + d.location.relativePath)
             }
             // A made folder gone from its staging name: it may have been
             // published (a crash before `done`).

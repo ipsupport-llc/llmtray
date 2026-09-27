@@ -294,6 +294,23 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(state(plan), .incomplete, "no guess about a rename's outcome")
     }
 
+    func testARenameCrashedAfterItsNewNameNeedsALook() throws {
+        write("case.txt", "c")
+        let plan = try approved([mv("case.txt", "CASE.txt")])
+        let item = plan.plan.items[0]
+        try journal.append(JournalEvent(kind: .begin, date: Date(), chatID: "c"), planID: plan.plan.id)
+        try journal.append(JournalEvent(kind: .pending, date: Date(), item: item.id, planItem: item), planID: plan.plan.id)
+        try journal.append(JournalEvent(kind: .staged, date: Date(), item: item.id,
+                                        staging: StagingRecord(kind: .rename, name: StagingRecord.name(.rename, planID: plan.plan.id, item: item.id),
+                                                               root: root, parentComponents: [], parentChain: [root.identity])),
+                           planID: plan.plan.id)
+        // As if renamed through the temporary name, the crash before `done`.
+        try fm.moveItem(atPath: grant + "/case.txt", toPath: grant + "/CASE.txt")
+        let r = undoer.recover(plan.plan.id)
+        XCTAssertTrue(r.needsLook[item.id]?.contains("renamed") ?? false, "\(r)")
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
     func testARunningPlanIsntRecoveredUnderItsFeet() throws {
         write("r.txt", "r")
         let plan = try approved([rm("r.txt")])

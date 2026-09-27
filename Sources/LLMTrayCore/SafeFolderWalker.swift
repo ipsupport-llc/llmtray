@@ -253,10 +253,7 @@ public struct SafeFolderWalker {
         var skipped = 0
         var visited = 0
         var capped = false
-        while let ent = readdir(stream) {
-            let name = withUnsafePointer(to: ent.pointee.d_name) {
-                $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
-            }
+        while let name = try Self.nextName(stream) {
             if name == "." || name == ".." { continue }
             if visited >= max(0, limit) {
                 capped = true
@@ -348,10 +345,11 @@ public struct SafeFolderWalker {
                 continue
             }
             defer { closedir(stream) }
-            while let ent = readdir(stream) {
-                let n = withUnsafePointer(to: ent.pointee.d_name) {
-                    $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
-                }
+            while true {
+                // A folder that can't be read to its end isn't checked.
+                let next: String?
+                do { next = try Self.nextName(stream) } catch { unchecked = true; break }
+                guard let n = next else { break }
                 if n == "." || n == ".." { continue }
                 remaining -= 1
                 if remaining < 0 { return done(.unchecked) }
@@ -366,6 +364,21 @@ public struct SafeFolderWalker {
             }
         }
         return done(unchecked ? .unchecked : .none)
+    }
+
+    /// The next name of a folder being read, nil at its end. `readdir` says
+    /// both the end and a read error with nil, told apart by `errno`: an
+    /// error is thrown, so a folder read partly never looks complete.
+    static func nextName(_ stream: UnsafeMutablePointer<DIR>) throws -> String? {
+        errno = 0
+        guard let ent = readdir(stream) else {
+            let e = errno
+            if e != 0 { throw FolderAccessError.system("read folder", e) }
+            return nil
+        }
+        return withUnsafePointer(to: ent.pointee.d_name) {
+            $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
+        }
     }
 
     public func display(_ components: [String]) -> String {
