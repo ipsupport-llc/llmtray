@@ -41,6 +41,12 @@ final class JunkCheckTests: XCTestCase {
         }
     }
 
+    func testDecomposedTextScoresLikeComposed() {
+        let mojibake = "Íàñòîÿùèé äîãîâîð çàêëþ÷åí ìåæäó ñòîðîíàìè"
+        XCTAssertEqual(JunkCheck.score(mojibake.decomposedStringWithCanonicalMapping), JunkCheck.score(mojibake))
+        XCTAssertTrue(JunkCheck.isJunk(mojibake.decomposedStringWithCanonicalMapping))
+    }
+
     func testEmptyAndShortPages() {
         XCTAssertEqual(JunkCheck.score(""), 1)
         XCTAssertEqual(JunkCheck.score("  \n "), 1)

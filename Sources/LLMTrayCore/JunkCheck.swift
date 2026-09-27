@@ -44,7 +44,10 @@ public enum JunkCheck {
         }
     }
 
+    /// Scored in NFC: PDFKit on macOS 14 returns decomposed text ("I" and a
+    /// combining acute for "Í"), which would hide the mojibake signal.
     public static func signals(_ text: String) -> Signals {
+        let text = text.precomposedStringWithCanonicalMapping
         var s = Signals()
         var n = 0, fffd = 0, control = 0, pua = 0, alnum = 0, letters = 0, latin1 = 0
         var words = 0, mixed = 0
