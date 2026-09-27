@@ -46,6 +46,14 @@ struct ChatSidebar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
+            if store.isReadOnly {
+                Label("Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it.",
+                      systemImage: "exclamationmark.triangle")
+                    .font(.system(size: 10))
+                    .foregroundColor(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(8)
+            }
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 1) {
                     if !query.isEmpty {

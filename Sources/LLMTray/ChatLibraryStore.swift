@@ -1,3 +1,4 @@
+import CryptoKit
 import AppKit
 import Combine
 import Foundation
@@ -18,8 +19,9 @@ final class ChatLibraryStore: ObservableObject {
     private var libraryPath: String { ChatSessionStore.sessionsDir + "/library.json" }
     private var observer: AnyCancellable?
     private var isLoadingAll = false
-    /// library.json couldn't be read at launch: nothing is written to it.
-    private var isReadOnly = false
+    /// library.json couldn't be read at launch: nothing is written to it
+    /// this session, and the sidebar says so.
+    @Published private(set) var isReadOnly = false
     private var changedWhileLoading: Set<UUID> = []
 
     /// Projects' own directories (adr/0012).
@@ -237,7 +239,14 @@ final class ChatLibraryStore: ObservableObject {
     }
 
     private static func keepCopy(_ path: String) {
-        let copy = path + ".unreadable-" + UUID().uuidString
+        // Named by content: the same broken file launch after launch is
+        // kept once.
+        guard let data = FileManager.default.contents(atPath: path) else {
+            NSLog("LLMTray: library.json couldn't be read (not written this session)")
+            return
+        }
+        let copy = path + ".unreadable-" + SHA256.hash(data: data).prefix(8).map { String(format: "%02x", $0) }.joined()
+        guard !FileManager.default.fileExists(atPath: copy) else { return }
         do {
             try FileManager.default.copyItem(atPath: path, toPath: copy)
             NSLog("LLMTray: library.json couldn't be read; not written this session; a copy is at %@", copy)
