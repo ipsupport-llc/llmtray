@@ -19,6 +19,8 @@ public enum HTMLText {
     static let skipTags: Set<String> = ["script", "style", "template", "svg", "noscript", "iframe", "object", "math", "head"]
     /// Skipped elements whose content is raw text: a "<script>" inside one is not a tag.
     static let rawText: Set<String> = ["script", "style"]
+    /// What may follow a tag's name: whitespace, "/" or ">".
+    static let tagNameEnd: Set<UInt8> = [0x20, 0x09, 0x0A, 0x0C, 0x0D, 0x2F, 0x3E]
 
     public static func text(_ html: String) -> String {
         let b = Array(html.utf8)
@@ -71,9 +73,9 @@ public enum HTMLText {
                     if i + 1 < n, b[i + 1] == 0x2F {
                         while k < raw.count, i + 2 + k < n, (b[i + 2 + k] | 0x20) == raw[k] { k += 1 }
                     }
-                    // The whole name, not a prefix: "</scripture>" doesn't end a script.
+                    // The whole name, not a prefix: "</scripture>" or "</script-x>" doesn't end a script.
                     let end = i + 2 + k
-                    if k < raw.count || (end < n && isNameByte(b[end])) { i += 1; continue }
+                    if k < raw.count || (end < n && !tagNameEnd.contains(b[end])) { i += 1; continue }
                     rawUntil = nil
                 }
                 // A comment, to its "-->" (or the end).
