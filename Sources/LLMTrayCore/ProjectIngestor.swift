@@ -344,7 +344,14 @@ public final class ProjectIngestor {
     /// Index Now: `not_indexed` documents back in the queue, embedding
     /// resumed. A Stop meanwhile wins: nothing is queued after it.
     public func indexNow(_ project: UUID) async {
-        if stopped.remove(project) != nil { persist() }
+        // Saved once its write is in: a quit before that leaves it stopped
+        // (the repair at open), never unstopped with files left `not_indexed`.
+        let wasStopped = stopped.remove(project) != nil
+        await resume(project)
+        if wasStopped { persist() }
+    }
+
+    private func resume(_ project: UUID) async {
         let e = epoch(project)
         await beginTransition(project)
         guard epoch(project) == e, let h = try? await handle(project), epoch(project) == e else {
@@ -697,6 +704,8 @@ public final class ProjectIngestor {
             if env.queue.hasInteractiveDemand {
                 // A generation: waited out in waitForForeground.
                 try? await Task.sleep(nanoseconds: UInt64(env.pollInterval * 1e9))
+                // Stopped meanwhile: not put back in its cleared queue.
+                guard isCurrent(item, e) else { return .dropped }
             } else {
                 // Held while its files are replaced or removed: not polled
                 // every beat; `embedderChanged` (the download's end) lifts it.

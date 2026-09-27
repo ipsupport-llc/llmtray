@@ -46,7 +46,7 @@ final class FakeEmbedder: ProjectEmbedder, @unchecked Sendable {
 
 /// A test's stand-in extractor: the file's text, pages split at form feeds;
 /// "UNSUPPORTED", "EMPTY" or "BROKEN" as the text make it fail that way;
-/// "SLOW" waits for `gate` (or cancellation) first.
+/// "SLOW" waits for `release` (or cancellation) first, "STUCK" for `release` only.
 final class FakeExtractor: @unchecked Sendable {
     private let lock = NSLock()
     private var _calls = 0
@@ -57,10 +57,16 @@ final class FakeExtractor: @unchecked Sendable {
     func extract(_ url: URL) async throws -> DocumentExtraction.Document {
         lock.withLock { _calls += 1 }
         let text = try String(contentsOf: url, encoding: .utf8)
-        if text.hasPrefix("SLOW") {
+        if text.hasPrefix("SLOW") || text.hasPrefix("STUCK") {
             while !lock.withLock({ open }) {
-                try Task.checkCancellation()
-                try await Task.sleep(nanoseconds: 5_000_000)
+                // STUCK: a child that takes its time to end when cancelled.
+                if text.hasPrefix("STUCK") {
+                    usleep(5_000)
+                    await Task.yield()
+                } else {
+                    try Task.checkCancellation()
+                    try await Task.sleep(nanoseconds: 5_000_000)
+                }
             }
         }
         switch text {
@@ -254,6 +260,20 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(statuses(i), [.embedded, .embedded, .embedded])
     }
 
+    func testIndexNowRightAfterAStopWhileTheStepStillRuns() async throws {
+        let i = ingestor()
+        let stuck = try file("stuck.txt", "STUCK then words")
+        _ = await i.add([stuck] + (try corpus(1)), to: project)
+        try await waitUntil("the first file is being read") { self.extractor.calls == 1 }
+        await i.stop(project)
+        // The cancelled read hasn't ended yet: Index Now queues it again.
+        await i.indexNow(project)
+        extractor.release()
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.embedded, .embedded])
+        XCTAssertEqual(persisted.stopped, [])
+    }
+
     func testAStoppedProjectIsNotEmbeddedAtLaunch() async throws {
         embedder = nil
         let i = ingestor()
@@ -302,13 +322,14 @@ final class ProjectIngestorTests: XCTestCase {
             await i.stop(project)
             try await settle(i)
             XCTAssertEqual(statuses(i), [.searchable, .searchable, .notIndexed])
-            extractor.release()
+            // Not released: a read the resumed run begins is still going
+            // when the Stop comes (else it may rightly finish before it).
             let slow = FakeEmbedder()
             slow.delay = 0.2
             embedder = slow
             let resumed = Task { await i.indexNow(self.project) }
             // Begun (the Stop lifted), then `yields` turns further in.
-            while !persisted.stopped.isEmpty { await Task.yield() }
+            while !i.stopped.isEmpty { await Task.yield() }
             for _ in 0..<yields { await Task.yield() }
             await i.stop(project)
             await resumed.value

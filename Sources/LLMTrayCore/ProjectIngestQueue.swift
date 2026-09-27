@@ -105,6 +105,9 @@ public struct ProjectIngestQueue: Sendable {
     /// Round robin: the project served last goes to the end.
     private var order: [UUID] = []
     public private(set) var inFlight: Item?
+    /// Queued again while it ran (Index Now right after a Stop cancelled
+    /// it): queued once it ends if the Stop dropped it.
+    private var rerun: Item?
     /// Embedding held back (the embedder is backing off after a failure):
     /// `next` hands out extraction only.
     public var embeddingBlocked = false
@@ -122,7 +125,11 @@ public struct ProjectIngestQueue: Sendable {
     public mutating func enqueue(_ work: [Work], in project: UUID) {
         touch(project)
         for w in work {
-            guard inFlight != Item(project: project, work: w) else { continue }
+            if inFlight == Item(project: project, work: w) {
+                rerun = inFlight
+                projects[project]!.run.insert(w.doc)
+                continue
+            }
             switch w {
             case .extract(let d):
                 guard !projects[project]!.extract.contains(d) else { continue }
@@ -203,6 +210,16 @@ public struct ProjectIngestQueue: Sendable {
         case .dropped:
             p.run.remove(doc)
         }
+        if rerun == item {
+            rerun = nil
+            if outcome == .dropped {
+                switch item.work {
+                case .extract: if !p.extract.contains(doc) { p.extract.append(doc) }
+                case .embed: if !p.embed.contains(doc) { p.embed.append(doc) }
+                }
+                p.run.insert(doc)
+            }
+        }
         projects[item.project] = p
         return endRunIfIdle(item.project)
     }
@@ -230,6 +247,7 @@ public struct ProjectIngestQueue: Sendable {
             p.workSeconds = 0
             projects[project] = p
         }
+        if rerun?.project == project { rerun = nil }
         return inFlight?.project == project
     }
 
@@ -237,6 +255,7 @@ public struct ProjectIngestQueue: Sendable {
     public mutating func remove(_ project: UUID) {
         projects[project] = nil
         order.removeAll { $0 == project }
+        if rerun?.project == project { rerun = nil }
     }
 
     /// One document removed: out of the queue and the run.
@@ -246,6 +265,7 @@ public struct ProjectIngestQueue: Sendable {
         p.embed.removeAll { $0 == doc }
         p.run.remove(doc)
         projects[project] = p
+        if rerun?.project == project, rerun?.work.doc == doc { rerun = nil }
     }
 
     /// Embedding became impossible for this session: every queued
