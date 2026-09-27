@@ -83,6 +83,10 @@ public enum Pref {
     /// The random install ID reports go with (a UUID string); made when
     /// telemetry is turned on, removed when it's turned off.
     public static let telemetryInstallID = PrefKey<String?>("llmtray.telemetry.installID", default: nil)
+    /// The last report the server stored, pretty-printed, and its day: shown
+    /// in Settings. Removed with the rest when telemetry is turned off.
+    public static let telemetryLastSentJSON = PrefKey<String?>("llmtray.telemetry.lastSentJSON", default: nil)
+    public static let telemetryLastSentDay = PrefKey<String?>("llmtray.telemetry.lastSentDay", default: nil)
 }
 
 extension UserDefaults {

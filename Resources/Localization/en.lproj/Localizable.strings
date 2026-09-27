@@ -153,6 +153,7 @@
 "Enable music generation?" = "Enable music generation?";
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
+"Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
@@ -229,6 +230,7 @@
 "LLMTray's version." = "LLMTray's version.";
 "Language" = "Language";
 "Larger than this Mac's RAM -- unlikely to load" = "Larger than this Mac's RAM -- unlikely to load";
+"Last sent: %@" = "Last sent: %@";
 "Later" = "Later";
 "Launch at login" = "Launch at login";
 "Leave a Review" = "Leave a Review";
@@ -291,6 +293,7 @@
 "Non-commercial license: read it on the model card before using the model." = "Non-commercial license: read it on the model card before using the model.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
+"Nothing sent yet." = "Nothing sent yet.";
 "OK" = "OK";
 "Off" = "Off";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
@@ -403,6 +406,7 @@
 "Show Chat Window" = "Show Chat Window";
 "Show Next Tab" = "Show Next Tab";
 "Show Previous Tab" = "Show Previous Tab";
+"Show Reports…" = "Show Reports…";
 "Show in Finder" = "Show in Finder";
 "Show model controls in the chat window" = "Show model controls in the chat window";
 "Show more" = "Show more";
@@ -467,6 +471,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "The downloaded embedder files don't match their checksums: %@";
 "The embedder is being downloaded -- try again once it's done." = "The embedder is being downloaded -- try again once it's done.";
 "The embedder list is missing or invalid: %@" = "The embedder list is missing or invalid: %@";
+"The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
@@ -486,6 +491,7 @@
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
 "The report" = "The report";
+"The reports" = "The reports";
 "The review has characters that can't be sent (control characters)." = "The review has characters that can't be sent (control characters).";
 "The review is %lld characters too long." = "The review is %lld characters too long.";
 "The review is too long." = "The review is too long.";
@@ -493,6 +499,7 @@
 "The review wasn't accepted: it must be 1 to 2000 characters, without control characters." = "The review wasn't accepted: it must be 1 to 2000 characters, without control characters.";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
+"The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
 "The server log" = "The server log";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
@@ -503,6 +510,7 @@
 "Tight -- may not leave room for context" = "Tight -- may not leave room for context";
 "Time in a city" = "Time in a city";
 "Today" = "Today";
+"Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
 "Too many reviews from this network. Try again later." = "Too many reviews from this network. Try again later.";
 "Tool Settings…" = "Tool Settings…";
@@ -526,6 +534,8 @@
 "Update channel" = "Update channel";
 "Updates" = "Updates";
 "Usage statistics" = "Usage statistics";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then).";
+"Usage statistics: the reports" = "Usage statistics: the reports";
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Uses the internet" = "Uses the internet";
@@ -536,6 +546,7 @@
 "View model card" = "View model card";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
+"Waiting to be sent: %@" = "Waiting to be sent: %@";
 "Weather" = "Weather";
 "Web search" = "Web search";
 "What happened?" = "What happened?";

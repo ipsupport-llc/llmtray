@@ -158,6 +158,11 @@ struct UsageStatisticsSection: View {
             } label: {
                 Text("What's sent")
             }
+            LabeledContent {
+                Button("Show Reports…") { TelemetryReportWindow.show() }
+            } label: {
+                SettingLabel(title: "The reports", help: "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.")
+            }
             if telemetry.isEnabled {
                 LabeledContent {
                     Button("Reset ID") { telemetry.resetID() }

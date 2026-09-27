@@ -290,6 +290,26 @@ final class TelemetryUploaderTests: XCTestCase {
         XCTAssertEqual(days, ["2026-09-20", "2026-09-26"])
     }
 
+    /// What the app shows as "last sent" is byte for byte what went out.
+    func testOnSentGetsTheStoredBodies() async throws {
+        Stub.statuses = [400, 204]
+        let store = store(["2026-09-25", "2026-09-26"])
+        final class Box: @unchecked Sendable { var sent: [(String, Data)] = [] }
+        let box = Box()
+        uploader.onSent = { day, body in box.sent.append((day, body)) }
+        await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
+        XCTAssertEqual(box.sent.map(\.0), ["2026-09-26"])   // the 400 one wasn't stored
+        XCTAssertEqual(box.sent.first?.1, Stub.bodies.last)
+    }
+
+    func testReadableBodyHasTheSameFields() throws {
+        let report = try TelemetryReport(installID: installID, day: "2026-09-26", today: "2026-09-27", now: now,
+                                         environment: env, usage: TelemetryUsage(features: ["chat": 2]), calendar: utc)
+        let compact = try JSONSerialization.jsonObject(with: report.body()) as? NSDictionary
+        let readable = try JSONSerialization.jsonObject(with: Data(report.readableBody().utf8)) as? NSDictionary
+        XCTAssertEqual(compact, readable)
+    }
+
     func testBadRequestDropsTheDayAndGoesOn() async {
         Stub.statuses = [400, 204]
         let store = store(["2026-09-25", "2026-09-26"])
