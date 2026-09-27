@@ -121,22 +121,28 @@ private struct ProjectFilesView: View {
     @State private var toRemove: IndexedDocument?
     @State private var disk: (files: Int64, index: Int64)?
     @State private var actionError: String?
+    /// The chat window's model: the pin limit shown is for it.
+    @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
 
     private var documents: [IndexedDocument] { indexer.documents[projectID] ?? [] }
+    private var pins: [Int64] { indexer.pins[projectID] ?? [] }
+    private var pinTokens: [Int64: Int] { indexer.pinTokens[projectID] ?? [:] }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             if !indexer.isEnabled {
                 offNote
             } else {
+                let limit = ProjectIndexer.pinLimit(forModel: selectedModelID).tokens
                 header
+                if !pins.isEmpty { pinnedSummary(limit: limit) }
                 controls
                 if let note = indexer.addNotes[projectID] { addNote(note) }
                 if let actionError {
                     Text(actionError).font(.caption).foregroundColor(.red).fixedSize(horizontal: false, vertical: true)
                 }
                 dropZone
-                list
+                list(limit: limit)
             }
         }
         .padding(16)
@@ -215,6 +221,30 @@ private struct ProjectFilesView: View {
         }
     }
 
+    /// "Pinned: K files, ≈X of Y tokens", and which of them the model's room
+    /// no longer holds (they're read with project_files instead).
+    private func pinnedSummary(limit: Int) -> some View {
+        let used = pins.compactMap { pinTokens[$0] }.reduce(0, +)
+        let tooLong = PinnedFiles.fitting(pins, tokens: pinTokens, limitTokens: limit).tooLong
+        let names = tooLong.compactMap { doc in documents.first { $0.doc == doc }?.name }
+        return VStack(alignment: .leading, spacing: 2) {
+            Label(String(format: NSLocalizedString("Pinned: %1$lld files, ≈%2$@ of %3$@ tokens",
+                                                   comment: "project files: pinned files, their tokens, the model's limit"),
+                         Int64(pins.count), Self.tokens(used), Self.tokens(limit)), systemImage: "pin.fill")
+                .font(.caption)
+            Text("Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.")
+                .font(.caption2).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+            if !names.isEmpty {
+                Text(String(format: NSLocalizedString("Too long for the selected model's room now, read by search instead: %@",
+                                                      comment: "pinned project files that don't fit the model: their names"),
+                            names.map { "\u{201C}" + $0 + "\u{201D}" }.joined(separator: ", ")))
+                    .font(.caption2).foregroundColor(.orange).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    static func tokens(_ n: Int) -> String { n.formatted() }
+
     private var controls: some View {
         let ring = indexer.ring(for: projectID)
         let paused = indexer.isPaused(projectID)
@@ -287,7 +317,7 @@ private struct ProjectFilesView: View {
     }
 
     @ViewBuilder
-    private var list: some View {
+    private func list(limit: Int) -> some View {
         if documents.isEmpty {
             Text("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.")
                 .font(.caption).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
@@ -296,7 +326,7 @@ private struct ProjectFilesView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     ForEach(documents, id: \.doc) { doc in
-                        row(doc)
+                        row(doc, limit: limit)
                         Divider()
                     }
                 }
@@ -310,8 +340,9 @@ private struct ProjectFilesView: View {
         }
     }
 
-    private func row(_ doc: IndexedDocument) -> some View {
+    private func row(_ doc: IndexedDocument, limit: Int) -> some View {
         let status = indexer.displayStatus(doc, in: projectID)
+        let pinned = pins.contains(doc.doc)
         return HStack(alignment: .top, spacing: 8) {
             Image(systemName: Self.icon(doc.ext)).foregroundColor(.secondary).frame(width: 16)
             VStack(alignment: .leading, spacing: 2) {
@@ -322,6 +353,11 @@ private struct ProjectFilesView: View {
                         Text(String(format: NSLocalizedString("%lld pages", comment: "a project file's page count"), Int64(pages)))
                     }
                     Text(ModelCatalog.format(doc.bytes))
+                    if pinned {
+                        Text(pinTokens[doc.doc].map { String(format: NSLocalizedString("Pinned · ≈%@ tokens", comment: "a pinned project file: its size"), Self.tokens($0)) }
+                             ?? NSLocalizedString("Pinned", comment: "a pinned project file"))
+                            .foregroundColor(.accentColor)
+                    }
                 }
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -332,6 +368,7 @@ private struct ProjectFilesView: View {
                 }
             }
             Spacer(minLength: 4)
+            pinButton(doc, pinned: pinned, limit: limit)
             Button { Task { await indexer.reindex(doc.doc, in: projectID) } } label: { Image(systemName: "arrow.clockwise") }
                 .buttonStyle(.borderless)
                 .disabled(!Self.canReindex(status))
@@ -345,6 +382,50 @@ private struct ProjectFilesView: View {
         }
         .padding(.vertical, 6)
         .accessibilityElement(children: .contain)
+    }
+
+    /// Pin / unpin (adr/0012, "Pinned files"): disabled, with why, for a
+    /// file without searchable text yet or one that wouldn't fit.
+    private func pinButton(_ doc: IndexedDocument, pinned: Bool, limit: Int) -> some View {
+        let check = PinnedFiles.check(doc.doc, docs: documents, pins: pins, tokens: pinTokens, limitTokens: limit)
+        let help: String
+        var enabled = true
+        switch check {
+        case .alreadyPinned:
+            help = NSLocalizedString("Unpin: the project's chats search this file again instead of getting all of it", comment: "a pinned project file's pin button")
+        case .fits(let t):
+            help = String(format: NSLocalizedString("Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.",
+                                                    comment: "a project file's pin button: its size"), Self.tokens(t))
+        case .tooLong(let t, let used, let limit):
+            enabled = false
+            help = String(format: NSLocalizedString("Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left",
+                                                    comment: "a project file's pin button: its size, what's left, the limit"),
+                          Self.tokens(t), Self.tokens(max(0, limit - used)), Self.tokens(limit))
+        case .noText, .noSuchFile:
+            enabled = false
+            help = doc.status.isSearchable ? NSLocalizedString("Measuring the file…", comment: "a project file's pin button, its size not known yet")
+                : NSLocalizedString("Nothing to pin until the file has been read", comment: "a project file's pin button")
+        }
+        return Button { setPinned(doc, !pinned) } label: { Image(systemName: pinned ? "pin.fill" : "pin") }
+            .buttonStyle(.borderless)
+            .foregroundColor(pinned ? .accentColor : nil)
+            // Unpinning is always possible.
+            .disabled(!pinned && !enabled)
+            .help(help)
+            .accessibilityLabel(String(format: pinned ? NSLocalizedString("Unpin %@", comment: "a project file's action")
+                                                      : NSLocalizedString("Pin %@", comment: "a project file's action"), doc.name))
+    }
+
+    private func setPinned(_ doc: IndexedDocument, _ on: Bool) {
+        actionError = nil
+        Task {
+            do {
+                try await indexer.setPinned(doc.doc, on, in: projectID)
+            } catch {
+                actionError = String(format: NSLocalizedString("\u{201C}%1$@\u{201D}: the pin couldn't be changed: %2$@", comment: "a project file's pin or unpin failed"),
+                                     doc.name, error.localizedDescription)
+            }
+        }
     }
 
     private static func canReindex(_ s: DocumentDisplayStatus) -> Bool {

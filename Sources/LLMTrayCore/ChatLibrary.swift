@@ -153,6 +153,11 @@ public struct ProjectContext: Equatable {
     /// files are off): what decides whether project_files is declared, and
     /// in which modes (ProjectFilesMode).
     public var files: ProjectIndexSummary
+    /// Its pinned files the turn's requests carry, in pin order, and a line
+    /// for each left out (adr/0012, "Pinned files"): read and fitted at the
+    /// turn's start, fixed for the turn.
+    public var pinned: [PinnedFileText] = []
+    public var pinnedLeftOut: [PinnedFileNote] = []
 
     /// Any of its files can be searched.
     public var hasSearchableFiles: Bool { files.searchable > 0 }
@@ -170,12 +175,15 @@ public struct ProjectContext: Equatable {
 }
 
 /// The system prompt of a chat request, in its order (adr/0012): the
-/// profile's, then the project's instructions, then the tool-use policy
-/// (nil when no tools are offered). Empty parts are left out.
+/// profile's, then the project's instructions, then its pinned files, then
+/// the tool-use policy (nil when no tools are offered). Empty parts are
+/// left out. The pinned files come before the policy, which can change
+/// within a turn: the prefix the server's prompt cache reuses stays whole.
 public func chatSystemPrompt(profile: String, project: ProjectContext?, toolUsePolicy: String?) -> String {
     let instructions = project?.instructions.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     let projectPart = instructions.isEmpty ? "" : "Instructions for this chat's project, \"\(project?.name ?? "")\":\n\(instructions)"
-    return [profile.trimmingCharacters(in: .whitespacesAndNewlines), projectPart, toolUsePolicy ?? ""]
+    let pinned = project.map { PinnedFiles.block($0.pinned, notes: $0.pinnedLeftOut) } ?? ""
+    return [profile.trimmingCharacters(in: .whitespacesAndNewlines), projectPart, pinned, toolUsePolicy ?? ""]
         .filter { !$0.isEmpty }
         .joined(separator: "\n\n")
 }

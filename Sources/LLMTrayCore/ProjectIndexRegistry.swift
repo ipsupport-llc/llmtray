@@ -315,6 +315,9 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
         return try await ProcessRunner.offMain { try ProjectIndexSummary.read(directory: dir) }
     }
 
+    /// Where the project's index lives.
+    func directoryURL(_ project: UUID) -> URL { directory(project) }
+
     private func openHandle(_ project: UUID) -> ProjectIndexHandle? {
         lock.lock()
         defer { lock.unlock() }

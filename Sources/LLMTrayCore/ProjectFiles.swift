@@ -17,7 +17,7 @@ public enum ProjectFilesMode: Equatable, Sendable {
     }
 }
 
-/// The one project tool, `project_files(query?, doc?, pages?, cursor?)`:
+/// The one project tool, `project_files(query?, doc?, pages?, cursor?, pin?)`:
 /// its declarations per mode, how its arguments read, what its answers say.
 public enum ProjectFiles {
     public static let toolName = "project_files"
@@ -37,6 +37,7 @@ public enum ProjectFiles {
         .init("doc", .integer, docDescription, aliases: ["file", "document", "doc_id", "file_id", "document_id", "id", "file_number"]),
         .init("pages", .string, pagesDescription, aliases: ["page", "page_range", "range", "page_number", "pages_range"]),
         .init("cursor", .string, aliases: ["next", "next_cursor", "continue", "continuation", "token"]),
+        .init("pin", .boolean, pinDescription, aliases: ["pinned"]),
         .init("top_k", .integer, aliases: ["k", "limit", "n", "count", "max_results", "num_results", "results"]),
     ])
 
@@ -44,6 +45,7 @@ public enum ProjectFiles {
     static let listingDescription = "List the files of this chat's project (none can be searched yet)."
     static let docDescription = "A file's id"
     static let pagesDescription = "With doc: pages to read verbatim, e.g. \"3\" or \"3-5\""
+    static let pinDescription = "With doc: true keeps the whole file in this project's chats (only if the user asks); false stops"
 
     /// The declaration for a mode; nil for `.none`.
     public static func declaredSchema(for mode: ProjectFilesMode) -> ToolSchema? {
@@ -65,6 +67,8 @@ public enum ProjectFiles {
         case list(from: Int)
         case search(query: String, doc: Int64?, limit: Int)
         case read(ReadCursor)
+        /// Pin `doc` (its whole text in the project's requests) or unpin it.
+        case pin(doc: Int64, on: Bool)
     }
 
     /// Where a read continues: `doc` at revision `rev`, from `offset` (code
@@ -116,6 +120,13 @@ public enum ProjectFiles {
             return .failure(ArgumentError("\"doc\" is a file's id from the list (1, 2, ...), not \(doc)",
                                           retry: #"{"doc":<integer>}"#))
         }
+        if let on = values["pin"] as? Bool {
+            guard let doc else {
+                return .failure(ArgumentError("\"pin\" needs \"doc\", the file's id (call with no arguments to list them)",
+                                              retry: "{\"doc\":<integer>,\"pin\":\(on)}"))
+            }
+            return .success(.pin(doc: Int64(doc), on: on))
+        }
         if let cursor = text("cursor") {
             if cursor.lowercased().hasPrefix(listCursorPrefix), let from = Int(cursor.dropFirst(listCursorPrefix.count)), from >= 0 {
                 return .success(.list(from: from))
@@ -143,6 +154,15 @@ public enum ProjectFiles {
                                           retry: "{\"doc\":<integer>,\"pages\":\"\(pages!.prefix(20))\"}"))
         }
         return .success(.list(from: 0))
+    }
+
+    /// A call that answers with names only (the listing, a pin): no file
+    /// content comes back, so a pin after it is still the user's.
+    public static func returnsNamesOnly(_ values: [String: Any]) -> Bool {
+        switch request(values) {
+        case .success(.list), .success(.pin), .failure: return true
+        case .success(.search), .success(.read): return false
+        }
     }
 
     /// "12", "3-5", "3–5", "3..5", "3 to 5", "p. 3", "pages 3-5", "3-" (to
@@ -266,13 +286,18 @@ public final class ProjectFilesService {
         /// A query's embedding at most (a cold start included); past it the
         /// search goes by words.
         public var embedTimeout: TimeInterval
+        /// Pins or unpins a file (the app's indexer, which then shows it);
+        /// nil: straight through the project's writer.
+        public var setPinned: ((UUID, Int64, Bool) async throws -> Void)?
 
         public init(registry: ProjectIndexRegistry, queryEmbedder: @escaping () -> ProjectQueryEmbedder?,
-                    wordsOnlyReason: @escaping () -> String? = { nil }, embedTimeout: TimeInterval = 15) {
+                    wordsOnlyReason: @escaping () -> String? = { nil }, embedTimeout: TimeInterval = 15,
+                    setPinned: ((UUID, Int64, Bool) async throws -> Void)? = nil) {
             self.registry = registry
             self.queryEmbedder = queryEmbedder
             self.wordsOnlyReason = wordsOnlyReason
             self.embedTimeout = embedTimeout
+            self.setPinned = setPinned
         }
     }
 
@@ -290,8 +315,10 @@ public final class ProjectFilesService {
     /// continues rather than by the chat's fitting; `fileTextAllowed`
     /// false: no room was left earlier in the turn -- search and read refuse (the tool is no longer declared).
     /// `stillOwned`: the chat is still in the project, and it exists.
+    /// `pinLimitTokens`: what the project's pinned files may take with the
+    /// chat's model (PinLimit); nil: this chat can't pin.
     public func run(_ request: ProjectFiles.Request, project: UUID, byteBudget: Int, fileTextAllowed: Bool = true,
-                    stillOwned: () -> Bool) async -> ProjectFilesAnswer {
+                    pinLimitTokens: Int? = nil, stillOwned: () -> Bool) async -> ProjectFilesAnswer {
         guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
         let handle: ProjectIndexHandle
         do {
@@ -303,16 +330,19 @@ public final class ProjectFilesService {
         }
         let answer: ProjectFilesAnswer
         do {
-            let docs = try await handle.read { try $0.documents() }
+            let (docs, pins) = try await handle.read { (try $0.documents(), try $0.pins()) }
             let budget = max(0, byteBudget - Self.slackBytes)
             switch request {
             case .list(let from):
-                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil))
+                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins))
+            case .pin(let doc, let on):
+                answer = try await pin(doc, on: on, docs: docs, pins: pins, handle: handle, project: project,
+                                       limitTokens: pinLimitTokens, stillOwned: stillOwned)
             case .search, .read:
                 if !fileTextAllowed { return .refused(ProjectTextBudget.noRoomText) }
                 if !docs.contains(where: { $0.status.isSearchable }) {
                     let note = "No file can be searched or read yet -- they're still being indexed, or couldn't be read. The files:"
-                    answer = .output(listing(docs, from: 0, project: project, budget: budget, note: note))
+                    answer = .output(listing(docs, from: 0, project: project, budget: budget, note: note, pins: pins))
                 } else if case .search(let query, let doc, let limit) = request {
                     answer = try await search(query, doc: doc, limit: limit, docs: docs, handle: handle, project: project)
                 } else if case .read(let cursor) = request {
@@ -334,7 +364,7 @@ public final class ProjectFilesService {
 
     // MARK: - listing
 
-    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?) -> ProjectToolOutput {
+    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64] = []) -> ProjectToolOutput {
         guard !docs.isEmpty else { return ProjectToolOutput(project: project, preamble: "This project has no files now.") }
         let searchable = docs.contains { $0.status.isSearchable }
         var head = note.map { $0 + "\n" } ?? ""
@@ -345,7 +375,7 @@ public final class ProjectFilesService {
         let start = docs.firstIndex { $0.doc >= Int64(from) } ?? docs.count
         func row(_ d: IndexedDocument, name: String) -> String {
             let pages = d.pages.map { "\($0) page\($0 == 1 ? "" : "s")" } ?? "? pages"
-            return "\(d.doc). \(name) -- \(pages) -- \(ProjectFiles.status(d))"
+            return "\(d.doc). \(name) -- \(pages) -- \(ProjectFiles.status(d))" + (pins.contains(d.doc) ? " -- pinned" : "")
         }
         func page(_ rows: [String]) -> ProjectToolOutput {
             var out = ProjectToolOutput(project: project, preamble: ([head] + rows).joined(separator: "\n") + hint)
@@ -617,6 +647,52 @@ public final class ProjectFilesService {
             if output.hits.isEmpty { output = try await fill("") }
         }
         return .output(output)
+    }
+
+    // MARK: - pin
+
+    /// Pins or unpins a file for the project's chats. From the user's next
+    /// message on: a turn's requests carry what was pinned at its start.
+    func pin(_ doc: Int64, on: Bool, docs: [IndexedDocument], pins: [Int64], handle: ProjectIndexHandle, project: UUID,
+             limitTokens: Int?, stillOwned: () -> Bool) async throws -> ProjectFilesAnswer {
+        let tool = ProjectFiles.toolName
+        guard let limitTokens else { return .text("\(tool): files can't be pinned in this chat.") }
+        guard let d = docs.first(where: { $0.doc == doc }) else { return .text(noSuchFile(doc, docs)) }
+        let name = ProjectFiles.shortName(d.name) ?? d.name
+        func write() async throws {
+            if let set = env.setPinned {
+                try await set(project, doc, on)
+            } else {
+                try await handle.write { try $0.setPinned(doc, on) }
+            }
+        }
+        guard on else {
+            guard pins.contains(doc) else { return .text("File \(doc) (\(name)) isn't pinned.") }
+            guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
+            try await write()
+            return .text("Unpinned file \(doc) (\(name)): from the user's next message it's no longer in your context; "
+                         + "search or read it with \(tool) when needed.")
+        }
+        let measured = docs.filter { pins.contains($0.doc) || $0.doc == doc }
+        let tokens = try await handle.read { try $0.pinTokens(of: measured) }
+        switch PinnedFiles.check(doc, docs: docs, pins: pins, tokens: tokens, limitTokens: limitTokens) {
+        case .noSuchFile:
+            return .text(noSuchFile(doc, docs))
+        case .alreadyPinned:
+            return .text("File \(doc) (\(name)) is already pinned: its whole text is in your context from the next message of the user.")
+        case .noText:
+            return .text("Not pinned: file \(doc) (\(name)) is \(ProjectFiles.status(d)), so it has no text to pin yet.")
+        case .tooLong(let t, let used, let limit):
+            let pinned = used > 0 ? " (≈\(used) taken by the files pinned already)" : ""
+            return .text("Not pinned: file \(doc) (\(name)) is ≈\(t) tokens, and this project's pinned files may take ≈\(limit) "
+                         + "with this model\(pinned). Tell the user it's too long to pin; read it by pages instead: "
+                         + "\(tool)({\"doc\":\(doc),\"pages\":\"1-3\"}).")
+        case .fits(let t):
+            guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
+            try await write()
+            return .text("Pinned file \(doc) (\(name), ≈\(t) tokens): from the user's next message its whole text is in your "
+                         + "context in this project's chats. For this answer, read it with \(tool)({\"doc\":\(doc),\"pages\":\"1-3\"}) if you need it.")
+        }
     }
 
     func noSuchFile(_ doc: Int64, _ docs: [IndexedDocument]) -> String {

@@ -36,6 +36,14 @@ final class ProjectIndexer: ObservableObject {
     /// (not supported, duplicates, failures), until it's dismissed or
     /// replaced by the next add's.
     @Published private(set) var addNotes: [UUID: String] = [:]
+    /// Each opened project's pinned documents, in pin order (adr/0012,
+    /// "Pinned files"), and each searchable document's pinned size in
+    /// tokens (measured once per revision, off the main thread).
+    @Published private(set) var pins: [UUID: [Int64]] = [:]
+    @Published private(set) var pinTokens: [UUID: [Int64: Int]] = [:]
+    /// The revision each size in `pinTokens` was measured at.
+    private var pinTokenRevs: [UUID: [Int64: Int64]] = [:]
+    private var pinRefreshes: [UUID: Task<Void, Never>] = [:]
 
     /// One writer and one reader per open project, for the indexer and
     /// (3.4b-ii) the project tools alike.
@@ -93,7 +101,8 @@ final class ProjectIndexer: ObservableObject {
     private(set) lazy var filesService = ProjectFilesService(environment: .init(
         registry: registry,
         queryEmbedder: { [weak self] in self?.currentEmbedder() as? RunnerEmbedder },
-        wordsOnlyReason: { [weak self] in self?.ingestor?.embeddingUnavailable }))
+        wordsOnlyReason: { [weak self] in self?.ingestor?.embeddingUnavailable },
+        setPinned: { [weak self] project, doc, on in try await self?.setPinned(doc, on, in: project) }))
 
     /// A project's file counts for a turn's start (which project_files modes
     /// it declares): read-only, without opening a closed project; `.empty`
@@ -101,6 +110,14 @@ final class ProjectIndexer: ObservableObject {
     func summary(for project: UUID) async -> ProjectIndexSummary {
         guard isEnabled else { return .empty }
         return (try? await registry.summary(for: project)) ?? .empty
+    }
+
+    /// A project's pinned files for a turn's start: read-only, without
+    /// opening a closed project; none while the feature is off or when they
+    /// can't be read.
+    func pinnedFiles(for project: UUID) async -> (files: [PinnedFileText], notes: [PinnedFileNote]) {
+        guard isEnabled else { return ([], []) }
+        return (try? await registry.pinnedFiles(for: project)) ?? ([], [])
     }
 
     /// Where a citation chip leads: read-only from the project's index,
@@ -212,6 +229,11 @@ final class ProjectIndexer: ObservableObject {
             if !documents.isEmpty { documents = [:] }
             if !paused.isEmpty { paused = [] }
             if !stopped.isEmpty { stopped = [] }
+            pinRefreshes.values.forEach { $0.cancel() }
+            pinRefreshes = [:]
+            if !pins.isEmpty { pins = [:] }
+            if !pinTokens.isEmpty { pinTokens = [:] }
+            pinTokenRevs = [:]
             if !addNotes.isEmpty { addNotes = [:] }
             embeddingUnavailable = nil
             return
@@ -222,7 +244,12 @@ final class ProjectIndexer: ObservableObject {
             if p.isActive { next[project.id] = p }
         }
         if next != progress { progress = next }
-        if ingestor.documents != documents { documents = ingestor.documents }
+        if ingestor.documents != documents {
+            // A removal unpins; a re-index changes a size.
+            let changed = Set(ingestor.documents.keys).union(documents.keys).filter { ingestor.documents[$0] != documents[$0] }
+            documents = ingestor.documents
+            for project in changed { refreshPins(project) }
+        }
         if ingestor.embeddingUnavailable != embeddingUnavailable { embeddingUnavailable = ingestor.embeddingUnavailable }
         if ingestor.paused != paused { paused = ingestor.paused }
         if ingestor.stopped != stopped { stopped = ingestor.stopped }
@@ -350,6 +377,105 @@ final class ProjectIndexer: ObservableObject {
     static func totalDiskUsage() async -> Int64 {
         let root = ChatLibraryStore.projectStorage.root
         return await Task.detached(priority: .utility) { DiskUsage.directorySize(root) }.value
+    }
+
+    // MARK: - pinned files (adr/0012, "Pinned files")
+
+    /// Pins or unpins a file (the Files window's pin, the model's
+    /// project_files pin); the published pins follow.
+    func setPinned(_ doc: Int64, _ on: Bool, in project: UUID) async throws {
+        guard isEnabled else { return }
+        let handle = try await registry.open(project)
+        try await handle.write { try $0.setPinned(doc, on) }
+        refreshPins(project)
+        await pinRefreshes[project]?.value
+    }
+
+    /// Reads the project's pins, then measures the searchable documents
+    /// not yet measured at their revision, one at a time on the reader (a
+    /// search in between isn't held up by a whole project's scan).
+    private func refreshPins(_ project: UUID) {
+        pinRefreshes[project]?.cancel()
+        let registry = registry
+        pinRefreshes[project] = Task { [weak self] in
+            guard let handle = try? await registry.open(project), let pinned = try? await handle.read({ try $0.pins() }),
+                  let self, !Task.isCancelled else { return }
+            if self.pins[project] != pinned { self.pins[project] = pinned }
+            let docs = (self.documents[project] ?? []).filter { $0.status.isSearchable }
+            let live = Set(docs.map(\.doc))
+            self.pinTokenRevs[project] = (self.pinTokenRevs[project] ?? [:]).filter { live.contains($0.key) }
+            let kept = (self.pinTokens[project] ?? [:]).filter { live.contains($0.key) }
+            if self.pinTokens[project] != kept { self.pinTokens[project] = kept }
+            // Kept as they're measured (a newer refresh goes on from them),
+            // shown every few files: a bulk index doesn't leave every pin
+            // "measuring" until the last one.
+            var measured: [(doc: Int64, rev: Int64, tokens: Int)] = []
+            for d in docs where self.pinTokenRevs[project]?[d.doc] != d.rev {
+                if Task.isCancelled { break }
+                guard let t = try? await handle.read({ try $0.pinTokens(of: [d]) })[d.doc] else { continue }
+                measured.append((d.doc, d.rev, t))
+                if measured.count >= 10 {
+                    self.storePinSizes(measured, in: project)
+                    measured = []
+                }
+            }
+            self.storePinSizes(measured, in: project)
+        }
+    }
+
+    private func storePinSizes(_ measured: [(doc: Int64, rev: Int64, tokens: Int)], in project: UUID) {
+        guard !measured.isEmpty, isEnabled else { return }
+        var sizes = pinTokens[project] ?? [:]
+        for m in measured {
+            sizes[m.doc] = m.tokens
+            pinTokenRevs[project, default: [:]][m.doc] = m.rev
+        }
+        pinTokens[project] = sizes
+    }
+
+    /// What the project's pinned files may take with `settings`' model: half
+    /// its context less the answer, or what its KV cache can hold in the GPU
+    /// memory its weights leave.
+    static func pinLimit(for settings: ChatSettings) -> PinLimit {
+        let kvBits: Int
+        if let path = settings.modelPath, !facts(path).disallowsQuantizedKV {
+            kvBits = ProfileManager.shared.resolved(for: path).kvBits
+        } else {
+            kvBits = 0
+        }
+        let kv = settings.modelPath.map { KVCacheSize.bytesPerToken(modelPath: $0, kvBits: kvBits) } ?? KVCacheSize.fallbackBytesPerToken
+        return PinLimit(context: settings.maxTokensCap, maxTokens: settings.maxTokens, gpuLimitBytes: gpuLimitBytes,
+                        weightsBytes: settings.modelPath.map(weightsBytes) ?? 0, kvBytesPerToken: kv)
+    }
+
+    /// The same for a model by its id (the Files window's, at every
+    /// render): its config read once.
+    static func pinLimit(forModel modelID: String?) -> PinLimit {
+        let cap = modelID.map { facts($0).maxContext } ?? ChatSettings.maxContext(forModel: nil)
+        var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
+        settings.modelPath = modelID
+        return pinLimit(for: settings)
+    }
+
+    /// What a model's config says that the limit needs, read once per path.
+    private static var factsCache: [String: (maxContext: Int, disallowsQuantizedKV: Bool)] = [:]
+
+    private static func facts(_ path: String) -> (maxContext: Int, disallowsQuantizedKV: Bool) {
+        if let known = factsCache[path] { return known }
+        let f = (ChatSettings.maxContext(forModel: path), ModelDiscovery.disallowsQuantizedKV(forModelPath: path))
+        factsCache[path] = f
+        return f
+    }
+
+    /// The GPU limit, read once (a Metal device each time otherwise).
+    private static let gpuLimitBytes: UInt64? = HardwareProbe.current().gpuLimitBytes
+    private static var weightsCache: [String: Int64] = [:]
+
+    private static func weightsBytes(_ path: String) -> Int64 {
+        if let known = weightsCache[path] { return known }
+        let bytes = ModelWeights.bytes(inFolder: path)
+        weightsCache[path] = bytes
+        return bytes
     }
 
     func removeDocument(_ doc: Int64, from project: UUID) async throws {

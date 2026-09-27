@@ -53,7 +53,7 @@ final class ProjectFilesArgumentTests: XCTestCase {
             return (try XCTUnwrap(parameters["properties"] as? [String: Any])).keys.sorted()
         }
         XCTAssertEqual(try properties(.listing), [], "listing only: no fields at all")
-        XCTAssertEqual(try properties(.all), ["cursor", "doc", "pages", "query"], "top_k is read, never declared")
+        XCTAssertEqual(try properties(.all), ["cursor", "doc", "pages", "pin", "query"], "top_k is read, never declared")
     }
 
     func request(_ json: String) -> Result<ProjectFiles.Request, ProjectFiles.ArgumentError>? {
@@ -74,6 +74,30 @@ final class ProjectFilesArgumentTests: XCTestCase {
         XCTAssertEqual(try request(#"{"cursor":"list:40"}"#)?.get(), .list(from: 40))
         XCTAssertEqual(try request(#"{"next":"3:4:120:9"}"#)?.get(), .read(.init(doc: 3, page: 4, offset: 120, last: 9)))
         XCTAssertEqual(try request(#"{"cursor":"3:4:0:9","query":"x"}"#)?.get(), .read(.init(doc: 3, page: 4, last: 9)), "a cursor wins")
+    }
+
+    func testPinReadsLeniently() throws {
+        XCTAssertEqual(try request(#"{"doc":3,"pin":true}"#)?.get(), .pin(doc: 3, on: true))
+        XCTAssertEqual(try request(#"{"doc":3,"pin":false}"#)?.get(), .pin(doc: 3, on: false))
+        XCTAssertEqual(try request(#"{"file":"3","pinned":"true"}"#)?.get(), .pin(doc: 3, on: true), "strings")
+        XCTAssertEqual(try request(#"{"doc":3,"pin":"FALSE"}"#)?.get(), .pin(doc: 3, on: false))
+        XCTAssertEqual(try request(#"{"doc":3,"pinned":true,"pages":"2"}"#)?.get(), .pin(doc: 3, on: true), "pin wins over a read")
+        // Only "pinned": "load", "keep", "attach" aren't pins (a stray word
+        // mustn't put a book in every request).
+        for word in ["load", "keep", "attach"] {
+            XCTAssertEqual(try request(#"{"doc":3,"\#(word)":true}"#)?.get(), .read(.init(doc: 3, page: 1, last: Int.max)), word)
+        }
+        XCTAssertEqual(ProjectFiles.schema.param("pin")?.aliases, ["pinned"])
+        guard case .failure(let e) = try XCTUnwrap(request(#"{"pin":true}"#)) else { return XCTFail("pin without doc") }
+        XCTAssertEqual(e.message, #"project_files: "pin" needs "doc", the file's id (call with no arguments to list them). "#
+                       + #"Retry: project_files({"doc":<integer>,"pin":true})"#)
+        // A number isn't a boolean to the schema: its error says how to retry.
+        let parsed = ToolArgumentParser.parse(#"{"doc":3,"pin":1}"#, schema: ProjectFiles.schema)
+        XCTAssertEqual(parsed.problems, [.wrongType("pin", "1")])
+        XCTAssertTrue(parsed.errorMessage(tool: ProjectFiles.schema)?.contains(#""pin":<true|false>"#) == true)
+        let declared = try XCTUnwrap(ProjectFiles.declaredSchema(for: .all)?.param("pin"))
+        XCTAssertEqual(declared.description, ProjectFiles.pinDescription)
+        XCTAssertNil(ProjectFiles.declaredSchema(for: .listing)?.param("pin"), "only with search and read")
     }
 
     func testPageRanges() {
@@ -533,6 +557,84 @@ final class ProjectFilesServiceTests: XCTestCase {
         }
         XCTAssertEqual(seen.count, 23, "every file once")
         XCTAssertEqual(Set(seen).count, 23)
+    }
+
+    func testTheListingMarksPinnedFiles() async throws {
+        let docs = try await addCorpus()
+        let h = try await registry.open(project)
+        try await h.write { try $0.setPinned(docs.memo, true) }
+        let o = output(await run(.list(from: 0)))
+        XCTAssertTrue(o.preamble.contains("\(docs.memo). memo.txt -- 1 page -- ready -- pinned"), o.preamble)
+        XCTAssertTrue(o.preamble.contains("\(docs.contract). contract.txt -- 3 pages -- ready\n"), o.preamble)
+    }
+
+    func pin(_ doc: Int64, _ on: Bool, limit: Int? = 100_000) async -> String {
+        let answer = await service().run(.pin(doc: doc, on: on), project: project, byteBudget: 16_000,
+                                         pinLimitTokens: limit, stillOwned: { self.owned })
+        guard case .text(let text) = answer else { XCTFail("not text: \(answer)"); return "" }
+        return text
+    }
+
+    func testPinAndUnpinThroughTheTool() async throws {
+        let docs = try await addCorpus()
+        let h = try await registry.open(project)
+        var pins: [Int64] = []
+        var got = ""
+        let pinned = await pin(docs.contract, true)
+        XCTAssertTrue(pinned.hasPrefix("Pinned file \(docs.contract) (contract.txt, ≈"), pinned)
+        XCTAssertTrue(pinned.contains("from the user's next message"), "says when it applies")
+        pins = try await h.read { try $0.pins() }
+        XCTAssertEqual(pins, [docs.contract])
+        got = await pin(docs.contract, true)
+        XCTAssertTrue(got.contains("already pinned"))
+        let unpinned = await pin(docs.contract, false)
+        XCTAssertTrue(unpinned.hasPrefix("Unpinned file \(docs.contract)"), unpinned)
+        pins = try await h.read { try $0.pins() }
+        XCTAssertEqual(pins, [])
+        got = await pin(docs.contract, false)
+        XCTAssertTrue(got.contains("isn't pinned"))
+        got = await pin(99, true)
+        XCTAssertTrue(got.contains("no file 99"))
+        got = await pin(docs.contract, true, limit: nil)
+        XCTAssertTrue(got.contains("can't be pinned in this chat"))
+        pins = try await h.read { try $0.pins() }
+        XCTAssertEqual(pins, [], "refused: nothing written")
+    }
+
+    func testPinningPastTheLimitIsRefusedWithTheSizes() async throws {
+        let docs = try await addCorpus()
+        let h = try await registry.open(project)
+        let sizes = try await h.read { s in try s.pinTokens(of: try s.documents()) }
+        let memo = try XCTUnwrap(sizes[docs.memo]), contract = try XCTUnwrap(sizes[docs.contract])
+        var pins: [Int64] = []
+        let got = await pin(docs.memo, true, limit: memo + contract - 1)
+        XCTAssertTrue(got.hasPrefix("Pinned"))
+        let refused = await pin(docs.contract, true, limit: memo + contract - 1)
+        XCTAssertEqual(refused, "Not pinned: file \(docs.contract) (contract.txt) is ≈\(contract) tokens, and this project's pinned "
+                       + "files may take ≈\(memo + contract - 1) with this model (≈\(memo) taken by the files pinned already). "
+                       + #"Tell the user it's too long to pin; read it by pages instead: project_files({"doc":\#(docs.contract),"pages":"1-3"})."#)
+        pins = try await h.read { try $0.pins() }
+        XCTAssertEqual(pins, [docs.memo])
+        // Moved out of the project meanwhile: nothing written.
+        owned = false
+        let answer = await service().run(.pin(doc: docs.notes, on: true), project: project, byteBudget: 16_000,
+                                         pinLimitTokens: 100_000, stillOwned: { self.owned })
+        XCTAssertEqual(answer, .refused(ProjectFiles.notInProjectText))
+        pins = try await h.read { try $0.pins() }
+        XCTAssertEqual(pins, [docs.memo])
+    }
+
+    func testARegistrysPinnedFilesOpenOrClosed() async throws {
+        let docs = try await addCorpus()
+        let h = try await registry.open(project)
+        try await h.write { try $0.setPinned(docs.memo, true) }
+        let open = try await registry.pinnedFiles(for: project)
+        XCTAssertEqual(open.files.map(\.doc), [docs.memo])
+        XCTAssertEqual(open.files.first?.pages.first?.text, "Memo about the office move. The server room moves to the second floor in March.")
+        registry.close(project)
+        let closed = try await registry.pinnedFiles(for: project)
+        XCTAssertEqual(closed.files, open.files, "read-only from the file")
+        XCTAssertFalse(registry.openProjects.contains(project), "not opened for it")
     }
 
     func testARemovalBetweenListingPagesSkipsNoFile() async throws {

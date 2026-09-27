@@ -52,6 +52,9 @@ struct ToolContext {
     /// False once a result found no room this turn: a project tool answers
     /// with its listing only (set by ChatToolbox).
     var fileTextAllowed = true
+    /// A file may be pinned now: no tool returned text this turn yet
+    /// (ToolTrust.allowsPin; set by ChatToolbox).
+    var pinAllowed = true
     /// This one call, unique (a model may repeat call ids): what a `once`
     /// folder grant is for.
     var callKey = UUID().uuidString
@@ -254,6 +257,13 @@ final class ChatToolbox {
         prepared = [:]
     }
 
+    /// The turn's request carries pinned file text (adr/0012, "Pinned
+    /// files"): the barrier is down from its start, as after a project
+    /// tool's result.
+    func notePinnedText() {
+        turnTrust.pinnedText = true
+    }
+
     /// The names of the tools that return project or folder text: their
     /// calls and results are left out of later turns' requests.
     var projectToolNames: Set<String> {
@@ -351,11 +361,14 @@ final class ChatToolbox {
             return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
         if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {
-            // Whatever it answers -- file names count as file text too.
-            defer { turnTrust.record(kind) }
+            // Whatever it answers -- file names count as file text too; only
+            // content (a search, a read) stops a pin.
+            let namesOnly = tool is ProjectFilesTool && ProjectFiles.returnsNamesOnly(arguments.values)
+            defer { if namesOnly { turnTrust.recordProjectNames() } else { turnTrust.record(kind) } }
             if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent
+            context.pinAllowed = ToolTrust.allowsPin(turnTrust)
             let result = await tool.run(arguments.values, context: context)
             // A folder read that found no room: no file text for the rest of the turn.
             if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }

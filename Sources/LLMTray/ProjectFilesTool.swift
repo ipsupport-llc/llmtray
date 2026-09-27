@@ -6,7 +6,9 @@ import LLMTrayCore
 /// (ProjectFilesMode) -- nothing without files or with the feature off, the
 /// listing alone while nothing is searchable, else search, read and the
 /// listing. Its work is LLMTrayCore's `ProjectFilesService` over the
-/// indexer's registry and the embedder's shared runner.
+/// indexer's registry and the embedder's shared runner. Its `pin` keeps a
+/// file whole in the project's requests (adr/0012, "Pinned files"); a
+/// temporary chat has no project, so it never gets here.
 @MainActor
 final class ProjectFilesTool: ChatTool {
     let name = ProjectFiles.toolName
@@ -41,10 +43,14 @@ final class ProjectFilesTool: ChatTool {
         case .failure(let error): return .text(error.message)
         case .success(let r): request = r
         }
+        // A tool's text this turn can't pin a file (unpinning is fine).
+        if case .pin(_, true) = request, !context.pinAllowed { return .refused(ToolTrust.pinRefusal) }
         let answer = await indexer.filesService.run(
             request, project: project.id,
             byteBudget: context.projectTextBytes ?? ProjectTextBudget.bytes(forTokens: ProjectTextBudget.hardCapTokens),
             fileTextAllowed: context.fileTextAllowed,
+            // A pin is for the project's chats, with this chat's model's room.
+            pinLimitTokens: ProjectIndexer.pinLimit(for: context.settings).tokens,
             stillOwned: { ChatLibraryStore.shared.library.chat(chat, isIn: project.id) })
         switch answer {
         case .output(let output): return .projectText(output)

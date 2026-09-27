@@ -246,6 +246,7 @@
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
 "Errors" = "Errors";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
@@ -386,6 +387,7 @@
 "Manage Models…" = "Manage Models…";
 "Managed by iCloud Drive or another cloud provider." = "Managed by iCloud Drive or another cloud provider.";
 "Max tokens" = "Max tokens";
+"Measuring the file…" = "Measuring the file…";
 "Memory" = "Memory";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Message…" = "Message…";
@@ -458,6 +460,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
+"Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
 "OK" = "OK";
 "Off" = "Off";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
@@ -489,7 +492,11 @@
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
 "Pin" = "Pin";
+"Pin %@" = "Pin %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.";
 "Pinned" = "Pinned";
+"Pinned · ≈%@ tokens" = "Pinned · ≈%@ tokens";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Pinned: %1$lld files, ≈%2$@ of %3$@ tokens";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it.";
 "Play" = "Play";
 "Point an app or agent at LLMTray:" = "Point an app or agent at LLMTray:";
@@ -759,6 +766,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder.";
 "Today" = "Today";
 "Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
+"Too long for the selected model's room now, read by search instead: %@" = "Too long for the selected model's room now, read by search instead: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
 "Too many reviews from this network. Try again later." = "Too many reviews from this network. Try again later.";
 "Tool" = "Tool";
@@ -792,6 +801,8 @@
 "Unload chat model during generation" = "Unload chat model during generation";
 "Unload model when idle" = "Unload model when idle";
 "Unpin" = "Unpin";
+"Unpin %@" = "Unpin %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Unpin: the project's chats search this file again instead of getting all of it";
 "Up to date" = "Up to date";
 "Up to date." = "Up to date.";
 "Update" = "Update";
@@ -892,6 +903,8 @@
 "~%1$lld h %2$lld min left" = "~%1$lld h %2$lld min left";
 "~%lld h left" = "~%lld h left";
 "~%lld min left" = "~%lld min left";
+"· %lld pinned" = "· %lld pinned";
 "· size…" = "· size…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” couldn't be removed: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: the pin couldn't be changed: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” and its index are deleted from the project. The file you added it from isn't touched.";
