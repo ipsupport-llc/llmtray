@@ -156,7 +156,7 @@ public struct FolderFiles {
         var incomplete = false
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
             // The cap counts every name looked at, shown or not.
-            let read = try walker.scanEntries(of: dir, limit: limits.maxScan - scanned)
+            let read = try walker.scanEntries(of: dir, limit: limits.maxScan - scanned, shouldStop: isCancelled)
             scanned += read.visited
             if read.skipped > 0 { incomplete = true }
             if read.capped { truncated = true }

@@ -82,8 +82,10 @@ public struct DuplicateFinder {
             let deadline = budget.deadline
             let read = try walker.scanEntries(of: dir, limit: room) { isCancelled() || clock() >= deadline }
             var entries = read.entries
-            if read.capped, budget.stop == nil, read.visited < room {
-                budget.stop = isCancelled() ? .cancelled : .timeLimit
+            // Asked again once the read ends: a cancel or the deadline during
+            // the last name is a stop too (ahead of the entry cap).
+            if budget.stop == nil {
+                if isCancelled() { budget.stop = .cancelled } else if clock() >= deadline { budget.stop = .timeLimit }
             }
             let capped = read.capped
             defer { if capped, budget.stop == nil { budget.stop = .fileLimit } }
