@@ -54,6 +54,11 @@ final class ExtractorMessageTests: XCTestCase {
         XCTAssertEqual(caps, expected)
         XCTAssertEqual(try JSONDecoder().decode(ExtractionCaps.self, from: Data(ExtractionCaps().json.utf8)), ExtractionCaps())
         XCTAssertThrowsError(try JSONDecoder().decode(ExtractionCaps.self, from: Data(#"{"maxPages":"many"}"#.utf8)))
-        XCTAssertGreaterThan(ExtractionCaps().maxOutputBytes, ExtractionCaps().maxTextBytes * 3 / 2)
+        // Text of short CRLF lines at the text cap still fits the output cap.
+        var small = ExtractionCaps()
+        small.maxTextBytes = 200_000
+        small.maxPages = 1
+        let crlf = String(repeating: "\r\n", count: 100_000)   // 200 KB, 400 KB escaped
+        XCTAssertLessThanOrEqual(ExtractorMessage.page(ExtractedPage(page: 1, text: crlf)).line.utf8.count + 1, small.maxOutputBytes)
     }
 }

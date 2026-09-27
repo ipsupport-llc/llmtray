@@ -28,9 +28,12 @@ public struct ExtractionCaps: Codable, Equatable, Sendable {
     public init() {}
 
     /// What the parent reads from the child's stdout at most: the text cap
-    /// plus JSON escaping (~1.5x) and each page's framing.
+    /// with JSON escaping and each page's framing. Twice the text: a line
+    /// break or quote escapes to two bytes, so short CRLF lines double it
+    /// (the adr's ~1.5x would refuse such a file under the text cap); only
+    /// control characters (\u00XX) go further, and they are junk anyway.
     public var maxOutputBytes: Int {
-        maxTextBytes + maxTextBytes / 2 + maxPages * 256 + 64 * 1024
+        maxTextBytes * 2 + maxPages * 256 + 64 * 1024
     }
 
     public init(from decoder: Decoder) throws {
