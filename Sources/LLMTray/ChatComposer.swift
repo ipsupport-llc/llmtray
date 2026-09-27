@@ -103,6 +103,7 @@ final class ComposerModel: ObservableObject {
 struct ChatComposer: View {
     @EnvironmentObject var chat: ChatClient
     @ObservedObject var composer: ComposerModel
+    @ObservedObject private var folders = FolderAccessManager.shared
     let canChat: Bool
     let canRegenerate: Bool
     let canCompact: Bool
@@ -124,6 +125,9 @@ struct ChatComposer: View {
                     Button { composer.pickImages() } label: { Image(systemName: "paperclip") }
                         .buttonStyle(.plain)
                         .help("Attach image(s) for the model to see")
+                }
+                if folders.isEnabled {
+                    ChatFolderMenu()
                 }
                 // Not disabled during streaming: a disabled NSTextField
                 // resigns first responder, which kicked focus out of the

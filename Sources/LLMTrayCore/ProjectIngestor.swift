@@ -180,8 +180,10 @@ public final class ProjectIngestor {
 
     public func displayStatus(_ d: IndexedDocument, in project: UUID) -> DocumentDisplayStatus {
         let a = activity[project]
-        let queuedEmbed = !isWordsOnly && (queue.queued(project).contains(.embed(d.doc)) || queue.inFlight == Item(project: project, work: .embed(d.doc)))
-        return DocumentDisplayStatus(d.status, activity: a?.doc == d.doc ? a?.stage : nil, embeddingQueued: queuedEmbed)
+        let queued = queue.queued(project)
+        let queuedEmbed = !isWordsOnly && (queued.contains(.embed(d.doc)) || queue.inFlight == Item(project: project, work: .embed(d.doc)))
+        return DocumentDisplayStatus(d.status, activity: a?.doc == d.doc ? a?.stage : nil, embeddingQueued: queuedEmbed,
+                                     reindexQueued: queued.contains(.reindex(d.doc)))
     }
 
     private func changed() { onChange?() }
@@ -227,6 +229,11 @@ public final class ProjectIngestor {
             if !done { opened.remove(project) }
         } else {
             queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
+            // Re-indexes asked for before a quit.
+            let reindexes = (try? await h.write { try $0.pendingReindexes() }) ?? []
+            if !stopped.contains(project), !deleted.contains(project) {
+                queue.enqueue(reindexes.map(ProjectIngestQueue.Work.reindex), in: project)
+            }
         }
         // Not the report's list: that one knows only an existing vector
         // set, and documents made searchable before the embedder was
@@ -342,6 +349,30 @@ public final class ProjectIngestor {
         if let h { _ = try? await h.write { try $0.stopIndexing() } }
         endTransition(project)
         if let h { await refreshDocuments(project, h) }
+    }
+
+    /// Re-index one document (the Files view): read again from its copy
+    /// into a new revision, the current one searchable until that commits,
+    /// then embedded. Like an add, it restarts a stopped project; a Stop
+    /// meanwhile wins.
+    public func reindex(_ doc: Int64, in project: UUID) async {
+        // A Stop after the click wins, whenever it lands.
+        let e = epoch(project)
+        guard let h = try? await handle(project), epoch(project) == e, !deleted.contains(project) else { return }
+        await beginTransition(project)
+        defer { endTransition(project) }
+        guard epoch(project) == e else { return }
+        // Kept in the index until it commits: a quit meanwhile doesn't lose it.
+        _ = try? await h.write { try $0.requestReindex(doc: doc) }
+        guard epoch(project) == e, !deleted.contains(project) else { return }
+        if stopped.remove(project) != nil {
+            persist()
+            await queueEmbedding(project, h)
+            guard epoch(project) == e, !deleted.contains(project) else { return }
+        }
+        queue.enqueue([.reindex(doc)], in: project)
+        kick()
+        changed()
     }
 
     /// Index Now: `not_indexed` documents back in the queue, embedding
@@ -557,12 +588,13 @@ public final class ProjectIngestor {
 
     private func perform(_ item: Item) async -> ProjectIngestQueue.Outcome {
         switch item.work {
-        case .extract(let doc): return await extract(doc, item)
+        case .extract(let doc): return await extract(doc, item, reindex: false)
+        case .reindex(let doc): return await extract(doc, item, reindex: true)
         case .embed(let doc): return await embed(doc, item)
         }
     }
 
-    private func extract(_ doc: Int64, _ item: Item) async -> ProjectIngestQueue.Outcome {
+    private func extract(_ doc: Int64, _ item: Item, reindex: Bool) async -> ProjectIngestQueue.Outcome {
         let e = epoch(item.project)
         guard await waitForForeground(item, e, pauses: true) else { return outcomeWhenCut(item, e) }
         activity[item.project] = Activity(doc: doc, stage: .reading)
@@ -573,11 +605,14 @@ public final class ProjectIngestor {
         let job: IndexJob
         do {
             h = try await handle(item.project)
-            job = try await h.write { try $0.beginExtraction(doc: doc) }
+            job = try await h.write { reindex ? try $0.beginReindex(doc: doc) : try $0.beginExtraction(doc: doc) }
         } catch {
-            // Removed or stopped meanwhile, or the project is gone.
+            // Removed or stopped meanwhile, or the project is gone (a
+            // re-index of a document not indexed yet: its first extraction does).
             if Self.isStale(error) || !isCurrent(item, e) { return .dropped }
             NSLog("LLMTray: project file %lld couldn't be read for indexing: %@", doc, "\(error)")
+            // A re-index that can't begin keeps the current revision.
+            if reindex { return .failed }
             if let h = try? await handle(item.project) {
                 _ = try? await h.write { try $0.failStaged(doc: doc, error: "\(error)") }
             }

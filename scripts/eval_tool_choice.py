@@ -47,6 +47,15 @@ CASES = [
     ("во сколько закат в Риме?", "get_weather", {"kind": "sun"}),
     ("нарисуй кота в шляпе", "generate_image", {}),
     ("compose a short upbeat synth-pop jingle", "generate_music", {}),
+    # Folder tools (adr/0014): looking is files; a change the user asked for
+    # outright is change_files (it only proposes a plan the user approves).
+    ("что лежит у меня в папке Загрузки?", "files", {"path": "*"}),
+    ("what's taking the space in ~/Downloads? any duplicate files?", "files", {"path": "*"}),
+    ("how big is ~/Documents/report.pdf and is it really a PDF?", "files", {"path": "*"}),
+    ("перемести ~/Downloads/invoice.pdf в папку ~/Documents/Invoices", "change_files", {"ops": "*"}),
+    ("put ~/Desktop/old-notes.txt in the Trash", "change_files", {"ops": "*"}),
+    ("create a folder Screenshots in ~/Desktop", "change_files", {"ops": "*"}),
+    ("what does 'ls' mean in a terminal?", None, {}),
 ]
 
 # Former names -> (tool, arguments they imply): scores a dump from before
@@ -59,8 +68,11 @@ FORMER = {
     "get_sunrise_sunset": ("get_weather", {"kind": "sun"}),
     "get_public_holidays": ("get_country_info", {"about": "holidays"}),
 }
-# Tools no single prompt can call without chat state (an image to edit or look at).
-NEEDS_STATE = {"edit_image", "view_image"}
+# Tools no single prompt can call without chat state (an image to edit or
+# look at, a project with files).
+NEEDS_STATE = {"edit_image", "view_image", "project_files"}
+# Former names a model may use for the folder tools (before they were two).
+FORMER.update({"list_dir": ("files", {}), "file_info": ("files", {}), "list_files": ("files", {})})
 
 SYSTEM = ("You are a helpful assistant running locally on the user's Mac. Answer in the language the user writes in. "
           "Be concise and direct; use Markdown (lists, code blocks) when it helps readability.")

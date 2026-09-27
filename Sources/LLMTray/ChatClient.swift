@@ -36,6 +36,21 @@ final class ChatClient: ObservableObject {
     enum MediaAction { case regenerate, tweak, remove }
     /// Creator mode's draft on screen, waiting for the user or its countdown.
     @Published var draft: GenerationDraft?
+    /// A folder grant prompt on screen (adr/0014): a folder tool's call
+    /// waits for it, or the user opened it (Allow Folder…).
+    @Published var folderPrompt: FolderAccessPrompt?
+    /// The chat's pending folder plan, or the last one's result.
+    @Published var folderPlan: FolderPlanModel?
+    /// The chat as the folder grants know it, per visit: a saved chat's
+    /// session id plus the visit's, a temporary chat's own. Never reused, so
+    /// a call that outlived a visit can't write for the next one; its grants
+    /// and plan end with the visit.
+    private(set) var folderChatID = UUID().uuidString
+
+    static func folderChatID(_ session: UUID?) -> String {
+        let visit = UUID().uuidString
+        return session.map { "\($0.uuidString)#\(visit)" } ?? visit
+    }
     /// Waiting in the app-wide generator queue: how many are ahead (the
     /// running one included); nil once it runs.
     @Published private(set) var mediaQueuePosition: Int?
@@ -176,7 +191,9 @@ final class ChatClient: ObservableObject {
     func newSession() {
         resetConversationState()
         messages.removeAll()
-        currentSessionID = UUID()
+        let id = UUID()
+        currentSessionID = id
+        folderChatID = Self.folderChatID(id)
         currentSessionTitle = ""
         sessionCreatedAt = Date()
         titleIsFinal = false
@@ -189,6 +206,7 @@ final class ChatClient: ObservableObject {
         resetConversationState()
         messages.removeAll()
         currentSessionID = nil
+        folderChatID = Self.folderChatID(nil)
         currentSessionTitle = ""
         sessionCreatedAt = nil
     }
@@ -204,6 +222,7 @@ final class ChatClient: ObservableObject {
         titleTask?.cancel()
         titleTask = nil
         conversationEpoch += 1
+        endFolderChat()
         assistantMessageIndex = nil
         pendingRequestContext = nil
         decoder = SSEDecoder()
@@ -241,6 +260,7 @@ final class ChatClient: ObservableObject {
             return message
         }
         currentSessionID = file.id
+        folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
         titleIsFinal = true
@@ -479,7 +499,108 @@ final class ChatClient: ObservableObject {
     private func withProject(_ settings: ChatSettings) -> ChatSettings {
         var settings = settings
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
+        settings.folders = folderChat
         return settings
+    }
+
+    // MARK: - Folder access (adr/0014)
+
+    /// The chat for the folder tools; nil while the feature is off.
+    var folderChat: FolderChat? {
+        FolderAccessManager.shared.isEnabled ? FolderChat(id: folderChatID, temporary: currentSessionID == nil) : nil
+    }
+
+    /// The chat is left (another one, a closed tab): its folder grants for
+    /// the chat, denies and pending plan end, and their cards go.
+    private func endFolderChat() {
+        folderPrompt?.resolve(nil)
+        folderPrompt = nil
+        folderPlan = nil
+        FolderAccessManager.shared.endChat(folderChatID)
+    }
+
+    /// A folder tool's call asks the user about a folder: the card shows in
+    /// the chat and the call waits for it (nil: Stop, another chat).
+    /// `chatID` and `token`: the call's chat and turn -- a call that outlived
+    /// a switch or a Stop never asks in the chat on screen now.
+    func askFolderAccess(_ request: FolderGrantRequest, chatID: String, token: Int) async -> GrantChoice? {
+        guard let chat = folderChat, chat.id == chatID, token == turnToken else { return nil }
+        let prompt = FolderAccessPrompt(request: request, choices: GrantChoice.offered(temporaryChat: chat.temporary), forCall: true)
+        folderPrompt?.resolve(nil)
+        folderPrompt = prompt
+        let answer = await prompt.decide()
+        if folderPrompt === prompt { folderPrompt = nil }
+        FolderAccessManager.shared.refresh()
+        return answer
+    }
+
+    /// Allow Folder… in the chat's menu: the user picks a folder, then how
+    /// long (a card in the chat); the model may ask again after a deny.
+    func allowFolder(level: FolderAccessLevel) {
+        guard let chat = folderChat, !(chat.temporary && level > .read) else { return }
+        // A call is waiting on its own question: that one first.
+        guard folderPrompt?.forCall != true else { return }
+        let message = level == .change
+            ? NSLocalizedString("Choose a folder the chat may propose changes in. You approve every change.", comment: "")
+            : NSLocalizedString("Choose a folder the chat may look in.", comment: "")
+        guard let picked = FolderAccessManager.shared.pickFolder(message: message) else { return }
+        switch picked {
+        case .failure(let error):
+            errorText = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), FolderAccessManager.message(error))
+        case .success(let root):
+            let prompt = FolderAccessPrompt(request: FolderGrantRequest(root: root, level: level),
+                                            choices: GrantChoice.offered(temporaryChat: chat.temporary, forCall: false), forCall: false)
+            prompt.onAnswer = { [weak prompt] choice in
+                do {
+                    try FolderAccessManager.shared.userGrant(root, level: level, choice: choice, chat: chat)
+                } catch {
+                    prompt?.error = FolderAccessManager.message(error)
+                }
+            }
+            prompt.onDone = { [weak self, weak prompt] in
+                if let self, self.folderPrompt === prompt { self.folderPrompt = nil }
+            }
+            folderPrompt = prompt
+        }
+    }
+
+    /// The folders this chat may use now, for its menu.
+    var accessibleFolders: [FolderGrant] {
+        guard let chat = folderChat else { return [] }
+        return FolderAccessManager.shared.service.accessibleFolders(chat)
+    }
+
+    /// The pending plan as the store has it now: a new card, or the card's
+    /// newer revision; none once it's gone (a result card stays).
+    func refreshFolderPlan() {
+        guard let plan = FolderAccessManager.shared.service.plans.pending(chatID: folderChatID) else {
+            if folderPlan?.isReviewing == true { folderPlan = nil }
+            return
+        }
+        if let card = folderPlan, card.isReviewing, card.review.plan.id == plan.id {
+            card.update(plan)
+        } else if folderPlan?.isBusy != true {
+            // A new plan: in place of the last one's result.
+            let card = FolderPlanModel(review: PlanReview(plan: plan), chatID: folderChatID)
+            // A plan proposed while this one ran shows once it's done.
+            card.onSettled = { [weak self] in self?.refreshFolderPlan() }
+            folderPlan = card
+        }
+    }
+
+    /// The plan card's Close (or Cancel): a plan waiting behind it shows.
+    func dismissFolderPlan() {
+        folderPlan = nil
+        refreshFolderPlan()
+    }
+
+    /// Settings turned folder access off: the plan waiting for approval and
+    /// any open prompt go (a running plan finishes; its result stays).
+    func folderAccessTurnedOff() {
+        folderPrompt?.resolve(nil)
+        folderPrompt = nil
+        FolderAccessManager.shared.service.plans.cancel(chatID: folderChatID)
+        if folderPlan?.isReviewing == true { folderPlan = nil }
     }
 
     /// The turn's first request, with its project and that project's file
@@ -520,6 +641,7 @@ final class ChatClient: ObservableObject {
         titleTask?.cancel()
         titleTask = nil
         conversationEpoch += 1
+        endFolderChat()
         forgetCurrentSession()
     }
 
@@ -855,6 +977,11 @@ final class ChatClient: ObservableObject {
     func cancel() {
         draft?.resolve(nil)
         draft = nil
+        // A call waiting on a folder prompt stops; one the user opened stays.
+        if folderPrompt?.forCall == true {
+            folderPrompt?.resolve(nil)
+            folderPrompt = nil
+        }
         transport.cancel()
         turnToken += 1
         isStreaming = false
@@ -891,6 +1018,8 @@ final class ChatClient: ObservableObject {
         now.modelPath = modelPath
         now.modelSupportsVision = start.modelSupportsVision
         now.project = start.project
+        // Turned off mid-turn: stops at once.
+        now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
         return now
     }
 
@@ -1153,8 +1282,9 @@ final class ChatClient: ObservableObject {
                 continue
             }
             if untrusted.contains(call.id) {
+                let text = toolbox.trustRefusalText(call, settings: settings)
                 toolbox.recordRefusal(call)
-                var refusal = ChatMessage(role: "tool", content: ToolTrust.refusal, toolCallID: call.id)
+                var refusal = ChatMessage(role: "tool", content: text, toolCallID: call.id)
                 refusal.isRefusal = true
                 messages.append(refusal)
                 continue
@@ -1168,7 +1298,9 @@ final class ChatClient: ObservableObject {
             let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
                                      model: drafts[call.id]?.modelID)
             var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
-            if toolbox.projectToolNames.contains(call.name) {
+            let chatID = folderChatID
+            toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }
+            if toolbox.budgetedToolNames.contains(call.name) {
                 // What the next request has room for now, the results before
                 // this one counted: the tool sizes its answer to it.
                 toolContext.projectTextBytes = ProjectTextBudget.allowance(
@@ -1177,6 +1309,8 @@ final class ChatClient: ObservableObject {
             }
             let result = await toolbox.run(call, context: toolContext)
             guard stillCurrent() else { break }
+            // A proposal went to the chat's plan: its card shows it.
+            if call.name == FolderTools.changeName { refreshFolderPlan() }
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
             switch result {
             case .text(let text):

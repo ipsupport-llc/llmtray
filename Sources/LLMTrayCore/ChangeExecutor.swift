@@ -157,7 +157,10 @@ public struct ChangeExecutor {
         var components: [String]
     }
 
-    public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false }) -> Report {
+    /// `progress` is told how many items have been dealt with, of all,
+    /// after each one.
+    public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false },
+                        progress: (_ finished: Int, _ total: Int) -> Void = { _, _ in }) -> Report {
         var report = Report(planID: approved.plan.id, outcomes: [], stoppedAt: nil)
         // An approval runs once -- and a plan with a journal already ran.
         guard let plan = approved.take(), !journal.exists(approved.plan.id) else {
@@ -180,6 +183,7 @@ public struct ChangeExecutor {
             return report
         }
         for item in plan.items {
+            defer { progress(report.outcomes.count, plan.items.count) }
             if report.stoppedAt != nil || isCancelled() {
                 report.outcomes.append((item.id, .notRun))
                 continue

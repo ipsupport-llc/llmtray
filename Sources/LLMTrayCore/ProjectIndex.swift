@@ -412,6 +412,7 @@ public final class ProjectIndex {
                 guard d.rev == job.rev - 1, d.status != .removing, d.status != .staged, d.status != .extracting else {
                     throw ProjectIndexError.stale(job.doc)
                 }
+                try clearReindexRequest(doc: job.doc)
                 let old = try db.scalarInt("SELECT count(*) FROM chunks WHERE doc = ?", [.int(job.doc)]) ?? 0
                 try db.run("DELETE FROM chunks WHERE doc = ?", [.int(job.doc)])
                 try point("reindex.deleted")
@@ -470,6 +471,7 @@ public final class ProjectIndex {
     /// revision and records why.
     public func failExtraction(_ job: IndexJob, error: String, unsupported: Bool = false) throws {
         if job.isReindex {
+            try clearReindexRequest(doc: job.doc)
             try db.run("UPDATE documents SET error = ? WHERE doc = ? AND rev = ?", [.text(error), .int(job.doc), .int(job.rev - 1)])
         } else {
             try db.run("UPDATE documents SET status = ?, error = ? WHERE doc = ? AND rev = ? AND status = 'extracting'",
@@ -483,6 +485,35 @@ public final class ProjectIndex {
         try db.run("UPDATE documents SET status = 'failed', error = ? WHERE doc = ? AND status = 'staged'", [.text(error), .int(doc)])
     }
 
+    // MARK: - re-index requests
+
+    /// A re-index asked for (the Files view), kept until its revision
+    /// commits or fails, the document is removed, or a Stop: a quit before
+    /// then doesn't lose it (`pendingReindexes` at open).
+    public func requestReindex(doc: Int64) throws {
+        try db.run("INSERT OR REPLACE INTO meta(key, value) VALUES (?, 1)", [.text("reindex:\(doc)")])
+    }
+
+    func clearReindexRequest(doc: Int64) throws {
+        try db.run("DELETE FROM meta WHERE key = ?", [.text("reindex:\(doc)")])
+    }
+
+    /// The documents a re-index was asked for that can still have one; the
+    /// rest's requests are dropped.
+    public func pendingReindexes() throws -> [Int64] {
+        let keys = try db.rows("SELECT key FROM meta WHERE key LIKE 'reindex:%'") { $0.text(0) }
+        var docs: [Int64] = []
+        let allowed: Set<DocumentStatus> = [.searchable, .embedded, .failed, .empty, .unsupported]
+        for key in keys {
+            guard let doc = Int64(key.dropFirst("reindex:".count)), let d = try document(doc), allowed.contains(d.status) else {
+                try db.run("DELETE FROM meta WHERE key = ?", [.text(key)])
+                continue
+            }
+            docs.append(doc)
+        }
+        return docs.sorted()
+    }
+
     // MARK: - stop / resume
 
     /// Stop: whatever isn't searchable yet becomes `not_indexed`; indexed
@@ -490,7 +521,10 @@ public final class ProjectIndex {
     @discardableResult
     public func stopIndexing() throws -> Int {
         try db.run("UPDATE documents SET status = 'not_indexed' WHERE status IN ('staged','extracting')")
-        return db.changes
+        let stopped = db.changes
+        // A Stop clears the queue, the re-indexes asked for included.
+        try db.run("DELETE FROM meta WHERE key LIKE 'reindex:%'")
+        return stopped
     }
 
     /// Index Now: `not_indexed` back to `staged`; returns them, and those
