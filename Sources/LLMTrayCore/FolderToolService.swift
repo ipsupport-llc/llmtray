@@ -376,7 +376,12 @@ public final class FolderToolService: @unchecked Sendable {
     /// One `files` call: the folders the chat may use (no path), a listing,
     /// duplicates or a file's info, within `byteBudget`. Asks for a read
     /// grant when the path has none (at most once per call).
+    /// `changeNextMessage`: changes are off in this turn once it has read and
+    /// back with the user's next message (`ToolTrust.changeWaitsForNextMessage`);
+    /// a result from a folder the chat may propose changes in then ends by
+    /// saying so (`FolderToolText.nextMessageNote`).
     public func files(_ request: FolderTools.FilesRequest, chat: FolderChat, callKey: String, byteBudget: Int,
+                      changeNextMessage: Bool = false,
                       ask: Ask, isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.filesName
         guard let raw = request.path else {
@@ -421,11 +426,16 @@ public final class FolderToolService: @unchecked Sendable {
             if !ok { revoked.set() }
             return ok
         }
-        let answer = run(request, at: location, byteBudget: byteBudget, isCancelled: { isCancelled() || !stillGranted() })
+        let note = changeNextMessage && !chat.temporary
+            && covered(path, level: .change, chat: chat, callKey: callKey) != nil ? FolderToolText.nextMessageNote : nil
+        let room = byteBudget - (note.map { $0.utf8.count + 1 } ?? 0)
+        let answer = run(request, at: location, byteBudget: room, isCancelled: { isCancelled() || !stillGranted() })
         guard !revoked.isSet, stillGranted() else {
             return .refused("Access to that folder was withdrawn while it was being read: nothing from it can be used. "
                 + "Answer without it.")
         }
+        // Only under a result read from the folder, not under an error.
+        if let note, case .text(let t) = answer, !t.hasPrefix(name + ":") { return .text(t + "\n" + note) }
         return answer
     }
 
@@ -668,19 +678,73 @@ public final class FolderToolService: @unchecked Sendable {
             .mapValues { $0.replacingOccurrences(of: home + "/", with: "~/") }
     }
 
+    /// What the review looks up on disk: folder sizes, how trashed copies
+    /// compare (`PlanChecker`, read only, bounded), only while the chat may
+    /// still read there.
+    public func checks(_ plan: ChangePlan, isCancelled: () -> Bool = { false }) -> PlanChecks {
+        let chat = plan.chatID
+        return PlanChecker(denylist: denylist).check(plan, canRead: { [grants] loc, proposal in
+            grants.coversRead(path: loc.displayPath, chatID: chat, callKey: proposal ?? "")
+        }, isCancelled: isCancelled)
+    }
+
+    /// Why ticked copies can't be approved as they stand (id -> why): not
+    /// compared yet, or found identical and changed since (either file). A
+    /// copy the user ticked though it differs or couldn't be compared is
+    /// their call.
+    func copyProblems(_ review: PlanReview) -> [Int: String] {
+        let checker = PlanChecker(denylist: denylist)
+        var out: [Int: String] = [:]
+        for item in review.plan.items where review.approvable.contains(item.id) && PlanChecker.isCopyCandidate(item) {
+            let name = item.source?.location.relativePath ?? ""
+            guard let c = review.checks.copies[item.id] else {
+                out[item.id] = "\(name) wasn't compared with its original yet"
+                continue
+            }
+            if c.verdict == .identical, !checker.stillIdentical(item, c) {
+                out[item.id] = "\(name) or its original changed since they were compared"
+            }
+        }
+        return out
+    }
+
+    private let copiesLock = NSLock()
+    /// The comparisons approved plans were approved on, by plan id: held to
+    /// at execution.
+    private var approvedCopies: [UUID: [Int: CopyCheck]] = [:]
+
     /// The user's approval of the ticked items of the exact plan reviewed.
     public func approve(_ review: PlanReview) throws -> ApprovedPlan {
         let chat = review.plan.chatID
-        return try plans.approve(chatID: chat, planID: review.plan.id, revision: review.plan.revision, items: review.approvable,
-                                 validator: ChangePlanner(denylist: denylist, canChange: grants.changeCheck(chatID: chat)))
+        let problems = copyProblems(review)
+        if !problems.isEmpty { throw ChangePlanError.invalidated(problems) }
+        let approved = try plans.approve(chatID: chat, planID: review.plan.id, revision: review.plan.revision,
+                                         items: review.approvable,
+                                         validator: ChangePlanner(denylist: denylist, canChange: grants.changeCheck(chatID: chat)))
+        let identical = review.checks.copies.filter { $0.value.verdict == .identical && review.approvable.contains($0.key) }
+        copiesLock.lock()
+        approvedCopies[approved.plan.id] = identical
+        copiesLock.unlock()
+        return approved
     }
 
     /// Runs an approved plan, one item at a time.
     public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false },
                         progress: (Int, Int) -> Void = { _, _ in }) -> ChangeExecutor.Report {
-        ChangeExecutor(denylist: denylist, journal: journal, trasher: trasher,
-                       canChange: grants.changeCheck(chatID: approved.plan.chatID))
-            .execute(approved, isCancelled: isCancelled, progress: progress)
+        copiesLock.lock()
+        let copies = approvedCopies.removeValue(forKey: approved.plan.id) ?? [:]
+        copiesLock.unlock()
+        var executor = ChangeExecutor(denylist: denylist, journal: journal, trasher: trasher,
+                                      canChange: grants.changeCheck(chatID: approved.plan.chatID))
+        // A copy trashed as identical must still be: both hashed again right
+        // before; anything else fails it (and stops the plan there).
+        let checker = PlanChecker(denylist: denylist)
+        let plan = approved.plan
+        executor.verifyItem = { item in
+            guard let c = copies[item.id] else { return }
+            try checker.verifyBeforeTrash(item, c, plan: plan)
+        }
+        return executor.execute(approved, isCancelled: isCancelled, progress: progress)
     }
 
     /// Undo of a journaled plan, under the change grants of its chat.
