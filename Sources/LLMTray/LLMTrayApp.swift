@@ -201,6 +201,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(showBugReport), name: .showBugReport, object: nil
         )
         NotificationCenter.default.addObserver(
+            self, selector: #selector(showReview), name: .showReview, object: nil
+        )
+        ReviewPrompter.shared.recordLaunch()
+        NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
         )
         // The `Settings { EmptyView() }` scene below exists only because
@@ -429,6 +433,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bugItem.target = self
         menu.addItem(bugItem)
 
+        let rateItem = NSMenuItem(title: NSLocalizedString("Rate LLMTray…", comment: ""), action: #selector(showReview), keyEquivalent: "")
+        rateItem.target = self
+        menu.addItem(rateItem)
+
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -524,6 +532,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.performClose(nil)
         bugReportWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    /// Also after a review was sent: another one is welcome.
+    @objc private func showReview() {
+        popover.performClose(nil)
+        ReviewWindow.show()
     }
 
     @objc private func quitApp() {

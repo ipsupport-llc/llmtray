@@ -51,11 +51,31 @@ public enum Pref {
     /// A new chat's first answer gets the model to name the chat.
     public static let autoTitleChats = PrefKey("llmtray.autoTitleChats", default: true)
 
+    /// The download queue (DownloadQueueState as JSON): what the first-run
+    /// wizard chose that is still to download or failed, kept across a
+    /// relaunch.
+    public static let downloadQueue = PrefKey<String?>("llmtray.downloadQueue", default: nil)
+
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)
     public static let checkUpdatesAtLaunch = PrefKey("llmtray.checkUpdatesAtLaunch", default: true)
     /// Sparkle's own key.
     public static let automaticUpdateChecks = PrefKey("SUEnableAutomaticChecks", default: true)
+
+    // Reviews (ReviewStore, ReviewPrompter)
+    /// The unsent review (a JSON ReviewDraft), kept until the server takes
+    /// it: a failed send is retried with the same idempotency key.
+    public static let reviewDraft = PrefKey<Data?>("llmtray.review.draft", default: nil)
+    /// When a review was last accepted (seconds since 1970); 0 = never.
+    public static let reviewSubmittedAt = PrefKey("llmtray.review.submittedAt", default: 0.0)
+    /// The first launch with reviews in the app; 0 = not yet recorded.
+    public static let reviewFirstLaunch = PrefKey("llmtray.review.firstLaunch", default: 0.0)
+    /// Chat answers that completed without an error.
+    public static let reviewAnswerCount = PrefKey("llmtray.review.answerCount", default: 0)
+    /// "Later": no prompt before this (seconds since 1970); 0 = not snoozed.
+    public static let reviewPromptSnoozedUntil = PrefKey("llmtray.review.snoozedUntil", default: 0.0)
+    /// "Don't ask again".
+    public static let reviewPromptNever = PrefKey("llmtray.review.neverAsk", default: false)
 }
 
 extension UserDefaults {
