@@ -37,6 +37,19 @@ final class HFHubCacheTests: XCTestCase {
         XCTAssertNil(HFHubCache.localSnapshot(repo: "notarepo", cacheDirectory: dir))
     }
 
+    func testAPrunedBlobIsNotComplete() throws {
+        // As huggingface_hub lays it out: the snapshot's file a symlink
+        // into blobs/.
+        let snap = try make("org/pruned", files: ["config.json": "{}"])
+        let blob = snap + "/../../blobs/deadbeef"
+        try FileManager.default.createDirectory(atPath: snap + "/../../blobs", withIntermediateDirectories: true)
+        try "x".write(toFile: blob, atomically: true, encoding: .utf8)
+        try FileManager.default.createSymbolicLink(atPath: snap + "/model.safetensors", withDestinationPath: "../../blobs/deadbeef")
+        XCTAssertEqual(HFHubCache.localSnapshot(repo: "org/pruned", cacheDirectory: dir), snap)
+        try FileManager.default.removeItem(atPath: blob)
+        XCTAssertNil(HFHubCache.localSnapshot(repo: "org/pruned", cacheDirectory: dir))
+    }
+
     func testTheCacheDirectoryFollowsTheEnvironment() {
         XCTAssertEqual(HFHubCache.directory(environment: ["HF_HUB_CACHE": "/h"], home: "/u"), "/h")
         XCTAssertEqual(HFHubCache.directory(environment: ["HF_HOME": "/hf"], home: "/u"), "/hf/hub")

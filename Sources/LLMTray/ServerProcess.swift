@@ -16,12 +16,13 @@ final class ServerProcess {
     /// Called once, after the exit waiters are released.
     var onExit: ((ServerProcess) -> Void)?
 
-    init(executable: String, arguments: [String]) {
+    /// `environment`: added to the app's own.
+    init(executable: String, arguments: [String], environment extra: [String: String] = [:]) {
         task.executableURL = URL(fileURLWithPath: executable)
         task.arguments = arguments
         // Marks the process as LLMTray's (OrphanScan tells an orphan of ours
         // from a user's own mlx_lm.server by it).
-        var environment = ProcessInfo.processInfo.environment
+        var environment = ProcessInfo.processInfo.environment.merging(extra) { $1 }
         environment[OrphanScan.serverMarker] = "1"
         task.environment = environment
         task.standardInput = FileHandle.nullDevice

@@ -15,7 +15,8 @@ public enum HFHubCache {
     }
 
     /// The snapshot folder of `repo` ("org/name") at `refs/main`, if it has
-    /// a config and its weights (every shard its index lists); nil otherwise.
+    /// a config and its weights (every shard its index lists, else every
+    /// .safetensors there, each with its blob); nil otherwise.
     public static func localSnapshot(repo: String, cacheDirectory: String = directory()) -> String? {
         let parts = repo.split(separator: "/")
         guard parts.count == 2 else { return nil }
@@ -33,7 +34,10 @@ public enum HFHubCache {
             guard !shards.isEmpty, shards.allSatisfy({ fm.fileExists(atPath: snapshot + "/" + $0) }) else { return nil }
             return snapshot
         }
-        let files = (try? fm.contentsOfDirectory(atPath: snapshot)) ?? []
-        return files.contains(where: { $0.hasSuffix(".safetensors") }) ? snapshot : nil
+        // Snapshot entries are symlinks into blobs/: fileExists follows
+        // them, so a pruned blob counts as missing.
+        let weights = ((try? fm.contentsOfDirectory(atPath: snapshot)) ?? []).filter { $0.hasSuffix(".safetensors") }
+        guard !weights.isEmpty, weights.allSatisfy({ fm.fileExists(atPath: snapshot + "/" + $0) }) else { return nil }
+        return snapshot
     }
 }

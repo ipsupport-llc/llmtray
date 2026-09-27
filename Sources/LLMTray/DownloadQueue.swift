@@ -5,7 +5,8 @@ import LLMTrayCore
 /// The first-run wizard's downloads, one at a time (adr/0013): the chat
 /// model through HFModelBrowser (as the Hugging Face browser downloads),
 /// the image, edit and music models through FeatureSetup -- each enabled
-/// on the Default profile once it's in place, as Settings does. Free space
+/// on the Default profile once it's in place, as Settings does -- and a
+/// downloaded chat model's MTP drafter (from either). Free space
 /// is checked before each. The order and states are
 /// LLMTrayCore.DownloadQueueState's, kept in Pref.downloadQueue while
 /// anything waits or failed: a relaunch picks up with resume(), a failed
@@ -47,6 +48,8 @@ final class DownloadQueue: ObservableObject {
         var saved = Self.load()
         saved.resetInterrupted()
         state = saved
+        // Here as from the Hugging Face window: a model comes with its drafter.
+        browser.onModelDownloaded = { [weak self] in self?.addMTPDrafter(forModelAt: $0) }
     }
 
     /// Starts what's waiting (after a relaunch: the restored items).
@@ -114,6 +117,22 @@ final class DownloadQueue: ObservableObject {
         add(.init(kind: .embedder, target: entry.id, approxBytes: FeatureSetup.downloadBytes(entry)))
     }
 
+    /// A downloaded model's MTP drafter (ModelDiscovery.mtpDrafterRepo),
+    /// its own row after the model: only when the profile the model runs
+    /// under has it on and it isn't in the hub cache yet. Its failing
+    /// leaves the model as it is; a server start fetches it then.
+    func addMTPDrafter(forModelAt folder: String) {
+        guard let repo = ServerLaunch.drafterToFetch(
+            with: ProfileManager.shared.resolved(for: folder),
+            knownRepo: ModelDiscovery.mtpDrafterRepo(forModelPath: folder),
+            cached: ModelDiscovery.mtpDrafterRepo(forModelPath: folder).flatMap { HFHubCache.localSnapshot(repo: $0) } != nil
+        ) else { return }
+        add(.init(kind: .mtpDrafter, target: repo, approxBytes: Self.mtpDrafterBytes))
+    }
+
+    /// About what a drafter takes (Gemma 4 26B's: ~450MB).
+    private static let mtpDrafterBytes: Int64 = 500 * 1_048_576
+
     private func add(_ item: DownloadQueueState.Item) {
         guard state.enqueue(item) else { return }
         pump()
@@ -122,9 +141,9 @@ final class DownloadQueue: ObservableObject {
     // MARK: - Control
 
     /// Stops `id`: a waiting item never runs; the running chat model's
-    /// download stops. An image or music download can't be stopped part
-    /// way (it's a pip / snapshot_download child); it finishes in the
-    /// background and its feature is left off.
+    /// download stops. An image, music or drafter download can't be
+    /// stopped part way (it's a pip / snapshot_download child); it finishes
+    /// in the background and its feature is left off.
     func cancel(_ id: UUID) {
         guard state.cancel(id) else { return }
         stopRunning(id)
@@ -224,6 +243,14 @@ final class DownloadQueue: ObservableObject {
             watch(setup.projectFiles.embedders.$statusText)
             if let error = await setup.downloadProjectFilesEmbedder() { return error.localizedDescription }
             return nil
+        case .mtpDrafter:
+            if HFHubCache.localSnapshot(repo: item.target) != nil { return nil }
+            // No runtime yet (it installs alongside): the model's first
+            // start fetches it.
+            guard FileManager.default.isExecutableFile(atPath: MLXRuntimeInstaller.venvPython) else { return nil }
+            if let refusal = spaceRefusal(item, at: NSHomeDirectory()) { return refusal }
+            detail = NSLocalizedString("For faster answers (speculative decoding)", comment: "download queue: MTP drafter detail")
+            return await MTPDrafterDownload.fetch(item.target)
         }
     }
 
@@ -263,6 +290,7 @@ final class DownloadQueue: ObservableObject {
         case .imageModel, .editModel: return ImageGenModel(rawValue: item.target)?.displayName ?? item.target
         case .musicModel: return MusicModel(rawValue: item.target)?.displayName ?? item.target
         case .embedder: return FeatureSetup.shared.projectFilesEmbedder.flatMap { $0.id == item.target ? $0.displayName : nil } ?? item.target
+        case .mtpDrafter: return String(format: NSLocalizedString("+ MTP drafter %@", comment: "download queue: a model's drafter, its repo"), item.target)
         }
     }
 

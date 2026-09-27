@@ -139,6 +139,32 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertNil(ServerLaunch.drafter(for: resolved(), available: nil))
     }
 
+    func testDrafterPlan() {
+        func plan(_ p: ResolvedProfile = resolved(), known: String? = "org/d", runtime: Bool = true, local: String? = nil) -> ServerLaunch.DrafterPlan {
+            ServerLaunch.drafterPlan(for: p, knownRepo: known, runtimeSupports: runtime, localSnapshot: local)
+        }
+        XCTAssertEqual(plan(local: "/cache/snap"), .use(folder: "/cache/snap"))
+        // Not downloaded: start without it, never wait on the Hub.
+        XCTAssertEqual(plan(), .startWithoutAndDownload(repo: "org/d"))
+        XCTAssertEqual(plan(runtime: false), .runtimeTooOld)
+        XCTAssertEqual(plan(known: nil), ServerLaunch.DrafterPlan.none)
+        XCTAssertEqual(plan(resolved { $0.launch.mtpDrafter = false }), ServerLaunch.DrafterPlan.none)
+        XCTAssertEqual(plan(resolved { $0.launch.extraServerArgs = "--draft-model x" }, local: "/s"), ServerLaunch.DrafterPlan.none)
+    }
+
+    func testDrafterFetchedWithTheModel() {
+        XCTAssertEqual(ServerLaunch.drafterToFetch(with: resolved(), knownRepo: "org/d", cached: false), "org/d")
+        XCTAssertNil(ServerLaunch.drafterToFetch(with: resolved(), knownRepo: "org/d", cached: true))
+        XCTAssertNil(ServerLaunch.drafterToFetch(with: resolved(), knownRepo: nil, cached: false))
+        // Opt-in: off in the profile, nothing is downloaded.
+        XCTAssertNil(ServerLaunch.drafterToFetch(with: resolved { $0.launch.mtpDrafter = false }, knownRepo: "org/d", cached: false))
+        XCTAssertNil(ServerLaunch.drafterToFetch(with: resolved { $0.launch.extraServerArgs = "--draft-model x" }, knownRepo: "org/d", cached: false))
+    }
+
+    func testTheServerRunsOffline() {
+        XCTAssertEqual(ServerLaunch.offlineEnvironment["HF_HUB_OFFLINE"], "1")
+    }
+
     func testMaxTokensCappedToModelContext() {
         var c = ctx
         c.maxContext = 8192
