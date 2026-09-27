@@ -19,8 +19,13 @@ final class ChatLibraryStore: ObservableObject {
     private var isLoadingAll = false
     private var changedWhileLoading: Set<UUID> = []
 
+    /// Projects' own directories (adr/0012).
+    static let projectStorage = ProjectStorage(root: RuntimePaths.externalRuntimeDir + "/projects")
+
     private init() {
-        library = Self.readLibrary(at: libraryPath)
+        let (library, state) = Self.readLibrary(at: libraryPath)
+        self.library = library
+        finishProjectDeletions(libraryState: state)
         observer = NotificationCenter.default.publisher(for: .sessionsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.reload($0.object as? UUID) }
@@ -129,9 +134,38 @@ final class ChatLibraryStore: ObservableObject {
         saveLibrary()
     }
 
-    func deleteProject(_ id: UUID) {
-        library.deleteProject(id)
+    /// Applies from the next message of its chats.
+    func setInstructions(_ id: UUID, _ text: String) {
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let project = library.project(id), project.instructions != text else { return }
+        library.setInstructions(id, text)
         saveLibrary()
+    }
+
+    /// Its chats stay, projectless from their next message (open tabs
+    /// too); its directory goes, through a deletion record, so a crash
+    /// halfway is finished at the next launch.
+    func deleteProject(_ id: UUID) {
+        let storage = Self.projectStorage
+        ProjectInstructionsWindow.close(id)
+        storage.beginDeletion(id)
+        library.deleteProject(id)
+        // Not saved (a full disk): the project would come back at the next
+        // launch without its directory. The record finishes it then.
+        guard saveLibrary() else { return }
+        storage.finishDeletion(id)
+    }
+
+    /// Deletions a crash left halfway: the project out of the library
+    /// first, then its directory. Not when library.json couldn't be read.
+    private func finishProjectDeletions(libraryState: ProjectStorage.LibraryState) {
+        let storage = Self.projectStorage
+        let pending = storage.pendingDeletions(library: libraryState)
+        guard !pending.isEmpty else { return }
+        let stillListed = pending.filter { library.project($0) != nil }
+        stillListed.forEach { library.deleteProject($0) }
+        if !stillListed.isEmpty { guard saveLibrary() else { return } }
+        pending.forEach { storage.finishDeletion($0) }
     }
 
     /// A tab showing it forgets it first (starting a new chat there saves
@@ -155,10 +189,12 @@ final class ChatLibraryStore: ObservableObject {
     }
 
     /// By the files there are, not the ones that decoded: a chat that
-    /// failed to read keeps its pin and project.
+    /// failed to read keeps its pin and project. A chat open in a tab keeps
+    /// its project too: one started in a project has no file until its
+    /// first turn.
     private func pruneLibrary(onDisk: Set<UUID>) {
         var pruned = library
-        pruned.prune(existing: onDisk)
+        pruned.prune(existing: onDisk.union(ChatTabs.shared.tabs.compactMap(\.currentSessionID)))
         guard pruned != library else { return }
         library = pruned
         saveLibrary()
@@ -171,17 +207,22 @@ final class ChatLibraryStore: ObservableObject {
         return e
     }()
 
-    private static func readLibrary(at path: String) -> ChatLibrary {
+    /// An unreadable file loads as empty, as it always has -- and says so,
+    /// so nothing is deleted on the strength of it.
+    private static func readLibrary(at path: String) -> (ChatLibrary, ProjectStorage.LibraryState) {
+        guard FileManager.default.fileExists(atPath: path) else { return (ChatLibrary(), .missing) }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         guard let data = FileManager.default.contents(atPath: path),
-              let library = try? decoder.decode(ChatLibrary.self, from: data) else { return ChatLibrary() }
-        return library
+              let library = try? decoder.decode(ChatLibrary.self, from: data) else { return (ChatLibrary(), .unreadable) }
+        return (library, .loaded)
     }
 
-    private func saveLibrary() {
+    /// True once it's on disk.
+    @discardableResult
+    private func saveLibrary() -> Bool {
         try? FileManager.default.createDirectory(atPath: ChatSessionStore.sessionsDir, withIntermediateDirectories: true)
-        guard let data = try? Self.encoder.encode(library) else { return }
-        try? data.write(to: URL(fileURLWithPath: libraryPath), options: .atomic)
+        guard let data = try? Self.encoder.encode(library) else { return false }
+        return (try? data.write(to: URL(fileURLWithPath: libraryPath), options: .atomic)) != nil
     }
 }

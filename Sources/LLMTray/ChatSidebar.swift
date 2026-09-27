@@ -78,7 +78,7 @@ struct ChatSidebar: View {
         ) { project in
             Button("Delete Project", role: .destructive) { store.deleteProject(project.id) }
         } message: { _ in
-            Text("Its chats stay, back among the recents.")
+            Text("Its chats stay, back among the recents; its instructions are deleted.")
         }
     }
 
@@ -165,6 +165,13 @@ struct ChatSidebar: View {
                             .font(.caption).foregroundColor(.secondary)
                             .padding(.leading, 30).padding(.vertical, 3)
                     }
+                    Button { open { tabs.newChat(inProject: project.id) } } label: {
+                        Label("New chat", systemImage: "square.and.pencil").font(.caption)
+                    }
+                    .buttonStyle(SidebarRowStyle(isSelected: false))
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 18)
+                    .help("New chat in this project")
                     ForEach(chats) { row($0, in: "project").padding(.leading, 18) }
                 }
             }
@@ -323,12 +330,20 @@ struct ChatSidebar: View {
                 }
             }
             .contextMenu {
+                // Saved chats only: a temporary chat is never in a project.
+                Button("New Chat in Project") {
+                    collapsedProjects.remove(project.id)
+                    open { tabs.newChat(inProject: project.id) }
+                }
+                Divider()
+                Button("Instructions…") { ProjectInstructionsWindow.show(project.id) }
                 Button("Rename…") {
                     renameHadFocus = false
                     renaming = nil
                     projectDraft = project.name
                     renamingProject = project.id
                 }
+                Divider()
                 Button("Delete Project…", role: .destructive) { projectToDelete = project }
             }
         }

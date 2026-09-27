@@ -9,20 +9,28 @@ public struct ChatLibrary: Codable, Equatable {
         public var id: UUID
         public var name: String
         public var createdAt: Date
+        /// The user's text for every chat of the project, placed in the
+        /// system prompt after the profile's (adr/0012). Empty: none.
+        public var instructions: String
 
-        public init(id: UUID = UUID(), name: String, createdAt: Date = Date()) {
+        public init(id: UUID = UUID(), name: String, createdAt: Date = Date(), instructions: String = "") {
             self.id = id
             self.name = name
             self.createdAt = createdAt
+            self.instructions = instructions
         }
 
-        private enum CodingKeys: String, CodingKey { case id, name, createdAt }
+        // An older build decodes only the keys it knows (it reads a project
+        // with instructions, without them); a file from before reads here
+        // as no instructions.
+        private enum CodingKeys: String, CodingKey { case id, name, createdAt, instructions }
 
         public init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
             id = try c.decode(UUID.self, forKey: .id)
             name = try c.decodeIfPresent(String.self, forKey: .name) ?? ""
             createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+            instructions = (try? c.decodeIfPresent(String.self, forKey: .instructions)) ?? ""
         }
     }
 
@@ -93,6 +101,19 @@ public struct ChatLibrary: Codable, Equatable {
         projects[i].name = name
     }
 
+    public mutating func setInstructions(_ id: UUID, _ text: String) {
+        guard let i = projects.firstIndex(where: { $0.id == id }) else { return }
+        projects[i].instructions = text
+    }
+
+    public func project(_ id: UUID) -> Project? { projects.first { $0.id == id } }
+
+    /// What a turn of `chat` knows about its project: nil when it's in none,
+    /// or in one that no longer exists.
+    public func projectContext(forChat chat: UUID) -> ProjectContext? {
+        projectOfChat[chat].flatMap(project).map(ProjectContext.init)
+    }
+
     /// Its chats stay, back among the recents.
     public mutating func deleteProject(_ id: UUID) {
         projects.removeAll { $0.id == id }
@@ -112,6 +133,40 @@ public struct ChatLibrary: Codable, Equatable {
         let projectIDs = Set(projects.map(\.id))
         projectOfChat = projectOfChat.filter { chats.contains($0.key) && projectIDs.contains($0.value) }
     }
+}
+
+/// The project a chat's turn belongs to (adr/0012): read from the library
+/// when the turn starts and carried through its tool rounds, so a chat
+/// moved, or a project edited or deleted, is seen from the next message.
+public struct ProjectContext: Equatable {
+    public var id: UUID
+    public var name: String
+    public var instructions: String
+    /// Any of its files can be searched. Always false until projects have
+    /// files; the project tools will be declared on it.
+    public var hasSearchableFiles: Bool
+
+    public init(id: UUID, name: String, instructions: String = "", hasSearchableFiles: Bool = false) {
+        self.id = id
+        self.name = name
+        self.instructions = instructions
+        self.hasSearchableFiles = hasSearchableFiles
+    }
+
+    public init(_ project: ChatLibrary.Project) {
+        self.init(id: project.id, name: project.name, instructions: project.instructions)
+    }
+}
+
+/// The system prompt of a chat request, in its order (adr/0012): the
+/// profile's, then the project's instructions, then the tool-use policy
+/// (nil when no tools are offered). Empty parts are left out.
+public func chatSystemPrompt(profile: String, project: ProjectContext?, toolUsePolicy: String?) -> String {
+    let instructions = project?.instructions.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    let projectPart = instructions.isEmpty ? "" : "Instructions for this chat's project, \"\(project?.name ?? "")\":\n\(instructions)"
+    return [profile.trimmingCharacters(in: .whitespacesAndNewlines), projectPart, toolUsePolicy ?? ""]
+        .filter { !$0.isEmpty }
+        .joined(separator: "\n\n")
 }
 
 /// One saved chat as the sidebar lists it.

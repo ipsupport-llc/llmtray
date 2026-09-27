@@ -144,6 +144,10 @@ struct ChatSettings {
     var modelSupportsVision: Bool = false
     /// Appended to the system prompt whenever tools are offered.
     var toolUsePolicy: String = Profile.defaultToolUsePolicy
+    /// The chat's project, set when the turn starts (ChatClient) and kept
+    /// through its tool rounds like modelPath; nil for a chat in none and
+    /// for a temporary chat.
+    var project: ProjectContext?
 
     /// The chat settings a model's profile resolves to.
     init(profile p: ResolvedProfile, maxTokensCap: Int) {

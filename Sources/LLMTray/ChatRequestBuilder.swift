@@ -5,7 +5,8 @@ import LLMTrayCore
 enum ChatRequestBuilder {
     /// A streaming request answering `history` (which must not include the
     /// empty assistant placeholder). `tools` are declared when non-empty,
-    /// and the profile's tool-use rule then joins the system prompt.
+    /// and the profile's tool-use rule then joins the system prompt. The
+    /// project's instructions come from `settings.project`.
     static func streaming(
         port: Int, modelAlias: String, settings: ChatSettings,
         history: [ChatMessage], tools: [[String: Any]]
@@ -24,10 +25,10 @@ enum ChatRequestBuilder {
                                                  toolCalls: message.toolCalls, toolCallID: message.toolCallID))
                 : serialize(message: message)
         }
-        let userSystemPrompt = settings.systemPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
-        let systemPrompt = [userSystemPrompt, tools.isEmpty ? "" : settings.toolUsePolicy]
-            .filter { !$0.isEmpty }
-            .joined(separator: "\n\n")
+        // The project's instructions between the profile's prompt and the
+        // tool-use rule: the rules about tools come last whatever they say.
+        let systemPrompt = chatSystemPrompt(profile: settings.systemPrompt, project: settings.project,
+                                            toolUsePolicy: tools.isEmpty ? nil : settings.toolUsePolicy)
         if !systemPrompt.isEmpty {
             payload.insert(["role": "system", "content": systemPrompt], at: 0)
         }

@@ -49,6 +49,16 @@ final class ChatTabs: ObservableObject {
         if selected.isBusy { newTab() } else { selected.newSession() }
     }
 
+    /// A new chat already in `project`: its id is mapped as it's made, in
+    /// the same main-actor turn, so its first message knows its project
+    /// (adr/0012). A temporary chat is never in one.
+    func newChat(inProject project: UUID) {
+        guard ChatLibraryStore.shared.library.project(project) != nil else { return }
+        newChat()
+        guard let id = selected.currentSessionID else { return }
+        ChatLibraryStore.shared.move(id, to: project)
+    }
+
     /// The same for a temporary chat.
     func newTemporaryChat() {
         if selected.isBusy { newTab() }

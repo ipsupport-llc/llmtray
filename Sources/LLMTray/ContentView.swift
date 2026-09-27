@@ -236,11 +236,16 @@ struct ContentView: View {
                 // position jumped whenever the estimate was corrected.
                 VStack(alignment: .leading, spacing: 10) {
                     if chat.messages.isEmpty {
-                        Text("No messages yet")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 8)
+                        VStack(spacing: 2) {
+                            Text("No messages yet")
+                                .font(.system(size: 12))
+                            // A chat started in a project isn't in the sidebar
+                            // until its first turn: where it will be.
+                            if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
+                        }
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 8)
                     }
                     // "tool" messages are protocol plumbing: the image a
                     // tool produced is attached to the assistant message
@@ -390,6 +395,21 @@ struct ContentView: View {
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
+}
+
+/// "In project …" under an empty chat that's in one. Its own view: only it
+/// is redrawn when the library changes (every save does).
+private struct EmptyChatProjectNote: View {
+    let sessionID: UUID
+    @ObservedObject private var store = ChatLibraryStore.shared
+
+    var body: some View {
+        if let project = store.library.projectContext(forChat: sessionID) {
+            Label(String(format: NSLocalizedString("In project %@", comment: ""), project.name), systemImage: "folder")
+                .font(.system(size: 11))
+                .lineLimit(1)
+        }
+    }
 }
 
 /// The chat content's bottom edge (in the scroll view's coordinates) and height.

@@ -138,6 +138,7 @@
 "Enable image generation?" = "Enable image generation?";
 "Enable music generation" = "Enable music generation";
 "Enable music generation?" = "Enable music generation?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
@@ -185,13 +186,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation isn't set up -- turn it on again in Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image model" = "Image model";
+"In project %@" = "In project %@";
 "In the queue: %lld ahead…" = "In the queue: %lld ahead…";
 "Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
 "Include the server log" = "Include the server log";
 "Installed" = "Installed";
 "Installing mflux…" = "Installing mflux…";
 "Installing mlx-audio…" = "Installing mlx-audio…";
-"Its chats stay, back among the recents." = "Its chats stay, back among the recents.";
+"Instructions for %@" = "Instructions for %@";
+"Instructions…" = "Instructions…";
+"Its chats stay, back among the recents; its instructions are deleted." = "Its chats stay, back among the recents; its instructions are deleted.";
 "KV cache" = "KV cache";
 "KV group size" = "KV group size";
 "Keep" = "Keep";
@@ -238,6 +242,7 @@
 "Network" = "Network";
 "Never" = "Never";
 "New Chat" = "New Chat";
+"New Chat in Project" = "New Chat in Project";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
 "New Tab" = "New Tab";
@@ -245,6 +250,7 @@
 "New Temporary Chat" = "New Temporary Chat";
 "New chat" = "New chat";
 "New chat (⌘N)" = "New chat (⌘N)";
+"New chat in this project" = "New chat in this project";
 "New profile" = "New profile";
 "New profile (inherits everything from Default)" = "New profile (inherits everything from Default)";
 "New project" = "New project";
