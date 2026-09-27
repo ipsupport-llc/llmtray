@@ -14,6 +14,8 @@ final class FakeEmbedder: ProjectEmbedder, @unchecked Sendable {
     var failure: Error?
     /// A request with a text containing this is refused (`.runner`).
     var refuse: String?
+    /// The next this many requests fail with the runner's own timeout.
+    var timeouts = 0
     private let lock = NSLock()
     private var _calls = 0
     var calls: Int { lock.withLock { _calls } }
@@ -26,6 +28,13 @@ final class FakeEmbedder: ProjectEmbedder, @unchecked Sendable {
         lock.withLock { _calls += 1 }
         if delay > 0 { try await Task.sleep(nanoseconds: UInt64(delay * 1e9)) }
         if let failure { throw failure }
+        if lock.withLock({ () -> Bool in
+            guard timeouts > 0 else { return false }
+            timeouts -= 1
+            return true
+        }) {
+            throw EmbedRunner.Failure.runner(code: "timeout", message: "slow")
+        }
         if let refuse, texts.contains(where: { $0.contains(refuse) }) {
             throw EmbedRunner.Failure.runner(code: "bad_request", message: "refused")
         }
@@ -372,6 +381,57 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(statuses(i), [.searchable, .embedded], "the refused one stays searchable by words")
         XCTAssertNil(i.embeddingUnavailable)
         XCTAssertEqual(i.progress(for: project), .idle)
+    }
+
+    func testARunnerTimeoutIsRetriedNotARefusal() async throws {
+        embedder!.timeouts = 1
+        let i = ingestor()
+        _ = await i.add([try file("a.txt", "plain good words")], to: project)
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.embedded], "tried again after the back-off")
+        XCTAssertNil(i.embeddingUnavailable)
+    }
+
+    func testAFileAddedDuringAStopIsIndexed() async throws {
+        for yields in [0, 1, 2, 3, 5, 8, 12] {
+            try await tearDown()
+            try await setUp()
+            let i = ingestor()
+            _ = await i.add(try corpus(1), to: project)
+            try await settle(i)
+            let stopping = Task { await i.stop(self.project) }
+            for _ in 0..<yields { await Task.yield() }
+            let results = await i.add([try file("new.txt", "fresh words")], to: project)
+            await stopping.value
+            try await settle(i)
+            guard case .added? = results.first else {
+                XCTAssertEqual(results, [.failed("indexing was stopped")], "after \(yields) yields")
+                continue
+            }
+            XCTAssertEqual(statuses(i), [.embedded, .embedded], "a file added after the Stop restarts it (\(yields) yields)")
+            XCTAssertEqual(persisted.stopped, [], "after \(yields) yields")
+            i.shutdown()
+        }
+    }
+
+    func testAnAddDuringTheRepairOfAStoppedProjectAtOpen() async throws {
+        for yields in [0, 1, 2, 3, 5, 8] {
+            try await tearDown()
+            try await setUp()
+            let dir = root.appendingPathComponent(project.uuidString)
+            let index = try ProjectIndex(directory: dir)
+            for url in try corpus(1) { try index.addCopy(of: url) }
+            index.close()
+            let i = ingestor(stopped: [project])
+            let opening = Task { await i.open(self.project) }
+            for _ in 0..<yields { await Task.yield() }
+            let results = await i.add([try file("new.txt", "fresh words")], to: project)
+            _ = await opening.value
+            try await settle(i)
+            XCTAssertEqual(results.count, 1)
+            XCTAssertEqual(statuses(i), [.notIndexed, .embedded], "the old one stays stopped, the new one is indexed (\(yields) yields)")
+            i.shutdown()
+        }
     }
 
     func testRemovingADocumentWhileItIsRead() async throws {

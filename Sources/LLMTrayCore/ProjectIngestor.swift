@@ -148,7 +148,7 @@ public final class ProjectIngestor {
     private var transitioning: Set<UUID> = []
     private var transitionWaiters: [UUID: [CheckedContinuation<Void, Never>]] = [:]
     /// A stopped project's staged documents being made `not_indexed` at open.
-    private var stopReconciles: [UUID: Task<Void, Never>] = [:]
+    private var stopReconciles: [UUID: Task<Bool, Never>] = [:]
     private var deleted: Set<UUID> = []
     private var opened: Set<UUID> = []
     private var copying: [UUID: Int] = [:]
@@ -209,25 +209,31 @@ public final class ProjectIngestor {
         guard !deleted.contains(project), !isShutDown else { throw ProjectIndexHandle.Closed() }
         let h = try await env.registry.open(project)
         guard !deleted.contains(project), !isShutDown else { throw ProjectIndexHandle.Closed() }
-        if opened.insert(project).inserted {
-            if stopped.contains(project) {
-                // Stopped, though what was staged wasn't made `not_indexed`
-                // (a quit between the persisted Stop and its write): made so
-                // now, and nothing queued. An Index Now meanwhile waits for it.
-                let write = Task { _ = try? await h.write { try $0.stopIndexing() } }
-                stopReconciles[project] = write
-                await write.value
-                stopReconciles[project] = nil
-            } else {
-                queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
-            }
-            // Not the report's list: that one knows only an existing vector
-            // set, and documents made searchable before the embedder was
-            // installed have none yet.
-            await queueEmbedding(project, h)
-            if deleted.contains(project) { queue.remove(project) }
-            kick()
+        guard opened.insert(project).inserted else {
+            // A stopped project's repair at open (below) comes first: an add
+            // or an Index Now's write mustn't land before it.
+            if let repair = stopReconciles[project] { _ = await repair.value }
+            return h
         }
+        if stopped.contains(project) {
+            // Stopped, though what was staged wasn't made `not_indexed`
+            // (a quit between the persisted Stop and its write): made so
+            // now, and nothing queued. Failed, it's tried again at the
+            // next use (and Index Now takes staged documents too).
+            let write = Task { () -> Bool in (try? await h.write { try $0.stopIndexing() }) != nil }
+            stopReconciles[project] = write
+            let done = await write.value
+            stopReconciles[project] = nil
+            if !done { opened.remove(project) }
+        } else {
+            queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
+        }
+        // Not the report's list: that one knows only an existing vector
+        // set, and documents made searchable before the embedder was
+        // installed have none yet.
+        await queueEmbedding(project, h)
+        if deleted.contains(project) { queue.remove(project) }
+        kick()
         return h
     }
 
@@ -274,16 +280,21 @@ public final class ProjectIngestor {
                 results.append(.notSupported)
                 continue
             }
+            // In turn with Stop's and Index Now's writes: a Stop's
+            // `not_indexed` never lands on a file queued after it.
+            await beginTransition(project)
+            defer { endTransition(project) }
             do {
                 let doc = try await h.write { try $0.addCopy(of: url) }
                 results.append(.added(doc))
-                // A stop that came during the copy made it `not_indexed`.
-                guard epoch(project) == e else { continue }
+                // A stop that came during the copy makes it `not_indexed`.
+                guard epoch(project) == e, !deleted.contains(project) else { continue }
                 if stopped.remove(project) != nil {
                     // A new file restarts a stopped project: what the stop
                     // left unembedded is queued again too.
                     persist()
                     await queueEmbedding(project, h)
+                    guard epoch(project) == e, !deleted.contains(project) else { continue }
                 }
                 queue.enqueue([.extract(doc)], in: project)
                 kick()
@@ -339,7 +350,6 @@ public final class ProjectIngestor {
         guard epoch(project) == e, let h = try? await handle(project), epoch(project) == e else {
             return endTransition(project)
         }
-        await stopReconciles[project]?.value
         let docs = (try? await h.write { try $0.resumeIndexing() }) ?? []
         guard epoch(project) == e, !deleted.contains(project) else { return endTransition(project) }
         queue.enqueue(docs.map(ProjectIngestQueue.Work.extract), in: project)
@@ -696,7 +706,7 @@ public final class ProjectIngestor {
         }
         if let doc, let failure {
             switch failure {
-            case .runner, .protocolViolation:
+            case .runner(code: "bad_request", _), .runner(code: "too_large", _), .protocolViolation:
                 // This document's request was refused (a text the runner
                 // won't take, an answer of the wrong shape): it stays
                 // searchable by words, and the rest goes on.

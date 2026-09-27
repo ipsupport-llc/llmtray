@@ -483,10 +483,11 @@ public final class ProjectIndex {
         return db.changes
     }
 
-    /// Index Now: `not_indexed` back to `staged`; returns them.
+    /// Index Now: `not_indexed` back to `staged`; returns them, and those
+    /// already staged (a Stop's write that didn't take left them unqueued).
     public func resumeIndexing() throws -> [Int64] {
         try db.transaction {
-            let docs = try db.rows("SELECT doc FROM documents WHERE status = 'not_indexed' ORDER BY doc") { $0.int(0) }
+            let docs = try db.rows("SELECT doc FROM documents WHERE status IN ('not_indexed','staged') ORDER BY doc") { $0.int(0) }
             try db.run("UPDATE documents SET status = 'staged' WHERE status = 'not_indexed'")
             return docs
         }
