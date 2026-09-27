@@ -46,18 +46,68 @@ public struct ChangeExecutor {
     public let denylist: FolderDenylist
     public let journal: ChangeJournal
     public let trasher: Trasher
+    /// Change grants for the plan's chat: both ends of each item must still
+    /// be covered when it runs.
+    public let canChange: ChangeGrantCheck
     /// "keep both" tries "name 2" up to "name <this>".
     public var maxNumberedName = 999
+    /// Entries a folder's subtree is checked for denied items at most.
+    public var protectedCheckBudget = 200_000
 
-    public init(denylist: FolderDenylist, journal: ChangeJournal, trasher: Trasher = SystemTrasher()) {
+    public init(denylist: FolderDenylist, journal: ChangeJournal, trasher: Trasher = SystemTrasher(),
+                canChange: @escaping ChangeGrantCheck) {
         self.denylist = denylist
         self.journal = journal
         self.trasher = trasher
+        self.canChange = canChange
     }
 
     /// Called after an item's checks, right before its operation: tests
     /// swap things there to exercise the check-to-use window.
     var beforeOperation: ((PlanItem) -> Void)?
+
+    /// The steps a crash can fall between (tests).
+    enum Step: Equatable {
+        /// The temporary name is journaled, not made yet.
+        case staged
+        /// The staging folder exists (trash, make_dir).
+        case stagingMade
+        /// The item is in the staging folder (trash) or under its temporary
+        /// name (rename).
+        case itemStaged
+        /// The Trash took the item; the staging folder is still there.
+        case trashed
+    }
+
+    /// Tests: true at a step stops the run right there, as a crash would --
+    /// nothing cleaned up, nothing more journaled.
+    var crashAt: ((Step) -> Bool)?
+
+    struct SimulatedCrash: Error {}
+
+    /// Plans executing in this process: recovery leaves them alone.
+    private final class Running: @unchecked Sendable {
+        let lock = NSLock()
+        var ids: Set<UUID> = []
+    }
+
+    private static let running = Running()
+
+    static func isRunning(_ planID: UUID) -> Bool {
+        running.lock.lock()
+        defer { running.lock.unlock() }
+        return running.ids.contains(planID)
+    }
+
+    private static func setRunning(_ planID: UUID, _ on: Bool) {
+        running.lock.lock()
+        if on { running.ids.insert(planID) } else { running.ids.remove(planID) }
+        running.lock.unlock()
+    }
+
+    private func step(_ s: Step) throws {
+        if crashAt?(s) == true { throw SimulatedCrash() }
+    }
 
     public enum Status: Equatable, Sendable {
         case done(JournalResult)
@@ -116,6 +166,8 @@ public struct ChangeExecutor {
             return report
         }
         var made: [Key: Made] = [:]
+        Self.setRunning(plan.id, true)
+        defer { Self.setRunning(plan.id, false) }
         do {
             try journal.append(JournalEvent(kind: .begin, date: Date(), chatID: plan.chatID), planID: plan.id)
         } catch {
@@ -138,7 +190,12 @@ public struct ChangeExecutor {
             }
             let result: JournalResult
             do {
-                result = try run(item, made: &made)
+                // The change grant must still cover both ends (defense in
+                // depth: approval checked it too).
+                try PlanItemGrant.check(item, canChange)
+                result = try run(item, planID: plan.id, made: &made)
+            } catch is SimulatedCrash {
+                return report
             } catch let u as Uncertain {
                 report.outcomes.append((item.id, .uncertain(u.description)))
                 report.stoppedAt = item.id
@@ -167,7 +224,18 @@ public struct ChangeExecutor {
 
     // MARK: One item
 
-    private func run(_ item: PlanItem, made: inout [Key: Made]) throws -> JournalResult {
+    /// Journals the temporary name an item is about to use (before it is
+    /// made): a crash leaves it findable (`ChangeUndo.recover`).
+    private func journalStaging(_ kind: StagingRecord.Kind, item: PlanItem, planID: UUID, root: FolderRoot,
+                                in dir: OpenedDirectory) throws -> String {
+        let name = StagingRecord.name(kind, planID: planID, item: item.id)
+        let record = StagingRecord(kind: kind, name: name, root: root, parentComponents: dir.components, parentChain: dir.chain)
+        try journal.append(JournalEvent(kind: .staged, date: Date(), item: item.id, staging: record), planID: planID)
+        try step(.staged)
+        return name
+    }
+
+    private func run(_ item: PlanItem, planID: UUID, made: inout [Key: Made]) throws -> JournalResult {
         switch item.kind {
         case .makeDir:
             guard let d = item.destination else { throw FolderAccessError.invalidPath("make_dir without a path") }
@@ -176,8 +244,9 @@ public struct ChangeExecutor {
             // Made under a staging name and held open, so its identity is the
             // folder this call made; then renamed (exclusively) to the name.
             let fd = parent.descriptor.fd
-            let staging = ".llmtray-new-\(UUID().uuidString)"
+            let staging = try journalStaging(.makeDir, item: item, planID: planID, root: d.location.root, in: parent)
             guard mkdirat(fd, staging, 0o700) == 0 else { throw FolderAccessError.system("make \(d.location.name)", errno) }
+            try step(.stagingMade)
             let newFD = openat(fd, staging, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
             guard newFD >= 0, let created = try? Descriptor(fd: newFD, stat: Posix.fstat(newFD)) else {
                 if newFD >= 0 { close(newFD) }
@@ -233,10 +302,15 @@ public struct ChangeExecutor {
             if src.descriptor.identity.device != dst.descriptor.identity.device {
                 throw FolderAccessError.crossDevice(d.location.displayPath)
             }
+            try checkNoProtectedInside(s, parent: src)
             beforeOperation?(item)
             let name = try Self.renameExclusive(from: src.descriptor, s.location.name, to: dst.descriptor, d.location.name,
                                                 identity: s.identity, policy: item.collision,
-                                                isDirectory: s.kind == .directory, limit: maxNumberedName)
+                                                isDirectory: s.kind == .directory, limit: maxNumberedName,
+                                                temporaryName: {
+                                                    try journalStaging(.rename, item: item, planID: planID,
+                                                                       root: s.location.root, in: src)
+                                                }, staged: { try step(.itemStaged) })
             // A rename moves whatever has the name: it must have been the
             // item, else what was swapped in goes back where it was.
             let moved = try? Posix.lstatAt(dst.descriptor.fd, name)
@@ -258,28 +332,44 @@ public struct ChangeExecutor {
             throw Uncertain(description: "moved \(s.location.relativePath), but what arrived isn't the item")
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("trash without a path") }
-            return try trash(item, s)
+            return try trash(item, s, planID: planID)
+        }
+    }
+
+    /// A folder whose subtree gained a denied item since review isn't moved.
+    private func checkNoProtectedInside(_ s: CapturedSource, parent: OpenedDirectory) throws {
+        guard s.kind == .directory || s.kind == .package else { return }
+        switch SafeFolderWalker(root: s.location.root, denylist: denylist)
+            .protectedContents(in: parent, s.location.name, budget: protectedCheckBudget) {
+        case .none: return
+        case .found: throw FolderAccessError.containsProtected(s.location.relativePath)
+        case .unchecked: throw FolderAccessError.uncheckable(s.location.relativePath)
         }
     }
 
     /// Trash (Hardening 1, 6). Foundation trashes by path, and a path can be
     /// redirected between any check and the call. So the item is first moved
     /// by descriptors, exclusively, into a private folder made for this call
-    /// next to it (same volume, a random name, ours, 0700); only a path into
-    /// that folder goes to the Trash, established again from the grant root
-    /// right before the call and inside its verify callback. Redirecting it
-    /// would take a copy of that random folder's path elsewhere; and what went
-    /// is checked afterwards and put back if it isn't the item, or if the
-    /// item's folder is no longer inside the grant.
-    private func trash(_ item: PlanItem, _ s: CapturedSource) throws -> JournalResult {
+    /// next to it (same volume, a name fixed by plan and item and journaled
+    /// before it is made, ours, 0700); only a path into that folder goes to
+    /// the Trash, established again from the grant root right before the
+    /// call and inside its verify callback. Redirecting it would take a copy
+    /// of that folder's path elsewhere; and what went is checked afterwards
+    /// and put back if it isn't the item, or if the item's folder is no
+    /// longer inside the grant. The cost: Finder records the staging folder
+    /// as the item's original location, so its Put Back can't restore it --
+    /// LLMTray's Undo does (adr/0014, Hardening 12).
+    private func trash(_ item: PlanItem, _ s: CapturedSource, planID: UUID) throws -> JournalResult {
         let parent = try openSourceParent(s)
         let pfd = parent.descriptor.fd
         let name = s.location.name
         let rel = s.location.relativePath
+        try checkNoProtectedInside(s, parent: parent)
         beforeOperation?(item)
         guard stillInside(parent, root: s.location.root) else { throw FolderAccessError.changed(rel) }
-        let stagingName = ".llmtray-trash-\(UUID().uuidString)"
+        let stagingName = try journalStaging(.trash, item: item, planID: planID, root: s.location.root, in: parent)
         guard mkdirat(pfd, stagingName, 0o700) == 0 else { throw FolderAccessError.system("trash \(name)", errno) }
+        try step(.stagingMade)
         let sfd = openat(pfd, stagingName, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard sfd >= 0, let staging = try? Descriptor(fd: sfd, stat: Posix.fstat(sfd)) else {
             if sfd >= 0 { close(sfd) }
@@ -308,6 +398,7 @@ public struct ChangeExecutor {
             if dropStaging() { throw FolderAccessError.system("trash \(name)", e) }
             throw Uncertain(description: "\(stagingName) was left behind")
         }
+        try step(.itemStaged)
         // A rename moves whatever has the name: it must have been the item.
         guard let staged = try? Posix.lstatAt(staging.fd, name) else {
             throw Uncertain(description: "moved \(rel) aside, then couldn't look at it")
@@ -330,6 +421,7 @@ public struct ChangeExecutor {
             if (try? Posix.lstatAt(staging.fd, name))?.identity == s.identity { try unstage(error) }
             throw Uncertain(description: "the Trash failed (\(error)) and \(rel) isn't where it was")
         }
+        try step(.trashed)
         guard let out else { throw Uncertain(description: "the Trash didn't say where it put \(rel)") }
         guard let trashed = Posix.lstatPath(out.path) else {
             throw Uncertain(description: "\(out.path) isn't in the Trash")
@@ -445,10 +537,10 @@ public struct ChangeExecutor {
     /// Calls `attempt` (0 or an errno) with the name, then numbered names on
     /// `EEXIST` when the policy is keep-both.
     static func exclusive(_ name: String, policy: CollisionPolicy, isDirectory: Bool, limit: Int,
-                          _ attempt: (String) -> Int32) throws -> String {
+                          _ attempt: (String) throws -> Int32) throws -> String {
         for n in 1...max(1, limit) {
             let candidate = n == 1 ? name : numberedName(name, n, isDirectory: isDirectory)
-            let e = attempt(candidate)
+            let e = try attempt(candidate)
             if e == 0 { return candidate }
             if e != EEXIST { throw FolderAccessError.system("create \(candidate)", e) }
             if policy == .fail { throw FolderAccessError.exists(candidate) }
@@ -459,19 +551,24 @@ public struct ChangeExecutor {
     /// `renameatx_np(RENAME_EXCL)`, keep-both numbering on `EEXIST`. A rename
     /// whose destination is the item itself -- a case- or
     /// normalization-only rename on an insensitive volume -- goes through a
-    /// temporary name, still exclusively.
+    /// temporary name (from `temporaryName`, which journals it first), still
+    /// exclusively.
     static func renameExclusive(from src: Descriptor, _ srcName: String, to dst: Descriptor, _ dstName: String,
-                                identity: FileIdentity, policy: CollisionPolicy, isDirectory: Bool, limit: Int) throws -> String {
+                                identity: FileIdentity, policy: CollisionPolicy, isDirectory: Bool, limit: Int,
+                                temporaryName: () throws -> String, staged: () throws -> Void = {}) throws -> String {
         let excl = UInt32(RENAME_EXCL)
         var stranded: String?
-        func attempt(_ candidate: String) -> Int32 {
+        var journaled: String?
+        func attempt(_ candidate: String) throws -> Int32 {
             if renameatx_np(src.fd, srcName, dst.fd, candidate, excl) == 0 { return 0 }
             let e = errno
             guard e == EEXIST, src.identity == dst.identity,
                   (try? Posix.lstatAt(dst.fd, candidate))?.identity == identity,
                   Array(candidate.utf8) != Array(srcName.utf8) else { return e }
-            let temp = ".llmtray-rename-\(UUID().uuidString)"
+            let temp = try journaled ?? temporaryName()
+            journaled = temp
             guard renameatx_np(src.fd, srcName, src.fd, temp, excl) == 0 else { return errno }
+            try staged()
             if renameatx_np(src.fd, temp, dst.fd, candidate, excl) == 0 { return 0 }
             let e2 = errno
             if !renameBack(src.fd, temp, src.fd, srcName, expecting: identity) { stranded = temp }

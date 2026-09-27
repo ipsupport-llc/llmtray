@@ -22,12 +22,45 @@ public struct JournalResult: Codable, Equatable, Sendable {
     public var device: Int32 { identity.device }
 }
 
+/// A temporary name an operation is about to use in a folder (Hardening 7):
+/// journaled before the name is made, fixed by plan and item, so after a
+/// crash the recovery pass finds it and puts the item back under its name.
+public struct StagingRecord: Codable, Equatable, Sendable {
+    public enum Kind: String, Codable, Sendable {
+        /// A private folder the item is moved into before the Trash.
+        case trash
+        /// The item itself under a temporary name (a case-only rename).
+        case rename
+        /// A new folder made under a temporary name, then published.
+        case makeDir = "make_dir"
+    }
+
+    public var kind: Kind
+    public var name: String
+    public var root: FolderRoot
+    /// The folder it is made in, below the root, as the file system names
+    /// it (made folders under the names they took)...
+    public var parentComponents: [String]
+    /// ...and the identities from the root down to it.
+    public var parentChain: [FileIdentity]
+
+    public static func name(_ kind: Kind, planID: UUID, item: Int) -> String {
+        switch kind {
+        case .trash: return ".llmtray-trash-\(planID.uuidString)-\(item)"
+        case .rename: return ".llmtray-rename-\(planID.uuidString)-\(item)"
+        case .makeDir: return ".llmtray-new-\(planID.uuidString)-\(item)"
+        }
+    }
+}
+
 /// One line of a journal file: JSON Lines, appended and synced before and
 /// after each operation, so a crash leaves a "pending" line without its
 /// outcome.
 public struct JournalEvent: Codable, Equatable, Sendable {
     public enum Kind: String, Codable, Sendable {
         case begin, pending, done, failed, end
+        /// A temporary name is about to be used (`staging`).
+        case staged
         /// Ran, outcome not established: stays incomplete.
         case uncertain
         case undoPending = "undo_pending", undone, undoFailed = "undo_failed"
@@ -40,6 +73,19 @@ public struct JournalEvent: Codable, Equatable, Sendable {
     public var planItem: PlanItem?
     public var result: JournalResult?
     public var message: String?
+    public var staging: StagingRecord?
+
+    public init(kind: Kind, date: Date, item: Int? = nil, chatID: String? = nil, planItem: PlanItem? = nil,
+                result: JournalResult? = nil, message: String? = nil, staging: StagingRecord? = nil) {
+        self.kind = kind
+        self.date = date
+        self.item = item
+        self.chatID = chatID
+        self.planItem = planItem
+        self.result = result
+        self.message = message
+        self.staging = staging
+    }
 }
 
 /// A plan's journal, folded from its events.
@@ -60,6 +106,8 @@ public struct JournalRecord: Equatable, Sendable {
     public struct Item: Equatable, Sendable {
         public var planItem: PlanItem
         public var state: ItemState
+        /// The temporary name it used, if any: a crash can leave it behind.
+        public var staging: StagingRecord? = nil
     }
 
     public var planID: UUID
@@ -145,8 +193,14 @@ public final class ChangeJournal: @unchecked Sendable {
             }
             written += n
         }
-        guard fsync(fd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
+        guard Self.fullSync(fd) else { throw FolderAccessError.system("journal sync", errno) }
         if isNew { try Self.syncDirectory(directory.path) }
+    }
+
+    /// To the disk's platters, not only its cache (`F_FULLFSYNC`); `fsync`
+    /// where the file system doesn't support that.
+    static func fullSync(_ fd: Int32) -> Bool {
+        fcntl(fd, F_FULLFSYNC) == 0 || fsync(fd) == 0
     }
 
     /// Makes each missing folder of `path`, outermost first, syncing its
@@ -169,7 +223,7 @@ public final class ChangeJournal: @unchecked Sendable {
         let dfd = open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
         guard dfd >= 0 else { throw FolderAccessError.system("journal sync", errno) }
         defer { close(dfd) }
-        guard fsync(dfd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
+        guard fullSync(dfd) else { throw FolderAccessError.system("journal sync", errno) }
     }
 
     /// Journals are read up to this many bytes (a plan's is a few KB); past
@@ -211,6 +265,28 @@ public final class ChangeJournal: @unchecked Sendable {
         return files.compactMap { record($0.0) }.sorted { $0.started > $1.started }
     }
 
+    /// Removes the journals of plans that finished cleanly -- every item
+    /// done, failed or undone, nothing interrupted or uncertain -- and
+    /// weren't touched for `maxAge` (30 days by default). Interrupted ones
+    /// stay until looked at. Returns the plans removed.
+    @discardableResult
+    public func prune(maxAge: TimeInterval = 30 * 24 * 3600, now: Date = Date()) -> [UUID] {
+        let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
+        var removed: [UUID] = []
+        for name in names {
+            guard name.hasSuffix(".jsonl"), let id = UUID(uuidString: String(name.dropLast(6))),
+                  let st = Posix.lstatPath(directory.path + "/" + name), st.isRegularFile,
+                  now.timeIntervalSince(st.modified) > maxAge,
+                  let rec = record(id), !rec.truncated, !rec.isIncomplete else { continue }
+            lock.lock()
+            let gone = unlink(url(for: id).path) == 0
+            lock.unlock()
+            if gone { removed.append(id) }
+        }
+        if !removed.isEmpty { try? Self.syncDirectory(directory.path) }
+        return removed
+    }
+
     static func fold(planID: UUID, _ events: [JournalEvent]) -> JournalRecord? {
         guard let begin = events.first, begin.kind == .begin else { return nil }
         var rec = JournalRecord(planID: planID, chatID: begin.chatID ?? "", started: begin.date, ended: nil, items: [])
@@ -226,6 +302,8 @@ public final class ChangeJournal: @unchecked Sendable {
                 if let i = index(e.item) { rec.items[i].state = .failed(e.message ?? "failed") }
             case .uncertain:
                 if let i = index(e.item) { rec.items[i].state = .uncertain(e.message ?? "uncertain") }
+            case .staged:
+                if let i = index(e.item), let st = e.staging { rec.items[i].staging = st }
             case .end:
                 rec.ended = e.date
             case .undoPending:

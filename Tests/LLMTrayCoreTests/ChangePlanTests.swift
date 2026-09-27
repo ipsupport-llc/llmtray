@@ -50,6 +50,7 @@ final class ChangePlanTests: FolderTestCase {
     private var journal: ChangeJournal!
     private var trash: FakeTrash!
     private let store = ChangePlanStore()
+    private let allow: ChangeGrantCheck = { _ in true }
 
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -57,28 +58,37 @@ final class ChangePlanTests: FolderTestCase {
         trash = FakeTrash(dir: base + "/Trash")
     }
 
-    private var planner: ChangePlanner { ChangePlanner(denylist: denylist) }
-    private var executor: ChangeExecutor { ChangeExecutor(denylist: denylist, journal: journal, trasher: trash) }
-    private var undoer: ChangeUndo { ChangeUndo(denylist: denylist, journal: journal) }
+    private var planner: ChangePlanner { ChangePlanner(denylist: denylist, canChange: allow) }
+    private var executor: ChangeExecutor { ChangeExecutor(denylist: denylist, journal: journal, trasher: trash, canChange: allow) }
+    private var undoer: ChangeUndo { ChangeUndo(denylist: denylist, journal: journal, canChange: allow) }
 
     private func mv(_ from: String, _ to: String) throws -> ChangeRequest { .move(from: try loc(from), to: try loc(to)) }
     private func md(_ path: String) throws -> ChangeRequest { .makeDir(try loc(path)) }
     private func rm(_ path: String) throws -> ChangeRequest { .trash(try loc(path)) }
 
     /// Plans `ops` into the chat's pending plan (nothing rejected), approves.
+    /// `collision` is keyed by the op's index in `ops`.
     private func approved(_ ops: [ChangeRequest], items: Set<Int>? = nil,
                           collision: [Int: CollisionPolicy] = [:]) throws -> ApprovedPlan {
+        let ids = try add(ops)
+        for (index, p) in collision { store.setCollision(p, item: ids[index], chatID: "c") }
+        return try approveNow(items)
+    }
+
+    /// Plans `ops` into the chat's pending plan (nothing rejected); the ids
+    /// the store gave them.
+    @discardableResult
+    private func add(_ ops: [ChangeRequest]) throws -> [Int] {
         let r = try planner.plan(ops, after: store.pending(chatID: "c")?.items ?? [])
         XCTAssertTrue(r.rejected.isEmpty, "\(r.rejected.map { "\($0.index): \($0.error)" })")
-        store.add(r.items, chatID: "c")
-        for (id, p) in collision { store.setCollision(p, item: id, chatID: "c") }
-        return try approveNow(items)
+        return Array(store.add(r.items, chatID: "c").items.suffix(r.items.count).map(\.id))
     }
 
     /// Approves the pending plan at the revision it has now (what the user
     /// just reviewed).
     private func approveNow(_ items: Set<Int>? = nil) throws -> ApprovedPlan {
-        try store.approve(chatID: "c", revision: store.pending(chatID: "c")?.revision ?? 0, items: items, validator: planner)
+        try store.approve(chatID: "c", planID: store.pending(chatID: "c")?.id ?? UUID(),
+                          revision: store.pending(chatID: "c")?.revision ?? 0, items: items, validator: planner)
     }
 
     private func statuses(_ r: ChangeExecutor.Report) -> [String] {
@@ -233,7 +243,7 @@ final class ChangePlanTests: FolderTestCase {
         XCTAssertEqual(statuses(refused), ["failed"])
         guard case .failed(let why) = refused.outcomes[0].status else { return XCTFail() }
         XCTAssertTrue(why.contains("already exists"), why)
-        plan = try approved([mv("in/a.txt", "out/a.txt")], collision: [1: .keepBoth])
+        plan = try approved([mv("in/a.txt", "out/a.txt")], collision: [0: .keepBoth])
         guard case .done(let r) = executor.execute(plan).outcomes[0].status else { return XCTFail() }
         XCTAssertEqual(r.finalName, "a 3.txt")
         XCTAssertEqual(try String(contentsOfFile: grant + "/out/a.txt"), "old", "never overwritten")
@@ -242,8 +252,8 @@ final class ChangePlanTests: FolderTestCase {
         XCTAssertEqual(p2.rejected.count, 1, "make_dir of an existing folder is refused when planned")
         // Taken after planning: keep-both makes "2024 2" and the move follows.
         try fm.removeItem(atPath: grant + "/2024")
-        store.add(try planner.plan([md("2024"), mv("in/b.txt", "2024/b.txt")]).items, chatID: "c")
-        store.setCollision(.keepBoth, item: 1, chatID: "c")
+        let ids = try add([md("2024"), mv("in/b.txt", "2024/b.txt")])
+        store.setCollision(.keepBoth, item: ids[0], chatID: "c")
         let p3 = try approveNow()
         mkdir("2024")
         write("2024/b.txt", "someone else's")
@@ -377,7 +387,7 @@ final class ChangePlanTests: FolderTestCase {
         // user's Trash -- and is put back.
         let name = "llmtray-test-\(UUID().uuidString).txt"
         write(name, "trash me")
-        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: SystemTrasher())
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: SystemTrasher(), canChange: allow)
         let plan = try approved([rm(name)])
         let report = exec.execute(plan)
         guard case .done(let r) = report.outcomes[0].status else {
@@ -420,7 +430,7 @@ final class ChangePlanTests: FolderTestCase {
         // The journal's folder can't be made: a file is in the way.
         fm.createFile(atPath: base + "/blocked", contents: Data())
         let exec = ChangeExecutor(denylist: denylist, journal: ChangeJournal(directory: URL(fileURLWithPath: base + "/blocked/j")),
-                                  trasher: trash)
+                                  trasher: trash, canChange: allow)
         let report = exec.execute(try approved([mv("a.txt", "b.txt")]))
         XCTAssertEqual(statuses(report), ["failed"])
         XCTAssertTrue(exists("a.txt"))
@@ -451,12 +461,12 @@ final class ChangePlanTests: FolderTestCase {
         let reviewed = try XCTUnwrap(store.pending(chatID: "c")?.revision)
         // The model adds to the plan while the user looks at it.
         store.add(try planner.plan([rm("b.txt")], after: store.pending(chatID: "c")!.items).items, chatID: "c")
-        XCTAssertThrowsError(try store.approve(chatID: "c", revision: reviewed, validator: planner)) {
+        XCTAssertThrowsError(try store.approve(chatID: "c", planID: store.pending(chatID: "c")!.id, revision: reviewed, validator: planner)) {
             XCTAssertEqual($0 as? ChangePlanError, .stale(reviewed: reviewed, current: reviewed + 1))
         }
         let next = store.pending(chatID: "c")!.revision
         store.setCollision(.keepBoth, item: 1, chatID: "c")
-        XCTAssertThrowsError(try store.approve(chatID: "c", revision: next, validator: planner))
+        XCTAssertThrowsError(try store.approve(chatID: "c", planID: store.pending(chatID: "c")!.id, revision: next, validator: planner))
         XCTAssertEqual(try approveNow().items.count, 2)
     }
 
@@ -491,7 +501,7 @@ final class ChangePlanTests: FolderTestCase {
                                   trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: {
                                       staged = $0.path
                                       self.swapInIntruder($0)
-                                  }))
+                                  }), canChange: allow)
         // What went isn't the item: it goes back where it was taken from; the
         // item itself was taken by someone else, and that is said.
         XCTAssertEqual(statuses(exec.execute(plan)), ["uncertain"])
@@ -506,7 +516,7 @@ final class ChangePlanTests: FolderTestCase {
         // it can't be put back, and that is said, not hidden.
         let exec = ChangeExecutor(denylist: denylist, journal: journal,
                                   trasher: HookedTrash(RacyTrash(dir: base + "/RacyTrash"), before: swapInIntruder,
-                                                       after: { self.fm.createFile(atPath: $0.path, contents: Data("third".utf8)) }))
+                                                       after: { self.fm.createFile(atPath: $0.path, contents: Data("third".utf8)) }), canChange: allow)
         let report = exec.execute(plan)
         XCTAssertEqual(statuses(report), ["uncertain"])
         let record = try XCTUnwrap(journal.record(plan.id))
@@ -621,7 +631,7 @@ final class ChangePlanTests: FolderTestCase {
         write("a.txt", "a")
         let moved = try approved([mv("a.txt", "b.txt")])
         XCTAssertEqual(executor.execute(moved).doneCount, 1)
-        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: 1), planID: moved.id)
+        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: moved.items[0].id), planID: moved.id)
         try fm.linkItem(atPath: grant + "/b.txt", toPath: grant + "/a.txt")
         let r2 = undoer.undo(moved.id)
         XCTAssertEqual(r2.undone, [])
@@ -732,7 +742,7 @@ final class ChangePlanTests: FolderTestCase {
         write("t/x.txt", "x")
         let plan = try approved([rm("t/x.txt")])
         let exec = ChangeExecutor(denylist: denylist, journal: journal,
-                                  trasher: HookedTrash(trash, before: { _ in self.swapForSymlink("t") }))
+                                  trasher: HookedTrash(trash, before: { _ in self.swapForSymlink("t") }), canChange: allow)
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"], "back under its name, staging gone")
         XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
@@ -750,7 +760,7 @@ final class ChangePlanTests: FolderTestCase {
             try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t")
             self.write("victim/\(staging)/x.txt", "victim", in: self.outside)
             try? self.fm.createSymbolicLink(atPath: self.grant + "/t", withDestinationPath: self.outside + "/victim")
-        })
+        }, canChange: allow)
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
         XCTAssertTrue(staging.hasPrefix(".llmtray-trash-"), staging)
         XCTAssertEqual(try String(contentsOfFile: outside + "/victim/\(staging)/x.txt"), "victim", "what went is put back")
@@ -764,7 +774,7 @@ final class ChangePlanTests: FolderTestCase {
         let plan = try approved([rm("t/x.txt")])
         let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: HookedTrash(trash, after: { _ in
             try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t")
-        }))
+        }), canChange: allow)
         XCTAssertEqual(statuses(exec.execute(plan)), ["failed"])
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/t"), ["x.txt"], "put back where it came from")
         XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
@@ -800,7 +810,7 @@ final class ChangePlanTests: FolderTestCase {
 
     private func assertStoppedPlainly(_ r: ChangeUndo.Report, _ planID: UUID, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertEqual(r.undone, [], file: file, line: line)
-        XCTAssertEqual(r.stopped?.id, 1, file: file, line: line)
+        XCTAssertEqual(r.stopped?.id, journal.record(planID)?.items.first?.planItem.id, file: file, line: line)
         XCTAssertFalse(r.stopped?.reason?.contains("needs a look") ?? true, "\(r)", file: file, line: line)
         guard case .done = journal.record(planID)?.items.first?.state else {
             return XCTFail("still done after a reverted undo", file: file, line: line)

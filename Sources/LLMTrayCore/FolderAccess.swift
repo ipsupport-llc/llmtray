@@ -28,24 +28,30 @@ public struct EntryStat: Equatable, Sendable {
     public var size: Int64
     public var created: Date
     public var modified: Date
+    /// `st_flags` (`SF_DATALESS`...).
+    public var flags: UInt32
 
     public init(identity: FileIdentity, mode: mode_t, linkCount: Int = 1, size: Int64 = 0,
-                created: Date = Date(timeIntervalSince1970: 0), modified: Date = Date(timeIntervalSince1970: 0)) {
+                created: Date = Date(timeIntervalSince1970: 0), modified: Date = Date(timeIntervalSince1970: 0),
+                flags: UInt32 = 0) {
         self.identity = identity
         self.mode = mode
         self.linkCount = linkCount
         self.size = size
         self.created = created
         self.modified = modified
+        self.flags = flags
     }
 
     init(_ st: stat) {
         func date(_ t: timespec) -> Date {
             Date(timeIntervalSince1970: TimeInterval(t.tv_sec) + TimeInterval(t.tv_nsec) / 1_000_000_000)
         }
-        self.init(identity: FileIdentity(device: st.st_dev, inode: st.st_ino), mode: st.st_mode,
+        let identity = FileIdentity(device: st.st_dev, inode: st.st_ino)
+        self.init(identity: identity, mode: st.st_mode,
                   linkCount: Int(st.st_nlink), size: Int64(st.st_size),
-                  created: date(st.st_birthtimespec), modified: date(st.st_mtimespec))
+                  created: date(st.st_birthtimespec), modified: date(st.st_mtimespec),
+                  flags: st.st_flags | StatFlagInjection.shared.flags(for: identity))
     }
 
     public var isDirectory: Bool { mode & S_IFMT == S_IFDIR }
@@ -54,6 +60,51 @@ public struct EntryStat: Equatable, Sendable {
     /// A regular file with more than one name: it can be the same file as one
     /// outside the grant (Hardening 5), so its contents aren't read.
     public var isHardLinked: Bool { isRegularFile && linkCount > 1 }
+    /// A file provider's placeholder (iCloud Drive "Optimize Mac Storage"):
+    /// the bytes aren't on this Mac, and reading them would download them.
+    public var isDataless: Bool { flags & UInt32(SF_DATALESS) != 0 }
+}
+
+/// File flags only the kernel can set (`SF_DATALESS`), for tests: added to
+/// what `stat` reports for an identity. Empty outside tests.
+final class StatFlagInjection: @unchecked Sendable {
+    static let shared = StatFlagInjection()
+    private let lock = NSLock()
+    private var extra: [FileIdentity: UInt32] = [:]
+
+    func flags(for identity: FileIdentity) -> UInt32 {
+        lock.lock()
+        defer { lock.unlock() }
+        return extra.isEmpty ? 0 : extra[identity] ?? 0
+    }
+
+    func set(_ flags: UInt32, for identity: FileIdentity) {
+        lock.lock()
+        extra[identity] = flags
+        lock.unlock()
+    }
+
+    func clear() {
+        lock.lock()
+        extra = [:]
+        lock.unlock()
+    }
+}
+
+/// Reads with the thread's policy for dataless files set to "don't
+/// materialize" (a read fails instead of downloading from iCloud): a second
+/// guard behind the `SF_DATALESS` check, restored afterwards.
+enum Materialization {
+    static func off<T>(_ body: () throws -> T) rethrows -> T {
+        let type = Int32(IOPOL_TYPE_VFS_MATERIALIZE_DATALESS_FILES)
+        let old = getiopolicy_np(type, IOPOL_SCOPE_THREAD)
+        let set = setiopolicy_np(type, IOPOL_SCOPE_THREAD, IOPOL_MATERIALIZE_DATALESS_FILES_OFF)
+        defer { if set == 0, old >= 0 { _ = setiopolicy_np(type, IOPOL_SCOPE_THREAD, old) } }
+        return try body()
+    }
+
+    /// The calling thread's policy now (tests).
+    static var current: Int32 { getiopolicy_np(Int32(IOPOL_TYPE_VFS_MATERIALIZE_DATALESS_FILES), IOPOL_SCOPE_THREAD) }
 }
 
 public enum EntryKind: String, Codable, Sendable {
@@ -86,6 +137,13 @@ public enum FolderAccessError: Error, Equatable, CustomStringConvertible {
     case exists(String)
     case notEmpty(String)
     case crossDevice(String)
+    /// A folder (or package) with denied items inside (`.ssh`, a keychain):
+    /// moving or trashing it would carry them along.
+    case containsProtected(String)
+    /// Too large (or partly unreadable) to be sure nothing denied is inside.
+    case uncheckable(String)
+    /// No change grant covers it (any more): revoked, expired, or never given.
+    case notGranted(String)
     case system(String, Int32)
 
     public var description: String {
@@ -103,6 +161,11 @@ public enum FolderAccessError: Error, Equatable, CustomStringConvertible {
         case .exists(let s): return "already exists: \(s)"
         case .notEmpty(let s): return "not empty: \(s)"
         case .crossDevice(let s): return "on another volume: \(s)"
+        case .containsProtected(let s):
+            return "contains protected items (like .ssh or keychains) that folder tools never touch, "
+                + "so it isn't moved or trashed as a whole: \(s)"
+        case .uncheckable(let s): return "too large to check for protected items inside, so it isn't moved or trashed: \(s)"
+        case .notGranted(let s): return "no change access (the grant was revoked or has expired): \(s)"
         case .system(let op, let e): return "\(op): \(String(cString: strerror(e)))"
         }
     }
@@ -180,8 +243,12 @@ public struct FolderDenylist: Sendable {
         let appSupport = h + "/Library/Application Support"
         var paths = [
             "/System", "/System/Volumes/Data", "/Library", "/usr", "/bin", "/sbin", "/private",
-            "/etc", "/var", "/tmp", "/dev", "/cores",
+            "/etc", "/var", "/tmp", "/dev", "/cores", "/Applications",
             h + "/Library", h + "/.ssh", h + "/.gnupg", h + "/.Trash",
+            // Credentials and tool configuration in the home folder.
+            h + "/.aws", h + "/.config", h + "/.kube", h + "/.docker", h + "/.netrc", h + "/.git-credentials",
+            h + "/.password-store", h + "/.npmrc", h + "/.pypirc", h + "/.gem/credentials",
+            h + "/.cargo/credentials", h + "/.cargo/credentials.toml", h + "/.terraform.d",
             h + "/Library/Keychains", h + "/Library/Containers", h + "/Library/Group Containers",
             h + "/Library/Safari", appSupport + "/Google/Chrome", appSupport + "/Firefox",
             appSupport + "/BraveSoftware", appSupport + "/Microsoft Edge", appSupport + "/Arc",
@@ -197,6 +264,27 @@ public struct FolderDenylist: Sendable {
         }
         return FolderDenylist(paths: paths, names: [".ssh", ".gnupg", "Keychains", ".Trash", ".Trashes"],
                               extensions: ["keychain", "keychain-db"], ungrantablePaths: ungrantable)
+    }
+
+    // MARK: Secret-looking files
+
+    /// Names whose contents are never read inside any grant (keys,
+    /// credentials, environment files): listed, movable, never opened for a
+    /// head, a hash or a duplicate check. Compared folded, like denied names.
+    static let secretNames: Set<String> = [".env", ".envrc", ".npmrc", ".netrc", ".git-credentials", ".pypirc"]
+    static let secretExtensions: Set<String> = ["pem", "key", "p12", "pfx"]
+    static let secretPrefixes = ["id_rsa", "id_dsa", "id_ecdsa", "id_ed25519", ".env."]
+
+    /// Whether a file looks like a secret by its name (and, for `config`,
+    /// its folder's: `.git/config` can hold credentials in remote URLs).
+    public static func looksSecret(name: String, parentName: String?) -> Bool {
+        let f = fold(name)
+        if secretNames.contains(f) { return true }
+        if secretPrefixes.contains(where: { f.hasPrefix($0) }) { return true }
+        let ext = (f as NSString).pathExtension
+        if !ext.isEmpty, secretExtensions.contains(ext) { return true }
+        if f == "config", let parentName, fold(parentName) == ".git" { return true }
+        return false
     }
 }
 

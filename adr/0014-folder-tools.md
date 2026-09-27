@@ -96,6 +96,70 @@ These override anything looser above.
     case-sensitive and insensitive volumes, composed and decomposed
     names.
 
+## Hardening, round 2 (Claude security review, 2026-09-27)
+
+These override anything looser above, too.
+
+12. **Trash restore is LLMTray's Undo, not Finder's Put Back.** The item
+    goes to the Trash from a private staging folder next to it (Hardening
+    1: `trashItem` works by path, and only a path into that folder is ever
+    handed over), so Finder records the staging folder as the original
+    location and its Put Back can't return the item to its folder. Trashing
+    in place after re-verifying the parent chain was measured and rejected:
+    `trashItem` takes 0.3 ms typically and up to ~55 ms, and a parent
+    swapped for a symlink in that window sends it to an arbitrary file of
+    the same name elsewhere, recoverable only by a rollback that itself
+    goes by path; with staging, a redirect can only reach a copy of the
+    staging folder's own path. The plan says so for every trash item
+    ("restore it with Undo in LLMTray"), and the plan review repeats it.
+13. **Approval names the exact plan**: plan id and revision. Revisions and
+    item ids are handed out by the plan store and never reused (across
+    cancels, approvals and chats), so an approval of a cancelled plan can't
+    land on the next one.
+14. **Temporary names survive a crash.** Every temporary name (the Trash's
+    staging folder, a new folder before it is published, an item under a
+    temporary name during a case-only rename) is fixed by plan id and item
+    id and journaled before it is made. A recovery pass -- when the journal
+    is opened, and before every undo -- puts an interrupted item found
+    under such a name back under its own name (by identity, exclusively; a
+    name taken since leaves it there, reported) and removes the empty
+    staging folder; nothing else is touched.
+15. **iCloud placeholders aren't read.** A dataless file (`SF_DATALESS`) is
+    listed and reported "in iCloud, not downloaded"; its contents are
+    never read or hashed (the duplicate scan counts it as skipped), and
+    every read runs with the thread's dataless materialization policy off
+    as a second guard. The duplicate scan has a time cap (60 s, then a
+    partial result).
+16. **A folder holding denied items isn't moved or trashed whole.** Its
+    subtree is checked by descriptors (bounded; too large to check counts
+    as holding something): listings and info flag it "contains protected
+    items", and a move or trash of it is refused with that reason -- at
+    proposal, approval and execution -- rather than carrying a `.ssh` along.
+17. **More is denied.** Home-level credentials and tool configuration
+    (`~/.aws`, `~/.config`, `~/.kube`, `~/.docker`, `~/.netrc`,
+    `~/.git-credentials`, `~/.password-store`, `~/.npmrc`, `~/.pypirc`,
+    `~/.gem/credentials`, `~/.cargo/credentials*`, `~/.terraform.d`) and
+    `/Applications` (no grant at or under it). Inside any grant,
+    secret-looking files (`.env`, `.env.*`, `.envrc`, `*.pem`, `*.key`,
+    `id_rsa*` / `id_dsa*` / `id_ecdsa*` / `id_ed25519*`, `*.p12`, `*.pfx`,
+    `.git/config`, `.npmrc`, `.netrc`, `.git-credentials`, `.pypirc`) are
+    listed and can be moved, but their contents are never read: no head, no
+    hash, no duplicate check. iCloud Drive and CloudStorage stay under the
+    denied `~/Library` for now (a product decision pending).
+18. **Change grants are checked again** at approval, at execution (both
+    ends of a move, across grants too) and before undo or recovery, without
+    using anything up: a grant revoked or expired since the proposal stops
+    the change ("grant revoked"). A `once` grant counts for the chat of the
+    call that used it.
+19. **Temporary chats read only through grants made in that chat** (once
+    or for the chat): no standing grant reaches them (Hardening 8).
+20. **The journal is synced with `F_FULLFSYNC`** (`fsync` where that isn't
+    supported); journals of plans that finished cleanly are pruned after
+    30 days, interrupted ones kept until looked at.
+21. **Undo of a made folder ignores a lone `.DS_Store`** (Finder writes one
+    just by showing the folder): removed with the folder only when it is
+    the sole entry.
+
 ## Tools
 
 - `list_dir(path, pattern?, recursive?, limit, cursor?)` — names, kinds

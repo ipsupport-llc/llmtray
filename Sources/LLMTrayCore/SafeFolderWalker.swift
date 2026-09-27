@@ -29,6 +29,15 @@ public struct ResolvedItem {
     public var components: [String] { parent.components + [name] }
 }
 
+/// What a folder's subtree holds of the denylist.
+public enum ProtectedContents: String, Codable, Sendable {
+    case none
+    /// Something denied is inside: shown as "contains protected items".
+    case found = "contains_protected_items"
+    /// Too large, or partly unreadable: not known.
+    case unchecked
+}
+
 /// Paths inside a grant, resolved by descriptors (adr/0014, Hardening 1): from
 /// an open descriptor of the grant root, one component at a time, with
 /// `openat(O_NOFOLLOW | O_DIRECTORY)`. No symlink, alias or package is ever
@@ -262,6 +271,62 @@ public struct SafeFolderWalker {
         // once the file is open, else the file isn't read.
         guard stillInside(item.parent) else { throw FolderAccessError.changed(shown) }
         return d
+    }
+
+    // MARK: Denied items inside a folder
+
+    /// Whether a folder's subtree holds anything denied (Hardening 4): a
+    /// move or trash of the folder would carry it along, so the folder is
+    /// flagged and isn't changed as a whole. Walked by descriptors (no
+    /// symlink followed, packages entered: their contents move with them),
+    /// at most `budget` entries; past it, or where a folder can't be read,
+    /// the answer is `.unchecked`.
+    public func protectedContents(in parent: OpenedDirectory, _ name: String, budget: Int = 200_000) -> ProtectedContents {
+        protectedScan(in: parent, name, budget: budget).result
+    }
+
+    /// `protectedContents`, with the entries it read.
+    func protectedScan(in parent: OpenedDirectory, _ name: String, budget: Int) -> (result: ProtectedContents, read: Int) {
+        guard let st = try? Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory,
+              let base = parent.descriptor.currentPath else { return (.unchecked, 0) }
+        var remaining = budget
+        func done(_ r: ProtectedContents) -> (result: ProtectedContents, read: Int) { (r, budget - max(0, remaining)) }
+        // Folders still to read, opened when their turn comes: the open ones
+        // are then only those on the way down (few descriptors held).
+        var stack: [(parent: Descriptor, name: String, stat: EntryStat, path: String, depth: Int)] =
+            [(parent.descriptor, name, st, base + "/" + name, 0)]
+        var unchecked = false
+        while let next = stack.popLast() {
+            let path = next.path, depth = next.depth
+            guard let dir = try? Self.openChild(next.parent, next.name, expecting: next.stat, display: next.name) else {
+                unchecked = true
+                continue
+            }
+            let dupFD = dup(dir.fd)
+            guard dupFD >= 0, let stream = fdopendir(dupFD) else {
+                if dupFD >= 0 { Darwin.close(dupFD) }
+                unchecked = true
+                continue
+            }
+            defer { closedir(stream) }
+            while let ent = readdir(stream) {
+                let n = withUnsafePointer(to: ent.pointee.d_name) {
+                    $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
+                }
+                if n == "." || n == ".." { continue }
+                remaining -= 1
+                if remaining < 0 { return done(.unchecked) }
+                if denylist.isDenied(name: n) || denylist.deniesPath(path + "/" + n) { return done(.found) }
+                guard let cst = try? Posix.lstatAt(dir.fd, n) else { unchecked = true; continue }
+                if denylist.isDenied(identity: cst.identity) { return done(.found) }
+                guard cst.isDirectory else { continue }
+                // Another volume mounted inside can't move with it anyway.
+                if cst.identity.device != dir.identity.device { continue }
+                if depth + 1 > 256 { unchecked = true; continue }
+                stack.append((dir, n, cst, path + "/" + n, depth + 1))
+            }
+        }
+        return done(unchecked ? .unchecked : .none)
     }
 
     public func display(_ components: [String]) -> String {

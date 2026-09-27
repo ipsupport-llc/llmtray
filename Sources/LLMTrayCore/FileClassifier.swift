@@ -73,6 +73,14 @@ public struct FileInfo: Codable, Equatable, Sendable {
     public var hash: HashOutcome?
     /// Why contents weren't looked at, when they weren't.
     public var note: String?
+    /// In iCloud (or another file provider), not downloaded: not read, as
+    /// reading would download it. Set only when true.
+    public var notDownloaded: Bool?
+    /// Named like a key or credentials file: not read. Set only when true.
+    public var looksSecret: Bool?
+    /// A folder or package: whether anything denied is inside (it isn't
+    /// moved or trashed as a whole then).
+    public var protectedInside: ProtectedContents?
 }
 
 public struct FileClassifier {
@@ -101,8 +109,23 @@ public struct FileClassifier {
 
     // MARK: file_info
 
+    static let notDownloadedNote = "in iCloud, not downloaded: contents not read (reading would download it)"
+    static let secretNote = "named like a key or credentials file: contents not read"
+
+    /// A file's parent folder's name, for `FolderDenylist.looksSecret`.
+    static func parentName(_ item: ResolvedItem, walker: SafeFolderWalker) -> String {
+        item.parent.components.last ?? (walker.root.path as NSString).lastPathComponent
+    }
+
     public func info(_ item: ResolvedItem, walker: SafeFolderWalker, hash: Bool = false,
                      isCancelled: () -> Bool = { false }) throws -> FileInfo {
+        // Reads fail rather than download a dataless file (a second guard
+        // behind the SF_DATALESS checks).
+        try Materialization.off { try infoReading(item, walker: walker, hash: hash, isCancelled: isCancelled) }
+    }
+
+    private func infoReading(_ item: ResolvedItem, walker: SafeFolderWalker, hash: Bool,
+                             isCancelled: () -> Bool) throws -> FileInfo {
         guard let entry = item.entry else { throw FolderAccessError.notFound(walker.display(item.components)) }
         let ext = (entry.name as NSString).pathExtension
         let extType = ext.isEmpty ? nil : UTType(filenameExtension: ext)
@@ -112,11 +135,30 @@ public struct FileClassifier {
                             extensionType: nil, typeMismatch: false)
         switch entry.kind {
         case .file: break
-        case .directory: info.contentType = UTType.folder.identifier; return info
-        case .package: info.note = "a package: one item, not opened"; return info
+        case .directory:
+            info.contentType = UTType.folder.identifier
+            info.protectedInside = walker.protectedContents(in: item.parent, entry.name)
+            if info.protectedInside == .found { info.note = "contains protected items: not moved or trashed as a whole" }
+            return info
+        case .package:
+            info.note = "a package: one item, not opened"
+            info.protectedInside = walker.protectedContents(in: item.parent, entry.name)
+            return info
         case .symlink: info.contentType = UTType.symbolicLink.identifier; info.note = "a symbolic link: not followed"; return info
         case .alias: info.contentType = UTType.aliasFile.identifier; info.note = "an alias: not followed"; return info
         case .other: info.note = "not a regular file: not opened"; return info
+        }
+        if FolderDenylist.looksSecret(name: entry.name, parentName: Self.parentName(item, walker: walker)) {
+            info.looksSecret = true
+            info.note = Self.secretNote
+            if hash { info.hash = .withheld("looks like a secret") }
+            return info
+        }
+        if entry.stat.isDataless {
+            info.notDownloaded = true
+            info.note = Self.notDownloadedNote
+            if hash { info.hash = .withheld("not downloaded") }
+            return info
         }
         if entry.stat.isHardLinked {
             info.note = "has more than one name (a hard link, maybe to a file outside this folder): contents not read"
@@ -124,6 +166,13 @@ public struct FileClassifier {
             return info
         }
         let file = try walker.openFile(item)
+        // Evicted since lstat: the open file's own flags decide.
+        if file.stat.isDataless {
+            info.notDownloaded = true
+            info.note = Self.notDownloadedNote
+            if hash { info.hash = .withheld("not downloaded") }
+            return info
+        }
         // A link made since lstat: the open file's own count decides.
         if file.stat.isHardLinked {
             info.hardLinked = true
@@ -391,6 +440,11 @@ public struct FileClassifier {
     public func sha256(_ file: Descriptor, isCancelled: () -> Bool = { false }) -> HashOutcome {
         guard file.stat.isRegularFile else { return .withheld("not a regular file") }
         if file.stat.isHardLinked { return .withheld("hard link") }
+        if file.stat.isDataless { return .withheld("not downloaded") }
+        return Materialization.off { hashReading(file, isCancelled: isCancelled) }
+    }
+
+    private func hashReading(_ file: Descriptor, isCancelled: () -> Bool) -> HashOutcome {
         if file.stat.size > caps.hashBytes { return .tooLarge(limit: caps.hashBytes) }
         let start = clock()
         var hasher = SHA256()

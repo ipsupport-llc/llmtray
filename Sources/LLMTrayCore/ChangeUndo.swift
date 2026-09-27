@@ -9,12 +9,16 @@ import Foundation
 public struct ChangeUndo {
     public let denylist: FolderDenylist
     public let journal: ChangeJournal
+    /// Change grants for the plan's chat: an item is reversed (or recovered)
+    /// only while one still covers both its ends; else "grant revoked".
+    public let canChange: ChangeGrantCheck
 
     typealias Uncertain = ChangeExecutor.Uncertain
 
-    public init(denylist: FolderDenylist, journal: ChangeJournal) {
+    public init(denylist: FolderDenylist, journal: ChangeJournal, canChange: @escaping ChangeGrantCheck) {
         self.denylist = denylist
         self.journal = journal
+        self.canChange = canChange
     }
 
     public struct Remaining: Equatable, Sendable {
@@ -66,6 +70,8 @@ public struct ChangeUndo {
 
     public func undo(_ planID: UUID) -> Report {
         var report = Report(planID: planID, undone: [], stopped: nil, remaining: [])
+        // What a crash left under a temporary name goes back first.
+        _ = recover(planID)
         guard let record = journal.record(planID) else {
             report.stopped = Remaining(id: 0, reversible: false, reason: "no journal for this plan")
             return report
@@ -183,13 +189,14 @@ public struct ChangeUndo {
     private func reverse(_ item: PlanItem, _ r: JournalResult, dryRun: Bool, planID: UUID) throws {
         let excl = UInt32(RENAME_EXCL)
         let renameBack = ChangeExecutor.renameBack
+        try PlanItemGrant.check(item, canChange)
         switch item.kind {
         case .makeDir:
             guard let d = item.destination else { throw FolderAccessError.invalidPath("the journal has no destination") }
             let (dir, name) = try placed(item, r)
             defer { withExtendedLifetime(dir) {} }
             if dryRun {
-                guard try Self.isEmptyDirectory(dir.descriptor, name) else { throw FolderAccessError.notEmpty(name) }
+                guard try Self.emptiness(dir.descriptor, name) != .notEmpty else { throw FolderAccessError.notEmpty(name) }
                 return
             }
             beforeOperation?(item)
@@ -214,6 +221,8 @@ public struct ChangeUndo {
             if !walker(d.location.root).stillInside(dir) {
                 try restore(.changed("\(comps(dir)) left the grant"))
             }
+            // Finder may have left its .DS_Store there: alone, it goes too.
+            Self.removeLoneDSStore(dir.descriptor, temp, identity: r.identity)
             if unlinkat(fd, temp, AT_REMOVEDIR) != 0 {
                 let e = errno
                 try restore(e == ENOTEMPTY || e == EEXIST ? .notEmpty(name) : .system("remove \(name)", e))
@@ -320,6 +329,7 @@ public struct ChangeUndo {
     /// removed if still empty and still inside the grant, else put back
     /// under its name.
     private func isBack(_ item: PlanItem, _ r: JournalResult, planID: UUID) throws -> Bool {
+        try PlanItemGrant.check(item, canChange)
         switch item.kind {
         case .makeDir:
             guard let d = item.destination, let comps = r.components, let name = comps.last, let chain = r.destinationChain else { return false }
@@ -343,6 +353,7 @@ public struct ChangeUndo {
                 _ = try restore()
                 throw FolderAccessError.changed("\(self.comps(dir)) left the grant")
             }
+            Self.removeLoneDSStore(dir.descriptor, aside, identity: r.identity)
             if unlinkat(fd, aside, AT_REMOVEDIR) == 0 {
                 if (try? Posix.lstatAt(fd, aside)) != nil {
                     throw Uncertain(description: "\(aside) is still there after removing it")
@@ -389,6 +400,14 @@ public struct ChangeUndo {
     }
 
     static func isEmptyDirectory(_ parent: Descriptor, _ name: String) throws -> Bool {
+        try emptiness(parent, name) == .empty
+    }
+
+    enum Emptiness { case empty, onlyDSStore, notEmpty }
+
+    /// Whether a folder is empty -- or holds only Finder's `.DS_Store`, which
+    /// a made folder gets just by being looked at in Finder.
+    static func emptiness(_ parent: Descriptor, _ name: String) throws -> Emptiness {
         let fd = openat(parent.fd, name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
         guard fd >= 0 else { throw FolderAccessError.system("open \(name)", errno) }
         guard let stream = fdopendir(fd) else {
@@ -396,12 +415,167 @@ public struct ChangeUndo {
             throw FolderAccessError.system("fdopendir", errno)
         }
         defer { closedir(stream) }
+        var dsStore = false
         while let ent = readdir(stream) {
             let n = withUnsafePointer(to: ent.pointee.d_name) {
                 $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
             }
-            if n != "." && n != ".." { return false }
+            if n == "." || n == ".." { continue }
+            if Array(n.utf8) == Array(".DS_Store".utf8), !dsStore { dsStore = true; continue }
+            return .notEmpty
         }
-        return true
+        return dsStore ? .onlyDSStore : .empty
+    }
+
+    /// Removes `.DS_Store` from the folder `name` when it is the folder's
+    /// only entry, the folder is `identity` and the entry a plain file with
+    /// one name. Anything else is left as it is (the removal of the folder
+    /// then fails as "not empty").
+    static func removeLoneDSStore(_ parent: Descriptor, _ name: String, identity: FileIdentity) {
+        guard (try? emptiness(parent, name)) == .onlyDSStore else { return }
+        let fd = openat(parent.fd, name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard fd >= 0 else { return }
+        defer { close(fd) }
+        guard (try? Posix.fstat(fd))?.identity == identity,
+              let st = try? Posix.lstatAt(fd, ".DS_Store"), st.isRegularFile, st.linkCount == 1 else { return }
+        _ = unlinkat(fd, ".DS_Store", 0)
+    }
+
+    // MARK: Recovery after a crash
+
+    public struct Recovery: Equatable, Sendable {
+        public var planID: UUID
+        /// Items put back under their names from a temporary one (their
+        /// operation didn't happen: journaled as failed).
+        public var restored: [Int] = []
+        /// Items whose leftover staging folder was removed (empty, ours).
+        public var cleaned: [Int] = []
+        /// Items left for the user to look at, and why.
+        public var needsLook: [Int: String] = [:]
+    }
+
+    /// Recovery for the newest `limit` plans with anything left under a
+    /// temporary name: to run when the journal is opened (app launch, the
+    /// journal's list) -- `undo` runs it for its plan first.
+    public func recoverInterrupted(limit: Int = 50) -> [Recovery] {
+        journal.records(limit: limit).filter { $0.items.contains { $0.staging != nil } }
+            .map { recover($0.planID) }
+            .filter { !$0.restored.isEmpty || !$0.cleaned.isEmpty || !$0.needsLook.isEmpty }
+    }
+
+    /// Finds what a crash left of a plan's temporary names (journaled before
+    /// each was made) and undoes it: an interrupted item found under its
+    /// temporary name (or in its staging folder) goes back under its own
+    /// name -- by identity, exclusively; a name taken since leaves it where it
+    /// is, reported -- and an empty staging folder of ours is removed.
+    /// Nothing else is touched.
+    public func recover(_ planID: UUID) -> Recovery {
+        var out = Recovery(planID: planID)
+        // A plan running in this process isn't interrupted: its names are
+        // in use.
+        guard !ChangeExecutor.isRunning(planID), let record = journal.record(planID), !record.truncated else { return out }
+        for item in record.items {
+            guard let st = item.staging else { continue }
+            let interrupted: Bool
+            switch item.state {
+            case .incomplete, .uncertain: interrupted = true
+            default: interrupted = false
+            }
+            let id = item.planItem.id
+            do {
+                switch try recoverOne(item.planItem, st, interrupted: interrupted) {
+                case .nothing: break
+                case .cleaned: out.cleaned.append(id)
+                case .restored:
+                    out.restored.append(id)
+                    try? journal.append(JournalEvent(kind: .failed, date: Date(), item: id,
+                                                     message: "interrupted, and undone from its temporary name"), planID: planID)
+                }
+            } catch {
+                out.needsLook[id] = "\(error)"
+            }
+        }
+        return out
+    }
+
+    private enum RecoveryStep { case nothing, cleaned, restored }
+
+    private func recoverOne(_ item: PlanItem, _ st: StagingRecord, interrupted: Bool) throws -> RecoveryStep {
+        let dir = try walker(st.root).openDirectory(st.parentComponents, expected: st.parentChain)
+        defer { withExtendedLifetime(dir) {} }
+        let pfd = dir.descriptor.fd
+        /// A trash that never took the item: it is still under its name
+        /// (a trashed item leaves it), so nothing changed.
+        func trashNeverRan() throws -> Bool {
+            guard st.kind == .trash, interrupted, let s = item.source else { return false }
+            return try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity
+        }
+        guard let staged = try Posix.lstatAt(pfd, st.name) else { return try trashNeverRan() ? .restored : .nothing }
+        // Something to change: only while a change grant still covers it.
+        try PlanItemGrant.check(item, canChange)
+        let excl = UInt32(RENAME_EXCL)
+        switch st.kind {
+        case .rename:
+            // The item itself under the temporary name.
+            guard interrupted, let s = item.source else { return .nothing }
+            guard staged.identity == s.identity else {
+                throw Uncertain(description: "\(st.name) isn't \(s.location.relativePath)")
+            }
+            if renameatx_np(pfd, st.name, pfd, s.location.name, excl) != 0 {
+                let e = errno
+                if e == EEXIST {
+                    throw FolderAccessError.exists("\(s.location.relativePath) (the item is at \(st.name))")
+                }
+                throw FolderAccessError.system("put back \(s.location.name)", e)
+            }
+            guard try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity else {
+                throw Uncertain(description: "\(s.location.relativePath) isn't the item after putting it back")
+            }
+            return .restored
+        case .trash, .makeDir:
+            // A private folder of ours: held open, checked, then emptied of
+            // the item (trash) and removed.
+            guard staged.isDirectory else { throw Uncertain(description: "\(st.name) isn't a folder") }
+            let sfd = openat(pfd, st.name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+            guard sfd >= 0, let folder = try? Descriptor(fd: sfd, stat: Posix.fstat(sfd)) else {
+                if sfd >= 0 { close(sfd) }
+                throw FolderAccessError.system("open \(st.name)", errno)
+            }
+            guard folder.identity == staged.identity, folder.identity.device == dir.descriptor.identity.device,
+                  ChangeExecutor.ownedByUs(folder) else {
+                throw Uncertain(description: "\(st.name) isn't a folder LLMTray made")
+            }
+            var result = RecoveryStep.cleaned
+            if st.kind == .trash, interrupted, let s = item.source,
+               let inside = try Posix.lstatAt(folder.fd, s.location.name) {
+                guard inside.identity == s.identity else {
+                    throw Uncertain(description: "\(st.name) holds something other than \(s.location.relativePath)")
+                }
+                if renameatx_np(folder.fd, s.location.name, pfd, s.location.name, excl) != 0 {
+                    let e = errno
+                    if e == EEXIST {
+                        throw FolderAccessError.exists("\(s.location.relativePath) (the item is in \(st.name))")
+                    }
+                    throw FolderAccessError.system("put back \(s.location.name)", e)
+                }
+                guard try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity else {
+                    throw Uncertain(description: "\(s.location.relativePath) isn't the item after putting it back")
+                }
+                result = .restored
+            }
+            guard try Self.isEmptyDirectory(dir.descriptor, st.name) else {
+                if result == .restored { return result }
+                throw FolderAccessError.notEmpty(st.name)
+            }
+            // Removal is by name: it must still be the folder checked.
+            guard try Posix.lstatAt(pfd, st.name)?.identity == folder.identity, unlinkat(pfd, st.name, AT_REMOVEDIR) == 0 else {
+                if result == .restored { return result }
+                throw FolderAccessError.system("remove \(st.name)", errno)
+            }
+            // A make_dir that never published its folder: nothing changed.
+            if st.kind == .makeDir, interrupted { return .restored }
+            if result == .cleaned, try trashNeverRan() { return .restored }
+            return result
+        }
     }
 }

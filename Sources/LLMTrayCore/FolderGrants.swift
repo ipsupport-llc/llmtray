@@ -100,6 +100,10 @@ public final class FolderGrants: @unchecked Sendable {
     /// Chats where a deny stopped the model from prompting again, until the
     /// user asks for access themselves.
     private var promptsBlocked: Set<String> = []
+    /// `once` grants used up by their call, kept for their chat: the change
+    /// that call proposed is still checked against them at approval,
+    /// execution and undo (they authorize no new call).
+    private var consumedOnce: [FolderGrant] = []
     private let storeURL: URL?
 
     /// Loads the standing grants in `storeURL` (expired ones dropped).
@@ -179,6 +183,7 @@ public final class FolderGrants: @unchecked Sendable {
             case .until, .always: return false
             }
         }
+        consumedOnce.removeAll { if case .once(_, let id) = $0.lifetime { return id == chatID }; return false }
         denies.removeAll { $0.chatID == chatID }
         promptsBlocked.remove(chatID)
         lock.unlock()
@@ -204,20 +209,18 @@ public final class FolderGrants: @unchecked Sendable {
     /// chat grants are preferred; a matching `once` grant is consumed by this
     /// call, atomically -- a second call with the same key finds nothing.
     /// A temporary chat is never authorized to change anything, whatever
-    /// grants exist (Hardening 8).
+    /// grants exist, and reads only through grants made in that chat -- no
+    /// standing grant reaches it (Hardening 8: no grants beyond the chat).
     public func authorize(path: String, level: FolderAccessLevel, chatID: String, callKey: String,
                           temporaryChat: Bool = false, now: Date = Date()) -> FolderGrant? {
         if temporaryChat, level > .read { return nil }
         lock.lock()
         defer { lock.unlock() }
-        let expired = grants.contains { $0.isExpired(now: now) }
-        grants.removeAll { $0.isExpired(now: now) }
-        // Expired grants are dropped on load too: a failed save here is harmless.
-        if expired { try? saveLocked() }
+        dropExpiredLocked(now: now)
         let usable = grants.filter { g in
             guard g.level >= level, g.covers(path) else { return false }
             switch g.lifetime {
-            case .always, .until: return true
+            case .always, .until: return !temporaryChat
             case .chat(let id): return id == chatID
             case .once(let key, let id): return key == callKey && id == chatID
             }
@@ -227,7 +230,40 @@ public final class FolderGrants: @unchecked Sendable {
         }
         guard let once = usable.first else { return nil }
         grants.removeAll { $0.id == once.id }
+        consumedOnce.append(once)
         return once
+    }
+
+    /// Whether a change grant still covers `path` for `chatID`, without
+    /// using anything up: asked again at approval, at execution (both ends
+    /// of a move) and before undo, so a grant revoked or expired since the
+    /// proposal stops the change (defense in depth: the proposal itself was
+    /// authorized with `authorize`). A `once` grant counts for the chat of
+    /// the call that used it. Never for a temporary chat.
+    public func coversChange(path: String, chatID: String, temporaryChat: Bool = false, now: Date = Date()) -> Bool {
+        if temporaryChat { return false }
+        lock.lock()
+        defer { lock.unlock() }
+        dropExpiredLocked(now: now)
+        return (grants + consumedOnce).contains { g in
+            guard g.level >= .change, g.covers(path) else { return false }
+            switch g.lifetime {
+            case .always, .until: return true
+            case .chat(let id), .once(_, let id): return id == chatID
+            }
+        }
+    }
+
+    /// `coversChange` for one chat, as the planner, executor and undo take it.
+    public func changeCheck(chatID: String, temporaryChat: Bool = false) -> ChangeGrantCheck {
+        { [self] location in coversChange(path: location.displayPath, chatID: chatID, temporaryChat: temporaryChat) }
+    }
+
+    private func dropExpiredLocked(now: Date) {
+        let expired = grants.contains { $0.isExpired(now: now) }
+        grants.removeAll { $0.isExpired(now: now) }
+        // Expired grants are dropped on load too: a failed save here is harmless.
+        if expired { try? saveLocked() }
     }
 
     // MARK: Denies and prompts

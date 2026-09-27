@@ -37,9 +37,18 @@ public struct ListingPage: Codable, Equatable, Sendable {
         public var modified: Date
         /// Set only when true (Hardening 5).
         public var hardLinked: Bool?
+        /// In iCloud, not downloaded. Set only when true.
+        public var notDownloaded: Bool? = nil
+        /// Folders and packages with something denied inside
+        /// (`contains_protected_items`), or too large to check (`unchecked`);
+        /// nil otherwise.
+        public var protectedInside: ProtectedContents? = nil
     }
 
     public var entries: [Entry]
+    /// The listed folder itself, when it isn't the grant's: denied items
+    /// inside it (`contains_protected_items`), or too large to check.
+    public var protectedInside: ProtectedContents? = nil
     /// Matching entries found (all of them, unless `scanTruncated`).
     public var total: Int
     /// The scan stopped at its cap: there may be more than `total`.
@@ -62,6 +71,10 @@ public struct FolderFiles {
         public var pageBytes = 8000
         public var maxDepth = 32
         public var duplicateGroupsPerPage = 20
+        /// Entries read, in all, to flag a page's folders that contain
+        /// protected items (each folder gets at most `protectedPerFolder`).
+        public var protectedCheckPerPage = 50_000
+        public var protectedPerFolder = 10_000
 
         public init() {}
     }
@@ -111,6 +124,23 @@ public struct FolderFiles {
         return n
     }
 
+    /// Flags the page's folders and packages whose subtree holds denied
+    /// items (a move or trash of them is refused), within a budget.
+    private func flagProtected(_ page: inout [ListingPage.Entry]) {
+        var budget = limits.protectedCheckPerPage
+        for i in page.indices where page[i].kind == .directory || page[i].kind == .package {
+            guard budget > 0 else { page[i].protectedInside = .unchecked; continue }
+            let comps = page[i].path.split(separator: "/").map(String.init)
+            guard let parent = try? walker.openDirectory(Array(comps.dropLast())), let name = comps.last else {
+                page[i].protectedInside = .unchecked
+                continue
+            }
+            let (found, read) = walker.protectedScan(in: parent, name, budget: min(budget, limits.protectedPerFolder))
+            budget -= read
+            page[i].protectedInside = found == .none ? nil : found
+        }
+    }
+
     public func listing(_ q: FolderQuery, isCancelled: () -> Bool = { false }) throws -> ListingPage {
         let offset = try Self.offset(q.cursor, tag: "l")
         var found: [ListingPage.Entry] = []
@@ -131,7 +161,8 @@ public struct FolderFiles {
                 if matches(e.name) {
                     found.append(.init(path: comps.joined(separator: "/"), kind: e.kind,
                                        size: e.kind == .file || e.kind == .symlink ? e.stat.size : nil,
-                                       modified: e.stat.modified, hardLinked: e.stat.isHardLinked ? true : nil))
+                                       modified: e.stat.modified, hardLinked: e.stat.isHardLinked ? true : nil,
+                                       notDownloaded: e.stat.isDataless ? true : nil))
                 }
                 if q.recursive, e.kind == .directory, depth + 1 <= limits.maxDepth,
                    e.identity.device == dir.descriptor.identity.device,
@@ -152,7 +183,14 @@ public struct FolderFiles {
             bytes += cost
             i += 1
         }
-        return ListingPage(entries: page, total: found.count, scanTruncated: truncated,
+        flagProtected(&page)
+        var listed: ProtectedContents?
+        if let name = q.components.last {
+            let parent = try walker.openDirectory(Array(q.components.dropLast()))
+            let found = walker.protectedContents(in: parent, name, budget: limits.protectedCheckPerPage)
+            listed = found == .none ? nil : found
+        }
+        return ListingPage(entries: page, protectedInside: listed, total: found.count, scanTruncated: truncated,
                            nextCursor: i < found.count ? Self.cursor(i, tag: "l") : nil)
     }
 }

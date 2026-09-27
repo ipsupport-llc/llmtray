@@ -20,6 +20,12 @@ public struct FolderLocation: Codable, Hashable, Sendable {
     public var displayPath: String { components.isEmpty ? root.path : root.path + "/" + relativePath }
 }
 
+/// Whether a change grant (still) covers a place, asked without using
+/// anything up (`FolderGrants.changeCheck`): by the planner for both ends of
+/// each op, again at approval, at execution and before undo (Hardening 3,
+/// defense in depth).
+public typealias ChangeGrantCheck = @Sendable (FolderLocation) -> Bool
+
 /// One op of a `change_files` call (adr/0014): the ops list is the plan the
 /// user approves, whole or in part. `move.to` is the full new path (a move
 /// into a folder names the item's name at the end; a rename is a move in
@@ -158,6 +164,9 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
     case tooManyItems(Int)
     /// The plan changed after the user reviewed it.
     case stale(reviewed: Int, current: Int)
+    /// The plan the user reviewed is gone (cancelled, approved, replaced by
+    /// a new one): an approval names the exact plan.
+    case notThePlanReviewed
 
     public var description: String {
         switch self {
@@ -168,6 +177,7 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
         case .invalidated(let m): return "changed since proposed: " + m.keys.sorted().map { "\($0): \(m[$0]!)" }.joined(separator: "; ")
         case .tooManyItems(let n): return "a plan holds at most \(n) changes: approve these first"
         case .stale(let r, let c): return "the plan changed since it was reviewed (revision \(r), now \(c))"
+        case .notThePlanReviewed: return "the plan that was reviewed is no longer pending: review the current one"
         }
     }
 }
@@ -176,13 +186,23 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
 /// execution can refuse anything that changed.
 public struct ChangePlanner {
     public let denylist: FolderDenylist
+    /// Change grants for the chat, asked for both ends of every op.
+    public let canChange: ChangeGrantCheck
     /// Items one pending plan may hold (its journal stays small enough to
     /// read whole).
     public var maxItems = 1000
+    /// Entries a folder's subtree is checked for denied items at most.
+    public var protectedCheckBudget = 200_000
 
-    public init(denylist: FolderDenylist) {
+    public init(denylist: FolderDenylist, canChange: @escaping ChangeGrantCheck) {
         self.denylist = denylist
+        self.canChange = canChange
     }
+
+    /// Restoring from the Trash is LLMTray's Undo: the item goes there from
+    /// a private folder made for the call (Hardening 1), which Finder then
+    /// records as its original location.
+    public static let trashRestoreNote = "restore it with Undo in LLMTray: Finder's Put Back doesn't know its original folder"
 
     public struct Result {
         public var items: [PlanItem]
@@ -215,7 +235,17 @@ public struct ChangePlanner {
         return Result(items: items, rejected: rejected)
     }
 
+    /// Both ends of every op must be under a change grant.
+    func checkGranted(_ locations: [FolderLocation]) throws {
+        if let missing = locations.first(where: { !canChange($0) }) { throw FolderAccessError.notGranted(missing.displayPath) }
+    }
+
     private func planOne(_ request: ChangeRequest, id: Int, prior: [PlanItem]) throws -> PlanItem {
+        switch request {
+        case .makeDir(let l): try checkGranted([l])
+        case .move(let f, let t): try checkGranted([f, t])
+        case .trash(let l): try checkGranted([l])
+        }
         switch request {
         case .makeDir(let loc):
             let (dest, deps) = try destination(loc, prior: prior)
@@ -243,6 +273,7 @@ public struct ChangePlanner {
             if source.fileProvider {
                 n.append("managed by a file provider: moving it to the Trash removes it from your other devices too")
             }
+            n.append(Self.trashRestoreNote)
             return PlanItem(id: id, kind: .trash, source: source, destination: nil, collision: .fail, dependsOn: [], notes: n)
         }
     }
@@ -263,10 +294,23 @@ public struct ChangePlanner {
         if prior.contains(where: { $0.source?.identity == entry.identity }) {
             throw FolderAccessError.invalidPath("already in the plan: \(loc.relativePath)")
         }
+        try checkNoProtectedInside(entry, parent: item.parent, root: loc.root, display: loc.relativePath)
         let path = item.parent.descriptor.currentPath.map { $0 + "/" + entry.name }
         return CapturedSource(location: loc, parentChain: item.parent.chain, identity: entry.identity, kind: entry.kind,
                               size: entry.stat.size, hardLinked: entry.stat.isHardLinked,
                               fileProvider: path.map(SafeFolderWalker.isFileProviderItem) ?? false)
+    }
+
+    /// A folder (or package) with denied items inside isn't moved or trashed
+    /// as a whole: `.ssh` would silently go along (Hardening 4).
+    func checkNoProtectedInside(_ entry: FolderEntry, parent: OpenedDirectory, root: FolderRoot, display: String) throws {
+        guard entry.kind == .directory || entry.kind == .package else { return }
+        let walker = SafeFolderWalker(root: root, denylist: denylist)
+        switch walker.protectedContents(in: parent, entry.name, budget: protectedCheckBudget) {
+        case .none: return
+        case .found: throw FolderAccessError.containsProtected(display)
+        case .unchecked: throw FolderAccessError.uncheckable(display)
+        }
     }
 
     /// The deepest existing ancestor of `loc`'s parent by descriptors; each
@@ -310,11 +354,13 @@ public struct ChangePlanner {
         var out: [Int: String] = [:]
         for item in plan.items {
             do {
+                try checkGranted([item.source?.location, item.destination?.location].compactMap { $0 })
                 if let s = item.source {
                     let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
                     let r = try walker.resolve(s.location.components, expectedParents: s.parentChain)
                     guard let e = r.entry, e.identity == s.identity else { throw FolderAccessError.changed(s.location.relativePath) }
                     try s.checkReviewedFlags(e.stat, parent: r.parent.descriptor)
+                    try checkNoProtectedInside(e, parent: r.parent, root: s.location.root, display: s.location.relativePath)
                 }
                 if let d = item.destination {
                     let walker = SafeFolderWalker(root: d.location.root, denylist: denylist)
@@ -334,17 +380,35 @@ public struct ChangePlanner {
 public final class ChangePlanStore: @unchecked Sendable {
     private let lock = NSLock()
     private var plans: [String: ChangePlan] = [:]
+    /// Revisions and item ids are handed out by the store, never reused
+    /// (across chats, cancels and approvals): a reviewed revision or item id
+    /// can't name something that came later.
+    private var lastRevision = 0
+    private var lastItemID = 0
 
     public init() {}
 
-    /// Adds planned items to the chat's pending plan (made if none).
+    /// Adds planned items to the chat's pending plan (made if none). The
+    /// items get new ids from the store (their `dependsOn` follows); the
+    /// returned plan has them as stored.
     @discardableResult
     public func add(_ items: [PlanItem], chatID: String, now: Date = Date()) -> ChangePlan {
         lock.lock()
         defer { lock.unlock() }
         var plan = plans[chatID] ?? ChangePlan(chatID: chatID, created: now)
-        plan.items += items
-        plan.revision += 1
+        var renumbered: [Int: Int] = [:]
+        for item in items {
+            lastItemID += 1
+            renumbered[item.id] = lastItemID
+        }
+        plan.items += items.map { item in
+            var item = item
+            item.id = renumbered[item.id]!
+            item.dependsOn = item.dependsOn.map { renumbered[$0] ?? $0 }
+            return item
+        }
+        lastRevision += 1
+        plan.revision = lastRevision
         plans[chatID] = plan
         return plan
     }
@@ -361,7 +425,8 @@ public final class ChangePlanStore: @unchecked Sendable {
         defer { lock.unlock() }
         guard var plan = plans[chatID], let i = plan.items.firstIndex(where: { $0.id == item }) else { return }
         plan.items[i].collision = policy
-        plan.revision += 1
+        lastRevision += 1
+        plan.revision = lastRevision
         plans[chatID] = plan
     }
 
@@ -371,15 +436,17 @@ public final class ChangePlanStore: @unchecked Sendable {
         lock.unlock()
     }
 
-    /// The user's approval of `items` (nil: all) of the plan `revision` they
-    /// reviewed: every chosen item is checked again against its captured
-    /// identities (`validator`), the pending plan is taken out and the
-    /// approved part returned in plan order. Refused, leaving the plan
-    /// pending, if the plan changed since `revision`, an item is unknown,
-    /// needs an unchosen make_dir, or no longer matches.
-    public func approve(chatID: String, revision: Int, items: Set<Int>? = nil,
+    /// The user's approval of `items` (nil: all) of the exact plan they
+    /// reviewed -- `planID` at `revision`: every chosen item is checked again
+    /// against its captured identities and the change grants (`validator`),
+    /// the pending plan is taken out and the approved part returned in plan
+    /// order. Refused, leaving the plan pending, if it isn't that plan, it
+    /// changed since `revision`, an item is unknown, needs an unchosen
+    /// make_dir, or no longer matches.
+    public func approve(chatID: String, planID: UUID, revision: Int, items: Set<Int>? = nil,
                         validator: ChangePlanner) throws -> ApprovedPlan {
         guard let snapshot = pending(chatID: chatID), !snapshot.items.isEmpty else { throw ChangePlanError.nothingPending }
+        if snapshot.id != planID { throw ChangePlanError.notThePlanReviewed }
         if snapshot.revision != revision { throw ChangePlanError.stale(reviewed: revision, current: snapshot.revision) }
         let chosen = items ?? Set(snapshot.items.map(\.id))
         let unknown = chosen.subtracting(snapshot.items.map(\.id))
@@ -398,10 +465,19 @@ public final class ChangePlanStore: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         guard let current = plans[chatID] else { throw ChangePlanError.nothingPending }
-        if current.revision != revision || current.id != snapshot.id {
-            throw ChangePlanError.stale(reviewed: revision, current: current.revision)
-        }
+        if current.id != planID { throw ChangePlanError.notThePlanReviewed }
+        if current.revision != revision { throw ChangePlanError.stale(reviewed: revision, current: current.revision) }
         plans[chatID] = nil
         return ApprovedPlan(plan: approved)
+    }
+}
+
+/// Both ends of a plan item under the change grants, checked again where it
+/// runs (execution, undo).
+enum PlanItemGrant {
+    static func check(_ item: PlanItem, _ canChange: ChangeGrantCheck) throws {
+        for loc in [item.source?.location, item.destination?.location].compactMap({ $0 }) where !canChange(loc) {
+            throw FolderAccessError.notGranted(loc.displayPath)
+        }
     }
 }

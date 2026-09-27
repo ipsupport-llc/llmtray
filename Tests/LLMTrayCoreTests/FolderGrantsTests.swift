@@ -109,10 +109,16 @@ final class FolderGrantsTests: XCTestCase {
         XCTAssertNoThrow(try g.grant(docs, level: .read, lifetime: .once(callKey: "k", chatID: "t"), chatID: "t", temporaryChat: true))
         XCTAssertThrowsError(try g.grant(docs, level: .read, lifetime: .once(callKey: "k", chatID: "c"), chatID: "t", temporaryChat: true))
         XCTAssertFalse(FileManager.default.fileExists(atPath: store.path), "nothing written")
-        // A standing change grant from a normal chat doesn't reach a temporary one.
+        // A standing grant from a normal chat doesn't reach a temporary one,
+        // not even for reading (Hardening 8: no grants beyond the chat).
         try g.grant(downloads, level: .change, lifetime: .always, chatID: "n")
         XCTAssertNil(g.authorize(path: downloads.path, level: .change, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
-        XCTAssertNotNil(g.authorize(path: downloads.path, level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
+        XCTAssertNil(g.authorize(path: downloads.path, level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
+        XCTAssertNotNil(g.authorize(path: downloads.path, level: .read, chatID: "n", callKey: "k", now: t0))
+        XCTAssertFalse(g.coversChange(path: downloads.path, chatID: "t", temporaryChat: true, now: t0))
+        // Its own chat grant does.
+        XCTAssertNotNil(g.authorize(path: docs.path + "/a", level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
+        XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "other", callKey: "k", temporaryChat: true, now: t0))
     }
 
     func testADenyHoldsAgainstEquivalentTargetsAndUpgrades() {
@@ -151,5 +157,34 @@ final class FolderGrantsTests: XCTestCase {
         XCTAssertEqual(g.denies(chatID: "c").count, 1)
         try g.grant(docs, level: .change, lifetime: .chat("c"), chatID: "c")
         XCTAssertTrue(g.denies(chatID: "c").isEmpty)
+    }
+}
+
+extension FolderGrantsTests {
+    func testTheChangeCheckFollowsRevocationWithoutUsingAnythingUp() throws {
+        let g = FolderGrants(storeURL: nil)
+        let always = try g.grant(docs, level: .change, lifetime: .always, chatID: "c", now: t0)
+        try g.grant(downloads, level: .read, lifetime: .always, chatID: "c", now: t0)
+        XCTAssertTrue(g.coversChange(path: docs.path + "/a/b", chatID: "c", now: t0))
+        XCTAssertFalse(g.coversChange(path: downloads.path + "/a", chatID: "c", now: t0), "read isn't change")
+        let check = g.changeCheck(chatID: "c")
+        let loc = FolderLocation(root: docs, components: ["a"])
+        XCTAssertTrue(check(loc))
+        try g.revoke(always.id)
+        XCTAssertFalse(check(loc), "revoked: the check says so at once")
+        // A once grant: consumed by its call, still covering that chat's
+        // change at approval and execution -- and nothing for another chat.
+        try g.grant(docs, level: .change, lifetime: .once(callKey: "k1", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", now: t0), "not consumed by the check")
+        XCTAssertNotNil(g.authorize(path: docs.path, level: .change, chatID: "c", callKey: "k1", now: t0))
+        XCTAssertNil(g.authorize(path: docs.path, level: .change, chatID: "c", callKey: "k1", now: t0), "used up")
+        XCTAssertTrue(g.coversChange(path: docs.path + "/x", chatID: "c", now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "d", now: t0))
+        g.endChat("c")
+        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "c", now: t0))
+        // An expired grant stops covering.
+        try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(60)), chatID: "c", now: t0)
+        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", now: t0.addingTimeInterval(61)))
     }
 }

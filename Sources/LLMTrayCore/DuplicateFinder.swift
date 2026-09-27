@@ -20,16 +20,22 @@ public struct DuplicateFinder {
         public var edgeBytes = 64 << 10
         public var chunkBytes = 1 << 20
         public var includeHidden = false
+        /// Wall-clock cap on the whole scan; past it the result is partial
+        /// (`stopped: time_limit`).
+        public var maxSeconds: Double = 60
 
         public init() {}
     }
 
     public let walker: SafeFolderWalker
     public var limits: Limits
+    /// Injectable for the time cap's tests.
+    public var clock: () -> Date
 
-    public init(walker: SafeFolderWalker, limits: Limits = Limits()) {
+    public init(walker: SafeFolderWalker, limits: Limits = Limits(), clock: @escaping () -> Date = Date.init) {
         self.walker = walker
         self.limits = limits
+        self.clock = clock
     }
 
     private struct Candidate {
@@ -41,15 +47,31 @@ public struct DuplicateFinder {
     private struct Budget {
         var bytes: Int64 = 0
         var stop: DuplicateReport.Stop?
+        var deadline: Date
     }
 
-    /// Scans the folder at `components` (the grant root when empty).
+    /// Past the time cap: the scan stops, partial.
+    private func outOfTime(_ budget: inout Budget) -> Bool {
+        if clock() >= budget.deadline {
+            if budget.stop == nil { budget.stop = .timeLimit }
+            return true
+        }
+        return false
+    }
+
+    /// Scans the folder at `components` (the grant root when empty). Files
+    /// not downloaded from iCloud and secret-looking ones are counted, never
+    /// read; reads run with dataless materialization off.
     public func find(_ components: [String] = [], recursive: Bool = true,
                      isCancelled: () -> Bool = { false }) throws -> DuplicateReport {
+        try Materialization.off { try findReading(components, recursive: recursive, isCancelled: isCancelled) }
+    }
+
+    private func findReading(_ components: [String], recursive: Bool, isCancelled: () -> Bool) throws -> DuplicateReport {
         var summary = DuplicateReport.Summary()
         var candidates: [Candidate] = []
         var links: [FileIdentity: (size: Int64, paths: [String])] = [:]
-        var budget = Budget()
+        var budget = Budget(deadline: clock().addingTimeInterval(limits.maxSeconds))
 
         var entriesRead = 0
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
@@ -64,14 +86,20 @@ public struct DuplicateFinder {
             for e in entries {
                 if budget.stop != nil { return }
                 if isCancelled() { budget.stop = .cancelled; return }
+                if outOfTime(&budget) { return }
                 if !limits.includeHidden, e.name.hasPrefix(".") { continue }
                 let comps = dir.components + [e.name]
                 switch e.kind {
                 case .file:
                     if summary.filesScanned >= limits.maxFiles { budget.stop = .fileLimit; return }
                     summary.filesScanned += 1
+                    let parentName = dir.components.last ?? (walker.root.path as NSString).lastPathComponent
                     if e.stat.size == 0 {
                         summary.emptyFilesSkipped += 1
+                    } else if FolderDenylist.looksSecret(name: e.name, parentName: parentName) {
+                        summary.secretsNotRead += 1
+                    } else if e.stat.isDataless {
+                        summary.notDownloadedSkipped += 1
                     } else if e.stat.isHardLinked {
                         summary.hardLinkedNotRead += 1
                         links[e.identity, default: (e.stat.size, [])].paths.append(comps.joined(separator: "/"))
@@ -136,7 +164,7 @@ public struct DuplicateFinder {
     private func open(_ c: Candidate) -> Descriptor? {
         guard let item = try? walker.resolve(c.components, expectedParents: c.parentChain),
               item.entry?.identity == c.stat.identity, let d = try? walker.openFile(item),
-              d.stat.size == c.stat.size, !d.stat.isHardLinked else { return nil }
+              d.stat.size == c.stat.size, !d.stat.isHardLinked, !d.stat.isDataless else { return nil }
         return d
     }
 
@@ -153,6 +181,7 @@ public struct DuplicateFinder {
     /// file when it is at most twice that).
     private func quickHash(_ c: Candidate, budget: inout Budget, isCancelled: () -> Bool) -> String? {
         if isCancelled() { budget.stop = .cancelled; return nil }
+        if outOfTime(&budget) { return nil }
         guard let d = open(c) else { return nil }
         let size = c.stat.size
         let edge = Int64(limits.edgeBytes)
@@ -178,6 +207,7 @@ public struct DuplicateFinder {
         var offset: Int64 = 0
         while offset < c.stat.size {
             if isCancelled() { budget.stop = .cancelled; return nil }
+            if outOfTime(&budget) { return nil }
             guard let chunk = try? FileClassifier.read(d.fd, offset: offset, count: limits.chunkBytes), !chunk.isEmpty else { return nil }
             hasher.update(data: chunk)
             offset += Int64(chunk.count)
@@ -189,6 +219,8 @@ public struct DuplicateFinder {
 public struct DuplicateReport: Codable, Equatable, Sendable {
     public enum Stop: String, Codable, Sendable {
         case fileLimit = "file_limit", byteLimit = "byte_limit", cancelled
+        /// The scan's time cap (`Limits.maxSeconds`).
+        case timeLimit = "time_limit"
     }
 
     public struct File: Codable, Equatable, Sendable {
@@ -222,6 +254,10 @@ public struct DuplicateReport: Codable, Equatable, Sendable {
         public var bytesHashed: Int64 = 0
         public var emptyFilesSkipped = 0
         public var hardLinkedNotRead = 0
+        /// In iCloud, not downloaded: not read (reading would download them).
+        public var notDownloadedSkipped = 0
+        /// Named like keys or credentials: not read.
+        public var secretsNotRead = 0
         public var sameFileGroups = 0
         /// Packages, links, aliases, other volumes, unreadable folders.
         public var skippedItems = 0
