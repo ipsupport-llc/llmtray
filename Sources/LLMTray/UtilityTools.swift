@@ -1,30 +1,64 @@
 import Foundation
 import LLMTrayCore
 
-/// A tool that's switched on per profile (`enabledTools`).
+/// A tool that's switched on per profile (`enabledTools`). One tool can
+/// serve several of ToolCatalog's switches, a mode each (web_search: web,
+/// news, wikipedia, hackernews): fewer tools for the model to tell apart
+/// and fewer tokens in every request, the same switches for the user. Only
+/// the modes switched on are declared.
 @MainActor
 class SelectableTool: ChatTool {
     let name: String
-    init(name: String) { self.name = name }
-    var definition: [String: Any] { [:] }
-    func isOffered(_ settings: ChatSettings) -> Bool { settings.enabledTools.contains(name) }
-    func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult { .text("not implemented") }
+    /// The ToolCatalog entries this tool serves, the default mode first.
+    let entries: [String]
 
-    /// The declaration shape every tool uses.
-    static func function(_ name: String, _ description: String, properties: [String: Any] = [:], required: [String] = []) -> [String: Any] {
-        [
-            "type": "function",
-            "function": [
-                "name": name,
-                "description": description,
-                "parameters": ["type": "object", "properties": properties, "required": required],
-            ],
-        ]
+    init(name: String, entries: [String]? = nil) {
+        self.name = name
+        self.entries = entries ?? [name]
     }
 
-    static func string(_ description: String) -> [String: Any] { ["type": "string", "description": description] }
-    static func integer(_ description: String) -> [String: Any] { ["type": "integer", "description": description] }
-    static func number(_ description: String) -> [String: Any] { ["type": "number", "description": description] }
+    /// The declaration offering these of `entries` (never empty).
+    func schema(offering entries: [String]) -> ToolSchema { ToolSchema(name, "") }
+
+    /// Every mode: what a call is read against.
+    var schema: ToolSchema? { schema(offering: entries) }
+    var definition: [String: Any] { schema(offering: entries).definition }
+
+    /// The modes switched on in `settings` -- without the ones that reach
+    /// the network when `allowGuarded` is false (the trust barrier).
+    func offeredEntries(_ settings: ChatSettings, allowGuarded: Bool = true) -> [String] {
+        entries.filter { settings.enabledTools.contains($0) && (allowGuarded || !ToolCatalog.usesNetwork($0)) }
+    }
+
+    func definition(for settings: ChatSettings, allowGuarded: Bool) -> [String: Any]? {
+        let offered = offeredEntries(settings, allowGuarded: allowGuarded)
+        return offered.isEmpty ? nil : schema(offering: offered).definition
+    }
+
+    func isOffered(_ settings: ChatSettings) -> Bool { !offeredEntries(settings).isEmpty }
+
+    /// The entry (mode) a call is for.
+    func entry(for arguments: [String: Any]) -> String { entries[0] }
+
+    /// A call for `entry` may run in `settings`.
+    func isModeOn(_ entry: String, _ settings: ChatSettings) -> Bool { settings.enabledTools.contains(entry) }
+
+    /// The call says which mode it wants (source, kind, about) rather than
+    /// taking the default.
+    func namesMode(_ arguments: [String: Any]) -> Bool { false }
+
+    /// The mode a call runs in: the one it names, else its default -- or,
+    /// when that one is switched off, the first that's on.
+    func mode(for arguments: [String: Any], _ settings: ChatSettings) -> String {
+        let asked = entry(for: arguments)
+        if isModeOn(asked, settings) || namesMode(arguments) { return asked }
+        return offeredEntries(settings).first ?? asked
+    }
+
+    /// How a mode reads in an error ("source=news").
+    func modeLabel(_ entry: String) -> String { entry }
+
+    func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult { .text("not implemented") }
 
     /// A tool result as compact JSON.
     static func json(_ value: Any) -> ToolResult {
@@ -37,6 +71,9 @@ class SelectableTool: ChatTool {
     }
 
     static func error(_ message: String) -> ToolResult { json(["error": message]) }
+
+    /// A result made by `error(_:)`: counted as a failed call.
+    static func isError(_ text: String) -> Bool { text.hasPrefix("{\"error\":") }
 
     /// JSONSerialization writes a parsed 47.4 as 47.399999999999999: every
     /// fractional number is re-encoded from its shortest form (booleans and
@@ -59,29 +96,65 @@ class SelectableTool: ChatTool {
     }
 }
 
+/// The city fields the time and weather tools share.
+enum PlaceParams {
+    static let city = ToolSchema.Param("city", .string, "Omit for the user's own.", aliases: ["location", "place", "town", "city_name"])
+    static let countryCode = ToolSchema.Param("country_code", .string,
+                                              aliases: ["country", "cc", "countrycode"])
+}
+
 // MARK: - Date and time
 
-final class CurrentDateTool: SelectableTool {
-    init() { super.init(name: "get_current_date") }
+/// `get_current_time`: the date and time here (local, no network) or in a
+/// city (looked up: the "Time in a city" switch).
+final class CurrentTimeTool: SelectableTool {
+    static let localEntry = "get_current_date"
+    static let cityEntry = "get_current_time_in_city"
 
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Today's date, weekday and local time. Call it first whenever the user says today, tomorrow, "
-                + "yesterday, a weekday or \"now\" -- you don't know the current date otherwise.",
-            properties: ["timezone": Self.string("IANA time zone like \"Europe/Kyiv\" or \"UTC\". Omit for the user's own.")]
-        )
+    init() { super.init(name: "get_current_time", entries: [Self.localEntry, Self.cityEntry]) }
+
+    override func schema(offering entries: [String]) -> ToolSchema {
+        var params: [ToolSchema.Param] = []
+        if entries.contains(Self.cityEntry) {
+            var city = PlaceParams.city
+            city.aliases += ["timezone", "tz", "zone", "time_zone"]
+            params = [city, PlaceParams.countryCode]
+        }
+        return ToolSchema(name, "Current date, weekday and time\(params.isEmpty ? "" : ", here or in a city"). "
+                          + "Call it for today, tomorrow, a weekday or now: you don't know the date otherwise.", params)
+    }
+
+    override func entry(for arguments: [String: Any]) -> String {
+        (arguments["city"] as? String).map { !$0.isEmpty && TimeZone(identifier: $0) == nil } == true ? Self.cityEntry : Self.localEntry
+    }
+
+    override func modeLabel(_ entry: String) -> String { entry == Self.cityEntry ? "city" : "local time" }
+
+    override func namesMode(_ arguments: [String: Any]) -> Bool { entry(for: arguments) == Self.cityEntry }
+
+    /// The local time needs no switch of its own once the tool is offered.
+    override func isModeOn(_ entry: String, _ settings: ChatSettings) -> Bool {
+        entry == Self.localEntry ? isOffered(settings) : super.isModeOn(entry, settings)
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        let zone: TimeZone
-        if let id = arguments["timezone"] as? String, !id.isEmpty {
-            guard let tz = TimeZone(identifier: id) else { return Self.error("unknown time zone \(id)") }
-            zone = tz
-        } else {
-            zone = .current
+        guard let city = arguments["city"] as? String, !city.isEmpty else { return Self.json(Self.describe(Date(), in: .current)) }
+        // An IANA zone ("UTC", "Europe/Kyiv"), as the former date tool took.
+        if let zone = TimeZone(identifier: city) { return Self.json(Self.describe(Date(), in: zone)) }
+        do {
+            guard let place = try await Geocoder.find(city, countryCode: arguments["country_code"] as? String),
+                  let zone = TimeZone(identifier: place.timezone) else {
+                return Self.error("no city called \(city) found")
+            }
+            var result = Self.describe(Date(), in: zone)
+            result["city"] = place.name
+            result["country"] = place.country
+            // Open-Meteo's data is CC BY 4.0 (shown under the answer).
+            result["source"] = Geocoder.attribution
+            return Self.json(result)
+        } catch {
+            return Self.error("city lookup failed: \(error.localizedDescription)")
         }
-        return Self.json(Self.describe(Date(), in: zone))
     }
 
     static func describe(_ date: Date, in zone: TimeZone) -> [String: Any] {
@@ -99,43 +172,6 @@ final class CurrentDateTool: SelectableTool {
     }
 }
 
-final class TimeInCityTool: SelectableTool {
-    init() { super.init(name: "get_current_time_in_city") }
-
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "The current local date and time in a city (\"what time is it in Tokyo?\"). `city` is a single "
-                + "place name, never a comma-separated address; put the country in `country_code`.",
-            properties: [
-                "city": Self.string("City name, e.g. \"Kyiv\"."),
-                "country_code": Self.string("Optional ISO-3166 alpha-2 code, e.g. \"UA\", to pick the right city."),
-            ],
-            required: ["city"]
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let city = (arguments["city"] as? String)?.trimmingCharacters(in: .whitespaces), !city.isEmpty else {
-            return Self.error("city is required")
-        }
-        do {
-            guard let place = try await Geocoder.find(city, countryCode: arguments["country_code"] as? String),
-                  let zone = TimeZone(identifier: place.timezone) else {
-                return Self.error("no city called \(city) found")
-            }
-            var result = CurrentDateTool.describe(Date(), in: zone)
-            result["city"] = place.name
-            result["country"] = place.country
-            // Open-Meteo's data is CC BY 4.0 (shown under the answer).
-            result["source"] = Geocoder.attribution
-            return Self.json(result)
-        } catch {
-            return Self.error("city lookup failed: \(error.localizedDescription)")
-        }
-    }
-}
-
 /// City lookup (Open-Meteo geocoding) for the time and weather tools.
 enum Geocoder {
     struct Place {
@@ -150,12 +186,23 @@ enum Geocoder {
 
     /// `city` (one place name) in `countryCode` (ISO alpha-2) if given.
     /// Open-Meteo matches a non-Latin name ("Москва", "Харків") only in its
-    /// language: the script's languages first, English last.
+    /// language: the script's languages first, English last. "Kyiv,
+    /// Ukraine" (the geocoder takes one name) is tried as "Kyiv" when the
+    /// whole doesn't match.
     static func find(_ city: String, countryCode: String?) async throws -> Place? {
+        if let place = try await findName(city, countryCode: countryCode) { return place }
+        if let comma = city.firstIndex(of: ",") {
+            let first = city[..<comma].trimmingCharacters(in: .whitespaces)
+            if !first.isEmpty { return try await findName(first, countryCode: countryCode) }
+        }
+        return nil
+    }
+
+    private static func findName(_ city: String, countryCode: String?) async throws -> Place? {
         for language in ScriptLanguage.wikipediaCandidates(for: city) {
             var query = [URLQueryItem(name: "name", value: city), URLQueryItem(name: "count", value: "1"),
                          URLQueryItem(name: "language", value: language)]
-            if let cc = countryCode, cc.count == 2, cc.allSatisfy({ $0.isASCII && $0.isLetter }) {
+            if let cc = countryCode?.trimmingCharacters(in: .whitespaces), cc.count == 2, cc.allSatisfy({ $0.isASCII && $0.isLetter }) {
                 query.append(URLQueryItem(name: "countryCode", value: cc.uppercased()))
             }
             let geo = try await WebFetch.json("https://geocoding-api.open-meteo.com/v1/search", query: query)
@@ -183,17 +230,13 @@ enum Geocoder {
 final class CalculateTool: SelectableTool {
     init() { super.init(name: "calculate") }
 
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Evaluate an arithmetic expression exactly. Use it for ANY numeric answer instead of computing in "
-                + "your head (multi-digit multiplication, percentages, powers, rounding). Supports + - * / // % "
-                + "^ **, parentheses, pi, e, and sqrt, cbrt, log(x[, base]), log10, log2, exp, sin, cos, tan, "
-                + "asin, acos, atan, floor, ceil, round(x[, digits]), abs, min, max, hypot, factorial, gcd, lcm. "
-                + "Examples: \"3847 * 29\", \"2450 * 15 / 100\", \"sqrt(2450)\", \"log(8, 2)\".",
-            properties: ["expression": Self.string("The expression, e.g. \"(300 + 50) * 1.08 / 2\".")],
-            required: ["expression"]
-        )
+    override func schema(offering entries: [String]) -> ToolSchema {
+        // The rest of the functions are named by the error for an unknown one.
+        ToolSchema(name, "Evaluate a math expression exactly; use it for any arithmetic instead of computing in your head. "
+                   + "+ - * / // % ^, parentheses, pi, e, sqrt, log(x, base), sin, cos, round(x, digits), min, max, "
+                   + "factorial, gcd and more; 15% of 2450.", [
+                       .init("expression", .string, required: true, aliases: ["expr", "formula", "equation", "math", "query", "calculation"]),
+                   ])
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {

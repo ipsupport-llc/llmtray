@@ -953,7 +953,11 @@ final class ChatClient: ObservableObject {
     }
 
     private func executeToolCalls(_ calls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
-        var toolCalls = calls
+        // Read once, before anything acts on them: the declared tool names
+        // and the arguments as the tools expect them (a fenced or
+        // single-quoted object, an alias, "5" for 5...), so the generator
+        // checks, drafts and saved sources see what will run.
+        var toolCalls = calls.map(toolbox.prepare)
         // Captured before the first suspension: a conversation switch or a
         // Stop during any await below ends this round.
         let epoch = conversationEpoch
@@ -963,6 +967,7 @@ final class ChatClient: ObservableObject {
         // model repeating them from history): refused, the turn ends.
         if toolRoundsThisTurn >= maxToolRoundsPerTurn {
             for call in toolCalls {
+                toolbox.recordRefusal(call)
                 var refusal = ChatMessage(role: "tool", content: "Not run: tool limit for this message reached.", toolCallID: call.id)
                 refusal.isRefusal = true
                 messages.append(refusal)
@@ -983,7 +988,7 @@ final class ChatClient: ObservableObject {
         // beside a project call, or after file text came back this turn, the
         // network and generator calls are refused -- no draft, no queue
         // ticket, no unload for them.
-        let untrusted = toolbox.trustRefusals(Array(toolCalls.prefix(maxToolCallsPerRound)))
+        let untrusted = toolbox.trustRefusals(Array(toolCalls.prefix(maxToolCallsPerRound)), settings: settings)
 
         // Creator mode: each image or song asked for is first an editable
         // draft (prompt, model, knobs), going ahead by itself after the
@@ -1078,6 +1083,7 @@ final class ChatClient: ObservableObject {
         for (i, call) in toolCalls.enumerated() {
             guard stillCurrent() else { break }
             guard i < maxToolCallsPerRound else {
+                toolbox.recordRefusal(call)
                 messages.append(ChatMessage(
                     role: "tool", content: "Not run: at most \(maxToolCallsPerRound) tool calls per response.",
                     toolCallID: call.id
@@ -1085,6 +1091,7 @@ final class ChatClient: ObservableObject {
                 continue
             }
             if skipped.contains(call.id) {
+                toolbox.recordRefusal(call)
                 var note = ChatMessage(role: "tool", content: "Not run: the user chose not to make this. Don't call it again "
                                        + "for this request; answer in text.", toolCallID: call.id)
                 note.isRefusal = true
@@ -1092,6 +1099,7 @@ final class ChatClient: ObservableObject {
                 continue
             }
             if untrusted.contains(call.id) {
+                toolbox.recordRefusal(call)
                 var refusal = ChatMessage(role: "tool", content: ToolTrust.refusal, toolCallID: call.id)
                 refusal.isRefusal = true
                 messages.append(refusal)

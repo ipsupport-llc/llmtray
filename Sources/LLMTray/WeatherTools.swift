@@ -77,14 +77,63 @@ enum WeatherUnits {
     }
 }
 
-class WeatherTool: SelectableTool {
+/// `get_weather`: the forecast, the hourly forecast, air quality and the
+/// sun as one tool with a `kind` -- each still its own switch in Settings,
+/// and only the switched-on kinds (and their fields) declared.
+final class WeatherTool: SelectableTool {
     nonisolated static let attribution = "Weather data by Open-Meteo (https://open-meteo.com), CC BY 4.0"
 
-    static let placeProperties: [String: Any] = [
-        "city": string("A single city name, e.g. \"Kyiv\" -- never a comma-separated address. Omit for the user's own location."),
-        "country_code": string("Optional ISO-3166 alpha-2 code, e.g. \"UA\", to pick the right city."),
-        "units": string("\"metric\" or \"imperial\". Omit for the user's usual units."),
+    static let kinds: [(entry: String, value: String, gloss: String)] = [
+        ("get_weather", "forecast", "now and daily"),
+        ("get_hourly_forecast", "hourly", "hour by hour"),
+        ("get_air_quality", "air", "air quality, UV"),
+        ("get_sunrise_sunset", "sun", "sunrise, sunset, day length"),
     ]
+
+    init() { super.init(name: "get_weather", entries: Self.kinds.map(\.entry)) }
+
+    override func schema(offering entries: [String]) -> ToolSchema {
+        let offered = Self.kinds.filter { entries.contains($0.entry) }
+        let on = Set(offered.map(\.value))
+        var params = [PlaceParams.city, PlaceParams.countryCode]
+        if offered.count > 1 {
+            params.append(.init("kind", .oneOf(offered.map(\.value)), aliases: ["type", "mode", "what", "report"], valueAliases: [
+                "daily": "forecast", "current": "forecast", "now": "forecast", "weather": "forecast", "today": "forecast",
+                "hour": "hourly", "hours": "hourly", "air_quality": "air", "aqi": "air", "pollution": "air", "uv": "air",
+                "sunrise": "sun", "sunset": "sun", "daylight": "sun", "sunrise_sunset": "sun",
+            ]))
+        }
+        if on.contains("forecast") { params.append(.init("days", .integer, "1-16, default 3.", aliases: ["forecast_days", "num_days"])) }
+        if on.contains("hourly") { params.append(.init("hours", .integer, "1-48, default 12.", aliases: ["forecast_hours", "num_hours"])) }
+        if on.contains("sun") { params.append(.init("date", .string, "yyyy-MM-dd for sun; default today.", aliases: ["day"])) }
+        if on.contains("forecast") || on.contains("hourly") {
+            params.append(.init("units", .oneOf(["metric", "imperial"]), aliases: ["unit", "unit_system", "system"], valueAliases: [
+                "celsius": "metric", "c": "metric", "si": "metric", "fahrenheit": "imperial", "f": "imperial", "us": "imperial",
+            ]))
+        }
+        let glosses = offered.enumerated().map { i, k in "\(k.value) (\(i == 0 ? "default; " : "")\(k.gloss))" }
+        let what = offered.count > 1 ? "Weather for a city. kind: " + glosses.joined(separator: ", ") + "."
+            : "Weather for a city: " + (offered.first?.gloss ?? "") + "."
+        return ToolSchema(name, what + " Days come labelled today/tomorrow/weekday.", params)
+    }
+
+    override func entry(for arguments: [String: Any]) -> String {
+        if let value = arguments["kind"] as? String, let k = Self.kinds.first(where: { $0.value == value }) { return k.entry }
+        return entries[0]
+    }
+
+    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["kind"] != nil }
+
+    override func modeLabel(_ entry: String) -> String { "kind=" + (Self.kinds.first { $0.entry == entry }?.value ?? entry) }
+
+    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+        switch mode(for: arguments, context.settings) {
+        case "get_hourly_forecast": return await hourly(arguments)
+        case "get_air_quality": return await airQuality(arguments)
+        case "get_sunrise_sunset": return await sun(arguments)
+        default: return await daily(arguments)
+        }
+    }
 
     func forecast(_ place: Geocoder.Place, _ query: [URLQueryItem], imperial: Bool) async throws -> [String: Any] {
         try await WebFetch.json("https://api.open-meteo.com/v1/forecast", query: [
@@ -111,22 +160,8 @@ class WeatherTool: SelectableTool {
     }
 }
 
-final class CurrentWeatherTool: WeatherTool {
-    init() { super.init(name: "get_weather") }
-
-    override var definition: [String: Any] {
-        var properties = Self.placeProperties
-        properties["days"] = Self.integer("Days of daily forecast, 1-16 (default 3; 1 = just today, 7 for \"this weekend\" or \"this week\").")
-        return Self.function(
-            name,
-            "Current weather and the daily forecast for a city (\"what's the weather in Lviv?\", \"will it rain "
-                + "tomorrow?\", \"weather this weekend\"). Without `city` it's for the user's own location. Days come "
-                + "labelled today / tomorrow / weekday in the city's time zone: no need to get the date first.",
-            properties: properties
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+extension WeatherTool {
+    fileprivate func daily(_ arguments: [String: Any]) async -> ToolResult {
         let days = max(1, min(16, (arguments["days"] as? Int) ?? Int(arguments["days"] as? String ?? "") ?? 3))
         let imperial = WeatherUnits.imperial(arguments)
         do {
@@ -170,22 +205,8 @@ final class CurrentWeatherTool: WeatherTool {
     }
 }
 
-final class HourlyForecastTool: WeatherTool {
-    init() { super.init(name: "get_hourly_forecast") }
-
-    override var definition: [String: Any] {
-        var properties = Self.placeProperties
-        properties["hours"] = Self.integer("Hours ahead, 1-48 (default 12).")
-        return Self.function(
-            name,
-            "Hour-by-hour forecast for the next hours (\"will it rain this evening?\", \"when does the rain stop?\"). "
-                + "Without `city` it's for the user's own location. Hours come labelled with their day (today / tomorrow) in "
-                + "the city's time zone.",
-            properties: properties
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+extension WeatherTool {
+    fileprivate func hourly(_ arguments: [String: Any]) async -> ToolResult {
         let hours = max(1, min(48, (arguments["hours"] as? Int) ?? Int(arguments["hours"] as? String ?? "") ?? 12))
         let imperial = WeatherUnits.imperial(arguments)
         do {
@@ -214,23 +235,10 @@ final class HourlyForecastTool: WeatherTool {
     }
 }
 
-final class AirQualityTool: WeatherTool {
-    init() { super.init(name: "get_air_quality") }
-
+extension WeatherTool {
     nonisolated static let airAttribution = "Air quality by Open-Meteo (https://open-meteo.com), CAMS, CC BY 4.0"
 
-    override var definition: [String: Any] {
-        var properties = Self.placeProperties
-        properties.removeValue(forKey: "units")
-        return Self.function(
-            name,
-            "Current air quality (AQI, PM2.5, PM10, ozone, NO2) and UV index for a city (\"is the air ok in Delhi?\"). "
-                + "Without `city` it's for the user's own location.",
-            properties: properties
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+    fileprivate func airQuality(_ arguments: [String: Any]) async -> ToolResult {
         do {
             let resolved = try await WeatherPlace.resolve(arguments)
             let data = try await WebFetch.json("https://air-quality-api.open-meteo.com/v1/air-quality", query: [
@@ -255,23 +263,8 @@ final class AirQualityTool: WeatherTool {
     }
 }
 
-final class SunTool: WeatherTool {
-    init() { super.init(name: "get_sunrise_sunset") }
-
-    override var definition: [String: Any] {
-        var properties = Self.placeProperties
-        properties.removeValue(forKey: "units")
-        properties["date"] = Self.string("yyyy-MM-dd. Omit for today (in that city).")
-        return Self.function(
-            name,
-            "Sunrise, sunset, solar noon, civil twilight and day length for a city on a date (\"when is sunset in "
-                + "Rome?\", \"how long is the day on December 21 in Oslo?\"). Without `city` it's for the user's own location; "
-                + "without `date`, today there (no need to get the date first). Years 1900-2100.",
-            properties: properties
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+extension WeatherTool {
+    fileprivate func sun(_ arguments: [String: Any]) async -> ToolResult {
         do {
             let resolved = try await WeatherPlace.resolve(arguments)
             let zone = TimeZone(identifier: resolved.place.timezone) ?? .current
@@ -280,7 +273,10 @@ final class SunTool: WeatherTool {
             f.timeZone = zone
             f.dateFormat = "yyyy-MM-dd HH:mm"
             var date = Date()
-            if let text = (arguments["date"] as? String)?.trimmingCharacters(in: .whitespaces), !text.isEmpty {
+            let word = (arguments["date"] as? String)?.trimmingCharacters(in: .whitespaces).lowercased() ?? ""
+            if word == "tomorrow" { date = date.addingTimeInterval(24 * 3600) }
+            if let text = (arguments["date"] as? String)?.trimmingCharacters(in: .whitespaces), !text.isEmpty,
+               word != "today", word != "tomorrow", word != "now" {
                 // Strict: "26-09-24" isn't year 26, and the formulas drift
                 // far from the present (a 14 h December day in Rome in 9999).
                 let check = DateFormatter()

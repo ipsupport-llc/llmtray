@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: bản dựng phát hành sớm với các tính năng vẫn đang được thử nghiệm và các bản cập nhật môi trường chạy từ nhánh beta của mlx-lm. Chuyển lại về Stable sẽ không hạ cấp bản beta đã cài đặt; bản Stable tiếp theo sẽ thay thế bản đó.";
 "Browse Hugging Face…" = "Duyệt Hugging Face…";
 "Calculator" = "Máy tính";
+"Calls" = "Lượt gọi";
 "Can't change models while auto-tune is running" = "Không thể đổi mô hình khi tự động tinh chỉnh đang chạy.";
 "Can't switch profiles while a request or the auto-tune is running" = "Không thể chuyển cấu hình khi một yêu cầu hoặc tự động tinh chỉnh đang chạy.";
 "Cancel" = "Hủy";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Không liên lạc được với ipsupport.us. Đánh giá của bạn được lưu: thử lại sau.";
 "Countdown" = "Đếm ngược";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Được đếm trên máy Mac này cho phiên bản LLMTray này và không bao giờ được gửi đi; báo cáo lỗi có kèm các số đếm. Di chuột lên một hàng để xem những gì đã được sửa (lệnh gọi sai định dạng của mô hình mà ứng dụng vẫn hiểu) và những lỗi đã xảy ra.";
 "Country facts" = "Thông tin quốc gia";
 "Crash reports (%lld)" = "Báo cáo sự cố (%lld)";
 "Create Email…" = "Tạo Email…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "Bật tạo nhạc";
 "Enable music generation?" = "Bật tính năng tạo nhạc?";
 "Enjoying LLMTray?" = "Bạn đang thích LLMTray chứ?";
+"Errors" = "Lỗi";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Mỗi cuộc trò chuyện trong dự án này sẽ nhận các hướng dẫn này, sau prompt hệ thống của cấu hình mô hình. Thay đổi có hiệu lực từ tin nhắn tiếp theo.";
 "Extra server arguments" = "Đối số máy chủ bổ sung";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — tạo và chỉnh sửa";
@@ -280,6 +283,7 @@
 "No model uses it." = "Không có mô hình nào sử dụng mục này.";
 "No models found in this folder." = "Không tìm thấy mô hình nào trong thư mục này.";
 "No runs yet." = "Chưa có lần chạy nào.";
+"No tool calls yet in this version." = "Chưa có lượt gọi công cụ nào trong phiên bản này.";
 "Non-commercial license: read it on the model card before using the model." = "Giấy phép phi thương mại: đọc trên model card trước khi sử dụng.";
 "Not enough free disk space for this model." = "Không đủ dung lượng trống trên ổ để cài mô hình này.";
 "OK" = "OK";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "Đang đọc những gì đã cài…";
 "Recently updated" = "Mới cập nhật";
 "Recovery" = "Khôi phục";
+"Refused" = "Bị từ chối";
 "Regenerate" = "Tạo lại";
 "Remove" = "Xóa";
 "Remove attachment" = "Xóa tệp đính kèm.";
@@ -338,11 +343,13 @@
 "Rename" = "Đổi tên";
 "Rename this profile" = "Đổi tên cấu hình này.";
 "Rename…" = "Đổi tên…";
+"Repaired" = "Đã sửa";
 "Report a Bug" = "Báo cáo Lỗi";
 "Report a Bug…" = "Báo cáo Lỗi…";
 "Rescan" = "Quét lại";
 "Rescan Models" = "Quét lại mô hình";
 "Rescan or manage models" = "Quét lại hoặc quản lý mô hình";
+"Reset" = "Đặt lại";
 "Reset: inherit this setting from Default" = "Đặt lại: kế thừa cài đặt này từ Default.";
 "Restart LLMTray to change the language?" = "Khởi động lại LLMTray để đổi ngôn ngữ?";
 "Restart Now" = "Khởi động lại bây giờ";
@@ -479,7 +486,10 @@
 "Today" = "Hôm nay";
 "Too many reviews from this network. Try again in %lld min." = "Quá nhiều đánh giá từ mạng này. Thử lại sau %lld phút.";
 "Too many reviews from this network. Try again later." = "Quá nhiều đánh giá từ mạng này. Thử lại sau.";
+"Tool" = "Công cụ";
 "Tool Settings…" = "Cài đặt Công cụ…";
+"Tool call statistics" = "Thống kê lượt gọi công cụ";
+"Tool calls" = "Lượt gọi công cụ";
 "Tool-use rule" = "Quy tắc sử dụng công cụ";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Các công cụ mà mô hình có thể gọi trong trò chuyện của ứng dụng (cần mô hình hỗ trợ gọi công cụ). Công cụ web gửi truy vấn của mô hình tới dịch vụ công cộng đó (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); công cụ cục bộ không bao giờ rời khỏi Mac.";
 "Top-k" = "Top-k";

@@ -50,6 +50,11 @@ struct ToolContext {
 protocol ChatTool: AnyObject {
     var name: String { get }
     var definition: [String: Any] { get }
+    /// The declaration as data: the call's arguments are read against it
+    /// (aliases, types, allowed values) before `run`, and a call that
+    /// still can't be understood gets an error saying how to retry. nil:
+    /// the JSON is read leniently, the fields as sent.
+    var schema: ToolSchema? { get }
     func isOffered(_ settings: ChatSettings) -> Bool
     func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult
     /// A project tool opts in here: the trust barrier and the budget for
@@ -59,6 +64,7 @@ protocol ChatTool: AnyObject {
 
 extension ChatTool {
     var projectAccess: ProjectToolAccess { .none }
+    var schema: ToolSchema? { nil }
 }
 
 /// The chat's tools, by name.
@@ -75,6 +81,35 @@ final class ChatToolbox {
     private(set) var fileTextRoomSpent = false
     /// Ids of the file text pieces sent this turn: not sent again.
     private var sentProjectHits: Set<String> = []
+    /// Calls read by `prepare` and not yet run: what their arguments came
+    /// to, by call id (for the stats and the error a call gets).
+    private var prepared: [String: Prepared] = [:]
+    /// Where each call's outcome is counted (Settings > Server).
+    var stats: ToolStatsStore = .shared
+
+    /// Former tools, now a mode of another: a model that saw them earlier in
+    /// the chat (or was tuned on them) still calls them.
+    static let formerNames: [String: (tool: String, arguments: [String: String])] = [
+        "get_current_date": ("get_current_time", [:]),
+        "get_current_time_in_city": ("get_current_time", [:]),
+        "news": ("web_search", ["source": "news"]),
+        "hackernews": ("web_search", ["source": "hackernews"]),
+        "get_wikipedia_summary": ("web_search", ["source": "wikipedia"]),
+        "get_hourly_forecast": ("get_weather", ["kind": "hourly"]),
+        "get_air_quality": ("get_weather", ["kind": "air"]),
+        "get_sunrise_sunset": ("get_weather", ["kind": "sun"]),
+        "get_public_holidays": ("get_country_info", ["about": "holidays"]),
+    ]
+
+    /// A call as read: the tool it means, its arguments, what was fixed and
+    /// what couldn't be understood.
+    struct Prepared {
+        let tool: ChatTool?
+        let arguments: ParsedToolArguments
+        /// The call `prepare` handed back: read again, it's this one.
+        var output: ToolCall? = nil
+        var repairs: [ToolRepair] { arguments.repairs }
+    }
 
     /// `mflux`, `music`: the app's one image and one music generator, shared
     /// by every chat tab.
@@ -89,6 +124,50 @@ final class ChatToolbox {
         tools.append(tool)
     }
 
+    /// The tool a call's name means (another case, a "functions." prefix, a
+    /// former name), with the arguments that name implies.
+    func resolve(_ called: String) -> (tool: ChatTool, implied: [String: String], repair: ToolRepair?)? {
+        guard let resolved = ToolNameResolver.resolve(called, known: tools.map(\.name), former: Self.formerNames),
+              let tool = tools.first(where: { $0.name == resolved.name }) else { return nil }
+        return (tool, resolved.impliedArguments, resolved.repair)
+    }
+
+    /// Reads a call before anything acts on it (ChatClient: the generator
+    /// checks, drafts, the saved source; `run`): the declared tool name and
+    /// its arguments as the tool expects them, when they could be
+    /// understood -- otherwise the call as sent, and `run` explains.
+    func prepare(_ call: ToolCall) -> ToolCall {
+        guard let (tool, implied, nameRepair) = resolve(call.name) else {
+            prepared[call.id] = Prepared(tool: nil, arguments: ParsedToolArguments(values: [:], repairs: [], problems: []))
+            return call
+        }
+        var parsed = ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema)
+        for (key, value) in implied where parsed.values[key] == nil { parsed.values[key] = value }
+        if let nameRepair { parsed.repairs.insert(nameRepair, at: 0) }
+        // Its own output read again (ChatClient prepared it, then run):
+        // what the first reading fixed still counts.
+        if let earlier = prepared[call.id], let output = earlier.output, output.name == call.name,
+           output.argumentsJSON == call.argumentsJSON {
+            parsed.repairs = earlier.repairs + parsed.repairs.filter { !earlier.repairs.contains($0) }
+        }
+        var out = ToolCall(id: call.id, name: tool.name, argumentsJSON: call.argumentsJSON)
+        if parsed.isValid, nameRepair != nil || !parsed.repairs.isEmpty || !implied.isEmpty,
+           JSONSerialization.isValidJSONObject(parsed.values),
+           let data = try? JSONSerialization.data(withJSONObject: parsed.values, options: [.sortedKeys, .withoutEscapingSlashes]) {
+            out.argumentsJSON = String(decoding: data, as: UTF8.self)
+        }
+        prepared[call.id] = Prepared(tool: tool, arguments: parsed, output: out)
+        return out
+    }
+
+    /// A call refused before it could run (the per-response cap, the trust
+    /// barrier, the turn's round limit, the user's skip): counted.
+    func recordRefusal(_ call: ToolCall) {
+        let entry = prepared.removeValue(forKey: call.id)
+        let tool = entry?.tool ?? resolve(call.name)?.tool
+        stats.record(tool: tool?.name, known: tool != nil, repairs: entry?.repairs ?? [], outcome: .refused)
+    }
+
     /// Declarations for the request's `tools`: not the generators this turn
     /// has used up (a small model otherwise calls one again after its
     /// result, in a loop, until the round limit).
@@ -100,11 +179,15 @@ final class ChatToolbox {
         if musicGeneration.songsThisTurn >= musicGeneration.maxSongsPerTurn { spent.insert(MusicToolRunner.toolName) }
         // After file text: nothing that reaches out (adr/0012), and no more
         // file text once there's no room for it.
-        return tools.filter {
-            $0.isOffered(settings) && !spent.contains($0.name)
-                && (trustKind($0) != .guarded || ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn))
-                && !(fileTextRoomSpent && $0.projectAccess == .fileText)
-        }.map(\.definition)
+        let allowGuarded = ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn)
+        return tools.compactMap { tool -> [String: Any]? in
+            guard tool.isOffered(settings), !spent.contains(tool.name),
+                  !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
+            // A tool of several switches: its modes that may run now (the
+            // local time stays after file text, the city lookup doesn't).
+            if let selectable = tool as? SelectableTool { return selectable.definition(for: settings, allowGuarded: allowGuarded) }
+            return trustKind(tool) != .guarded || allowGuarded ? tool.definition : nil
+        }
     }
 
     /// A real new user turn (per-turn limits reset).
@@ -114,6 +197,7 @@ final class ChatToolbox {
         projectTextThisTurn = false
         fileTextRoomSpent = false
         sentProjectHits = []
+        prepared = [:]
     }
 
     /// The names of the tools that return project text: their calls and
@@ -129,15 +213,22 @@ final class ChatToolbox {
         return ToolCatalog.entries.first { $0.name == tool.name }?.usesNetwork == true ? .guarded : .ordinary
     }
 
-    func trustKind(ofCall name: String) -> ToolTrust.Kind {
-        tools.first { $0.name == name }.map(trustKind) ?? .ordinary
+    /// A call's side of the barrier: for a tool of several switches, the
+    /// mode it's for (the local time is ordinary, a city's lookup isn't).
+    func trustKind(of call: ToolCall, settings: ChatSettings) -> ToolTrust.Kind {
+        guard let tool = resolve(call.name)?.tool else { return .ordinary }
+        if let selectable = tool as? SelectableTool {
+            let arguments = prepared[call.id]?.arguments.values ?? ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).values
+            return ToolCatalog.usesNetwork(selectable.mode(for: arguments, settings)) ? .guarded : .ordinary
+        }
+        return trustKind(tool)
     }
 
     /// The calls of a response refused before any of it runs (drafts, the
     /// generator queue, the model's unload): network and generator calls
     /// beside a project call, or after one returned this turn.
-    func trustRefusals(_ calls: [ToolCall]) -> Set<String> {
-        ToolTrust.refusedUpFront(calls.map { (id: $0.id, kind: trustKind(ofCall: $0.name)) },
+    func trustRefusals(_ calls: [ToolCall], settings: ChatSettings) -> Set<String> {
+        ToolTrust.refusedUpFront(calls.map { (id: $0.id, kind: trustKind(of: $0, settings: settings)) },
                                  projectTextThisTurn: projectTextThisTurn)
     }
 
@@ -161,30 +252,79 @@ final class ChatToolbox {
     }
 
     func run(_ call: ToolCall, context: ToolContext) async -> ToolResult {
-        guard let tool = tools.first(where: { $0.name == call.name }) else {
-            return .text("Unknown tool: \(call.name)")
+        let call = prepare(call)
+        let entry = prepared.removeValue(forKey: call.id)
+        let repairs = entry?.repairs ?? []
+        guard let tool = entry?.tool else {
+            stats.record(tool: nil, known: false, repairs: [], outcome: .error("unknown_tool"))
+            let available = definitions(for: context.settings).compactMap { ($0["function"] as? [String: Any])?["name"] as? String }
+            return .text(available.isEmpty ? "No tool named \(call.name), and no tools are available in this chat. Answer without one."
+                         : "No tool named \(call.name). Available: \(available.joined(separator: ", ")).")
         }
+        func finish(_ result: ToolResult, _ outcome: ToolCallStats.Outcome? = nil) -> ToolResult {
+            stats.record(tool: tool.name, known: true, repairs: repairs, outcome: outcome ?? Self.outcome(of: result))
+            return result
+        }
+        let arguments = entry?.arguments ?? ParsedToolArguments(values: [:], repairs: [], problems: [])
         // Checked again right before it runs (the round refused it up front
         // already): an earlier call of this round may have returned file text.
-        if trustKind(tool) == .guarded, !ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn) {
-            return .refused(ToolTrust.refusal)
+        if trustKind(of: call, settings: context.settings) == .guarded, !ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn) {
+            return finish(.refused(ToolTrust.refusal))
         }
         if tool.projectAccess != .none, tool.isOffered(context.settings) {
             // Whatever it answers -- file names count as file text too.
             defer { projectTextThisTurn = true }
-            return await tool.run(Self.parseArguments(call.argumentsJSON), context: context)
+            if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
+            return finish(await tool.run(arguments.values, context: context))
         }
         // generate_image, edit_image and generate_music explain their own refusals (the model often keeps
         // calling it from history after it's turned off).
-        guard tool.isOffered(context.settings) || tool === imageGeneration || tool is EditImageTool || tool === musicGeneration else {
-            return .text("The tool \(call.name) isn't available in this chat. Answer without it.")
+        let generator = tool === imageGeneration || tool is EditImageTool || tool === musicGeneration
+        guard tool.isOffered(context.settings) || generator else {
+            return finish(.text("The tool \(call.name) isn't available in this chat. Answer without it."), .error("unavailable"))
         }
-        return await tool.run(Self.parseArguments(call.argumentsJSON), context: context)
+        guard tool.isOffered(context.settings) else {
+            return finish(await tool.run(arguments.values, context: context), .error("unavailable"))
+        }
+        if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
+        // A mode switched off (web_search's news while only the web is on).
+        if let selectable = tool as? SelectableTool {
+            let mode = selectable.mode(for: arguments.values, context.settings)
+            if !selectable.isModeOn(mode, context.settings) {
+                let on = selectable.offeredEntries(context.settings).map(selectable.modeLabel)
+                return finish(SelectableTool.error("\(tool.name): \(selectable.modeLabel(mode)) isn't switched on in this chat; "
+                                                   + "available: \(on.joined(separator: ", "))"), .error("unavailable"))
+            }
+        }
+        return finish(await tool.run(arguments.values, context: context))
     }
 
+    /// The error for arguments that couldn't be understood, as the tool's
+    /// results read (JSON for the selectable tools, text for the others).
+    private static func argumentError(_ arguments: ParsedToolArguments, _ tool: ChatTool) -> (result: ToolResult, kind: String)? {
+        guard let first = arguments.problems.first else { return nil }
+        let message = tool.schema.flatMap { arguments.errorMessage(tool: $0) }
+            ?? "\(tool.name): arguments must be one JSON object."
+        return (tool is SelectableTool ? SelectableTool.error(message) : .text(message), first.statsKind)
+    }
+
+    /// How a result counts.
+    static func outcome(of result: ToolResult) -> ToolCallStats.Outcome {
+        switch result {
+        case .refused: return .refused
+        case .text(let text):
+            if SelectableTool.isError(text) { return .error("failed") }
+            // The generators' and view_image's plain-text failures.
+            let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
+            return failed.contains { text.contains($0) } ? .error("failed") : .success
+        case .generatedImage, .generatedAudio, .imageForModel, .projectText: return .success
+        }
+    }
+
+    /// A call's arguments, read leniently (a fence, single quotes, a
+    /// trailing comma...); `{}` when they aren't an object at all.
     static func parseArguments(_ json: String) -> [String: Any] {
-        guard let data = json.data(using: .utf8),
-              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
+        guard case .success(let parsed) = LenientJSON.parse(json), let obj = parsed.value as? [String: Any] else { return [:] }
         return obj
     }
 }
@@ -196,26 +336,11 @@ final class ChatToolbox {
 final class ViewImageTool: ChatTool {
     let name = "view_image"
 
-    var definition: [String: Any] {
-        [
-            "type": "function",
-            "function": [
-                "name": name,
-                "description": "Look at an image you generated earlier in this conversation with generate_image, "
-                    + "e.g. to check it matches the request or to describe it. Call it only when you need to see "
-                    + "the image; you otherwise don't have its pixels.",
-                "parameters": [
-                    "type": "object",
-                    "properties": [
-                        "index": [
-                            "type": "integer",
-                            "description": "Which generated image: 1 = the first in this conversation. Omit for the latest.",
-                        ],
-                    ],
-                ],
-            ],
-        ]
-    }
+    static let schema = ToolSchema("view_image", "Look at an image you generated in this chat, to check or describe it.", [
+        .init("index", .integer, "1 = the first; omit for the latest.", aliases: ["image", "image_index", "n", "number"]),
+    ])
+    var schema: ToolSchema? { Self.schema }
+    var definition: [String: Any] { Self.schema.definition }
 
     func isOffered(_ settings: ChatSettings) -> Bool {
         settings.enableImageGeneration && settings.modelSupportsVision

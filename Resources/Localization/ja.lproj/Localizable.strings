@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: テスト中の機能を含むプレリリースビルドと、mlx-lmのBetaブランチからのランタイムアップデートです。Stableに戻しても、インストール済みのBetaはダウングレードされません。次のStableリリースで置き換えられます。";
 "Browse Hugging Face…" = "Hugging Faceをブラウズ…";
 "Calculator" = "計算機";
+"Calls" = "呼び出し";
 "Can't change models while auto-tune is running" = "自動チューニングの実行中はモデルを変更できません。";
 "Can't switch profiles while a request or the auto-tune is running" = "リクエストまたは自動チューニングの実行中はプロファイルを切り替えられません。";
 "Cancel" = "キャンセル";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.usに接続できませんでした。レビューは保存されています。後で再試行してください。";
 "Countdown" = "カウントダウン";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "このMacでこのバージョンのLLMTrayについて集計され、どこにも送信されません。バグレポートには件数が含まれます。行にポインタを合わせると、修復された内容（アプリが理解できたモデルの不正な呼び出し）と発生したエラーが表示されます。";
 "Country facts" = "国の基本情報";
 "Crash reports (%lld)" = "クラッシュレポート（%lld）";
 "Create Email…" = "メールを作成…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "音楽生成を有効にする";
 "Enable music generation?" = "音楽生成を有効にしますか？";
 "Enjoying LLMTray?" = "LLMTrayをお楽しみですか？";
+"Errors" = "エラー";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
 "Extra server arguments" = "追加のサーバ引数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成と編集";
@@ -280,6 +283,7 @@
 "No model uses it." = "使用しているモデルはありません。";
 "No models found in this folder." = "このフォルダにモデルが見つかりません。";
 "No runs yet." = "実行履歴はまだありません。";
+"No tool calls yet in this version." = "このバージョンではまだツール呼び出しはありません。";
 "Non-commercial license: read it on the model card before using the model." = "非商用ライセンス: モデルを使用する前にモデルカードで確認してください。";
 "Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
 "OK" = "OK";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Recently updated" = "最近更新";
 "Recovery" = "復旧";
+"Refused" = "拒否";
 "Regenerate" = "再生成";
 "Remove" = "削除";
 "Remove attachment" = "添付ファイルを削除します。";
@@ -338,11 +343,13 @@
 "Rename" = "名称変更";
 "Rename this profile" = "このプロファイルの名前を変更します。";
 "Rename…" = "名前を変更…";
+"Repaired" = "修復";
 "Report a Bug" = "不具合を報告";
 "Report a Bug…" = "不具合を報告…";
 "Rescan" = "再スキャン";
 "Rescan Models" = "モデルを再スキャン";
 "Rescan or manage models" = "モデルを再スキャンするか管理します。";
+"Reset" = "リセット";
 "Reset: inherit this setting from Default" = "リセット：この設定を Default から継承します。";
 "Restart LLMTray to change the language?" = "言語を変更するには LLMTray を再起動しますか？";
 "Restart Now" = "今すぐ再起動";
@@ -479,7 +486,10 @@
 "Today" = "今日";
 "Too many reviews from this network. Try again in %lld min." = "このネットワークからのレビューが多すぎます。%lld分後に再試行してください。";
 "Too many reviews from this network. Try again later." = "このネットワークからのレビューが多すぎます。後でもう一度お試しください。";
+"Tool" = "ツール";
 "Tool Settings…" = "ツール設定…";
+"Tool call statistics" = "ツール呼び出しの統計";
+"Tool calls" = "ツール呼び出し";
 "Tool-use rule" = "ツール使用ルール";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "モデルがアプリ内チャットで呼び出せるツール（ツール呼び出し対応モデルが必要）です。Webツールはモデルの問い合わせを該当の公開サービス（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）に送信します。ローカルのツールはMac外に出ません。";
 "Top-k" = "Top-k";

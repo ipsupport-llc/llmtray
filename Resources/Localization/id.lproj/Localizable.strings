@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: build prarilis dengan fitur yang masih diuji, serta pembaruan runtime dari cabang beta mlx-lm. Beralih kembali ke Stable tidak menurunkan versi beta yang terinstal; rilis stabil berikutnya akan menggantikannya.";
 "Browse Hugging Face…" = "Telusuri Hugging Face…";
 "Calculator" = "Kalkulator";
+"Calls" = "Panggilan";
 "Can't change models while auto-tune is running" = "Model tidak dapat diubah saat penalaan otomatis berjalan.";
 "Can't switch profiles while a request or the auto-tune is running" = "Profil tidak dapat dialihkan saat permintaan atau penalaan otomatis sedang berjalan.";
 "Cancel" = "Batal";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "Gagal membuat laporan: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Tidak dapat menghubungi ipsupport.us. Ulasan Anda disimpan: coba lagi nanti.";
 "Countdown" = "Hitungan mundur";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Dihitung di Mac ini untuk versi LLMTray ini dan tidak pernah dikirim; laporan bug menyertakan jumlahnya. Arahkan ke sebuah baris untuk melihat apa yang diperbaiki (panggilan model yang salah format tetapi tetap dipahami aplikasi) dan kesalahan apa yang terjadi.";
 "Country facts" = "Fakta negara";
 "Crash reports (%lld)" = "Laporan crash (%lld)";
 "Create Email…" = "Buat Email…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "Aktifkan pembuatan musik";
 "Enable music generation?" = "Aktifkan pembuatan musik?";
 "Enjoying LLMTray?" = "Menikmati LLMTray?";
+"Errors" = "Kesalahan";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
 "Extra server arguments" = "Argumen server tambahan";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — buat dan edit";
@@ -280,6 +283,7 @@
 "No model uses it." = "Tidak ada model yang menggunakannya.";
 "No models found in this folder." = "Tidak ada model yang ditemukan di folder ini.";
 "No runs yet." = "Belum ada yang dijalankan.";
+"No tool calls yet in this version." = "Belum ada panggilan alat di versi ini.";
 "Non-commercial license: read it on the model card before using the model." = "Lisensi non-komersial: baca di model card sebelum menggunakan model.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "OK" = "OK";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Recently updated" = "Baru diperbarui";
 "Recovery" = "Pemulihan";
+"Refused" = "Ditolak";
 "Regenerate" = "Buat Ulang";
 "Remove" = "Hapus";
 "Remove attachment" = "Hapus lampiran.";
@@ -338,11 +343,13 @@
 "Rename" = "Ubah Nama";
 "Rename this profile" = "Ubah nama profil ini.";
 "Rename…" = "Ganti Nama…";
+"Repaired" = "Diperbaiki";
 "Report a Bug" = "Laporkan Bug";
 "Report a Bug…" = "Laporkan Bug…";
 "Rescan" = "Pindai Ulang";
 "Rescan Models" = "Pindai Ulang Model";
 "Rescan or manage models" = "Pindai ulang atau kelola model";
+"Reset" = "Atur ulang";
 "Reset: inherit this setting from Default" = "Atur ulang: warisi pengaturan ini dari Default.";
 "Restart LLMTray to change the language?" = "Mulai ulang LLMTray untuk mengubah bahasa?";
 "Restart Now" = "Mulai Ulang Sekarang";
@@ -479,7 +486,10 @@
 "Today" = "Hari ini";
 "Too many reviews from this network. Try again in %lld min." = "Terlalu banyak ulasan dari jaringan ini. Coba lagi dalam %lld menit.";
 "Too many reviews from this network. Try again later." = "Terlalu banyak ulasan dari jaringan ini. Coba lagi nanti.";
+"Tool" = "Alat";
 "Tool Settings…" = "Pengaturan Alat…";
+"Tool call statistics" = "Statistik panggilan alat";
+"Tool calls" = "Panggilan alat";
 "Tool-use rule" = "Aturan penggunaan alat";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Alat yang dapat dipanggil model dalam obrolan aplikasi (membutuhkan model pemanggil alat). Alat web mengirim kueri model ke layanan publik tersebut (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); alat lokal tidak pernah meninggalkan Mac.";
 "Top-k" = "Top-k";

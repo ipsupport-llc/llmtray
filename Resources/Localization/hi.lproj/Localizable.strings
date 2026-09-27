@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: प्री-रिलीज़ बिल्ड जिनमें सुविधाएँ अभी परीक्षण में हैं, और mlx-lm की beta ब्रांच से रनटाइम अपडेट। Stable पर वापस जाने से इंस्टॉल किया गया beta डाउनग्रेड नहीं होता; अगली stable रिलीज़ उसे बदल देती है।";
 "Browse Hugging Face…" = "Hugging Face ब्राउज़ करें…";
 "Calculator" = "कैलकुलेटर";
+"Calls" = "कॉल";
 "Can't change models while auto-tune is running" = "ऑटो-ट्यून चलने के दौरान मॉडल नहीं बदले जा सकते";
 "Can't switch profiles while a request or the auto-tune is running" = "किसी अनुरोध या ऑटो-ट्यून के चलने के दौरान प्रोफ़ाइल नहीं बदली जा सकती";
 "Cancel" = "रद्द करें";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us से संपर्क नहीं हो सका। आपकी समीक्षा सुरक्षित रखी गई है: बाद में फिर कोशिश करें।";
 "Countdown" = "काउंटडाउन";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "इस Mac पर LLMTray के इस संस्करण के लिए गिने जाते हैं और कभी भेजे नहीं जाते; बग रिपोर्ट में गिनती शामिल होती है। क्या ठीक किया गया (मॉडल की गलत कॉल जिसे ऐप फिर भी समझ गया) और कौन सी त्रुटियाँ हुईं, यह देखने के लिए किसी पंक्ति पर पॉइंटर रखें।";
 "Country facts" = "देश तथ्य";
 "Crash reports (%lld)" = "क्रैश रिपोर्टें (%lld)";
 "Create Email…" = "ईमेल बनाएं…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "संगीत जनरेशन सक्षम करें";
 "Enable music generation?" = "संगीत जनरेशन सक्षम करें?";
 "Enjoying LLMTray?" = "LLMTray पसंद आ रहा है?";
+"Errors" = "त्रुटियाँ";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "इस प्रोजेक्ट की हर चैट को मॉडल प्रोफ़ाइल के सिस्टम प्रॉम्प्ट के बाद ये निर्देश मिलेंगे। बदलाव अगले संदेश से लागू होंगे।";
 "Extra server arguments" = "अतिरिक्त सर्वर आर्ग्युमेंट्स";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — जनरेट और संपादित करें";
@@ -280,6 +283,7 @@
 "No model uses it." = "कोई मॉडल इसका उपयोग नहीं करता।";
 "No models found in this folder." = "इस फ़ोल्डर में कोई मॉडल नहीं मिला।";
 "No runs yet." = "अभी तक कोई रन नहीं।";
+"No tool calls yet in this version." = "इस संस्करण में अभी कोई टूल कॉल नहीं।";
 "Non-commercial license: read it on the model card before using the model." = "गैर‑व्यावसायिक लाइसेंस: मॉडल का उपयोग करने से पहले मॉडल कार्ड पर पढ़ें।";
 "Not enough free disk space for this model." = "इस मॉडल के लिए डिस्क पर पर्याप्त खाली जगह नहीं है।";
 "OK" = "ठीक है";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Recently updated" = "हाल ही में अपडेट हुआ";
 "Recovery" = "रिकवरी";
+"Refused" = "अस्वीकृत";
 "Regenerate" = "फिर से जनरेट करें";
 "Remove" = "हटाएं";
 "Remove attachment" = "अटैचमेंट हटाएँ।";
@@ -338,11 +343,13 @@
 "Rename" = "नाम बदलें";
 "Rename this profile" = "इस प्रोफ़ाइल का नाम बदलें।";
 "Rename…" = "नाम बदलें…";
+"Repaired" = "ठीक किए गए";
 "Report a Bug" = "बग रिपोर्ट करें";
 "Report a Bug…" = "बग रिपोर्ट करें…";
 "Rescan" = "फिर स्कैन करें";
 "Rescan Models" = "मॉडल फिर स्कैन करें";
 "Rescan or manage models" = "मॉडल पुनः स्कैन या प्रबंधित करें";
+"Reset" = "रीसेट";
 "Reset: inherit this setting from Default" = "रीसेट करें: यह सेटिंग Default से इनहेरिट करें।";
 "Restart LLMTray to change the language?" = "भाषा बदलने के लिए LLMTray रीस्टार्ट करें?";
 "Restart Now" = "अभी रीस्टार्ट करें";
@@ -479,7 +486,10 @@
 "Today" = "आज";
 "Too many reviews from this network. Try again in %lld min." = "इस नेटवर्क से बहुत सारी समीक्षाएँ भेजी जा चुकी हैं। %lld मिनट बाद पुनः प्रयास करें।";
 "Too many reviews from this network. Try again later." = "इस नेटवर्क से बहुत सारी समीक्षाएँ भेजी जा चुकी हैं। बाद में पुनः प्रयास करें।";
+"Tool" = "टूल";
 "Tool Settings…" = "टूल सेटिंग्स…";
+"Tool call statistics" = "टूल कॉल आँकड़े";
+"Tool calls" = "टूल कॉल";
 "Tool-use rule" = "टूल उपयोग नियम";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "मॉडल इन-ऐप चैट में इन टूल्स को कॉल कर सकता है (इसके लिए tool-calling मॉडल चाहिए)। वेब टूल मॉडल के प्रश्न को सार्वजनिक सेवा पर भेजते हैं (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); स्थानीय टूल कभी भी Mac से बाहर नहीं जाते।";
 "Top-k" = "Top-k";

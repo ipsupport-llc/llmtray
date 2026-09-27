@@ -83,6 +83,8 @@ enum BugReporter {
             sections: [
                 .init("App", app), .init("System", system), .init("Runtime", runtime),
                 .init("Server", serverLines), .init("Model", modelLines),
+                // Counts only: no tool arguments, results or chat text.
+                .init("Tool calls", ToolStatsStore.shared.stats.reportLines(version: ToolStatsStore.version)),
                 .init("Attached", attachments.isEmpty ? [("Files", "report.txt only")] : attachments.map { ("File", $0) }),
             ]
         )

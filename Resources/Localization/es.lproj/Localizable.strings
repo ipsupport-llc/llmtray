@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: versiones preliminares con funciones aún en pruebas, y actualizaciones del runtime desde la rama beta de mlx-lm. Volver a Estable no revierte una beta instalada; la siguiente versión estable la reemplaza.";
 "Browse Hugging Face…" = "Explorar Hugging Face…";
 "Calculator" = "Calculadora";
+"Calls" = "Llamadas";
 "Can't change models while auto-tune is running" = "No se puede cambiar de modelo durante el ajuste automático";
 "Can't switch profiles while a request or the auto-tune is running" = "No se puede cambiar de perfil mientras hay una solicitud o un ajuste automático en curso";
 "Cancel" = "Cancelar";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "No se pudo crear el informe: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "No se pudo contactar con ipsupport.us. Tu valoración se ha guardado: inténtalo de nuevo más tarde.";
 "Countdown" = "Cuenta atrás";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Se cuentan en este Mac para esta versión de LLMTray y nunca se envían; un informe de errores incluye los recuentos. Pasa el cursor sobre una fila para ver qué se reparó (una llamada mal formada del modelo que la app entendió igualmente) y qué errores hubo.";
 "Country facts" = "Datos del país";
 "Crash reports (%lld)" = "Informes de fallos (%lld)";
 "Create Email…" = "Crear correo…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "Activar generación de música";
 "Enable music generation?" = "¿Activar generación de música?";
 "Enjoying LLMTray?" = "¿Te gusta LLMTray?";
+"Errors" = "Errores";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Cada conversación de este proyecto recibe estas instrucciones después del prompt de sistema del perfil del modelo. Los cambios se aplican a partir del siguiente mensaje.";
 "Extra server arguments" = "Argumentos extra del servidor";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generar y editar";
@@ -280,6 +283,7 @@
 "No model uses it." = "Ningún modelo lo usa.";
 "No models found in this folder." = "No hay modelos en esta carpeta.";
 "No runs yet." = "Aún no hay ejecuciones.";
+"No tool calls yet in this version." = "Aún no hay llamadas a herramientas en esta versión.";
 "Non-commercial license: read it on the model card before using the model." = "Licencia no comercial: léela en la model card antes de usar el modelo.";
 "Not enough free disk space for this model." = "No hay suficiente espacio libre en disco para este modelo.";
 "OK" = "OK";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "Leyendo lo instalado…";
 "Recently updated" = "Actualizado recientemente";
 "Recovery" = "Recuperación";
+"Refused" = "Rechazadas";
 "Regenerate" = "Regenerar";
 "Remove" = "Eliminar";
 "Remove attachment" = "Quitar adjunto";
@@ -338,11 +343,13 @@
 "Rename" = "Renombrar";
 "Rename this profile" = "Renombrar este perfil";
 "Rename…" = "Renombrar…";
+"Repaired" = "Reparadas";
 "Report a Bug" = "Informar un fallo";
 "Report a Bug…" = "Informar un fallo…";
 "Rescan" = "Volver a buscar";
 "Rescan Models" = "Volver a buscar modelos";
 "Rescan or manage models" = "Volver a buscar o gestionar modelos";
+"Reset" = "Restablecer";
 "Reset: inherit this setting from Default" = "Restablecer: heredar este ajuste de Default";
 "Restart LLMTray to change the language?" = "¿Reiniciar LLMTray para cambiar el idioma?";
 "Restart Now" = "Reiniciar ahora";
@@ -479,7 +486,10 @@
 "Today" = "Hoy";
 "Too many reviews from this network. Try again in %lld min." = "Demasiadas valoraciones desde esta red. Inténtalo de nuevo en %lld min.";
 "Too many reviews from this network. Try again later." = "Demasiadas valoraciones desde esta red. Inténtalo más tarde.";
+"Tool" = "Herramienta";
 "Tool Settings…" = "Ajustes de herramientas…";
+"Tool call statistics" = "Estadísticas de llamadas a herramientas";
+"Tool calls" = "Llamadas a herramientas";
 "Tool-use rule" = "Regla de herramientas";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Herramientas que el modelo puede invocar en el chat integrado (requiere un modelo con llamadas a herramientas). Las herramientas web envían la consulta del modelo a ese servicio público (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); las locales nunca salen del Mac.";
 "Top-k" = "Top-k";

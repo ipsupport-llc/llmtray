@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 /// The `generate_music` tool: a song (sung lyrics) or an instrumental from a
 /// style description, through ACE-Step 1.5 (MusicManager). One per user
@@ -13,51 +14,20 @@ final class MusicToolRunner: ChatTool {
         self.music = music
     }
 
-    var definition: [String: Any] {
-        [
-            "type": "function",
-            "function": [
-                "name": name,
-                "description": "Compose a piece of music with a local music model on this Mac: a song with sung "
-                    + "lyrics, or an instrumental. Call this only when the user's latest message explicitly asks for "
-                    + "music (a song, a track, a beat, a jingle, a melody). Never call it for greetings, small talk "
-                    + "or questions about music.",
-                "parameters": [
-                    "type": "object",
-                    "properties": [
-                        "prompt": [
-                            "type": "string",
-                            "description": "The style: genre, mood, tempo, instruments and the kind of voice, in English "
-                                + "(e.g. \"upbeat synth-pop, female vocals, bright synths, driving beat\").",
-                        ],
-                        "lyrics": [
-                            "type": "string",
-                            "description": "The words to sing, in lines, with section markers like [Verse] and [Chorus]. "
-                                + "Write them yourself when the user wants a song but gave no words. Empty for an instrumental.",
-                        ],
-                        "duration": [
-                            "type": "integer",
-                            "description": "Length in seconds, 10 to 120. Defaults to 30.",
-                        ],
-                        "language": [
-                            "type": "string",
-                            "description": "Language code of the lyrics, e.g. \"en\", \"ru\", \"es\". Defaults to \"en\".",
-                        ],
-                        "creativity": [
-                            "type": "number",
-                            "description": "0 to 1: how adventurous and unexpected the music is. Omit to use the user's setting; "
-                                + "raise it only when the user asks for something weird or experimental.",
-                        ],
-                        "adherence": [
-                            "type": "number",
-                            "description": "0 to 1: how strictly the music follows the style description. Omit to use the user's setting.",
-                        ],
-                    ],
-                    "required": ["prompt"],
-                ],
-            ],
-        ]
-    }
+    static let schema = ToolSchema(toolName, "Compose music with a local model: a song with sung lyrics, or an instrumental. "
+                                   + "Only when the latest message asks for music (song, track, beat, jingle, melody); never for "
+                                   + "greetings, small talk or questions about music.", [
+        .init("prompt", .string, "Style in English: genre, mood, tempo, instruments, voice.", required: true,
+              aliases: ["style", "description", "caption", "tags", "genre"]),
+        .init("lyrics", .string, "Lines with [Verse]/[Chorus] markers; write them if the user gave none. Empty = instrumental.",
+              aliases: ["words", "text", "song_lyrics"]),
+        .init("duration", .integer, "Seconds, 10-120, default 30.", aliases: ["seconds", "length", "duration_seconds"]),
+        .init("language", .string, "Lyrics language code, default en.", aliases: ["lang", "lyrics_language"]),
+        .init("creativity", .number, "0-1; omit for the user's setting.", aliases: ["temperature"]),
+        .init("adherence", .number, "0-1, how closely to follow the style; omit for the user's setting.", aliases: ["guidance"]),
+    ])
+    var schema: ToolSchema? { Self.schema }
+    var definition: [String: Any] { Self.schema.definition }
 
     private(set) var songsThisTurn = 0
     let maxSongsPerTurn = 1

@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: גרסאות טרום־הפצה עם תכונות שעדיין נבדקות, ועדכוני זמן ריצה מענף ה־Beta של mlx-lm. חזרה ל־Stable לא משנמכת Beta מותקנת; גרסת Stable הבאה תחליף אותה.";
 "Browse Hugging Face…" = "עיון ב־Hugging Face…";
 "Calculator" = "מחשבון";
+"Calls" = "קריאות";
 "Can't change models while auto-tune is running" = "אי אפשר להחליף דגמים בזמן שהכוונון האוטומטי פועל";
 "Can't switch profiles while a request or the auto-tune is running" = "אי אפשר להחליף פרופילים בזמן שבקשה או הכוונון האוטומטי פועלים";
 "Cancel" = "ביטול";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "לא ניתן היה להגיע ל-ipsupport.us. הביקורת נשמרה: נסה שוב מאוחר יותר.";
 "Countdown" = "ספירה לאחור";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "נספרות ב-Mac הזה עבור גרסה זו של LLMTray ולעולם אינן נשלחות; דוח באג כולל את הספירות. רחפו מעל שורה כדי לראות מה תוקן (קריאה פגומה של המודל שהאפליקציה הבינה בכל זאת) ואילו שגיאות היו.";
 "Country facts" = "עובדות על מדינות";
 "Crash reports (%lld)" = "דוחות קריסה (%lld)";
 "Create Email…" = "צור דוא״ל…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "הפעל יצירת מוזיקה";
 "Enable music generation?" = "להפעיל יצירת מוזיקה?";
 "Enjoying LLMTray?" = "נהנים מ‑LLMTray?";
+"Errors" = "שגיאות";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — ליצור ולערוך";
@@ -280,6 +283,7 @@
 "No model uses it." = "אף מודל לא משתמש בו.";
 "No models found in this folder." = "לא נמצאו מודלים בתיקייה זו.";
 "No runs yet." = "עדיין אין הרצות.";
+"No tool calls yet in this version." = "עדיין אין קריאות לכלים בגרסה זו.";
 "Non-commercial license: read it on the model card before using the model." = "רישיון לא‑מסחרי: קרא אותו בכרטיס המודל לפני השימוש.";
 "Not enough free disk space for this model." = "אין מספיק מקום פנוי בדיסק עבור המודל הזה.";
 "OK" = "אישור";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "קורא מה מותקן…";
 "Recently updated" = "עודכן לאחרונה";
 "Recovery" = "התאוששות";
+"Refused" = "נדחו";
 "Regenerate" = "צור מחדש";
 "Remove" = "הסר";
 "Remove attachment" = "מסיר את הקובץ המצורף.";
@@ -338,11 +343,13 @@
 "Rename" = "שינוי שם";
 "Rename this profile" = "משנה את שם הפרופיל הזה.";
 "Rename…" = "שנה שם…";
+"Repaired" = "תוקנו";
 "Report a Bug" = "דווח על תקלה";
 "Report a Bug…" = "דווח על תקלה…";
 "Rescan" = "סרוק מחדש";
 "Rescan Models" = "סרוק מודלים מחדש";
 "Rescan or manage models" = "סריקה מחדש או ניהול דגמים.";
+"Reset" = "איפוס";
 "Reset: inherit this setting from Default" = "איפוס: ירושת ההגדרה הזו מ-Default.";
 "Restart LLMTray to change the language?" = "להפעיל מחדש את LLMTray כדי לשנות את השפה?";
 "Restart Now" = "הפעל מחדש כעת";
@@ -479,7 +486,10 @@
 "Today" = "היום";
 "Too many reviews from this network. Try again in %lld min." = "יותר מדי חוות דעת מהרשת הזו. נסה שוב בעוד %lld דקות.";
 "Too many reviews from this network. Try again later." = "יותר מדי חוות דעת מהרשת הזו. נסה שוב מאוחר יותר.";
+"Tool" = "כלי";
 "Tool Settings…" = "הגדרות כלי…";
+"Tool call statistics" = "סטטיסטיקת קריאות לכלים";
+"Tool calls" = "קריאות לכלים";
 "Tool-use rule" = "כלל לשימוש בכלים";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "כלים שהמודל יכול לקרוא בשיחה בתוך האפליקציה (דורש מודל התומך בקריאה לכלים). כלים ברשת שולחים את שאילתת המודל לשירות הציבורי המתאים (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); כלים מקומיים אינם עוזבים את המאק.";
 "Top-k" = "Top-k";

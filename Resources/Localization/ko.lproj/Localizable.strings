@@ -72,6 +72,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: 아직 테스트 중인 기능이 포함된 사전 출시 빌드와 mlx-lm의 beta 브랜치 런타임 업데이트를 사용합니다. Stable로 다시 전환해도 설치된 beta는 다운그레이드되지 않으며, 다음 Stable 릴리스가 이를 대체합니다.";
 "Browse Hugging Face…" = "Hugging Face 둘러보기…";
 "Calculator" = "계산기";
+"Calls" = "호출";
 "Can't change models while auto-tune is running" = "자동 튜닝이 실행 중일 때는 모델을 변경할 수 없습니다.";
 "Can't switch profiles while a request or the auto-tune is running" = "요청 또는 자동 튜닝이 실행 중일 때는 프로파일을 전환할 수 없습니다.";
 "Cancel" = "취소";
@@ -108,6 +109,7 @@
 "Couldn't create the report: %@" = "보고서를 생성할 수 없습니다: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us에 연결할 수 없습니다. 작성하신 리뷰는 보관됩니다: 나중에 다시 시도하세요.";
 "Countdown" = "카운트다운";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "이 Mac에서 이 버전의 LLMTray에 대해 집계되며 어디에도 전송되지 않습니다. 버그 리포트에는 개수가 포함됩니다. 행에 포인터를 올리면 복구된 내용(앱이 그래도 이해한 모델의 잘못된 호출)과 발생한 오류를 볼 수 있습니다.";
 "Country facts" = "국가 정보";
 "Crash reports (%lld)" = "충돌 보고서(%lld)";
 "Create Email…" = "이메일 생성…";
@@ -149,6 +151,7 @@
 "Enable music generation" = "음악 생성 사용";
 "Enable music generation?" = "음악 생성을 사용하시겠습니까?";
 "Enjoying LLMTray?" = "LLMTray가 마음에 드시나요?";
+"Errors" = "오류";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "이 프로젝트의 모든 채팅은 모델 프로필의 시스템 프롬프트 뒤에 이 지침을 받습니다. 변경 내용은 다음 메시지부터 적용됩니다.";
 "Extra server arguments" = "추가 서버 인수";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 생성 및 편집";
@@ -279,6 +282,7 @@
 "No model uses it." = "사용 중인 모델이 없습니다.";
 "No models found in this folder." = "이 폴더에서 모델을 찾을 수 없습니다.";
 "No runs yet." = "아직 실행이 없습니다.";
+"No tool calls yet in this version." = "이 버전에서는 아직 도구 호출이 없습니다.";
 "Non-commercial license: read it on the model card before using the model." = "비상업적 사용 허가: 모델을 사용하기 전에 모델 카드에서 확인하세요.";
 "Not enough free disk space for this model." = "이 모델을 위해 디스크 여유 공간이 충분하지 않습니다.";
 "OK" = "확인";
@@ -329,6 +333,7 @@
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Recently updated" = "최근 업데이트됨";
 "Recovery" = "복구";
+"Refused" = "거부됨";
 "Regenerate" = "다시 생성";
 "Remove" = "제거";
 "Remove attachment" = "첨부 파일을 제거합니다.";
@@ -337,11 +342,13 @@
 "Rename" = "이름 변경";
 "Rename this profile" = "이 프로필의 이름을 변경합니다.";
 "Rename…" = "이름 변경…";
+"Repaired" = "복구됨";
 "Report a Bug" = "버그 신고";
 "Report a Bug…" = "버그 신고…";
 "Rescan" = "다시 스캔";
 "Rescan Models" = "모델 다시 스캔";
 "Rescan or manage models" = "모델을 다시 검색하거나 관리합니다.";
+"Reset" = "재설정";
 "Reset: inherit this setting from Default" = "재설정: 이 설정을 Default에서 상속합니다.";
 "Restart LLMTray to change the language?" = "언어를 변경하려면 LLMTray를 재시동할까요?";
 "Restart Now" = "지금 재시동";
@@ -478,7 +485,10 @@
 "Today" = "오늘";
 "Too many reviews from this network. Try again in %lld min." = "이 네트워크에서 너무 많은 리뷰가 전송되었습니다. %lld분 후에 다시 시도하세요.";
 "Too many reviews from this network. Try again later." = "이 네트워크에서 너무 많은 리뷰가 전송되었습니다. 나중에 다시 시도하세요.";
+"Tool" = "도구";
 "Tool Settings…" = "도구 설정…";
+"Tool call statistics" = "도구 호출 통계";
+"Tool calls" = "도구 호출";
 "Tool-use rule" = "도구 사용 규칙";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "모델이 앱 내 채팅에서 호출할 수 있는 도구입니다(도구 호출을 지원하는 모델 필요). 웹 도구는 모델의 질의를 해당 공개 서비스(DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo)로 전송하며, 로컬 도구는 Mac을 벗어나지 않습니다.";
 "Top-k" = "Top-k";
