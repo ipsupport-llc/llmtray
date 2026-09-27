@@ -539,14 +539,7 @@ struct ProfilesPane: View {
             List(selection: Binding(get: { selectedID }, set: { navigation.profileID = $0 ?? Profile.defaultID })) {
                 ForEach(profiles.profiles) { p in
                     HStack {
-                        if renaming == p.id {
-                            TextField("", text: $nameDraft, onCommit: {
-                                profiles.rename(id: p.id, to: nameDraft)
-                                renaming = nil
-                            })
-                        } else {
-                            Text(p.name)
-                        }
+                        Text(p.name)
                         Spacer()
                         if !p.isDefault {
                             Text("\(p.overrideCount)").font(.caption).foregroundStyle(.secondary)
@@ -576,7 +569,7 @@ struct ProfilesPane: View {
                     .help(Text("Duplicate this profile"))
                 Button { startRenaming(selected) } label: { Image(systemName: "pencil") }
                     .disabled(isDefault)
-                    .help(Text("Rename this profile"))
+                    .help(isDefault ? Text("Default can't be renamed: every model falls back to it") : Text("Rename this profile"))
                 Spacer()
                 Button {
                     NSWorkspace.shared.open(URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("profiles"))
@@ -586,6 +579,33 @@ struct ProfilesPane: View {
             .buttonStyle(.borderless)
             .padding(8)
         }
+        // A sheet, not a text field in the list row: in a List with a
+        // selection on macOS the row's field doesn't take the keyboard, so
+        // renaming did nothing.
+        .sheet(isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Rename Profile").font(.headline)
+                TextField("Name", text: $nameDraft)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 260)
+                    .onSubmit(commitRename)
+                HStack {
+                    Spacer()
+                    Button("Cancel") { renaming = nil }
+                        .keyboardShortcut(.cancelAction)
+                    Button("Rename", action: commitRename)
+                        .keyboardShortcut(.defaultAction)
+                        .disabled(nameDraft.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+            .padding(20)
+        }
+    }
+
+    private func commitRename() {
+        guard let id = renaming else { return }
+        profiles.rename(id: id, to: nameDraft)
+        renaming = nil
     }
 
     private var ops: OperationAvailability { OperationAvailability(server: server, benchmark: benchmark) }
