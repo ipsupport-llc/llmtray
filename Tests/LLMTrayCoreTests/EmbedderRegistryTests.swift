@@ -134,8 +134,8 @@ final class EmbedderRegistryTests: XCTestCase {
         XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: folder.deletingLastPathComponent().path), ["e"])
     }
 
-    /// Every caller gets the entry's one live runner, so stopping it (before
-    /// the weights go) leaves none running.
+    /// Every caller gets the entry's one live runner, and holding it (while
+    /// its weights are replaced or removed) keeps any from running.
     @MainActor
     func testTheRunnerPoolSharesOneRunnerPerEntry() async throws {
         let pool = EmbedRunnerPool()
@@ -154,11 +154,27 @@ final class EmbedderRegistryTests: XCTestCase {
         let starting = Task { try await b.start() }
         for _ in 0..<100 where a.pid == nil { try await Task.sleep(nanoseconds: 10_000_000) }
         let pid = try XCTUnwrap(a.pid, "started through one caller")
-        // Nobody waiting for it to start (a waiter would get a replacement).
-        starting.cancel()
-        _ = try? await starting.value
-        await pool.stop("e")
+        // Held while a start waits: it exits and no replacement is spawned
+        // for the waiter -- nothing runs until the files are back.
+        await pool.hold("e")
         XCTAssertNil(a.pid, "stopped through the pool")
         XCTAssertNotEqual(kill(pid, 0), 0, "exited")
+        do {
+            _ = try await starting.value
+            XCTFail("the waiter got a replacement")
+        } catch EmbedRunner.Failure.paused {}
+        do {
+            _ = try await b.embed(["x"], kind: .query)
+            XCTFail("held")
+        } catch EmbedRunner.Failure.paused {}
+        XCTAssertNil(a.pid, "a request doesn't start it either")
+        pool.release("e")
+        XCTAssertFalse(a.isPaused)
+
+        // A runner made while its entry is held starts out held.
+        await pool.hold("fresh")
+        XCTAssertTrue(pool.runner(for: "fresh", make: make).isPaused)
+        pool.release("fresh")
+        XCTAssertFalse(pool.runner(for: "fresh", make: make).isPaused)
     }
 }

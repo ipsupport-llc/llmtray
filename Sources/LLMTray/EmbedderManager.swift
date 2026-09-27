@@ -116,11 +116,15 @@ final class EmbedderManager: ObservableObject {
         statusText = NSLocalizedString("Checking the download…", comment: "")
         let fm = FileManager.default
         try fm.createDirectory(atPath: Self.modelsDir, withIntermediateDirectories: true)
+        var holding = false
+        defer { if holding { runners.release(entry.id) } }
         do {
             try await EmbedderInstall.install(entry, at: URL(fileURLWithPath: Self.modelDir(entry))) { files, temp in
                 statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), entry.displayName)
-                // A runner using the folder being replaced exits first.
-                await runners.stop(entry.id)
+                // A runner using the folder being replaced exits first, and
+                // nothing starts one until the new folder is in place.
+                holding = true
+                await runners.hold(entry.id)
                 // Values go in as arguments, not into the code.
                 do {
                     try await ProcessRunner.run(MLXRuntimeInstaller.venvPython, [
@@ -149,7 +153,8 @@ final class EmbedderManager: ObservableObject {
         guard !isBusy else { throw EmbedderError.busy }
         isBusy = true
         defer { isBusy = false }
-        await runners.stop(entry.id)
+        await runners.hold(entry.id)
+        defer { runners.release(entry.id) }
         let target = Self.modelDir(entry)
         if FileManager.default.fileExists(atPath: target) { try FileManager.default.removeItem(atPath: target) }
     }

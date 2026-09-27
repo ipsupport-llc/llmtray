@@ -183,8 +183,17 @@ public enum EmbedderInstall {
             let still = try await ProcessRunner.offMain { EmbedderFiles.mismatches(in: temp, for: entry) }
             guard still.isEmpty else { throw ChecksumMismatch(files: still) }
             try entry.source.revision.write(to: temp.appendingPathComponent(stampName), atomically: true, encoding: .utf8)
-            if fm.fileExists(atPath: folder.path) { try fm.removeItem(at: folder) }
-            try fm.moveItem(at: temp, to: folder)
+            if fm.fileExists(atPath: folder.path) {
+                // One atomic exchange: the verified folder in, the old one
+                // out under the temp name (deleted now, or swept as a
+                // partial after a crash) -- never a moment with neither.
+                guard renamex_np(temp.path, folder.path, UInt32(RENAME_SWAP)) == 0 else {
+                    throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+                }
+            } else {
+                try fm.moveItem(at: temp, to: folder)
+            }
+            try? fm.removeItem(at: temp)
         } catch {
             try? fm.removeItem(at: temp)
             throw error
@@ -201,19 +210,32 @@ public enum EmbedderInstall {
 public final class EmbedRunnerPool {
     private struct Weak { weak var runner: EmbedRunner? }
     private var runners: [String: Weak] = [:]
+    private var held: Set<String> = []
 
     public init() {}
 
-    /// The entry's live runner, or a new one from `make`.
+    /// The entry's live runner, or a new one from `make` (held too while
+    /// the entry is).
     public func runner(for id: String, make: () -> EmbedRunner) -> EmbedRunner {
         if let live = runners[id]?.runner { return live }
         let runner = make()
+        if held.contains(id) { runner.setHeld(true) }
         runners[id] = Weak(runner: runner)
         return runner
     }
 
-    /// Stops the entry's runner and waits for it to exit.
-    public func stop(_ id: String) async {
-        await runners[id]?.runner?.stopAndWait()
+    /// Stops the entry's runner, waits for it to exit, and keeps it from
+    /// starting again -- no caller's request, no waiter's respawn -- until
+    /// `release`: its files can be replaced or removed meanwhile.
+    public func hold(_ id: String) async {
+        held.insert(id)
+        guard let runner = runners[id]?.runner else { return }
+        runner.setHeld(true)
+        await runner.stopAndWait()
+    }
+
+    public func release(_ id: String) {
+        held.remove(id)
+        runners[id]?.runner?.setHeld(false)
     }
 }

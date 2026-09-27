@@ -101,7 +101,11 @@ public final class EmbedRunner: @unchecked Sendable {
     private var idleWork: DispatchWorkItem?
     private var documentBusy = false
     private var documentWaiters: [(id: UUID, continuation: CheckedContinuation<Void, Error>)] = []
-    private var paused = false
+    /// Paused by a generation's demand (`setPaused`) or held while its files
+    /// are replaced or removed (`setHeld`); either one pauses it.
+    private var pausedByDemand = false
+    private var held = false
+    private var paused: Bool { pausedByDemand || held }
     /// A process that didn't exit even after SIGKILL: nothing new starts
     /// until it does (two runners would each hold the model).
     private var wedged: RunnerProcess?
@@ -187,7 +191,16 @@ public final class EmbedRunner: @unchecked Sendable {
     /// generation's grant does (`stopAndWait`).
     public func setPaused(_ value: Bool) {
         lock.lock()
-        paused = value
+        pausedByDemand = value
+        lock.unlock()
+    }
+
+    /// Held: paused the same way, independently of the generation's demand
+    /// (which may lift its pause meanwhile) -- while the model's files are
+    /// replaced or removed nothing may start it (EmbedRunnerPool.hold).
+    public func setHeld(_ value: Bool) {
+        lock.lock()
+        held = value
         lock.unlock()
     }
 
@@ -278,14 +291,17 @@ public final class EmbedRunner: @unchecked Sendable {
                 idleWork?.cancel()
                 idleWork = nil
                 lock.unlock()
-                // The deadline and the cancel action first: the write itself
-                // goes through the process's writer queue and never blocks here.
+                // The write goes through the process's serial writer queue
+                // and never blocks here. It's queued before the cancel action
+                // is registered, so a `cancel` (which an already-cancelled
+                // task sends at once) always follows its request -- the
+                // runner ignores a cancel for an id it hasn't seen.
                 timers.asyncAfter(deadline: .now() + timeout + configuration.grace) { [weak self] in
                     self?.expire(id, process: process)
                 }
-                box.onCancel { [weak self] in self?.cancel(id, process: process) }
                 // A failed write: it's exiting, and its exit fails the request.
                 process.send(line) { ok in if !ok { process.kill() } }
+                box.onCancel { [weak self] in self?.cancel(id, process: process) }
             }
         } onCancel: {
             box.cancel()
