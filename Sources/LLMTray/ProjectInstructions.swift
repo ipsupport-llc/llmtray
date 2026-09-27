@@ -24,6 +24,11 @@ enum ProjectInstructionsWindow {
         windows[projectID]?.close()
     }
 
+    /// Its project was renamed.
+    static func retitle(_ projectID: UUID, _ name: String) {
+        windows[projectID]?.title = String(format: NSLocalizedString("Instructions for %@", comment: ""), name)
+    }
+
     static func show(_ projectID: UUID) {
         guard let project = ChatLibraryStore.shared.library.project(projectID) else { return }
         if let window = windows[projectID] {

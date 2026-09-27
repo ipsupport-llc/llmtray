@@ -26,7 +26,11 @@
   the next message; New Chat in Project maps the chat as it's made, before
   its first turn. Deleting a project keeps its chats and removes
   `projects/<id>/` through a deletion record finished at launch — never
-  when `library.json` couldn't be read.
+  when `library.json` couldn't be read. An unreadable `library.json` is
+  moved aside (`library.json.unreadable-<date>`) instead of being
+  overwritten by the next save with an empty library. A build older than
+  project instructions reads the file but drops the instructions if it
+  saves it (a downgrade).
 - **A temporary chat writes nothing by itself**: `currentSessionID ==
   nil` makes saving a no-op, it isn't reopened as a tab, and its images
   and songs never touch disk — the runners stream them over stdout, no

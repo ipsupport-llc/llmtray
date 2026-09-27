@@ -1,3 +1,4 @@
+import AppKit
 import Combine
 import Foundation
 import LLMTrayCore
@@ -25,6 +26,10 @@ final class ChatLibraryStore: ObservableObject {
     private init() {
         let (library, state) = Self.readLibrary(at: libraryPath)
         self.library = library
+        // Unreadable (broken JSON, an I/O error): moved aside, not
+        // overwritten by the next save with an empty library -- projects,
+        // pins and instructions would be gone. The copy is for recovery.
+        if state == .unreadable { Self.setAside(libraryPath) }
         finishProjectDeletions(libraryState: state)
         observer = NotificationCenter.default.publisher(for: .sessionsDidChange)
             .receive(on: DispatchQueue.main)
@@ -132,6 +137,7 @@ final class ChatLibraryStore: ObservableObject {
         guard !name.isEmpty else { return }
         library.renameProject(id, to: name)
         saveLibrary()
+        ProjectInstructionsWindow.retitle(id, name)
     }
 
     /// Applies from the next message of its chats.
@@ -149,7 +155,11 @@ final class ChatLibraryStore: ObservableObject {
         let storage = Self.projectStorage
         // Its directory can't be deleted safely (no record could be
         // written): the project stays, as it is.
-        guard storage.beginDeletion(id) else { return }
+        guard storage.beginDeletion(id) else {
+            NSLog("LLMTray: project %@ not deleted: its deletion record couldn't be written", id.uuidString)
+            NSSound.beep()
+            return
+        }
         ProjectInstructionsWindow.close(id)
         library.deleteProject(id)
         // Not saved (a full disk): the project would come back at the next
@@ -218,6 +228,17 @@ final class ChatLibraryStore: ObservableObject {
         guard let data = FileManager.default.contents(atPath: path),
               let library = try? decoder.decode(ChatLibrary.self, from: data) else { return (ChatLibrary(), .unreadable) }
         return (library, .loaded)
+    }
+
+    private static func setAside(_ path: String) {
+        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let aside = path + ".unreadable-" + stamp
+        do {
+            try FileManager.default.moveItem(atPath: path, toPath: aside)
+            NSLog("LLMTray: library.json couldn't be read; kept as %@", aside)
+        } catch {
+            NSLog("LLMTray: library.json couldn't be read or set aside: %@", error.localizedDescription)
+        }
     }
 
     /// True once it's on disk.
