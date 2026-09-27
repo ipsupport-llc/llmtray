@@ -146,3 +146,53 @@ final class ModelRecommendationsTests: XCTestCase {
         }
     }
 }
+
+/// A pick already in the models folder isn't offered for download again.
+extension ModelRecommendationsTests {
+    private func pick(_ repo: String, recommended: Bool = false) -> ModelRecommendations.Pick {
+        ModelRecommendations.Pick(model: model(repo, gb: 3, min: 8, tiers: [8], recommended: recommended), sizeBytes: 3_000_000_000, fit: .fits)
+    }
+
+    func testLocalPathMatchesTheRepoCaseInsensitively() {
+        let paths = ["/m/lmstudio-community/Other", "/m/Roman220220/Gemma-4-26B-A4B-it-gptq-mlx-jang"]
+        XCTAssertEqual(ModelRecommendations.localPath(of: "roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang", in: paths), paths[1])
+        XCTAssertNil(ModelRecommendations.localPath(of: "roman220220/gemma-4-26B-A4B-it-gptq-mlx", in: paths), "a prefix isn't it")
+        XCTAssertNil(ModelRecommendations.localPath(of: "x/gemma-4-26B-A4B-it-gptq-mlx-jang", in: paths), "another org")
+        XCTAssertNil(ModelRecommendations.localPath(of: "man220220/gemma-4-26B-A4B-it-gptq-mlx-jang", in: paths), "whole components")
+    }
+
+    func testOfferMovesCompleteLocalCopiesOutOfDownloads() {
+        let picks = [pick("o/rec", recommended: true), pick("o/partial"), pick("o/plain"), pick("o/missing")]
+        let local = ["/m/a/first", "/m/o/plain", "/m/o/partial", "/m/O/Rec"]
+        let offer = ModelRecommendations.offer(picks, localPaths: local, isComplete: { $0 != "/m/o/partial" })
+        XCTAssertEqual(repos(offer.downloads), ["o/partial", "o/missing"], "an incomplete copy resumes")
+        XCTAssertEqual(offer.local["/m/O/Rec"]?.model.repo, "o/rec")
+        XCTAssertEqual(offer.local["/m/o/plain"]?.model.repo, "o/plain")
+        XCTAssertTrue(offer.isRecommended(localPath: "/m/O/Rec"))
+        XCTAssertFalse(offer.isRecommended(localPath: "/m/o/plain"), "the badge is the recommended picks'")
+        XCTAssertEqual(offer.ordered(local, path: { $0 }), ["/m/O/Rec", "/m/a/first", "/m/o/plain", "/m/o/partial"])
+    }
+
+    func testModelFolderCompleteness() throws {
+        let fm = FileManager.default
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("llmtray-models-\(UUID().uuidString)").path
+        defer { try? fm.removeItem(atPath: dir) }
+        func folder(_ name: String, _ files: [String: String]) throws -> String {
+            let path = dir + "/" + name
+            try fm.createDirectory(atPath: path, withIntermediateDirectories: true)
+            for (file, text) in files { fm.createFile(atPath: path + "/" + file, contents: Data(text.utf8)) }
+            return path
+        }
+        let index = #"{"weight_map": {"a": "model-1.safetensors", "b": "model-2.safetensors"}}"#
+        XCTAssertTrue(ModelFolder.isComplete(atPath: try folder("done", [ModelFolder.completionMarkerName: "", ModelFolder.manifestName: "{}"])))
+        XCTAssertFalse(ModelFolder.isComplete(atPath: try folder("downloading", [ModelFolder.manifestName: "{}", "config.json": "{}",
+                                                                                "model.safetensors": ""])), "our download, not finished")
+        XCTAssertTrue(ModelFolder.isComplete(atPath: try folder("foreign", ["config.json": "{}", "model.safetensors": ""])))
+        XCTAssertFalse(ModelFolder.isComplete(atPath: try folder("configOnly", ["config.json": "{}"])))
+        XCTAssertFalse(ModelFolder.isComplete(atPath: try folder("noConfig", ["model.safetensors": ""])))
+        XCTAssertFalse(ModelFolder.isComplete(atPath: try folder("shardMissing", ["config.json": "{}", "model.safetensors.index.json": index,
+                                                                                 "model-1.safetensors": ""])))
+        XCTAssertTrue(ModelFolder.isComplete(atPath: try folder("sharded", ["config.json": "{}", "model.safetensors.index.json": index,
+                                                                           "model-1.safetensors": "", "model-2.safetensors": ""])))
+    }
+}
