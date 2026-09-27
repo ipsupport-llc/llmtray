@@ -140,6 +140,7 @@
 "Enable image generation?" = "Görüntü oluşturma etkinleştirilsin mi?";
 "Enable music generation" = "Müzik üretimini etkinleştir";
 "Enable music generation?" = "Müzik üretimini etkinleştirmek istiyor musunuz?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Extra server arguments" = "Ek sunucu argümanları";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — oluştur ve düzenle";
 "Failed to reload the chat model after image generation: %@" = "Görüntü oluşturduktan sonra sohbet modeli yeniden yüklenemedi: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image model" = "Görüntü modeli";
+"In project %@" = "%@ projesinde";
 "In the queue: %lld ahead…" = "Sırada: %lld kişi önce…";
 "Include LLMTray crash reports from the last two weeks" = "Son iki haftanın LLMTray çökme raporlarını ekle";
 "Include the server log" = "Sunucu kaydını ekle";
 "Installed" = "Yüklü";
 "Installing mflux…" = "mflux yükleniyor…";
 "Installing mlx-audio…" = "mlx-audio yükleniyor…";
-"Its chats stay, back among the recents." = "Sohbetleri kalır, son kullanılanlar arasına döner.";
+"Instructions for %@" = "%@ için talimatlar";
+"Instructions…" = "Talimatlar…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Sohbetleri saklanır, Son'dakiler arasında geri görünür; projenin talimatları ve dosyaları silinir.";
 "KV cache" = "KV önbelleği";
 "KV group size" = "KV grup boyutu";
 "Keep" = "Tut";
@@ -240,6 +244,7 @@
 "Network" = "Ağ";
 "Never" = "Asla";
 "New Chat" = "Yeni Sohbet";
+"New Chat in Project" = "Projede Yeni Sohbet";
 "New Profile…" = "Yeni Profil…";
 "New Project…" = "Yeni Proje…";
 "New Tab" = "Yeni Sekme";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Yeni Geçici Sohbet";
 "New chat" = "Yeni sohbet";
 "New chat (⌘N)" = "Yeni sohbet (⌘N)";
+"New chat in this project" = "Bu projede yeni sohbet";
 "New profile" = "Yeni profil";
 "New profile (inherits everything from Default)" = "Yeni profil (her şeyi Default’tan devralır)";
 "New project" = "Yeni proje";
@@ -282,6 +288,7 @@
 "Performance" = "Performans";
 "Pin" = "Sabitlen";
 "Pinned" = "Sabitlenen";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Sabitlemeler ve projeler yüklenemedi. Bunlara yapılan değişiklikler LLMTray yeniden başlatılana kadar kaydedilmez; dosyanın bir kopyası yanında saklanır.";
 "Play" = "Oynat";
 "Port" = "Bağlantı noktası";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Attention önbelleğinin hassasiyeti. 8 bit: neredeyse kayıpsız, belleğin yarısı. 4 bit: dörtte biri, uzun bağlamda belirgin biçimde daha kötü. Tam: en iyi, en fazla bellek.";

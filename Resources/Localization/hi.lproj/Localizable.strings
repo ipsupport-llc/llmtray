@@ -140,6 +140,7 @@
 "Enable image generation?" = "इमेज जनरेशन सक्षम करें?";
 "Enable music generation" = "संगीत जनरेशन सक्षम करें";
 "Enable music generation?" = "संगीत जनरेशन सक्षम करें?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "इस प्रोजेक्ट की हर चैट को मॉडल प्रोफ़ाइल के सिस्टम प्रॉम्प्ट के बाद ये निर्देश मिलेंगे। बदलाव अगले संदेश से लागू होंगे।";
 "Extra server arguments" = "अतिरिक्त सर्वर आर्ग्युमेंट्स";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — जनरेट और संपादित करें";
 "Failed to reload the chat model after image generation: %@" = "Image generation के बाद chat मॉडल को पुनः लोड करना विफल रहा: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image model" = "इमेज मॉडल";
+"In project %@" = "प्रोजेक्ट %@ में";
 "In the queue: %lld ahead…" = "कतार में: %lld पहले…";
 "Include LLMTray crash reports from the last two weeks" = "पिछले दो हफ्तों की LLMTray क्रैश रिपोर्टें शामिल करें";
 "Include the server log" = "सर्वर लॉग शामिल करें";
 "Installed" = "इंस्टॉल किया गया";
 "Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
 "Installing mlx-audio…" = "mlx-audio इंस्टॉल किया जा रहा है…";
-"Its chats stay, back among the recents." = "इसके चैट वहीं रहते हैं, हाल के में वापस आ जाते हैं।";
+"Instructions for %@" = "%@ के लिए निर्देश";
+"Instructions…" = "निर्देश…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "इसके चैट बरकरार रहते हैं, हाल के में वापस आ जाते हैं; प्रोजेक्ट के निर्देश और फ़ाइलें हटा दी जाएँगी।";
 "KV cache" = "KV कैश";
 "KV group size" = "KV समूह आकार";
 "Keep" = "रखें";
@@ -240,6 +244,7 @@
 "Network" = "नेटवर्क";
 "Never" = "कभी नहीं";
 "New Chat" = "नया चैट";
+"New Chat in Project" = "प्रोजेक्ट में नई चैट";
 "New Profile…" = "नई प्रोफ़ाइल…";
 "New Project…" = "नया प्रोजेक्ट…";
 "New Tab" = "नया टैब";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "नया अस्थायी चैट";
 "New chat" = "नई चैट";
 "New chat (⌘N)" = "नया चैट (⌘N)";
+"New chat in this project" = "इस प्रोजेक्ट में नई चैट";
 "New profile" = "नई प्रोफ़ाइल";
 "New profile (inherits everything from Default)" = "नई प्रोफ़ाइल बनाएँ; यह Default से सब कुछ विरासत में लेती है।";
 "New project" = "नया प्रोजेक्ट";
@@ -282,6 +288,7 @@
 "Performance" = "प्रदर्शन";
 "Pin" = "पिन करें";
 "Pinned" = "पिन किया गया";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins और projects लोड नहीं हो सके। इनमें किए गए बदलाव LLMTray के रीस्टार्ट होने तक सहेजे नहीं जाते; फ़ाइल की एक कॉपी इसके साथ रखी जाती है।";
 "Play" = "प्ले";
 "Port" = "पोर्ट";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "अटेंशन कैश की सटीकता। 8-bit: लगभग बिना हानि, आधी मेमोरी। 4-bit: एक-चौथाई मेमोरी, लंबे संदर्भ में स्पष्ट रूप से खराब। Full: सबसे अच्छा, सबसे अधिक मेमोरी।";

@@ -140,6 +140,7 @@
 "Enable image generation?" = "要启用图像生成吗？";
 "Enable music generation" = "启用音乐生成";
 "Enable music generation?" = "要启用音乐生成吗？";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "此项目中的每个对话在模型配置文件的系统提示之后都会应用这些指令。更改自下一条消息起生效。";
 "Extra server arguments" = "额外服务器参数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成并编辑";
 "Failed to reload the chat model after image generation: %@" = "图像生成后重载聊天模型失败：%@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "尚未设置图像生成功能 —— 请在“设置”中重新开启。";
 "Image generation needs an update -- turn it off and on again in Settings." = "图像生成功能需要更新 —— 请在“设置”中先关闭再重新开启。";
 "Image model" = "图像模型";
+"In project %@" = "在项目 %@ 中";
 "In the queue: %lld ahead…" = "排队中：前面还有 %lld 个…";
 "Include LLMTray crash reports from the last two weeks" = "包含最近两周的 LLMTray 崩溃报告";
 "Include the server log" = "包含服务器日志";
 "Installed" = "已安装";
 "Installing mflux…" = "正在安装 mflux…";
 "Installing mlx-audio…" = "正在安装 mlx-audio…";
-"Its chats stay, back among the recents." = "其对话会保留，返回“最近使用”。";
+"Instructions for %@" = "为 %@ 提供的指令";
+"Instructions…" = "指令…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "其对话保留并回到最近使用列表；该项目的指令和文件将被删除。";
 "KV cache" = "KV 缓存";
 "KV group size" = "KV 组大小";
 "Keep" = "保持";
@@ -240,6 +244,7 @@
 "Network" = "网络";
 "Never" = "永不";
 "New Chat" = "新建对话";
+"New Chat in Project" = "在项目中新建对话";
 "New Profile…" = "新建配置…";
 "New Project…" = "新建项目…";
 "New Tab" = "新建标签页";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "新建临时对话";
 "New chat" = "新建聊天";
 "New chat (⌘N)" = "新建对话（⌘N）";
+"New chat in this project" = "在此项目中新建对话";
 "New profile" = "新建配置";
 "New profile (inherits everything from Default)" = "新建配置（继承 Default 的所有设置）。";
 "New project" = "新项目";
@@ -282,6 +288,7 @@
 "Performance" = "性能";
 "Pin" = "固定";
 "Pinned" = "已固定";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "无法加载固定项和项目。对它们的更改在 LLMTray 重启前不会保存；文件的副本已保存在其旁。";
 "Play" = "播放";
 "Port" = "端口";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力缓存的精度。8-bit：几乎无损，内存占用减半。4-bit：内存占用约为四分之一，长上下文下明显变差。完整精度：效果最佳，内存占用最多。";

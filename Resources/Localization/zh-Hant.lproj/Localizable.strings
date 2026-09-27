@@ -140,6 +140,7 @@
 "Enable image generation?" = "要啟用影像生成嗎？";
 "Enable music generation" = "啟用音樂生成功能";
 "Enable music generation?" = "要啟用音樂生成功能嗎？";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "每個專案中的對話會在模型設定檔的系統提示之後收到這些指示。變更自下一則訊息起生效。";
 "Extra server arguments" = "額外伺服器引數";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成並編輯";
 "Failed to reload the chat model after image generation: %@" = "影像生成後重新載入聊天模型失敗：%@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
 "Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image model" = "影像模型";
+"In project %@" = "於專案 %@";
 "In the queue: %lld ahead…" = "隊列中：前面還有 %lld 位…";
 "Include LLMTray crash reports from the last two weeks" = "包含最近兩週的 LLMTray 當機報告";
 "Include the server log" = "包含伺服器日誌";
 "Installed" = "已安裝";
 "Installing mflux…" = "正在安裝 mflux…";
 "Installing mlx-audio…" = "正在安裝 mlx-audio…";
-"Its chats stay, back among the recents." = "其對話會保留，回到最近項目中。";
+"Instructions for %@" = "%@ 的指示";
+"Instructions…" = "指示…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "其對話會保留，回到近期項目；專案的指示與檔案將被刪除。";
 "KV cache" = "KV 快取";
 "KV group size" = "KV 群組大小";
 "Keep" = "保留";
@@ -240,6 +244,7 @@
 "Network" = "網路";
 "Never" = "永不";
 "New Chat" = "新對話";
+"New Chat in Project" = "在專案中建立新對話";
 "New Profile…" = "新增設定檔…";
 "New Project…" = "新建專案…";
 "New Tab" = "新增分頁";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "新暫存對話";
 "New chat" = "新增聊天";
 "New chat (⌘N)" = "新對話（⌘N）";
+"New chat in this project" = "在此專案建立新對話";
 "New profile" = "新增設定檔";
 "New profile (inherits everything from Default)" = "新增設定檔，並從 Default 繼承所有設定。";
 "New project" = "新專案";
@@ -282,6 +288,7 @@
 "Performance" = "效能";
 "Pin" = "釘選";
 "Pinned" = "已釘選";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "無法載入固定項目與專案。對它們所做的變更在 LLMTray 重新啟動之前不會儲存；該檔案的複本會保留在旁邊。";
 "Play" = "播放";
 "Port" = "連接埠";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力快取的精度。8-bit：幾乎無損、記憶體用量減半。4-bit：記憶體用量為四分之一，但長上下文明顯較差。完整：最佳、記憶體用量最多。";

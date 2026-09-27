@@ -140,6 +140,7 @@
 "Enable image generation?" = "Włączyć generowanie obrazów?";
 "Enable music generation" = "Włącz generowanie muzyki";
 "Enable music generation?" = "Włączyć generowanie muzyki?";
+"Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Każdy czat w tym projekcie otrzymuje te instrukcje po systemowym komunikacie profilu modelu. Zmiana zaczyna obowiązywać od następnej wiadomości.";
 "Extra server arguments" = "Dodatkowe argumenty serwera";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generuj i edytuj";
 "Failed to reload the chat model after image generation: %@" = "Ponowne wczytanie modelu czatu po generowaniu obrazów nie powiodło się: %@";
@@ -187,13 +188,16 @@
 "Image generation isn't set up -- turn it on again in Settings." = "Generowanie obrazów nie jest skonfigurowane — włącz je ponownie w Ustawieniach.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Generowanie obrazów wymaga aktualizacji — wyłącz i włącz ponownie w Ustawieniach.";
 "Image model" = "Model obrazów";
+"In project %@" = "W projekcie %@";
 "In the queue: %lld ahead…" = "W kolejce: %lld przed tobą…";
 "Include LLMTray crash reports from the last two weeks" = "Dołącz raporty awarii LLMTray z ostatnich dwóch tygodni";
 "Include the server log" = "Dołącz log serwera";
 "Installed" = "Zainstalowane";
 "Installing mflux…" = "Instalowanie mflux…";
 "Installing mlx-audio…" = "Instalowanie mlx-audio…";
-"Its chats stay, back among the recents." = "Jego czaty pozostaną i wrócą do ostatnich.";
+"Instructions for %@" = "Instrukcje dla %@";
+"Instructions…" = "Instrukcje…";
+"Its chats stay, back among the recents; the project's instructions and files are deleted." = "Czaty pozostają, z powrotem wśród ostatnich; instrukcje i pliki projektu zostaną usunięte.";
 "KV cache" = "Pamięć podręczna KV";
 "KV group size" = "Rozmiar grupy KV";
 "Keep" = "Zachowaj";
@@ -240,6 +244,7 @@
 "Network" = "Sieć";
 "Never" = "Nigdy";
 "New Chat" = "Nowy czat";
+"New Chat in Project" = "Nowy czat w projekcie";
 "New Profile…" = "Nowy profil…";
 "New Project…" = "Nowy projekt…";
 "New Tab" = "Nowa karta";
@@ -247,6 +252,7 @@
 "New Temporary Chat" = "Nowy tymczasowy czat";
 "New chat" = "Nowy czat";
 "New chat (⌘N)" = "Nowy czat (⌘N)";
+"New chat in this project" = "Nowy czat w tym projekcie";
 "New profile" = "Nowy profil";
 "New profile (inherits everything from Default)" = "Nowy profil (dziedziczy wszystko z Default)";
 "New project" = "Nowy projekt";
@@ -282,6 +288,7 @@
 "Performance" = "Wydajność";
 "Pin" = "Przypnij";
 "Pinned" = "Przypięte";
+"Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Nie można wczytać przypięć i projektów. Zmiany nie będą zapisywane do ponownego uruchomienia LLMTray; kopia pliku jest przechowywana obok niego.";
 "Play" = "Odtwórz";
 "Port" = "Port";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precyzja pamięci podręcznej mechanizmu uwagi. 8-bitowa: prawie bezstratna, połowa pamięci. 4-bitowa: jedna czwarta, zauważalnie gorsza przy długim kontekście. Pełna: najlepsza, zużywa najwięcej pamięci.";
