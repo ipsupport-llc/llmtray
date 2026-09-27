@@ -129,8 +129,13 @@ hasn't seen; whole-document summaries are a later feature (per-document
 summary chunks, v3).
 
 **Budget.** Nothing in the chat counts prompt tokens today (auto-compact
-counts messages). A conservative estimator in LLMTrayCore (tokens ≈
-UTF-8 bytes / 3, erring high) counts the whole serialized request —
+counts messages). An estimator in LLMTrayCore counts the whole
+serialized request in UTF-8 bytes and converts with a ratio calibrated
+per chat from the server's own `usage.prompt_tokens` of the previous
+response (asked for with `stream_options.include_usage`; without it the
+default ratio stays), starting from a deliberately low 2 bytes per token until the
+first response (validated against the chat models' tokenizers on
+Russian, English and code in PR 3.3). It counts —
 system prompt, instructions, history, tool declarations, the calls so
 far. Before each project result the room left is `context − estimate −
 max_tokens − margin (10%)`; the result gets at most a share of it
@@ -150,17 +155,18 @@ their results together, leaving the answer (with its citations): what a
 reloaded chat has, so the request is the same live and reloaded. The
 model searches again when it needs the text.
 
-**Trust**, deterministic. What this guarantees is narrow: file text
-can't trigger a network or generator tool in the same turn, and can't
+**Trust**, deterministic. File names and every other project tool
+result (listing included) count as file text. What this guarantees is
+narrow: file text can't trigger a network or generator tool in the same turn, and can't
 come back as a trusted summary. It does not stop the model from being
 misled by what it reads — an answer built on a file is attributed to the
 file (citations), so the user can see where a claim came from.
 
 - document text reaches the model only as project tool results, framed
   as quoted material with its `[doc:page]`;
-- a batch of tool calls that includes a project read has its network
+- a batch of tool calls that includes any project tool has its network
   and generator calls refused up front, before drafts, queueing or
-  unload; and once a project tool has returned text in a turn, tools with
+  unload; and once a project tool has returned anything in a turn, tools with
   `ToolCatalog.Entry.usesNetwork` and the generators are not declared for
   the rest of the turn, and refused (`.refused`) if called anyway —
   exfiltration or actions prompted by a file need a new user message.
@@ -185,9 +191,13 @@ has changed since that revision or is gone.
 
 **Retention.** The cited revision's `pages` rows are kept as tombstones
 when its document is re-indexed or removed (a linked file too), until no
-saved citation refers to them: reference counts are updated when chats
-are deleted or compacted (citations become text) and when a project is
-deleted (all of it goes). Tombstones count towards the disk caps.
+saved citation refers to them. No reference counts across the two
+stores (session files and the project's database can't commit
+together): a **sweep** during maintenance reads the citations of the
+project's saved chats and drops tombstones none of them names —
+idempotent, so a crash, a regenerated or edited answer, a compaction or
+a deleted chat is simply caught by the next sweep. Deleting a project
+deletes all of it. Tombstones count towards the disk caps.
 
 ## The index
 
@@ -202,7 +212,9 @@ Application Support/LLMTray/projects/<projectID>/
   error)`; `doc` a small integer, `AUTOINCREMENT` (a plain integer key
   reuses the last id after a delete, and an old `[2:5]` would point at
   another document). `status`: staged → extracting → searchable →
-  embedded | failed | removing.
+  embedded | failed | removing, plus `empty` (no text in it),
+  `unsupported` (a format this version doesn't index), `not_indexed`
+  (indexing stopped by the user; Index Now resumes it).
 - `pages(doc, rev, page, text, tier, status, error)` — the raw extracted
   text: `read_project_file` quotes it; a failed page is retried from it.
 - `chunks(id AUTOINCREMENT, doc, rev, page, ord, heading, start, len,
@@ -229,7 +241,9 @@ Application Support/LLMTray/projects/<projectID>/
   the old one** (`index.next.sqlite`): documents migrated, derived
   tables rebuilt from copies and available linked sources, an
   unavailable source's rows and every cited revision's pages carried
-  over as they are; the switch is the compaction swap below, done only
+  over — and for an unavailable source its current revision too, pages
+  kept and its chunks, FTS rows and vectors rebuilt from those pages, so
+  it stays searchable offline; the switch is the compaction swap below, done only
   when the new file is complete; a crash leaves the old one in use;
   free disk is checked first. `documents` — user
   state — migrates only by explicit ALTERs. 16 KB pages and
@@ -296,7 +310,8 @@ chat deletion), so a citation still quotes what the model saw, marked
 or says it's gone.
 
 Removal and reconcile are source-aware: removing a linked document or
-source drops its rows and never touches the user's files; only copies
+source drops its rows — except the tombstoned pages of cited revisions,
+which the sweep removes later — and never touches the user's files; only copies
 under `files/` are ever deleted.
 
 **Concurrency.** An app-wide `ProjectIndexRegistry` owns one writer per
@@ -520,8 +535,8 @@ adds ~20 ms.
   marked so in the tool result. A project chat asked about a file that
   isn't ready gets that status from the tools and says so.
 - **Formats offered**: the add flow accepts only what the installed
-  version indexes (v1a: text, code, PDF text layer, docx/doc/odt/rtf,
-  HTML); anything else is refused at add with "not yet supported",
+  version indexes (v1a, exactly: plain text, Markdown, code, PDF text
+  layer, docx/doc/odt/rtf, HTML); anything else is refused at add with "not yet supported",
   never shown as searchable.
 - **Disk limits**: per project and app-wide (Settings); add, re-index and
   compaction check free space first (a file: its size + index growth;
@@ -593,7 +608,7 @@ contextual-retrieval.
    page; recall@10 and MRR, lexical vs hybrid with bge-m3 (and
    USER-bge-m3 beside it); CER per tier. Sets the fusion weights, the
    chunk size and the recall target for v1a.
-3. **v1a — text and PDF, behind a feature flag (beta)**, as separate PRs,
+3. **v1a — text documents and PDF, behind a feature flag (beta)**, as separate PRs,
    each with its tests, in this order:
    1. **Supervised extractor**: `ProcessRunner`'s `posix_spawn` variant
       (process group, wall timeout, stdout cap, footprint polling,
