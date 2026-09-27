@@ -48,6 +48,8 @@ final class HTMLTextTests: XCTestCase {
         XCTAssertEqual(HTMLText.text("<svg><svg><text>x</text></svg><text>y</text></svg>ok"), "ok")
         // Raw text doesn't nest: a "<script>" in a script is a string.
         XCTAssertEqual(HTMLText.text("<script>var s = '<script>';</script>after"), "after")
+        XCTAssertEqual(HTMLText.text("<script>if (a <!-- b) {}</script>visible"), "visible")
+        XCTAssertEqual(HTMLText.text("<style>/* <!-- */</style>visible"), "visible")
     }
 
     func testEntitiesThroughWebParsing() {

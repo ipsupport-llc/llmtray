@@ -96,17 +96,27 @@ public final class CappedZip {
             let (data, head) = try part(e, keep: named, allowEmbedded: true)
             // Images (an SVG with its DOCTYPE) aren't parsed as XML by the importer.
             let media = lower.split(separator: "/").dropLast().contains { $0 == "media" || $0 == "pictures" }
-            guard named || (!media && Self.looksLikeXML(head)) else { continue }
-            try XMLPartCheck.check(named ? data : try part(e, keep: true, counted: false).data, part: e.name,
-                                   maxDepth: caps.maxXMLDepth, allowExternalDoctype: odf && e.name == "META-INF/manifest.xml")
+            var xml = named ? data : nil
+            if !named && !media {
+                switch Self.leadingByte(head) {
+                case 0x3C?: xml = try part(e, keep: true, counted: false).data
+                case nil where !head.isEmpty:
+                    // Only whitespace so far: read on to the first other byte.
+                    let whole = try part(e, keep: true, counted: false).data
+                    if Self.leadingByte(whole) == 0x3C { xml = whole }
+                default: break
+                }
+            }
+            guard let xml else { continue }
+            try XMLPartCheck.check(xml, part: e.name, maxDepth: caps.maxXMLDepth,
+                                   allowExternalDoctype: odf && e.name == "META-INF/manifest.xml")
         }
     }
 
-    static func looksLikeXML(_ head: Data) -> Bool {
-        let bytes = head.starts(with: [0xEF, 0xBB, 0xBF]) ? head.dropFirst(3) : head[...]
-        // Only whitespace so far: XML may follow it, so it is checked as XML.
-        guard let first = bytes.first(where: { $0 != 0x20 && $0 != 0x09 && $0 != 0x0A && $0 != 0x0D }) else { return !bytes.isEmpty }
-        return first == 0x3C
+    /// The first byte after a UTF-8 BOM and whitespace; nil if there is none.
+    static func leadingByte(_ d: Data) -> UInt8? {
+        let bytes = d.starts(with: [0xEF, 0xBB, 0xBF]) ? d.dropFirst(3) : d[...]
+        return bytes.first { $0 != 0x20 && $0 != 0x09 && $0 != 0x0A && $0 != 0x0D }
     }
 
     // MARK: Layout

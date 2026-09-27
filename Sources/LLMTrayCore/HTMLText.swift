@@ -63,6 +63,12 @@ public enum HTMLText {
         while i < n {
             let c = b[i]
             if c == 0x3C /* < */ {
+                // Script and style are raw text: only a closing tag counts there,
+                // not a "<!--" or another "<tag".
+                if let skip = skipUntil, rawText.contains(skip), !(i + 1 < n && b[i + 1] == 0x2F) {
+                    i += 1
+                    continue
+                }
                 // A comment, to its "-->" (or the end).
                 if i + 3 < n, b[i + 1] == 0x21, b[i + 2] == 0x2D, b[i + 3] == 0x2D {
                     var j = i + 4

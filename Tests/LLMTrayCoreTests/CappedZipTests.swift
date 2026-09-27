@@ -192,6 +192,10 @@ final class CappedZipTests: XCTestCase {
         let padded = TestZip()
         padded.add("word/padded.bin", String(repeating: " ", count: 200) + hostile)
         assertUnreadable("DOCTYPE") { try CappedZip(data: padded.finish(), caps: caps()).checkAll() }
+        // Whitespace, then something that isn't XML: a blob, not refused.
+        let blob = TestZip()
+        blob.add("word/blob.bin", String(repeating: " ", count: 200) + "not xml at all")
+        XCTAssertNoThrow(try CappedZip(data: blob.finish(), caps: caps()).checkAll())
         // A PNG, or an SVG with its DOCTYPE among the images, stays a counted blob.
         let svg = TestZip()
         svg.add("word/media/image2.svg", "<?xml version='1.0'?><!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'svg11.dtd'><svg/>")
