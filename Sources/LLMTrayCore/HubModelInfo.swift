@@ -24,6 +24,17 @@ public struct HubModelInfo: Equatable, Sendable {
         self.access = access
     }
 
+    /// The current files' total from /api/models/<id>?blobs=true (each
+    /// sibling's `size`) -- what a download fetches. `usedStorage` counts
+    /// every stored revision, so it can be far more. nil unless every file
+    /// has a size (a partial sum would understate it).
+    public static func filesSize(_ data: Data) -> Int64? {
+        guard let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
+              let siblings = obj["siblings"] as? [[String: Any]], !siblings.isEmpty else { return nil }
+        let sizes = siblings.compactMap { ($0["size"] as? NSNumber)?.int64Value }.filter { $0 >= 0 }
+        return sizes.count == siblings.count ? sizes.reduce(0, +) : nil
+    }
+
     /// From the JSON of /api/models/<id>.
     public static func parse(_ data: Data) -> HubModelInfo? {
         guard let obj = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any], obj["id"] != nil else { return nil }

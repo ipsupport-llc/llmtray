@@ -266,7 +266,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         }
     }
 
-    func download(_ model: HFModelSummary, completion: @escaping () -> Void) {
+    /// `root`: the models folder to download into, fixed by the caller;
+    /// nil: the one set when the file list arrives.
+    func download(_ model: HFModelSummary, root: String? = nil, completion: @escaping () -> Void) {
         guard downloadingID == nil else { return }
         HFToken.refresh()
         // A gated model's files answer 401 without a token (seen live: the
@@ -315,7 +317,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     return
                 }
 
-                let modelsRoot = ModelDiscovery.currentModelsRoot()
+                let modelsRoot = root ?? ModelDiscovery.currentModelsRoot()
                 let destRoot = URL(fileURLWithPath: modelsRoot).appendingPathComponent(model.id)
                 try FileManager.default.createDirectory(at: destRoot, withIntermediateDirectories: true)
                 // Any marker from a previous, incomplete attempt at this
