@@ -9,15 +9,17 @@ import LLMTrayCore
 /// started twice.
 @MainActor
 enum MTPDrafterDownload {
-    private static var running: [String: Task<String?, Never>] = [:]
+    private static var running: [String: (id: UUID, task: Task<String?, Never>)] = [:]
 
     /// nil once it's in the cache, else why not.
     static func fetch(_ repo: String) async -> String? {
-        if let task = running[repo] { return await task.value }
+        if let fetch = running[repo] { return await fetch.task.value }
+        let id = UUID()
         let task = Task { @MainActor in await run(repo) }
-        running[repo] = task
+        running[repo] = (id, task)
         let error = await task.value
-        running[repo] = nil
+        // Only the fetch that started it: a later one may have its own now.
+        if running[repo]?.id == id { running[repo] = nil }
         return error
     }
 

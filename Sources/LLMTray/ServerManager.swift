@@ -609,8 +609,10 @@ final class ServerManager: ObservableObject {
         launchedAlias = alias
         launchedModelPath = modelPath
 
+        // Offline, unless the user's own extra arguments pick a drafter:
+        // that one may be a repo id to download, as before.
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args,
-                                          environment: ServerLaunch.offlineEnvironment)
+                                          environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
         readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
