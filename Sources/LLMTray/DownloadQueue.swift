@@ -33,6 +33,9 @@ final class DownloadQueue: ObservableObject {
     /// mustn't hold up the queue).
     private var hubLookup: Task<(info: HubModelInfo, filesBytes: Int64?)?, Never>?
     private var watches: Set<AnyCancellable> = []
+    /// An item ended (done, failed or cancelled) -- the wizard's server
+    /// start waits for its chat model here.
+    var onFinished: ((DownloadQueueState.Item) -> Void)?
 
     /// `browser`: the app's one HFModelBrowser, so the Hugging Face window
     /// shows the same download (and won't start a second one). What was
@@ -105,6 +108,12 @@ final class DownloadQueue: ObservableObject {
         add(.init(kind: .musicModel, target: model.rawValue, approxBytes: FeatureSetup.downloadBytes(model)))
     }
 
+    /// Project files' embedder (the feature is turned on separately: files
+    /// are searched by their words until it's in place).
+    func addEmbedder(_ entry: EmbedderEntry) {
+        add(.init(kind: .embedder, target: entry.id, approxBytes: FeatureSetup.downloadBytes(entry)))
+    }
+
     private func add(_ item: DownloadQueueState.Item) {
         guard state.enqueue(item) else { return }
         pump()
@@ -159,6 +168,7 @@ final class DownloadQueue: ObservableObject {
             guard let self else { return }
             self.state.finish(item.id, error: error)
             self.detail = ""
+            if let finished = self.state.item(item.id) { self.onFinished?(finished) }
             self.watches.removeAll()
             self.runner = nil
             self.pump()
@@ -198,6 +208,15 @@ final class DownloadQueue: ObservableObject {
             setup.setMusicModel(model, profileID: profileID)
             setup.setMusicGenerationEnabled(true, profileID: profileID)
             return nil
+        case .embedder:
+            guard let entry = setup.projectFilesEmbedder, entry.id == item.target else {
+                return String(format: NSLocalizedString("Unknown embedding model %@", comment: "download queue"), item.target)
+            }
+            if setup.isProjectFilesEmbedderReady { return nil }
+            if let refusal = spaceRefusal(item, at: RuntimePaths.externalRuntimeDir) { return refusal }
+            watch(setup.projectFiles.embedders.$statusText)
+            if let error = await setup.downloadProjectFilesEmbedder() { return error.localizedDescription }
+            return nil
         }
     }
 
@@ -236,6 +255,7 @@ final class DownloadQueue: ObservableObject {
         case .chatModel: return item.target
         case .imageModel, .editModel: return ImageGenModel(rawValue: item.target)?.displayName ?? item.target
         case .musicModel: return MusicModel(rawValue: item.target)?.displayName ?? item.target
+        case .embedder: return FeatureSetup.shared.projectFilesEmbedder.flatMap { $0.id == item.target ? $0.displayName : nil } ?? item.target
         }
     }
 
@@ -308,7 +328,7 @@ final class DownloadQueue: ObservableObject {
     /// be from a download interrupted part way; one without the marker
     /// (copied in by hand, LM Studio's) is downloaded over -- the browser
     /// replaces each file.
-    private static func isComplete(_ repo: String, root: String) -> Bool {
+    static func isComplete(_ repo: String, root: String) -> Bool {
         FileManager.default.fileExists(atPath: root + "/" + repo + "/" + HFModelBrowser.completionMarkerName)
     }
 
@@ -319,7 +339,9 @@ final class DownloadQueue: ObservableObject {
         continuation.resume(returning: error)
     }
 
-    private static func hubInfo(_ repo: String) async -> (info: HubModelInfo, filesBytes: Int64?)? {
+    /// The Hub's license, access and current files' size for `repo`; nil
+    /// when it can't be read (offline, unknown repo).
+    static func hubInfo(_ repo: String) async -> (info: HubModelInfo, filesBytes: Int64?)? {
         guard let url = URL(string: "https://huggingface.co/api/models/\(repo)?blobs=true") else { return nil }
         var request = URLRequest(url: url, timeoutInterval: 20)
         HFToken.authorize(&request)

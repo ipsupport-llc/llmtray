@@ -136,6 +136,30 @@ guided front end to the same code, not a second configuration path.
   mlx-lm's model code: no gpt-oss (no harmony tool parser there), no
   `gemma4_unified` conversions.
 
+## Built in step 3
+
+- `LLMTrayCore.SetupWizard` (tested): when it opens (no
+  `Pref.onboardingCompleted` and no model selected, or a first run quit
+  part way), resuming (`SetupProgress` in `Pref.onboardingProgress`; only
+  a wizard that opened by itself resumes, one opened by hand starts from
+  the current settings), and the plan: `SetupPlan.actions` diffs the
+  choices against a baseline (the settings when it opened, plus what it
+  has already applied) into ordered `SetupAction`s -- folder and chat
+  model, settings, downloads, the server start last. Skip puts a step
+  back to its baseline.
+- The app's `SetupWizardModel` runs the actions through `FeatureSetup`,
+  `ProfileManager` (Default) and the Settings `Pref` keys;
+  `SetupWizardView` is the window. The models folder is applied on
+  leaving step 3, the chat model when it's picked (a download goes to the
+  `DownloadQueue` at once); everything else on Finish. Closing the window
+  counts as done and applies nothing more.
+- `MLXRuntimeInstaller.ensureReady` is shared by concurrent callers (the
+  wizard's step 2 and a Start). The chat model the wizard downloads
+  starts the server when it's in place (`Pref.onboardingStartServerFor`,
+  AppDelegate). The queue gained the embedder (project files) and a
+  compact row in the popover.
+- Folder access (adr/0014) isn't merged: step 5 has no row for it yet.
+
 ## Decided with the user (2026-09-26)
 
 - The curated list goes by memory tier (8 / 16 / 24 / 32+ GB), and **our

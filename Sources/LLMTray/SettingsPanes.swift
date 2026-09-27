@@ -47,6 +47,11 @@ struct GeneralPane: View {
                 Toggle(isOn: $autoStartOnLaunch) {
                     SettingLabel(title: "Start the server when LLMTray opens", help: "Loads the last-used model right away, so it's ready without pressing Play.")
                 }
+                LabeledContent {
+                    Button("Set Up LLMTray…") { NotificationCenter.default.post(name: .showSetupWizard, object: nil) }
+                } label: {
+                    SettingLabel(title: "Setup assistant", help: "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings.")
+                }
             }
             Section("Chat") {
                 Toggle(isOn: $showReasoning) {

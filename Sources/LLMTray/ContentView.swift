@@ -85,6 +85,7 @@ struct ContentView: View {
                 ChatTabStrip().padding(.horizontal, 10).padding(.bottom, 6)
             }
             Divider()
+            DownloadQueueRow()
             ReviewPromptRow()
             conversation
         }
@@ -131,6 +132,7 @@ struct ContentView: View {
                     ChatHeaderView(selectedModelID: $selectedModelID, inChatWindow: true)
                     Divider()
                 }
+                DownloadQueueRow()
                 ReviewPromptRow()
                 conversation
             }

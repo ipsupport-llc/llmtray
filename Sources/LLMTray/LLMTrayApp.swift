@@ -135,6 +135,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // runtime state, and "auto-tune is running" must lock both).
     private let runtime = RuntimeManager()
     private let benchmark = BenchmarkRunner()
+    /// The wizard's downloads (adr/0013), shown in the popover.
+    private lazy var downloadQueue = DownloadQueue(browser: hfBrowser)
+    private let setupWizard = SetupWizardWindowController()
     private lazy var settingsWindow = SettingsWindowController(.init(
         server: server, chat: tabs.imageModels, runtime: runtime, benchmark: benchmark,
         checkForAppUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) }
@@ -209,6 +212,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showReview), name: .showReview, object: nil
         )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
+        )
+        // What the wizard queued and a relaunch interrupted goes on; its
+        // chat model starts the server once it's in place.
+        downloadQueue.onFinished = { [weak self] in self?.downloadFinished($0) }
+        downloadQueue.resume()
         ReviewPrompter.shared.recordLaunch()
         // Project files (adr/0012): nothing unless turned on in Settings.
         ProjectIndexer.shared.start(server: server)
@@ -237,6 +247,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let pane = UserDefaults.standard[Pref.settingsPaneAfterRelaunch].flatMap(SettingsPane.init(rawValue:))
             UserDefaults.standard[Pref.settingsPaneAfterRelaunch] = nil
             if let pane { settingsWindow.show(pane: pane) }
+        }
+
+        // A fresh install (adr/0013): the setup wizard, before the
+        // auto-start below (which has no model to start then).
+        let defaults = UserDefaults.standard
+        if SetupWizard.opensAutomatically(completedVersion: defaults[Pref.onboardingCompleted],
+                                          selectedModelID: defaults[Pref.selectedModelID],
+                                          saved: SetupWizardModel.loadSaved()) {
+            openSetupWizard(automatic: true)
         }
 
         // Starts the server automatically instead of making "click Start
@@ -291,6 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSHostingController(rootView: AnyView(ChatRoot()
             .environmentObject(server)
             .environmentObject(benchmark)
+            .environmentObject(downloadQueue)
             .environmentObject(chatPresentation)))
     }
 
@@ -299,6 +319,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let hosting = NSHostingController(rootView: AnyView(TrayRoot()
             .environmentObject(server)
             .environmentObject(benchmark)
+            .environmentObject(downloadQueue)
             .environmentObject(chatPresentation)))
         hosting.sizingOptions = [.preferredContentSize]
         return hosting
@@ -433,6 +454,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+        let setupItem = NSMenuItem(title: NSLocalizedString("Set Up LLMTray…", comment: ""), action: #selector(showSetupWizard), keyEquivalent: "")
+        setupItem.target = self
+        menu.addItem(setupItem)
         let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
         logItem.target = self
         menu.addItem(logItem)
@@ -490,6 +514,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // (ServerManager.launchServerProcess), including the KV-shared
         // model guard auto-start used to skip.
         server.start(modelPath: model.path, port: port, alias: ModelCatalog.shared.alias(for: model.id))
+    }
+
+    // MARK: - Setup wizard
+
+    /// From Settings or the menu: from the current settings.
+    @objc private func showSetupWizard() {
+        openSetupWizard(automatic: false)
+    }
+
+    private func openSetupWizard(automatic: Bool) {
+        popover.performClose(nil)
+        setupWizard.show(automatic: automatic, queue: downloadQueue, server: server) { [weak self] in self?.quickStart() }
+    }
+
+    /// The chat model the wizard picked is in place: selected, and the
+    /// server started with it (the usual start path). Cancelled: it won't
+    /// come; failed: a retry may still bring it.
+    private func downloadFinished(_ item: DownloadQueueState.Item) {
+        let defaults = UserDefaults.standard
+        guard item.kind == .chatModel, item.target == defaults[Pref.onboardingStartServerFor] else { return }
+        switch item.status {
+        case .done:
+            defaults[Pref.onboardingStartServerFor] = nil
+            ModelCatalog.shared.rescan()
+            let path = ModelCatalog.shared.root + "/" + item.target
+            guard ModelCatalog.shared.model(id: path) != nil else { return }
+            defaults[Pref.selectedModelID] = path
+            quickStart()
+        case .cancelled:
+            defaults[Pref.onboardingStartServerFor] = nil
+        default:
+            break
+        }
     }
 
     @objc private func quickStop() {

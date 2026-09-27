@@ -184,7 +184,35 @@ final class MLXRuntimeInstaller {
         }
     }
 
+    /// The Full build: the runtime ships inside the app (nothing to
+    /// download, no Python needed).
+    static var isFullBuild: Bool { FileManager.default.fileExists(atPath: bundledVenvServerBinary) }
+
+    /// The runtime for the current pin is set up (what ensureReady checks
+    /// first).
+    static var isReady: Bool {
+        guard let pin = RuntimePin.current?.ref,
+              let installed = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8) else { return false }
+        return installed.trimmingCharacters(in: .whitespacesAndNewlines) == pin
+            && FileManager.default.fileExists(atPath: venvServerBinary)
+    }
+
+    /// The setup running now, whoever started it (the first-run wizard, a
+    /// Start): a second caller waits for it instead of running pip into
+    /// the same venv at the same time.
+    private static var setup: Task<Void, Error>?
+
     func ensureReady() async throws {
+        if let running = Self.setup { return try await running.value }
+        let task = Task { @MainActor in
+            defer { Self.setup = nil }
+            try await self.install()
+        }
+        Self.setup = task
+        try await task.value
+    }
+
+    private func install() async throws {
         guard let pin = RuntimePin.current else {
             throw NSError(
                 domain: "MLXRuntimeInstaller", code: 1,
