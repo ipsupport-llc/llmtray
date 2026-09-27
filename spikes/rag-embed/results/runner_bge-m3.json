@@ -1,0 +1,51 @@
+{
+ "cold_start": {
+  "spawn_to_ready_ms": 698,
+  "runner_load_ms": 665,
+  "spawn_to_first_vector_ms": 763,
+  "first_request_ms": 62.8,
+  "verify_min_cos": 0.9999957084655762
+ },
+ "concurrent": {
+  "requests": 48,
+  "errors": 0,
+  "min_cos_vs_reference": 0.99998,
+  "wall_s": 12.14,
+  "p50_ms": 2033,
+  "max_ms": 2630,
+  "unmatched": 0
+ },
+ "limits": {
+  "oversize_line": [
+   "too_large",
+   "bad_request"
+  ],
+  "too_many_texts": "too_large",
+  "after": true
+ },
+ "timeout": {
+  "code": "timeout",
+  "message": "deadline passed after 1/30 texts"
+ },
+ "cancel": {
+  "error": {
+   "code": "cancelled",
+   "message": "cancelled by client"
+  },
+  "cancel_to_reply_ms": 1472
+ },
+ "kill_restart": {
+  "pending_failed_as_died": true,
+  "restart_to_first_vector_ms": 870,
+  "ok_after": true
+ },
+ "eof": {
+  "exit_code": 0,
+  "exit_ms": 1309,
+  "inflight_reply": "cancelled"
+ },
+ "orphan": {
+  "exited": true,
+  "after_ms": 105
+ }
+}

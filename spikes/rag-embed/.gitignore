@@ -1,0 +1,10 @@
+# weights, venvs, fetched corpora and reference dumps stay out of git
+models/
+*venv/
+.venv/
+data/
+ref/
+*.npz
+*.safetensors
+*.bin
+__pycache__/

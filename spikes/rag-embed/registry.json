@@ -1,0 +1,233 @@
+{
+  "registry_version": 1,
+  "embedders": [
+    {
+      "id": "bge-m3",
+      "display_name": "BGE-M3 (fp16)",
+      "license": "MIT",
+      "family": "xlm-roberta",
+      "source": {
+        "repo": "mlx-community/bge-m3-mlx-fp16",
+        "revision": "a37eddded9a6a1273a87fb8b0da0d1cdbd98aeec",
+        "files": {
+          "model.safetensors": "sha256:e8028acb2e77e0010d35ef75832d823edb5851c95682deef2bde86a45bd4441d",
+          "tokenizer.json": "sha256:5df1f55d60c9705a501ab9a75550728625740741fe4be308dac4806c16b7d51d",
+          "config.json": null
+        },
+        "bytes": 1152652294,
+        "upstream": "BAAI/bge-m3@5617a9f61b028005a4858fdac845db406aefb181"
+      },
+      "weights": {
+        "compute_dtype": "float16",
+        "quantization": null
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 8192,
+        "pad_id": 1,
+        "truncation": "right"
+      },
+      "prefixes": {
+        "query": "",
+        "document": ""
+      },
+      "pooling": "cls",
+      "normalize": true,
+      "dim": 1024,
+      "output_dim": null,
+      "similarity": "cosine",
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 4096,
+        "max_batch": 16
+      },
+      "reference": {
+        "file": "reference/bge-m3.json",
+        "sha256": "fa77b04b5b312c3b5c9e755a4fe38bc92eb994a15bae7ea9a93aeb1e14124256",
+        "min_cosine": 0.999
+      }
+    },
+    {
+      "id": "bge-m3-q8",
+      "display_name": "BGE-M3 (8-bit)",
+      "license": "MIT",
+      "family": "xlm-roberta",
+      "source": {
+        "repo": "mlx-community/bge-m3-mlx-8bit",
+        "revision": "7eca4a1c6ea1a0c5efc37598b369012f3985910f",
+        "upstream": "BAAI/bge-m3"
+      },
+      "weights": {
+        "compute_dtype": "float16",
+        "quantization": {
+          "bits": 8,
+          "group_size": 64
+        }
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 8192,
+        "pad_id": 1,
+        "truncation": "right"
+      },
+      "prefixes": {
+        "query": "",
+        "document": ""
+      },
+      "pooling": "cls",
+      "normalize": true,
+      "dim": 1024,
+      "similarity": "cosine",
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 4096,
+        "max_batch": 16
+      },
+      "reference": {
+        "file": "reference/bge-m3.json",
+        "sha256": "fa77b04b5b312c3b5c9e755a4fe38bc92eb994a15bae7ea9a93aeb1e14124256",
+        "min_cosine": 0.99
+      }
+    },
+    {
+      "id": "bge-m3-q4",
+      "display_name": "BGE-M3 (4-bit)",
+      "license": "MIT",
+      "family": "xlm-roberta",
+      "source": {
+        "repo": "mlx-community/bge-m3-mlx-4bit",
+        "revision": "0a93c12b0684953bdaed14865dc270bb1894a749",
+        "upstream": "BAAI/bge-m3"
+      },
+      "weights": {
+        "compute_dtype": "float16",
+        "quantization": {
+          "bits": 4,
+          "group_size": 64
+        }
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 8192,
+        "pad_id": 1,
+        "truncation": "right"
+      },
+      "prefixes": {
+        "query": "",
+        "document": ""
+      },
+      "pooling": "cls",
+      "normalize": true,
+      "dim": 1024,
+      "similarity": "cosine",
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 4096,
+        "max_batch": 16
+      },
+      "reference": {
+        "file": "reference/bge-m3.json",
+        "sha256": "fa77b04b5b312c3b5c9e755a4fe38bc92eb994a15bae7ea9a93aeb1e14124256",
+        "min_cosine": 0.99
+      },
+      "status": "rejected: min cosine 0.915 vs reference on the parity corpus (8-bit: 0.9991)"
+    },
+    {
+      "id": "multilingual-e5-large-instruct",
+      "display_name": "multilingual-E5-large-instruct",
+      "license": "MIT",
+      "family": "xlm-roberta",
+      "source": {
+        "repo": "intfloat/multilingual-e5-large-instruct",
+        "revision": "274baa43b0e13e37fafa6428dbc7938e62e5c439"
+      },
+      "weights": {
+        "compute_dtype": "float16",
+        "quantization": null
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 512,
+        "pad_id": 1,
+        "truncation": "right"
+      },
+      "prefixes": {
+        "query": "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: ",
+        "document": ""
+      },
+      "pooling": "mean",
+      "normalize": true,
+      "dim": 1024,
+      "similarity": "cosine",
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 4096,
+        "max_batch": 16
+      },
+      "reference": {
+        "file": "reference/multilingual-e5-large-instruct.json",
+        "sha256": "0beb4488cccc9e83a19337a8673ac94878ef00ee6bed807abce5f413c2aa6a29",
+        "min_cosine": 0.999
+      }
+    },
+    {
+      "id": "embeddinggemma-300m",
+      "display_name": "EmbeddingGemma 300M",
+      "license": "Gemma",
+      "family": "gemma3-bidir",
+      "source": {
+        "repo": "unsloth/embeddinggemma-300m",
+        "revision": "bfa3c846ac738e62aa61806ef9112d34acb1dc5a",
+        "upstream": "google/embeddinggemma-300m (gated: licence acceptance on HF)"
+      },
+      "weights": {
+        "compute_dtype": "bfloat16",
+        "quantization": null,
+        "note": "no float16: Gemma activations overflow fp16"
+      },
+      "tokenizer": {
+        "file": "tokenizer.json",
+        "max_length": 2048,
+        "pad_id": 0,
+        "truncation": "right"
+      },
+      "prefixes": {
+        "query": "task: search result | query: ",
+        "document": "title: none | text: "
+      },
+      "pooling": "mean",
+      "dense": [
+        {
+          "file": "2_Dense/model.safetensors",
+          "in": 768,
+          "out": 3072
+        },
+        {
+          "file": "3_Dense/model.safetensors",
+          "in": 3072,
+          "out": 768
+        }
+      ],
+      "normalize": true,
+      "dim": 768,
+      "output_dim": null,
+      "mrl_dims": [
+        768,
+        512,
+        256,
+        128
+      ],
+      "similarity": "cosine",
+      "preprocessing_version": 1,
+      "batching": {
+        "max_tokens_per_batch": 16384,
+        "max_batch": 32
+      },
+      "reference": {
+        "file": "reference/embeddinggemma-300m.json",
+        "sha256": "8745eca93270f5476fc02e0f39596770023132b7135e31b0d9ea99142a2c6061",
+        "min_cosine": 0.999
+      }
+    }
+  ]
+}
