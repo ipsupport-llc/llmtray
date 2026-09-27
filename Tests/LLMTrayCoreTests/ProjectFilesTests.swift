@@ -465,13 +465,18 @@ final class ProjectFilesServiceTests: XCTestCase {
 
     func testASearchAtTheSmallestBudgetStillGetsText() async throws {
         let long = (1...200).map { "payment\($0) deadline words" }.joined(separator: " ")
-        try await add(long, name: "ordinary-file-name.txt")
         let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
-        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
-        let r = o.rendered(byteBudget: budget)
-        XCTAssertFalse(r.returned.isEmpty, r.text)
-        XCTAssertTrue(r.text.contains("payment"), r.text)
-        XCTAssertLessThanOrEqual(r.text.utf8.count, budget)
+        for name in ["ordinary-file-name.txt", String(repeating: "n", count: 190) + ".txt"] {
+            try await setUp()
+            try await add(long, name: name)
+            let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
+            let r = o.rendered(byteBudget: budget)
+            XCTAssertFalse(r.returned.isEmpty, r.text)
+            XCTAssertEqual(r.returned.first?.name, name, "the citation keeps the whole name")
+            XCTAssertTrue(r.text.contains("payment"), r.text)
+            XCTAssertLessThanOrEqual(r.text.utf8.count, budget)
+            try await tearDown()
+        }
     }
 
     func testTheTimeoutDoesntWaitForTheEmbedderToGiveUp() async throws {

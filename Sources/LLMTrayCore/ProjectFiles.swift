@@ -461,8 +461,11 @@ public final class ProjectFilesService {
             notes.append("No match for \"\(query.prefix(80))\"" + (doc.map { " in file \($0)" } ?? "") + ".")
         }
         let hits = result.hits.map {
+            // A long name and heading cut in the result (the citation keeps
+            // the name whole): at a small budget the hit's text still fits.
             ProjectHit(id: "c\($0.chunk)", doc: Int($0.doc), rev: Int($0.rev), page: $0.page, chunk: Int($0.chunk),
-                       name: $0.name, heading: $0.heading, text: $0.text)
+                       name: $0.name, label: ProjectFiles.shortName($0.name),
+                       heading: $0.heading.map { ProjectFiles.shortName($0) ?? $0 }, text: $0.text)
         }
         return .output(ProjectToolOutput(project: project, preamble: notes.joined(separator: "\n"), hits: hits))
     }
