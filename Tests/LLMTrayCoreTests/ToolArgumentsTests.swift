@@ -101,6 +101,13 @@ final class ToolArgumentsTests: XCTestCase {
                        [.badJSON(#""city" given twice with different values"#)])
         XCTAssertEqual(parse(#"{"city": "Kyiv", "city": "Kyiv"}"#, weather).values["city"] as? String, "Kyiv")
         XCTAssertFalse(parse(#"{"city": "C:\Users"}"#, weather).isValid)
+        XCTAssertFalse(parse(#"{"index": true, "index": 1}"#, flags).isValid, "true isn't 1")
+        XCTAssertFalse(parse(#"{"index": "1", "index": 1}"#, flags).isValid)
+        // A fence with another object outside it; ``` inside a string value.
+        XCTAssertFalse(parse("{\"city\":\"A\"} ```json\n{\"city\":\"B\"}\n```", weather).isValid)
+        XCTAssertFalse(parse("Use this: ```json\n{\"city\":\"B\"}\n``` or {\"city\":\"A\"}", weather).isValid)
+        let lyrics = ToolSchema("m", "M.", [.init("lyrics", .string)])
+        XCTAssertEqual(parse(#"{"lyrics": "```verse```"}"#, lyrics).values["lyrics"] as? String, "```verse```")
         // Unbalanced nesting stays bounded.
         XCTAssertFalse(parse(String(repeating: "[", count: 500), nil).isValid)
     }

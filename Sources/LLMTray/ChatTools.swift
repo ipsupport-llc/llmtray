@@ -218,7 +218,9 @@ final class ChatToolbox {
     func trustKind(of call: ToolCall, settings: ChatSettings) -> ToolTrust.Kind {
         guard let tool = resolve(call.name)?.tool else { return .ordinary }
         if let selectable = tool as? SelectableTool {
-            let arguments = prepared[call.id]?.arguments.values ?? ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).values
+            // From the call itself, never a cache by id: a response can
+            // repeat an id, and the barrier mustn't read another call's mode.
+            let arguments = ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).values
             return ToolCatalog.usesNetwork(selectable.mode(for: arguments, settings)) ? .guarded : .ordinary
         }
         return trustKind(tool)

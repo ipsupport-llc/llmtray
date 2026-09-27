@@ -210,7 +210,7 @@ public enum ToolArgumentParser {
             // aliases with different values are a guess.
             sent.sort { $0.exact && !$1.exact }
             if sent.count > 1, !sent[0].exact,
-               sent.dropFirst().contains(where: { !($0.value as AnyObject).isEqual(sent[0].value as AnyObject) }) {
+               sent.dropFirst().contains(where: { !LenientJSON.same($0.value, sent[0].value) }) {
                 problems.append(.conflicting(param.name))
                 continue
             }

@@ -58,8 +58,12 @@ public enum LenientJSON {
         if body.isEmpty || body == "null" { return .success(([String: Any](), [])) }
         // Always our own parser, strict JSON included: JSONSerialization
         // keeps one of two repeated keys without a word.
-        if let unfenced = stripFence(body) {
-            body = unfenced
+        // A fence only around the payload: an object that starts the text
+        // may have ``` inside a string value.
+        if !body.hasPrefix("{"), !body.hasPrefix("\""), let fence = fenced(body) {
+            // An object outside the fence too: which one was meant isn't ours to pick.
+            guard !fence.outside.contains("{") else { return .failure(Failure(reason: "more than one object")) }
+            body = fence.inner
             repairs.append(.fenced)
             if body.isEmpty { return .success(([String: Any](), repairs)) }
         }
@@ -103,10 +107,12 @@ public enum LenientJSON {
         return repairs.filter { seen.insert($0).inserted }
     }
 
-    /// The inside of a ``` / ```json fence, if the text is one (or has one).
-    static func stripFence(_ text: String) -> String? {
+    /// The inside of a ``` / ```json fence, if the text has one, and the
+    /// text outside it.
+    static func fenced(_ text: String) -> (inner: String, outside: String)? {
         guard let open = text.range(of: "```") else { return nil }
         var inner = text[open.upperBound...]
+        var outside = String(text[..<open.lowerBound])
         // The fence's language tag.
         if let newline = inner.firstIndex(where: \.isNewline) {
             let tag = inner[..<newline].trimmingCharacters(in: .whitespaces)
@@ -114,8 +120,27 @@ public enum LenientJSON {
         } else if inner.hasPrefix("json") {
             inner = inner.dropFirst(4)
         }
-        if let close = inner.range(of: "```") { inner = inner[..<close.lowerBound] }
-        return inner.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let close = inner.range(of: "```") {
+            outside += inner[close.upperBound...]
+            inner = inner[..<close.lowerBound]
+        }
+        return (inner.trimmingCharacters(in: .whitespacesAndNewlines), outside)
+    }
+
+    /// The same JSON value, types kept: `true` isn't `1`, `"1"` isn't `1`.
+    public static func same(_ a: Any, _ b: Any) -> Bool {
+        if ToolArgumentParser.isBool(a) || ToolArgumentParser.isBool(b) {
+            guard ToolArgumentParser.isBool(a), ToolArgumentParser.isBool(b) else { return false }
+            return ((a as? NSNumber)?.boolValue ?? a as? Bool) == ((b as? NSNumber)?.boolValue ?? b as? Bool)
+        }
+        if let x = ToolArgumentParser.number(a), let y = ToolArgumentParser.number(b) { return x.value == y.value }
+        if let x = a as? String, let y = b as? String { return x == y }
+        if a is NSNull, b is NSNull { return true }
+        if let x = a as? [Any], let y = b as? [Any] { return x.count == y.count && zip(x, y).allSatisfy { same($0, $1) } }
+        if let x = a as? [String: Any], let y = b as? [String: Any] {
+            return x.count == y.count && x.allSatisfy { key, value in y[key].map { same(value, $0) } ?? false }
+        }
+        return false
     }
 
     /// JSON plus the unambiguous slips. Numbers without a fraction or
@@ -190,7 +215,7 @@ public enum LenientJSON {
                 let v = try value()
                 // The same field twice: fine when it's the same value, a
                 // guess otherwise.
-                if let earlier = out[key], !(earlier as AnyObject).isEqual(v as AnyObject) {
+                if let earlier = out[key], !LenientJSON.same(earlier, v) {
                     throw Failure(reason: "\"\(key)\" given twice with different values")
                 }
                 out[key] = v
