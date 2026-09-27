@@ -234,10 +234,10 @@ final class ReviewPromptPolicyTests: XCTestCase {
                                         answers: answers, snoozedUntil: snoozedUntil, neverAsk: never, reviewed: reviewed)
     }
 
-    func testNeedsAWeekAndTwentyAnswers() {
-        XCTAssertFalse(ask(days: 6.9))
-        XCTAssertFalse(ask(days: 30, answers: 19))
-        XCTAssertTrue(ask(days: 7))
+    func testNeedsADayAndOneAnswer() {
+        XCTAssertFalse(ask(days: 0.9))
+        XCTAssertFalse(ask(days: 30, answers: 0))
+        XCTAssertTrue(ask(days: 1, answers: 1))
         XCTAssertTrue(ask(days: 7, answers: 500))
         XCTAssertFalse(ReviewPromptPolicy.shouldPrompt(now: launch, firstLaunch: nil, answers: 99, snoozedUntil: nil,
                                                        neverAsk: false, reviewed: false))

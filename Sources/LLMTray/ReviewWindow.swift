@@ -119,8 +119,8 @@ final class ReviewStore: ObservableObject {
     }
 }
 
-/// The chat's one-time "Enjoying LLMTray?" row: after a week of use and 20
-/// answers (ReviewPromptPolicy).
+/// The chat's one-time "Enjoying LLMTray?" row: a day after the first
+/// launch, after one answer (ReviewPromptPolicy).
 @MainActor
 final class ReviewPrompter: ObservableObject {
     static let shared = ReviewPrompter()
@@ -166,7 +166,7 @@ final class ReviewPrompter: ObservableObject {
     }
 }
 
-/// "Enjoying LLMTray? Rate it · Later · Don't ask again", under the chat's
+/// "Enjoying LLMTray? Leave a review · Ask later · Don't ask again", under the chat's
 /// header. Only between turns, and not in a temporary chat.
 struct ReviewPromptRow: View {
     @EnvironmentObject var chat: ChatClient
@@ -180,11 +180,11 @@ struct ReviewPromptRow: View {
                     Image(systemName: "star.bubble").foregroundColor(.accentColor)
                     Text("Enjoying LLMTray?")
                     Spacer(minLength: 4)
-                    Button("Rate It") {
+                    Button("Leave a Review") {
                         prompter.later()
                         NotificationCenter.default.post(name: .showReview, object: nil)
                     }
-                    Button("Later") { prompter.later() }
+                    Button("Ask Later") { prompter.later() }
                         .help(Text("Ask again in two weeks"))
                     Button("Don't Ask Again") { prompter.never() }
                 }

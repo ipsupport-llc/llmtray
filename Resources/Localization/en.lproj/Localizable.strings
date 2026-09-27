@@ -48,6 +48,7 @@
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
 "Apply to profile" = "Apply to profile";
+"Ask Later" = "Ask Later";
 "Ask again in two weeks" = "Ask again in two weeks";
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
@@ -221,6 +222,7 @@
 "Larger than this Mac's RAM -- unlikely to load" = "Larger than this Mac's RAM -- unlikely to load";
 "Later" = "Later";
 "Launch at login" = "Launch at login";
+"Leave a Review" = "Leave a Review";
 "Library" = "Library";
 "Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
@@ -321,7 +323,6 @@
 "Quit LLMTray" = "Quit LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0.";
-"Rate It" = "Rate It";
 "Rate LLMTray" = "Rate LLMTray";
 "Rate LLMTray…" = "Rate LLMTray…";
 "Reading what's installed…" = "Reading what's installed…";

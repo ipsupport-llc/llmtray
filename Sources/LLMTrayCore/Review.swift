@@ -240,12 +240,12 @@ public struct ReviewFeed: Codable, Equatable {
     public var reviews: [Review]
 }
 
-/// When the chat asks, once, for a review: after a week of use and 20
-/// answers, never again once reviewed or declined, again 14 days after a
-/// "Later".
+/// When the chat asks, once, for a review: a day after the first launch,
+/// once it has answered at least once; never again once reviewed or
+/// declined, again 14 days after "Ask Later".
 public enum ReviewPromptPolicy {
-    public static let minimumDays = 7.0
-    public static let minimumAnswers = 20
+    public static let minimumDays = 1.0
+    public static let minimumAnswers = 1
     public static let snoozeDays = 14.0
 
     public static func shouldPrompt(now: Date, firstLaunch: Date?, answers: Int, snoozedUntil: Date?,
