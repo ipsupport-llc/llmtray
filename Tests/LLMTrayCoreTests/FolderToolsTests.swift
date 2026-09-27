@@ -321,6 +321,29 @@ final class FolderToolsTests: FolderTestCase {
         XCTAssertTrue(exists("a.txt"))
     }
 
+    func testARevokedGrantStopsARead() async throws {
+        for i in 0..<20 { write("f\(i).txt", "x") }
+        let g = try service.grants.grant(root, level: .read, lifetime: .always, chatID: nil)
+        let listed = await files("~/grant")
+        XCTAssertTrue(listed.text.contains("f0.txt"), listed.text)
+        // Revoked in Settings while the listing reads: it stops, and tells nothing.
+        let grants = service.grants
+        let answer = await service.files(FolderTools.FilesRequest(path: "~/grant", recursive: true), chat: chat, callKey: "k",
+                                         byteBudget: 16_000, ask: ScriptedUser([]).ask,
+                                         isCancelled: { try? grants.revoke(g.id); return false })
+        guard case .refused(let why) = answer else { return XCTFail("\(answer)") }
+        XCTAssertTrue(why.contains("withdrawn"), why)
+        XCTAssertFalse(why.contains("f0.txt"))
+        // Another grant for the folder keeps it readable.
+        try service.grants.grant(root, level: .read, lifetime: .chat(chat.id), chatID: chat.id)
+        let other = try service.grants.grant(root, level: .read, lifetime: .always, chatID: nil)
+        let kept = await service.files(FolderTools.FilesRequest(path: "~/grant"), chat: chat, callKey: "k2", byteBudget: 16_000,
+                                       ask: ScriptedUser([]).ask, isCancelled: { try? grants.revoke(other.id); return false })
+        XCTAssertTrue(kept.text.contains("f0.txt"), kept.text)
+        XCTAssertTrue(service.grants.coversRead(path: grant, chatID: chat.id, callKey: "k2"))
+        XCTAssertFalse(service.grants.coversRead(path: grant, chatID: "chat-other", callKey: "k2"))
+    }
+
     func testAnApprovalOfACancelledPlanCantLandOnTheNext() async throws {
         write("a.txt", "a")
         try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
