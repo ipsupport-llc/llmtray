@@ -88,14 +88,27 @@ public struct ProjectToolOutput: Equatable {
         // Room kept for the closing notes (a cursor, "N more didn't fit").
         let reserve = min(epilogue.utf8.count + 160, max(0, byteBudget / 4))
         func room() -> Int { byteBudget - reserve - out.utf8.count }
+        func head(_ hit: ProjectHit) -> String {
+            "\n[\(hit.doc):\(hit.page)] \(hit.label ?? hit.name)" + (hit.heading.map { " -- \($0)" } ?? "")
+        }
+        func frame(_ head: String) -> String { head + "\n\"\"\"\n" + "\n" + Self.cutMarker + "\n\"\"\"\n" }
+        // At the smallest budgets (near the context's end) a shorter piece
+        // is still worth it: the alternative is no text at all.
+        let pieceFloor = min(Self.minimumPieceBytes, max(64, byteBudget / 8))
 
         if !preamble.isEmpty {
-            out += (preamble.utf8.count + 1 <= room()
-                ? preamble : Self.cut(preamble, toBytes: room() - Self.cutMarker.utf8.count - 2) + "\n" + Self.cutMarker) + "\n"
+            // With hits, the notes leave room for a piece of the first:
+            // they never crowd out the text they're about.
+            let preambleRoom = hits.first.map { room() - frame(head($0)).utf8.count - pieceFloor } ?? room()
+            if preamble.utf8.count + 1 <= preambleRoom {
+                out += preamble + "\n"
+            } else if preambleRoom - Self.cutMarker.utf8.count - 2 >= 16 {
+                out += Self.cut(preamble, toBytes: preambleRoom - Self.cutMarker.utf8.count - 2) + "\n" + Self.cutMarker + "\n"
+            }
         }
         var left = 0
         for (i, hit) in hits.enumerated() {
-            let head = "\n[\(hit.doc):\(hit.page)] \(hit.label ?? hit.name)" + (hit.heading.map { " -- \($0)" } ?? "")
+            let head = head(hit)
             if alreadySent.contains(hit.id) {
                 let line = head + ": shown earlier in this turn.\n"
                 guard line.utf8.count <= room() else { left = hits.count - i; break }
@@ -111,11 +124,8 @@ public struct ProjectToolOutput: Equatable {
                 continue
             }
             // Part of it, if a useful part fits.
-            let frame = head + "\n\"\"\"\n" + "\n" + Self.cutMarker + "\n\"\"\"\n"
-            let textRoom = room() - frame.utf8.count
-            // At the smallest budgets (near the context's end) a shorter
-            // piece is still worth it: the alternative is no text at all.
-            if textRoom >= min(Self.minimumPieceBytes, max(64, byteBudget / 8)) {
+            let textRoom = room() - frame(head).utf8.count
+            if textRoom >= pieceFloor {
                 out += head + "\n\"\"\"\n" + Self.cut(hit.text, toBytes: textRoom) + "\n" + Self.cutMarker + "\n\"\"\"\n"
                 returned.append(hit)
                 left = hits.count - i - 1

@@ -219,7 +219,7 @@ public enum ProjectFiles {
 
     /// Names, at most `limit` of them, "and N more".
     static func names(_ docs: [IndexedDocument], limit: Int = 5) -> String {
-        let shown = docs.prefix(limit).map { "\($0.doc). \($0.name)" }.joined(separator: ", ")
+        let shown = docs.prefix(limit).map { "\($0.doc). \(shortName($0.name) ?? $0.name)" }.joined(separator: ", ")
         return docs.count > limit ? shown + " and \(docs.count - limit) more" : shown
     }
 }

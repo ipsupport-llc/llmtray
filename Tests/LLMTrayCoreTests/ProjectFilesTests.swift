@@ -456,9 +456,11 @@ final class ProjectFilesServiceTests: XCTestCase {
             let job = try idx.beginReindex(doc: doc)
             try idx.commitExtraction(job, pages: ProjectIndex.pages(text), kind: "text")
         }
+        // At the smallest budget the text comes before the note.
         let o = output(await run(.read(old), budget: budget))
-        XCTAssertTrue(o.rendered(byteBudget: budget).text.contains("since that read"), "said, if briefly")
         XCTAssertEqual(o.hits.first?.rev, 2)
+        let roomier = output(await run(.read(old), budget: budget * 2))
+        XCTAssertTrue(roomier.rendered(byteBudget: budget * 2).text.contains("since that read"), "said where there's room")
         XCTAssertTrue(o.hits.first.map { text.hasPrefix($0.text) } == true, "from the page's start")
         XCTAssertTrue(o.epilogue.contains("\"cursor\":\"\(doc):2:1:"), o.epilogue)
     }
@@ -477,6 +479,22 @@ final class ProjectFilesServiceTests: XCTestCase {
             XCTAssertLessThanOrEqual(r.text.utf8.count, budget)
             try await tearDown()
         }
+    }
+
+    func testSearchNotesDontCrowdOutTheHitAtTheSmallestBudget() async throws {
+        try await add((1...200).map { "payment\($0) deadline words" }.joined(separator: " "), name: "a.txt")
+        let h = try await registry.open(project)
+        for i in 0..<5 {
+            let src = root.appendingPathComponent("s\(i).txt")
+            try "x\(i)".write(to: src, atomically: true, encoding: .utf8)
+            _ = try await h.write { try $0.addCopy(of: src, name: String(repeating: "p", count: 200) + "\(i).txt") }
+        }
+        let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
+        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
+        let r = o.rendered(byteBudget: budget)
+        XCTAssertTrue(o.preamble.contains("Still being indexed"), o.preamble)
+        XCTAssertFalse(r.returned.isEmpty, r.text)
+        XCTAssertTrue(r.text.contains("payment"), r.text)
     }
 
     func testTheTimeoutDoesntWaitForTheEmbedderToGiveUp() async throws {
