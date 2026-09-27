@@ -238,10 +238,13 @@ final class ProjectIndexer: ObservableObject {
 
     /// Every page the project's chats cite -- the saved ones and those open
     /// in tabs, including what the current turn's tools returned -- or nil
-    /// when a saved chat couldn't be read (the sweep then keeps everything).
+    /// when a saved chat couldn't be read, or one was saved while they were
+    /// read (a tab that saved an answer and closed meanwhile would be in
+    /// neither): the sweep then keeps everything, until the next one.
     static func citedPages(in project: UUID) async -> Set<PageRef>? {
+        let before = ChatSessionStore.saves
         let saved = await Task.detached(priority: .utility) { ChatSessionStore.citedPages(in: project) }.value
-        guard var pages = saved else { return nil }
+        guard var pages = saved, ChatSessionStore.saves == before else { return nil }
         for tab in ChatTabs.shared.tabs {
             let live = ChatMessage.citationsByAnswer(tab.messages).values.flatMap { $0 } + tab.messages.flatMap(\.returnedCitations)
             for c in live where c.project == project {

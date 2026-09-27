@@ -145,9 +145,16 @@ enum ChatSessionStore {
         return d
     }()
 
+    private static let savesLock = NSLock()
+    private static var _saves = 0
+    /// Bumped by every save: a scan of the saved chats that saw it change
+    /// meanwhile may have read a file from before (the citation sweep).
+    static var saves: Int { savesLock.withLock { _saves } }
+
     /// True once it's on disk.
     @discardableResult
     static func save(_ file: ChatSessionFile) -> Bool {
+        defer { savesLock.withLock { _saves += 1 } }
         try? FileManager.default.createDirectory(atPath: sessionsDir, withIntermediateDirectories: true)
         guard let data = try? encoder.encode(file) else { return false }
         // Atomic: a crash or a full disk mid-write mustn't lose the chat.
