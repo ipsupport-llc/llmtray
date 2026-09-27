@@ -85,6 +85,7 @@ struct ContentView: View {
                 ChatTabStrip().padding(.horizontal, 10).padding(.bottom, 6)
             }
             Divider()
+            DownloadQueueRow()
             ReviewPromptRow()
             if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
             conversation
@@ -132,6 +133,7 @@ struct ContentView: View {
                     ChatHeaderView(selectedModelID: $selectedModelID, inChatWindow: true)
                     Divider()
                 }
+                DownloadQueueRow()
                 ReviewPromptRow()
                 if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
                 conversation

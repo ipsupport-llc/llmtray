@@ -9,11 +9,17 @@ ipsupport-api's `docs/telemetry.md`, its `api/openapi.yaml`
 (`TelemetryReport`) and its ADRs 9 (opt-in telemetry) and 10 (the
 country of a report); the app follows them.
 
-- **Off by default.** Settings → General → Usage statistics: a "Share
+- **Offered ticked on a first run** (the user's call, 2026-09-27): the
+  first-run wizard's "Staying up to date" step shows the toggle already
+  on, with the consent text and Show Reports…; it takes effect only on
+  Finish (Skip or closing the wizard leaves it off), and the first report
+  goes only after the first day ends. Existing installs are never turned
+  on by an update: the setting stays what it was (off unless chosen).
+  Without the wizard (Settings) it stays off until turned on.
+- Settings → General → Usage statistics: a "Share
   anonymous usage statistics" toggle with the consent text from
   `telemetry.md`, an expandable "What's sent" list of every field (with
-  this Mac's values) and what's never sent, and Reset ID. The first-run
-  wizard may offer the same toggle later.
+  this Mac's values) and what's never sent, and Reset ID.
 - **Turning it off** stops sending at once (the send in flight is
   cancelled and its answer ignored) and deletes the unsent counters and
   the install ID. **Turning it on** makes a new random install ID; Reset

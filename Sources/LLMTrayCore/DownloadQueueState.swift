@@ -8,6 +8,8 @@ import Foundation
 public struct DownloadQueueState: Equatable, Codable, Sendable {
     public enum Kind: String, Codable, Sendable, CaseIterable {
         case chatModel, imageModel, editModel, musicModel
+        /// Project files' embedding model (adr/0012); its registry id.
+        case embedder
     }
 
     public enum Status: Equatable, Codable, Sendable {
@@ -31,8 +33,8 @@ public struct DownloadQueueState: Equatable, Codable, Sendable {
         public let id: UUID
         public let kind: Kind
         /// What to download: a Hugging Face repo for the chat model, the
-        /// model's identifier (ImageGenModel / MusicModel raw value) for
-        /// the others.
+        /// model's identifier (ImageGenModel / MusicModel raw value, the
+        /// embedder's registry id) for the others.
         public let target: String
         /// Expected size, for the free-space check (nil: not known yet).
         public var approxBytes: Int64?
