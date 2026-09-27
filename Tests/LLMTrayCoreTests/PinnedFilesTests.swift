@@ -169,7 +169,7 @@ final class PinLimitTests: XCTestCase {
         // Gemma 4 26B at bf16 KV on a 19 GB GPU limit: 14 GB of weights
         // leave 3.5 GB, less than half its context would take.
         let g = PinLimit(context: 262_144, maxTokens: 8192, gpuLimitBytes: UInt64(19 * gib), weightsBytes: 14 * gib, kvBytesPerToken: 20_480)
-        XCTAssertEqual(g.contextTokens, 131_072 - 8192)
+        XCTAssertEqual(g.contextTokens, 131_072)
         XCTAssertEqual(g.memoryTokens, Int(Double(19 * gib - 14 * gib - PinLimit.marginBytes) / 20_480 * 0.5))
         XCTAssertEqual(g.tokens, g.memoryTokens)
         // 8-bit KV and 12 GB of weights: the context decides.
@@ -177,15 +177,27 @@ final class PinLimitTests: XCTestCase {
         XCTAssertEqual(roomy.tokens, roomy.contextTokens)
         // A small context: A decides.
         let small = PinLimit(context: 8192, maxTokens: 1024, gpuLimitBytes: UInt64(64 * gib), weightsBytes: 4 * gib, kvBytesPerToken: 131_072)
-        XCTAssertEqual(small.tokens, 3072)
+        XCTAssertEqual(small.tokens, 4096)
         // Weights past the limit: nothing can be pinned.
         XCTAssertEqual(PinLimit(context: 32768, maxTokens: 1024, gpuLimitBytes: UInt64(8 * gib), weightsBytes: 8 * gib,
                                 kvBytesPerToken: 131_072).tokens, 0)
         // No GPU limit known: A alone.
         let noGPU = PinLimit(context: 32768, maxTokens: 1024, gpuLimitBytes: nil, weightsBytes: 0, kvBytesPerToken: 131_072)
         XCTAssertNil(noGPU.memoryTokens)
-        XCTAssertEqual(noGPU.tokens, 15_360)
+        XCTAssertEqual(noGPU.tokens, 16_384)
         XCTAssertEqual(PinLimit(context: 1000, maxTokens: 4000, gpuLimitBytes: nil, weightsBytes: 0, kvBytesPerToken: 1).tokens, 0)
+        // max_tokens at half the context (a real profile): the answer and
+        // the margin are kept free, the rest can be pinned -- not 0.
+        let high = PinLimit(context: 262_144, maxTokens: 131_072, gpuLimitBytes: nil, weightsBytes: 0, kvBytesPerToken: 1)
+        XCTAssertEqual(high.tokens, 262_144 - 131_072 - 26_215)
+        // The Settings share: 80% of the context and of the free memory,
+        // the answer still kept free; out of range is clamped.
+        let more = PinLimit(context: 262_144, maxTokens: 8192, gpuLimitBytes: UInt64(19 * gib), weightsBytes: 14 * gib,
+                            kvBytesPerToken: 5120, share: 0.8)
+        XCTAssertEqual(more.contextTokens, Int(262_144 * 0.8))
+        XCTAssertEqual(more.memoryTokens, Int(Double(19 * gib - 14 * gib - PinLimit.marginBytes) / 5120 * 0.8))
+        XCTAssertEqual(PinLimit(context: 100_000, maxTokens: 0, gpuLimitBytes: nil, weightsBytes: 0, kvBytesPerToken: 1, share: 5).contextTokens,
+                       min(90_000, 100_000 - 10_000))
     }
 }
 

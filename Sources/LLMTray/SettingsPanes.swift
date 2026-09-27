@@ -359,6 +359,7 @@ struct ProjectFilesSection: View {
     @ObservedObject private var embedders = ProjectIndexer.shared.embedders
     @State private var error: String?
     @State private var diskTotal: Int64?
+    @AppStorage(Pref.pinnedFilesPercent) private var pinnedPercent
     private var setup: FeatureSetup { .shared }
 
     /// Re-measured when a project's documents change: added, removed,
@@ -394,6 +395,18 @@ struct ProjectFilesSection: View {
             if let reason = indexer.embeddingUnavailable {
                 Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
                     .font(.caption).foregroundStyle(.secondary)
+            }
+            if indexer.isEnabled {
+                LabeledContent {
+                    HStack {
+                        Slider(value: Binding(get: { Double(pinnedPercent) }, set: { pinnedPercent = Int($0.rounded()) }),
+                               in: 10...90, step: 10)
+                            .frame(maxWidth: 200)
+                        Text(verbatim: "\(pinnedPercent)%").monospacedDigit().foregroundStyle(.secondary).frame(width: 40, alignment: .trailing)
+                    }
+                } label: {
+                    SettingLabel(title: "Pinned files may take", help: "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.")
+                }
             }
             if let diskTotal, diskTotal > 0 {
                 LabeledContent {

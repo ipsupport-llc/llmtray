@@ -445,7 +445,8 @@ final class ProjectIndexer: ObservableObject {
         }
         let kv = settings.modelPath.map { KVCacheSize.bytesPerToken(modelPath: $0, kvBits: kvBits) } ?? KVCacheSize.fallbackBytesPerToken
         return PinLimit(context: settings.maxTokensCap, maxTokens: settings.maxTokens, gpuLimitBytes: gpuLimitBytes,
-                        weightsBytes: settings.modelPath.map(weightsBytes) ?? 0, kvBytesPerToken: kv)
+                        weightsBytes: settings.modelPath.map(weightsBytes) ?? 0, kvBytesPerToken: kv,
+                        share: Double(UserDefaults.standard[Pref.pinnedFilesPercent]) / 100)
     }
 
     /// The same for a model by its id (the Files window's, at every

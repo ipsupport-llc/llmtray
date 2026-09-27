@@ -302,7 +302,9 @@ public enum PinnedFiles {
 /// the smaller of half its context less the answer, and what its KV cache
 /// can hold in the memory the weights leave.
 public struct PinLimit: Equatable, Sendable {
-    /// A: half the context minus the answer's max_tokens.
+    /// A: the share (half by default) of the context, leaving the answer's max_tokens and the
+    /// request margin free beside it (max_tokens is a ceiling, often set
+    /// high: taken off the half, a 128K max_tokens on a 256K model left 0).
     public var contextTokens: Int
     /// B: the memory's share; nil when the GPU limit isn't known.
     public var memoryTokens: Int?
@@ -311,20 +313,25 @@ public struct PinLimit: Equatable, Sendable {
 
     /// Kept free of the GPU limit besides the weights.
     public static let marginBytes: Int64 = 3 << 29   // 1.5 GiB
-    /// Of the memory left, the pinned text's KV cache may take this much.
-    public static let memoryShare = 0.5
+    /// Of the context and of the memory left, the pinned text may take
+    /// this much by default (Settings > Files sets it, 10-90%).
+    public static let defaultShare = 0.5
+    public static let shareRange = 0.1...0.9
 
     public init(contextTokens: Int, memoryTokens: Int?) {
         self.contextTokens = contextTokens
         self.memoryTokens = memoryTokens
     }
 
-    public init(context: Int, maxTokens: Int, gpuLimitBytes: UInt64?, weightsBytes: Int64, kvBytesPerToken: Double) {
-        contextTokens = max(0, context / 2 - maxTokens)
+    public init(context: Int, maxTokens: Int, gpuLimitBytes: UInt64?, weightsBytes: Int64, kvBytesPerToken: Double,
+                share: Double = defaultShare) {
+        let share = min(max(share, Self.shareRange.lowerBound), Self.shareRange.upperBound)
+        let margin = Int((Double(context) * ProjectTextBudget.margin).rounded(.up))
+        contextTokens = max(0, min(Int(Double(context) * share), context - maxTokens - margin))
         memoryTokens = gpuLimitBytes.map { limit in
             let free = Int64(clamping: limit) - weightsBytes - Self.marginBytes
             guard free > 0, kvBytesPerToken > 0 else { return 0 }
-            return Int(Double(free) / kvBytesPerToken * Self.memoryShare)
+            return Int(Double(free) / kvBytesPerToken * share)
         }
     }
 }

@@ -71,6 +71,9 @@ public enum Pref {
     /// Off until turned on in Settings: nothing is indexed, downloaded or
     /// started before, and the project tools aren't declared.
     public static let projectFilesEnabled = PrefKey("llmtray.projectFiles.enabled", default: false)
+    /// Of the context, and of the memory the weights leave, what pinned
+    /// files may take (adr/0012, "Pinned files"), in percent.
+    public static let pinnedFilesPercent = PrefKey("llmtray.projectFiles.pinnedPercent", default: 50)
     /// Projects whose indexing the user paused (UUID strings): the pause
     /// survives a relaunch.
     public static let projectIndexPaused = PrefKey<[String]>("llmtray.projectFiles.paused", default: [])

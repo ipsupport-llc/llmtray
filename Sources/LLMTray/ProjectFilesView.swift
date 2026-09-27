@@ -123,6 +123,8 @@ private struct ProjectFilesView: View {
     @State private var actionError: String?
     /// The chat window's model: the pin limit shown is for it.
     @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
+    /// Read by the limit; here so a change in Settings redraws it.
+    @AppStorage(Pref.pinnedFilesPercent) private var pinnedPercent
 
     private var documents: [IndexedDocument] { indexer.documents[projectID] ?? [] }
     private var pins: [Int64] { indexer.pins[projectID] ?? [] }

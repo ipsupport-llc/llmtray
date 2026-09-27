@@ -855,12 +855,14 @@ removal's transaction drops it with the document.
 
 **Limit**, per project, all pinned files together, in tokens: the smaller of
 
-- **A** -- half the model's context (`max_position_embeddings`, the
-  chat's `maxTokensCap`) minus the answer's `max_tokens`;
+- **A** -- a share (Settings > Files, 10-90%, half by default) of the model's context (`max_position_embeddings`, the
+  chat's `maxTokensCap`), at most the context less the answer's
+  `max_tokens` and the 10% margin (`max_tokens` is a ceiling, often set
+  high: subtracted from the half, 128K on a 256K model left nothing);
 - **B** -- memory: (the GPU limit -- the wired limit if the user set one,
   else Metal's `recommendedMaxWorkingSetSize` -- minus the model's weights
   on disk, the sum of its `*.safetensors`, minus 1.5 GB) / the KV cache's
-  bytes per token × 0.5. Bytes per token from `config.json` (its
+  bytes per token × the same share. Bytes per token from `config.json` (its
   `text_config` if nested): per layer `kv_heads × head_dim × 2` (K and V:
   mlx-lm keeps both in its cache, also with `attention_k_eq_v`) × 2 bytes
   (bf16; 1 at 8-bit KV, 0.5 at 4-bit, the profile's `kvBits`; bf16 where
