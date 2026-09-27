@@ -140,6 +140,7 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
     /// A chosen item needs a make_dir item that wasn't chosen.
     case missingDependency(item: Int, needs: Int)
     case invalidated([Int: String])
+    case tooManyItems(Int)
     /// The plan changed after the user reviewed it.
     case stale(reviewed: Int, current: Int)
 
@@ -150,6 +151,7 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
         case .unknownItems(let ids): return "no such items: \(ids)"
         case .missingDependency(let i, let n): return "item \(i) needs item \(n) (the folder it goes into)"
         case .invalidated(let m): return "changed since proposed: " + m.keys.sorted().map { "\($0): \(m[$0]!)" }.joined(separator: "; ")
+        case .tooManyItems(let n): return "a plan holds at most \(n) changes: approve these first"
         case .stale(let r, let c): return "the plan changed since it was reviewed (revision \(r), now \(c))"
         }
     }
@@ -159,6 +161,9 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
 /// execution can refuse anything that changed.
 public struct ChangePlanner {
     public let denylist: FolderDenylist
+    /// Items one pending plan may hold (its journal stays small enough to
+    /// read whole).
+    public var maxItems = 1000
 
     public init(denylist: FolderDenylist) {
         self.denylist = denylist
@@ -180,6 +185,10 @@ public struct ChangePlanner {
         var rejected: [(Int, Error)] = []
         var nextID = (existing.map(\.id).max() ?? 0) + 1
         for (index, request) in requests.enumerated() {
+            if existing.count + items.count >= maxItems {
+                rejected.append((index, ChangePlanError.tooManyItems(maxItems)))
+                continue
+            }
             do {
                 let item = try planOne(request, id: nextID, prior: existing + items)
                 items.append(item)

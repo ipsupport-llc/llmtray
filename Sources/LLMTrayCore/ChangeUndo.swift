@@ -61,6 +61,10 @@ public struct ChangeUndo {
             report.stopped = Remaining(id: 0, reversible: false, reason: "no journal for this plan")
             return report
         }
+        if record.truncated {
+            report.stopped = Remaining(id: 0, reversible: false, reason: "the journal is too large to read whole")
+            return report
+        }
         items: for item in record.items.reversed() {
             let result: JournalResult
             switch item.state {
@@ -193,6 +197,11 @@ public struct ChangeUndo {
                 let e = errno
                 try restore(e == ENOTEMPTY || e == EEXIST ? .notEmpty(name) : .system("remove \(name)", e))
             }
+            // Removal is by name: anything still (or newly) there means it
+            // may not have been the folder checked a moment ago.
+            if (try? Posix.lstatAt(dir.descriptor.fd, temp)) != nil {
+                throw Uncertain(description: "\(temp) is still there after removing it")
+            }
         case .move:
             guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
             let (dir, name) = try placed(item, r)
@@ -257,7 +266,12 @@ public struct ChangeUndo {
                 // Removed -- or moved away by someone: can't be told apart.
                 throw Uncertain(description: "\(name) is gone from its place; if it was removed, nothing is left to undo")
             }
-            if unlinkat(dir.descriptor.fd, aside, AT_REMOVEDIR) == 0 { return true }
+            if unlinkat(dir.descriptor.fd, aside, AT_REMOVEDIR) == 0 {
+                if (try? Posix.lstatAt(dir.descriptor.fd, aside)) != nil {
+                    throw Uncertain(description: "\(aside) is still there after removing it")
+                }
+                return true
+            }
             if renameatx_np(dir.descriptor.fd, aside, dir.descriptor.fd, name, UInt32(RENAME_EXCL)) == 0 { return false }
             throw Uncertain(description: "\(name) was left as \(aside)")
         case .move, .trash:
@@ -274,7 +288,20 @@ public struct ChangeUndo {
             if item.kind == .trash {
                 stillPlaced = r.trashURL.flatMap { Posix.lstatPath($0) }?.identity == r.identity
             } else {
-                stillPlaced = (try? placed(item, r)) != nil
+                // Looked at, not assumed: a lookup that fails is no proof.
+                guard let d = item.destination, let comps = r.components, let name = comps.last,
+                      let chain = r.destinationChain else {
+                    throw Uncertain(description: "the journal has no destination")
+                }
+                let dir: OpenedDirectory
+                do {
+                    dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
+                } catch {
+                    throw Uncertain(description: "can't look where \(s.location.relativePath) was put: \(error)")
+                }
+                stillPlaced = try withExtendedLifetime(dir) {
+                    try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity
+                }
             }
             if stillPlaced { throw Uncertain(description: "\(s.location.relativePath) is in both places (a hard link?)") }
             return true

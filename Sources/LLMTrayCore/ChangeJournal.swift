@@ -67,6 +67,8 @@ public struct JournalRecord: Equatable, Sendable {
     public var started: Date
     public var ended: Date?
     public var items: [Item]
+    /// Read only up to the cap: later items are missing (undo refuses).
+    public var truncated = false
 
     /// A crash mid-plan (or mid-undo): no end, or an item without its outcome.
     public var isIncomplete: Bool {
@@ -190,17 +192,23 @@ public final class ChangeJournal: @unchecked Sendable {
             if let e = try? Self.decoder.decode(JournalEvent.self, from: Data(line)) { events.append(e) }
         }
         var record = Self.fold(planID: planID, events)
-        if truncated { record?.ended = nil }
+        if truncated {
+            record?.ended = nil
+            record?.truncated = true
+        }
         return record
     }
 
-    /// Every plan in the journal, newest first.
-    public func records() -> [JournalRecord] {
+    /// The newest `limit` plans in the journal (by when their file last
+    /// changed), newest first; only those are read.
+    public func records(limit: Int = 50) -> [JournalRecord] {
         let names = (try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []
-        return names.compactMap { name -> JournalRecord? in
-            guard name.hasSuffix(".jsonl"), let id = UUID(uuidString: String(name.dropLast(6))) else { return nil }
-            return record(id)
-        }.sorted { $0.started > $1.started }
+        let files = names.compactMap { name -> (UUID, Date)? in
+            guard name.hasSuffix(".jsonl"), let id = UUID(uuidString: String(name.dropLast(6))),
+                  let st = Posix.lstatPath(directory.path + "/" + name) else { return nil }
+            return (id, st.modified)
+        }.sorted { $0.1 > $1.1 }.prefix(max(0, limit))
+        return files.compactMap { record($0.0) }.sorted { $0.started > $1.started }
     }
 
     static func fold(planID: UUID, _ events: [JournalEvent]) -> JournalRecord? {

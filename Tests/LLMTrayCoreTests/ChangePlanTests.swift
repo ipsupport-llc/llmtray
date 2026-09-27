@@ -641,4 +641,35 @@ final class ChangePlanTests: FolderTestCase {
         deep.maxRecordBytes = 10
         XCTAssertNil(deep.record(id), "a cut first line isn't a begin")
     }
+
+    func testAHeldFolderMovedOutOfTheGrantIsNotChangedThrough() throws {
+        // Move: the destination folder leaves the grant while held open.
+        write("a.txt", "a")
+        mkdir("b")
+        var exec = executor
+        exec.beforeOperation = { _ in try? self.fm.moveItem(atPath: self.grant + "/b", toPath: self.outside + "/b") }
+        XCTAssertEqual(statuses(exec.execute(try approved([mv("a.txt", "b/a.txt")]))), ["failed"])
+        XCTAssertTrue(exists("a.txt"), "moved back")
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/b"), [])
+        // make_dir: its parent leaves the grant.
+        mkdir("p")
+        exec.beforeOperation = { _ in try? self.fm.moveItem(atPath: self.grant + "/p", toPath: self.outside + "/p") }
+        XCTAssertEqual(statuses(exec.execute(try approved([md("p/new")]))), ["failed"])
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: outside + "/p"), [], "taken back, staging removed")
+        // Trash: the item's folder leaves the grant; the grant path no longer
+        // names it, so nothing goes to the Trash.
+        write("t/x.txt", "x")
+        exec.beforeOperation = { _ in try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t") }
+        XCTAssertEqual(statuses(exec.execute(try approved([rm("t/x.txt")]))), ["failed"])
+        XCTAssertEqual(try String(contentsOfFile: outside + "/t/x.txt"), "x")
+    }
+
+    func testAPlanHasABoundedSize() throws {
+        for n in 0..<3 { write("f\(n)", "x") }
+        var p = planner
+        p.maxItems = 2
+        let r = try p.plan([rm("f0"), rm("f1"), rm("f2")])
+        XCTAssertEqual(r.items.count, 2)
+        XCTAssertEqual(r.rejected.map(\.index), [2])
+    }
 }

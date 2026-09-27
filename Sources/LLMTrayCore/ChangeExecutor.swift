@@ -204,12 +204,21 @@ public struct ChangeExecutor {
                 }
                 throw Uncertain(description: "\(error); \(staging) was left behind")
             }
-            guard (try? Posix.lstatAt(fd, name))?.identity == created.identity else {
+            guard let published = try? Posix.lstatAt(fd, name), published.identity == created.identity else {
                 // Something else was published: back to where it came from.
-                if renameatx_np(fd, name, fd, staging, UInt32(RENAME_EXCL)) == 0 {
+                if let other = try? Posix.lstatAt(fd, name),
+                   Self.renameBack(fd, name, fd, staging, expecting: other.identity) {
                     throw FolderAccessError.changed(d.location.relativePath)
                 }
                 throw Uncertain(description: "made \(name), but what is there now isn't it")
+            }
+            // The parent must still be inside the grant (it can be moved out
+            // while held open): else the folder is taken back.
+            if !stillInside(parent, root: d.location.root) {
+                if Self.renameBack(fd, name, fd, staging, expecting: created.identity), unlinkat(fd, staging, AT_REMOVEDIR) == 0 {
+                    throw FolderAccessError.changed(d.location.relativePath)
+                }
+                throw Uncertain(description: "made \(name) in a folder that left the grant")
             }
             made[Key(root: d.location.root.identity, components: d.location.components)] = Made(identity: created.identity, name: name)
             return JournalResult(identity: created.identity, finalName: name, destinationChain: parent.chain,
@@ -231,20 +240,30 @@ public struct ChangeExecutor {
             // A rename moves whatever has the name: it must have been the
             // item, else what was swapped in goes back where it was.
             let moved = try? Posix.lstatAt(dst.descriptor.fd, name)
-            if moved?.identity == s.identity {
-                return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
-                                     trashURL: nil, components: comps + [name])
+            if let moved, moved.identity == s.identity {
+                // Both ends must still be inside the grant (either can be
+                // moved out while held open): else it goes back.
+                if stillInside(src, root: s.location.root), stillInside(dst, root: d.location.root) {
+                    return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
+                                         trashURL: nil, components: comps + [name])
+                }
+                if Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: s.identity) {
+                    throw FolderAccessError.changed(s.location.relativePath)
+                }
+                throw Uncertain(description: "moved \(s.location.relativePath) while a folder left the grant")
             }
-            if moved != nil, renameatx_np(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, UInt32(RENAME_EXCL)) == 0 {
+            if let moved, Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: moved.identity) {
                 throw FolderAccessError.changed(s.location.relativePath)
             }
             throw Uncertain(description: "moved \(s.location.relativePath), but what arrived isn't the item")
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("trash without a path") }
             let parent = try openSourceParent(s)
-            guard let dirPath = parent.descriptor.currentPath else { throw FolderAccessError.changed(s.location.relativePath) }
             let parentIdentity = parent.descriptor.identity
-            let url = URL(fileURLWithPath: dirPath + "/" + s.location.name)
+            // By the grant's own spelling, not where the held folder is now
+            // (it may have been moved out of the grant): the Trash gets the
+            // item only if that path still names it.
+            let url = URL(fileURLWithPath: s.location.displayPath)
             beforeOperation?(item)
             let out: URL?
             do {
@@ -267,11 +286,25 @@ public struct ChangeExecutor {
                 return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
                                      destinationChain: nil, trashURL: out.path, components: nil)
             }
-            if renameatx_np(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, UInt32(RENAME_EXCL)) == 0 {
+            if Self.renameBack(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, expecting: trashed.identity) {
                 throw FolderAccessError.changed(s.location.relativePath)
             }
             throw Uncertain(description: "something other than \(s.location.relativePath) went to the Trash: \(out.path)")
         }
+    }
+
+    /// An exclusive rename back, confirmed: the name then holds `expecting`.
+    static func renameBack(_ fromFD: Int32, _ from: String, _ toFD: Int32, _ to: String, expecting: FileIdentity) -> Bool {
+        renameatx_np(fromFD, from, toFD, to, UInt32(RENAME_EXCL)) == 0
+            && (try? Posix.lstatAt(toFD, to))?.identity == expecting
+    }
+
+    /// Whether a held folder is still the one its path reaches from the
+    /// grant root.
+    private func stillInside(_ dir: OpenedDirectory, root: FolderRoot) -> Bool {
+        guard let again = try? SafeFolderWalker(root: root, denylist: denylist).openDirectory(dir.components, expected: dir.chain)
+        else { return false }
+        return again.descriptor.identity == dir.descriptor.identity
     }
 
     static func ownedByUs(_ d: Descriptor) -> Bool {
@@ -362,7 +395,7 @@ public struct ChangeExecutor {
             guard renameatx_np(src.fd, srcName, src.fd, temp, excl) == 0 else { return errno }
             if renameatx_np(src.fd, temp, dst.fd, candidate, excl) == 0 { return 0 }
             let e2 = errno
-            if renameatx_np(src.fd, temp, src.fd, srcName, excl) != 0 { stranded = temp }
+            if !renameBack(src.fd, temp, src.fd, srcName, expecting: identity) { stranded = temp }
             return e2
         }
         do {
