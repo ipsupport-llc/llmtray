@@ -113,7 +113,9 @@ public struct ProjectToolOutput: Equatable {
             // Part of it, if a useful part fits.
             let frame = head + "\n\"\"\"\n" + "\n" + Self.cutMarker + "\n\"\"\"\n"
             let textRoom = room() - frame.utf8.count
-            if textRoom >= Self.minimumPieceBytes {
+            // At the smallest budgets (near the context's end) a shorter
+            // piece is still worth it: the alternative is no text at all.
+            if textRoom >= min(Self.minimumPieceBytes, max(64, byteBudget / 8)) {
                 out += head + "\n\"\"\"\n" + Self.cut(hit.text, toBytes: textRoom) + "\n" + Self.cutMarker + "\n\"\"\"\n"
                 returned.append(hit)
                 left = hits.count - i - 1

@@ -463,6 +463,17 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertTrue(o.epilogue.contains("\"cursor\":\"\(doc):2:1:"), o.epilogue)
     }
 
+    func testASearchAtTheSmallestBudgetStillGetsText() async throws {
+        let long = (1...200).map { "payment\($0) deadline words" }.joined(separator: " ")
+        try await add(long, name: "ordinary-file-name.txt")
+        let budget = ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens)
+        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), budget: budget))
+        let r = o.rendered(byteBudget: budget)
+        XCTAssertFalse(r.returned.isEmpty, r.text)
+        XCTAssertTrue(r.text.contains("payment"), r.text)
+        XCTAssertLessThanOrEqual(r.text.utf8.count, budget)
+    }
+
     func testTheTimeoutDoesntWaitForTheEmbedderToGiveUp() async throws {
         _ = try await addCorpus()
         let stubborn = FakeQueryEmbedder()
