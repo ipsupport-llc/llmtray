@@ -15,7 +15,12 @@ enum WhatsNewWindow {
 
     static func show() {
         let release = WhatsNew.latest
-        UserDefaults.standard[Pref.whatsNewLastSeen] = release.version
+        // Only up: opened by hand on a newer version without notes, it
+        // mustn't bring "seen" back down.
+        let seen = UserDefaults.standard[Pref.whatsNewLastSeen].flatMap(WhatsNew.minorVersion)
+        if let shown = WhatsNew.minorVersion(release.version), seen.map({ shown > $0 }) ?? true {
+            UserDefaults.standard[Pref.whatsNewLastSeen] = release.version
+        }
         if let window {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
