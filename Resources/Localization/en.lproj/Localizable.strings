@@ -23,7 +23,7 @@
 "%@: not supported yet" = "%@: not supported yet";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld can still be undone from Settings > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld can still be undone from Settings > Files.";
 "%lld downloads" = "%lld downloads";
 "%lld failed" = "%lld failed";
 "%lld files couldn't be indexed" = "%lld files couldn't be indexed";
@@ -86,7 +86,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
 "An hour" = "An hour";
 "An item needs the new folder it goes into: tick that folder too." = "An item needs the new folder it goes into: tick that folder too.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.";
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
 "Another version next to this one (a new seed, the same request)" = "Another version next to this one (a new seed, the same request)";
@@ -254,6 +254,7 @@
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
 "Fetching file list…" = "Fetching file list…";
 "Files" = "Files";
+"Files Settings…" = "Files Settings…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Files in %@" = "Files in %@";
@@ -262,7 +263,6 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
 "Fits comfortably" = "Fits comfortably";
-"Folder Settings…" = "Folder Settings…";
 "Folder access" = "Folder access";
 "Folder access is off in Settings." = "Folder access is off in Settings.";
 "Folder changes" = "Folder changes";
@@ -504,7 +504,6 @@
 "Project files" = "Project files";
 "Project files are turned off" = "Project files are turned off";
 "Project files are turned off in Settings." = "Project files are turned off in Settings.";
-"Project files couldn't be turned on" = "Project files couldn't be turned on";
 "Project files off" = "Project files off";
 "Project files on" = "Project files on";
 "Project name" = "Project name";
@@ -703,6 +702,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "The downloaded embedder files don't match their checksums: %@";
 "The embedder is being downloaded -- try again once it's done." = "The embedder is being downloaded -- try again once it's done.";
 "The embedder list is missing or invalid: %@" = "The embedder list is missing or invalid: %@";
+"The embedding model couldn't be downloaded" = "The embedding model couldn't be downloaded";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";

@@ -672,14 +672,15 @@ private extension View {
     }
 }
 
-/// Turns Project files on from the sidebar; a failed download is shown,
+/// Turns Project files on from the sidebar; a failed embedder download (the
+/// feature is on by then, searching by words) is shown,
 /// there being no Settings row on screen to show it in.
 @MainActor
 private func turnOnProjectFiles() {
     Task {
         guard let failure = await ProjectFilesSection.turnOn() else { return }
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Project files couldn't be turned on", comment: "")
+        alert.messageText = NSLocalizedString("The embedding model couldn't be downloaded", comment: "")
         alert.informativeText = failure
         alert.runModal()
     }
