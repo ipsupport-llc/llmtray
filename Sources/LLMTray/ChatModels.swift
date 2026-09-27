@@ -167,7 +167,7 @@ struct ChatSettings {
     var topP: Double = 0.95
     /// 0 = top-k off.
     var topK: Int = 0
-    var maxTokens: Int = 1024
+    var maxTokens: Int = 16384
     var systemPrompt: String = ""
     var enableImageGeneration: Bool = false
     var enableMusicGeneration: Bool = false
