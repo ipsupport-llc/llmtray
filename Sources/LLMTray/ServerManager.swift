@@ -531,8 +531,26 @@ final class ServerManager: ObservableObject {
             disallowQuantizedKV: ModelDiscovery.disallowsQuantizedKV(forModelPath: modelPath),
             drafterRepo: drafterRepo,
             maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
-            verboseLogging: UserDefaults.standard[Pref.verboseServerLogging]
+            verboseLogging: UserDefaults.standard[Pref.verboseServerLogging],
+            prefillMemoryMB: Self.prefillMemoryMB(forModelPath: modelPath)
         )
+    }
+
+    /// Read once per model folder and installed runtime (a runtime update
+    /// changes the key): the flag check reads server.py, the weights' size
+    /// walks the folder.
+    private static var prefillMemoryCache: [String: Int?] = [:]
+
+    private static func prefillMemoryMB(forModelPath modelPath: String) -> Int? {
+        let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
+        let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0)
+        if let known = prefillMemoryCache[key] { return known }
+        let mb = MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb")
+            ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: HardwareProbe.current().gpuLimitBytes,
+                                           weightsBytes: ModelWeights.bytes(inFolder: modelPath))
+            : nil
+        prefillMemoryCache[key] = mb
+        return mb
     }
 
     init() {
