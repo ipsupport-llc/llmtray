@@ -296,6 +296,56 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(embedder!.calls, 0)
     }
 
+    func testAStopPersistedBeforeItsWriteIsFinishedAtOpen() async throws {
+        // A quit after the Stop was saved, before its write: still staged.
+        let dir = root.appendingPathComponent(project.uuidString)
+        let index = try ProjectIndex(directory: dir)
+        for url in try corpus(2) { try index.addCopy(of: url) }
+        index.close()
+        let i = ingestor(stopped: [project])
+        await i.open(project)
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.notIndexed, .notIndexed])
+        XCTAssertEqual(extractor.calls, 0)
+        XCTAssertEqual(i.progress(for: project), .idle)
+        await i.indexNow(project)
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.embedded, .embedded])
+    }
+
+    func testAStopDuringIndexNowWins() async throws {
+        // At every point of an Index Now a Stop can come in, nothing is
+        // queued or resumed after it.
+        for yields in [0, 1, 2, 3, 4, 6, 8, 12, 16, 24] {
+            try await tearDown()
+            try await setUp()
+            embedder = nil
+            let i = ingestor()
+            _ = await i.add(try corpus(2), to: project)
+            try await settle(i)
+            _ = await i.add([try file("slow.txt", "SLOW then words")], to: project)
+            try await waitUntil("the slow file is being read") { self.extractor.calls == 3 }
+            await i.stop(project)
+            try await settle(i)
+            XCTAssertEqual(statuses(i), [.searchable, .searchable, .notIndexed])
+            extractor.release()
+            let slow = FakeEmbedder()
+            slow.delay = 0.2
+            embedder = slow
+            let resumed = Task { await i.indexNow(self.project) }
+            // Begun (the Stop lifted), then `yields` turns further in.
+            while !persisted.stopped.isEmpty { await Task.yield() }
+            for _ in 0..<yields { await Task.yield() }
+            await i.stop(project)
+            await resumed.value
+            try await settle(i)
+            XCTAssertEqual(persisted.stopped, [project], "after \(yields) yields")
+            XCTAssertEqual(statuses(i), [.searchable, .searchable, .notIndexed], "after \(yields) yields")
+            XCTAssertEqual(i.progress(for: project), .idle, "after \(yields) yields")
+            i.shutdown()
+        }
+    }
+
     func testWaitsWhileTheChatModelGenerates() async throws {
         busy = true
         let i = ingestor()

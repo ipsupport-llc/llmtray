@@ -144,6 +144,11 @@ public final class ProjectIngestor {
     private var extraction: (item: Item, task: Task<DocumentExtraction.Document, Error>)?
     /// Bumped by stop and forget: a step begun before sees it changed.
     private var epochs: [UUID: Int] = [:]
+    /// A Stop or Index Now is writing (`beginTransition`); the next ones wait.
+    private var transitioning: Set<UUID> = []
+    private var transitionWaiters: [UUID: [CheckedContinuation<Void, Never>]] = [:]
+    /// A stopped project's staged documents being made `not_indexed` at open.
+    private var stopReconciles: [UUID: Task<Void, Never>] = [:]
     private var deleted: Set<UUID> = []
     private var opened: Set<UUID> = []
     private var copying: [UUID: Int] = [:]
@@ -207,7 +212,17 @@ public final class ProjectIngestor {
         let h = try await env.registry.open(project)
         guard !deleted.contains(project), !isShutDown else { throw ProjectIndexHandle.Closed() }
         if opened.insert(project).inserted {
-            queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
+            if stopped.contains(project) {
+                // Stopped, though what was staged wasn't made `not_indexed`
+                // (a quit between the persisted Stop and its write): made so
+                // now, and nothing queued. An Index Now meanwhile waits for it.
+                let write = Task { _ = try? await h.write { try $0.stopIndexing() } }
+                stopReconciles[project] = write
+                await write.value
+                stopReconciles[project] = nil
+            } else {
+                queue.enqueue(h.openReport.needExtraction.map(ProjectIngestQueue.Work.extract), in: project)
+            }
             // Not the report's list: that one knows only an existing vector
             // set, and documents made searchable before the embedder was
             // installed have none yet.
@@ -303,49 +318,88 @@ public final class ProjectIngestor {
     /// becomes `not_indexed` (Index Now resumes it). The step in flight is
     /// cancelled.
     public func stop(_ project: UUID) async {
-        let h = try? await handle(project)
         epochs[project] = epoch(project) + 1
         stopped.insert(project)
         if paused.remove(project) != nil { queue.setPaused(project, false) }
         persist()
         queue.stop(project)
         if let e = extraction, e.item.project == project { e.task.cancel() }
-        if let h { _ = try? await h.write { try $0.stopIndexing() } }
         changed()
+        await beginTransition(project)
+        let h = try? await handle(project)
+        if let h { _ = try? await h.write { try $0.stopIndexing() } }
+        endTransition(project)
         if let h { await refreshDocuments(project, h) }
     }
 
     /// Re-index one document (the Files view): read again from its copy
     /// into a new revision, the current one searchable until that commits,
-    /// then embedded. Like an add, it restarts a stopped project.
+    /// then embedded. Like an add, it restarts a stopped project; a Stop
+    /// meanwhile wins.
     public func reindex(_ doc: Int64, in project: UUID) async {
         guard let h = try? await handle(project) else { return }
+        let e = epoch(project)
         if stopped.remove(project) != nil {
             persist()
             await queueEmbedding(project, h)
         }
+        guard epoch(project) == e, !deleted.contains(project) else { return }
         queue.enqueue([.reindex(doc)], in: project)
         kick()
         changed()
     }
 
-    /// Index Now: `not_indexed` documents back in the queue, embedding resumed.
+    /// Index Now: `not_indexed` documents back in the queue, embedding
+    /// resumed. A Stop meanwhile wins: nothing is queued after it.
     public func indexNow(_ project: UUID) async {
         if stopped.remove(project) != nil { persist() }
-        guard let h = try? await handle(project) else { return }
+        let e = epoch(project)
+        await beginTransition(project)
+        guard epoch(project) == e, let h = try? await handle(project), epoch(project) == e else {
+            return endTransition(project)
+        }
+        await stopReconciles[project]?.value
         let docs = (try? await h.write { try $0.resumeIndexing() }) ?? []
+        guard epoch(project) == e, !deleted.contains(project) else { return endTransition(project) }
         queue.enqueue(docs.map(ProjectIngestQueue.Work.extract), in: project)
         await queueEmbedding(project, h)
+        endTransition(project)
         kick()
         await refreshDocuments(project, h)
     }
 
+    /// Stop's and Index Now's writes run one at a time per project, in the
+    /// order they were asked for: a Stop's `not_indexed` never lands before
+    /// the Index Now it follows, nor an Index Now's `staged` after it.
+    private func beginTransition(_ project: UUID) async {
+        guard transitioning.insert(project).inserted else {
+            await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+                transitionWaiters[project, default: []].append(c)
+            }
+            return   // handed over by endTransition, still marked
+        }
+    }
+
+    private func endTransition(_ project: UUID) {
+        guard var waiters = transitionWaiters[project], !waiters.isEmpty else {
+            transitioning.remove(project)
+            return
+        }
+        let next = waiters.removeFirst()
+        transitionWaiters[project] = waiters.isEmpty ? nil : waiters
+        next.resume()
+    }
+
+    /// Queues the project's searchable documents that lack vectors. Nothing
+    /// when it was stopped or deleted meanwhile.
     private func queueEmbedding(_ project: UUID, _ h: ProjectIndexHandle) async {
         guard !stopped.contains(project), let embedder = env.embedder(), embeddingUnavailable == nil else { return }
+        let e = epoch(project)
         let docs: [Int64] = (try? await h.write { idx -> [Int64] in
             guard let set = try Self.vectorSet(idx, for: embedder, create: false) else { return [] }
             return try idx.documentsToEmbed(set: set.id)
         }) ?? []
+        guard epoch(project) == e, !stopped.contains(project), !deleted.contains(project) else { return }
         queue.enqueue(docs.map(ProjectIngestQueue.Work.embed), in: project)
     }
 

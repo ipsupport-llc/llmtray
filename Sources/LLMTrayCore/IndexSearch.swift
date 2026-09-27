@@ -169,6 +169,11 @@ public final class IndexSearcher {
         try db.exec("CREATE VIRTUAL TABLE IF NOT EXISTS temp.chunks_tri_vocab USING fts5vocab(main, chunks_tri, row)")
     }
 
+    /// The model of the active vector set (nil: none yet).
+    public func activeVectorModel() throws -> String? {
+        try db.rows("SELECT model FROM vec_sets WHERE active = 1") { $0.text(0) }.first
+    }
+
     static let searchable = "('searchable','embedded')"
 
     /// Ranks inside FTS5 first (its own ORDER BY rank LIMIT, ~40% cheaper

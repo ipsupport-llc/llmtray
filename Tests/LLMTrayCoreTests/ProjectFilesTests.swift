@@ -287,6 +287,20 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertTrue(o.preamble.contains("re-indexed for another meaning-search model"), o.preamble)
     }
 
+    func testAnotherModelsVectorsDontStartTheEmbedder() async throws {
+        _ = try await addCorpus()
+        let other = FakeQueryEmbedder()
+        other.model = "other-model@1"
+        other.delay = 2
+        embedder = other
+        let started = Date()
+        let o = output(await run(.search(query: "payment deadline", doc: nil, limit: 5), service: service(timeout: 5)))
+        XCTAssertTrue(o.preamble.contains("re-indexed for another meaning-search model"), o.preamble)
+        XCTAssertEqual(other.calls, 0, "no query embedding for vectors it can't score")
+        XCTAssertLessThan(Date().timeIntervalSince(started), 1)
+        XCTAssertEqual(o.hits.first?.page, 2, "found by words")
+    }
+
     func testNothingEmbeddedDoesntStartTheEmbedder() async throws {
         try await add("Payment within ten days.", name: "a.txt", embed: false)
         let o = output(await run(.search(query: "payment", doc: nil, limit: 5)))
@@ -429,6 +443,31 @@ final class ProjectFilesServiceTests: XCTestCase {
         }
         XCTAssertEqual(seen.count, 23, "every file once")
         XCTAssertEqual(Set(seen).count, 23)
+    }
+
+    func testAFileLineLongerThanTheRoomStillListsTheRest() async throws {
+        // A name as long as the listing's room (a file's display name isn't
+        // bounded by the file system's).
+        let long = String(repeating: "a-very-long-file-name-", count: 40) + ".txt"
+        let h = try await registry.open(project)
+        let src = root.appendingPathComponent("s.txt")
+        try "x".write(to: src, atomically: true, encoding: .utf8)
+        let first = try await h.write { try $0.addCopy(of: src, name: long) }
+        for i in 0..<3 { try await add("File \(i) text", name: "f\(i).txt", embed: false) }
+        let budget = 700
+        var seen: [String] = []
+        var request = ProjectFiles.Request.list(from: 0)
+        for _ in 0..<10 {
+            let page = output(await run(request, budget: budget))
+            XCTAssertTrue(page.fitsWhole(byteBudget: budget - ProjectFilesService.slackBytes), page.preamble)
+            XCTAssertFalse(page.preamble.contains("no room"), page.preamble)
+            seen += page.preamble.split(separator: "\n").map(String.init).filter { $0.range(of: #"^\d+\. "#, options: .regularExpression) != nil }
+            guard let range = page.epilogue.range(of: #"(?<="cursor":"list:)\d+"#, options: .regularExpression) else { break }
+            request = .list(from: Int(page.epilogue[range])!)
+        }
+        XCTAssertEqual(seen.count, 4, "every file, the long one cut: \(seen)")
+        XCTAssertTrue(seen[0].hasPrefix("\(first). a-very-long-file-name-"), seen[0])
+        XCTAssertTrue(seen[0].contains("… -- ? pages -- waiting to be indexed"), seen[0])
     }
 
     func testNothingSearchableYetAnswersWithTheListing() async throws {

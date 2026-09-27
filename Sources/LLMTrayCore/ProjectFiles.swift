@@ -329,22 +329,46 @@ public final class ProjectFilesService {
         let hint = searchable && note == nil
             ? "\nSearch: \(ProjectFiles.toolName)({\"query\":\"...\"}); read: \(ProjectFiles.toolName)({\"doc\":1,\"pages\":\"1-2\"})." : ""
         let start = min(max(0, from), docs.count)
+        func row(_ d: IndexedDocument, name: String) -> String {
+            let pages = d.pages.map { "\($0) page\($0 == 1 ? "" : "s")" } ?? "? pages"
+            return "\(d.doc). \(name) -- \(pages) -- \(ProjectFiles.status(d))"
+        }
+        func page(_ rows: [String]) -> ProjectToolOutput {
+            var out = ProjectToolOutput(project: project, preamble: ([head] + rows).joined(separator: "\n") + hint)
+            let next = start + rows.count
+            if next < docs.count {
+                out.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(next)\"})"
+            }
+            return out
+        }
         var lines: [String] = []
         var output = ProjectToolOutput(project: project, preamble: head + hint)
         for d in docs[start...] {
-            let pages = d.pages.map { "\($0) page\($0 == 1 ? "" : "s")" } ?? "? pages"
-            let candidate = lines + ["\(d.doc). \(d.name) -- \(pages) -- \(ProjectFiles.status(d))"]
-            let next = start + candidate.count
-            var trial = ProjectToolOutput(project: project, preamble: ([head] + candidate).joined(separator: "\n") + hint)
-            if next < docs.count {
-                trial.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(next)\"})"
+            let trial = page(lines + [row(d, name: d.name)])
+            if trial.fitsWhole(byteBudget: budget) {
+                lines.append(row(d, name: d.name))
+                output = trial
+                continue
             }
-            guard trial.fitsWhole(byteBudget: budget) else {
-                if lines.isEmpty { output.preamble = head + "\n(no room to list them in this chat's context)" }
-                break
+            if lines.isEmpty {
+                // Its own line is longer than the room: its name cut to fit,
+                // so the listing still goes on (the cursor past it) rather
+                // than ending at this file.
+                let scalars = Array(d.name.unicodeScalars)
+                func cut(_ n: Int) -> String { String(String.UnicodeScalarView(scalars[0..<n])) + "…" }
+                var lo = -1, hi = scalars.count - 1
+                while lo < hi {
+                    let mid = (lo + hi + 1) / 2
+                    if page([row(d, name: cut(mid))]).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
+                }
+                if lo >= 0 {
+                    output = page([row(d, name: cut(lo))])
+                } else {
+                    // Not even its id fits: said so, and the rest still reachable.
+                    output = page(["\(d.doc). (no room for this file's line in this chat's context)"])
+                }
             }
-            lines = candidate
-            output = trial
+            break
         }
         return output
     }
@@ -386,10 +410,17 @@ public final class ProjectFilesService {
         } else if let reason = env.wordsOnlyReason() {
             wordsOnly = .unavailable(reason)
         } else if let embedder = env.queryEmbedder() {
-            model = embedder.model
-            switch await Self.embed(query, with: embedder, timeout: env.embedTimeout) {
-            case .success(let v): vector = v
-            case .failure(let failure): wordsOnly = failure.reason
+            // The files' vectors another model's: nothing this query's vector
+            // could score, so the runner isn't started for it.
+            let active = try await handle.read { try $0.activeVectorModel() }
+            if let active, active != embedder.model {
+                wordsOnly = .otherModel
+            } else {
+                model = embedder.model
+                switch await Self.embed(query, with: embedder, timeout: env.embedTimeout) {
+                case .success(let v): vector = v
+                case .failure(let failure): wordsOnly = failure.reason
+                }
             }
         } else {
             wordsOnly = .notInstalled
