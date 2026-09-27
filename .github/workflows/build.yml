@@ -51,3 +51,4 @@ jobs:
           VERSION=9.9.9-beta.1 SIGN_UPDATE=/tmp/sign_update SPARKLE_PRIVATE_KEY=stub ./scripts/sign_release.sh
           python3 -c "import json; m = json.load(open('.build/app/LLMTray.dmg.sparkle.json')); assert m['sparkleVersion'] == '9.9.9b1' and m['channel'] == 'beta' and m['edSignature'] == 'STUB', m"
           python3 scripts/test_render_appcast.py
+          python3 scripts/test_stamp_site.py
