@@ -30,17 +30,20 @@ chat of the project, reached by the chat model through tools.
   set's model only; the switch to the new set is one transaction.
 - **The default embedder is bge-m3** (the user's choice): MIT, 568M
   (XLM-RoBERTa), 8k-token context, 1024 dimensions, CLS pooling,
-  normalized, no query/document prefixes; RuBQ retrieval 71.2 against
-  mE5-large-instruct 69.2 and EmbeddingGemma 69.7; MLX conversions exist
+  normalized, no query/document prefixes; RuBQ retrieval (MTEB results)
+  71.2 against multilingual-e5-large-instruct 69.2 and EmbeddingGemma
+  69.7 (plain multilingual-e5-large scores 74.1 but has a 512-token
+  limit and no instructions); MLX conversions exist
   (mlx-community). No MRL: vectors stay 1024-d, ~400 MB f16 at 200k
   chunks. Its sparse and multi-vector outputs are not used in v1 — FTS5
   covers the lexical side. Other registry entries (USER-bge-m3, tuned
   for Russian; arctic-embed-l-v2.0; multilingual-e5-large-instruct;
   EmbeddingGemma-300m) stay possible per project.
 - **Scale**: 1-2k documents, up to ~200k chunks per project, without a
-  vector index — 200k × 1024 is ~16 ms per query in f32 (~4 ms with the
-  multi-core f16 kernel); vectors kept f16 in memory (~400 MB) or at a
-  smaller dimension where the model supports it. Indexing 1,000 documents
+  vector index — dense scoring of 200k × 1024 took 5-8 ms, the whole
+  hybrid search p50 ~190 ms / p95 ~350 ms (spike); vectors stay f16 in
+  memory (~400 MB at 200k) and are widened in tiles only while scoring.
+  The index takes ~104 MB per 10k chunks on disk (~2 GB at 200k). Indexing 1,000 documents
   × 20 pages is hours of background work at most: it shows progress,
   pauses for chat generation, resumes after a relaunch.
 - **Extraction in tiers**, cheapest first; a page takes the first tier
@@ -169,30 +172,72 @@ Application Support/LLMTray/projects/<projectID>/
 ```
 
 - `documents(doc, source, rev, name, ext, sha256, bytes, added_at, status, pages,
-  error)`; `doc` a small integer. `status`: staged → extracting →
-  searchable → embedded | failed | removing.
+  error)`; `doc` a small integer, `AUTOINCREMENT` (a plain integer key
+  reuses the last id after a delete, and an old `[2:5]` would point at
+  another document). `status`: staged → extracting → searchable →
+  embedded | failed | removing.
 - `pages(doc, rev, page, text, tier, status, error)` — the raw extracted
   text: `read_project_file` quotes it; a failed page is retried from it.
-- `chunks(id, doc, rev, page, ord, heading, body)` — `body` normalized (NFC,
-  ё→е, case; look-alike Latin/Cyrillic kept distinct) with the heading
-  path as prefix; 300-500 tokens by structure, no overlap, a table its
-  own chunk with its header row.
-- `chunks_fts` (`unicode61 remove_diacritics 2`) and `chunks_tri`
-  (`trigram`), both external content on `chunks(body)`, kept in step by
-  triggers, `'rebuild'` as the repair. Queries shorter than 3 characters
-  go to `chunks_fts` only (trigram can't match them).
-- `meta(schema, ...)`. On a schema change the derived tables (`pages`,
-  `chunks`, both FTS, vectors) are dropped and rebuilt from `files/`;
-  `documents` — user state — migrates only by explicit ALTERs.
+- `chunks(id AUTOINCREMENT, doc, rev, page, ord, heading, start, len,
+  body)` — `body` normalized for indexing only (NFC, ё→е, case, soft
+  hyphens and zero-width removed; look-alike Latin/Cyrillic kept
+  distinct) with the heading path as prefix; `start`/`len` are
+  code-point offsets into `pages.text`, where the verbatim text the model
+  is shown comes from. 300-500 tokens by structure, no overlap, a table
+  its own chunk with its header row.
+- `chunks_fts` (`unicode61 remove_diacritics 2` — it folds Latin only:
+  not ё/е, not й/и, so our ё→е is required) and `chunks_tri` (`trigram`,
+  `detail=full`: `none`/`column` break MATCH for any term of 4+
+  characters; budget ~1.75× the text), both external content on
+  `chunks(body)`, kept in step by insert/delete/`AFTER UPDATE OF id,
+  body` triggers, `'rebuild'` as the repair. Queries shorter than 3
+  characters go to `chunks_fts` only.
+- Vectors in packed blocks, not a row each (one 2 KB blob per row left
+  most of each page empty in the spike, and blocks load faster): `vec_blocks(set_id, doc, rev, n, chunk_ids, v)`, one row
+  per embedding batch (≤ 64 vectors), committed batch by batch —
+  `embedded` flips after the last, so a crash costs one batch;
+  `vec_sets(set_id, model, dim, prep_version, active)` for an embedder
+  switch (one transaction flips `active`).
+- `meta(schema, ...)`. On a schema change the derived tables (chunks,
+  both FTS, vectors) are rebuilt from the documents' sources — copies in
+  `files/`, linked files where their source is available; an unavailable
+  source keeps its old index until it's back — and `pages` rows kept
+  for cited revisions are migrated, not dropped. `documents` — user
+  state — migrates only by explicit ALTERs. 16 KB pages and
+  `auto_vacuum = INCREMENTAL`, both set before the first table.
 
-**Consistency.** Add: copy into `staging/`, hash, rename to `files/`,
-insert `documents`; extraction writes `pages`, chunks and FTS in one
+**Search path.** The query is normalized, split into letter/digit runs,
+each run double-quoted, joined with OR — at most 24 terms of 64
+characters; raw text never reaches MATCH (44 of 65 hostile strings
+would have been syntax errors). Cyrillic terms are pseudo-stemmed for
+trigram (a crude ending strip: "договоров" → "договор" finds
+договора/договору). Each list ranks inside FTS5 first (`ORDER BY rank
+LIMIT ~85`), then joins `documents` for `status IN (searchable,
+embedded)` (~40% cheaper than joining first; a `removing` document is
+hidden before reconcile). bm25 cost grows with the matching rows and
+FTS5 has no top-k early exit ("в" alone 300-880 ms at 200k), so a
+document-frequency gate drops terms in > 20% of chunks (via `fts5vocab`,
+~0.5 ms a term) but keeps the rarest matching one — it halves p95 and
+changes results, so its threshold is set by the eval. A per-query
+latency budget; trigram may run only when unicode61 underdelivers or
+for stemmed/identifier terms (eval). Dense: f16 blocks widened in tiles
+(vImage) into `cblas_sgemv` — f32 speed at f16 memory.
+
+**Consistency.** Add: insert the `staged` row (its `doc` allocated),
+copy to `staging/<doc>.part`, hash, rename to `staging/<doc>.<ext>`,
+record the hash, rename to `files/<doc>.<ext>` — every staged path
+belongs to exactly one row (two adds of the same file never share one;
+duplicates by hash are refused at add); extraction writes `pages`, chunks and FTS in one
 transaction → `searchable`. Remove: `removing` in a transaction, delete
 the file, delete the rows in a transaction. Re-index: rebuild the
 document's derived rows in one transaction; the old ones stay searchable
 until it commits. At project open a reconcile pass finishes or undoes
-every state (staging leftovers, files without rows, rows without files,
-interrupted extraction, `removing`).
+every state: `.part` files and staged copies no row claims are deleted,
+a complete staged copy whose hash matches its row is promoted, `extracting` goes back
+to `staged`, `removing` is finished, embedding resumes. The spike
+killed a child at 16 points of add/remove/re-index: before reconcile a
+document was invisible or complete, after it no orphans or duplicates,
+and a crash mid re-index kept the old revision searchable.
 
 **Linked folders.** A `sources(id, kind, bookmark, path)` table: `copy`
 or `folder`; a document of a folder source keeps its relative path and
@@ -223,7 +268,40 @@ under `files/` are ever deleted.
 project (tabs don't: `ChatToolbox` is per tab) plus a read-only WAL
 connection for searches, so tabs don't queue behind an ingest. No
 `await` while a transaction is open: extract first, then write
-synchronously. Checkpoint when ingest goes idle and on close.
+synchronously. The reader wasn't blocked by a 6k-chunk write (p50 44
+vs 45 ms, no BUSY) and never saw uncommitted rows. But the WAL grows
+(60-350 MB for that transaction) and any open reader snapshot stalls
+the checkpoint, so readers reset statements at once, a TRUNCATE
+checkpoint runs when ingest goes idle (retried on BUSY), and
+`journal_size_limit` is set. `'rebuild'` (82 s at 200k chunks) and
+`integrity-check` (23 s) are background jobs with progress, never run at
+every project open.
+
+**Maintenance (vacuum).** Deletes, re-indexes and embedder switches
+leave free pages, and FTS5 segments accumulate:
+
+- **Routine**: the database is created with `auto_vacuum =
+  INCREMENTAL`; when ingest goes idle, `PRAGMA incremental_vacuum(n)`
+  returns free pages to the OS in small steps. That shrinks the file but
+  doesn't defragment it or merge FTS segments.
+- **Full compaction** is triggered by fragmentation, not the free list
+  (which the routine step keeps low): after churn since the last
+  compaction passes a threshold (chunks deleted or re-indexed ≥ 30% of
+  the live ones), or on demand — **Compact Index** in the project's ring
+  menu and the Files view. Steps: FTS5 `'optimize'` on the live database
+  (5-8 s at 200k), `VACUUM INTO` a temp file, `quick_check` on it; then
+  the swap: new searches wait, readers drain, a TRUNCATE checkpoint,
+  **all** connections closed, the old file (and its `-wal`/`-shm`) moved
+  aside, the new one renamed in, connections reopened, the old one
+  deleted; a `meta`-independent marker file records the step, so a
+  crash mid-swap is finished or rolled back at the next open.
+- It rewrites the whole file (~2 GB at 200k chunks): free disk is
+  checked first; it runs only with no ingest active; it can't pause —
+  it's cancelled and restarted later (the old file stays in use until
+  the swap).
+- WAL: TRUNCATE checkpoints when idle and `journal_size_limit` (above).
+- The Files view shows the index's size on disk and how much a
+  compaction would free.
 
 **Deletion.** `deleteProject` (today it only edits `library.json`)
 cancels the project's jobs, closes its connections, writes a deletion
@@ -235,17 +313,70 @@ Open tabs of its chats get "project removed" from the tools.
 
 ## Extraction
 
-Parsers see hostile input. Extraction runs in a child process of the
-app binary (`LLMTray --extract <path>`, like `--run-tool`, through
-`ProcessRunner`): a crash, a hang past the time limit, or memory past a
-cap kills that process, not the app. Limits: bytes per file, pages,
-pixels, time per file, text per document; type from content, not the
-extension. `NSAttributedString`'s HTML import is WebKit-based and
-main-thread-only, so HTML goes through `WebParsing` instead. The junk
-check (letters per glyph, replacement characters, look-alike code points
-— PDFKit returned Cyrillic "к" as U+0138 in a test) is in v1: bad text
-must not become `searchable`. Per-project caps (files, bytes, chunks)
-and a free-space check before a copy are in v1.
+Parsers see hostile input, and Apple's own hang or blow up on it (the
+spike, branch `spike/rag-extract`): a 1.9 MB zip-bomb docx given to
+`NSAttributedString` reached 14.3 GB in 13.5 s; an 18 KB mutated RTF
+loops `NSAttributedString` and `textutil` forever
+(`fixtures/rtf_hangs_textkit.rtf`); Quick Look hung > 60 s on a corrupt
+.ppt. So:
+
+- **A child process** of the app binary (`LLMTray --extract <path>`,
+  JSON lines out) does all parsing, started with `posix_spawn` —
+  `ProcessRunner` gains that variant; `Process` can't set what follows —
+  in its own process group:
+  - **wall-clock timeout** that kills the group — required, not optional
+    (the RTF hang);
+  - **memory**: `setrlimit` RLIMIT_AS/DATA/RSS are rejected (`EINVAL`) on
+    macOS; the kernel's jetsam limit set at spawn
+    (`posix_spawnattr_setjetsam_ext`, private — resolved at run time)
+    killed exactly at the limit, with the parent polling the child's
+    footprint every 20 ms as the public backstop (+21 MB overshoot at a
+    500 MB limit);
+  - RLIMIT_CPU and RLIMIT_CORE = 0, set by the child on itself;
+  - **no network**: `sandbox_init` "no-network" in the child before it
+    opens the file (deprecated, works; none of the paths tried to
+    connect anyway);
+  - a **stdout cap** counted by the parent.
+- **Zip containers** (docx, xlsx, pptx, odt) go through our own capped
+  zip reader first — per-part and total bytes, compression ratio, entry
+  count, no nested archives — and only then to `NSAttributedString`
+  (the same bomb: refused in 2 ms). zip64 is refused.
+- **XML**: the system parser already refuses entity expansion and never
+  fetches external entities; any DOCTYPE in an OOXML part is refused
+  and nesting capped at 256 (it parsed 200k levels).
+- **HTML** through a new `HTMLText` in LLMTrayCore (sharing
+  `WebParsing.decodeEntities`; `WebParsing.text` keeps script/style and
+  drops newlines): consistent back to macOS 13 and 43 ms vs 373-504 ms
+  for `NSAttributedString`, whose HTML import is in-process WebKit on
+  macOS 13 (an out-of-process service on 27).
+- **Legacy .xls / .ppt: our own parsers** (OLE2 + BIFF5/8; PPT text
+  atoms following the live edit chain) — 46,688/46,688 cells against
+  xlrd on 23 files, all slide text and notes on 17 POI files, 2-15 ms a
+  file. Quick Look lost notes and whole sheets and hung; thumbnails +
+  OCR recalled a median 36%. Out of scope: .xls text boxes and charts,
+  .ppt headers, footers and comments. Password-protected files fail
+  cleanly.
+- **Type from content** (magic bytes), not the extension.
+- **The junk check**, six signals (letters per glyph, U+FFFD, private
+  use, look-alike code points such as U+0138 for "к", control characters,
+  mojibake like "Äîãîâîð"), threshold 0.5 (clean text in ~10 languages
+  scored ≤ 0.17), applied only where a next tier exists (PDF pages,
+  images); an empty sheet or slide is "empty", not junk.
+- **The runner contract**: the child writes JSON lines (one per page,
+  sheet or slide); the parent caps the encoded stdout at the text cap
+  plus framing (~1.5×, escaping included), the page count and the wall
+  time; hitting any cap kills the group and records which one on the
+  document ("too large: text cap"), keeping the pages already received
+  only if the document is otherwise complete — never a silently
+  truncated one.
+- **Caps**: bytes per file, 5,000 pages, 32 MB of text per document,
+  time per file, pixels per rendered page (a PDF page can claim 10⁹
+  points); per-project files, bytes and chunks; free space checked
+  before a copy.
+
+Timing (M5, child's own): PDF 100 pages 450 ms; docx/doc/odt/rtf 100
+pages 69-84 ms; xlsx 5k × 9 273 ms; xls 5k × 8 163 ms; process start
+adds ~20 ms.
 
 - **Tier 2 (v2)**: `VNRecognizeTextRequest` rev3 `.accurate` (Russian
   from macOS 13), document segmentation + perspective correction for
@@ -256,8 +387,9 @@ and a free-space check before a copy are in v1.
 
 ## Dense retrieval
 
-- Vectors `(chunk, model, dim, v f16)`, widened to f32 in memory for
-  open projects only; `model` recorded, so a change re-embeds.
+- Vectors in `vec_blocks` of their `vec_set` (The index), f16 in memory
+  for open projects only, widened in tiles while scoring; the set
+  records model and preprocessing, so a change re-embeds into a new set.
 - `embedded` is a second commit after `searchable`: lexical works from
   extraction on, and a crash while embedding costs only the embedding.
 - The embedder is a managed bidirectional runner (JSON lines, request
@@ -268,9 +400,61 @@ and a free-space check before a copy are in v1.
   Its fit is measured against the Metal limit (~19 GB by default on this
   Mac), not the 26 GB of RAM.
 - A query while it can't run falls back to lexical, and says so.
-- The runner is generic over the registry's families (XLM-R for the
-  bge-m3 line and e5, Gemma for EmbeddingGemma, …) on MLX; each entry
-  ships with reference vectors so a conversion is checked on load.
+- **The runner is plain MLX with our own family modules** (`xlm-roberta`
+  ~150 lines, `gemma3-bidir`): only `mlx`, `tokenizers`, `numpy` — all in
+  the app's venv already; not `mlx-embeddings` (36 more packages), not
+  mlx-lm (the fork pin doesn't matter). Spike: branch `spike/rag-embed`.
+- **bge-m3 weights**: `mlx-community/bge-m3-mlx-fp16` (1.1 GB, MIT),
+  pinned by revision and per-file sha256, tokenizer.json pinned by hash
+  (BAAI's older file adds a token before `</s>` after trailing
+  whitespace). fp16 is the default; 8-bit (592 MB) is allowed but saves
+  memory only, not time; 4-bit is refused (min cosine 0.915).
+- **Pooling, prefixes, dtype come from the registry**, never a model
+  card (mlx-community's card says mean pooling for bge-m3; it's CLS).
+  An entry: id, licence, family, source {repo, revision, files → sha256},
+  weights {compute dtype, quantization}, tokenizer {file, max length,
+  pad id}, prefixes, pooling, dense layers, normalize, dim,
+  `preprocessing_version`, batching, reference {file, sha256,
+  min_cosine}.
+- **Each entry ships reference vectors** (6 documents, 3 queries: ru,
+  en, mixed, code, one longer than any local-attention window); the
+  runner re-embeds them at load and refuses the model below the
+  threshold, NaN counting as failure (EmbeddingGemma gives NaN in fp16:
+  bf16 or fp32 only; a 512- vs 257-token window bug showed only past
+  ~250 tokens).
+- **Protocol**: a `ready` line (dim, max length, load ms, verify
+  cosine, limits) or `fatal`; requests `{id, op: embed, kind:
+  query|document, texts, timeout_ms}` → base64 f16 vectors with token
+  counts and truncation flags, or `{ok: false, error: bad_request |
+  too_large | timeout | cancelled | internal}`; `cancel`, `ping`,
+  `shutdown`; limits 8 MiB a line, 256 texts, 262k tokens a request.
+  Cancel and timeouts act at batch boundaries of ≤ 4,096 tokens (≤ ~2 s),
+  so the client adds a grace period, then kills. stdin EOF is the normal
+  stop; the runner exits within 0.1 s if the app dies. Large requests
+  (up to 256 texts): many small concurrent ones ran at 3-4k tokens/s.
+- EmbeddingGemma is gated on Hugging Face (Gemma licence): its entry
+  needs the user's acceptance or an ungated mirror.
+
+## UI
+
+- **Files view** of the project: a drop zone and Add… (files, or Link
+  Folder…), a row per document with its status (copying, reading, OCR,
+  describing, embedding, ready, empty, failed + reason), Remove,
+  Re-index; per source, its availability.
+- **Indexing is visible without opening it** (the user's design): in the
+  sidebar the project's folder icon becomes a progress ring while it
+  indexes — ⏸ when paused, ⚠︎ with a count when files failed — and
+  returns to the folder when done. Hover: "Indexing 120 of 450 files ·
+  OCR · ~20 min left". Clicking the ring: **Pause / Resume** (the pause
+  survives a relaunch), **Stop** (the queue is cleared; what's indexed
+  stays searchable, the rest is marked "not indexed" with Index Now),
+  **Show Files**.
+- **Automatic pause** while the chat model generates or an image/music
+  generator runs; the ring then says "waiting", so it doesn't look stuck.
+- The menu bar icon carries a small dot while any project indexes.
+- A project chat's header shows how many files it can search; answers
+  show their sources as chips (file, page) that open the file there.
+- Settings: the feature and each of its models, opt-in, with sizes.
 
 ## Tests (LLMTrayCore)
 
@@ -286,14 +470,27 @@ tabs; opening a previous schema.
 ## Evidence
 
 - System SQLite 3.54.0 here; FTS5 and `trigram` work with Cyrillic
-  (`МЕНТАЦ` finds `Документация`); `load_extension` absent. macOS 13.2
+  (`МЕНТАЦ` finds `Документация`); `load_extension` absent. Index spike
+  (branch `spike/rag-index`, 24 tests): at 200k chunks the DB is
+  2.08 GB (104 MB per 10k: trigram 32, chunks 28, vectors 20, pages 19,
+  unicode61 6 — measured with 4 KB pages and no auto_vacuum; to be
+  re-measured with the final layout); hybrid search p50 ~190 ms, p95 ~350 ms with the df gate
+  (232 / 700 ms without), nearly all of it trigram ranking; dense
+  scoring 5-8 ms, vectors loaded in 120-300 ms; ingest ~590 chunks/s
+  with both FTS tables. macOS 13.2
   ships 3.39.5: trigram (3.34), `remove_diacritics 2` (3.27); FTS5 is
   checked at runtime (`sqlite_compileoption_used('ENABLE_FTS5')`).
-- Brute force, 1 query, top-20, f32 `cblas_sgemv`: 50k × 1024 2.7 ms,
-  500k × 1024 40 ms. No vector index at project scale.
-- Qwen3-Embedding-0.6B (measured before Qwen was ruled out, kept as a
-  speed reference) under mlx-lm: ~6,400 tokens/s at batch 16, 1.8 GB peak. RuBQ retrieval: 0.6B 66.9, bge-m3
-  71.2, mE5-large 74.1, Qwen3-4B 73.7 (MTEB results repository).
+- Brute force, 1 query, top-20, f32 `cblas_sgemv`: 50k × 1024 2.6 ms,
+  200k 11 ms (5-8 ms tiled/parallel), 500k 40 ms. No vector index at
+  project scale.
+- bge-m3 fp16 on our MLX encoder: min cosine 0.99998 against
+  sentence-transformers / FlagEmbedding on 52 texts (ru, en, mixed,
+  code, up to 8k tokens), retrieval order identical; 8.0-9.4k tokens/s
+  on 400-token chunks at any batch size, an 8k text in 1.85 s, peak
+  ≤ 1.75 GB, load < 1 s, spawn to first vector 0.76 s. 200k chunks ×
+  400 tokens ≈ 2.5 h of background indexing. RuBQ retrieval (MTEB
+  results repository): bge-m3 71.2, multilingual-e5-large 74.1,
+  multilingual-e5-large-instruct 69.2, EmbeddingGemma-300m 69.7.
 - Vision rev3 `.accurate`, a clean Russian page: body near perfect,
   table cells column-wise; `RecognizeDocumentsRequest` (macOS 26+)
   returned rows and cells. PaddleOCR-VL-1.5 (0.96B, Apache-2.0) via
@@ -312,17 +509,10 @@ contextual-retrieval.
 
 ## Plan
 
-1. **Spike (throwaway).** Schema, triggers, both FTS tables on a few
-   hundred chunks; `--extract` on hostile samples (corrupt PDF, zip-bomb
-   docx, remote-loading HTML); injection documents against the tools;
-   legacy .xls / .ppt: xlrd-style BIFF parsing for .xls, the text
-   records of .ppt's binary stream, or Quick Look rendering + OCR as the
-   fallback — whichever gives full text on sample files;
-   the generic embed runner with bge-m3 on MLX, matching the reference
-   (FlagEmbedding / sentence-transformers) vectors, plus a second
-   registry entry of another family to prove the registry isn't bge-only;
-   bge-m3's own indexing speed and peak memory measured (the speed under
-   Evidence is Qwen's).
+1. **Spike (throwaway) — done 2026-09-26** (branches `spike/rag-index`,
+   `spike/rag-extract`, `spike/rag-embed`; results above). Carried into
+   v1a: injection documents against the real tools, and the index size
+   re-measured with 16 KB pages and incremental auto-vacuum.
 2. **Eval on extracted text.** The user's 20-30 real documents through
    tier 1 (and the tier-2 prototype); 40-60 questions with the answering
    page; recall@10 and MRR, lexical vs hybrid with bge-m3 (and
