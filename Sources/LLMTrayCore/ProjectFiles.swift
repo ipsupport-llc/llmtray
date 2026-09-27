@@ -316,9 +316,11 @@ public final class ProjectFilesService {
     /// false: no room was left earlier in the turn -- search and read refuse (the tool is no longer declared).
     /// `stillOwned`: the chat is still in the project, and it exists.
     /// `pinLimitTokens`: what the project's pinned files may take with the
-    /// chat's model (PinLimit); nil: this chat can't pin.
+    /// chat's model (PinLimit); nil: this chat can't pin. `pinBytesPerToken`:
+    /// what the files are sized at for that model (PinTokenRatios).
     public func run(_ request: ProjectFiles.Request, project: UUID, byteBudget: Int, fileTextAllowed: Bool = true,
-                    pinLimitTokens: Int? = nil, stillOwned: () -> Bool) async -> ProjectFilesAnswer {
+                    pinLimitTokens: Int? = nil, pinBytesPerToken: Double = PromptTokenEstimator.defaultBytesPerToken,
+                    stillOwned: () -> Bool) async -> ProjectFilesAnswer {
         guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
         let handle: ProjectIndexHandle
         do {
@@ -337,7 +339,7 @@ public final class ProjectFilesService {
                 answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins))
             case .pin(let doc, let on):
                 answer = try await pin(doc, on: on, docs: docs, pins: pins, handle: handle, project: project,
-                                       limitTokens: pinLimitTokens, stillOwned: stillOwned)
+                                       limitTokens: pinLimitTokens, bytesPerToken: pinBytesPerToken, stillOwned: stillOwned)
             case .search, .read:
                 if !fileTextAllowed { return .refused(ProjectTextBudget.noRoomText) }
                 if !docs.contains(where: { $0.status.isSearchable }) {
@@ -654,7 +656,7 @@ public final class ProjectFilesService {
     /// Pins or unpins a file for the project's chats. From the user's next
     /// message on: a turn's requests carry what was pinned at its start.
     func pin(_ doc: Int64, on: Bool, docs: [IndexedDocument], pins: [Int64], handle: ProjectIndexHandle, project: UUID,
-             limitTokens: Int?, stillOwned: () -> Bool) async throws -> ProjectFilesAnswer {
+             limitTokens: Int?, bytesPerToken: Double, stillOwned: () -> Bool) async throws -> ProjectFilesAnswer {
         let tool = ProjectFiles.toolName
         guard let limitTokens else { return .text("\(tool): files can't be pinned in this chat.") }
         guard let d = docs.first(where: { $0.doc == doc }) else { return .text(noSuchFile(doc, docs)) }
@@ -674,7 +676,7 @@ public final class ProjectFilesService {
                          + "search or read it with \(tool) when needed.")
         }
         let measured = docs.filter { pins.contains($0.doc) || $0.doc == doc }
-        let tokens = try await handle.read { try $0.pinTokens(of: measured) }
+        let tokens = PinTokenRatio.tokens(try await handle.read { try $0.pinBytes(of: measured) }, bytesPerToken: bytesPerToken)
         switch PinnedFiles.check(doc, docs: docs, pins: pins, tokens: tokens, limitTokens: limitTokens) {
         case .noSuchFile:
             return .text(noSuchFile(doc, docs))

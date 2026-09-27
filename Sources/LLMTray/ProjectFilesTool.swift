@@ -51,6 +51,7 @@ final class ProjectFilesTool: ChatTool {
             fileTextAllowed: context.fileTextAllowed,
             // A pin is for the project's chats, with this chat's model's room.
             pinLimitTokens: ProjectIndexer.pinLimit(for: context.settings).tokens,
+            pinBytesPerToken: ProjectIndexer.pinBytesPerToken(model: context.settings.modelPath),
             stillOwned: { ChatLibraryStore.shared.library.chat(chat, isIn: project.id) })
         switch answer {
         case .output(let output): return .projectText(output)

@@ -37,6 +37,8 @@
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
+"(estimate; exact after the first answer)" = "(estimate; exact after the first answer)";
+"(measured for this model)" = "(measured for this model)";
 "(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
 "1 hour" = "1 hour";

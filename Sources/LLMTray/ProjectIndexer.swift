@@ -38,10 +38,14 @@ final class ProjectIndexer: ObservableObject {
     @Published private(set) var addNotes: [UUID: String] = [:]
     /// Each opened project's pinned documents, in pin order (adr/0012,
     /// "Pinned files"), and each searchable document's pinned size in
-    /// tokens (measured once per revision, off the main thread).
+    /// bytes (measured once per revision, off the main thread; tokens at
+    /// the model's ratio, `pinTokens`).
     @Published private(set) var pins: [UUID: [Int64]] = [:]
-    @Published private(set) var pinTokens: [UUID: [Int64: Int]] = [:]
-    /// The revision each size in `pinTokens` was measured at.
+    @Published private(set) var pinBytes: [UUID: [Int64: Int]] = [:]
+    /// Each model's bytes-a-token samples from the server's counts
+    /// (PinTokenRatios), here so the Files window redraws when one comes.
+    @Published private(set) var pinTokenSamples: [String: [Double]] = PinTokenRatios().all
+    /// The revision each size in `pinBytes` was measured at.
     private var pinTokenRevs: [UUID: [Int64: Int64]] = [:]
     private var pinRefreshes: [UUID: Task<Void, Never>] = [:]
 
@@ -232,7 +236,7 @@ final class ProjectIndexer: ObservableObject {
             pinRefreshes.values.forEach { $0.cancel() }
             pinRefreshes = [:]
             if !pins.isEmpty { pins = [:] }
-            if !pinTokens.isEmpty { pinTokens = [:] }
+            if !pinBytes.isEmpty { pinBytes = [:] }
             pinTokenRevs = [:]
             if !addNotes.isEmpty { addNotes = [:] }
             embeddingUnavailable = nil
@@ -404,15 +408,15 @@ final class ProjectIndexer: ObservableObject {
             let docs = (self.documents[project] ?? []).filter { $0.status.isSearchable }
             let live = Set(docs.map(\.doc))
             self.pinTokenRevs[project] = (self.pinTokenRevs[project] ?? [:]).filter { live.contains($0.key) }
-            let kept = (self.pinTokens[project] ?? [:]).filter { live.contains($0.key) }
-            if self.pinTokens[project] != kept { self.pinTokens[project] = kept }
+            let kept = (self.pinBytes[project] ?? [:]).filter { live.contains($0.key) }
+            if self.pinBytes[project] != kept { self.pinBytes[project] = kept }
             // Kept as they're measured (a newer refresh goes on from them),
             // shown every few files: a bulk index doesn't leave every pin
             // "measuring" until the last one.
-            var measured: [(doc: Int64, rev: Int64, tokens: Int)] = []
+            var measured: [(doc: Int64, rev: Int64, bytes: Int)] = []
             for d in docs where self.pinTokenRevs[project]?[d.doc] != d.rev {
                 if Task.isCancelled { break }
-                guard let t = try? await handle.read({ try $0.pinTokens(of: [d]) })[d.doc] else { continue }
+                guard let t = try? await handle.read({ try $0.pinBytes(of: [d]) })[d.doc] else { continue }
                 measured.append((d.doc, d.rev, t))
                 if measured.count >= 10 {
                     self.storePinSizes(measured, in: project)
@@ -423,14 +427,41 @@ final class ProjectIndexer: ObservableObject {
         }
     }
 
-    private func storePinSizes(_ measured: [(doc: Int64, rev: Int64, tokens: Int)], in project: UUID) {
+    private func storePinSizes(_ measured: [(doc: Int64, rev: Int64, bytes: Int)], in project: UUID) {
         guard !measured.isEmpty, isEnabled else { return }
-        var sizes = pinTokens[project] ?? [:]
+        var sizes = pinBytes[project] ?? [:]
         for m in measured {
-            sizes[m.doc] = m.tokens
+            sizes[m.doc] = m.bytes
             pinTokenRevs[project, default: [:]][m.doc] = m.rev
         }
-        pinTokens[project] = sizes
+        pinBytes[project] = sizes
+    }
+
+    /// A project's pinned sizes in tokens for `model`: at its learned ratio.
+    func pinTokens(_ project: UUID, model: String?) -> [Int64: Int] {
+        PinTokenRatio.tokens(pinBytes[project] ?? [:], bytesPerToken: PinTokenRatio.effective(learnedPinRatio(model: model)))
+    }
+
+    /// What `model`'s pinned files are sized at (PinTokenRatio): learned
+    /// from the server's counts, the estimator's 2 bytes before any.
+    static func pinBytesPerToken(model: String?) -> Double {
+        PinTokenRatios().bytesPerToken(model: model)
+    }
+
+    /// Whether `model`'s ratio has been measured.
+    func isPinRatioMeasured(model: String?) -> Bool { learnedPinRatio(model: model) != nil }
+
+    private func learnedPinRatio(model: String?) -> Double? {
+        model.flatMap { PinTokenRatio.learned(pinTokenSamples[$0] ?? []) }
+    }
+
+    /// The server counted `promptTokens` for a request of `model`'s: a
+    /// sample of its ratio when it's large enough and has no images.
+    func recordPromptTokens(model: String?, _ measure: PromptTokenEstimator.Measure, promptTokens: Int) {
+        let ratios = PinTokenRatios()
+        guard ratios.record(model: model, measure, promptTokens: promptTokens) else { return }
+        let all = ratios.all
+        if pinTokenSamples != all { pinTokenSamples = all }
     }
 
     /// What the project's pinned files may take with `settings`' model: half

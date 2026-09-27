@@ -128,11 +128,13 @@ final class ChatClient: ObservableObject {
     private var tokenEstimator = PromptTokenEstimator()
     /// A request's shape for the estimate: its size, how many messages of
     /// the history it sent, and the rest serialized -- the system prompt
-    /// and parameters, and each tool declaration by name.
+    /// and parameters, and each tool declaration by name; and its model
+    /// (whose pinned-file ratio its count teaches).
     private struct SentRequest {
         var measure: PromptTokenEstimator.Measure
         var historyCount: Int
         var framing: Framing
+        var modelPath: String?
     }
     private struct Framing: Equatable {
         var base: Data
@@ -654,8 +656,18 @@ final class ChatClient: ObservableObject {
             s.project = project
             return s
         }
-        let chosen = PinnedFiles.select(pinned.files, limitTokens: ProjectIndexer.pinLimit(for: base).tokens) { files in
-            requestTokenEstimate(context, settings(files, [])) + base.maxTokens + margin <= base.maxTokensCap
+        // Sized at the model's learned ratio, in the pin limit and in the
+        // request's room alike: the request without the files (counted when
+        // it was) plus their block at that ratio -- unless this very prefix
+        // was counted. At 2 bytes a token a book that fits was left out.
+        let ratio = ProjectIndexer.pinBytesPerToken(model: base.modelPath)
+        let rest = requestTokenEstimate(context, settings([], []))
+        let chosen = PinnedFiles.select(pinned.files, limitTokens: ProjectIndexer.pinLimit(for: base).tokens,
+                                        bytesPerToken: ratio) { files in
+            let withFiles = settings(files, [])
+            let estimate = countedTokenEstimate(context, withFiles)
+                ?? rest + PinTokenRatio.tokens(bytes: PinnedFiles.jsonBytes(PinnedFiles.block(files, notes: [])), bytesPerToken: ratio)
+            return estimate + base.maxTokens + margin <= base.maxTokensCap
         }
         if let user = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) {
             messages[user].returnedCitations = PinnedFiles.citations(chosen.files, project: project.id)
@@ -985,7 +997,8 @@ final class ChatClient: ObservableObject {
         countedRequest = nil
         lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
                                   framing: framing(modelAlias: modelAlias, settings: settings,
-                                                   tools: offerTools ? toolbox.definitions(for: settings) : []))
+                                                   tools: offerTools ? toolbox.definitions(for: settings) : []),
+                                  modelPath: settings.modelPath)
 
         decoder = SSEDecoder()
         approxCompletionTokens = 0
@@ -1466,17 +1479,22 @@ final class ChatClient: ObservableObject {
     /// messages since (the call, the results so far) and any growth of the
     /// rest, at the estimator's conservative ratio.
     private func requestTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int {
-        let tools = toolbox.definitions(for: settings)
-        let framing = framing(modelAlias: context.modelAlias, settings: settings, tools: tools)
-        // A changed system prompt or profile (read again mid-turn) or a new
-        // declaration: estimated whole.
-        if let counted = countedRequest, counted.historyCount <= messages.count, framing.isCovered(by: counted.framing) {
-            let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map(ChatRequestBuilder.serialize)])
-            if let estimate = tokenEstimator.estimate(countedPlus: added) { return estimate }
-        }
+        if let counted = countedTokenEstimate(context, settings) { return counted }
         let body = ChatRequestBuilder.streamingBody(modelAlias: context.modelAlias, settings: settings, history: messages,
-                                                    tools: tools, projectTools: toolbox.projectToolNames)
+                                                    tools: toolbox.definitions(for: settings), projectTools: toolbox.projectToolNames)
         return tokenEstimator.estimate(ChatRequestBuilder.measure(body))
+    }
+
+    /// The estimate from the server's count of the last request, when it
+    /// covers this one (the same framing, the history only grown); nil
+    /// otherwise. A changed system prompt or profile (read again mid-turn)
+    /// or a new declaration isn't covered.
+    private func countedTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int? {
+        guard let counted = countedRequest, counted.historyCount <= messages.count else { return nil }
+        let framing = framing(modelAlias: context.modelAlias, settings: settings, tools: toolbox.definitions(for: settings))
+        guard framing.isCovered(by: counted.framing) else { return nil }
+        let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map(ChatRequestBuilder.serialize)])
+        return tokenEstimator.estimate(countedPlus: added)
     }
 
     /// A request without its history's messages, serialized. The system
@@ -1530,6 +1548,7 @@ final class ChatClient: ObservableObject {
                 requestStats.reasoningTokens = reasoningTokens
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
+                    ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens)
                 }
             }
         }

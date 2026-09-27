@@ -875,11 +875,22 @@ removal's transaction drops it with the document.
   512 × 2 × 2 = 20,480 bytes a token; a dense Llama 8B: 131,072. No usable
   config: 131,072. No GPU limit known: A alone.
 
-A file's size is its rendered pinned text (below) at the estimator's
-2 bytes a token, the JSON-escaped bytes as `measure` counts them -- the
-same count the request's budget makes, so a pin that fits the limit is
-what the request then carries (it overcounts English about twice, as
-every estimate before the first response does). Shown as "≈N tokens".
+A file's size is its rendered pinned text (below), the JSON-escaped
+bytes as `measure` counts them, kept in bytes and made tokens at the
+model's ratio (so a size follows a model switch). The ratio is learned
+from the server's counts: each counted request of at least 2,000 prompt
+tokens and without images is a sample (its bytes / `prompt_tokens`), kept
+per model path (the last 5, in UserDefaults), and the lowest of them less
+10% is used, within 2-6 bytes a token; a model not counted yet gets the
+estimator's 2 (which overcounts English about twice: a book of 242,712
+bytes was ≈121K and 57K by Gemma 4's count, left out at an 83K limit).
+The lowest, not an average: undercounting a pin overflows the request,
+overcounting only leaves a file out; a denser text takes the ratio down
+at its first counted request. The template's tokens aren't in the bytes,
+so a sample is on the low side too. Shown as "≈N tokens", the summary
+saying "(measured for this model)" or "(estimate; exact after the first
+answer)". The request-level estimate keeps its 2 bytes: only pinned
+sizing uses the ratio.
 Pinning past the limit is refused: the pin is disabled with the reason in
 the Files window; the tool answers with the size and the limit, tells the
 model to read the file by pages and to tell the user.
@@ -898,8 +909,11 @@ the user's next message, which its result says (a mid-turn change would
 re-prefill the whole prefix for one round). The files go in pin order,
 each while it fits what's left of the limit for the turn's model and of
 the request's room (context − the request's estimate − `max_tokens` −
-10%); for each one left out, one line: "Pinned file <name> (doc N) is too
-long for this model's room now; read it with project_files." (a model
+10%; the request's estimate here is the rest of it -- counted when it
+was -- plus the pinned block at the model's ratio, unless the server
+counted this very prefix already); for each one left out, one line:
+"Pinned file <name> (doc N) is too long for this model's room now; read
+it with project_files." (a model
 switched to one with less room); a pinned file with no text now (re-indexed
 to empty) gets a line too. The estimate counts the pinned text as part of
 the request, so `project_files`' allowance shrinks by it.

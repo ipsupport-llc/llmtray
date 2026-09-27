@@ -74,6 +74,9 @@ public enum Pref {
     /// Of the context, and of the memory the weights leave, what pinned
     /// files may take (adr/0012, "Pinned files"), in percent.
     public static let pinnedFilesPercent = PrefKey("llmtray.projectFiles.pinnedPercent", default: 50)
+    /// Each model's (by path) last bytes-a-token samples from the server's
+    /// counts, which size its pinned files (PinTokenRatios).
+    public static let pinTokenSamples = PrefKey<[String: [Double]]>("llmtray.projectFiles.pinTokenSamples", default: [:])
     /// Projects whose indexing the user paused (UUID strings): the pause
     /// survives a relaunch.
     public static let projectIndexPaused = PrefKey<[String]>("llmtray.projectFiles.paused", default: [])
