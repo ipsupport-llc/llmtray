@@ -64,7 +64,11 @@ public struct IndexSearchOptions: Sendable {
     public var listLimit = 50
     /// Terms in more than this share of the chunks are dropped (the rarest
     /// matching one kept): their bm25 weight is ~0 and ranking every row
-    /// holding "в" is what makes a query slow. nil: off. Set by the eval.
+    /// holding "в" is what makes a query slow. When only such terms are left
+    /// (a one-word query "в" too) and the dense list runs, the lexical list
+    /// is skipped altogether (bm25 over 78% of the index took 120-165 ms at
+    /// 200k chunks for ~0 information); without dense the rarest one still
+    /// ranks, so a lexical-only answer keeps its order. nil: off. Set by the eval.
     public var documentFrequencyGate: Double? = 0.2
     /// The gate only applies from this many chunks on.
     public var gateMinimumChunks = 2000
@@ -125,6 +129,20 @@ public struct ProjectIndexSummary: Equatable, Sendable {
     }
 }
 
+/// Where a search's time went (the last search of an `IndexSearcher`).
+public struct IndexSearchTimings: Equatable, Sendable {
+    /// Loading or refreshing the vectors.
+    public var vectors: Duration = .zero
+    public var words: Duration = .zero
+    public var trigram: Duration = .zero
+    /// Scoring every vector and the top-k.
+    public var dense: Duration = .zero
+    /// Fusion and fetching the hits' text.
+    public var fetch: Duration = .zero
+
+    public var total: Duration { vectors + words + trigram + dense + fetch }
+}
+
 /// A page of text as stored, current or kept for a citation.
 public struct IndexPage: Equatable, Sendable {
     public var doc: Int64
@@ -142,6 +160,7 @@ public struct IndexPage: Equatable, Sendable {
 /// ends it at once, so it never holds back a checkpoint.
 public final class IndexSearcher {
     public let db: SQLiteConnection
+    public private(set) var lastTimings = IndexSearchTimings()
 
     public init(db: SQLiteConnection) throws {
         self.db = db
@@ -198,34 +217,43 @@ public final class IndexSearcher {
     }
 
     /// The gate: drops terms in more than `share` of `total` chunks; if that
-    /// leaves nothing that matches, keeps the rarest term that does.
+    /// leaves nothing that matches, keeps the rarest term that does --
+    /// `commonOnly`: that one is above the share itself. A single term goes
+    /// through it too.
     static func gate(_ terms: [String], total: Int64, share: Double?, minimumChunks: Int,
-                     frequency: (String) throws -> Int64) rethrows -> (kept: [String], dropped: [String]) {
-        guard let share, terms.count > 1, total >= Int64(minimumChunks) else { return (terms, []) }
+                     frequency: (String) throws -> Int64) rethrows -> (kept: [String], dropped: [String], commonOnly: Bool) {
+        guard let share, total >= Int64(minimumChunks) else { return (terms, [], false) }
         let limit = Int64(Double(total) * share)
         let dfs = try terms.map { ($0, try frequency($0)) }
         var kept = dfs.filter { $0.1 <= limit }.map(\.0)
+        var commonOnly = false
         if !dfs.contains(where: { $0.1 > 0 && $0.1 <= limit }),
            let rarest = dfs.filter({ $0.1 > 0 }).min(by: { $0.1 < $1.1 }) {
             kept.append(rarest.0)
+            commonOnly = true
         }
-        return (kept, terms.filter { !kept.contains($0) })
+        return (kept, terms.filter { !kept.contains($0) }, commonOnly)
     }
 
-    /// The unicode61 list, gated.
-    public func words(_ q: LexicalQuery, options: IndexSearchOptions = IndexSearchOptions()) throws -> (ids: [Int64], dropped: [String]) {
+    /// The unicode61 list, gated. `withDense`: the dense list runs too, so
+    /// a list of common terms only is skipped (its terms reported dropped).
+    public func words(_ q: LexicalQuery, options: IndexSearchOptions = IndexSearchOptions(),
+                      withDense: Bool = false) throws -> (ids: [Int64], dropped: [String]) {
         let total = try chunkCount()
         let g = try Self.gate(q.terms, total: total, share: options.documentFrequencyGate, minimumChunks: options.gateMinimumChunks) {
             try documentFrequency(vocab: "chunks_fts_vocab", $0)
         }
+        if g.commonOnly && withDense { return ([], q.terms) }
         return (try ranked("chunks_fts", g.kept, limit: options.listLimit, document: options.document), g.dropped)
     }
 
-    /// The trigram list (terms of 3+ characters, pseudo-stemmed), gated.
-    public func trigram(_ q: LexicalQuery, options: IndexSearchOptions = IndexSearchOptions()) throws -> (ids: [Int64], dropped: [String]) {
+    /// The trigram list (terms of 3+ characters, pseudo-stemmed), gated like `words`.
+    public func trigram(_ q: LexicalQuery, options: IndexSearchOptions = IndexSearchOptions(),
+                        withDense: Bool = false) throws -> (ids: [Int64], dropped: [String]) {
         let total = try chunkCount()
         let g = try Self.gate(q.trigramTerms, total: total, share: options.documentFrequencyGate,
                               minimumChunks: options.gateMinimumChunks) { try trigramFrequency($0) }
+        if g.commonOnly && withDense { return ([], q.trigramTerms) }
         return (try ranked("chunks_tri", g.kept, limit: options.listLimit, document: options.document), g.dropped)
     }
 
@@ -252,13 +280,26 @@ public final class IndexSearcher {
     public func search(_ query: String, queryVector: [Float]?, vectors: (SQLiteConnection) throws -> DenseVectors?,
                        options: IndexSearchOptions = IndexSearchOptions()) throws -> IndexSearchResult {
         let q = IndexQuery.build(query)
+        let clock = ContinuousClock()
+        var timings = IndexSearchTimings()
+        defer { lastTimings = timings }
         return try db.transaction(immediate: false) {
-            let dense = queryVector == nil ? nil : try vectors(db)
-            let w = try words(q, options: options)
-            let t = try trigram(q, options: options)
+            var mark = clock.now
+            func lap(_ stage: WritableKeyPath<IndexSearchTimings, Duration>) {
+                let now = clock.now
+                timings[keyPath: stage] = now - mark
+                mark = now
+            }
+            let loaded = queryVector == nil ? nil : try vectors(db)
+            let dense = loaded.flatMap { $0.count > 0 && $0.dim == queryVector?.count ? $0 : nil }
+            lap(\.vectors)
+            let w = try words(q, options: options, withDense: dense != nil)
+            lap(\.words)
+            let t = try trigram(q, options: options, withDense: dense != nil)
+            lap(\.trigram)
             var denseList: [Int64] = []
             var usedDense = false
-            if let dense, let queryVector, dense.count > 0, queryVector.count == dense.dim {
+            if let dense, let queryVector {
                 let allowed = try searchableDocuments()
                 let filter = options.document
                 let scores = dense.scores(queryVector)
@@ -267,6 +308,7 @@ public final class IndexSearcher {
                 }.map(\.chunk)
                 usedDense = true
             }
+            lap(\.dense)
             let lists: [(IndexList, [Int64])] = [(.words, w.ids), (.trigram, t.ids), (.dense, denseList)]
             var found: [Int64: Set<IndexList>] = [:]
             for (name, ids) in lists { for id in ids { found[id, default: []].insert(name) } }
@@ -285,6 +327,7 @@ public final class IndexSearcher {
             }
             var seen = Set<String>()
             let dropped = (w.dropped + t.dropped).filter { seen.insert($0).inserted }
+            lap(\.fetch)
             return IndexSearchResult(hits: hits, usedDense: usedDense, gatedTerms: dropped)
         }
     }

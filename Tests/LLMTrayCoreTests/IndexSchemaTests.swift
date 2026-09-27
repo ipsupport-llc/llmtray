@@ -161,4 +161,36 @@ final class IndexSchemaTests: XCTestCase {
         XCTAssertEqual(rebuilt.joined(separator: " "), text)
         XCTAssertTrue(rebuilt.joined().contains("ДОГОВОР"), "original case kept for quoting")
     }
+
+    /// The vector load walks vec_blocks by rowid, already in id order: no
+    /// temp B-tree sorting every blob (the set_id index made one).
+    func testVectorLoadIsARowidRangeScanWithoutASort() throws {
+        let idx = try ProjectIndex.testIndex()
+        try idx.addText("договор поставки товара")
+        let plan = try idx.db.rows("EXPLAIN QUERY PLAN " + DenseVectors.loadSQL, [.int(idx.toySet), .int(0)]) { $0.text(3) }
+        XCTAssertFalse(plan.contains { $0.contains("TEMP B-TREE") }, "\(plan)")
+        XCTAssertTrue(plan.contains { $0.contains("INTEGER PRIMARY KEY") }, "\(plan)")
+        let dense = DenseVectors(setID: idx.toySet, dim: 64)
+        try dense.refresh(from: idx.db)
+        XCTAssertEqual(dense.count, Int(try idx.count("SELECT count(*) FROM chunks")))
+    }
+
+    /// SQLite's substr() stops at U+0000: a NUL in a page would empty every
+    /// chunk after it. It is stored as a space, offsets unchanged.
+    func testNULInPageTextDoesntCutChunks() throws {
+        let idx = try ProjectIndex.testIndex(chunker: IndexChunker(minTokens: 3, maxTokens: 5))
+        let text = "Первый абзац\u{0}договора поставки товара и ещё несколько слов после нуля в тексте страницы"
+        let doc = try idx.addText(text, embed: false)
+        XCTAssertEqual(try idx.count("SELECT count(*) FROM pages WHERE instr(text, char(0)) > 0"), 0)
+        let s = try idx.searcher()
+        let ids = try idx.db.rows("SELECT id FROM chunks WHERE doc = ? ORDER BY ord", [.int(doc)]) { $0.int(0) }
+        XCTAssertGreaterThan(ids.count, 2)
+        let rebuilt = try ids.map { try s.fetch($0)!.text }
+        XCTAssertFalse(rebuilt.contains(""), "no chunk comes back empty")
+        XCTAssertEqual(rebuilt.joined(separator: " "), text.replacingOccurrences(of: "\u{0}", with: " "))
+        let pending = try idx.pendingChunks(doc: doc, set: idx.toySet, limit: 100)
+        XCTAssertEqual(pending.count, ids.count)
+        XCTAssertFalse(pending.contains { $0.text.isEmpty })
+        XCTAssertEqual(try s.search("нуля").hits.count, 1)
+    }
 }

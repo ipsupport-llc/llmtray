@@ -23,11 +23,15 @@ final class IndexFusionTests: XCTestCase {
         XCTAssertEqual(g.dropped, ["в", "и"])
         let onlyCommon = IndexSearcher.gate(["в", "и"], total: 1000, share: 0.2, minimumChunks: 100) { df[$0]! }
         XCTAssertEqual(onlyCommon.kept, ["и"], "nothing useful left: the rarest matching term stays")
+        XCTAssertTrue(onlyCommon.commonOnly, "and is itself above the share")
+        XCTAssertFalse(g.commonOnly)
         XCTAssertEqual(IndexSearcher.gate(["в", "и"], total: 50, share: 0.2, minimumChunks: 100) { df[$0]! }.kept, ["в", "и"],
                        "a small index isn't gated")
         XCTAssertEqual(IndexSearcher.gate(["в", "и"], total: 1000, share: nil, minimumChunks: 100) { df[$0]! }.kept, ["в", "и"])
-        XCTAssertEqual(IndexSearcher.gate(["в"], total: 1000, share: 0.2, minimumChunks: 100) { df[$0]! }.kept, ["в"],
-                       "a single term is never gated")
+        let single = IndexSearcher.gate(["в"], total: 1000, share: 0.2, minimumChunks: 100) { df[$0]! }
+        XCTAssertEqual(single.kept, ["в"], "a single term is kept")
+        XCTAssertTrue(single.commonOnly, "but flagged when very common")
+        XCTAssertFalse(IndexSearcher.gate(["договор"], total: 1000, share: 0.2, minimumChunks: 100) { df[$0]! }.commonOnly)
     }
 
     func testGateOnARealIndexWithAConfigurableThreshold() throws {
@@ -43,10 +47,38 @@ final class IndexFusionTests: XCTestCase {
         XCTAssertEqual(gated.gatedTerms, ["общее"])
         XCTAssertEqual(gated.hits.first?.doc, 8)
         XCTAssertEqual(gated.hits.count, 1, "only the rare term ran")
+        let common = try s.search("общее", options: options)
+        XCTAssertEqual(common.hits.count, 10, "without dense a very common single word still answers, ranked")
+        XCTAssertTrue(common.gatedTerms.isEmpty)
         options.documentFrequencyGate = 1.0
         XCTAssertTrue(try s.search("общее редкоеслово", options: options).gatedTerms.isEmpty)
         options.documentFrequencyGate = nil
         XCTAssertGreaterThan(try s.search("общее редкоеслово", options: options).hits.count, 1)
+    }
+}
+
+extension IndexFusionTests {
+    /// With the dense list running, a query of very common terms only -- one
+    /// word too -- skips both lexical lists (ranking ~all rows for ~0
+    /// information was most of the search's time at scale).
+    func testCommonTermsOnlyGoDenseOnlyWhenVectorsRun() throws {
+        let idx = try ProjectIndex.testIndex()
+        for i in 0..<30 { try idx.addText("общее слово номер \(i) и текст про договор \(i)", name: "d\(i).txt") }
+        let s = try idx.searcher()
+        let dense = DenseVectors(setID: idx.toySet, dim: 64)
+        try dense.refresh(from: idx.db)
+        var options = IndexSearchOptions(limit: 5)
+        options.gateMinimumChunks = 1
+        let r = try s.search("общее", queryVector: ToyEmbedder().embed("общее"), dense: dense, options: options)
+        XCTAssertTrue(r.usedDense)
+        XCTAssertEqual(r.gatedTerms, ["общее"])
+        XCTAssertFalse(r.hits.isEmpty)
+        XCTAssertTrue(r.hits.allSatisfy { $0.foundBy == [.dense] }, "\(r.hits.map(\.foundBy))")
+        let mixed = try s.search("общее номер 7", queryVector: ToyEmbedder().embed("общее номер 7"), dense: dense, options: options)
+        XCTAssertTrue(mixed.hits.contains { $0.foundBy.contains(.words) }, "a rare term still ranks lexically")
+        let lexical = try s.search("общее", options: options)
+        XCTAssertFalse(lexical.usedDense)
+        XCTAssertTrue(lexical.hits.allSatisfy { $0.foundBy.contains(.words) }, "no dense: the common term still ranks")
     }
 }
 

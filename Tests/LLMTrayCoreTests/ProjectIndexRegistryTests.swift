@@ -15,14 +15,18 @@ final class ProjectIndexRegistryTests: XCTestCase {
     }
 
     /// The read-only WAL connection keeps searching while the writer holds a
-    /// large open transaction; it never sees uncommitted rows and never gets BUSY.
+    /// large open transaction; it never sees uncommitted rows and never gets
+    /// BUSY. No wall-clock bound: the transaction stays open until every
+    /// search has answered, so a search queued behind it would never return
+    /// before the release (the writer then reports its wait timed out).
     func testSearchDuringALargeWriteTransaction() async throws {
         let reg = registry()
         let h = try reg.handle(for: UUID())
         try await seed(h, docs: 10)
         let started = expectation(description: "write transaction open")
+        let release = DispatchSemaphore(value: 0)
         let writing = Task {
-            try await h.write { idx in
+            try await h.write { idx -> Bool in
                 try idx.db.transaction {
                     try idx.db.run("INSERT INTO documents(name, ext, sha256, added_at, status) VALUES ('big', 'txt', 'x', 0, 'searchable')")
                     let doc = idx.db.lastInsertRowID
@@ -33,20 +37,18 @@ final class ProjectIndexRegistryTests: XCTestCase {
                                        [.int(doc), .int(Int64(i)), .text(IndexText.normalize(gen.text(words: 120)) + " zzuncommitted")])
                     }
                     started.fulfill()
-                    Thread.sleep(forTimeInterval: 1.0)
+                    return release.wait(timeout: .now() + 120) == .timedOut
                 }
             }
         }
         await fulfillment(of: [started], timeout: 60)
-        var worst: Duration = .zero
         for q in ["договора", "zzuncommitted", "server config", "поставки", "zzuncommitted"] {
-            let t0 = ContinuousClock.now
             let r = try await h.search(q)
-            worst = max(worst, ContinuousClock.now - t0)
             if q == "zzuncommitted" { XCTAssertTrue(r.hits.isEmpty, "a reader never sees uncommitted chunks") }
         }
-        XCTAssertLessThan(worst, .milliseconds(500), "searches don't queue behind the ingest")
-        try await writing.value
+        release.signal()
+        let timedOut = try await writing.value
+        XCTAssertFalse(timedOut, "every search answered while the write transaction was open")
         let committed = try await h.search("zzuncommitted", options: IndexSearchOptions(limit: 10))
         XCTAssertEqual(committed.hits.count, 2, "one document: the per-document limit")
         var options = IndexSearchOptions(limit: 100, document: 11)
@@ -87,8 +89,9 @@ final class ProjectIndexRegistryTests: XCTestCase {
         } catch is ProjectIndexHandle.Closed {}
     }
 
-    /// Compaction swaps the file under the handle's reader: searches queued
-    /// meanwhile wait and then answer from the compacted file.
+    /// Compaction swaps the file under the handle's reader: searches issued
+    /// while the swap is in progress (held there by a hook) wait, then answer
+    /// from the compacted file -- after the swap, with the same hits.
     func testCompactionSwapWithAnOpenReader() async throws {
         let reg = registry()
         let h = try reg.handle(for: UUID())
@@ -96,19 +99,82 @@ final class ProjectIndexRegistryTests: XCTestCase {
         try await h.write { idx in for d in try idx.documents().prefix(8) { try idx.remove(doc: d.doc) } }
         let before = try await h.search("договор", queryVector: ToyEmbedder().embed("договор"))
         XCTAssertTrue(before.usedDense)
-        async let compaction: Void = h.compact()
-        var answered = 0
-        for _ in 0..<20 {
-            let r = try await h.search("договор", queryVector: ToyEmbedder().embed("договор"))
-            XCTAssertEqual(r.hits.map(\.chunk), before.hits.map(\.chunk))
-            answered += 1
+        let inSwap = DispatchSemaphore(value: 0), searchesIssued = DispatchSemaphore(value: 0)
+        let swapped = Flag()
+        try await h.write { idx in
+            idx.crashHook = { point in
+                if point == "swap.movedOld" {
+                    inSwap.signal()
+                    _ = searchesIssued.wait(timeout: .now() + 60)
+                    Thread.sleep(forTimeInterval: 0.1)   // lets the issued searches reach the reader queue
+                }
+                if point == "swap.movedNew" { swapped.set() }
+            }
         }
-        try await compaction
-        XCTAssertEqual(answered, 20)
+        let compaction = Task { try await h.compact() }
+        await withCheckedContinuation { c in DispatchQueue.global().async { inSwap.wait(); c.resume() } }
+        let searches = (0..<8).map { _ in
+            Task { () throws -> (hits: [Int64], afterSwap: Bool) in
+                let r = try await h.search("договор", queryVector: ToyEmbedder().embed("договор"))
+                return (r.hits.map(\.chunk), swapped.isSet)
+            }
+        }
+        searchesIssued.signal()
+        try await compaction.value
+        for task in searches {
+            let r = try await task.value
+            XCTAssertEqual(r.hits, before.hits.map(\.chunk))
+            XCTAssertTrue(r.afterSwap, "a search issued during the swap answers after it")
+        }
+        try await h.write { $0.crashHook = nil }
         let after = try await h.search("договор", queryVector: ToyEmbedder().embed("договор"))
         XCTAssertEqual(after.hits.map(\.chunk), before.hits.map(\.chunk))
         let churn = try await h.write { try $0.storage().churn }
         XCTAssertEqual(churn, 0)
+        reg.closeAll()
+    }
+
+    /// The swap happened but the writer couldn't reopen: the handle fails
+    /// clearly (every call throws `Failed`), and the registry replaces it.
+    func testAFailedReopenAfterTheSwapFailsTheHandleAndIsReplaced() async throws {
+        let reg = registry()
+        let project = UUID()
+        let h = try reg.handle(for: project)
+        try await seed(h, docs: 4)
+        try await h.write { idx in idx.crash(at: "swap.movedNew") }
+        do {
+            try await h.compact()
+            XCTFail("compaction should fail")
+        } catch {}
+        XCTAssertTrue(h.isFailed)
+        do {
+            _ = try await h.search("договор")
+            XCTFail("a failed handle doesn't search")
+        } catch is ProjectIndexHandle.Failed {}
+        do {
+            _ = try await h.write { try $0.documents().count }
+            XCTFail("nor write")
+        } catch is ProjectIndexHandle.Failed {}
+        let fresh = try await reg.open(project)
+        XCTAssertFalse(fresh === h)
+        let count = try await fresh.write { try $0.documents().count }
+        XCTAssertEqual(count, 4)
+        let hits = try await fresh.search("договор").hits.count
+        XCTAssertGreaterThan(hits, 0)
+        reg.closeAll()
+    }
+
+    /// Opening one project (its reconcile) doesn't hold up another's.
+    func testOpeningOneProjectDoesntWaitForAnother() throws {
+        let reg = registry()
+        let slow = UUID(), other = UUID()
+        let slowLock = reg.lifecycleLock(slow)
+        slowLock.lock()   // as if `slow` were opening
+        _ = try reg.handle(for: other)
+        slowLock.unlock()
+        XCTAssertEqual(reg.openProjects, [other])
+        _ = try reg.handle(for: slow)
+        XCTAssertEqual(reg.openProjects, [slow, other])
         reg.closeAll()
     }
 
@@ -189,4 +255,12 @@ final class ProjectIndexRegistryTests: XCTestCase {
         XCTAssertEqual(r.hits.count, 1)
         reg.closeAll()
     }
+}
+
+/// Set once, read from any thread.
+final class Flag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = false
+    func set() { lock.lock(); value = true; lock.unlock() }
+    var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
 }

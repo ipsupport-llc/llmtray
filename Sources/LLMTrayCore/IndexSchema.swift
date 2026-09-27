@@ -17,6 +17,12 @@ public enum ProjectIndexError: Error, Equatable, CustomStringConvertible {
     case insufficientDisk(needed: Int64, available: Int64)
     case integrity(String)
     case busy
+    /// Not a regular file (a directory, device, socket, broken link).
+    case notARegularFile(String)
+    /// A linked file's path must stay inside its folder.
+    case invalidRelativePath(String)
+    /// Vectors that don't match their chunks (count × dimension).
+    case vectorMismatch(expected: Int, got: Int)
 
     public var description: String {
         switch self {
@@ -30,6 +36,9 @@ public enum ProjectIndexError: Error, Equatable, CustomStringConvertible {
         case .insufficientDisk(let needed, let available): return "not enough free disk: \(needed) bytes needed, \(available) available"
         case .integrity(let why): return "index check failed: \(why)"
         case .busy: return "the index is busy"
+        case .notARegularFile(let name): return "\(name) is not a regular file"
+        case .invalidRelativePath(let path): return "invalid path in a linked folder: \(path)"
+        case .vectorMismatch(let expected, let got): return "\(got) vector values for \(expected) expected"
         }
     }
 }
@@ -43,6 +52,8 @@ public enum IndexSchema {
     public static let pageSize = 16384
     /// Keeps the WAL from staying hundreds of MB after a large ingest.
     public static let journalSizeLimit = 64 << 20
+    /// The writer's busy timeout (checkpoints use a short one).
+    static let writerBusyTimeout: Int32 = 5000
     /// trigram tokenizer: 3.34.0.
     static let minimumSQLite: Int32 = 3_034_000
 
@@ -57,7 +68,7 @@ public enum IndexSchema {
 
     /// Per-connection settings of the writer.
     static func configureWriter(_ db: SQLiteConnection) throws {
-        db.setBusyTimeout(milliseconds: 5000)
+        db.setBusyTimeout(milliseconds: writerBusyTimeout)
         try db.exec("PRAGMA journal_mode=WAL")
         try db.exec("PRAGMA synchronous=NORMAL")
         try db.exec("PRAGMA journal_size_limit=\(journalSizeLimit)")
@@ -67,6 +78,20 @@ public enum IndexSchema {
         // don't exist yet (SQLITE_CANTOPEN) -- as after the compaction swap.
         // The writer's first read creates both; they stay while it's open.
         _ = try db.scalarInt("SELECT count(*) FROM sqlite_master")
+    }
+
+    /// The reader's page cache (KB) and memory map (bytes). Measured at 200k
+    /// chunks (16 KB pages): a 256 MB map took the search p95 from 49 to
+    /// 43 ms (words p95 9.4 → 6.5 ms), 1-4 GB no better; a 16 MB cache
+    /// instead of SQLite's 2 MB changed nothing. Address space only: the
+    /// pages are the OS file cache's.
+    public static let readerCacheKB = 2000
+    public static let readerMmapBytes = 256 << 20
+
+    /// Per-connection settings of a search connection.
+    public static func configureReader(_ db: SQLiteConnection, cacheKB: Int = readerCacheKB, mmapBytes: Int = readerMmapBytes) throws {
+        try db.exec("PRAGMA cache_size=-\(max(0, cacheKB))")
+        try db.exec("PRAGMA mmap_size=\(max(0, mmapBytes))")
     }
 
     static func isEmptyDatabase(_ db: SQLiteConnection) throws -> Bool {

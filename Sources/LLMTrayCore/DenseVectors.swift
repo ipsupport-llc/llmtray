@@ -17,6 +17,8 @@ public final class DenseVectors {
     public private(set) var epoch: Int64 = -1
     public private(set) var lastBlockID: Int64 = 0
 
+    static let loadSQL = "SELECT id, doc, n, chunk_ids, v FROM vec_blocks WHERE +set_id = ? AND id > ? ORDER BY id"
+
     public var count: Int { chunkIDs.count }
     public var residentBytes: Int { values.count * 2 + chunkIDs.count * 16 }
 
@@ -37,7 +39,10 @@ public final class DenseVectors {
             lastBlockID = 0
             epoch = current
         }
-        let st = try db.cached("SELECT id, doc, n, chunk_ids, v FROM vec_blocks WHERE set_id = ? AND id > ? ORDER BY id")
+        // `+set_id`: a rowid range scan, already in id order. By the
+        // (set_id, doc, rev) index it was a temp B-tree sort of every blob
+        // (10x slower at 200k vectors, and twice the peak memory).
+        let st = try db.cached(Self.loadSQL)
         defer { st.reset() }
         try st.bind([.int(setID), .int(lastBlockID)])
         var changed = false
