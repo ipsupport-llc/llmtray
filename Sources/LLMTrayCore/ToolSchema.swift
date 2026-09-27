@@ -146,7 +146,11 @@ public enum ToolArgumentParser {
             guard let dict = parsed.value as? [String: Any] else {
                 return ParsedToolArguments(values: [:], repairs: repairs, problems: [.badJSON("expected a JSON object")])
             }
-            object = unwrap(dict, schema: schema, repairs: &repairs)
+            switch unwrap(dict, schema: schema, repairs: &repairs) {
+            case .success(let inner): object = inner
+            case .failure(let failure):
+                return ParsedToolArguments(values: [:], repairs: repairs, problems: [.badJSON(failure.reason)])
+            }
         }
         guard let schema else { return ParsedToolArguments(values: object, repairs: repairs, problems: []) }
         return normalize(object, schema: schema, repairs: repairs)
@@ -154,25 +158,41 @@ public enum ToolArgumentParser {
 
     /// `{"name": "x", "arguments": {...}}`, `{"arguments": "{...}"}`,
     /// `{"calculate": {...}}`: the inner object, when the wrapper isn't
-    /// one of the tool's own fields.
-    static func unwrap(_ dict: [String: Any], schema: ToolSchema?, repairs: inout [ToolRepair]) -> [String: Any] {
+    /// one of the tool's own fields. For a tool with a schema, two wrappers
+    /// or a wrapper that isn't an object are a failure, not empty
+    /// arguments; without one they may be the tool's fields, kept as sent.
+    static func unwrap(_ dict: [String: Any], schema: ToolSchema?, repairs: inout [ToolRepair]) -> Result<[String: Any], LenientJSON.Failure> {
         let own = Set(schema?.params.flatMap { [$0.name] + $0.aliases }.map(normalizedKey) ?? [])
-        let keys = dict.keys.filter { !own.contains(normalizedKey($0)) }
-        guard keys.count == dict.count else { return dict }
-        let wrapper = keys.first { key in
+        guard !dict.keys.contains(where: { own.contains(normalizedKey($0)) }) else { return .success(dict) }
+        let wrappers = dict.keys.filter { key in
             wrapperKeys.contains(key.lowercased()) || (schema.map { key == $0.name } ?? false)
+        }.sorted()
+        // Only wrappers, or wrappers and the tool's name / type.
+        guard !wrappers.isEmpty,
+              dict.keys.allSatisfy({ wrappers.contains($0) || $0.lowercased() == "name" || $0.lowercased() == "type" })
+        else { return .success(dict) }
+        func fail(_ reason: String) -> Result<[String: Any], LenientJSON.Failure> {
+            schema == nil ? .success(dict) : .failure(.init(reason: reason))
         }
-        // Only the wrapper, or the wrapper and the tool's name.
-        guard let wrapper, dict.keys.allSatisfy({ $0 == wrapper || $0.lowercased() == "name" || $0.lowercased() == "type" }) else { return dict }
-        var inner: [String: Any]?
-        if let obj = dict[wrapper] as? [String: Any] {
+        guard wrappers.count == 1 else {
+            return fail("arguments wrapped twice: " + wrappers.map { "\"\($0)\"" }.joined(separator: " and "))
+        }
+        let wrapper = wrappers[0]
+        let inner: [String: Any]
+        switch dict[wrapper] {
+        case let obj as [String: Any]:
             inner = obj
-        } else if let text = dict[wrapper] as? String, case .success(let parsed) = LenientJSON.parse(text),
-                  let obj = parsed.value as? [String: Any] {
+        case is NSNull:
+            inner = [:]
+        case let text as String:
+            guard case .success(let parsed) = LenientJSON.parse(text), let obj = parsed.value as? [String: Any] else {
+                return fail("\"\(wrapper)\" isn't a JSON object")
+            }
             inner = obj
             repairs += parsed.repairs
+        default:
+            return fail("\"\(wrapper)\" isn't a JSON object")
         }
-        guard let inner else { return dict }
         repairs.append(.nestedArguments)
         return unwrap(inner, schema: schema, repairs: &repairs)
     }
@@ -263,6 +283,14 @@ public enum ToolArgumentParser {
 
     static func numeric(_ value: Any) -> Double? { number(value)?.value }
 
+    /// A number written as an integer, exactly (a Double can't tell
+    /// integers above 2^53 apart).
+    static func integer(_ value: Any) -> Int? {
+        guard number(value)?.integer == true else { return nil }
+        if type(of: value) == Int.self { return value as? Int }
+        return (value as? NSNumber).flatMap { Int($0.stringValue) }
+    }
+
     static func shortText(_ value: Any) -> String {
         let text: String
         if let s = value as? String { text = "\"\(s)\"" }
@@ -283,7 +311,7 @@ public enum ToolArgumentParser {
             }
             if !isBool(value), let n = numeric(value) {
                 // 5 for "5"; an integer stays one ("2024", not "2024.0").
-                let text = n == n.rounded() && abs(n) < 1e15 ? String(Int(n)) : String(n)
+                let text = integer(value).map(String.init) ?? (n == n.rounded() && abs(n) < 1e15 ? String(Int(n)) : String(n))
                 return .ok(text, [.typeCoerced])
             }
             return .wrongType(shortText(value))

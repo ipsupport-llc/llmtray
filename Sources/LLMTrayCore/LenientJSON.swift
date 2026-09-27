@@ -133,7 +133,16 @@ public enum LenientJSON {
             guard ToolArgumentParser.isBool(a), ToolArgumentParser.isBool(b) else { return false }
             return ((a as? NSNumber)?.boolValue ?? a as? Bool) == ((b as? NSNumber)?.boolValue ?? b as? Bool)
         }
-        if let x = ToolArgumentParser.number(a), let y = ToolArgumentParser.number(b) { return x.value == y.value }
+        if let x = ToolArgumentParser.number(a), let y = ToolArgumentParser.number(b) {
+            // Integers exactly; 3 and 3.0 alike, but an integer only
+            // equals a fraction-written number that is exactly it.
+            switch (ToolArgumentParser.integer(a), ToolArgumentParser.integer(b)) {
+            case let (i?, j?): return i == j
+            case let (i?, nil): return Int(exactly: y.value) == i
+            case let (nil, j?): return Int(exactly: x.value) == j
+            case (nil, nil): return x.value == y.value
+            }
+        }
         if let x = a as? String, let y = b as? String { return x == y }
         if a is NSNull, b is NSNull { return true }
         if let x = a as? [Any], let y = b as? [Any] { return x.count == y.count && zip(x, y).allSatisfy { same($0, $1) } }
@@ -314,7 +323,13 @@ public enum LenientJSON {
                 i += 1
             }
             let text = String(String.UnicodeScalarView(s[start..<i]))
-            if !fractional, let int = Int(text) { return int }
+            if !fractional {
+                // Too big for Int: as a Double it would be another number.
+                if let int = Int(text) { return int }
+                let digits = text.hasPrefix("-") ? text.dropFirst() : Substring(text)
+                throw Failure(reason: !digits.isEmpty && digits.allSatisfy({ ("0"..."9").contains($0) })
+                    ? "integer too large: \(text)" : "bad number \(text)")
+            }
             guard let d = Double(text), d.isFinite else { throw Failure(reason: "bad number \(text)") }
             return d
         }

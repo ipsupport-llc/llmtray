@@ -88,6 +88,46 @@ final class ToolArgumentsTests: XCTestCase {
         // A wrapper beside real fields isn't unwrapped.
         let mixed = parse(#"{"arguments": {"city": "A"}, "city": "B"}"#, weather)
         XCTAssertEqual(mixed.values["city"] as? String, "B")
+        XCTAssertTrue(parse(#"{"name": "get_weather", "arguments": null}"#, weather).isValid)
+    }
+
+    func testAmbiguousWrappersAreProblemsNotEmptyArguments() {
+        // Two wrappers: which one was meant isn't ours to pick.
+        let two = parse(#"{"args": {"city": "A"}, "arguments": {"city": "B"}}"#, weather)
+        XCTAssertEqual(two.problems, [.badJSON(#"arguments wrapped twice: "args" and "arguments""#)])
+        XCTAssertTrue(two.values.isEmpty)
+        XCTAssertFalse(parse(#"{"arguments": {"city": "A"}, "get_weather": {"city": "A"}}"#, weather).isValid)
+        // A wrapper that isn't an object, nested wrappers included.
+        for raw in [#"{"arguments": "city=Lviv"}"#, #"{"arguments": "[1]"}"#, #"{"arguments": 5}"#,
+                    #"{"name": "get_weather", "arguments": {"args": "{city"}}"#] {
+            let p = parse(raw, weather)
+            guard case .badJSON = p.problems.first else { return XCTFail("expected badJSON for \(raw)") }
+        }
+        XCTAssertNotNil(parse(#"{"arguments": 5}"#, weather).errorMessage(tool: weather))
+        // Without a schema they may be the tool's own fields.
+        let loose = parse(#"{"input": "abc", "params": "x"}"#, nil)
+        XCTAssertTrue(loose.isValid)
+        XCTAssertEqual(loose.values["input"] as? String, "abc")
+        XCTAssertEqual(parse(#"{"input": "abc"}"#, nil).values["input"] as? String, "abc")
+    }
+
+    func testLargeIntegersCompareExactly() {
+        let ids = ToolSchema("i", "I.", [.init("id", .string, aliases: ["ident"])])
+        // Differ above 2^53, where Doubles are equal.
+        XCTAssertFalse(parse(#"{"id": 9007199254740993, "id": 9007199254740992}"#, ids).isValid)
+        XCTAssertEqual(parse(#"{"ID": 9007199254740993, "ident": 9007199254740992}"#, ids).problems, [.conflicting("id")])
+        let same = parse(#"{"ident": 9007199254740993, "ID": 9007199254740993}"#, ids)
+        XCTAssertTrue(same.isValid)
+        XCTAssertEqual(same.values["id"] as? String, "9007199254740993")
+        XCTAssertTrue(LenientJSON.same(3, 3.0))
+        XCTAssertFalse(LenientJSON.same(9007199254740993, 9007199254740992.0))
+        XCTAssertFalse(LenientJSON.same(NSNumber(value: 9007199254740993), NSNumber(value: 9007199254740992)))
+        XCTAssertTrue(LenientJSON.same(NSNumber(value: 9007199254740993), 9007199254740993))
+        // Beyond Int: no nearby Double stands in for it.
+        guard case .badJSON(let reason) = parse(#"{"id": 123456789012345678901234}"#, ids).problems.first else {
+            return XCTFail("expected badJSON")
+        }
+        XCTAssertTrue(reason.contains("too large"), reason)
     }
 
     func testNotJSONIsAProblemNotAGuess() {
