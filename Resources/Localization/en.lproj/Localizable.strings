@@ -6,6 +6,8 @@
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";
 "%1$@ items, %2$@" = "%1$@ items, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld copies differ from their originals, so they aren't duplicates: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld done, %2$lld undone, %3$lld failed";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld files · %2$lld searchable · %3$lld pages";
 "%1$lld items, %2$@." = "%1$lld items, %2$@.";
@@ -488,7 +490,6 @@
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
-"Not identical to its original: %@" = "Not identical to its original: %@";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";

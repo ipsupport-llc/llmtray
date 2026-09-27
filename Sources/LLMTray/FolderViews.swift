@@ -148,8 +148,13 @@ struct FolderPlanCard: View {
                 dismiss()
             }
             // No Return shortcut: approving is always a deliberate click.
-            Button("Approve Selected") { model.approve() }
-                .disabled(r.approvable.isEmpty || manager.isChanging)
+            if r.checksPending {
+                ProgressView().controlSize(.small)
+                Button("Checking…") {}.disabled(true)
+            } else {
+                Button("Approve Selected") { model.approve() }
+                    .disabled(!r.canApprove || manager.isChanging)
+            }
         }
         .font(.system(size: 11))
     }

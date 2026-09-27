@@ -310,9 +310,26 @@ took `change_files` for a text editor and wrote a shell script.
   has no "duplicate" field, so a trashed file named like a copy ("x (1).ext",
   "x copy.ext", "x copy 2.ext") with "x.ext" beside it is compared
   (`PlanChecker`): a different size, or the same size and a different SHA-256
-  (bounded: 1 GB per file, 5 s per review; never a hard link, a placeholder
-  or a key's name) → "Not identical to its original: x (1).ext", and it
-  starts unticked (once: a tick the user puts back holds).
+  (bounded: 1 GB per file, 5 s per review). A pair with a hard link, an
+  iCloud placeholder or a key's name isn't compared at all, not even by size
+  (Hardening 5, 15, 17), and the checker asks whether the chat may still
+  read there before each item, before each content read and after (what was
+  read once access ended is dropped).
+- **Copy-named trash items start unticked, and Approve waits for the checks**
+  of the revision under review ("Checking…"; a newer revision cancels the
+  older check, and results of another revision are ignored). Found identical,
+  such an item is ticked unless the user set it; one that differs or couldn't
+  be compared stays unticked (once: a tick the user puts back holds), listed
+  in one line ("N copies differ from their originals"). If the checks don't
+  come in 20 s Approve is let through with those items still unticked. An
+  "identical" verdict is bound to both files (identity, size, modification
+  time): checked again at approval (a change refuses the approval, and the
+  plan is checked anew) and at execution (the item fails and the plan stops
+  there -- nothing is trashed on a stale verdict). A copy ticked without a
+  comparison is refused at approval.
+- After its first refusal in a turn `change_files` isn't declared again
+  until the user's next message (like a spent generator); the refusal says
+  "Don't call it again now".
 
 ## Plan
 

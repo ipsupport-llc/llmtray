@@ -189,13 +189,15 @@ public enum FolderTools {
     /// (Hardening 2: `ToolTrust.allows`, the refusal saying to ask the user
     /// and call it in their next message) -- a model that no longer saw it
     /// concluded it had no way to move files and wrote a script instead.
-    /// Only pinned files, which keep changes off in every turn, drop it.
+    /// Pinned files, which keep changes off in every turn, drop it; so does
+    /// its first refusal in the turn (`changeRefused`: it has said how to go
+    /// on, like a generator that's spent).
     public static func declared(featureOn: Bool, temporaryChat: Bool, turn: ToolTrust.TurnState,
-                                fileTextRoomSpent: Bool) -> [String] {
+                                fileTextRoomSpent: Bool, changeRefused: Bool = false) -> [String] {
         guard featureOn else { return [] }
         var names: [String] = []
         if !fileTextRoomSpent { names.append(filesName) }
-        if !temporaryChat, !turn.pinnedText { names.append(changeName) }
+        if !temporaryChat, !turn.pinnedText, !changeRefused { names.append(changeName) }
         return names
     }
 }

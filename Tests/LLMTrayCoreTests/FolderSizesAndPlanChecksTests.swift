@@ -244,7 +244,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
                                      + [.init(kind: .trash, path: "~/grant/folder")])
         var review = PlanReview(plan: plan)
         XCTAssertEqual(review.planWarnings, [.large(items: 206, bytes: 205_000, atLeast: true)], "the folder isn't measured yet")
-        review.apply(service.checks(plan))
+        review.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
         XCTAssertEqual(review.planWarnings, [.large(items: 206, bytes: 210_000, atLeast: false)])
         let folderItem = try XCTUnwrap(plan.items.last)
         XCTAssertEqual(review.trashSize(folderItem), FolderSize(items: 1, bytes: 5000))
@@ -272,7 +272,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         XCTAssertNil(PlanChecker.originalName(ofCopy: "photocopy.txt"))
     }
 
-    func testATrashedCopyThatIsntIdenticalIsFlaggedAndUntickedOnce() async throws {
+    func testTrashedCopiesStartUntickedAndOnlyRealOnesGetTicked() async throws {
         writeData("manual.zip", bytes(5230))
         writeData("manual (1).zip", bytes(5570))              // bigger: not the same
         writeData("same.bin", bytes(4096, 0x41))
@@ -281,28 +281,146 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         writeData("twin (1).bin", bytes(4096, 0x43))          // a real copy
         writeData("alone (1).txt", bytes(3))                  // no original
         writeData("id_rsa.pem", bytes(64, 0x44))
-        writeData("id_rsa (1).pem", bytes(64, 0x45))          // a key's name: never read
+        writeData("id_rsa (1).pem", bytes(99, 0x45))          // a key's name: never compared, not even by size
+        writeData("plain.txt", bytes(5))
         try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
-        let plan = try await propose(["manual (1).zip", "same (1).bin", "twin (1).bin", "alone (1).txt", "id_rsa (1).pem"]
+        let plan = try await propose(["manual (1).zip", "same (1).bin", "twin (1).bin", "alone (1).txt", "id_rsa (1).pem", "plain.txt"]
             .map { .init(kind: .trash, path: "~/grant/" + $0) })
         let ids = plan.items.map(\.id)
+        var review = PlanReview(plan: plan)
+        XCTAssertEqual(review.approvable, [ids[5]], "every copy-named trash starts unticked")
+        XCTAssertTrue(review.checksPending)
+        XCTAssertFalse(review.canApprove, "Approve waits for the checks")
         let checks = service.checks(plan)
         XCTAssertEqual(checks.notIdentical, [ids[0]: "manual.zip", ids[1]: "same.bin"])
-        var review = PlanReview(plan: plan)
-        XCTAssertEqual(review.approvable, Set(ids))
-        review.apply(checks)
-        XCTAssertEqual(review.approvable, Set(ids).subtracting([ids[0], ids[1]]), "not a duplicate: unticked")
-        XCTAssertEqual(review.planWarnings, [.notIdentical(name: "manual (1).zip"), .notIdentical(name: "same (1).bin")])
+        XCTAssertEqual(checks.uncompared, [ids[3]: "alone.txt", ids[4]: "id_rsa.pem"])
+        XCTAssertEqual(checks.copies[ids[2]]?.verdict, .identical)
+        // Checks of another revision are ignored.
+        review.apply(checks, planID: plan.id, revision: plan.revision + 1)
+        XCTAssertTrue(review.checksPending)
+        review.apply(checks, planID: plan.id, revision: plan.revision)
+        XCTAssertFalse(review.checksPending)
+        XCTAssertTrue(review.canApprove)
+        XCTAssertEqual(review.approvable, [ids[2], ids[5]], "only the real copy is ticked")
+        XCTAssertEqual(review.planWarnings, [.notIdentical(count: 2, names: ["manual (1).zip", "same (1).bin"]),
+                                             .uncompared(count: 2, names: ["alone (1).txt", "id_rsa (1).pem"])])
         // The user ticks one back: a later check (a newer revision) doesn't
-        // untick it again.
+        // untick it again; the one they unticked isn't ticked again.
         review.set(ids[0], selected: true)
+        review.set(ids[2], selected: false)
         write("more.txt", "m")
         let newer = try await propose([.init(kind: .trash, path: "~/grant/more.txt")])
         var next = PlanReview(plan: newer, previous: review)
-        next.apply(service.checks(newer))
+        XCTAssertTrue(next.checksPending, "a new revision is checked again")
+        next.apply(service.checks(newer), planID: newer.id, revision: newer.revision)
         XCTAssertTrue(next.isSelected(ids[0]))
         XCTAssertFalse(next.isSelected(ids[1]))
-        XCTAssertEqual(next.checks.notIdentical[ids[0]], "manual.zip", "carried over")
+        XCTAssertFalse(next.isSelected(ids[2]))
+        XCTAssertEqual(next.checks.notIdentical[ids[0]], "manual.zip")
+    }
+
+    func testChecksThatDontComeLetApproveThroughWithCopiesUnticked() async throws {
+        writeData("a.bin", bytes(10))
+        writeData("a (1).bin", bytes(10))
+        writeData("b.txt", bytes(1))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/a (1).bin"), .init(kind: .trash, path: "~/grant/b.txt")])
+        var review = PlanReview(plan: plan)
+        review.checksTimedOut(planID: plan.id, revision: plan.revision)
+        XCTAssertTrue(review.canApprove)
+        XCTAssertEqual(review.approvable, [plan.items[1].id], "the copy not compared stays unticked")
+        // Ticked by the user without a comparison: the approval refuses it.
+        review.set(plan.items[0].id, selected: true)
+        XCTAssertThrowsError(try service.approve(review)) {
+            guard case ChangePlanError.invalidated(let bad)? = $0 as? ChangePlanError else { return XCTFail("\($0)") }
+            XCTAssertEqual(Array(bad.keys), [plan.items[0].id])
+        }
+    }
+
+    func testAHardLinkedCopyIsntComparedEvenWhenTheSizesDiffer() async throws {
+        let orig = writeData("h.bin", bytes(10))
+        writeData("h (1).bin", bytes(20))
+        XCTAssertEqual(Darwin.link(orig, outside + "/h-link"), 0)
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/h (1).bin")])
+        XCTAssertEqual(service.checks(plan).copies[plan.items[0].id]?.verdict, .unknown, "Hardening 5 before the sizes")
+        StatFlagInjection.shared.set(UInt32(SF_DATALESS), for: try XCTUnwrap(identity(grant + "/h (1).bin")))
+        XCTAssertEqual(service.checks(plan).copies[plan.items[0].id]?.verdict, .unknown)
+    }
+
+    func testAnIdenticalVerdictGoesStaleWhenEitherFileChanges() async throws {
+        writeData("t.bin", bytes(100, 0x31))
+        writeData("t (1).bin", bytes(100, 0x31))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/t (1).bin")])
+        let id = plan.items[0].id
+        var review = PlanReview(plan: plan)
+        review.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
+        XCTAssertEqual(review.approvable, [id])
+        // The original changes after the comparison: the approval refuses it.
+        writeData("t.bin", bytes(100, 0x32))
+        XCTAssertEqual(utimes(grant + "/t.bin", nil), 0)
+        XCTAssertThrowsError(try service.approve(review)) {
+            guard case ChangePlanError.invalidated(let bad)? = $0 as? ChangePlanError else { return XCTFail("\($0)") }
+            XCTAssertTrue(bad[id]?.contains("changed since they were compared") == true, "\(bad)")
+        }
+        XCTAssertTrue(exists("t (1).bin"))
+        // Compared again, then changed between approval and execution: the
+        // item fails there and nothing is trashed.
+        writeData("t.bin", bytes(100, 0x31))
+        var again = PlanReview(plan: plan)
+        again.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
+        let approved = try service.approve(again)
+        // Touched in place (same file, same bytes, another mtime).
+        var tv = [timeval(tv_sec: 1_000_000, tv_usec: 0), timeval(tv_sec: 1_000_000, tv_usec: 0)]
+        XCTAssertEqual(utimes(grant + "/t (1).bin", &tv), 0)
+        let report = service.execute(approved)
+        XCTAssertEqual(PlanOutcome(report).done, 0)
+        XCTAssertEqual(PlanOutcome(report).failed, 1)
+        XCTAssertTrue(exists("t (1).bin"), "fail closed: not trashed")
+    }
+
+    func testChecksKeepNothingOnceAccessEnds() async throws {
+        writeData("r.bin", bytes(10, 1))
+        writeData("r (1).bin", bytes(10, 2))
+        writeData("dir/x", bytes(10))
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .trash, path: "~/grant/r (1).bin"), .init(kind: .trash, path: "~/grant/dir")])
+        let checker = PlanChecker(denylist: denylist)
+        let none = checker.check(plan, canRead: { _, _ in false })
+        XCTAssertEqual(none, PlanChecks(), "nothing scanned without access")
+        // Access ending during the check (after the first question).
+        var asked = 0
+        let ended = checker.check(plan, canRead: { _, _ in asked += 1; return asked <= 1 })
+        XCTAssertEqual(ended.copies[plan.items[0].id]?.verdict, .unknown, "nothing of what was read is kept")
+        XCTAssertNil(ended.sizes[plan.items[1].id])
+        // Through the service: the chat's grant gone.
+        service.endChat(chat.id)
+        XCTAssertEqual(service.checks(plan), PlanChecks())
+    }
+
+    func testTopLevelFilesMovedIntoNewFoldersReachIntoNothing() async throws {
+        write("a.pdf", "a")
+        write("b.jpg", "b")
+        write("c.pdf", "c")
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([
+            .init(kind: .makeDir, path: "~/grant/PDFs"),
+            .init(kind: .makeDir, path: "~/grant/Images"),
+            .init(kind: .move, path: "~/grant/a.pdf", to: "~/grant/PDFs"),
+            .init(kind: .move, path: "~/grant/c.pdf", to: "~/grant/PDFs"),
+            .init(kind: .move, path: "~/grant/b.jpg", to: "~/grant/Images"),
+        ])
+        XCTAssertEqual(PlanReview.reachedSubfolders(plan.items), [])
+        XCTAssertEqual(PlanReview(plan: plan).planWarnings, [])
+    }
+
+    func testAChangeRefusedOnceIsntDeclaredAgainThisTurn() {
+        let t = ToolTrust.TurnState(folderText: true)
+        XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false), ["files", "change_files"])
+        XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false, changeRefused: true),
+                       ["files"])
+        XCTAssertTrue(ToolTrust.changeRefusal.contains("Don't call it again now"), ToolTrust.changeRefusal)
     }
 
     func testAChangedCopyIsntCheckedAgainstItsOriginal() async throws {

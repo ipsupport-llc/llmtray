@@ -118,6 +118,10 @@ final class ChatToolbox {
     /// The request had no room for more file text: search and read aren't
     /// declared for the rest of the turn.
     private(set) var fileTextRoomSpent = false
+    /// A change_files call was refused by the barrier this turn: it isn't
+    /// declared again until the user's next message (its refusal said how
+    /// to go on).
+    private(set) var changeRefusedThisTurn = false
     /// Ids of the file text pieces sent this turn: not sent again.
     private var sentProjectHits: Set<String> = []
     /// Calls read by `prepare` and not yet run: what their arguments came
@@ -237,7 +241,8 @@ final class ChatToolbox {
         // no room for it.
         let allowGuarded = ToolTrust.allowsGuarded(turnTrust)
         let folderTools = Set(FolderTools.declared(featureOn: settings.folders != nil, temporaryChat: settings.folders?.temporary ?? true,
-                                                   turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent))
+                                                   turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent,
+                                                   changeRefused: changeRefusedThisTurn))
         return tools.compactMap { tool -> [String: Any]? in
             guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
             // project_files by its mode (none once there's no room for file text).
@@ -257,6 +262,7 @@ final class ChatToolbox {
         musicGeneration.startTurn()
         turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
+        changeRefusedThisTurn = false
         sentProjectHits = []
         prepared = [:]
     }
@@ -312,7 +318,9 @@ final class ChatToolbox {
         let batch = calls.map { (id: $0.id, kind: trustKind(of: $0, settings: settings)) }
         batchTrust = turnTrust
         for call in batch { batchTrust.record(call.kind) }
-        return ToolTrust.refusedUpFront(batch, state: turnTrust)
+        let refused = ToolTrust.refusedUpFront(batch, state: turnTrust)
+        if batch.contains(where: { $0.kind == .folderChange && refused.contains($0.id) }) { changeRefusedThisTurn = true }
+        return refused
     }
 
     /// What the batch `trustRefusals` read would leave: what its refused
@@ -362,6 +370,7 @@ final class ChatToolbox {
         // already): an earlier call of this round may have returned file text.
         let kind = trustKind(of: call, settings: context.settings)
         if !ToolTrust.allows(kind, turnTrust) {
+            if kind == .folderChange { changeRefusedThisTurn = true }
             return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
         if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {

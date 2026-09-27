@@ -1,28 +1,77 @@
 import Foundation
 
+/// A file as a comparison saw it: the result holds only while this does.
+public struct FileStamp: Codable, Equatable, Sendable {
+    public var identity: FileIdentity
+    public var size: Int64
+    public var modified: Date
+
+    public init(identity: FileIdentity, size: Int64, modified: Date) {
+        self.identity = identity
+        self.size = size
+        self.modified = modified
+    }
+
+    init(_ e: FolderEntry) { self.init(identity: e.identity, size: e.stat.size, modified: e.stat.modified) }
+}
+
+/// A trashed file named like a copy ("x (1).zip", "x copy.zip"), compared
+/// with the original beside it.
+public struct CopyCheck: Equatable, Sendable {
+    public enum Verdict: String, Equatable, Sendable {
+        /// Same size and SHA-256: a real copy.
+        case identical
+        /// Another size, or other bytes.
+        case differs
+        /// Couldn't be told: no original, a hard link, an iCloud placeholder,
+        /// a key's name, too large, out of time, access ended.
+        case unknown
+    }
+
+    public var original: String
+    public var verdict: Verdict
+    /// Both files as compared (identical only): the verdict is dropped once
+    /// either changes (`PlanChecker.stillIdentical`).
+    public var copy: FileStamp?
+    public var originalStamp: FileStamp?
+
+    public init(original: String, verdict: Verdict, copy: FileStamp? = nil, originalStamp: FileStamp? = nil) {
+        self.original = original
+        self.verdict = verdict
+        self.copy = copy
+        self.originalStamp = originalStamp
+    }
+}
+
 /// What the plan review looks up on disk before the user approves (adr/0014,
 /// "Listing sizes and the plan's warnings"): the size of each folder the plan
-/// moves or trashes, and the "copies" it trashes that aren't the same as
-/// their original. Keyed by item id (ids are never reused).
+/// moves or trashes, and how each trashed "copy" compares with its original.
+/// Keyed by item id (ids are never reused).
 public struct PlanChecks: Equatable, Sendable {
     /// Folders and packages moved or trashed, measured.
     public var sizes: [Int: FolderSize] = [:]
-    /// Trashed files named like a copy ("x (1).zip", "x copy.zip") whose
-    /// contents differ from the original's beside them: id -> the original's
-    /// name.
-    public var notIdentical: [Int: String] = [:]
+    /// Trashed files named like a copy, compared.
+    public var copies: [Int: CopyCheck] = [:]
 
-    public init(sizes: [Int: FolderSize] = [:], notIdentical: [Int: String] = [:]) {
+    public init(sizes: [Int: FolderSize] = [:], copies: [Int: CopyCheck] = [:]) {
         self.sizes = sizes
-        self.notIdentical = notIdentical
+        self.copies = copies
     }
+
+    /// Copies that differ from their original: id -> the original's name.
+    public var notIdentical: [Int: String] { copies.filter { $0.value.verdict == .differs }.mapValues(\.original) }
+    /// Copies that couldn't be compared: id -> the original's name.
+    public var uncompared: [Int: String] { copies.filter { $0.value.verdict == .unknown }.mapValues(\.original) }
 }
 
 /// Runs the review's checks, read only and bounded: by descriptors from the
 /// grant root, each item held to the identity it was proposed with (one that
-/// changed is left out -- the review marks it invalid anyway). Contents are
-/// read only to compare a copy of the same size with its original -- never
-/// of a hard link, an iCloud placeholder or a file named like a key.
+/// changed is left out -- the review marks it invalid anyway), and only while
+/// the chat may still read there (`canRead`, asked before each item, before
+/// each content read and after; an item whose access ended keeps no result).
+/// Contents are read only to compare a copy of the same size with its
+/// original -- never of a hard link, an iCloud placeholder or a file named
+/// like a key (Hardening 5, 15, 17: such a pair isn't compared at all).
 public struct PlanChecker {
     public struct Limits: Sendable {
         public var sizePerFolder = 200_000
@@ -37,6 +86,10 @@ public struct PlanChecker {
         public init() {}
     }
 
+    /// Whether the chat may still read at a location, for the item's
+    /// proposal.
+    public typealias ReadCheck = (_ location: FolderLocation, _ proposal: String?) -> Bool
+
     public let denylist: FolderDenylist
     public var limits: Limits
 
@@ -45,13 +98,16 @@ public struct PlanChecker {
         self.limits = limits
     }
 
-    public func check(_ plan: ChangePlan, isCancelled: () -> Bool = { false }) -> PlanChecks {
+    public func check(_ plan: ChangePlan, canRead: @escaping ReadCheck = { _, _ in true },
+                      isCancelled: () -> Bool = { false }) -> PlanChecks {
         var out = PlanChecks()
         let now = ProcessInfo.processInfo.systemUptime
         let sizeDeadline = now + limits.sizeSeconds
         let hashDeadline = now + limits.hashSeconds
         for item in plan.items where item.kind != .makeDir {
             guard !isCancelled(), let s = item.source else { continue }
+            let readable = { canRead(s.location, item.proposal) }
+            guard readable() else { continue }
             let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
             guard let parent = try? walker.openDirectory(s.location.parentComponents, expected: s.parentChain) else { continue }
             switch s.kind {
@@ -61,12 +117,14 @@ public struct PlanChecker {
                 let r = walker.subtreeScan(in: parent, s.location.name, budget: limits.sizePerFolder,
                                            deadline: min(sizeDeadline, t + limits.sizeSecondsPerFolder),
                                            expecting: s.identity, measure: true)
-                if let size = r.size { out.sizes[item.id] = size }
+                if let size = r.size, readable() { out.sizes[item.id] = size }
             case .file where item.kind == .trash:
-                if let original = Self.originalName(ofCopy: s.location.name),
-                   differs(s, original: original, in: parent, walker: walker, deadline: hashDeadline, isCancelled: isCancelled) {
-                    out.notIdentical[item.id] = original
-                }
+                guard let original = Self.originalName(ofCopy: s.location.name) else { continue }
+                var c = compare(s, original: original, in: parent, walker: walker, deadline: hashDeadline,
+                                readable: readable, isCancelled: isCancelled)
+                // Access ended meanwhile: nothing of what was read is kept.
+                if !readable() { c = CopyCheck(original: original, verdict: .unknown) }
+                out.copies[item.id] = c
             default:
                 break
             }
@@ -74,35 +132,55 @@ public struct PlanChecker {
         return out
     }
 
-    /// Whether the copy `s` differs from `original` in the same folder: by
-    /// size, else by SHA-256 of both. False when it can't be told (no
-    /// original, a hard link, a placeholder, a key's name, too large, out of
-    /// time).
-    func differs(_ s: CapturedSource, original: String, in parent: OpenedDirectory, walker: SafeFolderWalker,
-                 deadline: TimeInterval, isCancelled: () -> Bool) -> Bool {
+    /// The copy `s` against `original` in the same folder: the pair is left
+    /// alone (unknown) when either is a hard link, a placeholder or named
+    /// like a key; else by size, then by SHA-256 of both.
+    func compare(_ s: CapturedSource, original: String, in parent: OpenedDirectory, walker: SafeFolderWalker,
+                 deadline: TimeInterval, readable: () -> Bool, isCancelled: () -> Bool) -> CopyCheck {
+        let unknown = CopyCheck(original: original, verdict: .unknown)
         guard let copy = try? walker.entry(in: parent, s.location.name), copy.identity == s.identity, copy.kind == .file,
               let orig = try? walker.entry(in: parent, original), orig.kind == .file,
-              orig.identity != copy.identity else { return false }
-        if copy.stat.size != orig.stat.size { return true }
+              orig.identity != copy.identity else { return unknown }
         let parentName = parent.components.last ?? (walker.root.path as NSString).lastPathComponent
         for e in [copy, orig] {
-            if e.stat.isHardLinked || e.stat.isDataless || e.stat.size > limits.hashBytes
-                || FolderDenylist.looksSecret(name: e.name, parentName: parentName) { return false }
+            if e.stat.isHardLinked || e.stat.isDataless || FolderDenylist.looksSecret(name: e.name, parentName: parentName) {
+                return unknown
+            }
         }
-        let left = deadline - ProcessInfo.processInfo.systemUptime
-        guard left > 0 else { return false }
+        if copy.stat.size != orig.stat.size { return CopyCheck(original: original, verdict: .differs) }
+        guard copy.stat.size <= limits.hashBytes else { return unknown }
         var caps = FileClassifier.Caps()
         caps.hashBytes = limits.hashBytes
-        caps.hashSeconds = left
-        let classifier = FileClassifier(caps: caps)
         func hash(_ e: FolderEntry) -> String? {
+            let left = deadline - ProcessInfo.processInfo.systemUptime
+            // Right before the read: still allowed, still in time.
+            guard left > 0, readable() else { return nil }
+            caps.hashSeconds = left
             let item = ResolvedItem(parent: parent, name: e.name, entry: e)
             guard let fd = try? walker.openFile(item) else { return nil }
-            if case .sha256(let h) = classifier.sha256(fd, isCancelled: isCancelled) { return h }
+            if case .sha256(let h) = FileClassifier(caps: caps).sha256(fd, isCancelled: isCancelled) { return h }
             return nil
         }
-        guard let a = hash(copy), let b = hash(orig) else { return false }
-        return a != b
+        guard let a = hash(copy), let b = hash(orig) else { return unknown }
+        if a != b { return CopyCheck(original: original, verdict: .differs) }
+        return CopyCheck(original: original, verdict: .identical, copy: FileStamp(copy), originalStamp: FileStamp(orig))
+    }
+
+    /// Whether an "identical" verdict still holds for `item`: both files
+    /// unchanged (identity, size, modification time) since they were
+    /// compared. The original may be gone when an earlier item of `plan`
+    /// took it (by identity). False for any other verdict.
+    public func stillIdentical(_ item: PlanItem, _ check: CopyCheck, plan: ChangePlan) -> Bool {
+        guard check.verdict == .identical, let s = item.source, let stamp = check.copy, let origStamp = check.originalStamp else {
+            return false
+        }
+        let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
+        guard let parent = try? walker.openDirectory(s.location.parentComponents, expected: s.parentChain),
+              let copy = try? walker.entry(in: parent, s.location.name), FileStamp(copy) == stamp else { return false }
+        let before = plan.items.prefix { $0.id != item.id }
+        if before.contains(where: { $0.source?.identity == origStamp.identity }) { return true }
+        guard let orig = try? walker.entry(in: parent, check.original) else { return false }
+        return FileStamp(orig) == origStamp
     }
 
     /// "report.pdf" for "report (1).pdf", "report copy.pdf" or
@@ -114,6 +192,13 @@ public struct PlanChecker {
         let stem = ns.substring(with: m.range(at: 1))
         let ext = m.range(at: 2).location == NSNotFound ? "" : ns.substring(with: m.range(at: 2))
         return stem + ext
+    }
+
+    /// A trash of a file named like a copy: it starts unticked until the
+    /// comparison says it's a real one.
+    public static func isCopyCandidate(_ item: PlanItem) -> Bool {
+        guard item.kind == .trash, let s = item.source, s.kind == .file else { return false }
+        return originalName(ofCopy: s.location.name) != nil
     }
 
     private static let copyPattern = try! NSRegularExpression(

@@ -19,13 +19,21 @@ public struct PlanReview: Equatable, Sendable {
     /// What was looked up on disk for the review (`PlanChecker`), once it's
     /// in (`apply`).
     public private(set) var checks = PlanChecks()
-    /// Items `apply` unticked (a copy that isn't identical): never again, so
-    /// a tick the user puts back holds.
+    /// The revision the checks are in for (nil: none yet). Approve waits
+    /// for the current one (`checksPending`).
+    public private(set) var checkedRevision: Int?
+    /// Items `apply` unticked (a copy not known to be identical): never
+    /// again, so a tick the user puts back holds.
     public private(set) var autoUnticked: Set<Int> = []
+    /// Items the user ticked or unticked themselves: `apply` never ticks
+    /// those.
+    public private(set) var touched: Set<Int> = []
 
     /// A review of `plan`; a newer revision of the plan reviewed in
     /// `previous` keeps the user's choices for the items it had, and the
-    /// new items start unticked.
+    /// new items start unticked. A trash of a file named like a copy
+    /// ("x (1).zip") starts unticked too, until the comparison with its
+    /// original says it's a real one.
     public init(plan: ChangePlan, previous: PlanReview? = nil, invalid: [Int: String] = [:]) {
         self.plan = plan
         self.invalid = invalid
@@ -35,9 +43,11 @@ public struct PlanReview: Equatable, Sendable {
             selected = previous.selected.intersection(ids)
             added = previous.added.intersection(ids).union(ids.subtracting(known))
             checks = previous.checks
+            checkedRevision = previous.checkedRevision
             autoUnticked = previous.autoUnticked
+            touched = previous.touched
         } else {
-            selected = ids
+            selected = ids.subtracting(plan.items.filter(PlanChecker.isCopyCandidate).map(\.id))
         }
         selected = closed(selected)
     }
@@ -47,12 +57,23 @@ public struct PlanReview: Equatable, Sendable {
     /// What an approval sends: ticked and still valid.
     public var approvable: Set<Int> { closed(selected.subtracting(invalid.keys)) }
 
+    /// The checks of the revision under review aren't in yet.
+    public var checksPending: Bool { checkedRevision != plan.revision }
+
+    /// Approve may be pressed: something ticked, the checks in.
+    public var canApprove: Bool { !approvable.isEmpty && !checksPending }
+
     public func isSelected(_ id: Int) -> Bool { selected.contains(id) }
 
-    /// Ticks or unticks an item. Ticking one ticks the make_dir items it
-    /// needs; unticking a make_dir unticks what goes into it.
+    /// The user ticks or unticks an item. Ticking one ticks the make_dir
+    /// items it needs; unticking a make_dir unticks what goes into it.
     public mutating func set(_ id: Int, selected on: Bool) {
         guard plan.items.contains(where: { $0.id == id }) else { return }
+        touched.insert(id)
+        select(id, on)
+    }
+
+    private mutating func select(_ id: Int, _ on: Bool) {
         added.remove(id)   // looked at now
         if on {
             var add: [Int] = [id]
@@ -69,19 +90,36 @@ public struct PlanReview: Equatable, Sendable {
         }
     }
 
-    /// The checks of this plan's items, in: a trashed copy that isn't
-    /// identical to its original is unticked (once; the user may tick it).
-    public mutating func apply(_ new: PlanChecks) {
+    /// The checks made on revision `revision` of plan `planID`, in -- ignored
+    /// for any other (a newer revision is being checked). A copy that differs
+    /// or couldn't be compared is unticked (once: a tick the user puts back
+    /// holds); one found identical is ticked unless the user set it.
+    public mutating func apply(_ new: PlanChecks, planID: UUID, revision: Int) {
+        guard planID == plan.id, revision == plan.revision else { return }
         let ids = Set(plan.items.map(\.id))
         checks.sizes.merge(new.sizes.filter { ids.contains($0.key) }) { $1 }
-        checks.notIdentical.merge(new.notIdentical.filter { ids.contains($0.key) }) { $1 }
-        for id in new.notIdentical.keys where ids.contains(id) && autoUnticked.insert(id).inserted {
-            set(id, selected: false)
+        checks.copies.merge(new.copies.filter { ids.contains($0.key) }) { $1 }
+        checkedRevision = revision
+        for (id, c) in new.copies.sorted(by: { $0.key < $1.key }) where ids.contains(id) {
+            if c.verdict == .identical {
+                if !touched.contains(id), !added.contains(id) { select(id, true) }
+            } else if autoUnticked.insert(id).inserted {
+                select(id, false)
+            }
         }
+    }
+
+    /// The checks of `revision` didn't come in time: Approve is let through,
+    /// the copies not compared staying as they are (unticked unless the user
+    /// ticked them).
+    public mutating func checksTimedOut(planID: UUID, revision: Int) {
+        guard planID == plan.id, revision == plan.revision, checksPending else { return }
+        checkedRevision = revision
     }
 
     public mutating func setAll(_ on: Bool) {
         selected = on ? Set(plan.items.map(\.id)) : []
+        touched = Set(plan.items.map(\.id))
         added = []
     }
 
@@ -171,8 +209,11 @@ public struct PlanReview: Equatable, Sendable {
         /// More than `largePlanItems` items moved or trashed: how many, their
         /// bytes (`atLeast`: a folder among them wasn't measured whole).
         case large(items: Int, bytes: Int64, atLeast: Bool)
-        /// A trashed "copy" that differs from its original (the copy's name).
-        case notIdentical(name: String)
+        /// Trashed "copies" that differ from their originals: how many, the
+        /// first names.
+        case notIdentical(count: Int, names: [String])
+        /// Trashed "copies" that couldn't be compared with their originals.
+        case uncompared(count: Int, names: [String])
     }
 
     /// For what Approve would do now (the ticked, valid items), and every
@@ -187,9 +228,10 @@ public struct PlanReview: Equatable, Sendable {
             let size = Self.bytes(touched, checks)
             out.append(.large(items: touched.count, bytes: size.bytes, atLeast: size.atLeast))
         }
-        for item in plan.items where checks.notIdentical[item.id] != nil {
-            out.append(.notIdentical(name: item.source?.location.name ?? ""))
-        }
+        let differ = plan.items.filter { checks.notIdentical[$0.id] != nil }.compactMap { $0.source?.location.name }
+        if !differ.isEmpty { out.append(.notIdentical(count: differ.count, names: Array(differ.prefix(3)))) }
+        let unknown = plan.items.filter { checks.uncompared[$0.id] != nil }.compactMap { $0.source?.location.name }
+        if !unknown.isEmpty { out.append(.uncompared(count: unknown.count, names: Array(unknown.prefix(3)))) }
         return out
     }
 

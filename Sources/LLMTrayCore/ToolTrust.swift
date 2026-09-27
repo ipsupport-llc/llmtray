@@ -135,7 +135,7 @@ public enum ToolTrust {
 
     /// The refusal of a folder change after (or beside) a read.
     public static let changeRefusal = "Not run: folder, file or web contents were read in this turn, so changes wait for "
-        + "the user's next message. Describe the changes you'd make and ask the user to confirm; then call "
+        + "the user's next message. Don't call it again now: describe the changes you'd make and ask the user to confirm; then call "
         + "change_files first thing in that turn, without reading again."
 
     /// The refusal of a guarded or change call while files are pinned: the

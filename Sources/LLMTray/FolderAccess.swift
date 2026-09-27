@@ -295,18 +295,34 @@ final class FolderPlanModel: ObservableObject, Identifiable {
     func set(_ item: Int, selected: Bool) { review.set(item, selected: selected) }
     func setAll(_ on: Bool) { review.setAll(on) }
 
-    /// Which items no longer match: off the main thread.
+    /// The checks of the revision being checked: cancelled when a newer
+    /// one comes.
+    private var checksCancel: CancelFlag?
+    /// How long Approve waits for the checks before letting the user go on
+    /// (the copies not compared stay unticked).
+    static let checksTimeout: UInt64 = 20
+
+    /// Which items no longer match, then sizes and copies (slower, bounded):
+    /// off the main thread, for this revision only. Approve waits for them
+    /// (`PlanReview.canApprove`).
     private func checkItems() {
         let plan = review.plan
         let service = self.service
+        checksCancel?.cancel()
+        let cancel = CancelFlag()
+        checksCancel = cancel
         Task { [weak self] in
             let bad = await Task.detached { service.invalidItems(plan) }.value
             guard let self, self.review.plan.id == plan.id, self.review.plan.revision == plan.revision else { return }
             self.review.invalid = bad
-            // Sizes and copies: slower (bounded), shown when in.
-            let checks = await Task.detached { service.checks(plan) }.value
-            guard self.review.plan.id == plan.id, self.phase == .review else { return }
-            self.review.apply(checks)
+            let checks = await Task.detached { service.checks(plan, isCancelled: { cancel.isSet }) }.value
+            guard !cancel.isSet, self.phase == .review else { return }
+            self.review.apply(checks, planID: plan.id, revision: plan.revision)
+        }
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: Self.checksTimeout * 1_000_000_000)
+            guard let self, !cancel.isSet else { return }
+            self.review.checksTimedOut(planID: plan.id, revision: plan.revision)
         }
     }
 
@@ -316,7 +332,7 @@ final class FolderPlanModel: ObservableObject, Identifiable {
 
     /// Approves the ticked items of the plan as reviewed, then runs them.
     func approve() {
-        guard phase == .review, !review.approvable.isEmpty else { return }
+        guard phase == .review, review.canApprove else { return }
         // Turned off in Settings meanwhile: nothing runs.
         guard FolderAccessManager.shared.isEnabled else {
             message = NSLocalizedString("Folder access is off in Settings.", comment: "")
@@ -432,8 +448,12 @@ final class FolderPlanModel: ObservableObject, Identifiable {
             let b = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
             return String(format: atLeast ? NSLocalizedString("%1$lld items, at least %2$@.", comment: "plan warning")
                           : NSLocalizedString("%1$lld items, %2$@.", comment: "plan warning"), items, b)
-        case .notIdentical(let name):
-            return String(format: NSLocalizedString("Not identical to its original: %@", comment: "plan warning"), name)
+        case .notIdentical(let count, let names):
+            return String(format: NSLocalizedString("%1$lld copies differ from their originals, so they aren't duplicates: %2$@", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        case .uncompared(let count, let names):
+            return String(format: NSLocalizedString("%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
         }
     }
 
