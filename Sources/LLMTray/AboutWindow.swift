@@ -98,6 +98,8 @@ struct AboutView: View {
                         Link(destination: URL(string: "https://ipsupport.us")!) { Text(verbatim: "ipsupport.us") }
                         Button("Report a Bug…") { NotificationCenter.default.post(name: .showBugReport, object: nil) }
                             .buttonStyle(.link)
+                        Button("Rate LLMTray…") { NotificationCenter.default.post(name: .showReview, object: nil) }
+                            .buttonStyle(.link)
                     }
                     .font(.callout)
                 }

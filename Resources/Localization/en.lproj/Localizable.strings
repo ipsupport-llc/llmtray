@@ -7,11 +7,13 @@
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ → %@ available" = "%@ → %@ available";
+"%@ ★ from %lld reviews" = "%@ ★ from %lld reviews";
 "%@ 🌐" = "%@ 🌐";
 "%@, p. %lld" = "%@, p. %lld";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";
+"%lld of 5 stars" = "%lld of 5 stars";
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
@@ -20,6 +22,7 @@
 "A client" = "A client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
+"A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — clear vocals, 8-bit (recommended)";
@@ -44,6 +47,7 @@
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
 "Apply to profile" = "Apply to profile";
+"Ask again in two weeks" = "Ask again in two weeks";
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
 "Attach image(s) for the model to see" = "Attach image(s) for the model to see";
@@ -99,6 +103,7 @@
 "Copy the song as an audio file" = "Copy the song as an audio file";
 "Copy the text" = "Copy the text";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
+"Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
 "Countdown" = "Countdown";
 "Country facts" = "Country facts";
 "Crash reports (%lld)" = "Crash reports (%lld)";
@@ -120,6 +125,7 @@
 "Delete…" = "Delete…";
 "Diagnostics" = "Diagnostics";
 "Disk usage" = "Disk usage";
+"Don't Ask Again" = "Don't Ask Again";
 "Done" = "Done";
 "Download" = "Download";
 "Download and Enable" = "Download and Enable";
@@ -139,6 +145,7 @@
 "Enable image generation?" = "Enable image generation?";
 "Enable music generation" = "Enable music generation";
 "Enable music generation?" = "Enable music generation?";
+"Enjoying LLMTray?" = "Enjoying LLMTray?";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
@@ -170,6 +177,7 @@
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Highest fidelity, largest download -- a correctness baseline you can trust.";
 "Hourly forecast" = "Hourly forecast";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.";
+"How do you like LLMTray?" = "How do you like LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
@@ -213,6 +221,7 @@
 "Later" = "Later";
 "Launch at login" = "Launch at login";
 "Library" = "Library";
+"Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
@@ -286,6 +295,7 @@
 "Paused" = "Paused";
 "Paused while an image or song is made -- the model reloads after" = "Paused while an image or song is made -- the model reloads after";
 "Performance" = "Performance";
+"Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pin" = "Pin";
 "Pinned" = "Pinned";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it.";
@@ -310,6 +320,9 @@
 "Quit LLMTray" = "Quit LLMTray";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0.";
+"Rate It" = "Rate It";
+"Rate LLMTray" = "Rate LLMTray";
+"Rate LLMTray…" = "Rate LLMTray…";
 "Reading what's installed…" = "Reading what's installed…";
 "Recently updated" = "Recently updated";
 "Recovery" = "Recovery";
@@ -334,6 +347,7 @@
 "Restarts the model process with the new settings (a few seconds to reload)." = "Restarts the model process with the new settings (a few seconds to reload).";
 "Resume download" = "Resume download";
 "Retry" = "Retry";
+"Review" = "Review";
 "Run benchmark" = "Run benchmark";
 "Running" = "Running";
 "Running — %@ on :%lld" = "Running — %@ on :%lld";
@@ -354,7 +368,9 @@
 "Select Tab" = "Select Tab";
 "Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
+"Sending…" = "Sending…";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
+"Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation.";
 "Server" = "Server";
 "Server Log" = "Server Log";
 "Server log" = "Server log";
@@ -421,6 +437,7 @@
 "Temperature" = "Temperature";
 "Temporary chat" = "Temporary chat";
 "Temporary — not saved" = "Temporary — not saved";
+"Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
@@ -436,17 +453,28 @@
 "The model's license, from its card." = "The model's license, from its card.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
+"The name can be at most %lld characters." = "The name can be at most %lld characters.";
+"The name must be on one line." = "The name must be on one line.";
+"The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
 "The report" = "The report";
+"The review has characters that can't be sent (control characters)." = "The review has characters that can't be sent (control characters).";
+"The review is %lld characters too long." = "The review is %lld characters too long.";
+"The review is too long." = "The review is too long.";
+"The review service didn't accept the request (%@). Please report a bug." = "The review service didn't accept the request (%@). Please report a bug.";
+"The review wasn't accepted: it must be 1 to 2000 characters, without control characters." = "The review wasn't accepted: it must be 1 to 2000 characters, without control characters.";
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "The server log" = "The server log";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
+"This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
 "Thought process" = "Thought process";
 "Tight -- may not leave room for context" = "Tight -- may not leave room for context";
 "Time in a city" = "Time in a city";
 "Today" = "Today";
+"Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
+"Too many reviews from this network. Try again later." = "Too many reviews from this network. Try again later.";
 "Tool Settings…" = "Tool Settings…";
 "Tool-use rule" = "Tool-use rule";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.";
@@ -487,6 +515,7 @@
 "Yesterday" = "Yesterday";
 "You" = "You";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
+"Your name (optional)" = "Your name (optional)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";

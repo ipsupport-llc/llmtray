@@ -916,6 +916,11 @@ final class ChatClient: ObservableObject {
         guard !afterError, let idx = assistantMessageIndex, idx < messages.count,
               !messages[idx].toolCalls.isEmpty, let context = pendingRequestContext else {
             isStreaming = false
+            if !afterError, errorText == nil, let idx = assistantMessageIndex, idx < messages.count,
+               messages[idx].role == "assistant", !messages[idx].content.isEmpty || !messages[idx].images.isEmpty {
+                // An answer that came through: what the review prompt counts.
+                ReviewPrompter.shared.recordAnswer()
+            }
             // After an error too: the history is valid (dangling tool calls
             // closed), and the user's message must not be lost.
             persistCurrentSession()

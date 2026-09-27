@@ -93,6 +93,11 @@ struct GeneralPane: View {
                 } label: {
                     SettingLabel(title: "Something went wrong?", help: "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.")
                 }
+                LabeledContent {
+                    Button("Rate LLMTray…") { NotificationCenter.default.post(name: .showReview, object: nil) }
+                } label: {
+                    SettingLabel(title: "Like LLMTray?", help: "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.")
+                }
             }
         }
         .formStyle(.grouped)
