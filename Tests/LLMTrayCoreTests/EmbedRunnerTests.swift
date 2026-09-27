@@ -335,6 +335,36 @@ final class EmbedRunnerTests: XCTestCase {
         r.stop()
     }
 
+    func testWaitersLeaveWhenCancelledAndStopAndWaitReturnsAfterExit() async throws {
+        let r = try runner()
+        try await r.start()
+        let running = Task { try await r.embed((0..<10).map { _ in "slow:0.1" }, kind: .document) }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        let queued = Task { try await r.embed(["waits for the slot"], kind: .document) }
+        try await Task.sleep(nanoseconds: 50_000_000)
+        let t0 = Date()
+        queued.cancel()
+        do {
+            _ = try await queued.value
+            XCTFail("cancelled")
+        } catch is CancellationError {}
+        XCTAssertLessThan(Date().timeIntervalSince(t0), 0.2, "left the slot's line at once")
+        let pid = r.pid!
+        await r.stopAndWait()
+        XCTAssertNotEqual(kill(pid, 0), 0, "exited before stopAndWait returned")
+        do { _ = try await running.value } catch EmbedRunner.Failure.stopped {}
+
+        let slow = try runner("slowready")
+        let starting = Task { try await slow.start() }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        starting.cancel()
+        do {
+            _ = try await starting.value
+            XCTFail("cancelled")
+        } catch is CancellationError {}
+        await slow.stopAndWait()
+    }
+
     func testExitsWhenIdle() async throws {
         let r = try runner { $0.idleTimeout = 0.3 }
         _ = try await r.embed(["x"], kind: .query)

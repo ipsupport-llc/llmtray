@@ -57,10 +57,12 @@ public final class GenerationQueue {
     private var lastGrantWasBackground = false
     private let pollInterval: UInt64
 
-    /// Called on the main actor when a generation is granted the queue while
-    /// indexing was using it (a slice just ended, or slices are waiting): the
-    /// embed runner should exit now.
-    public var onInteractiveGrant: (() -> Void)?
+    /// Awaited on the main actor when a generation is granted the queue while
+    /// indexing was using it (a slice just ended, or slices are waiting),
+    /// before the ticket is handed out: the embed runner exits and its
+    /// memory is free when the generation starts (`EmbedRunner.stopAndWait`).
+    /// Wired by the indexer (3.4b).
+    public var onInteractiveGrant: (() async -> Void)?
 
     public init(pollInterval: TimeInterval = 0.2) {
         self.pollInterval = UInt64(pollInterval * 1_000_000_000)
@@ -91,7 +93,7 @@ public final class GenerationQueue {
                 holder = id
                 let tookOver = lastGrantWasBackground || !backgroundWaiting.isEmpty
                 lastGrantWasBackground = false
-                if tookOver { onInteractiveGrant?() }
+                if tookOver, let hook = onInteractiveGrant { await hook() }
                 onPosition(nil)
                 return Ticket(queue: self, id: id)
             }

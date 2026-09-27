@@ -70,7 +70,7 @@ public final class EmbedRunner: @unchecked Sendable {
     private let lock = NSLock()
     private var process: RunnerProcess?
     private var info: EmbedRunnerReady?
-    private var startWaiters: [CheckedContinuation<EmbedRunnerReady, Error>] = []
+    private var startWaiters: [(id: UUID, continuation: CheckedContinuation<EmbedRunnerReady, Error>)] = []
     private var pending: [String: Pending] = [:]
     private var nextID = 0
     private var crashes = 0
@@ -78,7 +78,7 @@ public final class EmbedRunner: @unchecked Sendable {
     private var lastFailure = ""
     private var idleWork: DispatchWorkItem?
     private var documentBusy = false
-    private var documentWaiters: [CheckedContinuation<Void, Never>] = []
+    private var documentWaiters: [(id: UUID, continuation: CheckedContinuation<Void, Error>)] = []
     private let timers = DispatchQueue(label: "LLMTray embed runner timers")
 
     private final class Pending {
@@ -148,7 +148,7 @@ public final class EmbedRunner: @unchecked Sendable {
             throw Failure.runner(code: "too_large", message: "more than \(configuration.maxTexts) texts")
         }
         if texts.isEmpty { return EmbedResult(dim: readyInfo?.dim ?? 0, count: 0, vectors: [], tokens: [], truncated: [], milliseconds: 0) }
-        if kind == .document { await acquireDocumentSlot() }
+        if kind == .document { try await acquireDocumentSlot() }
         defer { if kind == .document { releaseDocumentSlot() } }
         try Task.checkCancellation()
         _ = try await start()
@@ -163,7 +163,7 @@ public final class EmbedRunner: @unchecked Sendable {
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<EmbedResult, Error>) in
                 lock.lock()
-                guard let process, info != nil else {
+                guard let process, info != nil, process.isHealthy else {
                     lock.unlock()
                     continuation.resume(throwing: Failure.died(lastFailure))
                     return
@@ -173,15 +173,14 @@ public final class EmbedRunner: @unchecked Sendable {
                 idleWork?.cancel()
                 idleWork = nil
                 lock.unlock()
-                if !process.write(line) {
-                    // It's exiting; its exit fails the request (unless that already happened).
-                    process.kill()
-                    return
-                }
+                // The deadline and the cancel action first: the write itself
+                // goes through the process's writer queue and never blocks here.
                 timers.asyncAfter(deadline: .now() + timeout + configuration.grace) { [weak self] in
                     self?.expire(id, process: process)
                 }
                 box.onCancel { [weak self] in self?.cancel(id, process: process) }
+                // A failed write: it's exiting, and its exit fails the request.
+                process.send(line) { ok in if !ok { process.kill() } }
             }
         } onCancel: {
             box.cancel()
@@ -200,7 +199,9 @@ public final class EmbedRunner: @unchecked Sendable {
         lock.lock()
         let p = info != nil ? process : nil
         lock.unlock()
-        return p?.write(EmbedRunnerMessage.ping(id: "ping")) ?? false
+        guard let p else { return false }
+        p.send(EmbedRunnerMessage.ping(id: "ping"))
+        return true
     }
 
     private func cancel(_ id: String, process: RunnerProcess) {
@@ -208,11 +209,13 @@ public final class EmbedRunner: @unchecked Sendable {
         guard let p = pending[id], !p.cancelled else { lock.unlock(); return }
         p.cancelled = true
         lock.unlock()
-        _ = process.write(EmbedRunnerMessage.cancel(id: "c-\(id)", target: id))
+        process.send(EmbedRunnerMessage.cancel(id: "c-\(id)", target: id))
         // The runner answers at its next batch boundary; past the grace it's stuck.
         timers.asyncAfter(deadline: .now() + configuration.grace) { [weak self] in self?.expire(id, process: process) }
     }
 
+    /// Decided under the lock: once marked unresponsive the process takes no
+    /// new request (`isHealthy`), so the kill can't hit one registered later.
     private func expire(_ id: String, process: RunnerProcess) {
         lock.lock()
         let stillPending = pending[id] != nil && pending[id]?.process === process
@@ -224,26 +227,41 @@ public final class EmbedRunner: @unchecked Sendable {
     // MARK: - lifecycle
 
     /// Starts the runner if needed and waits for `ready`.
+    /// A cancelled task stops waiting at once (the runner keeps starting).
     @discardableResult
     public func start() async throws -> EmbedRunnerReady {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<EmbedRunnerReady, Error>) in
+        let waiter = UUID()
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<EmbedRunnerReady, Error>) in
+                lock.lock()
+                if Task.isCancelled {
+                    lock.unlock()
+                    continuation.resume(throwing: CancellationError())
+                    return
+                }
+                if let info, let process, process.isHealthy {
+                    lock.unlock()
+                    continuation.resume(returning: info)
+                    return
+                }
+                let now = DispatchTime.now().uptimeNanoseconds
+                if process == nil, now < backoffUntil {
+                    let why = lastFailure
+                    lock.unlock()
+                    continuation.resume(throwing: Failure.unavailable(why))
+                    return
+                }
+                startWaiters.append((waiter, continuation))
+                // A runner on its way out is replaced once it has exited.
+                if process == nil { spawnLocked() }
+                lock.unlock()
+            }
+        } onCancel: {
             lock.lock()
-            if let info, let process, !process.stopping {
-                lock.unlock()
-                continuation.resume(returning: info)
-                return
-            }
-            let now = DispatchTime.now().uptimeNanoseconds
-            if process == nil, now < backoffUntil {
-                let why = lastFailure
-                lock.unlock()
-                continuation.resume(throwing: Failure.unavailable(why))
-                return
-            }
-            startWaiters.append(continuation)
-            // A runner on its way out is replaced once it has exited.
-            if process == nil { spawnLocked() }
+            let index = startWaiters.firstIndex { $0.id == waiter }
+            let removed = index.map { startWaiters.remove(at: $0) }
             lock.unlock()
+            removed?.continuation.resume(throwing: CancellationError())
         }
     }
 
@@ -272,7 +290,7 @@ public final class EmbedRunner: @unchecked Sendable {
             let waiters = startWaiters
             startWaiters = []
             let failure = Failure.died(lastFailure)
-            DispatchQueue.global().async { waiters.forEach { $0.resume(throwing: failure) } }
+            DispatchQueue.global().async { waiters.forEach { $0.continuation.resume(throwing: failure) } }
         }
     }
 
@@ -285,8 +303,22 @@ public final class EmbedRunner: @unchecked Sendable {
         idleWork?.cancel()
         idleWork = nil
         lock.unlock()
-        p.closeStdin()
         timers.asyncAfter(deadline: .now() + configuration.grace) { p.kill() }
+        p.closeStdinWhenWritten()
+    }
+
+    /// `stop()`, returning once the runner has exited (at most the grace
+    /// later): what a generation waits for before it loads its model.
+    public func stopAndWait() async {
+        guard let p = currentProcess() else { return }
+        stop()
+        await p.waitForExit()
+    }
+
+    private func currentProcess() -> RunnerProcess? {
+        lock.lock()
+        defer { lock.unlock() }
+        return process
     }
 
     /// Forgets earlier crashes (the user fixed something, e.g. re-downloaded).
@@ -340,7 +372,7 @@ public final class EmbedRunner: @unchecked Sendable {
             startWaiters = []
             scheduleIdleLocked()
             lock.unlock()
-            waiters.forEach { $0.resume(returning: r) }
+            waiters.forEach { $0.continuation.resume(returning: r) }
         case .fatal(let code, let text):
             p.failure = "\(code): \(text)"
             p.fatal = true
@@ -398,7 +430,7 @@ public final class EmbedRunner: @unchecked Sendable {
         pending = pending.filter { $0.value.process !== p }
         // Waiting to start: a stopped runner is replaced right away; after a
         // crash they fail (and the next request backs off).
-        var waiters: [CheckedContinuation<EmbedRunnerReady, Error>] = []
+        var waiters: [(id: UUID, continuation: CheckedContinuation<EmbedRunnerReady, Error>)] = []
         if !startWaiters.isEmpty {
             if p.stopping && !p.fatal && !p.unresponsive && !p.violation {
                 spawnLocked()
@@ -409,22 +441,35 @@ public final class EmbedRunner: @unchecked Sendable {
         }
         lock.unlock()
         for slot in inFlight { slot.continuation.resume(throwing: slot.cancelled ? CancellationError() : failure) }
-        waiters.forEach { $0.resume(throwing: failure) }
+        waiters.forEach { $0.continuation.resume(throwing: failure) }
     }
 
     // MARK: - one index batch at a time
 
-    private func acquireDocumentSlot() async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            lock.lock()
-            if !documentBusy {
-                documentBusy = true
-                lock.unlock()
-                continuation.resume()
-            } else {
-                documentWaiters.append(continuation)
-                lock.unlock()
+    /// Waits for the index-batch slot; a cancelled task leaves the line.
+    private func acquireDocumentSlot() async throws {
+        let waiter = UUID()
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                lock.lock()
+                if Task.isCancelled {
+                    lock.unlock()
+                    continuation.resume(throwing: CancellationError())
+                } else if !documentBusy {
+                    documentBusy = true
+                    lock.unlock()
+                    continuation.resume()
+                } else {
+                    documentWaiters.append((waiter, continuation))
+                    lock.unlock()
+                }
             }
+        } onCancel: {
+            lock.lock()
+            let index = documentWaiters.firstIndex { $0.id == waiter }
+            let removed = index.map { documentWaiters.remove(at: $0) }
+            lock.unlock()
+            removed?.continuation.resume(throwing: CancellationError())
         }
     }
 
@@ -434,9 +479,10 @@ public final class EmbedRunner: @unchecked Sendable {
             documentBusy = false
             lock.unlock()
         } else {
+            // The slot passes straight to the next waiter (still busy).
             let next = documentWaiters.removeFirst()
             lock.unlock()
-            next.resume()
+            next.continuation.resume()
         }
     }
 }
@@ -461,8 +507,15 @@ final class RunnerProcess: @unchecked Sendable {
     var unresponsive = false
     var violation = false
     var failure: String?
+    /// Takes new requests (owner's lock).
+    var isHealthy: Bool { !stopping && !unresponsive && !violation && !fatal }
+    /// Writes happen here, in order, so no caller blocks on a full pipe; a
+    /// kill makes a blocked write fail (EPIPE).
+    private let writer = DispatchQueue(label: "LLMTray embed runner stdin")
+    private let exitGroup = DispatchGroup()
 
     private init(pid: pid_t, stdin: Int32, stdout: Int32, stderr: Int32, maxLineBytes: Int) {
+        exitGroup.enter()
         self.pid = pid
         stdinFD = stdin
         stdoutFD = stdout
@@ -573,13 +626,33 @@ final class RunnerProcess: @unchecked Sendable {
             _ = stderrDone.wait(timeout: .now() + 2)
             closeStdin()
             onExit(status, tail.text)
+            exitGroup.leave()
         }
         outThread.name = "LLMTray embed runner"
         outThread.start()
     }
 
+    /// Queues `data` for the runner's stdin; `done` gets whether it all went.
+    func send(_ data: Data, done: ((Bool) -> Void)? = nil) {
+        writer.async { [self] in
+            let ok = write(data)
+            done?(ok)
+        }
+    }
+
+    /// EOF after everything queued before it.
+    func closeStdinWhenWritten() {
+        writer.async { [self] in closeStdin() }
+    }
+
+    func waitForExit() async {
+        await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+            exitGroup.notify(queue: .global()) { c.resume() }
+        }
+    }
+
     /// The whole line, or false (closed, or the runner is gone).
-    func write(_ data: Data) -> Bool {
+    private func write(_ data: Data) -> Bool {
         writeLock.lock()
         defer { writeLock.unlock() }
         guard stdinOpen else { return false }

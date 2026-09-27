@@ -53,7 +53,12 @@ LIMITS = {
     "max_texts": 256,                # per request
     "max_text_chars": 200_000,       # per text (the tokenizer truncates to max_length anyway)
     "max_request_tokens": 262_144,   # after tokenization and truncation
+    "max_queued": 64,                # requests waiting, both queues
+    "max_queued_bytes": 64 * 2**20,  # their lines together
 }
+# Queries a document request serves at one batch boundary before it looks
+# at its own deadline and cancel again.
+INTERLEAVE = 8
 
 out_lock = threading.Lock()
 
@@ -154,9 +159,16 @@ def reader() -> None:
             break
         elif op == "embed":
             msg["_t"] = time.monotonic()
+            msg["_bytes"] = len(line)
             with cond:
-                (queries if msg.get("kind") == "query" else documents).append(msg)
-                cond.notify()
+                waiting = list(queries) + list(documents)
+                full = (len(waiting) >= LIMITS["max_queued"]
+                        or sum(m["_bytes"] for m in waiting) + len(line) > LIMITS["max_queued_bytes"])
+                if not full:
+                    (queries if msg.get("kind") == "query" else documents).append(msg)
+                    cond.notify()
+            if full:
+                error(msg.get("id"), "too_large", "the runner's queue is full")
         else:
             error(msg.get("id"), "bad_request", f"unknown op {op!r}")
     closing.set()
@@ -215,18 +227,19 @@ def handle(msg: dict, allow_interleave: bool) -> None:
     vecs = np.zeros((len(seqs), emb.dim), np.float16)
     done = 0
     for idx in emb.batches(seqs):
+        # Queries that arrived meanwhile go first -- a bounded number, then
+        # this request's own deadline and cancel are looked at again.
+        for _ in range(INTERLEAVE if allow_interleave else 0):
+            q = take_query()
+            if q is None:
+                break
+            serve(q, allow_interleave=False)
         if is_cancelled(rid):
             return error(rid, "cancelled", "cancelled by the client")
         if closing.is_set():
             return error(rid, "cancelled", "the runner is shutting down")
         if time.monotonic() > deadline:
             return error(rid, "timeout", f"deadline passed after {done} of {len(seqs)} texts")
-        # A query that arrived meanwhile goes first.
-        while allow_interleave:
-            q = take_query()
-            if q is None:
-                break
-            serve(q, allow_interleave=False)
         vecs[idx] = emb.forward([seqs[j] for j in idx]).astype(np.float16)
         done += len(idx)
     is_cancelled(rid)   # a cancel that came too late is dropped
