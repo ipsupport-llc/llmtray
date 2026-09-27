@@ -15,6 +15,7 @@ on:
     paths:
       - "docs/**"
       - "scripts/render_appcast.py"
+      - "scripts/stamp_site.py"
       - ".github/workflows/pages.yml"
   release:
     types: [published, edited, deleted, unpublished, prereleased, released]
@@ -63,6 +64,7 @@ jobs:
           python3 scripts/render_appcast.py releases.json _site/appcast.xml
           python3 -c "import sys, xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" _site/appcast.xml
           grep -E '<title>Version|sparkle:version>' _site/appcast.xml
+          python3 scripts/stamp_site.py releases.json _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
