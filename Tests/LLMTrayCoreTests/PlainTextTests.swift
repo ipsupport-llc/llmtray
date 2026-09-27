@@ -24,6 +24,9 @@ final class PlainTextTests: XCTestCase {
         XCTAssertEqual(solidPages.joined(), solid)
         XCTAssertGreaterThan(solidPages.count, 5)
         XCTAssertEqual(try PlainText.pages(Data(), caps: ExtractionCaps()), [])
+        // cp1251 text full of 0x80-0xBF bytes ("Ђ", "Ѓ"...): full-size pages, not a byte each.
+        let legacy = Data(repeating: 0x80, count: 10_000)
+        XCTAssertEqual(try PlainText.pages(legacy, caps: ExtractionCaps(), pageBytes: 1000).count, 10)
     }
 
     func testCaps() {

@@ -35,8 +35,7 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
         func starts(_ s: [UInt8], at o: Int = 0) -> Bool {
             head.count >= o + s.count && Array(head[o..<(o + s.count)]) == s
         }
-        // Readers accept "%PDF-" anywhere in the first KB.
-        if data.prefix(1024).range(of: Data("%PDF-".utf8)) != nil { return .pdf }
+        if starts(Array("%PDF-".utf8)) { return .pdf }
         if starts([0x50, 0x4B, 0x03, 0x04]) || starts([0x50, 0x4B, 0x05, 0x06]) {
             return zipKind(data, caps: caps)
         }
@@ -50,6 +49,9 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
             return .compoundFile
         }
         if starts(Array("{\\rtf".utf8)) { return .rtf }
+        // Readers accept "%PDF-" anywhere in the first KB -- after the exact
+        // signatures, so a docx quoting it isn't taken for a PDF.
+        if data.prefix(1024).range(of: Data("%PDF-".utf8)) != nil { return .pdf }
         if starts([0x89, 0x50, 0x4E, 0x47]) || starts([0xFF, 0xD8, 0xFF]) || starts(Array("GIF8".utf8))
             || starts([0x49, 0x49, 0x2A, 0x00]) || starts([0x4D, 0x4D, 0x00, 0x2A])
             || (starts(Array("ftyp".utf8), at: 4) && head.count >= 12

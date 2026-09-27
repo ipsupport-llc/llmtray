@@ -38,8 +38,12 @@ public enum PlainText {
                 if let nl = data[(start + pageBytes * 3 / 4)..<end].lastIndex(of: 0x0A) {
                     end = nl + 1
                 } else {
-                    // ...else off any UTF-8 continuation bytes.
-                    while end > start + 1, data[end] & 0xC0 == 0x80 { end -= 1 }
+                    // ...else off UTF-8 continuation bytes -- at most 3; more
+                    // is a legacy 8-bit encoding, where any byte is a boundary.
+                    let cut = end
+                    var back = 0
+                    while back < 3, end > start + 1, data[end] & 0xC0 == 0x80 { end -= 1; back += 1 }
+                    if data[end] & 0xC0 == 0x80 { end = cut }
                 }
             }
             let text = decode(data[start..<end])

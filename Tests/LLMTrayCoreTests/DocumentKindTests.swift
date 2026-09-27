@@ -64,6 +64,9 @@ final class DocumentKindTests: XCTestCase {
 
     func testZipContainersByTheirParts() {
         XCTAssertEqual(DocumentKind.detect(TestZip.docx(body: TestZip.paragraph("x"))), .docx)
+        let quoting = TestZip()
+        quoting.add("word/document.xml", "<w:t>%PDF-1.7</w:t>", store: true)
+        XCTAssertEqual(DocumentKind.detect(quoting.finish()), .docx)
         let xlsx = TestZip(); xlsx.add("xl/workbook.xml", "<workbook/>")
         XCTAssertEqual(DocumentKind.detect(xlsx.finish()), .xlsx)
         let pptx = TestZip(); pptx.add("ppt/presentation.xml", "<p/>")
