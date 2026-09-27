@@ -113,19 +113,33 @@ policy gets their wording):
 
 - `list_project_files()` — whenever the chat has a project: short ids
   (`1`, `2`, … per project), names, pages, status;
-- `search_project_files(query, top_k = 5, ≤ 10)` — once any file is
-  searchable; hits as `[doc:page]`, heading, the chunk, a neighbour only
-  while budget remains;
-- `read_project_file(doc, from_page, to_page)` — bounded by tokens, not
-  pages.
+- `search_project_files(query, top_k = 5, ≤ 10, doc?)` — once any file
+  is searchable; hits as `[doc:page]`, heading, the chunk, a neighbour
+  only while budget remains; at most 2 hits per document unless `doc`
+  narrows the search, so a question across files isn't answered from one;
+  the result says which files are still indexing, failed, or searched
+  lexically only (no vectors yet or the embedder unavailable);
+- `read_project_file(doc, from_page, to_page, cursor?)` — bounded by
+  tokens, not pages; a cut result returns a cursor to continue.
+
+A large document (up to 5,000 pages) can't be read through in four tool
+rounds: the policy tells the model to say what it read and that the rest
+is unread ("insufficient coverage") rather than summarise pages it
+hasn't seen; whole-document summaries are a later feature (per-document
+summary chunks, v3).
 
 **Budget.** Nothing in the chat counts prompt tokens today (auto-compact
-counts messages). Project results get a per-turn budget in
-`ChatToolbox`, reset in `startTurn()` like `imagesThisTurn`: a share of
-`maxTokensCap − max_tokens` (~25%, hard-capped); a result past it is
-truncated with a marker; a chunk already returned this turn isn't sent
-again; once spent, search and read stop being declared — as spent
-generators are ([0007](0007-chat-tools.md)); listing stays.
+counts messages). A conservative estimator in LLMTrayCore (tokens ≈
+UTF-8 bytes / 3, erring high) counts the whole serialized request —
+system prompt, instructions, history, tool declarations, the calls so
+far. Before each project result the room left is `context − estimate −
+max_tokens − margin (10%)`; the result gets at most a share of it
+(≤ 50%, hard-capped), is truncated with a marker past that, and a chunk
+already returned this turn isn't sent again. With no safe room left the
+tool answers "the conversation is too long to add more file text —
+compact or start a new chat", and search/read stop being declared for
+the turn — as spent generators are ([0007](0007-chat-tools.md));
+listing stays. Tested with a long chat and repeated searches.
 
 **Earlier results.** Live chats resend old tool messages every turn;
 saved chats drop them (`persistCurrentSession` skips `role == "tool"`),
@@ -136,7 +150,11 @@ their results together, leaving the answer (with its citations): what a
 reloaded chat has, so the request is the same live and reloaded. The
 model searches again when it needs the text.
 
-**Trust**, deterministic:
+**Trust**, deterministic. What this guarantees is narrow: file text
+can't trigger a network or generator tool in the same turn, and can't
+come back as a trusted summary. It does not stop the model from being
+misled by what it reads — an answer built on a file is attributed to the
+file (citations), so the user can see where a claim came from.
 
 - document text reaches the model only as project tool results, framed
   as quoted material with its `[doc:page]`;
@@ -154,13 +172,22 @@ model searches again when it needs the text.
   messages out of its transcript (or uses their stubs), else file text
   would come back as a trusted summary.
 
-**Citations.** The model writes `[3:12]` (doc 3, page 12). `ChatMessage`
-and `PersistedMessage` gain `citations: [Citation(doc, page, chunk)]`
-(`decodeIfPresent`, `chunk` optional), collected per answer like
-`sourcesByAnswer`, from the pages search or read returned this turn
-only; a citation in the text that matches none stays plain text. A citation opens the copy at
-that page, or says the file was removed. After compaction citations are
-text only.
+**Citations.** The model writes `[3:12]` (doc 3, page 12 — a sheet or
+slide number for spreadsheets and decks, shown with its name).
+`ChatMessage` and `PersistedMessage` gain `citations: [Citation(project,
+doc, rev, page, chunk?)]` (`decodeIfPresent`), collected per answer
+like `sourcesByAnswer`, from the pages search or read returned this turn
+only, and resolved against the project they were made in — never the
+chat's current one (a chat can move). A `[n:p]` in the text that matches
+none stays plain text; duplicates collapse into one chip. A chip opens
+the copy (or the linked file) at that page, and says so when the file
+has changed since that revision or is gone.
+
+**Retention.** The cited revision's `pages` rows are kept as tombstones
+when its document is re-indexed or removed (a linked file too), until no
+saved citation refers to them: reference counts are updated when chats
+are deleted or compacted (citations become text) and when a project is
+deleted (all of it goes). Tombstones count towards the disk caps.
 
 ## The index
 
@@ -198,11 +225,13 @@ Application Support/LLMTray/projects/<projectID>/
   `embedded` flips after the last, so a crash costs one batch;
   `vec_sets(set_id, model, dim, prep_version, active)` for an embedder
   switch (one transaction flips `active`).
-- `meta(schema, ...)`. On a schema change the derived tables (chunks,
-  both FTS, vectors) are rebuilt from the documents' sources — copies in
-  `files/`, linked files where their source is available; an unavailable
-  source keeps its old index until it's back — and `pages` rows kept
-  for cited revisions are migrated, not dropped. `documents` — user
+- `meta(schema, ...)`. A schema change builds a **new database beside
+  the old one** (`index.next.sqlite`): documents migrated, derived
+  tables rebuilt from copies and available linked sources, an
+  unavailable source's rows and every cited revision's pages carried
+  over as they are; the switch is the compaction swap below, done only
+  when the new file is complete; a crash leaves the old one in use;
+  free disk is checked first. `documents` — user
   state — migrates only by explicit ALTERs. 16 KB pages and
   `auto_vacuum = INCREMENTAL`, both set before the first table.
 
@@ -239,7 +268,13 @@ killed a child at 16 points of add/remove/re-index: before reconcile a
 document was invisible or complete, after it no orphans or duplicates,
 and a crash mid re-index kept the old revision searchable.
 
-**Linked folders.** A `sources(id, kind, bookmark, path)` table: `copy`
+**Linked folders.** Before linking, the user is told that the folder's
+text and vectors are kept in the app's data (searchable while the folder
+is offline) and how much disk that takes; removing a source offers
+"remove it and its index". The app isn't sandboxed, so the bookmark is a
+plain (not security-scoped) one, refreshed when stale; the folder is
+read only, and the extractor gets file paths inside it only. A
+`sources(id, kind, bookmark, path)` table: `copy`
 or `folder`; a document of a folder source keeps its relative path and
 the mtime + hash it was indexed at. FSEvents (and a full rescan at
 project open, since events are lost while the app isn't running) queue
@@ -320,6 +355,18 @@ loops `NSAttributedString` and `textutil` forever
 (`fixtures/rtf_hangs_textkit.rtf`); Quick Look hung > 60 s on a corrupt
 .ppt. So:
 
+- **The safety contract is the public mechanisms**; the private and
+  deprecated ones only tighten it. Required before any parser runs: the
+  wall-clock timeout, killing the process group, the stdout cap, and
+  parent-side footprint polling (20 ms). The jetsam limit is used when
+  the symbol resolves, and is not relied on. Network isolation
+  (`sandbox_init`) is required for the formats that go through Apple's
+  importers (docx/doc/odt/rtf via `NSAttributedString`): if it can't be
+  set up, those formats fail with "not supported on this system" and our
+  own parsers (PDFKit text, OOXML sheets and slides, legacy, HTML, plain)
+  still run — none of them opens a connection. Tested in the signed,
+  packaged app on macOS 13 and the current macOS, with the private symbol
+  absent and the sandbox call failing.
 - **A child process** of the app binary (`LLMTray --extract <path>`,
   JSON lines out) does all parsing, started with `posix_spawn` —
   `ProcessRunner` gains that variant; `Process` can't set what follows —
@@ -378,7 +425,7 @@ Timing (M5, child's own): PDF 100 pages 450 ms; docx/doc/odt/rtf 100
 pages 69-84 ms; xlsx 5k × 9 273 ms; xls 5k × 8 163 ms; process start
 adds ~20 ms.
 
-- **Tier 2 (v2)**: `VNRecognizeTextRequest` rev3 `.accurate` (Russian
+- **Tier 2**: `VNRecognizeTextRequest` rev3 `.accurate` (Russian
   from macOS 13), document segmentation + perspective correction for
   photos, `RecognizeDocumentsRequest` for tables on macOS 26+.
 - **Tier 3 (v3)**: PaddleOCR-VL-1.5 or GLM-OCR via mlx-vlm, as a
@@ -394,11 +441,21 @@ adds ~20 ms.
   extraction on, and a crash while embedding costs only the embedding.
 - The embedder is a managed bidirectional runner (JSON lines, request
   ids, bounded messages, timeouts, cancellation, restart, the orphan
-  marker) — `ProcessRunner.runStreaming` is one-shot. It runs for
-  indexing and for the query only, as a `GenerationQueue` client: never
-  beside an image or music generator, exiting when one takes the ticket.
-  Its fit is measured against the Metal limit (~19 GB by default on this
-  Mac), not the 26 GB of RAM.
+  marker) — `ProcessRunner.runStreaming` is one-shot.
+- **Scheduling.** Indexing is a background job in bounded slices (one
+  embed request ≤ 256 chunks, ≤ ~3 s); it holds no `GenerationQueue`
+  ticket across slices. `GenerationQueue` gains a background lane below
+  the interactive one: an image or music generation that wants the queue
+  gets it at the next slice boundary, and the embed runner exits then
+  (its ~1.7 GB freed); indexing resumes after. Slices also wait while
+  the chat model generates. A query embedding is interactive: it jumps
+  ahead of queued index batches in the runner. At most two projects'
+  vectors are resident (LRU, a ~800 MB budget); a search in a third
+  loads its vectors (120-300 ms at 200k) and evicts the oldest.
+- **Budget, measured before v1b ships**: the chat model + the embedder +
+  two open projects' vectors + the extractor, at the Metal limit
+  (~19 GB by default here, not the 26 GB of RAM), with chat latency
+  under indexing; the OCR/VLM tiers only run as exclusive queue jobs.
 - A query while it can't run falls back to lexical, and says so.
 - **The runner is plain MLX with our own family modules** (`xlm-roberta`
   ~150 lines, `gemma3-bidir`): only `mlx`, `tokenizers`, `numpy` — all in
@@ -454,7 +511,22 @@ adds ~20 ms.
 - The menu bar icon carries a small dot while any project indexes.
 - A project chat's header shows how many files it can search; answers
   show their sources as chips (file, page) that open the file there.
-- Settings: the feature and each of its models, opt-in, with sizes.
+- Settings: the feature and each of its models, opt-in, with sizes;
+  the disk each project's index uses and the app-wide total.
+- **Statuses the user sees**, one mapping: copying / reading / OCR /
+  describing / embedding / ready / empty / failed / not supported.
+  `searchable` shows as *ready (words only, meaning search after
+  embedding)*; `embedded` as *ready*; a hit found lexically only is
+  marked so in the tool result. A project chat asked about a file that
+  isn't ready gets that status from the tools and says so.
+- **Formats offered**: the add flow accepts only what the installed
+  version indexes (v1a: text, code, PDF text layer, docx/doc/odt/rtf,
+  HTML); anything else is refused at add with "not yet supported",
+  never shown as searchable.
+- **Disk limits**: per project and app-wide (Settings); add, re-index and
+  compaction check free space first (a file: its size + index growth;
+  compaction and migration: 1.2× the index); a failed swap is cleaned up
+  at the next open.
 
 ## Tests (LLMTrayCore)
 
@@ -513,23 +585,47 @@ contextual-retrieval.
    `spike/rag-extract`, `spike/rag-embed`; results above). Carried into
    v1a: injection documents against the real tools, and the index size
    re-measured with 16 KB pages and incremental auto-vacuum.
-2. **Eval on extracted text.** The user's 20-30 real documents through
-   tier 1 (and the tier-2 prototype); 40-60 questions with the answering
+2. **Eval on extracted text**, run with the spike's code (no app changes
+   needed): the user's 20-30 real documents through tier 1 (and the
+   tier-2 prototype); questions include cross-file comparisons,
+   whole-document summaries (expected: "insufficient coverage"), long
+   tables, a just-added file; 40-60 questions with the answering
    page; recall@10 and MRR, lexical vs hybrid with bge-m3 (and
    USER-bge-m3 beside it); CER per tier. Sets the fusion weights, the
    chunk size and the recall target for v1a.
-3. **v1a — hybrid, safe, usable.** The embed runner and registry, the
-   ML policy, `ProjectIndex` and the registry,
-   ingestion and reconcile, tier 1 with the junk check, `--extract`,
-   caps, the three tools, budget, elision, trust rules, compaction
-   exclusion, citations, the Files view, New Chat in Project, project
-   instructions, deletion,
-   the tests above. Exit: text-document recall on the eval set, the
-   injection tests passing.
+3. **v1a — text and PDF, behind a feature flag (beta)**, as separate PRs,
+   each with its tests, in this order:
+   1. **Supervised extractor**: `ProcessRunner`'s `posix_spawn` variant
+      (process group, wall timeout, stdout cap, footprint polling,
+      jetsam when available), `LLMTray --extract`, the capped zip reader,
+      `HTMLText`, the junk check; packaged smoke test on macOS 13.
+   2. **Project lifecycle**: New Chat in Project (the session and its
+      project mapping created atomically before the first turn), project
+      instructions, project deletion with deletion records, the
+      projects/ layout.
+   3. **Chat plumbing**: the token estimator and per-request budget,
+      `withoutEarlierProjectResults`, compaction without tool text,
+      citations in `ChatMessage`/`PersistedMessage` (with project and
+      rev) and their chips, the per-call trust barrier.
+   4. **The index and tools**: `ProjectIndex` + `ProjectIndexRegistry`
+      (schema, FTS, packed vectors, staging/reconcile, maintenance), the
+      embed runner and registry (bge-m3), the background lane of
+      `GenerationQueue`, the three tools.
+   5. **Files UI**: the Files view, the sidebar ring with Pause / Stop,
+      the menu-bar dot, Settings opt-in.
+
+   Exit gates: recall@10 on the eval's text documents at the target;
+   injection documents passing with network and generator tools on; a
+   search tool call p95 ≤ 1.5 s warm and ≤ 3 s cold (runner spawn
+   included), measured while indexing and while a generator waits;
+   combined peak memory within the Metal limit; the index re-measured
+   with the final layout and the disk limits set from it; macOS 13
+   packaged smoke test.
 4. **v1b — every format**: tier 2 (Vision OCR, segmentation,
    perspective, `RecognizeDocumentsRequest` tables on macOS 26+), image
    descriptions (the small VLM), xlsx/pptx and .xls/.ppt, linked folders
-   with FSEvents. Exit: CER and recall on the scanned part of
+   with FSEvents — **the full-workspace promise is gated here**. Exit:
+   CER and recall on the scanned part of
    the eval set, description quality on the eval images, peak memory
    within the Metal limit.
 5. **v2 — images as material**: project images for `edit_image` by a
