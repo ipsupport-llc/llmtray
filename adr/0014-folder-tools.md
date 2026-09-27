@@ -267,6 +267,53 @@ may also lower them; a failure is shown in the pane). It says where it came
 from (`GrantOrigin`: a chat, or Settings). Allow Folder… there adds "Can
 look · 1 hour".
 
+## Listing sizes and the plan's warnings (2026-09-27)
+
+From real chats (Gemma 4 26B, "tidy up ~/Downloads, delete duplicates"): the
+model listed recursively, proposed sorting every file by extension -- 22,484
+of them from one folder, a service manual -- and trashing "x (1).zip" as a
+duplicate of "x.zip" though the sizes differed (55.7 vs 52.3 MB); after
+reading it said "starting, please wait" and couldn't. In another chat it
+took `change_files` for a text editor and wrote a shell script.
+
+- **A subfolder's line says what it holds**: `Name/  22,484 items, 1.9 GB`
+  (a package: its bytes). Measured in the walk that already flags protected
+  items (Hardening 16) -- by descriptors, `lstat` only, no link followed,
+  another volume not entered, a package one item, hidden names and denied
+  items not counted as items, a hard-linked file once, an iCloud placeholder
+  by its metadata size, a dataless folder not entered, materialization off:
+  nothing is downloaded or opened. Capped per folder (50,000 entries,
+  0.3 s) and per page (250,000, 1.5 s): past a cap `≥ 50,000 items, ≥ 12.0
+  GB`; a folder past the page's budget shows no size. A recursive listing
+  measures only the listed folder's own subfolders (their files are listed
+  anyway).
+- **`change_files` says what it is and two rules** (+165 bytes, ~40 tokens,
+  in every request that declares it): it makes folders, moves, renames and
+  trashes for real once approved, not for editing contents; a subfolder is
+  one item (whole or left alone unless asked); duplicates are only what
+  `files(only_duplicates)` finds.
+- **It stays declared after a read in the turn** and is refused in code
+  (Hardening 2 is about running, not declaring; the refusal says to ask the
+  user and call it first thing in their next message). Only pinned files,
+  which keep changes off in every turn, drop it. A `files` result from a
+  folder the chat may propose changes in ends with one line: "change_files
+  (new folders, moves, renames, Trash) works from their next message:
+  describe the plan and ask the user to confirm." Not for read grants,
+  temporary chats, errors, or with pinned files.
+- **The plan review warns above Approve** (`PlanReview.planWarnings`, for
+  what Approve would do now): "Reaches into N subfolders (names)" -- per
+  grant, the folder the plan tidies is the longest common parent of the
+  moved and trashed items; when some sit right in it, the others are taken
+  out of its subfolders (a plan whose items all sit in subfolders, or that
+  moves a folder whole, reaches into nothing); "N items, X GB" past 200
+  items; each Trash row shows its size (a folder's as measured). `change_files`
+  has no "duplicate" field, so a trashed file named like a copy ("x (1).ext",
+  "x copy.ext", "x copy 2.ext") with "x.ext" beside it is compared
+  (`PlanChecker`): a different size, or the same size and a different SHA-256
+  (bounded: 1 GB per file, 5 s per review; never a hard link, a placeholder
+  or a key's name) → "Not identical to its original: x (1).ext", and it
+  starts unticked (once: a tick the user puts back holds).
+
 ## Plan
 
 1. Core: containment, denylist, grants, classifier, plan, journal +

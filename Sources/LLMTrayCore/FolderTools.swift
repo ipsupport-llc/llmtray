@@ -73,8 +73,14 @@ public enum FolderTools {
 
     // MARK: change_files
 
-    static let changeDescription = "Propose changes in the user's folders as one list: make_dir, move (also renames), "
-        + "trash. Nothing changes until the user approves them."
+    // What models got wrong in real Downloads folders (adr/0014, "Listing
+    // sizes and the plan's warnings"): one took this for a text editor and
+    // wrote a shell script instead; one split a 22,000-file folder by
+    // extension and trashed "x (1).zip", which wasn't a copy.
+    static let changeDescription = "Make folders, move or rename files and folders, move them to the Trash: one list, "
+        + "done for real once the user approves it. Not for editing a file's contents. "
+        + "A subfolder is one item: move it whole or leave it, unless asked. "
+        + "Duplicates are only what files(only_duplicates) finds, not a (1) in a name."
 
     static let opParams: [ToolSchema.Param] = [
         .init("op", .oneOf(["make_dir", "move", "trash"]),
@@ -178,14 +184,18 @@ public enum FolderTools {
 
     /// Which folder tools a request declares: none with the feature off;
     /// `files` unless the request has no room for more file text;
-    /// `change_files` only in a saved chat, and not after file or folder
-    /// text in this turn (Hardening 2, 8).
+    /// `change_files` only in a saved chat (Hardening 8). After file or
+    /// folder text in the turn it stays declared and is refused in code
+    /// (Hardening 2: `ToolTrust.allows`, the refusal saying to ask the user
+    /// and call it in their next message) -- a model that no longer saw it
+    /// concluded it had no way to move files and wrote a script instead.
+    /// Only pinned files, which keep changes off in every turn, drop it.
     public static func declared(featureOn: Bool, temporaryChat: Bool, turn: ToolTrust.TurnState,
                                 fileTextRoomSpent: Bool) -> [String] {
         guard featureOn else { return [] }
         var names: [String] = []
         if !fileTextRoomSpent { names.append(filesName) }
-        if !temporaryChat, ToolTrust.allowsChange(turn) { names.append(changeName) }
+        if !temporaryChat, !turn.pinnedText { names.append(changeName) }
         return names
     }
 }

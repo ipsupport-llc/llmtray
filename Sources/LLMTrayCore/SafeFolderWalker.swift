@@ -38,6 +38,21 @@ public enum ProtectedContents: String, Codable, Sendable {
     case unchecked
 }
 
+/// A folder's items and bytes, as a listing shows them ("22,484 items,
+/// 1.9 GB"). `partial`: the count stopped at a cap or left something out --
+/// at least this much.
+public struct FolderSize: Codable, Equatable, Sendable {
+    public var items: Int
+    public var bytes: Int64
+    public var partial: Bool
+
+    public init(items: Int, bytes: Int64, partial: Bool = false) {
+        self.items = items
+        self.bytes = bytes
+        self.partial = partial
+    }
+}
+
 /// Paths inside a grant, resolved by descriptors (adr/0014, Hardening 1): from
 /// an open descriptor of the grant root, one component at a time, with
 /// `openat(O_NOFOLLOW | O_DIRECTORY)`. No symlink, alias or package is ever
@@ -324,16 +339,56 @@ public struct SafeFolderWalker {
     /// `protectedContents`, with the entries it read.
     func protectedScan(in parent: OpenedDirectory, _ name: String, budget: Int,
                        expecting: FileIdentity? = nil) -> (result: ProtectedContents, read: Int) {
+        let r = subtreeScan(in: parent, name, budget: budget, expecting: expecting, measure: false)
+        return (r.protected, r.read)
+    }
+
+    /// One walk of a folder's subtree: whether it holds anything denied, the
+    /// entries read, and -- with `measure` -- its size.
+    struct SubtreeScan {
+        var protected: ProtectedContents
+        var read: Int
+        var size: FolderSize?
+    }
+
+    /// Walks a folder's subtree by descriptors (no symlink followed, another
+    /// volume not entered), at most `budget` entries and until `deadline`.
+    /// Without `measure` it stops at the first denied item (`protectedScan`).
+    /// With it, it goes on to count the folder's items and add up its files'
+    /// sizes, from `lstat` alone -- no file is opened, an iCloud placeholder
+    /// counts with the size its metadata gives, a dataless folder isn't
+    /// entered (partial), and reads run with materialization off: nothing is
+    /// downloaded. A package counts as one item (its contents' bytes count),
+    /// hidden names don't count as items (their bytes do), denied items
+    /// neither, and a file of several names is counted once.
+    func subtreeScan(in parent: OpenedDirectory, _ name: String, budget: Int, deadline: TimeInterval? = nil,
+                     expecting: FileIdentity? = nil, measure: Bool) -> SubtreeScan {
         guard let st = try? Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory,
               expecting == nil || st.identity == expecting,
-              let base = parent.descriptor.currentPath else { return (.unchecked, 0) }
+              let base = parent.descriptor.currentPath else { return SubtreeScan(protected: .unchecked, read: 0, size: nil) }
+        if measure, st.isDataless { return SubtreeScan(protected: .unchecked, read: 0, size: FolderSize(items: 0, bytes: 0, partial: true)) }
+        return measure ? Materialization.off { walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, true) }
+            : walkSubtree(parent.descriptor, name, st, base + "/" + name, budget, deadline, false)
+    }
+
+    private func walkSubtree(_ parent: Descriptor, _ name: String, _ st: EntryStat, _ top: String, _ budget: Int,
+                             _ deadline: TimeInterval?, _ measure: Bool) -> SubtreeScan {
         var remaining = budget
-        func done(_ r: ProtectedContents) -> (result: ProtectedContents, read: Int) { (r, budget - max(0, remaining)) }
-        // Folders still to read, opened when their turn comes: the open ones
-        // are then only those on the way down (few descriptors held).
-        var stack: [(parent: Descriptor, name: String, stat: EntryStat, path: String, depth: Int)] =
-            [(parent.descriptor, name, st, base + "/" + name, 0)]
+        var items = 0
+        var bytes: Int64 = 0
+        var linked = Set<FileIdentity>()
+        var found = false
         var unchecked = false
+        var partial = false
+        func done(_ r: ProtectedContents) -> SubtreeScan {
+            SubtreeScan(protected: r, read: budget - max(0, remaining),
+                        size: measure ? FolderSize(items: items, bytes: bytes, partial: partial) : nil)
+        }
+        // Folders still to read, opened when their turn comes: the open ones
+        // are then only those on the way down (few descriptors held). `counts`:
+        // its entries are items (not inside a package or a hidden folder).
+        var stack: [(parent: Descriptor, name: String, stat: EntryStat, path: String, depth: Int, counts: Bool)] =
+            [(parent, name, st, top, 0, true)]
         while let next = stack.popLast() {
             let path = next.path, depth = next.depth
             guard let dir = try? Self.openChild(next.parent, next.name, expecting: next.stat, display: next.name) else {
@@ -349,23 +404,45 @@ public struct SafeFolderWalker {
             defer { closedir(stream) }
             while true {
                 // A folder that can't be read to its end isn't checked.
-                let next: String?
-                do { next = try Self.nextName(stream) } catch { unchecked = true; break }
-                guard let n = next else { break }
+                let entry: String?
+                do { entry = try Self.nextName(stream) } catch { unchecked = true; break }
+                guard let n = entry else { break }
                 if n == "." || n == ".." { continue }
                 remaining -= 1
-                if remaining < 0 { return done(.unchecked) }
-                if denylist.isDenied(name: n) || denylist.deniesPath(path + "/" + n) { return done(.found) }
+                if remaining < 0 || deadline.map({ remaining % 64 == 0 && ProcessInfo.processInfo.systemUptime > $0 }) == true {
+                    partial = true
+                    return done(found ? .found : .unchecked)
+                }
+                if denylist.isDenied(name: n) || denylist.deniesPath(path + "/" + n) {
+                    if !measure { return done(.found) }
+                    found = true
+                    continue
+                }
                 guard let cst = try? Posix.lstatAt(dir.fd, n) else { unchecked = true; continue }
-                if denylist.isDenied(identity: cst.identity) { return done(.found) }
+                if denylist.isDenied(identity: cst.identity) {
+                    if !measure { return done(.found) }
+                    found = true
+                    continue
+                }
+                if measure {
+                    if next.counts, !n.hasPrefix(".") { items += 1 }
+                    if cst.isRegularFile, !cst.isHardLinked || linked.insert(cst.identity).inserted { bytes += cst.size }
+                }
                 guard cst.isDirectory else { continue }
                 // Another volume mounted inside can't move with it anyway.
                 if cst.identity.device != dir.identity.device { continue }
                 if depth + 1 > 256 { unchecked = true; continue }
-                stack.append((dir, n, cst, path + "/" + n, depth + 1))
+                var counts = next.counts
+                if measure {
+                    // A placeholder folder's listing would come from the cloud.
+                    if cst.isDataless { partial = true; continue }
+                    if counts, n.hasPrefix(".") || Self.isPackage(path: path + "/" + n) { counts = false }
+                }
+                stack.append((dir, n, cst, path + "/" + n, depth + 1, counts))
             }
         }
-        return done(unchecked ? .unchecked : .none)
+        if unchecked { partial = true }
+        return done(found ? .found : unchecked ? .unchecked : .none)
     }
 
     /// The next name of a folder being read, nil at its end. `readdir` says

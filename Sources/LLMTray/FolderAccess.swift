@@ -303,6 +303,10 @@ final class FolderPlanModel: ObservableObject, Identifiable {
             let bad = await Task.detached { service.invalidItems(plan) }.value
             guard let self, self.review.plan.id == plan.id, self.review.plan.revision == plan.revision else { return }
             self.review.invalid = bad
+            // Sizes and copies: slower (bounded), shown when in.
+            let checks = await Task.detached { service.checks(plan) }.value
+            guard self.review.plan.id == plan.id, self.phase == .review else { return }
+            self.review.apply(checks)
         }
     }
 
@@ -407,6 +411,32 @@ final class FolderPlanModel: ObservableObject, Identifiable {
         }
     }
 
+    /// "1.9 GB", or "22,484 items, 1.9 GB" for a folder, in the user's
+    /// language.
+    static func size(_ f: FolderSize, folder: Bool) -> String {
+        let bytes = ByteCountFormatter.string(fromByteCount: f.bytes, countStyle: .file)
+        guard folder else {
+            return f.partial ? String(format: NSLocalizedString("at least %@", comment: "a size"), bytes) : bytes
+        }
+        let items = NumberFormatter.localizedString(from: NSNumber(value: f.items), number: .decimal)
+        return String(format: f.partial ? NSLocalizedString("at least %1$@ items, %2$@", comment: "a folder's size")
+                      : NSLocalizedString("%1$@ items, %2$@", comment: "a folder's size"), items, bytes)
+    }
+
+    static func planWarning(_ w: PlanReview.PlanWarning) -> String {
+        switch w {
+        case .reachesIntoSubfolders(let count, let names):
+            return String(format: NSLocalizedString("Reaches into %1$lld subfolders (%2$@): their files are taken out of them.", comment: "plan warning"),
+                          count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        case .large(let items, let bytes, let atLeast):
+            let b = ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+            return String(format: atLeast ? NSLocalizedString("%1$lld items, at least %2$@.", comment: "plan warning")
+                          : NSLocalizedString("%1$lld items, %2$@.", comment: "plan warning"), items, b)
+        case .notIdentical(let name):
+            return String(format: NSLocalizedString("Not identical to its original: %@", comment: "plan warning"), name)
+        }
+    }
+
     static func warning(_ w: PlanReview.Warning) -> String {
         switch w {
         case .hardLink: return NSLocalizedString("Has other names (a hard link): they keep the file.", comment: "plan warning")
@@ -473,8 +503,10 @@ final class FilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let ask = context.askFolderAccess ?? { _ in nil }
         let key = context.callKey
+        let changeNext = context.changeNextMessage
         let answer = await offMain { isCancelled in
-            await service.files(request, chat: chat, callKey: key, byteBudget: budget, ask: ask, isCancelled: isCancelled)
+            await service.files(request, chat: chat, callKey: key, byteBudget: budget, changeNextMessage: changeNext, ask: ask,
+                                isCancelled: isCancelled)
         }
         return answer.toolResult
     }

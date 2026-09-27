@@ -92,6 +92,12 @@ public enum ToolTrust {
     /// text in this turn.
     public static func allowsChange(_ state: TurnState) -> Bool { !state.hasFileText }
 
+    /// After a folder read in `state` (a turn in which changes are off from
+    /// then on): whether the user's next message turns them back on -- not
+    /// while files are pinned. What makes `files` say so (the chat has a
+    /// change grant for the folder).
+    public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { !state.pinnedText }
+
     /// Whether a call of `kind` may run now.
     public static func allows(_ kind: Kind, _ state: TurnState) -> Bool {
         switch kind {

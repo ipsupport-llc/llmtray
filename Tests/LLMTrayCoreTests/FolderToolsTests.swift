@@ -77,9 +77,12 @@ final class FolderToolsTests: FolderTestCase {
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: true, turn: fresh, fileTextRoomSpent: false), ["files"],
                        "temporary chats only look")
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: ToolTrust.TurnState(folderText: true),
-                                            fileTextRoomSpent: false), ["files"], "no change after a read in the turn")
+                                            fileTextRoomSpent: false), ["files", "change_files"],
+                       "after a read it stays declared (refused in code): the model knows it can ask for the next message")
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: ToolTrust.TurnState(projectText: true),
-                                            fileTextRoomSpent: false), ["files"], "nor after project file text")
+                                            fileTextRoomSpent: false), ["files", "change_files"])
+        XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: ToolTrust.TurnState(pinnedText: true),
+                                            fileTextRoomSpent: false), ["files"], "pinned files: changes are off every turn")
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: ToolTrust.TurnState(changeResult: true),
                                             fileTextRoomSpent: true), ["change_files"], "no room: no more file text")
         // The declarations: compact, the undeclared fields left out.
@@ -161,7 +164,8 @@ final class FolderToolsTests: FolderTestCase {
         afterWeb.record(.guarded)
         XCTAssertFalse(ToolTrust.allows(.folderChange, afterWeb), "a web result can't prompt a change")
         XCTAssertTrue(ToolTrust.allows(.guarded, afterWeb), "web after web still runs")
-        XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: afterWeb, fileTextRoomSpent: false), ["files"])
+        XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: afterWeb, fileTextRoomSpent: false),
+                       ["files", "change_files"], "declared, refused when called")
         // After a folder result in the turn, both stay refused.
         var state = fresh
         state.record(.folderRead)

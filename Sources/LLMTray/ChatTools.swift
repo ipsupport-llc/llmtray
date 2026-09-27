@@ -61,6 +61,10 @@ struct ToolContext {
     /// Asks the user about a folder in the chat (a folder tool's grant
     /// prompt); nil answers: Stop or another chat.
     var askFolderAccess: FolderToolService.Ask? = nil
+    /// A folder read now turns changes off for the rest of the turn, and the
+    /// user's next message turns them back on (set by ChatToolbox): `files`
+    /// then says so where the chat may propose changes.
+    var changeNextMessage = false
 }
 
 /// What a tool does in the user's folders (adr/0014).
@@ -369,6 +373,7 @@ final class ChatToolbox {
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent
             context.pinAllowed = ToolTrust.allowsPin(turnTrust)
+            context.changeNextMessage = ToolTrust.changeWaitsForNextMessage(turnTrust)
             let result = await tool.run(arguments.values, context: context)
             // A folder read that found no room: no file text for the rest of the turn.
             if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }

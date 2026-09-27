@@ -376,7 +376,12 @@ public final class FolderToolService: @unchecked Sendable {
     /// One `files` call: the folders the chat may use (no path), a listing,
     /// duplicates or a file's info, within `byteBudget`. Asks for a read
     /// grant when the path has none (at most once per call).
+    /// `changeNextMessage`: changes are off in this turn once it has read and
+    /// back with the user's next message (`ToolTrust.changeWaitsForNextMessage`);
+    /// a result from a folder the chat may propose changes in then ends by
+    /// saying so (`FolderToolText.nextMessageNote`).
     public func files(_ request: FolderTools.FilesRequest, chat: FolderChat, callKey: String, byteBudget: Int,
+                      changeNextMessage: Bool = false,
                       ask: Ask, isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.filesName
         guard let raw = request.path else {
@@ -421,11 +426,16 @@ public final class FolderToolService: @unchecked Sendable {
             if !ok { revoked.set() }
             return ok
         }
-        let answer = run(request, at: location, byteBudget: byteBudget, isCancelled: { isCancelled() || !stillGranted() })
+        let note = changeNextMessage && !chat.temporary
+            && covered(path, level: .change, chat: chat, callKey: callKey) != nil ? FolderToolText.nextMessageNote : nil
+        let room = byteBudget - (note.map { $0.utf8.count + 1 } ?? 0)
+        let answer = run(request, at: location, byteBudget: room, isCancelled: { isCancelled() || !stillGranted() })
         guard !revoked.isSet, stillGranted() else {
             return .refused("Access to that folder was withdrawn while it was being read: nothing from it can be used. "
                 + "Answer without it.")
         }
+        // Only under a result read from the folder, not under an error.
+        if let note, case .text(let t) = answer, !t.hasPrefix(name + ":") { return .text(t + "\n" + note) }
         return answer
     }
 
@@ -666,6 +676,12 @@ public final class FolderToolService: @unchecked Sendable {
     public func invalidItems(_ plan: ChangePlan) -> [Int: String] {
         ChangePlanner(denylist: denylist, canChange: grants.changeCheck(chatID: plan.chatID)).invalidItems(plan)
             .mapValues { $0.replacingOccurrences(of: home + "/", with: "~/") }
+    }
+
+    /// What the review looks up on disk: folder sizes, copies that aren't
+    /// identical (`PlanChecker`, read only, bounded).
+    public func checks(_ plan: ChangePlan, isCancelled: () -> Bool = { false }) -> PlanChecks {
+        PlanChecker(denylist: denylist).check(plan, isCancelled: isCancelled)
     }
 
     /// The user's approval of the ticked items of the exact plan reviewed.
