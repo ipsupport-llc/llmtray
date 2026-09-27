@@ -477,6 +477,25 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(left, 0, "uncited tombstones swept once the dropped step ended")
     }
 
+    func testTombstonesLeftByAQuitAreSweptAtOpen() async throws {
+        let i = ingestor()
+        _ = await i.add([try file("two.txt", "first page words\u{0C}second page words"), try file("b.txt", "other")], to: project)
+        try await settle(i)
+        i.shutdown()
+        registry.closeAll()
+        // Removed, then a quit before the sweep.
+        let index = try ProjectIndex(directory: root.appendingPathComponent(project.uuidString))
+        try index.remove(doc: 1)
+        XCTAssertEqual(try index.db.scalarInt("SELECT count(*) FROM pages WHERE doc = 1"), 2)
+        index.close()
+        let again = ingestor()
+        await again.open(project)
+        try await settle(again)
+        let h = try await registry.open(project)
+        let left = try await h.write { try $0.db.scalarInt("SELECT count(*) FROM pages WHERE doc = 1") }
+        XCTAssertEqual(left, 0)
+    }
+
     func testTheEstimateLeavesTheWaitsOut() async throws {
         busy = true
         let i = ingestor()

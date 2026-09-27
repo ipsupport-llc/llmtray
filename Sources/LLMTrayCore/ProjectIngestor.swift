@@ -234,6 +234,9 @@ public final class ProjectIngestor {
         await queueEmbedding(project, h)
         if deleted.contains(project) { queue.remove(project) }
         kick()
+        // Nothing to do: the maintenance a quit may have cut short (a
+        // removal's tombstones not yet swept) is done now.
+        if !queue.hasWork(project) { scheduleMaintenance(project) }
         return h
     }
 
