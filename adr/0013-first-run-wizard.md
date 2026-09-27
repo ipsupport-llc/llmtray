@@ -1,6 +1,6 @@
 # 0013 — The first-run wizard
 
-**Status: proposed** (2026-09-26). Nothing here is built yet; the facts
+**Status: accepted** (2026-09-26, by the user). Nothing here is built yet; the facts
 about today's first launch are from the code as of v0.7.3-beta.1.
 
 ## Why
