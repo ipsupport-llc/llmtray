@@ -174,7 +174,10 @@ public final class ProjectIndex {
     }
 
     /// Closes the connection and gives up the project (its lock).
+    /// Off its owner queue (an index leaked out of a registry closure) it
+    /// does nothing: only the owner gives the project up.
     public func close() {
+        if let owner, !owner.isCurrent { return }
         db.close()
         lock = nil
     }
@@ -914,6 +917,7 @@ public final class ProjectIndex {
                 try checkpoint()
                 try point("compact.checkpointed")
                 guard try dataVersion() == version else { throw ProjectIndexError.changedDuringCompaction }
+                try point("compact.checked")
             } catch let crash as SimulatedCrash {
                 throw crash
             } catch {
@@ -999,6 +1003,17 @@ public enum CompactionSwap {
     static func swap(in dir: URL, crash: (String) throws -> Void = { _ in }) throws {
         let live = dir.appendingPathComponent(ProjectIndex.databaseName)
         let old = dir.appendingPathComponent(oldName)
+        // The TRUNCATE checkpoint left the WAL empty: content in it now is a
+        // commit since (by a connection that doesn't hold index.lock), which
+        // the copy lacks -- nothing is moved, the copy goes, the live file
+        // stays. (The lock is the guarantee; this narrows what a foreign
+        // writer can lose to one it makes during the renames.)
+        let wal = (try? FileManager.default.attributesOfItem(atPath: live.path + "-wal"))?[.size] as? NSNumber
+        if let wal, wal.int64Value > 0 {
+            removeFamily(dir.appendingPathComponent(compactName))
+            try? FileManager.default.removeItem(at: dir.appendingPathComponent(markerName))
+            throw ProjectIndexError.changedDuringCompaction
+        }
         removeFamily(old)
         try moveFamily(live, to: old)
         try crash("swap.movedOld")
