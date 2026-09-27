@@ -242,6 +242,11 @@
     font-size: 0.88em;
   }
 
+  .reviews-summary { color: var(--fg-muted); margin: -0.4rem 0 1rem; }
+  .reviews { display: grid; gap: 0.9rem; }
+  .stars { color: #e0a800; letter-spacing: 0.05em; }
+  .card.review p { color: var(--fg); margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+  .card.review p.review-meta { color: var(--fg-muted); font-size: 0.8rem; margin: 0; }
   footer {
     text-align: center;
     color: var(--fg-muted);
@@ -343,6 +348,8 @@ export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code>
         </div>
       </div>
     </section>
+
+    <!-- REVIEWS -->
 
     <section>
       <h2>Quick start</h2>

@@ -83,6 +83,7 @@ struct ContentView: View {
                 ChatTabStrip().padding(.horizontal, 10).padding(.bottom, 6)
             }
             Divider()
+            ReviewPromptRow()
             conversation
         }
         .frame(width: 420)
@@ -128,6 +129,7 @@ struct ContentView: View {
                     ChatHeaderView(selectedModelID: $selectedModelID, inChatWindow: true)
                     Divider()
                 }
+                ReviewPromptRow()
                 conversation
             }
             .frame(minWidth: 380)
