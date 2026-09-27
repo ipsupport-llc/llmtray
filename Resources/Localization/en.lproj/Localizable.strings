@@ -220,6 +220,7 @@
 "Date" = "Date";
 "Date & time" = "Date & time";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it.";
+"Default can't be renamed: every model falls back to it" = "Default can't be renamed: every model falls back to it";
 "Delete" = "Delete";
 "Delete Project" = "Delete Project";
 "Delete Project…" = "Delete Project…";
@@ -442,6 +443,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Music generation isn't set up -- turn it on again in Settings.";
 "Music model" = "Music model";
 "Music off" = "Music off";
+"Name" = "Name";
 "Name new chats automatically" = "Name new chats automatically";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden.";
 "Network" = "Network";
@@ -593,6 +595,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.";
 "Rename" = "Rename";
 "Rename %1$@ to %2$@" = "Rename %1$@ to %2$@";
+"Rename Profile" = "Rename Profile";
 "Rename this profile" = "Rename this profile";
 "Rename…" = "Rename…";
 "Repaired" = "Repaired";
