@@ -10,7 +10,7 @@
 The models run on your Mac. Only the optional web tools reach the internet.
 
 <p align="center">
-  <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
+  <img src="docs/assets/welcome-banner.jpg" width="800" alt="LLMTray, a local AI workstation for macOS: chat, images, music, agents and an API">
 </p>
 
 <p align="center">
