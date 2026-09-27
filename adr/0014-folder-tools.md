@@ -106,6 +106,16 @@ These override anything looser above.
   (UTF-8, UTF-16 with BOM, legacy single-byte guessed), MIME / UTI,
   size, created / modified, for images their pixel size, for text the
   line count and a short head (bounded). Never the whole file.
+- `file_info(path, hash: true)` adds the file's SHA-256, streamed
+  through the verified descriptor, within a byte and time cap ("too
+  large to hash" rather than a stalled turn).
+- `find_duplicates(path, recursive?)` — the user's addition: files
+  grouped by size, then a quick hash of the first and last 64 KB, then a
+  full SHA-256 only for what still matches; hard links to one inode are
+  "the same file", not duplicates; bounded (files scanned, bytes
+  hashed), cancellable. It only reports groups (paths, sizes, dates);
+  removing copies is a change plan like any other, the model proposing
+  which copy to keep and the user approving.
 - `make_dir(path)`, `move(from, to)` (also renames), `delete(path)` →
   Trash. Each change call validates both ends against the grant; name
   collisions are never overwritten — the tool answers with the conflict,
