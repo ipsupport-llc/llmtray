@@ -161,7 +161,11 @@ struct RestartBanner: View {
         if server.pendingLaunchChange {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                Text("Server settings changed -- restart to apply them.")
+                if server.pendingChangeIsDrafter {
+                    Text("The MTP drafter has downloaded -- restart the server to use it.")
+                } else {
+                    Text("Server settings changed -- restart to apply them.")
+                }
                 Spacer()
                 Button("Restart Server") {
                     Task { try? await server.restartToApplyLaunchSettings() }

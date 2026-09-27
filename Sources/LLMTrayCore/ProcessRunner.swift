@@ -20,9 +20,11 @@ public enum ProcessRunner {
     /// Output is drained as it arrives -- a pipe nobody reads fills up at
     /// 64 KB and blocks the child forever (a chatty pip install did exactly
     /// that when output was only read after exit) -- passed to `log` when
-    /// given, and its tail is kept for the error.
+    /// given, and its tail is kept for the error. `environment`: added to
+    /// the app's own.
     public static func run(
         _ executable: String, _ arguments: [String],
+        environment: [String: String]? = nil,
         log: (@MainActor @Sendable (String) -> Void)? = nil
     ) async throws {
         let tail = OutputTail()
@@ -30,6 +32,7 @@ public enum ProcessRunner {
             let task = Process()
             task.executableURL = URL(fileURLWithPath: executable)
             task.arguments = arguments
+            if let environment { task.environment = ProcessInfo.processInfo.environment.merging(environment) { $1 } }
             task.standardInput = FileHandle.nullDevice
             let pipe = Pipe()
             task.standardOutput = pipe

@@ -20,6 +20,9 @@ final class ServerManager: ObservableObject {
     /// (a restart kills in-flight requests). Recomputed on state, profile
     /// and defaults changes -- not per render: it reads model files.
     @Published private(set) var pendingLaunchChange = false
+    /// ...and all that changed is the MTP drafter, downloaded since the
+    /// start (fetched in the background: the start didn't wait for it).
+    @Published private(set) var pendingChangeIsDrafter = false
     private var pendingLaunchObservers: [AnyCancellable] = []
     @Published private(set) var log: String = ""
     /// The running server's command-line arguments (bug reports).
@@ -456,26 +459,66 @@ final class ServerManager: ObservableObject {
     /// runtime would fail to load it and the whole server start with it,
     /// so the setting simply has no effect until Check for Updates brings
     /// in a runtime that supports it. A --draft-model the user put in the
-    /// extra arguments wins. mlx_lm.server loads the drafter from Hugging
-    /// Face itself (~450MB, cached after the first start).
+    /// extra arguments wins. Only ever its folder in the hub cache: one not
+    /// downloaded yet (~450MB) is fetched in the background while the
+    /// model starts without it, and a later start uses it (a restart is
+    /// offered once it's there -- pendingLaunchChange).
     private func mtpDrafterArgument(forModelPath modelPath: String, profile: ResolvedProfile) -> String? {
-        let known = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath)
-        let drafter = ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
-        if let drafter {
-            appendLog("--- speculative decoding with MTP drafter \(drafter) ---\n")
-        } else if known != nil, profile.mtpDrafter, !ServerLaunch.extraArgsSetDrafter(profile) {
+        switch drafterPlan(forModelPath: modelPath, profile: profile) {
+        case .none:
+            return nil
+        case .runtimeTooOld:
             appendLog("--- MTP drafter available for this model, but the installed mlx-lm runtime doesn't support it yet (Check for Updates) ---\n")
+            return nil
+        case .use(let folder):
+            appendLog("--- speculative decoding with MTP drafter \(folder) ---\n")
+            return folder
+        case .startWithoutAndDownload(let repo):
+            appendLog("--- MTP drafter not downloaded yet: starting without it; downloading in the background ---\n")
+            fetchDrafterInBackground(repo)
+            return nil
         }
-        return drafter
     }
 
-    /// The drafter this model can actually use: one is known for it and the
-    /// installed runtime has the architecture. An older pinned runtime
-    /// would fail to load it and the whole server start with it.
+    private func drafterPlan(forModelPath modelPath: String, profile: ResolvedProfile) -> ServerLaunch.DrafterPlan {
+        let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath)
+        return ServerLaunch.drafterPlan(
+            for: profile, knownRepo: repo,
+            runtimeSupports: repo != nil && MLXRuntimeInstaller.supportsModelType("gemma4_assistant"),
+            localSnapshot: repo.flatMap { HFHubCache.localSnapshot(repo: $0) }
+        )
+    }
+
+    /// The drafter this model can actually use: one is known for it, the
+    /// installed runtime has the architecture (an older pinned runtime
+    /// would fail to load it and the whole server start with it), and it's
+    /// downloaded -- its folder, so a start doesn't ask the Hub (and works
+    /// offline).
     private func availableDrafter(forModelPath modelPath: String) -> String? {
         guard let repo = ModelDiscovery.mtpDrafterRepo(forModelPath: modelPath),
               MLXRuntimeInstaller.supportsModelType("gemma4_assistant") else { return nil }
-        return repo
+        return HFHubCache.localSnapshot(repo: repo)
+    }
+
+    /// Drafters a server start is fetching (MTPDrafterDownload); one that
+    /// failed (offline) is tried again at a later start.
+    private var drafterFetches: Set<String> = []
+
+    private func fetchDrafterInBackground(_ repo: String) {
+        guard drafterFetches.insert(repo).inserted else { return }
+        Task { [weak self] in
+            let error = await MTPDrafterDownload.fetch(repo)
+            guard let self else { return }
+            self.drafterFetches.remove(repo)
+            if let error {
+                self.appendLog("--- MTP drafter \(repo) didn't download (\(error)); trying again at a later start ---\n")
+            } else {
+                self.appendLog("--- MTP drafter \(repo) downloaded: restart the server to use it ---\n")
+                // Offered, never applied on its own: a restart would cut off
+                // a chat in progress.
+                self.refreshPendingLaunchChange()
+            }
+        }
     }
 
     /// The model-specific facts the launch arguments depend on; drafterRepo
@@ -509,18 +552,24 @@ final class ServerManager: ObservableObject {
     }
 
     private func refreshPendingLaunchChange() {
-        let changed = computePendingLaunchChange()
+        let (changed, drafterOnly) = computePendingLaunchChange()
         if changed != pendingLaunchChange { pendingLaunchChange = changed }
+        if drafterOnly != pendingChangeIsDrafter { pendingChangeIsDrafter = drafterOnly }
     }
 
-    private func computePendingLaunchChange() -> Bool {
-        guard case .running = state, let modelPath = currentModelPath, let last = lastRestartKey else { return false }
+    /// Whether a restart would change the launch; drafterOnly: the only
+    /// change is a drafter that has been downloaded since.
+    private func computePendingLaunchChange() -> (changed: Bool, drafterOnly: Bool) {
+        guard case .running = state, let modelPath = currentModelPath, let last = lastRestartKey else { return (false, false) }
         let profile = withLaunchTrial(ProfileManager.shared.resolved(for: modelPath), modelPath: modelPath)
-        let context = launchContext(
+        var context = launchContext(
             modelPath: modelPath, alias: currentAlias,
             drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
         )
-        return ServerLaunch.restartKey(profile, context) != last
+        guard ServerLaunch.restartKey(profile, context) != last else { return (false, false) }
+        let hasDrafter = context.drafterRepo != nil
+        context.drafterRepo = nil
+        return (true, hasDrafter && ServerLaunch.restartKey(profile, context) == last)
     }
 
     /// The loaded model's sampling, from its profile as it is now, for the
@@ -560,7 +609,10 @@ final class ServerManager: ObservableObject {
         launchedAlias = alias
         launchedModelPath = modelPath
 
-        let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args)
+        // Offline, unless the user's own extra arguments pick a drafter:
+        // that one may be a repo id to download, as before.
+        let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args,
+                                          environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
         readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in

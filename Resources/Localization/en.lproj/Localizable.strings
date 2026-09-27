@@ -41,6 +41,7 @@
 "(measured for this model)" = "(measured for this model)";
 "(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
 "A chat model" = "A chat model";
@@ -291,6 +292,7 @@
 "Follow the description" = "Follow the description";
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
+"For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
 "Found after an interruption" = "Found after an interruption";
 "Free disk space" = "Free disk space";
@@ -721,6 +723,7 @@
 "That folder can't be shared with the chat: %@" = "That folder can't be shared with the chat: %@";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
+"The MTP drafter has downloaded -- restart the server to use it." = "The MTP drafter has downloaded -- restart the server to use it.";
 "The Mac's chip." = "The Mac's chip.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
 "The app's language (the language only, not the region)." = "The app's language (the language only, not the region).";
@@ -926,6 +929,8 @@
 "removing" = "removing";
 "rename %lld" = "rename %lld";
 "search by words only" = "search by words only";
+"the download finished incomplete" = "the download finished incomplete";
+"the model runtime isn't installed yet" = "the model runtime isn't installed yet";
 "then" = "then";
 "this call only" = "this call only";
 "tight fit" = "tight fit";

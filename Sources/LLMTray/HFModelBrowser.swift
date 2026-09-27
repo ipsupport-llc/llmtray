@@ -150,6 +150,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     private var session: URLSession!
     private var onAllDone: (() -> Void)?
+    /// Every download that completes, with its folder, before its own
+    /// completion: the download queue adds the model's MTP drafter.
+    var onModelDownloaded: ((_ folder: String) -> Void)?
     private var currentModelID = ""
     private var currentDestRoot: URL?
 
@@ -549,6 +552,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             FileManager.default.createFile(atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil)
         }
         downloadingID = nil
+        if let destRoot = currentDestRoot { onModelDownloaded?(destRoot.path) }
         UsageTelemetry.shared.record(.modelDownload)   // a count: not which model
         downloadStatusText = NSLocalizedString("Done", comment: "")
         downloadSpeedBytesPerSec = 0

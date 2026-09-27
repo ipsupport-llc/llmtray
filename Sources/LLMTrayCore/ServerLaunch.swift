@@ -84,6 +84,50 @@ public enum ServerLaunch {
         return available
     }
 
+    /// What a launch does about the model's MTP drafter.
+    public enum DrafterPlan: Equatable, Sendable {
+        /// Nothing: no drafter is known for the model, the profile turns it
+        /// off, or its own extra arguments pick one.
+        case none
+        /// Known, but the installed runtime can't load it (an older pinned
+        /// mlx-lm would fail the whole start): Check for Updates.
+        case runtimeTooOld
+        /// In the hub cache: `--draft-model` gets its snapshot folder, so
+        /// the start needs no network.
+        case use(folder: String)
+        /// Not downloaded yet: start without it (never wait on the network)
+        /// and fetch `repo` in the background for a later start.
+        case startWithoutAndDownload(repo: String)
+    }
+
+    /// The drafter decision for a launch: `knownRepo` is the model's
+    /// drafter (ModelDiscovery), `localSnapshot` its folder in the hub
+    /// cache if it's complete there.
+    public static func drafterPlan(for p: ResolvedProfile, knownRepo: String?, runtimeSupports: Bool, localSnapshot: String?) -> DrafterPlan {
+        guard let repo = knownRepo, p.mtpDrafter, !extraArgsSetDrafter(p) else { return .none }
+        guard runtimeSupports else { return .runtimeTooOld }
+        if let folder = localSnapshot { return .use(folder: folder) }
+        return .startWithoutAndDownload(repo: repo)
+    }
+
+    /// The drafter to fetch along with a freshly downloaded model: its
+    /// known repo, when the profile the model runs under wants it and it
+    /// isn't in the hub cache yet. The runtime isn't asked -- one that can't
+    /// load it yet may be updated before the model's first start.
+    public static func drafterToFetch(with p: ResolvedProfile, knownRepo: String?, cached: Bool) -> String? {
+        guard let repo = knownRepo, !cached, p.mtpDrafter, !extraArgsSetDrafter(p) else { return nil }
+        return repo
+    }
+
+    /// Environment for the model server: it never goes to the network (the
+    /// model is a local folder, the drafter its cached snapshot), so a start
+    /// works offline and never waits on the Hub.
+    public static let offlineEnvironment: [String: String] = [
+        "HF_HUB_OFFLINE": "1",
+        "HF_DATASETS_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+    ]
+
     /// Whether moving a running model from one resolved profile to another
     /// changes its actual launch arguments (so the server must restart).
     /// `context` is the model's real one (KV-shared guard, context cap);

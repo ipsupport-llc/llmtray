@@ -10,6 +10,9 @@ public struct DownloadQueueState: Equatable, Codable, Sendable {
         case chatModel, imageModel, editModel, musicModel
         /// Project files' embedding model (adr/0012); its registry id.
         case embedder
+        /// A downloaded chat model's MTP drafter, into the Hugging Face hub
+        /// cache; its repo.
+        case mtpDrafter
     }
 
     public enum Status: Equatable, Codable, Sendable {
@@ -32,8 +35,8 @@ public struct DownloadQueueState: Equatable, Codable, Sendable {
     public struct Item: Identifiable, Equatable, Codable, Sendable {
         public let id: UUID
         public let kind: Kind
-        /// What to download: a Hugging Face repo for the chat model, the
-        /// model's identifier (ImageGenModel / MusicModel raw value, the
+        /// What to download: a Hugging Face repo for the chat model and a
+        /// drafter, the model's identifier (ImageGenModel / MusicModel raw value, the
         /// embedder's registry id) for the others.
         public let target: String
         /// Expected size, for the free-space check (nil: not known yet).
