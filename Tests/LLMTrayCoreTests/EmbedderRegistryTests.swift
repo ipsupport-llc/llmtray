@@ -27,11 +27,15 @@ final class EmbedderRegistryTests: XCTestCase {
     }
 
     func entryJSON(id: String = "e", repo: String = "org/model", revision: String = String(repeating: "a", count: 40),
-                   sha: String = String(repeating: "b", count: 64), family: String = "xlm-roberta") -> String {
-        """
+                   sha: String = String(repeating: "b", count: 64), family: String = "xlm-roberta",
+                   upstream: String = "org/original@main", extra: String = "",
+                   files: [String] = ["config.json", "tokenizer.json"], fileSHA: String = String(repeating: "d", count: 64)) -> String {
+        let pins = files.map { "\"\($0)\":\"\(fileSHA)\"," }.joined()
+        return """
         {"id":"\(id)","display_name":"E","license":"MIT","family":"\(family)",
-         "source":{"repo":"\(repo)","revision":"\(revision)","files":{"model.safetensors":"\(sha)"},"bytes":1},
-         "pooling":"cls","dim":8,"preprocessing_version":1,
+         "source":{"repo":"\(repo)","revision":"\(revision)","files":{\(pins)"model.safetensors":"\(sha)"},"bytes":1,
+                   "upstream":"\(upstream)"},
+         "pooling":"cls","dim":8,"preprocessing_version":1,\(extra)
          "reference":{"file":"r.json","sha256":"\(String(repeating: "c", count: 64))","min_cosine":0.99}}
         """
     }
@@ -53,17 +57,32 @@ final class EmbedderRegistryTests: XCTestCase {
         XCTAssertThrowsError(try registry([entryJSON(revision: "main")]), "a branch isn't a pin")
         XCTAssertThrowsError(try registry([entryJSON(sha: "sha256:abc")]))
         XCTAssertThrowsError(try registry([entryJSON(family: "bert")]), "no module for that family")
+        XCTAssertThrowsError(try registry([entryJSON(upstream: "Qwen/Qwen3-Embedding-0.6B@abc")]), "converted from a Qwen model") {
+            XCTAssertEqual($0 as? EmbedderRegistry.Invalid, .forbidden("e"))
+        }
+        // Every file the runner reads is pinned (sha-checked after the download).
+        XCTAssertThrowsError(try registry([entryJSON(files: ["config.json"])])) {
+            XCTAssertEqual($0 as? EmbedderRegistry.Invalid, .unpinnedFile(entry: "e", file: "tokenizer.json"))
+        }
+        XCTAssertThrowsError(try registry([entryJSON(extra: #""tokenizer":{"file":"tok.json"},"#)])) {
+            XCTAssertEqual($0 as? EmbedderRegistry.Invalid, .unpinnedFile(entry: "e", file: "tok.json"))
+        }
+        XCTAssertThrowsError(try registry([entryJSON(extra: #""dense":[{"file":"2_Dense/model.safetensors"}],"#)])) {
+            XCTAssertEqual($0 as? EmbedderRegistry.Invalid, .unpinnedFile(entry: "e", file: "2_Dense/model.safetensors"))
+        }
+        XCTAssertNoThrow(try registry([entryJSON(extra: #""dense":[{"file":"2_Dense/model.safetensors"}],"#,
+                                                 files: ["config.json", "tokenizer.json", "2_Dense/model.safetensors"])]))
     }
 
     func testDownloadedFilesAreCheckedAgainstTheirPins() throws {
         let dir = indexTempDir()
         let data = Data("weights".utf8)
-        try data.write(to: dir.appendingPathComponent("model.safetensors"))
+        for name in ["model.safetensors", "config.json", "tokenizer.json"] { try data.write(to: dir.appendingPathComponent(name)) }
         let sha = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
-        let good = try XCTUnwrap(try registry([entryJSON(sha: sha)]).entry("e"))
+        let good = try XCTUnwrap(try registry([entryJSON(sha: sha, fileSHA: sha)]).entry("e"))
         XCTAssertEqual(EmbedderFiles.mismatches(in: dir, for: good), [])
-        let bad = try XCTUnwrap(try registry([entryJSON(sha: String(repeating: "0", count: 64))]).entry("e"))
+        let bad = try XCTUnwrap(try registry([entryJSON(sha: String(repeating: "0", count: 64), fileSHA: sha)]).entry("e"))
         XCTAssertEqual(EmbedderFiles.mismatches(in: dir, for: bad), ["model.safetensors"])
-        XCTAssertEqual(EmbedderFiles.mismatches(in: indexTempDir(), for: good), ["model.safetensors"], "missing")
+        XCTAssertEqual(EmbedderFiles.mismatches(in: indexTempDir(), for: good), ["config.json", "model.safetensors", "tokenizer.json"], "missing")
     }
 }

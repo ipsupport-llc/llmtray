@@ -29,6 +29,26 @@ FAMILIES = {
 DTYPES = {"float16": mx.float16, "bfloat16": mx.bfloat16, "float32": mx.float32}
 
 
+def forbidden(entry: dict, config: dict | None = None) -> str | None:
+    """What makes an entry or its config a Qwen model (never used: the
+    user's rule), else None. The Swift registry checks the same names."""
+    src = entry.get("source", {})
+    names = [entry.get("id"), entry.get("display_name"), entry.get("family"), src.get("repo"), src.get("upstream")]
+    if config is not None:
+        names += [config.get("model_type"), config.get("_name_or_path")] + list(config.get("architectures") or [])
+    for n in names:
+        if isinstance(n, str) and "qwen" in n.lower():
+            return n
+    return None
+
+
+def referenced_files(entry: dict) -> list[str]:
+    """Every file read from the model folder by name: each must be pinned
+    in source.files (sha-checked by the app after the download)."""
+    return (["config.json", entry.get("tokenizer", {}).get("file", "tokenizer.json")]
+            + [d["file"] for d in entry.get("dense", [])])
+
+
 def sha256_file(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -46,13 +66,20 @@ class Embedder:
             raise ValueError(f"unknown family {entry['family']!r}")
         with open(os.path.join(model_dir, "config.json")) as f:
             cfg = json.load(f)
+        bad = forbidden(entry, cfg)
+        if bad:
+            raise ValueError(f"a Qwen model is never used ({bad!r})")
         self.model = family(cfg)
         self.dtype = DTYPES[entry["weights"].get("compute_dtype", "float16")]
 
         weights = {}
-        files = sorted(glob.glob(os.path.join(model_dir, "model*.safetensors")))
+        # Only the pinned weights: a stray model*.safetensors in the folder
+        # was never sha-checked.
+        pinned = entry["source"]["files"]
+        files = sorted(p for p in glob.glob(os.path.join(model_dir, "model*.safetensors"))
+                       if os.path.basename(p) in pinned)
         if not files:
-            raise FileNotFoundError("no model*.safetensors in the model folder")
+            raise FileNotFoundError("no pinned model*.safetensors in the model folder")
         for path in files:
             weights.update(mx.load(path))
         weights = family.sanitize(weights)
@@ -168,5 +195,12 @@ def load_entry(registry_path: str, entry_id: str) -> dict:
         registry = json.load(f)
     for entry in registry["embedders"]:
         if entry["id"] == entry_id:
+            bad = forbidden(entry)
+            if bad:
+                raise ValueError(f"a Qwen model is never used ({bad!r})")
+            pinned = entry.get("source", {}).get("files", {})
+            unpinned = [f for f in referenced_files(entry) if f not in pinned]
+            if unpinned:
+                raise ValueError(f"files not pinned in source.files: {unpinned}")
             return entry
     raise KeyError(f"no embedder {entry_id!r} in the registry")

@@ -113,9 +113,12 @@ public enum EmbedRunnerMessage: Equatable, Sendable {
             self = .pong(id: m.id, queued: m.queue ?? 0)
             return
         }
-        guard let id = m.id, let dim = m.dim, dim > 0, let count = m.count, count >= 0, m.dtype == "f16",
-              let b64 = m.vectors, let data = Data(base64Encoded: b64), data.count == count * dim * 2 else { return nil }
-        var vectors = [Float16](repeating: 0, count: count * dim)
+        guard let id = m.id, let dim = m.dim, dim > 0, let count = m.count, count >= 0, m.dtype == "f16" else { return nil }
+        let (values, o1) = count.multipliedReportingOverflow(by: dim)
+        let (bytes, o2) = values.multipliedReportingOverflow(by: 2)
+        guard !o1, !o2, let b64 = m.vectors, b64.count / 4 * 3 <= bytes + 3,
+              let data = Data(base64Encoded: b64), data.count == bytes else { return nil }
+        var vectors = [Float16](repeating: 0, count: values)
         vectors.withUnsafeMutableBytes { dst in data.withUnsafeBytes { dst.copyMemory(from: $0) } }
         let tokens = m.tokens ?? []
         guard tokens.isEmpty || tokens.count == count else { return nil }

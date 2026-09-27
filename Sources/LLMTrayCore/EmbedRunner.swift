@@ -12,6 +12,18 @@ import Foundation
 /// index batches go one at a time, so a query never waits behind a queue of
 /// them. With nothing to do for `idleTimeout` it exits (its ~1.7 GB freed),
 /// and `stop()` ends it now -- what an image or music generation asks for.
+///
+/// While a generation holds or waits for the GenerationQueue the runner is
+/// `paused` (`setPaused`, wired to `GenerationQueue.onInteractiveDemand`):
+/// nothing starts it and every request throws `.paused` at once, so a
+/// search falls back to lexical instead of loading 1.7 GB next to the
+/// generation's model.
+///
+/// Index requests are bounded so one is one slice of the background lane
+/// (adr/0012, Scheduling: ≤ ~3 s): at most `maxDocumentRequestTokens`
+/// estimated tokens (`IndexText.estimatedTokens`) unless it is a single
+/// text; `documentBatches` splits a document's chunks to fit. The runner's
+/// own 262k-token limit is only its hard backstop.
 public final class EmbedRunner: @unchecked Sendable {
     public struct Configuration: Sendable {
         public var executable: String
@@ -27,6 +39,12 @@ public final class EmbedRunner: @unchecked Sendable {
         /// The runner's own limits (runtime/llmtray_embed_runner.py).
         public var maxRequestBytes = 8 << 20
         public var maxTexts = 256
+        /// One index request, estimated tokens: ~10k is ≤ ~3 s of bge-m3 on
+        /// an M-series GPU -- one background slice. Queries aren't capped.
+        public var maxDocumentRequestTokens = 10_000
+        /// After the SIGKILL, how long `stopAndWait` waits for the exit
+        /// before it gives up on the process and marks the runner failed.
+        public var exitTimeout: TimeInterval = 10
         /// Waits after the 1st, 2nd, ... consecutive crash.
         public var restartBackoff: [TimeInterval] = [0.5, 2, 8, 30]
 
@@ -51,6 +69,9 @@ public final class EmbedRunner: @unchecked Sendable {
         /// `stop()` ended it first.
         case stopped
         case protocolViolation(String)
+        /// A generation holds or waits for the GPU: nothing is embedded now
+        /// (a search goes lexical-only).
+        case paused
 
         public var description: String {
             switch self {
@@ -61,6 +82,7 @@ public final class EmbedRunner: @unchecked Sendable {
             case .unavailable(let why): return "the embedder is unavailable: \(why)"
             case .stopped: return "the embedder was stopped"
             case .protocolViolation(let why): return "the embedder broke its protocol: \(why)"
+            case .paused: return "the embedder is paused while a generation runs"
             }
         }
     }
@@ -79,14 +101,29 @@ public final class EmbedRunner: @unchecked Sendable {
     private var idleWork: DispatchWorkItem?
     private var documentBusy = false
     private var documentWaiters: [(id: UUID, continuation: CheckedContinuation<Void, Error>)] = []
+    private var paused = false
+    /// A process that didn't exit even after SIGKILL: nothing new starts
+    /// until it does (two runners would each hold the model).
+    private var wedged: RunnerProcess?
     private let timers = DispatchQueue(label: "LLMTray embed runner timers")
 
     private final class Pending {
         let continuation: CheckedContinuation<EmbedResult, Error>
         let process: RunnerProcess
+        /// What the answer must hold: one vector per text, of the ready dim.
+        let count: Int
+        let dim: Int
         var cancelled = false
-        init(_ c: CheckedContinuation<EmbedResult, Error>, _ p: RunnerProcess) { continuation = c; process = p }
+        init(_ c: CheckedContinuation<EmbedResult, Error>, _ p: RunnerProcess, count: Int, dim: Int) {
+            continuation = c
+            process = p
+            self.count = count
+            self.dim = dim
+        }
     }
+
+    /// The runner went away between `start` and the request (a stop raced it).
+    private struct NotReady: Error {}
 
     /// Set from any thread before `onCancel` or registration, whichever is first.
     private final class CancelBox: @unchecked Sendable {
@@ -138,6 +175,45 @@ public final class EmbedRunner: @unchecked Sendable {
         return info
     }
 
+    public var isPaused: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return paused
+    }
+
+    /// Paused: no request is sent and nothing starts the runner (requests
+    /// throw `.paused`); callers waiting for a start get `.paused` once the
+    /// runner is stopped. Doesn't stop a running one itself -- the
+    /// generation's grant does (`stopAndWait`).
+    public func setPaused(_ value: Bool) {
+        lock.lock()
+        paused = value
+        lock.unlock()
+    }
+
+    /// Splits a document's texts into requests of at most
+    /// `maxDocumentRequestTokens` estimated tokens and `maxTexts` texts (a
+    /// longer text alone), in order.
+    public func documentBatches(_ texts: [String]) -> [Range<Int>] {
+        Self.batches(texts.map { IndexText.estimatedTokens($0) }, maxTokens: configuration.maxDocumentRequestTokens,
+                     maxTexts: configuration.maxTexts)
+    }
+
+    static func batches(_ tokens: [Int], maxTokens: Int, maxTexts: Int) -> [Range<Int>] {
+        var out: [Range<Int>] = []
+        var start = 0, sum = 0
+        for (i, t) in tokens.enumerated() {
+            if i > start, sum + t > maxTokens || i - start >= maxTexts {
+                out.append(start..<i)
+                start = i
+                sum = 0
+            }
+            sum += t
+        }
+        if start < tokens.count { out.append(start..<tokens.count) }
+        return out
+    }
+
     // MARK: - requests
 
     /// Embeds `texts`; `.query` is interactive, `.document` an index batch.
@@ -147,12 +223,41 @@ public final class EmbedRunner: @unchecked Sendable {
         guard texts.count <= configuration.maxTexts else {
             throw Failure.runner(code: "too_large", message: "more than \(configuration.maxTexts) texts")
         }
+        if kind == .document, texts.count > 1 {
+            let tokens = texts.reduce(0) { $0 + IndexText.estimatedTokens($1) }
+            guard tokens <= configuration.maxDocumentRequestTokens else {
+                throw Failure.runner(code: "too_large", message: "~\(tokens) tokens in one index request, more than "
+                                     + "\(configuration.maxDocumentRequestTokens) (split with documentBatches)")
+            }
+        }
         if texts.isEmpty { return EmbedResult(dim: readyInfo?.dim ?? 0, count: 0, vectors: [], tokens: [], truncated: [], milliseconds: 0) }
+        if isPaused { throw Failure.paused }
         if kind == .document { try await acquireDocumentSlot() }
         defer { if kind == .document { releaseDocumentSlot() } }
-        try Task.checkCancellation()
-        _ = try await start()
+        // A start can race a stop (the runner ready just as it was told to
+        // exit): once more with the replacement, then a clear error.
+        for attempt in 0..<2 {
+            try Task.checkCancellation()
+            if isPaused { throw Failure.paused }
+            _ = try await start()
+            do {
+                return try await send(texts, kind: kind, timeout: timeout)
+            } catch is NotReady {
+                if attempt == 1 { throw notReadyFailure() }
+            }
+        }
+        throw notReadyFailure()
+    }
 
+    private func notReadyFailure() -> Failure {
+        lock.lock()
+        defer { lock.unlock() }
+        if paused { return .paused }
+        if process?.stopping ?? false { return .stopped }
+        return .died(lastFailure.isEmpty ? "the runner exited before the request could be sent" : lastFailure)
+    }
+
+    private func send(_ texts: [String], kind: EmbedRunnerMessage.Kind, timeout: TimeInterval) async throws -> EmbedResult {
         let id = makeID()
         let line = EmbedRunnerMessage.embedRequest(id: id, kind: kind, texts: texts,
                                                    timeoutMilliseconds: max(1, Int(timeout * 1000)))
@@ -163,12 +268,12 @@ public final class EmbedRunner: @unchecked Sendable {
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<EmbedResult, Error>) in
                 lock.lock()
-                guard let process, info != nil, process.isHealthy else {
+                guard let process, let info, process.isHealthy, !paused else {
                     lock.unlock()
-                    continuation.resume(throwing: Failure.died(lastFailure))
+                    continuation.resume(throwing: NotReady())
                     return
                 }
-                let p = Pending(continuation, process)
+                let p = Pending(continuation, process, count: texts.count, dim: info.dim)
                 pending[id] = p
                 idleWork?.cancel()
                 idleWork = nil
@@ -244,6 +349,16 @@ public final class EmbedRunner: @unchecked Sendable {
                     continuation.resume(returning: info)
                     return
                 }
+                if process == nil, paused {
+                    lock.unlock()
+                    continuation.resume(throwing: Failure.paused)
+                    return
+                }
+                if process == nil, wedged != nil {
+                    lock.unlock()
+                    continuation.resume(throwing: Failure.unavailable("the previous embed runner didn't exit after SIGKILL"))
+                    return
+                }
                 let now = DispatchTime.now().uptimeNanoseconds
                 if process == nil, now < backoffUntil {
                     let why = lastFailure
@@ -308,11 +423,36 @@ public final class EmbedRunner: @unchecked Sendable {
     }
 
     /// `stop()`, returning once the runner has exited (at most the grace
-    /// later): what a generation waits for before it loads its model.
+    /// later): what a generation waits for before it loads its model. A
+    /// process still there `exitTimeout` after the SIGKILL is given up on:
+    /// this returns, and the runner is failed (nothing new starts) until it
+    /// is finally reaped.
     public func stopAndWait() async {
         guard let p = currentProcess() else { return }
         stop()
-        await p.waitForExit()
+        guard await !p.waitForExit(timeout: configuration.grace + configuration.exitTimeout) else { return }
+        giveUp(on: p)
+    }
+
+    /// The process didn't exit after SIGKILL: forgotten (its requests and
+    /// start waiters fail), nothing new starts until it is reaped.
+    private func giveUp(on p: RunnerProcess) {
+        lock.lock()
+        guard process === p else { lock.unlock(); return }
+        p.unresponsive = true
+        process = nil
+        info = nil
+        wedged = p
+        lastFailure = "the embed runner (pid \(p.pid)) didn't exit after SIGKILL"
+        noteCrashLocked()
+        let inFlight = pending.values.filter { $0.process === p }
+        pending = pending.filter { $0.value.process !== p }
+        let waiters = startWaiters
+        startWaiters = []
+        let failure = Failure.unavailable(lastFailure)
+        lock.unlock()
+        for slot in inFlight { slot.continuation.resume(throwing: slot.cancelled ? CancellationError() : failure) }
+        waiters.forEach { $0.continuation.resume(throwing: failure) }
     }
 
     private func currentProcess() -> RunnerProcess? {
@@ -368,6 +508,21 @@ public final class EmbedRunner: @unchecked Sendable {
         switch message {
         case .ready(let r):
             info = r
+            // A runner told to stop meanwhile is dying: its waiters stay
+            // queued, and its exit starts the replacement for them.
+            if p.stopping {
+                lock.unlock()
+                return
+            }
+            if paused {
+                // Nobody may use it now: the waiters fall back, it goes.
+                let waiters = startWaiters
+                startWaiters = []
+                lock.unlock()
+                waiters.forEach { $0.continuation.resume(throwing: Failure.paused) }
+                stop()
+                return
+            }
             let waiters = startWaiters
             startWaiters = []
             scheduleIdleLocked()
@@ -379,6 +534,15 @@ public final class EmbedRunner: @unchecked Sendable {
             lock.unlock()
         case .result(let id, let result):
             let slot = pending.removeValue(forKey: id)
+            if let slot, result.count != slot.count || result.dim != slot.dim {
+                let why = "answer to \(id): \(result.count) × \(result.dim) for \(slot.count) texts × \(slot.dim)"
+                p.failure = why
+                p.violation = true
+                lock.unlock()
+                slot.continuation.resume(throwing: Failure.protocolViolation(why))
+                p.kill()
+                return
+            }
             crashes = 0
             scheduleIdleLocked()
             lock.unlock()
@@ -403,6 +567,7 @@ public final class EmbedRunner: @unchecked Sendable {
 
     private func exited(_ p: RunnerProcess, status: Int32, stderrTail: String) {
         lock.lock()
+        if wedged === p { wedged = nil }
         guard process === p else { lock.unlock(); return }
         process = nil
         info = nil
@@ -432,16 +597,20 @@ public final class EmbedRunner: @unchecked Sendable {
         // crash they fail (and the next request backs off).
         var waiters: [(id: UUID, continuation: CheckedContinuation<EmbedRunnerReady, Error>)] = []
         if !startWaiters.isEmpty {
-            if p.stopping && !p.fatal && !p.unresponsive && !p.violation {
+            if paused {
+                waiters = startWaiters
+                startWaiters = []
+            } else if p.stopping && !p.fatal && !p.unresponsive && !p.violation {
                 spawnLocked()
             } else {
                 waiters = startWaiters
                 startWaiters = []
             }
         }
+        let pausedNow = paused
         lock.unlock()
         for slot in inFlight { slot.continuation.resume(throwing: slot.cancelled ? CancellationError() : failure) }
-        waiters.forEach { $0.continuation.resume(throwing: failure) }
+        waiters.forEach { $0.continuation.resume(throwing: pausedNow ? Failure.paused : failure) }
     }
 
     // MARK: - one index batch at a time
@@ -501,14 +670,32 @@ final class RunnerProcess: @unchecked Sendable {
     private var stdinOpen = true
     private let stateLock = NSLock()
     private var reaped = false
-    // Guarded by the owner's lock.
-    var stopping = false
-    var fatal = false
-    var unresponsive = false
-    var violation = false
-    var failure: String?
-    /// Takes new requests (owner's lock).
-    var isHealthy: Bool { !stopping && !unresponsive && !violation && !fatal }
+    /// The flags are written by the owner (under its lock) and by the stdout
+    /// thread (a runaway line): each access takes `flagLock`.
+    private let flagLock = NSLock()
+    private var flags = (stopping: false, fatal: false, unresponsive: false, violation: false, failure: String?.none)
+    var stopping: Bool {
+        get { flagLock.withLock { flags.stopping } }
+        set { flagLock.withLock { flags.stopping = newValue } }
+    }
+    var fatal: Bool {
+        get { flagLock.withLock { flags.fatal } }
+        set { flagLock.withLock { flags.fatal = newValue } }
+    }
+    var unresponsive: Bool {
+        get { flagLock.withLock { flags.unresponsive } }
+        set { flagLock.withLock { flags.unresponsive = newValue } }
+    }
+    var violation: Bool {
+        get { flagLock.withLock { flags.violation } }
+        set { flagLock.withLock { flags.violation = newValue } }
+    }
+    var failure: String? {
+        get { flagLock.withLock { flags.failure } }
+        set { flagLock.withLock { flags.failure = newValue } }
+    }
+    /// Takes new requests.
+    var isHealthy: Bool { flagLock.withLock { !flags.stopping && !flags.unresponsive && !flags.violation && !flags.fatal } }
     /// Writes happen here, in order, so no caller blocks on a full pipe; a
     /// kill makes a blocked write fail (EPIPE).
     private let writer = DispatchQueue(label: "LLMTray embed runner stdin")
@@ -608,8 +795,10 @@ final class RunnerProcess: @unchecked Sendable {
                 line.append(buffer + start, count: n - start)
                 if line.count > maxLineBytes {
                     // Bounded messages: a runaway line ends the runner.
-                    violation = true
-                    failure = "a line over \(maxLineBytes) bytes"
+                    flagLock.withLock {
+                        flags.violation = true
+                        flags.failure = "a line over \(maxLineBytes) bytes"
+                    }
                     kill()
                     break reading
                 }
@@ -648,6 +837,14 @@ final class RunnerProcess: @unchecked Sendable {
     func waitForExit() async {
         await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
             exitGroup.notify(queue: .global()) { c.resume() }
+        }
+    }
+
+    /// False: still not reaped after `timeout`.
+    func waitForExit(timeout: TimeInterval) async -> Bool {
+        let group = exitGroup
+        return await withCheckedContinuation { (c: CheckedContinuation<Bool, Never>) in
+            DispatchQueue.global().async { c.resume(returning: group.wait(timeout: .now() + timeout) == .success) }
         }
     }
 

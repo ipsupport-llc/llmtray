@@ -31,6 +31,13 @@ final class EmbedRunnerMessageTests: XCTestCase {
         }
     }
 
+    func testASizeThatOverflowsIsRejectedNotTrapped() {
+        let b64 = DenseVectors.encode(vectors: [1, 2]).base64EncodedString()
+        for (count, dim) in [(Int.max / 2, 4), (Int.max, 1), (1 << 40, 1 << 30)] {
+            XCTAssertNil(line(#"{"id":"r","ok":true,"dim":\#(dim),"count":\#(count),"dtype":"f16","vectors":"\#(b64)"}"#), "\(count) × \(dim)")
+        }
+    }
+
     func testEncodesRequests() throws {
         let data = EmbedRunnerMessage.embedRequest(id: "r1", kind: .query, texts: ["a \"b\"\n", "ё/"], timeoutMilliseconds: 500)
         XCTAssertEqual(data.last, 0x0A)
@@ -63,6 +70,8 @@ final class EmbedRunnerTests: XCTestCase {
         time.sleep(30)
     if mode == "dies":
         sys.exit(4)
+    if mode == "delayready":
+        time.sleep(0.4)
     parent = os.getppid()
     def watchdog():
         while True:
@@ -108,6 +117,9 @@ final class EmbedRunnerTests: XCTestCase {
                     out.write(b"x" * 100000); out.flush()
                 time.sleep(10)
             if t == "bad": return fail(rid, "bad_request")
+            if t == "wrongdim":
+                b = base64.b64encode(struct.pack("<2e", 1.0, 2.0)).decode()
+                return send({"id": rid, "ok": True, "dim": 2, "count": 1, "dtype": "f16", "vectors": b})
             if t.startswith("slow:"): time.sleep(float(t[5:]))
             while m["kind"] == "document":
                 with cond: qq = q.popleft() if q else None
@@ -372,6 +384,101 @@ final class EmbedRunnerTests: XCTestCase {
         try await Task.sleep(nanoseconds: 1_000_000_000)
         XCTAssertFalse(r.isRunning)
         XCTAssertNotEqual(kill(pid, 0), 0)
+    }
+
+    /// While a generation holds or waits for the queue nothing starts the
+    /// runner: a query throws `.paused` at once (the tool goes lexical-only).
+    func testPausedRefusesWithoutStartingTheRunner() async throws {
+        let r = try runner()
+        r.setPaused(true)
+        do {
+            _ = try await r.embed(["как сбросить пароль?"], kind: .query)
+            XCTFail("paused")
+        } catch EmbedRunner.Failure.paused {}
+        XCTAssertNil(r.pid, "not started")
+        r.setPaused(false)
+        let ok = try await r.embed(["x"], kind: .query)
+        XCTAssertEqual(ok.count, 1)
+        r.setPaused(true)
+        do {
+            _ = try await r.embed(["y"], kind: .document)
+            XCTFail("paused")
+        } catch EmbedRunner.Failure.paused {}
+        await r.stopAndWait()
+        XCTAssertFalse(r.isRunning)
+    }
+
+    /// Paused while a query waits for the start, then stopped by the
+    /// generation's grant: the query gets `.paused`, no replacement starts.
+    func testPauseWhileStartingIsNotUndoneByARespawn() async throws {
+        let r = try runner("delayready")
+        let query = Task { try await r.embed(["x"], kind: .query) }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        r.setPaused(true)
+        await r.stopAndWait()
+        do {
+            _ = try await query.value
+            XCTFail("paused")
+        } catch EmbedRunner.Failure.paused {}
+        try await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertNil(r.pid, "nothing respawned for the waiter")
+    }
+
+    /// `ready` from a runner already told to stop: the waiter isn't handed
+    /// the dying process -- it gets the replacement.
+    func testReadyWhileStoppingWaitsForTheReplacement() async throws {
+        let r = try runner("delayready")
+        let starting = Task { try await r.start() }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        let first = try XCTUnwrap(r.pid)
+        r.stop()
+        let ready = try await starting.value
+        XCTAssertNotEqual(ready.pid, first, "not the stopped one")
+        XCTAssertEqual(r.pid, ready.pid)
+        let v = try await r.embed(["after"], kind: .query)
+        XCTAssertEqual(v.count, 1)
+        r.stop()
+    }
+
+    /// An answer that isn't one vector per text of the ready dimension is
+    /// the runner breaking its protocol, not a result.
+    func testAnAnswerOfTheWrongShapeIsAProtocolViolation() async throws {
+        let r = try runner()
+        do {
+            _ = try await r.embed(["wrongdim"], kind: .query)
+            XCTFail("violation")
+        } catch EmbedRunner.Failure.protocolViolation(let why) {
+            XCTAssertTrue(why.contains("1 × 2"), why)
+        }
+        try await Task.sleep(nanoseconds: 200_000_000)
+        let ok = try await r.embed(["x"], kind: .query)
+        XCTAssertEqual(ok.dim, 4)
+        r.stop()
+    }
+
+    /// One index request is one background slice: bounded by estimated
+    /// tokens (a single long text still goes alone); queries aren't.
+    func testIndexRequestsAreBoundedToOneSlice() async throws {
+        let r = try runner { $0.maxDocumentRequestTokens = 40 }
+        let text = String(repeating: "слово ", count: 20)   // ~25 estimated tokens
+        do {
+            _ = try await r.embed([text, text], kind: .document)
+            XCTFail("over the slice")
+        } catch EmbedRunner.Failure.runner(let code, let message) {
+            XCTAssertEqual(code, "too_large")
+            XCTAssertTrue(message.contains("documentBatches"), message)
+        }
+        XCTAssertNil(r.pid, "refused before starting anything")
+        let alone = try await r.embed([text + text + text], kind: .document)
+        XCTAssertEqual(alone.count, 1)
+        let query = try await r.embed([text, text, text], kind: .query)
+        XCTAssertEqual(query.count, 3)
+        let batches = r.documentBatches(Array(repeating: text, count: 5) + [text + text + text, "короткий"])
+        XCTAssertEqual(batches, [0..<1, 1..<2, 2..<3, 3..<4, 4..<5, 5..<6, 6..<7])
+        XCTAssertEqual(EmbedRunner.batches([10, 10, 10, 50, 5, 5], maxTokens: 25, maxTexts: 256), [0..<2, 2..<3, 3..<4, 4..<6])
+        XCTAssertEqual(EmbedRunner.batches([1, 1, 1], maxTokens: 100, maxTexts: 2), [0..<2, 2..<3])
+        XCTAssertEqual(EmbedRunner.batches([], maxTokens: 100, maxTexts: 2), [])
+        r.stop()
     }
 
     func testARunawayLineEndsTheRunner() async throws {

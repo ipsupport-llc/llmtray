@@ -42,6 +42,25 @@ final class EmbedderManager: ObservableObject {
 
     @Published private(set) var isBusy = false
     @Published private(set) var statusText = ""
+    /// The runners `makeRunner` handed out, so `remove` can stop a live one.
+    private var runners: [String: WeakRunner] = [:]
+    private struct WeakRunner { weak var runner: EmbedRunner? }
+
+    init() {
+        Self.sweepPartials()
+    }
+
+    /// Leftovers of downloads a quit or crash interrupted
+    /// (`<id>.partial-<uuid>`, gigabytes each): nothing else writes there, and
+    /// no download runs before this manager exists. (mflux and music name
+    /// their temp folders the same way in their own directories and code;
+    /// they aren't touched here.)
+    static func sweepPartials() {
+        let fm = FileManager.default
+        for name in (try? fm.contentsOfDirectory(atPath: modelsDir)) ?? [] where name.contains(".partial-") {
+            try? fm.removeItem(atPath: modelsDir + "/" + name)
+        }
+    }
 
     static var registryURL: URL { URL(fileURLWithPath: RuntimePaths.runtimeDir + "/embedders.json") }
     static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/embed_models" }
@@ -125,9 +144,14 @@ final class EmbedderManager: ObservableObject {
         }
     }
 
-    /// Removes the weights (the feature turned off in Settings).
-    func remove(_ entry: EmbedderEntry) throws {
+    /// Removes the weights (the feature turned off in Settings), after a
+    /// runner still using them has exited.
+    func remove(_ entry: EmbedderEntry) async throws {
         guard !isBusy else { throw EmbedderError.busy }
+        isBusy = true
+        defer { isBusy = false }
+        if let runner = runners[entry.id]?.runner { await runner.stopAndWait() }
+        runners[entry.id] = nil
         let target = Self.modelDir(entry)
         if FileManager.default.fileExists(atPath: target) { try FileManager.default.removeItem(atPath: target) }
     }
@@ -136,7 +160,7 @@ final class EmbedderManager: ObservableObject {
     /// Offline, bytecode-free, with the parent's pid for its watchdog; the
     /// orphan marker is EmbedRunner's own.
     func makeRunner(_ entry: EmbedderEntry) -> EmbedRunner {
-        EmbedRunner(configuration: EmbedRunner.Configuration(
+        let runner = EmbedRunner(configuration: EmbedRunner.Configuration(
             executable: MLXRuntimeInstaller.venvPython,
             arguments: [
                 runnerScript,
@@ -150,5 +174,7 @@ final class EmbedderManager: ObservableObject {
                 "HF_HUB_OFFLINE": "1",
                 "TOKENIZERS_PARALLELISM": "false",
             ]))
+        runners[entry.id] = WeakRunner(runner: runner)
+        return runner
     }
 }

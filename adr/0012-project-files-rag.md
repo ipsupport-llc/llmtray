@@ -486,11 +486,18 @@ adds ~20 ms.
   ids, bounded messages, timeouts, cancellation, restart, the orphan
   marker) — `ProcessRunner.runStreaming` is one-shot.
 - **Scheduling.** Indexing is a background job in bounded slices (one
-  embed request ≤ 256 chunks, ≤ ~3 s); it holds no `GenerationQueue`
+  embed request ≤ 256 chunks and ≤ 10k estimated tokens — `EmbedRunner`
+  refuses a larger one and `documentBatches` splits a document to fit;
+  the runner's own 262k-token limit is only a backstop — ≤ ~3 s); it
+  holds no `GenerationQueue`
   ticket across slices. `GenerationQueue` gains a background lane below
   the interactive one: an image or music generation that wants the queue
   gets it at the next slice boundary, and the embed runner exits then
-  (its ~1.7 GB freed); indexing resumes after. Slices also wait while
+  (its ~1.7 GB freed) — at every generation grant, since a search's
+  query may have started it too; indexing resumes after. While a
+  generation holds or waits for the queue the runner is paused: a query
+  embedding gets `.paused` at once and the search goes lexical-only
+  instead of loading the embedder next to the generation's model. Slices also wait while
   the chat model generates. A query embedding is interactive: it jumps
   ahead of queued index batches in the runner. At most two projects'
   vectors are resident (LRU, a ~800 MB budget); a search in a third

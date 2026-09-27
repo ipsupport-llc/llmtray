@@ -26,6 +26,7 @@ import argparse
 import base64
 import collections
 import json
+import math
 import os
 import sys
 import threading
@@ -61,13 +62,23 @@ LIMITS = {
 INTERLEAVE = 8
 
 out_lock = threading.Lock()
+closing = threading.Event()
+cond = threading.Condition()
 
 
 def send(obj: dict) -> None:
     line = json.dumps(obj, ensure_ascii=False, separators=(",", ":")).encode() + b"\n"
-    with out_lock:
-        protocol.write(line)
-        protocol.flush()
+    try:
+        with out_lock:
+            protocol.write(line)
+            protocol.flush()
+    except (OSError, ValueError):
+        # The client is gone (EPIPE) or the pipe closed: nothing can be
+        # answered any more, so stop taking work.
+        closing.set()
+        with cond:   # a Condition's lock is re-entrant: fine from any thread
+            cond.notify_all()
+        raise
 
 
 def log(*a) -> None:
@@ -119,12 +130,13 @@ if not args.no_verify:
         sys.exit(1)
 
 # Two queues, queries first. The reader thread fills them; the main thread
-# (the only one touching MLX) serves them.
-cond = threading.Condition()
+# (the only one touching MLX) serves them (`cond`, above, guards them).
 queries: "collections.deque[dict]" = collections.deque()
 documents: "collections.deque[dict]" = collections.deque()
+# Ids queued or being served; a cancel for anything else (finished, never
+# sent) is dropped, so `cancelled` only holds live ids -- bounded by the queue.
+active: set = set()
 cancelled: set = set()
-closing = threading.Event()
 
 
 def reader() -> None:
@@ -150,7 +162,9 @@ def reader() -> None:
         op = msg.get("op", "embed")
         if op == "cancel":
             with cond:
-                cancelled.add(str(msg.get("target")))
+                target = str(msg.get("target"))
+                if target in active:
+                    cancelled.add(target)
         elif op == "ping":
             with cond:
                 n = len(queries) + len(documents)
@@ -166,6 +180,7 @@ def reader() -> None:
                         or sum(m["_bytes"] for m in waiting) + len(line) > LIMITS["max_queued_bytes"])
                 if not full:
                     (queries if msg.get("kind") == "query" else documents).append(msg)
+                    active.add(str(msg.get("id")))
                     cond.notify()
             if full:
                 error(msg.get("id"), "too_large", "the runner's queue is full")
@@ -206,8 +221,8 @@ def validate(msg: dict):
         error(rid, "too_large", f"a text exceeds {LIMITS['max_text_chars']} characters")
         return None
     timeout = msg.get("timeout_ms", 60_000)
-    if not isinstance(timeout, (int, float)) or timeout <= 0:
-        error(rid, "bad_request", "timeout_ms must be a positive number")
+    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
+        error(rid, "bad_request", "timeout_ms must be a positive finite number")
         return None
     return texts, kind
 
@@ -256,7 +271,15 @@ def serve(msg: dict, allow_interleave: bool = True) -> None:
     try:
         handle(msg, allow_interleave)
     except Exception as ex:  # noqa: BLE001
-        error(msg.get("id"), "internal", f"{type(ex).__name__}: {ex}")
+        if not closing.is_set():
+            try:
+                error(msg.get("id"), "internal", f"{type(ex).__name__}: {ex}")
+            except Exception:  # noqa: BLE001
+                pass
+    finally:
+        with cond:
+            active.discard(str(msg.get("id")))
+            cancelled.discard(str(msg.get("id")))
 
 
 threading.Thread(target=reader, daemon=True).start()
@@ -278,7 +301,10 @@ while True:
             pending = []
     if msg is None:
         for m in pending:
-            error(m.get("id"), "cancelled", "the runner is shutting down")
+            try:
+                error(m.get("id"), "cancelled", "the runner is shutting down")
+            except Exception:  # noqa: BLE001
+                break
         break
     serve(msg)
     mx.clear_cache()   # hand freed buffers back: the chat model shares the GPU

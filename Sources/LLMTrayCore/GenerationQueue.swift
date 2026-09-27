@@ -12,7 +12,8 @@ import Foundation
 /// across slices. A slice is granted only when no generation runs or waits;
 /// a generation that asks while a slice runs gets the queue at the slice's
 /// end, and `onInteractiveGrant` fires then -- the embed runner is told to
-/// exit, its memory freed for the generation.
+/// exit, its memory freed for the generation. `onInteractiveDemand` tells
+/// the runner it is paused meanwhile, so a search doesn't start it again.
 @MainActor
 public final class GenerationQueue {
     public static let shared = GenerationQueue()
@@ -52,17 +53,21 @@ public final class GenerationQueue {
     private var waiting: [UUID] = []
     private var backgroundHolder: UUID?
     private var backgroundWaiting: [UUID] = []
-    /// The last grant was a background slice: a generation granted next takes
-    /// over from indexing.
-    private var lastGrantWasBackground = false
+    private var lastDemand = false
     private let pollInterval: UInt64
 
-    /// Awaited on the main actor when a generation is granted the queue while
-    /// indexing was using it (a slice just ended, or slices are waiting),
-    /// before the ticket is handed out: the embed runner exits and its
-    /// memory is free when the generation starts (`EmbedRunner.stopAndWait`).
-    /// Wired by the indexer (3.4b).
+    /// Awaited on the main actor each time a generation is granted the
+    /// queue, before the ticket is handed out: the embed runner exits if it
+    /// runs (started by indexing or by a search's query) and its memory is
+    /// free when the generation starts (`EmbedRunner.stopAndWait`, at once
+    /// when nothing runs). Wired by the indexer (3.4b).
     public var onInteractiveGrant: (() async -> Void)?
+
+    /// Called on the main actor when `hasInteractiveDemand` changes: true
+    /// once a generation asks, false when none runs or waits any more. The
+    /// indexer wires it to `EmbedRunner.setPaused` -- a search meanwhile gets
+    /// `.paused` and goes lexical-only instead of restarting the runner.
+    public var onInteractiveDemand: ((Bool) -> Void)?
 
     public init(pollInterval: TimeInterval = 0.2) {
         self.pollInterval = UInt64(pollInterval * 1_000_000_000)
@@ -76,24 +81,31 @@ public final class GenerationQueue {
     /// A generation runs or waits: background slices hold off.
     public var hasInteractiveDemand: Bool { holder != nil || !waiting.isEmpty }
 
+    private func demandMayHaveChanged() {
+        let demand = hasInteractiveDemand
+        guard demand != lastDemand else { return }
+        lastDemand = demand
+        onInteractiveDemand?(demand)
+    }
+
     /// Waits for this request's turn. `onPosition` gets how many are ahead
     /// (the running one included) while it waits, then nil once granted.
     /// Throws Cancelled when `isCancelled` says so, or the task is cancelled.
     public func acquire(isCancelled: () -> Bool = { false }, onPosition: (Int?) -> Void = { _ in }) async throws -> Ticket {
         let id = UUID()
         waiting.append(id)
+        demandMayHaveChanged()
         var lastPosition: Int?
         while true {
             if isCancelled() || Task.isCancelled {
                 waiting.removeAll { $0 == id }
+                demandMayHaveChanged()
                 throw Cancelled()
             }
             if holder == nil, backgroundHolder == nil, waiting.first == id {
                 waiting.removeFirst()
                 holder = id
-                let tookOver = lastGrantWasBackground || !backgroundWaiting.isEmpty
-                lastGrantWasBackground = false
-                if tookOver, let hook = onInteractiveGrant { await hook() }
+                if let hook = onInteractiveGrant { await hook() }
                 onPosition(nil)
                 return Ticket(queue: self, id: id)
             }
@@ -120,7 +132,6 @@ public final class GenerationQueue {
             if holder == nil, waiting.isEmpty, backgroundHolder == nil, backgroundWaiting.first == id {
                 backgroundWaiting.removeFirst()
                 backgroundHolder = id
-                lastGrantWasBackground = true
                 return Slice(queue: self, id: id)
             }
             try? await Task.sleep(nanoseconds: pollInterval)
@@ -129,6 +140,7 @@ public final class GenerationQueue {
 
     fileprivate func release(_ id: UUID) {
         if holder == id { holder = nil }
+        demandMayHaveChanged()
     }
 
     fileprivate func releaseBackground(_ id: UUID) {

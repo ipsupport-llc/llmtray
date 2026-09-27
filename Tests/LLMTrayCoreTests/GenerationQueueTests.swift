@@ -136,21 +136,46 @@ final class GenerationQueueTests: XCTestCase {
         XCTAssertEqual(order, ["second", "slice"], "a generation that asked after the slice still goes first")
     }
 
-    func testAGenerationWithNoIndexingAroundDoesntStopTheRunner() async throws {
+    /// Every grant asks: the runner may have been started by a search's
+    /// query, not only by an index slice.
+    func testEveryGenerationGrantAsksTheRunnerToStop() async throws {
         let queue = GenerationQueue(pollInterval: 0.01)
         var told = 0
         queue.onInteractiveGrant = { told += 1 }
         let t = try await queue.acquire()
         t.release()
-        XCTAssertEqual(told, 0)
+        XCTAssertEqual(told, 1, "no slice before it: the hook still runs")
         let s = try await queue.acquireBackground()
         s.release()
         let t2 = try await queue.acquire()
         t2.release()
-        XCTAssertEqual(told, 1, "indexing used it last")
-        let t3 = try await queue.acquire()
-        t3.release()
-        XCTAssertEqual(told, 1)
+        XCTAssertEqual(told, 2)
+    }
+
+    /// The demand hook pauses the runner from the first waiting generation
+    /// until none runs or waits.
+    func testInteractiveDemandIsReportedOnEachChange() async throws {
+        let queue = GenerationQueue(pollInterval: 0.01)
+        var changes: [Bool] = []
+        queue.onInteractiveDemand = { changes.append($0) }
+        let first = try await queue.acquire()
+        XCTAssertEqual(changes, [true])
+        let second = Task { @MainActor in try await queue.acquire() }
+        try await Task.sleep(nanoseconds: 30_000_000)
+        first.release()
+        let t2 = try await second.value
+        XCTAssertEqual(changes, [true], "still a generation: no flip between them")
+        t2.release()
+        XCTAssertEqual(changes, [true, false])
+        var stop = false
+        let blocker = try await queue.acquire()
+        let cancelled = Task { @MainActor in try await queue.acquire(isCancelled: { stop }) }
+        try await Task.sleep(nanoseconds: 30_000_000)
+        stop = true
+        _ = try? await cancelled.value
+        XCTAssertEqual(changes, [true, false, true], "a waiter leaving doesn't end the demand while one runs")
+        blocker.release()
+        XCTAssertEqual(changes, [true, false, true, false])
     }
 
     func testCancelledBackgroundWaiterLeaves() async throws {
