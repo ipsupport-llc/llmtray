@@ -14,6 +14,12 @@ struct LLMTrayApp: App {
         // otherwise sits in that buffer and never shows up until the
         // process exits, which looks exactly like "nothing happened."
         setvbuf(stdout, nil, _IONBF, 0)
+        // `LLMTray --extract <path> [--caps <json>]`: the document extractor
+        // child (ExtractorCLI) -- first, before anything opens a connection
+        // or touches settings.
+        if CommandLine.arguments.contains("--extract") {
+            ExtractorCLI.run(arguments: CommandLine.arguments)
+        }
         // Developer entry point: `LLMTray --run-tool <name> '<json args>'`
         // runs one chat tool, prints its result and exits -- for checking
         // the tools against the live services without a model.

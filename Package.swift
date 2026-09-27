@@ -26,7 +26,10 @@ let package = Package(
         .testTarget(
             name: "LLMTrayCoreTests",
             dependencies: ["LLMTrayCore"],
-            path: "Tests/LLMTrayCoreTests"
+            path: "Tests/LLMTrayCoreTests",
+            // Only what can't be generated at test time: the RTF that loops
+            // Apple's importer (ExtractorIntegrationTests).
+            resources: [.copy("Fixtures")]
         )
     ]
 )

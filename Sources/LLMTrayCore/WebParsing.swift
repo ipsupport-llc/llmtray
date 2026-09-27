@@ -86,28 +86,45 @@ public enum WebParsing {
         return collapsed.count > limit ? String(collapsed.prefix(limit - 1)) + "…" : collapsed
     }
 
-    private static let entity = try! NSRegularExpression(pattern: "&(amp|lt|gt|quot|apos|nbsp|#39|#[xX][0-9a-fA-F]+|#[0-9]+);")
+    private static let entity = try! NSRegularExpression(pattern: "&(#[xX][0-9a-fA-F]{1,8}|#[0-9]{1,10}|[A-Za-z][A-Za-z0-9]{1,31});")
+
+    /// The named entities decoded; any other name stays as written. The
+    /// common ones of documents too (HTMLText shares this), not all ~2,000.
+    static let namedEntities: [String: String] = [
+        "amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'", "nbsp": " ",
+        "mdash": "—", "ndash": "–", "laquo": "«", "raquo": "»", "hellip": "…", "copy": "©",
+        "reg": "®", "trade": "™", "lsquo": "‘", "rsquo": "’", "ldquo": "“", "rdquo": "”",
+        "bdquo": "„", "sbquo": "‚", "bull": "•", "middot": "·", "times": "×", "divide": "÷",
+        "euro": "€", "deg": "°", "plusmn": "±", "sect": "§", "para": "¶", "shy": "",
+        "thinsp": " ", "ensp": " ", "emsp": " ", "zwnj": "", "zwj": "", "minus": "−",
+        "larr": "←", "rarr": "→", "uarr": "↑", "darr": "↓", "le": "≤", "ge": "≥", "ne": "≠",
+        "infin": "∞", "frac12": "½", "frac14": "¼", "frac34": "¾", "numero": "№", "cent": "¢",
+        "pound": "£", "yen": "¥", "iexcl": "¡", "iquest": "¿", "prime": "′", "Prime": "″",
+        "dagger": "†", "Dagger": "‡", "permil": "‰", "sup2": "²", "sup3": "³", "micro": "µ",
+        "acute": "´", "uml": "¨", "ordm": "º", "ordf": "ª", "not": "¬", "macr": "¯",
+    ]
 
     /// In one pass: "&amp;lt;" is the text "&lt;", not "<".
     public static func decodeEntities(_ s: String) -> String {
         guard s.contains("&") else { return s }
-        let named = ["amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'", "nbsp": " ", "#39": "'"]
         let ns = s as NSString
         var result = ""
         var last = 0
         for m in entity.matches(in: s, range: NSRange(location: 0, length: ns.length)) {
             result += ns.substring(with: NSRange(location: last, length: m.range.location - last))
             let name = ns.substring(with: m.range(at: 1))
-            if let char = named[name] {
+            if !name.hasPrefix("#"), let char = namedEntities[name] ?? namedEntities[name.lowercased()] {
                 result += char
-            } else {
+            } else if name.hasPrefix("#") {
                 let hex = name.hasPrefix("#x") || name.hasPrefix("#X")
                 let digits = String(name.dropFirst(hex ? 2 : 1))
-                if let code = UInt32(digits, radix: hex ? 16 : 10), let scalar = Unicode.Scalar(code) {
+                if let code = UInt32(digits, radix: hex ? 16 : 10), code != 0, let scalar = Unicode.Scalar(code) {
                     result.unicodeScalars.append(scalar)
                 } else {
                     result += ns.substring(with: m.range)
                 }
+            } else {
+                result += ns.substring(with: m.range)
             }
             last = m.range.location + m.range.length
         }
