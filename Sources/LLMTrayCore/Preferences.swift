@@ -67,6 +67,10 @@ public enum Pref {
     /// at launch until Index Now (or a new file).
     public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
 
+    // Folder access (adr/0014)
+    /// Off until turned on in Settings: no folder tool is declared before.
+    public static let folderToolsEnabled = PrefKey("llmtray.folderTools.enabled", default: false)
+
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)
     public static let checkUpdatesAtLaunch = PrefKey("llmtray.checkUpdatesAtLaunch", default: true)

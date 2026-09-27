@@ -4,7 +4,7 @@ import LLMTrayCore
 
 /// The panes of the Settings window, in toolbar order.
 enum SettingsPane: String, CaseIterable {
-    case general, models, profiles, server, benchmark, updates
+    case general, models, profiles, folders, server, benchmark, updates
 
     /// Localized via Localizable.strings (keys are the English titles).
     var title: String {
@@ -12,6 +12,7 @@ enum SettingsPane: String, CaseIterable {
         case .general: return NSLocalizedString("General", comment: "Settings pane")
         case .models: return NSLocalizedString("Models", comment: "Settings pane")
         case .profiles: return NSLocalizedString("Profiles", comment: "Settings pane")
+        case .folders: return NSLocalizedString("Folders", comment: "Settings pane")
         case .server: return NSLocalizedString("Server", comment: "Settings pane")
         case .benchmark: return NSLocalizedString("Benchmark", comment: "Settings pane")
         case .updates: return NSLocalizedString("Updates", comment: "Settings pane")
@@ -23,6 +24,7 @@ enum SettingsPane: String, CaseIterable {
         case .general: return "gearshape"
         case .models: return "square.stack.3d.up"
         case .profiles: return "slider.horizontal.3"
+        case .folders: return "folder"
         case .server: return "server.rack"
         case .benchmark: return "speedometer"
         case .updates: return "arrow.triangle.2.circlepath"
@@ -93,6 +95,7 @@ final class SettingsWindowController: NSWindowController {
         case .general: GeneralPane()
         case .models: ModelsPane()
         case .profiles: ProfilesPane()
+        case .folders: FoldersPane()
         case .server: ServerPane()
         case .benchmark: BenchmarkPane()
         case .updates: UpdatesPane(checkForAppUpdates: deps.checkForAppUpdates)

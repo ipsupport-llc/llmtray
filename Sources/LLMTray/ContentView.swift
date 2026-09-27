@@ -294,6 +294,14 @@ struct ContentView: View {
                     if let draft = chat.draft, draft.anchor == nil {
                         GenerationDraftView(draft: draft).id(draft.id)
                     }
+                    // Folder access (adr/0014): the plan waiting for approval
+                    // (or its result), and a grant prompt a call waits for.
+                    if let plan = chat.folderPlan {
+                        FolderPlanCard(model: plan, dismiss: { chat.dismissFolderPlan() }).id(plan.id)
+                    }
+                    if let prompt = chat.folderPrompt {
+                        FolderPromptCard(prompt: prompt).id(prompt.id)
+                    }
                     if chat.isGeneratingMedia {
                         if chat.generatingKind == .music {
                             MusicGenerationProgressView()
@@ -382,6 +390,15 @@ struct ContentView: View {
                     if followBeforeDraft == nil { followBeforeDraft = followChatBottom }
                     followChatBottom = false
                 }
+                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+            }
+            // A folder prompt or plan wants the user's eyes too.
+            .onChange(of: chat.folderPrompt?.id) { _, id in
+                guard let id else { return }
+                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+            }
+            .onChange(of: chat.folderPlan?.id) { _, id in
+                guard let id else { return }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
             .onChange(of: lastUserMessageID) {
