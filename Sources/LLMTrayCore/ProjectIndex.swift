@@ -75,6 +75,8 @@ public struct ReconcileReport: Equatable, Sendable {
     public var droppedStaged = 0
     public var resetExtracting = 0
     public var finishedRemoving = 0
+    /// Removals that failed again (a copy that couldn't be deleted): still hidden, retried next time.
+    public var failedRemovals = 0
     public var deletedOrphanFiles = 0
     /// Documents to extract (staged), in doc order.
     public var needExtraction: [Int64] = []
@@ -323,8 +325,12 @@ public final class ProjectIndex {
     /// with them: `searchable`, or `empty` when no page has text. A re-index
     /// replaces the derived rows of the old revision in the same
     /// transaction; its pages stay behind as tombstones for citations.
+    /// For a linked file, `identity` is the hash and mtime the caller checked
+    /// *after* parsing (the file may change meanwhile -- then it discards the
+    /// pages and retries): the revision is recorded with the content it holds.
     @discardableResult
-    public func commitExtraction(_ job: IndexJob, pages: [ExtractedPage], kind: String? = nil) throws -> DocumentStatus {
+    public func commitExtraction(_ job: IndexJob, pages: [ExtractedPage], kind: String? = nil,
+                                 identity: (sha256: String, mtime: Double)? = nil) throws -> DocumentStatus {
         try db.transaction {
             guard let d = try document(job.doc) else { throw ProjectIndexError.stale(job.doc) }
             if job.isReindex {
@@ -343,6 +349,10 @@ public final class ProjectIndex {
             let status = try writeDerived(doc: job.doc, rev: job.rev, pages: pages)
             try db.run("UPDATE documents SET rev = ?, status = ?, pages = ?, kind = ?, error = NULL WHERE doc = ?",
                        [.int(job.rev), .text(status.rawValue), .int(Int64(pages.count)), kind.map { .text($0) } ?? .null, .int(job.doc)])
+            if let identity {
+                try db.run("UPDATE documents SET sha256 = ?, mtime = ? WHERE doc = ?",
+                           [.text(identity.sha256), .double(identity.mtime), .int(job.doc)])
+            }
             try point("extract.beforeCommit")
             return status
         }
@@ -534,9 +544,13 @@ public final class ProjectIndex {
 
     private func finishRemoval(_ d: IndexedDocument) throws {
         if d.source == 1 {
-            try? FileManager.default.removeItem(at: fileURL(doc: d.doc, ext: d.ext))
-            try? FileManager.default.removeItem(at: stagingDirectory.appendingPathComponent("\(d.doc).\(d.ext)"))
-            try? FileManager.default.removeItem(at: stagingDirectory.appendingPathComponent("\(d.doc).part"))
+            // A copy that can't be deleted keeps its row `removing` (hidden),
+            // so the next reconcile tries again -- never a file without a row.
+            let fm = FileManager.default
+            for url in [fileURL(doc: d.doc, ext: d.ext), stagingDirectory.appendingPathComponent("\(d.doc).\(d.ext)"),
+                        stagingDirectory.appendingPathComponent("\(d.doc).part")] where fm.fileExists(atPath: url.path) {
+                try fm.removeItem(at: url)
+            }
         }
         try point("remove.fileDeleted")
         try db.transaction {
@@ -551,10 +565,21 @@ public final class ProjectIndex {
     }
 
     /// A linked folder and its documents' rows -- never its files.
+    /// The source and all its documents are marked in one transaction, so a
+    /// crash halfway is finished by the next reconcile.
     public func removeSource(_ source: Int64) throws {
         guard source != 1 else { return }
-        for d in try documents(where: "source = ?", [.int(source)]) { try remove(doc: d.doc) }
-        try db.run("DELETE FROM sources WHERE id = ?", [.int(source)])
+        try db.transaction {
+            try db.run("UPDATE sources SET removing = 1 WHERE id = ?", [.int(source)])
+            try db.run("UPDATE documents SET status = 'removing' WHERE source = ?", [.int(source)])
+        }
+        try point("removeSource.marked")
+        try finishSourceRemovals()
+    }
+
+    private func finishSourceRemovals() throws {
+        for d in try documents(where: "source IN (SELECT id FROM sources WHERE removing = 1)", []) { try finishRemoval(d) }
+        try db.run("DELETE FROM sources WHERE removing = 1 AND id != 1 AND NOT EXISTS (SELECT 1 FROM documents WHERE source = sources.id)")
     }
 
     // MARK: - reconcile
@@ -571,9 +596,17 @@ public final class ProjectIndex {
         let fm = FileManager.default
 
         for d in try documents(where: "status = 'removing'", []) {
-            try finishRemoval(d)
-            r.finishedRemoving += 1
+            // One copy that can't be deleted now doesn't stop the rest.
+            do {
+                try finishRemoval(d)
+                r.finishedRemoving += 1
+            } catch let crash as SimulatedCrash {
+                throw crash
+            } catch {
+                r.failedRemovals += 1
+            }
         }
+        try? finishSourceRemovals()
 
         var staging = Set((try? fm.contentsOfDirectory(atPath: stagingDirectory.path)) ?? [])
         for d in try documents(where: "status = 'staged' AND source = 1", []) {

@@ -33,6 +33,8 @@ public struct IndexHit: Equatable, Sendable {
     public var rev: Int64
     public var page: Int
     public var heading: String?
+    /// The document's file name (shown with the citation).
+    public var name: String
     /// Verbatim, from `pages.text` by the chunk's offsets.
     public var text: String
     public var score: Double
@@ -193,8 +195,16 @@ public final class IndexSearcher {
     /// the active set and refreshed from this connection.
     public func search(_ query: String, queryVector: [Float]? = nil, dense: DenseVectors? = nil,
                        options: IndexSearchOptions = IndexSearchOptions()) throws -> IndexSearchResult {
+        try search(query, queryVector: queryVector, vectors: { _ in dense }, options: options)
+    }
+
+    /// `vectors` runs inside the search's read transaction, so the vectors it
+    /// loads or refreshes are of the same snapshot as the lexical lists.
+    public func search(_ query: String, queryVector: [Float]?, vectors: (SQLiteConnection) throws -> DenseVectors?,
+                       options: IndexSearchOptions = IndexSearchOptions()) throws -> IndexSearchResult {
         let q = IndexQuery.build(query)
         return try db.transaction(immediate: false) {
+            let dense = queryVector == nil ? nil : try vectors(db)
             let w = try words(q, options: options)
             let t = try trigram(q, options: options)
             var denseList: [Int64] = []
@@ -233,14 +243,14 @@ public final class IndexSearcher {
     /// One chunk as a hit, if its document is still searchable at its revision.
     public func fetch(_ chunk: Int64) throws -> IndexHit? {
         try db.rows("""
-            SELECT c.doc, c.rev, c.page, c.heading, substr(p.text, c.start + 1, c.len)
+            SELECT c.doc, c.rev, c.page, c.heading, substr(p.text, c.start + 1, c.len), d.name
             FROM chunks c
             JOIN documents d ON d.doc = c.doc AND d.rev = c.rev
             JOIN pages p ON p.doc = c.doc AND p.rev = c.rev AND p.page = c.page
             WHERE c.id = ? AND d.status IN \(Self.searchable)
             """, [.int(chunk)]) {
             IndexHit(chunk: chunk, doc: $0.int(0), rev: $0.int(1), page: Int($0.int(2)), heading: $0.optionalText(3),
-                     text: $0.text(4), score: 0, foundBy: [])
+                     name: $0.text(5), text: $0.text(4), score: 0, foundBy: [])
         }.first
     }
 

@@ -84,13 +84,13 @@ public final class ProjectIndexHandle: @unchecked Sendable {
                        options: IndexSearchOptions = IndexSearchOptions()) async throws -> IndexSearchResult {
         let result: (IndexSearchResult, Int) = try await withCheckedThrowingContinuation { continuation in
             readerQueue.async {
-                guard let searcher = self.searcher, let reader = self.reader else { return continuation.resume(throwing: Closed()) }
+                guard let searcher = self.searcher else { return continuation.resume(throwing: Closed()) }
                 do {
                     var vectors: DenseVectors?
-                    if let queryVector {
-                        vectors = try self.currentVectors(reader, dim: queryVector.count)
-                    }
-                    let r = try searcher.search(query, queryVector: queryVector, dense: vectors, options: options)
+                    let r = try searcher.search(query, queryVector: queryVector, vectors: { db in
+                        vectors = try self.currentVectors(db, dim: queryVector?.count ?? 0)
+                        return vectors
+                    }, options: options)
                     continuation.resume(returning: (r, vectors?.residentBytes ?? 0))
                 } catch {
                     continuation.resume(throwing: error)
@@ -177,6 +177,9 @@ public final class ProjectIndexHandle: @unchecked Sendable {
 /// memory (LRU, ~800 MB budget).
 public final class ProjectIndexRegistry: @unchecked Sendable {
     private let lock = NSLock()
+    /// Opening and closing are serialized, so a project never has two
+    /// writers: a close finishes before the next open of it starts.
+    private let lifecycle = NSLock()
     private var handles: [UUID: ProjectIndexHandle] = [:]
     private var vectorUse: [(project: UUID, bytes: Int)] = []   // most recent last
     private let directory: (UUID) -> URL
@@ -193,11 +196,16 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
 
     /// The project's handle, opened (and reconciled) on first use.
     public func handle(for project: UUID) throws -> ProjectIndexHandle {
+        lifecycle.lock()
+        defer { lifecycle.unlock() }
         lock.lock()
-        defer { lock.unlock() }
-        if let h = handles[project] { return h }
+        let existing = handles[project]
+        lock.unlock()
+        if let existing { return existing }
         let h = try ProjectIndexHandle(project: project, directory: directory(project), idleDelay: idleDelay, registry: self)
+        lock.lock()
         handles[project] = h
+        lock.unlock()
         return h
     }
 
@@ -209,6 +217,8 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
 
     /// Closes the project's connections (before its deletion).
     public func close(_ project: UUID) {
+        lifecycle.lock()
+        defer { lifecycle.unlock() }
         lock.lock()
         let h = handles.removeValue(forKey: project)
         vectorUse.removeAll { $0.project == project }
@@ -217,6 +227,8 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
     }
 
     public func closeAll() {
+        lifecycle.lock()
+        defer { lifecycle.unlock() }
         lock.lock()
         let all = Array(handles.values)
         handles.removeAll()

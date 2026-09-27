@@ -107,7 +107,8 @@ public enum IndexSchema {
       id INTEGER PRIMARY KEY,
       kind TEXT NOT NULL CHECK (kind IN ('copy','folder')),
       bookmark BLOB,
-      path TEXT);
+      path TEXT,
+      removing INTEGER NOT NULL DEFAULT 0);
     INSERT INTO sources(id, kind) VALUES (1, 'copy');
 
     -- AUTOINCREMENT: a doc id is never reused, so an old [2:5] can't come to

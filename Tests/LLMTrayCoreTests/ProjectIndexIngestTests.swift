@@ -310,6 +310,41 @@ final class ProjectIndexLifecycleTests: XCTestCase {
         XCTAssertEqual(try idx.count("SELECT count(*) FROM sources"), 1)
     }
 
+    func testSourceRemovalInterruptedIsFinishedByReconcile() throws {
+        let idx = try ProjectIndex.testIndex()
+        let folder = indexTempDir("linked2")
+        try "связанный текст".write(to: folder.appendingPathComponent("a.txt"), atomically: true, encoding: .utf8)
+        let source = try idx.addFolderSource(path: folder.path)
+        let doc = try idx.addLinkedDocument(source: source, relativePath: "a.txt", mtime: 1, sha256: "x", bytes: 1)
+        let job = try idx.beginExtraction(doc: doc)
+        try idx.commitExtraction(job, pages: ProjectIndex.pages("связанный текст"), identity: (sha256: "y", mtime: 2))
+        XCTAssertEqual(try idx.document(doc)?.sha256, "y", "the revision records what was parsed")
+        idx.crash(at: "removeSource.marked")
+        XCTAssertThrowsError(try idx.removeSource(source))
+        idx.crashHook = nil
+        XCTAssertTrue(try idx.searcher().search("связанный").hits.isEmpty, "hidden at once")
+        _ = try idx.reconcile()
+        XCTAssertNil(try idx.status(doc))
+        XCTAssertEqual(try idx.count("SELECT count(*) FROM sources"), 1)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: folder.appendingPathComponent("a.txt").path))
+    }
+
+    func testACopyThatCantBeDeletedStaysHiddenAndIsRetried() throws {
+        let idx = try ProjectIndex.testIndex()
+        let doc = try idx.addText("удаляемый документ", name: "a.txt")
+        let files = idx.filesDirectory.path
+        try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: files)
+        defer { try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: files) }
+        XCTAssertThrowsError(try idx.remove(doc: doc))
+        XCTAssertEqual(try idx.status(doc), .removing)
+        XCTAssertTrue(try idx.searcher().search("удаляемый").hits.isEmpty)
+        XCTAssertEqual(try idx.reconcile().failedRemovals, 1)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: files)
+        XCTAssertEqual(try idx.reconcile().finishedRemoving, 1)
+        XCTAssertNil(try idx.status(doc))
+        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: files), [])
+    }
+
     func testReconcileLeavesForeignFilesAndDropsOrphans() throws {
         let idx = try ProjectIndex.testIndex()
         let a = try idx.addText("документ", name: "a.txt")

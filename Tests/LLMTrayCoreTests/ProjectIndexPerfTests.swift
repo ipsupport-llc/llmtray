@@ -10,6 +10,7 @@ final class ProjectIndexPerfTests: XCTestCase {
             throw XCTSkip("set LLMTRAY_INDEX_PERF=<chunks> to run")
         }
         let idx = try ProjectIndex.testIndex(chunker: IndexChunker())
+        defer { try? FileManager.default.removeItem(at: idx.directory) }   // ~2 GB
         let set = try idx.vectorSet(model: "random", dim: 1024, prepVersion: 1).id
         var gen = CorpusGenerator(seed: 42)
         var g = SplitMix64(seed: 7)
@@ -29,7 +30,7 @@ final class ProjectIndexPerfTests: XCTestCase {
         let ingest = ContinuousClock.now - t0
         try idx.checkpoint()
         let storage = try idx.storage()
-        print("perf: \(storage.liveChunks) chunks ingested in \(ingest), \(storage.fileBytes / max(1, storage.liveChunks / 10_000) >> 20) MB per 10k chunks")
+        print("perf: \(storage.liveChunks) chunks ingested in \(ingest), \((storage.fileBytes / max(1, storage.liveChunks / 10_000)) >> 20) MB per 10k chunks")
 
         let reader = try SQLiteConnection(path: idx.databaseURL.path, readOnly: true)
         let s = try IndexSearcher(db: reader)
