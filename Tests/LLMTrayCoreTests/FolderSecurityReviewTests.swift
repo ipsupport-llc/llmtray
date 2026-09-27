@@ -181,6 +181,7 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(staging("t").count, 1)
         let r = undoer.recover(plan.plan.id)
         XCTAssertNotNil(r.leftBehind[plan.plan.items[0].id], "\(r)")
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("Trash") ?? false, "\(r)")
         XCTAssertEqual(r.restored, [])
         XCTAssertEqual(staging("t").count, 1, "the empty staging folder is reported, not removed")
         XCTAssertFalse(exists("t/x.txt"))
@@ -507,6 +508,17 @@ final class FolderSecurityReviewTests: FolderTestCase {
         guard case .listing(let page) = try files.run(FolderQuery(components: ["l"], recursive: true)) else { return XCTFail() }
         XCTAssertTrue(page.scanTruncated, "a subfolder was skipped")
         XCTAssertTrue(page.entries.contains { $0.path == "l/locked" })
+        _ = chmod(locked, 0o755)
+        // Past the depth limit too.
+        write("deep/1/2/c.txt", "c")
+        var limits = FolderFiles.Limits()
+        limits.maxDepth = 1
+        guard case .listing(let shallow) = try FolderFiles(walker: walker, limits: limits)
+            .run(FolderQuery(components: ["deep"], recursive: true)) else { return XCTFail() }
+        XCTAssertTrue(shallow.scanTruncated, "deep/1/2 wasn't entered")
+        guard case .listing(let full) = try FolderFiles(walker: walker)
+            .run(FolderQuery(components: ["deep"], recursive: true)) else { return XCTFail() }
+        XCTAssertFalse(full.scanTruncated)
     }
 
     func testTheProtectedScanIsHeldToTheItemsIdentity() throws {

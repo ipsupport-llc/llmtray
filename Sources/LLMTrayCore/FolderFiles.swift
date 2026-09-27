@@ -51,8 +51,9 @@ public struct ListingPage: Codable, Equatable, Sendable {
     public var protectedInside: ProtectedContents? = nil
     /// Matching entries found (all of them, unless `scanTruncated`).
     public var total: Int
-    /// The scan stopped at its cap, or a subfolder couldn't be entered: there
-    /// may be more than `total`.
+    /// The scan stopped at its cap, or left something out (a subfolder past
+    /// the depth limit or that couldn't be entered, an entry that couldn't
+    /// be looked at): there may be more than `total`.
     public var scanTruncated: Bool
     public var nextCursor: String?
 }
@@ -151,8 +152,11 @@ public struct FolderFiles {
             guard let p = q.pattern, !p.isEmpty else { return true }
             return fnmatch(p, name, FNM_CASEFOLD) == 0
         }
+        // Something left out along the way (not the cap): the listing says so.
+        var incomplete = false
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
-            let entries = try walker.entries(of: dir, limit: limits.maxScan - scanned + 1)
+            let (entries, skipped) = try walker.scanEntries(of: dir, limit: limits.maxScan - scanned + 1)
+            if skipped > 0 { incomplete = true }
             for e in entries {
                 if truncated { return }
                 if isCancelled() || scanned >= limits.maxScan { truncated = true; return }
@@ -165,11 +169,14 @@ public struct FolderFiles {
                                        modified: e.stat.modified, hardLinked: e.stat.isHardLinked ? true : nil,
                                        notDownloaded: e.stat.isDataless ? true : nil))
                 }
-                if q.recursive, e.kind == .directory, depth + 1 <= limits.maxDepth,
-                   e.identity.device == dir.descriptor.identity.device {
-                    // A subfolder that can't be entered (changed or unreadable
-                    // since it was listed) makes the listing incomplete.
-                    guard let sub = try? walker.step(dir, e.name) else { truncated = true; return }
+                if q.recursive, e.kind == .directory, e.identity.device == dir.descriptor.identity.device {
+                    // A subfolder past the depth limit, or that can't be
+                    // entered (changed or unreadable since it was listed),
+                    // makes the listing incomplete.
+                    guard depth + 1 <= limits.maxDepth, let sub = try? walker.step(dir, e.name) else {
+                        incomplete = true
+                        continue
+                    }
                     try scan(sub, depth: depth + 1)
                 }
             }
@@ -193,7 +200,7 @@ public struct FolderFiles {
             let found = walker.protectedContents(in: parent, name, budget: limits.protectedCheckPerPage)
             listed = found == .none ? nil : found
         }
-        return ListingPage(entries: page, protectedInside: listed, total: found.count, scanTruncated: truncated,
+        return ListingPage(entries: page, protectedInside: listed, total: found.count, scanTruncated: truncated || incomplete,
                            nextCursor: i < found.count ? Self.cursor(i, tag: "l") : nil)
     }
 }

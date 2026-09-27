@@ -501,6 +501,7 @@ public struct ChangeUndo {
             do {
                 let step = try recoverOne(item.planItem, st, stagingIdentity: item.stagingIdentity)
                 if let note = step.leftBehind { out.leftBehind[id] = note }
+                if let why = step.needsLook { out.needsLook[id] = why }
                 if step.restored {
                     out.restored.append(id)
                     var why = step.putBack ? "interrupted, and undone from its temporary name"
@@ -524,6 +525,8 @@ public struct ChangeUndo {
         var putBack = false
         /// Its staging folder, left where it is.
         var leftBehind: String?
+        /// Its outcome still needs a look.
+        var needsLook: String?
     }
 
     /// The points of a recovery operation (tests swap things there).
@@ -644,6 +647,11 @@ public struct ChangeUndo {
                 : "\(st.name) was left in \(comps(dir)): LLMTray can't tell it is the folder it made"
             // A make_dir that never published its folder changed nothing.
             if !out.restored { out.restored = try st.kind == .makeDir || trashNeverRan() }
+            // Neither in the folder made for it nor under its name: the Trash
+            // may have taken it.
+            if !out.restored, ours, st.kind == .trash, let s = item.source {
+                out.needsLook = "interrupted: \(s.location.relativePath) isn't in its place; it may be in the Trash"
+            }
             return out
         }
     }

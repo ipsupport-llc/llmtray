@@ -223,6 +223,13 @@ public struct SafeFolderWalker {
     /// The entries of an open directory, denied ones left out, in the order
     /// the file system returns them.
     public func entries(of dir: OpenedDirectory, limit: Int = .max) throws -> [FolderEntry] {
+        try scanEntries(of: dir, limit: limit).entries
+    }
+
+    /// `entries`, with how many names couldn't be looked at (changed while
+    /// read, or failing): left out, so the listing isn't complete. Names
+    /// gone or denied since readdir aren't counted.
+    public func scanEntries(of dir: OpenedDirectory, limit: Int = .max) throws -> (entries: [FolderEntry], skipped: Int) {
         let dupFD = dup(dir.descriptor.fd)
         guard dupFD >= 0 else { throw FolderAccessError.system("dup", errno) }
         guard let stream = fdopendir(dupFD) else {
@@ -233,18 +240,24 @@ public struct SafeFolderWalker {
         defer { closedir(stream) }
         rewinddir(stream)
         var out: [FolderEntry] = []
+        var skipped = 0
         while out.count < limit, let ent = readdir(stream) {
             let name = withUnsafePointer(to: ent.pointee.d_name) {
                 $0.withMemoryRebound(to: CChar.self, capacity: Int(MAXNAMLEN) + 1) { String(cString: $0) }
             }
             if name == "." || name == ".." { continue }
-            // A name that vanished (or turned denied) since readdir is skipped.
-            if let e = try? entry(in: dir, name) { out.append(e) }
+            // A name that vanished (or turned denied) since readdir is
+            // skipped; one that couldn't be looked at is counted.
+            do {
+                if let e = try entry(in: dir, name) { out.append(e) }
+            } catch {
+                skipped += 1
+            }
         }
         // Listed through a held descriptor: the folder must still be inside
         // the grant now that it has been read, else nothing of it is shown.
         guard stillInside(dir) else { throw FolderAccessError.changed(display(dir.components)) }
-        return out
+        return (out, skipped)
     }
 
     /// Opens a regular file for reading, held to the entry's identity. The
