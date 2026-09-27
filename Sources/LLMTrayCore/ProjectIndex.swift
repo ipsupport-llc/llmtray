@@ -197,6 +197,11 @@ public final class ProjectIndex {
     }
 
     private func documents(where clause: String, _ args: [SQLValue]) throws -> [IndexedDocument] {
+        try Self.documents(db, where: clause, args)
+    }
+
+    /// The documents rows, through any connection (the reader's too).
+    static func documents(_ db: SQLiteConnection, where clause: String, _ args: [SQLValue]) throws -> [IndexedDocument] {
         try db.rows("""
             SELECT doc, source, rev, name, ext, rel_path, sha256, bytes, status, kind, pages, error
             FROM documents WHERE \(clause) ORDER BY doc
@@ -221,7 +226,12 @@ public final class ProjectIndex {
     /// the folder (the file or a directory on its path) that leads out of it
     /// is never followed there.
     public func file(of d: IndexedDocument) throws -> URL? {
-        if d.source == 1 { return fileURL(doc: d.doc, ext: d.ext) }
+        try Self.file(of: d, directory: directory, db)
+    }
+
+    /// `file(of:)` through any connection (a citation opened read-only).
+    static func file(of d: IndexedDocument, directory: URL, _ db: SQLiteConnection) throws -> URL? {
+        if d.source == 1 { return directory.appendingPathComponent("files").appendingPathComponent("\(d.doc).\(d.ext)") }
         guard let root = try db.scalarText("SELECT path FROM sources WHERE id = ?", [.int(d.source)]), let rel = d.relativePath,
               Self.isSafeRelativePath(rel) else { return nil }
         return Self.contained(rel, in: root)

@@ -80,8 +80,8 @@ public struct IndexSearchOptions: Sendable {
     }
 }
 
-/// What a project has, for deciding at a turn's start which project tools
-/// to declare (none / listing only / all three).
+/// What a project has, for deciding at a turn's start whether project_files
+/// is declared, and in which modes (ProjectFilesMode).
 public struct ProjectIndexSummary: Equatable, Sendable {
     /// Documents the user sees (everything but `removing`).
     public var documents: Int
@@ -100,7 +100,7 @@ public struct ProjectIndexSummary: Equatable, Sendable {
         FROM documents WHERE status != 'removing'
         """
 
-    init(documents: Int, searchable: Int, embedded: Int, pending: Int, failed: Int) {
+    public init(documents: Int, searchable: Int, embedded: Int, pending: Int, failed: Int) {
         self.documents = documents
         self.searchable = searchable
         self.embedded = embedded
@@ -356,6 +356,30 @@ public final class IndexSearcher {
             FROM pages p WHERE p.doc = ? AND p.rev = ? AND p.page = ?
             """, [.int(doc), .int(rev), .int(Int64(page))]) {
             IndexPage(doc: doc, rev: rev, page: page, text: $0.text(0), isCurrent: $0.int(1) != 0)
+        }.first
+    }
+
+    /// The documents the user sees (none `removing`), in id order.
+    public func documents() throws -> [IndexedDocument] {
+        try ProjectIndex.documents(db, where: "status != 'removing'", [])
+    }
+
+    /// The page numbers of a document's revision within `range`, and each
+    /// page's length in code points (SQL `length`, the unit of `substr`).
+    public func pageLengths(doc: Int64, rev: Int64, in range: ClosedRange<Int>) throws -> [(page: Int, length: Int)] {
+        try db.rows("""
+            SELECT page, length(text) FROM pages WHERE doc = ? AND rev = ? AND page BETWEEN ? AND ? ORDER BY page
+            """, [.int(doc), .int(rev), .int(Int64(range.lowerBound)), .int(Int64(range.upperBound))]) {
+            (Int($0.int(0)), Int($0.int(1)))
+        }
+    }
+
+    /// Part of a page's verbatim text: `count` code points from `offset`
+    /// (0-based), no more -- so a read never loads a whole long page.
+    public func pageText(doc: Int64, rev: Int64, page: Int, offset: Int, count: Int) throws -> String? {
+        try db.rows("SELECT substr(text, ?, ?) FROM pages WHERE doc = ? AND rev = ? AND page = ?",
+                    [.int(Int64(offset) + 1), .int(Int64(max(0, count))), .int(doc), .int(rev), .int(Int64(page))]) {
+            $0.text(0)
         }.first
     }
 

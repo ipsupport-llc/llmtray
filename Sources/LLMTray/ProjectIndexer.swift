@@ -77,6 +77,27 @@ final class ProjectIndexer: ObservableObject {
 
     var isEmbedderReady: Bool { embedderReady }
 
+    /// project_files' work, over this registry and the embedder's runner.
+    private(set) lazy var filesService = ProjectFilesService(environment: .init(
+        registry: registry,
+        queryEmbedder: { [weak self] in self?.currentEmbedder() as? RunnerEmbedder },
+        wordsOnlyReason: { [weak self] in self?.ingestor?.embeddingUnavailable }))
+
+    /// A project's file counts for a turn's start (which project_files modes
+    /// it declares): read-only, without opening a closed project; `.empty`
+    /// while the feature is off or when they can't be read.
+    func summary(for project: UUID) async -> ProjectIndexSummary {
+        guard isEnabled else { return .empty }
+        return (try? await registry.summary(for: project)) ?? .empty
+    }
+
+    /// Where a citation chip leads: read-only from the project's index,
+    /// also while the feature is off.
+    static func citationTarget(_ c: Citation) async -> CitationTarget {
+        let dir = URL(fileURLWithPath: ChatLibraryStore.projectStorage.directory(for: c.project))
+        return await Task.detached(priority: .userInitiated) { CitationTarget.resolve(c, projectDirectory: dir) }.value
+    }
+
     // MARK: - wiring
 
     private func activate() {

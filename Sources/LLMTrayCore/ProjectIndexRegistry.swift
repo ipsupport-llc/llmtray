@@ -112,8 +112,10 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     }
 
     /// The hybrid search on the reader. The active set's vectors are loaded
-    /// (or brought up to date) first when a query vector comes with it.
-    public func search(_ query: String, queryVector: [Float]? = nil,
+    /// (or brought up to date) first when a query vector comes with it --
+    /// only if that set is of `model` (the query's embedder), when given:
+    /// a vector of another model scores nothing (dense is skipped).
+    public func search(_ query: String, queryVector: [Float]? = nil, model: String? = nil,
                        options: IndexSearchOptions = IndexSearchOptions()) async throws -> IndexSearchResult {
         let result: (IndexSearchResult, Int) = try await withCheckedThrowingContinuation { continuation in
             readerQueue.async {
@@ -121,7 +123,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
                 do {
                     var vectors: DenseVectors?
                     let r = try searcher.search(query, queryVector: queryVector, vectors: { db in
-                        vectors = try self.currentVectors(db, dim: queryVector?.count ?? 0)
+                        vectors = try self.currentVectors(db, dim: queryVector?.count ?? 0, model: model)
                         return vectors
                     }, options: options)
                     continuation.resume(returning: (r, vectors?.residentBytes ?? 0))
@@ -140,9 +142,9 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     }
 
     /// Reader queue: the active set's vectors, refreshed.
-    private func currentVectors(_ db: SQLiteConnection, dim: Int) throws -> DenseVectors? {
-        let active = try db.rows("SELECT set_id, dim FROM vec_sets WHERE active = 1") { ($0.int(0), Int($0.int(1))) }.first
-        guard let active, active.1 == dim else {
+    private func currentVectors(_ db: SQLiteConnection, dim: Int, model: String?) throws -> DenseVectors? {
+        let active = try db.rows("SELECT set_id, dim, model FROM vec_sets WHERE active = 1") { ($0.int(0), Int($0.int(1)), $0.text(2)) }.first
+        guard let active, active.1 == dim, model == nil || active.2 == model else {
             dense = nil
             return nil
         }

@@ -470,7 +470,7 @@ final class ChatClient: ObservableObject {
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: withProject(settings), server: server)
+        startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 
     /// The chat's project as the library has it now (adr/0012): read as a
@@ -480,6 +480,25 @@ final class ChatClient: ObservableObject {
         var settings = settings
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
         return settings
+    }
+
+    /// The turn's first request, with its project and that project's file
+    /// counts (which project_files modes it declares) -- read first, off the
+    /// main thread, while the turn already shows as busy. A Stop or another
+    /// chat meanwhile drops it.
+    private func startTurn(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager) {
+        var settings = withProject(settings)
+        guard let project = settings.project, ProjectIndexer.shared.isEnabled else {
+            return startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
+        }
+        isStreaming = true
+        let token = turnToken, epoch = conversationEpoch
+        Task { [weak self] in
+            let files = await ProjectIndexer.shared.summary(for: project.id)
+            guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
+            settings.project?.files = files
+            self.startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
+        }
     }
 
     /// Re-runs the last user turn with a fresh generation -- drops the
@@ -514,7 +533,7 @@ final class ChatClient: ObservableObject {
             messages.removeLast()
         }
         guard messages.last?.role == "user" else { return }
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: withProject(settings), server: server)
+        startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 
     /// Explicit, Settings-initiated warm-up download for the given image
@@ -1147,7 +1166,15 @@ final class ChatClient: ObservableObject {
             }
             let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
                                      model: drafts[call.id]?.modelID)
-            let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
+            var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
+            if toolbox.projectToolNames.contains(call.name) {
+                // What the next request has room for now, the results before
+                // this one counted: the tool sizes its answer to it.
+                toolContext.projectTextBytes = ProjectTextBudget.allowance(
+                    contextTokens: settings.maxTokensCap, requestTokens: requestTokenEstimate(context, settings),
+                    maxTokens: settings.maxTokens).map(ProjectTextBudget.bytes(forTokens:)) ?? 0
+            }
+            let result = await toolbox.run(call, context: toolContext)
             guard stillCurrent() else { break }
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
             switch result {

@@ -114,6 +114,13 @@ public struct ChatLibrary: Codable, Equatable {
         projectOfChat[chat].flatMap(project).map(ProjectContext.init)
     }
 
+    /// The chat is still in that project, and the project still exists:
+    /// what a project tool checks each time it runs, and again before it
+    /// returns file text (a chat moved or a project deleted mid-turn).
+    public func chat(_ chat: UUID, isIn project: UUID) -> Bool {
+        projectOfChat[chat] == project && self.project(project) != nil
+    }
+
     /// Its chats stay, back among the recents.
     public mutating func deleteProject(_ id: UUID) {
         projects.removeAll { $0.id == id }
@@ -142,15 +149,19 @@ public struct ProjectContext: Equatable {
     public var id: UUID
     public var name: String
     public var instructions: String
-    /// Any of its files can be searched. Always false until projects have
-    /// files; the project tools will be declared on it.
-    public var hasSearchableFiles: Bool
+    /// Its files' counts, read at the turn's start (`.empty` while project
+    /// files are off): what decides whether project_files is declared, and
+    /// in which modes (ProjectFilesMode).
+    public var files: ProjectIndexSummary
 
-    public init(id: UUID, name: String, instructions: String = "", hasSearchableFiles: Bool = false) {
+    /// Any of its files can be searched.
+    public var hasSearchableFiles: Bool { files.searchable > 0 }
+
+    public init(id: UUID, name: String, instructions: String = "", files: ProjectIndexSummary = .empty) {
         self.id = id
         self.name = name
         self.instructions = instructions
-        self.hasSearchableFiles = hasSearchableFiles
+        self.files = files
     }
 
     public init(_ project: ChatLibrary.Project) {
