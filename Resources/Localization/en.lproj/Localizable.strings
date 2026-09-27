@@ -14,6 +14,7 @@
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
+"%@ — page %lld" = "%@ — page %lld";
 "%@ → %@ available" = "%@ → %@ available";
 "%@ ★ from %lld reviews" = "%@ ★ from %lld reviews";
 "%@ ★ from 1 review" = "%@ ★ from 1 review";
@@ -468,6 +469,7 @@
 "Open Server Log…" = "Open Server Log…";
 "Open Settings" = "Open Settings";
 "Open in New Tab" = "Open in New Tab";
+"Open in Preview" = "Open in Preview";
 "Open in Window" = "Open in Window";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";

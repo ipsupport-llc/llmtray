@@ -650,4 +650,24 @@ final class ProjectFilesServiceTests: XCTestCase {
         try await h.write { try $0.remove(doc: doc) }
         XCTAssertEqual(CitationTarget.resolve(cite, projectDirectory: dir), .gone, "removed")
     }
+
+    func testCitationQuote() async throws {
+        let doc = try await add("one\u{0C}the second page's text", name: "a.txt")
+        let dir = root.appendingPathComponent(project.uuidString)
+        let db = try SQLiteConnection(path: dir.appendingPathComponent(ProjectIndex.databaseName).path, readOnly: true)
+        let chunk = try XCTUnwrap(db.scalarInt("SELECT id FROM chunks WHERE doc = ? AND page = 2", [.int(doc)]))
+        db.close()
+        var cite = Citation(project: project, doc: Int(doc), rev: 1, page: 2, chunk: Int(chunk), name: "a.txt")
+        XCTAssertEqual(CitationTarget.quote(cite, projectDirectory: dir), "the second page's text")
+        cite.page = 1
+        XCTAssertNil(CitationTarget.quote(cite, projectDirectory: dir), "not that page's chunk")
+        cite.page = 2
+        cite.rev = 2
+        XCTAssertNil(CitationTarget.quote(cite, projectDirectory: dir), "another revision")
+        cite.rev = 1
+        cite.chunk = nil
+        XCTAssertNil(CitationTarget.quote(cite, projectDirectory: dir))
+        cite.chunk = Int(chunk)
+        XCTAssertNil(CitationTarget.quote(cite, projectDirectory: root.appendingPathComponent("nowhere")))
+    }
 }

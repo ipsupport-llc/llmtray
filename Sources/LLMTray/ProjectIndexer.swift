@@ -110,6 +110,12 @@ final class ProjectIndexer: ObservableObject {
         return await Task.detached(priority: .userInitiated) { CitationTarget.resolve(c, projectDirectory: dir) }.value
     }
 
+    /// The cited chunk's text, for the PDF viewer's highlight: read-only too.
+    static func citationQuote(_ c: Citation) async -> String? {
+        let dir = URL(fileURLWithPath: ChatLibraryStore.projectStorage.directory(for: c.project))
+        return await Task.detached(priority: .userInitiated) { CitationTarget.quote(c, projectDirectory: dir) }.value
+    }
+
     // MARK: - wiring
 
     private func activate() {
