@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 extension Notification.Name {
     // Posted by ChatSessionStore.save()/delete() -- ContentView's History
@@ -39,10 +40,13 @@ struct PersistedMessage: Codable {
     // What Regenerate runs again (see ChatMessage.imageSources).
     var imageSources: [MediaSource] = []
     var audioSources: [MediaSource] = []
+    // An answer's citations of project files (see ChatMessage.citations);
+    // nil, and not written, when it has none.
+    var citations: [Citation]?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
-        case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources
+        case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
     }
 
     init(
@@ -78,6 +82,7 @@ struct PersistedMessage: Codable {
         audioDurations = try c.decodeIfPresent([Double].self, forKey: .audioDurations) ?? []
         imageSources = try c.decodeIfPresent([MediaSource].self, forKey: .imageSources) ?? []
         audioSources = try c.decodeIfPresent([MediaSource].self, forKey: .audioSources) ?? []
+        citations = try c.decodeIfPresent([Citation].self, forKey: .citations)
     }
 }
 

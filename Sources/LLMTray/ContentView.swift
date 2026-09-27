@@ -229,6 +229,8 @@ struct ContentView: View {
         // The data credits of each turn's tools, under its answer whether
         // or not the tool calls are shown.
         let sources = ChatMessage.sourcesByAnswer(chat.messages)
+        // The project file pages each answer cites.
+        let citations = ChatMessage.citationsByAnswer(chat.messages)
         return ScrollViewReader { proxy in
             ScrollView {
                 // Not Lazy: a lazy stack estimates the height of rows it
@@ -252,6 +254,7 @@ struct ContentView: View {
                     // that called it.
                     ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
+                                      citations: citations[msg.id] ?? [],
                                       regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
                                       draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil)
                             .environment(\.visibleChatHeight, chatViewportHeight)

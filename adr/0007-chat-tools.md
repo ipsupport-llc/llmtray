@@ -50,7 +50,7 @@ prompt (`ChatRequestBuilder`).
 - **Refusals read back cause loops.** Read in later turns, "one was
   already generated" made the model think no image was made; it called
   generate_image until the round limit (81e7f20). Now `.refused` messages
-  are dropped from earlier turns (`withoutEarlierRefusals`) and a spent
+  are dropped from earlier turns (`ChatRequestBuilder.withoutEarlier`) and a spent
   generator isn't declared (`ChatToolbox.definitions`).
 - **Undeclared isn't uncalled.** A model that saw generate_image earlier
   kept calling it after it was switched off, and the server still parses

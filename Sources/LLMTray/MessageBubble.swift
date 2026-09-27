@@ -1,4 +1,5 @@
 import AppKit
+import LLMTrayCore
 import SwiftUI
 
 /// One chat message: a compaction summary, or a user/assistant bubble with
@@ -14,6 +15,11 @@ struct MessageBubble: View {
     var toolResults: [String: String]?
     /// Credits of the data this answer's tools used.
     var sources: [String] = []
+    /// The project file pages this answer cites (adr/0012), one chip each.
+    var citations: [Citation] = []
+    /// Opens a cited file at its page; nil until project files can be
+    /// opened (the chips are shown, not clickable).
+    var openCitation: ((Citation) -> Void)?
     /// Makes an image or piece of music of this message again; nil while
     /// the chat is busy.
     var regenerateMedia: ((ChatClient.MediaKind, Int, ChatClient.MediaAction) -> Void)?
@@ -119,6 +125,10 @@ struct MessageBubble: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
                 tweakDraft(.music, i)
+            }
+
+            if !citations.isEmpty {
+                CitationChips(citations: citations, open: openCitation)
             }
 
             ForEach(sources, id: \.self) { source in
@@ -255,6 +265,44 @@ struct MessageBubble: View {
         case .image: return message.imageSources.count == message.images.count && message.imageSources.indices.contains(i)
         case .music: return message.audioSources.count == message.audios.count && message.audioSources.indices.contains(i)
         }
+    }
+}
+
+/// An answer's citations as chips: the file and its page.
+@MainActor
+private struct CitationChips: View {
+    let citations: [Citation]
+    let open: ((Citation) -> Void)?
+
+    var body: some View {
+        // Wraps on a narrow popover: a flow of chips, not one long row.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 4) { chips }
+            VStack(alignment: .leading, spacing: 4) { chips }
+        }
+    }
+
+    private var chips: some View {
+        ForEach(citations, id: \.self) { citation in
+            Button { open?(citation) } label: {
+                Label(Self.label(citation), systemImage: "doc.text")
+                    .font(.system(size: 10))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(Color.gray.opacity(0.12))
+                    .cornerRadius(6)
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.secondary)
+            .disabled(open == nil)
+            .help(Text(Self.label(citation)))
+        }
+    }
+
+    static func label(_ c: Citation) -> String {
+        String(format: NSLocalizedString("%@, p. %lld", comment: "citation chip: file name, page"), c.name, c.page)
     }
 }
 

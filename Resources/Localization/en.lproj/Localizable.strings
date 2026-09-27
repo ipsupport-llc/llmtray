@@ -8,6 +8,7 @@
 "%@ · %@ left" = "%@ · %@ left";
 "%@ → %@ available" = "%@ → %@ available";
 "%@ 🌐" = "%@ 🌐";
+"%@, p. %lld" = "%@, p. %lld";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
 "%lld MB" = "%lld MB";
 "%lld downloads" = "%lld downloads";

@@ -7,8 +7,10 @@ public enum SSEEvent: Equatable {
     /// An inline (data: URI) image in a multimodal content array.
     case image(Data)
     case toolCall(id: String, name: String, argumentsJSON: String)
-    /// The final stream_options.include_usage chunk.
-    case usage(completionTokens: Int)
+    /// The final stream_options.include_usage chunk: completion_tokens for
+    /// tok/s, prompt_tokens (the whole prompt, cached part included) for
+    /// the token estimate.
+    case usage(completionTokens: Int, promptTokens: Int? = nil)
 }
 
 /// Turns an OpenAI-style `text/event-stream` chat-completion response into
@@ -44,7 +46,7 @@ public struct SSEDecoder {
         // The usage chunk has an empty (or absent) choices array and a
         // top-level "usage" -- the accurate completion_tokens for tok/s.
         if let usage = obj["usage"] as? [String: Any], let tokens = usage["completion_tokens"] as? Int {
-            events.append(.usage(completionTokens: tokens))
+            events.append(.usage(completionTokens: tokens, promptTokens: usage["prompt_tokens"] as? Int))
         }
         guard let choices = obj["choices"] as? [[String: Any]],
               let delta = choices.first?["delta"] as? [String: Any] else { return events }

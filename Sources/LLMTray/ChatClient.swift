@@ -102,6 +102,10 @@ final class ChatClient: ObservableObject {
     private(set) var conversationEpoch = 0
     private var approxCompletionTokens: Int = 0
     private var usageCompletionTokens: Int?
+    /// This chat's prompt-token estimate (adr/0012), calibrated by each
+    /// response's usage against the request it answered.
+    private var tokenEstimator = PromptTokenEstimator()
+    private var lastRequestMeasure: PromptTokenEstimator.Measure?
     private var assistantMessageIndex: Int?
 
     private struct RequestContext {
@@ -186,6 +190,8 @@ final class ChatClient: ObservableObject {
         lastTokensPerSecond = nil
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        tokenEstimator = PromptTokenEstimator()
+        lastRequestMeasure = nil
     }
 
     func loadSession(_ file: ChatSessionFile) {
@@ -200,6 +206,7 @@ final class ChatClient: ObservableObject {
             )
             // The files they came from: saved again under the same names.
             message.imageFilenames = images.count == pm.imageFilenames.count ? pm.imageFilenames : []
+            message.citations = pm.citations ?? []
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -275,6 +282,7 @@ final class ChatClient: ObservableObject {
 
         // Before the tool messages they come from are dropped.
         let sources = ChatMessage.sourcesByAnswer(messages)
+        let citations = ChatMessage.citationsByAnswer(messages)
         var persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
             if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty, msg.audios.isEmpty { return nil }
@@ -304,6 +312,7 @@ final class ChatClient: ObservableObject {
             persisted.audioDurations = msg.audioDurations
             persisted.imageSources = msg.imageSources.count == msg.images.count ? msg.imageSources : []
             persisted.audioSources = msg.audioSources.count == msg.audios.count ? msg.audioSources : []
+            persisted.citations = citations[msg.id]
             return persisted
         }
         guard !persisted.isEmpty else { return }
@@ -401,11 +410,11 @@ final class ChatClient: ObservableObject {
         guard let middleRange = Self.compactionRange(messages, keepStart: keepStart, keepEnd: keepEnd) else { return }
         let middle = Array(messages[middleRange])
 
-        let transcript = middle.map { msg -> String in
-            let speaker = msg.role == "user" ? "User" : (msg.role == "tool" ? "Tool result" : "Assistant")
-            let text = msg.content.isEmpty ? msg.reasoning : msg.content
-            return "\(speaker): \(text)"
-        }.joined(separator: "\n\n")
+        // Without tool results: file (or web) text must not come back as a
+        // trusted summary (adr/0012). The answers' citations become text.
+        let transcript = CompactionTranscript.make(middle.map {
+            CompactionTranscript.Line(role: $0.role, content: $0.content, reasoning: $0.reasoning, isToolContext: $0.isToolContext)
+        })
 
         let requestMessages: [[String: Any]] = [
             ["role": "system", "content": Self.compactionSystemPrompt],
@@ -754,14 +763,18 @@ final class ChatClient: ObservableObject {
         messages.append(ChatMessage(role: "assistant"))
         assistantMessageIndex = messages.count - 1
 
-        guard let request = ChatRequestBuilder.streaming(
-            port: port, modelAlias: modelAlias, settings: settings,
+        let body = ChatRequestBuilder.streamingBody(
+            modelAlias: modelAlias, settings: settings,
             history: Array(messages.dropLast(1)),
-            tools: offerTools ? toolbox.definitions(for: settings) : []
-        ) else {
+            tools: offerTools ? toolbox.definitions(for: settings) : [],
+            projectTools: toolbox.projectToolNames
+        )
+        guard let request = ChatRequestBuilder.streaming(port: port, body: body) else {
             errorText = NSLocalizedString("failed to build request", comment: "")
             return
         }
+        // What the response's usage calibrates the estimate against.
+        lastRequestMeasure = ChatRequestBuilder.measure(body)
 
         decoder = SSEDecoder()
         approxCompletionTokens = 0
@@ -934,6 +947,11 @@ final class ChatClient: ObservableObject {
         }
 
         var settings = currentSettings(context.settings)
+        // The trust barrier (adr/0012), per call and before anything below:
+        // beside a project call, or after file text came back this turn, the
+        // network and generator calls are refused -- no draft, no queue
+        // ticket, no unload for them.
+        let untrusted = toolbox.trustRefusals(Array(toolCalls.prefix(maxToolCallsPerRound)))
 
         // Creator mode: each image or song asked for is first an editable
         // draft (prompt, model, knobs), going ahead by itself after the
@@ -944,7 +962,7 @@ final class ChatClient: ObservableObject {
         if settings.creatorMode {
             isStreaming = false
             for (i, call) in toolCalls.enumerated() {
-                guard i < maxToolCallsPerRound, let kind = GenerationDraft.kind(of: call, settings),
+                guard i < maxToolCallsPerRound, !untrusted.contains(call.id), let kind = GenerationDraft.kind(of: call, settings),
                       kind == .music ? musicTool.willGenerate([call], settings: settings) && musicManager.isReady(settings.musicModel)
                                      : imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
                 else { continue }
@@ -971,7 +989,7 @@ final class ChatClient: ObservableObject {
         // Images and music alike: either generator takes most of this
         // Mac's memory, so neither runs beside the other.
         let images = chatImages
-        let running = toolCalls.filter { !skipped.contains($0.id) }
+        let running = toolCalls.filter { !skipped.contains($0.id) && !untrusted.contains($0.id) }
         let wantsImage = running.contains { imageTool.willGenerate([$0], settings: settingsFor($0, settings), chatImages: images) }
         let wantsMusic = running.contains {
             let s = settingsFor($0, settings)
@@ -1040,6 +1058,12 @@ final class ChatClient: ObservableObject {
                 messages.append(note)
                 continue
             }
+            if untrusted.contains(call.id) {
+                var refusal = ChatMessage(role: "tool", content: ToolTrust.refusal, toolCallID: call.id)
+                refusal.isRefusal = true
+                messages.append(refusal)
+                continue
+            }
             settings = settingsFor(call, currentSettings(context.settings))
             if willActuallyGenerate, call.name == MusicToolRunner.toolName {
                 generatingKind = .music
@@ -1060,6 +1084,14 @@ final class ChatClient: ObservableObject {
             case .imageForModel(let data, let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
                 pendingModelImages.append(data)
+            case .projectText(let output):
+                // Fitted into what the next request has room for, measured
+                // with the results before it.
+                let fitted = toolbox.fitProjectResult(output, tool: call.name, requestTokens: requestTokenEstimate(context, settings),
+                                                      settings: settings)
+                var result = ChatMessage(role: "tool", content: fitted.text, toolCallID: call.id)
+                result.returnedCitations = fitted.returned
+                messages.append(result)
             case .generatedImage(let data, let seconds, let prompt, let text):
                 if sourceIndex < messages.count {
                     messages[sourceIndex].images.append(data)
@@ -1119,6 +1151,14 @@ final class ChatClient: ObservableObject {
         )
     }
 
+    /// The next request's prompt tokens as it would be sent now: the whole
+    /// history so far, with the tools it would declare.
+    private func requestTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int {
+        let body = ChatRequestBuilder.streamingBody(modelAlias: context.modelAlias, settings: settings, history: messages,
+                                                    tools: toolbox.definitions(for: settings), projectTools: toolbox.projectToolNames)
+        return tokenEstimator.estimate(ChatRequestBuilder.measure(body))
+    }
+
     private func finalizeTokensPerSecond(firstByte: Date?, endDate: Date) {
         guard let start = firstByte else { return }
         let elapsed = endDate.timeIntervalSince(start)
@@ -1147,8 +1187,11 @@ final class ChatClient: ObservableObject {
                 appendToAssistant(image: data)
             case .toolCall(let id, let name, let argumentsJSON):
                 appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
-            case .usage(let completionTokens):
+            case .usage(let completionTokens, let promptTokens):
                 usageCompletionTokens = completionTokens
+                if let promptTokens, let measure = lastRequestMeasure {
+                    tokenEstimator.calibrate(measure, promptTokens: promptTokens)
+                }
             }
         }
     }

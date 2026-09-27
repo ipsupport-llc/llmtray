@@ -47,6 +47,14 @@ final class SSEDecoderTests: XCTestCase {
         XCTAssertEqual(events, [.usage(completionTokens: 42)])
     }
 
+    /// mlx_lm.server's usage chunk (the fork's completion_usage_response).
+    func testUsageChunkWithPromptTokens() {
+        var d = SSEDecoder()
+        let line = #"data: {"id":"x","object":"chat.completion","choices":[],"#
+            + #""usage":{"prompt_tokens":1834,"completion_tokens":57,"total_tokens":1891,"prompt_tokens_details":{"cached_tokens":1800}}}"#
+        XCTAssertEqual(d.feed(line + "\n"), [.usage(completionTokens: 57, promptTokens: 1834)])
+    }
+
     func testContentArrayWithInlineImageOnly() {
         var d = SSEDecoder()
         let png = Data([0x89, 0x50, 0x4E, 0x47])
