@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: Vorabversionen mit Funktionen, die noch getestet werden, und Laufzeitupdates aus dem Beta-Branch von mlx-lm. Ein Wechsel zurück zu Stable stuft eine installierte Beta nicht herunter; sie wird durch das nächste stabile Release ersetzt.";
 "Browse Hugging Face…" = "Hugging Face durchsuchen …";
 "Calculator" = "Taschenrechner";
+"Calls" = "Aufrufe";
 "Can't change models while auto-tune is running" = "Modelle können nicht gewechselt werden, während die automatische Optimierung läuft.";
 "Can't switch profiles while a request or the auto-tune is running" = "Profile können nicht gewechselt werden, während eine Anfrage oder die automatische Optimierung läuft.";
 "Cancel" = "Abbrechen";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "Bericht konnte nicht erstellt werden: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us konnte nicht erreicht werden. Ihre Bewertung wird zwischengespeichert: Bitte später erneut versuchen.";
 "Countdown" = "Countdown";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Auf diesem Mac für diese LLMTray-Version gezählt und nie gesendet; ein Fehlerbericht enthält die Zahlen. Zeige auf eine Zeile, um zu sehen, was repariert wurde (ein fehlerhafter Aufruf des Modells, den die App trotzdem verstand) und welche Fehler auftraten.";
 "Country facts" = "Länderdaten";
 "Crash reports (%lld)" = "Absturzberichte (%lld)";
 "Create Email…" = "E‑Mail erstellen…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "Musikgenerierung aktivieren";
 "Enable music generation?" = "Musikgenerierung aktivieren?";
 "Enjoying LLMTray?" = "Gefällt Ihnen LLMTray?";
+"Errors" = "Fehler";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Jeder Chat in diesem Projekt erhält diese Anweisungen nach dem Systemprompt des Modellprofils. Änderungen gelten ab der nächsten Nachricht.";
 "Extra server arguments" = "Zusätzliche Serverargumente";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — erzeugen und bearbeiten";
@@ -280,6 +283,7 @@
 "No model uses it." = "Kein Modell verwendet es.";
 "No models found in this folder." = "In diesem Ordner wurden keine Modelle gefunden.";
 "No runs yet." = "Noch keine Läufe.";
+"No tool calls yet in this version." = "Noch keine Tool-Aufrufe in dieser Version.";
 "Non-commercial license: read it on the model card before using the model." = "Nicht­kommerzielle Lizenz: Lesen Sie diese auf der Modell‑Card, bevor Sie das Modell verwenden.";
 "Not enough free disk space for this model." = "Nicht genug freier Speicherplatz für dieses Modell.";
 "OK" = "OK";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "Lese installierte Komponenten…";
 "Recently updated" = "Kürzlich aktualisiert";
 "Recovery" = "Wiederherstellung";
+"Refused" = "Abgelehnt";
 "Regenerate" = "Neu generieren";
 "Remove" = "Entfernen";
 "Remove attachment" = "Entfernt den Anhang.";
@@ -338,11 +343,13 @@
 "Rename" = "Umbenennen";
 "Rename this profile" = "Dieses Profil umbenennen.";
 "Rename…" = "Umbenennen…";
+"Repaired" = "Repariert";
 "Report a Bug" = "Fehler melden";
 "Report a Bug…" = "Fehler melden…";
 "Rescan" = "Erneut suchen";
 "Rescan Models" = "Modelle erneut suchen";
 "Rescan or manage models" = "Modelle erneut scannen oder verwalten";
+"Reset" = "Zurücksetzen";
 "Reset: inherit this setting from Default" = "Zurücksetzen: Diese Einstellung von Default übernehmen.";
 "Restart LLMTray to change the language?" = "LLMTray neu starten, um die Sprache zu ändern?";
 "Restart Now" = "Jetzt neu starten";
@@ -479,7 +486,10 @@
 "Today" = "Heute";
 "Too many reviews from this network. Try again in %lld min." = "Zu viele Bewertungen von diesem Netzwerk. Bitte in %lld Min. erneut versuchen.";
 "Too many reviews from this network. Try again later." = "Zu viele Bewertungen von diesem Netzwerk. Bitte später erneut versuchen.";
+"Tool" = "Tool";
 "Tool Settings…" = "Werkzeugeinstellungen…";
+"Tool call statistics" = "Tool-Aufruf-Statistik";
+"Tool calls" = "Tool-Aufrufe";
 "Tool-use rule" = "Regel für Tool-Nutzung";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Werkzeuge, die das Modell im In‑App‑Chat aufrufen kann (erfordert ein tool‑fähiges Modell). Web‑Werkzeuge senden die Anfrage des Modells an den jeweiligen öffentlichen Dienst (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open‑Meteo); lokale Werkzeuge verlassen den Mac nie.";
 "Top-k" = "Top-k";

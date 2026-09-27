@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: إصدارات ما قبل الطرح تتضمن ميزات لا تزال قيد الاختبار، وتحديثات وقت التشغيل من فرع Beta في mlx-lm. لا يؤدي الرجوع إلى Stable إلى خفض إصدار Beta مثبّت؛ سيستبدله الإصدار Stable التالي.";
 "Browse Hugging Face…" = "تصفّح Hugging Face…";
 "Calculator" = "آلة حاسبة";
+"Calls" = "الاستدعاءات";
 "Can't change models while auto-tune is running" = "لا يمكن تغيير النماذج أثناء تشغيل الضبط التلقائي.";
 "Can't switch profiles while a request or the auto-tune is running" = "لا يمكن تبديل ملفات التعريف أثناء تشغيل طلب أو الضبط التلقائي.";
 "Cancel" = "إلغاء";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "تعذّر إنشاء التقرير: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "تعذّر الوصول إلى ipsupport.us. تم الاحتفاظ بمراجعتك؛ حاول لاحقًا.";
 "Countdown" = "العد التنازلي";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "تُحسب على هذا الـ Mac لهذا الإصدار من LLMTray ولا تُرسل أبدًا؛ يتضمن تقرير الخطأ الأعداد. مرّر المؤشر فوق صف لترى ما تم إصلاحه (استدعاء غير سليم من النموذج فهمه التطبيق مع ذلك) وما الأخطاء التي حدثت.";
 "Country facts" = "حقائق عن البلد";
 "Crash reports (%lld)" = "تقارير الأعطال (%lld)";
 "Create Email…" = "إنشاء رسالة…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "تمكين إنتاج الموسيقى";
 "Enable music generation?" = "هل تريد تمكين إنتاج الموسيقى؟";
 "Enjoying LLMTray?" = "هل تستمتع بـ LLMTray؟";
+"Errors" = "الأخطاء";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
 "Extra server arguments" = "وسيطات الخادم الإضافية";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — إنشاء وتحرير";
@@ -280,6 +283,7 @@
 "No model uses it." = "لا يستخدمه أي نموذج.";
 "No models found in this folder." = "لم يتم العثور على نماذج في هذا المجلد.";
 "No runs yet." = "لا توجد عمليات تشغيل بعد.";
+"No tool calls yet in this version." = "لا توجد استدعاءات أدوات في هذا الإصدار بعد.";
 "Non-commercial license: read it on the model card before using the model." = "ترخيص غير تجاري: اقرأه في بطاقة النموذج قبل استخدامه.";
 "Not enough free disk space for this model." = "لا توجد مساحة قرص كافية لهذا النموذج.";
 "OK" = "موافق";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Recently updated" = "تم التحديث مؤخرًا";
 "Recovery" = "الاسترداد";
+"Refused" = "مرفوضة";
 "Regenerate" = "إعادة التوليد";
 "Remove" = "إزالة";
 "Remove attachment" = "إزالة المرفق.";
@@ -338,11 +343,13 @@
 "Rename" = "إعادة تسمية";
 "Rename this profile" = "أعد تسمية ملف التعريف هذا.";
 "Rename…" = "إعادة تسمية…";
+"Repaired" = "مُصلحة";
 "Report a Bug" = "الإبلاغ عن خلل";
 "Report a Bug…" = "الإبلاغ عن خلل…";
 "Rescan" = "إعادة الفحص";
 "Rescan Models" = "إعادة فحص النماذج";
 "Rescan or manage models" = "إعادة فحص أو إدارة النماذج";
+"Reset" = "إعادة تعيين";
 "Reset: inherit this setting from Default" = "أعد التعيين: اجعل هذا الإعداد موروثًا من Default.";
 "Restart LLMTray to change the language?" = "هل تريد إعادة تشغيل LLMTray لتغيير اللغة؟";
 "Restart Now" = "إعادة التشغيل الآن";
@@ -479,7 +486,10 @@
 "Today" = "اليوم";
 "Too many reviews from this network. Try again in %lld min." = "عدد كبير جدًا من المراجعات من هذه الشبكة. حاول مرة أخرى بعد %lld دقيقة.";
 "Too many reviews from this network. Try again later." = "عدد كبير جدًا من المراجعات من هذه الشبكة. حاول لاحقًا.";
+"Tool" = "الأداة";
 "Tool Settings…" = "إعدادات الأدوات…";
+"Tool call statistics" = "إحصاءات استدعاءات الأدوات";
+"Tool calls" = "استدعاءات الأدوات";
 "Tool-use rule" = "قاعدة استخدام الأدوات";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "الأدوات التي قد يستدعيها الموديل داخل دردشة التطبيق (تتطلب موديل يدعم استدعاء الأدوات). الأدوات التي تعمل عبر الويب ترسل استعلام الموديل إلى تلك الخدمة العامة (DuckDuckGo، Google News، Wikipedia/Wikidata، Hacker News، date.nager.at، open.er-api.com، Open-Meteo)؛ أما الأدوات المحلية فلا تغادر بياناتها جهاز الـMac.";
 "Top-k" = "Top-k";

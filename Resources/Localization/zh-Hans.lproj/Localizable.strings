@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta：预发布版本，包含仍在测试的功能，并使用来自 mlx-lm 的 Beta 分支的运行时更新。切换回 Stable 不会降级已安装的 Beta；下一个 Stable 版本会替换它。";
 "Browse Hugging Face…" = "浏览 Hugging Face…";
 "Calculator" = "计算器";
+"Calls" = "调用";
 "Can't change models while auto-tune is running" = "自动调优运行时无法更改模型";
 "Can't switch profiles while a request or the auto-tune is running" = "请求或自动调优运行时无法切换配置";
 "Cancel" = "取消";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "无法创建报告：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "无法连接到 ipsupport.us。已保存您的评论：请稍后重试。";
 "Countdown" = "倒计时";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "在这台 Mac 上按此版本的 LLMTray 统计，从不发送；错误报告会包含这些数字。将指针悬停在某一行上，可查看修复了什么（应用仍能理解的模型格式错误调用）以及发生了哪些错误。";
 "Country facts" = "国家资料";
 "Crash reports (%lld)" = "崩溃报告（%lld）";
 "Create Email…" = "创建邮件…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "启用音乐生成";
 "Enable music generation?" = "要启用音乐生成吗？";
 "Enjoying LLMTray?" = "喜欢 LLMTray 吗？";
+"Errors" = "错误";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "此项目中的每个对话在模型配置文件的系统提示之后都会应用这些指令。更改自下一条消息起生效。";
 "Extra server arguments" = "额外服务器参数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成并编辑";
@@ -280,6 +283,7 @@
 "No model uses it." = "没有模型使用它。";
 "No models found in this folder." = "在此文件夹中未找到模型。";
 "No runs yet." = "尚无运行记录。";
+"No tool calls yet in this version." = "此版本中还没有工具调用。";
 "Non-commercial license: read it on the model card before using the model." = "非商业许可：使用前请在模型卡上阅读。";
 "Not enough free disk space for this model." = "磁盘可用空间不足，无法安装此模型。";
 "OK" = "好";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "正在读取已安装内容…";
 "Recently updated" = "最近更新";
 "Recovery" = "恢复";
+"Refused" = "已拒绝";
 "Regenerate" = "重新生成";
 "Remove" = "移除";
 "Remove attachment" = "移除附件";
@@ -338,11 +343,13 @@
 "Rename" = "重命名";
 "Rename this profile" = "重命名此配置。";
 "Rename…" = "重命名…";
+"Repaired" = "已修复";
 "Report a Bug" = "报告错误";
 "Report a Bug…" = "报告错误…";
 "Rescan" = "重新扫描";
 "Rescan Models" = "重新扫描模型";
 "Rescan or manage models" = "重新扫描或管理模型";
+"Reset" = "重置";
 "Reset: inherit this setting from Default" = "还原：从 Default 继承此设置。";
 "Restart LLMTray to change the language?" = "要重启 LLMTray 以更改语言吗？";
 "Restart Now" = "立即重启";
@@ -479,7 +486,10 @@
 "Today" = "今天";
 "Too many reviews from this network. Try again in %lld min." = "来自此网络的评论过多。%lld 分钟后重试。";
 "Too many reviews from this network. Try again later." = "来自此网络的评论过多。请稍后重试。";
+"Tool" = "工具";
 "Tool Settings…" = "工具设置…";
+"Tool call statistics" = "工具调用统计";
+"Tool calls" = "工具调用";
 "Tool-use rule" = "工具使用规则";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "模型可在应用内聊天中调用的工具（需支持调用工具的模型）。网页版工具会将模型的查询发送到相应的公共服务（DuckDuckGo、Google News、Wikipedia/Wikidata、Hacker News、date.nager.at、open.er-api.com、Open-Meteo）；本地工具的数据不会离开这台 Mac。";
 "Top-k" = "Top-k";

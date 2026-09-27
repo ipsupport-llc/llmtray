@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Calculator" = "Calculator";
+"Calls" = "Calls";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -110,6 +111,7 @@
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
 "Countdown" = "Countdown";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened.";
 "Country facts" = "Country facts";
 "Crash reports (%lld)" = "Crash reports (%lld)";
 "Create Email…" = "Create Email…";
@@ -152,6 +154,7 @@
 "Enable music generation" = "Enable music generation";
 "Enable music generation?" = "Enable music generation?";
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
+"Errors" = "Errors";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Extra server arguments" = "Extra server arguments";
@@ -290,6 +293,7 @@
 "No model uses it." = "No model uses it.";
 "No models found in this folder." = "No models found in this folder.";
 "No runs yet." = "No runs yet.";
+"No tool calls yet in this version." = "No tool calls yet in this version.";
 "Non-commercial license: read it on the model card before using the model." = "Non-commercial license: read it on the model card before using the model.";
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
@@ -342,6 +346,7 @@
 "Reading what's installed…" = "Reading what's installed…";
 "Recently updated" = "Recently updated";
 "Recovery" = "Recovery";
+"Refused" = "Refused";
 "Regenerate" = "Regenerate";
 "Remove" = "Remove";
 "Remove attachment" = "Remove attachment";
@@ -350,11 +355,13 @@
 "Rename" = "Rename";
 "Rename this profile" = "Rename this profile";
 "Rename…" = "Rename…";
+"Repaired" = "Repaired";
 "Report a Bug" = "Report a Bug";
 "Report a Bug…" = "Report a Bug…";
 "Rescan" = "Rescan";
 "Rescan Models" = "Rescan Models";
 "Rescan or manage models" = "Rescan or manage models";
+"Reset" = "Reset";
 "Reset ID" = "Reset ID";
 "Reset: inherit this setting from Default" = "Reset: inherit this setting from Default";
 "Restart LLMTray to change the language?" = "Restart LLMTray to change the language?";
@@ -513,7 +520,10 @@
 "Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
 "Too many reviews from this network. Try again later." = "Too many reviews from this network. Try again later.";
+"Tool" = "Tool";
 "Tool Settings…" = "Tool Settings…";
+"Tool call statistics" = "Tool call statistics";
+"Tool calls" = "Tool calls";
 "Tool-use rule" = "Tool-use rule";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.";
 "Top-k" = "Top-k";

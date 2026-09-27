@@ -12,6 +12,15 @@ final class CalculatorTests: XCTestCase {
         XCTAssertEqual(try eval("(300 + 50) * 1.08 / 2"), 189, accuracy: 1e-9)
     }
 
+    func testPercentOf() throws {
+        XCTAssertEqual(try eval("15% of 2450"), 367.5)
+        XCTAssertEqual(try eval("12.5 % OF 80 + 1"), 11)
+        XCTAssertEqual(try eval("17 % 5"), 2, "a bare % is still modulo")
+        XCTAssertThrowsError(try eval("foo(2)")) { error in
+            XCTAssertTrue(error.localizedDescription.contains("Functions: sqrt"), "names what exists")
+        }
+    }
+
     func testPowersUnaryAndAssociativity() throws {
         XCTAssertEqual(try eval("2 ** 10"), 1024)
         XCTAssertEqual(try eval("2^3^2"), 512)          // right-associative

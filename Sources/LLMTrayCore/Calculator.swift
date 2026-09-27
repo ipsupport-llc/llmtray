@@ -17,14 +17,16 @@ public enum Calculator {
         public var errorDescription: String? {
             switch self {
             case .syntax(let s): return "syntax error: \(s)"
-            case .unknown(let s): return "unknown name: \(s)"
+            // The declaration names only some functions: the rest are here.
+            case .unknown(let s):
+                return "unknown name: \(s). Functions: \(Calculator.functionNames.joined(separator: ", ")); constants: pi, e, tau"
             case .domain(let s): return "math error: \(s)"
             }
         }
     }
 
     public static func evaluate(_ expression: String) throws -> Double {
-        var parser = Parser(tokens: try tokenize(expression))
+        var parser = Parser(tokens: try tokenize(percentOf(expression)))
         let value = try parser.expression()
         guard parser.atEnd else { throw Failure.syntax("unexpected '\(parser.peekText)'") }
         guard value.isFinite else { throw Failure.domain("result is not finite") }
@@ -221,7 +223,19 @@ public enum Calculator {
         }
     }
 
+    /// "15% of 2450", as small models write it: `(15 / 100) * 2450`. Only
+    /// with "of" -- a bare `%` stays the modulo operator.
+    static func percentOf(_ expression: String) -> String {
+        expression.replacingOccurrences(of: #"(\d+(?:\.\d+)?)\s*%\s*of\s+"#, with: "($1 / 100) * ",
+                                        options: [.regularExpression, .caseInsensitive])
+    }
+
     static let constants: [String: Double] = ["pi": .pi, "e": M_E, "tau": 2 * .pi]
+
+    /// What `call` knows (for the error naming an unknown one).
+    public static let functionNames = ["sqrt", "cbrt", "log", "ln", "log2", "log10", "exp", "sin", "cos", "tan", "asin", "acos",
+                                       "atan", "atan2", "sinh", "cosh", "tanh", "floor", "ceil", "trunc", "abs", "degrees", "radians",
+                                       "round", "min", "max", "sum", "pow", "hypot", "factorial", "gcd", "lcm"]
 
     static func call(_ name: String, _ a: [Double]) throws -> Double {
         func arity(_ n: ClosedRange<Int>) throws {

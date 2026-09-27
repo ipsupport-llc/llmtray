@@ -73,6 +73,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: Hâlâ test edilen özelliklere sahip yayın öncesi derlemeler ve mlx-lm’nin beta dalından çalışma zamanı güncellemeleri. Stable’a geri dönmek yüklü bir betayı düşürmez; sonraki kararlı sürüm onun yerine geçer.";
 "Browse Hugging Face…" = "Hugging Face’e Göz At…";
 "Calculator" = "Hesap Makinesi";
+"Calls" = "Çağrılar";
 "Can't change models while auto-tune is running" = "Otomatik ayar çalışırken modeller değiştirilemez.";
 "Can't switch profiles while a request or the auto-tune is running" = "Bir istek veya otomatik ayar çalışırken profiller değiştirilemez.";
 "Cancel" = "Vazgeç";
@@ -109,6 +110,7 @@
 "Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us adresine ulaşılamadı. Değerlendirmeniz saklandı: daha sonra tekrar deneyin.";
 "Countdown" = "Geri sayım";
+"Counted on this Mac for this version of LLMTray and never sent anywhere; a bug report includes the counts. Hover a row for what was repaired (a model's malformed call the app still understood) and which errors happened." = "Bu Mac'te LLMTray'in bu sürümü için sayılır ve hiçbir yere gönderilmez; hata raporu sayıları içerir. Neyin onarıldığını (uygulamanın yine de anladığı hatalı bir model çağrısı) ve hangi hataların olduğunu görmek için bir satırın üzerine gelin.";
 "Country facts" = "Ülke bilgileri";
 "Crash reports (%lld)" = "Çökme raporları (%lld)";
 "Create Email…" = "E‑posta Oluştur…";
@@ -150,6 +152,7 @@
 "Enable music generation" = "Müzik üretimini etkinleştir";
 "Enable music generation?" = "Müzik üretimini etkinleştirmek istiyor musunuz?";
 "Enjoying LLMTray?" = "LLMTray hoşunuza gidiyor mu?";
+"Errors" = "Hatalar";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
 "Extra server arguments" = "Ek sunucu argümanları";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — oluştur ve düzenle";
@@ -280,6 +283,7 @@
 "No model uses it." = "Hiçbir model bunu kullanmıyor.";
 "No models found in this folder." = "Bu klasörde model bulunamadı.";
 "No runs yet." = "Henüz çalıştırma yok.";
+"No tool calls yet in this version." = "Bu sürümde henüz araç çağrısı yok.";
 "Non-commercial license: read it on the model card before using the model." = "Ticari olmayan lisans: modeli kullanmadan önce model kartında okuyun.";
 "Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
 "OK" = "Tamam";
@@ -330,6 +334,7 @@
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Recently updated" = "Son güncellenenler";
 "Recovery" = "Kurtarma";
+"Refused" = "Reddedilen";
 "Regenerate" = "Yeniden oluştur";
 "Remove" = "Kaldır";
 "Remove attachment" = "Eki kaldırır.";
@@ -338,11 +343,13 @@
 "Rename" = "Yeniden Adlandır";
 "Rename this profile" = "Bu profilin adını değiştirin.";
 "Rename…" = "Yeniden Adlandır…";
+"Repaired" = "Onarılan";
 "Report a Bug" = "Hata Bildir";
 "Report a Bug…" = "Hata Bildir…";
 "Rescan" = "Yeniden Tara";
 "Rescan Models" = "Modelleri Yeniden Tara";
 "Rescan or manage models" = "Modelleri yeniden tara veya yönet";
+"Reset" = "Sıfırla";
 "Reset: inherit this setting from Default" = "Sıfırla: bu ayarı Default’tan devral";
 "Restart LLMTray to change the language?" = "Dili değiştirmek için LLMTray yeniden başlatılsın mı?";
 "Restart Now" = "Şimdi Yeniden Başlat";
@@ -479,7 +486,10 @@
 "Today" = "Bugün";
 "Too many reviews from this network. Try again in %lld min." = "Bu ağdan çok fazla değerlendirme yapıldı. %lld dakika sonra tekrar deneyin.";
 "Too many reviews from this network. Try again later." = "Bu ağdan çok fazla değerlendirme yapıldı. Daha sonra tekrar deneyin.";
+"Tool" = "Araç";
 "Tool Settings…" = "Araç Ayarları…";
+"Tool call statistics" = "Araç çağrısı istatistikleri";
+"Tool calls" = "Araç çağrıları";
 "Tool-use rule" = "Araç kullanma kuralı";
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Modelin uygulama içi sohbette çağırabileceği araçlar (araç çağırabilen bir modele ihtiyaç vardır). Web araçları modelin sorgusunu ilgili kamu hizmetine gönderir (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); yerel araçlar asla Mac’ten çıkmaz.";
 "Top-k" = "Top-k";

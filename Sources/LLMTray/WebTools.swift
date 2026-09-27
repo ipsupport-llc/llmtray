@@ -5,28 +5,80 @@ import LLMTrayCore
 // tuned for small local models in rromenskyi/mcp-weather-simple. Every
 // tool reports failures as {"error": ...} for the model, never throws.
 
+/// `web_search`: the web (DuckDuckGo), news (Google News), Wikipedia and
+/// Hacker News as one tool with a `source` -- each still its own switch
+/// in Settings, and only the switched-on ones declared.
 final class WebSearchTool: SelectableTool {
-    init() { super.init(name: "web_search") }
+    static let sources: [(entry: String, value: String, gloss: String)] = [
+        ("web_search", "web", "docs, facts, how-tos"),
+        ("news", "news", "current events; no query = top headlines"),
+        ("get_wikipedia_summary", "wikipedia", "summary of a person, place or topic"),
+        ("hackernews", "hackernews", "Hacker News front page"),
+    ]
 
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "General web search (DuckDuckGo) for non-time-sensitive questions: documentation, facts, companies, "
-                + "how-tos. Returns titles, URLs and snippets. For current events use `news`; for Hacker News "
-                + "use `hackernews`.",
-            properties: [
-                "query": Self.string("What to search for, in any language."),
-                "limit": Self.integer("1-15, default 8."),
-            ],
-            required: ["query"]
-        )
+    init() { super.init(name: "web_search", entries: Self.sources.map(\.entry)) }
+
+    override func schema(offering entries: [String]) -> ToolSchema {
+        let offered = Self.sources.filter { entries.contains($0.entry) }
+        let glosses = offered.enumerated().map { i, s in "\(s.value) (\(i == 0 ? "default; " : "")\(s.gloss))" }
+        var params: [ToolSchema.Param] = [
+            .init("query", .string, aliases: ["q", "search", "search_query", "search_term", "title", "topic", "term", "keywords", "text"]),
+        ]
+        if offered.count > 1 {
+            params.append(.init("source", .oneOf(offered.map(\.value)), aliases: ["type", "kind", "mode", "engine"], valueAliases: [
+                "search": "web", "internet": "web", "duckduckgo": "web", "google": "web", "wiki": "wikipedia", "hn": "hackernews",
+                "hacker_news": "hackernews", "hacker news": "hackernews", "headlines": "news",
+            ]))
+        }
+        if offered.contains(where: { $0.value == "news" || $0.value == "wikipedia" }) {
+            params.append(.init("lang", .string, "Language code for news and wikipedia.", aliases: ["language", "locale", "hl"]))
+        }
+        let what = offered.count > 1 ? "Search. source: " + glosses.joined(separator: ", ") + "."
+            : "Search: " + (offered.first?.gloss ?? "") + "."
+        return ToolSchema(name, what, params)
+    }
+
+    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["source"] != nil }
+
+    override func entry(for arguments: [String: Any]) -> String {
+        if let value = arguments["source"] as? String, let s = Self.sources.first(where: { $0.value == value }) { return s.entry }
+        return entries[0]
+    }
+
+    override func modeLabel(_ entry: String) -> String {
+        "source=" + (Self.sources.first { $0.entry == entry }?.value ?? entry)
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let query = (arguments["query"] as? String)?.trimmingCharacters(in: .whitespaces), !query.isEmpty else {
-            return Self.error("query is required")
+        let entry = mode(for: arguments, context.settings)
+        let query = (arguments["query"] as? String) ?? ""
+        switch entry {
+        case "news": return await NewsSource.run(query: query, lang: arguments["lang"] as? String)
+        case "hackernews": return await HackerNewsSource.run(query: query)
+        case "get_wikipedia_summary":
+            guard !query.isEmpty else { return Self.error("query is required for source=wikipedia") }
+            return await WikipediaSource().run(title: Self.withoutWikipedia(query), lang: arguments["lang"] as? String)
+        default:
+            guard !query.isEmpty else { return Self.error("query is required for source=web") }
+            return await Self.webSearch(query)
         }
-        let limit = min(max(arguments["limit"] as? Int ?? 8, 1), 15)
+    }
+
+    /// "Kyiv Wikipedia" (small models name the source in the query too):
+    /// the topic.
+    static func withoutWikipedia(_ query: String) -> String {
+        let wiki: Set<String> = ["wikipedia", "wiki", "википедия", "википедии", "вікіпедія", "вікіпедії"]
+        var words = query.split(separator: " ").map(String.init)
+        if let last = words.last, words.count > 1, wiki.contains(last.lowercased()) {
+            words.removeLast()
+            // "... on Wikipedia", "... в Википедии"
+            if let prep = words.last, words.count > 1, ["on", "in", "в", "у"].contains(prep.lowercased()) { words.removeLast() }
+        }
+        if let first = words.first, words.count > 1, wiki.contains(first.lowercased()) { words.removeFirst() }
+        return words.joined(separator: " ")
+    }
+
+    static func webSearch(_ query: String, limit: Int = 8) async -> ToolResult {
         do {
             let data = try await WebFetch.data(
                 "https://html.duckduckgo.com/html/", method: "POST",
@@ -36,54 +88,40 @@ final class WebSearchTool: SelectableTool {
             let results = WebParsing.duckDuckGoResults(html, limit: limit)
             if results.isEmpty, !html.contains("result__a"), !html.contains("no-results") {
                 // Neither results nor DDG's "No results" block: its bot check.
-                return Self.error("web search is temporarily blocked by DuckDuckGo; try again later or use news / get_wikipedia_summary")
+                return error("web search is temporarily blocked by DuckDuckGo; try again later or use another source")
             }
-            return Self.json(["query": query, "results": results.map { ["title": $0.title, "url": $0.url, "snippet": $0.snippet] }])
+            return json(["query": query, "results": results.map { ["title": $0.title, "url": $0.url, "snippet": $0.snippet] }])
         } catch {
             return Self.error("search failed: \(error.localizedDescription)")
         }
     }
 }
 
-final class NewsTool: SelectableTool {
-    init() { super.init(name: "news") }
-
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Recent news (Google News) -- use for current events, anything \"today\", \"latest\", \"recent\". "
-                + "With a query: articles about it; without: top headlines.",
-            properties: [
-                "query": Self.string("Topic to search news for. Omit for top headlines."),
-                "lang": Self.string("Language code for the edition, e.g. \"en\", \"ru\", \"uk\", \"de\". Default \"en\"."),
-                "limit": Self.integer("1-20, default 10."),
-            ]
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        let limit = min(max(arguments["limit"] as? Int ?? 10, 1), 20)
-        let lang = String(((arguments["lang"] as? String) ?? "en").lowercased().prefix(2))
-        let edition = Self.editions[lang] ?? Self.editions["en"]!
-        var query = [URLQueryItem(name: "hl", value: edition.hl), URLQueryItem(name: "gl", value: edition.gl),
+/// Google News for web_search's source=news.
+@MainActor
+enum NewsSource {
+    static func run(query: String, lang: String?, limit: Int = 10) async -> ToolResult {
+        let lang = String((lang ?? "en").lowercased().prefix(2))
+        let edition = editions[lang] ?? editions["en"]!
+        var items = [URLQueryItem(name: "hl", value: edition.hl), URLQueryItem(name: "gl", value: edition.gl),
                      URLQueryItem(name: "ceid", value: "\(edition.gl):\(edition.ceidLang)")]
         var base = "https://news.google.com/rss"
-        if let q = (arguments["query"] as? String)?.trimmingCharacters(in: .whitespaces), !q.isEmpty {
+        if !query.isEmpty {
             base += "/search"
-            query.insert(URLQueryItem(name: "q", value: q), at: 0)
+            items.insert(URLQueryItem(name: "q", value: query), at: 0)
         }
         do {
-            let items = WebParsing.rssItems(try await WebFetch.data(base, query: query), limit: limit)
-            return Self.json(["articles": items.map {
+            let found = WebParsing.rssItems(try await WebFetch.data(base, query: items), limit: limit)
+            return SelectableTool.json(["articles": found.map {
                 ["title": $0.title, "url": $0.url, "source": $0.source ?? "", "published": $0.published ?? ""]
             }])
         } catch {
-            return Self.error("news failed: \(error.localizedDescription)")
+            return SelectableTool.error("news failed: \(error.localizedDescription)")
         }
     }
 }
 
-extension NewsTool {
+extension NewsSource {
     /// Google News editions by language: the country isn't the language
     /// code upper-cased (uk -> UA, ja -> JP, en -> US).
     static let editions: [String: (hl: String, gl: String, ceidLang: String)] = [
@@ -96,25 +134,13 @@ extension NewsTool {
     ]
 }
 
-final class HackerNewsTool: SelectableTool {
-    init() { super.init(name: "hackernews") }
-
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Hacker News posts -- when the user names HN or asks what the tech community is discussing. "
-                + "For mainstream news use `news`.",
-            properties: [
-                "category": Self.string("One of top (default), new, best, ask, show, job."),
-                "limit": Self.integer("1-30, default 15."),
-            ]
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+/// Hacker News for web_search's source=hackernews.
+@MainActor
+enum HackerNewsSource {
+    static func run(query: String, limit: Int = 15) async -> ToolResult {
         let categories = ["top", "new", "best", "ask", "show", "job"]
-        let category = (arguments["category"] as? String).flatMap { categories.contains($0) ? $0 : nil } ?? "top"
-        let limit = min(max(arguments["limit"] as? Int ?? 15, 1), 30)
+        // A query naming a list picks it (new, best, ask, show, job).
+        let category = categories.first { $0 == query.lowercased() } ?? "top"
         do {
             let ids = try await WebFetch.jsonArray("https://hacker-news.firebaseio.com/v0/\(category)stories.json")
                 .compactMap { $0 as? Int }.prefix(limit)
@@ -126,7 +152,7 @@ final class HackerNewsTool: SelectableTool {
                 for await (rank, item) in group { if let item { out.append((rank, item)) } }
                 return out.sorted { $0.0 < $1.0 }
             }
-            return Self.json(["category": category, "posts": items.map { rank, item -> [String: Any] in
+            return SelectableTool.json(["category": category, "posts": items.map { rank, item -> [String: Any] in
                 let id = item["id"] as? Int ?? 0
                 return [
                     "rank": rank + 1,
@@ -138,34 +164,18 @@ final class HackerNewsTool: SelectableTool {
                 ]
             }])
         } catch {
-            return Self.error("Hacker News failed: \(error.localizedDescription)")
+            return SelectableTool.error("Hacker News failed: \(error.localizedDescription)")
         }
     }
 }
 
-final class WikipediaTool: SelectableTool {
-    init() { super.init(name: "get_wikipedia_summary") }
-
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "A short Wikipedia summary and link for a person, place, concept or event (\"tell me about X\", "
-                + "\"who is X\", \"what is X\", \"расскажи про X\", \"кто такой X\").",
-            properties: [
-                "title": Self.string("The topic as the user said it, e.g. \"Kyiv\" or \"Alan Turing\"."),
-                "lang": Self.string("Wikipedia language code, e.g. \"en\", \"ru\", \"uk\", \"de\". Default: the title's language."),
-            ],
-            required: ["title"]
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let title = (arguments["title"] as? String)?.trimmingCharacters(in: .whitespaces), !title.isEmpty else {
-            return Self.error("title is required")
-        }
+/// Wikipedia for web_search's source=wikipedia.
+@MainActor
+final class WikipediaSource {
+    func run(title: String, lang: String?) async -> ToolResult {
         // Goes into the host name: only a real language code (not a value a
         // prompt injection could point elsewhere with).
-        let lang: String? = (arguments["lang"] as? String)?.lowercased()
+        let lang: String? = lang?.lowercased()
         let requested: String? = lang.flatMap { code in
             code.range(of: #"^[a-z]{2,3}(-[a-z]{2,8})?$"#, options: .regularExpression) != nil ? code : nil
         }
@@ -177,22 +187,22 @@ final class WikipediaTool: SelectableTool {
         let deadline = Date().addingTimeInterval(20)
         let langs = NSOrderedSet(array: candidates).compactMap { $0 as? String }
         for (n, lang) in langs.enumerated() where Date() < deadline {
-            if let summary = await summary(title, lang: lang) { return Self.json(summary) }
+            if let summary = await summary(title, lang: lang) { return SelectableTool.json(summary) }
             // Not an exact title: a prefix match first (not for a question:
             // "what is 50% of?" prefix-matched "What Is Love")...
             if !Self.looksLikeQuestion(title), Date() < deadline, let best = await prefixMatch(title, lang: lang),
                let summary = await summary(best, lang: lang) {
-                return Self.json(summary)
+                return SelectableTool.json(summary)
             }
             // ...then full text (also handles a question: "what is
             // photosynthesis"), in the most likely language only -- it
             // always finds *something*, often unrelated, elsewhere.
             if n == 0, Date() < deadline, let best = await fullTextMatch(title, lang: lang),
                let summary = await summary(best, lang: lang) {
-                return Self.json(summary)
+                return SelectableTool.json(summary)
             }
         }
-        return Self.error("no Wikipedia article found for \(title)")
+        return SelectableTool.error("no Wikipedia article found for \(title)")
     }
 
     private func prefixMatch(_ query: String, lang: String) async -> String? {
@@ -229,7 +239,7 @@ final class WikipediaTool: SelectableTool {
     }
 }
 
-extension WikipediaTool {
+extension WikipediaSource {
     /// A question rather than a title ("what is photosynthesis?", "кто такой …").
     static func looksLikeQuestion(_ text: String) -> Bool {
         let t = text.lowercased().trimmingCharacters(in: .whitespaces)
@@ -242,25 +252,59 @@ extension WikipediaTool {
     }
 }
 
+/// `get_country_info`: a country's facts (Wikidata) or, with
+/// about=holidays, its public holidays (Nager.Date) -- two switches, one
+/// tool.
 final class CountryInfoTool: SelectableTool {
-    init() { super.init(name: "get_country_info") }
+    static let factsEntry = "get_country_info"
+    static let holidaysEntry = "get_public_holidays"
 
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Country facts from Wikidata: capital, population, area, continent, currency, official languages, "
-                + "calling code, neighbours.",
-            properties: ["country": Self.string("Country name in any language (\"Ukraine\", \"Украина\") or ISO code (\"UA\", \"UKR\").")],
-            required: ["country"]
-        )
+    init() { super.init(name: "get_country_info", entries: [Self.factsEntry, Self.holidaysEntry]) }
+
+    override func schema(offering entries: [String]) -> ToolSchema {
+        let facts = entries.contains(Self.factsEntry), holidays = entries.contains(Self.holidaysEntry)
+        var params: [ToolSchema.Param] = [
+            .init("country", .string, "Name in any language or ISO code.", required: true,
+                  aliases: ["country_code", "country_name", "name", "code", "iso", "q", "query"]),
+        ]
+        if facts && holidays {
+            params.append(.init("about", .oneOf(["facts", "holidays"]), aliases: ["kind", "type", "mode", "info", "topic"],
+                                valueAliases: ["info": "facts", "country": "facts", "holiday": "holidays",
+                                               "public_holidays": "holidays", "public holidays": "holidays"]))
+        }
+        if holidays { params.append(.init("year", .integer, "For holidays; default this year.")) }
+        let what = facts && holidays
+            ? "Country facts (capital, population, area, currency, languages, calling code, neighbours) or, with about=holidays, its public holidays."
+            : facts ? "Country facts: capital, population, area, currency, languages, calling code, neighbours."
+            : "A country's public holidays in a year."
+        return ToolSchema(name, what, params)
     }
 
-    private static let api = "https://www.wikidata.org/w/api.php"
+    override func entry(for arguments: [String: Any]) -> String {
+        if arguments["about"] as? String == "holidays" { return Self.holidaysEntry }
+        if arguments["about"] as? String == "facts" { return Self.factsEntry }
+        // A year asks for holidays.
+        return arguments["year"] != nil ? Self.holidaysEntry : Self.factsEntry
+    }
+
+    override func modeLabel(_ entry: String) -> String { entry == Self.holidaysEntry ? "about=holidays" : "about=facts" }
+
+    /// A year asks for holidays as plainly as about=holidays.
+    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["about"] != nil || arguments["year"] != nil }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
         guard let country = (arguments["country"] as? String)?.trimmingCharacters(in: .whitespaces), !country.isEmpty else {
             return Self.error("country is required")
         }
+        if mode(for: arguments, context.settings) == Self.holidaysEntry {
+            return await HolidaysSource.run(country: country, year: arguments["year"] as? Int)
+        }
+        return await facts(country)
+    }
+
+    private static let api = "https://www.wikidata.org/w/api.php"
+
+    private func facts(_ country: String) async -> ToolResult {
         do {
             guard let (id, entity) = try await Self.findCountry(country) else { return Self.error("no country \(country)") }
             let claims = WikidataClaims(entity)
@@ -425,36 +469,29 @@ private extension String {
     var nilIfEmpty: String? { isEmpty ? nil : self }
 }
 
-final class HolidaysTool: SelectableTool {
-    init() { super.init(name: "get_public_holidays") }
-
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Public holidays of a country in a year.",
-            properties: [
-                "country_code": Self.string("ISO-3166 alpha-2 code, e.g. \"UA\", \"US\", \"JP\"."),
-                "year": Self.integer("Defaults to the current year."),
-            ],
-            required: ["country_code"]
-        )
-    }
-
-    override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let code = (arguments["country_code"] as? String)?.uppercased(), code.count == 2,
-              code.allSatisfy({ $0.isASCII && $0.isLetter }) else {
-            return Self.error("country_code must be a 2-letter ISO code")
+/// Public holidays (Nager.Date) for get_country_info's about=holidays.
+enum HolidaysSource {
+    /// `country`: an ISO alpha-2 code, else a name looked up on Wikidata.
+    @MainActor
+    static func run(country: String, year: Int?) async -> ToolResult {
+        var code = country.uppercased()
+        if !(code.count == 2 && code.allSatisfy({ $0.isASCII && $0.isLetter })) {
+            guard let found = try? await CountryInfoTool.findCountry(country),
+                  let alpha2 = WikidataClaims(found.1).strings("P297").first else {
+                return SelectableTool.error("no country \(country)")
+            }
+            code = alpha2
         }
-        let year = arguments["year"] as? Int ?? Calendar.current.component(.year, from: Date())
+        let year = year ?? Calendar.current.component(.year, from: Date())
         do {
             let list = try await WebFetch.jsonArray("https://date.nager.at/api/v3/PublicHolidays/\(year)/\(code)")
-            return Self.json(["country_code": code, "year": year, "holidays": list.compactMap { $0 as? [String: Any] }.map {
+            return SelectableTool.json(["country_code": code, "year": year, "holidays": list.compactMap { $0 as? [String: Any] }.map {
                 ["date": $0["date"] as? String ?? "", "name": $0["name"] as? String ?? "", "local_name": $0["localName"] as? String ?? ""]
             }])
         } catch let error as WebFetch.HTTPError where error.status == 404 {
-            return Self.error("no holiday data for \(code)")
+            return SelectableTool.error("no holiday data for \(code)")
         } catch {
-            return Self.error("holiday lookup failed: \(error.localizedDescription)")
+            return SelectableTool.error("holiday lookup failed: \(error.localizedDescription)")
         }
     }
 }
@@ -480,27 +517,22 @@ final class CurrencyTool: SelectableTool {
         return rates
     }
 
-    override var definition: [String: Any] {
-        Self.function(
-            name,
-            "Convert an amount between currencies at today's exchange rate (\"how much is 50 USD in EUR?\"). "
-                + "Rates change every day: always call this for any currency conversion -- never assume a rate "
-                + "or compute one with `calculate`.",
-            properties: [
-                "amount": Self.number("The amount to convert."),
-                "from_currency": Self.string("ISO-4217 code, e.g. \"USD\"."),
-                "to_currency": Self.string("ISO-4217 code, e.g. \"EUR\"."),
-            ],
-            required: ["amount", "from_currency", "to_currency"]
-        )
+    override func schema(offering entries: [String]) -> ToolSchema {
+        ToolSchema(name, "Convert money at today's exchange rate. Rates change daily: always call this for a conversion, "
+                   + "never assume a rate or use calculate.", [
+                       .init("amount", .number, required: true, aliases: ["value", "sum", "quantity"]),
+                       .init("from", .string, "ISO 4217 code.", required: true, aliases: ["from_currency", "base", "source", "currency_from", "src"]),
+                       .init("to", .string, required: true, aliases: ["to_currency", "target", "currency_to", "dest", "destination"]),
+                   ])
     }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        let amount = (arguments["amount"] as? Double) ?? (arguments["amount"] as? Int).map(Double.init) ?? Double(arguments["amount"] as? String ?? "")
-        guard let amount, amount.isFinite, abs(amount) < 1e15,
-              let from = (arguments["from_currency"] as? String)?.uppercased(), from.count == 3, from.allSatisfy({ $0.isASCII && $0.isLetter }),
-              let to = (arguments["to_currency"] as? String)?.uppercased(), to.count == 3, to.allSatisfy({ $0.isASCII && $0.isLetter }) else {
-            return Self.error("amount, from_currency and to_currency (3-letter codes) are required")
+        guard let amount = arguments["amount"] as? Double, amount.isFinite, abs(amount) < 1e15 else {
+            return Self.error("amount must be a number")
+        }
+        guard let from = (arguments["from"] as? String)?.uppercased(), from.count == 3, from.allSatisfy({ $0.isASCII && $0.isLetter }),
+              let to = (arguments["to"] as? String)?.uppercased(), to.count == 3, to.allSatisfy({ $0.isASCII && $0.isLetter }) else {
+            return Self.error("from and to must be 3-letter ISO 4217 codes, like USD")
         }
         do {
             let rates = try await Self.rates(for: from)
@@ -551,15 +583,21 @@ enum ToolCatalog {
         Entry(name: "get_hourly_forecast", title: NSLocalizedString("Hourly forecast", comment: "chat tool"), usesNetwork: true,
               credit: WeatherTool.attribution),
         Entry(name: "get_air_quality", title: NSLocalizedString("Air quality", comment: "chat tool"), usesNetwork: true,
-              credit: AirQualityTool.airAttribution),
+              credit: WeatherTool.airAttribution),
         Entry(name: "get_sunrise_sunset", title: NSLocalizedString("Sunrise & sunset", comment: "chat tool"), usesNetwork: true,
               credit: Geocoder.attribution),
     ]
 
+    /// Whether a switch's tool (or mode) reaches the network.
+    static func usesNetwork(_ name: String) -> Bool {
+        entries.first { $0.name == name }?.usesNetwork ?? false
+    }
+
+    /// The selectable tools: several switches can be one tool's modes
+    /// (SelectableTool.entries), so the model sees fewer tools than
+    /// Settings lists.
     @MainActor
     static func makeTools() -> [ChatTool] {
-        [CurrentDateTool(), TimeInCityTool(), CalculateTool(), WebSearchTool(), NewsTool(), HackerNewsTool(),
-         WikipediaTool(), CountryInfoTool(), HolidaysTool(), CurrencyTool(),
-         CurrentWeatherTool(), HourlyForecastTool(), AirQualityTool(), SunTool()]
+        [CurrentTimeTool(), CalculateTool(), WebSearchTool(), CountryInfoTool(), CurrencyTool(), WeatherTool()]
     }
 }
