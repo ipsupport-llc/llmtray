@@ -130,7 +130,7 @@ struct UsageStatisticsSection: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Share anonymous usage statistics")
                     Text("Help improve LLMTray?").font(.caption.bold()).foregroundStyle(.secondary)
-                    Text("Send an anonymous daily report: app and macOS version, Mac model, memory size, language, and which features you used. No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.")
+                    Text("Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.")
                         .font(.caption).foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -148,7 +148,7 @@ struct UsageStatisticsSection: View {
                     field("chip", Text("The Mac's chip."), value: environment?.chip)
                     field("memory_gb", Text("Its memory, in GB."), value: environment.map { String($0.memoryGB) })
                     field("locale", Text("The app's language (the language only, not the region)."), value: environment?.locale)
-                    field("features", Text("How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, LoRA, model downloads."))
+                    field("features", Text("How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads."))
                     field("model_families", Text("The families of the models used that day (such as qwen or flux), never their names."))
                     Text("The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.")
                         .fixedSize(horizontal: false, vertical: true)

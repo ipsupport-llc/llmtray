@@ -185,7 +185,7 @@
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
-"How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, LoRA, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, LoRA, model downloads.";
+"How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
@@ -379,7 +379,7 @@
 "Select Tab" = "Select Tab";
 "Select a component to see its license." = "Select a component to see its license.";
 "Send" = "Send";
-"Send an anonymous daily report: app and macOS version, Mac model, memory size, language, and which features you used. No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Send an anonymous daily report: app and macOS version, Mac model, memory size, language, and which features you used. No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.";
+"Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings." = "Send an anonymous daily report: app and macOS version, chip, memory size, language, which features you used and the families of the models (never their names). No prompts, content, files or model names ever leave your Mac. You can turn this off at any time in Settings.";
 "Sending…" = "Sending…";
 "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients." = "Sent first in every in-app chat request. Default comes with a short starting prompt -- extend it or replace it. Not applied to external API clients.";
 "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation." = "Sent to ipsupport.us; no account, no device identifiers. Reviews are published on the LLMTray website after moderation.";

@@ -66,6 +66,9 @@ final class UsageTelemetry: ObservableObject {
     func resetID() {
         guard isEnabled else { return }
         cancelSend()
+        // The counts gathered under the old ID go too: sent under the new
+        // one they'd tie the two together (and a day in flight twice).
+        store.erase()
         regenerateID()
     }
 
