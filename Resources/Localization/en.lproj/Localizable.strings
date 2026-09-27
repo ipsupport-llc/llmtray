@@ -283,6 +283,7 @@
 "Pause" = "Pause";
 "Pause download" = "Pause download";
 "Paused" = "Paused";
+"Paused while an image or song is made -- the model reloads after" = "Paused while an image or song is made -- the model reloads after";
 "Performance" = "Performance";
 "Pin" = "Pin";
 "Pinned" = "Pinned";
