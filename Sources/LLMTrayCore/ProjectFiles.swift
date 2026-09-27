@@ -156,6 +156,15 @@ public enum ProjectFiles {
         return .success(.list(from: 0))
     }
 
+    /// A call that answers with names only (the listing, a pin): no file
+    /// content comes back, so a pin after it is still the user's.
+    public static func returnsNamesOnly(_ values: [String: Any]) -> Bool {
+        switch request(values) {
+        case .success(.list), .success(.pin), .failure: return true
+        case .success(.search), .success(.read): return false
+        }
+    }
+
     /// "12", "3-5", "3–5", "3..5", "3 to 5", "p. 3", "pages 3-5", "3-" (to
     /// the end), "all"; a reversed range is turned round. nil: none of these.
     static func pageRange(_ raw: String) -> ClosedRange<Int>? {

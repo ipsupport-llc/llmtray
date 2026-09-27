@@ -361,8 +361,10 @@ final class ChatToolbox {
             return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
         if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {
-            // Whatever it answers -- file names count as file text too.
-            defer { turnTrust.record(kind) }
+            // Whatever it answers -- file names count as file text too; only
+            // content (a search, a read) stops a pin.
+            let namesOnly = tool is ProjectFilesTool && ProjectFiles.returnsNamesOnly(arguments.values)
+            defer { if namesOnly { turnTrust.recordProjectNames() } else { turnTrust.record(kind) } }
             if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent

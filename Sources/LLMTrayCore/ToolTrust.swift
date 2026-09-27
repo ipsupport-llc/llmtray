@@ -22,6 +22,9 @@ public enum ToolTrust {
     public struct TurnState: Equatable, Sendable {
         /// A project tool returned something.
         public var projectText = false
+        /// ...and it was file content (a search or a read), not only the
+        /// listing's names or a pin's answer: what stops a pin.
+        public var projectContent = false
         /// A folder read (`files`) returned something.
         public var folderText = false
         /// A folder change proposal (`change_files`) returned something.
@@ -48,12 +51,23 @@ public enum ToolTrust {
         /// names are the model's).
         public var hasFileText: Bool { projectText || folderText || networkText || pinnedText }
         /// What this turn's tool results brought in (the pinned prefix aside).
-        public var hasToolText: Bool { projectText || folderText || changeResult || networkText }
+        /// The listing doesn't count: a model learns a file's id from it
+        /// before pinning the file the user asked for.
+        public var hasToolText: Bool { projectContent || folderText || changeResult || networkText }
 
         /// After a call of `kind` returned.
+        /// After a project call that returned names only (the listing, a
+        /// pin's answer): the barrier as after any project text, but a pin
+        /// still allowed.
+        public mutating func recordProjectNames() {
+            projectText = true
+        }
+
         public mutating func record(_ kind: Kind) {
             switch kind {
-            case .project: projectText = true
+            case .project:
+                projectText = true
+                projectContent = true
             case .folderRead: folderText = true
             case .folderChange: changeResult = true
             case .guarded: networkText = true

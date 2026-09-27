@@ -909,7 +909,9 @@ changes too, for the whole turn -- as after a project tool's result, but
 refused with their own text (the next message won't lift it; the user can
 unpin in the Files window). The Files window says so on the pin. `pin:
 true` is refused once a tool returned text this turn (a file can't pin
-itself or another); the pinned prefix alone doesn't count, else a project
+itself or another) -- file content, folder, change or web text; the
+listing's names and a pin's answer don't count (the model lists the files
+for the id of the one the user named); the pinned prefix alone doesn't count, else a project
 with a pin could never get a second. Unpinning always works.
 
 **Citations.** The pages sent pinned are the turn's returned pages (kept
