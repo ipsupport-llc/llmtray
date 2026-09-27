@@ -159,23 +159,41 @@ final class GenerationQueueTests: XCTestCase {
         var changes: [Bool] = []
         queue.onInteractiveDemand = { changes.append($0) }
         let first = try await queue.acquire()
-        XCTAssertEqual(changes, [true])
+        XCTAssertEqual(changes, [false, true], "the current state first, then the change")
         let second = Task { @MainActor in try await queue.acquire() }
         try await Task.sleep(nanoseconds: 30_000_000)
         first.release()
         let t2 = try await second.value
-        XCTAssertEqual(changes, [true], "still a generation: no flip between them")
+        XCTAssertEqual(changes, [false, true], "still a generation: no flip between them")
         t2.release()
-        XCTAssertEqual(changes, [true, false])
+        XCTAssertEqual(changes, [false, true, false])
         var stop = false
         let blocker = try await queue.acquire()
         let cancelled = Task { @MainActor in try await queue.acquire(isCancelled: { stop }) }
         try await Task.sleep(nanoseconds: 30_000_000)
         stop = true
         _ = try? await cancelled.value
-        XCTAssertEqual(changes, [true, false, true], "a waiter leaving doesn't end the demand while one runs")
+        XCTAssertEqual(changes, [false, true, false, true], "a waiter leaving doesn't end the demand while one runs")
         blocker.release()
-        XCTAssertEqual(changes, [true, false, true, false])
+        XCTAssertEqual(changes, [false, true, false, true, false])
+    }
+
+    /// An embedder wired up while a generation runs starts out paused: the
+    /// hook is told the current demand when it's set, not at the next change.
+    func testADemandHookSetMidGenerationIsToldAtOnce() async throws {
+        let queue = GenerationQueue(pollInterval: 0.01)
+        let generation = try await queue.acquire()
+        let runner = EmbedRunner(configuration: EmbedRunner.Configuration(executable: "/usr/bin/false", arguments: []))
+        XCTAssertFalse(runner.isPaused)
+        queue.onInteractiveDemand = { runner.setPaused($0) }
+        XCTAssertTrue(runner.isPaused, "paused before anything could start it")
+        do {
+            _ = try await runner.embed(["запрос"], kind: .query)
+            XCTFail("paused")
+        } catch EmbedRunner.Failure.paused {}
+        XCTAssertNil(runner.pid, "nothing started")
+        generation.release()
+        XCTAssertFalse(runner.isPaused)
     }
 
     func testCancelledBackgroundWaiterLeaves() async throws {

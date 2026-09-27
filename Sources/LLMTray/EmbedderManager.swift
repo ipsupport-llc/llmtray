@@ -42,9 +42,8 @@ final class EmbedderManager: ObservableObject {
 
     @Published private(set) var isBusy = false
     @Published private(set) var statusText = ""
-    /// The runners `makeRunner` handed out, so `remove` can stop a live one.
-    private var runners: [String: WeakRunner] = [:]
-    private struct WeakRunner { weak var runner: EmbedRunner? }
+    /// One runner per entry, whoever asks: `remove` stops the only one.
+    private let runners = EmbedRunnerPool()
 
     init() {
         Self.sweepPartials()
@@ -65,9 +64,6 @@ final class EmbedderManager: ObservableObject {
     static var registryURL: URL { URL(fileURLWithPath: RuntimePaths.runtimeDir + "/embedders.json") }
     static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/embed_models" }
     static func modelDir(_ entry: EmbedderEntry) -> String { modelsDir + "/" + entry.id }
-    /// Written into the folder once every file matched its checksum: the
-    /// revision it holds. A folder without it (or with another) isn't ready.
-    static let stampName = ".llmtray-revision"
 
     func registry() throws -> EmbedderRegistry {
         do {
@@ -87,10 +83,17 @@ final class EmbedderManager: ObservableObject {
     /// Where the runner's modules are, when shipped.
     private var runnerScript: String { RuntimePaths.runtimeDir + "/llmtray_embed_runner.py" }
 
+    /// The stamp only (cheap); `verify` hashes the files.
     func isDownloaded(_ entry: EmbedderEntry) -> Bool {
-        let stamp = (try? String(contentsOfFile: Self.modelDir(entry) + "/" + Self.stampName, encoding: .utf8))?
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return stamp == entry.source.revision
+        EmbedderInstall.isStamped(entry, at: URL(fileURLWithPath: Self.modelDir(entry)))
+    }
+
+    /// Hashes the installed files; a damaged one takes the stamp away, so
+    /// the entry isn't ready and `download` repairs it. Call it when the
+    /// runner fails to load the model. Returns the damaged files.
+    @discardableResult
+    func verify(_ entry: EmbedderEntry) async throws -> [String] {
+        try await EmbedderInstall.verify(entry, at: URL(fileURLWithPath: Self.modelDir(entry)))
     }
 
     /// Weights in place and verified, the runtime there to run them.
@@ -100,81 +103,76 @@ final class EmbedderManager: ObservableObject {
             && FileManager.default.fileExists(atPath: runnerScript)
     }
 
-    /// Downloads the entry's pinned files into a temporary folder, checks
-    /// each against its sha256, and only then moves the folder into place.
-    /// A folder that exists with the stamp is a finished, verified one.
+    /// Installs the entry's pinned files, or repairs them: every file already
+    /// there is hashed (the stamp alone isn't trusted -- a damaged file under
+    /// a good stamp is fetched again); missing or mismatching files are
+    /// downloaded into a temporary folder, the good ones linked over, the
+    /// whole set checked against its sha256 and only then moved into place.
     func download(_ entry: EmbedderEntry) async throws {
         guard !isBusy else { throw EmbedderError.busy }
         guard FileManager.default.isExecutableFile(atPath: MLXRuntimeInstaller.venvPython) else { throw EmbedderError.noRuntime }
-        if isDownloaded(entry) { return }
         isBusy = true
         defer { isBusy = false; statusText = "" }
-        statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), entry.displayName)
+        statusText = NSLocalizedString("Checking the download…", comment: "")
         let fm = FileManager.default
         try fm.createDirectory(atPath: Self.modelsDir, withIntermediateDirectories: true)
-        let target = Self.modelDir(entry)
-        let temp = target + ".partial-\(UUID().uuidString)"
-        let files = entry.source.files.keys.sorted()
         do {
-            // Values go in as arguments, not into the code.
-            do {
-                try await ProcessRunner.run(MLXRuntimeInstaller.venvPython, [
-                    "-c",
-                    """
-                    import sys
-                    from huggingface_hub import snapshot_download
-                    snapshot_download(sys.argv[1], revision=sys.argv[2], local_dir=sys.argv[3], allow_patterns=sys.argv[4:])
-                    """,
-                    entry.source.repo, entry.source.revision, temp,
-                ] + files)
-            } catch let failure as ProcessRunner.Failure {
-                throw EmbedderError.processFailed(failure.outputTail)
+            try await EmbedderInstall.install(entry, at: URL(fileURLWithPath: Self.modelDir(entry))) { files, temp in
+                statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), entry.displayName)
+                // A runner using the folder being replaced exits first.
+                await runners.stop(entry.id)
+                // Values go in as arguments, not into the code.
+                do {
+                    try await ProcessRunner.run(MLXRuntimeInstaller.venvPython, [
+                        "-c",
+                        """
+                        import sys
+                        from huggingface_hub import snapshot_download
+                        snapshot_download(sys.argv[1], revision=sys.argv[2], local_dir=sys.argv[3], allow_patterns=sys.argv[4:])
+                        """,
+                        entry.source.repo, entry.source.revision, temp.path,
+                    ] + files)
+                } catch let failure as ProcessRunner.Failure {
+                    throw EmbedderError.processFailed(failure.outputTail)
+                }
+                try? fm.removeItem(at: temp.appendingPathComponent(".cache"))   // huggingface_hub's own bookkeeping
+                statusText = NSLocalizedString("Checking the download…", comment: "")
             }
-            try? fm.removeItem(atPath: temp + "/.cache")   // huggingface_hub's own bookkeeping
-            statusText = NSLocalizedString("Checking the download…", comment: "")
-            let folder = URL(fileURLWithPath: temp)
-            let bad = try await ProcessRunner.offMain { EmbedderFiles.mismatches(in: folder, for: entry) }
-            guard bad.isEmpty else { throw EmbedderError.checksum(bad) }
-            try entry.source.revision.write(toFile: temp + "/" + Self.stampName, atomically: true, encoding: .utf8)
-            if fm.fileExists(atPath: target) { try fm.removeItem(atPath: target) }
-            try fm.moveItem(atPath: temp, toPath: target)
-        } catch {
-            try? fm.removeItem(atPath: temp)
-            throw error
+        } catch let mismatch as EmbedderInstall.ChecksumMismatch {
+            throw EmbedderError.checksum(mismatch.files)
         }
     }
 
-    /// Removes the weights (the feature turned off in Settings), after a
-    /// runner still using them has exited.
+    /// Removes the weights (the feature turned off in Settings), after the
+    /// entry's runner -- the one `makeRunner` shares -- has exited.
     func remove(_ entry: EmbedderEntry) async throws {
         guard !isBusy else { throw EmbedderError.busy }
         isBusy = true
         defer { isBusy = false }
-        if let runner = runners[entry.id]?.runner { await runner.stopAndWait() }
-        runners[entry.id] = nil
+        await runners.stop(entry.id)
         let target = Self.modelDir(entry)
         if FileManager.default.fileExists(atPath: target) { try FileManager.default.removeItem(atPath: target) }
     }
 
-    /// The runner for `entry` (not started: the first request starts it).
-    /// Offline, bytecode-free, with the parent's pid for its watchdog; the
-    /// orphan marker is EmbedRunner's own.
+    /// The entry's runner (not started: the first request starts it), shared
+    /// by every caller while one lives. Offline, bytecode-free, with the
+    /// parent's pid for its watchdog; the orphan marker is EmbedRunner's own.
     func makeRunner(_ entry: EmbedderEntry) -> EmbedRunner {
-        let runner = EmbedRunner(configuration: EmbedRunner.Configuration(
-            executable: MLXRuntimeInstaller.venvPython,
-            arguments: [
-                runnerScript,
-                "--registry", Self.registryURL.path,
-                "--entry", entry.id,
-                "--model-dir", Self.modelDir(entry),
-                "--parent", String(getpid()),
-            ],
-            environment: [
-                "PYTHONDONTWRITEBYTECODE": "1",
-                "HF_HUB_OFFLINE": "1",
-                "TOKENIZERS_PARALLELISM": "false",
-            ]))
-        runners[entry.id] = WeakRunner(runner: runner)
-        return runner
+        runners.runner(for: entry.id) {
+            EmbedRunner(configuration: EmbedRunner.Configuration(
+                executable: MLXRuntimeInstaller.venvPython,
+                arguments: [
+                    runnerScript,
+                    "--registry", Self.registryURL.path,
+                    "--entry", entry.id,
+                    "--model-dir", Self.modelDir(entry),
+                    "--parent", String(getpid()),
+                ],
+                environment: [
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    "HF_HUB_OFFLINE": "1",
+                    "TOKENIZERS_PARALLELISM": "false",
+                ]))
+        }
     }
 }

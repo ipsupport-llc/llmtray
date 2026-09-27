@@ -117,6 +117,9 @@ final class EmbedRunnerTests: XCTestCase {
                     out.write(b"x" * 100000); out.flush()
                 time.sleep(10)
             if t == "bad": return fail(rid, "bad_request")
+            if t == "garbage":
+                with lock:
+                    out.write(b"not json\n"); out.flush()
             if t == "wrongdim":
                 b = base64.b64encode(struct.pack("<2e", 1.0, 2.0)).decode()
                 return send({"id": rid, "ok": True, "dim": 2, "count": 1, "dtype": "f16", "vectors": b})
@@ -453,6 +456,30 @@ final class EmbedRunnerTests: XCTestCase {
         try await Task.sleep(nanoseconds: 200_000_000)
         let ok = try await r.embed(["x"], kind: .query)
         XCTAssertEqual(ok.dim, 4)
+        r.stop()
+    }
+
+    /// After an unreadable line nothing that process says counts: the
+    /// valid-looking answers it sends next (to this request and to an index
+    /// batch in flight) don't succeed them -- both fail as a violation.
+    func testNothingCountsAfterAProtocolViolation() async throws {
+        let r = try runner()
+        try await r.start()
+        let batch = Task { try await r.embed(["slow:0.3", "y"], kind: .document) }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        do {
+            _ = try await r.embed(["garbage"], kind: .query)
+            XCTFail("an answer after the violation succeeded")
+        } catch EmbedRunner.Failure.protocolViolation(let why) {
+            XCTAssertEqual(why, "unreadable line")
+        }
+        do {
+            _ = try await batch.value
+            XCTFail("the batch in flight succeeded")
+        } catch EmbedRunner.Failure.protocolViolation {}
+        try await Task.sleep(nanoseconds: 200_000_000)
+        let ok = try await r.embed(["x"], kind: .query)
+        XCTAssertEqual(ok.dim, 4, "a new runner answers")
         r.stop()
     }
 

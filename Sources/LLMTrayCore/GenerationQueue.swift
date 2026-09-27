@@ -67,7 +67,14 @@ public final class GenerationQueue {
     /// once a generation asks, false when none runs or waits any more. The
     /// indexer wires it to `EmbedRunner.setPaused` -- a search meanwhile gets
     /// `.paused` and goes lexical-only instead of restarting the runner.
-    public var onInteractiveDemand: ((Bool) -> Void)?
+    /// Setting it reports the current state at once: an embedder wired up
+    /// while a generation runs starts out paused, not at the next change.
+    public var onInteractiveDemand: ((Bool) -> Void)? {
+        didSet {
+            lastDemand = hasInteractiveDemand
+            onInteractiveDemand?(lastDemand)
+        }
+    }
 
     public init(pollInterval: TimeInterval = 0.2) {
         self.pollInterval = UInt64(pollInterval * 1_000_000_000)

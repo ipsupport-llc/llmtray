@@ -494,16 +494,30 @@ public final class EmbedRunner: @unchecked Sendable {
 
     // MARK: - the runner's side
 
-    private func received(_ line: Data, from p: RunnerProcess) {
-        guard let message = EmbedRunnerMessage(line: line) else {
-            lock.lock()
-            p.failure = "unreadable line"
+    /// Lock held (released here): the process broke the protocol. Nothing it
+    /// says afterwards counts -- every request in flight on it fails now
+    /// (a later, valid-looking answer can't succeed one) and it is killed.
+    private func violatedLocked(_ p: RunnerProcess, _ why: String) {
+        if !p.violation {
+            p.failure = why
             p.violation = true
-            lock.unlock()
-            p.kill()
+        }
+        let inFlight = pending.values.filter { $0.process === p }
+        pending = pending.filter { $0.value.process !== p }
+        lock.unlock()
+        let failure = Failure.protocolViolation(why)
+        for slot in inFlight { slot.continuation.resume(throwing: slot.cancelled ? CancellationError() : failure) }
+        p.kill()
+    }
+
+    private func received(_ line: Data, from p: RunnerProcess) {
+        lock.lock()
+        // After a violation every later line of that process is dropped.
+        guard !p.violation else { lock.unlock(); return }
+        guard let message = EmbedRunnerMessage(line: line) else {
+            violatedLocked(p, "unreadable line")
             return
         }
-        lock.lock()
         guard process === p else { lock.unlock(); return }
         switch message {
         case .ready(let r):
@@ -533,16 +547,11 @@ public final class EmbedRunner: @unchecked Sendable {
             p.fatal = true
             lock.unlock()
         case .result(let id, let result):
-            let slot = pending.removeValue(forKey: id)
-            if let slot, result.count != slot.count || result.dim != slot.dim {
-                let why = "answer to \(id): \(result.count) × \(result.dim) for \(slot.count) texts × \(slot.dim)"
-                p.failure = why
-                p.violation = true
-                lock.unlock()
-                slot.continuation.resume(throwing: Failure.protocolViolation(why))
-                p.kill()
+            if let slot = pending[id], result.count != slot.count || result.dim != slot.dim {
+                violatedLocked(p, "answer to \(id): \(result.count) × \(result.dim) for \(slot.count) texts × \(slot.dim)")
                 return
             }
+            let slot = pending.removeValue(forKey: id)
             crashes = 0
             scheduleIdleLocked()
             lock.unlock()

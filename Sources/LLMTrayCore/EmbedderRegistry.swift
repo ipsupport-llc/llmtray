@@ -122,3 +122,98 @@ public enum EmbedderFiles {
         }
     }
 }
+
+/// An entry's folder of weights (adr/0012): installed, checked and repaired
+/// by the files' sha256, not by the revision stamp alone -- a folder whose
+/// stamp says "done" can still hold a damaged file, and a download must
+/// then fix it instead of trusting the stamp.
+public enum EmbedderInstall {
+    /// Written into the folder once every file matched its checksum: the
+    /// revision it holds. A folder without it (or with another) isn't ready.
+    public static let stampName = ".llmtray-revision"
+
+    public struct ChecksumMismatch: Error, Equatable {
+        public let files: [String]
+    }
+
+    /// The cheap check (no hashing): the folder's stamp is this revision.
+    public static func isStamped(_ entry: EmbedderEntry, at folder: URL) -> Bool {
+        let stamp = try? String(contentsOf: folder.appendingPathComponent(stampName), encoding: .utf8)
+        return stamp?.trimmingCharacters(in: .whitespacesAndNewlines) == entry.source.revision
+    }
+
+    /// Hashes every file; any that doesn't match takes the stamp away, so
+    /// the folder isn't ready and the next `install` repairs it. For a
+    /// runner that failed to load. Returns the damaged or missing files.
+    @discardableResult
+    public static func verify(_ entry: EmbedderEntry, at folder: URL) async throws -> [String] {
+        let bad = try await ProcessRunner.offMain { EmbedderFiles.mismatches(in: folder, for: entry) }
+        if !bad.isEmpty { try? FileManager.default.removeItem(at: folder.appendingPathComponent(stampName)) }
+        return bad
+    }
+
+    /// Installs `entry` into `folder`, or repairs it: every file is hashed;
+    /// only the missing or mismatching ones are fetched (`fetch(names,
+    /// into)`, into a temporary folder beside it), the good ones linked
+    /// over, the whole set checked again, stamped, and swapped in -- the
+    /// folder in place is never half-written. Returns the files fetched
+    /// ([]: nothing to do).
+    @discardableResult
+    public static func install(_ entry: EmbedderEntry, at folder: URL,
+                               fetch: (_ files: [String], _ into: URL) async throws -> Void) async throws -> [String] {
+        let fm = FileManager.default
+        let bad = try await ProcessRunner.offMain { EmbedderFiles.mismatches(in: folder, for: entry) }
+        if bad.isEmpty {
+            if !isStamped(entry, at: folder) {
+                try entry.source.revision.write(to: folder.appendingPathComponent(stampName), atomically: true, encoding: .utf8)
+            }
+            return []
+        }
+        let temp = folder.deletingLastPathComponent().appendingPathComponent("\(folder.lastPathComponent).partial-\(UUID().uuidString)")
+        do {
+            try fm.createDirectory(at: temp, withIntermediateDirectories: true)
+            try await fetch(bad, temp)
+            // The good files come over as hard links (same volume: no copy).
+            for name in entry.source.files.keys.sorted() where !bad.contains(name) {
+                let target = temp.appendingPathComponent(name)
+                guard !fm.fileExists(atPath: target.path) else { continue }
+                try fm.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try fm.linkItem(at: folder.appendingPathComponent(name), to: target)
+            }
+            let still = try await ProcessRunner.offMain { EmbedderFiles.mismatches(in: temp, for: entry) }
+            guard still.isEmpty else { throw ChecksumMismatch(files: still) }
+            try entry.source.revision.write(to: temp.appendingPathComponent(stampName), atomically: true, encoding: .utf8)
+            if fm.fileExists(atPath: folder.path) { try fm.removeItem(at: folder) }
+            try fm.moveItem(at: temp, to: folder)
+        } catch {
+            try? fm.removeItem(at: temp)
+            throw error
+        }
+        return bad
+    }
+}
+
+/// One runner per embedder entry, shared by every caller while it lives
+/// (held weakly): stopping an entry's runner -- before its weights are
+/// removed -- then stops the only one there is, never leaving another
+/// behind.
+@MainActor
+public final class EmbedRunnerPool {
+    private struct Weak { weak var runner: EmbedRunner? }
+    private var runners: [String: Weak] = [:]
+
+    public init() {}
+
+    /// The entry's live runner, or a new one from `make`.
+    public func runner(for id: String, make: () -> EmbedRunner) -> EmbedRunner {
+        if let live = runners[id]?.runner { return live }
+        let runner = make()
+        runners[id] = Weak(runner: runner)
+        return runner
+    }
+
+    /// Stops the entry's runner and waits for it to exit.
+    public func stop(_ id: String) async {
+        await runners[id]?.runner?.stopAndWait()
+    }
+}

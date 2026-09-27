@@ -508,7 +508,9 @@ adds ~20 ms.
   query may have started it too; indexing resumes after. While a
   generation holds or waits for the queue the runner is paused: a query
   embedding gets `.paused` at once and the search goes lexical-only
-  instead of loading the embedder next to the generation's model. Slices also wait while
+  instead of loading the embedder next to the generation's model (the
+  demand hook is told the current state when it's set, so a runner wired
+  up mid-generation starts paused). Slices also wait while
   the chat model generates. A query embedding is interactive: it jumps
   ahead of queued index batches in the runner. At most two projects'
   vectors are resident (LRU, a ~800 MB budget); a search in a third
@@ -534,7 +536,12 @@ adds ~20 ms.
   pinned by revision and per-file sha256, tokenizer.json pinned by hash
   (BAAI's older file adds a token before `</s>` after trailing
   whitespace). fp16 is the default; 8-bit (592 MB) is allowed but saves
-  memory only, not time; 4-bit is refused (min cosine 0.915).
+  memory only, not time; 4-bit is refused (min cosine 0.915). A download
+  hashes what is already installed and fetches only the missing or
+  damaged files (a revision stamp alone isn't trusted); a load failure
+  re-verifies the folder and unstamps it if a file no longer matches.
+  One runner per entry is shared by every caller, so removing the
+  weights stops the only one.
 - **Pooling, prefixes, dtype come from the registry**, never a model
   card (mlx-community's card says mean pooling for bge-m3; it's CLS).
   An entry: id, licence, family, source {repo, revision, files → sha256},
@@ -555,7 +562,9 @@ adds ~20 ms.
   too_large | timeout | cancelled | internal}`; `cancel`, `ping`,
   `shutdown`; limits 8 MiB a line, 256 texts, 262k tokens a request.
   Cancel and timeouts act at batch boundaries of ≤ 4,096 tokens (≤ ~2 s),
-  so the client adds a grace period, then kills. stdin EOF is the normal
+  so the client adds a grace period, then kills. A protocol violation (an
+  unreadable line, an answer of the wrong shape) fails every request in
+  flight on that process and drops all its later lines. stdin EOF is the normal
   stop; the runner exits within 0.1 s if the app dies. Large requests
   (up to 256 texts): many small concurrent ones ran at 3-4k tokens/s.
 - EmbeddingGemma is gated on Hugging Face (Gemma licence): its entry
