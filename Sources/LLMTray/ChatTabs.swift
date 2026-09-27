@@ -239,7 +239,7 @@ struct ChatTabStrip: View {
                         }
                     }
                 }
-                .onChange(of: tabs.selectedIndex) { index in
+                .onChange(of: tabs.selectedIndex) { _, index in
                     guard tabs.tabs.indices.contains(index) else { return }
                     withAnimation { proxy.scrollTo(tabs.tabs[index].tabID) }
                 }

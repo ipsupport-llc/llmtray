@@ -37,7 +37,7 @@
   "description": "Run local AI on Mac: LLMTray is a native MLX local LLM GUI for macOS. It serves an OpenAI-compatible local API on Apple Silicon for apps, editors and local AI coding agents, chats with tools, and does local image generation and editing and local music generation. Models run on the Mac; only the optional web tools reach the internet.",
   "applicationCategory": "DeveloperApplication",
   "applicationSubCategory": "Local AI / LLM",
-  "operatingSystem": "macOS 13 or later (Apple Silicon)",
+  "operatingSystem": "macOS 14 or later (Apple Silicon)",
   "softwareVersion": "__LATEST_VERSION__",
   "dateModified": "__LATEST_DATE__",
   "releaseNotes": "https://github.com/ipsupport-llc/llmtray/releases/latest",
@@ -257,7 +257,7 @@
             <span>Download Light<span class="sub">~3MB · installs the mlx-lm runtime on first launch, needs Python 3.10+</span></span>
           </a>
         </div>
-        <span class="cta-meta">macOS 13+ (Apple Silicon) · free · not notarized: allow it once in Privacy &amp; Security</span>
+        <span class="cta-meta">macOS 14+ (Apple Silicon) · free · not notarized: allow it once in Privacy &amp; Security</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
       <div class="badges">
@@ -337,7 +337,7 @@ export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code>
       <h2>Quick start</h2>
       <ol style="padding-left: 1.2rem; color: var(--fg-muted);">
         <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">Download LLMTray</a> and drag it to Applications.</li>
-        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 13–14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
+        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
         <li>Click the brain icon in the menu bar and pick a model (or download one from Hugging Face in the app). The local server starts on its own, now and at every launch.</li>
         <li>Image and music generation are optional. Turn them on in Settings, and their models are downloaded then.</li>
       </ol>

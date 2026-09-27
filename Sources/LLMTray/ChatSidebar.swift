@@ -234,7 +234,7 @@ struct ChatSidebar: View {
                 .onSubmit { commitRename(summary.id) }
                 .onExitCommand { renaming = nil }
                 // Clicking elsewhere commits it, like Finder.
-                .onChange(of: chatRenameFocused) { focused in
+                .onChange(of: chatRenameFocused) { _, focused in
                     if focused { renameHadFocus = true } else if renameHadFocus { commitRename(summary.id) }
                 }
                 .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
@@ -308,7 +308,7 @@ struct ChatSidebar: View {
                 .focused($projectRenameFocused)
                 .onSubmit { commitProjectRename(project.id) }
                 .onExitCommand { renamingProject = nil }
-                .onChange(of: projectRenameFocused) { focused in
+                .onChange(of: projectRenameFocused) { _, focused in
                     if focused { renameHadFocus = true } else if renameHadFocus { commitProjectRename(project.id) }
                 }
                 .onAppear { DispatchQueue.main.async { projectRenameFocused = true } }
