@@ -251,9 +251,11 @@ final class FolderPlanModel: ObservableObject, Identifiable {
         let service = self.service
         message = nil
         phase = .running(done: 0, total: review.approvable.count)
-        let progress: @Sendable (Int, Int) -> Void = { [weak self] done, total in
+        // Held until the run ends (a weak capture here is refused by the
+        // older compiler CI builds with).
+        let progress: @Sendable (Int, Int) -> Void = { done, total in
             Task { @MainActor in
-                if case .running = self?.phase { self?.phase = .running(done: done, total: total) }
+                if case .running = self.phase { self.phase = .running(done: done, total: total) }
             }
         }
         Task { [weak self] in

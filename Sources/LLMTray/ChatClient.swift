@@ -514,8 +514,10 @@ final class ChatClient: ObservableObject {
 
     /// A folder tool's call asks the user about a folder: the card shows in
     /// the chat and the call waits for it (nil: Stop, another chat).
-    func askFolderAccess(_ request: FolderGrantRequest) async -> GrantChoice? {
-        guard let chat = folderChat else { return nil }
+    /// `chatID` and `token`: the call's chat and turn -- a call that outlived
+    /// a switch or a Stop never asks in the chat on screen now.
+    func askFolderAccess(_ request: FolderGrantRequest, chatID: String, token: Int) async -> GrantChoice? {
+        guard let chat = folderChat, chat.id == chatID, token == turnToken else { return nil }
         let prompt = FolderAccessPrompt(request: request, choices: GrantChoice.offered(temporaryChat: chat.temporary), forCall: true)
         folderPrompt?.resolve(nil)
         folderPrompt = prompt
@@ -1273,7 +1275,8 @@ final class ChatClient: ObservableObject {
             let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
                                      model: drafts[call.id]?.modelID)
             var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
-            toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request) }
+            let chatID = folderChatID
+            toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }
             if toolbox.budgetedToolNames.contains(call.name) {
                 // What the next request has room for now, the results before
                 // this one counted: the tool sizes its answer to it.
