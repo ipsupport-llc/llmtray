@@ -107,11 +107,20 @@ Chat in Project" writes the map when the session id is created, so the
 first turn already sees the files; a temporary chat started from a
 project is still projectless.
 
-**Tools** (always on in a project chat, independent of the profile's
-`enabledTools`; in `--dump-tool-definitions` for evals; the tool-use
-policy gets their wording):
+**Tools** (independent of the profile's `enabledTools`; in
+`--dump-tool-definitions` for evals; the tool-use policy gets their
+wording). Declared by what the project has, checked at each turn's
+start (the user's call — an empty project costs no tokens and gives a
+small model nothing to call in vain):
 
-- `list_project_files()` — whenever the chat has a project: short ids
+- the feature off, no project, or a project without files: **none** —
+  the request is an ordinary chat's;
+- files, none searchable yet (copying, reading, embedding, failed):
+  **`list_project_files` only**, so the model can say they're still
+  being indexed;
+- at least one file searchable: **all three**.
+
+- `list_project_files()` — short ids
   (`1`, `2`, … per project), names, pages, status;
 - `search_project_files(query, top_k = 5, ≤ 10, doc?)` — once any file
   is searchable; hits as `[doc:page]`, heading, the chunk, a neighbour
