@@ -13,7 +13,13 @@ let package = Package(
         // without launching the app.
         .target(
             name: "LLMTrayCore",
-            path: "Sources/LLMTrayCore"
+            path: "Sources/LLMTrayCore",
+            // The CBLAS interface without the macOS 13.3 deprecation
+            // (DenseVectors' cblas_sgemv): same symbols, current headers.
+            swiftSettings: [.unsafeFlags(["-Xcc", "-DACCELERATE_NEW_LAPACK"])],
+            // The system SQLite (ProjectIndex, adr/0012): FTS5 built in, no
+            // extensions to load.
+            linkerSettings: [.linkedLibrary("sqlite3")]
         ),
         .executableTarget(
             name: "LLMTray",

@@ -270,7 +270,11 @@ Application Support/LLMTray/projects/<projectID>/
   per embedding batch (≤ 64 vectors), committed batch by batch —
   `embedded` flips after the last, so a crash costs one batch;
   `vec_sets(set_id, model, dim, prep_version, active)` for an embedder
-  switch (one transaction flips `active`).
+  switch (one transaction flips `active`). `vec_chunks(chunk, set_id)`
+  says which chunks have a vector (a batch checks its own chunks, not
+  every block of the document) and `vec_progress(set_id, doc, rev,
+  next_ord)` where the next batch starts, so a batch costs the same at the
+  end of a 10k-chunk document as at its start.
 - `meta(schema, ...)`. A schema change builds a **new database beside
   the old one** (`index.next.sqlite`): documents migrated, derived
   tables rebuilt from copies and available linked sources, an
@@ -295,7 +299,10 @@ hidden before reconcile). bm25 cost grows with the matching rows and
 FTS5 has no top-k early exit ("в" alone 300-880 ms at 200k), so a
 document-frequency gate drops terms in > 20% of chunks (via `fts5vocab`,
 ~0.5 ms a term) but keeps the rarest matching one — it halves p95 and
-changes results, so its threshold is set by the eval. A per-query
+changes results, so its threshold is set by the eval. When only terms
+above it are left (a one-word "в" too) and the dense list runs, both
+lexical lists are skipped: bm25 over most of the index for ~0
+information (without dense the rarest still ranks). A per-query
 latency budget; trigram may run only when unicode61 underdelivers or
 for stemmed/identifier terms (eval). Dense: f16 blocks widened in tiles
 (vImage) into `cblas_sgemv` — f32 speed at f16 memory.
@@ -310,7 +317,9 @@ the file, delete the rows in a transaction. Re-index: rebuild the
 document's derived rows in one transaction; the old ones stay searchable
 until it commits. At project open a reconcile pass finishes or undoes
 every state: `.part` files and staged copies no row claims are deleted,
-a complete staged copy whose hash matches its row is promoted, `extracting` goes back
+a complete staged copy whose hash matches its row is promoted (a promoted
+copy of a still-`staged` row is re-hashed first: a torn one gives way to a
+matching staged copy, or, the only copy left, is kept and `failed`), `extracting` goes back
 to `staged`, `removing` is finished, embedding resumes. The spike
 killed a child at 16 points of add/remove/re-index: before reconcile a
 document was invisible or complete, after it no orphans or duplicates,
@@ -352,7 +361,12 @@ under `files/` are ever deleted.
 project (tabs don't: `ChatToolbox` is per tab) plus a read-only WAL
 connection for searches, so tabs don't queue behind an ingest. No
 `await` while a transaction is open: extract first, then write
-synchronously. The reader wasn't blocked by a 6k-chunk write (p50 44
+synchronously. The writer owns the project exclusively — an flock on
+`index.lock` from open to close, so a second writer (another handle, another
+process) is refused rather than racing a compaction swap, which also
+checks `data_version` and drops a copy older than the file. Each
+connection answers on its own queue only (a `ProjectIndex` or searcher
+leaked out of a registry closure throws instead of racing it). The reader wasn't blocked by a 6k-chunk write (p50 44
 vs 45 ms, no BUSY) and never saw uncommitted rows. But the WAL grows
 (60-350 MB for that transaction) and any open reader snapshot stalls
 the checkpoint, so readers reset statements at once, a TRUNCATE
@@ -627,7 +641,11 @@ tabs; opening a previous schema.
   re-measured with the final layout); hybrid search p50 ~190 ms, p95 ~350 ms with the df gate
   (232 / 700 ms without), nearly all of it trigram ranking; dense
   scoring 5-8 ms, vectors loaded in 120-300 ms; ingest ~590 chunks/s
-  with both FTS tables. macOS 13.2
+  with both FTS tables. PR 3.4a's scale run (210,975 chunks, 103 MB
+  per 10k with 16 KB pages; the synthetic corpus puts nearly every query
+  term above the gate): vectors loaded in 55 ms warm (a rowid range
+  scan, no sort), hybrid p50 19 ms / p95 44 ms over 200 searches with a
+  256 MB reader mmap, lexical-only p50 122 ms / p95 270 ms. macOS 13.2
   ships 3.39.5: trigram (3.34), `remove_diacritics 2` (3.27); FTS5 is
   checked at runtime (`sqlite_compileoption_used('ENABLE_FTS5')`).
 - Brute force, 1 query, top-20, f32 `cblas_sgemv`: 50k × 1024 2.6 ms,
