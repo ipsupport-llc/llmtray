@@ -115,11 +115,14 @@ guided front end to the same code, not a second configuration path.
    a fresh first launch (a clean user account or a wiped Application
    Support folder).
 
-## Open questions (the user's)
+## Decided with the user (2026-09-26)
 
-- The curated chat models per memory tier (8 / 16 / 24 / 32+ GB), and
-  whether our own GPTQ checkpoints lead the list.
-- Should the chat-model download start during the wizard (as proposed)
-  or only after Finish like the rest?
-- The banner: the app's current branding (the green brain) — to be
-  redrawn.
+- The curated list goes by memory tier (8 / 16 / 24 / 32+ GB), and **our
+  own GPTQ checkpoints lead it as the recommended picks**: Gemma 4
+  26B-A4B (`roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang`) for 24 GB and
+  up, Gemma 4 E4B (`roman220220/gemma-4-E4B-it-gptq-mlx-jang`) below;
+  the rest of each tier filled in PR 2 from what fits.
+- The chat-model download **starts at step 4**, right when it's picked,
+  and runs on while the wizard continues; everything else after Finish.
+- The banner: `docs/assets/welcome-banner.jpg` (the app's green-brain
+  branding), shown on the Welcome step.
