@@ -19,8 +19,19 @@
 - **Pins and projects live apart**, in `sessions/library.json`
   (`LLMTrayCore.ChatLibrary`, `ChatLibraryStore`): the session file is
   rewritten whole after every turn, so a pin set in between would be
-  lost. A project today is only a named group (id, name, createdAt) and
-  a chat → project map; nothing else is scoped to it.
+  lost. A project is a named group (id, name, createdAt), its
+  instructions, and a chat → project map
+  ([0012](0012-project-files-rag.md)): each turn reads the chat's project
+  as it starts (`ChatSettings.project`), so a move or an edit applies from
+  the next message; New Chat in Project maps the chat as it's made, before
+  its first turn. Deleting a project keeps its chats and removes
+  `projects/<id>/` through a deletion record finished at launch — never
+  when `library.json` couldn't be read. An unreadable `library.json` is
+  never overwritten in that session (changes to pins and projects aren't
+  saved until a launch reads it); a copy is kept as
+  `library.json.unreadable-<uuid>` for recovery. A build older than
+  project instructions reads the file but drops the instructions if it
+  saves it (a downgrade).
 - **A temporary chat writes nothing by itself**: `currentSessionID ==
   nil` makes saving a no-op, it isn't reopened as a tab, and its images
   and songs never touch disk — the runners stream them over stdout, no

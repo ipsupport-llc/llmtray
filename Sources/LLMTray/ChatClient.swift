@@ -439,7 +439,16 @@ final class ChatClient: ObservableObject {
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
+        startAssistantResponse(port: port, modelAlias: modelAlias, settings: withProject(settings), server: server)
+    }
+
+    /// The chat's project as the library has it now (adr/0012): read as a
+    /// turn starts, so a move, an edit of its instructions or its deletion
+    /// applies from the next message. A temporary chat has none.
+    private func withProject(_ settings: ChatSettings) -> ChatSettings {
+        var settings = settings
+        settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
+        return settings
     }
 
     /// Re-runs the last user turn with a fresh generation -- drops the
@@ -474,7 +483,7 @@ final class ChatClient: ObservableObject {
             messages.removeLast()
         }
         guard messages.last?.role == "user" else { return }
-        startAssistantResponse(port: port, modelAlias: modelAlias, settings: settings, server: server)
+        startAssistantResponse(port: port, modelAlias: modelAlias, settings: withProject(settings), server: server)
     }
 
     /// Explicit, Settings-initiated warm-up download for the given image
@@ -814,12 +823,13 @@ final class ChatClient: ObservableObject {
     }
 
     /// The settings as they are *now* (a tool switched off mid-turn stops
-    /// at once), for the model the turn started with.
+    /// at once), for the model and the project the turn started with.
     private func currentSettings(_ start: ChatSettings) -> ChatSettings {
         guard let modelPath = start.modelPath else { return start }
         var now = ChatSettings(profile: ProfileManager.shared.resolved(for: modelPath), maxTokensCap: start.maxTokensCap)
         now.modelPath = modelPath
         now.modelSupportsVision = start.modelSupportsVision
+        now.project = start.project
         return now
     }
 
