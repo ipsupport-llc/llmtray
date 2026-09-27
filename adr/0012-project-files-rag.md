@@ -380,7 +380,7 @@ loops `NSAttributedString` and `textutil` forever
   set up, those formats fail with "not supported on this system" and our
   own parsers (PDFKit text, OOXML sheets and slides, legacy, HTML, plain)
   still run — none of them opens a connection. Tested in the signed,
-  packaged app on macOS 13 and the current macOS, with the private symbol
+  packaged app on macOS 14 (the minimum, as CI) and the current macOS, with the private symbol
   absent and the sandbox call failing.
 - **A child process** of the app binary (`LLMTray --extract <path>`,
   JSON lines out) does all parsing, started with `posix_spawn` —
@@ -408,9 +408,9 @@ loops `NSAttributedString` and `textutil` forever
   and nesting capped at 256 (it parsed 200k levels).
 - **HTML** through a new `HTMLText` in LLMTrayCore (sharing
   `WebParsing.decodeEntities`; `WebParsing.text` keeps script/style and
-  drops newlines): consistent back to macOS 13 and 43 ms vs 373-504 ms
+  drops newlines): consistent on every supported macOS and 43 ms vs 373-504 ms
   for `NSAttributedString`, whose HTML import is in-process WebKit on
-  macOS 13 (an out-of-process service on 27).
+  macOS 14 (an out-of-process service on 27).
 - **Legacy .xls / .ppt: our own parsers** (OLE2 + BIFF5/8; PPT text
   atoms following the live edit chain) — 46,688/46,688 cells against
   xlrd on 23 files, all slide text and notes on 17 POI files, 2-15 ms a
@@ -613,7 +613,7 @@ contextual-retrieval.
    1. **Supervised extractor**: `ProcessRunner`'s `posix_spawn` variant
       (process group, wall timeout, stdout cap, footprint polling,
       jetsam when available), `LLMTray --extract`, the capped zip reader,
-      `HTMLText`, the junk check; packaged smoke test on macOS 13.
+      `HTMLText`, the junk check; packaged smoke test on macOS 14.
    2. **Project lifecycle**: New Chat in Project (the session and its
       project mapping created atomically before the first turn), project
       instructions, project deletion with deletion records, the
@@ -634,7 +634,7 @@ contextual-retrieval.
    search tool call p95 ≤ 1.5 s warm and ≤ 3 s cold (runner spawn
    included), measured while indexing and while a generator waits;
    combined peak memory within the Metal limit; the index re-measured
-   with the final layout and the disk limits set from it; macOS 13
+   with the final layout and the disk limits set from it; macOS 14
    packaged smoke test.
 4. **v1b — every format**: tier 2 (Vision OCR, segmentation,
    perspective, `RecognizeDocumentsRequest` tables on macOS 26+), image

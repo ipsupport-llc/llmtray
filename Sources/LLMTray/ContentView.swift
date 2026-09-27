@@ -66,8 +66,8 @@ struct ContentView: View {
             modelDidChange(selectedModelID)
             isInputFocused = true
         }
-        .onChange(of: selectedModelID) { modelDidChange($0) }
-        .onChange(of: catalog.models) { _ in keepSelectionValid() }
+        .onChange(of: selectedModelID) { modelDidChange($1) }
+        .onChange(of: catalog.models) { keepSelectionValid() }
     }
 
     // MARK: - Layouts
@@ -236,11 +236,16 @@ struct ContentView: View {
                 // position jumped whenever the estimate was corrected.
                 VStack(alignment: .leading, spacing: 10) {
                     if chat.messages.isEmpty {
-                        Text("No messages yet")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 8)
+                        VStack(spacing: 2) {
+                            Text("No messages yet")
+                                .font(.system(size: 12))
+                            // A chat started in a project isn't in the sidebar
+                            // until its first turn: where it will be.
+                            if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
+                        }
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 8)
                     }
                     // "tool" messages are protocol plumbing: the image a
                     // tool produced is attached to the assistant message
@@ -293,7 +298,7 @@ struct ContentView: View {
             }
             .background(GeometryReader { g in
                 Color.clear.onAppear { chatViewportHeight = g.size.height }
-                    .onChange(of: g.size.height) { chatViewportHeight = $0 }
+                    .onChange(of: g.size.height) { chatViewportHeight = $1 }
             })
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
@@ -324,7 +329,7 @@ struct ContentView: View {
             // takes whatever height the window leaves it.
             .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
             // A draft wants the user's eyes: brought into view, wherever it is.
-            .onChange(of: chat.draft?.id) { id in
+            .onChange(of: chat.draft?.id) { _, id in
                 guard let id else {
                     if let before = followBeforeDraft {
                         followChatBottom = before
@@ -340,7 +345,7 @@ struct ContentView: View {
                 }
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
-            .onChange(of: lastUserMessageID) { _ in
+            .onChange(of: lastUserMessageID) {
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
                 followChatBottom = true
@@ -390,6 +395,21 @@ struct ContentView: View {
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
+}
+
+/// "In project …" under an empty chat that's in one. Its own view: only it
+/// is redrawn when the library changes (every save does).
+private struct EmptyChatProjectNote: View {
+    let sessionID: UUID
+    @ObservedObject private var store = ChatLibraryStore.shared
+
+    var body: some View {
+        if let project = store.library.projectContext(forChat: sessionID) {
+            Label(String(format: NSLocalizedString("In project %@", comment: ""), project.name), systemImage: "folder")
+                .font(.system(size: 11))
+                .lineLimit(1)
+        }
+    }
 }
 
 /// The chat content's bottom edge (in the scroll view's coordinates) and height.

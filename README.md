@@ -1,6 +1,13 @@
 # LLMTray
 
-A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.com/ml-explore/mlx-lm) on Apple Silicon — a proper interface instead of a shell script and a terminal tab.
+**Run local AI on Mac.** LLMTray is a native MLX local LLM GUI for macOS, living in the menu bar and built on [mlx-lm](https://github.com/ml-explore/mlx-lm) for Apple Silicon. It gives you a proper interface instead of a shell script and a terminal tab. It also provides:
+
+- an **OpenAI-compatible local API on Apple Silicon** for your apps and **local AI coding agents on Mac**;
+- chat with tools;
+- **local image generation and editing on Mac**;
+- local music generation.
+
+The models run on your Mac. Only the optional web tools reach the internet.
 
 <p align="center">
   <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
@@ -11,12 +18,17 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
   &nbsp;
   <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"><img src="https://img.shields.io/badge/Download-LLMTray--Full.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray-Full.dmg"></a>
   <br>
-  <sub>Light — ~2MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~260MB, self-contained</sub>
+  <sub>Light — ~3MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~254MB, self-contained</sub>
   <br><br>
   <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
 </p>
 
 ## What it does
+
+- **OpenAI-compatible local API on Apple Silicon** at `http://localhost:8765/v1`. A client can name a model in each request, and LLMTray switches to it (without one, the loaded model answers). A setting decides whether outside clients may switch the loaded model, must ask first, or keep what's loaded.
+- **Local AI coding agents on Mac.** Point any OpenAI-compatible agent or editor at that endpoint (`OPENAI_BASE_URL=http://localhost:8765/v1`), and the model's profile fills in its sampling defaults.
+- **Local image generation and editing on Mac.** The chat model calls Z-Image Turbo or FLUX.2 klein, using our GPTQ checkpoints on Hugging Face, and edits photos with klein. Also local music with sung lyrics (ACE-Step 1.5), and a Creator mode for reviewing a prompt before anything is made. All optional, and downloaded only when turned on in Settings.
+- **Chat** with tabs, projects and their instructions, and tools (web search, news, Wikipedia, weather, calculator, …).
 
 - **Start/stop `mlx_lm.server`** from the menu bar, against any model in your models folder (`~/.llmtray/models` by default, configurable in Settings — point it at `~/.lmstudio/models` to share models already downloaded via LM Studio).
 - **Browse and download models from Hugging Face** right from the app — search, see file sizes, download with a real progress bar (speed, ETA, pause/resume), and a size check on every file so a truncated download doesn't quietly pass as "done."
@@ -27,7 +39,7 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 ## Requirements
 
-- macOS 13+, Apple Silicon.
+- macOS 14+, Apple Silicon (v0.7.2 is the last release for macOS 13).
 - Xcode command line tools (`swift build`) — no full Xcode project needed.
 - **Python 3.10+** somewhere on the machine (Homebrew, pyenv, MacPorts, Anaconda/Miniconda, or python.org) — used once to create the `mlx-lm` venv in `runtime/`. The macOS-provided `/usr/bin/python3` (Xcode Command Line Tools, currently 3.9.x) is too old: `mlx` doesn't publish wheels for it, so the first-run setup fails with a `pip` "could not find a version that satisfies the requirement mlx" error if that's the only Python installed. LLMTray looks for a newer interpreter in common install locations automatically; it only falls back to the CLT one if none of those exist.
 
@@ -35,11 +47,11 @@ A native macOS menu bar app for running local LLMs with [mlx-lm](https://github.
 
 Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtray/releases/latest):
 
-- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~2MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
-- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~260MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
+- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~3MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
+- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~254MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
 
 1. Download one of the two above and drag it to Applications.
-2. First launch (this build isn't notarized): open it once, then **System Settings → Privacy & Security → "Open Anyway"** (macOS 15+; on macOS 13–14, right-click the app → Open also works). Or in Terminal: `xattr -dr com.apple.quarantine /Applications/LLMTray.app`.
+2. First launch (this build isn't notarized): open it once, then **System Settings → Privacy & Security → "Open Anyway"** (macOS 15+; on macOS 14, right-click the app → Open also works). Or in Terminal: `xattr -dr com.apple.quarantine /Applications/LLMTray.app`.
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
 The very first start creates the `mlx-lm` venv and installs our fork automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.

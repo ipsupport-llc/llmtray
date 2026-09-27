@@ -17,7 +17,7 @@ struct ServerLogView: View {
                     .padding(10)
                     .id("bottom")
             }
-            .onChange(of: server.log) { _ in
+            .onChange(of: server.log) {
                 proxy.scrollTo("bottom", anchor: .bottom)
             }
             .onAppear {

@@ -46,6 +46,14 @@ struct ChatSidebar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
+            if store.isReadOnly {
+                Label("Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it.",
+                      systemImage: "exclamationmark.triangle")
+                    .font(.system(size: 10))
+                    .foregroundColor(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(8)
+            }
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 1) {
                     if !query.isEmpty {
@@ -78,7 +86,7 @@ struct ChatSidebar: View {
         ) { project in
             Button("Delete Project", role: .destructive) { store.deleteProject(project.id) }
         } message: { _ in
-            Text("Its chats stay, back among the recents.")
+            Text("Its chats stay, back among the recents; the project's instructions and files are deleted.")
         }
     }
 
@@ -165,6 +173,13 @@ struct ChatSidebar: View {
                             .font(.caption).foregroundColor(.secondary)
                             .padding(.leading, 30).padding(.vertical, 3)
                     }
+                    Button { open { tabs.newChat(inProject: project.id) } } label: {
+                        Label("New chat", systemImage: "square.and.pencil").font(.caption)
+                    }
+                    .buttonStyle(SidebarRowStyle(isSelected: false))
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 18)
+                    .help("New chat in this project")
                     ForEach(chats) { row($0, in: "project").padding(.leading, 18) }
                 }
             }
@@ -219,7 +234,7 @@ struct ChatSidebar: View {
                 .onSubmit { commitRename(summary.id) }
                 .onExitCommand { renaming = nil }
                 // Clicking elsewhere commits it, like Finder.
-                .onChange(of: chatRenameFocused) { focused in
+                .onChange(of: chatRenameFocused) { _, focused in
                     if focused { renameHadFocus = true } else if renameHadFocus { commitRename(summary.id) }
                 }
                 .onAppear { DispatchQueue.main.async { chatRenameFocused = true } }
@@ -293,7 +308,7 @@ struct ChatSidebar: View {
                 .focused($projectRenameFocused)
                 .onSubmit { commitProjectRename(project.id) }
                 .onExitCommand { renamingProject = nil }
-                .onChange(of: projectRenameFocused) { focused in
+                .onChange(of: projectRenameFocused) { _, focused in
                     if focused { renameHadFocus = true } else if renameHadFocus { commitProjectRename(project.id) }
                 }
                 .onAppear { DispatchQueue.main.async { projectRenameFocused = true } }
@@ -323,12 +338,20 @@ struct ChatSidebar: View {
                 }
             }
             .contextMenu {
+                // Saved chats only: a temporary chat is never in a project.
+                Button("New Chat in Project") {
+                    collapsedProjects.remove(project.id)
+                    open { tabs.newChat(inProject: project.id) }
+                }
+                Divider()
+                Button("Instructions…") { ProjectInstructionsWindow.show(project.id) }
                 Button("Rename…") {
                     renameHadFocus = false
                     renaming = nil
                     projectDraft = project.name
                     renamingProject = project.id
                 }
+                Divider()
                 Button("Delete Project…", role: .destructive) { projectToDelete = project }
             }
         }

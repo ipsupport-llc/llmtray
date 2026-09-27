@@ -60,6 +60,14 @@
 - **The Full build's Python is pinned** (`runtime/python_runtime.json`):
   a new CPython minor ships before MLX wheels do (51e9997).
 
+### The minimum macOS is the one CI runs
+
+macOS 14 (from v0.7.3; v0.7.2 was the last for macOS 13):
+`Package.swift` `platforms`, `LSMinimumSystemVersion`, the site and the
+README. The oldest system CI runs is `macos-14`; a minimum below it was a
+claim nothing tested (the extractor's packaged smoke test, 0012, had no
+macOS 13 to run on).
+
 ### CI builds on an older toolchain
 
 The app's build workflows run on `macos-14` (the Pages feed job on

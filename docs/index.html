@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LLMTray — local LLM menu bar app for macOS (mlx-lm)</title>
-<meta name="description" content="LLMTray is a native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat — in a ~2MB download (native Swift, no Electron); the mlx-lm runtime installs on first launch.">
+<title>LLMTray — Run Local AI on Mac · MLX LLM GUI for macOS</title>
+<meta name="description" content="Run local AI on Mac with LLMTray, an MLX local LLM GUI for macOS: an OpenAI-compatible local API on Apple Silicon for apps and local AI coding agents, chat with tools, and local image generation and editing.">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="vPSnv-ACweVU7zedD6wmncgyS5txK4xSHu5ZJ_OzHII" />
 <link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/">
@@ -16,16 +16,16 @@
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LLMTray">
-<meta property="og:title" content="LLMTray — local LLM menu bar app for macOS">
-<meta property="og:description" content="A native, ~2MB macOS menu bar app for running local LLMs with mlx-lm: server control, Hugging Face model browser, and chat. No Electron.">
+<meta property="og:title" content="LLMTray — Run local AI on Mac">
+<meta property="og:description" content="An MLX local LLM GUI for macOS: an OpenAI-compatible local API on Apple Silicon, local AI coding agents, chat with tools, and local image generation and editing. Native Swift; models run on your Mac.">
 <meta property="og:url" content="https://ipsupport-llc.github.io/llmtray/">
 <meta property="og:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LLMTray — local LLM menu bar app for macOS">
-<meta name="twitter:description" content="A native, ~2MB macOS menu bar app for running local LLMs with mlx-lm. No Electron.">
+<meta name="twitter:title" content="LLMTray — Run local AI on Mac">
+<meta name="twitter:description" content="MLX local LLM GUI for macOS: OpenAI-compatible local API on Apple Silicon, local AI coding agents, local image generation and editing.">
 <meta name="twitter:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
 
 <script type="application/ld+json">
@@ -34,11 +34,32 @@
   "@type": "SoftwareApplication",
   "name": "LLMTray",
   "url": "https://ipsupport-llc.github.io/llmtray/",
-  "description": "A native macOS menu bar app for running local LLMs with mlx-lm on Apple Silicon: start/stop a server, browse and download models from Hugging Face, and chat.",
+  "description": "Run local AI on Mac: LLMTray is a native MLX local LLM GUI for macOS. It serves an OpenAI-compatible local API on Apple Silicon for apps, editors and local AI coding agents, chats with tools, and does local image generation and editing and local music generation. Models run on the Mac; only the optional web tools reach the internet.",
   "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "macOS 13+ (Apple Silicon)",
-  "downloadUrl": "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg",
-  "fileSize": "2MB",
+  "applicationSubCategory": "Local AI / LLM",
+  "operatingSystem": "macOS 14 or later (Apple Silicon)",
+  "softwareVersion": "__LATEST_VERSION__",
+  "dateModified": "__LATEST_DATE__",
+  "releaseNotes": "https://github.com/ipsupport-llc/llmtray/releases/latest",
+  "downloadUrl": [
+    "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg",
+    "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"
+  ],
+  "softwareRequirements": "Apple Silicon Mac; Light build: Python 3.10+",
+  "screenshot": "https://ipsupport-llc.github.io/llmtray/assets/screenshot-popover.png",
+  "image": "https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg",
+  "featureList": [
+    "Menu bar control of local models (mlx-lm on Apple Silicon)",
+    "OpenAI-compatible /v1/chat/completions on localhost, switching models by request",
+    "A local backend for coding agents and editors",
+    "Chat with tabs, projects, reasoning and tools (web search, Wikipedia, weather, calculator)",
+    "Image generation and editing (Z-Image Turbo, FLUX.2 klein)",
+    "Local music generation with sung lyrics (ACE-Step 1.5)",
+    "Hugging Face model browser with resumable downloads",
+    "Per-model profiles, KV-cache quantization, speculative decoding"
+  ],
+  "keywords": "run local AI on Mac, MLX local LLM GUI for macOS, OpenAI-compatible local API on Apple Silicon, local image generation and editing on Mac, local AI coding agents on Mac",
+  "isAccessibleForFree": true,
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -47,9 +68,18 @@
   "license": "https://github.com/ipsupport-llc/llmtray/blob/main/LICENSE",
   "author": {
     "@type": "Organization",
-    "name": "ipsupport-llc",
+    "name": "IP Support",
     "url": "https://github.com/ipsupport-llc"
-  }
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "IP Support",
+    "url": "https://github.com/ipsupport-llc"
+  },
+  "sameAs": [
+    "https://github.com/ipsupport-llc/llmtray",
+    "https://huggingface.co/roman220220"
+  ]
 }
 </script>
 
@@ -215,54 +245,90 @@
     <header>
       <img class="icon-img" src="assets/icon-512.png" alt="LLMTray icon">
       <h1>LLMTray</h1>
-      <p class="tagline">Local LLMs from your macOS menu bar — no terminal tab required.</p>
-
+      <p class="tagline">Run local AI on Mac, from the menu bar. An MLX local LLM GUI for macOS: the models run on your own GPU.</p>
       <div class="cta">
         <div class="cta-buttons">
-          <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
+          <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            <span>Download for macOS<span class="sub">~2MB · installs the mlx-lm runtime (~450MB) on first launch, needs Python 3.10+</span></span>
+            <span>Download for macOS<span class="sub">Full · ~254MB · Python + mlx-lm inside, nothing else needed</span></span>
           </a>
-          <a class="btn-download alt" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">
+          <a class="btn-download alt" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            <span>Download Full<span class="sub">~270MB · Python + mlx-lm inside, nothing else needed</span></span>
+            <span>Download Light<span class="sub">~3MB · installs the mlx-lm runtime on first launch, needs Python 3.10+</span></span>
           </a>
         </div>
-        <span class="cta-meta">macOS 13+ (Apple Silicon) · not notarized: allow it once in Privacy &amp; Security</span>
+        <span class="cta-meta">macOS 14+ (Apple Silicon) · free · not notarized: allow it once in Privacy &amp; Security</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
-
       <div class="badges">
-        <span class="badge">No Electron</span>
-        <span class="badge">Swift / SwiftUI</span>
+        <span class="badge">MLX on Apple Silicon</span>
+        <span class="badge">OpenAI-compatible API</span>
+        <span class="badge">Native Swift, no Electron</span>
         <span class="badge">Apache 2.0</span>
       </div>
-
-      <img class="screenshot" src="assets/screenshot-popover.png" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
+      <img class="screenshot" src="assets/screenshot-popover.png" alt="LLMTray, an MLX local LLM GUI for macOS: the menu bar popover with a running local model, model picker and chat settings">
     </header>
 
     <section>
-      <h2>What it does</h2>
+      <h2>Run local AI on Mac</h2>
+      <p style="color: var(--fg-muted);">Pick a model and LLMTray starts it on your Mac's GPU with <a href="https://github.com/ml-explore/mlx-lm">mlx-lm</a>. There is no terminal, no cloud account and no API key. The models, and what you give them, stay on the machine. Only the optional web tools (search, news, Wikipedia, weather) send their queries out, and only when the model calls them.</p>
+    </section>
+
+    <section>
+      <h2>MLX local LLM GUI for macOS</h2>
       <div class="grid">
         <div class="card">
-          <h3>Start/stop a local server</h3>
-          <p>Runs a patched <code>mlx_lm.server</code> against any model in your models folder (<code>~/.llmtray/models</code> by default, or point it at LM Studio's).</p>
+          <h3>Models from Hugging Face</h3>
+          <p>Browse and download MLX models with real progress (speed, ETA, pause/resume) and a size check per file. It also works with the models folder you already have from LM Studio.</p>
         </div>
         <div class="card">
-          <h3>Browse &amp; download from Hugging Face</h3>
-          <p>Search mlx-format models, download with a real progress bar — speed, ETA, pause/resume, and a size check per file.</p>
+          <h3>Chat with tools</h3>
+          <p>Tabs, projects with their own instructions, reasoning you can fold away, and tools the model can call: web search, news, Wikipedia, weather, a calculator and more.</p>
         </div>
         <div class="card">
-          <h3>Built-in chat</h3>
-          <p>Streamed reasoning shown separately from the final answer, tok/s, adjustable temperature/top-p/max tokens.</p>
+          <h3>Tuned per model</h3>
+          <p>Profiles per model cover sampling, KV-cache quantization and speculative decoding (MTP drafters), plus a benchmark that auto-tunes prefill and concurrency.</p>
         </div>
         <div class="card">
-          <h3>Icon reflects real state</h3>
-          <p>Green + pulsing while anything is generating — including an external tool hitting the server directly — orange/red under real thermal pressure.</p>
+          <h3>Lives in the menu bar</h3>
+          <p>The icon shows real state: green while anything generates, including external clients, and orange or red under thermal pressure. A live server log is one click away.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>OpenAI-compatible local API on Apple Silicon</h2>
+      <p style="color: var(--fg-muted);">LLMTray serves <code>http://localhost:8765/v1</code>, which is OpenAI-compatible. A client can name a model in each request, and LLMTray switches to it (without one, the loaded model answers). A setting decides whether an outside client may switch models at once, must ask first, or gets the loaded one. Network access is off by default and can be enabled for your local network.</p>
+      <pre><code>curl http://localhost:8765/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model": "&lt;a model from /v1/models&gt;", "messages": [{"role": "user", "content": "Hello"}]}'</code></pre>
+    </section>
+
+    <section>
+      <h2>Local AI coding agents on Mac</h2>
+      <p style="color: var(--fg-muted);">Point any OpenAI-compatible coding agent, editor extension or script at the local endpoint, and the model reading your code runs on the Mac. The model's profile fills in its sampling defaults for external clients too. Switch between a chat model and a coding model without restarting anything.</p>
+      <pre><code>export OPENAI_BASE_URL=http://localhost:8765/v1
+export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code></pre>
+    </section>
+
+    <section>
+      <h2>Local image generation and editing on Mac</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Generate images in the chat</h3>
+          <p>Ask for a picture, and the chat model writes the prompt for Z-Image Turbo or FLUX.2 klein, running locally. Our GPTQ-quantized checkpoints are published on Hugging Face.</p>
         </div>
         <div class="card">
-          <h3>Small, fast, no bloat</h3>
-          <p>Native Swift/SwiftUI, no Electron. The app itself is a ~2MB download (~6MB on disk) and idles at around 45MB of memory; the models and the mlx-lm runtime (~450MB, installed once) are where the real size is.</p>
+          <h3>Edit your photos locally</h3>
+          <p>Attach or generate an image and ask for a change, such as "make it night, keep everything else". FLUX.2 klein edits it on your Mac.</p>
+        </div>
+        <div class="card">
+          <h3>Music with sung lyrics</h3>
+          <p>ACE-Step 1.5 makes a song from a style and lyrics the model writes. Choose turbo for a fuller mix or sft for clear vocals.</p>
+        </div>
+        <div class="card">
+          <h3>Creator mode</h3>
+          <p>Before an image or song is made, check the prompt, model and settings. It then starts on its own after a short countdown. Make a variant afterwards, or tweak it and try again.</p>
         </div>
       </div>
     </section>
@@ -270,9 +336,10 @@
     <section>
       <h2>Quick start</h2>
       <ol style="padding-left: 1.2rem; color: var(--fg-muted);">
-        <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">Download LLMTray.dmg</a> and drag it to Applications.</li>
-        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 13–14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
-        <li>Click the brain icon in the menu bar and pick a model — the server starts on its own, every launch.</li>
+        <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">Download LLMTray</a> and drag it to Applications.</li>
+        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
+        <li>Click the brain icon in the menu bar and pick a model (or download one from Hugging Face in the app). The local server starts on its own, now and at every launch.</li>
+        <li>Image and music generation are optional. Turn them on in Settings, and their models are downloaded then.</li>
       </ol>
     </section>
 
@@ -286,7 +353,7 @@ swift build
     </section>
 
     <footer>
-      <a href="https://github.com/ipsupport-llc/llmtray">github.com/ipsupport-llc/llmtray</a>
+      <a href="https://github.com/ipsupport-llc/llmtray">github.com/ipsupport-llc/llmtray</a> · made by <a href="https://github.com/ipsupport-llc">IP Support</a>
     </footer>
   </div>
 </body>
