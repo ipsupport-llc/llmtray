@@ -291,6 +291,13 @@ public struct TelemetryReport: Codable, Equatable, Sendable {
         modelFamilies = families.map(\.rawValue).sorted()
     }
 
+    /// The body pretty-printed, for showing the user (same keys and values).
+    public func readableBody() throws -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes, .prettyPrinted]
+        return String(decoding: try encoder.encode(self), as: UTF8.self)
+    }
+
     /// The JSON body: these fields, nothing else.
     public func body() throws -> Data {
         let encoder = JSONEncoder()
@@ -454,6 +461,9 @@ public final class TelemetryCounterStore {
 @MainActor
 public struct TelemetryUploader {
     public var client: TelemetryClient
+    /// Called with each report the server stored (its day and exact body),
+    /// so the app can show what was sent.
+    public var onSent: (@Sendable (String, Data) -> Void)?
     /// nil: TelemetryDay.calendar as of each run -- the time zone the
     /// counters are dated in now, even after it changed.
     public var calendar: Calendar?
@@ -482,6 +492,7 @@ public struct TelemetryUploader {
                 let report = try TelemetryReport(installID: id, day: day, today: today, now: started, environment: environment(),
                                                  usage: usage, calendar: calendar)
                 outcome = await client.send(report)
+                if outcome == .sent, let body = try? report.body() { onSent?(day, body) }
             } catch let error as TelemetryValidationError {
                 outcome = .dropped(code: error.code)   // would be refused just the same
             } catch {

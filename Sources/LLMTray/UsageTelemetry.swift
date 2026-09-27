@@ -22,7 +22,7 @@ final class UsageTelemetry: ObservableObject {
 
     private let defaults: UserDefaults
     private let store: TelemetryCounterStore
-    private let uploader: TelemetryUploader
+    private var uploader: TelemetryUploader
     private var timer: Timer?
     private var sendTask: Task<Void, Never>?
     /// Bumped by each send and by turning off: a cancelled send finishing
@@ -44,6 +44,44 @@ final class UsageTelemetry: ObservableObject {
         installID = defaults[Pref.telemetryInstallID].flatMap(UUID.init(uuidString:))
         if isEnabled, installID == nil { regenerateID() }
         if !isEnabled, installID != nil || !store.counters.days.isEmpty { turnOff() }
+        lastSentJSON = defaults[Pref.telemetryLastSentJSON]
+        lastSentDay = defaults[Pref.telemetryLastSentDay]
+        uploader.onSent = { [weak self] day, body in
+            let readable = (try? JSONSerialization.jsonObject(with: body))
+                .flatMap { try? JSONSerialization.data(withJSONObject: $0, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]) }
+                .map { String(decoding: $0, as: UTF8.self) } ?? String(decoding: body, as: UTF8.self)
+            Task { @MainActor [weak self] in
+                guard let self, self.isEnabled else { return }
+                self.lastSentJSON = readable
+                self.lastSentDay = day
+                self.defaults[Pref.telemetryLastSentJSON] = readable
+                self.defaults[Pref.telemetryLastSentDay] = day
+            }
+        }
+    }
+
+    /// The last report the server stored, as sent (pretty-printed).
+    @Published private(set) var lastSentJSON: String?
+    @Published private(set) var lastSentDay: String?
+
+    /// What the next reports will be, exactly as they'd go out: one per
+    /// day not sent yet, and today's so far (sent once the day is over).
+    /// Off, it shows what today's would look like, with no ID yet.
+    func previewReports() -> [(day: String, pending: Bool, json: String)] {
+        let calendar = TelemetryDay.calendar
+        let now = Date()
+        let today = TelemetryDay.string(for: now, calendar: calendar)
+        let id = installID ?? UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let env = TelemetryEnvironment.current()
+        var days = store.counters.pending(today: today).map { ($0, true) }
+        days.append((today, false))
+        return days.compactMap { day, pending in
+            let usage = store.counters.days[day] ?? TelemetryUsage()
+            guard let report = try? TelemetryReport(installID: id, day: day, today: today, now: now, environment: env,
+                                                    usage: usage, calendar: calendar),
+                  let json = try? report.readableBody() else { return nil }
+            return (day, pending, json)
+        }
     }
 
     // MARK: - Settings
@@ -93,6 +131,10 @@ final class UsageTelemetry: ObservableObject {
         timer?.invalidate()
         timer = nil
         store.erase()
+        lastSentJSON = nil
+        lastSentDay = nil
+        defaults[Pref.telemetryLastSentJSON] = nil
+        defaults[Pref.telemetryLastSentDay] = nil
     }
 
     // MARK: - Counting
