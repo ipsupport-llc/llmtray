@@ -239,7 +239,9 @@ public struct SafeFolderWalker {
         public var capped: Bool
     }
 
-    public func scanEntries(of dir: OpenedDirectory, limit: Int = .max) throws -> Scan {
+    /// `shouldStop` is asked before each name: true ends the read there, as
+    /// `capped` (a time limit, a cancel).
+    public func scanEntries(of dir: OpenedDirectory, limit: Int = .max, shouldStop: () -> Bool = { false }) throws -> Scan {
         let dupFD = dup(dir.descriptor.fd)
         guard dupFD >= 0 else { throw FolderAccessError.system("dup", errno) }
         guard let stream = fdopendir(dupFD) else {
@@ -255,7 +257,7 @@ public struct SafeFolderWalker {
         var capped = false
         while let name = try Self.nextName(stream) {
             if name == "." || name == ".." { continue }
-            if visited >= max(0, limit) {
+            if visited >= max(0, limit) || shouldStop() {
                 capped = true
                 break
             }

@@ -423,9 +423,10 @@ public struct ChangeUndo {
         let want = Array(name.utf8)
         var read = 0
         while let n = try SafeFolderWalker.nextName(stream) {
-            if Array(n.utf8) == want { return true }
-            read += 1
+            // More names than the limit: not known.
             if read >= limit { throw Uncertain(description: "the folder is too large to look for \(name) in") }
+            read += 1
+            if Array(n.utf8) == want { return true }
         }
         return false
     }

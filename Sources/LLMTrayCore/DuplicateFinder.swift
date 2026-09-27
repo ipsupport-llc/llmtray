@@ -78,8 +78,13 @@ public struct DuplicateFinder {
             let room = limits.maxEntries - entriesRead
             // The cap counts every name looked at (denied ones too). Over
             // it: what was read is scanned, then the scan stops.
-            let read = try walker.scanEntries(of: dir, limit: room)
+            // The clock and a cancel are asked while the folder is read too.
+            let deadline = budget.deadline
+            let read = try walker.scanEntries(of: dir, limit: room) { isCancelled() || clock() >= deadline }
             var entries = read.entries
+            if read.capped, budget.stop == nil, read.visited < room {
+                budget.stop = isCancelled() ? .cancelled : .timeLimit
+            }
             let capped = read.capped
             defer { if capped, budget.stop == nil { budget.stop = .fileLimit } }
             entriesRead += read.visited

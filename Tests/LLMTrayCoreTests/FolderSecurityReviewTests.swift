@@ -647,6 +647,16 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertLessThan(report.summary.filesScanned, 20, "partial")
     }
 
+    func testTheDuplicateScansTimeCapCoversReadingAFolder() throws {
+        // Only denied names: nothing to scan, but reading them takes time.
+        for i in 0..<20 { write("slow/x\(i).keychain", "k") }
+        var t = Date(timeIntervalSince1970: 0)
+        var finder = DuplicateFinder(walker: walker, clock: { t = t.addingTimeInterval(1); return t })
+        finder.limits.maxSeconds = 5
+        let report = try finder.find(["slow"])
+        XCTAssertEqual(report.summary.stopped, .timeLimit)
+    }
+
     // MARK: 5. Folders holding denied items
 
     func testAFolderHoldingDeniedItemsIsFlaggedAndNotMovedOrTrashed() throws {
