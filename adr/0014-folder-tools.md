@@ -246,8 +246,11 @@ recovery runs as the one change in progress; turning the feature off
 drops the plans waiting for approval.
 
 Settings lists **one row per folder**: a standing grant (an hour, always)
-of a folder that has one merges into it -- the higher level, the later
-end, always winning -- in `FolderGrants` itself, and duplicates stored
+of a folder that has one merges into it -- the higher level, with the
+lifetime of the grant that carries it (a merge never makes change last
+longer than it was given: change for an hour plus read always is change
+for an hour); between equal levels the later end, always winning -- in
+`FolderGrants` itself, and duplicates stored
 before are merged on load. Only the same path merges (a parent's and a
 child's grant stay two rows); once and per-chat grants and denies are
 untouched. The row edits its level ("Can look" / "Can look and propose

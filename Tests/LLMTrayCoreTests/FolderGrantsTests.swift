@@ -224,23 +224,45 @@ extension FolderGrantsTests {
         let later = try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(4000)), chatID: "c", now: t0.addingTimeInterval(400))
         XCTAssertEqual(later.id, first.id)
         XCTAssertEqual(g.standingGrants(now: t0).map(\.lifetime), [.until(t0.addingTimeInterval(4000))])
-        // An earlier end doesn't shorten it; change is the higher level.
+        // Change is the higher level: its own lifetime, not the read's longer one.
         try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(100)), chatID: nil, origin: .settings, now: t0)
         var only = try XCTUnwrap(g.standingGrants(now: t0).first)
         XCTAssertEqual(g.standingGrants(now: t0).count, 1)
         XCTAssertEqual(only.level, .change)
-        XCTAssertEqual(only.lifetime, .until(t0.addingTimeInterval(4000)))
+        XCTAssertEqual(only.lifetime, .until(t0.addingTimeInterval(100)), "change never lasts longer than given")
         XCTAssertEqual(only.origin, .chat, "where it was first given")
-        // Always wins; read doesn't lower change.
+        // A read always doesn't stretch change: change for its time is kept.
         try g.grant(docs, level: .read, lifetime: .always, chatID: "c", now: t0)
         only = try XCTUnwrap(g.standingGrants(now: t0).first)
         XCTAssertEqual(g.standingGrants(now: t0).count, 1)
         XCTAssertEqual(only.level, .change)
-        XCTAssertEqual(only.lifetime, .always)
-        try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(9000)), chatID: "c", now: t0)
-        XCTAssertEqual(g.standingGrants(now: t0).first?.lifetime, .always, "an hour doesn't shorten always")
+        XCTAssertEqual(only.lifetime, .until(t0.addingTimeInterval(100)))
+        // Equal levels: the later, always wins; an hour doesn't shorten always.
+        try g.grant(docs, level: .change, lifetime: .always, chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).first?.lifetime, .always)
+        try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(9000)), chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).first?.lifetime, .always)
         // On disk as one.
         XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0), g.standingGrants(now: t0))
+    }
+
+    func testMergeRulesByLevel() throws {
+        let hour = GrantLifetime.until(t0.addingTimeInterval(3600))
+        func merge(_ a: (FolderAccessLevel, GrantLifetime), _ b: (FolderAccessLevel, GrantLifetime)) throws -> FolderGrant? {
+            let g = FolderGrants(storeURL: nil)
+            try g.grant(docs, level: a.0, lifetime: a.1, chatID: "c", now: t0)
+            try g.grant(docs, level: b.0, lifetime: b.1, chatID: "c", now: t0)
+            XCTAssertEqual(g.standingGrants(now: t0).count, 1)
+            return g.standingGrants(now: t0).first
+        }
+        var m = try merge((.change, hour), (.read, .always))
+        XCTAssertEqual(m?.level, .change); XCTAssertEqual(m?.lifetime, hour)
+        m = try merge((.read, .always), (.change, hour))
+        XCTAssertEqual(m?.level, .change); XCTAssertEqual(m?.lifetime, hour)
+        m = try merge((.read, hour), (.read, .always))
+        XCTAssertEqual(m?.level, .read); XCTAssertEqual(m?.lifetime, .always)
+        m = try merge((.read, .always), (.read, hour))
+        XCTAssertEqual(m?.lifetime, .always)
     }
 
     func testAnExpiredGrantIsntMergedInto() throws {
@@ -280,7 +302,7 @@ extension FolderGrantsTests {
         XCTAssertEqual(loaded.map(\.root.path), [downloads.path, docs.path])
         XCTAssertEqual(loaded[0].id, a.id)
         XCTAssertEqual(loaded[0].level, .change)
-        XCTAssertEqual(loaded[0].lifetime, .until(t0.addingTimeInterval(120)))
+        XCTAssertEqual(loaded[0].lifetime, .until(t0.addingTimeInterval(90)), "change's own end, not the longer read's")
         XCTAssertEqual(loaded[0].origin, .chat)
         XCTAssertEqual(loaded[1].level, .read, "an expired duplicate adds nothing")
         // Written back merged.

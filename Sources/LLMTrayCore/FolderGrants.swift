@@ -67,13 +67,19 @@ public struct FolderGrant: Codable, Equatable, Identifiable, Sendable {
     }
 
     /// Another standing grant of the same folder folded into this one: the
-    /// higher level, the later lifetime, the folder as last checked; the
-    /// first origin known.
+    /// higher level with that grant's own lifetime (a merge never makes change
+    /// last longer than it was given; a longer read is dropped), the later
+    /// lifetime between equal levels; the folder as last checked; the first
+    /// origin known.
     func merged(with other: FolderGrant) -> FolderGrant {
         var g = self
         g.root = other.root
         g.level = max(level, other.level)
-        g.lifetime = GrantLifetime.later(lifetime, other.lifetime)
+        if other.level > level {
+            g.lifetime = other.lifetime
+        } else if other.level == level {
+            g.lifetime = GrantLifetime.later(lifetime, other.lifetime)
+        }
         g.origin = origin ?? other.origin
         return g
     }
@@ -168,7 +174,7 @@ public final class FolderGrants: @unchecked Sendable {
 
     /// Adds a grant the user gave. A standing grant of a folder that has one
     /// (the same path: a parent's and a child's stay apart) is merged into it
-    /// -- one per folder. A grant for a folder removes this chat's denies it
+    /// -- one per folder, never widening change (`FolderGrant.merged`). A grant for a folder removes this chat's denies it
     /// answers (the user changed their mind). Temporary chats: read only, and
     /// no grant outlives the chat.
     @discardableResult
