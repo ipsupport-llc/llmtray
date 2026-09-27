@@ -342,7 +342,7 @@ struct FoldersPane: View {
                 }
                 if grant.level == .change, grant.lifetime != .always {
                     HStack(spacing: 6) {
-                        Text("then").font(.caption).foregroundStyle(.secondary)
+                        Text(NSLocalizedString("then", comment: "folder grant: what follows when the change part ends")).font(.caption).foregroundStyle(.secondary)
                         Menu(lookAfterTitle(grant)) {
                             Button("Can look · 1 hour") { update(grant, .lookAfterChange(.hour)) }
                             Button("Can look · Always") { update(grant, .lookAfterChange(.always)) }
