@@ -246,6 +246,10 @@ public struct ChangeUndo {
                 return
             }
             beforeOperation?(item)
+            // Looked at again right before the rename: still the item.
+            guard try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity else {
+                throw FolderAccessError.changed("\(name) was replaced since")
+            }
             if renameatx_np(dir.descriptor.fd, name, back.descriptor.fd, s.location.name, excl) != 0 {
                 let e = errno
                 if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
@@ -284,6 +288,10 @@ public struct ChangeUndo {
                 return
             }
             beforeOperation?(item)
+            // Looked at again right before the rename: still the item.
+            guard try Self.lstatIfPresent(trashed.path)?.identity == r.identity else {
+                throw FolderAccessError.changed("\(s.location.name) changed in the Trash")
+            }
             if renameatx_np(AT_FDCWD, trashed.path, back.descriptor.fd, s.location.name, excl) != 0 {
                 let e = errno
                 if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
@@ -539,11 +547,18 @@ public struct ChangeUndo {
         func leftGrant() -> FolderAccessError { .changed("\(comps(dir)) left the grant") }
         /// The item from `from` (in `fromFD`) back under its own name,
         /// exclusively, confirmed by identity -- only while its folder is
-        /// inside the grant, before and after (else it is taken back).
-        func putBack(from fromFD: Int32, _ from: String, _ shown: String) throws {
+        /// inside the grant, before and after (else it is taken back). Out of
+        /// a held staging folder (`folder`), that folder must still be the
+        /// one under its name in the item's folder, before and after too.
+        func putBack(from fromFD: Int32, _ from: String, _ shown: String, folder: Descriptor? = nil) throws {
             guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
+            func folderInPlace() -> Bool {
+                guard let folder else { return true }
+                return (try? Posix.lstatAt(pfd, st.name))?.identity == folder.identity
+            }
             recoveryHook?(.beforeRename, item)
             guard w.stillInside(dir) else { throw leftGrant() }
+            guard folderInPlace() else { throw FolderAccessError.changed("\(st.name) was moved since") }
             // Looked at again right before the rename: it must still be the
             // item.
             guard try Posix.lstatAt(fromFD, from)?.identity == s.identity else {
@@ -566,9 +581,11 @@ public struct ChangeUndo {
                 }
                 throw Uncertain(description: "something other than the item was put back as \(s.location.relativePath)")
             }
-            if !w.stillInside(dir) {
-                if ChangeExecutor.renameBack(pfd, s.location.name, fromFD, from, expecting: s.identity) { throw leftGrant() }
-                throw Uncertain(description: "put \(s.location.relativePath) back while its folder left the grant")
+            if !w.stillInside(dir) || !folderInPlace() {
+                if ChangeExecutor.renameBack(pfd, s.location.name, fromFD, from, expecting: s.identity) {
+                    throw folderInPlace() ? leftGrant() : FolderAccessError.changed("\(st.name) was moved since")
+                }
+                throw Uncertain(description: "put \(s.location.relativePath) back while a folder of it moved")
             }
             out.putBack = true
         }
@@ -608,7 +625,7 @@ public struct ChangeUndo {
             // Only the item itself, found in it by identity, goes back.
             if st.kind == .trash, let s = item.source, let inside = try Posix.lstatAt(folder.fd, s.location.name) {
                 if inside.identity == s.identity {
-                    try putBack(from: folder.fd, s.location.name, "in \(st.name)")
+                    try putBack(from: folder.fd, s.location.name, "in \(st.name)", folder: folder)
                     out.restored = true
                 } else if ours {
                     throw Uncertain(description: "\(st.name) holds something other than \(s.location.relativePath)")

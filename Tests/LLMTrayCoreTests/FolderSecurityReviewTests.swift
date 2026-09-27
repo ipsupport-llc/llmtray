@@ -424,6 +424,21 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertFalse(fm.fileExists(atPath: outside + "/r/readme.txt"))
     }
 
+    func testRecoveryDoesntPutBackOutOfAStagingFolderThatLeftTheGrant() throws {
+        write("t/x.txt", "mine")
+        let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        var u = undoer
+        u.recoveryHook = { p, _ in
+            if p == .beforeRename { try? self.fm.moveItem(atPath: self.grant + "/t/" + name, toPath: self.outside + "/staging") }
+        }
+        let r = u.recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("moved since") ?? false, "\(r)")
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/staging/x.txt"), "left where it is")
+        XCTAssertFalse(exists("t/x.txt"))
+    }
+
     func testRecoveryTakesBackWhatWasSwappedInForTheItem() throws {
         write("t/x.txt", "mine")
         let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
