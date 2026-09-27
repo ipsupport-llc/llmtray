@@ -35,6 +35,12 @@ final class OrphanScanTests: XCTestCase {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_MUSIC_RUNNER", with: "LLMTRAY_IMAGE_RUNNER")), [])
     }
 
+    func testOrphanedEmbedRunner() {
+        let line = "  979     1 1700000 \(python) /Applications/LLMTray.app/Contents/Resources/runtime/llmtray_embed_runner.py --registry /r/embedders.json --entry bge-m3 --model-dir /m/bge-m3 LLMTRAY_EMBED_RUNNER=1"
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line).map(\.kind), [.embedRunner])
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_EMBED_RUNNER", with: "LLMTRAY_MUSIC_RUNNER")), [])
+    }
+
     func testRunningLLMTraysChildIsKept() {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: server(pid: 4312, ppid: 2592)), [])
     }

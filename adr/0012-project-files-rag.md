@@ -501,6 +501,14 @@ adds ~20 ms.
   ~150 lines, `gemma3-bidir`): only `mlx`, `tokenizers`, `numpy` — all in
   the app's venv already; not `mlx-embeddings` (36 more packages), not
   mlx-lm (the fork pin doesn't matter). Spike: branch `spike/rag-embed`.
+  It runs in **the mlx-lm server's venv** (`mlx_server_venv`), not a venv
+  of its own like mflux's or music's: those exist because their stacks
+  pull conflicting transformers/tokenizers versions, while the runner
+  needs nothing the server venv lacks, and its own venv would download the
+  same ~200 MB of wheels again. The coupling to the fork pin's versions is
+  guarded rather than assumed: every load re-embeds the reference vectors
+  (below), so an mlx or tokenizers bump that changed the vectors refuses
+  the model instead of mixing old and new vectors in one set.
 - **bge-m3 weights**: `mlx-community/bge-m3-mlx-fp16` (1.1 GB, MIT),
   pinned by revision and per-file sha256, tokenizer.json pinned by hash
   (BAAI's older file adds a token before `</s>` after trailing
@@ -647,10 +655,11 @@ contextual-retrieval.
       `withoutEarlierProjectResults`, compaction without tool text,
       citations in `ChatMessage`/`PersistedMessage` (with project and
       rev) and their chips, the per-call trust barrier.
-   4. **The index and tools**: `ProjectIndex` + `ProjectIndexRegistry`
-      (schema, FTS, packed vectors, staging/reconcile, maintenance), the
-      embed runner and registry (bge-m3), the background lane of
-      `GenerationQueue`, the three tools.
+   4. **The index and tools**, in two PRs: 4a `ProjectIndex` +
+      `ProjectIndexRegistry` (schema, FTS, packed vectors,
+      staging/reconcile, maintenance), the embed runner and registry
+      (bge-m3), the background lane of `GenerationQueue`; 4b, after the
+      chat plumbing, the indexing job and the three tools.
    5. **Files UI**: the Files view, the sidebar ring with Pause / Stop,
       the menu-bar dot, Settings opt-in.
 
