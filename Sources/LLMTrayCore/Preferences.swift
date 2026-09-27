@@ -76,6 +76,17 @@ public enum Pref {
     public static let reviewPromptSnoozedUntil = PrefKey("llmtray.review.snoozedUntil", default: 0.0)
     /// "Don't ask again".
     public static let reviewPromptNever = PrefKey("llmtray.review.neverAsk", default: false)
+
+    // Telemetry (adr/0015)
+    /// "Share anonymous usage statistics": off until the user turns it on.
+    public static let telemetryEnabled = PrefKey("llmtray.telemetry.enabled", default: false)
+    /// The random install ID reports go with (a UUID string); made when
+    /// telemetry is turned on, removed when it's turned off.
+    public static let telemetryInstallID = PrefKey<String?>("llmtray.telemetry.installID", default: nil)
+    /// The last report the server stored, pretty-printed, and its day: shown
+    /// in Settings. Removed with the rest when telemetry is turned off.
+    public static let telemetryLastSentJSON = PrefKey<String?>("llmtray.telemetry.lastSentJSON", default: nil)
+    public static let telemetryLastSentDay = PrefKey<String?>("llmtray.telemetry.lastSentDay", default: nil)
 }
 
 extension UserDefaults {

@@ -710,6 +710,7 @@ final class ChatClient: ObservableObject {
                 }
             }
             guard stillCurrent(), let j = messages.firstIndex(where: { $0.id == messageID }) else { return }
+            recordToolUsage(call, result, settings: settings, chatModel: nil, asToolCall: false)   // the user's, not the model's
             let at = index + 1
             let id = messages[j].id.uuidString
             switch result {
@@ -892,6 +893,34 @@ final class ChatClient: ObservableObject {
         continueWithPendingToolCalls(afterError: completion.error != nil)
     }
 
+    // MARK: - Usage statistics
+
+    /// One use for the opted-in statistics (adr/0015), with the model's
+    /// family. A temporary chat counts nothing, not even a number.
+    private func recordUsage(_ feature: TelemetryFeature, model: String?) {
+        guard currentSessionID != nil else { return }
+        UsageTelemetry.shared.record(feature, model: model)
+    }
+
+    /// A tool that ran (not a refusal, an unknown tool or one this chat
+    /// doesn't offer, which answer in text): a tool call, when the model
+    /// made it, and the image or song it made.
+    private func recordToolUsage(_ call: ToolCall, _ result: ToolResult, settings: ChatSettings, chatModel: String?, asToolCall: Bool) {
+        if case .refused = result { return }
+        guard toolbox.tools.contains(where: { $0.name == call.name && $0.isOffered(settings) }) else { return }
+        if asToolCall { recordUsage(.toolCalls, model: chatModel) }
+        switch result {
+        case .generatedImage:
+            let edit = call.name == EditImageTool.toolName
+            let model = edit ? settings.imageEditModel : settings.imageGenModel
+            recordUsage(edit ? .imageEdit : .imageGenerate, model: model?.hfRepo)
+        case .generatedAudio:
+            recordUsage(.music, model: settings.musicModel.hfRepo)
+        default:
+            break
+        }
+    }
+
     /// A failed request leaves the assistant message that was appended up
     /// front with nothing in it -- remove it rather than leaving a blank
     /// bubble that looks like a hung response.
@@ -920,6 +949,7 @@ final class ChatClient: ObservableObject {
                messages[idx].role == "assistant", !messages[idx].content.isEmpty || !messages[idx].images.isEmpty {
                 // An answer that came through: what the review prompt counts.
                 ReviewPrompter.shared.recordAnswer()
+                recordUsage(.chat, model: pendingRequestContext?.settings.modelPath)
             }
             // After an error too: the history is valid (dangling tool calls
             // closed), and the user's message must not be lost.
@@ -1118,6 +1148,7 @@ final class ChatClient: ObservableObject {
                                      model: drafts[call.id]?.modelID)
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             guard stillCurrent() else { break }
+            recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
             switch result {
             case .text(let text):
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))

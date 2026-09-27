@@ -210,6 +210,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(showReview), name: .showReview, object: nil
         )
         ReviewPrompter.shared.recordLaunch()
+        UsageTelemetry.shared.start()   // nothing unless the user opted in
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
         )
