@@ -45,7 +45,7 @@ public enum ProjectFiles {
     static let listingDescription = "List the files of this chat's project (none can be searched yet)."
     static let docDescription = "A file's id"
     static let pagesDescription = "With doc: pages to read verbatim, e.g. \"3\" or \"3-5\""
-    static let pinDescription = "With doc: true keeps the whole file in this project's chats (only if the user asks); false stops"
+    static let pinDescription = "With doc: true loads the whole file into memory (context) for this project's chats, when the user asks; false stops"
 
     /// The declaration for a mode; nil for `.none`.
     public static func declaredSchema(for mode: ProjectFilesMode) -> ToolSchema? {
@@ -370,7 +370,7 @@ public final class ProjectFilesService {
         var head = note.map { $0 + "\n" } ?? ""
         head += "\(docs.count) file(s) in this project (id. name -- pages -- status):"
         let hint = searchable && note == nil
-            ? "\nSearch: \(ProjectFiles.toolName)({\"query\":\"...\"}); read: \(ProjectFiles.toolName)({\"doc\":1,\"pages\":\"1-2\"})." : ""
+            ? "\nSearch: \(ProjectFiles.toolName)({\"query\":\"...\"}); read: \(ProjectFiles.toolName)({\"doc\":1,\"pages\":\"1-2\"}); load a whole file into memory when asked: {\"doc\":1,\"pin\":true}. Only a pinned file is in memory." : ""
         // Documents come in id order.
         let start = docs.firstIndex { $0.doc >= Int64(from) } ?? docs.count
         func row(_ d: IndexedDocument, name: String) -> String {
