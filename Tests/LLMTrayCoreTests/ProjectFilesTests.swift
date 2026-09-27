@@ -80,9 +80,14 @@ final class ProjectFilesArgumentTests: XCTestCase {
         XCTAssertEqual(try request(#"{"doc":3,"pin":true}"#)?.get(), .pin(doc: 3, on: true))
         XCTAssertEqual(try request(#"{"doc":3,"pin":false}"#)?.get(), .pin(doc: 3, on: false))
         XCTAssertEqual(try request(#"{"file":"3","pinned":"true"}"#)?.get(), .pin(doc: 3, on: true), "strings")
-        XCTAssertEqual(try request(#"{"doc":3,"load":"FALSE"}"#)?.get(), .pin(doc: 3, on: false))
-        XCTAssertEqual(try request(#"{"doc":3,"keep":true,"pages":"2"}"#)?.get(), .pin(doc: 3, on: true), "pin wins over a read")
-        XCTAssertEqual(try request(#"{"doc":3,"attach":true}"#)?.get(), .pin(doc: 3, on: true))
+        XCTAssertEqual(try request(#"{"doc":3,"pin":"FALSE"}"#)?.get(), .pin(doc: 3, on: false))
+        XCTAssertEqual(try request(#"{"doc":3,"pinned":true,"pages":"2"}"#)?.get(), .pin(doc: 3, on: true), "pin wins over a read")
+        // Only "pinned": "load", "keep", "attach" aren't pins (a stray word
+        // mustn't put a book in every request).
+        for word in ["load", "keep", "attach"] {
+            XCTAssertEqual(try request(#"{"doc":3,"\#(word)":true}"#)?.get(), .read(.init(doc: 3, page: 1, last: Int.max)), word)
+        }
+        XCTAssertEqual(ProjectFiles.schema.param("pin")?.aliases, ["pinned"])
         guard case .failure(let e) = try XCTUnwrap(request(#"{"pin":true}"#)) else { return XCTFail("pin without doc") }
         XCTAssertEqual(e.message, #"project_files: "pin" needs "doc", the file's id (call with no arguments to list them). "#
                        + #"Retry: project_files({"doc":<integer>,"pin":true})"#)

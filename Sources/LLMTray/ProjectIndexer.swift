@@ -402,17 +402,35 @@ final class ProjectIndexer: ObservableObject {
                   let self, !Task.isCancelled else { return }
             if self.pins[project] != pinned { self.pins[project] = pinned }
             let docs = (self.documents[project] ?? []).filter { $0.status.isSearchable }
-            var sizes = (self.pinTokens[project] ?? [:]).filter { entry in docs.contains { $0.doc == entry.key } }
-            var revs = (self.pinTokenRevs[project] ?? [:]).filter { entry in sizes[entry.key] != nil }
-            for d in docs where revs[d.doc] != d.rev {
-                guard let t = try? await handle.read({ try $0.pinTokens(of: [d]) })[d.doc], !Task.isCancelled else { continue }
-                sizes[d.doc] = t
-                revs[d.doc] = d.rev
+            let live = Set(docs.map(\.doc))
+            self.pinTokenRevs[project] = (self.pinTokenRevs[project] ?? [:]).filter { live.contains($0.key) }
+            let kept = (self.pinTokens[project] ?? [:]).filter { live.contains($0.key) }
+            if self.pinTokens[project] != kept { self.pinTokens[project] = kept }
+            // Kept as they're measured (a newer refresh goes on from them),
+            // shown every few files: a bulk index doesn't leave every pin
+            // "measuring" until the last one.
+            var measured: [(doc: Int64, rev: Int64, tokens: Int)] = []
+            for d in docs where self.pinTokenRevs[project]?[d.doc] != d.rev {
+                if Task.isCancelled { break }
+                guard let t = try? await handle.read({ try $0.pinTokens(of: [d]) })[d.doc] else { continue }
+                measured.append((d.doc, d.rev, t))
+                if measured.count >= 10 {
+                    self.storePinSizes(measured, in: project)
+                    measured = []
+                }
             }
-            guard !Task.isCancelled, self.isEnabled else { return }
-            self.pinTokenRevs[project] = revs
-            if self.pinTokens[project] != sizes { self.pinTokens[project] = sizes }
+            self.storePinSizes(measured, in: project)
         }
+    }
+
+    private func storePinSizes(_ measured: [(doc: Int64, rev: Int64, tokens: Int)], in project: UUID) {
+        guard !measured.isEmpty, isEnabled else { return }
+        var sizes = pinTokens[project] ?? [:]
+        for m in measured {
+            sizes[m.doc] = m.tokens
+            pinTokenRevs[project, default: [:]][m.doc] = m.rev
+        }
+        pinTokens[project] = sizes
     }
 
     /// What the project's pinned files may take with `settings`' model: half
@@ -420,7 +438,7 @@ final class ProjectIndexer: ObservableObject {
     /// memory its weights leave.
     static func pinLimit(for settings: ChatSettings) -> PinLimit {
         let kvBits: Int
-        if let path = settings.modelPath, !ModelDiscovery.disallowsQuantizedKV(forModelPath: path) {
+        if let path = settings.modelPath, !facts(path).disallowsQuantizedKV {
             kvBits = ProfileManager.shared.resolved(for: path).kvBits
         } else {
             kvBits = 0
@@ -428,6 +446,25 @@ final class ProjectIndexer: ObservableObject {
         let kv = settings.modelPath.map { KVCacheSize.bytesPerToken(modelPath: $0, kvBits: kvBits) } ?? KVCacheSize.fallbackBytesPerToken
         return PinLimit(context: settings.maxTokensCap, maxTokens: settings.maxTokens, gpuLimitBytes: gpuLimitBytes,
                         weightsBytes: settings.modelPath.map(weightsBytes) ?? 0, kvBytesPerToken: kv)
+    }
+
+    /// The same for a model by its id (the Files window's, at every
+    /// render): its config read once.
+    static func pinLimit(forModel modelID: String?) -> PinLimit {
+        let cap = modelID.map { facts($0).maxContext } ?? ChatSettings.maxContext(forModel: nil)
+        var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
+        settings.modelPath = modelID
+        return pinLimit(for: settings)
+    }
+
+    /// What a model's config says that the limit needs, read once per path.
+    private static var factsCache: [String: (maxContext: Int, disallowsQuantizedKV: Bool)] = [:]
+
+    private static func facts(_ path: String) -> (maxContext: Int, disallowsQuantizedKV: Bool) {
+        if let known = factsCache[path] { return known }
+        let f = (ChatSettings.maxContext(forModel: path), ModelDiscovery.disallowsQuantizedKV(forModelPath: path))
+        factsCache[path] = f
+        return f
     }
 
     /// The GPU limit, read once (a Metal device each time otherwise).

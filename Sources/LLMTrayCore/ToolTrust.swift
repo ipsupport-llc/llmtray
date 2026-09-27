@@ -28,20 +28,27 @@ public enum ToolTrust {
         public var changeResult = false
         /// A network tool (or a generator) returned something: web text.
         public var networkText = false
+        /// The request carries the project's pinned files (adr/0012, "Pinned
+        /// files"): file text from the turn's start, every turn while pinned.
+        public var pinnedText = false
 
-        public init(projectText: Bool = false, folderText: Bool = false, changeResult: Bool = false, networkText: Bool = false) {
+        public init(projectText: Bool = false, folderText: Bool = false, changeResult: Bool = false, networkText: Bool = false,
+                    pinnedText: Bool = false) {
             self.projectText = projectText
             self.folderText = folderText
             self.changeResult = changeResult
             self.networkText = networkText
+            self.pinnedText = pinnedText
         }
 
         /// Anything that names files: guarded tools are off.
-        public var hasUntrustedText: Bool { projectText || folderText || changeResult }
+        public var hasUntrustedText: Bool { projectText || folderText || changeResult || pinnedText }
         /// Outside text a change could be prompted by -- file, folder or web
         /// text: folder changes are off (a change's own result isn't: its
         /// names are the model's).
-        public var hasFileText: Bool { projectText || folderText || networkText }
+        public var hasFileText: Bool { projectText || folderText || networkText || pinnedText }
+        /// What this turn's tool results brought in (the pinned prefix aside).
+        public var hasToolText: Bool { projectText || folderText || changeResult || networkText }
 
         /// After a call of `kind` returned.
         public mutating func record(_ kind: Kind) {
@@ -60,6 +67,12 @@ public enum ToolTrust {
     public static func allowsGuarded(projectTextThisTurn: Bool) -> Bool { !projectTextThisTurn }
 
     public static func allowsGuarded(_ state: TurnState) -> Bool { !state.hasUntrustedText }
+
+    /// A file may be pinned (project_files' pin: true): not after text a
+    /// tool returned this turn -- a file mustn't pin itself or another --
+    /// though the pinned files' own text doesn't count (else a project with
+    /// one pinned could never pin a second). Unpinning is always allowed.
+    public static func allowsPin(_ state: TurnState) -> Bool { !state.hasToolText }
 
     /// Folder changes may be declared and run: not after file or folder
     /// text in this turn.
@@ -105,8 +118,18 @@ public enum ToolTrust {
         + "the user's next message. Describe the changes you'd make and ask the user to confirm; then call "
         + "change_files first thing in that turn, without reading again."
 
+    /// The refusal of a guarded or change call while files are pinned: the
+    /// next message won't lift it.
+    public static let pinnedRefusal = "Not run: this project has pinned files in context, so web search, generators and "
+        + "folder changes are off in its chats. Tell the user; they can unpin files in the project's Files window."
+
+    /// The refusal of a pin after a tool's text this turn.
+    public static let pinRefusal = "Not pinned: text a tool returned this turn can't pin files. Ask the user to pin it "
+        + "in the project's Files window, or to ask again in a new message."
+
     /// The refusal a guarded or change call gets in `state`.
     public static func refusalText(for kind: Kind, _ state: TurnState) -> String {
+        if state.pinnedText { return pinnedRefusal }
         if kind == .folderChange { return changeRefusal }
         return state.projectText ? refusal : folderRefusal
     }

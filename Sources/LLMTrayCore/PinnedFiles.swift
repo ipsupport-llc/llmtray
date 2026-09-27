@@ -57,8 +57,14 @@ enum ProjectPins {
     static func key(_ doc: Int64) -> String { keyPrefix + String(doc) }
 
     /// The pinned documents in pin order.
+    /// Only documents still there: a row left by a build that removed a
+    /// pinned file without unpinning it counts for nothing.
     static func read(_ db: SQLiteConnection) throws -> [Int64] {
-        try db.rows("SELECT key FROM meta WHERE key LIKE 'pin:%' ORDER BY value, key") { $0.text(0) }
+        try db.rows("""
+            SELECT key FROM meta WHERE key LIKE 'pin:%'
+              AND EXISTS (SELECT 1 FROM documents d WHERE d.status != 'removing' AND 'pin:' || d.doc = meta.key)
+            ORDER BY value, key
+            """) { $0.text(0) }
             .compactMap { Int64($0.dropFirst(keyPrefix.count)) }
     }
 
@@ -338,8 +344,7 @@ public enum KVCacheSize {
         }
     }
 
-    /// Per token: every attention layer's K and V (V shares K's with
-    /// `attention_k_eq_v`), except sliding-window layers of `layer_types`,
+    /// Per token: every attention layer's K and V, except sliding-window layers of `layer_types`,
     /// whose cache stops growing at their window. Full layers use the
     /// global heads when the config has them (Gemma 4). The language
     /// model's fields are under `text_config` in multimodal configs.
@@ -354,7 +359,9 @@ public enum KVCacheSize {
         guard let headDim = int("head_dim") ?? int("hidden_size").map({ $0 / heads }), headDim > 0 else { return fallbackBytesPerToken }
         let globalHeads = int("num_global_key_value_heads") ?? kvHeads
         let globalDim = int("global_head_dim") ?? headDim
-        let kv: Double = (c["attention_k_eq_v"] as? Bool) == true ? 1 : 2
+        // K and V: mlx-lm keeps both arrays in the cache even when V is
+        // derived from K (Gemma 4's attention_k_eq_v).
+        let kv: Double = 2
         let element = bytesPerElement(kvBits: kvBits)
         guard let types = c["layer_types"] as? [String], !types.isEmpty else {
             return Double(layers * kvHeads * headDim) * kv * element
@@ -363,11 +370,18 @@ public enum KVCacheSize {
         return Double(full * globalHeads * globalDim) * kv * element
     }
 
-    /// From the model folder's config.json (the fallback without one).
+    /// From the model folder's config.json (the fallback without one),
+    /// read once per folder and KV setting.
     public static func bytesPerToken(modelPath: String, kvBits: Int) -> Double {
+        let key = "\(kvBits):\(modelPath)"
+        if let known = cache.withLock({ $0[key] }) { return known }
         let data = FileManager.default.contents(atPath: (modelPath as NSString).appendingPathComponent("config.json"))
-        return bytesPerToken(config: data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }, kvBits: kvBits)
+        let value = bytesPerToken(config: data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }, kvBits: kvBits)
+        cache.withLock { $0[key] = value }
+        return value
     }
+
+    private static let cache = Locked<[String: Double]>([:])
 }
 
 /// A model's weights on disk: its `*.safetensors`, through symlinks (a
@@ -380,5 +394,19 @@ public enum ModelWeights {
             let file = URL(fileURLWithPath: path).appendingPathComponent(name).resolvingSymlinksInPath().path
             return sum + (((try? fm.attributesOfItem(atPath: file))?[.size] as? NSNumber)?.int64Value ?? 0)
         }
+    }
+}
+
+/// A value behind a lock (a cache shared across threads).
+final class Locked<T>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: T
+
+    init(_ value: T) { self.value = value }
+
+    func withLock<R>(_ body: (inout T) -> R) -> R {
+        lock.lock()
+        defer { lock.unlock() }
+        return body(&value)
     }
 }

@@ -840,8 +840,8 @@ every request of the project's chats, so the model has all of it without
 calling the tool. Any indexed file -- a note, a spec, a book -- within the
 limit below. Pinned from the Files window (a pin per row), or by the model
 when the user asks ("load the whole file"): no new tool, one optional
-field of `project_files`, `pin` (boolean, with `doc`; aliases `pinned`,
-`load`, `keep`, `attach`), declared in the `.all` mode only. `pin` without
+field of `project_files`, `pin` (boolean, with `doc`; alias `pinned`),
+declared in the `.all` mode only. `pin` without
 `doc` is an error with a retry, as `pages` is. A temporary chat has no
 project (above), so it can't pin: nothing is written from one.
 
@@ -861,15 +861,16 @@ removal's transaction drops it with the document.
   else Metal's `recommendedMaxWorkingSetSize` -- minus the model's weights
   on disk, the sum of its `*.safetensors`, minus 1.5 GB) / the KV cache's
   bytes per token × 0.5. Bytes per token from `config.json` (its
-  `text_config` if nested): per layer `kv_heads × head_dim × 2` (K and V;
-  × 1 with `attention_k_eq_v`) × 2 bytes (bf16; 1 at 8-bit KV, 0.5 at 4-bit,
-  the profile's `kvBits`, 0 where the model refuses a quantized cache).
+  `text_config` if nested): per layer `kv_heads × head_dim × 2` (K and V:
+  mlx-lm keeps both in its cache, also with `attention_k_eq_v`) × 2 bytes
+  (bf16; 1 at 8-bit KV, 0.5 at 4-bit, the profile's `kvBits`; bf16 where
+  the model refuses a quantized cache).
   With `layer_types`, `sliding_attention` layers add nothing per extra
   token (their window is bounded); every other layer counts fully. Full
   layers use `num_global_key_value_heads` / `global_head_dim` when present
   (Gemma 4), else `num_key_value_heads` / `head_dim` (`hidden_size /
   num_attention_heads` without it). Gemma 4 26B: 5 full layers × 2 heads ×
-  512 × 1 × 2 = 10,240 bytes a token; a dense Llama 8B: 131,072. No usable
+  512 × 2 × 2 = 20,480 bytes a token; a dense Llama 8B: 131,072. No usable
   config: 131,072. No GPU limit known: A alone.
 
 A file's size is its rendered pinned text (below) at the estimator's
@@ -904,9 +905,12 @@ the request, so `project_files`' allowance shrinks by it.
 **Trust.** Pinned text is file text: a turn whose request carries any
 (or a line naming a pinned file) starts with the barrier already down --
 network tools and generators aren't declared and are refused, folder
-changes too, for the whole turn -- as after a project tool's result. The
-Files window says so on the pin. A chat that needs the web with a file
-pinned unpins it (or asks in another chat).
+changes too, for the whole turn -- as after a project tool's result, but
+refused with their own text (the next message won't lift it; the user can
+unpin in the Files window). The Files window says so on the pin. `pin:
+true` is refused once a tool returned text this turn (a file can't pin
+itself or another); the pinned prefix alone doesn't count, else a project
+with a pin could never get a second. Unpinning always works.
 
 **Citations.** The pages sent pinned are the turn's returned pages (kept
 on the turn's user message, in memory like a tool result's), so `[3:12]`

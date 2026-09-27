@@ -133,7 +133,7 @@ private struct ProjectFilesView: View {
             if !indexer.isEnabled {
                 offNote
             } else {
-                let limit = ProjectIndexer.pinLimit(for: ChatSettings.forModel(selectedModelID, supportsVision: false)).tokens
+                let limit = ProjectIndexer.pinLimit(forModel: selectedModelID).tokens
                 header
                 if !pins.isEmpty { pinnedSummary(limit: limit) }
                 controls

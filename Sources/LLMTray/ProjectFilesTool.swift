@@ -43,6 +43,8 @@ final class ProjectFilesTool: ChatTool {
         case .failure(let error): return .text(error.message)
         case .success(let r): request = r
         }
+        // A tool's text this turn can't pin a file (unpinning is fine).
+        if case .pin(_, true) = request, !context.pinAllowed { return .refused(ToolTrust.pinRefusal) }
         let answer = await indexer.filesService.run(
             request, project: project.id,
             byteBudget: context.projectTextBytes ?? ProjectTextBudget.bytes(forTokens: ProjectTextBudget.hardCapTokens),

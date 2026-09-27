@@ -37,7 +37,7 @@ public enum ProjectFiles {
         .init("doc", .integer, docDescription, aliases: ["file", "document", "doc_id", "file_id", "document_id", "id", "file_number"]),
         .init("pages", .string, pagesDescription, aliases: ["page", "page_range", "range", "page_number", "pages_range"]),
         .init("cursor", .string, aliases: ["next", "next_cursor", "continue", "continuation", "token"]),
-        .init("pin", .boolean, pinDescription, aliases: ["pinned", "load", "keep", "attach"]),
+        .init("pin", .boolean, pinDescription, aliases: ["pinned"]),
         .init("top_k", .integer, aliases: ["k", "limit", "n", "count", "max_results", "num_results", "results"]),
     ])
 
