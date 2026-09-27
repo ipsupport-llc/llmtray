@@ -39,8 +39,11 @@
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bitowy";
 "(Please attach the report file shown in Finder.)" = "(Proszę dołączyć plik raportu pokazany w Finderze.)";
+"(estimate; exact after the first answer)" = "(szacunkowo; dokładne po pierwszej odpowiedzi)";
+"(measured for this model)" = "(zmierzone dla tego modelu)";
 "(no result yet)" = "(brak jeszcze wyniku)";
 "(no server output yet)" = "(brak jeszcze danych wyjściowych serwera)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 godz.";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Czat pyta przed zajrzeniem do folderu i pokazuje każdą zmianę jako plan do zatwierdzenia. Miejsca prywatne (Library, keys, katalog domowy) nigdy nie są udostępniane.";
 "A chat model" = "Model rozmów";
@@ -291,6 +294,7 @@
 "Follow the description" = "Trzymaj się opisu";
 "For This Chat" = "Dla tego czatu";
 "For an Hour" = "Na godzinę";
+"For faster answers (speculative decoding)" = "Dla szybszych odpowiedzi (dekodowanie spekulatywne)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Dla modeli z opublikowanym modelem szkicującym (Gemma 4 26B): mały dodatkowy model zgaduje tokeny z wyprzedzeniem, a główny model sprawdza je w jednym przebiegu. Wynik jest taki sam, a działanie szybsze. Żądania są wtedy obsługiwane po kolei.";
 "Found after an interruption" = "Znalezione po przerwaniu";
 "Free disk space" = "Wolne miejsce na dysku";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "Ten folder nie może być udostępniony czatowi: %@";
 "The Keychain refused to remove the token." = "Keychain odmówił usunięcia tokenu.";
 "The Keychain refused to save the token." = "Keychain odmówił zapisania tokenu.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter został pobrany — uruchom ponownie serwer, aby z niego korzystać.";
 "The Mac's chip." = "Chip Maca.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API zgodne z OpenAI nasłuchuje tutaj (http://localhost:<port>/v1). Zmień ten adres, gdy serwer jest zatrzymany.";
 "The app's language (the language only, not the region)." = "Język aplikacji (tylko język, nie region).";
@@ -926,6 +931,8 @@
 "removing" = "usuwanie";
 "rename %lld" = "zmień nazwę %lld";
 "search by words only" = "wyszukuj tylko po słowach";
+"the download finished incomplete" = "pobieranie zakończyło się niepełne";
+"the model runtime isn't installed yet" = "runtime modelu nie jest jeszcze zainstalowany";
 "then" = "następnie";
 "this call only" = "tylko to wywołanie";
 "tight fit" = "dopasowane";

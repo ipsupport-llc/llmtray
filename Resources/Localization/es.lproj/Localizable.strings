@@ -39,8 +39,11 @@
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld bits";
 "(Please attach the report file shown in Finder.)" = "(Adjunte el archivo de informe que se muestra en Finder.)";
+"(estimate; exact after the first answer)" = "(estimación; exacto después de la primera respuesta)";
+"(measured for this model)" = "(medido para este modelo)";
 "(no result yet)" = "(aún no hay resultados)";
 "(no server output yet)" = "(aún no hay salida del servidor)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hora";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Un chat pide permiso antes de mirar en una carpeta y muestra cada cambio como un plan para aprobar. Los lugares privados (Library, keys, la carpeta de inicio) nunca se comparten.";
 "A chat model" = "Un modelo de chat";
@@ -291,6 +294,7 @@
 "Follow the description" = "Seguir la descripción";
 "For This Chat" = "Para este chat";
 "For an Hour" = "Durante una hora";
+"For faster answers (speculative decoding)" = "Para respuestas más rápidas (decodificación especulativa)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Para modelos con un drafter publicado (Gemma 4 26B): un modelo pequeño adivina tokens por adelantado y el principal los verifica en una pasada. Misma salida, más rápido. Las solicitudes se atienden de una en una.";
 "Found after an interruption" = "Encontrados tras una interrupción";
 "Free disk space" = "Espacio libre en disco";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "Esa carpeta no se puede compartir con el chat: %@";
 "The Keychain refused to remove the token." = "El Keychain rechazó eliminar el token.";
 "The Keychain refused to save the token." = "El Keychain rechazó guardar el token.";
+"The MTP drafter has downloaded -- restart the server to use it." = "El MTP drafter se ha descargado; reinicia el servidor para usarlo.";
 "The Mac's chip." = "El chip del Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "Aquí escucha la API compatible con OpenAI (http://localhost:<puerto>/v1). Cámbialo con el servidor detenido.";
 "The app's language (the language only, not the region)." = "El idioma de la app (solo el idioma, no la región).";
@@ -926,6 +931,8 @@
 "removing" = "eliminando";
 "rename %lld" = "renombrar %lld";
 "search by words only" = "buscar solo por palabras";
+"the download finished incomplete" = "la descarga finalizó incompleta";
+"the model runtime isn't installed yet" = "el runtime del modelo aún no está instalado";
 "then" = "entonces";
 "this call only" = "solo esta llamada";
 "tight fit" = "ajuste ajustado";

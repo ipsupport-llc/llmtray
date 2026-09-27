@@ -39,8 +39,11 @@
 "%lld s" = "%lld sn";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Lütfen Finder’da gösterilen rapor dosyasını ekleyin.)";
+"(estimate; exact after the first answer)" = "(tahmini; ilk yanıttan sonra kesinleşir)";
+"(measured for this model)" = "(bu model için ölçüldü)";
 "(no result yet)" = "(henüz sonuç yok)";
 "(no server output yet)" = "(henüz sunucu çıktısı yok)";
+"+ MTP drafter %@" = "+ MTP taslağı %@";
 "1 hour" = "1 saat";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Sohbet bir klasöre bakmadan önce sorar ve her değişikliği onaylamanız için bir plan olarak gösterir. Özel yerler (Library, keys, ana kullanıcı klasörü) asla paylaşılmaz.";
 "A chat model" = "Sohbet modeli";
@@ -291,6 +294,7 @@
 "Follow the description" = "Açıklamayı takip et";
 "For This Chat" = "Bu Sohbet İçin";
 "For an Hour" = "Bir Saat İçin";
+"For faster answers (speculative decoding)" = "Daha hızlı yanıtlar için (spekülatif çözümleme)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış taslak modeli olan modellerde (Gemma 4 26B): küçük bir ek model ilerideki token’ları tahmin eder ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. İstekler bu durumda teker teker işlenir.";
 "Found after an interruption" = "Kesintiden sonra bulunanlar";
 "Free disk space" = "Boş disk alanı";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "O klasör sohbetle paylaşılamaz: %@";
 "The Keychain refused to remove the token." = "Keychain tokenı kaldırmayı reddetti.";
 "The Keychain refused to save the token." = "Keychain tokenı kaydetmeyi reddetti.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP taslağı indirildi — kullanmak için sunucuyu yeniden başlatın.";
 "The Mac's chip." = "Mac'in çipi.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI uyumlu API burada dinler (http://localhost:<port>/v1). Sunucu durdurulmuşken değiştirin.";
 "The app's language (the language only, not the region)." = "Uygulamanın dili (sadece dil, bölge değil).";
@@ -926,6 +931,8 @@
 "removing" = "kaldırılıyor";
 "rename %lld" = "%lld yeniden adlandır";
 "search by words only" = "sadece kelimelere göre ara";
+"the download finished incomplete" = "indirme eksik tamamlandı";
+"the model runtime isn't installed yet" = "model çalışma zamanı henüz kurulmamış";
 "then" = "sonra";
 "this call only" = "sadece bu çağrı için";
 "tight fit" = "sıkı uyum";

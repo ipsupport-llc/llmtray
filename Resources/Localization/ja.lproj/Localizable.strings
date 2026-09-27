@@ -39,8 +39,11 @@
 "%lld s" = "%lld 秒";
 "%lld-bit" = "%lldビット";
 "(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
+"(estimate; exact after the first answer)" = "(概算。最初の応答後に正確値が表示されます)";
+"(measured for this model)" = "(このモデルで計測)";
 "(no result yet)" = "(結果はまだありません)";
 "(no server output yet)" = "（サーバ出力はまだありません）";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1時間";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "チャットはフォルダを参照する前に許可を求め、各変更を承認するための計画として表示します。Library、keys、ホームフォルダなどのプライベートな場所は共有されません。";
 "A chat model" = "チャット用モデル";
@@ -291,6 +294,7 @@
 "Follow the description" = "説明に従う";
 "For This Chat" = "このチャット用";
 "For an Hour" = "1 時間だけ";
+"For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "公開済みの下書きモデルがあるモデル（Gemma 4 26B）では、小さな追加モデルが先のトークンを予測し、メインモデルが1回のパスで確認します。出力は同じで、より高速です。その場合、リクエストは1件ずつ処理されます。";
 "Found after an interruption" = "中断後に見つかった項目";
 "Free disk space" = "空きディスク容量";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "そのフォルダはチャットと共有できません：%@";
 "The Keychain refused to remove the token." = "Keychain がトークンの削除を拒否しました。";
 "The Keychain refused to save the token." = "Keychain がトークンの保存を拒否しました。";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter のダウンロードが完了しました — 使用するにはサーバを再起動してください。";
 "The Mac's chip." = "Macのチップ。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI互換APIはここで待ち受けます（http://localhost:<port>/v1）。サーバが停止している間に変更してください。";
 "The app's language (the language only, not the region)." = "アプリの言語（地域は含みません）。";
@@ -926,6 +931,8 @@
 "removing" = "削除中";
 "rename %lld" = "%lld 件を名前変更";
 "search by words only" = "単語のみで検索";
+"the download finished incomplete" = "ダウンロードが不完全に終了しました";
+"the model runtime isn't installed yet" = "モデル実行環境がまだインストールされていません";
 "then" = "その後";
 "this call only" = "この呼び出しのみ";
 "tight fit" = "ぴったり";

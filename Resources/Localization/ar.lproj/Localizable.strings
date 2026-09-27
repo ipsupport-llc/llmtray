@@ -39,8 +39,11 @@
 "%lld s" = "%lld ث";
 "%lld-bit" = "%lld-بت";
 "(Please attach the report file shown in Finder.)" = "الرجاء إرفاق ملف التقرير المعروض في Finder.";
+"(estimate; exact after the first answer)" = "(تقديري؛ الدقة بعد الإجابة الأولى)";
+"(measured for this model)" = "(مقاس لهذا النموذج)";
 "(no result yet)" = "(لا توجد نتائج بعد)";
 "(no server output yet)" = "(لا توجد مخرجات من الخادم بعد)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "ساعة واحدة";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "يطلب الدردشة إذناً قبل النظر داخل مجلد، ويعرض كل تغيير كخطة للموافقة. الأماكن الخاصة (Library، keys، مجلد المنزل نفسه) لا تُشارك أبداً.";
 "A chat model" = "نموذج دردشة";
@@ -291,6 +294,7 @@
 "Follow the description" = "التقِ بالوصف";
 "For This Chat" = "لهذه الدردشة";
 "For an Hour" = "لمدة ساعة";
+"For faster answers (speculative decoding)" = "لإجابات أسرع (توقّع فك التشفير)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "للنماذج التي لها نموذج مُسوِّد منشور (Gemma 4 26B): يخمّن نموذج إضافي صغير الرموز مسبقًا، ويتحقق منها النموذج الرئيسي في مرور واحد. النتيجة نفسها وبسرعة أكبر. عندئذٍ تُلبّى الطلبات واحدًا تلو الآخر.";
 "Found after an interruption" = "تم العثور عليها بعد انقطاع";
 "Free disk space" = "مساحة القرص الحرة";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "لا يمكن مشاركة ذلك المجلد مع الدردشة: %@";
 "The Keychain refused to remove the token." = "رفض Keychain إزالة الرمز.";
 "The Keychain refused to save the token." = "رفض Keychain حفظ الرمز.";
+"The MTP drafter has downloaded -- restart the server to use it." = "تم تنزيل MTP drafter — أعد تشغيل الخادم لاستخدامه.";
 "The Mac's chip." = "معالج الـ Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "تستمع API المتوافقة مع OpenAI هنا (http://localhost:<port>/v1). غيّرها أثناء توقف الخادم.";
 "The app's language (the language only, not the region)." = "لغة التطبيق (اللغة فقط، لا المنطقة).";
@@ -926,6 +931,8 @@
 "removing" = "جارٍ الإزالة";
 "rename %lld" = "إعادة تسمية %lld";
 "search by words only" = "البحث بالكلمات فقط";
+"the download finished incomplete" = "اكتمل التنزيل جزئيًا";
+"the model runtime isn't installed yet" = "بيئة تشغيل النموذج غير مُثبتة بعد";
 "then" = "ثم";
 "this call only" = "لهذا الطلب فقط";
 "tight fit" = "مناسب بإحكام";

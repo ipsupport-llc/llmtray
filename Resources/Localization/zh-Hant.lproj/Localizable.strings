@@ -39,8 +39,11 @@
 "%lld s" = "%lld 秒";
 "%lld-bit" = "%lld 位元";
 "(Please attach the report file shown in Finder.)" = "（請在 Finder 中附上報告檔案。）";
+"(estimate; exact after the first answer)" = "(估計值；第一次回應後為準)";
+"(measured for this model)" = "(此模型的實測值)";
 "(no result yet)" = "(尚無結果)";
 "(no server output yet)" = "（尚無伺服器輸出）";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 小時";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天室在檢視資料夾前會先詢問，並將每項變更顯示為需您核可的計畫。私人位置（Library、keys、使用者主目錄本身）不會被分享。";
 "A chat model" = "聊天模型";
@@ -291,6 +294,7 @@
 "Follow the description" = "遵循描述";
 "For This Chat" = "用於此聊天室";
 "For an Hour" = "一小時內";
+"For faster answers (speculative decoding)" = "可加速回應（推測解碼）";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "適用於有發布 drafter 的模型（Gemma 4 26B）：一個額外的小模型會預先猜測 token，主模型再一次檢查。輸出相同，但速度更快。接著要求會一次處理一個。";
 "Found after an interruption" = "中斷後找到的項目";
 "Free disk space" = "剩餘磁碟空間";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "該資料夾無法與聊天室分享：%@";
 "The Keychain refused to remove the token." = "Keychain 無法移除該代幣。";
 "The Keychain refused to save the token." = "Keychain 無法儲存該代幣。";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter 已下載完成 — 重新啟動伺服器以使用。";
 "The Mac's chip." = "此 Mac 的晶片。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI 相容 API 會在此監聽（http://localhost:<port>/v1）。請在伺服器停止時變更。";
 "The app's language (the language only, not the region)." = "應用程式語言（僅語言，不包含地區）。";
@@ -926,6 +931,8 @@
 "removing" = "移除中";
 "rename %lld" = "重新命名 %lld 項";
 "search by words only" = "僅以文字搜尋";
+"the download finished incomplete" = "下載未完整完成";
+"the model runtime isn't installed yet" = "尚未安裝模型執行環境";
 "then" = "然後";
 "this call only" = "僅限此呼叫";
 "tight fit" = "空間不足";

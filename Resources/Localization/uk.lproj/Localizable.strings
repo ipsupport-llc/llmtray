@@ -39,8 +39,11 @@
 "%lld s" = "%lld с";
 "%lld-bit" = "%lld біт";
 "(Please attach the report file shown in Finder.)" = "(Будь ласка, додайте файл звіту, показаний у Finder.)";
+"(estimate; exact after the first answer)" = "(оцінка; точно після першої відповіді)";
+"(measured for this model)" = "(виміряно для цієї моделі)";
 "(no result yet)" = "(ще немає результатів)";
 "(no server output yet)" = "(виводу сервера ще немає)";
+"+ MTP drafter %@" = "+ MTP‑складання %@";
 "1 hour" = "1 година";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Чат запитує перед тим, як переглядати папку, і показує кожну зміну як план для затвердження. Приватні місця (Library, keys, сам домашній каталог) ніколи не передаються.";
 "A chat model" = "Модель для чату";
@@ -291,6 +294,7 @@
 "Follow the description" = "Дотримуватися опису";
 "For This Chat" = "Для цього чату";
 "For an Hour" = "На годину";
+"For faster answers (speculative decoding)" = "Для швидших відповідей (спекулятивне декодування)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей з опублікованим драфтером (Gemma 4 26B): маленька модель вгадує токени наперед, а основна перевіряє їх за один прохід. Відповідь та сама, але швидше. Запити при цьому обробляються по одному.";
 "Found after an interruption" = "Знайдено після перерви";
 "Free disk space" = "Вільне місце на диску";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "Цю папку не можна надати чату: %@";
 "The Keychain refused to remove the token." = "Keychain відмовив у видаленні токена.";
 "The Keychain refused to save the token." = "Keychain відмовив у збереженні токена.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP‑складання завантажено — перезапустіть сервер, щоб використовувати його.";
 "The Mac's chip." = "Чип Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "Тут слухає OpenAI-сумісний API (http://localhost:<порт>/v1). Змінюється, коли сервер зупинено.";
 "The app's language (the language only, not the region)." = "Мова додатка (лише мова, без регіону).";
@@ -926,6 +931,8 @@
 "removing" = "видалення";
 "rename %lld" = "перейменувати %lld";
 "search by words only" = "пошук лише за словами";
+"the download finished incomplete" = "завантаження завершилося неповністю";
+"the model runtime isn't installed yet" = "час виконання моделі ще не встановлено";
 "then" = "тоді";
 "this call only" = "тільки для цього виклику";
 "tight fit" = "щільне розміщення";

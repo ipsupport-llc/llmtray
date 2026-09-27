@@ -39,8 +39,11 @@
 "%lld s" = "%lld स";
 "%lld-bit" = "%lld-बिट";
 "(Please attach the report file shown in Finder.)" = "(कृपया Finder में दिख रही रिपोर्ट फ़ाइल संलग्न करें।)";
+"(estimate; exact after the first answer)" = "(अनुमान; पहली प्रतिक्रिया के बाद सटीक)";
+"(measured for this model)" = "(इस मॉडल के लिए मापा गया)";
 "(no result yet)" = "(अब तक कोई परिणाम नहीं)";
 "(no server output yet)" = "(अभी सर्वर आउटपुट नहीं)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 घंटा";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "कोई चैट फ़ोल्डर में देखने से पहले पूछता है और हर परिवर्तन को अनुमोदन के लिए एक योजना के रूप में दिखाता है। निजी स्थान (Library, keys, होम फ़ोल्डर स्वयं) कभी साझा नहीं होते।";
 "A chat model" = "एक चैट मॉडल";
@@ -291,6 +294,7 @@
 "Follow the description" = "विवरण का पालन करें";
 "For This Chat" = "इस चैट के लिए";
 "For an Hour" = "एक घंटे के लिए";
+"For faster answers (speculative decoding)" = "तेज़ उत्तरों के लिए (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "प्रकाशित ड्राफ़्टर वाले मॉडल (Gemma 4 26B) के लिए: एक छोटा अतिरिक्त मॉडल आगे के टोकन का अनुमान लगाता है और मुख्य मॉडल उन्हें एक पास में जाँचता है। वही आउटपुट, ज़्यादा तेज़। फिर अनुरोध एक-एक करके पूरे किए जाते हैं।";
 "Found after an interruption" = "विराम के बाद मिले";
 "Free disk space" = "खाली डिस्क स्पेस";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "उस फ़ोल्डर को चैट के साथ साझा नहीं किया जा सकता: %@";
 "The Keychain refused to remove the token." = "Keychain ने token हटाने से मना कर दिया।";
 "The Keychain refused to save the token." = "Keychain ने token सहेजने से मना कर दिया।";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter डाउनलोड हो गया है — उपयोग करने के लिए सर्वर को पुनरारंभ करें।";
 "The Mac's chip." = "Mac की चिप।";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI-संगत API यहां चलता है (http://localhost:<port>/v1)। सर्वर रुका होने पर इसे बदलें।";
 "The app's language (the language only, not the region)." = "ऐप की भाषा (सिर्फ भाषा, क्षेत्र नहीं)।";
@@ -926,6 +931,8 @@
 "removing" = "हटा रहा है";
 "rename %lld" = "%lld का नाम बदलें";
 "search by words only" = "केवल शब्दों से खोजें";
+"the download finished incomplete" = "डाउनलोड अधूरा हुआ";
+"the model runtime isn't installed yet" = "मॉडल runtime अभी इंस्टॉल नहीं हुआ है";
 "then" = "फिर";
 "this call only" = "केवल इस कॉल के लिए";
 "tight fit" = "सख्त फ़िट";

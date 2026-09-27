@@ -39,8 +39,11 @@
 "%lld s" = "%lld초";
 "%lld-bit" = "%lld비트";
 "(Please attach the report file shown in Finder.)" = "(Finder에 표시된 보고서 파일을 첨부해 주세요.)";
+"(estimate; exact after the first answer)" = "(추정치; 첫 응답 후 정확 값)";
+"(measured for this model)" = "(이 모델에 대해 측정됨)";
 "(no result yet)" = "(아직 결과 없음)";
 "(no server output yet)" = "(아직 서버 출력 없음)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1시간";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "채팅은 폴더를 살펴보기 전에 허가를 구하고, 모든 변경을 승인할 계획으로 보여줍니다. 개인 영역(Library, keys, 홈 폴더 등)은 절대 공유되지 않습니다.";
 "A chat model" = "채팅 모델";
@@ -291,6 +294,7 @@
 "Follow the description" = "설명 따르기";
 "For This Chat" = "이 채팅용";
 "For an Hour" = "1시간 동안";
+"For faster answers (speculative decoding)" = "더 빠른 응답(추측적 디코딩)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "공개된 drafter가 있는 모델(Gemma 4 26B)의 경우, 작은 추가 모델이 토큰을 미리 추측하고 주 모델이 한 번에 확인합니다. 출력은 같고 속도는 더 빠릅니다. 그러면 요청은 한 번에 하나씩 처리됩니다.";
 "Found after an interruption" = "중단 후 발견됨";
 "Free disk space" = "여유 디스크 공간";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "해당 폴더는 채팅과 공유할 수 없음: %@";
 "The Keychain refused to remove the token." = "키체인이 토큰 삭제를 거부했습니다.";
 "The Keychain refused to save the token." = "키체인이 토큰 저장을 거부했습니다.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter가 다운로드되었습니다 — 서버를 재시작해야 사용할 수 있습니다.";
 "The Mac's chip." = "Mac의 칩.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI 호환 API가 여기서 수신 대기합니다(http://localhost:<port>/v1). 서버가 중지된 상태에서 변경하십시오.";
 "The app's language (the language only, not the region)." = "앱의 언어(지역 정보 제외).";
@@ -926,6 +931,8 @@
 "removing" = "제거 중";
 "rename %lld" = "%lld개 이름 변경";
 "search by words only" = "단어로만 검색";
+"the download finished incomplete" = "다운로드가 불완전하게 완료되었습니다";
+"the model runtime isn't installed yet" = "모델 런타임이 아직 설치되어 있지 않습니다";
 "then" = "그런 다음";
 "this call only" = "이 호출에만";
 "tight fit" = "공간 부족";

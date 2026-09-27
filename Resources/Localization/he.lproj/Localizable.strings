@@ -39,8 +39,11 @@
 "%lld s" = "%lld שנ׳";
 "%lld-bit" = "%lld סיביות";
 "(Please attach the report file shown in Finder.)" = "(אנא צרפו את קובץ הדוח שמוצג ב‑Finder.)";
+"(estimate; exact after the first answer)" = "(הערכה; מדויק לאחר התשובה הראשונה)";
+"(measured for this model)" = "(נמדד עבור המודל הזה)";
 "(no result yet)" = "(אין תוצאה עדיין)";
 "(no server output yet)" = "(עדיין אין פלט מהשרת)";
+"+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "שעה";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "שיחה מבקשת רשות לפני שהיא מסתכלת בתיקייה ומציגה כל שינוי כ־תכנית לאישור. מקומות פרטיים (Library, keys, תיקיית הבית עצמה) אינם משותפים לעולם.";
 "A chat model" = "מודל צ'אט";
@@ -291,6 +294,7 @@
 "Follow the description" = "היצמד לתיאור";
 "For This Chat" = "לעבור שיחה זו";
 "For an Hour" = "לשעה";
+"For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם drafter שפורסם (Gemma 4 26B): מודל קטן נוסף מנחש מראש אסימונים, והמודל הראשי בודק אותם במעבר אחד. אותו פלט, מהר יותר. לאחר מכן הבקשות מטופלות אחת בכל פעם.";
 "Found after an interruption" = "נמצאו אחרי הפרעה";
 "Free disk space" = "שטח דיסק פנוי";
@@ -721,6 +725,7 @@
 "That folder can't be shared with the chat: %@" = "לא ניתן לשתף תיקייה זו עם השיחה: %@";
 "The Keychain refused to remove the token." = "Keychain סרב להסיר את האסימון.";
 "The Keychain refused to save the token." = "Keychain סרב לשמור את האסימון.";
+"The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter הורד — יש להפעיל מחדש את השרת כדי להשתמש בו.";
 "The Mac's chip." = "השבב של המק.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "ה‑API שתואם ל‑OpenAI מאזין כאן (http://localhost:<port>/v1). אפשר לשנות אותו כשהשרת עצור.";
 "The app's language (the language only, not the region)." = "שפת האפליקציה (רק השפה, לא האזור).";
@@ -926,6 +931,8 @@
 "removing" = "מסיר";
 "rename %lld" = "שנה שם ל־%lld";
 "search by words only" = "חיפוש לפי מילים בלבד";
+"the download finished incomplete" = "ההורדה הושלמה באופן לא שלם";
+"the model runtime isn't installed yet" = "סביבת ההרצה של המודל עדיין לא מותקנת";
 "then" = "אז";
 "this call only" = "לקריאה זו בלבד";
 "tight fit" = "התאמה הדוקה";
