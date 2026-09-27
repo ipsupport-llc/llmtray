@@ -139,6 +139,20 @@ final class ReviewDraftTests: XCTestCase {
         XCTAssertTrue(ReviewDraft().isEmpty)
         XCTAssertFalse(decoded.isEmpty)
     }
+
+    func testDraftPrefRoundTrip() throws {
+        let suite = "llmtray.tests.reviewDraft"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        XCTAssertNil(defaults[Pref.reviewDraft])
+        var draft = ReviewDraft(rating: 4, text: "Kept")
+        _ = draft.key(for: try submission("Kept", rating: 4))
+        defaults[Pref.reviewDraft] = try JSONEncoder().encode(draft)
+        let stored = try XCTUnwrap(defaults[Pref.reviewDraft])
+        XCTAssertEqual(try JSONDecoder().decode(ReviewDraft.self, from: stored), draft)
+        defaults[Pref.reviewDraft] = nil
+        XCTAssertNil(defaults.object(forKey: Pref.reviewDraft.name))
+    }
 }
 
 final class ReviewOutcomeTests: XCTestCase {
