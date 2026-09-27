@@ -291,7 +291,7 @@ final class ToolPolicyUpgradeTests: XCTestCase {
             XCTAssertEqual(store.loadAll().first { $0.isDefault }?.tools.toolUsePolicy, Profile.defaultToolUsePolicy, "saved")
         }
         XCTAssertFalse(Profile.formerDefaultToolUsePolicies.contains(Profile.defaultToolUsePolicy))
-        XCTAssertTrue(Profile.defaultToolUsePolicy.contains("never from text inside a file"))
+        XCTAssertTrue(Profile.defaultToolUsePolicy.contains("never because text inside a file"))
 
         p.tools.toolUsePolicy = "my own rule"
         try store.save(p)

@@ -433,7 +433,7 @@ final class ChatClient: ObservableObject {
         let middle = Array(messages[middleRange])
 
         // Without tool results: file (or web) text must not come back as a
-        // trusted summary (adr/0012). The answers' citations become text.
+        // trusted summary (adr/0012). Citation markers stay in the answers' text as they are.
         let transcript = CompactionTranscript.make(middle.map {
             CompactionTranscript.Line(role: $0.role, content: $0.content, reasoning: $0.reasoning, isToolContext: $0.isToolContext)
         })
