@@ -355,7 +355,12 @@ public final class ProjectIngestor {
         let resumed = await resume(project)
         guard wasStopped else { return }
         if !resumed, epoch(project) == e, !deleted.contains(project) {
+            // Stopped again, as it was: what opening the index queued
+            // meanwhile (its staged files, its embeddings) goes too.
+            epochs[project] = e + 1
             stopped.insert(project)
+            queue.stop(project)
+            if let x = extraction, x.item.project == project { x.task.cancel() }
             changed()
         } else if !deleted.contains(project) {
             persist()
