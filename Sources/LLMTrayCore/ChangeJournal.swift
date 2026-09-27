@@ -61,6 +61,9 @@ public struct JournalEvent: Codable, Equatable, Sendable {
         case begin, pending, done, failed, end
         /// A temporary name is about to be used (`staging`).
         case staged
+        /// The staging folder under that name was made and checked: its
+        /// identity (`stagingIdentity`), the only folder recovery acts on.
+        case stagedCreated = "staged_created"
         /// Ran, outcome not established: stays incomplete.
         case uncertain
         case undoPending = "undo_pending", undone, undoFailed = "undo_failed"
@@ -74,9 +77,11 @@ public struct JournalEvent: Codable, Equatable, Sendable {
     public var result: JournalResult?
     public var message: String?
     public var staging: StagingRecord?
+    public var stagingIdentity: FileIdentity?
 
     public init(kind: Kind, date: Date, item: Int? = nil, chatID: String? = nil, planItem: PlanItem? = nil,
-                result: JournalResult? = nil, message: String? = nil, staging: StagingRecord? = nil) {
+                result: JournalResult? = nil, message: String? = nil, staging: StagingRecord? = nil,
+                stagingIdentity: FileIdentity? = nil) {
         self.kind = kind
         self.date = date
         self.item = item
@@ -85,6 +90,7 @@ public struct JournalEvent: Codable, Equatable, Sendable {
         self.result = result
         self.message = message
         self.staging = staging
+        self.stagingIdentity = stagingIdentity
     }
 }
 
@@ -108,6 +114,10 @@ public struct JournalRecord: Equatable, Sendable {
         public var state: ItemState
         /// The temporary name it used, if any: a crash can leave it behind.
         public var staging: StagingRecord? = nil
+        /// The staging folder's identity, once it was made and journaled:
+        /// without it recovery removes nothing (a folder found under the
+        /// name can't be told from one someone else made there).
+        public var stagingIdentity: FileIdentity? = nil
     }
 
     public var planID: UUID
@@ -303,7 +313,14 @@ public final class ChangeJournal: @unchecked Sendable {
             case .uncertain:
                 if let i = index(e.item) { rec.items[i].state = .uncertain(e.message ?? "uncertain") }
             case .staged:
-                if let i = index(e.item), let st = e.staging { rec.items[i].staging = st }
+                if let i = index(e.item), let st = e.staging {
+                    rec.items[i].staging = st
+                    rec.items[i].stagingIdentity = nil
+                }
+            case .stagedCreated:
+                if let i = index(e.item), rec.items[i].staging != nil, let id = e.stagingIdentity {
+                    rec.items[i].stagingIdentity = id
+                }
             case .end:
                 rec.ended = e.date
             case .undoPending:

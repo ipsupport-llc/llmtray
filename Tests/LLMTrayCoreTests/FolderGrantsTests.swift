@@ -115,7 +115,7 @@ final class FolderGrantsTests: XCTestCase {
         XCTAssertNil(g.authorize(path: downloads.path, level: .change, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
         XCTAssertNil(g.authorize(path: downloads.path, level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
         XCTAssertNotNil(g.authorize(path: downloads.path, level: .read, chatID: "n", callKey: "k", now: t0))
-        XCTAssertFalse(g.coversChange(path: downloads.path, chatID: "t", temporaryChat: true, now: t0))
+        XCTAssertFalse(g.coversChange(path: downloads.path, chatID: "t", proposal: nil, temporaryChat: true, now: t0))
         // Its own chat grant does.
         XCTAssertNotNil(g.authorize(path: docs.path + "/a", level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
         XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "other", callKey: "k", temporaryChat: true, now: t0))
@@ -165,26 +165,46 @@ extension FolderGrantsTests {
         let g = FolderGrants(storeURL: nil)
         let always = try g.grant(docs, level: .change, lifetime: .always, chatID: "c", now: t0)
         try g.grant(downloads, level: .read, lifetime: .always, chatID: "c", now: t0)
-        XCTAssertTrue(g.coversChange(path: docs.path + "/a/b", chatID: "c", now: t0))
-        XCTAssertFalse(g.coversChange(path: downloads.path + "/a", chatID: "c", now: t0), "read isn't change")
+        XCTAssertTrue(g.coversChange(path: docs.path + "/a/b", chatID: "c", proposal: nil, now: t0))
+        XCTAssertFalse(g.coversChange(path: downloads.path + "/a", chatID: "c", proposal: nil, now: t0), "read isn't change")
         let check = g.changeCheck(chatID: "c")
         let loc = FolderLocation(root: docs, components: ["a"])
-        XCTAssertTrue(check(loc))
+        XCTAssertTrue(check(loc, nil))
         try g.revoke(always.id)
-        XCTAssertFalse(check(loc), "revoked: the check says so at once")
-        // A once grant: consumed by its call, still covering that chat's
-        // change at approval and execution -- and nothing for another chat.
+        XCTAssertFalse(check(loc, nil), "revoked: the check says so at once")
+        // A once grant: consumed by its call, still covering that call's
+        // proposal at approval and execution -- nothing for another chat.
         try g.grant(docs, level: .change, lifetime: .once(callKey: "k1", chatID: "c"), chatID: "c", now: t0)
-        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", now: t0), "not consumed by the check")
+        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", proposal: "k1", now: t0), "not consumed by the check")
         XCTAssertNotNil(g.authorize(path: docs.path, level: .change, chatID: "c", callKey: "k1", now: t0))
         XCTAssertNil(g.authorize(path: docs.path, level: .change, chatID: "c", callKey: "k1", now: t0), "used up")
-        XCTAssertTrue(g.coversChange(path: docs.path + "/x", chatID: "c", now: t0))
-        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "d", now: t0))
+        XCTAssertTrue(g.coversChange(path: docs.path + "/x", chatID: "c", proposal: "k1", now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "d", proposal: "k1", now: t0))
         g.endChat("c")
-        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "c", now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path + "/x", chatID: "c", proposal: "k1", now: t0))
         // An expired grant stops covering.
         try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(60)), chatID: "c", now: t0)
-        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", now: t0))
-        XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", now: t0.addingTimeInterval(61)))
+        XCTAssertTrue(g.coversChange(path: docs.path, chatID: "c", proposal: nil, now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", proposal: nil, now: t0.addingTimeInterval(61)))
+    }
+
+    func testAConsumedOnceCoversOnlyTheProposalItAuthorized() throws {
+        let g = FolderGrants(storeURL: nil)
+        try g.grant(docs, level: .change, lifetime: .once(callKey: "call-1", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertNotNil(g.authorize(path: docs.path + "/a", level: .change, chatID: "c", callKey: "call-1", now: t0))
+        // That call's proposal stays covered (approval, execution, undo)...
+        XCTAssertTrue(g.coversChange(path: docs.path + "/a", chatID: "c", proposal: "call-1", now: t0))
+        XCTAssertTrue(g.coversChange(path: docs.path + "/deep/b", chatID: "c", proposal: "call-1", now: t0))
+        // ...a later proposal in the same chat isn't: it needs its own grant.
+        XCTAssertFalse(g.coversChange(path: docs.path + "/a", chatID: "c", proposal: "call-2", now: t0))
+        XCTAssertFalse(g.coversChange(path: docs.path + "/a", chatID: "c", proposal: nil, now: t0), "no key: no once")
+        XCTAssertNil(g.authorize(path: docs.path + "/a", level: .change, chatID: "c", callKey: "call-2", now: t0))
+        let check = g.changeCheck(chatID: "c")
+        XCTAssertTrue(check(FolderLocation(root: docs, components: ["a"]), "call-1"))
+        XCTAssertFalse(check(FolderLocation(root: docs, components: ["a"]), "call-2"))
+        // An unconsumed once is bound to its key as well.
+        try g.grant(downloads, level: .change, lifetime: .once(callKey: "call-3", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertFalse(g.coversChange(path: downloads.path, chatID: "c", proposal: "call-4", now: t0))
+        XCTAssertTrue(g.coversChange(path: downloads.path, chatID: "c", proposal: "call-3", now: t0))
     }
 }

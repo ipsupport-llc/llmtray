@@ -33,7 +33,7 @@ private final class GrantSwitch: @unchecked Sendable {
     }
 
     var check: ChangeGrantCheck {
-        { [self] loc in
+        { [self] loc, _ in
             lock.lock()
             defer { lock.unlock() }
             return !denied(loc)
@@ -157,7 +157,7 @@ final class FolderSecurityReviewTests: FolderTestCase {
     private func state(_ plan: ApprovedPlan) -> JournalRecord.ItemState? { journal.record(plan.plan.id)?.items.first?.state }
 
     func testATrashCrashedAtEachStepIsRecovered() throws {
-        for step in [ChangeExecutor.Step.staged, .stagingMade, .itemStaged] {
+        for step in [ChangeExecutor.Step.staged, .stagingJournaled, .itemStaged] {
             let name = "t-\(step).txt"
             write("t/" + name, "mine")
             let plan = try crashed([rm("t/" + name)], at: step)
@@ -211,7 +211,7 @@ final class FolderSecurityReviewTests: FolderTestCase {
     }
 
     func testAMakeDirCrashedWithItsStagingFolderIsCleanedUp() throws {
-        let plan = try crashed([md("New")], at: .stagingMade)
+        let plan = try crashed([md("New")], at: .stagingJournaled)
         XCTAssertEqual(staging().count, 1)
         let recoveries = undoer.recoverInterrupted()
         XCTAssertEqual(recoveries.map(\.planID), [plan.plan.id], "found when the journal is opened")
@@ -275,6 +275,181 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(executor.execute(plan).doneCount, 1)
         grants.deny { _ in true }
         XCTAssertEqual(undoer.recoverInterrupted(), [], "no leftovers, nothing to report -- revoked grant or not")
+    }
+
+    // MARK: 2b. Staging folders by journaled identity
+
+    func testTheStagingFoldersIdentityIsJournaledOnceMade() throws {
+        write("j.txt", "j")
+        let plan = try crashed([rm("j.txt")], at: .stagingJournaled)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        XCTAssertEqual(journal.record(plan.plan.id)?.items.first?.stagingIdentity, identity(grant + "/" + name))
+        let before = try crashed([md("K")], at: .stagingMade)
+        XCTAssertNil(journal.record(before.plan.id)?.items.first?.stagingIdentity, "made, not journaled yet")
+    }
+
+    func testATrashCrashedBeforeItsFolderIdentityWasJournaledRemovesNothing() throws {
+        write("t/x.txt", "mine")
+        let plan = try crashed([rm("t/x.txt")], at: .stagingMade)
+        let id = plan.plan.items[0].id
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: id)
+        let r = undoer.recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [id], "the item never moved: nothing changed")
+        XCTAssertNotNil(r.leftBehind[id], "\(r)")
+        XCTAssertEqual(r.cleaned, [])
+        XCTAssertEqual(staging("t"), [name], "a folder of unknown origin is left")
+        XCTAssertEqual(try String(contentsOfFile: grant + "/t/x.txt"), "mine")
+        guard case .failed = state(plan) else { return XCTFail("\(String(describing: state(plan)))") }
+        XCTAssertEqual(undoer.recover(plan.plan.id), .init(planID: plan.plan.id), "settled: never touched again")
+        XCTAssertEqual(staging("t"), [name])
+    }
+
+    func testAnUnrelatedFolderTakingAStagingNameIsNeverRemoved() throws {
+        // Crashed after the name was journaled, before anything was made;
+        // then someone makes an empty folder under that name.
+        write("t/y.txt", "y")
+        let trashPlan = try crashed([rm("t/y.txt")], at: .staged)
+        let trashName = StagingRecord.name(.trash, planID: trashPlan.plan.id, item: trashPlan.plan.items[0].id)
+        mkdir("t/" + trashName)
+        let r = undoer.recover(trashPlan.plan.id)
+        XCTAssertEqual(r.restored, [trashPlan.plan.items[0].id])
+        XCTAssertNotNil(r.leftBehind[trashPlan.plan.items[0].id])
+        XCTAssertTrue(exists("t/" + trashName), "not ours to remove")
+        XCTAssertTrue(exists("t/y.txt"))
+        let mdPlan = try crashed([md("M")], at: .staged)
+        let mdName = StagingRecord.name(.makeDir, planID: mdPlan.plan.id, item: mdPlan.plan.items[0].id)
+        mkdir(mdName)
+        let m = undoer.recover(mdPlan.plan.id)
+        XCTAssertEqual(m.restored, [mdPlan.plan.items[0].id])
+        XCTAssertNotNil(m.leftBehind[mdPlan.plan.items[0].id])
+        XCTAssertTrue(exists(mdName))
+        XCTAssertFalse(exists("M"))
+        // A make_dir crashed after its folder was made, identity not yet
+        // journaled: that folder stays too.
+        let made = try crashed([md("N")], at: .stagingMade)
+        let madeName = StagingRecord.name(.makeDir, planID: made.plan.id, item: made.plan.items[0].id)
+        let n = undoer.recover(made.plan.id)
+        XCTAssertEqual(n.restored, [made.plan.items[0].id])
+        XCTAssertNotNil(n.leftBehind[made.plan.items[0].id])
+        XCTAssertTrue(exists(madeName))
+        guard case .failed = state(made) else { return XCTFail() }
+    }
+
+    func testAStagingFolderReplacedSinceItsIdentityWasJournaledIsLeftAlone() throws {
+        write("t/z.txt", "z")
+        let plan = try crashed([rm("t/z.txt")], at: .stagingJournaled)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        let old = identity(grant + "/t/" + name)
+        // Kept, so the replacement can't reuse its inode.
+        try fm.moveItem(atPath: grant + "/t/" + name, toPath: outside + "/old-staging")
+        mkdir("t/" + name)
+        XCTAssertNotEqual(identity(grant + "/t/" + name), old)
+        let r = undoer.recover(plan.plan.id)
+        XCTAssertNotNil(r.needsLook[plan.plan.items[0].id], "\(r)")
+        XCTAssertEqual(r.cleaned, [])
+        XCTAssertTrue(exists("t/" + name), "not the folder that was made")
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
+    func testTheStagingNamesOfSettledItemsAreNeverTouched() throws {
+        write("d.txt", "d")
+        let done = try approved([rm("d.txt")])
+        XCTAssertEqual(executor.execute(done).doneCount, 1)
+        let doneName = StagingRecord.name(.trash, planID: done.plan.id, item: done.plan.items[0].id)
+        mkdir(doneName)
+        write("e.txt", "e")
+        let failed = try crashed([rm("e.txt")], at: .itemStaged)
+        XCTAssertEqual(undoer.recover(failed.plan.id).restored, [failed.plan.items[0].id])
+        let failedName = StagingRecord.name(.trash, planID: failed.plan.id, item: failed.plan.items[0].id)
+        mkdir(failedName)
+        XCTAssertEqual(undoer.recover(done.plan.id), .init(planID: done.plan.id))
+        XCTAssertEqual(undoer.recover(failed.plan.id), .init(planID: failed.plan.id))
+        XCTAssertEqual(undoer.recoverInterrupted(), [])
+        XCTAssertTrue(exists(doneName))
+        XCTAssertTrue(exists(failedName))
+    }
+
+    // MARK: 2c. Recovery inside the grant
+
+    private func movedOut(_ point: ChangeUndo.RecoveryPoint) -> ChangeUndo {
+        var u = undoer
+        u.recoveryHook = { p, _ in
+            if p == point { try? self.fm.moveItem(atPath: self.grant + "/t", toPath: self.outside + "/t") }
+        }
+        return u
+    }
+
+    func testRecoveryDoesntPutBackIntoAFolderThatLeftTheGrant() throws {
+        write("t/x.txt", "mine")
+        let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        let r = movedOut(.beforeRename).recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("left the grant") ?? false, "\(r)")
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/t/\(name)/x.txt"), "left where it was")
+        XCTAssertFalse(fm.fileExists(atPath: outside + "/t/x.txt"))
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
+    func testRecoveryTakesBackAPutBackWhoseFolderLeftTheGrant() throws {
+        write("t/x.txt", "mine")
+        let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        let r = movedOut(.afterRename).recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("left the grant") ?? false, "\(r)")
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/t/\(name)/x.txt"), "taken back into the staging folder")
+        XCTAssertFalse(fm.fileExists(atPath: outside + "/t/x.txt"))
+        // A rename's temporary name too.
+        write("r/readme.txt", "r")
+        let rename = try approved([mv("r/readme.txt", "r/README2.txt")])
+        let item = rename.plan.items[0]
+        let temp = StagingRecord.name(.rename, planID: rename.plan.id, item: item.id)
+        let rChain = [root.identity, try XCTUnwrap(identity(grant + "/r"))]
+        try journal.append(JournalEvent(kind: .begin, date: Date(), chatID: "c"), planID: rename.plan.id)
+        try journal.append(JournalEvent(kind: .pending, date: Date(), item: item.id, planItem: item), planID: rename.plan.id)
+        try journal.append(JournalEvent(kind: .staged, date: Date(), item: item.id,
+                                        staging: StagingRecord(kind: .rename, name: temp, root: root, parentComponents: ["r"],
+                                                               parentChain: rChain)), planID: rename.plan.id)
+        try fm.moveItem(atPath: grant + "/r/readme.txt", toPath: grant + "/r/" + temp)
+        var u = undoer
+        u.recoveryHook = { p, _ in
+            if p == .afterRename { try? self.fm.moveItem(atPath: self.grant + "/r", toPath: self.outside + "/r") }
+        }
+        let rr = u.recover(rename.plan.id)
+        XCTAssertTrue(rr.needsLook[item.id]?.contains("left the grant") ?? false, "\(rr)")
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/r/" + temp))
+        XCTAssertFalse(fm.fileExists(atPath: outside + "/r/readme.txt"))
+    }
+
+    func testRecoveryDoesntRemoveAStagingFolderThatLeftTheGrant() throws {
+        write("t/x.txt", "x")
+        let plan = try crashed([rm("t/x.txt")], at: .trashed)
+        let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
+        let r = movedOut(.beforeRemove).recover(plan.plan.id)
+        XCTAssertEqual(r.cleaned, [])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("left the grant") ?? false, "\(r)")
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/t/" + name))
+    }
+
+    // MARK: 2d. Denied items added between the scan and the rename
+
+    func testADeniedItemAddedBetweenTheScanAndTheRenameIsTakenBack() throws {
+        write("f/a.txt", "a")
+        write("g/a.txt", "a")
+        var exec = executor
+        exec.beforeOperation = { item in
+            self.write((item.kind == .move ? "f" : "g") + "/.ssh/config", "x")
+        }
+        let move = try approved([mv("f", "f2")])
+        XCTAssertEqual(status(exec.execute(move)), ["failed: \(FolderAccessError.containsProtected("f"))"])
+        XCTAssertTrue(exists("f/.ssh/config"), "moved back")
+        XCTAssertFalse(exists("f2"))
+        let trashed = try approved([rm("g")])
+        XCTAssertEqual(status(exec.execute(trashed)), ["failed: \(FolderAccessError.containsProtected("g"))"])
+        XCTAssertTrue(exists("g/.ssh/config"), "back under its name, never handed to the Trash")
+        XCTAssertEqual(staging(), [])
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash"), [])
     }
 
     func testUndoRecoversFirst() throws {
@@ -541,6 +716,40 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(try temp.plan([mv("a.txt", "b.txt")]).rejected.count, 1)
         try g.revoke(grantRecord.id)
         XCTAssertEqual(try p.plan([mv("a.txt", "b.txt")]).rejected.count, 1, "revoked")
+    }
+
+    func testAOnceChangeGrantCoversOnlyTheProposalItAuthorized() throws {
+        let g = FolderGrants(storeURL: nil)
+        try g.grant(root, level: .change, lifetime: .once(callKey: "call-1", chatID: "c"), chatID: "c")
+        write("a.txt", "a")
+        write("b.txt", "b")
+        XCTAssertNotNil(g.authorize(path: grant + "/a.txt", level: .change, chatID: "c", callKey: "call-1"), "consumed")
+        let check = g.changeCheck(chatID: "c")
+        let p = ChangePlanner(denylist: denylist, canChange: check)
+        let first = try p.plan([mv("a.txt", "a2.txt")], proposal: "call-1")
+        XCTAssertEqual(first.rejected.count, 0)
+        XCTAssertEqual(first.items.first?.proposal, "call-1")
+        // A later proposal in the chat isn't covered by the used-up once.
+        let later = try p.plan([mv("b.txt", "b2.txt")], after: first.items, proposal: "call-2")
+        XCTAssertEqual(later.rejected.first?.error as? FolderAccessError, .notGranted(grant + "/b.txt"))
+        XCTAssertEqual(try p.plan([mv("b.txt", "b2.txt")]).rejected.count, 1, "nor one without a key")
+        // An item that claims another proposal is refused at approval...
+        var forged = first.items[0]
+        forged.proposal = "call-2"
+        let bad = store.add([forged], chatID: "c")
+        XCTAssertThrowsError(try store.approve(chatID: "c", planID: bad.id, revision: bad.revision, validator: p)) {
+            guard case .invalidated = $0 as? ChangePlanError else { return XCTFail("\($0)") }
+        }
+        store.cancel(chatID: "c")
+        // ...while the authorized proposal runs through approval, execution
+        // and undo.
+        let plan = store.add(first.items, chatID: "c")
+        let ok = try store.approve(chatID: "c", planID: plan.id, revision: plan.revision, validator: p)
+        let exec = ChangeExecutor(denylist: denylist, journal: journal, trasher: trash, canChange: check)
+        XCTAssertEqual(exec.execute(ok).doneCount, 1)
+        XCTAssertTrue(exists("a2.txt"))
+        XCTAssertEqual(ChangeUndo(denylist: denylist, journal: journal, canChange: check).undo(plan.id).undone, [plan.items[0].id])
+        XCTAssertTrue(exists("a.txt"))
     }
 
     // MARK: 9. .DS_Store in a made folder

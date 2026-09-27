@@ -50,7 +50,7 @@ final class ChangePlanTests: FolderTestCase {
     private var journal: ChangeJournal!
     private var trash: FakeTrash!
     private let store = ChangePlanStore()
-    private let allow: ChangeGrantCheck = { _ in true }
+    private let allow: ChangeGrantCheck = { _, _ in true }
 
     override func setUpWithError() throws {
         try super.setUpWithError()

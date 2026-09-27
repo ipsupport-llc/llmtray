@@ -70,8 +70,11 @@ public struct ChangeExecutor {
     enum Step: Equatable {
         /// The temporary name is journaled, not made yet.
         case staged
-        /// The staging folder exists (trash, make_dir).
+        /// The staging folder exists (trash, make_dir); its identity isn't
+        /// journaled yet.
         case stagingMade
+        /// The staging folder's identity is journaled (`stagedCreated`).
+        case stagingJournaled
         /// The item is in the staging folder (trash) or under its temporary
         /// name (rename).
         case itemStaged
@@ -235,6 +238,21 @@ public struct ChangeExecutor {
         return name
     }
 
+    /// Journals the identity of the staging folder just made and checked:
+    /// recovery acts only on a folder that is it. Not journaled, the folder
+    /// goes again (`drop`, true when it went) and the item fails.
+    private func journalStagingIdentity(_ identity: FileIdentity, item: PlanItem, planID: UUID, name: String,
+                                        drop: () -> Bool) throws {
+        do {
+            try journal.append(JournalEvent(kind: .stagedCreated, date: Date(), item: item.id, stagingIdentity: identity),
+                               planID: planID)
+        } catch {
+            if drop() { throw error }
+            throw Uncertain(description: "\(error); \(name) was left behind")
+        }
+        try step(.stagingJournaled)
+    }
+
     private func run(_ item: PlanItem, planID: UUID, made: inout [Key: Made]) throws -> JournalResult {
         switch item.kind {
         case .makeDir:
@@ -259,6 +277,9 @@ public struct ChangeExecutor {
                   created.stat.mode & 0o077 == 0,
                   Self.ownedByUs(created), (try? ChangeUndo.isEmptyDirectory(parent.descriptor, staging)) == true else {
                 throw Uncertain(description: "\(staging) isn't the folder just made")
+            }
+            try journalStagingIdentity(created.identity, item: item, planID: planID, name: staging) {
+                (try? Posix.lstatAt(fd, staging))?.identity == created.identity && unlinkat(fd, staging, AT_REMOVEDIR) == 0
             }
             _ = fchmod(created.fd, 0o755)
             let name: String
@@ -303,6 +324,8 @@ public struct ChangeExecutor {
                 throw FolderAccessError.crossDevice(d.location.displayPath)
             }
             try checkNoProtectedInside(s, parent: src)
+            // What the scan saw can change before the rename: checked again
+            // once it moved.
             beforeOperation?(item)
             let name = try Self.renameExclusive(from: src.descriptor, s.location.name, to: dst.descriptor, d.location.name,
                                                 identity: s.identity, policy: item.collision,
@@ -318,8 +341,16 @@ public struct ChangeExecutor {
                 // Both ends must still be inside the grant (either can be
                 // moved out while held open): else it goes back.
                 if stillInside(src, root: s.location.root), stillInside(dst, root: d.location.root) {
-                    return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
-                                         trashURL: nil, components: comps + [name])
+                    // Something denied put inside between the scan and the
+                    // rename came along: the move is taken back.
+                    guard let why = protectedInside(s, in: dst, name) else {
+                        return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
+                                             trashURL: nil, components: comps + [name])
+                    }
+                    if Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: s.identity) {
+                        throw why
+                    }
+                    throw Uncertain(description: "\(why), and it couldn't be moved back from \(d.location.relativePath)")
                 }
                 if Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: s.identity) {
                     throw FolderAccessError.changed(s.location.relativePath)
@@ -338,12 +369,19 @@ public struct ChangeExecutor {
 
     /// A folder whose subtree gained a denied item since review isn't moved.
     private func checkNoProtectedInside(_ s: CapturedSource, parent: OpenedDirectory) throws {
-        guard s.kind == .directory || s.kind == .package else { return }
+        if let why = protectedInside(s, in: parent, s.location.name) { throw why }
+    }
+
+    /// Why the item -- a folder or package, `name` in `dir` (where it is
+    /// now) -- can't be moved or trashed whole: something denied inside, or
+    /// too much to check (Hardening 16). Nil when neither.
+    private func protectedInside(_ s: CapturedSource, in dir: OpenedDirectory, _ name: String) -> FolderAccessError? {
+        guard s.kind == .directory || s.kind == .package else { return nil }
         switch SafeFolderWalker(root: s.location.root, denylist: denylist)
-            .protectedContents(in: parent, s.location.name, budget: protectedCheckBudget) {
-        case .none: return
-        case .found: throw FolderAccessError.containsProtected(s.location.relativePath)
-        case .unchecked: throw FolderAccessError.uncheckable(s.location.relativePath)
+            .protectedContents(in: dir, name, budget: protectedCheckBudget) {
+        case .none: return nil
+        case .found: return .containsProtected(s.location.relativePath)
+        case .unchecked: return .uncheckable(s.location.relativePath)
         }
     }
 
@@ -387,6 +425,7 @@ public struct ChangeExecutor {
         func dropStaging() -> Bool {
             (try? Posix.lstatAt(pfd, stagingName))?.identity == staging.identity && unlinkat(pfd, stagingName, AT_REMOVEDIR) == 0
         }
+        try journalStagingIdentity(staging.identity, item: item, planID: planID, name: stagingName, drop: dropStaging)
         /// The item back from the staging folder under its name, the folder
         /// gone: then `why` is a plain failure.
         func unstage(_ why: Error) throws -> Never {
@@ -409,6 +448,11 @@ public struct ChangeExecutor {
             }
             throw Uncertain(description: "something other than \(rel) was moved into \(stagingName)")
         }
+        // Checked again where it is now, before the Trash gets it: something
+        // denied put inside between the scan and the move would go along.
+        let stagingDir = OpenedDirectory(descriptor: staging, chain: parent.chain + [staging.identity],
+                                         components: parent.components + [stagingName])
+        if let why = protectedInside(s, in: stagingDir, name) { try unstage(why) }
         // Moved through a held folder: it must still be inside the grant.
         guard let path = stagedPath(s, parent: parent, staging: staging) else { try unstage(FolderAccessError.changed(rel)) }
         let out: URL?

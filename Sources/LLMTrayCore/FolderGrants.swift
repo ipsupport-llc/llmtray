@@ -101,8 +101,9 @@ public final class FolderGrants: @unchecked Sendable {
     /// user asks for access themselves.
     private var promptsBlocked: Set<String> = []
     /// `once` grants used up by their call, kept for their chat: the change
-    /// that call proposed is still checked against them at approval,
-    /// execution and undo (they authorize no new call).
+    /// that call proposed -- only that one, by its call key -- is still
+    /// checked against them at approval, execution and undo (they authorize
+    /// no new call and no later proposal).
     private var consumedOnce: [FolderGrant] = []
     private let storeURL: URL?
 
@@ -238,9 +239,12 @@ public final class FolderGrants: @unchecked Sendable {
     /// using anything up: asked again at approval, at execution (both ends
     /// of a move) and before undo, so a grant revoked or expired since the
     /// proposal stops the change (defense in depth: the proposal itself was
-    /// authorized with `authorize`). A `once` grant counts for the chat of
-    /// the call that used it. Never for a temporary chat.
-    public func coversChange(path: String, chatID: String, temporaryChat: Bool = false, now: Date = Date()) -> Bool {
+    /// authorized with `authorize`). A `once` grant covers only the proposal
+    /// it authorized -- the change call `proposal` names, by its call key --
+    /// never a later one in the chat, which needs its own grant; nil matches
+    /// no `once` grant. Never for a temporary chat.
+    public func coversChange(path: String, chatID: String, proposal: String?, temporaryChat: Bool = false,
+                             now: Date = Date()) -> Bool {
         if temporaryChat { return false }
         lock.lock()
         defer { lock.unlock() }
@@ -249,14 +253,18 @@ public final class FolderGrants: @unchecked Sendable {
             guard g.level >= .change, g.covers(path) else { return false }
             switch g.lifetime {
             case .always, .until: return true
-            case .chat(let id), .once(_, let id): return id == chatID
+            case .chat(let id): return id == chatID
+            case .once(let key, let id): return id == chatID && proposal != nil && key == proposal
             }
         }
     }
 
-    /// `coversChange` for one chat, as the planner, executor and undo take it.
+    /// `coversChange` for one chat, as the planner, executor and undo take it
+    /// (each passing the call key of the proposal the item came from).
     public func changeCheck(chatID: String, temporaryChat: Bool = false) -> ChangeGrantCheck {
-        { [self] location in coversChange(path: location.displayPath, chatID: chatID, temporaryChat: temporaryChat) }
+        { [self] location, proposal in
+            coversChange(path: location.displayPath, chatID: chatID, proposal: proposal, temporaryChat: temporaryChat)
+        }
     }
 
     private func dropExpiredLocked(now: Date) {

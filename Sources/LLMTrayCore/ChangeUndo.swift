@@ -452,6 +452,11 @@ public struct ChangeUndo {
         public var cleaned: [Int] = []
         /// Items left for the user to look at, and why.
         public var needsLook: [Int: String] = [:]
+        /// Items whose staging folder may be left in place: the crash came
+        /// before its identity was journaled, so a folder under that name
+        /// can't be told from one someone else made there -- nothing of it
+        /// is removed.
+        public var leftBehind: [Int: String] = [:]
     }
 
     /// Recovery for the newest `limit` plans with anything left under a
@@ -460,15 +465,20 @@ public struct ChangeUndo {
     public func recoverInterrupted(limit: Int = 50) -> [Recovery] {
         journal.records(limit: limit).filter { $0.items.contains { $0.staging != nil } }
             .map { recover($0.planID) }
-            .filter { !$0.restored.isEmpty || !$0.cleaned.isEmpty || !$0.needsLook.isEmpty }
+            .filter { !$0.restored.isEmpty || !$0.cleaned.isEmpty || !$0.needsLook.isEmpty || !$0.leftBehind.isEmpty }
     }
 
     /// Finds what a crash left of a plan's temporary names (journaled before
-    /// each was made) and undoes it: an interrupted item found under its
-    /// temporary name (or in its staging folder) goes back under its own
-    /// name -- by identity, exclusively; a name taken since leaves it where it
-    /// is, reported -- and an empty staging folder of ours is removed.
-    /// Nothing else is touched.
+    /// each was made) and undoes it, for interrupted items only: the
+    /// temporary names of items whose outcome is settled (done, failed,
+    /// undone) are never touched, whatever is found under them now. An
+    /// interrupted item found under its temporary name (or in its staging
+    /// folder) goes back under its own name -- by identity, exclusively, its
+    /// folder still inside the grant before and after; a name taken since
+    /// leaves it where it is, reported. A staging folder is removed only when
+    /// it is the one whose identity was journaled right after it was made,
+    /// and empty; before that identity is journaled nothing is removed
+    /// (`leftBehind`). Nothing else is touched.
     public func recover(_ planID: UUID) -> Recovery {
         var out = Recovery(planID: planID)
         // A plan running in this process isn't interrupted: its names are
@@ -476,20 +486,20 @@ public struct ChangeUndo {
         guard !ChangeExecutor.isRunning(planID), let record = journal.record(planID), !record.truncated else { return out }
         for item in record.items {
             guard let st = item.staging else { continue }
-            let interrupted: Bool
             switch item.state {
-            case .incomplete, .uncertain: interrupted = true
-            default: interrupted = false
+            case .incomplete, .uncertain: break
+            case .done, .failed, .undone, .undoIncomplete: continue
             }
             let id = item.planItem.id
             do {
-                switch try recoverOne(item.planItem, st, interrupted: interrupted) {
-                case .nothing: break
-                case .cleaned: out.cleaned.append(id)
-                case .restored:
+                let step = try recoverOne(item.planItem, st, stagingIdentity: item.stagingIdentity)
+                if let note = step.leftBehind { out.leftBehind[id] = note }
+                if step.cleaned { out.cleaned.append(id) }
+                if step.restored {
                     out.restored.append(id)
-                    try? journal.append(JournalEvent(kind: .failed, date: Date(), item: id,
-                                                     message: "interrupted, and undone from its temporary name"), planID: planID)
+                    let why = step.leftBehind.map { "interrupted before it changed anything; \($0)" }
+                        ?? "interrupted, and undone from its temporary name"
+                    try? journal.append(JournalEvent(kind: .failed, date: Date(), item: id, message: why), planID: planID)
                 }
             } catch {
                 out.needsLook[id] = "\(error)"
@@ -498,84 +508,134 @@ public struct ChangeUndo {
         return out
     }
 
-    private enum RecoveryStep { case nothing, cleaned, restored }
+    /// What recovering one item did.
+    private struct RecoveryStep {
+        /// Its operation is known not to have happened (the item back under
+        /// its name, or never moved): journaled as failed.
+        var restored = false
+        /// Its empty staging folder was removed.
+        var cleaned = false
+        /// Its staging folder, not provably ours, was left where it is.
+        var leftBehind: String?
+    }
 
-    private func recoverOne(_ item: PlanItem, _ st: StagingRecord, interrupted: Bool) throws -> RecoveryStep {
-        let dir = try walker(st.root).openDirectory(st.parentComponents, expected: st.parentChain)
+    /// The points of a recovery operation (tests swap things there).
+    enum RecoveryPoint { case beforeRename, afterRename, beforeRemove }
+
+    /// Called at each `RecoveryPoint` of a recovery operation.
+    var recoveryHook: ((RecoveryPoint, PlanItem) -> Void)?
+
+    private func recoverOne(_ item: PlanItem, _ st: StagingRecord, stagingIdentity: FileIdentity?) throws -> RecoveryStep {
+        let w = walker(st.root)
+        let dir = try w.openDirectory(st.parentComponents, expected: st.parentChain)
         defer { withExtendedLifetime(dir) {} }
         let pfd = dir.descriptor.fd
-        /// A trash that never took the item: it is still under its name
-        /// (a trashed item leaves it), so nothing changed.
+        var out = RecoveryStep()
+        /// A trash that never took the item: it is still under its name (a
+        /// trashed item leaves it), so nothing changed.
         func trashNeverRan() throws -> Bool {
-            guard st.kind == .trash, interrupted, let s = item.source else { return false }
+            guard st.kind == .trash, let s = item.source else { return false }
             return try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity
         }
-        guard let staged = try Posix.lstatAt(pfd, st.name) else { return try trashNeverRan() ? .restored : .nothing }
-        // Something to change: only while a change grant still covers it.
-        try PlanItemGrant.check(item, canChange)
-        let excl = UInt32(RENAME_EXCL)
-        switch st.kind {
-        case .rename:
-            // The item itself under the temporary name.
-            guard interrupted, let s = item.source else { return .nothing }
-            guard staged.identity == s.identity else {
-                throw Uncertain(description: "\(st.name) isn't \(s.location.relativePath)")
-            }
-            if renameatx_np(pfd, st.name, pfd, s.location.name, excl) != 0 {
+        func leftGrant() -> FolderAccessError { .changed("\(comps(dir)) left the grant") }
+        /// The item from `from` (in `fromFD`) back under its own name,
+        /// exclusively, confirmed by identity -- only while its folder is
+        /// inside the grant, before and after (else it is taken back).
+        func putBack(from fromFD: Int32, _ from: String, _ shown: String) throws {
+            guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
+            recoveryHook?(.beforeRename, item)
+            guard w.stillInside(dir) else { throw leftGrant() }
+            if renameatx_np(fromFD, from, pfd, s.location.name, UInt32(RENAME_EXCL)) != 0 {
                 let e = errno
-                if e == EEXIST {
-                    throw FolderAccessError.exists("\(s.location.relativePath) (the item is at \(st.name))")
-                }
+                if e == EEXIST { throw FolderAccessError.exists("\(s.location.relativePath) (the item is \(shown))") }
                 throw FolderAccessError.system("put back \(s.location.name)", e)
             }
+            recoveryHook?(.afterRename, item)
             guard try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity else {
                 throw Uncertain(description: "\(s.location.relativePath) isn't the item after putting it back")
             }
-            return .restored
+            if !w.stillInside(dir) {
+                if ChangeExecutor.renameBack(pfd, s.location.name, fromFD, from, expecting: s.identity) { throw leftGrant() }
+                throw Uncertain(description: "put \(s.location.relativePath) back while its folder left the grant")
+            }
+        }
+        guard let staged = try Posix.lstatAt(pfd, st.name) else {
+            out.restored = try trashNeverRan()
+            return out
+        }
+        // Something to change: only while a change grant still covers it.
+        try PlanItemGrant.check(item, canChange)
+        switch st.kind {
+        case .rename:
+            // The item itself under the temporary name.
+            guard let s = item.source else { return out }
+            guard staged.identity == s.identity else {
+                throw Uncertain(description: "\(st.name) isn't \(s.location.relativePath)")
+            }
+            try putBack(from: pfd, st.name, "at \(st.name)")
+            out.restored = true
+            return out
         case .trash, .makeDir:
-            // A private folder of ours: held open, checked, then emptied of
-            // the item (trash) and removed.
             guard staged.isDirectory else { throw Uncertain(description: "\(st.name) isn't a folder") }
             let sfd = openat(pfd, st.name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
             guard sfd >= 0, let folder = try? Descriptor(fd: sfd, stat: Posix.fstat(sfd)) else {
                 if sfd >= 0 { close(sfd) }
                 throw FolderAccessError.system("open \(st.name)", errno)
             }
-            guard folder.identity == staged.identity, folder.identity.device == dir.descriptor.identity.device,
-                  ChangeExecutor.ownedByUs(folder) else {
-                throw Uncertain(description: "\(st.name) isn't a folder LLMTray made")
+            guard folder.identity == staged.identity else { throw FolderAccessError.changed(st.name) }
+            guard let made = stagingIdentity else {
+                // The crash came before the folder's identity was journaled:
+                // a folder under this name may be someone else's. Nothing is
+                // removed; only the item itself, found in it by identity, goes
+                // back. (The item is moved in only after the identity is
+                // journaled, and a make_dir publishes only after it: neither
+                // operation happened.)
+                out.leftBehind = "\(st.name) was left in \(comps(dir)): LLMTray can't tell it is the folder it made"
+                if st.kind == .trash, let s = item.source,
+                   try Posix.lstatAt(folder.fd, s.location.name)?.identity == s.identity {
+                    try putBack(from: folder.fd, s.location.name, "in \(st.name)")
+                    out.restored = true
+                } else {
+                    out.restored = try st.kind == .makeDir || trashNeverRan()
+                }
+                return out
             }
-            var result = RecoveryStep.cleaned
-            if st.kind == .trash, interrupted, let s = item.source,
-               let inside = try Posix.lstatAt(folder.fd, s.location.name) {
+            // The folder made for this item, and no other.
+            guard folder.identity == made, ChangeExecutor.ownedByUs(folder) else {
+                throw Uncertain(description: "\(st.name) isn't the folder LLMTray made")
+            }
+            if st.kind == .trash, let s = item.source, let inside = try Posix.lstatAt(folder.fd, s.location.name) {
                 guard inside.identity == s.identity else {
                     throw Uncertain(description: "\(st.name) holds something other than \(s.location.relativePath)")
                 }
-                if renameatx_np(folder.fd, s.location.name, pfd, s.location.name, excl) != 0 {
-                    let e = errno
-                    if e == EEXIST {
-                        throw FolderAccessError.exists("\(s.location.relativePath) (the item is in \(st.name))")
-                    }
-                    throw FolderAccessError.system("put back \(s.location.name)", e)
-                }
-                guard try Posix.lstatAt(pfd, s.location.name)?.identity == s.identity else {
-                    throw Uncertain(description: "\(s.location.relativePath) isn't the item after putting it back")
-                }
-                result = .restored
+                try putBack(from: folder.fd, s.location.name, "in \(st.name)")
+                out.restored = true
             }
             guard try Self.isEmptyDirectory(dir.descriptor, st.name) else {
-                if result == .restored { return result }
+                if out.restored { return out }
                 throw FolderAccessError.notEmpty(st.name)
             }
-            // Removal is by name: it must still be the folder checked.
+            // Removal is by name: it must still be the folder checked, in a
+            // folder still inside the grant.
+            recoveryHook?(.beforeRemove, item)
+            guard w.stillInside(dir) else {
+                if out.restored { return out }
+                throw leftGrant()
+            }
             guard try Posix.lstatAt(pfd, st.name)?.identity == folder.identity, unlinkat(pfd, st.name, AT_REMOVEDIR) == 0 else {
-                if result == .restored { return result }
+                if out.restored { return out }
                 throw FolderAccessError.system("remove \(st.name)", errno)
             }
+            // An empty folder can't be put back as it was: a folder that left
+            // the grant meanwhile is reported.
+            if !w.stillInside(dir) {
+                throw Uncertain(description: "removed the empty \(st.name) while its folder left the grant")
+            }
             // A make_dir that never published its folder: nothing changed.
-            if st.kind == .makeDir, interrupted { return .restored }
-            if result == .cleaned, try trashNeverRan() { return .restored }
-            return result
+            if st.kind == .makeDir { out.restored = true }
+            if !out.restored { out.restored = try trashNeverRan() }
+            out.cleaned = !out.restored
+            return out
         }
     }
 }

@@ -20,11 +20,13 @@ public struct FolderLocation: Codable, Hashable, Sendable {
     public var displayPath: String { components.isEmpty ? root.path : root.path + "/" + relativePath }
 }
 
-/// Whether a change grant (still) covers a place, asked without using
-/// anything up (`FolderGrants.changeCheck`): by the planner for both ends of
-/// each op, again at approval, at execution and before undo (Hardening 3,
-/// defense in depth).
-public typealias ChangeGrantCheck = @Sendable (FolderLocation) -> Bool
+/// Whether a change grant (still) covers a place for one proposal -- the call
+/// key of the `change_files` call that proposed the change, nil when unknown
+/// -- asked without using anything up (`FolderGrants.changeCheck`): by the
+/// planner for both ends of each op, again at approval, at execution and
+/// before undo (Hardening 3, defense in depth). A `once` grant covers only
+/// the proposal it authorized.
+public typealias ChangeGrantCheck = @Sendable (_ location: FolderLocation, _ proposal: String?) -> Bool
 
 /// One op of a `change_files` call (adr/0014): the ops list is the plan the
 /// user approves, whole or in part. `move.to` is the full new path (a move
@@ -100,6 +102,9 @@ public struct PlanItem: Codable, Equatable, Identifiable, Sendable {
     /// What the review must say: a hard link, a file-provider item, a
     /// package...
     public var notes: [String]
+    /// The call key of the `change_files` call that proposed it: a `once`
+    /// grant covers the item only for that call (nil: no `once` grant does).
+    public var proposal: String? = nil
 
     /// A one-line description for the plan review.
     public var summary: String {
@@ -212,9 +217,12 @@ public struct ChangePlanner {
     }
 
     /// Plans `requests` after the items already in `existing` (their
-    /// make_dir items can be parents of new ones). Temporary chats can't
-    /// change files (Hardening 8).
-    public func plan(_ requests: [ChangeRequest], after existing: [PlanItem] = [], temporaryChat: Bool = false) throws -> Result {
+    /// make_dir items can be parents of new ones). `proposal` is the call key
+    /// of the `change_files` call they come from: a `once` grant covers them
+    /// only if it was given for that call, and the items keep the key for
+    /// every later check. Temporary chats can't change files (Hardening 8).
+    public func plan(_ requests: [ChangeRequest], after existing: [PlanItem] = [], proposal: String? = nil,
+                     temporaryChat: Bool = false) throws -> Result {
         if temporaryChat { throw ChangePlanError.temporaryChat }
         var items: [PlanItem] = []
         var rejected: [(Int, Error)] = []
@@ -225,7 +233,8 @@ public struct ChangePlanner {
                 continue
             }
             do {
-                let item = try planOne(request, id: nextID, prior: existing + items)
+                var item = try planOne(request, id: nextID, prior: existing + items, proposal: proposal)
+                item.proposal = proposal
                 items.append(item)
                 nextID += 1
             } catch {
@@ -235,16 +244,18 @@ public struct ChangePlanner {
         return Result(items: items, rejected: rejected)
     }
 
-    /// Both ends of every op must be under a change grant.
-    func checkGranted(_ locations: [FolderLocation]) throws {
-        if let missing = locations.first(where: { !canChange($0) }) { throw FolderAccessError.notGranted(missing.displayPath) }
+    /// Both ends of every op must be under a change grant for `proposal`.
+    func checkGranted(_ locations: [FolderLocation], proposal: String?) throws {
+        if let missing = locations.first(where: { !canChange($0, proposal) }) {
+            throw FolderAccessError.notGranted(missing.displayPath)
+        }
     }
 
-    private func planOne(_ request: ChangeRequest, id: Int, prior: [PlanItem]) throws -> PlanItem {
+    private func planOne(_ request: ChangeRequest, id: Int, prior: [PlanItem], proposal: String?) throws -> PlanItem {
         switch request {
-        case .makeDir(let l): try checkGranted([l])
-        case .move(let f, let t): try checkGranted([f, t])
-        case .trash(let l): try checkGranted([l])
+        case .makeDir(let l): try checkGranted([l], proposal: proposal)
+        case .move(let f, let t): try checkGranted([f, t], proposal: proposal)
+        case .trash(let l): try checkGranted([l], proposal: proposal)
         }
         switch request {
         case .makeDir(let loc):
@@ -354,7 +365,7 @@ public struct ChangePlanner {
         var out: [Int: String] = [:]
         for item in plan.items {
             do {
-                try checkGranted([item.source?.location, item.destination?.location].compactMap { $0 })
+                try checkGranted([item.source?.location, item.destination?.location].compactMap { $0 }, proposal: item.proposal)
                 if let s = item.source {
                     let walker = SafeFolderWalker(root: s.location.root, denylist: denylist)
                     let r = try walker.resolve(s.location.components, expectedParents: s.parentChain)
@@ -472,11 +483,11 @@ public final class ChangePlanStore: @unchecked Sendable {
     }
 }
 
-/// Both ends of a plan item under the change grants, checked again where it
-/// runs (execution, undo).
+/// Both ends of a plan item under the change grants (for the proposal it
+/// came from), checked again where it runs (execution, undo).
 enum PlanItemGrant {
     static func check(_ item: PlanItem, _ canChange: ChangeGrantCheck) throws {
-        for loc in [item.source?.location, item.destination?.location].compactMap({ $0 }) where !canChange(loc) {
+        for loc in [item.source?.location, item.destination?.location].compactMap({ $0 }) where !canChange(loc, item.proposal) {
             throw FolderAccessError.notGranted(loc.displayPath)
         }
     }

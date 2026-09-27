@@ -123,7 +123,15 @@ These override anything looser above, too.
     is opened, and before every undo -- puts an interrupted item found
     under such a name back under its own name (by identity, exclusively; a
     name taken since leaves it there, reported) and removes the empty
-    staging folder; nothing else is touched.
+    staging folder; nothing else is touched. A staging folder's identity is
+    journaled right after it is made, before anything is moved into it or
+    published from it: recovery removes only the folder with that identity,
+    and when the crash came before it was journaled removes nothing (only the
+    item itself, found in it by identity, goes back; the folder is reported
+    as left behind). Recovery acts only on interrupted items -- the names of
+    settled ones are never touched -- and, like undo, only through folders
+    still inside the grant, checked before and after each step (a put-back
+    whose folder left is taken back).
 15. **iCloud placeholders aren't read.** A dataless file (`SF_DATALESS`) is
     listed and reported "in iCloud, not downloaded"; its contents are
     never read or hashed (the duplicate scan counts it as skipped), and
@@ -135,6 +143,9 @@ These override anything looser above, too.
     as holding something): listings and info flag it "contains protected
     items", and a move or trash of it is refused with that reason -- at
     proposal, approval and execution -- rather than carrying a `.ssh` along.
+    At execution it is checked again after the rename, at the new place (for
+    a trash, inside the staging folder before the Trash is called): anything
+    denied put inside in between takes the move back.
 17. **More is denied.** Home-level credentials and tool configuration
     (`~/.aws`, `~/.config`, `~/.kube`, `~/.docker`, `~/.netrc`,
     `~/.git-credentials`, `~/.password-store`, `~/.npmrc`, `~/.pypirc`,
@@ -149,8 +160,9 @@ These override anything looser above, too.
 18. **Change grants are checked again** at approval, at execution (both
     ends of a move, across grants too) and before undo or recovery, without
     using anything up: a grant revoked or expired since the proposal stops
-    the change ("grant revoked"). A `once` grant counts for the chat of the
-    call that used it.
+    the change ("grant revoked"). A `once` grant covers only the proposal it
+    authorized: plan items keep the call key of the `change_files` call that
+    proposed them, and a later proposal in the chat needs a grant of its own.
 19. **Temporary chats read only through grants made in that chat** (once
     or for the chat): no standing grant reaches them (Hardening 8).
 20. **The journal is synced with `F_FULLFSYNC`** (`fsync` where that isn't
