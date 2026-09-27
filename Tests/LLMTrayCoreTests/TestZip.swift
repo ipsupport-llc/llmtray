@@ -46,21 +46,22 @@ final class TestZip {
     /// One entry; `localName` lets the local header disagree with the
     /// central directory, `offset` points the central record elsewhere.
     func addRaw(_ name: String, method: Int, payload: Data, size: Int, crc: UInt32, flags: Int = 0,
-                localName: String? = nil, offset: Int? = nil) {
+                localName: String? = nil, offset: Int? = nil, localMethod: Int? = nil, localSize: Int? = nil,
+                centralExtra: Data = Data()) {
         let nameData = Data(name.utf8)
         let local = Data((localName ?? name).utf8)
         let at = offset ?? out.count
         if offset == nil {
             var lh = Data()
-            le32(0x0403_4B50, &lh); le16(20, &lh); le16(flags, &lh); le16(method, &lh); le16(0, &lh); le16(0x21, &lh)
-            le32(Int(crc), &lh); le32(payload.count, &lh); le32(size, &lh); le16(local.count, &lh); le16(0, &lh)
+            le32(0x0403_4B50, &lh); le16(20, &lh); le16(flags, &lh); le16(localMethod ?? method, &lh); le16(0, &lh); le16(0x21, &lh)
+            le32(Int(crc), &lh); le32(payload.count, &lh); le32(localSize ?? size, &lh); le16(local.count, &lh); le16(0, &lh)
             out.append(lh); out.append(local); out.append(payload)
         }
         var ch = Data()
         le32(0x0201_4B50, &ch); le16(20, &ch); le16(20, &ch); le16(flags, &ch); le16(method, &ch); le16(0, &ch); le16(0x21, &ch)
         le32(Int(crc), &ch); le32(payload.count, &ch); le32(size, &ch); le16(nameData.count, &ch)
-        le16(0, &ch); le16(0, &ch); le16(0, &ch); le16(0, &ch); le32(0, &ch); le32(at, &ch)
-        central.append(ch); central.append(nameData)
+        le16(centralExtra.count, &ch); le16(0, &ch); le16(0, &ch); le16(0, &ch); le32(0, &ch); le32(at, &ch)
+        central.append(ch); central.append(nameData); central.append(centralExtra)
         count += 1
     }
 

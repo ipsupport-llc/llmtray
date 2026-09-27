@@ -39,13 +39,24 @@ final class XMLPartCheckTests: XCTestCase {
         XCTAssertNil(XMLPartCheck.doctype(Data("<r>no doctype here</r>".utf8)))
     }
 
-    func testDoctypeInUTF16IsRefused() {
-        let xml = "<?xml version=\"1.0\" encoding=\"UTF-16\"?><!DOCTYPE r SYSTEM \"x.dtd\"><r/>"
-        for encoding in [String.Encoding.utf16LittleEndian, .utf16BigEndian] {
+    func testPartsMustBeUTF8() {
+        // A DOCTYPE in UTF-16 or UTF-32 would slip past a byte scan: such parts are refused.
+        let xml = "<?xml version=\"1.0\"?><!DOCTYPE r [<!ENTITY a \"b\">]><r>&a;</r>"
+        for encoding in [String.Encoding.utf16LittleEndian, .utf16BigEndian, .utf16, .utf32LittleEndian, .utf32] {
             let data = xml.data(using: encoding)!
-            XCTAssertEqual(XMLPartCheck.doctype(data), .internalSubset, "\(encoding)")
-            XCTAssertThrowsError(try XMLPartCheck.check(data, part: "p", maxDepth: 256, allowExternalDoctype: true))
+            XCTAssertThrowsError(try XMLPartCheck.check(data, part: "p", maxDepth: 256, allowExternalDoctype: true)) {
+                XCTAssertEqual($0 as? ExtractionError, .unreadable("xml: p is not UTF-8"), "\(encoding)")
+            }
         }
+    }
+
+    func testQuotedLiteralsDontHideAnInternalSubset() {
+        let tricky = "<?xml version=\"1.0\"?><!DOCTYPE r SYSTEM \"x>y\" [<!ENTITY a 'b'>]><r>&a;</r>"
+        XCTAssertEqual(XMLPartCheck.doctype(Data(tricky.utf8)), .internalSubset)
+        XCTAssertThrowsError(try check(tricky, allowExternal: true))
+        let single = "<!DOCTYPE r PUBLIC '-//x>[//EN' \"m.dtd\"><r/>"
+        XCTAssertEqual(XMLPartCheck.doctype(Data(single.utf8)), .external)
+        XCTAssertEqual(XMLPartCheck.doctype(Data("<!DOCTYPE r SYSTEM \"never closed".utf8)), .internalSubset)
     }
 
     func testNestingCap() {

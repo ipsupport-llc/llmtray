@@ -61,11 +61,20 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
         let probe = data.prefix(64 * 1024)
         let utf16 = starts([0xFF, 0xFE]) || starts([0xFE, 0xFF])
         if !utf16 && probe.contains(0) { return .unknown }
-        let lead = PlainText.decode(Data(probe.prefix(4096)))
+        // The probe's end may cut a UTF-8 sequence: back off continuation bytes.
+        var lead = probe.prefix(4096)
+        if !utf16, lead.count == 4096 {
+            var cut = lead.endIndex
+            while cut > lead.startIndex, cut > lead.endIndex - 4, lead[cut - 1] & 0xC0 == 0x80 { cut -= 1 }
+            if cut > lead.startIndex, lead[cut - 1] & 0xC0 == 0xC0 { cut -= 1 }
+            lead = lead[..<cut]
+        }
+        let leadText = PlainText.decode(Data(lead))
+        let leading = leadText
             .trimmingCharacters(in: .whitespacesAndNewlines.union(CharacterSet(charactersIn: "\u{FEFF}")))
             .prefix(1024).lowercased()
-        if lead.hasPrefix("<!doctype html") || lead.hasPrefix("<html")
-            || (lead.hasPrefix("<") && (lead.contains("<html") || lead.contains("<body") || lead.contains("<head"))) {
+        if leading.hasPrefix("<!doctype html") || leading.hasPrefix("<html")
+            || (leading.hasPrefix("<") && (leading.contains("<html") || leading.contains("<body") || leading.contains("<head"))) {
             return .html
         }
         return .text

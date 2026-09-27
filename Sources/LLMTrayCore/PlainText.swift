@@ -4,16 +4,13 @@ import Foundation
 /// 1 MB so a large log never becomes one String.
 public enum PlainText {
     /// UTF-8; UTF-16 with a BOM; else Windows-1251 (the common Russian legacy
-    /// encoding), which maps every byte but one -- then Latin-1.
+    /// encoding), which maps every byte but one -- then Latin-1. Never drops
+    /// bytes: callers cut only between characters.
     public static func decode(_ data: Data) -> String {
         if data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF]) {
             return String(data: data, encoding: .utf16) ?? ""
         }
         if let s = String(data: data, encoding: .utf8) { return s }
-        // A UTF-8 sequence cut at the end of a slice isn't a legacy encoding.
-        for cut in 1...3 where data.count > cut {
-            if let s = String(data: data.dropLast(cut), encoding: .utf8) { return s }
-        }
         let cp1251 = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(
             CFStringEncoding(CFStringEncodings.windowsCyrillic.rawValue)))
         return String(data: data, encoding: cp1251) ?? String(data: data, encoding: .isoLatin1) ?? ""

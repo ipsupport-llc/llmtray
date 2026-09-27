@@ -8,10 +8,13 @@ import Foundation
 /// with no caps (a 1.9 MB bomb docx took it to 14.3 GB, adr/0012), so a
 /// container goes through here first and only then to it.
 ///
-/// Refused outright: zip64, encrypted parts, more entries than the cap, two
-/// entries with one name or overlapping data (a reader that picks the other
-/// one would see something unchecked), and a part that is itself an archive
-/// -- nested archives are never opened.
+/// Refused outright: zip64 (records or extra fields), encrypted parts, more
+/// entries than the cap, two entries with one name, overlapping data, a
+/// local header that disagrees with its central record (a reader that goes
+/// by the other one would see something unchecked), and a part that is
+/// itself an archive -- nested archives are never opened. The one exception
+/// is an embedded object under `embeddings/` (a chart's workbook in a docx:
+/// common, and importers leave it alone); its bytes are still counted.
 public final class CappedZip {
     public struct Entry: Equatable {
         public let name: String
@@ -44,8 +47,9 @@ public final class CappedZip {
         return try read(e, keep: keep)
     }
 
+    /// `allowEmbedded`: an archive under `embeddings/` passes (counted, never opened).
     @discardableResult
-    public func read(_ e: Entry, keep: Bool = true) throws -> Data {
+    public func read(_ e: Entry, keep: Bool = true, allowEmbedded: Bool = false) throws -> Data {
         if e.flags & 1 != 0 { throw ExtractionError.encrypted }
         if e.declaredSize > caps.maxZipPartBytes { throw ExtractionError.tooLarge(.zipPart) }
         let start = try dataStart(of: e)
@@ -53,20 +57,24 @@ public final class CappedZip {
         guard end <= data.count else { throw Self.corrupt("\(e.name) runs past the end (truncated?)") }
         let room = caps.maxZipTotalBytes - inflatedTotal
         let out: Data
+        let head: Data
         let produced: Int
         switch e.method {
         case 0:
             if e.compressedSize > caps.maxZipPartBytes { throw ExtractionError.tooLarge(.zipPart) }
             if e.compressedSize > room { throw ExtractionError.tooLarge(.zipTotal) }
-            out = keep ? data.subdata(in: (data.startIndex + start)..<(data.startIndex + end)) : Data()
+            out = keep ? data.subdata(in: start..<end) : Data()
+            head = data.subdata(in: start..<min(end, start + 8))
             produced = e.compressedSize
         case 8:
-            (out, produced) = try inflate(e, from: start, to: end, room: room, keep: keep)
+            (out, head, produced) = try inflate(e, from: start, to: end, room: room, keep: keep)
         default:
             throw Self.corrupt("\(e.name) uses compression method \(e.method)")
         }
         inflatedTotal += produced
-        if keep, Self.isArchive(out) { throw Self.corrupt("\(e.name) is a nested archive") }
+        if Self.isArchive(head) && !(allowEmbedded && Self.isEmbedding(e.name)) {
+            throw Self.corrupt("\(e.name) is a nested archive")
+        }
         return out
     }
 
@@ -80,7 +88,7 @@ public final class CappedZip {
                 try XMLPartCheck.check(try read(e), part: e.name, maxDepth: caps.maxXMLDepth,
                                        allowExternalDoctype: allowExternalDoctype)
             } else {
-                try read(e, keep: false)
+                try read(e, keep: false, allowEmbedded: true)
             }
         }
     }
@@ -91,6 +99,20 @@ public final class CappedZip {
 
     static func isArchive(_ d: Data) -> Bool {
         d.starts(with: [0x50, 0x4B, 0x03, 0x04]) || d.starts(with: CompoundFile.magic)
+    }
+
+    static func isEmbedding(_ name: String) -> Bool {
+        name.lowercased().split(separator: "/").dropLast().contains("embeddings")
+    }
+
+    /// Whether an extra field carries a zip64 record (header id 1).
+    private static func hasZip64Extra(_ d: Data, from start: Int, length: Int) throws -> Bool {
+        var p = start
+        while p + 4 <= start + length {
+            if try u16(d, p) == 0x0001 { return true }
+            p += 4 + (try u16(d, p + 2))
+        }
+        return false
     }
 
     private static func u16(_ d: Data, _ o: Int) throws -> Int {
@@ -138,6 +160,9 @@ public final class CappedZip {
                 throw corrupt("zip64 is not supported")
             }
             guard names.insert(name).inserted else { throw corrupt("two entries named \(name)") }
+            if try hasZip64Extra(data, from: p + 46 + nameLength, length: try u16(data, p + 30)) {
+                throw corrupt("zip64 is not supported")
+            }
             entries.append(e)
             p += 46 + nameLength + (try u16(data, p + 30)) + (try u16(data, p + 32))
         }
@@ -154,20 +179,30 @@ public final class CappedZip {
     }
 
     /// Where an entry's data starts, after its local header -- which must
-    /// name the same part (a streaming reader goes by the local headers).
+    /// agree with the central record on name, method, encryption and (unless
+    /// a data descriptor follows) sizes: a streaming reader goes by the local
+    /// headers, and must see what was checked.
     private func dataStart(of e: Entry) throws -> Int {
         let lh = e.localHeaderOffset
         guard try Self.u32(data, lh) == 0x0403_4B50 else { throw Self.corrupt("bad local header for \(e.name)") }
+        let flags = try Self.u16(data, lh + 6)
         let nameLength = try Self.u16(data, lh + 26)
         let extraLength = try Self.u16(data, lh + 28)
-        guard lh + 30 + nameLength <= data.count else { throw Self.corrupt("\(e.name) runs past the end (truncated?)") }
-        let base = data.startIndex
-        let localName = String(decoding: data[(base + lh + 30)..<(base + lh + 30 + nameLength)], as: UTF8.self)
+        guard lh + 30 + nameLength + extraLength <= data.count else { throw Self.corrupt("\(e.name) runs past the end (truncated?)") }
+        let localName = String(decoding: data[(lh + 30)..<(lh + 30 + nameLength)], as: UTF8.self)
         guard localName == e.name else { throw Self.corrupt("local header of \(e.name) names \(localName)") }
+        let method = try Self.u16(data, lh + 8)
+        let compressed = try Self.u32(data, lh + 18)
+        let declared = try Self.u32(data, lh + 22)
+        var agrees = method == e.method && (flags & 1) == (e.flags & 1)
+        if flags & 8 == 0 { agrees = agrees && compressed == e.compressedSize && declared == e.declaredSize }
+        guard agrees else { throw Self.corrupt("local header of \(e.name) disagrees with the central directory") }
+        if try Self.hasZip64Extra(data, from: lh + 30 + nameLength, length: extraLength) { throw Self.corrupt("zip64 is not supported") }
         return lh + 30 + nameLength + extraLength
     }
 
-    private func inflate(_ e: Entry, from start: Int, to end: Int, room: Int, keep: Bool) throws -> (Data, Int) {
+    /// The inflated part (when `keep`), its first bytes, and how many bytes it inflated to.
+    private func inflate(_ e: Entry, from start: Int, to end: Int, room: Int, keep: Bool) throws -> (Data, Data, Int) {
         // The ratio cap has 1 MB of slack: a tiny part may legitimately inflate
         // far past 200x (a run of spaces).
         let ratioCap = Int(Double(max(e.compressedSize, 1)) * caps.maxZipRatio) + 1_048_576
@@ -176,6 +211,7 @@ public final class CappedZip {
             n > ratioCap ? .tooLarge(.zipRatio) : n > room ? .tooLarge(.zipTotal) : .tooLarge(.zipPart)
         }
         var out = Data()
+        var head = Data()
         var total = 0
         let chunk = 256 * 1024
         let dst = UnsafeMutablePointer<UInt8>.allocate(capacity: chunk)
@@ -198,12 +234,13 @@ public final class CappedZip {
                 let produced = chunk - stream.pointee.dst_size
                 if total + produced > limit { throw overLimit(total + produced) }
                 if keep { out.append(dst, count: produced) }
+                if head.count < 8 { head.append(dst, count: min(produced, 8 - head.count)) }
                 total += produced
                 if status == COMPRESSION_STATUS_END { break }
                 if status == COMPRESSION_STATUS_ERROR { throw Self.corrupt("\(e.name) has corrupt deflate data") }
                 if produced == 0 && stream.pointee.src_size == 0 { throw Self.corrupt("\(e.name) is truncated") }
             }
         }
-        return (out, total)
+        return (out, head, total)
     }
 }

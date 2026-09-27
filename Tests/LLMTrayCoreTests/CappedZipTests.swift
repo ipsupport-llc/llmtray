@@ -139,11 +139,38 @@ final class CappedZipTests: XCTestCase {
     func testNestedArchiveIsNeverHandedOut() throws {
         let inner = TestZip.docx(body: TestZip.paragraph("inner"))
         let z = TestZip()
-        z.add("word/embeddings/x.docx", inner)
+        z.add("word/embeddings/x.xlsx", inner)
         let zip = try CappedZip(data: z.finish(), caps: caps())
-        assertUnreadable("nested archive") { try zip.read("word/embeddings/x.docx") }
-        // Counted, but not opened, by the pre-check.
+        assertUnreadable("nested archive") { try zip.read("word/embeddings/x.xlsx") }
+        // An embedded object is counted, never opened, by the pre-check...
         XCTAssertNoThrow(try zip.checkAll())
+        // ...but an archive anywhere else refuses the container, stored or
+        // deflated, whatever its name says.
+        for store in [false, true] {
+            let other = TestZip()
+            other.add("word/media/image1.png", inner, store: store)
+            assertUnreadable("nested archive") { try CappedZip(data: other.finish(), caps: caps()).checkAll() }
+            let ole = TestZip()
+            ole.add("word/media/x.bin", Data(CompoundFile.magic) + Data(count: 100), store: store)
+            assertUnreadable("nested archive") { try CappedZip(data: ole.finish(), caps: caps()).checkAll() }
+        }
+    }
+
+    func testLocalHeaderDisagreeingWithTheCentralRecordIsRefused() {
+        // The central record says stored, 4 bytes; the local header says deflated.
+        let z = TestZip()
+        z.addRaw("a.xml", method: 0, payload: Data("<a/>".utf8), size: 4, crc: 0, localMethod: 8)
+        assertUnreadable("disagrees") { try CappedZip(data: z.finish(), caps: caps()).checkAll() }
+        let sizes = TestZip()
+        sizes.addRaw("a.xml", method: 0, payload: Data("<a/>".utf8), size: 4, crc: 0, localSize: 4_000_000)
+        assertUnreadable("disagrees") { try CappedZip(data: sizes.finish(), caps: caps()).checkAll() }
+    }
+
+    func testZip64ExtraFieldIsRefused() {
+        let z = TestZip()
+        z.addRaw("a.xml", method: 0, payload: Data("<a/>".utf8), size: 4, crc: 0,
+                 centralExtra: Data([0x01, 0x00, 0x08, 0x00]) + Data(count: 8))
+        assertUnreadable("zip64") { _ = try CappedZip(data: z.finish(), caps: caps()) }
     }
 
     func testUnknownMethodIsRefused() {

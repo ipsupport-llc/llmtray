@@ -8,8 +8,8 @@ final class PlainTextTests: XCTestCase {
         let cp1251 = String.Encoding(rawValue: CFStringConvertEncodingToNSStringEncoding(
             CFStringEncoding(CFStringEncodings.windowsCyrillic.rawValue)))
         XCTAssertEqual(PlainText.decode("Договор №5".data(using: cp1251)!), "Договор №5")
-        // A UTF-8 sequence cut at the end is dropped, not read as cp1251.
-        XCTAssertEqual(PlainText.decode(Data("Да".utf8).dropLast()), "Д")
+        // Never loses a byte: invalid UTF-8 is read as cp1251 whole (0xFF is "я").
+        XCTAssertEqual(PlainText.decode(Data("hello".utf8) + Data([0xFF])), "helloя")
     }
 
     func testPagesCutAtNewlinesAndNeverInsideACharacter() throws {

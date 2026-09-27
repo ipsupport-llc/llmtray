@@ -124,11 +124,7 @@ private struct Extractor {
     }
 
     mutating func extract(path: String, kind: inout DocumentKind) throws {
-        let attributes = try FileManager.default.attributesOfItem(atPath: path)
-        guard attributes[.type] as? FileAttributeType == .typeRegular else { throw ExtractionError.unreadable("not a regular file") }
-        let size = (attributes[.size] as? NSNumber)?.intValue ?? 0
-        if size > caps.maxFileBytes { throw ExtractionError.tooLarge(.fileBytes) }
-        let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .alwaysMapped)
+        let data = try Self.map(path, maxBytes: caps.maxFileBytes)
         kind = DocumentKind.detect(data, caps: caps)
         if kind == .encryptedOffice { throw ExtractionError.encrypted }
         guard kind.isSupported else { throw ExtractionError.unsupported(kind.rawValue) }
@@ -153,6 +149,24 @@ private struct Extractor {
         default:
             throw ExtractionError.unsupported(kind.rawValue)
         }
+    }
+
+    /// The file, mapped read-only through the one descriptor its size was
+    /// checked on: a path swapped in between can't bring a bigger file.
+    private static func map(_ path: String, maxBytes: Int) throws -> Data {
+        let fd = open(path, O_RDONLY)
+        guard fd >= 0 else { throw ExtractionError.unreadable(String(cString: strerror(errno))) }
+        defer { close(fd) }
+        var st = stat()
+        guard fstat(fd, &st) == 0 else { throw ExtractionError.unreadable(String(cString: strerror(errno))) }
+        guard st.st_mode & S_IFMT == S_IFREG else { throw ExtractionError.unreadable("not a regular file") }
+        let size = Int(st.st_size)
+        if size > maxBytes { throw ExtractionError.tooLarge(.fileBytes) }
+        if size == 0 { return Data() }
+        guard let base = mmap(nil, size, PROT_READ, MAP_PRIVATE, fd, 0), base != MAP_FAILED else {
+            throw ExtractionError.unreadable(String(cString: strerror(errno)))
+        }
+        return Data(bytesNoCopy: base, count: size, deallocator: .unmap)
     }
 
     private mutating func page(_ text: String, junk: Double? = nil, error: String? = nil) throws {
