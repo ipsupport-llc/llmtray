@@ -60,7 +60,8 @@ public enum ProjectFiles {
 
     /// A call as the tool will run it.
     public enum Request: Equatable, Sendable {
-        /// The files, from this position in the listing (0-based).
+        /// The files whose id is `from` or more (`list:N` names the next
+        /// one's id: a file removed or added meanwhile doesn't shift it).
         case list(from: Int)
         case search(query: String, doc: Int64?, limit: Int)
         case read(ReadCursor)
@@ -340,7 +341,8 @@ public final class ProjectFilesService {
         head += "\(docs.count) file(s) in this project (id. name -- pages -- status):"
         let hint = searchable && note == nil
             ? "\nSearch: \(ProjectFiles.toolName)({\"query\":\"...\"}); read: \(ProjectFiles.toolName)({\"doc\":1,\"pages\":\"1-2\"})." : ""
-        let start = min(max(0, from), docs.count)
+        // Documents come in id order.
+        let start = docs.firstIndex { $0.doc >= Int64(from) } ?? docs.count
         func row(_ d: IndexedDocument, name: String) -> String {
             let pages = d.pages.map { "\($0) page\($0 == 1 ? "" : "s")" } ?? "? pages"
             return "\(d.doc). \(name) -- \(pages) -- \(ProjectFiles.status(d))"
@@ -349,7 +351,7 @@ public final class ProjectFilesService {
             var out = ProjectToolOutput(project: project, preamble: ([head] + rows).joined(separator: "\n") + hint)
             let next = start + rows.count
             if next < docs.count {
-                out.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(next)\"})"
+                out.epilogue = "\(docs.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.listCursorPrefix)\(docs[next].doc)\"})"
             }
             return out
         }

@@ -489,6 +489,22 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertEqual(Set(seen).count, 23)
     }
 
+    func testARemovalBetweenListingPagesSkipsNoFile() async throws {
+        for i in 0..<12 { try await add("File \(i) text", name: "file-with-a-longish-name-\(i).txt", embed: false) }
+        func rows(_ o: ProjectToolOutput) -> [String] {
+            o.preamble.split(separator: "\n").map(String.init).filter { $0.range(of: #"^\d+\. "#, options: .regularExpression) != nil }
+        }
+        let first = output(await run(.list(from: 0), budget: 700))
+        let shown = rows(first)
+        XCTAssertGreaterThan(shown.count, 1)
+        let range = try XCTUnwrap(first.epilogue.range(of: #"(?<="cursor":"list:)\d+"#, options: .regularExpression))
+        // One of the files shown is removed before the next page.
+        let h = try await registry.open(project)
+        try await h.write { try $0.remove(doc: 1) }
+        let second = output(await run(.list(from: Int(first.epilogue[range])!), budget: 700))
+        XCTAssertTrue(rows(second).first?.hasPrefix("\(shown.count + 1). ") == true, "\(rows(second))")
+    }
+
     func testNoRoomForAnyLineGivesNoCursor() async throws {
         for i in 0..<3 { try await add("File \(i) text", name: "f\(i).txt", embed: false) }
         let o = output(await run(.list(from: 0), budget: 250))
