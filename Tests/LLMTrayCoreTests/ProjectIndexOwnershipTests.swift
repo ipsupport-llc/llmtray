@@ -49,9 +49,39 @@ final class ProjectIndexOwnershipTests: XCTestCase {
         XCTAssertFalse(fm.fileExists(atPath: idx.directory.appendingPathComponent(CompactionSwap.markerName).path))
         XCTAssertEqual(try idx.count("SELECT count(*) FROM documents WHERE name = 'late'"), 1, "the late write kept")
         XCTAssertGreaterThan(try idx.storage().churn, 0, "not compacted")
+        // A connection still open at the swap (it could commit after any check):
+        // nothing is moved.
+        var other: SQLiteConnection?
+        idx.crashHook = { point in
+            guard point == "compact.checked" else { return }
+            other = try SQLiteConnection(path: idx.databaseURL.path)
+            try other?.run("INSERT INTO documents(name, ext, sha256, added_at, status) VALUES ('later', 'txt', 'later', 0, 'failed')")
+        }
+        XCTAssertThrowsError(try idx.compact()) { XCTAssertEqual($0 as? ProjectIndexError, .changedDuringCompaction, "\($0)") }
+        idx.crashHook = nil
+        other?.close()
+        XCTAssertFalse(fm.fileExists(atPath: idx.directory.appendingPathComponent(CompactionSwap.compactName).path))
+        XCTAssertFalse(fm.fileExists(atPath: idx.directory.appendingPathComponent(CompactionSwap.markerName).path))
+        XCTAssertEqual(try idx.count("SELECT count(*) FROM documents WHERE name = 'later'"), 1, "the later write kept")
+
         try idx.compact()
-        XCTAssertEqual(try idx.count("SELECT count(*) FROM documents WHERE name = 'late'"), 1, "and in the compacted file")
+        XCTAssertEqual(try idx.count("SELECT count(*) FROM documents WHERE name IN ('late', 'later')"), 2, "and in the compacted file")
         XCTAssertEqual(try idx.storage().churn, 0)
+    }
+
+    /// Closing a leaked index doesn't give the project up behind its owner.
+    func testALeakedIndexCantReleaseTheLock() async throws {
+        let dir = indexTempDir()
+        let reg = ProjectIndexRegistry(directory: { _ in dir }, idleDelay: 0.05)
+        let h = try reg.handle(for: UUID())
+        let leak = Leak()
+        try await h.write { leak.index = $0 }
+        leak.index?.close()
+        XCTAssertThrowsError(try ProjectIndex(directory: dir)) { XCTAssertEqual($0 as? ProjectIndexError, .inUse) }
+        let n = try await h.write { try $0.documents().count }
+        XCTAssertEqual(n, 0, "the owner still works")
+        leak.index = nil
+        reg.closeAll()
     }
 
     /// Symlinks in a linked folder: one to a file or directory outside it is
