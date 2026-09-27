@@ -44,7 +44,7 @@ final class ProjectIndexer: ObservableObject {
     @Published private(set) var pinBytes: [UUID: [Int64: Int]] = [:]
     /// Each model's bytes-a-token samples from the server's counts
     /// (PinTokenRatios), here so the Files window redraws when one comes.
-    @Published private(set) var pinTokenSamples: [String: [Double]] = PinTokenRatios().all
+    @Published private(set) var pinTokenSamples = PinTokenRatios().samples
     /// The revision each size in `pinBytes` was measured at.
     private var pinTokenRevs: [UUID: [Int64: Int64]] = [:]
     private var pinRefreshes: [UUID: Task<Void, Never>] = [:]
@@ -439,7 +439,7 @@ final class ProjectIndexer: ObservableObject {
 
     /// A project's pinned sizes in tokens for `model`: at its learned ratio.
     func pinTokens(_ project: UUID, model: String?) -> [Int64: Int] {
-        PinTokenRatio.tokens(pinBytes[project] ?? [:], bytesPerToken: PinTokenRatio.effective(learnedPinRatio(model: model)))
+        PinTokenRatio.tokens(pinBytes[project] ?? [:], bytesPerToken: pinTokenSamples.bytesPerToken(model: model))
     }
 
     /// What `model`'s pinned files are sized at (PinTokenRatio): learned
@@ -449,19 +449,28 @@ final class ProjectIndexer: ObservableObject {
     }
 
     /// Whether `model`'s ratio has been measured.
-    func isPinRatioMeasured(model: String?) -> Bool { learnedPinRatio(model: model) != nil }
-
-    private func learnedPinRatio(model: String?) -> Double? {
-        model.flatMap { PinTokenRatio.learned(pinTokenSamples[$0] ?? []) }
-    }
+    func isPinRatioMeasured(model: String?) -> Bool { pinTokenSamples.learned(model: model) != nil }
 
     /// The server counted `promptTokens` for a request of `model`'s: a
-    /// sample of its ratio when it's large enough and has no images.
-    func recordPromptTokens(model: String?, _ measure: PromptTokenEstimator.Measure, promptTokens: Int) {
+    /// sample of its ratio when it's large enough and has no images
+    /// (`carriedPins`: one of the pinned text's own).
+    func recordPromptTokens(model: String?, _ measure: PromptTokenEstimator.Measure, promptTokens: Int, carriedPins: Bool) {
         let ratios = PinTokenRatios()
-        guard ratios.record(model: model, measure, promptTokens: promptTokens) else { return }
-        let all = ratios.all
-        if pinTokenSamples != all { pinTokenSamples = all }
+        guard ratios.record(model: model, measure, promptTokens: promptTokens, carriedPins: carriedPins) else { return }
+        publishPinSamples(ratios)
+    }
+
+    /// A request of `model`'s that carried pinned text failed: the next
+    /// turns size pins conservatively (PinTokenRatios.recordFailure).
+    func recordPinnedRequestFailed(model: String?) {
+        let ratios = PinTokenRatios()
+        ratios.recordFailure(model: model)
+        publishPinSamples(ratios)
+    }
+
+    private func publishPinSamples(_ ratios: PinTokenRatios) {
+        let samples = ratios.samples
+        if pinTokenSamples != samples { pinTokenSamples = samples }
     }
 
     /// What the project's pinned files may take with `settings`' model: half

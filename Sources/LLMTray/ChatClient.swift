@@ -129,12 +129,16 @@ final class ChatClient: ObservableObject {
     /// A request's shape for the estimate: its size, how many messages of
     /// the history it sent, and the rest serialized -- the system prompt
     /// and parameters, and each tool declaration by name; and its model
-    /// (whose pinned-file ratio its count teaches).
+    /// (whose pinned-file ratio its count teaches), its pinned block's
+    /// bytes and its framing without that block.
     private struct SentRequest {
         var measure: PromptTokenEstimator.Measure
         var historyCount: Int
         var framing: Framing
         var modelPath: String?
+        var pinnedBytes: Int
+        var unpinnedFraming: Framing
+        var carriesPins: Bool
     }
     private struct Framing: Equatable {
         var base: Data
@@ -660,13 +664,20 @@ final class ChatClient: ObservableObject {
         // request's room alike: the request without the files (counted when
         // it was) plus their block at that ratio -- unless this very prefix
         // was counted. At 2 bytes a token a book that fits was left out.
+        // The last count, when its request differed only in its pins, is
+        // used less nothing of its pinned block (the growth alone added):
+        // taking it off at a ratio that may be too low could undercount.
         let ratio = ProjectIndexer.pinBytesPerToken(model: base.modelPath)
-        let rest = requestTokenEstimate(context, settings([], []))
+        let bare = Self.unpinned(base)
+        let unpinnedCount = countedTokenEstimate(context, bare, unpinned: true)
+        let rest = unpinnedCount ?? requestTokenEstimate(context, bare)
+        let countedPinned = unpinnedCount == nil ? 0 : countedRequest?.pinnedBytes ?? 0
         let chosen = PinnedFiles.select(pinned.files, limitTokens: ProjectIndexer.pinLimit(for: base).tokens,
                                         bytesPerToken: ratio) { files in
             let withFiles = settings(files, [])
+            let block = Self.pinnedBlockBytes(withFiles)
             let estimate = countedTokenEstimate(context, withFiles)
-                ?? rest + PinTokenRatio.tokens(bytes: PinnedFiles.jsonBytes(PinnedFiles.block(files, notes: [])), bytesPerToken: ratio)
+                ?? rest + PinTokenRatio.tokens(bytes: max(0, block - countedPinned), bytesPerToken: ratio)
             return estimate + base.maxTokens + margin <= base.maxTokensCap
         }
         if let user = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) {
@@ -995,10 +1006,12 @@ final class ChatClient: ObservableObject {
         // it comes, nothing is counted (an older count may be of a history
         // compaction or a new turn has changed since).
         countedRequest = nil
+        let sentTools = offerTools ? toolbox.definitions(for: settings) : []
         lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
-                                  framing: framing(modelAlias: modelAlias, settings: settings,
-                                                   tools: offerTools ? toolbox.definitions(for: settings) : []),
-                                  modelPath: settings.modelPath)
+                                  framing: framing(modelAlias: modelAlias, settings: settings, tools: sentTools),
+                                  modelPath: settings.modelPath, pinnedBytes: Self.pinnedBlockBytes(settings),
+                                  unpinnedFraming: framing(modelAlias: modelAlias, settings: Self.unpinned(settings), tools: sentTools),
+                                  carriesPins: !(settings.project?.pinned.isEmpty ?? true))
 
         decoder = SSEDecoder()
         approxCompletionTokens = 0
@@ -1087,6 +1100,7 @@ final class ChatClient: ObservableObject {
 
     private func streamDidComplete(_ completion: ChatTransport.Completion) {
         if let statusCode = completion.statusCode, completion.isHTTPError {
+            pinnedRequestFailed()
             isStreaming = false
             errorText = ChatTransport.serverErrorMessage(statusCode: statusCode, body: completion.errorBody)
             dropEmptyAssistantPlaceholder()
@@ -1097,12 +1111,22 @@ final class ChatClient: ObservableObject {
         handle(decoder.finish())
         if completion.error == nil { recordRequestStats(completion) }
         if let error = completion.error, (error as NSError).code != NSURLErrorCancelled {
+            if requestStats.promptTokens == nil { pinnedRequestFailed() }
             errorText = error.localizedDescription
             dropEmptyAssistantPlaceholder()
         }
         finalizeTokensPerSecond(firstToken: completion.firstDataDate, endDate: completion.endDate)
         if completion.error != nil { closeDanglingToolCalls() }   // no follow-up: keep the history valid
         continueWithPendingToolCalls(afterError: completion.error != nil)
+    }
+
+    /// The request failed without a count (refused, or the server gone):
+    /// when it carried pinned text, likely past the context with pins sized
+    /// too small, and no count comes back to correct the ratio -- the
+    /// failure does (PinTokenRatios.recordFailure). Nothing is shown.
+    private func pinnedRequestFailed() {
+        guard let request = lastRequest, request.carriesPins else { return }
+        ProjectIndexer.shared.recordPinnedRequestFailed(model: request.modelPath)
     }
 
     /// The request that just ended, in the turn's answer details.
@@ -1489,12 +1513,29 @@ final class ChatClient: ObservableObject {
     /// covers this one (the same framing, the history only grown); nil
     /// otherwise. A changed system prompt or profile (read again mid-turn)
     /// or a new declaration isn't covered.
-    private func countedTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int? {
+    /// `unpinned`: `settings` has no pinned block, matched against the
+    /// counted request's framing without its own.
+    private func countedTokenEstimate(_ context: RequestContext, _ settings: ChatSettings, unpinned: Bool = false) -> Int? {
         guard let counted = countedRequest, counted.historyCount <= messages.count else { return nil }
         let framing = framing(modelAlias: context.modelAlias, settings: settings, tools: toolbox.definitions(for: settings))
-        guard framing.isCovered(by: counted.framing) else { return nil }
+        guard framing.isCovered(by: unpinned ? counted.unpinnedFraming : counted.framing) else { return nil }
         let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map(ChatRequestBuilder.serialize)])
         return tokenEstimator.estimate(countedPlus: added)
+    }
+
+    /// The settings without pinned files or their notes.
+    private static func unpinned(_ settings: ChatSettings) -> ChatSettings {
+        var s = settings
+        s.project?.pinned = []
+        s.project?.pinnedLeftOut = []
+        return s
+    }
+
+    /// The bytes of the pinned block the system prompt carries (its files
+    /// and notes), as `measure` counts them.
+    private static func pinnedBlockBytes(_ settings: ChatSettings) -> Int {
+        guard let p = settings.project else { return 0 }
+        return PinnedFiles.jsonBytes(PinnedFiles.block(p.pinned, notes: p.pinnedLeftOut))
     }
 
     /// A request without its history's messages, serialized. The system
@@ -1548,7 +1589,8 @@ final class ChatClient: ObservableObject {
                 requestStats.reasoningTokens = reasoningTokens
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
-                    ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens)
+                    ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens,
+                                                             carriedPins: request.carriesPins)
                 }
             }
         }

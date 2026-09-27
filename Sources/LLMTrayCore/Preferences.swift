@@ -77,6 +77,9 @@ public enum Pref {
     /// Each model's (by path) last bytes-a-token samples from the server's
     /// counts, which size its pinned files (PinTokenRatios).
     public static let pinTokenSamples = PrefKey<[String: [Double]]>("llmtray.projectFiles.pinTokenSamples", default: [:])
+    /// The same of the requests that carried pinned text (and a failed one
+    /// of those as 2 bytes a token): they size pinned files first.
+    public static let pinTokenPinnedSamples = PrefKey<[String: [Double]]>("llmtray.projectFiles.pinTokenPinnedSamples", default: [:])
     /// Projects whose indexing the user paused (UUID strings): the pause
     /// survives a relaunch.
     public static let projectIndexPaused = PrefKey<[String]>("llmtray.projectFiles.paused", default: [])

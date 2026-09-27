@@ -59,14 +59,50 @@ final class PinTokenRatioTests: XCTestCase {
         XCTAssertFalse(ratios.record(model: nil, .init(bytes: 43_000), promptTokens: 10_000), "no model")
         XCTAssertNil(ratios.learned(model: model))
         XCTAssertTrue(ratios.record(model: model, .init(bytes: 43_000), promptTokens: 10_000))
-        XCTAssertEqual(PinTokenRatios(defaults: defaults).learned(model: model), 4.3, "persisted")
-        XCTAssertEqual(ratios.bytesPerToken(model: model), 4.3 * 0.9, accuracy: 1e-9)
+        XCTAssertEqual(PinTokenRatios(defaults: defaults).samples.all[model], [4.3], "persisted")
+        XCTAssertEqual(ratios.learned(model: model), 3.0, "no pinned text counted yet: capped")
+        XCTAssertEqual(ratios.bytesPerToken(model: model), 3.0 * 0.9, accuracy: 1e-9)
+        XCTAssertTrue(ratios.record(model: model, .init(bytes: 44_000), promptTokens: 10_000, carriedPins: true))
+        XCTAssertEqual(PinTokenRatios(defaults: defaults).samples.pinned[model], [4.4])
+        XCTAssertEqual(ratios.samples.all[model], [4.3, 4.4], "a pinned request is a sample of both")
+        XCTAssertEqual(ratios.bytesPerToken(model: model), 4.4 * 0.9, accuracy: 1e-9)
         XCTAssertEqual(ratios.bytesPerToken(model: "/models/other"), 2.0, "another model isn't")
         XCTAssertEqual(ratios.bytesPerToken(model: nil), 2.0)
     }
 
+    /// An English chat's ratio would undercount a pinned code or CSV file:
+    /// until a request carrying pinned text is counted, at most 3.
+    func testOnlyPinnedRequestsLiftTheRatioPastTheCap() {
+        XCTAssertEqual(PinTokenRatio.learned([4.3], pinned: []), 3.0)
+        XCTAssertEqual(PinTokenRatio.learned([2.6], pinned: []), 2.6, "lower stays")
+        XCTAssertEqual(PinTokenRatio.learned([2.4, 4.3], pinned: [4.5]), 4.5, "the pinned text's own, once there")
+        XCTAssertEqual(PinTokenRatio.learned([4.3], pinned: [2.8, 4.5]), 2.8)
+        XCTAssertNil(PinTokenRatio.learned([], pinned: []))
+    }
+
+    /// A failed pinned request (no count comes back) sizes pins at 2 bytes
+    /// a token until counted pinned requests replace it.
+    func testAFailedPinnedRequestSizesConservatively() {
+        let ratios = PinTokenRatios(defaults: defaults)
+        ratios.record(model: model, .init(bytes: 43_000), promptTokens: 10_000, carriedPins: true)
+        XCTAssertEqual(ratios.bytesPerToken(model: model), 4.3 * 0.9, accuracy: 1e-9)
+        ratios.recordFailure(model: model)
+        XCTAssertEqual(ratios.learned(model: model), 2.0)
+        XCTAssertEqual(PinTokenRatios(defaults: defaults).bytesPerToken(model: model), 2.0, "persisted")
+        XCTAssertEqual(ratios.samples.all[model], [4.3], "the other samples untouched")
+        for _ in 1..<PinTokenRatio.samplesKept {
+            ratios.record(model: model, .init(bytes: 42_000), promptTokens: 10_000, carriedPins: true)
+        }
+        XCTAssertEqual(ratios.learned(model: model), 2.0, "still among the last few")
+        ratios.record(model: model, .init(bytes: 42_000), promptTokens: 10_000, carriedPins: true)
+        XCTAssertEqual(ratios.learned(model: model), 4.2)
+        ratios.recordFailure(model: nil)
+        XCTAssertEqual(ratios.samples.pinned.count, 1, "no model: nothing")
+    }
+
     /// The book: 242,712 bytes, ≈121K tokens at 2 bytes a token -- refused
-    /// at an 83K limit -- and ≈62.7K at Gemma 4's 4.3 less the margin.
+    /// at an 83K limit -- and ≈62.7K at Gemma 4's 4.3 (counted with pinned
+    /// text) less the margin.
     func testTheBookFitsAtTheLearnedRatio() {
         let book: [Int64: Int] = [7: 242_712]
         let limit = 83_000
@@ -76,7 +112,8 @@ final class PinTokenRatioTests: XCTestCase {
         let docs = [IndexedDocument(doc: 7, source: 1, rev: 1, name: "book.txt", ext: "txt", sha256: "", bytes: 242_712, status: .embedded)]
         XCTAssertEqual(PinnedFiles.check(7, docs: docs, pins: [], tokens: estimated, limitTokens: limit),
                        .tooLong(tokens: 121_356, used: 0, limit: limit))
-        let measured = PinTokenRatio.tokens(book, bytesPerToken: PinTokenRatio.effective(4.3))
+        let learned = PinTokenSamples(all: [model: [4.3]], pinned: [model: [4.3]])
+        let measured = PinTokenRatio.tokens(book, bytesPerToken: learned.bytesPerToken(model: model))
         XCTAssertEqual(measured[7], 62_717)
         XCTAssertEqual(PinnedFiles.fitting([7], tokens: measured, limitTokens: limit).fit, [7])
         XCTAssertEqual(PinnedFiles.check(7, docs: docs, pins: [], tokens: measured, limitTokens: limit), .fits(tokens: 62_717))

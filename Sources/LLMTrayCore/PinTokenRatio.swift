@@ -41,6 +41,20 @@ public enum PinTokenRatio {
         samples.filter { $0.isFinite && $0 > 0 }.min()
     }
 
+    /// Until a request that carried pinned text was counted, the ratio of
+    /// the others is taken at most at this: English prose's ~4.3 would
+    /// undercount a pinned code, CSV or digit-heavy file by 40% and more.
+    public static let unpinnedCap = 3.0
+    /// What a failed request that carried pinned text counts as.
+    public static let failureSample = PromptTokenEstimator.defaultBytesPerToken
+
+    /// The ratio for pinned text: the lowest of the samples of requests
+    /// that carried some; without any, the others' at most `unpinnedCap`.
+    public static func learned(_ samples: [Double], pinned: [Double]) -> Double? {
+        if let fromPinned = learned(pinned) { return fromPinned }
+        return learned(samples).map { min($0, unpinnedCap) }
+    }
+
     /// What pins are sized at: the learned ratio less the safety margin,
     /// within `range`; the estimator's default for a model not counted yet.
     public static func effective(_ learned: Double?) -> Double {
@@ -60,8 +74,29 @@ public enum PinTokenRatio {
     }
 }
 
-/// The learned ratios, by model path, kept in UserDefaults
-/// (`Pref.pinTokenSamples`: each model's last samples).
+/// Each model's samples (by path): of every counted request, and of those
+/// that carried pinned text -- the ones that say how pinned text tokenizes.
+public struct PinTokenSamples: Equatable {
+    public var all: [String: [Double]]
+    public var pinned: [String: [Double]]
+
+    public init(all: [String: [Double]] = [:], pinned: [String: [Double]] = [:]) {
+        self.all = all
+        self.pinned = pinned
+    }
+
+    public func learned(model: String?) -> Double? {
+        model.flatMap { PinTokenRatio.learned(all[$0] ?? [], pinned: pinned[$0] ?? []) }
+    }
+
+    /// What `model`'s pins are sized at.
+    public func bytesPerToken(model: String?) -> Double {
+        PinTokenRatio.effective(learned(model: model))
+    }
+}
+
+/// The samples kept in UserDefaults (`Pref.pinTokenSamples`,
+/// `Pref.pinTokenPinnedSamples`).
 public struct PinTokenRatios {
     private let defaults: UserDefaults
 
@@ -69,24 +104,37 @@ public struct PinTokenRatios {
         self.defaults = defaults
     }
 
-    public var all: [String: [Double]] { defaults[Pref.pinTokenSamples] }
+    public var samples: PinTokenSamples {
+        PinTokenSamples(all: defaults[Pref.pinTokenSamples], pinned: defaults[Pref.pinTokenPinnedSamples])
+    }
 
-    /// Records a counted request of `model`'s; true when it was a sample.
+    /// Records a counted request of `model`'s (`carriedPins`: with pinned
+    /// text in it); true when it was a sample.
     @discardableResult
-    public func record(model: String?, _ m: PromptTokenEstimator.Measure, promptTokens: Int) -> Bool {
+    public func record(model: String?, _ m: PromptTokenEstimator.Measure, promptTokens: Int, carriedPins: Bool = false) -> Bool {
         guard let model, let sample = PinTokenRatio.sample(m, promptTokens: promptTokens) else { return false }
-        var all = all
-        all[model] = PinTokenRatio.adding(sample, to: all[model] ?? [])
-        defaults[Pref.pinTokenSamples] = all
+        add(sample, model: model, to: Pref.pinTokenSamples)
+        if carriedPins { add(sample, model: model, to: Pref.pinTokenPinnedSamples) }
         return true
     }
 
-    public func learned(model: String?) -> Double? {
-        model.flatMap { PinTokenRatio.learned(all[$0] ?? []) }
+    /// A request of `model`'s that carried pinned text failed (the server
+    /// refused it, likely past its context): no count comes back, so the
+    /// ratio would never drop by itself; the next turns size pins at the
+    /// estimator's rate until a few counted pinned requests replace it.
+    public func recordFailure(model: String?) {
+        guard let model else { return }
+        add(PinTokenRatio.failureSample, model: model, to: Pref.pinTokenPinnedSamples)
     }
 
-    /// What `model`'s pins are sized at.
-    public func bytesPerToken(model: String?) -> Double {
-        PinTokenRatio.effective(learned(model: model))
+    private func add(_ sample: Double, model: String, to key: PrefKey<[String: [Double]]>) {
+        var all = defaults[key]
+        all[model] = PinTokenRatio.adding(sample, to: all[model] ?? [])
+        defaults[key] = all
     }
+
+    public func learned(model: String?) -> Double? { samples.learned(model: model) }
+
+    /// What `model`'s pins are sized at.
+    public func bytesPerToken(model: String?) -> Double { samples.bytesPerToken(model: model) }
 }
