@@ -47,6 +47,11 @@ struct GeneralPane: View {
                 Toggle(isOn: $autoStartOnLaunch) {
                     SettingLabel(title: "Start the server when LLMTray opens", help: "Loads the last-used model right away, so it's ready without pressing Play.")
                 }
+                LabeledContent {
+                    Button("Set Up LLMTray…") { NotificationCenter.default.post(name: .showSetupWizard, object: nil) }
+                } label: {
+                    SettingLabel(title: "Setup assistant", help: "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings.")
+                }
             }
             Section("Chat") {
                 Toggle(isOn: $showReasoning) {
@@ -345,14 +350,27 @@ struct ModelsPane: View {
 }
 
 /// Project files (adr/0012): the feature's opt-in and its embedding model,
-/// with its size. Off, nothing is indexed, downloaded or started. The
-/// Files view with each project's documents comes with PR 3.5.
+/// with its size, and the disk every project's files and index take. Off,
+/// nothing is indexed, downloaded or started. Each project's files are in
+/// its Files window (the project's menu in the chats sidebar).
 @MainActor
 struct ProjectFilesSection: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var embedders = ProjectIndexer.shared.embedders
     @State private var error: String?
+    @State private var diskTotal: Int64?
     private var setup: FeatureSetup { .shared }
+
+    /// Re-measured when a project's documents change: added, removed,
+    /// re-indexed, embedded (the vectors are most of an index), and when a
+    /// project's indexing moves on or ends (its last slices, the checkpoint).
+    private var diskKey: String {
+        let docs = indexer.documents.map { project, docs in
+            "\(project):\(docs.count):\(docs.map(\.rev).reduce(0, +)):\(docs.filter { $0.status == .embedded }.count)"
+        }
+        let runs = indexer.progress.map { "\($0.key)=\($0.value.state.rawValue):\($0.value.done):\($0.value.total)" }
+        return (docs + runs).sorted().joined(separator: ",")
+    }
 
     var body: some View {
         Section("Project files") {
@@ -377,8 +395,33 @@ struct ProjectFilesSection: View {
                 Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
                     .font(.caption).foregroundStyle(.secondary)
             }
+            if let diskTotal, diskTotal > 0 {
+                LabeledContent {
+                    Text(ModelCatalog.format(diskTotal)).foregroundStyle(.secondary)
+                } label: {
+                    SettingLabel(title: "Projects' files on disk", help: "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.")
+                }
+            }
             if let error {
                 Text(error).font(.caption).foregroundStyle(.red)
+            }
+        }
+        .task(id: diskKey) {
+            // Debounced: the documents change after every indexing step,
+            // so a run is measured once it pauses or ends.
+            if diskTotal != nil { try? await Task.sleep(nanoseconds: 3_000_000_000) }
+            guard !Task.isCancelled else { return }
+            let total = await ProjectIndexer.totalDiskUsage()
+            if !Task.isCancelled { diskTotal = total }
+        }
+        .task(id: !indexer.progress.isEmpty) {
+            // Indexing on: measured every 10 s besides the debounced changes
+            // (their task restarts at each step; this one doesn't).
+            while !Task.isCancelled, !indexer.progress.isEmpty {
+                try? await Task.sleep(nanoseconds: 10_000_000_000)
+                guard !Task.isCancelled else { return }
+                let total = await ProjectIndexer.totalDiskUsage()
+                if !Task.isCancelled { diskTotal = total }
             }
         }
     }
@@ -1222,6 +1265,8 @@ struct UpdatesPane: View {
     private func shortRef(_ ref: String) -> String { ref.count > 12 ? String(ref.prefix(7)) : ref }
 
     private func uninstallRuntime() {
+        // The setup wizard (or a Start) is making the venv this deletes.
+        guard !MLXRuntimeInstaller.isSettingUp else { return runtimeBusy() }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Uninstall runtime data?", comment: "")
         alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
@@ -1229,7 +1274,16 @@ struct UpdatesPane: View {
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         alert.alertStyle = .warning
         guard alert.runModal() == .alertFirstButtonReturn else { return }
+        // A setup may have started while the alert was up.
+        guard !MLXRuntimeInstaller.isSettingUp else { return runtimeBusy() }
         server.removeExternalRuntime()
+    }
+
+    private func runtimeBusy() {
+        let busy = NSAlert()
+        busy.messageText = NSLocalizedString("The runtime is busy.", comment: "")
+        busy.informativeText = NSLocalizedString("It is being set up or updated. Try again once that's done.", comment: "")
+        busy.runModal()
     }
 }
 

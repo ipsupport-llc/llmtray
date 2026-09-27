@@ -184,7 +184,47 @@ final class MLXRuntimeInstaller {
         }
     }
 
+    /// The Full build: the runtime ships inside the app (nothing to
+    /// download, no Python needed).
+    static var isFullBuild: Bool { FileManager.default.fileExists(atPath: bundledVenvServerBinary) }
+
+    /// The runtime for the current pin is set up (what ensureReady checks
+    /// first).
+    static var isReady: Bool {
+        guard let pin = RuntimePin.current?.ref,
+              let installed = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8) else { return false }
+        return installed.trimmingCharacters(in: .whitespacesAndNewlines) == pin
+            && FileManager.default.fileExists(atPath: venvServerBinary)
+    }
+
+    /// The setup running now, whoever started it (the first-run wizard, a
+    /// Start): a second caller waits for it instead of running pip into
+    /// the same venv at the same time.
+    private static var setup: Task<Void, Error>?
+
+    /// A setup is running (the wizard's, a Start's).
+    static var isSettingUp: Bool { setup != nil }
+
+    /// `body` once no other setup or runtime update runs, and none starts
+    /// until it's done: two pips never work on the venv at once. (Nothing
+    /// awaits between the wait and taking the slot.)
+    static func exclusively(_ body: @escaping @MainActor () async throws -> Void) async throws {
+        while let running = setup { _ = try? await running.value }
+        let task = Task { @MainActor in
+            defer { setup = nil }
+            try await body()
+        }
+        setup = task
+        try await task.value
+    }
+
+    /// A caller arriving while another setup runs waits for it; install()
+    /// then finds the runtime ready and returns at once.
     func ensureReady() async throws {
+        try await Self.exclusively { try await self.install() }
+    }
+
+    private func install() async throws {
         guard let pin = RuntimePin.current else {
             throw NSError(
                 domain: "MLXRuntimeInstaller", code: 1,

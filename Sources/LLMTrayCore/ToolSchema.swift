@@ -5,11 +5,15 @@ import Foundation
 /// (aliases, types, allowed values) and the errors that tell it how to
 /// retry -- declared once, next to each other.
 public struct ToolSchema: Sendable {
-    public struct Param: Sendable {
+    public struct Param: Sendable, Equatable {
         public enum Kind: Sendable, Equatable {
             case string, integer, number, boolean
             /// One of these strings.
             case oneOf([String])
+            /// A list of objects with these fields, each read like a call's
+            /// arguments (aliases, types, allowed values); a single object
+            /// sent instead is taken as a list of one.
+            case objects([Param])
         }
 
         public var name: String
@@ -39,6 +43,7 @@ public struct ToolSchema: Sendable {
             case .number: return "number"
             case .boolean: return "boolean"
             case .oneOf(let values): return values.joined(separator: "|")
+            case .objects: return "list of objects"
             }
         }
 
@@ -50,6 +55,13 @@ public struct ToolSchema: Sendable {
             case .number: out = ["type": "number"]
             case .boolean: out = ["type": "boolean"]
             case .oneOf(let values): out = ["type": "string", "enum": values]
+            case .objects(let fields):
+                var properties: [String: Any] = [:]
+                for f in fields { properties[f.name] = f.jsonSchema }
+                var item: [String: Any] = ["type": "object", "properties": properties]
+                let required = fields.filter(\.required).map(\.name)
+                if !required.isEmpty { item["required"] = required }
+                out = ["type": "array", "items": item]
             }
             if let description { out["description"] = description }
             return out
@@ -63,6 +75,11 @@ public struct ToolSchema: Sendable {
             case .number: return "<number>"
             case .boolean: return "<true|false>"
             case .oneOf(let values): return values.joined(separator: "|")
+            case .objects(let fields):
+                var item: [String: Any] = [:]
+                for f in fields where f.required { item[f.name] = f.placeholder }
+                if item.isEmpty, let first = fields.first { item[first.name] = first.placeholder }
+                return [item]
             }
         }
     }
@@ -274,6 +291,10 @@ public enum ToolArgumentParser {
                 problems.append(.wrongType(param.name, sentText))
             case .notAllowed(let sentText):
                 problems.append(.notAllowed(param.name, sentText))
+            case .nested(let inner, let partial, let fixes):
+                values[param.name] = partial
+                problems += inner
+                repairs += fixes
             }
         }
         var seen = Set<ToolRepair>()
@@ -284,6 +305,9 @@ public enum ToolArgumentParser {
         case ok(Any, [ToolRepair])
         case wrongType(String)
         case notAllowed(String)
+        /// A list of objects with problems in its items (named
+        /// `field[i].name`); `partial` is what was understood, for the retry.
+        case nested([ParsedToolArguments.Problem], partial: Any, [ToolRepair])
     }
 
     /// Swift's Bool, or JSONSerialization's boolean NSNumber.
@@ -380,7 +404,59 @@ public enum ToolArgumentParser {
                 return .ok(target, [.enumValue])
             }
             return .notAllowed(shortText(value))
+        case .objects(let fields):
+            return coerceObjects(value, fields: fields, name: param.name)
         }
+    }
+
+    /// A list of objects, each normalized against `fields`: a JSON string
+    /// holding the list, or one object for a list of one, are taken too.
+    static func coerceObjects(_ value: Any, fields: [ToolSchema.Param], name: String) -> Coerced {
+        var fixes: [ToolRepair] = []
+        var value = value
+        if let text = value as? String {
+            let body = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard body.hasPrefix("[") || body.hasPrefix("{"), case .success(let parsed) = LenientJSON.parse(body) else {
+                return .wrongType(shortText(value))
+            }
+            value = parsed.value
+            fixes += parsed.repairs + [.doubleEncoded]
+        }
+        var list: [[String: Any]]
+        if let dict = value as? [String: Any] {
+            list = [dict]
+            fixes.append(.listWrapped)
+        } else if let array = value as? [Any] {
+            list = []
+            for element in array {
+                guard let dict = element as? [String: Any] else { return .wrongType(shortText(value)) }
+                list.append(dict)
+            }
+        } else {
+            return .wrongType(shortText(value))
+        }
+        let schema = ToolSchema(name, "", fields)
+        var out: [[String: Any]] = []
+        var problems: [ParsedToolArguments.Problem] = []
+        for (i, element) in list.enumerated() {
+            let parsed = normalize(element, schema: schema, repairs: [])
+            fixes += parsed.repairs
+            var item = parsed.values
+            let prefix = "\(name)[\(i)]."
+            for problem in parsed.problems {
+                switch problem {
+                case .badJSON(let r): problems.append(.badJSON("\(name)[\(i)]: \(r)"))
+                case .missing(let f): problems.append(.missing(prefix + f)); item[f] = schema.param(f)?.placeholder
+                case .wrongType(let f, let s): problems.append(.wrongType(prefix + f, s)); item[f] = schema.param(f)?.placeholder
+                case .notAllowed(let f, let s): problems.append(.notAllowed(prefix + f, s)); item[f] = schema.param(f)?.placeholder
+                case .conflicting(let f): problems.append(.conflicting(prefix + f)); item[f] = schema.param(f)?.placeholder
+                }
+            }
+            out.append(item)
+        }
+        var seen = Set<ToolRepair>()
+        fixes = fixes.filter { seen.insert($0).inserted }
+        return problems.isEmpty ? .ok(out, fixes) : .nested(problems, partial: out, fixes)
     }
 }
 
@@ -390,17 +466,25 @@ extension ParsedToolArguments {
     /// from what it sent, a placeholder where a value is missing or wrong.
     public func errorMessage(tool schema: ToolSchema) -> String? {
         guard !problems.isEmpty else { return nil }
+        // "ops[2].op": the field of a list's item.
+        func param(_ field: String) -> ToolSchema.Param? {
+            if let p = schema.param(field) { return p }
+            guard let open = field.firstIndex(of: "["), let dot = field.lastIndex(of: "."),
+                  let list = schema.param(String(field[..<open])), case .objects(let fields) = list.kind else { return nil }
+            let name = String(field[field.index(after: dot)...])
+            return fields.first { $0.name == name }
+        }
         var parts: [String] = []
         for problem in problems.prefix(3) {
             switch problem {
             case .badJSON(let reason):
                 parts.append("arguments aren't a JSON object (\(reason))")
             case .missing(let field):
-                parts.append("\"\(field)\" is required (\(schema.param(field)?.typeName ?? "value"))")
+                parts.append("\"\(field)\" is required (\(param(field)?.typeName ?? "value"))")
             case .wrongType(let field, let sent):
-                parts.append("\"\(field)\" must be \(article(schema.param(field)?.typeName ?? "value")), not \(sent)")
+                parts.append("\"\(field)\" must be \(article(param(field)?.typeName ?? "value")), not \(sent)")
             case .notAllowed(let field, let sent):
-                let allowed = schema.param(field).map { p -> String in
+                let allowed = param(field).map { p -> String in
                     if case .oneOf(let v) = p.kind { return v.joined(separator: ", ") }
                     return p.typeName
                 } ?? ""
@@ -427,6 +511,7 @@ extension ParsedToolArguments {
         for problem in problems {
             switch problem {
             case .missing(let f), .wrongType(let f, _), .notAllowed(let f, _), .conflicting(let f):
+                // A list item's field: the list as understood has its placeholder already.
                 if let p = schema.param(f) { example[p.name] = p.placeholder }
             case .badJSON:
                 for p in schema.params where p.required { example[p.name] = p.placeholder }

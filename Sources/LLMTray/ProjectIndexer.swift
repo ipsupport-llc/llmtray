@@ -16,8 +16,8 @@ import LLMTrayCore
 /// embedder installed documents stay searchable by their words and are
 /// embedded once it is. Pause and Stop persist across a relaunch.
 ///
-/// Linked folders (v1b) and the Files view (PR 3.5) come later; this is
-/// what they call.
+/// The Files view, the sidebar's ring and the menu bar's dot (PR 3.5) read
+/// what's published here; linked folders (v1b) come later.
 @MainActor
 final class ProjectIndexer: ObservableObject {
     static let shared = ProjectIndexer()
@@ -29,6 +29,13 @@ final class ProjectIndexer: ObservableObject {
     @Published private(set) var documents: [UUID: [IndexedDocument]] = [:]
     /// Why embedding is off this session, when it is (the embedder failed).
     @Published private(set) var embeddingUnavailable: String?
+    /// Paused by the user, and stopped (Index Now resumes): kept across a relaunch.
+    @Published private(set) var paused: Set<UUID> = []
+    @Published private(set) var stopped: Set<UUID> = []
+    /// What the last add to a project said about the files it didn't take
+    /// (not supported, duplicates, failures), until it's dismissed or
+    /// replaced by the next add's.
+    @Published private(set) var addNotes: [UUID: String] = [:]
 
     /// One writer and one reader per open project, for the indexer and
     /// (3.4b-ii) the project tools alike.
@@ -72,8 +79,13 @@ final class ProjectIndexer: ObservableObject {
         if on { activate() } else { deactivate() }
     }
 
-    /// Anything indexing (the menu bar's dot, 3.5).
-    var isAnyIndexing: Bool { progress.values.contains { $0.state == .running || $0.state == .waiting } }
+    /// Anything indexing (the menu bar's dot), waiting included; not paused.
+    var isAnyIndexing: Bool { Self.isIndexing(progress) }
+
+    /// The rule itself, for a publisher's new value (`$progress` emits before it's set).
+    nonisolated static func isIndexing(_ progress: [UUID: ProjectIndexProgress]) -> Bool {
+        progress.values.contains { $0.state == .running || $0.state == .waiting }
+    }
 
     var isEmbedderReady: Bool { embedderReady }
 
@@ -198,6 +210,9 @@ final class ProjectIndexer: ObservableObject {
         guard let ingestor else {
             if !progress.isEmpty { progress = [:] }
             if !documents.isEmpty { documents = [:] }
+            if !paused.isEmpty { paused = [] }
+            if !stopped.isEmpty { stopped = [] }
+            if !addNotes.isEmpty { addNotes = [:] }
             embeddingUnavailable = nil
             return
         }
@@ -209,13 +224,15 @@ final class ProjectIndexer: ObservableObject {
         if next != progress { progress = next }
         if ingestor.documents != documents { documents = ingestor.documents }
         if ingestor.embeddingUnavailable != embeddingUnavailable { embeddingUnavailable = ingestor.embeddingUnavailable }
+        if ingestor.paused != paused { paused = ingestor.paused }
+        if ingestor.stopped != stopped { stopped = ingestor.stopped }
     }
 
     private static func load(_ key: PrefKey<[String]>) -> Set<UUID> {
         Set(UserDefaults.standard[key].compactMap(UUID.init(uuidString:)))
     }
 
-    // MARK: - what the Files view (3.5) calls
+    // MARK: - what the Files view and the sidebar call
 
     /// Copies the files into the project and queues them.
     func add(_ urls: [URL], to project: UUID) async -> [ProjectIngestor.AddResult] {
@@ -225,11 +242,115 @@ final class ProjectIndexer: ObservableObject {
         return await ingestor.add(urls, to: project)
     }
 
+    /// Add Files… and a drop on the project (the Files view's or the
+    /// sidebar's): formats this version doesn't index and folders are
+    /// refused at once, the rest copied and queued; what wasn't taken is
+    /// said in `addNotes[project]`.
+    func addFiles(_ urls: [URL], to project: UUID) async {
+        guard isEnabled else { return }
+        // Looked up off the main actor, in order.
+        let sorted = await ProjectFileDrop.sort(urls)
+        guard !sorted.isEmpty, isEnabled else { return }
+        addNotes[project] = nil
+        var notes: [String] = []
+        if !sorted.notSupported.isEmpty {
+            notes.append(String(format: NSLocalizedString("Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.",
+                                                          comment: "files refused at add: their names"), Self.nameList(sorted.notSupported)))
+        }
+        if !sorted.folders.isEmpty {
+            notes.append(String(format: NSLocalizedString("Folders can't be added yet: %@. Add the files in them instead.",
+                                                          comment: "folders refused at add: their names"), Self.nameList(sorted.folders)))
+        }
+        if !sorted.accepted.isEmpty {
+            let results = await add(sorted.accepted, to: project)
+            var duplicates: [URL] = []
+            var failures: [String] = []
+            for (url, result) in zip(sorted.accepted, results) {
+                switch result {
+                case .added: break
+                case .duplicate: duplicates.append(url)
+                case .notSupported:
+                    failures.append(String(format: NSLocalizedString("%@: not supported yet", comment: "add result: a file name"), url.lastPathComponent))
+                case .failed(let why): failures.append(url.lastPathComponent + ": " + why)
+                }
+            }
+            if !duplicates.isEmpty {
+                notes.append(String(format: NSLocalizedString("Already in the project: %@.", comment: "duplicate files at add: their names"),
+                                    Self.nameList(duplicates)))
+            }
+            if !failures.isEmpty {
+                notes.append(String(format: NSLocalizedString("Couldn't be added: %@", comment: "add failures"), failures.prefix(3).joined(separator: "; ")))
+            }
+        }
+        if !notes.isEmpty, isEnabled { addNotes[project] = notes.joined(separator: "\n") }
+    }
+
+    func dismissAddNote(_ project: UUID) { addNotes[project] = nil }
+
+    private static func nameList(_ urls: [URL]) -> String {
+        let (shown, more) = ProjectFileDrop.names(urls)
+        let list = shown.map { "\u{201C}" + $0 + "\u{201D}" }.joined(separator: ", ")
+        guard more > 0 else { return list }
+        return String(format: NSLocalizedString("%1$@ and %2$lld more", comment: "a list of file names, then how many more"), list, Int64(more))
+    }
+
     func pause(_ project: UUID) { ingestor?.pause(project) }
     func resume(_ project: UUID) { ingestor?.resume(project) }
     func stop(_ project: UUID) async { await ingestor?.stop(project) }
     func indexNow(_ project: UUID) async { await ingestor?.indexNow(project) }
-    func isPaused(_ project: UUID) -> Bool { ingestor?.paused.contains(project) ?? false }
+    func reindex(_ doc: Int64, in project: UUID) async { await ingestor?.reindex(doc, in: project) }
+    func isPaused(_ project: UUID) -> Bool { paused.contains(project) }
+
+    /// The project's ring in the sidebar.
+    func ring(for project: UUID) -> ProjectRing {
+        guard isEnabled else { return .folder }
+        return ProjectRing(progress: progress[project], failedDocuments: ProjectFileTotals(documents[project] ?? []).failed)
+    }
+
+    /// The ring's hover text, the Files view's progress line.
+    func statusText(for project: UUID) -> String? {
+        guard isEnabled else { return nil }
+        return Self.statusText.text(progress: progress[project], failedDocuments: ProjectFileTotals(documents[project] ?? []).failed)
+    }
+
+    private static let statusText: ProjectIndexStatusText = {
+        var s = ProjectIndexStatusText.Strings()
+        s.indexing = NSLocalizedString("Indexing %1$lld of %2$lld files", comment: "project indexing: the file under way, the total")
+        s.paused = NSLocalizedString("Paused at %1$lld of %2$lld files", comment: "project indexing: files done, the total")
+        s.pausedNoCount = NSLocalizedString("Paused", comment: "project indexing")
+        s.waiting = NSLocalizedString("Waiting for the chat or a generator to finish", comment: "project indexing, paused automatically")
+        s.addingFiles = NSLocalizedString("Adding files", comment: "project indexing")
+        s.copying = NSLocalizedString("copying", comment: "project indexing stage")
+        s.reading = NSLocalizedString("reading", comment: "project indexing stage")
+        s.embedding = NSLocalizedString("embedding", comment: "project indexing stage")
+        s.lessThanAMinute = NSLocalizedString("less than a minute left", comment: "project indexing time left")
+        s.minutesLeft = NSLocalizedString("~%lld min left", comment: "project indexing time left: minutes")
+        s.hoursMinutesLeft = NSLocalizedString("~%1$lld h %2$lld min left", comment: "project indexing time left: hours, minutes")
+        s.hoursLeft = NSLocalizedString("~%lld h left", comment: "project indexing time left: hours")
+        s.wordsOnly = NSLocalizedString("search by words only", comment: "project indexing: no embedding model")
+        s.failed = NSLocalizedString("%lld failed", comment: "project indexing: files that failed")
+        s.needsALook = NSLocalizedString("%lld files couldn't be indexed", comment: "project files that failed or aren't supported")
+        return ProjectIndexStatusText(strings: s)
+    }()
+
+    /// The copies' and the index's size on disk (read off the main thread).
+    static func diskUsage(for project: UUID) async -> (files: Int64, index: Int64) {
+        let dir = ChatLibraryStore.projectStorage.directory(for: project)
+        return await Task.detached(priority: .utility) {
+            let files = DiskUsage.directorySize(dir + "/files") + DiskUsage.directorySize(dir + "/staging")
+            let index = ["", "-wal", "-shm"].reduce(Int64(0)) { sum, suffix in
+                let path = dir + "/" + ProjectIndex.databaseName + suffix
+                return sum + (((try? FileManager.default.attributesOfItem(atPath: path))?[.size] as? NSNumber)?.int64Value ?? 0)
+            }
+            return (files, index)
+        }.value
+    }
+
+    /// Every project's data together (Settings).
+    static func totalDiskUsage() async -> Int64 {
+        let root = ChatLibraryStore.projectStorage.root
+        return await Task.detached(priority: .utility) { DiskUsage.directorySize(root) }.value
+    }
 
     func removeDocument(_ doc: Int64, from project: UUID) async throws {
         guard let ingestor else { return }

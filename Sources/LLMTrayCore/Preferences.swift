@@ -56,6 +56,17 @@ public enum Pref {
     /// relaunch.
     public static let downloadQueue = PrefKey<String?>("llmtray.downloadQueue", default: nil)
 
+    // First-run wizard (adr/0013)
+    /// The SetupWizard.version finished, skipped or closed; unset on a
+    /// fresh install (or an existing one that never saw the wizard).
+    public static let onboardingCompleted = PrefKey<Int?>("llmtray.onboarding.completedVersion", default: nil)
+    /// The wizard's SetupProgress as JSON while it's open, so a relaunch
+    /// resumes it; removed when it's done.
+    public static let onboardingProgress = PrefKey<String?>("llmtray.onboarding.progress", default: nil)
+    /// The repo of the chat model the wizard is downloading: the server
+    /// starts with it once it's in place (then this is removed).
+    public static let onboardingStartServerFor = PrefKey<String?>("llmtray.onboarding.startServerFor", default: nil)
+
     // Project files (adr/0012)
     /// Off until turned on in Settings: nothing is indexed, downloaded or
     /// started before, and the project tools aren't declared.
@@ -66,6 +77,10 @@ public enum Pref {
     /// Projects whose indexing the user stopped: nothing is queued for them
     /// at launch until Index Now (or a new file).
     public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
+
+    // Folder access (adr/0014)
+    /// Off until turned on in Settings: no folder tool is declared before.
+    public static let folderToolsEnabled = PrefKey("llmtray.folderTools.enabled", default: false)
 
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)

@@ -135,6 +135,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // runtime state, and "auto-tune is running" must lock both).
     private let runtime = RuntimeManager()
     private let benchmark = BenchmarkRunner()
+    /// The wizard's downloads (adr/0013), shown in the popover.
+    private lazy var downloadQueue = DownloadQueue(browser: hfBrowser)
+    private let setupWizard = SetupWizardWindowController()
     private lazy var settingsWindow = SettingsWindowController(.init(
         server: server, chat: tabs.imageModels, runtime: runtime, benchmark: benchmark,
         checkForAppUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) }
@@ -209,9 +212,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showReview), name: .showReview, object: nil
         )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
+        )
+        // The wizard's chat model starts the server once it's in place.
+        downloadQueue.onFinished = { [weak self] in self?.downloadFinished($0) }
         ReviewPrompter.shared.recordLaunch()
         // Project files (adr/0012): nothing unless turned on in Settings.
         ProjectIndexer.shared.start(server: server)
+        // Folder access (adr/0014): interrupted plans put right, when it's on.
+        FolderAccessManager.shared.start()
         UsageTelemetry.shared.start()   // nothing unless the user opted in
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil
@@ -239,6 +249,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if let pane { settingsWindow.show(pane: pane) }
         }
 
+        // A fresh install (adr/0013): the setup wizard, before the
+        // auto-start below (which has no model to start then).
+        let defaults = UserDefaults.standard
+        if SetupWizard.opensAutomatically(completedVersion: defaults[Pref.onboardingCompleted],
+                                          selectedModelID: defaults[Pref.selectedModelID],
+                                          saved: SetupWizardModel.loadSaved()) {
+            openSetupWizard(automatic: true)
+        }
+
         // Starts the server automatically instead of making "click Start
         // Server" the first thing every session requires -- reuses the
         // same quickStart() the right-click menu's "Start Server" item
@@ -254,7 +273,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // one's memory.
         Task { @MainActor [weak self] in
             await server.reapOrphans()
-            if UserDefaults.standard[Pref.autoStartOnLaunch] {
+            // What the wizard queued and a relaunch interrupted goes on --
+            // after the reap: a chat model already in place starts the
+            // server at once.
+            self?.downloadQueue.resume()
+            // Not under a resumed setup wizard (its Apps step changes the
+            // port): it starts the chosen model when it's closed.
+            if UserDefaults.standard[Pref.autoStartOnLaunch], self?.setupWizard.isOpen != true {
                 self?.quickStart()
             }
         }
@@ -291,6 +316,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSHostingController(rootView: AnyView(ChatRoot()
             .environmentObject(server)
             .environmentObject(benchmark)
+            .environmentObject(downloadQueue)
             .environmentObject(chatPresentation)))
     }
 
@@ -299,6 +325,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let hosting = NSHostingController(rootView: AnyView(TrayRoot()
             .environmentObject(server)
             .environmentObject(benchmark)
+            .environmentObject(downloadQueue)
             .environmentObject(chatPresentation)))
         hosting.sizingOptions = [.preferredContentSize]
         return hosting
@@ -433,6 +460,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+        let setupItem = NSMenuItem(title: NSLocalizedString("Set Up LLMTray…", comment: ""), action: #selector(showSetupWizard), keyEquivalent: "")
+        setupItem.target = self
+        menu.addItem(setupItem)
         let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
         logItem.target = self
         menu.addItem(logItem)
@@ -490,6 +520,65 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // (ServerManager.launchServerProcess), including the KV-shared
         // model guard auto-start used to skip.
         server.start(modelPath: model.path, port: port, alias: ModelCatalog.shared.alias(for: model.id))
+    }
+
+    // MARK: - Setup wizard
+
+    /// From Settings or the menu: from the current settings.
+    @objc private func showSetupWizard() {
+        openSetupWizard(automatic: false)
+    }
+
+    private func openSetupWizard(automatic: Bool) {
+        popover.performClose(nil)
+        setupWizard.show(automatic: automatic, queue: downloadQueue, server: server) { [weak self] in self?.startSelectedModel() }
+    }
+
+    /// The selected model, started -- or, with another one running, loaded
+    /// in its place (as picking it in the popover does).
+    private func startSelectedModel() {
+        switch server.state {
+        case .stopped, .failed:
+            Task { await attemptStart(retriesLeft: 1) }
+        case .running:
+            // As picking it in the popover: not mid-turn or under a benchmark
+            // (the header's Load is there after).
+            guard OperationAvailability(server: server, benchmark: benchmark).canSwitchModel, !tabs.isAnyBusy,
+                  let model = ModelCatalog.shared.model(id: UserDefaults.standard[Pref.selectedModelID]),
+                  model.path != server.loadedModelPath else { return }
+            let server = self.server
+            Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
+        default:
+            break
+        }
+    }
+
+    /// The chat model the wizard picked is in place: selected, and the
+    /// server started with it (the usual start path). Cancelled: it won't
+    /// come; failed: a retry may still bring it.
+    private func downloadFinished(_ item: DownloadQueueState.Item) {
+        let defaults = UserDefaults.standard
+        guard item.kind == .chatModel, item.target == defaults[Pref.onboardingStartServerFor] else { return }
+        if item.status == .cancelled {
+            defaults[Pref.onboardingStartServerFor] = nil
+            return
+        }
+        // Not under the open wizard (its Apps step changes the port): it
+        // starts the model when it's closed or finished.
+        guard !setupWizard.isOpen else { return }
+        switch item.status {
+        case .done:
+            defaults[Pref.onboardingStartServerFor] = nil
+            ModelCatalog.shared.rescan()
+            let path = ModelCatalog.shared.root + "/" + item.target
+            guard ModelCatalog.shared.model(id: path) != nil else { return }
+            defaults[Pref.selectedModelID] = path
+            startSelectedModel()
+        case .cancelled:
+            defaults[Pref.onboardingStartServerFor] = nil
+        default:
+            break
+        }
     }
 
     @objc private func quickStop() {
@@ -670,7 +759,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingMedia)
             }
             .store(in: &cancellables)
+        // A project indexing (adr/0012): a small dot on the icon.
+        ProjectIndexer.shared.$progress
+            .map(ProjectIndexer.isIndexing)
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] indexing in
+                guard let self else { return }
+                self.isIndexingProjects = indexing
+                self.statusItem.button?.image = self.coloredStatusImage
+            }
+            .store(in: &cancellables)
     }
+
+    /// Any project indexing: the icon carries a dot.
+    private var isIndexingProjects = false
 
     /// Color alone can't carry both signals once thermal state (orange/red)
     /// outranks "is generating" (green) -- so activity is layered on as a
@@ -708,7 +811,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ?? NSImage()
         let image = base.withSymbolConfiguration(config) ?? base
         image.isTemplate = false
-        return image
+        guard isIndexingProjects else { return image }
+        // The dot in the corner, drawn over the symbol (its colors kept).
+        let dotted = NSImage(size: image.size, flipped: false) { rect in
+            image.draw(in: rect)
+            let d = max(4, rect.width * 0.28)
+            let dot = NSRect(x: rect.maxX - d, y: rect.minY, width: d, height: d)
+            NSColor.controlAccentColor.setFill()
+            NSBezierPath(ovalIn: dot).fill()
+            return true
+        }
+        dotted.isTemplate = false
+        dotted.accessibilityDescription = NSLocalizedString("LLMTray status, indexing project files", comment: "the menu bar icon while a project indexes")
+        return dotted
     }
 
     /// Thermal state still wins on color (a hot/throttling machine is the

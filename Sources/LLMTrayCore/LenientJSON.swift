@@ -40,6 +40,8 @@ public enum ToolRepair: String, CaseIterable, Codable, Sendable {
     case toolName
     /// A former tool's name, now a mode of another tool.
     case formerToolName
+    /// One object where a list of them goes: a list of one.
+    case listWrapped
 }
 
 /// Tool-call arguments as small local models write them: JSON, or nearly

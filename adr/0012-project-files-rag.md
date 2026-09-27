@@ -678,6 +678,25 @@ search. The user's explicit choice.
   compaction and migration: 1.2× the index); a failed swap is cleaned up
   at the next open.
 
+Built (PR 3.5): the Files window per project (`ProjectFilesWindow`, a window
+like the instructions' -- sheets don't present from the popover), opened
+from the project's menu, the ring's menu and the chat's "Searches N files"
+row. Add Files… and drops (on the window, or on the project's row in the
+sidebar) go through one path, `ProjectIndexer.addFiles`: `ProjectFileDrop`
+sorts them first -- folders and formats not offered are refused with their
+names, duplicates and failures are said after the copy. Re-index is a queue
+item of its own (`Work.reindex`, in the extraction lane; the current
+revision stays searchable until the new one commits). The ring's state and
+hover text are `ProjectRing` and `ProjectIndexStatusText` (LLMTrayCore,
+tested; the wording passed in localized); ⚠︎ counts documents `failed` or
+`unsupported`, and stays after the run until they're removed or re-indexed.
+The ring's menu is an AppKit menu at the pointer (a SwiftUI `Menu` label
+can't draw the ring). Feature off: no ring, dot or Files window -- the
+project's menu offers "Turn On in Settings…" and files dragged onto a
+project show the same hint. Not yet: Compact Index in the menus (the
+maintenance runs on its own), the OCR and describing stages (v1b), sources'
+availability (linked folders, v1b).
+
 ## Tests (LLMTrayCore)
 
 The pure logic lives in LLMTrayCore, where the tests are: schema and

@@ -22,6 +22,9 @@ enum ToolRunnerCLI {
             // project_files as a project with searchable files declares it
             // (it isn't a switch: it follows the chat's project).
             if !defaultToolsOnly, let files = ProjectFiles.definition(for: .all) { tools.append(files) }
+            // The folder tools as a saved chat with the feature on declares
+            // them (adr/0014; a Settings switch, not a profile's).
+            if !defaultToolsOnly { tools += [FolderTools.filesDefinition, FolderTools.changeDefinition] }
             let modes = ["all": ProjectFiles.definition(for: .all) ?? [:], "listing": ProjectFiles.definition(for: .listing) ?? [:]]
             let out: [String: Any] = ["tools": tools, "tool_use_policy": Profile.defaultToolUsePolicy, "project_files_modes": modes]
             if let data = try? JSONSerialization.data(withJSONObject: out, options: [.prettyPrinted, .sortedKeys]) {
