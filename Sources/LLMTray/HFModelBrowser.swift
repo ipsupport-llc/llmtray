@@ -69,9 +69,14 @@ extension ModelFitLevel {
 }
 
 private struct HFTreeEntry: Decodable {
+    struct LFS: Decodable { let oid: String? }
     let type: String
     let path: String
     let size: Int?
+    let oid: String?
+    let lfs: LFS?
+    /// The file's revision identity: the LFS sha256, else the git blob id.
+    var revision: String? { lfs?.oid ?? oid }
 }
 
 /// Per-file bookkeeping keyed by repo-relative path (not URLSessionTask
@@ -81,6 +86,8 @@ private struct FileDownload {
     let path: String
     let destination: URL
     let expectedBytes: Int64
+    /// The Hub's id for this file's content (see HFTreeEntry.revision).
+    var revision: String?
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
@@ -104,6 +111,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// ModelDiscovery.isDownloaded), not just config.json's existence,
     /// which would false-positive on a download interrupted partway through.
     static let completionMarkerName = ".llmtray-complete"
+    /// Which revision of each file is on disk: a file is picked up after a
+    /// relaunch only if its size AND its Hub id still match.
+    static let manifestName = ".llmtray-files.json"
 
     @Published var query: String = ""
     @Published var results: [HFModelSummary] = []
@@ -313,6 +323,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 try? FileManager.default.removeItem(at: destRoot.appendingPathComponent(Self.completionMarkerName))
                 currentDestRoot = destRoot
 
+                let manifestURL = destRoot.appendingPathComponent(Self.manifestName)
+                let manifest = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL))) ?? [:]
                 files.removeAll()
                 tasksByPath.removeAll()
                 pathByTaskID.removeAll()
@@ -325,11 +337,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 for entry in entries {
                     let destination = destRoot.appendingPathComponent(entry.path)
                     let expected = Int64(entry.size ?? 0)
-                    var file = FileDownload(path: entry.path, destination: destination, expectedBytes: expected)
+                    var file = FileDownload(path: entry.path, destination: destination, expectedBytes: expected, revision: entry.revision)
                     // Picked up, not restarted: a file already there at its
-                    // expected size (a download interrupted by quitting).
+                    // expected size and the same Hub revision (a download
+                    // interrupted by quitting).
                     let onDisk = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? NSNumber)?.int64Value
-                    if expected > 0, onDisk == expected {
+                    if expected > 0, onDisk == expected, let revision = entry.revision, manifest[entry.path] == revision {
                         file.isDone = true
                         file.preexisting = true
                         file.writtenBytes = expected
@@ -508,6 +521,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             } else {
                 files[path]?.isDone = true
                 saveError = nil
+                MainActor.assumeIsolated { self.recordRevision(path) }
             }
         } catch {
             saveError = "Failed to save \(dest.lastPathComponent): \(error.localizedDescription)"
@@ -517,6 +531,15 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             return
         }
         Task { @MainActor in self.finishIfComplete() }
+    }
+
+    /// Notes a finished file's Hub revision in the folder's manifest.
+    private func recordRevision(_ path: String) {
+        guard let root = currentDestRoot, let revision = files[path]?.revision else { return }
+        let url = root.appendingPathComponent(Self.manifestName)
+        var manifest = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: url))) ?? [:]
+        manifest[path] = revision
+        if let data = try? JSONEncoder().encode(manifest) { try? data.write(to: url, options: .atomic) }
     }
 
     /// Every file in place: the marker, and the download is over.

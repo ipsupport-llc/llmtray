@@ -493,6 +493,7 @@
 "Uninstall Runtime Data…" = "Uninstall Runtime Data…";
 "Uninstall runtime data?" = "Uninstall runtime data?";
 "Unknown image model %@" = "Unknown image model %@";
+"Unknown music model %@" = "Unknown music model %@";
 "Unload chat model during generation" = "Unload chat model during generation";
 "Unload model when idle" = "Unload model when idle";
 "Unpin" = "Unpin";

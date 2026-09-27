@@ -187,7 +187,7 @@ final class DownloadQueue: ObservableObject {
             }
             return nil
         case .musicModel:
-            guard let model = MusicModel(rawValue: item.target) else { return "Unknown music model \(item.target)" }
+            guard let model = MusicModel(rawValue: item.target) else { return String(format: NSLocalizedString("Unknown music model %@", comment: "download queue"), item.target) }
             guard await waitForSettingsDownload(item) else { return nil }
             if !setup.isMusicModelReady(model) {
                 if let refusal = spaceRefusal(item, at: RuntimePaths.externalRuntimeDir) { return refusal }
