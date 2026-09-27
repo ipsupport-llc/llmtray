@@ -412,8 +412,7 @@ final class ProjectFilesServiceTests: XCTestCase {
         }
         // Read again from that page of the new revision, in the same call.
         let changed = output(await run(.read(cursor)))
-        XCTAssertTrue(changed.preamble.hasPrefix("File \(doc) (f.txt) has changed since that read (indexed again): "
-                                                 + "page 1 is read again from its start"), changed.preamble)
+        XCTAssertEqual(changed.preamble, "File \(doc) changed since that read (indexed again): page 1 is read again from its start.")
         XCTAssertEqual(changed.hits.map(\.text), ["new text", "new second"])
         XCTAssertEqual(changed.hits.map(\.rev), [2, 2])
     }
@@ -449,6 +448,19 @@ final class ProjectFilesServiceTests: XCTestCase {
             request = .read(try XCTUnwrap(ProjectFiles.ReadCursor(next)))
         }
         XCTAssertEqual(read, text, "the whole page, once")
+
+        // Indexed again: the old cursor still gets text (and a cursor on).
+        let old = try XCTUnwrap(ProjectFiles.ReadCursor(try XCTUnwrap(cursors.first)))
+        let h = try await registry.open(project)
+        try await h.write { idx in
+            let job = try idx.beginReindex(doc: doc)
+            try idx.commitExtraction(job, pages: ProjectIndex.pages(text), kind: "text")
+        }
+        let o = output(await run(.read(old), budget: budget))
+        XCTAssertTrue(o.rendered(byteBudget: budget).text.contains("since that read"), "said, if briefly")
+        XCTAssertEqual(o.hits.first?.rev, 2)
+        XCTAssertTrue(o.hits.first.map { text.hasPrefix($0.text) } == true, "from the page's start")
+        XCTAssertTrue(o.epilogue.contains("\"cursor\":\"\(doc):2:1:"), o.epilogue)
     }
 
     func testTheTimeoutDoesntWaitForTheEmbedderToGiveUp() async throws {

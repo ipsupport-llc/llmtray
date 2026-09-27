@@ -532,8 +532,8 @@ public final class ProjectFilesService {
         if let cited = cursor.rev, cited != rev {
             // Indexed again since: read again from that page of the current
             // revision (an offset counts only in the one it was counted in).
-            changedNote = "File \(doc) (\(d.name)) has changed since that read (indexed again): "
-                + "page \(cursor.page) is read again from its start; what was shown before may not match."
+            // Short (no name): at a small budget the page's text still fits.
+            changedNote = "File \(doc) changed since that read (indexed again): page \(cursor.page) is read again from its start."
             cursor = ProjectFiles.ReadCursor(doc: doc, rev: rev, page: cursor.page, offset: 0, last: cursor.last)
         }
         let requested = cursor.page...cursor.last
@@ -547,62 +547,71 @@ public final class ProjectFilesService {
         func cursorText(_ page: Int, _ offset: Int) -> String {
             "Not all shown: continue with \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.ReadCursor(doc: doc, rev: rev, page: page, offset: offset, last: last).text)\"})."
         }
-        var output = ProjectToolOutput(project: project)
-        var notes = changedNote.map { [$0] } ?? []
-        if cursor.last != Int.max, cursor.last > last, cursor.offset == 0 {
-            notes.append("\(d.name) has \(pageCount) page(s).")
-        }
-        output.preamble = notes.joined(separator: "\n")
         // A long name cut in the result (the citation keeps it whole): at a
         // small budget the page's text still fits, and each cursor moves on.
         let label = ProjectFiles.shortName(d.name)
+        var notes = changedNote.map { [$0] } ?? []
+        if cursor.last != Int.max, cursor.last > last, cursor.offset == 0 {
+            notes.append("\(label ?? d.name) has \(pageCount) page(s).")
+        }
         // Its id names the range it holds: a piece of another length (the
         // same page read again under another budget) isn't "shown earlier".
         func hit(_ page: Int, _ start: Int, _ text: String) -> ProjectHit {
             ProjectHit(id: "r\(doc).\(rev).\(page).\(start)-\(start + text.unicodeScalars.count)", doc: Int(doc), rev: Int(rev),
                        page: page, name: d.name, label: label, text: text.isEmpty ? "(no text on this page)" : text)
         }
-        for (i, entry) in lengths.enumerated() {
-            let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0
-            let remaining = entry.length - start
-            // Never more than could fit: a code point is at least a byte.
-            let text = try await handle.read { try $0.pageText(doc: doc, rev: rev, page: entry.page, offset: start, count: min(remaining, budget)) } ?? ""
-            let isLast = i == lengths.count - 1
-            var whole = output
-            whole.hits.append(hit(entry.page, start, text))
-            whole.epilogue = isLast ? "" : cursorText(lengths[i + 1].page, 0)
-            if text.unicodeScalars.count == remaining, whole.fitsWhole(byteBudget: budget) {
-                output = whole
-                continue
+        func fill(_ preamble: String) async throws -> ProjectToolOutput {
+            var output = ProjectToolOutput(project: project, preamble: preamble)
+            for (i, entry) in lengths.enumerated() {
+                let start = entry.page == cursor.page ? min(cursor.offset, entry.length) : 0
+                let remaining = entry.length - start
+                // Never more than could fit: a code point is at least a byte.
+                let text = try await handle.read { try $0.pageText(doc: doc, rev: rev, page: entry.page, offset: start, count: min(remaining, budget)) } ?? ""
+                let isLast = i == lengths.count - 1
+                var whole = output
+                whole.hits.append(hit(entry.page, start, text))
+                whole.epilogue = isLast ? "" : cursorText(lengths[i + 1].page, 0)
+                if text.unicodeScalars.count == remaining, whole.fitsWhole(byteBudget: budget) {
+                    output = whole
+                    continue
+                }
+                // The page doesn't fit whole: as much as does, cut at a space,
+                // and the cursor where it stopped.
+                let scalars = Array(text.unicodeScalars)
+                func trial(_ n: Int) -> ProjectToolOutput {
+                    var t = output
+                    t.hits.append(hit(entry.page, start, String(String.UnicodeScalarView(scalars[0..<n]))))
+                    t.epilogue = cursorText(entry.page, start + n)
+                    return t
+                }
+                var lo = 0, hi = scalars.count - 1
+                while lo < hi {
+                    let mid = (lo + hi + 1) / 2
+                    if trial(mid).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
+                }
+                let minimum = max(1, min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4))
+                var n = lo
+                if n > 0, n < scalars.count, !scalars[n].properties.isWhitespace,
+                   let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }),
+                   space > n / 2, space + 1 >= minimum {
+                    n = space + 1
+                }
+                if n >= minimum {
+                    output = trial(n)
+                } else {
+                    output.epilogue = cursorText(entry.page, start)
+                    if output.hits.isEmpty { output.preamble = "No room for this page in this chat's context." }
+                }
+                break
             }
-            // The page doesn't fit whole: as much as does, cut at a space,
-            // and the cursor where it stopped.
-            let scalars = Array(text.unicodeScalars)
-            func trial(_ n: Int) -> ProjectToolOutput {
-                var t = output
-                t.hits.append(hit(entry.page, start, String(String.UnicodeScalarView(scalars[0..<n]))))
-                t.epilogue = cursorText(entry.page, start + n)
-                return t
-            }
-            var lo = 0, hi = scalars.count - 1
-            while lo < hi {
-                let mid = (lo + hi + 1) / 2
-                if trial(mid).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
-            }
-            let minimum = max(1, min(scalars.count, ProjectToolOutput.minimumPieceBytes / 4))
-            var n = lo
-            if n > 0, n < scalars.count, !scalars[n].properties.isWhitespace,
-               let space = scalars[max(0, n - 120)..<n].lastIndex(where: { $0.properties.isWhitespace }),
-               space > n / 2, space + 1 >= minimum {
-                n = space + 1
-            }
-            if n >= minimum {
-                output = trial(n)
-            } else {
-                output.epilogue = cursorText(entry.page, start)
-                if output.hits.isEmpty { output.preamble = "No room for this page in this chat's context." }
-            }
-            break
+            return output
+        }
+        // The notes shortened, then left out, before the text is: a read
+        // always moves on while any of it fits.
+        var output = try await fill(notes.joined(separator: "\n"))
+        if output.hits.isEmpty, !notes.isEmpty {
+            if changedNote != nil { output = try await fill("Indexed again since that read.") }
+            if output.hits.isEmpty { output = try await fill("") }
         }
         return .output(output)
     }
