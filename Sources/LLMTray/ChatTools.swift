@@ -162,7 +162,11 @@ final class ChatToolbox {
 
     /// Whether `prepare` understood a call's arguments: one it didn't gets
     /// only `run`'s error -- no draft, no queue ticket, no unload.
-    func understood(_ call: ToolCall) -> Bool { prepared[call.id]?.arguments.isValid ?? true }
+    /// Read from the call itself, not the cache by id: a model may repeat ids.
+    func understood(_ call: ToolCall) -> Bool {
+        guard let tool = resolve(call.name)?.tool else { return true }   // unknown: runs nothing
+        return ToolArgumentParser.parse(call.argumentsJSON, schema: tool.schema).isValid
+    }
 
     /// A call refused before it could run (the per-response cap, the trust
     /// barrier, the turn's round limit, the user's skip): counted.
