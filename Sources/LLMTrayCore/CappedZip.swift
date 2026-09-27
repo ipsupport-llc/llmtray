@@ -104,7 +104,8 @@ public final class CappedZip {
 
     static func looksLikeXML(_ head: Data) -> Bool {
         let bytes = head.starts(with: [0xEF, 0xBB, 0xBF]) ? head.dropFirst(3) : head[...]
-        guard let first = bytes.first(where: { $0 != 0x20 && $0 != 0x09 && $0 != 0x0A && $0 != 0x0D }) else { return false }
+        // Only whitespace so far: XML may follow it, so it is checked as XML.
+        guard let first = bytes.first(where: { $0 != 0x20 && $0 != 0x09 && $0 != 0x0A && $0 != 0x0D }) else { return !bytes.isEmpty }
         return first == 0x3C
     }
 
