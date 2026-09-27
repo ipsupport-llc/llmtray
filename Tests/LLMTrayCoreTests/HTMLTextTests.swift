@@ -43,6 +43,13 @@ final class HTMLTextTests: XCTestCase {
         XCTAssertEqual(HTMLText.text(html), "link after")
     }
 
+    func testNestedSkippedElements() {
+        XCTAssertEqual(HTMLText.text("<template><template>a</template>hidden</template>shown"), "shown")
+        XCTAssertEqual(HTMLText.text("<svg><svg><text>x</text></svg><text>y</text></svg>ok"), "ok")
+        // Raw text doesn't nest: a "<script>" in a script is a string.
+        XCTAssertEqual(HTMLText.text("<script>var s = '<script>';</script>after"), "after")
+    }
+
     func testEntitiesThroughWebParsing() {
         XCTAssertEqual(HTMLText.text("<p>&#1044;&#x43E; &mdash; &hellip; &unknown; &amp;lt;</p>"), "До — … &unknown; &lt;")
         XCTAssertEqual(HTMLText.text("a &lt;b&gt; c"), "a <b> c")

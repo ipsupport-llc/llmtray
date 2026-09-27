@@ -17,6 +17,8 @@ public enum HTMLText {
     static let paragraphTags: Set<String> = ["p", "h1", "h2", "h3", "h4", "h5", "h6", "table", "blockquote", "pre", "title"]
     /// Skipped with everything inside, up to their closing tag.
     static let skipTags: Set<String> = ["script", "style", "template", "svg", "noscript", "iframe", "object", "math", "head"]
+    /// Skipped elements whose content is raw text: a "<script>" inside one is not a tag.
+    static let rawText: Set<String> = ["script", "style"]
 
     public static func text(_ html: String) -> String {
         let b = Array(html.utf8)
@@ -25,6 +27,7 @@ public enum HTMLText {
         out.reserveCapacity(n / 3)
         var i = 0
         var skipUntil: String?     // inside <script> etc.: its closing tag's name
+        var skipDepth = 0          // the same element nested inside it (<template> in <template>)
         var inTitle = false        // <title> inside the skipped <head>
         var pre = 0
         var pendingSpace = false
@@ -98,7 +101,10 @@ public enum HTMLText {
                 let selfClosed = j > 0 && j < n && b[j - 1] == 0x2F
                 i = j + 1
                 if let skip = skipUntil {
-                    if closing && name == skip { skipUntil = nil; inTitle = false }
+                    if name == skip && !rawText.contains(skip) {
+                        if !closing && !selfClosed { skipDepth += 1 } else if closing && skipDepth > 0 { skipDepth -= 1; runStart = out.count; continue }
+                    }
+                    if closing && name == skip && skipDepth == 0 { skipUntil = nil; inTitle = false }
                     if name == "title" && skip == "head" {
                         inTitle = !closing
                         newline(2)
@@ -107,7 +113,7 @@ public enum HTMLText {
                     continue
                 }
                 if !closing && skipTags.contains(name) {
-                    if !selfClosed { skipUntil = name }   // <svg/> has nothing to skip
+                    if !selfClosed { skipUntil = name; skipDepth = 0 }   // <svg/> has nothing to skip
                     runStart = out.count
                     continue
                 }
