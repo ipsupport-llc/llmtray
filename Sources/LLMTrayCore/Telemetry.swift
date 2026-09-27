@@ -358,7 +358,7 @@ public enum TelemetryOutcome: Equatable, Sendable {
         guard let status else { return .retryLater(seconds: nil) }
         let code = (body.flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any])?["error"] as? String
         switch status {
-        case 200..<300:
+        case 204:
             return .sent
         case 429:
             let seconds = retryAfter.flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }.flatMap { $0 >= 0 ? $0 : nil }

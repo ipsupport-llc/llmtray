@@ -130,6 +130,8 @@ final class TelemetryOutcomeTests: XCTestCase {
             TelemetryOutcome.classify(status: status, body: Data(body.utf8), retryAfter: retryAfter)
         }
         XCTAssertEqual(c(204), .sent)
+        // Only 204 says stored: a portal's or proxy's 200 isn't the server.
+        XCTAssertEqual(c(200), .retryLater(seconds: nil))
         XCTAssertEqual(c(400, #"{"error":"invalid_day"}"#), .dropped(code: "invalid_day"))
         XCTAssertEqual(c(400), .dropped(code: "http_400"))
         XCTAssertEqual(c(413), .dropped(code: "payload_too_large"))
