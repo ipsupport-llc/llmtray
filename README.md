@@ -41,7 +41,7 @@ The models run on your Mac. Only the optional web tools reach the internet.
 
 - macOS 14+, Apple Silicon (v0.7.2 is the last release for macOS 13).
 - Xcode command line tools (`swift build`) — no full Xcode project needed.
-- **Python 3.10+** somewhere on the machine (Homebrew, pyenv, MacPorts, Anaconda/Miniconda, or python.org) — used once to create the `mlx-lm` venv in `runtime/`. The macOS-provided `/usr/bin/python3` (Xcode Command Line Tools, currently 3.9.x) is too old: `mlx` doesn't publish wheels for it, so the first-run setup fails with a `pip` "could not find a version that satisfies the requirement mlx" error if that's the only Python installed. LLMTray looks for a newer interpreter in common install locations automatically; it only falls back to the CLT one if none of those exist.
+- **Python 3.10+** somewhere on the machine (Homebrew, pyenv, MacPorts, Anaconda/Miniconda, or python.org) — used once to create the `mlx-lm` venv in `runtime/`. The macOS-provided `/usr/bin/python3` (Xcode Command Line Tools, currently 3.9.x) is too old: `mlx` doesn't publish wheels for it, so the first-run setup fails with a `pip` "could not find a version that satisfies the requirement mlx" error if that's the only Python installed. LLMTray looks for a newer interpreter in common install locations automatically and never uses the CLT one. With none found, first-run setup says so. The Full DMG ships its own Python and needs none.
 
 ## Quick start
 
