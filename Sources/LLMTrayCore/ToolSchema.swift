@@ -169,8 +169,9 @@ public enum ToolArgumentParser {
         func describesCall(_ key: String) -> Bool {
             guard ["name", "type"].contains(key.lowercased()) else { return false }
             guard own.contains(normalizedKey(key)), let schema else { return true }
-            guard let value = (dict[key] as? String)?.trimmingCharacters(in: .whitespaces).lowercased() else { return false }
-            return value == schema.name.lowercased() || value == "function"
+            guard let value = (dict[key] as? String)?.trimmingCharacters(in: .whitespaces) else { return false }
+            return value.lowercased() == "function"
+                || ToolNameResolver.resolve(value, known: [schema.name], former: [:]) != nil
         }
         let wrappers = dict.keys.filter { key in
             !own.contains(normalizedKey(key))
@@ -182,17 +183,18 @@ public enum ToolArgumentParser {
         }
         // Only wrappers, or wrappers and the call's name / type: fields
         // beside a wrapper leave which arguments were meant to a guess.
-        // (A wrapper name holding a plain value there is just an unknown field.)
+        // (A wrapper name holding a plain value or an empty object there is
+        // just an unknown field: nothing to choose between.)
         let beside = dict.keys.filter { !wrappers.contains($0) && !describesCall($0) }.sorted()
         guard beside.isEmpty else {
-            let holdsObject = wrappers.contains { key in
-                if dict[key] is [String: Any] { return true }
-                guard let text = dict[key] as? String, case .success(let parsed) = LenientJSON.parse(text) else { return false }
-                return parsed.value is [String: Any] && !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    && text.trimmingCharacters(in: .whitespacesAndNewlines) != "null"
+            let holding = wrappers.first { key in
+                if let obj = dict[key] as? [String: Any] { return !obj.isEmpty }
+                guard let text = (dict[key] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines), text.hasPrefix("{"),
+                      case .success(let parsed) = LenientJSON.parse(text), let obj = parsed.value as? [String: Any] else { return false }
+                return !obj.isEmpty
             }
-            guard holdsObject else { return .success(dict) }
-            return fail("\"\(wrappers[0])\" beside other fields (" + beside.map { "\"\($0)\"" }.joined(separator: ", ") + ")")
+            guard let holding else { return .success(dict) }
+            return fail("\"\(holding)\" beside other fields (" + beside.map { "\"\($0)\"" }.joined(separator: ", ") + ")")
         }
         guard wrappers.count == 1 else {
             return fail("arguments wrapped twice: " + wrappers.map { "\"\($0)\"" }.joined(separator: " and "))

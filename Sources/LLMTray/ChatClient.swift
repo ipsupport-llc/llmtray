@@ -1019,9 +1019,10 @@ final class ChatClient: ObservableObject {
         // network and generator calls are refused -- no draft, no queue
         // ticket, no unload for them.
         let untrusted = toolbox.trustRefusals(Array(toolCalls.prefix(maxToolCallsPerRound)), settings: settings)
-        // Arguments that couldn't be read: run answers with the error; no
-        // generator gets ready for them.
-        let unreadable = Set(toolCalls.filter { !toolbox.understood($0) }.map(\.id))
+        // Arguments that couldn't be read (toolbox.understood, below): run
+        // answers with the error; no generator gets ready for them. Asked of
+        // each call, not by id: a repeated id mustn't take a readable
+        // generator call's preflight away while it still runs.
 
         // Creator mode: each image or song asked for is first an editable
         // draft (prompt, model, knobs), going ahead by itself after the
@@ -1032,7 +1033,7 @@ final class ChatClient: ObservableObject {
         if settings.creatorMode {
             isStreaming = false
             for (i, call) in toolCalls.enumerated() {
-                guard i < maxToolCallsPerRound, !untrusted.contains(call.id), !unreadable.contains(call.id), let kind = GenerationDraft.kind(of: call, settings),
+                guard i < maxToolCallsPerRound, !untrusted.contains(call.id), toolbox.understood(call), let kind = GenerationDraft.kind(of: call, settings),
                       kind == .music ? musicTool.willGenerate([call], settings: settings) && musicManager.isReady(settings.musicModel)
                                      : imageTool.willGenerate([call], settings: settings, chatImages: chatImages)
                 else { continue }
@@ -1060,7 +1061,7 @@ final class ChatClient: ObservableObject {
         // Mac's memory, so neither runs beside the other.
         let images = chatImages
         // Past the per-response cap a call isn't run: it mustn't queue or unload either.
-        let running = toolCalls.prefix(maxToolCallsPerRound).filter { !skipped.contains($0.id) && !untrusted.contains($0.id) && !unreadable.contains($0.id) }
+        let running = toolCalls.prefix(maxToolCallsPerRound).filter { !skipped.contains($0.id) && !untrusted.contains($0.id) && toolbox.understood($0) }
         let wantsImage = running.contains { imageTool.willGenerate([$0], settings: settingsFor($0, settings), chatImages: images) }
         let wantsMusic = running.contains {
             let s = settingsFor($0, settings)

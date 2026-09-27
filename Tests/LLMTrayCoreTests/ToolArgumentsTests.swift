@@ -94,12 +94,18 @@ final class ToolArgumentsTests: XCTestCase {
         let plain = parse(#"{"city": "Paris", "params": "metric"}"#, weather)
         XCTAssertTrue(plain.isValid)
         XCTAssertEqual(plain.values["city"] as? String, "Paris")
+        // An empty wrapper, or prose in a wrapper-named field, leaves nothing to choose.
+        for raw in [#"{"city": "Paris", "params": {}}"#, #"{"city": "Paris", "arguments": "{}"}"#,
+                    #"{"city": "Paris", "input": "use {\"a\": 1} here"}"#] {
+            XCTAssertEqual(parse(raw, weather).values["city"] as? String, "Paris", raw)
+        }
         XCTAssertTrue(parse(#"{"name": "get_weather", "arguments": {}}"#, weather).isValid)
         // "name" as a field's alias: the tool's name beside a wrapper still
         // describes the call; any other value is the field.
         let country = ToolSchema("get_country_info", "C.", [.init("country", .string, required: true, aliases: ["name"])])
         for raw in [#"{"name": "get_country_info", "arguments": {"country": "France"}}"#,
-                    #"{"type": "function", "name": "Get_Country_Info", "parameters": "{\"country\": \"France\"}"}"#] {
+                    #"{"type": "function", "name": "Get_Country_Info", "parameters": "{\"country\": \"France\"}"}"#,
+                    #"{"name": "functions.get_country_info", "arguments": {"country": "France"}}"#] {
             XCTAssertEqual(parse(raw, country).values["country"] as? String, "France", raw)
         }
         XCTAssertEqual(parse(#"{"name": "France"}"#, country).values["country"] as? String, "France")
