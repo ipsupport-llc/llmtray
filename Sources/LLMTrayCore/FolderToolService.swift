@@ -128,7 +128,22 @@ public final class FolderToolService: @unchecked Sendable {
         guard let lifetime = choice.lifetime(callKey: UUID().uuidString, chatID: chat?.id ?? "", now: now),
               choice != .once else { return nil }
         if chat == nil, case .chat = lifetime { return nil }
-        return try grants.grant(root, level: level, lifetime: lifetime, chatID: chat?.id, temporaryChat: chat?.temporary ?? false, now: now)
+        return try grants.grant(root, level: level, lifetime: lifetime, chatID: chat?.id, temporaryChat: chat?.temporary ?? false,
+                                origin: chat == nil ? .settings : .chat, now: now)
+    }
+
+    /// A standing grant edited in Settings: its folder checked again as a new
+    /// grant's is, then its level and lifetime set -- `choice` hour (from
+    /// now) or always, nil keeping the one it has. Nil when the grant is gone.
+    @discardableResult
+    public func updateGrant(_ id: UUID, level: FolderAccessLevel, choice: GrantChoice?, now: Date = Date()) throws -> FolderGrant? {
+        guard choice == nil || choice == .hour || choice == .always,
+              let current = grants.standingGrants(now: now).first(where: { $0.id == id }) else { return nil }
+        let lifetime = choice?.lifetime(callKey: "", chatID: "", now: now) ?? current.lifetime
+        let root = try makeRoot(current.root.path)
+        // The path leads elsewhere now (a link put in its place): not this grant's folder.
+        guard root.path == current.root.path else { throw FolderAccessError.symlink(current.root.path) }
+        return try grants.update(id, root: root, level: level, lifetime: lifetime, now: now)
     }
 
     /// A folder picked by the user, checked for being grantable.
@@ -186,7 +201,8 @@ public final class FolderToolService: @unchecked Sendable {
                 + "Don't ask again in this chat; they can allow it themselves.")
         }
         do {
-            try grants.grant(request.root, level: request.level, lifetime: lifetime, chatID: chat.id, temporaryChat: chat.temporary)
+            try grants.grant(request.root, level: request.level, lifetime: lifetime, chatID: chat.id, temporaryChat: chat.temporary,
+                             origin: .chat)
             // The chat ended in between: what was just granted for it goes too.
             if hasEnded(chat.id) {
                 grants.endChat(chat.id)

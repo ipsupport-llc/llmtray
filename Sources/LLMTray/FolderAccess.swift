@@ -115,6 +115,13 @@ final class FolderAccessManager: ObservableObject {
         refresh()
     }
 
+    /// A standing grant's level or lifetime (hour, always; nil keeps it)
+    /// changed in Settings: its folder checked again, as a new grant's is.
+    func updateGrant(_ grant: FolderGrant, level: FolderAccessLevel, choice: GrantChoice?) throws {
+        defer { refresh() }
+        try service.updateGrant(grant.id, level: level, choice: choice)
+    }
+
     func endChat(_ chatID: String) {
         service.endChat(chatID)
         grantsRevision += 1
@@ -175,9 +182,18 @@ final class FolderAccessManager: ObservableObject {
         }
     }
 
+    /// The same, as a menu's title in Settings.
+    static func lifetimeTitle(_ grant: FolderGrant) -> String {
+        guard case .until(let date) = grant.lifetime else {
+            return NSLocalizedString("Always", comment: "folder grant lifetime: menu title")
+        }
+        return String(format: NSLocalizedString("Until %@", comment: "folder grant lifetime: menu title, a time"),
+                      date.formatted(date: .omitted, time: .shortened))
+    }
+
     static func levelText(_ level: FolderAccessLevel) -> String {
-        level == .change ? NSLocalizedString("read and change", comment: "folder grant level")
-            : NSLocalizedString("read", comment: "folder grant level")
+        level == .change ? NSLocalizedString("can look and propose changes", comment: "folder grant level")
+            : NSLocalizedString("can look", comment: "folder grant level")
     }
 }
 

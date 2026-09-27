@@ -39,6 +39,7 @@
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
 "(no result yet)" = "(no result yet)";
 "(no server output yet)" = "(no server output yet)";
+"1 hour" = "1 hour";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
 "A chat model" = "A chat model";
 "A client" = "A client";
@@ -56,9 +57,9 @@
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
 "About LLMTray" = "About LLMTray";
-"Access" = "Access";
 "Add" = "Add";
 "Add Files…" = "Add Files…";
+"Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
 "Advanced" = "Advanced";
@@ -74,6 +75,7 @@
 "Allow Once" = "Allow Once";
 "Allow connections from the local network" = "Allow connections from the local network";
 "Allowed folders" = "Allowed folders";
+"Allowed in a chat" = "Allowed in a chat";
 "Almost done" = "Almost done";
 "Already in the project: %@." = "Already in the project: %@.";
 "Already on this Mac" = "Already on this Mac";
@@ -84,7 +86,6 @@
 "An OpenAI-compatible API on localhost for other apps." = "An OpenAI-compatible API on localhost for other apps.";
 "An alias: the alias itself, not what it points to." = "An alias: the alias itself, not what it points to.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
-"An hour" = "An hour";
 "An item needs the new folder it goes into: tick that folder too." = "An item needs the new folder it goes into: tick that folder too.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.";
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
@@ -125,6 +126,8 @@
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Calculator" = "Calculator";
 "Calls" = "Calls";
+"Can look" = "Can look";
+"Can look and propose changes" = "Can look and propose changes";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -269,9 +272,9 @@
 "Folder changes" = "Folder changes";
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "Folders can't be added yet: %@. Add the files in them instead.";
+"Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat.";
 "Folders the chat may use" = "Folders the chat may use";
 "Follow the description" = "Follow the description";
-"For" = "For";
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
@@ -377,8 +380,6 @@
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
-"Look in" = "Look in";
-"Look in and propose changes" = "Look in and propose changes";
 "Maintenance" = "Maintenance";
 "Make images and edit them." = "Make images and edit them.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
@@ -753,6 +754,7 @@
 "The server log" = "The server log";
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
+"The suggestions for this Mac are already here. Browse Hugging Face for another model." = "The suggestions for this Mac are already here. Browse Hugging Face for another model.";
 "There's no plan waiting any more." = "There's no plan waiting any more.";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
@@ -805,6 +807,7 @@
 "Unpin" = "Unpin";
 "Unpin %@" = "Unpin %@";
 "Unpin: the project's chats search this file again instead of getting all of it" = "Unpin: the project's chats search this file again instead of getting all of it";
+"Until %@" = "Until %@";
 "Up to date" = "Up to date";
 "Up to date." = "Up to date.";
 "Update" = "Update";
@@ -860,6 +863,8 @@
 "always" = "always";
 "and %lld more" = "and %lld more";
 "calls tools" = "calls tools";
+"can look" = "can look";
+"can look and propose changes" = "can look and propose changes";
 "cancelled" = "cancelled";
 "copy" = "copy";
 "copying" = "copying";
@@ -885,8 +890,6 @@
 "not supported" = "not supported";
 "not used by any model" = "not used by any model";
 "queued" = "queued";
-"read" = "read";
-"read and change" = "read and change";
 "reading" = "reading";
 "reads images" = "reads images";
 "ready" = "ready";

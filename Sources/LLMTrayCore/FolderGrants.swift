@@ -28,6 +28,23 @@ public enum GrantLifetime: Codable, Equatable, Sendable {
         case .once, .chat: return false
         }
     }
+
+    /// The later of two standing lifetimes: always wins, else the later date.
+    static func later(_ a: Self, _ b: Self) -> Self {
+        switch (a, b) {
+        case (.until(let x), .until(let y)): return .until(max(x, y))
+        case (.until, _): return b
+        default: return a
+        }
+    }
+}
+
+/// Where a standing grant was given, shown under it in Settings.
+public enum GrantOrigin: String, Codable, Sendable {
+    /// From a chat: its prompt or its folder menu.
+    case chat
+    /// In Settings.
+    case settings
 }
 
 public struct FolderGrant: Codable, Equatable, Identifiable, Sendable {
@@ -36,13 +53,29 @@ public struct FolderGrant: Codable, Equatable, Identifiable, Sendable {
     public var level: FolderAccessLevel
     public var lifetime: GrantLifetime
     public var created: Date
+    /// nil for grants stored before it was kept.
+    public var origin: GrantOrigin?
 
-    public init(id: UUID = UUID(), root: FolderRoot, level: FolderAccessLevel, lifetime: GrantLifetime, created: Date) {
+    public init(id: UUID = UUID(), root: FolderRoot, level: FolderAccessLevel, lifetime: GrantLifetime, created: Date,
+                origin: GrantOrigin? = nil) {
         self.id = id
         self.root = root
         self.level = level
         self.lifetime = lifetime
         self.created = created
+        self.origin = origin
+    }
+
+    /// Another standing grant of the same folder folded into this one: the
+    /// higher level, the later lifetime, the folder as last checked; the
+    /// first origin known.
+    func merged(with other: FolderGrant) -> FolderGrant {
+        var g = self
+        g.root = other.root
+        g.level = max(level, other.level)
+        g.lifetime = GrantLifetime.later(lifetime, other.lifetime)
+        g.origin = origin ?? other.origin
+        return g
     }
 
     public func isExpired(now: Date) -> Bool {
@@ -107,12 +140,21 @@ public final class FolderGrants: @unchecked Sendable {
     private var consumedOnce: [FolderGrant] = []
     private let storeURL: URL?
 
-    /// Loads the standing grants in `storeURL` (expired ones dropped).
+    /// Loads the standing grants in `storeURL` (expired ones dropped; two of
+    /// one folder, from before they were merged, become one).
     public init(storeURL: URL?, now: Date = Date()) {
         self.storeURL = storeURL
         if let storeURL, let data = try? Data(contentsOf: storeURL),
            let stored = try? JSONDecoder().decode([FolderGrant].self, from: data) {
-            grants = stored.filter { $0.lifetime.isStanding && !$0.isExpired(now: now) }
+            let live = stored.filter { $0.lifetime.isStanding && !$0.isExpired(now: now) }
+            for g in live {
+                if let i = grants.firstIndex(where: { $0.root.path == g.root.path }) {
+                    grants[i] = grants[i].merged(with: g)
+                } else {
+                    grants.append(g)
+                }
+            }
+            if grants.count < live.count { try? saveLocked() }
         }
     }
 
@@ -124,12 +166,15 @@ public final class FolderGrants: @unchecked Sendable {
 
     // MARK: Granting
 
-    /// Adds a grant the user gave. A grant for a folder removes this chat's
-    /// denies it answers (the user changed their mind). Temporary chats: read
-    /// only, and no grant outlives the chat.
+    /// Adds a grant the user gave. A standing grant of a folder that has one
+    /// (the same path: a parent's and a child's stay apart) is merged into it
+    /// -- one per folder. A grant for a folder removes this chat's denies it
+    /// answers (the user changed their mind). Temporary chats: read only, and
+    /// no grant outlives the chat.
     @discardableResult
     public func grant(_ root: FolderRoot, level: FolderAccessLevel, lifetime: GrantLifetime,
-                      chatID: String?, temporaryChat: Bool = false, now: Date = Date()) throws -> FolderGrant {
+                      chatID: String?, temporaryChat: Bool = false, origin: GrantOrigin? = nil,
+                      now: Date = Date()) throws -> FolderGrant {
         if temporaryChat {
             guard level == .read else { throw GrantError.temporaryChat }
             switch lifetime {
@@ -138,18 +183,27 @@ public final class FolderGrants: @unchecked Sendable {
             default: throw GrantError.temporaryChat
             }
         }
-        let g = FolderGrant(root: root, level: level, lifetime: lifetime, created: now)
+        var g = FolderGrant(root: root, level: level, lifetime: lifetime, created: now, origin: origin)
         lock.lock()
         defer { lock.unlock() }
-        grants.append(g)
-        // A standing grant exists only once it is on disk.
         if lifetime.isStanding {
+            grants.removeAll { $0.isExpired(now: now) }
+            let before = grants
+            if let i = grants.firstIndex(where: { $0.lifetime.isStanding && $0.root.path == root.path }) {
+                g = grants[i].merged(with: g)
+                grants[i] = g
+            } else {
+                grants.append(g)
+            }
+            // A standing grant exists only once it is on disk.
             do {
                 try saveLocked()
             } catch {
-                grants.removeAll { $0.id == g.id }
+                grants = before
                 throw error
             }
+        } else {
+            grants.append(g)
         }
         if let chatID {
             denies.removeAll { $0.chatID == chatID && $0.level <= level
@@ -175,6 +229,30 @@ public final class FolderGrants: @unchecked Sendable {
                 throw error
             }
         }
+    }
+
+    /// Sets a standing grant's level and lifetime as the user edited them in
+    /// Settings (lower too, unlike a merge), the folder as just checked
+    /// again; on disk first. Nil when it's gone (revoked, expired).
+    @discardableResult
+    public func update(_ id: UUID, root: FolderRoot, level: FolderAccessLevel, lifetime: GrantLifetime,
+                       now: Date = Date()) throws -> FolderGrant? {
+        guard lifetime.isStanding else { return nil }
+        lock.lock()
+        defer { lock.unlock() }
+        guard let i = grants.firstIndex(where: { $0.id == id && $0.lifetime.isStanding && !$0.isExpired(now: now) }),
+              grants[i].root.path == root.path else { return nil }
+        let old = grants[i]
+        grants[i].root = root
+        grants[i].level = level
+        grants[i].lifetime = lifetime
+        do {
+            try saveLocked()
+        } catch {
+            grants[i] = old
+            throw error
+        }
+        return grants[i]
     }
 
     /// A chat ended (closed, deleted): its grants and denies go.

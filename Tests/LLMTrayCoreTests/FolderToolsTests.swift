@@ -558,3 +558,32 @@ final class FolderToolsTests: FolderTestCase {
         XCTAssertTrue(service.accessibleFolders(chat).isEmpty)
     }
 }
+
+extension FolderToolsTests {
+    func testSettingsGrantsAreOnePerFolderAndEditedInPlace() throws {
+        let t0 = Date()
+        // From Settings, then from a chat: one row, its origin the first.
+        let added = try XCTUnwrap(service.userGrant(root, level: .read, choice: .hour, chat: nil, now: t0))
+        XCTAssertEqual(added.origin, .settings)
+        try service.userGrant(root, level: .change, choice: .hour, chat: chat, now: t0.addingTimeInterval(60))
+        var rows = service.grants.standingGrants(now: t0)
+        XCTAssertEqual(rows.count, 1)
+        XCTAssertEqual(rows[0].level, .change)
+        XCTAssertEqual(rows[0].lifetime, .until(t0.addingTimeInterval(3660)))
+        XCTAssertEqual(rows[0].origin, .settings)
+        // A level edit keeps the end; a lifetime edit sets it.
+        try service.updateGrant(added.id, level: .read, choice: nil, now: t0)
+        rows = service.grants.standingGrants(now: t0)
+        XCTAssertEqual(rows[0].level, .read)
+        XCTAssertEqual(rows[0].lifetime, .until(t0.addingTimeInterval(3660)))
+        try service.updateGrant(added.id, level: .read, choice: .always, now: t0)
+        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].lifetime, .always)
+        try service.updateGrant(added.id, level: .read, choice: .hour, now: t0)
+        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].lifetime, .until(t0.addingTimeInterval(3600)))
+        XCTAssertNil(try service.updateGrant(added.id, level: .read, choice: .chat, now: t0), "hour or always only")
+        // The folder is checked again: gone, the edit fails and changes nothing.
+        try fm.removeItem(atPath: grant)
+        XCTAssertThrowsError(try service.updateGrant(added.id, level: .change, choice: nil, now: t0))
+        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].level, .read)
+    }
+}

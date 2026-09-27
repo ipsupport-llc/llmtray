@@ -214,3 +214,120 @@ extension FolderGrantsTests {
         XCTAssertTrue(g.coversChange(path: downloads.path, chatID: "c", proposal: "call-3", now: t0))
     }
 }
+
+/// One row per folder in Settings: standing grants of the same folder merge.
+extension FolderGrantsTests {
+    func testStandingGrantsOfOneFolderMerge() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        let first = try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(3600)), chatID: "c", origin: .chat, now: t0)
+        // A later hour: the later end.
+        let later = try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(4000)), chatID: "c", now: t0.addingTimeInterval(400))
+        XCTAssertEqual(later.id, first.id)
+        XCTAssertEqual(g.standingGrants(now: t0).map(\.lifetime), [.until(t0.addingTimeInterval(4000))])
+        // An earlier end doesn't shorten it; change is the higher level.
+        try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(100)), chatID: nil, origin: .settings, now: t0)
+        var only = try XCTUnwrap(g.standingGrants(now: t0).first)
+        XCTAssertEqual(g.standingGrants(now: t0).count, 1)
+        XCTAssertEqual(only.level, .change)
+        XCTAssertEqual(only.lifetime, .until(t0.addingTimeInterval(4000)))
+        XCTAssertEqual(only.origin, .chat, "where it was first given")
+        // Always wins; read doesn't lower change.
+        try g.grant(docs, level: .read, lifetime: .always, chatID: "c", now: t0)
+        only = try XCTUnwrap(g.standingGrants(now: t0).first)
+        XCTAssertEqual(g.standingGrants(now: t0).count, 1)
+        XCTAssertEqual(only.level, .change)
+        XCTAssertEqual(only.lifetime, .always)
+        try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(9000)), chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).first?.lifetime, .always, "an hour doesn't shorten always")
+        // On disk as one.
+        XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0), g.standingGrants(now: t0))
+    }
+
+    func testAnExpiredGrantIsntMergedInto() throws {
+        let g = FolderGrants(storeURL: nil)
+        try g.grant(docs, level: .change, lifetime: .until(t0.addingTimeInterval(60)), chatID: "c", now: t0)
+        let fresh = try g.grant(docs, level: .read, lifetime: .until(t0.addingTimeInterval(3700)), chatID: "c", now: t0.addingTimeInterval(100))
+        XCTAssertEqual(fresh.level, .read, "the ended grant's change isn't carried over")
+        XCTAssertEqual(g.standingGrants(now: t0.addingTimeInterval(100)).count, 1)
+    }
+
+    func testParentAndChildAndPerChatGrantsStayApart() throws {
+        let g = FolderGrants(storeURL: nil)
+        let parent = FolderRoot(path: "/Users/u/Work", identity: FileIdentity(device: 1, inode: 300))
+        let child = FolderRoot(path: "/Users/u/Work/Sub", identity: FileIdentity(device: 1, inode: 301))
+        try g.grant(parent, level: .read, lifetime: .always, chatID: "c", now: t0)
+        try g.grant(child, level: .change, lifetime: .always, chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).map(\.root.path), [parent.path, child.path])
+        XCTAssertNil(g.authorize(path: parent.path + "/a", level: .change, chatID: "c", callKey: "k", now: t0),
+                     "the child's change doesn't reach its parent")
+        // Chat and once grants aren't merged, nor listed.
+        try g.grant(parent, level: .change, lifetime: .chat("c"), chatID: "c", now: t0)
+        try g.grant(parent, level: .change, lifetime: .once(callKey: "k", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertEqual(g.standingGrants(now: t0).first?.level, .read)
+        XCTAssertEqual(g.allGrants(now: t0).count, 4)
+    }
+
+    func testDuplicatesOnDiskAreMergedOnLoad() throws {
+        let a = FolderGrant(root: downloads, level: .read, lifetime: .until(t0.addingTimeInterval(60)), created: t0, origin: .chat)
+        let b = FolderGrant(root: downloads, level: .read, lifetime: .until(t0.addingTimeInterval(120)), created: t0)
+        let c = FolderGrant(root: downloads, level: .change, lifetime: .until(t0.addingTimeInterval(90)), created: t0)
+        let d = FolderGrant(root: docs, level: .read, lifetime: .always, created: t0)
+        let old = FolderGrant(root: docs, level: .change, lifetime: .until(t0.addingTimeInterval(-1)), created: t0)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try JSONEncoder().encode([a, b, c, d, old]).write(to: store)
+        let g = FolderGrants(storeURL: store, now: t0)
+        let loaded = g.standingGrants(now: t0)
+        XCTAssertEqual(loaded.map(\.root.path), [downloads.path, docs.path])
+        XCTAssertEqual(loaded[0].id, a.id)
+        XCTAssertEqual(loaded[0].level, .change)
+        XCTAssertEqual(loaded[0].lifetime, .until(t0.addingTimeInterval(120)))
+        XCTAssertEqual(loaded[0].origin, .chat)
+        XCTAssertEqual(loaded[1].level, .read, "an expired duplicate adds nothing")
+        // Written back merged.
+        let stored = try JSONDecoder().decode([FolderGrant].self, from: Data(contentsOf: store))
+        XCTAssertEqual(stored.count, 2)
+    }
+
+    func testOriginRoundTripsAndOldGrantsHaveNone() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        try g.grant(docs, level: .read, lifetime: .always, chatID: nil, origin: .settings, now: t0)
+        try g.grant(downloads, level: .read, lifetime: .always, chatID: "c", origin: .chat, now: t0)
+        let reloaded = FolderGrants(storeURL: store, now: t0).standingGrants(now: t0)
+        XCTAssertEqual(reloaded.map(\.origin), [.settings, .chat])
+        // A store from before the field: decoded, no origin.
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: store)) as? [[String: Any]])
+        XCTAssertNotNil(legacy[0]["origin"])
+        for i in legacy.indices { legacy[i]["origin"] = nil }
+        try JSONSerialization.data(withJSONObject: legacy).write(to: store)
+        let old = FolderGrants(storeURL: store, now: t0).standingGrants(now: t0)
+        XCTAssertEqual(old.count, 2)
+        XCTAssertEqual(old.map(\.origin), [nil, nil])
+    }
+
+    func testRevokingAMergedRowRemovesTheFolder() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        try g.grant(downloads, level: .read, lifetime: .until(t0.addingTimeInterval(3600)), chatID: "c", now: t0)
+        let merged = try g.grant(downloads, level: .change, lifetime: .always, chatID: "c", now: t0)
+        try g.revoke(merged.id)
+        XCTAssertTrue(g.standingGrants(now: t0).isEmpty)
+        XCTAssertNil(g.authorize(path: downloads.path, level: .read, chatID: "c", callKey: "k", now: t0))
+        XCTAssertTrue(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).isEmpty)
+    }
+
+    func testUpdateSetsLevelAndLifetimeExactly() throws {
+        let g = FolderGrants(storeURL: store, now: t0)
+        let grant = try g.grant(docs, level: .change, lifetime: .always, chatID: "c", origin: .chat, now: t0)
+        let hour = t0.addingTimeInterval(3600)
+        let updated = try g.update(grant.id, root: docs, level: .read, lifetime: .until(hour), now: t0)
+        XCTAssertEqual(updated?.level, .read, "lowered, unlike a merge")
+        XCTAssertEqual(updated?.lifetime, .until(hour))
+        XCTAssertEqual(updated?.origin, .chat)
+        XCTAssertFalse(g.coversChange(path: docs.path, chatID: "c", proposal: nil, now: t0))
+        XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).first?.level, .read)
+        XCTAssertNil(try g.update(grant.id, root: docs, level: .read, lifetime: .chat("c"), now: t0), "standing only")
+        XCTAssertNil(try g.update(grant.id, root: downloads, level: .read, lifetime: .always, now: t0), "same folder only")
+        XCTAssertNil(try g.update(grant.id, root: docs, level: .read, lifetime: .always, now: hour), "expired")
+        try g.revoke(grant.id)
+        XCTAssertNil(try g.update(grant.id, root: docs, level: .read, lifetime: .always, now: t0), "gone")
+    }
+}
