@@ -69,7 +69,7 @@ jobs:
           python3 -c "import sys, xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" _site/appcast.xml
           grep -E '<title>Version|sparkle:version>' _site/appcast.xml
       - name: Stamp the release and the reviews
-        run: python3 scripts/stamp_site.py releases.json _site/index.html --reviews "https://ipsupport.us/api/reviews?product=llmtray"
+        run: python3 scripts/stamp_site.py releases.json _site/index.html --reviews "https://ipsupport.us/api/reviews?product=llmtray" --reviews-fallback "https://ipsupport-llc.github.io/llmtray/reviews.json" --reviews-out _site/reviews.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

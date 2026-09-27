@@ -217,6 +217,23 @@ public struct ReviewFeed: Codable, Equatable {
             case id, rating, text, version, author
             case createdAt = "created_at"
         }
+
+        // Empty fields may be left out by the server: one review without
+        // them mustn't fail the whole feed.
+        public init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+            id = try c.decode(String.self, forKey: .id)
+            rating = try c.decode(Int.self, forKey: .rating)
+            text = try c.decodeIfPresent(String.self, forKey: .text) ?? ""
+            version = try c.decodeIfPresent(String.self, forKey: .version) ?? ""
+            author = try c.decodeIfPresent(String.self, forKey: .author) ?? ""
+            createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt) ?? ""
+        }
+
+        public init(id: String, rating: Int, text: String, version: String, author: String, createdAt: String) {
+            self.id = id; self.rating = rating; self.text = text
+            self.version = version; self.author = author; self.createdAt = createdAt
+        }
     }
 
     public var summary: Summary

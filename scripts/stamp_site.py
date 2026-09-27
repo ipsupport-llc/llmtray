@@ -95,7 +95,7 @@ def render_section(count, average, reviews):
     lines = ['<section id="reviews">', "      <h2>Reviews</h2>"]
     noun = "review" if count == 1 else "reviews"
     if average is not None:
-        lines.append(f'      <p class="reviews-summary"><span class="stars" aria-hidden="true">{stars(round(average))}</span> '
+        lines.append(f'      <p class="reviews-summary"><span class="stars" aria-hidden="true">{stars(int(average + 0.5))}</span> '
                      f"{average:.1f} out of 5 · {count} {noun}</p>")
     else:
         lines.append(f'      <p class="reviews-summary">{count} {noun}</p>')
@@ -180,19 +180,34 @@ def stamp(page, version, date, feed):
 
 def main() -> None:
     args = sys.argv[1:]
-    source = None
-    if "--reviews" in args:
-        i = args.index("--reviews")
-        source = args[i + 1]
-        del args[i:i + 2]
+    def option(name):
+        if name in args:
+            i = args.index(name)
+            value = args[i + 1]
+            del args[i:i + 2]
+            return value
+        return None
+    source = option("--reviews")
+    fallback = option("--reviews-fallback")   # the live site's reviews.json
+    feed_out = option("--reviews-out")        # published next to the page
     releases_path, page_path = args
     version, date = latest_release(json.load(open(releases_path)))
     feed = None
     if source:
         try:
             feed = read_reviews(source)
-        except Exception as error:  # fail-soft: deploy without reviews
+        except Exception as error:
+            # Fail-soft, but not blank: the last good feed, as the live site
+            # published it, so one failed fetch doesn't drop every review.
             print(f"::warning::reviews not fetched: {error}")
+            if fallback:
+                try:
+                    feed = read_reviews(fallback)
+                    print("using the last published reviews")
+                except Exception as error2:
+                    print(f"::warning::no last published reviews either: {error2}")
+    if feed is not None and feed_out:
+        json.dump(feed, open(feed_out, "w"))
     page, shown = stamp(open(page_path).read(), version, date, feed)
     open(page_path, "w").write(page)
     print("stamped", version, date, f"reviews shown: {shown}")

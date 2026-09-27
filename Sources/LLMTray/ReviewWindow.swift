@@ -88,7 +88,8 @@ final class ReviewStore: ObservableObject {
             draft.dropKey()
             await send(submission, renewingKeyOnce: false)
         case .keyReused:
-            state = .retryLater
+            // Refused twice: a client problem, not the network.
+            state = .rejected(code: "idempotency_key_reused")
         case .rejected(let code):
             state = .rejected(code: code)
         case .rateLimited(let seconds):
@@ -262,8 +263,10 @@ private struct ReviewView: View {
             Text("How do you like LLMTray?").font(.headline)
             Spacer()
             if let summary = store.summary, summary.count > 0, let average = summary.average {
-                Text(String(format: NSLocalizedString("%@ ★ from %lld reviews", comment: "review summary: average, count"),
-                            String(format: "%.1f", average), summary.count))
+                Text(summary.count == 1
+                     ? String(format: NSLocalizedString("%@ ★ from 1 review", comment: "review summary: average"), String(format: "%.1f", average))
+                     : String(format: NSLocalizedString("%@ ★ from %lld reviews", comment: "review summary: average, count"),
+                              String(format: "%.1f", average), summary.count))
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

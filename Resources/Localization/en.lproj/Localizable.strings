@@ -8,6 +8,7 @@
 "%@ · %@ left" = "%@ · %@ left";
 "%@ → %@ available" = "%@ → %@ available";
 "%@ ★ from %lld reviews" = "%@ ★ from %lld reviews";
+"%@ ★ from 1 review" = "%@ ★ from 1 review";
 "%@ 🌐" = "%@ 🌐";
 "%@, p. %lld" = "%@, p. %lld";
 "%d overridden, rest from Default · %@" = "%d overridden, rest from Default · %@";
