@@ -50,6 +50,8 @@ struct ContentView: View {
     /// The user's own scrolling (wheel, trackpad, scroller): only it turns
     /// following off -- the chat's own layout changes never do.
     @StateObject private var userScroll = UserScrollWatch()
+    /// One retry waits for the user's gesture to end, not one per token.
+    @State private var followRetryPending = false
     @State private var chatViewportHeight: CGFloat = 380
     /// What a citation chip found: the file changed since, or gone.
     @State private var citationNote: String?
@@ -225,6 +227,40 @@ struct ContentView: View {
         chat.messages.last { $0.role == "user" && !$0.isToolContext }?.id
     }
 
+    /// Changes with every piece of the streaming end of the chat: what
+    /// follows it, besides the measured height (which changes only when a
+    /// line wraps, and whose callbacks coalesce).
+    private var chatEndKey: String {
+        guard let m = chat.messages.last else { return "" }
+        return "\(m.id)|\(m.reasoning.count)|\(m.content.count)|\(m.toolCalls.count)|\(m.images.count)|\(m.audios.count)"
+    }
+
+    /// Brings the end into view while following: after the layout the
+    /// change causes (one main-queue turn isn't enough -- the scroll landed
+    /// against the old content height, a line short each time).
+    private func followToEnd(_ proxy: ScrollViewProxy) {
+        guard followChatBottom, chat.draft?.anchor == nil else { return }
+        DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                guard followChatBottom else { return }
+                // The user's gesture first; the end once it's over (the last
+                // token may have come meanwhile, with nothing after it).
+                guard !userScroll.isScrolling else {
+                    guard !followRetryPending else { return }
+                    followRetryPending = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        followRetryPending = false
+                        followToEnd(proxy)
+                    }
+                    return
+                }
+                var t = Transaction()
+                t.disablesAnimations = true
+                withTransaction(t) { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+            }
+        }
+    }
+
     /// Tool results by call id, for the debug view of tool calls.
     private var toolResults: [String: String] {
         var results: [String: String] = [:]
@@ -339,6 +375,7 @@ struct ContentView: View {
                 // The content's height and where its bottom is in the
                 // viewport: the bottom moving with the height unchanged means
                 // the user scrolled.
+                .background(ChatScrollViewFinder { userScroll.target = $0 })
                 .background(GeometryReader { g in
                     let frame = g.frame(in: .named("chatScroll"))
                     Color.clear.preference(key: ChatBottomKey.self, value: ChatGeometry(bottom: frame.maxY, height: frame.height))
@@ -379,7 +416,9 @@ struct ContentView: View {
                     if moved { AnswerInfoPresenter.shared.chatScrolled() }
                     // Up and away from the end: stop. Text arriving while the
                     // user scrolls down to it doesn't count as leaving.
-                    if atEnd { followChatBottom = true } else if scrolledUp { followChatBottom = false }
+                    // A shrink meanwhile (reasoning folding) moves the offset
+                    // without the user: only a pass that didn't shrink counts.
+                    if atEnd { followChatBottom = true } else if scrolledUp, grew > -0.5 { followChatBottom = false }
                 } else if atEnd {
                     followChatBottom = true
                 }
@@ -389,8 +428,8 @@ struct ContentView: View {
                 // Not while a Tweak draft up the chat is what the user looks at.
                 // Never while the user scrolls: that would take the end back from
                 // under them before they're 40 pt away.
-                if followChatBottom, !userScroll.isScrolling, chat.draft?.anchor == nil, grew > 0.5, geometry.bottom > chatViewportHeight + 1 {
-                    DispatchQueue.main.async { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
+                if grew > 0.5, geometry.bottom > chatViewportHeight + 1, !userScroll.isScrolling {
+                    followToEnd(proxy)
                 }
             }
             // Small for an empty chat, capped so a long one scrolls inside
@@ -427,8 +466,10 @@ struct ContentView: View {
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
                 followChatBottom = true
-                proxy.scrollTo(Self.chatBottomID, anchor: .bottom)
+                followToEnd(proxy)
             }
+            // Every token, reasoning or answer, a tool call, an image or song.
+            .onChange(of: chatEndKey) { followToEnd(proxy) }
         }
     }
 
@@ -470,6 +511,8 @@ struct ContentView: View {
     }
 
     private func regenerate() {
+        // The new answer is what the user asked to see.
+        followChatBottom = true
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
@@ -542,57 +585,59 @@ struct ChatGeometry: Equatable {
     var height: CGFloat
 }
 
-/// Whether the user is scrolling now: a scroll-wheel or trackpad event
-/// in the last moments, or a live scroll (a drag of the scroller, a
-/// trackpad's momentum). Programmatic scrolls (following the end) are
-/// neither, so they can't be mistaken for the user's.
+/// Whether the user is scrolling the chat now: a scroll-wheel or trackpad
+/// event over the chat's own scroll view in the last moments, or a live
+/// scroll of it (a drag of its scroller, a trackpad's momentum). Other scroll
+/// views (the composer, code blocks elsewhere, other windows) don't count,
+/// and programmatic scrolls (following the end) are neither.
 @MainActor
 final class UserScrollWatch: ObservableObject {
-    private final class Live {
-        weak var view: NSScrollView?
-        var last: Date
-        init(_ view: NSScrollView) { self.view = view; last = Date() }
-    }
-
+    /// The chat's NSScrollView, found once it's in a window.
+    weak var target: NSScrollView?
     private var lastWheel = Date.distantPast
-    /// Scroll views in a live scroll, weakly: one rebuilt or gone mid-scroll
-    /// (a code block re-rendered while streaming) never sends its end, and
-    /// a counter would then say "scrolling" for good -- following dead
-    /// until relaunch. Gone, off-window or silent for 2 s: not scrolling.
-    private var live: [ObjectIdentifier: Live] = [:]
+    /// When the chat's live scroll began or last moved; nil when none. Stale
+    /// after 2 s: a scroll view rebuilt mid-scroll never sends its end.
+    private var liveSince: Date?
     private var monitor: Any?
     private var observers: [NSObjectProtocol] = []
 
     var isScrolling: Bool {
         let now = Date()
-        live = live.filter { $0.value.view?.window != nil && now.timeIntervalSince($0.value.last) < 2 }
-        return !live.isEmpty || now.timeIntervalSince(lastWheel) < 0.35
+        if let since = liveSince, now.timeIntervalSince(since) >= 2 { liveSince = nil }
+        return liveSince != nil || now.timeIntervalSince(lastWheel) < 0.35
     }
 
     func start() {
         guard monitor == nil else { return }
         monitor = NSEvent.addLocalMonitorForEvents(matching: .scrollWheel) { [weak self] event in
-            self?.lastWheel = Date()
+            guard let self, event.phase != .mayBegin else { return event }
+            // Not found (yet): any wheel counts, as before -- better than
+            // never letting the user read back.
+            guard let target = self.target else {
+                self.lastWheel = Date()
+                return event
+            }
+            guard event.window === target.window,
+                  // Sideways: a code block's or table's own scroller.
+                  abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX) else { return event }
+            let point = target.convert(event.locationInWindow, from: nil)
+            if target.bounds.contains(point) { self.lastWheel = Date() }
             return event
         }
         let center = NotificationCenter.default
         observers = [
             center.addObserver(forName: NSScrollView.willStartLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
-                MainActor.assumeIsolated {
-                    guard let view = note.object as? NSScrollView else { return }
-                    self?.live[ObjectIdentifier(view)] = Live(view)
-                }
+                MainActor.assumeIsolated { if let self, (note.object as? NSScrollView) === self.target { self.liveSince = Date() } }
             },
             center.addObserver(forName: NSScrollView.didLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
                 MainActor.assumeIsolated {
-                    guard let view = note.object as? NSScrollView else { return }
-                    self?.live[ObjectIdentifier(view)]?.last = Date()
+                    if let self, (note.object as? NSScrollView) === self.target, self.liveSince != nil { self.liveSince = Date() }
                 }
             },
             center.addObserver(forName: NSScrollView.didEndLiveScrollNotification, object: nil, queue: .main) { [weak self] note in
                 MainActor.assumeIsolated {
-                    guard let self, let view = note.object as? NSScrollView else { return }
-                    self.live[ObjectIdentifier(view)] = nil
+                    guard let self, (note.object as? NSScrollView) === self.target else { return }
+                    self.liveSince = nil
                     // Its last movement lands just after the end.
                     self.lastWheel = Date()
                 }
@@ -603,6 +648,36 @@ final class UserScrollWatch: ObservableObject {
     deinit {
         if let monitor { NSEvent.removeMonitor(monitor) }
         observers.forEach(NotificationCenter.default.removeObserver)
+    }
+}
+
+/// Reports the NSScrollView around the view it's the background of.
+private struct ChatScrollViewFinder: NSViewRepresentable {
+    let found: (NSScrollView) -> Void
+
+    init(_ found: @escaping (NSScrollView) -> Void) { self.found = found }
+
+    func makeNSView(context: Context) -> FinderView {
+        let v = FinderView()
+        v.found = found
+        return v
+    }
+
+    func updateNSView(_ view: FinderView, context: Context) { view.found = found }
+
+    final class FinderView: NSView {
+        var found: ((NSScrollView) -> Void)?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard window != nil else { return }
+            // After this pass: the hosting hierarchy is complete by then.
+            DispatchQueue.main.async { [weak self] in
+                if let scroll = self?.enclosingScrollView { self?.found?(scroll) }
+            }
+        }
+
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
     }
 }
 
