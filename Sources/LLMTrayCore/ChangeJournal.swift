@@ -121,10 +121,7 @@ public final class ChangeJournal: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         try appendHook?(event)
-        if Posix.lstatPath(directory.path) == nil {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            try Self.syncDirectory(directory.deletingLastPathComponent().path)
-        }
+        try Self.makeDurably(directory.path)
         var line = try Self.encoder.encode(event)
         line.append(0x0A)
         let path = url(for: planID).path
@@ -150,6 +147,21 @@ public final class ChangeJournal: @unchecked Sendable {
         if isNew { try Self.syncDirectory(directory.path) }
     }
 
+    /// Makes each missing folder of `path`, outermost first, syncing its
+    /// parent after each: a crash can't lose a folder the journal is in.
+    static func makeDurably(_ path: String) throws {
+        var missing: [String] = []
+        var p = path
+        while Posix.lstatPath(p) == nil, p != "/", !p.isEmpty {
+            missing.append(p)
+            p = (p as NSString).deletingLastPathComponent
+        }
+        for dir in missing.reversed() {
+            if mkdir(dir, 0o700) != 0, errno != EEXIST { throw FolderAccessError.system("journal folder", errno) }
+            try syncDirectory((dir as NSString).deletingLastPathComponent)
+        }
+    }
+
     /// A new entry in `path` is on disk only once the folder itself is synced.
     static func syncDirectory(_ path: String) throws {
         let dfd = open(path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
@@ -158,15 +170,28 @@ public final class ChangeJournal: @unchecked Sendable {
         guard fsync(dfd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
     }
 
+    /// Journals are read up to this many bytes (a plan's is a few KB); past
+    /// it the record shows as incomplete.
+    public var maxRecordBytes = 16 << 20
+
+    /// Whether a journal exists for the plan (it has started).
+    public func exists(_ planID: UUID) -> Bool { Posix.lstatPath(url(for: planID).path) != nil }
+
     public func record(_ planID: UUID) -> JournalRecord? {
-        guard let data = try? Data(contentsOf: url(for: planID)) else { return nil }
+        guard let handle = try? FileHandle(forReadingFrom: url(for: planID)) else { return nil }
+        defer { try? handle.close() }
+        guard var data = try? handle.read(upToCount: maxRecordBytes + 1) else { return nil }
+        let truncated = data.count > maxRecordBytes
+        if truncated { data = data.prefix(maxRecordBytes) }
         var events: [JournalEvent] = []
         for line in data.split(separator: 0x0A) {
             // A torn last line (a crash mid-write) is skipped: its operation
             // hadn't started.
             if let e = try? Self.decoder.decode(JournalEvent.self, from: Data(line)) { events.append(e) }
         }
-        return Self.fold(planID: planID, events)
+        var record = Self.fold(planID: planID, events)
+        if truncated { record?.ended = nil }
+        return record
     }
 
     /// Every plan in the journal, newest first.

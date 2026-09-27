@@ -607,4 +607,38 @@ final class ChangePlanTests: FolderTestCase {
         XCTAssertEqual(undoer.undo(plan.id).undone, [1])
         guard case .undone = journal.record(plan.id)!.items[0].state else { return XCTFail() }
     }
+
+    func testInterruptedUndoRecoveryDoesntGuess() throws {
+        // A made folder gone from its place and not taken aside: removed, or
+        // moved away by someone -- uncertain, not undone.
+        let made = try approved([md("X")])
+        XCTAssertEqual(executor.execute(made).doneCount, 1)
+        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: 1), planID: made.id)
+        try fm.moveItem(atPath: grant + "/X", toPath: grant + "/elsewhere")
+        let r1 = undoer.undo(made.id)
+        XCTAssertEqual(r1.undone, [])
+        XCTAssertTrue(r1.stopped?.reason?.contains("needs a look") ?? false, "\(r1)")
+        // A move whose item is back at its source by a hard link, still at
+        // the destination: uncertain.
+        write("a.txt", "a")
+        let moved = try approved([mv("a.txt", "b.txt")])
+        XCTAssertEqual(executor.execute(moved).doneCount, 1)
+        try journal.append(JournalEvent(kind: .undoPending, date: Date(), item: 1), planID: moved.id)
+        try fm.linkItem(atPath: grant + "/b.txt", toPath: grant + "/a.txt")
+        let r2 = undoer.undo(moved.id)
+        XCTAssertEqual(r2.undone, [])
+        XCTAssertTrue(r2.stopped?.reason?.contains("both places") ?? false, "\(r2)")
+        XCTAssertTrue(exists("b.txt"))
+    }
+
+    func testTheJournalMakesItsFoldersDurably() throws {
+        let deep = ChangeJournal(directory: URL(fileURLWithPath: base + "/j1/j2/j3"))
+        let id = UUID()
+        try deep.append(JournalEvent(kind: .begin, date: Date(), chatID: "c"), planID: id)
+        XCTAssertTrue(deep.exists(id))
+        XCTAssertNotNil(deep.record(id))
+        // Over the read cap: shown as incomplete, not read whole.
+        deep.maxRecordBytes = 10
+        XCTAssertNil(deep.record(id), "a cut first line isn't a begin")
+    }
 }

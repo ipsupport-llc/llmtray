@@ -107,7 +107,7 @@ public struct ChangeExecutor {
     public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false }) -> Report {
         var report = Report(planID: approved.plan.id, outcomes: [], stoppedAt: nil)
         // An approval runs once -- and a plan with a journal already ran.
-        guard let plan = approved.take(), journal.record(approved.plan.id) == nil else {
+        guard let plan = approved.take(), !journal.exists(approved.plan.id) else {
             report.outcomes = approved.plan.items.map { ($0.id, .notRun) }
             if let first = approved.plan.items.first {
                 report.outcomes[0] = (first.id, .failed("this approval was already used: approve again"))
@@ -183,6 +183,14 @@ public struct ChangeExecutor {
                 if newFD >= 0 { close(newFD) }
                 throw Uncertain(description: "made \(staging), then couldn't open it")
             }
+            // Still the folder mkdirat made, as far as can be told: ours,
+            // private, empty. (One swapped in by the same user would have to
+            // be an empty private folder too: harmless to publish.)
+            guard created.stat.isDirectory, created.stat.identity.device == parent.descriptor.identity.device,
+                  created.stat.mode & 0o077 == 0,
+                  Self.ownedByUs(created), (try? ChangeUndo.isEmptyDirectory(parent.descriptor, staging)) == true else {
+                throw Uncertain(description: "\(staging) isn't the folder just made")
+            }
             _ = fchmod(created.fd, 0o755)
             let name: String
             do {
@@ -197,6 +205,10 @@ public struct ChangeExecutor {
                 throw Uncertain(description: "\(error); \(staging) was left behind")
             }
             guard (try? Posix.lstatAt(fd, name))?.identity == created.identity else {
+                // Something else was published: back to where it came from.
+                if renameatx_np(fd, name, fd, staging, UInt32(RENAME_EXCL)) == 0 {
+                    throw FolderAccessError.changed(d.location.relativePath)
+                }
                 throw Uncertain(description: "made \(name), but what is there now isn't it")
             }
             made[Key(root: d.location.root.identity, components: d.location.components)] = Made(identity: created.identity, name: name)
@@ -260,6 +272,11 @@ public struct ChangeExecutor {
             }
             throw Uncertain(description: "something other than \(s.location.relativePath) went to the Trash: \(out.path)")
         }
+    }
+
+    static func ownedByUs(_ d: Descriptor) -> Bool {
+        var st = Darwin.stat()
+        return Darwin.fstat(d.fd, &st) == 0 && st.st_uid == geteuid()
     }
 
     private func openSourceParent(_ s: CapturedSource) throws -> OpenedDirectory {

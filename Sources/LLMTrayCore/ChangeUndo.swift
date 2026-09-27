@@ -253,7 +253,10 @@ public struct ChangeUndo {
             let dir = try walker(d.location.root).openDirectory(Array(comps.dropLast()), expected: chain)
             if try Posix.lstatAt(dir.descriptor.fd, name)?.identity == r.identity { return false }
             let aside = Self.asideName(planID: planID, item: item.id)
-            guard try Posix.lstatAt(dir.descriptor.fd, aside)?.identity == r.identity else { return true }
+            guard try Posix.lstatAt(dir.descriptor.fd, aside)?.identity == r.identity else {
+                // Removed -- or moved away by someone: can't be told apart.
+                throw Uncertain(description: "\(name) is gone from its place; if it was removed, nothing is left to undo")
+            }
             if unlinkat(dir.descriptor.fd, aside, AT_REMOVEDIR) == 0 { return true }
             if renameatx_np(dir.descriptor.fd, aside, dir.descriptor.fd, name, UInt32(RENAME_EXCL)) == 0 { return false }
             throw Uncertain(description: "\(name) was left as \(aside)")
@@ -261,9 +264,20 @@ public struct ChangeUndo {
             guard let s = item.source else { return false }
             // Held in a local: the descriptor closes when the value goes.
             let parent = try sourceParent(s)
-            return try withExtendedLifetime(parent) {
+            let atSource = try withExtendedLifetime(parent) {
                 try Posix.lstatAt(parent.descriptor.fd, s.location.name)?.identity == s.identity
             }
+            guard atSource else { return false }
+            // Also gone from where the plan put it (a hard link could make it
+            // look back while still there).
+            let stillPlaced: Bool
+            if item.kind == .trash {
+                stillPlaced = r.trashURL.flatMap { Posix.lstatPath($0) }?.identity == r.identity
+            } else {
+                stillPlaced = (try? placed(item, r)) != nil
+            }
+            if stillPlaced { throw Uncertain(description: "\(s.location.relativePath) is in both places (a hard link?)") }
+            return true
         }
     }
 

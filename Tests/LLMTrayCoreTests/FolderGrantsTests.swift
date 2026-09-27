@@ -85,8 +85,18 @@ final class FolderGrantsTests: XCTestCase {
         // Reloaded after the hour: the expired one is gone.
         let later = FolderGrants(storeURL: store, now: t0.addingTimeInterval(61))
         XCTAssertEqual(later.standingGrants(now: t0.addingTimeInterval(61)).map(\.id), [always.id])
-        later.revoke(always.id)
+        try later.revoke(always.id)
         XCTAssertTrue(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).isEmpty)
+    }
+
+    func testAStandingGrantThatCantBeSavedDoesntExist() throws {
+        // The store's folder can't be made: a file is in the way.
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        FileManager.default.createFile(atPath: dir.appendingPathComponent("blocked").path, contents: Data())
+        let g = FolderGrants(storeURL: dir.appendingPathComponent("blocked/grants.json"))
+        XCTAssertThrowsError(try g.grant(docs, level: .read, lifetime: .always, chatID: "c"))
+        XCTAssertTrue(g.allGrants().isEmpty)
+        XCTAssertNoThrow(try g.grant(docs, level: .read, lifetime: .chat("c"), chatID: "c"), "in memory only")
     }
 
     func testTemporaryChatsGetReadForTheChatOnly() throws {

@@ -137,20 +137,37 @@ public final class FolderGrants: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         grants.append(g)
+        // A standing grant exists only once it is on disk.
+        if lifetime.isStanding {
+            do {
+                try saveLocked()
+            } catch {
+                grants.removeAll { $0.id == g.id }
+                throw error
+            }
+        }
         if let chatID {
             denies.removeAll { $0.chatID == chatID && $0.level <= level
                 && ($0.root.identity == root.identity || Self.isWithin($0.root.path, root.path)) }
         }
-        if lifetime.isStanding { saveLocked() }
         return g
     }
 
-    public func revoke(_ id: UUID) {
+    /// Removes a grant; a standing one is removed on disk first (a revoke
+    /// that didn't stick throws and changes nothing).
+    public func revoke(_ id: UUID) throws {
         lock.lock()
         defer { lock.unlock() }
-        let wasStanding = grants.first { $0.id == id }?.lifetime.isStanding ?? false
-        grants.removeAll { $0.id == id }
-        if wasStanding { saveLocked() }
+        guard let i = grants.firstIndex(where: { $0.id == id }) else { return }
+        let removed = grants.remove(at: i)
+        if removed.lifetime.isStanding {
+            do {
+                try saveLocked()
+            } catch {
+                grants.insert(removed, at: i)
+                throw error
+            }
+        }
     }
 
     /// A chat ended (closed, deleted): its grants and denies go.
@@ -195,7 +212,8 @@ public final class FolderGrants: @unchecked Sendable {
         defer { lock.unlock() }
         let expired = grants.contains { $0.isExpired(now: now) }
         grants.removeAll { $0.isExpired(now: now) }
-        if expired { saveLocked() }
+        // Expired grants are dropped on load too: a failed save here is harmless.
+        if expired { try? saveLocked() }
         let usable = grants.filter { g in
             guard g.level >= level, g.covers(path) else { return false }
             switch g.lifetime {
@@ -262,13 +280,13 @@ public final class FolderGrants: @unchecked Sendable {
 
     /// Writes the standing grants; called with the lock held, so saves land
     /// in the order the changes were made.
-    private func saveLocked() {
+    private func saveLocked() throws {
         guard let storeURL else { return }
         let standing = grants.filter { $0.lifetime.isStanding }
         let enc = JSONEncoder()
         enc.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? enc.encode(standing) else { return }
+        let data = try enc.encode(standing)
         try? FileManager.default.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try? data.write(to: storeURL, options: .atomic)
+        try data.write(to: storeURL, options: .atomic)
     }
 }
