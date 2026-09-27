@@ -251,7 +251,7 @@ struct ContentView: View {
                                                                   comment: "citation chip: the cited file was re-indexed"), c.name, page) : nil
                 if CitationViewer.opensInViewer(url) {
                     let quote = await ProjectIndexer.citationQuote(c)
-                    if !PDFCitationViewer.show(url, name: c.name, page: page, quote: quote, note: note) { NSWorkspace.shared.open(url) }
+                    if await !PDFCitationViewer.show(url, name: c.name, page: page, quote: quote, note: note) { NSWorkspace.shared.open(url) }
                 } else {
                     NSWorkspace.shared.open(url)
                 }

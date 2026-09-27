@@ -263,9 +263,11 @@ public enum SetupPlan {
             guard applied.chatModel != original.chatModel else { return [] }
             var actions: [SetupAction] = []
             if case .download(let repo, _) = applied.chatModel { actions.append(.cancelChatDownload(repo: repo)) }
+            // The selection as it was, whatever was picked on the way (a
+            // local model, then a download: the local one is still selected).
             switch original.chatModel {
             case .local(let path): actions.append(.selectModel(path: path))
-            case nil: if case .local = applied.chatModel { actions.append(.clearModelSelection) }
+            case nil: actions.append(.clearModelSelection)
             case .download: break   // never the opening state (a selection is local)
             }
             return actions

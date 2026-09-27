@@ -694,7 +694,8 @@
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "The chat model is downloading into this folder. Change it once that's done, here or in Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.";
 "The day the counts are for." = "The day the counts are for.";
 "The download didn't start." = "The download didn't start.";
