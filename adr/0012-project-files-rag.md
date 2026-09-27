@@ -63,7 +63,9 @@ chat of the project, reached by the chat model through tools.
   (Florence-2, SmolVLM2, moondream2 — licences and MLX support checked
   in the spike) are compared on the eval images. All three tiers are in
   the product's scope; the plan orders them.
-- **Retrieval, not stuffing**: no "whole project in the request" mode.
+- **Retrieval by default; whole documents only when the user pins
+  them** (v1b, the user's call): no automatic "whole project in the
+  request" mode, but a file can be pinned to a chat (below).
 - **Copies or linked folders — the user's choice**, per source:
   - *added files* are immutable copies in the project; replacing one is
     remove + add;
@@ -541,6 +543,35 @@ adds ~20 ms.
 - EmbeddingGemma is gated on Hugging Face (Gemma licence): its entry
   needs the user's acceptance or an ungated mirror.
 
+## Pinned documents (v1b)
+
+The user can **pin** one or more files of the project to a chat, to work
+with them whole (a contract, an article, a chapter) rather than through
+search. The user's explicit choice.
+
+- **What goes in**: the document's page text (the current revision),
+  once, as a project-tool result, so it is data with the trust rules
+  above (network tools and generators refused in the turn, not
+  compacted into a summary, never in the system prompt). It stays
+  cached by the server's prompt cache for the chat's later turns. It
+  counts against the per-request budget like any file text, at the
+  front of the history.
+- **Before pinning, the cost is shown and checked**: the tokens
+  (the estimator of the chat plumbing), the KV-cache memory they need
+  for the chat's model and its KV settings, against what's left under
+  the Metal limit with the model loaded, and a rough first-answer time
+  (prefill). "~24k tokens — fits; the first answer takes about a
+  minute", or "too large for this model on this Mac — search it, or
+  summarise it". Several pinned files share one limit.
+- **Too large to pin**: search as usual, or **Summarise** (v3): the
+  document read once chapter by chapter into short summaries kept in
+  the index, which the model works from, reading exact pages on demand.
+- A pinned file that is re-indexed (a linked file changed) says so in
+  the chat and offers to re-pin; removing the file unpins it.
+- Measured before it ships: KV bytes per token for the supported models
+  and KV settings, prefill speed on this Mac, and where a book-sized
+  document stops fitting.
+
 ## UI
 
 - **Files view** of the project: a drop zone and Add… (files, or Link
@@ -670,7 +701,7 @@ contextual-retrieval.
    combined peak memory within the Metal limit; the index re-measured
    with the final layout and the disk limits set from it; macOS 14
    packaged smoke test.
-4. **v1b — every format**: tier 2 (Vision OCR, segmentation,
+4. **v1b — every format, pinned documents**: tier 2 (Vision OCR, segmentation,
    perspective, `RecognizeDocumentsRequest` tables on macOS 26+), image
    descriptions (the small VLM), xlsx/pptx and .xls/.ppt, linked folders
    with FSEvents — **the full-workspace promise is gated here**. Exit:
