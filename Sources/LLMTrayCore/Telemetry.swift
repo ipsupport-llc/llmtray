@@ -454,9 +454,11 @@ public final class TelemetryCounterStore {
 @MainActor
 public struct TelemetryUploader {
     public var client: TelemetryClient
-    public var calendar: Calendar
+    /// nil: TelemetryDay.calendar as of each run -- the time zone the
+    /// counters are dated in now, even after it changed.
+    public var calendar: Calendar?
 
-    public init(client: TelemetryClient, calendar: Calendar = TelemetryDay.calendar) {
+    public init(client: TelemetryClient, calendar: Calendar? = nil) {
         self.client = client
         self.calendar = calendar
     }
@@ -468,6 +470,7 @@ public struct TelemetryUploader {
     public func run(store: TelemetryCounterStore, now: () -> Date = Date.init,
                     installID: () -> UUID?, environment: () -> TelemetryEnvironment) async -> [String] {
         var done: [String] = []
+        let calendar = self.calendar ?? TelemetryDay.calendar
         let started = now()
         let today = TelemetryDay.string(for: started, calendar: calendar)
         store.update { $0.prune(today: today, now: started, calendar: calendar) }
