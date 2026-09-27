@@ -78,6 +78,8 @@ public struct ReconcileReport: Equatable, Sendable {
     /// Removals that failed again (a copy that couldn't be deleted): still hidden, retried next time.
     public var failedRemovals = 0
     public var deletedOrphanFiles = 0
+    /// Promoted copies whose hash no longer matched, with no good staged copy: `failed`.
+    public var damagedCopies = 0
     /// Documents to extract (staged), in doc order.
     public var needExtraction: [Int64] = []
     /// Searchable documents still missing vectors of the active set.
@@ -107,9 +109,20 @@ public struct IndexStorage: Equatable, Sendable {
 /// Every method is synchronous and each state change is one transaction;
 /// nothing awaits while one is open. A crash anywhere leaves a state the
 /// next `reconcile()` finishes or undoes.
+///
+/// It owns its project exclusively: `index.lock` is held (flock) from open
+/// to `close`, so no second `ProjectIndex` -- in this process or another --
+/// writes the same file (a compaction swap would lose its writes). Its
+/// connection is internal; in a registry handle it only answers on the
+/// writer queue (`owner`).
 public final class ProjectIndex {
     public let directory: URL
-    public private(set) var db: SQLiteConnection
+    private(set) var db: SQLiteConnection
+    private var lock: ProjectLock?
+    /// The queue the connection must be used on (the registry's writer).
+    var owner: ConnectionQueue? {
+        didSet { db.owner = owner }
+    }
     public var chunker = IndexChunker()
     /// Free bytes on the index's volume; replaceable for tests.
     var freeSpace: () -> Int64? = { nil }
@@ -118,6 +131,7 @@ public final class ProjectIndex {
     var crashHook: ((String) throws -> Void)?
 
     public static let databaseName = "index.sqlite"
+    public static let lockName = "index.lock"
     public var databaseURL: URL { directory.appendingPathComponent(Self.databaseName) }
     public var filesDirectory: URL { directory.appendingPathComponent("files") }
     public var stagingDirectory: URL { directory.appendingPathComponent("staging") }
@@ -129,9 +143,13 @@ public final class ProjectIndex {
         let fm = FileManager.default
         try fm.createDirectory(at: directory.appendingPathComponent("files"), withIntermediateDirectories: true)
         try fm.createDirectory(at: directory.appendingPathComponent("staging"), withIntermediateDirectories: true)
+        // Before anything touches the files: a swap recovered or a migration
+        // run under another owner's feet would be the same lost write.
+        let lock = try ProjectLock(directory.appendingPathComponent(Self.lockName))
         try CompactionSwap.recover(in: directory)
         IndexMigration.discardLeftovers(in: directory)
         db = try Self.openWriter(directory: directory)
+        self.lock = lock
         freeSpace = { [directory] in Self.availableCapacity(at: directory) }
     }
 
@@ -155,7 +173,11 @@ public final class ProjectIndex {
         return db
     }
 
-    public func close() { db.close() }
+    /// Closes the connection and gives up the project (its lock).
+    public func close() {
+        db.close()
+        lock = nil
+    }
     /// False after `close`, or when a compaction couldn't reopen the file.
     public var isOpen: Bool { db.isOpen }
 
@@ -191,12 +213,29 @@ public final class ProjectIndex {
 
     func fileURL(doc: Int64, ext: String) -> URL { filesDirectory.appendingPathComponent("\(doc).\(ext)") }
 
-    /// Where a document's file is: its copy, or the file in its linked folder.
+    /// Where a document's file is: its copy, or the file in its linked folder
+    /// -- resolved, and nil unless it exists inside the folder: a symlink in
+    /// the folder (the file or a directory on its path) that leads out of it
+    /// is never followed there.
     public func file(of d: IndexedDocument) throws -> URL? {
         if d.source == 1 { return fileURL(doc: d.doc, ext: d.ext) }
         guard let root = try db.scalarText("SELECT path FROM sources WHERE id = ?", [.int(d.source)]), let rel = d.relativePath,
               Self.isSafeRelativePath(rel) else { return nil }
-        return URL(fileURLWithPath: root).appendingPathComponent(rel)
+        return Self.contained(rel, in: root)
+    }
+
+    /// `rel` under `root`, both through realpath(3): the resolved file if it
+    /// lies inside the resolved root, else nil (gone, or outside).
+    static func contained(_ rel: String, in root: String) -> URL? {
+        func real(_ path: String) -> String? {
+            guard let p = realpath(path, nil) else { return nil }
+            defer { free(p) }
+            return String(cString: p)
+        }
+        guard let base = real(root), let target = real((root as NSString).appendingPathComponent(rel)) else { return nil }
+        let prefix = base.hasSuffix("/") ? base : base + "/"
+        guard target.hasPrefix(prefix), target.count > prefix.count else { return nil }
+        return URL(fileURLWithPath: target)
     }
 
     /// A path inside its folder: relative, no `.`/`..` component, no NUL.
@@ -363,6 +402,7 @@ public final class ProjectIndex {
                 try point("reindex.deleted")
                 try db.run("DELETE FROM vec_blocks WHERE doc = ?", [.int(job.doc)])
                 if db.changes > 0 { try bump("vec_epoch", by: 1) }
+                try db.run("DELETE FROM vec_progress WHERE doc = ?", [.int(job.doc)])
                 try bump("churn", by: old)
             } else {
                 guard d.status == .extracting, d.rev == job.rev else { throw ProjectIndexError.stale(job.doc) }
@@ -472,6 +512,8 @@ public final class ProjectIndex {
             try db.run("UPDATE vec_sets SET active = 0 WHERE active = 1")
             try db.run("UPDATE vec_sets SET active = 1 WHERE set_id = ?", [.int(set)])
             try db.run("DELETE FROM vec_blocks WHERE set_id != ?", [.int(set)])
+            try db.run("DELETE FROM vec_chunks WHERE set_id != ?", [.int(set)])
+            try db.run("DELETE FROM vec_progress WHERE set_id != ?", [.int(set)])
             try db.run("DELETE FROM vec_sets WHERE set_id != ?", [.int(set)])
             try bump("vec_epoch", by: 1)
             for doc in try db.rows("SELECT doc FROM documents WHERE status IN ('searchable','embedded')", [], { $0.int(0) }) {
@@ -488,43 +530,68 @@ public final class ProjectIndex {
         return try docs.filter { try !pendingChunks(doc: $0, set: set, limit: 1).isEmpty }
     }
 
-    private func coveredChunks(doc: Int64, rev: Int64, set: Int64) throws -> Set<Int64> {
-        var covered = Set<Int64>()
-        let st = try db.cached("SELECT chunk_ids FROM vec_blocks WHERE set_id = ? AND doc = ? AND rev = ?")
-        defer { st.reset() }
-        try st.bind([.int(set), .int(doc), .int(rev)])
-        while try st.step() { covered.formUnion(DenseVectors.decodeIDs(st.blob(0))) }
-        return covered
+    /// Where the document's next batch starts: every chunk of `rev` before
+    /// this ord has a vector of `set` (0 without progress of that revision).
+    private func embeddedUpTo(doc: Int64, rev: Int64, set: Int64) throws -> Int64 {
+        try db.scalarInt("SELECT next_ord FROM vec_progress WHERE set_id = ? AND doc = ? AND rev = ?", [.int(set), .int(doc), .int(rev)]) ?? 0
     }
 
     /// Up to `limit` chunks of the document's current revision without a
     /// vector of `set`, in order: the heading path and the verbatim text.
+    /// Starts at the progress cursor, so a batch costs its own size, not
+    /// the chunks embedded before it.
     public func pendingChunks(doc: Int64, set: Int64, limit: Int) throws -> [PendingChunk] {
         guard let rev = try db.scalarInt("SELECT rev FROM documents WHERE doc = ? AND status IN ('searchable','embedded')", [.int(doc)]) else {
             return []
         }
-        let covered = try coveredChunks(doc: doc, rev: rev, set: set)
+        let from = try embeddedUpTo(doc: doc, rev: rev, set: set)
         var out: [PendingChunk] = []
         let st = try db.cached("""
             SELECT c.id, c.heading, substr(p.text, c.start + 1, c.len) FROM chunks c
             JOIN pages p ON p.doc = c.doc AND p.rev = c.rev AND p.page = c.page
-            WHERE c.doc = ? AND c.rev = ? ORDER BY c.ord
+            WHERE c.doc = ?1 AND c.rev = ?2 AND c.ord >= ?3
+              AND NOT EXISTS (SELECT 1 FROM vec_chunks v WHERE v.chunk = c.id AND v.set_id = ?4)
+            ORDER BY c.ord LIMIT ?5
             """)
         defer { st.reset() }
-        try st.bind([.int(doc), .int(rev)])
-        while out.count < limit, try st.step() {
-            let id = st.int(0)
-            guard !covered.contains(id) else { continue }
+        try st.bind([.int(doc), .int(rev), .int(from), .int(set), .int(Int64(max(0, limit)))])
+        while try st.step() {
             let text = st.text(2)
-            out.append(PendingChunk(id: id, rev: rev, text: st.optionalText(1).map { $0 + "\n" + text } ?? text))
+            out.append(PendingChunk(id: st.int(0), rev: rev, text: st.optionalText(1).map { $0 + "\n" + text } ?? text))
         }
         return out
+    }
+
+    /// Moves the cursor past the chunks now covered, from where it was:
+    /// each chunk is passed once over the document's embedding. Returns
+    /// whether every chunk of the revision is covered.
+    private func advanceProgress(doc: Int64, rev: Int64, set: Int64) throws -> Bool {
+        var next = try embeddedUpTo(doc: doc, rev: rev, set: set)
+        var complete = true
+        let st = try db.cached("""
+            SELECT c.ord, EXISTS (SELECT 1 FROM vec_chunks v WHERE v.chunk = c.id AND v.set_id = ?4) FROM chunks c
+            WHERE c.doc = ?1 AND c.rev = ?2 AND c.ord >= ?3 ORDER BY c.ord
+            """)
+        try st.bind([.int(doc), .int(rev), .int(next), .int(set)])
+        while try st.step() {
+            guard st.int(1) != 0 else {
+                next = st.int(0)
+                complete = false
+                break
+            }
+            next = st.int(0) + 1
+        }
+        st.reset()
+        try db.run("INSERT OR REPLACE INTO vec_progress(set_id, doc, rev, next_ord) VALUES (?, ?, ?, ?)",
+                   [.int(set), .int(doc), .int(rev), .int(next)])
+        return complete
     }
 
     /// One embedding batch, one transaction, in blocks of ≤ 64 vectors; a
     /// crash costs this batch only. Chunks already covered are skipped (a
     /// repeated commit adds nothing). When the active set covers the whole
-    /// document it becomes `embedded`. Returns whether it is complete.
+    /// document it becomes `embedded`. Returns whether it is complete. Its
+    /// cost is the batch's, however much of the document is embedded.
     @discardableResult
     public func commitVectors(doc: Int64, rev: Int64, set: Int64, chunks: [Int64], vectors: [Float16]) throws -> Bool {
         guard let dim = try db.scalarInt("SELECT dim FROM vec_sets WHERE set_id = ?", [.int(set)]).map(Int.init) else {
@@ -534,11 +601,16 @@ public final class ProjectIndex {
         guard !overflow, vectors.count == expected else { throw ProjectIndexError.vectorMismatch(expected: expected, got: vectors.count) }
         return try db.transaction {
             guard let current = try document(doc), current.rev == rev, current.status.isSearchable else { throw ProjectIndexError.stale(doc) }
-            let valid = Set(try db.rows("SELECT id FROM chunks WHERE doc = ? AND rev = ?", [.int(doc), .int(rev)]) { $0.int(0) })
-            let covered = try coveredChunks(doc: doc, rev: rev, set: set)
+            // A chunk of this revision without a vector of the set yet: its
+            // row in vec_chunks is new (a duplicate in the batch isn't).
             var rows: [Int] = []
-            var seen = Set<Int64>()
-            for (i, id) in chunks.enumerated() where valid.contains(id) && !covered.contains(id) && seen.insert(id).inserted { rows.append(i) }
+            for (i, id) in chunks.enumerated() {
+                guard try db.scalarInt("SELECT 1 FROM chunks WHERE id = ? AND doc = ? AND rev = ?", [.int(id), .int(doc), .int(rev)]) != nil else {
+                    continue
+                }
+                try db.run("INSERT OR IGNORE INTO vec_chunks(chunk, set_id) VALUES (?, ?)", [.int(id), .int(set)])
+                if db.changes > 0 { rows.append(i) }
+            }
             let insert = try db.cached("INSERT INTO vec_blocks(set_id, doc, rev, n, chunk_ids, v) VALUES (?, ?, ?, ?, ?, ?)")
             for start in stride(from: 0, to: rows.count, by: Self.vectorsPerBlock) {
                 let block = rows[start..<min(rows.count, start + Self.vectorsPerBlock)]
@@ -550,7 +622,7 @@ public final class ProjectIndex {
                 try insert.step()
                 try point("embed.block")
             }
-            let complete = try pendingChunks(doc: doc, set: set, limit: 1).isEmpty
+            let complete = try advanceProgress(doc: doc, rev: rev, set: set)
             if complete, try activeVectorSet()?.id == set {
                 try db.run("UPDATE documents SET status = 'embedded' WHERE doc = ? AND status = 'searchable'", [.int(doc)])
             }
@@ -584,6 +656,7 @@ public final class ProjectIndex {
         try db.transaction {
             try db.run("DELETE FROM vec_blocks WHERE doc = ?", [.int(d.doc)])
             if db.changes > 0 { try bump("vec_epoch", by: 1) }
+            try db.run("DELETE FROM vec_progress WHERE doc = ?", [.int(d.doc)])
             let chunks = try db.scalarInt("SELECT count(*) FROM chunks WHERE doc = ?", [.int(d.doc)]) ?? 0
             try db.run("DELETE FROM chunks WHERE doc = ?", [.int(d.doc)])
             try bump("churn", by: chunks)
@@ -642,16 +715,27 @@ public final class ProjectIndex {
             let stagedName = "\(d.doc).\(d.ext)"
             staging.remove("\(d.doc).part")
             try? fm.removeItem(at: stagingDirectory.appendingPathComponent("\(d.doc).part"))
-            if fm.fileExists(atPath: final.path), !d.sha256.isEmpty {
-                if staging.remove(stagedName) != nil { try? fm.removeItem(at: stagingDirectory.appendingPathComponent(stagedName)) }
+            let stagedURL = stagingDirectory.appendingPathComponent(stagedName)
+            // A promoted copy counts only if it still hashes to what was
+            // recorded (a crash can leave it torn); then the staged one goes.
+            if fm.fileExists(atPath: final.path), !d.sha256.isEmpty, (try? Self.sha256(of: final)) == d.sha256 {
+                if staging.remove(stagedName) != nil { try? fm.removeItem(at: stagedURL) }
                 continue
             }
-            if staging.contains(stagedName), !d.sha256.isEmpty,
-               (try? Self.sha256(of: stagingDirectory.appendingPathComponent(stagedName))) == d.sha256 {
+            if staging.contains(stagedName), !d.sha256.isEmpty, (try? Self.sha256(of: stagedURL)) == d.sha256 {
                 try? fm.removeItem(at: final)
-                try fm.moveItem(at: stagingDirectory.appendingPathComponent(stagedName), to: final)
+                try fm.moveItem(at: stagedURL, to: final)
                 staging.remove(stagedName)
                 r.promoted += 1
+                continue
+            }
+            if fm.fileExists(atPath: final.path), !d.sha256.isEmpty {
+                // Promoted but damaged, no good copy left: kept (it's the
+                // only one) and failed, never dropped as an unfinished add.
+                if staging.remove(stagedName) != nil { try? fm.removeItem(at: stagedURL) }
+                try db.run("UPDATE documents SET status = 'failed', error = ? WHERE doc = ?",
+                           [.text("the copy is damaged (its hash doesn't match); add the file again"), .int(d.doc)])
+                r.damagedCopies += 1
                 continue
             }
             // The add never completed: its copy (if any) and its row go.
@@ -672,6 +756,7 @@ public final class ProjectIndex {
                 try db.run("DELETE FROM chunks WHERE doc = ? AND rev = ?", [.int(d.doc), .int(d.rev)])
                 try db.run("DELETE FROM pages WHERE doc = ? AND rev = ?", [.int(d.doc), .int(d.rev)])
                 try db.run("DELETE FROM vec_blocks WHERE doc = ? AND rev = ?", [.int(d.doc), .int(d.rev)])
+                try db.run("DELETE FROM vec_progress WHERE doc = ? AND rev = ?", [.int(d.doc), .int(d.rev)])
                 try db.run("UPDATE documents SET status = 'staged' WHERE doc = ?", [.int(d.doc)])
             }
             r.resetExtracting += 1
@@ -768,8 +853,9 @@ public final class ProjectIndex {
     /// Full compaction, first half (adr/0012, Maintenance): FTS `optimize`,
     /// free disk checked, `VACUUM INTO` a temp file, `quick_check` on it, the
     /// churn reset there, the marker written. The live file stays in use
-    /// until `CompactionSwap.swap`.
-    func prepareCompaction() throws {
+    /// until `CompactionSwap.swap`. Returns the file's `data_version` as of
+    /// just before the copy: any other connection's commit since changes it.
+    func prepareCompaction() throws -> Int64 {
         let storage = try storage()
         let needed = (storage.fileBytes + storage.walBytes) * 6 / 5
         if let free = freeSpace(), free < needed { throw ProjectIndexError.insufficientDisk(needed: needed, available: free) }
@@ -777,6 +863,7 @@ public final class ProjectIndex {
         let target = directory.appendingPathComponent(CompactionSwap.compactName)
         CompactionSwap.removeFamily(target)
         try point("compact.optimized")
+        let version = try dataVersion()
         do {
             try db.run("VACUUM INTO ?", [.text(target.path)])
             try point("compact.vacuumed")
@@ -789,6 +876,16 @@ public final class ProjectIndex {
             if !(error is SimulatedCrash) { CompactionSwap.removeFamily(target) }
             throw error
         }
+        return version
+    }
+
+    /// `PRAGMA data_version`: changes when another connection commits to the
+    /// file (this one's own commits don't count).
+    func dataVersion() throws -> Int64 { try db.scalarInt("PRAGMA data_version") ?? 0 }
+
+    private func reopen() throws {
+        db = try Self.openWriter(directory: directory)
+        db.owner = owner
     }
 
     /// Full compaction when this is the only connection (tests, tools). The
@@ -800,15 +897,27 @@ public final class ProjectIndex {
     /// `holdingOthers` runs the swap with every other connection to the file
     /// closed and new searches held, reopening them after (the registry
     /// does it on its reader queue).
+    /// The copy is installed only if nothing else committed to the file since
+    /// `VACUUM INTO` read it (`data_version` unchanged after the last
+    /// checkpoint) -- the project lock keeps other `ProjectIndex`es out, this
+    /// catches any other writer; else the copy is dropped and the error is
+    /// `changedDuringCompaction` (compact again later).
     func compact(holdingOthers: (() throws -> Void) throws -> Void) throws {
-        try prepareCompaction()
+        let version = try prepareCompaction()
         try holdingOthers {
-            do {
-                try checkpoint()
-            } catch {
+            func abandon() {
                 // Not swapped: the copy and its marker go, the live file stays.
                 try? FileManager.default.removeItem(at: directory.appendingPathComponent(CompactionSwap.markerName))
                 CompactionSwap.removeFamily(directory.appendingPathComponent(CompactionSwap.compactName))
+            }
+            do {
+                try checkpoint()
+                try point("compact.checkpointed")
+                guard try dataVersion() == version else { throw ProjectIndexError.changedDuringCompaction }
+            } catch let crash as SimulatedCrash {
+                throw crash
+            } catch {
+                abandon()
                 throw error
             }
             db.close()
@@ -819,11 +928,35 @@ public final class ProjectIndex {
             } catch {
                 // Whatever happened, the file in place is a complete index again.
                 try? CompactionSwap.recover(in: directory)
-                db = try Self.openWriter(directory: directory)
+                try reopen()
                 throw error
             }
-            db = try Self.openWriter(directory: directory)
+            try reopen()
         }
+    }
+}
+
+/// A project's exclusive ownership: an flock on `index.lock`, held for the
+/// owner's life. flock locks belong to the open file, not the process, so a
+/// second open in this process is refused like one in another; the kernel
+/// drops the lock when the process dies (no stale lock after a crash).
+final class ProjectLock {
+    private var fd: Int32
+
+    init(_ url: URL) throws {
+        fd = Darwin.open(url.path, O_RDWR | O_CREAT | O_CLOEXEC, 0o644)
+        guard fd >= 0 else { throw CocoaError(.fileWriteUnknown, userInfo: [NSFilePathErrorKey: url.path]) }
+        guard flock(fd, LOCK_EX | LOCK_NB) == 0 else {
+            let busy = errno == EWOULDBLOCK
+            Darwin.close(fd)
+            fd = -1
+            if busy { throw ProjectIndexError.inUse }
+            throw CocoaError(.fileWriteUnknown, userInfo: [NSFilePathErrorKey: url.path])
+        }
+    }
+
+    deinit {
+        if fd >= 0 { Darwin.close(fd) }
     }
 }
 

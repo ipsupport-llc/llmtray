@@ -201,7 +201,7 @@ final class ProjectIndexCrashTests: XCTestCase {
             XCTAssertEqual(try hits(idx, "бетамаркер"), markerChunks(w.bText, "бетамаркер"), point)
             XCTAssertEqual(try hits(idx, "альфамаркер"), 0, point)
             let leftovers = try FileManager.default.contentsOfDirectory(atPath: w.dir.path).filter {
-                $0.hasPrefix("index.") && !$0.hasPrefix("index.sqlite")
+                $0.hasPrefix("index.") && !$0.hasPrefix("index.sqlite") && $0 != ProjectIndex.lockName
             }
             XCTAssertEqual(leftovers, [], point)
             XCTAssertEqual(try idx.count("PRAGMA page_size"), 16384, point)

@@ -261,7 +261,11 @@ Application Support/LLMTray/projects/<projectID>/
   per embedding batch (≤ 64 vectors), committed batch by batch —
   `embedded` flips after the last, so a crash costs one batch;
   `vec_sets(set_id, model, dim, prep_version, active)` for an embedder
-  switch (one transaction flips `active`).
+  switch (one transaction flips `active`). `vec_chunks(chunk, set_id)`
+  says which chunks have a vector (a batch checks its own chunks, not
+  every block of the document) and `vec_progress(set_id, doc, rev,
+  next_ord)` where the next batch starts, so a batch costs the same at the
+  end of a 10k-chunk document as at its start.
 - `meta(schema, ...)`. A schema change builds a **new database beside
   the old one** (`index.next.sqlite`): documents migrated, derived
   tables rebuilt from copies and available linked sources, an
@@ -304,7 +308,9 @@ the file, delete the rows in a transaction. Re-index: rebuild the
 document's derived rows in one transaction; the old ones stay searchable
 until it commits. At project open a reconcile pass finishes or undoes
 every state: `.part` files and staged copies no row claims are deleted,
-a complete staged copy whose hash matches its row is promoted, `extracting` goes back
+a complete staged copy whose hash matches its row is promoted (a promoted
+copy of a still-`staged` row is re-hashed first: a torn one gives way to a
+matching staged copy, or, the only copy left, is kept and `failed`), `extracting` goes back
 to `staged`, `removing` is finished, embedding resumes. The spike
 killed a child at 16 points of add/remove/re-index: before reconcile a
 document was invisible or complete, after it no orphans or duplicates,
@@ -346,7 +352,12 @@ under `files/` are ever deleted.
 project (tabs don't: `ChatToolbox` is per tab) plus a read-only WAL
 connection for searches, so tabs don't queue behind an ingest. No
 `await` while a transaction is open: extract first, then write
-synchronously. The reader wasn't blocked by a 6k-chunk write (p50 44
+synchronously. The writer owns the project exclusively — an flock on
+`index.lock` from open to close, so a second writer (another handle, another
+process) is refused rather than racing a compaction swap, which also
+checks `data_version` and drops a copy older than the file. Each
+connection answers on its own queue only (a `ProjectIndex` or searcher
+leaked out of a registry closure throws instead of racing it). The reader wasn't blocked by a 6k-chunk write (p50 44
 vs 45 ms, no BUSY) and never saw uncommitted rows. But the WAL grows
 (60-350 MB for that transaction) and any open reader snapshot stalls
 the checkpoint, so readers reset statements at once, a TRUNCATE

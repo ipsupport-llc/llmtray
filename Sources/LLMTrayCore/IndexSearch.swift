@@ -159,7 +159,8 @@ public struct IndexPage: Equatable, Sendable {
 /// revision; each search runs in one read transaction (one snapshot) and
 /// ends it at once, so it never holds back a checkpoint.
 public final class IndexSearcher {
-    public let db: SQLiteConnection
+    /// Internal: in a registry handle it answers on the reader queue only.
+    let db: SQLiteConnection
     public private(set) var lastTimings = IndexSearchTimings()
 
     public init(db: SQLiteConnection) throws {
