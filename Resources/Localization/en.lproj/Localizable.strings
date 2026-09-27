@@ -270,6 +270,7 @@
 "Instructions for %@" = "Instructions for %@";
 "Instructions…" = "Instructions…";
 "It goes on in the background: you can continue." = "It goes on in the background: you can continue.";
+"It is being set up or updated. Try again once that's done." = "It is being set up or updated. Try again once that's done.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Its chats stay, back among the recents; the project's instructions and files are deleted.";
 "Its memory, in GB." = "Its memory, in GB.";
 "KV cache" = "KV cache";
@@ -612,7 +613,7 @@
 "The running model server is stopped and started again." = "The running model server is stopped and started again.";
 "The runtime" = "The runtime";
 "The runtime couldn't be set up." = "The runtime couldn't be set up.";
-"The runtime is being set up." = "The runtime is being set up.";
+"The runtime is busy." = "The runtime is busy.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
 "The server log" = "The server log";
@@ -642,7 +643,6 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Try Again" = "Try Again";
-"Try again once that's done." = "Try again once that's done.";
 "Turn on project files?" = "Turn on project files?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";

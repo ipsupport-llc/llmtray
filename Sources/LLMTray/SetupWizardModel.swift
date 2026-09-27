@@ -133,9 +133,9 @@ final class SetupWizardModel: ObservableObject {
             close?()
             return
         }
-        // The wizard's download runs into the folder applied: it stays
-        // until that's done (as the folder picker does).
-        if step == .modelsFolder, isWizardDownloadActive {
+        // The wizard's download runs into the folder applied (or is done
+        // there): the folder stays.
+        if step == .modelsFolder, isWizardDownloadActive || isWizardDownloadComplete {
             progress.choices.modelsFolder = progress.baseline.modelsFolder
             progress.step = .chatModel
             return

@@ -1243,8 +1243,8 @@ struct UpdatesPane: View {
 
     private func runtimeBusy() {
         let busy = NSAlert()
-        busy.messageText = NSLocalizedString("The runtime is being set up.", comment: "")
-        busy.informativeText = NSLocalizedString("Try again once that's done.", comment: "")
+        busy.messageText = NSLocalizedString("The runtime is busy.", comment: "")
+        busy.informativeText = NSLocalizedString("It is being set up or updated. Try again once that's done.", comment: "")
         busy.runModal()
     }
 }
