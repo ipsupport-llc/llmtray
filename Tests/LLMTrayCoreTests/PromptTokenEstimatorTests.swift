@@ -69,8 +69,11 @@ final class PromptTokenEstimatorTests: XCTestCase {
     func testImagesCountedApartAndNotCalibrated() {
         var e = PromptTokenEstimator()
         XCTAssertEqual(e.estimate(.init(bytes: 200, images: 2)), 100 + 2 * PromptTokenEstimator.tokensPerImage)
-        e.calibrate(.init(bytes: 4_000, images: 1), promptTokens: 2_000)
+        XCTAssertFalse(e.calibrate(.init(bytes: 4_000, images: 1), promptTokens: 2_000))
         XCTAssertNil(e.calibration, "an image's tokens aren't in the bytes")
+        XCTAssertTrue(e.calibrate(.init(bytes: 1_000), promptTokens: 300))
+        e.calibrate(.init(bytes: 4_000, images: 1), promptTokens: 2_000)
+        XCTAssertNil(e.calibration, "not the older request's count either")
         e.calibrate(.init(bytes: 4_000), promptTokens: 0)
         XCTAssertNil(e.calibration)
         e.calibrate(.init(bytes: 4_000), promptTokens: 1_000)

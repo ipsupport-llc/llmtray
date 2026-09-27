@@ -61,9 +61,15 @@ public struct PromptTokenEstimator: Equatable {
     }
 
     /// The server counted `promptTokens` for a request of this size. A
-    /// request with images isn't used: their tokens aren't in its bytes.
-    public mutating func calibrate(_ m: Measure, promptTokens: Int) {
-        guard m.images == 0, promptTokens > 0, m.bytes > 0 else { return }
+    /// request with images isn't used (their tokens aren't in its bytes):
+    /// then nothing is counted, not an older request. True when it's used.
+    @discardableResult
+    public mutating func calibrate(_ m: Measure, promptTokens: Int) -> Bool {
+        guard m.images == 0, promptTokens > 0, m.bytes > 0 else {
+            calibration = nil
+            return false
+        }
         calibration = Calibration(bytes: m.bytes, tokens: promptTokens)
+        return true
     }
 }
