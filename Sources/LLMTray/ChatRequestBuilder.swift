@@ -88,10 +88,8 @@ enum ChatRequestBuilder {
     /// citations without the file text. The current turn -- after the
     /// user's last message -- is kept whole.
     static func withoutEarlier(_ history: [ChatMessage], projectTools: Set<String>) -> [ChatMessage] {
-        let entries = history.map(\.historyEntry)
-        let dropped = HistoryPruning.earlierCallsToDrop(entries, projectTools: projectTools)
-        guard !dropped.isEmpty else { return history }
-        return zip(history, HistoryPruning.plan(entries, dropping: dropped)).compactMap { message, keptCalls in
+        guard let plan = HistoryPruning.plan(history.map(\.historyEntry), projectTools: projectTools) else { return history }
+        return zip(history, plan).compactMap { message, keptCalls in
             guard let keptCalls else { return nil }
             var kept = message
             kept.toolCalls.removeAll { !keptCalls.contains($0.id) }

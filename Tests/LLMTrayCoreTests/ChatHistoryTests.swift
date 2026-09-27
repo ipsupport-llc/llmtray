@@ -6,7 +6,7 @@ final class ChatHistoryTests: XCTestCase {
 
     /// The messages left, as the kept calls of each (nil: left out).
     func apply(_ entries: [HistoryEntry]) -> [[String]?] {
-        HistoryPruning.plan(entries, dropping: HistoryPruning.earlierCallsToDrop(entries, projectTools: projectTools))
+        HistoryPruning.plan(entries, projectTools: projectTools) ?? entries.map { $0.toolCalls.map(\.id) }
     }
 
     func assistant(_ calls: [(String, String)], content: Bool = false) -> HistoryEntry {
@@ -22,7 +22,7 @@ final class ChatHistoryTests: XCTestCase {
 
     func testOrdinaryChatUntouched() {
         let entries = [user, assistant([("w", "get_weather")]), tool("w"), answer, user]
-        XCTAssertEqual(HistoryPruning.earlierCallsToDrop(entries, projectTools: projectTools), [])
+        XCTAssertNil(HistoryPruning.plan(entries, projectTools: projectTools), "nothing dropped: the history as it is")
         XCTAssertEqual(apply(entries), [[], ["w"], [], [], []])
     }
 
@@ -42,6 +42,15 @@ final class ChatHistoryTests: XCTestCase {
         let entries = [user, assistant([("g", "generate_image")]), tool("g", refused: true), answer, user,
                        assistant([("g2", "generate_image")]), tool("g2", refused: true)]
         XCTAssertEqual(apply(entries), [[], nil, nil, [], [], ["g2"], []])
+    }
+
+    /// A model reusing a call id in another turn: only the project call and
+    /// its own result go.
+    func testReusedCallIDScopedToItsMessage() {
+        let entries = [user, assistant([("call_1", "get_weather")]), tool("call_1"), answer,
+                       user, assistant([("call_1", "search_project_files")]), tool("call_1"), answer,
+                       user]
+        XCTAssertEqual(apply(entries), [[], ["call_1"], [], [], [], nil, nil, [], []])
     }
 
     func testNoUserMessageNothingDropped() {

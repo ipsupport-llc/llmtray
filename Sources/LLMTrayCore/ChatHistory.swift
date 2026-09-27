@@ -42,35 +42,48 @@ public enum HistoryPruning {
         entries.lastIndex { $0.role == "user" && !$0.isToolContext }
     }
 
-    /// Calls of earlier turns to leave out, with their results: refused
-    /// ones (read back, "not run" made small models think the image was
-    /// never made), and project tool calls -- a saved chat has none of
-    /// them, so a live one sends what it would after a reload, and old
-    /// file text doesn't pile up turn after turn.
-    public static func earlierCallsToDrop(_ entries: [HistoryEntry], projectTools: Set<String>) -> Set<String> {
-        guard let start = turnStart(entries) else { return [] }
-        var ids: Set<String> = []
-        for entry in entries[..<start] {
-            if entry.isRefusal, let id = entry.toolCallID { ids.insert(id) }
-            for call in entry.toolCalls where projectTools.contains(call.name) { ids.insert(call.id) }
+    /// Earlier turns without the tool calls that don't belong in later
+    /// requests, each with its result: refused ones (read back, "not run"
+    /// made small models think the image was never made), and project tool
+    /// calls -- a saved chat has none of them, so a live one sends what it
+    /// would after a reload, and old file text doesn't pile up turn after
+    /// turn. Per message: `nil` leaves it out, else the ids of its calls to
+    /// keep. The current turn is kept whole; an assistant message that was
+    /// only dropped calls goes (its answer, if it had one, stays). A call
+    /// is its message's: a model may reuse an id in another round, and a
+    /// result belongs to the latest call with its id before it. nil when
+    /// nothing is dropped.
+    public static func plan(_ entries: [HistoryEntry], projectTools: Set<String>) -> [[String]?]? {
+        guard let start = turnStart(entries) else { return nil }
+        // The message each earlier result answers, and the calls to drop.
+        var owner: [Int: Int] = [:]
+        var latest: [String: Int] = [:]
+        var dropped: Set<CallKey> = []
+        for (i, entry) in entries[..<start].enumerated() {
+            for call in entry.toolCalls {
+                latest[call.id] = i
+                if projectTools.contains(call.name) { dropped.insert(CallKey(message: i, id: call.id)) }
+            }
+            if entry.role == "tool", let id = entry.toolCallID, let o = latest[id] {
+                owner[i] = o
+                if entry.isRefusal { dropped.insert(CallKey(message: o, id: id)) }
+            }
         }
-        return ids
-    }
-
-    /// What to do with each message given the calls to drop: `nil` leaves
-    /// it out, else the ids of its calls to keep. The current turn is kept
-    /// whole; an assistant message that was only dropped calls goes (its
-    /// answer, if it had one, stays).
-    public static func plan(_ entries: [HistoryEntry], dropping ids: Set<String>) -> [[String]?] {
-        let start = turnStart(entries) ?? 0
+        guard !dropped.isEmpty else { return nil }
         return entries.enumerated().map { i, entry in
             let all = entry.toolCalls.map(\.id)
-            guard i < start, !ids.isEmpty else { return all }
-            if entry.role == "tool", let id = entry.toolCallID, ids.contains(id) { return nil }
-            let kept = all.filter { !ids.contains($0) }
+            guard i < start else { return all }
+            if entry.role == "tool", let id = entry.toolCallID, let o = owner[i], dropped.contains(CallKey(message: o, id: id)) { return nil }
+            let kept = all.filter { !dropped.contains(CallKey(message: i, id: $0)) }
             if entry.role == "assistant", kept.isEmpty, !all.isEmpty, !entry.hasContent { return nil }
             return kept
         }
+    }
+
+    /// A call: the message it's in, and its id.
+    private struct CallKey: Hashable {
+        var message: Int
+        var id: String
     }
 }
 
