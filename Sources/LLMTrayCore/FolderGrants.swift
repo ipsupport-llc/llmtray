@@ -158,11 +158,13 @@ public final class FolderGrants: @unchecked Sendable {
         return g
     }
 
-    /// Removes a grant; a standing one is removed on disk first (a revoke
-    /// that didn't stick throws and changes nothing).
+    /// Removes a grant -- a `once` grant already used by its call too, so
+    /// the change it proposed is no longer covered; a standing one is removed
+    /// on disk first (a revoke that didn't stick throws and changes nothing).
     public func revoke(_ id: UUID) throws {
         lock.lock()
         defer { lock.unlock() }
+        consumedOnce.removeAll { $0.id == id }
         guard let i = grants.firstIndex(where: { $0.id == id }) else { return }
         let removed = grants.remove(at: i)
         if removed.lifetime.isStanding {

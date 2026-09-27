@@ -317,7 +317,7 @@ public struct ChangePlanner {
     func checkNoProtectedInside(_ entry: FolderEntry, parent: OpenedDirectory, root: FolderRoot, display: String) throws {
         guard entry.kind == .directory || entry.kind == .package else { return }
         let walker = SafeFolderWalker(root: root, denylist: denylist)
-        switch walker.protectedContents(in: parent, entry.name, budget: protectedCheckBudget) {
+        switch walker.protectedContents(in: parent, entry.name, budget: protectedCheckBudget, expecting: entry.identity) {
         case .none: return
         case .found: throw FolderAccessError.containsProtected(display)
         case .unchecked: throw FolderAccessError.uncheckable(display)

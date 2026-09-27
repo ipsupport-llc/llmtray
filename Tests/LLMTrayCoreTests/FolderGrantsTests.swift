@@ -202,6 +202,12 @@ extension FolderGrantsTests {
         let check = g.changeCheck(chatID: "c")
         XCTAssertTrue(check(FolderLocation(root: docs, components: ["a"]), "call-1"))
         XCTAssertFalse(check(FolderLocation(root: docs, components: ["a"]), "call-2"))
+        // A used-up once can still be revoked: its proposal stops being covered.
+        let revocable = try g.grant(docs, level: .change, lifetime: .once(callKey: "call-5", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertNotNil(g.authorize(path: docs.path + "/r", level: .change, chatID: "c", callKey: "call-5", now: t0))
+        XCTAssertTrue(g.coversChange(path: docs.path + "/r", chatID: "c", proposal: "call-5", now: t0))
+        try g.revoke(revocable.id)
+        XCTAssertFalse(g.coversChange(path: docs.path + "/r", chatID: "c", proposal: "call-5", now: t0))
         // An unconsumed once is bound to its key as well.
         try g.grant(downloads, level: .change, lifetime: .once(callKey: "call-3", chatID: "c"), chatID: "c", now: t0)
         XCTAssertFalse(g.coversChange(path: downloads.path, chatID: "c", proposal: "call-4", now: t0))

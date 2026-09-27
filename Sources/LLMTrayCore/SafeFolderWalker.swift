@@ -280,14 +280,23 @@ public struct SafeFolderWalker {
     /// flagged and isn't changed as a whole. Walked by descriptors (no
     /// symlink followed, packages entered: their contents move with them),
     /// at most `budget` entries; past it, or where a folder can't be read,
-    /// the answer is `.unchecked`.
-    public func protectedContents(in parent: OpenedDirectory, _ name: String, budget: Int = 200_000) -> ProtectedContents {
-        protectedScan(in: parent, name, budget: budget).result
+    /// the answer is `.unchecked`. With `expecting`, the folder must be that
+    /// one -- when the scan starts and still under `name` when it ends --
+    /// else `.unchecked` too.
+    public func protectedContents(in parent: OpenedDirectory, _ name: String, budget: Int = 200_000,
+                                  expecting: FileIdentity? = nil) -> ProtectedContents {
+        let r = protectedScan(in: parent, name, budget: budget, expecting: expecting).result
+        if let expecting, r != .found, (try? Posix.lstatAt(parent.descriptor.fd, name))?.identity != expecting {
+            return .unchecked
+        }
+        return r
     }
 
     /// `protectedContents`, with the entries it read.
-    func protectedScan(in parent: OpenedDirectory, _ name: String, budget: Int) -> (result: ProtectedContents, read: Int) {
+    func protectedScan(in parent: OpenedDirectory, _ name: String, budget: Int,
+                       expecting: FileIdentity? = nil) -> (result: ProtectedContents, read: Int) {
         guard let st = try? Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory,
+              expecting == nil || st.identity == expecting,
               let base = parent.descriptor.currentPath else { return (.unchecked, 0) }
         var remaining = budget
         func done(_ r: ProtectedContents) -> (result: ProtectedContents, read: Int) { (r, budget - max(0, remaining)) }

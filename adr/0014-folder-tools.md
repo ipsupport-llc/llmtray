@@ -122,13 +122,14 @@ These override anything looser above, too.
     id and journaled before it is made. A recovery pass -- when the journal
     is opened, and before every undo -- puts an interrupted item found
     under such a name back under its own name (by identity, exclusively; a
-    name taken since leaves it there, reported) and removes the empty
-    staging folder; nothing else is touched. A staging folder's identity is
-    journaled right after it is made, before anything is moved into it or
-    published from it: recovery removes only the folder with that identity,
-    and when the crash came before it was journaled removes nothing (only the
-    item itself, found in it by identity, goes back; the folder is reported
-    as left behind). Recovery acts only on interrupted items -- the names of
+    name taken since leaves it there, reported); nothing else is touched.
+    A staging folder's identity is journaled right after it is made, before
+    anything is moved into it or published from it: recovery takes the item
+    out only of the folder with that identity (before it was journaled, only
+    an item found in it by identity). The folder itself is never removed by
+    recovery -- removal goes by name, and a folder swapped in between the
+    check and the removal would go instead -- but reported as left behind
+    (hidden, empty once the item is back). Recovery acts only on interrupted items -- the names of
     settled ones are never touched -- and, like undo, only through folders
     still inside the grant, checked before and after each step (a put-back
     whose folder left is taken back).

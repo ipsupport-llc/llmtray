@@ -347,7 +347,10 @@ public struct ChangeExecutor {
                         return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
                                              trashURL: nil, components: comps + [name])
                     }
-                    if Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: s.identity) {
+                    // Only the item goes back (the scan held it to its
+                    // identity; something swapped in since stays put).
+                    if (try? Posix.lstatAt(dst.descriptor.fd, name))?.identity == s.identity,
+                       Self.renameBack(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, expecting: s.identity) {
                         throw why
                     }
                     throw Uncertain(description: "\(why), and it couldn't be moved back from \(d.location.relativePath)")
@@ -378,7 +381,7 @@ public struct ChangeExecutor {
     private func protectedInside(_ s: CapturedSource, in dir: OpenedDirectory, _ name: String) -> FolderAccessError? {
         guard s.kind == .directory || s.kind == .package else { return nil }
         switch SafeFolderWalker(root: s.location.root, denylist: denylist)
-            .protectedContents(in: dir, name, budget: protectedCheckBudget) {
+            .protectedContents(in: dir, name, budget: protectedCheckBudget, expecting: s.identity) {
         case .none: return nil
         case .found: return .containsProtected(s.location.relativePath)
         case .unchecked: return .uncheckable(s.location.relativePath)
@@ -429,7 +432,8 @@ public struct ChangeExecutor {
         /// The item back from the staging folder under its name, the folder
         /// gone: then `why` is a plain failure.
         func unstage(_ why: Error) throws -> Never {
-            if Self.renameBack(staging.fd, name, pfd, name, expecting: s.identity), dropStaging() { throw why }
+            if (try? Posix.lstatAt(staging.fd, name))?.identity == s.identity,
+               Self.renameBack(staging.fd, name, pfd, name, expecting: s.identity), dropStaging() { throw why }
             throw Uncertain(description: "\(why); \(rel) may be left in \(stagingName)")
         }
         if renameatx_np(pfd, name, staging.fd, name, UInt32(RENAME_EXCL)) != 0 {

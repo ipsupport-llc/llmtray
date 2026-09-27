@@ -167,20 +167,22 @@ final class FolderSecurityReviewTests: FolderTestCase {
             let r = undoer.recover(plan.plan.id)
             XCTAssertEqual(r.restored, [plan.plan.items[0].id], "\(step): \(r)")
             XCTAssertEqual(try String(contentsOfFile: grant + "/t/" + name), "mine", "\(step)")
-            XCTAssertEqual(staging("t"), [], "\(step)")
+            // The staging folder, once made, is left (never removed by name).
+            XCTAssertEqual(staging("t").contains(expected), step != .staged, "\(step)")
+            XCTAssertEqual(r.leftBehind[plan.plan.items[0].id] != nil, step != .staged, "\(step): \(r)")
             guard case .failed = state(plan) else { return XCTFail("\(step): \(String(describing: state(plan)))") }
             XCTAssertEqual(undoer.recover(plan.plan.id), .init(planID: plan.plan.id), "a second pass finds nothing")
         }
     }
 
-    func testATrashCrashedAfterTheTrashTookItLeavesItThereAndCleansUp() throws {
+    func testATrashCrashedAfterTheTrashTookItLeavesItThere() throws {
         write("t/x.txt", "x")
         let plan = try crashed([rm("t/x.txt")], at: .trashed)
         XCTAssertEqual(staging("t").count, 1)
         let r = undoer.recover(plan.plan.id)
-        XCTAssertEqual(r.cleaned, [plan.plan.items[0].id])
+        XCTAssertNotNil(r.leftBehind[plan.plan.items[0].id], "\(r)")
         XCTAssertEqual(r.restored, [])
-        XCTAssertEqual(staging("t"), [])
+        XCTAssertEqual(staging("t").count, 1, "the empty staging folder is reported, not removed")
         XCTAssertFalse(exists("t/x.txt"))
         XCTAssertEqual(try fm.contentsOfDirectory(atPath: base + "/Trash").count, 1, "still in the Trash")
         XCTAssertEqual(state(plan), .incomplete, "its outcome still needs a look")
@@ -210,13 +212,15 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertFalse(exists("t/x.txt"))
     }
 
-    func testAMakeDirCrashedWithItsStagingFolderIsCleanedUp() throws {
+    func testAMakeDirCrashedWithItsStagingFolderIsSettled() throws {
         let plan = try crashed([md("New")], at: .stagingJournaled)
         XCTAssertEqual(staging().count, 1)
         let recoveries = undoer.recoverInterrupted()
         XCTAssertEqual(recoveries.map(\.planID), [plan.plan.id], "found when the journal is opened")
         XCTAssertEqual(recoveries.first?.restored, [plan.plan.items[0].id])
-        XCTAssertEqual(staging(), [])
+        XCTAssertNotNil(recoveries.first?.leftBehind[plan.plan.items[0].id])
+        XCTAssertEqual(staging().count, 1, "reported, not removed")
+        XCTAssertEqual(undoer.recoverInterrupted(), [], "settled: reported once")
         XCTAssertFalse(exists("New"))
         guard case .failed = state(plan) else { return XCTFail() }
     }
@@ -296,7 +300,6 @@ final class FolderSecurityReviewTests: FolderTestCase {
         let r = undoer.recover(plan.plan.id)
         XCTAssertEqual(r.restored, [id], "the item never moved: nothing changed")
         XCTAssertNotNil(r.leftBehind[id], "\(r)")
-        XCTAssertEqual(r.cleaned, [])
         XCTAssertEqual(staging("t"), [name], "a folder of unknown origin is left")
         XCTAssertEqual(try String(contentsOfFile: grant + "/t/x.txt"), "mine")
         guard case .failed = state(plan) else { return XCTFail("\(String(describing: state(plan)))") }
@@ -346,7 +349,6 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertNotEqual(identity(grant + "/t/" + name), old)
         let r = undoer.recover(plan.plan.id)
         XCTAssertNotNil(r.needsLook[plan.plan.items[0].id], "\(r)")
-        XCTAssertEqual(r.cleaned, [])
         XCTAssertTrue(exists("t/" + name), "not the folder that was made")
         XCTAssertEqual(state(plan), .incomplete)
     }
@@ -422,14 +424,22 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertFalse(fm.fileExists(atPath: outside + "/r/readme.txt"))
     }
 
-    func testRecoveryDoesntRemoveAStagingFolderThatLeftTheGrant() throws {
-        write("t/x.txt", "x")
-        let plan = try crashed([rm("t/x.txt")], at: .trashed)
+    func testRecoveryTakesBackWhatWasSwappedInForTheItem() throws {
+        write("t/x.txt", "mine")
+        let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
         let name = StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id)
-        let r = movedOut(.beforeRemove).recover(plan.plan.id)
-        XCTAssertEqual(r.cleaned, [])
-        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("left the grant") ?? false, "\(r)")
-        XCTAssertTrue(fm.fileExists(atPath: outside + "/t/" + name))
+        var u = undoer
+        u.recoveryHook = { p, _ in
+            // Swapped right after the rename: what arrived isn't the item.
+            guard p == .afterRename else { return }
+            try? self.fm.moveItem(atPath: self.grant + "/t/x.txt", toPath: self.outside + "/x.txt")
+            self.write("t/x.txt", "decoy")
+        }
+        let r = u.recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [])
+        XCTAssertNotNil(r.needsLook[plan.plan.items[0].id], "\(r)")
+        XCTAssertFalse(exists("t/x.txt"), "the decoy went back where it came from")
+        XCTAssertEqual(try String(contentsOfFile: grant + "/t/\(name)/x.txt"), "decoy")
     }
 
     // MARK: 2d. Denied items added between the scan and the rename
@@ -458,7 +468,16 @@ final class FolderSecurityReviewTests: FolderTestCase {
         let r = undoer.undo(plan.plan.id)
         XCTAssertEqual(r.undone, [])
         XCTAssertEqual(try String(contentsOfFile: grant + "/u.txt"), "u")
-        XCTAssertEqual(staging(), [])
+        XCTAssertEqual(staging().count, 1, "its empty staging folder is reported, not removed")
+    }
+
+    func testTheProtectedScanIsHeldToTheItemsIdentity() throws {
+        write("p/a.txt", "a")
+        write("q/a.txt", "a")
+        let dir = try walker.openRoot()
+        let p = try XCTUnwrap(identity(grant + "/p"))
+        XCTAssertEqual(walker.protectedContents(in: dir, "p", expecting: p), ProtectedContents.none)
+        XCTAssertEqual(walker.protectedContents(in: dir, "q", expecting: p), .unchecked, "another folder under the name")
     }
 
     // MARK: 3. Put Back
