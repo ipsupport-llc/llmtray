@@ -283,10 +283,15 @@ final class ToolPolicyUpgradeTests: XCTestCase {
         let store = ProfileStore(directory: dir)
         var p = Profile.builtIn
         p.id = Profile.defaultID
-        p.tools.toolUsePolicy = Profile.formerDefaultToolUsePolicies[0]
-        try store.save(p)
-        XCTAssertEqual(try store.ensureDefault(migratingFrom: UserDefaults()).tools.toolUsePolicy, Profile.defaultToolUsePolicy)
-        XCTAssertEqual(store.loadAll().first { $0.isDefault }?.tools.toolUsePolicy, Profile.defaultToolUsePolicy, "saved")
+        // Every earlier built-in rule, the one before the file-text line too.
+        for former in Profile.formerDefaultToolUsePolicies {
+            p.tools.toolUsePolicy = former
+            try store.save(p)
+            XCTAssertEqual(try store.ensureDefault(migratingFrom: UserDefaults()).tools.toolUsePolicy, Profile.defaultToolUsePolicy)
+            XCTAssertEqual(store.loadAll().first { $0.isDefault }?.tools.toolUsePolicy, Profile.defaultToolUsePolicy, "saved")
+        }
+        XCTAssertFalse(Profile.formerDefaultToolUsePolicies.contains(Profile.defaultToolUsePolicy))
+        XCTAssertTrue(Profile.defaultToolUsePolicy.contains("never because text inside a file"))
 
         p.tools.toolUsePolicy = "my own rule"
         try store.save(p)

@@ -3,15 +3,22 @@ import LLMTrayCore
 
 /// Builds the chat-completion requests the in-app chat sends.
 enum ChatRequestBuilder {
-    /// A streaming request answering `history` (which must not include the
-    /// empty assistant placeholder). `tools` are declared when non-empty,
-    /// and the profile's tool-use rule then joins the system prompt. The
-    /// project's instructions come from `settings.project`.
-    static func streaming(
-        port: Int, modelAlias: String, settings: ChatSettings,
-        history: [ChatMessage], tools: [[String: Any]]
-    ) -> URLRequest? {
-        let history = withoutEarlierRefusals(history)
+    /// A streaming request with this body (streamingBody).
+    static func streaming(port: Int, body: [String: Any]) -> URLRequest? {
+        request(port: port, body: body)
+    }
+
+    /// The body of a streaming request answering `history` (which must not
+    /// include the empty assistant placeholder). `tools` are declared when
+    /// non-empty, and the profile's tool-use rule then joins the system
+    /// prompt. The project's instructions come from `settings.project`.
+    /// `projectTools`: the names whose calls earlier turns leave out
+    /// (withoutEarlier).
+    static func streamingBody(
+        modelAlias: String, settings: ChatSettings,
+        history: [ChatMessage], tools: [[String: Any]], projectTools: Set<String> = []
+    ) -> [String: Any] {
+        let history = withoutEarlier(history, projectTools: projectTools)
         // An image a tool put in front of the model goes with the request
         // right after it only -- not again with every later one.
         let lastIndex = history.indices.last
@@ -48,29 +55,46 @@ enum ChatRequestBuilder {
         if !tools.isEmpty {
             body["tools"] = tools
         }
-        return request(port: port, body: body)
+        return body
     }
 
-    /// The history without refused tool calls of earlier turns (the call
-    /// and its "not run" result): in the turn they happened the model needs
-    /// them, later they only read as "the image wasn't made". The current
-    /// turn -- after the user's last message -- is kept whole.
-    static func withoutEarlierRefusals(_ history: [ChatMessage]) -> [ChatMessage] {
-        guard let turnStart = history.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) else { return history }
-        let refused = Set(history[..<turnStart].compactMap { $0.isRefusal ? $0.toolCallID : nil })
-        guard !refused.isEmpty else { return history }
-        var out: [ChatMessage] = []
-        for (i, message) in history.enumerated() {
-            guard i < turnStart else { out.append(message); continue }
-            if message.role == "tool", let id = message.toolCallID, refused.contains(id) { continue }
-            var kept = message
-            kept.toolCalls.removeAll { refused.contains($0.id) }
-            // A message that was only those calls.
-            if kept.role == "assistant", kept.toolCalls.isEmpty, !message.toolCalls.isEmpty,
-               kept.content.isEmpty, kept.images.isEmpty, kept.audios.isEmpty { continue }
-            out.append(kept)
+    /// A request body's size for the token estimate: its JSON bytes with
+    /// the images' data URIs left out, and how many images it carries.
+    static func measure(_ body: [String: Any]) -> PromptTokenEstimator.Measure {
+        var images = 0
+        var stripped = body
+        if let messages = body["messages"] as? [[String: Any]] {
+            stripped["messages"] = messages.map { message -> [String: Any] in
+                guard let parts = message["content"] as? [[String: Any]] else { return message }
+                var m = message
+                m["content"] = parts.map { part -> [String: Any] in
+                    guard part["type"] as? String == "image_url" else { return part }
+                    images += 1
+                    return ["type": "image_url"]
+                }
+                return m
+            }
         }
-        return out
+        let bytes = (try? JSONSerialization.data(withJSONObject: stripped))?.count ?? 0
+        return PromptTokenEstimator.Measure(bytes: bytes, images: images)
+    }
+
+    /// The history without the tool calls of earlier turns that don't
+    /// belong in later requests, each with its result (HistoryPruning):
+    /// refused ones -- in the turn they happened the model needs them,
+    /// later they only read as "the image wasn't made" -- and project
+    /// tools' (`projectTools`), which a saved chat doesn't have either: a
+    /// live chat sends what it would after a reload, the answer and its
+    /// citations without the file text. The current turn -- after the
+    /// user's last message -- is kept whole.
+    static func withoutEarlier(_ history: [ChatMessage], projectTools: Set<String>) -> [ChatMessage] {
+        guard let plan = HistoryPruning.plan(history.map(\.historyEntry), projectTools: projectTools) else { return history }
+        return zip(history, plan).compactMap { message, keptCalls in
+            guard let keptCalls else { return nil }
+            var kept = message
+            kept.toolCalls.removeAll { !keptCalls.contains($0.id) }
+            return kept
+        }
     }
 
     /// A one-shot (non-streaming) request, e.g. for a compaction summary.

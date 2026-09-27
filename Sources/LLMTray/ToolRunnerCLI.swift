@@ -30,6 +30,7 @@ enum ToolRunnerCLI {
             switch await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: [])) {
             case .text(let text), .refused(let text): print(text)
             case .generatedImage(_, _, _, let text), .generatedAudio(_, _, _, let text), .imageForModel(_, let text): print(text)
+            case .projectText(let output): print(output.rendered(byteBudget: 1 << 30).text)
             }
             exit(0)
         }

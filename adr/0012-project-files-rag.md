@@ -146,6 +146,27 @@ compact or start a new chat", and search/read stop being declared for
 the turn — as spent generators are ([0007](0007-chat-tools.md));
 listing stays. Tested with a long chat and repeated searches.
 
+Built (PR 3.3, `PromptTokenEstimator`, `ProjectTextBudget`): the fork's
+mlx_lm.server (pin `e1a05ac`) answers `include_usage` in streams too — a
+last chunk with `prompt_tokens` = the whole prompt (`len(ctx.prompt)`,
+the cached part included; `cached_tokens` apart). The next request of a
+tool round is that count plus what was added since (the call, the
+results, grown declarations) at 2 bytes/token — new file text may
+tokenize worse than the chat so far; anything else (nothing counted, a
+request with images) is the whole request at 2. No chat-average ratio is
+applied to new text: a request that got smaller (tools no longer
+declared) while adding dense file text would be undercounted (Codex).
+Images count 1,536 tokens each,
+their data URIs left out of the bytes, and a request with images doesn't
+calibrate. Measured on the local tokenizers (Gemma 4, Qwen3, Llama 3.2,
+Mistral v0.3, Phi-3.5, DeepSeek-Coder-V2-Lite, LFM2.5, Falcon3): Russian
+2.1-6.9 bytes/token (Falcon3 the lowest), English 4.1-4.6, code 2.8-3.6
+— 2 never undercounts. Hard cap 8,000 tokens a result, 256 the least
+worth sending. A project tool opts in with `ChatTool.projectAccess`
+(`.listing` / `.fileText`) and returns `ToolResult.projectText` —
+`ProjectToolOutput`: hits with an id (dedup), doc, rev, page, chunk,
+name, heading and text, plus text before and after them.
+
 **Earlier results.** Live chats resend old tool messages every turn;
 saved chats drop them (`persistCurrentSession` skips `role == "tool"`),
 so a reloaded chat would lose its evidence and a live one grow ~5-10k
@@ -153,7 +174,9 @@ tokens per search. A `withoutEarlierProjectResults` step, beside
 `withoutEarlierRefusals`, drops earlier turns' project tool calls and
 their results together, leaving the answer (with its citations): what a
 reloaded chat has, so the request is the same live and reloaded. The
-model searches again when it needs the text.
+model searches again when it needs the text. (Built as one step with the
+refusals: `ChatRequestBuilder.withoutEarlier`, the logic in
+`LLMTrayCore.HistoryPruning`.)
 
 **Trust**, deterministic. File names and every other project tool
 result (listing included) count as file text. What this guarantees is
@@ -187,7 +210,9 @@ only, and resolved against the project they were made in — never the
 chat's current one (a chat can move). A `[n:p]` in the text that matches
 none stays plain text; duplicates collapse into one chip. A chip opens
 the copy (or the linked file) at that page, and says so when the file
-has changed since that revision or is gone.
+has changed since that revision or is gone. A citation also keeps the
+file's name as it was read (the chip's label, once the file is gone too);
+the chip's action is `MessageBubble.openCitation`, nil until PR 3.4/3.5.
 
 **Retention.** The cited revision's `pages` rows are kept as tombstones
 when its document is re-indexed or removed (a linked file too), until no

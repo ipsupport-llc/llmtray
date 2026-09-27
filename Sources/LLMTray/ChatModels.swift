@@ -76,6 +76,12 @@ struct ChatMessage: Identifiable, Equatable {
     // The files a loaded session's images came from, same order: saved
     // again under these names (not the message's new id).
     var imageFilenames: [String] = []
+    // An answer's citations as it was saved (see citationsByAnswer): its
+    // turn's tool messages, where they come from, aren't saved.
+    var citations: [Citation] = []
+    // A project tool's result: the pages it showed the model, what the
+    // turn's answer may cite. In memory only, like the tool message.
+    var returnedCitations: [Citation] = []
 }
 
 extension ChatMessage {
@@ -102,6 +108,42 @@ extension ChatMessage {
             }
         }
         return out
+    }
+}
+
+extension ChatMessage {
+    /// Each answer's citations (adr/0012): the `[doc:page]` markers in its
+    /// text that match a page a project tool returned in its turn, one per
+    /// page, plus any it was saved with. A marker that matches none stays
+    /// plain text.
+    static func citationsByAnswer(_ messages: [ChatMessage]) -> [UUID: [Citation]] {
+        var returned: [Citation] = []
+        var out: [UUID: [Citation]] = [:]
+        for msg in messages {
+            switch msg.role {
+            case "user" where !msg.isToolContext:
+                returned = []
+            case "tool":
+                returned += msg.returnedCitations
+            case "assistant" where !msg.content.isEmpty:
+                // Text beside a tool call too ("the deadline is ten days
+                // [1:2]", then a read): it's shown and saved as well. The
+                // turn's pages stay citable until its last answer.
+                let all = CitationMarkers.unique(msg.citations + CitationMarkers.resolve(msg.content, returned: returned))
+                if !all.isEmpty { out[msg.id] = all }
+                if msg.toolCalls.isEmpty { returned = [] }
+            default:
+                break
+            }
+        }
+        return out
+    }
+
+    /// What request pruning and compaction look at (LLMTrayCore).
+    var historyEntry: HistoryEntry {
+        HistoryEntry(role: role, isToolContext: isToolContext,
+                     toolCalls: toolCalls.map { HistoryCall(id: $0.id, name: $0.name) }, toolCallID: toolCallID,
+                     isRefusal: isRefusal, hasContent: !content.isEmpty || !images.isEmpty || !audios.isEmpty)
     }
 }
 
