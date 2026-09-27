@@ -84,6 +84,10 @@ private struct FileDownload {
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
+    /// Already on disk at its expected size when the download started (a
+    /// relaunch mid-download, or a copy put there by hand): not fetched
+    /// again, and never removed if this attempt fails -- it isn't ours.
+    var preexisting = false
     /// Restarted once from scratch after the file CDN refused it (its
     /// signed link expires an hour after the redirect: a long pause).
     var restarted = false
@@ -319,13 +323,21 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
                 for entry in entries {
-                    files[entry.path] = FileDownload(
-                        path: entry.path,
-                        destination: destRoot.appendingPathComponent(entry.path),
-                        expectedBytes: Int64(entry.size ?? 0)
-                    )
-                    startTask(forPath: entry.path)
+                    let destination = destRoot.appendingPathComponent(entry.path)
+                    let expected = Int64(entry.size ?? 0)
+                    var file = FileDownload(path: entry.path, destination: destination, expectedBytes: expected)
+                    // Picked up, not restarted: a file already there at its
+                    // expected size (a download interrupted by quitting).
+                    let onDisk = (try? FileManager.default.attributesOfItem(atPath: destination.path)[.size] as? NSNumber)?.int64Value
+                    if expected > 0, onDisk == expected {
+                        file.isDone = true
+                        file.preexisting = true
+                        file.writtenBytes = expected
+                    }
+                    files[entry.path] = file
+                    if !file.isDone { startTask(forPath: entry.path) }
                 }
+                if files.values.allSatisfy(\.isDone) { finishIfComplete() }
             } catch {
                 downloadError = error.localizedDescription
                 downloadingID = nil
@@ -504,22 +516,21 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             MainActor.assumeIsolated { self.failDownload(saveError) }
             return
         }
-        let allDone = !downloadFailed && !files.isEmpty && files.values.allSatisfy { $0.isDone }
-        Task { @MainActor in
-            if allDone {
-                if let destRoot = self.currentDestRoot {
-                    FileManager.default.createFile(
-                        atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil
-                    )
-                }
-                self.downloadingID = nil
-                self.downloadStatusText = NSLocalizedString("Done", comment: "")
-                self.downloadSpeedBytesPerSec = 0
-                self.downloadETASeconds = nil
-                self.onAllDone?()
-                self.onAllDone = nil
-            }
+        Task { @MainActor in self.finishIfComplete() }
+    }
+
+    /// Every file in place: the marker, and the download is over.
+    private func finishIfComplete() {
+        guard !downloadFailed, !files.isEmpty, files.values.allSatisfy(\.isDone), downloadingID != nil else { return }
+        if let destRoot = currentDestRoot {
+            FileManager.default.createFile(atPath: destRoot.appendingPathComponent(Self.completionMarkerName).path, contents: nil)
         }
+        downloadingID = nil
+        downloadStatusText = NSLocalizedString("Done", comment: "")
+        downloadSpeedBytesPerSec = 0
+        downloadETASeconds = nil
+        onAllDone?()
+        onAllDone = nil
     }
 
     /// The rel="next" URL of a Link header.
@@ -585,7 +596,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// removed (a folder with a config.json would pass for a model).
     private func failDownload(_ message: String) {
         downloadFailed = true
-        let written = files.values.filter(\.isDone).map(\.destination)
+        let written = files.values.filter { $0.isDone && !$0.preexisting }.map(\.destination)
         let root = currentDestRoot
         cancelDownload()   // clears downloadError: set after
         for url in written { try? FileManager.default.removeItem(at: url) }

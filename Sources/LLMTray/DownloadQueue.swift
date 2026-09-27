@@ -171,7 +171,7 @@ final class DownloadQueue: ObservableObject {
         case .chatModel:
             return await runChatModel(item)
         case .imageModel, .editModel:
-            guard let model = ImageGenModel(rawValue: item.target) else { return "Unknown image model \(item.target)" }
+            guard let model = ImageGenModel(rawValue: item.target) else { return String(format: NSLocalizedString("Unknown image model %@", comment: "download queue"), item.target) }
             // A Settings download first; it may take the space this needs.
             guard await waitForSettingsDownload(item) else { return nil }
             if !model.isDownloaded, let refusal = spaceRefusal(item, at: RuntimePaths.externalRuntimeDir) { return refusal }
