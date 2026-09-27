@@ -52,6 +52,21 @@ struct ToolContext {
     /// False once a result found no room this turn: a project tool answers
     /// with its listing only (set by ChatToolbox).
     var fileTextAllowed = true
+    /// This one call, unique (a model may repeat call ids): what a `once`
+    /// folder grant is for.
+    var callKey = UUID().uuidString
+    /// Asks the user about a folder in the chat (a folder tool's grant
+    /// prompt); nil answers: Stop or another chat.
+    var askFolderAccess: FolderToolService.Ask? = nil
+}
+
+/// What a tool does in the user's folders (adr/0014).
+enum FolderToolAccess {
+    case none
+    /// `files`: names and bounded contents -- untrusted text.
+    case read
+    /// `change_files`: proposes a plan, never runs it.
+    case change
 }
 
 /// One tool the in-app chat offers the model: its declaration, when it's
@@ -70,10 +85,14 @@ protocol ChatTool: AnyObject {
     /// A project tool opts in here: the trust barrier and the budget for
     /// file text then apply to it.
     var projectAccess: ProjectToolAccess { get }
+    /// A folder tool opts in here: the trust barrier (and, for reads, the
+    /// budget) apply to it.
+    var folderAccess: FolderToolAccess { get }
 }
 
 extension ChatTool {
     var projectAccess: ProjectToolAccess { .none }
+    var folderAccess: FolderToolAccess { .none }
     var schema: ToolSchema? { nil }
 }
 
@@ -83,9 +102,12 @@ final class ChatToolbox {
     let imageGeneration: ImageToolRunner
     let musicGeneration: MusicToolRunner
     private(set) var tools: [ChatTool] = []
-    /// A project tool returned something in this turn: network tools and the
-    /// generators are off until the user's next message (ToolTrust).
-    private(set) var projectTextThisTurn = false
+    /// What file text this turn has had back (project files, folder
+    /// listings, change proposals): network tools and the generators are off
+    /// after any of it, folder changes after a read, until the user's next
+    /// message (ToolTrust).
+    private(set) var turnTrust = ToolTrust.TurnState()
+    var projectTextThisTurn: Bool { turnTrust.projectText }
     /// The request had no room for more file text: search and read aren't
     /// declared for the rest of the turn.
     private(set) var fileTextRoomSpent = false
@@ -113,6 +135,10 @@ final class ChatToolbox {
         "search_project_files": (ProjectFiles.toolName, [:]),
         "read_project_file": (ProjectFiles.toolName, [:]),
         "list_project_files": (ProjectFiles.toolName, [:]),
+        // The folder tools first planned (adr/0014), `files` now.
+        "list_dir": (FolderTools.filesName, [:]),
+        "list_directory": (FolderTools.filesName, [:]),
+        "file_info": (FolderTools.filesName, [:]),
     ]
 
     /// A call as read: the tool it means, its arguments, what was fixed and
@@ -131,7 +157,7 @@ final class ChatToolbox {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         musicGeneration = MusicToolRunner(music: music ?? MusicManager())
         tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
-            + ToolCatalog.makeTools() + [ProjectFilesTool()]
+            + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool()]
     }
 
     func register(_ tool: ChatTool) {
@@ -199,13 +225,17 @@ final class ChatToolbox {
             spent.formUnion([ImageToolRunner.toolName, EditImageTool.toolName])
         }
         if musicGeneration.songsThisTurn >= musicGeneration.maxSongsPerTurn { spent.insert(MusicToolRunner.toolName) }
-        // After file text: nothing that reaches out (adr/0012), and no more
-        // file text once there's no room for it.
-        let allowGuarded = ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn)
+        // After file text: nothing that reaches out (adr/0012), no folder
+        // change after a read (adr/0014), and no more file text once there's
+        // no room for it.
+        let allowGuarded = ToolTrust.allowsGuarded(turnTrust)
+        let folderTools = Set(FolderTools.declared(featureOn: settings.folders != nil, temporaryChat: settings.folders?.temporary ?? true,
+                                                   turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent))
         return tools.compactMap { tool -> [String: Any]? in
             guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
             // project_files by its mode (none once there's no room for file text).
             if let files = tool as? ProjectFilesTool { return files.definition(for: settings, fileTextAllowed: !fileTextRoomSpent) }
+            if tool.folderAccess != .none { return folderTools.contains(tool.name) ? tool.definition : nil }
             guard !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
             // A tool of several switches: its modes that may run now (the
             // local time stays after file text, the city lookup doesn't).
@@ -218,21 +248,31 @@ final class ChatToolbox {
     func startTurn() {
         imageGeneration.startTurn()
         musicGeneration.startTurn()
-        projectTextThisTurn = false
+        turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
         sentProjectHits = []
         prepared = [:]
     }
 
-    /// The names of the tools that return project text: their calls and
-    /// results are left out of later turns' requests.
+    /// The names of the tools that return project or folder text: their
+    /// calls and results are left out of later turns' requests.
     var projectToolNames: Set<String> {
-        Set(tools.filter { $0.projectAccess != .none }.map(\.name))
+        Set(tools.filter { $0.projectAccess != .none || $0.folderAccess != .none }.map(\.name))
+    }
+
+    /// The tools whose answer is sized to the request's room for file text.
+    var budgetedToolNames: Set<String> {
+        Set(tools.filter { $0.projectAccess != .none || $0.folderAccess == .read }.map(\.name))
     }
 
     /// Which side of the trust barrier a tool is on.
     func trustKind(_ tool: ChatTool) -> ToolTrust.Kind {
         if tool.projectAccess != .none { return .project }
+        switch tool.folderAccess {
+        case .read: return .folderRead
+        case .change: return .folderChange
+        case .none: break
+        }
         if tool === imageGeneration || tool is EditImageTool || tool === musicGeneration { return .guarded }
         return ToolCatalog.entries.first { $0.name == tool.name }?.usesNetwork == true ? .guarded : .ordinary
     }
@@ -252,10 +292,22 @@ final class ChatToolbox {
 
     /// The calls of a response refused before any of it runs (drafts, the
     /// generator queue, the model's unload): network and generator calls
-    /// beside a project call, or after one returned this turn.
+    /// beside a project or folder call, or after one returned this turn;
+    /// folder changes beside a read, or after one.
     func trustRefusals(_ calls: [ToolCall], settings: ChatSettings) -> Set<String> {
-        ToolTrust.refusedUpFront(calls.map { (id: $0.id, kind: trustKind(of: $0, settings: settings)) },
-                                 projectTextThisTurn: projectTextThisTurn)
+        let batch = calls.map { (id: $0.id, kind: trustKind(of: $0, settings: settings)) }
+        batchTrust = turnTrust
+        for call in batch { batchTrust.record(call.kind) }
+        return ToolTrust.refusedUpFront(batch, state: turnTrust)
+    }
+
+    /// What the batch `trustRefusals` read would leave: what its refused
+    /// calls are told.
+    private var batchTrust = ToolTrust.TurnState()
+
+    /// What a call refused up front by the barrier is told.
+    func trustRefusalText(_ call: ToolCall, settings: ChatSettings) -> String {
+        ToolTrust.refusalText(for: trustKind(of: call, settings: settings), batchTrust)
     }
 
     /// A project tool's output as its tool result: at most its share of the
@@ -294,16 +346,20 @@ final class ChatToolbox {
         let arguments = entry?.arguments ?? ParsedToolArguments(values: [:], repairs: [], problems: [])
         // Checked again right before it runs (the round refused it up front
         // already): an earlier call of this round may have returned file text.
-        if trustKind(of: call, settings: context.settings) == .guarded, !ToolTrust.allowsGuarded(projectTextThisTurn: projectTextThisTurn) {
-            return finish(.refused(ToolTrust.refusal))
+        let kind = trustKind(of: call, settings: context.settings)
+        if !ToolTrust.allows(kind, turnTrust) {
+            return finish(.refused(ToolTrust.refusalText(for: kind, turnTrust)))
         }
-        if tool.projectAccess != .none, tool.isOffered(context.settings) {
+        if tool.projectAccess != .none || tool.folderAccess != .none, tool.isOffered(context.settings) {
             // Whatever it answers -- file names count as file text too.
-            defer { projectTextThisTurn = true }
+            defer { turnTrust.record(kind) }
             if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent
-            return finish(await tool.run(arguments.values, context: context))
+            let result = await tool.run(arguments.values, context: context)
+            // A folder read that found no room: no file text for the rest of the turn.
+            if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }
+            return finish(result)
         }
         // generate_image, edit_image and generate_music explain their own refusals (the model often keeps
         // calling it from history after it's turned off).
@@ -341,7 +397,8 @@ final class ChatToolbox {
         switch result {
         case .refused: return .refused
         case .text(let text):
-            if SelectableTool.isError(text) || text.hasPrefix(ProjectFiles.toolName + ":") { return .error("failed") }
+            if SelectableTool.isError(text) || text.hasPrefix(ProjectFiles.toolName + ":")
+                || text.hasPrefix(FolderTools.filesName + ":") || text.hasPrefix(FolderTools.changeName + ":") { return .error("failed") }
             // The generators' and view_image's plain-text failures.
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success

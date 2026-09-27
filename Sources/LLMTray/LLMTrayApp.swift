@@ -212,6 +212,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ReviewPrompter.shared.recordLaunch()
         // Project files (adr/0012): nothing unless turned on in Settings.
         ProjectIndexer.shared.start(server: server)
+        // Folder access (adr/0014): interrupted plans put right, when it's on.
+        FolderAccessManager.shared.start()
         UsageTelemetry.shared.start()   // nothing unless the user opted in
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSettingsFromNotification(_:)), name: .showSettings, object: nil

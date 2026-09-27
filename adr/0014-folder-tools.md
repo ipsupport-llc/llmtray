@@ -1,6 +1,6 @@
 # 0014 — Folder tools: the chat works in folders the user grants
 
-**Status: accepted** (2026-09-26, by the user). Core (LLMTrayCore) in progress: PR #115.
+**Status: accepted** (2026-09-26, by the user). Core (LLMTrayCore): PR #115; the app layer (steps 2-3): feature/folder-tools-app.
 
 ## Decision
 
@@ -217,6 +217,25 @@ per-request budget): a folder of 10,000 files is paged, never dumped.
 - File operations run off the main actor, one plan at a time; a plan
   stops at the first failure and reports what was done (the journal
   has it).
+
+Built (steps 2-3, the app layer): `LLMTrayCore.FolderTools` (the two
+schemas -- `ops` a list of objects read item by item, aliases such as
+`mkdir`/`delete`/`source`/`destination`, one op without the list, `from` +
+`to` meaning a move -- and when each is declared), `FolderToolService` (paths
+as the model writes them: `~`, absolute, or under the granted folder of
+that name; the grant prompt's rules; `files` within the request's room for
+file text; `change_files` into the pending plan, a move "to" a folder going
+into it; approval, execution, undo, launch recovery), `FolderToolText`
+(listings, duplicates and info as compact text, cursors where a page stops,
+names framed as data, only paths inside grants), `PlanReview` (ticks that
+follow make_dir dependencies, counts, warnings). `ToolTrust.TurnState`
+carries the barrier: a folder read (or project text) holds back folder
+changes and guarded tools, a change's result holds back guarded tools. The
+app: `FilesTool` / `ChangeFilesTool` (`ChatTool.folderAccess`), the grant
+prompt and plan cards in the chat (`FolderViews.swift`; a call waits on the
+prompt like a Creator mode draft), the chat's folder menu (Allow Folder…, the
+chat's folders, Revoke), Settings > Folders. A chat's per-chat grants,
+denies and pending plan end when the chat is left or its tab closed.
 
 ## Plan
 
