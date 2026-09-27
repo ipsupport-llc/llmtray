@@ -144,7 +144,7 @@ public final class SQLiteConnection {
     /// when it throws. Synchronous by construction: nothing may await while
     /// a write transaction is open (adr/0012, Concurrency).
     public func transaction<T>(immediate: Bool = true, _ body: () throws -> T) throws -> T {
-        precondition(isAutocommit, "nested transaction")
+        guard isAutocommit else { throw SQLiteError(code: SQLITE_MISUSE, message: "nested transaction") }
         try exec(immediate ? "BEGIN IMMEDIATE" : "BEGIN")
         do {
             let result = try body()

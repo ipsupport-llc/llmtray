@@ -156,6 +156,8 @@ public final class ProjectIndex {
     }
 
     public func close() { db.close() }
+    /// False after `close`, or when a compaction couldn't reopen the file.
+    public var isOpen: Bool { db.isOpen }
 
     func point(_ name: String) throws { try crashHook?(name) }
 
@@ -192,8 +194,15 @@ public final class ProjectIndex {
     /// Where a document's file is: its copy, or the file in its linked folder.
     public func file(of d: IndexedDocument) throws -> URL? {
         if d.source == 1 { return fileURL(doc: d.doc, ext: d.ext) }
-        guard let root = try db.scalarText("SELECT path FROM sources WHERE id = ?", [.int(d.source)]), let rel = d.relativePath else { return nil }
+        guard let root = try db.scalarText("SELECT path FROM sources WHERE id = ?", [.int(d.source)]), let rel = d.relativePath,
+              Self.isSafeRelativePath(rel) else { return nil }
         return URL(fileURLWithPath: root).appendingPathComponent(rel)
+    }
+
+    /// A path inside its folder: relative, no `.`/`..` component, no NUL.
+    static func isSafeRelativePath(_ path: String) -> Bool {
+        guard !path.isEmpty, !path.hasPrefix("/"), !path.hasPrefix("~"), !path.unicodeScalars.contains("\u{0}") else { return false }
+        return path.split(separator: "/", omittingEmptySubsequences: false).allSatisfy { !$0.isEmpty && $0 != "." && $0 != ".." }
     }
 
     static func sanitizedExtension(_ ext: String) -> String {
@@ -228,16 +237,23 @@ public final class ProjectIndex {
     /// file already in the project (same hash) is refused. The document
     /// stays `staged` until extracted.
     @discardableResult
-    public func addCopy(of source: URL, name: String? = nil) throws -> Int64 {
+    public func addCopy(of link: URL, name: String? = nil) throws -> Int64 {
         let fm = FileManager.default
-        let ext = Self.sanitizedExtension(source.pathExtension)
-        let size = (try? fm.attributesOfItem(atPath: source.path)[.size] as? NSNumber)?.int64Value ?? 0
+        // A symlink is copied as its target's bytes (copyItem would copy the
+        // link itself: a "copy" pointing at the user's file, sized as a link).
+        // Anything but a regular file is refused.
+        let source = link.resolvingSymlinksInPath()
+        guard let attributes = try? fm.attributesOfItem(atPath: source.path), attributes[.type] as? FileAttributeType == .typeRegular else {
+            throw ProjectIndexError.notARegularFile(link.lastPathComponent)
+        }
+        let ext = Self.sanitizedExtension(link.pathExtension.isEmpty ? source.pathExtension : link.pathExtension)
+        let size = (attributes[.size] as? NSNumber)?.int64Value ?? 0
         if let free = freeSpace(), free < size + size / 2 + (1 << 20) {
             throw ProjectIndexError.insufficientDisk(needed: size + size / 2 + (1 << 20), available: free)
         }
         let doc = try db.transaction {
             try db.run("INSERT INTO documents(source, rev, name, ext, added_at, status) VALUES (1, 1, ?, ?, ?, 'staged')",
-                       [.text(name ?? source.lastPathComponent), .text(ext), .double(Date().timeIntervalSince1970)])
+                       [.text(name ?? link.lastPathComponent), .text(ext), .double(Date().timeIntervalSince1970)])
             return db.lastInsertRowID
         }
         try point("add.row")
@@ -254,7 +270,9 @@ public final class ProjectIndex {
             try fm.copyItem(at: source, to: part)
             try point("add.copied")
             sha = try Self.sha256(of: part)
-            bytes = (try fm.attributesOfItem(atPath: part.path)[.size] as? NSNumber)?.int64Value ?? 0
+            let copied = try fm.attributesOfItem(atPath: part.path)
+            guard copied[.type] as? FileAttributeType == .typeRegular else { throw ProjectIndexError.notARegularFile(link.lastPathComponent) }
+            bytes = (copied[.size] as? NSNumber)?.int64Value ?? 0
             try fm.moveItem(at: part, to: staged)
             try point("add.hashed")
         } catch let crash as SimulatedCrash {
@@ -288,6 +306,7 @@ public final class ProjectIndex {
     /// A file of a linked folder, `staged` for extraction; the file stays the user's.
     @discardableResult
     public func addLinkedDocument(source: Int64, relativePath: String, mtime: Double, sha256: String, bytes: Int64) throws -> Int64 {
+        guard Self.isSafeRelativePath(relativePath) else { throw ProjectIndexError.invalidRelativePath(relativePath) }
         let ext = Self.sanitizedExtension((relativePath as NSString).pathExtension)
         return try db.transaction {
             guard try db.scalarText("SELECT kind FROM sources WHERE id = ?", [.int(source)]) == "folder" else {
@@ -363,7 +382,13 @@ public final class ProjectIndex {
     private func writeDerived(doc: Int64, rev: Int64, pages: [ExtractedPage]) throws -> DocumentStatus {
         let insertPage = try db.cached("INSERT INTO pages(doc, rev, page, text, tier, status, error) VALUES (?, ?, ?, ?, ?, ?, ?)")
         var indexable: [(page: Int, text: String)] = []
-        for p in pages {
+        for var p in pages {
+            // SQLite's substr() and text functions stop at U+0000, so a NUL
+            // would cut every chunk after it: a space instead (one code
+            // point for one, so the chunks' start/len stay right).
+            if p.text.unicodeScalars.contains("\u{0}") {
+                p.text = String(String.UnicodeScalarView(p.text.unicodeScalars.map { $0 == "\u{0}" ? " " : $0 }))
+            }
             // A page without a usable text layer isn't indexed (a later tier
             // retries it from here); its text is still stored.
             let status = p.error != nil || p.isJunk ? "failed" : (p.hasText ? "ok" : "empty")
@@ -505,7 +530,8 @@ public final class ProjectIndex {
         guard let dim = try db.scalarInt("SELECT dim FROM vec_sets WHERE set_id = ?", [.int(set)]).map(Int.init) else {
             throw ProjectIndexError.stale(set)
         }
-        precondition(vectors.count == chunks.count * dim, "vectors don't match the chunks")
+        let (expected, overflow) = chunks.count.multipliedReportingOverflow(by: dim)
+        guard !overflow, vectors.count == expected else { throw ProjectIndexError.vectorMismatch(expected: expected, got: vectors.count) }
         return try db.transaction {
             guard let current = try document(doc), current.rev == rev, current.status.isSearchable else { throw ProjectIndexError.stale(doc) }
             let valid = Set(try db.rows("SELECT id FROM chunks WHERE doc = ? AND rev = ?", [.int(doc), .int(rev)]) { $0.int(0) })
@@ -717,8 +743,14 @@ public final class ProjectIndex {
         return Int(before - (try db.scalarInt("PRAGMA freelist_count") ?? 0))
     }
 
-    /// A TRUNCATE checkpoint, retried while a reader's snapshot holds it.
-    public func checkpoint(attempts: Int = 5) throws {
+    /// A PASSIVE checkpoint (never waits), then TRUNCATE, retried while a
+    /// reader's snapshot holds it. The busy timeout is `busyMilliseconds`
+    /// meanwhile, not the writer's 5 s: a long read must not stall ingest
+    /// for attempts × 5 s -- it throws BUSY after ~`attempts` × 150 ms.
+    public func checkpoint(attempts: Int = 5, busyMilliseconds: Int32 = 100) throws {
+        db.setBusyTimeout(milliseconds: busyMilliseconds)
+        defer { db.setBusyTimeout(milliseconds: IndexSchema.writerBusyTimeout) }
+        _ = try? db.checkpoint(truncate: false)
         for attempt in 1...max(1, attempts) {
             do {
                 try db.checkpoint(truncate: true)
@@ -820,11 +852,13 @@ public enum CompactionSwap {
         try Data("compacted copy verified\n".utf8).write(to: dir.appendingPathComponent(markerName), options: .atomic)
     }
 
-    /// Moves `path` and its -wal/-shm to `target`'s names.
+    /// Moves `path` and its -wal/-shm to `target`'s names. The target's
+    /// whole family goes first: a stale -wal/-shm left beside the new main
+    /// file (a crash between two renames) would be replayed into it.
     static func moveFamily(_ from: URL, to: URL) throws {
         let fm = FileManager.default
+        for s in suffixes where fm.fileExists(atPath: to.path + s) { try fm.removeItem(atPath: to.path + s) }
         for s in suffixes where fm.fileExists(atPath: from.path + s) {
-            try? fm.removeItem(atPath: to.path + s)
             try fm.moveItem(atPath: from.path + s, toPath: to.path + s)
         }
     }
@@ -835,7 +869,7 @@ public enum CompactionSwap {
         removeFamily(old)
         try moveFamily(live, to: old)
         try crash("swap.movedOld")
-        try FileManager.default.moveItem(at: dir.appendingPathComponent(compactName), to: live)
+        try moveFamily(dir.appendingPathComponent(compactName), to: live)
         try crash("swap.movedNew")
         removeFamily(old)
         try FileManager.default.removeItem(at: dir.appendingPathComponent(markerName))
@@ -856,7 +890,7 @@ public enum CompactionSwap {
                 // The old file was moved aside: the verified copy goes in,
                 // or, if it's gone too, the old one comes back.
                 if hasCompact {
-                    try fm.moveItem(at: compact, to: live)
+                    try moveFamily(compact, to: live)
                 } else if hasOld {
                     try moveFamily(old, to: live)
                 }

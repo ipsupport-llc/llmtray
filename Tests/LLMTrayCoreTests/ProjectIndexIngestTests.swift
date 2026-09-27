@@ -159,6 +159,32 @@ final class ProjectIndexCrashTests: XCTestCase {
         }
     }
 
+    /// A crash after the live file was moved aside but before its -wal/-shm
+    /// were: those must not stay beside the compacted copy put in place.
+    func testSwapRecoveryDropsTheLiveFilesStaleSidecars() throws {
+        let w = try world(withB: true)
+        do {
+            let idx = try ProjectIndex.testIndex(w.dir)
+            try idx.remove(doc: w.a)
+            idx.crash(at: "swap.movedOld")
+            XCTAssertThrowsError(try idx.compact())
+            idx.close()
+        }
+        let live = w.dir.appendingPathComponent(ProjectIndex.databaseName).path
+        XCTAssertFalse(FileManager.default.fileExists(atPath: live))
+        let junk = Data(repeating: 0xA5, count: 40_000)
+        for s in ["-wal", "-shm", "-journal"] { try junk.write(to: URL(fileURLWithPath: live + s)) }
+        try CompactionSwap.recover(in: w.dir)
+        for s in ["-wal", "-shm", "-journal"] {
+            XCTAssertFalse(FileManager.default.fileExists(atPath: live + s), "stale \(s) removed")
+        }
+        let idx = try ProjectIndex.testIndex(w.dir)
+        _ = try idx.reconcile()
+        try assertConsistent(idx, "stale sidecars")
+        XCTAssertEqual(try hits(idx, "бетамаркер"), markerChunks(w.bText, "бетамаркер"))
+        XCTAssertEqual(try idx.storage().churn, 0, "the compacted copy is the one in place")
+    }
+
     func testCrashDuringCompactionIsFinishedOrRolledBack() throws {
         for point in ["compact.optimized", "compact.vacuumed", "swap.movedOld", "swap.movedNew"] {
             let w = try world(withB: true)
@@ -199,6 +225,80 @@ final class ProjectIndexLifecycleTests: XCTestCase {
         XCTAssertThrowsError(try idx.addText("новый", name: "c.txt")) {
             guard case .insufficientDisk? = $0 as? ProjectIndexError else { return XCTFail("\($0)") }
         }
+    }
+
+    /// A symlink is copied as its target's bytes, never as a link to the
+    /// user's file; anything but a regular file is refused.
+    func testSymlinkIsCopiedAsItsTargetAndDirectoriesAreRefused() throws {
+        let idx = try ProjectIndex.testIndex()
+        let fm = FileManager.default
+        let target = idx.directory.appendingPathComponent("../\(idx.directory.lastPathComponent)-target.txt").standardizedFileURL
+        let text = "договор поставки, настоящий файл за ссылкой"
+        try text.write(to: target, atomically: true, encoding: .utf8)
+        let link = idx.directory.appendingPathComponent("../\(idx.directory.lastPathComponent)-link.txt").standardizedFileURL
+        try fm.createSymbolicLink(at: link, withDestinationURL: target)
+        let doc = try idx.addCopy(of: link)
+        let copy = idx.fileURL(doc: doc, ext: "txt")
+        XCTAssertEqual(try fm.attributesOfItem(atPath: copy.path)[.type] as? FileAttributeType, .typeRegular)
+        XCTAssertThrowsError(try fm.destinationOfSymbolicLink(atPath: copy.path), "not a link")
+        XCTAssertEqual(try idx.document(doc)?.bytes, Int64(text.utf8.count))
+        XCTAssertEqual(try idx.document(doc)?.name, link.lastPathComponent)
+        try "изменён".write(to: target, atomically: false, encoding: .utf8)
+        XCTAssertEqual(try String(contentsOf: copy, encoding: .utf8), text, "the copy is immutable")
+        let folder = idx.directory.appendingPathComponent("../\(idx.directory.lastPathComponent)-dir.txt").standardizedFileURL
+        try fm.createDirectory(at: folder, withIntermediateDirectories: true)
+        XCTAssertThrowsError(try idx.addCopy(of: folder)) {
+            XCTAssertEqual($0 as? ProjectIndexError, .notARegularFile(folder.lastPathComponent))
+        }
+        XCTAssertEqual(try idx.documents().map(\.doc), [doc], "a refused add leaves no row")
+    }
+
+    func testLinkedPathsMustStayInsideTheirFolder() throws {
+        let idx = try ProjectIndex.testIndex()
+        let source = try idx.addFolderSource(path: indexTempDir("linked").path)
+        for bad in ["../secret.txt", "/etc/hosts", "a/../../b.txt", "./a.txt", "a//b.txt", "", "~/x.txt", "a/\u{0}.txt"] {
+            XCTAssertThrowsError(try idx.addLinkedDocument(source: source, relativePath: bad, mtime: 1, sha256: "x", bytes: 1), bad) {
+                XCTAssertEqual($0 as? ProjectIndexError, .invalidRelativePath(bad))
+            }
+        }
+        XCTAssertNoThrow(try idx.addLinkedDocument(source: source, relativePath: "a/..b/c..txt", mtime: 1, sha256: "x", bytes: 1))
+    }
+
+    /// Misuse throws instead of trapping: vectors that don't match their
+    /// chunks, a transaction inside a transaction.
+    func testMismatchedVectorsAndNestedTransactionsThrow() throws {
+        let idx = try ProjectIndex.testIndex()
+        let doc = try idx.addText("договор поставки товара", embed: false)
+        let pending = try idx.pendingChunks(doc: doc, set: idx.toySet, limit: 10)
+        XCTAssertThrowsError(try idx.commitVectors(doc: doc, rev: 1, set: idx.toySet, chunks: pending.map(\.id), vectors: [0, 1])) {
+            XCTAssertEqual($0 as? ProjectIndexError, .vectorMismatch(expected: pending.count * 64, got: 2))
+        }
+        XCTAssertThrowsError(try idx.db.transaction { try idx.db.transaction {} }) {
+            XCTAssertEqual(($0 as? SQLiteError)?.primaryCode, 21)   // SQLITE_MISUSE
+        }
+        XCTAssertTrue(idx.db.isAutocommit, "the outer one rolled back")
+        XCTAssertEqual(try idx.status(doc), .searchable)
+    }
+
+    /// A checkpoint a long read blocks gives up in well under a second per
+    /// attempt instead of 5 × the writer's 5 s busy timeout.
+    func testCheckpointBlockedByAReaderDoesntStallTheWriter() throws {
+        let idx = try ProjectIndex.testIndex()
+        try idx.addText("первый документ про договор", name: "a.txt")
+        let reader = try SQLiteConnection(path: idx.databaseURL.path, readOnly: true)
+        try reader.exec("BEGIN")
+        XCTAssertEqual(try reader.scalarInt("SELECT count(*) FROM documents"), 1)   // the snapshot is held
+        try idx.addText("второй документ про поставки", name: "b.txt")
+        let t0 = ContinuousClock.now
+        XCTAssertThrowsError(try idx.checkpoint()) { XCTAssertTrue(($0 as? SQLiteError)?.isBusy ?? false, "\($0)") }
+        XCTAssertLessThan(ContinuousClock.now - t0, .seconds(4), "5 attempts × ~150 ms, not 5 × 5 s")
+        try reader.exec("COMMIT")
+        reader.close()
+        try idx.checkpoint()
+        XCTAssertEqual(try idx.storage().walBytes, 0)
+        let started = ContinuousClock.now
+        try idx.addText("третий", name: "c.txt")
+        XCTAssertLessThan(ContinuousClock.now - started, .seconds(4), "the writer's own busy timeout is back")
     }
 
     func testStatusesThroughTheLifecycle() throws {

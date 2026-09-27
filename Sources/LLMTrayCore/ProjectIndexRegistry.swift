@@ -22,6 +22,29 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     public let openReport: ReconcileReport
 
     public struct Closed: Error {}
+    /// The handle can't be used any more (a compaction swapped the file but
+    /// it couldn't be reopened); the registry opens a new one on next use.
+    public struct Failed: Error, CustomStringConvertible {
+        public let reason: String
+        public var description: String { "the project index failed: \(reason)" }
+    }
+    private let failureLock = NSLock()
+    private var failure: Failed?
+    public var isFailed: Bool {
+        failureLock.lock()
+        defer { failureLock.unlock() }
+        return failure != nil
+    }
+    private func fail(_ error: Error) {
+        failureLock.lock()
+        if failure == nil { failure = Failed(reason: "\(error)") }
+        failureLock.unlock()
+    }
+    private var failed: Failed? {
+        failureLock.lock()
+        defer { failureLock.unlock() }
+        return failure
+    }
 
     init(project: UUID, directory: URL, idleDelay: TimeInterval, registry: ProjectIndexRegistry) throws {
         self.project = project
@@ -40,6 +63,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     private func openReader() throws {
         let db = try SQLiteConnection(path: directory.appendingPathComponent(ProjectIndex.databaseName).path, readOnly: true)
         db.setBusyTimeout(milliseconds: 2000)
+        try IndexSchema.configureReader(db)
         searcher = try IndexSearcher(db: db)
         reader = db
     }
@@ -55,7 +79,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     public func write<T>(_ body: @escaping (ProjectIndex) throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
             writerQueue.async {
-                guard let index = self.index else { return continuation.resume(throwing: Closed()) }
+                guard let index = self.index else { return continuation.resume(throwing: self.failed ?? Closed()) }
                 do {
                     let result = try body(index)
                     self.scheduleIdle()
@@ -72,7 +96,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     public func read<T>(_ body: @escaping (IndexSearcher) throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
             readerQueue.async {
-                guard let searcher = self.searcher else { return continuation.resume(throwing: Closed()) }
+                guard let searcher = self.searcher else { return continuation.resume(throwing: self.failed ?? Closed()) }
                 do { continuation.resume(returning: try body(searcher)) } catch { continuation.resume(throwing: error) }
             }
         }
@@ -84,7 +108,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
                        options: IndexSearchOptions = IndexSearchOptions()) async throws -> IndexSearchResult {
         let result: (IndexSearchResult, Int) = try await withCheckedThrowingContinuation { continuation in
             readerQueue.async {
-                guard let searcher = self.searcher else { return continuation.resume(throwing: Closed()) }
+                guard let searcher = self.searcher else { return continuation.resume(throwing: self.failed ?? Closed()) }
                 do {
                     var vectors: DenseVectors?
                     let r = try searcher.search(query, queryVector: queryVector, vectors: { db in
@@ -151,16 +175,31 @@ public final class ProjectIndexHandle: @unchecked Sendable {
 
     /// Full compaction with the swap: new searches wait on the reader queue
     /// while it closes, every connection is closed for the rename, both
-    /// reopen after. Only with no ingest running (the caller's job).
+    /// reopen after. Only with no ingest running (the caller's job). When a
+    /// connection can't be reopened after the swap the handle is `Failed`
+    /// (every call throws it) and the registry replaces it on next use.
     public func compact() async throws {
         try await write { index in
-            try index.compact(holdingOthers: { swap in
-                try self.readerQueue.sync {
-                    self.closeReader()
-                    defer { try? self.openReader() }
-                    try swap()
-                }
-            })
+            do {
+                try index.compact(holdingOthers: { swap in
+                    try self.readerQueue.sync {
+                        self.closeReader()
+                        defer {
+                            do { try self.openReader() } catch { self.fail(error) }
+                        }
+                        try swap()
+                    }
+                })
+            } catch {
+                if !index.isOpen { self.fail(error) }
+                if self.failed == nil { throw error }
+            }
+            guard let failure = self.failed else { return }
+            // Nothing can be trusted any more: both connections go.
+            index.close()
+            self.index = nil
+            self.readerQueue.sync { self.closeReader() }
+            throw failure
         }
     }
 
@@ -182,9 +221,11 @@ public final class ProjectIndexHandle: @unchecked Sendable {
 /// memory (LRU, ~800 MB budget).
 public final class ProjectIndexRegistry: @unchecked Sendable {
     private let lock = NSLock()
-    /// Opening and closing are serialized, so a project never has two
-    /// writers: a close finishes before the next open of it starts.
-    private let lifecycle = NSLock()
+    /// Opening and closing a project are serialized per project, so it never
+    /// has two writers (a close finishes before the next open of it starts),
+    /// while opening one -- a reconcile may hash big files -- doesn't hold up
+    /// any other project.
+    private var lifecycles: [UUID: NSLock] = [:]
     private var handles: [UUID: ProjectIndexHandle] = [:]
     private var vectorUse: [(project: UUID, bytes: Int)] = []   // most recent last
     private let directory: (UUID) -> URL
@@ -199,19 +240,38 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
         self.idleDelay = idleDelay
     }
 
-    /// The project's handle, opened (and reconciled) on first use.
+    func lifecycleLock(_ project: UUID) -> NSLock {
+        lock.lock()
+        defer { lock.unlock() }
+        if let l = lifecycles[project] { return l }
+        let l = NSLock()
+        lifecycles[project] = l
+        return l
+    }
+
+    /// The project's handle, opened (and reconciled) on first use; a failed
+    /// one is replaced. Blocks while it opens: off the main thread, `open`.
     public func handle(for project: UUID) throws -> ProjectIndexHandle {
+        let lifecycle = lifecycleLock(project)
         lifecycle.lock()
         defer { lifecycle.unlock() }
         lock.lock()
         let existing = handles[project]
         lock.unlock()
-        if let existing { return existing }
+        if let existing {
+            guard existing.isFailed else { return existing }
+            existing.close()
+        }
         let h = try ProjectIndexHandle(project: project, directory: directory(project), idleDelay: idleDelay, registry: self)
         lock.lock()
         handles[project] = h
         lock.unlock()
         return h
+    }
+
+    /// `handle(for:)` off the caller's thread: the first open reconciles.
+    public func open(_ project: UUID) async throws -> ProjectIndexHandle {
+        try await ProcessRunner.offMain { [self] in try handle(for: project) }
     }
 
     /// The project's counts: from its open handle, else read-only from its
@@ -236,6 +296,7 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
 
     /// Closes the project's connections (before its deletion).
     public func close(_ project: UUID) {
+        let lifecycle = lifecycleLock(project)
         lifecycle.lock()
         defer { lifecycle.unlock() }
         lock.lock()
@@ -246,14 +307,7 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
     }
 
     public func closeAll() {
-        lifecycle.lock()
-        defer { lifecycle.unlock() }
-        lock.lock()
-        let all = Array(handles.values)
-        handles.removeAll()
-        vectorUse.removeAll()
-        lock.unlock()
-        all.forEach { $0.close() }
+        for project in openProjects { close(project) }
     }
 
     /// A search loaded vectors: the least recently used beyond the count or
