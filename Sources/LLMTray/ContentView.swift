@@ -478,7 +478,7 @@ private struct EmptyChatProjectNote: View {
 }
 
 /// "Searches N files" above a project chat whose project has searchable
-/// files (adr/0012); clicking it shows them. Nothing while Project files are
+/// files (adr/0012), "· N pinned" with pinned ones; clicking it shows them. Nothing while Project files are
 /// off or nothing is searchable yet.
 private struct ProjectChatFilesRow: View {
     let sessionID: UUID
@@ -500,6 +500,12 @@ private struct ProjectChatFilesRow: View {
                                 .lineLimit(1)
                                 // The name truncates first, not the count.
                                 .layoutPriority(1)
+                            if let pinned = indexer.pins[project.id], !pinned.isEmpty {
+                                Text(String(format: NSLocalizedString("· %lld pinned", comment: "a project chat's header: how many files are pinned (whole in its requests)"),
+                                            Int64(pinned.count)))
+                                    .lineLimit(1)
+                                    .layoutPriority(1)
+                            }
                             Spacer(minLength: 0)
                         }
                         .font(.system(size: 11))
