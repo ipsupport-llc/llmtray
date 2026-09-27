@@ -124,6 +124,60 @@ final class FeatureSetup {
         return nil
     }
 
+    // MARK: - Project files
+
+    var projectFiles: ProjectIndexer { .shared }
+
+    var isProjectFilesEnabled: Bool { projectFiles.isEnabled }
+
+    /// The embedder the feature downloads (the registry's default, bge-m3);
+    /// nil when runtime/embedders.json can't be read.
+    var projectFilesEmbedder: EmbedderEntry? { try? projectFiles.embedders.defaultEntry() }
+
+    var isProjectFilesEmbedderReady: Bool {
+        projectFilesEmbedder.map(projectFiles.embedders.isReady) ?? false
+    }
+
+    var isProjectFilesEmbedderDownloaded: Bool {
+        projectFilesEmbedder.map(projectFiles.embedders.isDownloaded) ?? false
+    }
+
+    /// On; with `downloadingEmbedder`, the embedder downloaded too (files are
+    /// indexed by their words meanwhile, and embedded once it's in place).
+    /// The feature stays on if the download fails: nil, or its error.
+    func enableProjectFiles(downloadingEmbedder: Bool) async -> Error? {
+        projectFiles.setEnabled(true)
+        guard downloadingEmbedder, !isProjectFilesEmbedderReady else { return nil }
+        return await downloadProjectFilesEmbedder()
+    }
+
+    /// The embedder's pinned files, fetched or repaired. nil on success.
+    func downloadProjectFilesEmbedder() async -> Error? {
+        do {
+            try await projectFiles.embedders.download(try projectFiles.embedders.defaultEntry())
+            return nil
+        } catch {
+            return error
+        }
+    }
+
+    /// Off: nothing indexes and no runner starts; the indexes and the
+    /// embedder stay (Remove takes the embedder away).
+    func disableProjectFiles() {
+        projectFiles.setEnabled(false)
+    }
+
+    /// Removes the embedder's weights (after its runner has exited).
+    func removeProjectFilesEmbedder() async -> Error? {
+        do {
+            guard let entry = projectFilesEmbedder else { return nil }
+            try await projectFiles.embedders.remove(entry)
+            return nil
+        } catch {
+            return error
+        }
+    }
+
     // MARK: - Download sizes
 
     /// Bytes to expect for the free-space check -- the published
@@ -145,6 +199,9 @@ final class FeatureSetup {
         case .sftBF16: return gigabytes(7.5)
         }
     }
+
+    /// The embedder's pinned files, as the registry lists them.
+    static func downloadBytes(_ entry: EmbedderEntry) -> Int64 { entry.source.bytes }
 
     private static func gigabytes(_ value: Double) -> Int64 { Int64(value * 1_000_000_000) }
 

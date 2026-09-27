@@ -185,6 +185,28 @@ enum ChatSessionStore {
         })
     }
 
+    /// The pages every saved chat cites in `project` (a chat that moved keeps
+    /// citing where it was made), for the tombstone sweep (adr/0012,
+    /// Retention). nil when any session file can't be read: a sweep on a
+    /// partial list would drop pages an unreadable chat still cites.
+    static func citedPages(in project: UUID) -> Set<PageRef>? {
+        let fm = FileManager.default
+        guard let names = try? fm.contentsOfDirectory(atPath: sessionsDir) else {
+            return fm.fileExists(atPath: sessionsDir) ? nil : []
+        }
+        var pages: Set<PageRef> = []
+        for name in names where name.hasSuffix(".json") {
+            guard let data = fm.contents(atPath: sessionsDir + "/" + name),
+                  let file = try? decoder.decode(ChatSessionFile.self, from: data) else { return nil }
+            for message in file.messages {
+                for c in message.citations ?? [] where c.project == project {
+                    pages.insert(PageRef(doc: Int64(c.doc), rev: Int64(c.rev), page: c.page))
+                }
+            }
+        }
+        return pages
+    }
+
     static func exists(_ id: UUID) -> Bool {
         FileManager.default.fileExists(atPath: path(for: id))
     }

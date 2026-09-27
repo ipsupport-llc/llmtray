@@ -391,9 +391,11 @@ public final class ProjectIndex {
     /// For a linked file, `identity` is the hash and mtime the caller checked
     /// *after* parsing (the file may change meanwhile -- then it discards the
     /// pages and retries): the revision is recorded with the content it holds.
+    /// `note` is kept as the document's error text (why an `empty` one has
+    /// no text: "no usable text layer").
     @discardableResult
     public func commitExtraction(_ job: IndexJob, pages: [ExtractedPage], kind: String? = nil,
-                                 identity: (sha256: String, mtime: Double)? = nil) throws -> DocumentStatus {
+                                 identity: (sha256: String, mtime: Double)? = nil, note: String? = nil) throws -> DocumentStatus {
         try db.transaction {
             guard let d = try document(job.doc) else { throw ProjectIndexError.stale(job.doc) }
             if job.isReindex {
@@ -411,8 +413,9 @@ public final class ProjectIndex {
                 guard d.status == .extracting, d.rev == job.rev else { throw ProjectIndexError.stale(job.doc) }
             }
             let status = try writeDerived(doc: job.doc, rev: job.rev, pages: pages)
-            try db.run("UPDATE documents SET rev = ?, status = ?, pages = ?, kind = ?, error = NULL WHERE doc = ?",
-                       [.int(job.rev), .text(status.rawValue), .int(Int64(pages.count)), kind.map { .text($0) } ?? .null, .int(job.doc)])
+            try db.run("UPDATE documents SET rev = ?, status = ?, pages = ?, kind = ?, error = ? WHERE doc = ?",
+                       [.int(job.rev), .text(status.rawValue), .int(Int64(pages.count)), kind.map { .text($0) } ?? .null,
+                        note.map { .text($0) } ?? .null, .int(job.doc)])
             if let identity {
                 try db.run("UPDATE documents SET sha256 = ?, mtime = ? WHERE doc = ?",
                            [.text(identity.sha256), .double(identity.mtime), .int(job.doc)])

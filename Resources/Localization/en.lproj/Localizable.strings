@@ -146,6 +146,8 @@
 "Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
 "Duplicate this profile" = "Duplicate this profile";
 "Edit Profile…" = "Edit Profile…";
+"Embedding model" = "Embedding model";
+"Enable Without It" = "Enable Without It";
 "Enable image editing?" = "Enable image editing?";
 "Enable image generation" = "Enable image generation";
 "Enable image generation?" = "Enable image generation?";
@@ -160,6 +162,7 @@
 "Failed: %@" = "Failed: %@";
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
 "Fetching file list…" = "Fetching file list…";
+"Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Fits comfortably" = "Fits comfortably";
 "Follow the description" = "Follow the description";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
@@ -324,6 +327,8 @@
 "Previous 7 Days" = "Previous 7 Days";
 "Profile" = "Profile";
 "Profiles" = "Profiles";
+"Project files" = "Project files";
+"Project files are turned off in Settings." = "Project files are turned off in Settings.";
 "Project name" = "Project name";
 "Projects" = "Projects";
 "Prompt & tools" = "Prompt & tools";
@@ -380,6 +385,8 @@
 "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is." = "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is.";
 "Search" = "Search";
 "Search Hugging Face (mlx models)…" = "Search Hugging Face (mlx models)…";
+"Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
+"Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
 "Select Tab" = "Select Tab";
@@ -519,7 +526,10 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
+"Turn on project files?" = "Turn on project files?";
+"Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
+"Unavailable" = "Unavailable";
 "Uncompressed (WAV)" = "Uncompressed (WAV)";
 "Uninstall" = "Uninstall";
 "Uninstall Runtime Data…" = "Uninstall Runtime Data…";
@@ -567,8 +577,10 @@
 "copy" = "copy";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
 "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld" = "decode-concurrency: %lld → %lld   prefill-step-size: %lld → %lld";
+"downloaded" = "downloaded";
 "failed to build request" = "failed to build request";
 "mlx-lm runtime" = "mlx-lm runtime";
+"not downloaded" = "not downloaded";
 "not used by any model" = "not used by any model";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.";
 "used by %@" = "used by %@";

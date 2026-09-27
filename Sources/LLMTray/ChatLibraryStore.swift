@@ -173,7 +173,13 @@ final class ChatLibraryStore: ObservableObject {
         // Not saved (a full disk): the project would come back at the next
         // launch without its directory. The record finishes it then.
         guard saveLibrary() else { return }
-        storage.finishDeletion(id)
+        // Its indexing cancelled and its index closed first (after the write
+        // in progress): the directory isn't removed from under a connection,
+        // and nothing recreates it. A quit meanwhile leaves the record.
+        Task { @MainActor in
+            await ProjectIndexer.shared.projectWillBeDeleted(id)
+            storage.finishDeletion(id)
+        }
     }
 
     /// Deletions a crash left halfway: the project out of the library
