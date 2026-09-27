@@ -212,6 +212,29 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(state(plan), .incomplete)
     }
 
+    func testARecoveryTheJournalCantRecordNeedsALook() throws {
+        write("t/j.txt", "j")
+        let plan = try crashed([rm("t/j.txt")], at: .itemStaged)
+        journal.appendHook = { if $0.kind == .failed { throw FolderAccessError.system("journal write", EIO) } }
+        defer { journal.appendHook = nil }
+        let r = undoer.recover(plan.plan.id)
+        XCTAssertEqual(r.restored, [plan.plan.items[0].id])
+        XCTAssertTrue(r.needsLook[plan.plan.items[0].id]?.contains("couldn't record") ?? false, "\(r)")
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
+    func testRecoveryLooksAtOlderPlansToo() throws {
+        write("old.txt", "o")
+        let old = try crashed([rm("old.txt")], at: .itemStaged)
+        // Many newer finished plans.
+        for i in 0..<55 {
+            write("n\(i).txt", "n")
+            XCTAssertEqual(executor.execute(try approved([mv("n\(i).txt", "m\(i).txt")])).doneCount, 1)
+        }
+        let r = undoer.recoverInterrupted()
+        XCTAssertEqual(r.map(\.planID), [old.plan.id])
+    }
+
     func testATrashCrashedAfterItsCleanupNeedsALook() throws {
         write("t/w.txt", "w")
         let plan = try crashed([rm("t/w.txt")], at: .trashed)

@@ -487,10 +487,12 @@ public struct ChangeUndo {
         public var leftBehind: [Int: String] = [:]
     }
 
-    /// Recovery for the newest `limit` plans with anything left under a
-    /// temporary name: to run when the journal is opened (app launch, the
-    /// journal's list) -- `undo` runs it for its plan first.
-    public func recoverInterrupted(limit: Int = 50) -> [Recovery] {
+    /// Recovery for the plans with anything left under a temporary name --
+    /// every journal by default (finished ones are pruned after 30 days,
+    /// interrupted ones kept), so an older interrupted plan isn't missed: to
+    /// run when the journal is opened (app launch, the journal's list) --
+    /// `undo` runs it for its plan first.
+    public func recoverInterrupted(limit: Int = .max) -> [Recovery] {
         journal.records(limit: limit).filter { $0.items.contains { $0.staging != nil } }
             .map { recover($0.planID) }
             .filter { !$0.restored.isEmpty || !$0.needsLook.isEmpty || !$0.leftBehind.isEmpty }
@@ -528,7 +530,13 @@ public struct ChangeUndo {
                     var why = step.putBack ? "interrupted, and undone from its temporary name"
                         : "interrupted before it changed anything"
                     if let note = step.leftBehind { why += "; \(note)" }
-                    try? journal.append(JournalEvent(kind: .failed, date: Date(), item: id, message: why), planID: planID)
+                    do {
+                        try journal.append(JournalEvent(kind: .failed, date: Date(), item: id, message: why), planID: planID)
+                    } catch {
+                        // Still incomplete in the journal: said so, as a later
+                        // pass may find nothing left to tell.
+                        out.needsLook[id] = "\(why), but the journal couldn't record it: \(error)"
+                    }
                 }
             } catch {
                 out.needsLook[id] = "\(error)"
