@@ -67,6 +67,11 @@ public enum Pref {
     /// starts with it once it's in place (then this is removed).
     public static let onboardingStartServerFor = PrefKey<String?>("llmtray.onboarding.startServerFor", default: nil)
 
+    // What's New
+    /// The major.minor ("0.8") the What's New window last opened for, or
+    /// that a fresh install started on; unset before this window existed.
+    public static let whatsNewLastSeen = PrefKey<String?>("llmtray.whatsNew.lastSeen", default: nil)
+
     // Project files (adr/0012)
     /// Off until turned on in Settings: nothing is indexed, downloaded or
     /// started before, and the project tools aren't declared.

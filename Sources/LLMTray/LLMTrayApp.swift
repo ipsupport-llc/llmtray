@@ -70,6 +70,7 @@ struct LLMTrayApp: App {
         .commands {
             CommandGroup(replacing: .appInfo) {
                 Button("About LLMTray") { NotificationCenter.default.post(name: .showAbout, object: nil) }
+                Button("What's New…") { NotificationCenter.default.post(name: .showWhatsNew, object: nil) }
             }
             CommandGroup(replacing: .appSettings) {
                 Button("Settings…") { NotificationCenter.default.post(name: .showSettings, object: nil) }
@@ -215,6 +216,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
         )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showWhatsNew), name: .showWhatsNew, object: nil
+        )
         // The wizard's chat model starts the server once it's in place.
         downloadQueue.onFinished = { [weak self] in self?.downloadFinished($0) }
         ReviewPrompter.shared.recordLaunch()
@@ -252,10 +256,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // A fresh install (adr/0013): the setup wizard, before the
         // auto-start below (which has no model to start then).
         let defaults = UserDefaults.standard
-        if SetupWizard.opensAutomatically(completedVersion: defaults[Pref.onboardingCompleted],
-                                          selectedModelID: defaults[Pref.selectedModelID],
-                                          saved: SetupWizardModel.loadSaved()) {
+        let firstRun = SetupWizard.opensAutomatically(completedVersion: defaults[Pref.onboardingCompleted],
+                                                      selectedModelID: defaults[Pref.selectedModelID],
+                                                      saved: SetupWizardModel.loadSaved())
+        if firstRun {
             openSetupWizard(automatic: true)
+        }
+        // A newer minor version: its notes, once (not on a fresh install --
+        // the wizard is that -- and not over the wizard: after it closes).
+        switch WhatsNew.launchAction(appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev",
+                                     lastSeen: defaults[Pref.whatsNewLastSeen], freshInstall: firstRun) {
+        case .show:
+            if setupWizard.isOpen {
+                setupWizard.onClose = { [weak self] in
+                    self?.setupWizard.onClose = nil
+                    WhatsNewWindow.show()
+                }
+            } else {
+                WhatsNewWindow.show()
+            }
+        case .record(let version):
+            defaults[Pref.whatsNewLastSeen] = version
+        case .nothing:
+            break
         }
 
         // Starts the server automatically instead of making "click Start
@@ -480,6 +503,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
+        let whatsNewItem = NSMenuItem(title: NSLocalizedString("What's New…", comment: ""), action: #selector(showWhatsNew), keyEquivalent: "")
+        whatsNewItem.target = self
+        menu.addItem(whatsNewItem)
 
         menu.addItem(.separator())
 
@@ -631,6 +657,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.performClose(nil)
         bugReportWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func showWhatsNew() {
+        popover.performClose(nil)
+        WhatsNewWindow.show()
     }
 
     /// Also after a review was sent: another one is welcome.

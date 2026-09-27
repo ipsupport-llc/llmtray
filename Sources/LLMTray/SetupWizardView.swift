@@ -11,6 +11,8 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
 
     /// Open, minimized or not.
     var isOpen: Bool { window != nil }
+    /// Once each time it closes (after the wizard's own close work).
+    var onClose: (() -> Void)?
 
     /// Brings it up (already open: to the front). `automatic`: the first
     /// run, resumed where a relaunch left it; else from the settings now.
@@ -51,6 +53,7 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
         // it started is still running.
         closing.contentView = nil
         window = nil
+        onClose?()
     }
 }
 

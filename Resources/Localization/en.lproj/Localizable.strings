@@ -44,6 +44,7 @@
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
+"A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";
 "A client" = "A client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
@@ -62,6 +63,7 @@
 "About LLMTray" = "About LLMTray";
 "Add" = "Add";
 "Add Files…" = "Add Files…";
+"Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
 "Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
@@ -187,6 +189,7 @@
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";
 "Context" = "Context";
+"Continue" = "Continue";
 "Copies %1$@ · index %2$@ on disk" = "Copies %1$@ · index %2$@ on disk";
 "Copy" = "Copy";
 "Copy the details as text" = "Copy the details as text";
@@ -269,6 +272,7 @@
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
 "Failed: %@" = "Failed: %@";
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
+"Faster long chats" = "Faster long chats";
 "Fetching file list…" = "Fetching file list…";
 "Files" = "Files";
 "Files Settings…" = "Files Settings…";
@@ -280,6 +284,7 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
 "First token" = "First token";
+"First-run setup" = "First-run setup";
 "Fits comfortably" = "Fits comfortably";
 "Folder" = "Folder";
 "Folder access" = "Folder access";
@@ -323,6 +328,7 @@
 "High quality (larger canvas)" = "High quality (larger canvas)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Highest fidelity, largest download -- a correctness baseline you can trust.";
 "Hourly forecast" = "Hourly forecast";
+"Hover the info button under an answer to see the model, speed and how much context it used." = "Hover the info button under an answer to see the model, speed and how much context it used.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.";
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
@@ -397,6 +403,7 @@
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
+"Long conversations and pinned files come from the cache instead of being read again every turn." = "Long conversations and pinned files come from the cache instead of being read again every turn.";
 "Maintenance" = "Maintenance";
 "Make images and edit them." = "Make images and edit them.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
@@ -512,6 +519,7 @@
 "Performance" = "Performance";
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
+"Picks a model that fits your Mac and turns on only what you choose." = "Picks a model that fits your Mac and turns on only what you choose.";
 "Pin" = "Pin";
 "Pin %@" = "Pin %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.";
@@ -754,6 +762,7 @@
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model reloads when the image or song is done" = "The model reloads when the image or song is done";
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
+"The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model's license, from its card." = "The model's license, from its card.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
@@ -874,6 +883,9 @@
 "What else" = "What else";
 "What happened?" = "What happened?";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
+"What's New" = "What's New";
+"What's New in LLMTray %@" = "What's New in LLMTray %@";
+"What's New…" = "What's New…";
 "What's sent" = "What's sent";
 "When a client asks for another model" = "When a client asks for another model";
 "When an app asks for another model" = "When an app asks for another model";
@@ -882,6 +894,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";
 "Wikipedia" = "Wikipedia";
+"Works offline" = "Works offline";
 "Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
 "You" = "You";
