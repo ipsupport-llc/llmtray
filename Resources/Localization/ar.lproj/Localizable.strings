@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ و%2$lld أخرى";
 "%1$@ asks for %2$@" = "%1$@ يطلب %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ يطلب %2$@. التبديل يفرغ النموذج المحمّل حالياً.";
+"%1$@ items, %2$@" = "%1$@ عنصر، %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "لم أمكن مقارنة %1$lld نسخة بأصلها، فتم إلغاء تحديدها: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld نسخة تختلف عن أصلها، لذا ليست مكررة: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld مكتملة، %2$lld تم التراجع عنها، %3$lld فاشلة";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld ملف · %2$lld قابل للبحث · %3$lld صفحة";
+"%1$lld items, %2$@." = "%1$lld عناصر، %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld عنصرًا، على الأقل %2$@.";
 "%1$lld of %2$lld changes selected" = "تم اختيار %1$lld من أصل %2$lld تغييرات";
 "%@ (LM Studio's, shared with it)" = "%@ (تابع لـ LM Studio، مُشترك معه)";
 "%@ didn't download: %@" = "لم يتم تنزيل %@: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "لا شيء حتى الآن. الأذونات لدردشة واحدة أو طلب واحد غير مدرجة هنا: تنتهي معه.";
 "Not enough free disk space for this model." = "لا توجد مساحة قرص كافية لهذا النموذج.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "لم يتبقَّ مساحة كافية على القرص: %@ يحتاج نحو %@، و%@ متاح.";
+"Not identical to %@: not a duplicate." = "ليس مطابقًا لـ %@: ليس مكررًا.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "غير مدعوم بعد: %@. هذه النسخة تفهرِس النصوص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML.";
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "معدلات وأول رمز: آخر %lld طلبًا.";
 "Re-index %@" = "أعِد فهرسة %@";
 "Re-index this file" = "أعد فهرسة هذا الملف";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "يتعمق في %1$lld مجلدًا فرعيًا (%2$@): تُستخرج ملفاتها.";
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Ready." = "جاهز.";
 "Ready. This is the Full build: the runtime is included." = "جاهز. هذا هو البناء Full: الـ runtime مضمن.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (موصى به)";
 "always" = "دائماً";
 "and %lld more" = "و %lld إضافية";
+"at least %1$@ items, %2$@" = "على الأقل %1$@ عناصر، %2$@";
+"at least %@" = "على الأقل %@";
 "calls tools" = "يستدعي أدوات";
 "can look" = "يمكنه الاطلاع";
 "can look and propose changes" = "يمكنه الاطلاع واقتراح تغييرات";

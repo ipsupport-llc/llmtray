@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ і ще %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запитує %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запитує %2$@. Переключення розвантажить поточну модель.";
+"%1$@ items, %2$@" = "%1$@ предметів, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "Не вдалося порівняти %1$lld копій з оригіналами, тому вони зняті з відмітки: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld копій відрізняються від оригіналів, тому вони не є дублікатами: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld виконано, %2$lld скасовано, %3$lld не вдалося";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld файлів · %2$lld доступні для пошуку · %3$lld сторінок";
+"%1$lld items, %2$@." = "%1$lld предметів, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld предметів, щонайменше %2$@.";
 "%1$lld of %2$lld changes selected" = "Вибрано %1$lld із %2$lld змін";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio, спільно з ним)";
 "%@ didn't download: %@" = "%@ не завантажено: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Ще немає. Дозволи для одного чату або одного запиту тут не списуються: вони закінчуються разом із ним.";
 "Not enough free disk space for this model." = "Недостатньо вільного місця на диску для цієї моделі.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостатньо вільного місця на диску: %@ потребує приблизно %@, вільно %@.";
+"Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ще не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF і HTML.";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "Швидкості та перший токен: останні %lld запитів.";
 "Re-index %@" = "Переіндексувати %@";
 "Re-index this file" = "Переіндексувати цей файл";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Проникає в %1$lld підпапок (%2$@): їхні файли витягуються.";
 "Reading what's installed…" = "Зчитування встановлених компонентів…";
 "Ready." = "Готово.";
 "Ready. This is the Full build: the runtime is included." = "Готово. Це збірка Full: runtime включено.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
 "always" = "завжди";
 "and %lld more" = "і ще %lld";
+"at least %1$@ items, %2$@" = "щонайменше %1$@ предметів, %2$@";
+"at least %@" = "щонайменше %@";
 "calls tools" = "викликає інструменти";
 "can look" = "може переглядати";
 "can look and propose changes" = "може переглядати й пропонувати зміни";

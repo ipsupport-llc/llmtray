@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ e mais %2$lld";
 "%1$@ asks for %2$@" = "%1$@ solicita %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ solicita %2$@. Trocar descarrega o modelo atualmente carregado.";
+"%1$@ items, %2$@" = "%1$@ itens, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld cópias não puderam ser comparadas com os originais, então foram desmarcadas: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld cópias diferem dos originais, portanto não são duplicatas: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld concluídos, %2$lld desfeitos, %3$lld falharam";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld arquivos · %2$lld pesquisáveis · %3$lld páginas";
+"%1$lld items, %2$@." = "%1$lld itens, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld itens, pelo menos %2$@.";
 "%1$lld of %2$lld changes selected" = "%1$lld de %2$lld alterações selecionadas";
 "%@ (LM Studio's, shared with it)" = "%@ (do LM Studio, compartilhado com ele)";
 "%@ didn't download: %@" = "%@ não foi baixado: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Nenhum até agora. Concessões para um chat ou uma solicitação não aparecem aqui: terminam com ele.";
 "Not enough free disk space for this model." = "Espaço livre em disco insuficiente para este modelo.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Espaço em disco insuficiente: %@ precisa de cerca de %@, %@ disponíveis.";
+"Not identical to %@: not a duplicate." = "Não idêntico a %@: não é duplicata.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ainda não é compatível: %@. Esta versão indexa texto, Markdown, código, PDF, Word (docx, doc), ODT, RTF e HTML.";
 "Nothing sent yet." = "Nada enviado ainda.";
 "Nothing to change." = "Nada a alterar.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "Taxas e primeiro token: o último de %lld solicitações.";
 "Re-index %@" = "Reindexar %@";
 "Re-index this file" = "Reindexar este arquivo";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Acessa %1$lld subpastas (%2$@): os arquivos são removidos delas.";
 "Reading what's installed…" = "Lendo o que está instalado…";
 "Ready." = "Pronto.";
 "Ready. This is the Full build: the runtime is included." = "Pronto. Esta é a build Full: o runtime está incluído.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
 "always" = "sempre";
 "and %lld more" = "e mais %lld";
+"at least %1$@ items, %2$@" = "pelo menos %1$@ itens, %2$@";
+"at least %@" = "pelo menos %@";
 "calls tools" = "chama ferramentas";
 "can look" = "pode ver";
 "can look and propose changes" = "pode ver e sugerir alterações";

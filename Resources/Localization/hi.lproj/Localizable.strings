@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ और %2$lld और";
 "%1$@ asks for %2$@" = "%1$@ ने %2$@ मांगा है";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ ने %2$@ मांगा है। स्विच करने से अभी लोड किया गया मॉडल अनलोड हो जाएगा।";
+"%1$@ items, %2$@" = "%1$@ आइटम, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld कॉपीज़ की मूल फ़ाइलों से तुलना नहीं हो सकी, इसलिए वे अनचेक्ड कर दी गईं: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld कॉपीज़ उनकी मूल फ़ाइलों से भिन्न हैं, इसलिए वे डुप्लिकेट नहीं हैं: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld पूरा, %2$lld पूर्ववत, %3$lld विफल";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld फाइलें · %2$lld खोजने योग्य · %3$lld पेज";
+"%1$lld items, %2$@." = "%1$lld आइटम, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld आइटम, कम से कम %2$@.";
 "%1$lld of %2$lld changes selected" = "%2$lld में से %1$lld परिवर्तन चुने गए";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio का, इसके साथ साझा)";
 "%@ didn't download: %@" = "%@ डाउनलोड नहीं हुआ: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "अभी तक कुछ नहीं। एक चैट या एक अनुरोध के लिए दिए गए अनुमति यहाँ सूचीबद्ध नहीं होते: वे उसी के साथ समाप्त हो जाती हैं।";
 "Not enough free disk space for this model." = "इस मॉडल के लिए डिस्क पर पर्याप्त खाली जगह नहीं है।";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "डिस्क में पर्याप्त खाली स्थान नहीं: %@ को लगभग %@ चाहिए, %@ खाली है।";
+"Not identical to %@: not a duplicate." = "%@ के समान नहीं: डुप्लिकेट नहीं।";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "अभी समर्थित नहीं: %@। यह संस्करण टेक्स्ट, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF और HTML को इंडेक्स करता है।";
 "Nothing sent yet." = "अभी कुछ भी नहीं भेजा गया।";
 "Nothing to change." = "बदलने के लिए कुछ नहीं।";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "राशियाँ और पहला token: अंतिम %lld अनुरोध।";
 "Re-index %@" = "फिर से इंडेक्स करें %@";
 "Re-index this file" = "इस फाइल का फिर से इंडेक्स बनाएं";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "यह %1$lld सबफ़ोल्डर (%2$@) में भी जाता है: उनकी फाइलें बाहर निकाली जाती हैं।";
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Ready." = "तैयार।";
 "Ready. This is the Full build: the runtime is included." = "तैयार। यह Full बिल्ड है: runtime शामिल है।";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (Recommended)";
 "always" = "हमेशा";
 "and %lld more" = "और %lld अन्य";
+"at least %1$@ items, %2$@" = "कम से कम %1$@ आइटम, %2$@";
+"at least %@" = "कम से कम %@";
 "calls tools" = "टूल्स कॉल करता है";
 "can look" = "देख सकता है";
 "can look and propose changes" = "देख सकता है और परिवर्तन सुझा सकता है";

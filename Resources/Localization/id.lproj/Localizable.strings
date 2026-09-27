@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ dan %2$lld lagi";
 "%1$@ asks for %2$@" = "%1$@ meminta %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ meminta %2$@. Beralih akan memuat keluar model yang sedang dimuat.";
+"%1$@ items, %2$@" = "%1$@ item, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld salinan tidak dapat dibandingkan dengan aslinya, jadi tidak dicentang: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld salinan berbeda dari aslinya, jadi bukan duplikat: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld selesai, %2$lld dibatalkan, %3$lld gagal";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld berkas · %2$lld dapat dicari · %3$lld halaman";
+"%1$lld items, %2$@." = "%1$lld item, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld item, setidaknya %2$@.";
 "%1$lld of %2$lld changes selected" = "%1$lld dari %2$lld perubahan dipilih";
 "%@ (LM Studio's, shared with it)" = "%@ (milik LM Studio, dibagikan dengannya)";
 "%@ didn't download: %@" = "%@ tidak diunduh: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Belum ada. Izin untuk satu chat atau satu permintaan tidak tercantum di sini: izin berakhir bersamanya.";
 "Not enough free disk space for this model." = "Ruang disk tidak cukup untuk model ini.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Ruang disk tidak cukup: %@ memerlukan sekitar %@, tersedia %@.";
+"Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, dan HTML.";
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "Kecepatan dan token pertama: %lld permintaan terakhir.";
 "Re-index %@" = "Indeks ulang %@";
 "Re-index this file" = "Indeks ulang berkas ini";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Mencakup %1$lld subfolder (%2$@): file‑filenya dikeluarkan dari sana.";
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Ready." = "Siap.";
 "Ready. This is the Full build: the runtime is included." = "Siap. Ini adalah build Full: runtime sudah disertakan.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ campuran (direkomendasikan)";
 "always" = "selalu";
 "and %lld more" = "dan %lld lainnya";
+"at least %1$@ items, %2$@" = "setidaknya %1$@ item, %2$@";
+"at least %@" = "setidaknya %@";
 "calls tools" = "memanggil alat";
 "can look" = "bisa melihat";
 "can look and propose changes" = "bisa melihat dan mengusulkan perubahan";

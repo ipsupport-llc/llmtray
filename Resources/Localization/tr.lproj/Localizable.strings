@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ ve %2$lld tane daha";
 "%1$@ asks for %2$@" = "%1$@, %2$@ istiyor";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@, %2$@ istiyor. Değiştirirseniz şu anda yüklü olan model boşaltılır.";
+"%1$@ items, %2$@" = "%1$@ öğe, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "Orijinalleriyle karşılaştırılamayan %1$lld kopya işaretsiz bırakıldı: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "Orijinallerinden farklı olan %1$lld kopya yinelenen sayılmaz: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld tamamlandı, %2$lld geri alındı, %3$lld başarısız";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld dosya · %2$lld aranabilir · %3$lld sayfa";
+"%1$lld items, %2$@." = "%1$lld öğe, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld öğe, en az %2$@.";
 "%1$lld of %2$lld changes selected" = "%2$lld değişiklikten %1$lld seçildi";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio'ya ait, onunla paylaşılıyor)";
 "%@ didn't download: %@" = "%@ indirilmedi: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Henüz yok. Tek bir sohbet veya tek bir istek için verilen izinler burada listelenmez: onlar işlemle sona erer.";
 "Not enough free disk space for this model." = "Bu model için yeterli boş disk alanı yok.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Yeterli boş disk alanı yok: %@ yaklaşık %@ gerektiriyor, %@ boş.";
+"Not identical to %@: not a duplicate." = "%@ ile aynı değil: yinelenen değil.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF ve HTML dosyalarını dizine alır.";
 "Nothing sent yet." = "Henüz gönderilen yok.";
 "Nothing to change." = "Değiştirilecek bir şey yok.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "Oranlar ve ilk token: son %lld isteğin verileri.";
 "Re-index %@" = "%@ öğesini yeniden dizine al";
 "Re-index this file" = "Bu dosyayı yeniden dizine al";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld alt klasöre (%2$@) giriliyor: dosyaları bu klasörlerden çıkarılır.";
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Ready." = "Hazır.";
 "Ready. This is the Full build: the runtime is included." = "Hazır. Bu Full derlemesidir: runtime dahil.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ karışık (önerilen)";
 "always" = "her zaman";
 "and %lld more" = "ve %lld tane daha";
+"at least %1$@ items, %2$@" = "en az %1$@ öğe, %2$@";
+"at least %@" = "en az %@";
 "calls tools" = "araçları çağırır";
 "can look" = "görebilir";
 "can look and propose changes" = "görebilir ve değişiklik önerebilir";

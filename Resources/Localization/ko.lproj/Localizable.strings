@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ 및 %2$lld개 더";
 "%1$@ asks for %2$@" = "%1$@이(가) %2$@을(를) 요청합니다";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@이(가) %2$@을(를) 요청합니다. 전환하면 현재 로드된 모델이 언로드됩니다.";
+"%1$@ items, %2$@" = "%1$@개 항목, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld개의 복사본을 원본과 비교할 수 없어 선택 해제됨: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld개의 복사본이 원본과 다름(중복 아님): %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld 완료, %2$lld 되돌림, %3$lld 실패";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld개 파일 · %2$lld개 검색 가능 · %3$lld페이지";
+"%1$lld items, %2$@." = "%1$lld개 항목, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld개 항목, 최소 %2$@.";
 "%1$lld of %2$lld changes selected" = "%2$lld개 변경 중 %1$lld개 선택됨";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio와 공유됨)";
 "%@ didn't download: %@" = "%@를 다운로드하지 못함: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "아직 없음. 개별 채팅 또는 요청에 대한 권한은 여기 나열되지 않습니다: 권한은 해당 채팅/요청과 함께 종료됩니다.";
 "Not enough free disk space for this model." = "이 모델을 위해 디스크 여유 공간이 충분하지 않습니다.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "디스크 여유 공간이 부족합니다: %@에 약 %@가 필요하지만 %@만 남아 있습니다.";
+"Not identical to %@: not a duplicate." = "%@와(과) 동일하지 않음: 중복 아님.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "아직 지원되지 않음: %@. 이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF 및 HTML을 인덱스합니다.";
 "Nothing sent yet." = "아직 전송된 항목이 없습니다.";
 "Nothing to change." = "변경할 항목 없음.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "속도와 첫 토큰: 최근 %lld개의 요청.";
 "Re-index %@" = "다시 인덱스 %@";
 "Re-index this file" = "이 파일 다시 인덱스";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld개의 하위 폴더(%2$@)까지 검색: 해당 폴더의 파일을 꺼냄.";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Ready." = "준비됨.";
 "Ready. This is the Full build: the runtime is included." = "준비됨. Full 빌드입니다: 런타임 포함.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ 혼합(권장)";
 "always" = "항상";
 "and %lld more" = "그리고 %lld개 더";
+"at least %1$@ items, %2$@" = "최소 %1$@개 항목, %2$@";
+"at least %@" = "최소 %@";
 "calls tools" = "도구 호출";
 "can look" = "볼 수 있음";
 "can look and propose changes" = "볼 수 있고 변경 제안 가능";
