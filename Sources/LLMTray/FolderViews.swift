@@ -303,7 +303,7 @@ struct FoldersPane: View {
         Section("Allowed folders") {
             Text("Folders chats can use without asking. When a chat needs another folder, it asks you in the chat.")
                 .font(.caption).foregroundStyle(.secondary)
-            let grants = manager.standingGrants.filter { !$0.isExpired(now: now) }
+            let grants = manager.standingGrants.compactMap { $0.current(now: now) }
             if grants.isEmpty {
                 Text("None yet. Grants for one chat or one request aren't listed here: they end with it.")
                     .font(.caption).foregroundStyle(.secondary)
@@ -319,21 +319,37 @@ struct FoldersPane: View {
         }
     }
 
+    /// Path and origin; the level with its lifetime, and for a change grant
+    /// that ends, what it may do after ("then can look · Always").
     private func grantRow(_ grant: FolderGrant) -> some View {
         LabeledContent {
-            HStack(spacing: 8) {
-                Menu(grant.level == .change ? String(localized: "Can look and propose changes") : String(localized: "Can look")) {
-                    Button("Can look") { update(grant, level: .read, choice: nil) }
-                    Button("Can look and propose changes") { update(grant, level: .change, choice: nil) }
+            VStack(alignment: .trailing, spacing: 4) {
+                HStack(spacing: 8) {
+                    Menu(grant.level == .change ? String(localized: "Can look and propose changes") : String(localized: "Can look")) {
+                        Button("Can look") { update(grant, .level(.read)) }
+                        Button("Can look and propose changes") { update(grant, .level(.change)) }
+                    }
+                    .fixedSize()
+                    Menu(FolderAccessManager.lifetimeTitle(grant.lifetime)) {
+                        Button("1 hour") { update(grant, .lifetime(.hour)) }
+                        Button("Always") { update(grant, .lifetime(.always)) }
+                    }
+                    .fixedSize()
+                    Button("Revoke") {
+                        error = nil
+                        do { try manager.revoke(grant) } catch { self.error = FolderAccessManager.message(error) }
+                    }
                 }
-                .fixedSize()
-                Menu(FolderAccessManager.lifetimeTitle(grant)) {
-                    Button("1 hour") { update(grant, level: grant.level, choice: .hour) }
-                    Button("Always") { update(grant, level: grant.level, choice: .always) }
-                }
-                .fixedSize()
-                Button("Revoke") {
-                    do { try manager.revoke(grant) } catch { self.error = FolderAccessManager.message(error) }
+                if grant.level == .change, grant.lifetime != .always {
+                    HStack(spacing: 6) {
+                        Text("then").font(.caption).foregroundStyle(.secondary)
+                        Menu(lookAfterTitle(grant)) {
+                            Button("Can look · 1 hour") { update(grant, .lookAfterChange(.hour)) }
+                            Button("Can look · Always") { update(grant, .lookAfterChange(.always)) }
+                            Button("No access") { update(grant, .lookAfterChange(nil)) }
+                        }
+                        .fixedSize()
+                    }
                 }
             }
         } label: {
@@ -348,13 +364,18 @@ struct FoldersPane: View {
         }
     }
 
-    /// Through the manager, as a grant is. A level change (`choice` nil)
-    /// keeps the grant ending when it did.
-    private func update(_ grant: FolderGrant, level: FolderAccessLevel, choice: GrantChoice?) {
+    private func lookAfterTitle(_ grant: FolderGrant) -> String {
+        guard let look = grant.readLifetime else { return NSLocalizedString("No access", comment: "folder grant: after the change part ends") }
+        return String(format: NSLocalizedString("Can look · %@", comment: "folder grant: after the change part ends; a lifetime"),
+                      FolderAccessManager.lifetimeTitle(look))
+    }
+
+    /// Through the manager, as a grant is; a failure says why in the pane.
+    private func update(_ grant: FolderGrant, _ edit: FolderToolService.GrantEdit) {
         error = nil
-        if choice == nil, level == grant.level { return }
+        if case .level(let level) = edit, level == grant.level { return }
         do {
-            try manager.updateGrant(grant, level: level, choice: choice)
+            try manager.updateGrant(grant, edit)
         } catch {
             self.error = FolderAccessManager.message(error)
         }

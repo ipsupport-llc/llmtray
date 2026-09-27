@@ -132,18 +132,55 @@ public final class FolderToolService: @unchecked Sendable {
                                 origin: chat == nil ? .settings : .chat, now: now)
     }
 
+    /// One edit of a standing grant's row in Settings.
+    public enum GrantEdit: Equatable, Sendable {
+        /// Look only (for as long as it may look), or look and propose
+        /// changes (for as long as it has).
+        case level(FolderAccessLevel)
+        /// The row's level for an hour from now, or always.
+        case lifetime(GrantChoice)
+        /// After a change grant's time: looking on (an hour from now,
+        /// always), or nil for nothing.
+        case lookAfterChange(GrantChoice?)
+    }
+
     /// A standing grant edited in Settings: its folder checked again as a new
-    /// grant's is, then its level and lifetime set -- `choice` hour (from
-    /// now) or always, nil keeping the one it has. Nil when the grant is gone.
+    /// grant's is -- still there, grantable, and the same folder (path and
+    /// identity) -- then the edit applied. Throws when anything doesn't hold;
+    /// nothing changes then.
     @discardableResult
-    public func updateGrant(_ id: UUID, level: FolderAccessLevel, choice: GrantChoice?, now: Date = Date()) throws -> FolderGrant? {
-        guard choice == nil || choice == .hour || choice == .always,
-              let current = grants.standingGrants(now: now).first(where: { $0.id == id }) else { return nil }
-        let lifetime = choice?.lifetime(callKey: "", chatID: "", now: now) ?? current.lifetime
-        let root = try makeRoot(current.root.path)
-        // The path leads elsewhere now (a link put in its place): not this grant's folder.
-        guard root.path == current.root.path else { throw FolderAccessError.symlink(current.root.path) }
-        return try grants.update(id, root: root, level: level, lifetime: lifetime, now: now)
+    public func updateGrant(_ id: UUID, _ edit: GrantEdit, now: Date = Date()) throws -> FolderGrant {
+        guard let current = grants.standingGrants(now: now).first(where: { $0.id == id }) else {
+            throw FolderGrants.GrantError.gone
+        }
+        func standing(_ choice: GrantChoice) throws -> GrantLifetime {
+            guard choice == .hour || choice == .always,
+                  let l = choice.lifetime(callKey: "", chatID: "", now: now) else { throw FolderGrants.GrantError.notStanding }
+            return l
+        }
+        var level = current.level, lifetime = current.lifetime, readLifetime = current.readLifetime
+        switch edit {
+        case .level(.read):
+            level = .read
+            lifetime = current.lookLifetime
+            readLifetime = nil
+        case .level(.change):
+            level = .change
+        case .lifetime(let choice):
+            lifetime = try standing(choice)
+        case .lookAfterChange(let choice):
+            guard current.level == .change else { return current }
+            readLifetime = try choice.map(standing)
+        }
+        let root: FolderRoot
+        do {
+            root = try makeRoot(current.root.path)
+        } catch {
+            throw FolderGrants.GrantError.folderChanged
+        }
+        // Another folder at the path now (replaced, a link put in its place).
+        guard root == current.root else { throw FolderGrants.GrantError.folderChanged }
+        return try grants.update(id, root: root, level: level, lifetime: lifetime, readLifetime: readLifetime, now: now)
     }
 
     /// A folder picked by the user, checked for being grantable.

@@ -128,6 +128,9 @@
 "Calls" = "Calls";
 "Can look" = "Can look";
 "Can look and propose changes" = "Can look and propose changes";
+"Can look · %@" = "Can look · %@";
+"Can look · 1 hour" = "Can look · 1 hour";
+"Can look · Always" = "Can look · Always";
 "Can't change models while auto-tune is running" = "Can't change models while auto-tune is running";
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
@@ -439,6 +442,7 @@
 "No Python 3.10 or newer was found." = "No Python 3.10 or newer was found.";
 "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh)." = "No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh).";
 "No README.md in this repo." = "No README.md in this repo.";
+"No access" = "No access";
 "No auto-tune run yet." = "No auto-tune run yet.";
 "No automatic update checks" = "No automatic update checks";
 "No chats found" = "No chats found";
@@ -760,6 +764,8 @@
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
 "Thinking…" = "Thinking…";
 "This chat may use" = "This chat may use";
+"This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "This folder is gone or isn't the one allowed any more: revoke it and allow it again.";
+"This folder's access has ended or was revoked." = "This folder's access has ended or was revoked.";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";

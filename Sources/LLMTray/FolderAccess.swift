@@ -115,11 +115,11 @@ final class FolderAccessManager: ObservableObject {
         refresh()
     }
 
-    /// A standing grant's level or lifetime (hour, always; nil keeps it)
-    /// changed in Settings: its folder checked again, as a new grant's is.
-    func updateGrant(_ grant: FolderGrant, level: FolderAccessLevel, choice: GrantChoice?) throws {
+    /// A standing grant's row edited in Settings: its folder checked again,
+    /// as a new grant's is.
+    func updateGrant(_ grant: FolderGrant, _ edit: FolderToolService.GrantEdit) throws {
         defer { refresh() }
-        try service.updateGrant(grant.id, level: level, choice: choice)
+        try service.updateGrant(grant.id, edit)
     }
 
     func endChat(_ chatID: String) {
@@ -161,6 +161,10 @@ final class FolderAccessManager: ObservableObject {
             return NSLocalizedString("Some items changed on disk since they were proposed: untick them, or ask again.", comment: "folder plan error")
         case ChangePlanError.missingDependency:
             return NSLocalizedString("An item needs the new folder it goes into: tick that folder too.", comment: "folder plan error")
+        case FolderGrants.GrantError.gone:
+            return NSLocalizedString("This folder's access has ended or was revoked.", comment: "folder grant error")
+        case FolderGrants.GrantError.folderChanged:
+            return NSLocalizedString("This folder is gone or isn't the one allowed any more: revoke it and allow it again.", comment: "folder grant error")
         case FolderGrants.GrantError.temporaryChat, ChangePlanError.temporaryChat:
             return NSLocalizedString("Temporary chats can only look in folders, for that chat only.", comment: "folder grant error")
         case FolderAccessError.notGrantable, FolderAccessError.notFound, FolderAccessError.symlink:
@@ -182,9 +186,9 @@ final class FolderAccessManager: ObservableObject {
         }
     }
 
-    /// The same, as a menu's title in Settings.
-    static func lifetimeTitle(_ grant: FolderGrant) -> String {
-        guard case .until(let date) = grant.lifetime else {
+    /// A standing lifetime as a menu's title in Settings.
+    static func lifetimeTitle(_ lifetime: GrantLifetime) -> String {
+        guard case .until(let date) = lifetime else {
             return NSLocalizedString("Always", comment: "folder grant lifetime: menu title")
         }
         return String(format: NSLocalizedString("Until %@", comment: "folder grant lifetime: menu title, a time"),

@@ -277,6 +277,16 @@ final class SetupWizardModel: ObservableObject {
         }
     }
 
+    /// Local folders that are complete copies of a pick, read when the
+    /// models, the picks or the chat downloads change -- never per redraw.
+    @Published private(set) var completePickFolders: Set<String> = []
+
+    func refreshLocalCopies(localPaths: [String]) {
+        let matched = picks.compactMap { ModelRecommendations.localPath(of: $0.model.repo, in: localPaths) }
+        let complete = Set(matched.filter { ModelFolder.isComplete(atPath: $0) })
+        if complete != completePickFolders { completePickFolders = complete }
+    }
+
     var selectedLocalPath: String? {
         if case .local(let path) = progress.choices.chatModel { return path }
         return nil

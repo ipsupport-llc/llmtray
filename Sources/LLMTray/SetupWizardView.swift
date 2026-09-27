@@ -394,10 +394,17 @@ private struct ChatModelStep: View {
     }
 
     /// A pick already complete here is listed with the local models, not
-    /// offered for download again.
+    /// offered for download again (completeness cached in the model).
     private var offer: ModelRecommendations.Offer {
-        ModelRecommendations.offer(model.picks, localPaths: localModels.map(\.path),
-                                   isComplete: { ModelFolder.isComplete(atPath: $0) })
+        let complete = model.completePickFolders
+        return ModelRecommendations.offer(model.picks, localPaths: localModels.map(\.path), isComplete: complete.contains)
+    }
+
+    /// What completeness depends on: the folders, the picks, the chat
+    /// downloads' states (not their progress).
+    private var localCopiesKey: [String] {
+        catalog.models.map(\.path) + model.picks.map(\.model.repo)
+            + queue.state.items.filter { $0.kind == .chatModel }.map { "\($0.target) \($0.status)" }
     }
 
     /// Picked here, or the wizard's download of it is in place.
@@ -447,7 +454,11 @@ private struct ChatModelStep: View {
                 Spacer()
             }
         }
-        .onAppear { model.loadPicks() }
+        .onAppear {
+            model.loadPicks()
+            model.refreshLocalCopies(localPaths: catalog.models.map(\.path))
+        }
+        .onChange(of: localCopiesKey) { model.refreshLocalCopies(localPaths: catalog.models.map(\.path)) }
     }
 
     private func pickRow(_ pick: ModelRecommendations.Pick) -> some View {

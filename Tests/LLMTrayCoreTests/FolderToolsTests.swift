@@ -563,27 +563,51 @@ extension FolderToolsTests {
     func testSettingsGrantsAreOnePerFolderAndEditedInPlace() throws {
         let t0 = Date()
         // From Settings, then from a chat: one row, its origin the first.
-        let added = try XCTUnwrap(service.userGrant(root, level: .read, choice: .hour, chat: nil, now: t0))
+        let added = try XCTUnwrap(service.userGrant(root, level: .read, choice: .always, chat: nil, now: t0))
         XCTAssertEqual(added.origin, .settings)
         try service.userGrant(root, level: .change, choice: .hour, chat: chat, now: t0.addingTimeInterval(60))
-        var rows = service.grants.standingGrants(now: t0)
-        XCTAssertEqual(rows.count, 1)
-        XCTAssertEqual(rows[0].level, .change)
-        XCTAssertEqual(rows[0].lifetime, .until(t0.addingTimeInterval(3660)))
-        XCTAssertEqual(rows[0].origin, .settings)
-        // A level edit keeps the end; a lifetime edit sets it.
-        try service.updateGrant(added.id, level: .read, choice: nil, now: t0)
-        rows = service.grants.standingGrants(now: t0)
-        XCTAssertEqual(rows[0].level, .read)
-        XCTAssertEqual(rows[0].lifetime, .until(t0.addingTimeInterval(3660)))
-        try service.updateGrant(added.id, level: .read, choice: .always, now: t0)
-        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].lifetime, .always)
-        try service.updateGrant(added.id, level: .read, choice: .hour, now: t0)
-        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].lifetime, .until(t0.addingTimeInterval(3600)))
-        XCTAssertNil(try service.updateGrant(added.id, level: .read, choice: .chat, now: t0), "hour or always only")
-        // The folder is checked again: gone, the edit fails and changes nothing.
+        var row = try XCTUnwrap(service.grants.standingGrants(now: t0).first)
+        XCTAssertEqual(service.grants.standingGrants(now: t0).count, 1)
+        XCTAssertEqual(row.level, .change)
+        XCTAssertEqual(row.lifetime, .until(t0.addingTimeInterval(3660)))
+        XCTAssertEqual(row.readLifetime, .always)
+        XCTAssertEqual(row.origin, .settings)
+        // "then": nothing after the change's hour, then looking always again.
+        row = try service.updateGrant(added.id, .lookAfterChange(nil), now: t0)
+        XCTAssertNil(row.readLifetime)
+        row = try service.updateGrant(added.id, .lookAfterChange(.always), now: t0)
+        XCTAssertEqual(row.readLifetime, .always)
+        // Change always: the look lifetime is folded in.
+        row = try service.updateGrant(added.id, .lifetime(.always), now: t0)
+        XCTAssertEqual(row.lifetime, .always)
+        XCTAssertNil(row.readLifetime)
+        // Look only: for as long as it looked.
+        row = try service.updateGrant(added.id, .level(.read), now: t0)
+        XCTAssertEqual(row.level, .read)
+        XCTAssertEqual(row.lifetime, .always)
+        row = try service.updateGrant(added.id, .lifetime(.hour), now: t0)
+        XCTAssertEqual(row.lifetime, .until(t0.addingTimeInterval(3600)))
+        XCTAssertThrowsError(try service.updateGrant(added.id, .lifetime(.chat), now: t0), "hour or always only")
+        XCTAssertThrowsError(try service.updateGrant(UUID(), .level(.change), now: t0)) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .gone)
+        }
+    }
+
+    func testAnEditFailsForAFolderReplacedAtTheSamePath() throws {
+        let added = try XCTUnwrap(service.userGrant(root, level: .read, choice: .always, chat: nil))
+        // The granted folder moved aside (its inode kept alive), a new one in its place.
+        try fm.moveItem(atPath: grant, toPath: outside + "/moved")
+        try fm.createDirectory(atPath: grant, withIntermediateDirectories: false)
+        XCTAssertNotEqual(try SafeFolderWalker.makeRoot(path: grant, denylist: denylist).identity, root.identity)
+        XCTAssertThrowsError(try service.updateGrant(added.id, .level(.change))) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .folderChanged)
+        }
+        XCTAssertEqual(service.grants.standingGrants().first?.level, .read, "nothing changed")
+        // Gone altogether: the same.
         try fm.removeItem(atPath: grant)
-        XCTAssertThrowsError(try service.updateGrant(added.id, level: .change, choice: nil, now: t0))
-        XCTAssertEqual(service.grants.standingGrants(now: t0)[0].level, .read)
+        XCTAssertThrowsError(try service.updateGrant(added.id, .lifetime(.hour))) {
+            XCTAssertEqual($0 as? FolderGrants.GrantError, .folderChanged)
+        }
+        XCTAssertEqual(service.grants.standingGrants().first?.lifetime, .always)
     }
 }
