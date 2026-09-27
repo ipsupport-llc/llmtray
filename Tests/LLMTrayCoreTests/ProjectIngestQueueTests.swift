@@ -157,4 +157,38 @@ final class ProjectIngestQueueTests: XCTestCase {
             XCTAssertFalse(ProjectFileFormats.isOffered(URL(fileURLWithPath: "/x/" + name)), name)
         }
     }
+
+    func testReindexGoesInTheExtractionLane() {
+        var q = Q()
+        q.enqueue([.embed(1)], in: a)
+        q.enqueue([.reindex(5)], in: a)
+        XCTAssertEqual(q.queued(a), [.reindex(5), .embed(1)])
+        let first = q.next()!
+        XCTAssertEqual(first.work, .reindex(5), "before any embedding")
+        q.finish(first, .interrupted)
+        XCTAssertEqual(q.queued(a).first, .reindex(5), "an interrupted re-index stays one")
+        let again = q.next()!
+        XCTAssertEqual(again.work, .reindex(5))
+        q.finish(again, .needsEmbedding)
+        XCTAssertEqual(q.queued(a), [.embed(1), .embed(5)])
+    }
+
+    func testAReindexOfADocumentAlreadyQueuedIsItsExtraction() {
+        var q = Q()
+        q.enqueue([.extract(2)], in: a)
+        q.enqueue([.reindex(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(2)], "a first extraction reads it anyway")
+        let item = q.next()!
+        q.enqueue([.reindex(2)], in: a)
+        XCTAssertTrue(q.queued(a).isEmpty, "nor while it's being read")
+        q.finish(item, .finished)
+        q.enqueue([.reindex(2), .reindex(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.reindex(2)])
+        q.drop(2, in: a)
+        XCTAssertTrue(q.queued(a).isEmpty)
+        q.enqueue([.reindex(2)], in: a)
+        q.stop(a)
+        q.enqueue([.extract(2)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(2)], "a stop forgets the re-index")
+    }
 }

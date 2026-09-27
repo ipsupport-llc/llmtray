@@ -245,6 +245,41 @@ final class ProjectIngestorTests: XCTestCase {
         XCTAssertEqual(statuses(i), [.embedded, .embedded, .embedded])
     }
 
+    func testReindexWritesANewRevisionAndEmbedsIt() async throws {
+        let i = ingestor()
+        _ = await i.add(try corpus(2), to: project)
+        try await settle(i)
+        XCTAssertEqual(i.documents[project]?.map(\.rev), [1, 1])
+        i.pause(project)
+        await i.reindex(1, in: project)
+        XCTAssertEqual(i.displayStatus(i.documents[project]![0], in: project), .queued, "waits its turn, and says so")
+        XCTAssertEqual(i.documents[project]?.first?.status, .embedded, "the current revision stays searchable meanwhile")
+        i.resume(project)
+        try await settle(i)
+        XCTAssertEqual(i.documents[project]?.map(\.rev), [2, 1])
+        XCTAssertEqual(statuses(i), [.embedded, .embedded])
+        XCTAssertEqual(extractor.calls, 3)
+        let h = try await registry.open(project)
+        let hit = try await h.search("unique0marker", queryVector: ToyEmbedder().embed("unique0marker"))
+        XCTAssertEqual(hit.hits.first?.doc, 1)
+        XCTAssertEqual(hit.hits.first?.rev, 2)
+    }
+
+    func testReindexRestartsAStoppedProjectAndRetriesAFailure() async throws {
+        let i = ingestor()
+        _ = await i.add([try file("broken.txt", "BROKEN")], to: project)
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.failed])
+        await i.stop(project)
+        XCTAssertEqual(persisted.stopped, [project])
+        await i.reindex(1, in: project)
+        XCTAssertEqual(persisted.stopped, [], "an explicit re-index restarts it, as an add does")
+        try await settle(i)
+        XCTAssertEqual(statuses(i), [.failed], "fails again, the same way, with its reason")
+        XCTAssertEqual(i.documents[project]?.first?.error, "unreadable: corrupt")
+        XCTAssertEqual(extractor.calls, 2)
+    }
+
     func testAStoppedProjectIsNotEmbeddedAtLaunch() async throws {
         embedder = nil
         let i = ingestor()

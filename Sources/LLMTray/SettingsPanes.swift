@@ -345,14 +345,21 @@ struct ModelsPane: View {
 }
 
 /// Project files (adr/0012): the feature's opt-in and its embedding model,
-/// with its size. Off, nothing is indexed, downloaded or started. The
-/// Files view with each project's documents comes with PR 3.5.
+/// with its size, and the disk every project's files and index take. Off,
+/// nothing is indexed, downloaded or started. Each project's files are in
+/// its Files window (the project's menu in the chats sidebar).
 @MainActor
 struct ProjectFilesSection: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var embedders = ProjectIndexer.shared.embedders
     @State private var error: String?
+    @State private var diskTotal: Int64?
     private var setup: FeatureSetup { .shared }
+
+    /// Re-measured when a project's documents change.
+    private var diskKey: String {
+        indexer.documents.map { "\($0.key):\($0.value.count):\($0.value.map(\.rev).reduce(0, +))" }.sorted().joined(separator: ",")
+    }
 
     var body: some View {
         Section("Project files") {
@@ -377,10 +384,18 @@ struct ProjectFilesSection: View {
                 Text(String(format: NSLocalizedString("Search by meaning is off for now: %@", comment: ""), reason))
                     .font(.caption).foregroundStyle(.secondary)
             }
+            if let diskTotal, diskTotal > 0 {
+                LabeledContent {
+                    Text(ModelCatalog.format(diskTotal)).foregroundStyle(.secondary)
+                } label: {
+                    SettingLabel(title: "Projects' files on disk", help: "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.")
+                }
+            }
             if let error {
                 Text(error).font(.caption).foregroundStyle(.red)
             }
         }
+        .task(id: diskKey) { diskTotal = await ProjectIndexer.totalDiskUsage() }
     }
 
     private var embedderStatus: String {

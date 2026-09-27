@@ -670,7 +670,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.updatePulse(isStreaming: isStreaming || isBusy || isGeneratingMedia)
             }
             .store(in: &cancellables)
+        // A project indexing (adr/0012): a small dot on the icon.
+        ProjectIndexer.shared.$progress
+            .map { $0.values.contains { $0.state == .running || $0.state == .waiting } }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] indexing in
+                guard let self else { return }
+                self.isIndexingProjects = indexing
+                self.statusItem.button?.image = self.coloredStatusImage
+            }
+            .store(in: &cancellables)
     }
+
+    /// Any project indexing: the icon carries a dot.
+    private var isIndexingProjects = false
 
     /// Color alone can't carry both signals once thermal state (orange/red)
     /// outranks "is generating" (green) -- so activity is layered on as a
@@ -708,7 +722,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             ?? NSImage()
         let image = base.withSymbolConfiguration(config) ?? base
         image.isTemplate = false
-        return image
+        guard isIndexingProjects else { return image }
+        // The dot in the corner, drawn over the symbol (its colors kept).
+        let dotted = NSImage(size: image.size, flipped: false) { rect in
+            image.draw(in: rect)
+            let d = max(4, rect.width * 0.28)
+            let dot = NSRect(x: rect.maxX - d, y: rect.minY, width: d, height: d)
+            NSColor.controlAccentColor.setFill()
+            NSBezierPath(ovalIn: dot).fill()
+            return true
+        }
+        dotted.isTemplate = false
+        dotted.accessibilityDescription = NSLocalizedString("LLMTray status, indexing project files", comment: "the menu bar icon while a project indexes")
+        return dotted
     }
 
     /// Thermal state still wins on color (a hot/throttling machine is the
