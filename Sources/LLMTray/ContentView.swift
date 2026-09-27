@@ -50,6 +50,8 @@ struct ContentView: View {
     /// The user's own scrolling (wheel, trackpad, scroller): only it turns
     /// following off -- the chat's own layout changes never do.
     @StateObject private var userScroll = UserScrollWatch()
+    /// One retry waits for the user's gesture to end, not one per token.
+    @State private var followRetryPending = false
     @State private var chatViewportHeight: CGFloat = 380
     /// What a citation chip found: the file changed since, or gone.
     @State private var citationNote: String?
@@ -240,7 +242,18 @@ struct ContentView: View {
         guard followChatBottom, chat.draft?.anchor == nil else { return }
         DispatchQueue.main.async {
             DispatchQueue.main.async {
-                guard followChatBottom, !userScroll.isScrolling else { return }
+                guard followChatBottom else { return }
+                // The user's gesture first; the end once it's over (the last
+                // token may have come meanwhile, with nothing after it).
+                guard !userScroll.isScrolling else {
+                    guard !followRetryPending else { return }
+                    followRetryPending = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        followRetryPending = false
+                        followToEnd(proxy)
+                    }
+                    return
+                }
                 var t = Transaction()
                 t.disablesAnimations = true
                 withTransaction(t) { proxy.scrollTo(Self.chatBottomID, anchor: .bottom) }
@@ -403,7 +416,9 @@ struct ContentView: View {
                     if moved { AnswerInfoPresenter.shared.chatScrolled() }
                     // Up and away from the end: stop. Text arriving while the
                     // user scrolls down to it doesn't count as leaving.
-                    if atEnd { followChatBottom = true } else if scrolledUp { followChatBottom = false }
+                    // A shrink meanwhile (reasoning folding) moves the offset
+                    // without the user: only a pass that didn't shrink counts.
+                    if atEnd { followChatBottom = true } else if scrolledUp, grew > -0.5 { followChatBottom = false }
                 } else if atEnd {
                     followChatBottom = true
                 }
@@ -496,6 +511,8 @@ struct ContentView: View {
     }
 
     private func regenerate() {
+        // The new answer is what the user asked to see.
+        followChatBottom = true
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 
@@ -600,7 +617,9 @@ final class UserScrollWatch: ObservableObject {
                 self.lastWheel = Date()
                 return event
             }
-            guard event.window === target.window else { return event }
+            guard event.window === target.window,
+                  // Sideways: a code block's or table's own scroller.
+                  abs(event.scrollingDeltaY) >= abs(event.scrollingDeltaX) else { return event }
             let point = target.convert(event.locationInWindow, from: nil)
             if target.bounds.contains(point) { self.lastWheel = Date() }
             return event
