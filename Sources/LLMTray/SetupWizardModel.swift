@@ -135,7 +135,7 @@ final class SetupWizardModel: ObservableObject {
         }
         // The wizard's download runs into the folder applied (or is done
         // there): the folder stays.
-        if step == .modelsFolder, isWizardDownloadActive || isWizardDownloadComplete {
+        if step == .modelsFolder, locksModelsFolder {
             progress.choices.modelsFolder = progress.baseline.modelsFolder
             progress.step = .chatModel
             return
@@ -249,7 +249,7 @@ final class SetupWizardModel: ObservableObject {
         panel.canChooseFiles = false
         panel.directoryURL = URL(fileURLWithPath: progress.choices.modelsFolder)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
-        guard panel.runModal() == .OK, let url = panel.url else { return }
+        guard panel.runModal() == .OK, let url = panel.url, !locksModelsFolder else { return }
         progress.choices.modelsFolder = url.path
     }
 
@@ -326,6 +326,11 @@ final class SetupWizardModel: ObservableObject {
         guard let repo = selectedDownloadRepo else { return false }
         return DownloadQueue.isComplete(repo, root: ModelDiscovery.currentModelsRoot())
     }
+
+    /// The picked download is coming into the folder applied, or is there:
+    /// the folder stays (Finish looks for the model in it), until another
+    /// chat model is picked.
+    var locksModelsFolder: Bool { isWizardDownloadActive || isWizardDownloadComplete }
 
     /// A download this wizard started for another pick is cancelled.
     private func stopWizardDownload(keeping repo: String?) {

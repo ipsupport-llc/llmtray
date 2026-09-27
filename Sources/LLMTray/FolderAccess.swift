@@ -23,6 +23,8 @@ final class FolderAccessManager: ObservableObject {
 
     let service: FolderToolService
     private var recovered = false
+    /// Recovery found another change running: it runs once that one ends.
+    private var recoveryWaits = false
 
     private init() {
         isEnabled = UserDefaults.standard[Pref.folderToolsEnabled]
@@ -62,14 +64,21 @@ final class FolderAccessManager: ObservableObject {
         }
     }
 
-    /// As the one change in progress: no approval or undo runs beside it.
+    /// As the one change in progress: no approval or undo runs beside it;
+    /// behind one that's running, once it ends.
     private func recover() {
         guard !recovered else { return }
+        guard !isChanging else {
+            recoveryWaits = true
+            return
+        }
         recovered = true
         let service = self.service
         Task {
             guard let found = await change({ service.recoverInterrupted() }) else {
-                recovered = false   // something else ran: next time
+                // Another change took the slot first: after it.
+                recovered = false
+                recoveryWaits = true
                 return
             }
             recoveries = found
@@ -119,6 +128,10 @@ final class FolderAccessManager: ObservableObject {
         defer {
             isChanging = false
             refresh()
+            if recoveryWaits, isEnabled {
+                recoveryWaits = false
+                recover()
+            }
         }
         return await Task.detached { work() }.value
     }

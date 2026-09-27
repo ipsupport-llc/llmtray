@@ -359,7 +359,29 @@ public final class FolderToolService: @unchecked Sendable {
         guard let location else {
             return .text("\(name): \(raw) isn't in a folder shared with this chat.")
         }
-        return run(request, at: location, byteBudget: byteBudget, isCancelled: isCancelled)
+        // A grant revoked or expired while it reads (a long listing, a
+        // duplicate scan) stops the read, and nothing of it is told.
+        let revoked = Flag()
+        let stillGranted = { [self] () -> Bool in
+            let ok = !hasEnded(chat.id) && grants.coversRead(path: location.displayPath, chatID: chat.id, callKey: callKey,
+                                                             temporaryChat: chat.temporary)
+            if !ok { revoked.set() }
+            return ok
+        }
+        let answer = run(request, at: location, byteBudget: byteBudget, isCancelled: { isCancelled() || !stillGranted() })
+        guard !revoked.isSet, stillGranted() else {
+            return .refused("Access to that folder was withdrawn while it was being read: nothing from it can be used. "
+                + "Answer without it.")
+        }
+        return answer
+    }
+
+    /// Set once, from any thread.
+    private final class Flag: @unchecked Sendable {
+        private let lock = NSLock()
+        private var value = false
+        var isSet: Bool { lock.lock(); defer { lock.unlock() }; return value }
+        func set() { lock.lock(); value = true; lock.unlock() }
     }
 
     /// The read itself, by descriptors from the grant root.

@@ -342,12 +342,16 @@ private struct ModelsFolderStep: View {
             }
             .pickerStyle(.radioGroup)
             .labelsHidden()
-            .disabled(model.isWizardDownloadActive)
+            .disabled(model.locksModelsFolder)
             Button("Choose Another Folder…") { model.chooseModelsFolder() }
-                .disabled(model.isWizardDownloadActive)
+                .disabled(model.locksModelsFolder)
             if model.isWizardDownloadActive {
                 // The download goes on into the folder it started in.
-                Text("The chat model is downloading into this folder. Change it once that's done, here or in Settings.")
+                Text("The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.")
+                    .font(.caption).foregroundStyle(.secondary)
+            } else if model.locksModelsFolder {
+                // Finish selects the downloaded model from this folder.
+                Text("The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first.")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Divider()

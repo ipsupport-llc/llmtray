@@ -186,7 +186,7 @@ final class SetupWizardTests: XCTestCase {
         progress.choices.chatModel = .download(repo: "org/model", approxBytes: 5)
         progress.startsServer = true
         _ = progress.applyEarly(.chatModel)
-        XCTAssertEqual(progress.skip(), [.cancelChatDownload(repo: "org/model")])
+        XCTAssertEqual(progress.skip(), [.cancelChatDownload(repo: "org/model"), .clearModelSelection])
         XCTAssertNil(progress.choices.chatModel)
         XCTAssertFalse(progress.startsServer, "no server start for a pick that was undone")
         XCTAssertEqual(SetupPlan.actions(from: progress.choices, baseline: progress.baseline, startsServer: progress.startsServer), [])
@@ -206,6 +206,28 @@ final class SetupWizardTests: XCTestCase {
         fresh.choices.chatModel = .local(path: "/m/b")
         _ = fresh.applyEarly(.chatModel)
         XCTAssertEqual(fresh.skip(), [.clearModelSelection])
+    }
+
+    func testSkipAfterALocalPickThenADownloadClearsTheSelection() {
+        var fresh = SetupProgress(step: .chatModel, choices: base, startedAutomatically: true)
+        fresh.choices.chatModel = .local(path: "/m/b")
+        XCTAssertEqual(fresh.applyEarly(.chatModel), [.selectModel(path: "/m/b")])
+        fresh.choices.chatModel = .download(repo: "org/model", approxBytes: nil)
+        XCTAssertEqual(fresh.applyEarly(.chatModel), [.downloadChatModel(repo: "org/model", approxBytes: nil)])
+        XCTAssertEqual(fresh.skip(), [.cancelChatDownload(repo: "org/model"), .clearModelSelection],
+                       "the local pick doesn't stay selected")
+        XCTAssertNil(fresh.choices.chatModel)
+        XCTAssertNil(fresh.baseline.chatModel)
+
+        // Opened with a selection: that one again.
+        var opened = base
+        opened.chatModel = .local(path: "/m/a")
+        var progress = SetupProgress(step: .chatModel, choices: opened, startedAutomatically: false)
+        progress.choices.chatModel = .local(path: "/m/b")
+        _ = progress.applyEarly(.chatModel)
+        progress.choices.chatModel = .download(repo: "org/model", approxBytes: nil)
+        _ = progress.applyEarly(.chatModel)
+        XCTAssertEqual(progress.skip(), [.cancelChatDownload(repo: "org/model"), .selectModel(path: "/m/a")])
     }
 
     func testSkipPutsAnAppliedFolderBack() {

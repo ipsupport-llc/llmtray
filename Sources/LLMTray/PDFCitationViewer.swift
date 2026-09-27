@@ -19,27 +19,36 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
     private let window: NSWindow
     private let pdfView = PDFView()
     private let state = PDFCitationViewerState()
-    /// The file's modification date when it was loaded: a file changed since
-    /// is loaded again, not shown as it was.
-    private var loadedModification: Date?
+    /// The latest chip's load: an earlier one finishing after it is dropped.
+    private var loads = 0
 
     /// Shows `url` at `page` (1-based, clamped to the document): false when
     /// it can't be opened as a PDF (locked, or not one) -- the caller opens it
-    /// in its app then.
-    static func show(_ url: URL, name: String, page: Int, quote: String?, note: String?) -> Bool {
+    /// in its app then. The file is read again for every chip, off the main
+    /// thread (a large PDF doesn't stall the app; a file changed since, even
+    /// with its date kept, isn't shown as it was).
+    static func show(_ url: URL, name: String, page: Int, quote: String?, note: String?) async -> Bool {
         let key = url.standardizedFileURL
         let viewer = viewers[key] ?? PDFCitationViewer(url: key)
-        guard viewer.load() else {
+        viewers[key] = viewer
+        viewer.loads += 1
+        let load = viewer.loads
+        let loaded = await Task.detached { read(key, page: page, quote: quote) }.value
+        // A newer chip for the file took over, or the window was closed meanwhile.
+        guard viewer.loads == load, viewers[key] === viewer else { return true }
+        guard let loaded else {
             viewer.window.close()
+            if viewers[key] === viewer { viewers[key] = nil }
             return false
         }
-        viewers[key] = viewer
+        viewer.pdfView.highlightedSelections = nil
+        viewer.pdfView.document = loaded.document
         viewer.state.note = note
         viewer.window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         // Laid out first: PDFView ignores a go(to:) before it has a size.
         viewer.window.layoutIfNeeded()
-        viewer.go(page: page, quote: quote, name: name)
+        viewer.go(loaded, name: name)
         return true
     }
 
@@ -67,26 +76,23 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
         window.delegate = self
     }
 
-    /// Loads the file unless the loaded document is still current.
-    private func load() -> Bool {
-        let modified = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
-        if pdfView.document != nil, modified == loadedModification { return true }
-        guard let document = PDFDocument(url: url), !document.isLocked, document.pageCount > 0 else { return false }
-        pdfView.document = document
-        loadedModification = modified
-        return true
+    /// The document and the cited page's quote, found off the main thread
+    /// (nil: not a PDF that opens). Only that page's text is searched:
+    /// cheap, and never a match elsewhere.
+    nonisolated private static func read(_ url: URL, page: Int, quote: String?) -> LoadedPDF? {
+        guard let document = PDFDocument(url: url), !document.isLocked, document.pageCount > 0 else { return nil }
+        let index = CitationViewer.pageIndex(page, pageCount: document.pageCount)
+        let text = index.flatMap { document.page(at: $0)?.string }
+        let range = quote.flatMap { q in text.flatMap { CitationViewer.quoteRange(q, in: $0) } }
+        return LoadedPDF(document: document, pageIndex: index, quoteRange: range)
     }
 
-    private func go(page: Int, quote: String?, name: String) {
-        guard let document = pdfView.document,
-              let index = CitationViewer.pageIndex(page, pageCount: document.pageCount),
-              let target = document.page(at: index) else { return }
+    private func go(_ loaded: LoadedPDF, name: String) {
+        guard let index = loaded.pageIndex, let target = loaded.document.page(at: index) else { return }
         window.title = String(format: NSLocalizedString("%@ — page %lld", comment: "PDF viewer title: file name, page"), name, index + 1)
-        pdfView.highlightedSelections = nil
         pdfView.go(to: target)
-        // Only that page's text is searched: cheap, and never a match elsewhere.
-        guard let quote, let text = target.string, let range = CitationViewer.quoteRange(quote, in: text),
-              let selection = target.selection(for: range) else { return }
+        // The page's text was read with the document: the selection is cheap.
+        guard let range = loaded.quoteRange, let selection = target.selection(for: range) else { return }
         selection.color = .findHighlightColor
         pdfView.highlightedSelections = [selection]
         pdfView.go(to: selection)
@@ -97,6 +103,20 @@ final class PDFCitationViewer: NSObject, NSWindowDelegate {
         pdfView.highlightedSelections = nil
         pdfView.document = nil
         Self.viewers[url] = nil
+    }
+}
+
+/// A document read off the main thread, handed to it once: PDFKit's objects
+/// aren't Sendable, and nothing else touches this one in between.
+private final class LoadedPDF: @unchecked Sendable {
+    let document: PDFDocument
+    let pageIndex: Int?
+    let quoteRange: NSRange?
+
+    init(document: PDFDocument, pageIndex: Int?, quoteRange: NSRange?) {
+        self.document = document
+        self.pageIndex = pageIndex
+        self.quoteRange = quoteRange
     }
 }
 

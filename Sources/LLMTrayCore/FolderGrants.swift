@@ -261,6 +261,26 @@ public final class FolderGrants: @unchecked Sendable {
         }
     }
 
+    /// Whether a read (or wider) grant still covers `path` for the call
+    /// `callKey` in `chatID`, without using anything up: asked while a
+    /// `files` call reads and before it answers, so a grant revoked or
+    /// expired meanwhile stops it. The call's own `once` grant counts (used
+    /// up by it, not yet revoked).
+    public func coversRead(path: String, chatID: String, callKey: String, temporaryChat: Bool = false,
+                           now: Date = Date()) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        dropExpiredLocked(now: now)
+        return (grants + consumedOnce).contains { g in
+            guard g.covers(path) else { return false }
+            switch g.lifetime {
+            case .always, .until: return !temporaryChat
+            case .chat(let id): return id == chatID
+            case .once(let key, let id): return id == chatID && key == callKey
+            }
+        }
+    }
+
     /// `coversChange` for one chat, as the planner, executor and undo take it
     /// (each passing the call key of the proposal the item came from).
     public func changeCheck(chatID: String, temporaryChat: Bool = false) -> ChangeGrantCheck {
