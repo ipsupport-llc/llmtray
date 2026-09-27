@@ -20,6 +20,7 @@ final class ProjectToolResultsTests: XCTestCase {
         XCTAssertTrue(r.text.hasSuffix("cursor: abc"))
         XCTAssertFalse(r.text.contains(ProjectToolOutput.cutMarker))
         XCTAssertEqual(r.returned.map(\.id), ["c1", "c2"])
+        XCTAssertEqual(r.whole, ["c1", "c2"])
     }
 
     func testCutWithMarkerWithinBudget() {
@@ -31,6 +32,7 @@ final class ProjectToolResultsTests: XCTestCase {
             XCTAssertTrue(r.text.contains(ProjectToolOutput.cutMarker), "\(budget)")
             XCTAssertTrue(r.text.contains("1 more result(s) didn't fit"), "\(budget)")
             XCTAssertEqual(r.returned.map(\.id), ["c1"], "a cut piece was shown: it may be cited")
+            XCTAssertTrue(r.whole.isEmpty, "a cut piece may be sent again, whole")
             XCTAssertNotNil(r.text.data(using: .utf8), "cut at a character boundary")
         }
     }
@@ -71,12 +73,13 @@ final class ProjectToolResultsTests: XCTestCase {
     func testRepeatedSearchesInALongChat() {
         let context = 16_384, maxTokens = 1_024
         var estimator = PromptTokenEstimator()
-        var requestBytes = 20_000
-        estimator.calibrate(.init(bytes: requestBytes), promptTokens: 5_000)
+        estimator.calibrate(.init(bytes: 20_000), promptTokens: 5_000)
+        var addedBytes = 0
         var sent: Set<String> = []
         var rounds = 0, named = 0
         let chunk = String(repeating: "Покупатель уплачивает неустойку. ", count: 60)   // ~3.6 KB
-        while let tokens = ProjectTextBudget.allowance(contextTokens: context, requestTokens: estimator.estimate(.init(bytes: requestBytes)),
+        while let tokens = ProjectTextBudget.allowance(contextTokens: context,
+                                                       requestTokens: estimator.estimate(countedPlus: .init(bytes: addedBytes)) ?? 0,
                                                        maxTokens: maxTokens) {
             rounds += 1
             XCTAssertLessThan(rounds, 20)
@@ -88,9 +91,9 @@ final class ProjectToolResultsTests: XCTestCase {
                 XCTAssertFalse(r.text.contains(repeated.text.prefix(40)), "\(repeated.id) sent again")
             }
             if r.text.contains("shown earlier in this turn") { named += 1 }
-            sent.formUnion(r.returned.map(\.id))
-            requestBytes += r.text.utf8.count
-            let estimate = estimator.estimate(.init(bytes: requestBytes))
+            sent.formUnion(r.whole)
+            addedBytes += r.text.utf8.count
+            let estimate = estimator.estimate(countedPlus: .init(bytes: addedBytes)) ?? 0
             XCTAssertLessThanOrEqual(estimate + maxTokens, context, "never past the context")
         }
         XCTAssertGreaterThan(rounds, 1)

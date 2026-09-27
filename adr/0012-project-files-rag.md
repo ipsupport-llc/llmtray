@@ -149,10 +149,14 @@ listing stays. Tested with a long chat and repeated searches.
 Built (PR 3.3, `PromptTokenEstimator`, `ProjectTextBudget`): the fork's
 mlx_lm.server (pin `e1a05ac`) answers `include_usage` in streams too — a
 last chunk with `prompt_tokens` = the whole prompt (`len(ctx.prompt)`,
-the cached part included; `cached_tokens` apart). A request that grew
-from the counted one is that count plus the new bytes at 2 bytes/token
-(new file text may tokenize worse than the chat so far); a smaller one
-uses the chat's ratio (clamped 1-8). Images count 1,536 tokens each,
+the cached part included; `cached_tokens` apart). The next request of a
+tool round is that count plus what was added since (the call, the
+results, grown declarations) at 2 bytes/token — new file text may
+tokenize worse than the chat so far; anything else (nothing counted, a
+request with images) is the whole request at 2. No chat-average ratio is
+applied to new text: a request that got smaller (tools no longer
+declared) while adding dense file text would be undercounted (Codex).
+Images count 1,536 tokens each,
 their data URIs left out of the bytes, and a request with images doesn't
 calibrate. Measured on the local tokenizers (Gemma 4, Qwen3, Llama 3.2,
 Mistral v0.3, Phi-3.5, DeepSeek-Coder-V2-Lite, LFM2.5, Falcon3): Russian

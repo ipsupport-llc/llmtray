@@ -105,7 +105,18 @@ final class ChatClient: ObservableObject {
     /// This chat's prompt-token estimate (adr/0012), calibrated by each
     /// response's usage against the request it answered.
     private var tokenEstimator = PromptTokenEstimator()
-    private var lastRequestMeasure: PromptTokenEstimator.Measure?
+    /// A request's shape for the estimate: its size, how many messages of
+    /// the history it sent, and the bytes of everything but them (system
+    /// prompt, declarations, parameters).
+    private struct SentRequest {
+        var measure: PromptTokenEstimator.Measure
+        var historyCount: Int
+        var framingBytes: Int
+    }
+    /// The last request sent, and the last one the server counted (what
+    /// tokenEstimator's calibration is of).
+    private var lastRequest: SentRequest?
+    private var countedRequest: SentRequest?
     private var assistantMessageIndex: Int?
 
     private struct RequestContext {
@@ -191,7 +202,8 @@ final class ChatClient: ObservableObject {
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         tokenEstimator = PromptTokenEstimator()
-        lastRequestMeasure = nil
+        lastRequest = nil
+        countedRequest = nil
     }
 
     func loadSession(_ file: ChatSessionFile) {
@@ -773,8 +785,13 @@ final class ChatClient: ObservableObject {
             errorText = NSLocalizedString("failed to build request", comment: "")
             return
         }
-        // What the response's usage calibrates the estimate against.
-        lastRequestMeasure = ChatRequestBuilder.measure(body)
+        // What the response's usage calibrates the estimate against; until
+        // it comes, nothing is counted (an older count may be of a history
+        // compaction or a new turn has changed since).
+        countedRequest = nil
+        lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
+                                  framingBytes: framingBytes(modelAlias: modelAlias, settings: settings,
+                                                             tools: offerTools ? toolbox.definitions(for: settings) : []))
 
         decoder = SSEDecoder()
         approxCompletionTokens = 0
@@ -989,7 +1006,8 @@ final class ChatClient: ObservableObject {
         // Images and music alike: either generator takes most of this
         // Mac's memory, so neither runs beside the other.
         let images = chatImages
-        let running = toolCalls.filter { !skipped.contains($0.id) && !untrusted.contains($0.id) }
+        // Past the per-response cap a call isn't run: it mustn't queue or unload either.
+        let running = toolCalls.prefix(maxToolCallsPerRound).filter { !skipped.contains($0.id) && !untrusted.contains($0.id) }
         let wantsImage = running.contains { imageTool.willGenerate([$0], settings: settingsFor($0, settings), chatImages: images) }
         let wantsMusic = running.contains {
             let s = settingsFor($0, settings)
@@ -1152,11 +1170,26 @@ final class ChatClient: ObservableObject {
     }
 
     /// The next request's prompt tokens as it would be sent now: the whole
-    /// history so far, with the tools it would declare.
+    /// history so far, with the tools it would declare. In a tool round it
+    /// grew from the request the server just counted: that count, plus the
+    /// messages since (the call, the results so far) and any growth of the
+    /// rest, at the estimator's conservative ratio.
     private func requestTokenEstimate(_ context: RequestContext, _ settings: ChatSettings) -> Int {
+        let tools = toolbox.definitions(for: settings)
+        if let counted = countedRequest, counted.historyCount <= messages.count {
+            let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map(ChatRequestBuilder.serialize)])
+            let framing = framingBytes(modelAlias: context.modelAlias, settings: settings, tools: tools)
+            let grown = PromptTokenEstimator.Measure(bytes: added.bytes + max(0, framing - counted.framingBytes), images: added.images)
+            if let estimate = tokenEstimator.estimate(countedPlus: grown) { return estimate }
+        }
         let body = ChatRequestBuilder.streamingBody(modelAlias: context.modelAlias, settings: settings, history: messages,
-                                                    tools: toolbox.definitions(for: settings), projectTools: toolbox.projectToolNames)
+                                                    tools: tools, projectTools: toolbox.projectToolNames)
         return tokenEstimator.estimate(ChatRequestBuilder.measure(body))
+    }
+
+    /// A request's bytes besides its history's messages.
+    private func framingBytes(modelAlias: String, settings: ChatSettings, tools: [[String: Any]]) -> Int {
+        ChatRequestBuilder.measure(ChatRequestBuilder.streamingBody(modelAlias: modelAlias, settings: settings, history: [], tools: tools)).bytes
     }
 
     private func finalizeTokensPerSecond(firstByte: Date?, endDate: Date) {
@@ -1189,8 +1222,9 @@ final class ChatClient: ObservableObject {
                 appendToAssistant(toolCall: ToolCall(id: id, name: name, argumentsJSON: argumentsJSON))
             case .usage(let completionTokens, let promptTokens):
                 usageCompletionTokens = completionTokens
-                if let promptTokens, let measure = lastRequestMeasure {
-                    tokenEstimator.calibrate(measure, promptTokens: promptTokens)
+                if let promptTokens, let request = lastRequest {
+                    tokenEstimator.calibrate(request.measure, promptTokens: promptTokens)
+                    countedRequest = tokenEstimator.calibration == nil ? nil : request
                 }
             }
         }

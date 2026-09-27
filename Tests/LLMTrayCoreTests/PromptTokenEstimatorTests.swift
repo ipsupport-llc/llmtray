@@ -44,14 +44,15 @@ final class PromptTokenEstimatorTests: XCTestCase {
         XCTAssertEqual(e.estimate(.init(bytes: 1001)), 501, "rounded up")
     }
 
-    func testCalibratedRatio() {
+    func testCountedPlusAdded() {
         var e = PromptTokenEstimator()
+        XCTAssertNil(e.estimate(countedPlus: .init(bytes: 100)), "nothing counted yet")
         e.calibrate(.init(bytes: 45_000), promptTokens: 10_000)
-        XCTAssertEqual(e.bytesPerToken, 4.5)
-        // A smaller request (earlier results left out): at the chat's ratio.
-        XCTAssertEqual(e.estimate(.init(bytes: 9_000)), 2_000)
-        // A larger one grew from the counted request: the new bytes at 2.
-        XCTAssertEqual(e.estimate(.init(bytes: 47_000)), 11_000)
+        XCTAssertEqual(e.estimate(countedPlus: .init(bytes: 2_000)), 11_000, "the new bytes at 2")
+        XCTAssertEqual(e.estimate(countedPlus: .init(bytes: 0, images: 1)), 10_000 + PromptTokenEstimator.tokensPerImage)
+        // A whole request is never taken at the chat's average: dense text in
+        // a request that got smaller would be undercounted.
+        XCTAssertEqual(e.estimate(.init(bytes: 9_000)), 4_500)
     }
 
     /// Russian file text after an English chat: the growth still counts high.
@@ -59,17 +60,10 @@ final class PromptTokenEstimatorTests: XCTestCase {
         var e = PromptTokenEstimator()
         let english = Self.samples[1]
         e.calibrate(.init(bytes: english.text.utf8.count), promptTokens: english.maxTokens)
-        let russian = Self.samples[0]
-        let estimate = e.estimate(.init(bytes: english.text.utf8.count + russian.text.utf8.count))
-        XCTAssertGreaterThanOrEqual(estimate, english.maxTokens + russian.maxTokens)
-    }
-
-    func testRatioClamped() {
-        var e = PromptTokenEstimator()
-        e.calibrate(.init(bytes: 100), promptTokens: 1)
-        XCTAssertEqual(e.bytesPerToken, 8)
-        e.calibrate(.init(bytes: 100), promptTokens: 400)
-        XCTAssertEqual(e.bytesPerToken, 1)
+        for added in [Self.samples[0], Self.samples[2]] {
+            let estimate = e.estimate(countedPlus: .init(bytes: added.text.utf8.count)) ?? 0
+            XCTAssertGreaterThanOrEqual(estimate, english.maxTokens + added.maxTokens, added.name)
+        }
     }
 
     func testImagesCountedApartAndNotCalibrated() {

@@ -73,10 +73,12 @@ public struct ProjectToolOutput: Equatable {
     /// bytes (never less than the framing line): each piece quoted with its
     /// `[doc:page]`, cut with a marker past the budget; a hit in
     /// `alreadySent` (by id) is only named. `returned`: the hits it names,
-    /// what an answer may cite.
-    public func rendered(byteBudget: Int, alreadySent: Set<String> = []) -> (text: String, returned: [ProjectHit]) {
+    /// what an answer may cite; `whole`: the ids shown in full (a cut one
+    /// may be asked for again).
+    public func rendered(byteBudget: Int, alreadySent: Set<String> = []) -> (text: String, returned: [ProjectHit], whole: Set<String>) {
         var out = Self.framing
         var returned: [ProjectHit] = []
+        var whole: Set<String> = []
         // Room kept for the closing notes (a cursor, "N more didn't fit").
         let reserve = min(epilogue.utf8.count + 160, max(0, byteBudget / 4))
         func room() -> Int { byteBudget - reserve - out.utf8.count }
@@ -99,6 +101,7 @@ public struct ProjectToolOutput: Equatable {
             if block.utf8.count <= room() {
                 out += block
                 returned.append(hit)
+                whole.insert(hit.id)
                 continue
             }
             // Part of it, if a useful part fits.
@@ -120,7 +123,7 @@ public struct ProjectToolOutput: Equatable {
         if !epilogue.isEmpty, epilogue.utf8.count + 1 <= byteBudget - out.utf8.count {
             out += "\n" + epilogue
         }
-        return (out, returned)
+        return (out, returned, whole)
     }
 
     /// Each project result starts with it: file text is material, not

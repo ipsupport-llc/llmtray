@@ -1,11 +1,16 @@
 import Foundation
 
 /// A chat request's prompt tokens, estimated before it's sent (adr/0012,
-/// "Budget"): the whole serialized request in UTF-8 bytes, converted with a
-/// ratio calibrated per chat from the server's own `usage.prompt_tokens`.
-/// mlx_lm.server (the app's fork) sends that in the stream's last chunk when
-/// asked with `stream_options.include_usage`, the full prompt count even
-/// when most of it came from its prompt cache.
+/// "Budget"), from its serialized UTF-8 bytes and the server's own
+/// `usage.prompt_tokens` of the chat's last request. mlx_lm.server (the
+/// app's fork) sends that in the stream's last chunk when asked with
+/// `stream_options.include_usage`, the full prompt count even when most of
+/// it came from its prompt cache.
+///
+/// Only the counted request's own tokens are trusted: what was added since
+/// counts at the default ratio. A ratio averaged over the chat so far
+/// isn't applied to new text -- dense file text in a request that got
+/// smaller (tools no longer declared) would be undercounted.
 public struct PromptTokenEstimator: Equatable {
     /// Until the first response, and for text added since the counted
     /// request: deliberately low. The chat models' tokenizers measured
@@ -37,25 +42,22 @@ public struct PromptTokenEstimator: Equatable {
 
     public init() {}
 
-    /// Bytes per token as this chat's last counted request had them
-    /// (clamped: a template-heavy tiny prompt says little), else the default.
-    public var bytesPerToken: Double {
-        guard let c = calibration, c.tokens > 0 else { return Self.defaultBytesPerToken }
-        return min(8, max(1, Double(c.bytes) / Double(c.tokens)))
+    /// The prompt tokens of a whole request, uncounted: at the default ratio.
+    public func estimate(_ m: Measure) -> Int {
+        Self.tokens(m)
     }
 
-    /// The prompt tokens of a request this size. One that grew from the
-    /// counted request (a tool round adds results to it) is that count plus
-    /// the new bytes at the default ratio: new file text may tokenize worse
-    /// than what the chat had so far (code after Russian).
-    public func estimate(_ m: Measure) -> Int {
-        let text: Int
-        if let c = calibration, m.bytes >= c.bytes {
-            text = c.tokens + Int((Double(m.bytes - c.bytes) / Self.defaultBytesPerToken).rounded(.up))
-        } else {
-            text = Int((Double(max(0, m.bytes)) / bytesPerToken).rounded(.up))
-        }
-        return text + max(0, m.images) * Self.tokensPerImage
+    /// The prompt tokens of the counted request plus what was `added` to it
+    /// since (a tool round's call and results, declarations that grew): the
+    /// server's count plus the new part at the default ratio -- new file
+    /// text may tokenize worse than the chat so far (code after Russian).
+    /// nil when nothing was counted yet.
+    public func estimate(countedPlus added: Measure) -> Int? {
+        calibration.map { $0.tokens + Self.tokens(added) }
+    }
+
+    private static func tokens(_ m: Measure) -> Int {
+        Int((Double(max(0, m.bytes)) / defaultBytesPerToken).rounded(.up)) + max(0, m.images) * tokensPerImage
     }
 
     /// The server counted `promptTokens` for a request of this size. A

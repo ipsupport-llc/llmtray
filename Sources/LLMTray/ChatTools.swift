@@ -153,7 +153,7 @@ final class ChatToolbox {
             return (ProjectTextBudget.noRoomText, [])
         }
         let fitted = output.rendered(byteBudget: ProjectTextBudget.bytes(forTokens: tokens), alreadySent: sentProjectHits)
-        sentProjectHits.formUnion(fitted.returned.map(\.id))
+        sentProjectHits.formUnion(fitted.whole)
         let returned = fitted.returned.map {
             Citation(project: output.project, doc: $0.doc, rev: $0.rev, page: $0.page, chunk: $0.chunk, name: $0.name)
         }
