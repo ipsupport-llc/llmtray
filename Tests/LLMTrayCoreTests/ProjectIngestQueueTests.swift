@@ -222,6 +222,24 @@ final class ProjectIngestQueueTests: XCTestCase {
         XCTAssertEqual(q.progress(a), .idle)
     }
 
+    func testARemovedOrDroppedDocumentTakesItsCountBack() {
+        var q = Q()
+        q.enqueue([.extract(1), .extract(2), .extract(3)], in: a)
+        q.finish(q.next()!, .finished)
+        q.finish(q.next()!, .failed)
+        q.drop(1, in: a)
+        var p = q.progress(a)
+        XCTAssertEqual([p.total, p.done, p.failed], [2, 0, 1])
+        let three = q.next()!
+        q.finish(three, .needsEmbedding)
+        let embed = q.next()!
+        q.enqueue([.reindex(2)], in: a)
+        q.finish(embed, .dropped)
+        p = q.progress(a)
+        XCTAssertLessThanOrEqual(p.done + p.failed, p.total)
+        XCTAssertEqual(p.failed, 0, "2's failure taken back by its re-index")
+    }
+
     func testAnEmbeddingEndingAfterAReindexClickIsNotCounted() {
         var q = Q()
         q.enqueue([.embed(7), .extract(8)], in: a)

@@ -107,6 +107,12 @@ public struct ProjectIngestQueue: Sendable {
         /// failed): once each, and taken back when it's re-indexed.
         var counted: [Int64: Bool] = [:]
         var hasWork: Bool { !extract.isEmpty || !embed.isEmpty }
+
+        /// Takes back how `doc` counted (re-indexed, removed, dropped).
+        mutating func uncount(_ doc: Int64) {
+            guard let wasDone = counted.removeValue(forKey: doc) else { return }
+            if wasDone { done -= 1 } else { failed -= 1 }
+        }
     }
 
     private var projects: [UUID: Project] = [:]
@@ -144,9 +150,7 @@ public struct ProjectIngestQueue: Sendable {
                 projects[project]!.extract.append(d)
                 projects[project]!.reindex.insert(d)
                 // Finished earlier this run: it counts again when it's done again.
-                if let wasDone = projects[project]!.counted.removeValue(forKey: d) {
-                    if wasDone { projects[project]!.done -= 1 } else { projects[project]!.failed -= 1 }
-                }
+                projects[project]!.uncount(d)
             case .embed(let d):
                 guard !projects[project]!.embed.contains(d) else { continue }
                 projects[project]!.embed.append(d)
@@ -236,6 +240,7 @@ public struct ProjectIngestQueue: Sendable {
             }
         case .dropped:
             p.run.remove(doc)
+            p.uncount(doc)
         }
         projects[item.project] = p
         return endRunIfIdle(item.project)
@@ -283,6 +288,7 @@ public struct ProjectIngestQueue: Sendable {
         p.reindex.remove(doc)
         p.embed.removeAll { $0 == doc }
         p.run.remove(doc)
+        p.uncount(doc)
         projects[project] = p
     }
 
@@ -293,7 +299,7 @@ public struct ProjectIngestQueue: Sendable {
         var ended: [UUID] = []
         for id in order {
             guard var p = projects[id], !p.embed.isEmpty else { continue }
-            for d in p.embed where p.run.contains(d) && p.counted[d] == nil {
+            for d in p.embed where p.run.contains(d) && p.counted[d] == nil && !p.reindex.contains(d) {
                 p.done += 1
                 p.counted[d] = true
             }

@@ -93,7 +93,7 @@ enum ProjectFileDropLoader {
 
     /// Loads every provider's URL, then hands them all to `perform` on the
     /// main thread (one add for the whole drop).
-    static func load(_ providers: [NSItemProvider], perform: @escaping @MainActor ([URL]) -> Void) {
+    static func load(_ providers: [NSItemProvider], perform: @escaping @MainActor @Sendable ([URL]) -> Void) {
         let files = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
         guard !files.isEmpty else { return }
         let group = DispatchGroup()
