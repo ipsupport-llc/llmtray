@@ -395,7 +395,13 @@ struct ProjectFilesSection: View {
                 Text(error).font(.caption).foregroundStyle(.red)
             }
         }
-        .task(id: diskKey) { diskTotal = await ProjectIndexer.totalDiskUsage() }
+        .task(id: diskKey) {
+            // Debounced: the documents change after every indexing step.
+            if diskTotal != nil { try? await Task.sleep(nanoseconds: 3_000_000_000) }
+            guard !Task.isCancelled else { return }
+            let total = await ProjectIndexer.totalDiskUsage()
+            if !Task.isCancelled { diskTotal = total }
+        }
     }
 
     private var embedderStatus: String {

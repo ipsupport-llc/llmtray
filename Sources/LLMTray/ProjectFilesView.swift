@@ -11,6 +11,7 @@ import UniformTypeIdentifiers
 enum ProjectFilesWindow {
     private static var windows: [UUID: NSWindow] = [:]
 
+    @MainActor
     private final class Delegate: NSObject, NSWindowDelegate {
         static let shared = Delegate()
 
@@ -75,6 +76,15 @@ enum ProjectFilesWindow {
 
 /// The file URLs a drop carries (Finder's drag), loaded off the drag.
 enum ProjectFileDropLoader {
+    /// The URLs as their loads finish (on any thread), in drop order after.
+    private final class Found: @unchecked Sendable {
+        private let lock = NSLock()
+        private var urls: [(Int, URL)] = []
+
+        func add(_ i: Int, _ url: URL) { lock.withLock { urls.append((i, url)) } }
+        var ordered: [URL] { lock.withLock { urls.sorted { $0.0 < $1.0 }.map(\.1) } }
+    }
+
     static let types: [UTType] = [.fileURL]
 
     static func carriesFiles(_ providers: [NSItemProvider]) -> Bool {
@@ -87,17 +97,16 @@ enum ProjectFileDropLoader {
         let files = providers.filter { $0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
         guard !files.isEmpty else { return }
         let group = DispatchGroup()
-        let lock = NSLock()
-        var urls: [(Int, URL)] = []
+        let found = Found()
         for (i, provider) in files.enumerated() {
             group.enter()
             _ = provider.loadObject(ofClass: URL.self) { url, _ in
-                if let url { lock.withLock { urls.append((i, url)) } }
+                if let url { found.add(i, url) }
                 group.leave()
             }
         }
         group.notify(queue: .main) {
-            let ordered = lock.withLock { urls.sorted { $0.0 < $1.0 }.map(\.1) }
+            let ordered = found.ordered
             MainActor.assumeIsolated { perform(ordered) }
         }
     }
@@ -108,6 +117,7 @@ private struct ProjectFilesView: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var store = ChatLibraryStore.shared
     @State private var dropTargeted = false
+    @State private var listDropTargeted = false
     @State private var toRemove: IndexedDocument?
     @State private var disk: (files: Int64, index: Int64)?
     @State private var actionError: String?
@@ -131,7 +141,13 @@ private struct ProjectFilesView: View {
         }
         .padding(16)
         .frame(minWidth: 420, minHeight: 320)
-        .task(id: diskKey) { disk = await ProjectIndexer.diskUsage(for: projectID) }
+        .task(id: diskKey) {
+            // Debounced: the documents change after every indexing step.
+            if disk != nil { try? await Task.sleep(nanoseconds: 1_500_000_000) }
+            guard !Task.isCancelled else { return }
+            let usage = await ProjectIndexer.diskUsage(for: projectID)
+            if !Task.isCancelled { disk = usage }
+        }
         .confirmationDialog(
             Text("Remove this file from the project?"), isPresented: Binding(get: { toRemove != nil }, set: { if !$0 { toRemove = nil } }),
             presenting: toRemove
@@ -269,7 +285,8 @@ private struct ProjectFilesView: View {
                 }
             }
             // Files dropped on the list go in too.
-            .onDrop(of: ProjectFileDropLoader.types, isTargeted: $dropTargeted) { providers in
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(listDropTargeted ? 0.08 : 0)))
+            .onDrop(of: ProjectFileDropLoader.types, isTargeted: $listDropTargeted) { providers in
                 ProjectFileDropLoader.load(providers) { urls in Task { await ProjectIndexer.shared.addFiles(urls, to: projectID) } }
                 return ProjectFileDropLoader.carriesFiles(providers)
             }
@@ -315,8 +332,9 @@ private struct ProjectFilesView: View {
 
     private static func canReindex(_ s: DocumentDisplayStatus) -> Bool {
         switch s {
-        case .ready, .readyWordsOnly, .empty, .failed, .notSupported, .notIndexed: return true
-        case .queued, .copying, .reading, .embedding, .removing: return false
+        case .ready, .readyWordsOnly, .empty, .failed, .notSupported: return true
+        // Not indexed: Index Now does it (a re-index would race it).
+        case .queued, .copying, .reading, .embedding, .removing, .notIndexed: return false
         }
     }
 

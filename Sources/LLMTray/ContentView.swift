@@ -472,6 +472,8 @@ private struct ProjectChatFilesRow: View {
                             Text(String(format: NSLocalizedString("Searches %lld files", comment: "a project chat's header: how many files its tools search"),
                                         Int64(searchable)))
                                 .lineLimit(1)
+                                // The name truncates first, not the count.
+                                .layoutPriority(1)
                             Spacer(minLength: 0)
                         }
                         .font(.system(size: 11))

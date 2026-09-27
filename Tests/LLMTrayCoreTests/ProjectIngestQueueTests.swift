@@ -191,4 +191,51 @@ final class ProjectIngestQueueTests: XCTestCase {
         q.enqueue([.extract(2)], in: a)
         XCTAssertEqual(q.queued(a), [.extract(2)], "a stop forgets the re-index")
     }
+
+    func testAFirstExtractionSupersedesAQueuedReindex() {
+        var q = Q()
+        q.enqueue([.extract(9)], in: a)
+        let busy = q.next()!
+        q.enqueue([.reindex(4)], in: a)
+        // Index Now made 4 staged again: it's extracted, not re-indexed.
+        q.enqueue([.extract(4)], in: a)
+        XCTAssertEqual(q.queued(a), [.extract(4)])
+        q.finish(busy, .finished)
+        XCTAssertEqual(q.next()?.work, .extract(4))
+    }
+
+    func testAReindexedDocumentCountsOnceInTheRun() {
+        var q = Q()
+        q.enqueue([.extract(1), .extract(2), .extract(3)], in: a)
+        let one = q.next()!
+        q.finish(one, .finished)
+        XCTAssertEqual(q.progress(a).done, 1)
+        q.enqueue([.reindex(1)], in: a)
+        XCTAssertEqual(q.progress(a).done, 0, "taken back: it's to be done again")
+        while let item = q.next() {
+            if item.work == .extract(2) { q.enqueue([.reindex(2)], in: a) }   // clicked while it's read
+            let ended = q.finish(item, .finished)
+            if ended { break }
+            let p = q.progress(a)
+            XCTAssertLessThanOrEqual(p.done + p.failed, p.total)
+        }
+        XCTAssertEqual(q.progress(a), .idle)
+    }
+
+    func testAnEmbeddingEndingAfterAReindexClickIsNotCounted() {
+        var q = Q()
+        q.enqueue([.embed(7), .extract(8)], in: a)
+        let extract = q.next()!
+        q.finish(extract, .finished)
+        let embed = q.next()!
+        XCTAssertEqual(embed.work, .embed(7))
+        q.enqueue([.reindex(7)], in: a)
+        q.finish(embed, .finished)
+        XCTAssertEqual(q.progress(a).done, 1, "only 8: 7 counts when its re-index is done")
+        let re = q.next()!
+        XCTAssertEqual(re.work, .reindex(7))
+        q.finish(re, .needsEmbedding)
+        let again = q.next()!
+        XCTAssertTrue(q.finish(again, .finished))
+    }
 }

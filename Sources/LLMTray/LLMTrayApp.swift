@@ -672,7 +672,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
         // A project indexing (adr/0012): a small dot on the icon.
         ProjectIndexer.shared.$progress
-            .map { $0.values.contains { $0.state == .running || $0.state == .waiting } }
+            .map(ProjectIndexer.isIndexing)
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] indexing in

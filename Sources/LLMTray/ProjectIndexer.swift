@@ -80,7 +80,12 @@ final class ProjectIndexer: ObservableObject {
     }
 
     /// Anything indexing (the menu bar's dot), waiting included; not paused.
-    var isAnyIndexing: Bool { progress.values.contains { $0.state == .running || $0.state == .waiting } }
+    var isAnyIndexing: Bool { Self.isIndexing(progress) }
+
+    /// The rule itself, for a publisher's new value (`$progress` emits before it's set).
+    nonisolated static func isIndexing(_ progress: [UUID: ProjectIndexProgress]) -> Bool {
+        progress.values.contains { $0.state == .running || $0.state == .waiting }
+    }
 
     var isEmbedderReady: Bool { embedderReady }
 
