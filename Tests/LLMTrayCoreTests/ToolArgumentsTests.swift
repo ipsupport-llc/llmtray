@@ -96,6 +96,11 @@ final class ToolArgumentsTests: XCTestCase {
             XCTAssertFalse(p.isValid, raw)
             guard case .badJSON = p.problems.first else { return XCTFail("expected badJSON for \(raw)") }
         }
+        // A field twice with different values, an unknown escape: guesses.
+        XCTAssertEqual(parse(#"{"city": "Kyiv", "city": "Paris"}"#, weather).problems,
+                       [.badJSON(#""city" given twice with different values"#)])
+        XCTAssertEqual(parse(#"{"city": "Kyiv", "city": "Kyiv"}"#, weather).values["city"] as? String, "Kyiv")
+        XCTAssertFalse(parse(#"{"city": "C:\Users"}"#, weather).isValid)
         // Unbalanced nesting stays bounded.
         XCTAssertFalse(parse(String(repeating: "[", count: 500), nil).isValid)
     }
@@ -123,6 +128,13 @@ final class ToolArgumentsTests: XCTestCase {
         let p = parse(#"{"from_currency": "EUR", "from": "USD", "to": "JPY", "amount": 1}"#, currency)
         XCTAssertEqual(p.values["from"] as? String, "USD")
         XCTAssertTrue(p.repairs.contains(.unknownField))
+        // Two aliases disagreeing: neither is picked.
+        let place = ToolSchema("w", "W.", [.init("city", .string, aliases: ["location", "place"])])
+        let conflict = parse(#"{"location": "Kyiv", "place": "Paris"}"#, place)
+        XCTAssertEqual(conflict.problems, [.conflicting("city")])
+        XCTAssertEqual(conflict.problems.first?.statsKind, "bad_value")
+        XCTAssertTrue(conflict.errorMessage(tool: place)?.contains(#"Retry: w({"city":"<city>"})"#) == true)
+        XCTAssertEqual(parse(#"{"location": "Kyiv", "place": "Kyiv"}"#, place).values["city"] as? String, "Kyiv")
     }
 
     func testUnknownFieldsAreIgnored() {

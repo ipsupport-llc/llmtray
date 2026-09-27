@@ -56,7 +56,8 @@ public enum LenientJSON {
         var repairs: [ToolRepair] = []
         var body = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if body.isEmpty || body == "null" { return .success(([String: Any](), [])) }
-        if let strict = strictObject(body) { return .success((strict, [])) }
+        // Always our own parser, strict JSON included: JSONSerialization
+        // keeps one of two repeated keys without a word.
         if let unfenced = stripFence(body) {
             body = unfenced
             repairs.append(.fenced)
@@ -100,11 +101,6 @@ public enum LenientJSON {
     private static func dedupe(_ repairs: [ToolRepair]) -> [ToolRepair] {
         var seen = Set<ToolRepair>()
         return repairs.filter { seen.insert($0).inserted }
-    }
-
-    private static func strictObject(_ text: String) -> Any? {
-        guard text.hasPrefix("{"), let data = text.data(using: .utf8) else { return nil }
-        return try? JSONSerialization.jsonObject(with: data)
     }
 
     /// The inside of a ``` / ```json fence, if the text is one (or has one).
@@ -191,7 +187,13 @@ public enum LenientJSON {
                 skipWhitespace()
                 guard peek == ":" else { throw Failure(reason: "expected : after \"\(key)\"") }
                 i += 1
-                out[key] = try value()
+                let v = try value()
+                // The same field twice: fine when it's the same value, a
+                // guess otherwise.
+                if let earlier = out[key], !(earlier as AnyObject).isEqual(v as AnyObject) {
+                    throw Failure(reason: "\"\(key)\" given twice with different values")
+                }
+                out[key] = v
                 skipWhitespace()
                 if peek == "," {
                     i += 1
@@ -256,7 +258,9 @@ public enum LenientJSON {
                             guard let scalar = Unicode.Scalar(unit) else { throw Failure(reason: "bad \\u escape") }
                             out.append(scalar)
                         }
-                    default: out.append(e)   // \" \\ \/ \'
+                    case "\"", "\\", "/", "'": out.append(e)
+                    // \q, C:\Users: what was meant isn't clear.
+                    default: throw Failure(reason: "unknown escape \\\(e)")
                     }
                 } else {
                     if c.value < 0x20 {

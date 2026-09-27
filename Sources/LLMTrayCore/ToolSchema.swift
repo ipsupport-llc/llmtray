@@ -101,13 +101,15 @@ public struct ParsedToolArguments {
         case wrongType(String, String)
         /// Not one of the allowed values (field, what was sent).
         case notAllowed(String, String)
+        /// Two of its names with different values (location and place).
+        case conflicting(String)
 
         public var statsKind: String {
             switch self {
             case .badJSON: return "bad_json"
             case .missing: return "missing_field"
             case .wrongType: return "bad_type"
-            case .notAllowed: return "bad_value"
+            case .notAllowed, .conflicting: return "bad_value"
             }
         }
     }
@@ -204,8 +206,14 @@ public enum ToolArgumentParser {
                 if param.required { problems.append(.missing(param.name)) }
                 continue
             }
-            // The declared name wins over an alias sent beside it.
+            // The declared name wins over an alias sent beside it; two
+            // aliases with different values are a guess.
             sent.sort { $0.exact && !$1.exact }
+            if sent.count > 1, !sent[0].exact,
+               sent.dropFirst().contains(where: { !($0.value as AnyObject).isEqual(sent[0].value as AnyObject) }) {
+                problems.append(.conflicting(param.name))
+                continue
+            }
             if sent.count > 1 { repairs.append(.unknownField) }
             let chosen = sent[0]
             if !chosen.exact { repairs.append(.fieldAlias) }
@@ -345,6 +353,8 @@ extension ParsedToolArguments {
                     return p.typeName
                 } ?? ""
                 parts.append("\"\(field)\" must be one of \(allowed), not \(sent)")
+            case .conflicting(let field):
+                parts.append("\"\(field)\" was given twice under different names with different values")
             }
         }
         return "\(schema.name): " + parts.joined(separator: "; ") + ". Retry: " + retryExample(schema)
@@ -364,7 +374,7 @@ extension ParsedToolArguments {
         }
         for problem in problems {
             switch problem {
-            case .missing(let f), .wrongType(let f, _), .notAllowed(let f, _):
+            case .missing(let f), .wrongType(let f, _), .notAllowed(let f, _), .conflicting(let f):
                 if let p = schema.param(f) { example[p.name] = p.placeholder }
             case .badJSON:
                 for p in schema.params where p.required { example[p.name] = p.placeholder }

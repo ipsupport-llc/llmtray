@@ -289,7 +289,8 @@ final class CountryInfoTool: SelectableTool {
 
     override func modeLabel(_ entry: String) -> String { entry == Self.holidaysEntry ? "about=holidays" : "about=facts" }
 
-    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["about"] != nil }
+    /// A year asks for holidays as plainly as about=holidays.
+    override func namesMode(_ arguments: [String: Any]) -> Bool { arguments["about"] != nil || arguments["year"] != nil }
 
     override func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
         guard let country = (arguments["country"] as? String)?.trimmingCharacters(in: .whitespaces), !country.isEmpty else {
