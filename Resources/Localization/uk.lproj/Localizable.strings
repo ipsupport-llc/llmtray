@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: ще не підтримується";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
 "%lld MB" = "%lld МБ";
-"%lld can still be undone from Settings > Folders." = "Ще можна скасувати %lld у Settings > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld ще можна скасувати в Налаштування > Files.";
 "%lld downloads" = "%lld завантажень";
 "%lld failed" = "%lld не вдалося";
 "%lld files couldn't be indexed" = "%lld файлів не вдалося індексувати";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Редактор, агент або скрипт, що запитує іншу модель, відмінну від завантаженої. Переключення розвантажує поточну модель — і чат теж. Спочатку запитати: повідомлення з опціями Switch / Keep; якщо не відповісти протягом хвилини, вважається Keep. Keep: клієнт отримає помилку з назвою завантаженої моделі. Вбудований чат програми завжди переключається.";
 "An hour" = "Година";
 "An item needs the new folder it goes into: tick that folder too." = "Елемент потребує нової папки, куди він переміщується: також позначте цю папку.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "Невпевнений елемент міг змінитися або ні: перегляньте його в Finder. Settings > Folders зберігає журнал.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Неоднозначний елемент міг змінитися або ні: перегляньте його в Finder. Налаштування > Files зберігає журнал.";
 "Another folder change is running: try again when it's done." = "Інша зміна папки виконується: повторіть спробу після завершення.";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
 "Another version next to this one (a new seed, the same request)" = "Інша версія поруч із цією (новий seed, той самий запит)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "Сподобається LLMTray?";
 "Errors" = "Помилки";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Кожен чат у цьому проєкті отримує ці інструкції після системного підказу в описі моделі. Зміни діють з наступного повідомлення.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Усі чати проєкту отримують весь текст файлу; у цих чатах під час закріплення вимкнено web-пошук та генерацію зображень або музики.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Точний вміст, який LLMTray надсилає на ipsupport.us — поле за полем. Нічого іншого не покидає ваш Mac.";
 "Extra server arguments" = "Дод. аргументи сервера";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — генерувати та редагувати";
@@ -255,6 +256,8 @@
 "Failed: %@" = "Помилка: %@";
 "Fast (smaller canvas)" = "Швидко (менше полотно)";
 "Fetching file list…" = "Отримання списку файлів…";
+"Files" = "Files";
+"Files Settings…" = "Налаштування Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Файли, додані сюди, копіюються в проєкт і індексуються на цьому Mac; будь-який чат проєкту може їх шукати.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файли, додані до проєкту, індексуються на цьому Mac, щоб чати могли їх шукати. Пошук за значенням використовує модель вбудовування; без неї файли шукаються за словами.";
 "Files in %@" = "Файли в %@";
@@ -263,7 +266,6 @@
 "Finish" = "Готово";
 "Finish applies what you chose. You can change all of it later in Settings." = "«Готово» застосовує вибране. Ви зможете змінити все потім у Settings.";
 "Fits comfortably" = "Впевнено вміщується";
-"Folder Settings…" = "Налаштування папок…";
 "Folder access" = "Доступ до папок";
 "Folder access is off in Settings." = "Доступ до папок вимкнено в Settings.";
 "Folder changes" = "Зміни у папках";
@@ -387,6 +389,7 @@
 "Manage Models…" = "Керувати моделями…";
 "Managed by iCloud Drive or another cloud provider." = "Керується iCloud Drive або іншим хмарним провайдером.";
 "Max tokens" = "Макс. токенів";
+"Measuring the file…" = "Вимірюється файл…";
 "Memory" = "Пам’ять";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Пам'ять під контекст попередніх розмов, щоб продовжений чат не перечитував усю історію. Обмежена, щоб не зростати, доки в сервера не скінчиться пам'ять.";
 "Message…" = "Повідомлення…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "Автопідбір ще не запускався.";
 "No automatic update checks" = "Без автоматичної перевірки оновлень";
 "No chats found" = "Чатів не знайдено";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "Немає моделі вбудовування: файли шукаються за словами. Завантажте її в Налаштування > Models для пошуку за змістом.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Відсутня модель embedding: файли шукаються за словами. Завантажте її в Налаштування > Files для пошуку за значенням.";
 "No files yet" = "Файлів ще немає";
 "No folder changes yet." = "Поки що немає змін у папках.";
 "No messages yet" = "Повідомлень поки немає";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ще не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF і HTML.";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
+"Nothing to pin until the file has been read" = "Нічого закріплювати, поки файл не буде прочитано";
 "OK" = "OK";
 "Off" = "Вимк.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Вимк. — до сервера підключається лише цей Mac. Увімк. — будь-які пристрої у вашій мережі, тому вмикайте лише в довірених мережах.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Цей регулятор є лише в turbo: у sft немає планувальника пісень для варіацій.";
 "Open LLMTray when you log in" = "Відкривати LLMTray під час входу";
 "Open Server Log…" = "Відкрити лог сервера…";
-"Open Settings" = "Відкрити Налаштування";
 "Open in New Tab" = "Відкрити в новій вкладці";
 "Open in Preview" = "Відкрити в Preview";
 "Open in Window" = "Відкрити у вікні";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "Виберіть оцінку від 1 до 5 зірок.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Оберіть модель для чату. Завантаження почнеться одразу й триватиме у фоновому режимі.";
 "Pin" = "Закріпити";
+"Pin %@" = "Закріпити %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закріпити: усі чати проєкту отримають увесь файл (≈%@ токенів). У цих чатах під час закріплення вимкнено web‑пошук та генерацію зображень або музики.";
 "Pinned" = "Закріплено";
+"Pinned · ≈%@ tokens" = "Закріплено · ≈%@ токенів";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Закріплено: %1$lld файлів, ≈%2$@ з %3$@ токенів";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Не вдалося завантажити закріплення та проєкти. Зміни в них не збережуться, поки LLMTray не перезапуститься; копія файлу зберігається поруч.";
 "Play" = "Відтворити";
 "Point an app or agent at LLMTray:" = "Вкажіть додатку або агенту на LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "Останні 7 днів";
 "Profile" = "Профіль";
 "Profiles" = "Профілі";
-"Project Files: Turn On in Settings…" = "Файли проєкту: увімкніть у Налаштуваннях…";
 "Project files" = "Файли проєкту";
 "Project files are turned off" = "Файли проєкту вимкнено";
 "Project files are turned off in Settings." = "Файли проєкту вимкнено в Параметрах.";
@@ -697,7 +703,8 @@
 "The app's name." = "Назва додатка.";
 "The base profile: every other profile inherits from it." = "Базовий профіль: усі інші успадковуються від нього.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Модель чату може переглядати дозволені папки (імена, розміри, дати, короткі витяги) і пропонувати там зміни — нові папки, переміщення, перейменування, переміщення в Кошик. Кожна зміна — це план, який ви спочатку затверджуєте, і його можна скасувати.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "Модель чату завантажується в цю папку. Змініть її після завершення тут або в Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Чат‑модель завантажується в цю папку. Змініть її в Налаштуваннях після налаштування або спочатку виберіть іншу чат‑модель.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "Обрану чат‑модель завантажено в цю папку. Змініть її в Налаштуваннях після налаштування або спочатку виберіть іншу чат‑модель.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Копії файлів, доданих до проєктів, та їхні індекси разом. Файли проєкту показуються у вікні Files; видалення проєкту видаляє їх.";
 "The day the counts are for." = "День, за який підрахунок.";
 "The download didn't start." = "Завантаження не почалося.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "Завантажені файли embedder не відповідають їх контрольним сумам: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder завантажується — спробуйте знову після завершення.";
 "The embedder list is missing or invalid: %@" = "Список embedder відсутній або недійсний: %@";
+"The embedding model couldn't be downloaded" = "Не вдалося завантажити модель embedding";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "Точний JSON, який надсилає LLMTray: звіти в черзі, сьогоднішні до цього моменту та останній надісланий.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Сімейства моделей, використаних того дня (наприклад qwen або flux), ніколи їхні назви.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Першого разу на цей Mac завантажиться %@ (%@) — зараз, а не посеред розмови.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Щоб повернути його, використовуйте Undo в LLMTray: Put Back у Finder не знає його папки.";
 "Today" = "Сьогодні";
 "Today so far: %@ (sent once the day is over)" = "Сьогодні до цього моменту: %@ (надішлеться після закінчення дня)";
+"Too long for the selected model's room now, read by search instead: %@" = "Зараз завеликий для доступного місця моделі, буде читатися через пошук: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Занадто довгий для закріплення з обраною моделлю: ≈%1$@ токенів, ≈%2$@ із %3$@ залишилось";
 "Too many reviews from this network. Try again in %lld min." = "З цього мережевого підключення надто багато відгуків. Спробуйте знову через %lld хв.";
 "Too many reviews from this network. Try again later." = "З цього мережевого підключення надто багато відгуків. Спробуйте пізніше.";
 "Tool" = "Інструмент";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирає decode-concurrency (1/2/4/8) і prefill-step-size (64/128/256/512) на запущеній моделі, перезапускаючи сервер між спробами, і залишає найшвидше.";
 "Try Again" = "Спробувати ще";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Увімкніть файли проєкту в Налаштуваннях > Models, щоб додавати файли до проєкту й дозволити чатам шукати їх. До цього нічого не індексується й не завантажується.";
-"Turn on Project files in Settings to add files" = "Увімкніть файли проєкту в Налаштуваннях, щоб додавати файли";
+"Turn On Project Files…" = "Увімкнути Project files…";
+"Turn On…" = "Увімкнути…";
+"Turn on Project files to add files" = "Увімкніть Project files, щоб додати файли";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Увімкніть Project files, щоб додавати файли до проєкту й дозволити чатам шукати в них. До цього нічого не індексується й не завантажується.";
 "Turn on project files?" = "Увімкнути файли проєкту?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Перетворює текст файлів у вектори для пошуку за значенням на цьому Mac. Видалення самої моделі не торкається індексів: файли потім шукатимуться за словами, доки модель не буде знову завантажена.";
 "Tweak…" = "Налаштувати…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "Вивантажувати чат-модель на час генерації";
 "Unload model when idle" = "Вивантажувати модель під час простою";
 "Unpin" = "Відкріпити";
+"Unpin %@" = "Відкріпити %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Відкріпити: чати проєкту знову шукатимуть цей файл замість отримання його повністю";
 "Up to date" = "Актуально";
 "Up to date." = "Актуальна версія.";
 "Update" = "Оновити";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "≈%1$lld год %2$lld хв залишилось";
 "~%lld h left" = "≈%lld год залишилось";
 "~%lld min left" = "≈%lld хв залишилось";
+"· %lld pinned" = "· %lld закріплено";
 "· size…" = "· розмір…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» не вдалося видалити: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не вдалося змінити закріплення: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» та його індекс видалено з проєкту. Файл, з якого ви його додали, не змінюється.";

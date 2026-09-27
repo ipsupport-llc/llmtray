@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: 暂不支持";
 "%d overridden, rest from Default · %@" = "%d 项已覆盖，其余来自 Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld 项仍可在“设置 > 文件夹”中撤销。";
+"%lld can still be undone from Settings > Files." = "%lld 仍可在“设置 > 文件”中撤消。";
 "%lld downloads" = "%lld 次下载";
 "%lld failed" = "%lld 项失败";
 "%lld files couldn't be indexed" = "%lld 个文件无法建立索引";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "当编辑器、代理或脚本请求与当前不同的模型时。切换会卸载已加载的模型——聊天也会被卸载。先询问：显示包含“切换 / 保持”的通知；一分钟内未回复视为“保持”。选择“保持”时，客户端会收到指明已加载模型的错误。应用自带的聊天始终会切换。";
 "An hour" = "一小时";
 "An item needs the new folder it goes into: tick that folder too." = "某项需要其目标新文件夹：也请勾选该文件夹。";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "某些不确定的项可能已更改也可能未更改：在 Finder 中查看。“设置 > 文件夹”会保存日志。";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "不确定的项目可能已更改也可能未更改：请在 Finder 中查看。“设置 > 文件”会保存操作日志。";
 "Another folder change is running: try again when it's done." = "另一个文件夹更改正在进行：完成后重试。";
 "Another model already uses this alias." = "另一个模型已使用此别名。";
 "Another version next to this one (a new seed, the same request)" = "与此相邻的另一个版本（新随机种子，相同请求）";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "喜欢 LLMTray 吗？";
 "Errors" = "错误";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "此项目中的每个对话在模型配置文件的系统提示之后都会应用这些指令。更改自下一条消息起生效。";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "当文件被置顶时，项目的每个对话都会获取该文件的全部文本；这些对话中的网页搜索和图像或音乐生成功能被禁用。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray 向 ipsupport.us 发送的完整内容，逐字段列出。你的 Mac 不会发送其他任何内容。";
 "Extra server arguments" = "额外服务器参数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成并编辑";
@@ -255,6 +256,8 @@
 "Failed: %@" = "失败：%@";
 "Fast (smaller canvas)" = "快速（画布更小）";
 "Fetching file list…" = "正在获取文件列表…";
+"Files" = "文件";
+"Files Settings…" = "文件设置…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "在此添加的文件会复制到项目并在此 Mac 上建立索引；项目的每个聊天都可搜索这些文件。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "添加到项目的文件会在此 Mac 上建立索引，使其聊天能够搜索这些文件。按语义搜索使用嵌入模型；没有嵌入模型时，文件仅按词语进行搜索。";
 "Files in %@" = "%@ 中的文件";
@@ -263,7 +266,6 @@
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "“完成”将应用你的选择。你可在设置中随时更改。";
 "Fits comfortably" = "可舒适放下";
-"Folder Settings…" = "文件夹设置…";
 "Folder access" = "文件夹访问";
 "Folder access is off in Settings." = "“设置”中已关闭文件夹访问。";
 "Folder changes" = "文件夹更改";
@@ -387,6 +389,7 @@
 "Manage Models…" = "管理模型…";
 "Managed by iCloud Drive or another cloud provider." = "由 iCloud Drive 或其他云提供商管理。";
 "Max tokens" = "最大词元数";
+"Measuring the file…" = "正在测量文件…";
 "Memory" = "内存";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "保留一部分内存用于复用先前对话的上下文，因此继续聊天时无需重新读取完整历史。此内存有上限，避免增长到服务器内存耗尽。";
 "Message…" = "消息…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "尚未运行自动调优。";
 "No automatic update checks" = "不自动检查更新";
 "No chats found" = "未找到对话";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "未设置 embedding 模型：文件将按文字搜索。要按语义搜索，请在“设置 > Models”下载。";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "没有嵌入模型：文件按词语搜索。请在“设置 > 文件”中下载以按语义搜索。";
 "No files yet" = "暂无文件";
 "No folder changes yet." = "尚无文件夹更改。";
 "No messages yet" = "暂无消息";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "暂不支持：%@。此版本可建立文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF 和 HTML 的索引。";
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
+"Nothing to pin until the file has been read" = "在文件被读取之前无法置顶任何内容";
 "OK" = "好";
 "Off" = "关";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "关闭时，只有这台 Mac 可以访问服务器。开启时，网络中的其他设备也可以访问——包括网络上的任何人，因此仅在你信任的网络上开启。";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "仅 turbo 有此旋钮：sft 无歌曲规划器以供变化。";
 "Open LLMTray when you log in" = "登录时打开 LLMTray";
 "Open Server Log…" = "打开服务器日志…";
-"Open Settings" = "打开设置";
 "Open in New Tab" = "在新标签页中打开";
 "Open in Preview" = "在 预览 中 打开";
 "Open in Window" = "在窗口中打开";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "请选择 1 到 5 星的评分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "选择一个进行聊天。下载会立即开始并在后台进行。";
 "Pin" = "固定";
+"Pin %@" = "置顶 %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "置顶：项目的每个对话都会获取整个文件（≈%@ 令牌）。文件被置顶期间，这些对话中的网页搜索和图像或音乐生成功能被禁用。";
 "Pinned" = "已固定";
+"Pinned · ≈%@ tokens" = "已置顶 · 约 %@ 令牌";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "已置顶：%1$lld 个文件，约占 %3$@ 的 %2$@ 令牌";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "无法加载固定项和项目。对它们的更改在 LLMTray 重启前不会保存；文件的副本已保存在其旁。";
 "Play" = "播放";
 "Point an app or agent at LLMTray:" = "让应用或代理指向 LLMTray：";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "过去 7 天";
 "Profile" = "配置方案";
 "Profiles" = "配置方案";
-"Project Files: Turn On in Settings…" = "项目文件：在设置中开启…";
 "Project files" = "项目文件";
 "Project files are turned off" = "项目文件已关闭";
 "Project files are turned off in Settings." = "“设置”中已关闭项目文件。";
@@ -697,7 +703,8 @@
 "The app's name." = "应用名称。";
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可在你允许的文件夹中查看（名称、大小、日期、简短摘录）并提出更改——新建文件夹、移动、重命名、移至“废纸篓”。每项更改都是需你先批准的计划，并可撤销。";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "聊天模型正在下载到此文件夹。下载完成后可在此处或“设置”中更改。";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下载到此文件夹。设置完成后可在“设置”中更改，或先选择其他聊天模型。";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "你选择的聊天模型已下载到此文件夹。设置完成后可在“设置”中更改，或先选择其他聊天模型。";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "添加到项目的文件副本及其索引将存放于一起。项目自己的文件会在其“文件”窗口显示；删除项目会删除这些内容。";
 "The day the counts are for." = "计数所属日期。";
 "The download didn't start." = "下载未开始。";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "下载的嵌入器文件校验和不匹配：%@";
 "The embedder is being downloaded -- try again once it's done." = "正在下载嵌入器——完成后请重试。";
 "The embedder list is missing or invalid: %@" = "嵌入器列表缺失或无效：%@";
+"The embedding model couldn't be downloaded" = "无法下载嵌入模型";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray 发送的精确 JSON：待发送的报告、今日已生成的报告以及最后一次发送的报告。";
 "The families of the models used that day (such as qwen or flux), never their names." = "当天使用的模型系列（例如 qwen 或 flux），不包含具体模型名称。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "首次使用时，这会立即将 %@（%@）下载到这台 Mac，而不是等到聊天过程中下载。";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "要恢复，请在 LLMTray 中使用“撤销”：Finder 的“放回原处”无法识别其文件夹。";
 "Today" = "今天";
 "Today so far: %@ (sent once the day is over)" = "今日至今：%@（将在当天结束后发送）";
+"Too long for the selected model's room now, read by search instead: %@" = "对于当前选定模型的空间过长，改为通过搜索读取：%@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "对于所选模型无法置顶：约 %1$@ 令牌，剩余约 %3$@ 的 %2$@";
 "Too many reviews from this network. Try again in %lld min." = "来自此网络的评论过多。%lld 分钟后重试。";
 "Too many reviews from this network. Try again later." = "来自此网络的评论过多。请稍后重试。";
 "Tool" = "工具";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "对正在运行的模型尝试 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之间都会重启服务器，并保留实测最快的组合。";
 "Try Again" = "重试";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "在“设置 > Models”启用项目文件，以将文件添加到项目并允许聊天搜索。启用前不会建立索引或下载任何内容。";
-"Turn on Project files in Settings to add files" = "在设置中启用项目文件以添加文件";
+"Turn On Project Files…" = "启用项目文件…";
+"Turn On…" = "启用…";
+"Turn on Project files to add files" = "启用项目文件以添加文件";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "启用项目文件以将文件添加到项目并允许其聊天搜索这些文件。在启用之前不会有任何索引或下载。";
 "Turn on project files?" = "要启用项目文件吗？";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "生成期间卸载聊天模型";
 "Unload model when idle" = "空闲时卸载模型";
 "Unpin" = "取消固定";
+"Unpin %@" = "取消置顶 %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "取消置顶：项目的对话将改为搜索该文件而不是获取全部内容";
 "Up to date" = "最新";
 "Up to date." = "已是最新。";
 "Update" = "更新";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "约剩 %1$lld 小时 %2$lld 分钟";
 "~%lld h left" = "约剩 %lld 小时";
 "~%lld min left" = "约剩 %lld 分钟";
+"· %lld pinned" = "· 已置顶 %lld 个";
 "· size…" = "· 大小…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” 无法移除：%2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”：无法更改置顶：%2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” 及其索引已从项目删除。你添加该文件的原始文件不受影响。";

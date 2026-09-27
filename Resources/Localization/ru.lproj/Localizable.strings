@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: ещё не поддерживается";
 "%d overridden, rest from Default · %@" = "Переопределено: %d, остальное из Default · %@";
 "%lld MB" = "%lld МБ";
-"%lld can still be undone from Settings > Folders." = "Ещё %lld можно отменить в Настройках > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld всё ещё можно отменить в Настройках > Files.";
 "%lld downloads" = "%lld загрузок";
 "%lld failed" = "%lld не удалось";
 "%lld files couldn't be indexed" = "%lld файлов не удалось проиндексировать";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Редактор, агент или скрипт запрашивает модель, отличную от загруженной. Переключение выгружает текущую модель и связанную с ней переписку. Сначала спрашивать: уведомление с вариантами Switch / Keep; отсутствие ответа в течение минуты считается Keep. Keep: клиенту возвращается ошибка с указанием загруженной модели. Собственный чат приложения всегда переключается.";
 "An hour" = "Час";
 "An item needs the new folder it goes into: tick that folder too." = "Элемент требует новой папки, в которую он переместится: отметьте и эту папку.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "Неясно, изменился ли элемент: просмотрите его в Finder. Settings > Folders ведёт журнал.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Неуверенный элемент мог измениться или нет — проверьте его в Finder. Настройки > Files ведут журнал.";
 "Another folder change is running: try again when it's done." = "Другое изменение папки выполняется: повторите попытку после завершения.";
 "Another model already uses this alias." = "Этот алиас уже занят другой моделью.";
 "Another version next to this one (a new seed, the same request)" = "Другая версия рядом с этой (новая seed, тот же запрос)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "Нравится LLMTray?";
 "Errors" = "Ошибки";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Каждый чат в этом проекте получает эти инструкции после системного запроса профиля модели. Изменение вступает в силу с следующего сообщения.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Каждый чат проекта получает весь текст файла; в этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Именно то, что LLMTray отправляет на ipsupport.us, поле за полем. Больше ничего не покидает ваш Mac.";
 "Extra server arguments" = "Доп. аргументы сервера";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — генерация и редактирование";
@@ -255,6 +256,8 @@
 "Failed: %@" = "Ошибка: %@";
 "Fast (smaller canvas)" = "Быстро (меньше холст)";
 "Fetching file list…" = "Получение списка файлов…";
+"Files" = "Files";
+"Files Settings…" = "Параметры Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Файлы, добавленные сюда, копируются в проект и индексируются на этом Mac; любой чат проекта может их искать.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файлы, добавленные в проект, индексируются на этом Mac, чтобы их можно было искать в чатах. Поиск по смыслу использует модель эмбеддингов; без неё файлы ищутся по словам.";
 "Files in %@" = "Файлы в %@";
@@ -263,7 +266,6 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "«Finish» применяет выбранное. Вы сможете изменить всё позже в Settings.";
 "Fits comfortably" = "Помещается с запасом";
-"Folder Settings…" = "Настройки папок…";
 "Folder access" = "Доступ к папкам";
 "Folder access is off in Settings." = "Доступ к папкам отключён в Настройках.";
 "Folder changes" = "Изменения папок";
@@ -387,6 +389,7 @@
 "Manage Models…" = "Управлять моделями…";
 "Managed by iCloud Drive or another cloud provider." = "Управляется iCloud Drive или другим облачным провайдером.";
 "Max tokens" = "Макс. токенов";
+"Measuring the file…" = "Измерение файла…";
 "Memory" = "Память";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Память под контекст прошлых разговоров, чтобы продолженный чат не перечитывал всю историю. Ограничена, чтобы не расти, пока у сервера не кончится память.";
 "Message…" = "Сообщение…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "Автоподбор ещё не запускался.";
 "No automatic update checks" = "Не проверять обновления автоматически";
 "No chats found" = "Чаты не найдены";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "Нет модели embedding: файлы ищутся по словам. Загрузите её в Настройки > Models для поиска по смыслу.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Нет модели embedding: файлы ищутся по словам. Скачайте её в Настройки > Files для поиска по смыслу.";
 "No files yet" = "Файлов пока нет";
 "No folder changes yet." = "Пока нет изменений папок.";
 "No messages yet" = "Сообщений пока нет";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ещё не поддерживается: %@. Эта версия индексирует текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF и HTML.";
 "Nothing sent yet." = "Ещё ничего не отправлено.";
 "Nothing to change." = "Нечего менять.";
+"Nothing to pin until the file has been read" = "Нечего закреплять, пока файл не будет прочитан";
 "OK" = "OK";
 "Off" = "Выкл.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Выкл. — к серверу подключается только этот Mac. Вкл. — любые устройства в вашей сети, поэтому включайте только в доверенных сетях.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Этот регулятор есть только у turbo: у sft нет планировщика песни для вариаций.";
 "Open LLMTray when you log in" = "Открывать LLMTray при входе";
 "Open Server Log…" = "Открыть лог сервера…";
-"Open Settings" = "Открыть Настройки";
 "Open in New Tab" = "Открыть в новой вкладке";
 "Open in Preview" = "Открыть в Preview";
 "Open in Window" = "Открыть в окне";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "Выберите оценку от 1 до 5 звёзд.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Выберите модель для общения. Загрузка начнётся сразу и продолжится в фоне.";
 "Pin" = "Закрепить";
+"Pin %@" = "Закрепить %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закрепить: каждый чат проекта получит весь файл (≈%@ токенов). В этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
 "Pinned" = "Закреплённые";
+"Pinned · ≈%@ tokens" = "Закреплено · ≈%@ токенов";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Закреплено: %1$lld файлов, ≈%2$@ из %3$@ токенов";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Закрепления и проекты не удалось загрузить. Изменения не сохраняются до перезапуска LLMTray; копия файла сохраняется рядом с ним.";
 "Play" = "Воспроизвести";
 "Point an app or agent at LLMTray:" = "Укажите приложению или агенту адрес LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "Последние 7 дней";
 "Profile" = "Профиль";
 "Profiles" = "Профили";
-"Project Files: Turn On in Settings…" = "Файлы проекта: включите в Настройках…";
 "Project files" = "Файлы проекта";
 "Project files are turned off" = "Файлы проекта отключены";
 "Project files are turned off in Settings." = "Файлы проекта отключены в Параметрах.";
@@ -697,7 +703,8 @@
 "The app's name." = "Название приложения.";
 "The base profile: every other profile inherits from it." = "Базовый профиль: все остальные наследуются от него.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Модель чата может просматривать разрешённые папки (имена, размеры, даты, короткие фрагменты) и предлагать там изменения — новые папки, перемещения, переименования, отправку в Корзину. Каждое изменение — это план, который вы сначала одобряете, и его можно отменить.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "Чат‑модель загружается в эту папку. Измените её после завершения здесь или в Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Чат‑модель загружается в эту папку. Измените её в Настройках после установки или сначала выберите другую чат‑модель.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "Выбранная чат‑модель была загружена в эту папку. Измените её в Настройках после установки или сначала выберите другую чат‑модель.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Копии файлов, добавленных в проекты, и их индексы находятся вместе. Собственные файлы проекта отображаются в окне Файлы; удаление проекта удаляет их.";
 "The day the counts are for." = "День, за который подсчитаны данные.";
 "The download didn't start." = "Загрузка не началась.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "Загруженные файлы embedder не совпадают по контрольным суммам: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder загружается — попробуйте снова после завершения.";
 "The embedder list is missing or invalid: %@" = "Список embedder отсутствует или недействителен: %@";
+"The embedding model couldn't be downloaded" = "Не удалось скачать модель embedding";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "Точный JSON, который отправляет LLMTray: отчёты в очереди, сегодняшние пока что и последний отправленный.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Семейства моделей, использованных в этот день (например, qwen или flux), но не их имена.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "В первый раз на этот Mac скачается %@ (%@) — сейчас, а не посреди разговора.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Чтобы вернуть его, используйте Undo в LLMTray: Put Back в Finder не знает его папку.";
 "Today" = "Сегодня";
 "Today so far: %@ (sent once the day is over)" = "Сегодня пока: %@ (отправляется по окончании дня)";
+"Too long for the selected model's room now, read by search instead: %@" = "Слишком длинно для текущего размера модели, будет читаться через поиск: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Слишком длинно для закрепления с выбранной моделью: ≈%1$@ токенов, ≈%2$@ из %3$@ осталось";
 "Too many reviews from this network. Try again in %lld min." = "С этого подключениия слишком много отзывов. Попробуйте снова через %lld мин.";
 "Too many reviews from this network. Try again later." = "С этого подключения слишком много отзывов. Попробуйте позже.";
 "Tool" = "Инструмент";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирает decode-concurrency (1/2/4/8) и prefill-step-size (64/128/256/512) на запущенной модели, перезапуская сервер между попытками, и оставляет самое быстрое.";
 "Try Again" = "Повторить";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите Project files в Настройки > Models, чтобы добавлять файлы в проект и позволить чатам проекта их искать. До этого ничего не индексируется и не загружается.";
-"Turn on Project files in Settings to add files" = "Включите Project files в Настройках, чтобы добавлять файлы";
+"Turn On Project Files…" = "Включить Project Files…";
+"Turn On…" = "Включить…";
+"Turn on Project files to add files" = "Включите Project files, чтобы добавлять файлы";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите Project files, чтобы добавлять файлы в проект и позволить его чатам искать по ним. До этого ничего не индексируется и не скачивается.";
 "Turn on project files?" = "Включить файлы проекта?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Преобразует текст файлов в векторы для поиска по смыслу на этом Mac. При удалении модель индексы сохранятся — файлы будут искаться по словам до повторной загрузки модели.";
 "Tweak…" = "Настроить…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "Выгружать чат-модель на время генерации";
 "Unload model when idle" = "Выгружать модель при простое";
 "Unpin" = "Открепить";
+"Unpin %@" = "Открепить %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Открепить: чаты проекта снова будут искать этот файл вместо получения его целиком";
 "Up to date" = "Актуально";
 "Up to date." = "Актуальная версия.";
 "Update" = "Обновить";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "≈%1$lld ч %2$lld мин осталось";
 "~%lld h left" = "≈%lld ч осталось";
 "~%lld min left" = "≈%lld мин осталось";
+"· %lld pinned" = "· %lld закреплено";
 "· size…" = "· размер…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» невозможно удалить: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не удалось изменить закрепление: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» и её индекс удалены из проекта. Исходный файл, из которого вы добавляли, не затронут.";

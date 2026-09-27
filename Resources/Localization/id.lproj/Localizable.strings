@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: belum didukung";
 "%d overridden, rest from Default · %@" = "%d ditimpa, sisanya dari Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld masih bisa dibatalkan dari Settings > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld masih dapat dibatalkan dari Pengaturan > Files.";
 "%lld downloads" = "%lld unduhan";
 "%lld failed" = "%lld gagal";
 "%lld files couldn't be indexed" = "%lld berkas tidak dapat diindeks";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Sebuah editor, agen, atau skrip yang meminta model selain yang sedang dimuat. Beralih akan memuat keluar model yang dimuat — begitu juga chat. Tanyakan dulu: notifikasi dengan Opsi Beralih / Pertahankan; tanpa jawaban dalam satu menit dianggap Pertahankan. Pertahankan: klien menerima kesalahan yang menyebutkan model yang dimuat. Chat bawaan aplikasi selalu beralih.";
 "An hour" = "Satu jam";
 "An item needs the new folder it goes into: tick that folder too." = "Sebuah item membutuhkan folder baru tempatnya dipindahkan: centang folder itu juga.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "Item yang tidak pasti mungkin berubah atau tidak: periksa di Finder. Settings > Folders menyimpan jurnal.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Item yang tidak pasti mungkin berubah atau tidak: periksa di Finder. Pengaturan > Files menyimpan jurnal.";
 "Another folder change is running: try again when it's done." = "Perubahan folder lain sedang berjalan: coba lagi setelah selesai.";
 "Another model already uses this alias." = "Model lain sudah menggunakan alias ini.";
 "Another version next to this one (a new seed, the same request)" = "Versi lain di samping ini (seed baru, permintaan sama)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "Menikmati LLMTray?";
 "Errors" = "Kesalahan";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Setiap chat di proyek ini menerima instruksi ini setelah system prompt profil model. Perubahan berlaku mulai pesan berikutnya.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Setiap obrolan proyek mendapatkan seluruh teksnya; pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut sementara berkas dipin.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Persis apa yang dikirim LLMTray ke ipsupport.us, per bidang. Tidak ada yang lain keluar dari Mac Anda.";
 "Extra server arguments" = "Argumen server tambahan";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — buat dan edit";
@@ -255,6 +256,8 @@
 "Failed: %@" = "Gagal: %@";
 "Fast (smaller canvas)" = "Cepat (kanvas lebih kecil)";
 "Fetching file list…" = "Mengambil daftar berkas…";
+"Files" = "Files";
+"Files Settings…" = "Pengaturan Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Berkas yang ditambahkan di sini disalin ke proyek dan diindeks di Mac ini; setiap obrolan dalam proyek dapat mencarinya.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Berkas yang ditambahkan ke proyek diindeks di Mac ini sehingga obrolannya bisa mencari. Pencarian berdasarkan makna menggunakan model embedding; tanpa itu, berkas dicari berdasarkan kata-katanya.";
 "Files in %@" = "Berkas di %@";
@@ -263,7 +266,6 @@
 "Finish" = "Selesai";
 "Finish applies what you chose. You can change all of it later in Settings." = "Selesai menerapkan pilihan Anda. Anda bisa mengubah semuanya nanti di Pengaturan.";
 "Fits comfortably" = "Muatan pas";
-"Folder Settings…" = "Folder Settings…";
 "Folder access" = "Akses folder";
 "Folder access is off in Settings." = "Akses folder dimatikan di Settings.";
 "Folder changes" = "Perubahan folder";
@@ -387,6 +389,7 @@
 "Manage Models…" = "Kelola Model…";
 "Managed by iCloud Drive or another cloud provider." = "Dikelola oleh iCloud Drive atau penyedia cloud lain.";
 "Max tokens" = "Token maksimum";
+"Measuring the file…" = "Mengukur berkas…";
 "Memory" = "Memori";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memori yang disimpan untuk menggunakan kembali konteks percakapan sebelumnya, sehingga obrolan lanjutan tidak perlu membaca ulang seluruh riwayatnya. Dibatasi agar tidak terus bertambah hingga server kehabisan memori.";
 "Message…" = "Pesan…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "Penalaan otomatis belum pernah dijalankan.";
 "No automatic update checks" = "Tidak ada pemeriksaan pembaruan otomatis";
 "No chats found" = "Tidak ada chat ditemukan";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "Tidak ada model embedding: berkas dicari berdasarkan kata. Unduh di Pengaturan > Models untuk pencarian berdasarkan makna.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Tidak ada model embedding: file dicari berdasarkan kata-katanya. Unduh di Pengaturan > Files untuk pencarian berdasarkan makna.";
 "No files yet" = "Belum ada berkas";
 "No folder changes yet." = "Belum ada perubahan folder.";
 "No messages yet" = "Belum ada pesan";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, dan HTML.";
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
+"Nothing to pin until the file has been read" = "Tidak ada yang dapat dipin sampai berkas dibaca";
 "OK" = "OK";
 "Off" = "Mati";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Mati: hanya Mac ini yang dapat mengakses server. Nyala: perangkat lain di jaringan Anda juga dapat mengaksesnya — siapa pun di jaringan itu, jadi gunakan hanya di jaringan yang Anda percayai.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Hanya turbo yang memiliki pengaturan ini: sft tidak punya perencana lagu untuk variasi.";
 "Open LLMTray when you log in" = "Buka LLMTray saat Anda masuk";
 "Open Server Log…" = "Buka Log Server…";
-"Open Settings" = "Buka Pengaturan";
 "Open in New Tab" = "Buka di Tab Baru";
 "Open in Preview" = "Buka di Pratinjau";
 "Open in Window" = "Buka di Jendela";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "Pilih penilaian dari 1 sampai 5 bintang.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pilih salah satu untuk diajak obrolan. Unduhan dimulai segera dan berlangsung di latar belakang.";
 "Pin" = "Sematkan";
+"Pin %@" = "Pin %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: setiap obrolan proyek mendapatkan seluruh berkas (≈%@ token). Pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut selagi dipin.";
 "Pinned" = "Tersemat";
+"Pinned · ≈%@ tokens" = "Dipin · ≈%@ token";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Dipin: %1$lld berkas, ≈%2$@ dari %3$@ token";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Pins dan proyek tidak dapat dimuat. Perubahan tidak disimpan sampai LLMTray dimulai ulang; salinan file disimpan di sampingnya.";
 "Play" = "Putar";
 "Point an app or agent at LLMTray:" = "Arahkan aplikasi atau agen ke LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "7 Hari Terakhir";
 "Profile" = "Profil";
 "Profiles" = "Profil";
-"Project Files: Turn On in Settings…" = "Berkas Proyek: Aktifkan di Pengaturan…";
 "Project files" = "Berkas proyek";
 "Project files are turned off" = "Berkas proyek dimatikan";
 "Project files are turned off in Settings." = "Berkas proyek dimatikan di Pengaturan.";
@@ -697,7 +703,8 @@
 "The app's name." = "Nama aplikasi.";
 "The base profile: every other profile inherits from it." = "Profil dasar: setiap profil lain mewarisinya.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Model chat dapat melihat folder yang Anda izinkan (nama, ukuran, tanggal, kutipan singkat) dan mengusulkan perubahan di sana — folder baru, pemindahan, penggantian nama, pemindahan ke Trash. Setiap perubahan adalah rencana yang Anda setujui dulu, dan dapat dibatalkan.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "Model obrolan sedang diunduh ke folder ini. Ubah setelah selesai, di sini atau di Pengaturan.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Model chat sedang diunduh ke folder ini. Ubah di Pengaturan setelah pemasangan, atau pilih model chat lain terlebih dahulu.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "Model chat yang Anda pilih telah diunduh ke folder ini. Ubah di Pengaturan setelah pemasangan, atau pilih model chat lain terlebih dahulu.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Salinan berkas yang ditambahkan ke proyek, beserta indeksnya, bersama-sama. Berkas milik proyek ditampilkan di jendela Files; menghapus proyek akan menghapusnya.";
 "The day the counts are for." = "Hari yang dihitung.";
 "The download didn't start." = "Unduhan tidak dimulai.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "File embedder yang diunduh tidak cocok dengan checksum mereka: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder sedang diunduh — coba lagi setelah selesai.";
 "The embedder list is missing or invalid: %@" = "Daftar embedder hilang atau tidak valid: %@";
+"The embedding model couldn't be downloaded" = "Model embedding gagal diunduh";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "JSON persis yang dikirim LLMTray: laporan yang menunggu, yang terkumpul hari ini, dan yang terakhir dikirim.";
 "The families of the models used that day (such as qwen or flux), never their names." = "Keluarga model yang digunakan hari itu (mis. qwen atau flux), bukan nama model.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Untuk pertama kali, ini mengunduh %@ (%@) ke Mac ini sekarang, bukan di tengah obrolan.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Untuk mengembalikannya, gunakan Undo di LLMTray: Finder's Put Back tidak mengetahui foldernya.";
 "Today" = "Hari ini";
 "Today so far: %@ (sent once the day is over)" = "Hari ini sejauh ini: %@ (dikirim setelah hari berakhir)";
+"Too long for the selected model's room now, read by search instead: %@" = "Terlalu panjang untuk ruang model yang dipilih sekarang, dibaca lewat pencarian sebagai gantinya: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Terlalu panjang untuk dipin dengan model yang dipilih: ≈%1$@ token, tersisa ≈%2$@ dari %3$@";
 "Too many reviews from this network. Try again in %lld min." = "Terlalu banyak ulasan dari jaringan ini. Coba lagi dalam %lld menit.";
 "Too many reviews from this network. Try again later." = "Terlalu banyak ulasan dari jaringan ini. Coba lagi nanti.";
 "Tool" = "Alat";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Mencoba decode-concurrency (1/2/4/8) dan prefill-step-size (64/128/256/512) pada model yang berjalan, memulai ulang server di antara tiap percobaan, lalu menyimpan yang terukur paling cepat.";
 "Try Again" = "Coba Lagi";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Aktifkan Berkas Proyek di Pengaturan > Models untuk menambahkan berkas ke proyek dan memungkinkan obrolannya mencarinya. Tidak ada yang diindeks atau diunduh sampai itu diaktifkan.";
-"Turn on Project files in Settings to add files" = "Aktifkan Berkas Proyek di Pengaturan untuk menambah berkas";
+"Turn On Project Files…" = "Nyalakan Project Files…";
+"Turn On…" = "Nyalakan…";
+"Turn on Project files to add files" = "Nyalakan Project Files untuk menambahkan file";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Nyalakan Project Files untuk menambahkan file ke proyek dan memungkinkan obrolan mencarinya. Tidak ada yang diindeks atau diunduh sampai saat itu.";
 "Turn on project files?" = "Nyalakan berkas proyek?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "Lepaskan model chat saat menghasilkan";
 "Unload model when idle" = "Lepaskan model saat idle";
 "Unpin" = "Lepas sematan";
+"Unpin %@" = "Lepas pin %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Lepas pin: obrolan proyek akan mencari berkas ini lagi alih‑alih menerima seluruh isinya";
 "Up to date" = "Terkini";
 "Up to date." = "Sudah versi terbaru.";
 "Update" = "Perbarui";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "~%1$lld j %2$lld m tersisa";
 "~%lld h left" = "~%lld j tersisa";
 "~%lld min left" = "~%lld m tersisa";
+"· %lld pinned" = "· %lld dipin";
 "· size…" = "· ukuran…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” tidak dapat dihapus: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: pin tidak dapat diubah: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” dan indeksnya dihapus dari proyek. Berkas sumber yang Anda tambahkan tidak diubah.";

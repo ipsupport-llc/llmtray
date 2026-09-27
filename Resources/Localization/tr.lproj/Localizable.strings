@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: henüz desteklenmiyor";
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld değişiklik hâlâ Ayarlar > Folders üzerinden geri alınabilir.";
+"%lld can still be undone from Settings > Files." = "%lld işlemi hâlâ Ayarlar > Files bölümünden geri alınabilir.";
 "%lld downloads" = "%lld indirme";
 "%lld failed" = "%lld başarısız";
 "%lld files couldn't be indexed" = "%lld dosya dizine eklenemedi";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Yüklü olandan farklı bir modeli isteyen bir düzenleyici, agent veya betik. Değiştirdiğinizde yüklü olan boşaltılır — sohbet de dahil. Önce sor: Switch / Keep içeren bir bildirim; bir dakika içinde yanıtlanmazsa Keep sayılır. Keep: istemciye, yüklü modeli belirten bir hata döner. Uygulamanın kendi sohbeti her zaman değişir.";
 "An hour" = "Bir saat";
 "An item needs the new folder it goes into: tick that folder too." = "Bir öğe gideceği yeni klasöre ihtiyaç duyuyor: o klasörü de işaretleyin.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "Kararsız bir öğe değişmiş olabilir ya da olmayabilir: Finder'da inceleyin. Ayarlar > Folders günlük tutar.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Değişmiş olup olmadığı belirsiz öğe için Finder’da kontrol edin. Ayarlar > Files günlük tutar.";
 "Another folder change is running: try again when it's done." = "Başka bir klasör değişikliği sürüyor: bitince yeniden deneyin.";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
 "Another version next to this one (a new seed, the same request)" = "Bunun yanında başka bir versiyon (yeni seed, aynı istek)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "LLMTray hoşunuza gidiyor mu?";
 "Errors" = "Hatalar";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Bu projedeki her sohbet, model profili sistem isteminden sonra bu talimatları alır. Bir değişiklik bir sonraki mesajdan itibaren geçerlidir.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Projedeki her sohbet tüm metni alır; bir dosya sabitlenmişken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapatılır.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray'nin ipsupport.us'a alan alan gönderdiği tam bilgiler. Başka hiçbir şey Mac'inizden ayrılmaz.";
 "Extra server arguments" = "Ek sunucu argümanları";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — oluştur ve düzenle";
@@ -255,6 +256,8 @@
 "Failed: %@" = "Başarısız oldu: %@";
 "Fast (smaller canvas)" = "Hızlı (küçük tuval)";
 "Fetching file list…" = "Dosya listesi alınıyor…";
+"Files" = "Files";
+"Files Settings…" = "Files Ayarları…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Buraya eklenen dosyalar projeye kopyalanır ve bu Mac'te dizine alınır; projenin her sohbeti bunlarda arama yapabilir.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Bir projeye eklenen dosyalar bu Mac’te indekslenir, böylece sohbetler bunlarda arama yapabilir. Anlamsal arama bir gömü modeli kullanır; olmadan dosyalar yalnızca kelimelerine göre aranır.";
 "Files in %@" = "%@ içindeki dosyalar";
@@ -263,7 +266,6 @@
 "Finish" = "Bitir";
 "Finish applies what you chose. You can change all of it later in Settings." = "Bitir seçiminizi uygular. Sonra Settings'ten her şeyi değiştirebilirsiniz.";
 "Fits comfortably" = "Rahat sığar";
-"Folder Settings…" = "Klasör Ayarları…";
 "Folder access" = "Klasör erişimi";
 "Folder access is off in Settings." = "Klasör erişimi Ayarlar'da kapalı.";
 "Folder changes" = "Klasör değişiklikleri";
@@ -387,6 +389,7 @@
 "Manage Models…" = "Modelleri Yönet…";
 "Managed by iCloud Drive or another cloud provider." = "iCloud Drive veya başka bir bulut sağlayıcısı tarafından yönetiliyor.";
 "Max tokens" = "Maksimum token";
+"Measuring the file…" = "Dosya ölçülüyor…";
 "Memory" = "Bellek";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Önceki konuşmaların bağlamını yeniden kullanmak için tutulan bellek; böylece devam eden bir sohbet tüm geçmişini yeniden okumaz. Sunucunun belleği tükenene kadar büyüyememesi için sınırlandırılır.";
 "Message…" = "Mesaj…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "Henüz otomatik ayarlama çalıştırılmadı.";
 "No automatic update checks" = "Otomatik güncelleme denetimi yok";
 "No chats found" = "Sohbet bulunamadı";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "Gömme modeli yok: dosyalar kelimelerine göre aranır. Anlama göre arama için Ayarlar > Models bölümünden indirin.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Gömmelenme modeli yok: dosyalar sözcüklerine göre aranır. Anlamına göre arama için Ayarlar > Files bölümünden indirin.";
 "No files yet" = "Henüz dosya yok";
 "No folder changes yet." = "Henüz klasör değişikliği yok.";
 "No messages yet" = "Henüz mesaj yok";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF ve HTML dosyalarını dizine alır.";
 "Nothing sent yet." = "Henüz gönderilen yok.";
 "Nothing to change." = "Değiştirilecek bir şey yok.";
+"Nothing to pin until the file has been read" = "Dosya okunana kadar sabitlenecek bir şey yok";
 "OK" = "Tamam";
 "Off" = "Kapalı";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Kapalı: sunucuya yalnızca bu Mac erişebilir. Açık: ağınızdaki diğer aygıtlar da erişebilir; ağdaki herkes erişebileceği için yalnızca güvendiğiniz ağlarda kullanın.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "Sadece turbo’da bu ayar var: sft’de şarkı planlayıcısı yok.";
 "Open LLMTray when you log in" = "Girişte LLMTray'ı aç";
 "Open Server Log…" = "Sunucu Günlüğünü Aç…";
-"Open Settings" = "Ayarları Aç";
 "Open in New Tab" = "Yeni Sekmede Aç";
 "Open in Preview" = "Önizlemede Aç";
 "Open in Window" = "Pencerede Aç";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "1 ile 5 yıldız arasında bir puan seçin.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Sohbet etmek için birini seçin. İndirme hemen başlar ve arka planda devam eder.";
 "Pin" = "Sabitlen";
+"Pin %@" = "Sabitle %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Sabitle: projedeki her sohbet tüm dosyayı alır (≈%@ token). Dosya sabitliyken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapalıdır.";
 "Pinned" = "Sabitlenen";
+"Pinned · ≈%@ tokens" = "Sabitlendi · ≈%@ token";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "Sabitlendi: %1$lld dosya, %3$@ tokenın ≈%2$@'u";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "Sabitlemeler ve projeler yüklenemedi. Bunlara yapılan değişiklikler LLMTray yeniden başlatılana kadar kaydedilmez; dosyanın bir kopyası yanında saklanır.";
 "Play" = "Oynat";
 "Point an app or agent at LLMTray:" = "Bir uygulamayı veya ajanı LLMTray'ı gösterecek şekilde ayarlayın:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "Son 7 Gün";
 "Profile" = "Profil";
 "Profiles" = "Profiller";
-"Project Files: Turn On in Settings…" = "Proje Dosyaları: Ayarlarda Aç…";
 "Project files" = "Proje dosyaları";
 "Project files are turned off" = "Proje dosyaları kapalı";
 "Project files are turned off in Settings." = "Proje dosyaları Ayarlar’da kapalı.";
@@ -697,7 +703,8 @@
 "The app's name." = "Uygulama adı.";
 "The base profile: every other profile inherits from it." = "Temel profil: diğer tüm profiller ondan devralır.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Sohbet modeli, izin verdiğiniz klasörlere bakabilir (adlar, boyutlar, tarihler, kısa alıntılar) ve orada değişiklik önerebilir — yeni klasörler, taşıma, yeniden adlandırma, Çöp'e taşıma. Her değişiklik önce sizin onayınıza sunulan bir plandır ve geri alınabilir.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "Sohbet modeli bu klasöre indiriliyor. Tamamlandıktan sonra buradan veya Settings'ten değiştirin.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Sohbet modeli bu klasöre indiriliyor. Kurulumdan sonra Ayarlar’dan değiştirin veya önce başka bir sohbet modeli seçin.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "Seçtiğiniz sohbet modeli bu klasöre indirildi. Kurulumdan sonra Ayarlar’dan değiştirin veya önce başka bir sohbet modeli seçin.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "Projeye eklenen dosyaların kopyaları ve bunların indeksleri bir arada. Bir projenin kendi dosyaları Dosyalar penceresinde gösterilir; bir proje silindiğinde bunlar da silinir.";
 "The day the counts are for." = "Sayımın ait olduğu gün.";
 "The download didn't start." = "İndirme başlamadı.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "İndirilen embedder dosyaları checksum'larıyla eşleşmiyor: %@";
 "The embedder is being downloaded -- try again once it's done." = "Embedder indiriliyor — tamamlandığında tekrar deneyin.";
 "The embedder list is missing or invalid: %@" = "Embedder listesi eksik veya geçersiz: %@";
+"The embedding model couldn't be downloaded" = "Gömmelenme modeli indirilemedi";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray'nin gönderdiği tam JSON: gönderilmeyi bekleyen raporlar, bugüne kadar olanlar ve en son gönderilen.";
 "The families of the models used that day (such as qwen or flux), never their names." = "O gün kullanılan model aileleri (ör. qwen veya flux), model adları asla.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "İlk seferinde %@ (%@) bu Mac’e sohbet sırasında değil, şimdi indirilir.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Geri koymak için LLMTray'de Geri Al'ı kullanın: Finder'ın Put Back işlemi klasörünü bilmez.";
 "Today" = "Bugün";
 "Today so far: %@ (sent once the day is over)" = "Bugüne kadar: %@ (gün bittikten sonra gönderilir)";
+"Too long for the selected model's room now, read by search instead: %@" = "Seçili modelin hafızası için şimdi çok uzun, bunun yerine arama ile okunacak: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Seçili model ile sabitlemek için çok uzun: ≈%1$@ token, %3$@ tokenın ≈%2$@'u kaldı";
 "Too many reviews from this network. Try again in %lld min." = "Bu ağdan çok fazla değerlendirme yapıldı. %lld dakika sonra tekrar deneyin.";
 "Too many reviews from this network. Try again later." = "Bu ağdan çok fazla değerlendirme yapıldı. Daha sonra tekrar deneyin.";
 "Tool" = "Araç";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Çalışan modelde decode-concurrency (1/2/4/8) ve prefill-step-size (64/128/256/512) değerlerini dener, her biri arasında sunucuyu yeniden başlatır ve ölçülen en hızlı olanı tutar.";
 "Try Again" = "Tekrar Dene";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Dosyaları projeye ekleyip sohbetlerin bunlarda arama yapmasını sağlamak için Ayarlar > Models içinde Proje dosyalarını açın. O zamana kadar hiçbir şey dizine alınmaz veya indirilmez.";
-"Turn on Project files in Settings to add files" = "Dosya eklemek için Ayarlar'da Proje dosyalarını açın";
+"Turn On Project Files…" = "Proje Dosyalarını Aç…";
+"Turn On…" = "Aç…";
+"Turn on Project files to add files" = "Dosya eklemek için Proje Dosyalarını açın";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenir veya indirilmez.";
 "Turn on project files?" = "Proje dosyalarını açmak istiyor musunuz?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "Üretim sırasında sohbet modelini bellekten çıkar";
 "Unload model when idle" = "Boştayken modeli bellekten çıkar";
 "Unpin" = "Sabitlenmeyi Kaldır";
+"Unpin %@" = "Sabit kaldır %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "Sabit kaldır: projenin sohbetleri tüm dosyayı almak yerine bu dosyayı yeniden arayacak";
 "Up to date" = "Güncel";
 "Up to date." = "Güncel.";
 "Update" = "Güncelle";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "~%1$lld sa %2$lld dk kaldı";
 "~%lld h left" = "~%lld sa kaldı";
 "~%lld min left" = "~%lld dk kaldı";
+"· %lld pinned" = "· %lld sabitlendi";
 "· size…" = "· boyut…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” kaldırılamadı: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: sabitleme değiştirilemedi: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” ve indeksi projeden silindi. Eklediğiniz kaynak dosya etkilenmez.";

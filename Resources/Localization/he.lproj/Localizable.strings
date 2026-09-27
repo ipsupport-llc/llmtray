@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: עדיין לא נתמך";
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
 "%lld MB" = "%lld מ״ב";
-"%lld can still be undone from Settings > Folders." = "ניתן עדיין לבטלם ב־Settings > Folders: %lld";
+"%lld can still be undone from Settings > Files." = "%lld עדיין ניתן לבטל מ־Settings > Files.";
 "%lld downloads" = "%lld הורדות";
 "%lld failed" = "%lld נכשלו";
 "%lld files couldn't be indexed" = "לא ניתן לאנדקס %lld קבצים";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "עורך, סוכן או סקריפט מבקשים מודל שונה מהטעון. החלפה תסיר את המודל הטעון — גם הצ'אט. שאל קודם: הודעה עם 'Switch' / 'Keep'; ללא תשובה בדקה נחשבת 'Keep'. 'Keep': הלקוח מקבל שגיאה שמציינת את המודל הטעון. הצ'אט של האפליקציה תמיד מחליף.";
 "An hour" = "שעה";
 "An item needs the new folder it goes into: tick that folder too." = "פריט צריך את התיקייה החדשה שאליה מועבר: סמן גם אותה.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "פריט לא ודאי יתכן ששונה או לא: הסתכל עליו ב־Finder. Settings > Folders שומר את היומן.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "פריט לא ודאי אולי השתנה או לא — בדקו אותו ב‑Finder. Settings > Files שומר יומן.";
 "Another folder change is running: try again when it's done." = "שינוי תיקייה אחר בפועל: נסה שוב כשייגמר.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
 "Another version next to this one (a new seed, the same request)" = "גרסה נוספת לצד זו (seed חדש, אותו בקשה)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "נהנים מ‑LLMTray?";
 "Errors" = "שגיאות";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "בדיוק מה ש‑LLMTray שולח אל ipsupport.us, שדה אחר שדה. שום דבר אחר לא יוצא מהמחשב.";
 "Extra server arguments" = "ארגומנטים נוספים לשרת";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — ליצור ולערוך";
@@ -255,6 +256,8 @@
 "Failed: %@" = "נכשל: %@";
 "Fast (smaller canvas)" = "מהיר (קנבס קטן יותר)";
 "Fetching file list…" = "מושך/ת את רשימת הקבצים…";
+"Files" = "קבצים";
+"Files Settings…" = "הגדרות קבצים…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "קבצים שמוספים לכאן מועתקים לפרויקט ונאונדקסים במחשב זה; כל שיחה בפרויקט יכולה לחפש בהם.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "קבצים שנוספו לפרויקט מאונדקסים במחשב זה, כך שהשיחות יוכלו לחפש בהם. חיפוש לפי משמעות משתמש בדגם הטמעה; בלעדיו מחפשים בקבצים לפי מילים.";
 "Files in %@" = "קבצים ב־%@";
@@ -263,7 +266,6 @@
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish מיישם את מה שבחרתם. אפשר לשנות הכל מאוחר יותר ב‑Settings.";
 "Fits comfortably" = "מתאים בנוחות";
-"Folder Settings…" = "הגדרות תיקייה…";
 "Folder access" = "גישה לתיקייה";
 "Folder access is off in Settings." = "גישה לתיקיות כבויה ב־Settings.";
 "Folder changes" = "שינויים בתיקיות";
@@ -387,6 +389,7 @@
 "Manage Models…" = "ניהול מודלים…";
 "Managed by iCloud Drive or another cloud provider." = "מנוהל על־ידי iCloud Drive או ספק ענן אחר.";
 "Max tokens" = "מספר טוקנים מרבי";
+"Measuring the file…" = "מודד את הקובץ…";
 "Memory" = "זיכרון";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "זיכרון שנשמר לשימוש חוזר בהקשר של שיחות קודמות, כדי ששיחה נמשכת לא תקרא מחדש את כל ההיסטוריה שלה. מוגבל כדי שלא ימשיך לגדול עד שלשרת ייגמר הזיכרון.";
 "Message…" = "הודעה…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "עדיין לא בוצעה הרצת כוונון אוטומטי.";
 "No automatic update checks" = "אין בדיקות עדכון אוטומטיות";
 "No chats found" = "לא נמצאו צ'אטים";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "אין מודל הטמעה: הקבצים מחופשים לפי מילים. הורד אותו ב'הגדרות' > 'Models' לחיפוש על פי משמעות.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "אין מודל embedding: החיפוש בקבצים נעשה לפי מילים. הורידו אותו ב‑Settings > Files כדי לחפש לפי משמעות.";
 "No files yet" = "אין קבצים עדיין";
 "No folder changes yet." = "עדיין אין שינויים בתיקיות.";
 "No messages yet" = "עדיין אין הודעות";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "עדיין לא נתמך: %@. גרסה זו מאונדקסת טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF ו‑HTML.";
 "Nothing sent yet." = "טרם נשלח דבר.";
 "Nothing to change." = "אין דבר לשנות.";
+"Nothing to pin until the file has been read" = "אין מה לסמן עד שהקובץ ייקרא";
 "OK" = "אישור";
 "Off" = "כבוי";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "רק ל‑turbo קיים הכפתור הזה: ל‑sft אין מתכנן שירים לשינויים.";
 "Open LLMTray when you log in" = "פתח את LLMTray כשאתה נכנס";
 "Open Server Log…" = "פתח את יומן השרת…";
-"Open Settings" = "פתח הגדרות";
 "Open in New Tab" = "פתח בכרטיסייה חדשה";
 "Open in Preview" = "פתח ב‑Preview";
 "Open in Window" = "פתח בחלון";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "בחר דירוג מ‑1 עד 5 כוכבים.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "בחר אחד לשיחה. הורדה תתחיל מיד ותמשיך ברקע.";
 "Pin" = "נעץ";
+"Pin %@" = "סמן %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "סימון: כל צ'אט בפרויקט מקבל את הקובץ במלואו (≈%@ טוקנים). חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד הקובץ מסומן.";
 "Pinned" = "נעוץ";
+"Pinned · ≈%@ tokens" = "מסומן · ≈%@ טוקנים";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "מסומנים: %1$lld קבצים, ≈%2$@ מתוך %3$@ טוקנים";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "לא ניתן היה לטעון קבצי Pins ו־projects. שינויים לא יישמרו עד להפעלת LLMTray מחדש; עותק של הקובץ נשמר לצד התוכנית.";
 "Play" = "נגן";
 "Point an app or agent at LLMTray:" = "כוונו אפליקציה או סוכן ל‑LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "7 הימים האחרונים";
 "Profile" = "פרופיל";
 "Profiles" = "פרופילים";
-"Project Files: Turn On in Settings…" = "קבצי פרויקט: הפעל בהגדרות…";
 "Project files" = "קבצי פרויקט";
 "Project files are turned off" = "קבצי הפרויקט כבויים";
 "Project files are turned off in Settings." = "קבצי הפרויקט מושבתים בהגדרות.";
@@ -697,7 +703,8 @@
 "The app's name." = "שם האפליקציה.";
 "The base profile: every other profile inherits from it." = "פרופיל הבסיס: כל פרופיל אחר יורש ממנו.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "מודל השיחה יכול להסתכל בתיקיות שתאפשר (שמות, גדלים, תאריכים, ציטוטים קצרים) ולהציע שם שינויים — תיקיות חדשות, העברות, שינויי שם, העברה ל־Trash. כל שינוי הוא תכנית שדורשת את אישורך וניתן לביטול.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "מודל הצ'אט יורד לתיקייה זו. שנה אותו כשתסתיים ההורדה, כאן או ב‑Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "מודל הצ׳אט יורד לתיקיה זו. שנה זאת ב־Settings לאחר ההתקנה, או בחר קודם דגם צ׳אט אחר.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "מודל הצ׳אט שבחרת הורד לתיקיה זו. שנה זאת ב־Settings לאחר ההתקנה, או בחר קודם דגם צ׳אט אחר.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "עותקי הקבצים שנוספו לפרויקטים, יחד עם האינדקסים שלהן. של כל פרויקט מוצגים בחלון הקבצים שלו; מחיקת פרויקט מוחקת אותן.";
 "The day the counts are for." = "היום שאליו שייכים המונים.";
 "The download didn't start." = "ההורדה לא החלה.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "קבצי ה-embedder שהורדו אינם תואמים ל-checksum שלהם: %@";
 "The embedder is being downloaded -- try again once it's done." = "ה-embedder מורד כעת — נסה שוב כשההורדה תסתיים.";
 "The embedder list is missing or invalid: %@" = "רשימת ה-embedder חסרה או לא תקינה: %@";
+"The embedding model couldn't be downloaded" = "לא הצליח להוריד את מודל ה‑embedding";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "ה‑JSON המדויק ש‑LLMTray שולח: הדוחות שמחכים להשלחה, מה שנשלח היום עד כה, והדוח האחרון שנשלח.";
 "The families of the models used that day (such as qwen or flux), never their names." = "משפחות המודלים ששומשו באותו יום (למשל qwen או flux), לא שמות המודלים.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "בפעם הראשונה, פעולה זו מורידה את %@ (%@) ל‑Mac הזה עכשיו, במקום באמצע צ׳אט.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "להשיבו חזור השתמש ב־Undo ב־LLMTray: Finder's Put Back לא יודע את התיקייה שלו.";
 "Today" = "היום";
 "Today so far: %@ (sent once the day is over)" = "היום עד כה: %@ (יימסר בסיום היום)";
+"Too long for the selected model's room now, read by search instead: %@" = "ארוך מדי לעת עתה לחדר של המודל הנבחר, ייקרא באמצעות חיפוש במקום זאת: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "ארוך מדי לסימון עם המודל הנבחר: ≈%1$@ טוקנים, נותרו ≈%2$@ מתוך %3$@";
 "Too many reviews from this network. Try again in %lld min." = "יותר מדי חוות דעת מהרשת הזו. נסה שוב בעוד %lld דקות.";
 "Too many reviews from this network. Try again later." = "יותר מדי חוות דעת מהרשת הזו. נסה שוב מאוחר יותר.";
 "Tool" = "כלי";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "בודק את decode-concurrency (1/2/4/8) ואת prefill-step-size (64/128/256/512) מול המודל הפעיל, מפעיל מחדש את השרת בין כל בדיקה, ושומר את האפשרות שנמדדה כמהירה ביותר.";
 "Try Again" = "נסה שוב";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעל 'קבצי פרויקט' ב'הגדרות' > 'Models' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות בחיפוש בהם. כלום לא מאונדקס או מורד עד אז.";
-"Turn on Project files in Settings to add files" = "הפעל 'קבצי פרויקט' בהגדרות כדי להוסיף קבצים";
+"Turn On Project Files…" = "הפעל קבצי פרויקט…";
+"Turn On…" = "הפעל…";
+"Turn on Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
 "Turn on project files?" = "להפעיל את קבצי הפרויקט?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "פריקת מודל הצ׳אט בזמן יצירה";
 "Unload model when idle" = "פריקת המודל כשאינו פעיל";
 "Unpin" = "הסר נעיצה";
+"Unpin %@" = "הסר סימון %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "הסר סימון: צ'אטים של הפרויקט יחפשו את הקובץ שוב במקום לקבל את כולו";
 "Up to date" = "מעודכן";
 "Up to date." = "מעודכן.";
 "Update" = "עדכן";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "~%1$lld ש׳ %2$lld דק׳ נותרו";
 "~%lld h left" = "~%lld ש׳ נותרו";
 "~%lld min left" = "~%lld דק׳ נותרו";
+"· %lld pinned" = "· %lld מסומנים";
 "· size…" = "· גודל…";
 "“%1$@” couldn't be removed: %2$@" = "לא ניתן להסיר “%1$@”: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: לא ניתן לשנות את הסימון: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";

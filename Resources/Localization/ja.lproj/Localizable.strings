@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: 未対応です";
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Folders." = "%lld 件はまだ設定 > Folders で元に戻せます。";
+"%lld can still be undone from Settings > Files." = "%lld は Settings > Files で元に戻せます。";
 "%lld downloads" = "%lld回のダウンロード";
 "%lld failed" = "%lld 件失敗";
 "%lld files couldn't be indexed" = "%lld 件をインデックスできませんでした";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "編集中のエディタ、エージェント、またはスクリプトが現在読み込まれているものと異なるモデルを要求する場合。切り替えると読み込まれているモデル（チャットも含む）はアンロードされます。先に確認する: 「切り替え / 維持」の通知を表示。1分間未回答なら「維持」とみなします。「維持」の場合、クライアントには読み込まれているモデル名を伝えるエラーが返ります。アプリ内のチャットは常に切り替えます。";
 "An hour" = "1 時間";
 "An item needs the new folder it goes into: tick that folder too." = "項目には移動先の新しいフォルダが必要です：そのフォルダにもチェックを入れてください。";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "不確かな項目は変更されている可能性があります：Finder で確認してください。設定 > Folders にジャーナルが保存されます。";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "変更されたか不確かな項目は Finder で確認してください。Settings > Files がジャーナルを保持します。";
 "Another folder change is running: try again when it's done." = "別のフォルダ変更が実行中です：完了後にもう一度お試しください。";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
 "Another version next to this one (a new seed, the same request)" = "この作品の横に並ぶ別バージョン（新しいシード、同じリクエスト）";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "LLMTrayをお楽しみですか？";
 "Errors" = "エラー";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "プロジェクト内のすべてのチャットがファイル全体のテキストを取得します。ファイルがピン留めされている間、そのチャットでは Web 検索や画像・音楽生成は無効になります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
 "Extra server arguments" = "追加のサーバ引数";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — 生成と編集";
@@ -255,6 +256,8 @@
 "Failed: %@" = "失敗しました：%@";
 "Fast (smaller canvas)" = "高速（キャンバス小）";
 "Fetching file list…" = "ファイル一覧を取得しています…";
+"Files" = "Files";
+"Files Settings…" = "Files 設定…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "ここに追加したファイルはプロジェクトにコピーされ、このMacでインデックス化されます。プロジェクト内のすべてのチャットが検索できます。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "プロジェクトに追加されたファイルはこのMac上で索引化され、チャットから検索できます。意味による検索には埋め込みモデルを使用します。モデルがない場合は、ファイルは単語ベースで検索されます。";
 "Files in %@" = "%@ のファイル";
@@ -263,7 +266,6 @@
 "Finish" = "完了";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish で選択内容が適用されます。後で設定でいつでも変更できます。";
 "Fits comfortably" = "余裕あり";
-"Folder Settings…" = "フォルダ設定…";
 "Folder access" = "フォルダアクセス";
 "Folder access is off in Settings." = "設定でフォルダアクセスがオフになっています。";
 "Folder changes" = "フォルダの変更";
@@ -387,6 +389,7 @@
 "Manage Models…" = "モデルを管理…";
 "Managed by iCloud Drive or another cloud provider." = "iCloud Drive や他のクラウドプロバイダにより管理されています。";
 "Max tokens" = "最大トークン数";
+"Measuring the file…" = "ファイルを計測しています…";
 "Memory" = "メモリ";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "以前の会話のコンテキストを再利用するために保持するメモリです。継続したチャットで履歴全体を読み直さずに済みます。サーバのメモリを使い切るまで増え続けないよう、上限があります。";
 "Message…" = "メッセージ…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "自動調整はまだ実行されていません。";
 "No automatic update checks" = "自動アップデート確認なし";
 "No chats found" = "チャットが見つかりません";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "埋め込みモデルがありません：ファイルは単語で検索されます。意味で検索するには「設定 > Models」でダウンロードしてください。";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "埋め込みモデルがありません：ファイルは語句で検索されます。意味で検索するには Settings > Files からダウンロードしてください。";
 "No files yet" = "ファイルがありません";
 "No folder changes yet." = "まだフォルダの変更はありません。";
 "No messages yet" = "メッセージはまだありません";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "未対応です: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML をインデックス化します。";
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
+"Nothing to pin until the file has been read" = "ファイルが読み取られるまでピン留めできません";
 "OK" = "OK";
 "Off" = "オフ";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "このノブはturboのみ：sftには曲のプランナーがありません。";
 "Open LLMTray when you log in" = "ログイン時に LLMTray を開く";
 "Open Server Log…" = "サーバログを開く…";
-"Open Settings" = "設定を開く";
 "Open in New Tab" = "新規タブで開く";
 "Open in Preview" = "プレビューで開く";
 "Open in Window" = "ウインドウで開く";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "1〜5の星から評価を選んでください。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "チャットするモデルを選んでください。選択するとすぐにダウンロードが開始され、バックグラウンドで進行します。";
 "Pin" = "ピン留め";
+"Pin %@" = "ピン留め %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "ピン留め: プロジェクト内のすべてのチャットがファイル全体を受け取ります（約 %@ トークン）。ピン留め中はそのチャットで Web 検索や画像・音楽生成は無効になります。";
 "Pinned" = "ピン留め済み";
+"Pinned · ≈%@ tokens" = "ピン留め済 · 約 %@ トークン";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "ピン留め済: %1$lld 件、約 %2$@ ／ %3$@ トークン";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "ピンとプロジェクトを読み込めませんでした。変更は LLMTray を再起動するまで保存されません。ファイルのコピーが隣に保持されます。";
 "Play" = "再生";
 "Point an app or agent at LLMTray:" = "アプリやエージェントから LLMTray を指定するには：";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "過去7日";
 "Profile" = "プロファイル";
 "Profiles" = "プロファイル";
-"Project Files: Turn On in Settings…" = "プロジェクトファイル：設定で有効にする…";
 "Project files" = "プロジェクトファイル";
 "Project files are turned off" = "プロジェクトファイルはオフです";
 "Project files are turned off in Settings." = "プロジェクトファイルは「設定」でオフになっています。";
@@ -697,7 +703,8 @@
 "The app's name." = "アプリ名。";
 "The base profile: every other profile inherits from it." = "基本プロファイルです。ほかのすべてのプロファイルはこれを継承します。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "チャットモデルはあなたが許可したフォルダを参照できます（名前、サイズ、日付、短い抜粋）およびそこに対する変更を提案できます—新規フォルダ、移動、名前変更、ゴミ箱への移動。各変更は事前にあなたが承認する計画として表示され、元に戻せます。";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "チャットモデルはこのフォルダにダウンロード中です。完了後にここまたは設定で変更できます。";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "チャットモデルをこのフォルダにダウンロードしています。セットアップ後に「Settings」で変更するか、先に別のチャットモデルを選んでください。";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "選択したチャットモデルはこのフォルダにダウンロードされました。セットアップ後に「Settings」で変更するか、先に別のチャットモデルを選んでください。";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "プロジェクトに追加されたファイルのコピーとそのインデックスです。プロジェクト固有のものは Files ウィンドウに表示され、プロジェクトを削除するとこれらも削除されます。";
 "The day the counts are for." = "集計対象の日付。";
 "The download didn't start." = "ダウンロードが開始されませんでした。";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "ダウンロードした埋め込み器ファイルのチェックサムが一致しません: %@";
 "The embedder is being downloaded -- try again once it's done." = "埋め込み器をダウンロード中です。完了してからもう一度お試しください。";
 "The embedder list is missing or invalid: %@" = "埋め込み器リストが存在しないか無効です: %@";
+"The embedding model couldn't be downloaded" = "埋め込みモデルをダウンロードできませんでした";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "LLMTray が送信する正確な JSON：送信待ちのレポート、本日の分、および最後に送信されたレポートを表示します。";
 "The families of the models used that day (such as qwen or flux), never their names." = "その日に使われたモデルのファミリ（例：qwenやflux）。モデル名自体は含みません。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "初回は、チャットの途中ではなく今、%@（%@）をこのMacにダウンロードします。";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "元に戻すには LLMTray の Undo を使用してください：Finder の Put Back は元のフォルダを認識しません。";
 "Today" = "今日";
 "Today so far: %@ (sent once the day is over)" = "本日これまで: %@（日付が変わると送信されます）";
+"Too long for the selected model's room now, read by search instead: %@" = "選択されたモデルのルームには長すぎるため、代わりに検索で読み取ります: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "選択モデルではピン留め不可（長すぎます）: 約 %1$@ トークン、残り 約 %2$@ ／ %3$@";
 "Too many reviews from this network. Try again in %lld min." = "このネットワークからのレビューが多すぎます。%lld分後に再試行してください。";
 "Too many reviews from this network. Try again later." = "このネットワークからのレビューが多すぎます。後でもう一度お試しください。";
 "Tool" = "ツール";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
 "Try Again" = "再試行";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "「設定 > Models」でプロジェクトファイルを有効にすると、ファイルをプロジェクトに追加してチャットで検索できます。それまでは何もインデックス化やダウンロードされません。";
-"Turn on Project files in Settings to add files" = "設定でプロジェクトファイルを有効にしてファイルを追加";
+"Turn On Project Files…" = "プロジェクトファイルを有効にする…";
+"Turn On…" = "有効にする…";
+"Turn on Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
 "Turn on project files?" = "プロジェクトファイルを有効にしますか？";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "生成中にチャットモデルをアンロード";
 "Unload model when idle" = "アイドル時にモデルをアンロード";
 "Unpin" = "ピンを外す";
+"Unpin %@" = "ピン留めを外す %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "ピン留めを外す: プロジェクトのチャットはファイル全体を取得するのではなく再び検索で参照します";
 "Up to date" = "最新です";
 "Up to date." = "最新です。";
 "Update" = "アップデート";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "約 %1$lld 時間 %2$lld 分 残り";
 "~%lld h left" = "約 %lld 時間 残り";
 "~%lld min left" = "約 %lld 分 残り";
+"· %lld pinned" = "· %lld 件ピン留め済";
 "· size…" = "・サイズ…";
 "“%1$@” couldn't be removed: %2$@" = "「%1$@」を削除できませんでした: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "「%1$@」のピンを変更できませんでした: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";

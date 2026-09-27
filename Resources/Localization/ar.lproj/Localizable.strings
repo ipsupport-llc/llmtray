@@ -25,7 +25,7 @@
 "%@: not supported yet" = "%@: غير مدعوم بعد";
 "%d overridden, rest from Default · %@" = "%d متجاوز، والباقي من Default · %@";
 "%lld MB" = "%lld م.ب";
-"%lld can still be undone from Settings > Folders." = "لا يزال بإمكان التراجع عن %lld من الإعدادات > Folders.";
+"%lld can still be undone from Settings > Files." = "%lld لا يزال من الممكن التراجع عنه من الإعدادات > Files.";
 "%lld downloads" = "%lld تنزيلات";
 "%lld failed" = "%lld فشل";
 "%lld files couldn't be indexed" = "تعذر فهرسة %lld ملفًا";
@@ -88,7 +88,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "محرر أو وكيل أو سكربت يطلب نموذجاً مختلفاً عن المحمّل. التبديل يفرغ النموذج المحمّل — وكذلك الدردشة. اسأل أولاً: إشعار مع خيارات Switch / Keep؛ عدم الرد خلال دقيقة يعتبر Keep. عند اختيار Keep: يحصل العميل على خطأ يذكر النموذج المحمّل. دردشة التطبيق نفسها تتحوّل دائماً.";
 "An hour" = "ساعة";
 "An item needs the new folder it goes into: tick that folder too." = "العنصر يحتاج المجلد الجديد الذي سينتقل إليه: حدّد ذلك المجلد أيضاً.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "قد يكون العنصر غير المؤكد قد تغير أو لم يتغير: تفقده في Finder. الإعدادات > Folders يحتفظ بالسجل.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "قد يكون العنصر غير المؤكد قد تغيّر أو لم يتغيّر: انظُر إليه في Finder. الإعدادات > Files يحتفظ بالسجل.";
 "Another folder change is running: try again when it's done." = "هناك تغيير مجلد آخر قيد التشغيل: حاول مرة أخرى بعد الانتهاء.";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
 "Another version next to this one (a new seed, the same request)" = "نسخة أخرى بجانب هذه (بذرة جديدة، نفس الطلب)";
@@ -248,6 +248,7 @@
 "Enjoying LLMTray?" = "هل تستمتع بـ LLMTray؟";
 "Errors" = "الأخطاء";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "كل محادثة في هذا المشروع تتلقى هذه التعليمات بعد موجه النظام في ملف تعريف النموذج. يسري أي تغيير بدءاً من الرسالة التالية.";
+"Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "تحصل كل محادثة في المشروع على كامل نص الملف؛ البحث على الويب وتوليد الصور أو الموسيقى متوقفان في تلك المحادثات طالما الملف مثبت.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "بالضبط ما يرسله LLMTray إلى ipsupport.us، حقلًا بحقل. لا شيء آخر يغادر جهاز Mac الخاص بك.";
 "Extra server arguments" = "وسيطات الخادم الإضافية";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — إنشاء وتحرير";
@@ -255,6 +256,8 @@
 "Failed: %@" = "فشل: %@";
 "Fast (smaller canvas)" = "سريع (لوحة أصغر)";
 "Fetching file list…" = "جارٍ جلب قائمة الملفات…";
+"Files" = "Files";
+"Files Settings…" = "إعدادات Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "الملفات التي تُضاف هنا تُنسَخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "الملفات المضافة إلى مشروع تُفهرَس على هذا الـMac، حتى تتمكن المحادثات من البحث فيها. البحث بحسب المعنى يستخدم نموذج تضمين؛ بدونه تُبحث الملفات حسب كلماتها.";
 "Files in %@" = "الملفات في %@";
@@ -263,7 +266,6 @@
 "Finish" = "إنهاء";
 "Finish applies what you chose. You can change all of it later in Settings." = "ينفّذ Finish ما اخترتَه. يمكنك تغيير كل ذلك لاحقًا في Settings.";
 "Fits comfortably" = "يناسب بشكل مريح";
-"Folder Settings…" = "إعدادات المجلد…";
 "Folder access" = "وصول المجلد";
 "Folder access is off in Settings." = "وصول المجلد معطل في الإعدادات.";
 "Folder changes" = "تغييرات المجلد";
@@ -387,6 +389,7 @@
 "Manage Models…" = "إدارة النماذج…";
 "Managed by iCloud Drive or another cloud provider." = "تتم إدارته بواسطة iCloud Drive أو مزوّد سحابي آخر.";
 "Max tokens" = "الحد الأقصى للرموز";
+"Measuring the file…" = "جارٍ قياس الملف…";
 "Memory" = "الذاكرة";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "الذاكرة المحتفَظ بها لإعادة استخدام سياق المحادثات السابقة، حتى لا تعيد المحادثة المستمرة قراءة سجلها بالكامل. حجمها محدود حتى لا تكبر إلى أن تنفد ذاكرة الخادم.";
 "Message…" = "رسالة…";
@@ -440,7 +443,7 @@
 "No auto-tune run yet." = "لم يتم تشغيل الضبط التلقائي بعد.";
 "No automatic update checks" = "لا فحوص تحديث تلقائية";
 "No chats found" = "لم تُعثر على دردشات";
-"No embedding model: files are searched by their words. Download it in Settings > Models for search by meaning." = "لا يوجد نموذج تضمين: تُبحث الملفات بكلماتها. حمّله من الإعدادات > Models للبحث بالمعنى.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "لا يوجد نموذج تضمين: تُبحث الملفات بالكلمات. نزِّلَه من الإعدادات > Files للبحث بالمعنى.";
 "No files yet" = "لا توجد ملفات بعد";
 "No folder changes yet." = "لا توجد تغييرات في المجلد حتى الآن.";
 "No messages yet" = "لا توجد رسائل بعد";
@@ -459,6 +462,7 @@
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "غير مدعوم بعد: %@. هذه النسخة تفهرِس النصوص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML.";
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
+"Nothing to pin until the file has been read" = "لا شيء لتثبيته حتى يتم قراءة الملف";
 "OK" = "موافق";
 "Off" = "إيقاف";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "إيقاف: لا يمكن إلا لهذا الـ Mac الوصول إلى الخادم. تشغيل: يمكن للأجهزة الأخرى على شبكتك الوصول إليه أيضًا — أي شخص عليها، لذا لا تستخدمه إلا على الشبكات التي تثق بها.";
@@ -469,7 +473,6 @@
 "Only turbo has this knob: sft has no song planner to vary." = "هذا الضابط متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
 "Open LLMTray when you log in" = "فتح LLMTray عند تسجيل الدخول";
 "Open Server Log…" = "فتح سجل الخادم…";
-"Open Settings" = "فتح الإعدادات";
 "Open in New Tab" = "فتح في تبويب جديد";
 "Open in Preview" = "افتح في Preview";
 "Open in Window" = "فتح في نافذة";
@@ -491,7 +494,11 @@
 "Pick a rating from 1 to 5 stars." = "اختر تقييماً من 1 إلى 5 نجوم.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "اختر واحدًا للدردشة معه. يبدأ التنزيل فورًا ويستمر في الخلفية.";
 "Pin" = "تثبيت";
+"Pin %@" = "تثبيت %@";
+"Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "تثبيت: تحصل كل محادثة في المشروع على الملف كاملًا (≈%@ رمزًا). البحث على الويب وتوليد الصور أو الموسيقى متوقّفان في تلك المحادثات طالما هو مثبت.";
 "Pinned" = "مثبّتة";
+"Pinned · ≈%@ tokens" = "مثبت · ≈%@ رمزًا";
+"Pinned: %1$lld files, ≈%2$@ of %3$@ tokens" = "مثبت: %1$lld ملفات، ≈%2$@ من %3$@ رمزًا";
 "Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it." = "تعذر تحميل الدبابيس والمشروعات. لن تُحفظ التغييرات عليها حتى إعادة تشغيل LLMTray؛ يتم الاحتفاظ بنسخة من الملف بجانب التطبيق.";
 "Play" = "تشغيل";
 "Point an app or agent at LLMTray:" = "وجّه تطبيقًا أو agent إلى LLMTray:";
@@ -503,7 +510,6 @@
 "Previous 7 Days" = "السبعة أيام الماضية";
 "Profile" = "ملف التعريف";
 "Profiles" = "ملفات التعريف";
-"Project Files: Turn On in Settings…" = "ملفات المشروع: شغِّلها في الإعدادات…";
 "Project files" = "ملفات المشروع";
 "Project files are turned off" = "ملفات المشروع متوقفة";
 "Project files are turned off in Settings." = "تم تعطيل ملفات المشروع في الإعدادات.";
@@ -697,7 +703,8 @@
 "The app's name." = "اسم التطبيق.";
 "The base profile: every other profile inherits from it." = "ملف التعريف الأساسي: ترث منه كل ملفات التعريف الأخرى.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "نموذج الدردشة يمكنه النظر في المجلدات التي تسمح بها (الأسماء، الأحجام، التواريخ، مقتطفات قصيرة) واقتراح تغييرات هناك — مجلدات جديدة، نقل، إعادة تسمية، الإرسال إلى Trash. كل تغيير هو خطة توافق عليها أولاً، ويمكن التراجع عنها.";
-"The chat model is downloading into this folder. Change it once that's done, here or in Settings." = "نموذج الدردشة يُنزَل إلى هذا المجلد. غيّره بعد الانتهاء، هنا أو في Settings.";
+"The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "نموذج الدردشة يُحمَّل في هذا المجلد. غيّره في الإعدادات بعد الإعداد، أو اختر نموذج دردشة آخر أولاً.";
+"The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "نموذج الدردشة الذي اخترته تم تنزيله في هذا المجلد. غيّره في الإعدادات بعد الإعداد، أو اختر نموذج دردشة آخر أولاً.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "نسخ الملفات المضافة إلى المشاريع وفهارسها معًا. تُعرض ملفات المشروع الخاصة في نافذة Files الخاصة به؛ حذف المشروع يحذفها.";
 "The day the counts are for." = "اليوم الذي تخصّه الأعداد.";
 "The download didn't start." = "لم يبدأ التنزيل.";
@@ -705,6 +712,7 @@
 "The downloaded embedder files don't match their checksums: %@" = "ملفات الـembedder التي تم تنزيلها لا تطابق مجموعات التحقق الخاصة بها: %@";
 "The embedder is being downloaded -- try again once it's done." = "جارٍ تنزيل الـembedder — حاول مرة أخرى بعد اكتمال العملية.";
 "The embedder list is missing or invalid: %@" = "قائمة الـembedder مفقودة أو غير صالحة: %@";
+"The embedding model couldn't be downloaded" = "لم يتمكّن تنزيل نموذج التضمين";
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "الـ JSON الدقيق الذي يرسله LLMTray: التقارير التي تنتظر الإرسال، ما تم اليوم حتى الآن، وآخر تقرير مُرسل.";
 "The families of the models used that day (such as qwen or flux), never their names." = "عائلات النماذج المستخدمة في ذلك اليوم (مثل qwen أو flux)، دون أسماء النماذج.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "في المرة الأولى، يؤدي هذا إلى تنزيل %@ (%@) إلى هذا الـ Mac الآن، بدلًا من أثناء الدردشة.";
@@ -760,6 +768,8 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "لإعادته، استخدم Undo في LLMTray: أمر Put Back في Finder لا يعرف مجلده.";
 "Today" = "اليوم";
 "Today so far: %@ (sent once the day is over)" = "ما تم اليوم حتى الآن: %@ (يُرسل عند انتهاء اليوم)";
+"Too long for the selected model's room now, read by search instead: %@" = "طويل جدًا بالنسبة لمساحة النموذج المحدد الآن، سيُقرأ عبر البحث بدلًا من ذلك: %@";
+"Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "طويل جدًا للتثبيت مع النموذج المحدد: ≈%1$@ رمزًا، تبقّى ≈%2$@ من %3$@";
 "Too many reviews from this network. Try again in %lld min." = "عدد كبير جدًا من المراجعات من هذه الشبكة. حاول مرة أخرى بعد %lld دقيقة.";
 "Too many reviews from this network. Try again later." = "عدد كبير جدًا من المراجعات من هذه الشبكة. حاول لاحقًا.";
 "Tool" = "الأداة";
@@ -772,8 +782,10 @@
 "Top-p" = "Top-p";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "يجرب decode-concurrency (1/2/4/8) و prefill-step-size (64/128/256/512) على النموذج قيد التشغيل، مع إعادة تشغيل الخادم بين كل تجربة، ويحتفظ بالإعداد الأسرع قياسًا.";
 "Try Again" = "حاول مرة أخرى";
-"Turn on Project files in Settings > Models to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل ملفات المشروع في الإعدادات > Models لإضافة ملفات إلى مشروع والسماح لمحادثاته بالبحث فيها. لن يُفهرَس أو يُحمَّل شيء حتى ذلك الحين.";
-"Turn on Project files in Settings to add files" = "شغّل ملفات المشروع في الإعدادات لإضافة ملفات";
+"Turn On Project Files…" = "تشغيل Project Files…";
+"Turn On…" = "تشغيل…";
+"Turn on Project files to add files" = "شغّل Project files لإضافة ملفات";
+"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل Project files لإضافة ملفات إلى المشروع وتمكين الدردشات من البحث فيها. لا يُفهرس أو يُنزل شيء حتى ذلك الحين.";
 "Turn on project files?" = "تشغيل ملفات المشروع؟";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "يحوِّل نص الملفات إلى متجهات للبحث بحسب المعنى على هذا الـMac. إزالته تحتفظ بالفهارس: عندها تُبحث الملفات بكلماتها حتى يعاد تنزيله.";
 "Tweak…" = "تعديل…";
@@ -791,6 +803,8 @@
 "Unload chat model during generation" = "إلغاء تحميل نموذج الدردشة أثناء التوليد";
 "Unload model when idle" = "إلغاء تحميل النموذج عند الخمول";
 "Unpin" = "إلغاء التثبيت";
+"Unpin %@" = "إزالة تثبيت %@";
+"Unpin: the project's chats search this file again instead of getting all of it" = "إلغاء التثبيت: ستبحث محادثات المشروع في هذا الملف مرة أخرى بدلًا من استلامه كاملًا";
 "Up to date" = "محدّث";
 "Up to date." = "محدّث.";
 "Update" = "تحديث";
@@ -891,6 +905,8 @@
 "~%1$lld h %2$lld min left" = "≈%1$lld س %2$lld دق متبقي";
 "~%lld h left" = "≈%lld س متبقي";
 "~%lld min left" = "≈%lld دق متبقي";
+"· %lld pinned" = "· %lld مثبت";
 "· size…" = "· الحجم…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» لم يتم إزالته: %2$@";
+"“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: لم يتمكن من تغيير التثبيت: %2$@";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» وفهرسه حُذفا من المشروع. الملف الذي أضفته منه لم يتأثر.";
