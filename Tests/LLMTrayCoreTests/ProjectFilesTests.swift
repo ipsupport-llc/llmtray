@@ -604,7 +604,8 @@ final class ProjectFilesServiceTests: XCTestCase {
     func testPinningPastTheLimitIsRefusedWithTheSizes() async throws {
         let docs = try await addCorpus()
         let h = try await registry.open(project)
-        let sizes = try await h.read { s in try s.pinTokens(of: try s.documents()) }
+        let sizes = PinTokenRatio.tokens(try await h.read { s in try s.pinBytes(of: try s.documents()) },
+                                         bytesPerToken: PromptTokenEstimator.defaultBytesPerToken)
         let memo = try XCTUnwrap(sizes[docs.memo]), contract = try XCTUnwrap(sizes[docs.contract])
         var pins: [Int64] = []
         let got = await pin(docs.memo, true, limit: memo + contract - 1)
@@ -622,6 +623,22 @@ final class ProjectFilesServiceTests: XCTestCase {
         XCTAssertEqual(answer, .refused(ProjectFiles.notInProjectText))
         pins = try await h.read { try $0.pins() }
         XCTAssertEqual(pins, [docs.memo])
+    }
+
+    /// The tool sizes a pin at the model's learned ratio: refused at the
+    /// estimator's 2 bytes a token, it fits at 4.
+    func testPinningSizesAtTheModelsRatio() async throws {
+        let docs = try await addCorpus()
+        let h = try await registry.open(project)
+        let sizes = try await h.read { s in try s.pinBytes(of: try s.documents()) }
+        let bytes = try XCTUnwrap(sizes[docs.contract])
+        let limit = PinTokenRatio.tokens(bytes: bytes, bytesPerToken: 4)
+        let refused = await pin(docs.contract, true, limit: limit)
+        XCTAssertTrue(refused.hasPrefix("Not pinned"), refused)
+        let answer = await service().run(.pin(doc: docs.contract, on: true), project: project, byteBudget: 16_000,
+                                         pinLimitTokens: limit, pinBytesPerToken: 4, stillOwned: { self.owned })
+        guard case .text(let text) = answer else { return XCTFail("not text: \(answer)") }
+        XCTAssertTrue(text.hasPrefix("Pinned file \(docs.contract) (contract.txt, ≈\(limit) tokens)"), text)
     }
 
     func testARegistrysPinnedFilesOpenOrClosed() async throws {

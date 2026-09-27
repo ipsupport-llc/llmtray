@@ -99,14 +99,15 @@ enum ProjectPins {
         return "length(CAST(\(column) AS BLOB)) + " + escaped.joined(separator: " + ")
     }
 
-    /// Each searchable document's pinned size in tokens (what it would add
-    /// to a request), for `docs` -- one read of its pages' lengths.
-    static func tokens(_ db: SQLiteConnection, of docs: [IndexedDocument]) throws -> [Int64: Int] {
+    /// Each searchable document's pinned size in bytes (what it would add
+    /// to a request, JSON-escaped), for `docs` -- one read of its pages'
+    /// lengths. In bytes, so a size follows the model: tokens at its ratio.
+    static func bytes(_ db: SQLiteConnection, of docs: [IndexedDocument]) throws -> [Int64: Int] {
         var out: [Int64: Int] = [:]
         for d in docs where d.status.isSearchable {
             let pages = try db.rows("SELECT page, \(escapedBytes("text")) FROM pages WHERE doc = ? AND rev = ? ORDER BY page",
                                     [.int(d.doc), .int(d.rev)]) { (page: Int($0.int(0)), bytes: Int($0.int(1))) }
-            out[d.doc] = PinnedFiles.tokens(doc: d.doc, name: d.name, pageBytes: pages)
+            out[d.doc] = PinnedFiles.bytes(doc: d.doc, name: d.name, pageBytes: pages)
         }
         return out
     }
@@ -139,8 +140,9 @@ extension ProjectIndex {
         }
     }
 
-    /// Each searchable document's pinned size in tokens.
-    public func pinTokens(of docs: [IndexedDocument]) throws -> [Int64: Int] { try ProjectPins.tokens(db, of: docs) }
+    /// Each searchable document's pinned size in bytes (PinTokenRatio makes
+    /// them tokens for a model).
+    public func pinBytes(of docs: [IndexedDocument]) throws -> [Int64: Int] { try ProjectPins.bytes(db, of: docs) }
 }
 
 extension IndexSearcher {
@@ -150,7 +152,7 @@ extension IndexSearcher {
     /// without text now.
     public func pinnedFiles() throws -> (files: [PinnedFileText], notes: [PinnedFileNote]) { try ProjectPins.files(db) }
 
-    public func pinTokens(of docs: [IndexedDocument]) throws -> [Int64: Int] { try ProjectPins.tokens(db, of: docs) }
+    public func pinBytes(of docs: [IndexedDocument]) throws -> [Int64: Int] { try ProjectPins.bytes(db, of: docs) }
 }
 
 extension ProjectIndexHandle {
@@ -198,19 +200,22 @@ public enum PinnedFiles {
         return data.count - 4   // ["..."]
     }
 
-    /// What a file adds to a request, at the estimator's rate for new text.
-    public static func tokens(_ f: PinnedFileText) -> Int {
-        PromptTokenEstimator().estimate(.init(bytes: jsonBytes(render(f))))
+    /// What a file adds to a request, in bytes as `measure` counts them.
+    public static func bytes(_ f: PinnedFileText) -> Int { jsonBytes(render(f)) }
+
+    /// What a file adds to a request in tokens, at `bytesPerToken` (the
+    /// model's, PinTokenRatios; the estimator's rate by default).
+    public static func tokens(_ f: PinnedFileText, bytesPerToken: Double = PromptTokenEstimator.defaultBytesPerToken) -> Int {
+        PinTokenRatio.tokens(bytes: bytes(f), bytesPerToken: bytesPerToken)
     }
 
-    /// The same from its pages' escaped sizes (the index's count, without
+    /// Its bytes from its pages' escaped sizes (the index's count, without
     /// reading the text).
-    static func tokens(doc: Int64, name: String, pageBytes: [(page: Int, bytes: Int)]) -> Int {
+    static func bytes(doc: Int64, name: String, pageBytes: [(page: Int, bytes: Int)]) -> Int {
         let tail = jsonBytes(pageTail)
-        let bytes = pageBytes.reduce(jsonBytes(header(doc: doc, name: name, pages: pageBytes.count))) {
+        return pageBytes.reduce(jsonBytes(header(doc: doc, name: name, pages: pageBytes.count))) {
             $0 + jsonBytes(pageHead(doc: doc, page: $1.page)) + $1.bytes + tail
         }
-        return PromptTokenEstimator().estimate(.init(bytes: bytes))
     }
 
     /// The line a left-out file gets.
@@ -235,14 +240,16 @@ public enum PinnedFiles {
 
     /// The files a request carries, in pin order: each while it fits what's
     /// left of `limitTokens` and the whole request still `fits` (its room:
-    /// the conversation so far counted); the rest are notes.
+    /// the conversation so far counted); the rest are notes. Sized at
+    /// `bytesPerToken`, the model's.
     public static func select(_ files: [PinnedFileText], limitTokens: Int,
+                              bytesPerToken: Double = PromptTokenEstimator.defaultBytesPerToken,
                               fits: ([PinnedFileText]) -> Bool = { _ in true }) -> (files: [PinnedFileText], left: [PinnedFileNote]) {
         var included: [PinnedFileText] = []
         var left: [PinnedFileNote] = []
         var used = 0
         for f in files {
-            let t = tokens(f)
+            let t = tokens(f, bytesPerToken: bytesPerToken)
             if used + t <= limitTokens, fits(included + [f]) {
                 included.append(f)
                 used += t

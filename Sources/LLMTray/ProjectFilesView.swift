@@ -128,7 +128,8 @@ private struct ProjectFilesView: View {
 
     private var documents: [IndexedDocument] { indexer.documents[projectID] ?? [] }
     private var pins: [Int64] { indexer.pins[projectID] ?? [] }
-    private var pinTokens: [Int64: Int] { indexer.pinTokens[projectID] ?? [:] }
+    /// At the selected model's ratio (learned from the server's counts).
+    private var pinTokens: [Int64: Int] { indexer.pinTokens(projectID, model: selectedModelID) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -230,10 +231,18 @@ private struct ProjectFilesView: View {
         let tooLong = PinnedFiles.fitting(pins, tokens: pinTokens, limitTokens: limit).tooLong
         let names = tooLong.compactMap { doc in documents.first { $0.doc == doc }?.name }
         return VStack(alignment: .leading, spacing: 2) {
-            Label(String(format: NSLocalizedString("Pinned: %1$lld files, ≈%2$@ of %3$@ tokens",
-                                                   comment: "project files: pinned files, their tokens, the model's limit"),
-                         Int64(pins.count), Self.tokens(used), Self.tokens(limit)), systemImage: "pin.fill")
-                .font(.caption)
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Label(String(format: NSLocalizedString("Pinned: %1$lld files, ≈%2$@ of %3$@ tokens",
+                                                       comment: "project files: pinned files, their tokens, the model's limit"),
+                             Int64(pins.count), Self.tokens(used), Self.tokens(limit)), systemImage: "pin.fill")
+                    .font(.caption)
+                // Sizes at the model's ratio from the server's counts, or
+                // the estimator's until its first answer.
+                Text(indexer.isPinRatioMeasured(model: selectedModelID)
+                     ? NSLocalizedString("(measured for this model)", comment: "pinned files: their sizes come from the model's own token counts")
+                     : NSLocalizedString("(estimate; exact after the first answer)", comment: "pinned files: their sizes are estimated until the model answers once"))
+                    .font(.caption2).foregroundColor(.secondary)
+            }
             Text("Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.")
                 .font(.caption2).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
             if !names.isEmpty {

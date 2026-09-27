@@ -96,10 +96,12 @@ final class PinnedFilesStorageTests: XCTestCase {
         XCTAssertEqual(files.files, [])
         try idx.setPinned(a, true)
         let file = try XCTUnwrap(ProjectPins.files(idx.db).files.first)
-        XCTAssertEqual(try idx.pinTokens(of: [d])[a], PinnedFiles.tokens(file))
         let body = ChatRequestMeasure.bytes(of: PinnedFiles.render(file))
+        XCTAssertEqual(try idx.pinBytes(of: [d])[a], body)
+        XCTAssertEqual(PinnedFiles.bytes(file), body)
         XCTAssertEqual(PinnedFiles.jsonBytes(PinnedFiles.render(file)), body)
         XCTAssertEqual(PinnedFiles.tokens(file), (body + 1) / 2, "2 bytes a token, rounded up")
+        XCTAssertEqual(PinnedFiles.tokens(file, bytesPerToken: 4), (body + 3) / 4, "at a model's ratio")
     }
 }
 
