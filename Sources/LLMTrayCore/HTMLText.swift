@@ -28,6 +28,7 @@ public enum HTMLText {
         var i = 0
         var skipUntil: String?     // inside <script> etc.: its closing tag's name
         var skipDepth = 0          // the same element nested inside it (<template> in <template>)
+        var rawUntil: [UInt8]?     // inside <script>/<style>, wherever: "</" + its name ends it
         var inTitle = false        // <title> inside the skipped <head>
         var pre = 0
         var pendingSpace = false
@@ -63,11 +64,15 @@ public enum HTMLText {
         while i < n {
             let c = b[i]
             if c == 0x3C /* < */ {
-                // Script and style are raw text: only a closing tag counts there,
-                // not a "<!--" or another "<tag".
-                if let skip = skipUntil, rawText.contains(skip), !(i + 1 < n && b[i + 1] == 0x2F) {
-                    i += 1
-                    continue
+                // Script and style are raw text, inside <head> too: only their own
+                // closing tag counts there, not a "<!--" or another "<tag".
+                if let raw = rawUntil {
+                    var k = 0
+                    if i + 1 < n, b[i + 1] == 0x2F {
+                        while k < raw.count, i + 2 + k < n, (b[i + 2 + k] | 0x20) == raw[k] { k += 1 }
+                    }
+                    if k < raw.count { i += 1; continue }
+                    rawUntil = nil
                 }
                 // A comment, to its "-->" (or the end).
                 if i + 3 < n, b[i + 1] == 0x21, b[i + 2] == 0x2D, b[i + 3] == 0x2D {
@@ -106,6 +111,7 @@ public enum HTMLText {
                 }
                 let selfClosed = j > 0 && j < n && b[j - 1] == 0x2F
                 i = j + 1
+                if !closing && !selfClosed && rawText.contains(name) { rawUntil = Array(name.utf8) }
                 if let skip = skipUntil {
                     if name == skip && !rawText.contains(skip) {
                         if !closing && !selfClosed { skipDepth += 1 } else if closing && skipDepth > 0 { skipDepth -= 1; runStart = out.count; continue }
