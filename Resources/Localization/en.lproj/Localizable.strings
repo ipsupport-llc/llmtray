@@ -283,6 +283,7 @@
 "Pause" = "Pause";
 "Pause download" = "Pause download";
 "Paused" = "Paused";
+"Paused while an image or song is made -- the model reloads after" = "Paused while an image or song is made -- the model reloads after";
 "Performance" = "Performance";
 "Pin" = "Pin";
 "Pinned" = "Pinned";
@@ -430,6 +431,7 @@
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
+"The model reloads when the image or song is done" = "The model reloads when the image or song is done";
 "The model's license, from its card." = "The model's license, from its card.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";

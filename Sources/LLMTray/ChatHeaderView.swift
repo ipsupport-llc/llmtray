@@ -216,8 +216,9 @@ struct ChatHeaderView: View {
             switch server.state {
             case .stopped, .failed:
                 Button(action: startServer) { Image(systemName: "play.fill") }
-                    .disabled(selectedModelID == nil)
-                    .help("Start server")
+                    // Not beside a generator: it reloads by itself after.
+                    .disabled(selectedModelID == nil || server.suspendedForImageGeneration)
+                    .help(server.suspendedForImageGeneration ? Text("The model reloads when the image or song is done") : Text("Start server"))
             case .starting:
                 ProgressView().controlSize(.small).help("Starting…")
             case .running:
@@ -228,7 +229,7 @@ struct ChatHeaderView: View {
         .buttonStyle(.plain)
         .contextMenu {
             Button("Start Server", action: startServer)
-                .disabled(!isStoppedOrFailed || selectedModelID == nil)
+                .disabled(!isStoppedOrFailed || selectedModelID == nil || server.suspendedForImageGeneration)
             Button("Stop Server") { server.stop() }
                 .disabled(!isRunning)
         }
@@ -358,7 +359,7 @@ struct ServerStatusLabel: View {
 
     private var statusColor: Color {
         switch server.state {
-        case .stopped: return .gray
+        case .stopped: return server.suspendedForImageGeneration ? .blue : .gray
         case .starting: return .yellow
         case .running: return .green
         case .failed: return .red
@@ -368,6 +369,11 @@ struct ServerStatusLabel: View {
     private var statusText: String {
         switch server.state {
         case .stopped:
+            // Unloaded for an image or a song (ChatClient): not idle, and
+            // it comes back by itself when that's done.
+            if server.suspendedForImageGeneration {
+                return NSLocalizedString("Paused while an image or song is made -- the model reloads after", comment: "server status")
+            }
             return server.isIdleUnloaded
                 ? NSLocalizedString("Idle -- the model reloads on the next message", comment: "server status")
                 : NSLocalizedString("Stopped", comment: "server status")
