@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ и ещё %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запрашивает %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запрашивает %2$@. Переключение выгружает текущую модель.";
+"%1$@ items, %2$@" = "%1$@ элементов, %2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld копий не удалось сравнить с оригиналами, поэтому они сняты: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld копий отличаются от оригиналов, поэтому это не дубликаты: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld выполнено, %2$lld отменено, %3$lld не удалось";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld файлов · %2$lld доступны для поиска · %3$lld страниц";
+"%1$lld items, %2$@." = "%1$lld элементов, %2$@.";
+"%1$lld items, at least %2$@." = "%1$lld элементов, по крайней мере %2$@.";
 "%1$lld of %2$lld changes selected" = "Выбрано %1$lld из %2$lld изменений";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio — общий)";
 "%@ didn't download: %@" = "%@ не загрузился: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "Пока нет. Разрешения для одного чата или запроса здесь не отображаются: они завершаются вместе с ним.";
 "Not enough free disk space for this model." = "Недостаточно свободного места на диске для этой модели.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостаточно свободного места: %@ требует примерно %@, свободно %@.";
+"Not identical to %@: not a duplicate." = "Не совпадает с %@ — не дубликат.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ещё не поддерживается: %@. Эта версия индексирует текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF и HTML.";
 "Nothing sent yet." = "Ещё ничего не отправлено.";
 "Nothing to change." = "Нечего менять.";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "Скорость и первый токен: последние %lld запросов.";
 "Re-index %@" = "Переиндексировать %@";
 "Re-index this file" = "Переиндексировать этот файл";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Просматривает %1$lld вложенных папок (%2$@): их файлы извлечены.";
 "Reading what's installed…" = "Чтение установленных компонентов…";
 "Ready." = "Готово.";
 "Ready. This is the Full build: the runtime is included." = "Готово. Это Full‑сборка: runtime включён.";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ смешанный (рекомендуется)";
 "always" = "всегда";
 "and %lld more" = "и ещё %lld";
+"at least %1$@ items, %2$@" = "как минимум %1$@ элементов, %2$@";
+"at least %@" = "как минимум %@";
 "calls tools" = "вызовы инструментов";
 "can look" = "может просматривать";
 "can look and propose changes" = "может просматривать и предлагать изменения";

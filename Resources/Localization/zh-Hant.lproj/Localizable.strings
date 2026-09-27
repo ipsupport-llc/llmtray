@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ 與其他 %2$lld 筆";
 "%1$@ asks for %2$@" = "%1$@ 請求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 請求 %2$@。切換會卸載目前載入的模型。";
+"%1$@ items, %2$@" = "%1$@ 項目，%2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 個副本無法與原始檔比較，已取消勾選：%2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 個副本與原始檔不同，因此不是重複項：%2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld 已完成，%2$lld 已復原，%3$lld 失敗";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld 個檔案 · %2$lld 可搜尋 · %3$lld 頁";
+"%1$lld items, %2$@." = "%1$lld 項目，%2$@。";
+"%1$lld items, at least %2$@." = "%1$lld 項目，至少 %2$@。";
 "%1$lld of %2$lld changes selected" = "已選取 %1$lld / %2$lld 項變更";
 "%@ (LM Studio's, shared with it)" = "%@（LM Studio 的，與之共用）";
 "%@ didn't download: %@" = "%@ 未下載：%@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "尚無。單一聊天室或單次請求的授權不會列在此處：會隨該請求結束。";
 "Not enough free disk space for this model." = "此模型所需的磁碟空間不足。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁碟空間不足：%@ 大約需要 %@，目前可用 %@。";
+"Not identical to %@: not a duplicate." = "與 %@ 不相同：非重複項。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "尚未支援：%@。此版本會建立文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF 及 HTML 的索引。";
 "Nothing sent yet." = "尚未寄出任何資料。";
 "Nothing to change." = "無需變更。";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "速率與首個標記：最後 %lld 筆請求。";
 "Re-index %@" = "重新建立 %@ 的索引";
 "Re-index this file" = "重新建立此檔案的索引";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "會深入 %1$lld 個子資料夾（%2$@）：其內的檔案會被取出。";
 "Reading what's installed…" = "正在讀取已安裝項目…";
 "Ready." = "已就緒。";
 "Ready. This is the Full build: the runtime is included." = "已就緒。這是 Full 版本：已包含執行環境。";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ 混合（推薦）";
 "always" = "永遠";
 "and %lld more" = "以及另外 %lld 個";
+"at least %1$@ items, %2$@" = "至少 %1$@ 項目，%2$@";
+"at least %@" = "至少 %@";
 "calls tools" = "呼叫工具";
 "can look" = "可查看";
 "can look and propose changes" = "可查看並建議變更";

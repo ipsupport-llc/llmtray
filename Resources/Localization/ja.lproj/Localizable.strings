@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@ 他 %2$lld 件";
 "%1$@ asks for %2$@" = "%1$@ が %2$@ を要求しています";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ が %2$@ を要求しています。切り替えると現在読み込まれているモデルはアンロードされます。";
+"%1$@ items, %2$@" = "%1$@ 個、%2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "元のファイルと比較できなかったものが %1$lld 個あるため、選択解除されました: %2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "元と異なるコピーが %1$lld 個あるため、重複として扱われません: %2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld 完了、%2$lld 元に戻し済み、%3$lld 失敗";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld 件 · 検索可能 %2$lld 件 · %3$lld ページ";
+"%1$lld items, %2$@." = "%1$lld 個、%2$@。";
+"%1$lld items, at least %2$@." = "%1$lld 個、少なくとも %2$@。";
 "%1$lld of %2$lld changes selected" = "%2$lld 件のうち %1$lld 件の変更を選択";
 "%@ (LM Studio's, shared with it)" = "%@（LM Studioと共有）";
 "%@ didn't download: %@" = "%@ をダウンロードできませんでした: %@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "まだありません。単一のチャットやリクエストに対する許可はここに表示されません：そのチャット／リクエストの終了で消えます。";
 "Not enough free disk space for this model." = "このモデルを保存するためのディスク空き容量が不足しています。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "空きディスク容量が不足しています：%@ は約 %@ が必要で、%@ の空きがあります。";
+"Not identical to %@: not a duplicate." = "%@ と同一ではないため、重複ではありません。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "未対応です: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML をインデックス化します。";
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "料金と最初のトークン：直近 %lld 件のリクエスト。";
 "Re-index %@" = "%@ を再インデックス";
 "Re-index this file" = "このファイルを再インデックス";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld 個のサブフォルダ（%2$@）を確認します: そこからファイルは取り出されます。";
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Ready." = "準備完了。";
 "Ready. This is the Full build: the runtime is included." = "準備完了。これは Full ビルドで、ランタイムが同梱されています。";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed（推奨）";
 "always" = "常に";
 "and %lld more" = "ほか %lld 件";
+"at least %1$@ items, %2$@" = "少なくとも %1$@ 個、%2$@";
+"at least %@" = "少なくとも %@";
 "calls tools" = "ツールを呼び出す";
 "can look" = "参照できます";
 "can look and propose changes" = "参照および変更を提案できます";

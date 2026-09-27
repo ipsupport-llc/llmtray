@@ -7,8 +7,13 @@
 "%1$@ and %2$lld more" = "%1$@，另有 %2$lld 项";
 "%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
+"%1$@ items, %2$@" = "%1$@ 项，%2$@";
+"%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@" = "%1$lld 个副本无法与原件比较，已取消勾选：%2$@";
+"%1$lld copies differ from their originals, so they aren't duplicates: %2$@" = "%1$lld 个副本与原件不同，因此不是重复项：%2$@";
 "%1$lld done, %2$lld undone, %3$lld failed" = "%1$lld 完成，%2$lld 撤销，%3$lld 失败";
 "%1$lld files · %2$lld searchable · %3$lld pages" = "%1$lld 个文件 · %2$lld 个可搜索 · %3$lld 页";
+"%1$lld items, %2$@." = "%1$lld 项，%2$@。";
+"%1$lld items, at least %2$@." = "%1$lld 项，至少 %2$@。";
 "%1$lld of %2$lld changes selected" = "已选择 %1$lld / 共 %2$lld 项更改";
 "%@ (LM Studio's, shared with it)" = "%@（LM Studio 的，共享）";
 "%@ didn't download: %@" = "%@ 未下载：%@";
@@ -486,6 +491,7 @@
 "None yet. Grants for one chat or one request aren't listed here: they end with it." = "尚无。对单个聊天或请求的授权不会列在此处：它们随之结束。";
 "Not enough free disk space for this model." = "磁盘可用空间不足，无法安装此模型。";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁盘空间不足：%@ 需要约 %@，当前可用 %@。";
+"Not identical to %@: not a duplicate." = "与 %@ 不相同：不是重复项。";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "暂不支持：%@。此版本可建立文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF 和 HTML 的索引。";
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
@@ -569,6 +575,7 @@
 "Rates and first token: the last of %lld requests." = "速率与首个标记：最近 %lld 次请求。";
 "Re-index %@" = "重新建立 %@ 索引";
 "Re-index this file" = "为此文件重新建立索引";
+"Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "将进入 %1$lld 个子文件夹（%2$@）：其文件将被移出。";
 "Reading what's installed…" = "正在读取已安装内容…";
 "Ready." = "已就绪。";
 "Ready. This is the Full build: the runtime is included." = "已就绪。此为 Full 版本：包含运行时。";
@@ -909,6 +916,8 @@
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ 混合（推荐）";
 "always" = "始终";
 "and %lld more" = "以及另外 %lld 个";
+"at least %1$@ items, %2$@" = "至少 %1$@ 项，%2$@";
+"at least %@" = "至少 %@";
 "calls tools" = "调用工具";
 "can look" = "可查看";
 "can look and propose changes" = "可查看并建议更改";
