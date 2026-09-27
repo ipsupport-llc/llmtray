@@ -23,6 +23,11 @@ public enum ProjectIndexError: Error, Equatable, CustomStringConvertible {
     case invalidRelativePath(String)
     /// Vectors that don't match their chunks (count × dimension).
     case vectorMismatch(expected: Int, got: Int)
+    /// Another `ProjectIndex` (this process or another) owns the project.
+    case inUse
+    /// Something else committed to the file while it was being compacted:
+    /// the copy was dropped, the live file kept.
+    case changedDuringCompaction
 
     public var description: String {
         switch self {
@@ -39,6 +44,8 @@ public enum ProjectIndexError: Error, Equatable, CustomStringConvertible {
         case .notARegularFile(let name): return "\(name) is not a regular file"
         case .invalidRelativePath(let path): return "invalid path in a linked folder: \(path)"
         case .vectorMismatch(let expected, let got): return "\(got) vector values for \(expected) expected"
+        case .inUse: return "the project index is open elsewhere"
+        case .changedDuringCompaction: return "the index changed while it was compacted; try again"
         }
     }
 }
@@ -223,6 +230,24 @@ public enum IndexSchema {
       set_id INTEGER NOT NULL, doc INTEGER NOT NULL, rev INTEGER NOT NULL,
       n INTEGER NOT NULL, chunk_ids BLOB NOT NULL, v BLOB NOT NULL);
     CREATE INDEX vec_blocks_doc ON vec_blocks(set_id, doc, rev);
+
+    -- Which chunks have a vector of a set (vec_blocks' ids, one row each), so
+    -- a batch checks its own chunks, not every block of the document; gone
+    -- with the chunk (chunks_vd).
+    CREATE TABLE vec_chunks(
+      chunk INTEGER NOT NULL, set_id INTEGER NOT NULL,
+      PRIMARY KEY (chunk, set_id)) WITHOUT ROWID;
+    CREATE TRIGGER chunks_vd AFTER DELETE ON chunks BEGIN
+      DELETE FROM vec_chunks WHERE chunk = old.id;
+    END;
+
+    -- Embedding progress: every chunk of (doc, rev) with ord < next_ord has a
+    -- vector of the set, so the next batch starts there. A hint only: another
+    -- rev (a re-index) or no row means from the start.
+    CREATE TABLE vec_progress(
+      set_id INTEGER NOT NULL, doc INTEGER NOT NULL, rev INTEGER NOT NULL,
+      next_ord INTEGER NOT NULL,
+      PRIMARY KEY (set_id, doc)) WITHOUT ROWID;
     """
 
     /// FTS5 integrity-check with rank = 1: also compares each index with its

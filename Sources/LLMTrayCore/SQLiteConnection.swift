@@ -17,6 +17,24 @@ public struct SQLiteError: Error, CustomStringConvertible, Equatable {
     public var description: String { "SQLite \(code): \(message)" }
 }
 
+/// A serial queue that owns connections: a connection bound to one refuses
+/// (SQLITE_MISUSE) every call made anywhere else, so one that leaked out of
+/// its queue -- through a closure's result or a capture -- can't be used
+/// concurrently with its owner (the connections are SQLITE_OPEN_NOMUTEX).
+/// `isCurrent` also tells the queue's own work that it's already on it.
+public final class ConnectionQueue: @unchecked Sendable {
+    public let queue: DispatchQueue
+    private let key = DispatchSpecificKey<ObjectIdentifier>()
+
+    public init(label: String) {
+        queue = DispatchQueue(label: label)
+        queue.setSpecific(key: key, value: ObjectIdentifier(self))
+    }
+
+    /// Running on `queue`.
+    public var isCurrent: Bool { DispatchQueue.getSpecific(key: key) == ObjectIdentifier(self) }
+}
+
 /// A value bound to a statement parameter.
 public enum SQLValue: Equatable {
     case int(Int64), double(Double), text(String), blob(Data), null
@@ -33,6 +51,11 @@ public final class SQLiteConnection {
     public let isReadOnly: Bool
     private(set) var handle: OpaquePointer?
     private var cache: [String: SQLiteStatement] = [:]
+    /// When set, every call must come from this queue.
+    public var owner: ConnectionQueue?
+    /// SQLite VM operations run by this connection's statements (tests: what
+    /// a call costs, independent of the clock).
+    var vmSteps: Int64 = 0
 
     public init(path: String, readOnly: Bool = false) throws {
         var h: OpaquePointer?
@@ -66,8 +89,13 @@ public final class SQLiteConnection {
     var errorMessage: String { handle.map { String(cString: sqlite3_errmsg($0)) } ?? "connection closed" }
 
     private func live() throws -> OpaquePointer {
+        try checkOwner()
         guard let handle else { throw SQLiteError(code: SQLITE_MISUSE, message: "connection closed") }
         return handle
+    }
+
+    func checkOwner() throws {
+        if let owner, !owner.isCurrent { throw SQLiteError(code: SQLITE_MISUSE, message: "connection used outside its queue") }
     }
 
     public func exec(_ sql: String) throws {
@@ -92,6 +120,7 @@ public final class SQLiteConnection {
 
     /// A statement kept for the connection's life (the hot queries).
     public func cached(_ sql: String) throws -> SQLiteStatement {
+        try checkOwner()
         if let st = cache[sql] {
             st.reset()
             return st
@@ -192,21 +221,28 @@ public final class SQLiteStatement {
         st = nil
     }
 
+    /// sqlite3_reset, counting the run's VM operations first.
+    private func rewind(_ st: OpaquePointer) {
+        connection.vmSteps += Int64(sqlite3_stmt_status(st, SQLITE_STMTSTATUS_VM_STEP, 1))
+        sqlite3_reset(st)
+    }
+
     /// Ends the current run (releases the read snapshot) and clears bindings.
     public func reset() {
         guard let st else { return }
-        sqlite3_reset(st)
+        rewind(st)
         sqlite3_clear_bindings(st)
     }
 
     private func live() throws -> OpaquePointer {
+        try connection.checkOwner()
         guard let st else { throw SQLiteError(code: SQLITE_MISUSE, message: "statement finalized") }
         return st
     }
 
     public func bind(_ args: [SQLValue]) throws {
         let st = try live()
-        sqlite3_reset(st)
+        rewind(st)
         sqlite3_clear_bindings(st)
         for (i, value) in args.enumerated() {
             let index = Int32(i + 1)
@@ -233,11 +269,11 @@ public final class SQLiteStatement {
         let rc = sqlite3_step(st)
         if rc == SQLITE_ROW { return true }
         if rc == SQLITE_DONE {
-            sqlite3_reset(st)
+            rewind(st)
             return false
         }
         let message = connection.errorMessage
-        sqlite3_reset(st)
+        rewind(st)
         throw SQLiteError(code: rc, message: message)
     }
 

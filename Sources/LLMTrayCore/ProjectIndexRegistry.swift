@@ -8,8 +8,10 @@ import Foundation
 public final class ProjectIndexHandle: @unchecked Sendable {
     public let project: UUID
     public let directory: URL
-    private let writerQueue: DispatchQueue
-    private let readerQueue: DispatchQueue
+    private let writer: ConnectionQueue
+    private let reading: ConnectionQueue
+    private var writerQueue: DispatchQueue { writer.queue }
+    private var readerQueue: DispatchQueue { reading.queue }
     /// Writer queue only.
     private var index: ProjectIndex?
     /// Reader queue only.
@@ -51,11 +53,13 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         self.directory = directory
         self.idleDelay = idleDelay
         self.registry = registry
-        writerQueue = DispatchQueue(label: "LLMTray index writer \(project.uuidString.prefix(8))")
-        readerQueue = DispatchQueue(label: "LLMTray index reader \(project.uuidString.prefix(8))")
+        writer = ConnectionQueue(label: "LLMTray index writer \(project.uuidString.prefix(8))")
+        reading = ConnectionQueue(label: "LLMTray index reader \(project.uuidString.prefix(8))")
         let index = try ProjectIndex(directory: directory)
         openReport = try index.reconcile()
         try? index.checkpoint()
+        // From here on its connection answers on the writer queue only.
+        index.owner = writer
         self.index = index
         try openReader()
     }
@@ -65,6 +69,7 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         db.setBusyTimeout(milliseconds: 2000)
         try IndexSchema.configureReader(db)
         searcher = try IndexSearcher(db: db)
+        db.owner = reading
         reader = db
     }
 
@@ -75,7 +80,10 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         reader = nil
     }
 
-    /// Runs `body` on the writer, then schedules the idle maintenance.
+    /// Runs `body` on the writer, then schedules the idle maintenance. The
+    /// index is only valid inside `body`: its connection refuses (throws
+    /// SQLITE_MISUSE) any call from outside the writer queue, so a leaked
+    /// one can't race it.
     public func write<T>(_ body: @escaping (ProjectIndex) throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
             writerQueue.async {
@@ -92,7 +100,8 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         }
     }
 
-    /// Runs `body` on the reader connection.
+    /// Runs `body` on the reader connection; like `write`, the searcher is
+    /// only valid inside it (it refuses calls from anywhere else).
     public func read<T>(_ body: @escaping (IndexSearcher) throws -> T) async throws -> T {
         try await withCheckedThrowingContinuation { continuation in
             readerQueue.async {
@@ -147,8 +156,11 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         readerQueue.async { self.dense = nil }
     }
 
+    /// Safe from anywhere, a `read` closure included (it's already on the
+    /// reader queue then: no sync onto it).
     public var residentVectorBytes: Int {
-        readerQueue.sync { dense?.residentBytes ?? 0 }
+        if reading.isCurrent { return dense?.residentBytes ?? 0 }
+        return readerQueue.sync { dense?.residentBytes ?? 0 }
     }
 
     private func scheduleIdle() {
@@ -162,6 +174,8 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     private func maintainIdle() {
         guard let index else { return }
         try? index.checkpoint()
+        // From here on its connection answers on the writer queue only.
+        index.owner = writer
         _ = try? index.incrementalVacuum(pages: 512)
     }
 
@@ -182,13 +196,23 @@ public final class ProjectIndexHandle: @unchecked Sendable {
         try await write { index in
             do {
                 try index.compact(holdingOthers: { swap in
-                    try self.readerQueue.sync {
+                    // The reader queue is held (closed reader, new searches
+                    // waiting) while the swap runs here, on the writer: the
+                    // writer's connection answers on its own queue only.
+                    let closed = DispatchSemaphore(value: 0), swapped = DispatchSemaphore(value: 0), reopened = DispatchSemaphore(value: 0)
+                    self.readerQueue.async {
                         self.closeReader()
-                        defer {
-                            do { try self.openReader() } catch { self.fail(error) }
-                        }
-                        try swap()
+                        closed.signal()
+                        swapped.wait()
+                        do { try self.openReader() } catch { self.fail(error) }
+                        reopened.signal()
                     }
+                    closed.wait()
+                    defer {
+                        swapped.signal()
+                        reopened.wait()
+                    }
+                    try swap()
                 })
             } catch {
                 if !index.isOpen { self.fail(error) }
@@ -204,8 +228,10 @@ public final class ProjectIndexHandle: @unchecked Sendable {
     }
 
     /// Closes both connections; later calls throw `Closed`. Waits for the
-    /// work already queued.
+    /// work already queued -- so never from inside `write` or `read`.
     public func close() {
+        dispatchPrecondition(condition: .notOnQueue(writerQueue))
+        dispatchPrecondition(condition: .notOnQueue(readerQueue))
         writerQueue.sync {
             idleWork?.cancel()
             try? index?.checkpoint()
