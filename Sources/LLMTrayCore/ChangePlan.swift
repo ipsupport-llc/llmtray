@@ -98,12 +98,26 @@ public struct ChangePlan: Codable, Equatable, Identifiable, Sendable {
     public var chatID: String
     public var created: Date
     public var items: [PlanItem]
+    /// Bumped by every change to the pending plan: an approval names the
+    /// revision the user reviewed, so nothing added after it rides along.
+    public var revision: Int
 
-    public init(id: UUID = UUID(), chatID: String, created: Date = Date(), items: [PlanItem] = []) {
+    public init(id: UUID = UUID(), chatID: String, created: Date = Date(), items: [PlanItem] = [], revision: Int = 0) {
         self.id = id
         self.chatID = chatID
         self.created = created
         self.items = items
+        self.revision = revision
+    }
+}
+
+/// A plan the user approved, as `ChangePlanStore.approve` returned it -- the
+/// only way to get one, and the only thing `ChangeExecutor` runs.
+public struct ApprovedPlan: Equatable, Sendable {
+    public let plan: ChangePlan
+
+    init(plan: ChangePlan) {
+        self.plan = plan
     }
 }
 
@@ -114,6 +128,8 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
     /// A chosen item needs a make_dir item that wasn't chosen.
     case missingDependency(item: Int, needs: Int)
     case invalidated([Int: String])
+    /// The plan changed after the user reviewed it.
+    case stale(reviewed: Int, current: Int)
 
     public var description: String {
         switch self {
@@ -122,6 +138,7 @@ public enum ChangePlanError: Error, Equatable, CustomStringConvertible {
         case .unknownItems(let ids): return "no such items: \(ids)"
         case .missingDependency(let i, let n): return "item \(i) needs item \(n) (the folder it goes into)"
         case .invalidated(let m): return "changed since proposed: " + m.keys.sorted().map { "\($0): \(m[$0]!)" }.joined(separator: "; ")
+        case .stale(let r, let c): return "the plan changed since it was reviewed (revision \(r), now \(c))"
         }
     }
 }
@@ -290,6 +307,7 @@ public final class ChangePlanStore: @unchecked Sendable {
         defer { lock.unlock() }
         var plan = plans[chatID] ?? ChangePlan(chatID: chatID, created: now)
         plan.items += items
+        plan.revision += 1
         plans[chatID] = plan
         return plan
     }
@@ -306,6 +324,7 @@ public final class ChangePlanStore: @unchecked Sendable {
         defer { lock.unlock() }
         guard var plan = plans[chatID], let i = plan.items.firstIndex(where: { $0.id == item }) else { return }
         plan.items[i].collision = policy
+        plan.revision += 1
         plans[chatID] = plan
     }
 
@@ -315,28 +334,37 @@ public final class ChangePlanStore: @unchecked Sendable {
         lock.unlock()
     }
 
-    /// The user's approval of `items` (nil: all), bound to the exact items:
-    /// the pending plan is taken out and the approved part returned in plan
-    /// order. Refused, leaving the plan pending, if an item is unknown, needs
-    /// an unchosen make_dir, or `invalid` (from `ChangePlanner.invalidItems`)
-    /// names a chosen one.
-    public func approve(chatID: String, items: Set<Int>? = nil, invalid: [Int: String] = [:]) throws -> ChangePlan {
-        lock.lock()
-        defer { lock.unlock() }
-        guard let plan = plans[chatID], !plan.items.isEmpty else { throw ChangePlanError.nothingPending }
-        let chosen = items ?? Set(plan.items.map(\.id))
-        let unknown = chosen.subtracting(plan.items.map(\.id))
+    /// The user's approval of `items` (nil: all) of the plan `revision` they
+    /// reviewed: every chosen item is checked again against its captured
+    /// identities (`validator`), the pending plan is taken out and the
+    /// approved part returned in plan order. Refused, leaving the plan
+    /// pending, if the plan changed since `revision`, an item is unknown,
+    /// needs an unchosen make_dir, or no longer matches.
+    public func approve(chatID: String, revision: Int, items: Set<Int>? = nil,
+                        validator: ChangePlanner) throws -> ApprovedPlan {
+        guard let snapshot = pending(chatID: chatID), !snapshot.items.isEmpty else { throw ChangePlanError.nothingPending }
+        if snapshot.revision != revision { throw ChangePlanError.stale(reviewed: revision, current: snapshot.revision) }
+        let chosen = items ?? Set(snapshot.items.map(\.id))
+        let unknown = chosen.subtracting(snapshot.items.map(\.id))
         if !unknown.isEmpty { throw ChangePlanError.unknownItems(unknown.sorted()) }
-        for item in plan.items where chosen.contains(item.id) {
+        for item in snapshot.items where chosen.contains(item.id) {
             if let missing = item.dependsOn.first(where: { !chosen.contains($0) }) {
                 throw ChangePlanError.missingDependency(item: item.id, needs: missing)
             }
         }
-        let bad = invalid.filter { chosen.contains($0.key) }
+        var approved = snapshot
+        approved.items = snapshot.items.filter { chosen.contains($0.id) }
+        // File checks outside the lock; the revision check below makes sure
+        // they were made on what is taken out.
+        let bad = validator.invalidItems(approved)
         if !bad.isEmpty { throw ChangePlanError.invalidated(bad) }
+        lock.lock()
+        defer { lock.unlock() }
+        guard let current = plans[chatID] else { throw ChangePlanError.nothingPending }
+        if current.revision != revision || current.id != snapshot.id {
+            throw ChangePlanError.stale(reviewed: revision, current: current.revision)
+        }
         plans[chatID] = nil
-        var approved = plan
-        approved.items = plan.items.filter { chosen.contains($0.id) }
-        return approved
+        return ApprovedPlan(plan: approved)
     }
 }

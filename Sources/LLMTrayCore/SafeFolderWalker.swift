@@ -75,7 +75,7 @@ public struct SafeFolderWalker {
             throw FolderAccessError.notFound(path)
         }
         if denylist.deniesPath(canonical) { throw FolderAccessError.notGrantable(canonical) }
-        let d = try openAbsolute(canonical, denylist: denylist, denied: { .notGrantable($0) })
+        let d = try openAbsolute(canonical, denylist: denylist, rejectPackages: true, denied: { .notGrantable($0) })
         if denylist.ungrantable.contains(d.identity) { throw FolderAccessError.notGrantable(canonical) }
         if isPackage(path: canonical) { throw FolderAccessError.notGrantable("\(canonical) is a package") }
         return FolderRoot(path: canonical, identity: d.identity)
@@ -84,7 +84,7 @@ public struct SafeFolderWalker {
     /// Walks an absolute canonical path from `/`. Volume changes are allowed
     /// here (a grant may live on another disk); symlinks and denied
     /// directories are not.
-    static func openAbsolute(_ path: String, denylist: FolderDenylist,
+    static func openAbsolute(_ path: String, denylist: FolderDenylist, rejectPackages: Bool = false,
                              denied: (String) -> FolderAccessError) throws -> Descriptor {
         let fd = open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC)
         guard fd >= 0 else { throw FolderAccessError.system("open /", errno) }
@@ -98,6 +98,8 @@ public struct SafeFolderWalker {
             if st.isSymlink { throw FolderAccessError.symlink(walked) }
             if !st.isDirectory { throw FolderAccessError.notADirectory(walked) }
             if denylist.isDenied(identity: st.identity, name: name) { throw denied(walked) }
+            // A grant never starts inside a package (packages are one item).
+            if rejectPackages, isPackage(path: walked) { throw denied("\(walked) is a package") }
             current = try openChild(current, name, expecting: st, display: walked)
         }
         return current
@@ -129,7 +131,7 @@ public struct SafeFolderWalker {
 
     /// The grant root, reopened: it must still be the folder that was granted.
     public func openRoot() throws -> OpenedDirectory {
-        let d = try Self.openAbsolute(root.path, denylist: denylist, denied: { .notGrantable($0) })
+        let d = try Self.openAbsolute(root.path, denylist: denylist, rejectPackages: true, denied: { .notGrantable($0) })
         if d.identity != root.identity { throw FolderAccessError.changed(root.path) }
         return OpenedDirectory(descriptor: d, chain: [d.identity], components: [])
     }
@@ -164,9 +166,11 @@ public struct SafeFolderWalker {
             throw FolderAccessError.notFound(shown)
         }
         try Self.checkStep(parent: parent.descriptor.stat, child: st, display: shown)
-        if let p = parent.descriptor.currentPath, Self.isPackage(path: p + "/" + name) {
-            throw FolderAccessError.insidePackage(shown)
-        }
+        guard let p = parent.descriptor.currentPath else { throw FolderAccessError.changed(shown) }
+        // By path too: a denied folder made (or remade) after the denylist
+        // was built has an identity it doesn't know.
+        if denylist.deniesPath(p + "/" + name) { throw FolderAccessError.notFound(shown) }
+        if Self.isPackage(path: p + "/" + name) { throw FolderAccessError.insidePackage(shown) }
         let d = try Self.openChild(parent.descriptor, name, expecting: st, display: shown)
         return OpenedDirectory(descriptor: d, chain: parent.chain + [d.identity], components: comps)
     }
@@ -185,7 +189,9 @@ public struct SafeFolderWalker {
         guard let st = try Posix.lstatAt(dir.descriptor.fd, name),
               !denylist.isDenied(identity: st.identity, name: name) else { return nil }
         var kind = Self.baseKind(st)
-        if kind == .directory || kind == .file, let dirPath = dir.descriptor.currentPath {
+        guard let dirPath = dir.descriptor.currentPath else { throw FolderAccessError.changed(display(dir.components)) }
+        if denylist.deniesPath(dirPath + "/" + name) { return nil }
+        if kind == .directory || kind == .file {
             let path = dirPath + "/" + name
             if kind == .directory, Self.isPackage(path: path) { kind = .package }
             if kind == .file, Self.isAlias(path: path) { kind = .alias }

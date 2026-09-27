@@ -28,6 +28,8 @@ public struct JournalResult: Codable, Equatable, Sendable {
 public struct JournalEvent: Codable, Equatable, Sendable {
     public enum Kind: String, Codable, Sendable {
         case begin, pending, done, failed, end
+        /// Ran, outcome not established: stays incomplete.
+        case uncertain
         case undoPending = "undo_pending", undone, undoFailed = "undo_failed"
     }
 
@@ -45,6 +47,8 @@ public struct JournalRecord: Equatable, Sendable {
     public enum ItemState: Equatable, Sendable {
         /// Started and never finished: the outcome is unknown (a crash).
         case incomplete
+        /// Ran, and what it did couldn't be established: look.
+        case uncertain(String)
         case done(JournalResult)
         case failed(String)
         /// Reversed by undo.
@@ -68,6 +72,7 @@ public struct JournalRecord: Equatable, Sendable {
     public var isIncomplete: Bool {
         ended == nil || items.contains {
             if case .incomplete = $0.state { return true }
+            if case .uncertain = $0.state { return true }
             if case .undoIncomplete = $0.state { return true }
             return false
         }
@@ -106,19 +111,46 @@ public final class ChangeJournal: @unchecked Sendable {
         return d
     }()
 
-    /// Appends one event and syncs it to disk.
+    /// Tests make appends fail here.
+    var appendHook: ((JournalEvent) throws -> Void)?
+
+    /// Appends one event and syncs it to disk. A torn last line (a crash
+    /// mid-write) is closed off first, so it can't swallow this one; a new
+    /// file's directory entry is synced too.
     public func append(_ event: JournalEvent, planID: UUID) throws {
         lock.lock()
         defer { lock.unlock() }
+        try appendHook?(event)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         var line = try Self.encoder.encode(event)
         line.append(0x0A)
-        let fd = open(url(for: planID).path, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0o600)
+        let path = url(for: planID).path
+        let isNew = Posix.lstatPath(path) == nil
+        let fd = open(path, O_RDWR | O_APPEND | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0o600)
         guard fd >= 0 else { throw FolderAccessError.system("journal open", errno) }
         defer { close(fd) }
-        let written = line.withUnsafeBytes { write(fd, $0.baseAddress, $0.count) }
-        guard written == line.count else { throw FolderAccessError.system("journal write", errno) }
+        let size = lseek(fd, 0, SEEK_END)
+        if size > 0 {
+            var last: UInt8 = 0
+            if pread(fd, &last, 1, size - 1) == 1, last != 0x0A { line.insert(0x0A, at: 0) }
+        }
+        var written = 0
+        while written < line.count {
+            let n = line.withUnsafeBytes { write(fd, $0.baseAddress! + written, $0.count - written) }
+            if n < 0 {
+                if errno == EINTR { continue }
+                throw FolderAccessError.system("journal write", errno)
+            }
+            written += n
+        }
         guard fsync(fd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
+        if isNew {
+            let dfd = open(directory.path, O_RDONLY | O_DIRECTORY | O_CLOEXEC)
+            if dfd >= 0 {
+                defer { close(dfd) }
+                guard fsync(dfd) == 0 else { throw FolderAccessError.system("journal sync", errno) }
+            }
+        }
     }
 
     public func record(_ planID: UUID) -> JournalRecord? {
@@ -154,6 +186,8 @@ public final class ChangeJournal: @unchecked Sendable {
                 if let i = index(e.item), let r = e.result { rec.items[i].state = .done(r) }
             case .failed:
                 if let i = index(e.item) { rec.items[i].state = .failed(e.message ?? "failed") }
+            case .uncertain:
+                if let i = index(e.item) { rec.items[i].state = .uncertain(e.message ?? "uncertain") }
             case .end:
                 rec.ended = e.date
             case .undoPending:

@@ -55,16 +55,25 @@ public struct ChangeExecutor {
         self.trasher = trasher
     }
 
+    /// Called after an item's checks, right before its operation: tests
+    /// swap things there to exercise the check-to-use window.
+    var beforeOperation: ((PlanItem) -> Void)?
+
     public enum Status: Equatable, Sendable {
         case done(JournalResult)
+        /// Nothing was changed.
         case failed(String)
+        /// Something may have changed and it couldn't be established what:
+        /// the plan stops, the journal keeps the item as incomplete, the user
+        /// is told to look.
+        case uncertain(String)
         case notRun
     }
 
     public struct Report: Equatable, Sendable {
         public var planID: UUID
         public var outcomes: [(id: Int, status: Status)]
-        /// The item that failed (the plan stopped there), if one did.
+        /// The item that failed or was uncertain (the plan stopped there).
         public var stoppedAt: Int?
 
         public static func == (a: Report, b: Report) -> Bool {
@@ -73,6 +82,13 @@ public struct ChangeExecutor {
         }
 
         public var doneCount: Int { outcomes.filter { if case .done = $0.status { return true }; return false }.count }
+    }
+
+    /// Thrown once an operation has run but its outcome can't be confirmed
+    /// (or undone): never reported as a plain failure, which would tell undo
+    /// there is nothing to reverse.
+    struct Uncertain: Error, CustomStringConvertible {
+        var description: String
     }
 
     /// The make_dir items this run made, by the path they were asked for:
@@ -88,7 +104,8 @@ public struct ChangeExecutor {
         var components: [String]
     }
 
-    public func execute(_ plan: ChangePlan, isCancelled: () -> Bool = { false }) -> Report {
+    public func execute(_ approved: ApprovedPlan, isCancelled: () -> Bool = { false }) -> Report {
+        let plan = approved.plan
         var report = Report(planID: plan.id, outcomes: [], stoppedAt: nil)
         var made: [Key: Made] = [:]
         do {
@@ -111,14 +128,29 @@ public struct ChangeExecutor {
                 report.stoppedAt = item.id
                 continue
             }
+            let result: JournalResult
             do {
-                let result = try run(item, made: &made)
-                report.outcomes.append((item.id, .done(result)))
-                try? journal.append(JournalEvent(kind: .done, date: Date(), item: item.id, result: result), planID: plan.id)
+                result = try run(item, made: &made)
+            } catch let u as Uncertain {
+                report.outcomes.append((item.id, .uncertain(u.description)))
+                report.stoppedAt = item.id
+                try? journal.append(JournalEvent(kind: .uncertain, date: Date(), item: item.id, message: u.description), planID: plan.id)
+                continue
             } catch {
                 report.outcomes.append((item.id, .failed("\(error)")))
                 report.stoppedAt = item.id
+                // If this line is lost the item stays "pending": incomplete,
+                // the safe reading.
                 try? journal.append(JournalEvent(kind: .failed, date: Date(), item: item.id, message: "\(error)"), planID: plan.id)
+                continue
+            }
+            do {
+                try journal.append(JournalEvent(kind: .done, date: Date(), item: item.id, result: result), planID: plan.id)
+                report.outcomes.append((item.id, .done(result)))
+            } catch {
+                // Changed, but undo couldn't find it: stop here.
+                report.outcomes.append((item.id, .uncertain("done, but the journal couldn't record it: \(error)")))
+                report.stoppedAt = item.id
             }
         }
         try? journal.append(JournalEvent(kind: .end, date: Date()), planID: plan.id)
@@ -132,11 +164,12 @@ public struct ChangeExecutor {
         case .makeDir:
             guard let d = item.destination else { throw FolderAccessError.invalidPath("make_dir without a path") }
             let (parent, comps) = try openDestinationParent(d, made: made)
+            beforeOperation?(item)
             let name = try Self.exclusive(d.location.name, policy: item.collision, isDirectory: true, limit: maxNumberedName) {
                 mkdirat(parent.descriptor.fd, $0, 0o755) == 0 ? 0 : errno
             }
-            guard let st = try Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory else {
-                throw FolderAccessError.changed(d.location.relativePath)
+            guard let st = try? Posix.lstatAt(parent.descriptor.fd, name), st.isDirectory else {
+                throw Uncertain(description: "made \(name), then couldn't find it")
             }
             made[Key(root: d.location.root.identity, components: d.location.components)] = Made(identity: st.identity, name: name)
             return JournalResult(identity: st.identity, finalName: name, destinationChain: parent.chain,
@@ -151,32 +184,53 @@ public struct ChangeExecutor {
             if src.descriptor.identity.device != dst.descriptor.identity.device {
                 throw FolderAccessError.crossDevice(d.location.displayPath)
             }
+            beforeOperation?(item)
             let name = try Self.renameExclusive(from: src.descriptor, s.location.name, to: dst.descriptor, d.location.name,
                                                 identity: s.identity, policy: item.collision,
                                                 isDirectory: s.kind == .directory, limit: maxNumberedName)
-            // The rename moved whatever had the name: it must be the item.
-            guard try Posix.lstatAt(dst.descriptor.fd, name)?.identity == s.identity else {
-                _ = renameatx_np(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, UInt32(RENAME_EXCL))
+            // A rename moves whatever has the name: it must have been the
+            // item, else what was swapped in goes back where it was.
+            let moved = try? Posix.lstatAt(dst.descriptor.fd, name)
+            if moved?.identity == s.identity {
+                return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
+                                     trashURL: nil, components: comps + [name])
+            }
+            if moved != nil, renameatx_np(dst.descriptor.fd, name, src.descriptor.fd, s.location.name, UInt32(RENAME_EXCL)) == 0 {
                 throw FolderAccessError.changed(s.location.relativePath)
             }
-            return JournalResult(identity: s.identity, finalName: name, destinationChain: dst.chain,
-                                 trashURL: nil, components: comps + [name])
+            throw Uncertain(description: "moved \(s.location.relativePath), but what arrived isn't the item")
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("trash without a path") }
             let parent = try openSourceParent(s)
             guard let dirPath = parent.descriptor.currentPath else { throw FolderAccessError.changed(s.location.relativePath) }
             let parentIdentity = parent.descriptor.identity
             let url = URL(fileURLWithPath: dirPath + "/" + s.location.name)
-            let out = try trasher.trash(url, coordinated: s.fileProvider) { u in
-                Posix.lstatPath(u.path)?.identity == s.identity
-                    && Posix.lstatPath(u.deletingLastPathComponent().path)?.identity == parentIdentity
+            beforeOperation?(item)
+            let out: URL?
+            do {
+                out = try trasher.trash(url, coordinated: s.fileProvider) { u in
+                    Posix.lstatPath(u.path)?.identity == s.identity
+                        && Posix.lstatPath(u.deletingLastPathComponent().path)?.identity == parentIdentity
+                }
+            } catch {
+                // The Trash said no: nothing moved -- unless the item is gone.
+                if (try? Posix.lstatAt(parent.descriptor.fd, s.location.name))?.identity == s.identity { throw error }
+                throw Uncertain(description: "the Trash failed (\(error)) and \(s.location.relativePath) isn't where it was")
             }
-            if try Posix.lstatAt(parent.descriptor.fd, s.location.name)?.identity == s.identity {
-                throw FolderAccessError.system("trash (still there)", EIO)
+            guard let out else { throw Uncertain(description: "the Trash didn't say where it put \(s.location.relativePath)") }
+            // Foundation moves by path: what went must be the item, else
+            // what was swapped in is put back.
+            guard let trashed = Posix.lstatPath(out.path) else {
+                throw Uncertain(description: "\(out.path) isn't in the Trash")
             }
-            let trashed = out.flatMap { Posix.lstatPath($0.path) }
-            return JournalResult(identity: trashed?.identity ?? s.identity, finalName: out?.lastPathComponent,
-                                 destinationChain: nil, trashURL: out?.path, components: nil)
+            if trashed.identity == s.identity {
+                return JournalResult(identity: trashed.identity, finalName: out.lastPathComponent,
+                                     destinationChain: nil, trashURL: out.path, components: nil)
+            }
+            if renameatx_np(AT_FDCWD, out.path, parent.descriptor.fd, s.location.name, UInt32(RENAME_EXCL)) == 0 {
+                throw FolderAccessError.changed(s.location.relativePath)
+            }
+            throw Uncertain(description: "something other than \(s.location.relativePath) went to the Trash: \(out.path)")
         }
     }
 
@@ -252,18 +306,25 @@ public struct ChangeExecutor {
     static func renameExclusive(from src: Descriptor, _ srcName: String, to dst: Descriptor, _ dstName: String,
                                 identity: FileIdentity, policy: CollisionPolicy, isDirectory: Bool, limit: Int) throws -> String {
         let excl = UInt32(RENAME_EXCL)
-        return try exclusive(dstName, policy: policy, isDirectory: isDirectory, limit: limit) { candidate in
+        var stranded: String?
+        func attempt(_ candidate: String) -> Int32 {
             if renameatx_np(src.fd, srcName, dst.fd, candidate, excl) == 0 { return 0 }
             let e = errno
             guard e == EEXIST, src.identity == dst.identity,
-                  (try? Posix.lstatAt(dst.fd, candidate))??.identity == identity,
+                  (try? Posix.lstatAt(dst.fd, candidate))?.identity == identity,
                   Array(candidate.utf8) != Array(srcName.utf8) else { return e }
             let temp = ".llmtray-rename-\(UUID().uuidString)"
             guard renameatx_np(src.fd, srcName, src.fd, temp, excl) == 0 else { return errno }
             if renameatx_np(src.fd, temp, dst.fd, candidate, excl) == 0 { return 0 }
             let e2 = errno
-            _ = renameatx_np(src.fd, temp, src.fd, srcName, excl)
+            if renameatx_np(src.fd, temp, src.fd, srcName, excl) != 0 { stranded = temp }
             return e2
+        }
+        do {
+            return try exclusive(dstName, policy: policy, isDirectory: isDirectory, limit: limit, attempt)
+        } catch {
+            if let stranded { throw Uncertain(description: "left under a temporary name: \(stranded)") }
+            throw error
         }
     }
 }

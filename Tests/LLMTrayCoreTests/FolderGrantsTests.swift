@@ -35,7 +35,7 @@ final class FolderGrantsTests: XCTestCase {
 
     func testOnceIsConsumedByExactlyOneCall() throws {
         let g = FolderGrants(storeURL: nil)
-        try g.grant(docs, level: .read, lifetime: .once(callKey: "call-1"), chatID: "c", now: t0)
+        try g.grant(docs, level: .read, lifetime: .once(callKey: "call-1", chatID: "c"), chatID: "c", now: t0)
         XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "c", callKey: "call-2", now: t0),
                      "another call can't use it")
         // Many threads race for it; one wins.
@@ -48,11 +48,16 @@ final class FolderGrantsTests: XCTestCase {
         }
         XCTAssertEqual(count, 1)
         XCTAssertTrue(g.allGrants(now: t0).isEmpty)
+        // Bound to its chat, and gone with it.
+        try g.grant(docs, level: .read, lifetime: .once(callKey: "call-3", chatID: "c"), chatID: "c", now: t0)
+        XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "other", callKey: "call-3", now: t0))
+        g.endChat("c")
+        XCTAssertNil(g.authorize(path: docs.path, level: .read, chatID: "c", callKey: "call-3", now: t0))
     }
 
     func testALastingGrantIsPreferredOverOnce() throws {
         let g = FolderGrants(storeURL: nil)
-        try g.grant(docs, level: .read, lifetime: .once(callKey: "k"), chatID: "c")
+        try g.grant(docs, level: .read, lifetime: .once(callKey: "k", chatID: "c"), chatID: "c")
         try g.grant(docs, level: .read, lifetime: .chat("c"), chatID: "c")
         XCTAssertEqual(g.authorize(path: docs.path, level: .read, chatID: "c", callKey: "k", now: t0)?.lifetime, .chat("c"))
         XCTAssertEqual(g.allGrants().count, 2, "once kept for its call")
@@ -75,7 +80,7 @@ final class FolderGrantsTests: XCTestCase {
         let always = try a.grant(docs, level: .change, lifetime: .always, chatID: "c", now: t0)
         try a.grant(downloads, level: .read, lifetime: .until(t0.addingTimeInterval(60)), chatID: "c", now: t0)
         try a.grant(downloads, level: .read, lifetime: .chat("c"), chatID: "c", now: t0)
-        try a.grant(downloads, level: .read, lifetime: .once(callKey: "k"), chatID: "c", now: t0)
+        try a.grant(downloads, level: .read, lifetime: .once(callKey: "k", chatID: "c"), chatID: "c", now: t0)
         XCTAssertEqual(FolderGrants(storeURL: store, now: t0).standingGrants(now: t0).count, 2)
         // Reloaded after the hour: the expired one is gone.
         let later = FolderGrants(storeURL: store, now: t0.addingTimeInterval(61))
@@ -91,8 +96,13 @@ final class FolderGrantsTests: XCTestCase {
         XCTAssertThrowsError(try g.grant(docs, level: .read, lifetime: .until(t0), chatID: "t", temporaryChat: true))
         XCTAssertThrowsError(try g.grant(docs, level: .read, lifetime: .chat("other"), chatID: "t", temporaryChat: true))
         XCTAssertNoThrow(try g.grant(docs, level: .read, lifetime: .chat("t"), chatID: "t", temporaryChat: true))
-        XCTAssertNoThrow(try g.grant(docs, level: .read, lifetime: .once(callKey: "k"), chatID: "t", temporaryChat: true))
+        XCTAssertNoThrow(try g.grant(docs, level: .read, lifetime: .once(callKey: "k", chatID: "t"), chatID: "t", temporaryChat: true))
+        XCTAssertThrowsError(try g.grant(docs, level: .read, lifetime: .once(callKey: "k", chatID: "c"), chatID: "t", temporaryChat: true))
         XCTAssertFalse(FileManager.default.fileExists(atPath: store.path), "nothing written")
+        // A standing change grant from a normal chat doesn't reach a temporary one.
+        try g.grant(downloads, level: .change, lifetime: .always, chatID: "n")
+        XCTAssertNil(g.authorize(path: downloads.path, level: .change, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
+        XCTAssertNotNil(g.authorize(path: downloads.path, level: .read, chatID: "t", callKey: "k", temporaryChat: true, now: t0))
     }
 
     func testADenyHoldsAgainstEquivalentTargetsAndUpgrades() {

@@ -10,6 +10,8 @@ public struct ChangeUndo {
     public let denylist: FolderDenylist
     public let journal: ChangeJournal
 
+    typealias Uncertain = ChangeExecutor.Uncertain
+
     public init(denylist: FolderDenylist, journal: ChangeJournal) {
         self.denylist = denylist
         self.journal = journal
@@ -38,6 +40,8 @@ public struct ChangeUndo {
             switch item.state {
             case .incomplete:
                 return Remaining(id: item.planItem.id, reversible: false, reason: "interrupted: its outcome is unknown")
+            case .uncertain(let why):
+                return Remaining(id: item.planItem.id, reversible: false, reason: "needs a look: \(why)")
             case .failed, .undone:
                 return nil
             case .done(let r), .undoIncomplete(let r):
@@ -69,7 +73,8 @@ public struct ChangeUndo {
                     continue
                 }
                 result = r
-            case .failed, .undone, .incomplete: continue
+            // Unknown outcomes are left alone (reported in `remaining`).
+            case .failed, .undone, .incomplete, .uncertain: continue
             }
             let id = item.planItem.id
             do {
@@ -82,6 +87,10 @@ public struct ChangeUndo {
                 try reverse(item.planItem, result, dryRun: false)
                 try? journal.append(JournalEvent(kind: .undone, date: Date(), item: id), planID: planID)
                 report.undone.append(id)
+            } catch let u as Uncertain {
+                try? journal.append(JournalEvent(kind: .uncertain, date: Date(), item: id, message: u.description), planID: planID)
+                report.stopped = Remaining(id: id, reversible: false, reason: "needs a look: \(u.description)")
+                break
             } catch {
                 try? journal.append(JournalEvent(kind: .undoFailed, date: Date(), item: id, message: "\(error)"), planID: planID)
                 report.stopped = Remaining(id: id, reversible: false, reason: "\(error)")
@@ -140,10 +149,23 @@ public struct ChangeUndo {
                 guard try Self.isEmptyDirectory(dir.descriptor, name) else { throw FolderAccessError.notEmpty(name) }
                 return
             }
-            if unlinkat(dir.descriptor.fd, name, AT_REMOVEDIR) != 0 {
+            // Taken aside under a temporary name first: the rename takes one
+            // exact folder, checked before it is removed (a folder swapped in
+            // by name is put back, not removed).
+            let temp = ".llmtray-undo-\(UUID().uuidString)"
+            guard renameatx_np(dir.descriptor.fd, name, dir.descriptor.fd, temp, excl) == 0 else {
+                throw FolderAccessError.system("remove \(name)", errno)
+            }
+            func restore(_ why: FolderAccessError) throws -> Never {
+                if renameatx_np(dir.descriptor.fd, temp, dir.descriptor.fd, name, excl) == 0 { throw why }
+                throw Uncertain(description: "\(name) was left as \(temp)")
+            }
+            if (try? Posix.lstatAt(dir.descriptor.fd, temp))?.identity != r.identity {
+                try restore(.changed("\(name) was replaced since"))
+            }
+            if unlinkat(dir.descriptor.fd, temp, AT_REMOVEDIR) != 0 {
                 let e = errno
-                if e == ENOTEMPTY || e == EEXIST { throw FolderAccessError.notEmpty(name) }
-                throw FolderAccessError.system("remove \(name)", e)
+                try restore(e == ENOTEMPTY || e == EEXIST ? .notEmpty(name) : .system("remove \(name)", e))
             }
         case .move:
             guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
@@ -159,6 +181,13 @@ public struct ChangeUndo {
                 let e = errno
                 if e == EEXIST { throw FolderAccessError.exists(s.location.relativePath) }
                 throw FolderAccessError.system("move back \(name)", e)
+            }
+            // What moved must be the item; anything swapped in goes back.
+            if (try? Posix.lstatAt(back.descriptor.fd, s.location.name))?.identity != r.identity {
+                if renameatx_np(back.descriptor.fd, s.location.name, dir.descriptor.fd, name, excl) == 0 {
+                    throw FolderAccessError.changed("\(name) was replaced since")
+                }
+                throw Uncertain(description: "something other than the item was moved to \(s.location.relativePath)")
             }
         case .trash:
             guard let s = item.source else { throw FolderAccessError.invalidPath("the journal has no source") }
@@ -179,9 +208,11 @@ public struct ChangeUndo {
                 throw FolderAccessError.system("put back \(s.location.name)", e)
             }
             // Swapped in the Trash between the check and the move: back it goes.
-            if try Posix.lstatAt(back.descriptor.fd, s.location.name)?.identity != r.identity {
-                _ = renameatx_np(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, excl)
-                throw FolderAccessError.changed("\(s.location.name) changed in the Trash")
+            if (try? Posix.lstatAt(back.descriptor.fd, s.location.name))?.identity != r.identity {
+                if renameatx_np(back.descriptor.fd, s.location.name, AT_FDCWD, trashed.path, excl) == 0 {
+                    throw FolderAccessError.changed("\(s.location.name) changed in the Trash")
+                }
+                throw Uncertain(description: "something other than the item came back to \(s.location.relativePath)")
             }
         }
     }

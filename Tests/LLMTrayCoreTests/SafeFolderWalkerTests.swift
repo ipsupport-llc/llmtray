@@ -77,6 +77,8 @@ final class SafeFolderWalkerTests: FolderTestCase {
             }
         }
         XCTAssertThrowsError(try SafeFolderWalker.makeRoot(path: grant + "/Tool.app", denylist: denylist))
+        XCTAssertThrowsError(try SafeFolderWalker.makeRoot(path: grant + "/Tool.app/Contents", denylist: denylist),
+                             "nor a folder inside one")
     }
 
     func testFinderAliasesAreNotFollowed() throws {
@@ -160,5 +162,14 @@ final class SafeFolderWalkerTests: FolderTestCase {
         let kinds = Dictionary(uniqueKeysWithValues: try walker.entries(of: walker.openRoot()).map { ($0.name, $0.kind) })
         XCTAssertEqual(kinds, ["f.txt": .file, "d": .directory, "l": .symlink, "fifo": .other])
         XCTAssertThrowsError(try walker.openFile(walker.resolve(["fifo"])))
+    }
+
+    func testADeniedFolderMadeAfterTheListIsStillDenied() throws {
+        let list = FolderDenylist(paths: [grant + "/later"])
+        let w = SafeFolderWalker(root: root, denylist: list)
+        write("later/secret.txt", "s")
+        XCTAssertNil(try w.resolve(["later"]).entry)
+        XCTAssertThrowsError(try w.resolve(["later", "secret.txt"]))
+        XCTAssertFalse(try w.entries(of: w.openRoot()).map(\.name).contains("later"))
     }
 }

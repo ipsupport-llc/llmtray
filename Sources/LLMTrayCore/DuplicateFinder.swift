@@ -12,6 +12,9 @@ import Foundation
 public struct DuplicateFinder {
     public struct Limits: Sendable {
         public var maxFiles = 100_000
+        /// Directory entries read in all (folders, links... included): a
+        /// folder of a million names is never loaded whole.
+        public var maxEntries = 200_000
         public var maxBytesHashed: Int64 = 16 << 30
         public var maxDepth = 64
         public var edgeBytes = 64 << 10
@@ -48,8 +51,16 @@ public struct DuplicateFinder {
         var links: [FileIdentity: (size: Int64, paths: [String])] = [:]
         var budget = Budget()
 
+        var entriesRead = 0
         func scan(_ dir: OpenedDirectory, depth: Int) throws {
-            let entries = try walker.entries(of: dir).sorted { Array($0.name.utf8).lexicographicallyPrecedes(Array($1.name.utf8)) }
+            let room = limits.maxEntries - entriesRead
+            var entries = try walker.entries(of: dir, limit: room + 1)
+            // Over the cap: what was read is scanned, then the scan stops.
+            let capped = entries.count > room
+            if capped { entries = Array(entries.prefix(room)) }
+            defer { if capped, budget.stop == nil { budget.stop = .fileLimit } }
+            entriesRead += entries.count
+            entries.sort { Array($0.name.utf8).lexicographicallyPrecedes(Array($1.name.utf8)) }
             for e in entries {
                 if budget.stop != nil { return }
                 if isCancelled() { budget.stop = .cancelled; return }
@@ -227,15 +238,18 @@ public struct DuplicateReport: Codable, Equatable, Sendable {
     /// A page for the model: the summary and groups from `cursor` (paths and
     /// sizes only), at most `maxGroups` and about `maxBytes` of paths (at
     /// least one group). `nextCursor` is nil on the last page.
-    public func page(cursor: Int = 0, maxGroups: Int = 20, maxBytes: Int = 4000) -> DuplicatePage {
+    public func page(cursor: Int = 0, maxGroups: Int = 20, maxBytes: Int = 4000, maxPathsPerGroup: Int = 10) -> DuplicatePage {
         var out: [DuplicatePage.Group] = []
         var bytes = 0
         var i = max(0, cursor)
         while i < groups.count, out.count < maxGroups {
             let g = groups[i]
-            let cost = g.files.reduce(16) { $0 + $1.path.utf8.count + 4 }
+            // One group of many copies is cut too: its first paths, and a count.
+            let shown = Array(g.files.prefix(max(2, maxPathsPerGroup)))
+            let cost = shown.reduce(16) { $0 + $1.path.utf8.count + 4 }
             if !out.isEmpty, bytes + cost > maxBytes { break }
-            out.append(.init(size: g.size, paths: g.files.map(\.path)))
+            let more = g.files.count - shown.count
+            out.append(.init(size: g.size, paths: shown.map(\.path), copies: g.files.count, morePaths: more > 0 ? more : nil))
             bytes += cost
             i += 1
         }
@@ -247,6 +261,10 @@ public struct DuplicatePage: Codable, Equatable, Sendable {
     public struct Group: Codable, Equatable, Sendable {
         public var size: Int64
         public var paths: [String]
+        /// All copies in the group (`paths` may show fewer).
+        public var copies: Int
+        /// Copies not listed in `paths`.
+        public var morePaths: Int?
     }
 
     public var summary: DuplicateReport.Summary

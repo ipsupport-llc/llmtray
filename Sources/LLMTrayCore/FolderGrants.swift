@@ -12,8 +12,8 @@ public enum FolderAccessLevel: Int, Codable, Comparable, Sendable {
 
 /// How long a grant lasts, the user's pick when asked.
 public enum GrantLifetime: Codable, Equatable, Sendable {
-    /// One exact call (identified by `callKey`), consumed by it.
-    case once(callKey: String)
+    /// One exact call (identified by `callKey`) in one chat, consumed by it.
+    case once(callKey: String, chatID: String)
     /// Until a date ("for an hour").
     case until(Date)
     /// For one chat.
@@ -128,7 +128,7 @@ public final class FolderGrants: @unchecked Sendable {
         if temporaryChat {
             guard level == .read else { throw GrantError.temporaryChat }
             switch lifetime {
-            case .once: break
+            case .once(_, let id) where id == chatID: break
             case .chat(let id) where id == chatID: break
             default: throw GrantError.temporaryChat
             }
@@ -156,7 +156,12 @@ public final class FolderGrants: @unchecked Sendable {
     /// A chat ended (closed, deleted): its grants and denies go.
     public func endChat(_ chatID: String) {
         lock.lock()
-        grants.removeAll { if case .chat(let id) = $0.lifetime { return id == chatID }; return false }
+        grants.removeAll {
+            switch $0.lifetime {
+            case .chat(let id), .once(_, let id): return id == chatID
+            case .until, .always: return false
+            }
+        }
         denies.removeAll { $0.chatID == chatID }
         promptsBlocked.remove(chatID)
         lock.unlock()
@@ -181,8 +186,11 @@ public final class FolderGrants: @unchecked Sendable {
     /// canonical absolute path) at `level` in `chatID`, or nil. Standing and
     /// chat grants are preferred; a matching `once` grant is consumed by this
     /// call, atomically -- a second call with the same key finds nothing.
+    /// A temporary chat is never authorized to change anything, whatever
+    /// grants exist (Hardening 8).
     public func authorize(path: String, level: FolderAccessLevel, chatID: String, callKey: String,
-                          now: Date = Date()) -> FolderGrant? {
+                          temporaryChat: Bool = false, now: Date = Date()) -> FolderGrant? {
+        if temporaryChat, level > .read { return nil }
         lock.lock()
         defer { lock.unlock() }
         let expired = grants.contains { $0.isExpired(now: now) }
@@ -193,7 +201,7 @@ public final class FolderGrants: @unchecked Sendable {
             switch g.lifetime {
             case .always, .until: return true
             case .chat(let id): return id == chatID
-            case .once(let key): return key == callKey
+            case .once(let key, let id): return key == callKey && id == chatID
             }
         }
         if let lasting = usable.first(where: { if case .once = $0.lifetime { return false }; return true }) {

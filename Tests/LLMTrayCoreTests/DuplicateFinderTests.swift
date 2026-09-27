@@ -92,6 +92,13 @@ final class DuplicateFinderTests: FolderTestCase {
         var calls = 0
         let cancelled = try find { calls += 1; return calls > 3 }
         XCTAssertEqual(cancelled.summary.stopped, .cancelled)
+        // Entries of any kind count: a folder of many names isn't read whole.
+        for i in 0..<10 { mkdir("dirs/d\(i)") }
+        limits = DuplicateFinder.Limits()
+        limits.maxEntries = 5
+        let entries = try find(limits)
+        XCTAssertEqual(entries.summary.stopped, .fileLimit)
+        XCTAssertLessThanOrEqual(entries.summary.filesScanned, 5)
     }
 
     func testPagesAreCompactAndBounded() throws {
@@ -100,15 +107,23 @@ final class DuplicateFinderTests: FolderTestCase {
             writeData("g\(g)/one.bin", d)
             writeData("g\(g)/two.bin", d)
         }
+        let many = bytes(999, seed: 99)
+        for i in 0..<15 { writeData("many/\(i).bin", many) }
         let r = try find()
-        XCTAssertEqual(r.summary.groups, 30)
-        let first = r.page(cursor: 0, maxGroups: 20, maxBytes: 100_000)
+        XCTAssertEqual(r.summary.groups, 31)
+        let big = r.page(cursor: 0, maxGroups: 1)
+        XCTAssertEqual(big.groups[0].copies, 15, "the most reclaimable first")
+        XCTAssertEqual(big.groups[0].paths.count, 10)
+        XCTAssertEqual(big.groups[0].morePaths, 5)
+        let first = r.page(cursor: 1, maxGroups: 20, maxBytes: 100_000)
         XCTAssertEqual(first.groups.count, 20)
-        XCTAssertEqual(first.nextCursor, "d20")
-        XCTAssertEqual(first.groups[0].size, 129, "the most reclaimable first")
+        XCTAssertEqual(first.nextCursor, "d21")
+        XCTAssertEqual(first.groups[0].size, 129)
         let tight = r.page(cursor: 0, maxGroups: 20, maxBytes: 60)
         XCTAssertEqual(tight.groups.count, 1, "at least one group, then the byte budget")
-        let last = r.page(cursor: 20)
+        let short = r.page(cursor: 0, maxGroups: 1, maxPathsPerGroup: 1)
+        XCTAssertEqual(short.groups[0].paths.count, 2, "at least two paths show a duplicate")
+        let last = r.page(cursor: 21)
         XCTAssertEqual(last.groups.count, 10)
         XCTAssertNil(last.nextCursor)
     }

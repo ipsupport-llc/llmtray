@@ -124,6 +124,13 @@ public struct FileClassifier {
             return info
         }
         let file = try walker.openFile(item)
+        // A link made since lstat: the open file's own count decides.
+        if file.stat.isHardLinked {
+            info.hardLinked = true
+            info.note = "has more than one name (a hard link, maybe to a file outside this folder): contents not read"
+            if hash { info.hash = .withheld("hard link") }
+            return info
+        }
         let size = file.stat.size
         info.size = size
         let head = try Self.read(file.fd, offset: 0, count: caps.sniffBytes)
