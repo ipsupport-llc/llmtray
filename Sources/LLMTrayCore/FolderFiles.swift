@@ -170,11 +170,13 @@ public struct FolderFiles {
                                        modified: e.stat.modified, hardLinked: e.stat.isHardLinked ? true : nil,
                                        notDownloaded: e.stat.isDataless ? true : nil))
                 }
-                if q.recursive, e.kind == .directory, e.identity.device == dir.descriptor.identity.device {
-                    // A subfolder past the depth limit, or that can't be
-                    // entered (changed or unreadable since it was listed),
-                    // makes the listing incomplete.
-                    guard depth + 1 <= limits.maxDepth, let sub = try? walker.step(dir, e.name) else {
+                if q.recursive, e.kind == .directory {
+                    // A subfolder on another volume (it needs its own grant),
+                    // past the depth limit, or that can't be entered (changed
+                    // or unreadable since it was listed) makes the listing
+                    // incomplete.
+                    guard e.identity.device == dir.descriptor.identity.device, depth + 1 <= limits.maxDepth,
+                          let sub = try? walker.step(dir, e.name) else {
                         incomplete = true
                         continue
                     }

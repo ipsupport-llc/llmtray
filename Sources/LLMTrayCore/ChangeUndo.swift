@@ -606,6 +606,15 @@ public struct ChangeUndo {
             if !out.restored, st.kind == .trash, stagingIdentity != nil, let s = item.source {
                 throw Uncertain(description: "interrupted: \(s.location.relativePath) isn't in its place; it may be in the Trash")
             }
+            // A made folder gone from its staging name: it may have been
+            // published (a crash before `done`).
+            if st.kind == .makeDir, let made = stagingIdentity, let d = item.destination {
+                if (try? Posix.lstatAt(pfd, d.location.name))?.identity == made {
+                    throw Uncertain(description: "interrupted: the folder was made as \(d.location.relativePath)")
+                }
+                throw Uncertain(description: "interrupted: the folder may have been made (as \(d.location.relativePath) "
+                    + "or a numbered name)")
+            }
             return out
         }
         // Something to change: only while a change grant still covers it.

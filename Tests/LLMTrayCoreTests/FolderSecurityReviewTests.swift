@@ -200,6 +200,18 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(state(plan), .incomplete)
     }
 
+    func testAMakeDirCrashedAfterPublishingNeedsALook() throws {
+        let plan = try crashed([md("Pub")], at: .stagingJournaled)
+        let name = StagingRecord.name(.makeDir, planID: plan.plan.id, item: plan.plan.items[0].id)
+        // As if published and the crash came before `done`.
+        try fm.moveItem(atPath: grant + "/" + name, toPath: grant + "/Pub")
+        let r = undoer.recoverInterrupted()
+        XCTAssertEqual(r.map(\.planID), [plan.plan.id])
+        XCTAssertTrue(r.first?.needsLook[plan.plan.items[0].id]?.contains("was made as Pub") ?? false, "\(r)")
+        XCTAssertTrue(exists("Pub"))
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
     func testATrashCrashedAfterItsCleanupNeedsALook() throws {
         write("t/w.txt", "w")
         let plan = try crashed([rm("t/w.txt")], at: .trashed)

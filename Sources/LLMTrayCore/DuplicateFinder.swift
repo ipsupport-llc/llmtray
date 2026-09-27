@@ -83,6 +83,8 @@ public struct DuplicateFinder {
             let capped = read.capped
             defer { if capped, budget.stop == nil { budget.stop = .fileLimit } }
             entriesRead += read.visited
+            // Names that couldn't be looked at are skipped items too.
+            summary.skippedItems += read.skipped
             entries.sort { Array($0.name.utf8).lexicographicallyPrecedes(Array($1.name.utf8)) }
             for e in entries {
                 if budget.stop != nil { return }
