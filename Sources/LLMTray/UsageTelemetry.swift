@@ -47,11 +47,13 @@ final class UsageTelemetry: ObservableObject {
         lastSentJSON = defaults[Pref.telemetryLastSentJSON]
         lastSentDay = defaults[Pref.telemetryLastSentDay]
         uploader.onSent = { [weak self] day, body in
+            let sentID = (try? JSONSerialization.jsonObject(with: body) as? [String: Any])?["install_id"] as? String
             let readable = (try? JSONSerialization.jsonObject(with: body))
                 .flatMap { try? JSONSerialization.data(withJSONObject: $0, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]) }
                 .map { String(decoding: $0, as: UTF8.self) } ?? String(decoding: body, as: UTF8.self)
             Task { @MainActor [weak self] in
-                guard let self, self.isEnabled else { return }
+                // A late answer from before a reset or an off/on: not this ID's.
+                guard let self, self.isEnabled, sentID == self.installID?.uuidString.lowercased() else { return }
                 self.lastSentJSON = readable
                 self.lastSentDay = day
                 self.defaults[Pref.telemetryLastSentJSON] = readable
@@ -107,7 +109,15 @@ final class UsageTelemetry: ObservableObject {
         // The counts gathered under the old ID go too: sent under the new
         // one they'd tie the two together (and a day in flight twice).
         store.erase()
+        clearLastSent()
         regenerateID()
+    }
+
+    private func clearLastSent() {
+        lastSentJSON = nil
+        lastSentDay = nil
+        defaults[Pref.telemetryLastSentJSON] = nil
+        defaults[Pref.telemetryLastSentDay] = nil
     }
 
     private func cancelSend() {
@@ -131,10 +141,7 @@ final class UsageTelemetry: ObservableObject {
         timer?.invalidate()
         timer = nil
         store.erase()
-        lastSentJSON = nil
-        lastSentDay = nil
-        defaults[Pref.telemetryLastSentJSON] = nil
-        defaults[Pref.telemetryLastSentDay] = nil
+        clearLastSent()
     }
 
     // MARK: - Counting

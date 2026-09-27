@@ -63,6 +63,9 @@ private struct TelemetryReportView: View {
         }
         .frame(minWidth: 460, minHeight: 360)
         .onAppear { reports = telemetry.previewReports() }
+        // Turned off, on, or a new ID while open: not the old previews.
+        .onChange(of: telemetry.installID) { reports = telemetry.previewReports() }
+        .onChange(of: telemetry.isEnabled) { reports = telemetry.previewReports() }
     }
 
     private func block(title: String, json: String) -> some View {
