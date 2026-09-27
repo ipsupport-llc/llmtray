@@ -25,7 +25,13 @@ public enum SetupWizard {
     /// the current settings.
     public static func resume(saved: SetupProgress?, current: SetupChoices, automatic: Bool) -> SetupProgress {
         if automatic, let saved, saved.startedAutomatically { return saved }
-        return SetupProgress(choices: current, startedAutomatically: automatic)
+        var progress = SetupProgress(choices: current, startedAutomatically: automatic)
+        // A first run offers usage statistics ticked (the user's call):
+        // the step shows what's sent and the box can be cleared; only
+        // Finish turns it on, and Skip or closing before leaves it off.
+        // Opened by hand, it shows the current setting as is.
+        if automatic { progress.choices.usageStatistics = true }
+        return progress
     }
 }
 

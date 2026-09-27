@@ -51,6 +51,18 @@ final class SetupWizardTests: XCTestCase {
         XCTAssertEqual(SetupWizard.resume(saved: nil, current: current, automatic: true).step, .welcome)
     }
 
+    /// A first run offers usage statistics ticked; opened by hand, as is.
+    /// Ticked isn't on: only Finish applies it (it differs from the baseline).
+    func testUsageStatisticsTickedOnAFirstRunOnly() {
+        var current = base
+        current.usageStatistics = false
+        let first = SetupWizard.resume(saved: nil, current: current, automatic: true)
+        XCTAssertTrue(first.choices.usageStatistics)
+        XCTAssertFalse(first.baseline.usageStatistics)
+        XCTAssertFalse(first.original.usageStatistics)
+        XCTAssertFalse(SetupWizard.resume(saved: nil, current: current, automatic: false).choices.usageStatistics)
+    }
+
     func testStepsInOrder() {
         XCTAssertEqual(SetupStep.allCases.first, .welcome)
         XCTAssertEqual(SetupStep.allCases.last, .done)
