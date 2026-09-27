@@ -106,6 +106,10 @@ struct FolderPlanCard: View {
             Text(String(format: NSLocalizedString("%lld need a look: see the list.", comment: "plan review"), warned))
                 .font(.system(size: 11)).foregroundColor(.orange)
         }
+        if !r.added.isEmpty {
+            Text(String(format: NSLocalizedString("%lld new since you opened the list: unticked until you tick them.", comment: "plan review"), r.added.count))
+                .font(.system(size: 11)).foregroundColor(.orange)
+        }
         if r.counts.trashes > 0 {
             Text("Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder.")
                 .font(.system(size: 11)).foregroundColor(.secondary)
@@ -136,8 +140,8 @@ struct FolderPlanCard: View {
                 model.cancel()
                 dismiss()
             }
+            // No Return shortcut: approving is always a deliberate click.
             Button("Approve Selected") { model.approve() }
-                .keyboardShortcut(.defaultAction)
                 .disabled(r.approvable.isEmpty || manager.isChanging)
         }
         .font(.system(size: 11))
@@ -299,7 +303,7 @@ struct FoldersPane: View {
             ForEach(manager.standingGrants) { grant in
                 LabeledContent {
                     Button("Revoke") {
-                        do { try manager.revoke(grant) } catch { self.error = "\(error)" }
+                        do { try manager.revoke(grant) } catch { self.error = FolderAccessManager.message(error) }
                     }
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
@@ -335,12 +339,12 @@ struct FoldersPane: View {
         switch manager.pickFolder(message: message) {
         case nil: return
         case .failure(let e)?:
-            error = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), "\(e)")
+            error = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), FolderAccessManager.message(e))
         case .success(let root)?:
             do {
                 try manager.userGrant(root, level: level, choice: always ? .always : .hour, chat: nil)
             } catch {
-                self.error = "\(error)"
+                self.error = FolderAccessManager.message(error)
             }
         }
     }

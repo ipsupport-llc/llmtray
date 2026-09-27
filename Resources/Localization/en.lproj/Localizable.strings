@@ -22,6 +22,7 @@
 "%lld interrupted: look at them in Finder" = "%lld interrupted: look at them in Finder";
 "%lld items put back under their names." = "%lld items put back under their names.";
 "%lld need a look: see the list." = "%lld need a look: see the list.";
+"%lld new since you opened the list: unticked until you tick them." = "%lld new since you opened the list: unticked until you tick them.";
 "%lld of 5 stars" = "%lld of 5 stars";
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bit";
@@ -64,6 +65,7 @@
 "An alias: the alias itself, not what it points to." = "An alias: the alias itself, not what it points to.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
 "An hour" = "An hour";
+"An item needs the new folder it goes into: tick that folder too." = "An item needs the new folder it goes into: tick that folder too.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Folders keeps the journal.";
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
@@ -200,6 +202,7 @@
 "Fits comfortably" = "Fits comfortably";
 "Folder Settings…" = "Folder Settings…";
 "Folder access" = "Folder access";
+"Folder access is off in Settings." = "Folder access is off in Settings.";
 "Folder changes" = "Folder changes";
 "Folders" = "Folders";
 "Folders the chat may use" = "Folders the chat may use";
@@ -496,6 +499,7 @@
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music.";
 "Skip" = "Skip";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
+"Some items changed on disk since they were proposed: untick them, or ask again." = "Some items changed on disk since they were proposed: untick them, or ask again.";
 "Something went wrong?" = "Something went wrong?";
 "Sort by" = "Sort by";
 "Source on GitHub" = "Source on GitHub";
@@ -528,11 +532,13 @@
 "Switch models?" = "Switch models?";
 "Switch the music model?" = "Switch the music model?";
 "System" = "System";
+"System and private places (the home folder itself, Library, Applications, keys) are never shared." = "System and private places (the home folder itself, Library, Applications, keys) are never shared.";
 "System prompt" = "System prompt";
 "Tab %lld" = "Tab %lld";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
 "Temporary chat" = "Temporary chat";
+"Temporary chats can only look in folders, for that chat only." = "Temporary chats can only look in folders, for that chat only.";
 "Temporary — not saved" = "Temporary — not saved";
 "Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "That folder can't be shared with the chat: %@" = "That folder can't be shared with the chat: %@";
@@ -570,6 +576,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "The name is taken there: this change will fail rather than overwrite.";
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
+"The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The report" = "The report";
 "The reports" = "The reports";
 "The review has characters that can't be sent (control characters)." = "The review has characters that can't be sent (control characters).";
@@ -581,6 +588,7 @@
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
 "The server log" = "The server log";
+"There's no plan waiting any more." = "There's no plan waiting any more.";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "Thinking…" = "Thinking…";
 "This chat may use" = "This chat may use";

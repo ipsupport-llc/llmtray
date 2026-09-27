@@ -26,18 +26,22 @@ public enum ToolTrust {
         public var folderText = false
         /// A folder change proposal (`change_files`) returned something.
         public var changeResult = false
+        /// A network tool (or a generator) returned something: web text.
+        public var networkText = false
 
-        public init(projectText: Bool = false, folderText: Bool = false, changeResult: Bool = false) {
+        public init(projectText: Bool = false, folderText: Bool = false, changeResult: Bool = false, networkText: Bool = false) {
             self.projectText = projectText
             self.folderText = folderText
             self.changeResult = changeResult
+            self.networkText = networkText
         }
 
         /// Anything that names files: guarded tools are off.
         public var hasUntrustedText: Bool { projectText || folderText || changeResult }
-        /// File or folder text a change could be prompted by: folder changes
-        /// are off (a change's own result isn't: its names are the model's).
-        public var hasFileText: Bool { projectText || folderText }
+        /// Outside text a change could be prompted by -- file, folder or web
+        /// text: folder changes are off (a change's own result isn't: its
+        /// names are the model's).
+        public var hasFileText: Bool { projectText || folderText || networkText }
 
         /// After a call of `kind` returned.
         public mutating func record(_ kind: Kind) {
@@ -45,7 +49,8 @@ public enum ToolTrust {
             case .project: projectText = true
             case .folderRead: folderText = true
             case .folderChange: changeResult = true
-            case .ordinary, .guarded: break
+            case .guarded: networkText = true
+            case .ordinary: break
             }
         }
     }
@@ -96,7 +101,7 @@ public enum ToolTrust {
         + "generator tools are off until the user's next message. Answer in text."
 
     /// The refusal of a folder change after (or beside) a read.
-    public static let changeRefusal = "Not run: folder or file contents were read in this turn, so changes wait for "
+    public static let changeRefusal = "Not run: folder, file or web contents were read in this turn, so changes wait for "
         + "the user's next message. Describe the changes you'd make and ask the user to confirm; then call "
         + "change_files first thing in that turn, without reading again."
 

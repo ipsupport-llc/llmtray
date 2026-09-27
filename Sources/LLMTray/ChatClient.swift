@@ -41,9 +41,16 @@ final class ChatClient: ObservableObject {
     @Published var folderPrompt: FolderAccessPrompt?
     /// The chat's pending folder plan, or the last one's result.
     @Published var folderPlan: FolderPlanModel?
-    /// The chat as the folder grants know it: a saved chat's session id, a
-    /// temporary chat's own id. Its grants and plan end with it.
+    /// The chat as the folder grants know it, per visit: a saved chat's
+    /// session id plus the visit's, a temporary chat's own. Never reused, so
+    /// a call that outlived a visit can't write for the next one; its grants
+    /// and plan end with the visit.
     private(set) var folderChatID = UUID().uuidString
+
+    static func folderChatID(_ session: UUID?) -> String {
+        let visit = UUID().uuidString
+        return session.map { "\($0.uuidString)#\(visit)" } ?? visit
+    }
     /// Waiting in the app-wide generator queue: how many are ahead (the
     /// running one included); nil once it runs.
     @Published private(set) var mediaQueuePosition: Int?
@@ -186,7 +193,7 @@ final class ChatClient: ObservableObject {
         messages.removeAll()
         let id = UUID()
         currentSessionID = id
-        folderChatID = id.uuidString
+        folderChatID = Self.folderChatID(id)
         currentSessionTitle = ""
         sessionCreatedAt = Date()
         titleIsFinal = false
@@ -199,7 +206,7 @@ final class ChatClient: ObservableObject {
         resetConversationState()
         messages.removeAll()
         currentSessionID = nil
-        folderChatID = UUID().uuidString
+        folderChatID = Self.folderChatID(nil)
         currentSessionTitle = ""
         sessionCreatedAt = nil
     }
@@ -253,7 +260,7 @@ final class ChatClient: ObservableObject {
             return message
         }
         currentSessionID = file.id
-        folderChatID = file.id.uuidString
+        folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
         titleIsFinal = true
@@ -531,26 +538,29 @@ final class ChatClient: ObservableObject {
     /// long (a card in the chat); the model may ask again after a deny.
     func allowFolder(level: FolderAccessLevel) {
         guard let chat = folderChat, !(chat.temporary && level > .read) else { return }
+        // A call is waiting on its own question: that one first.
+        guard folderPrompt?.forCall != true else { return }
         let message = level == .change
             ? NSLocalizedString("Choose a folder the chat may propose changes in. You approve every change.", comment: "")
             : NSLocalizedString("Choose a folder the chat may look in.", comment: "")
         guard let picked = FolderAccessManager.shared.pickFolder(message: message) else { return }
         switch picked {
         case .failure(let error):
-            errorText = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), "\(error)")
+            errorText = String(format: NSLocalizedString("That folder can't be shared with the chat: %@", comment: ""), FolderAccessManager.message(error))
         case .success(let root):
             let prompt = FolderAccessPrompt(request: FolderGrantRequest(root: root, level: level),
                                             choices: GrantChoice.offered(temporaryChat: chat.temporary, forCall: false), forCall: false)
-            prompt.onAnswer = { [weak self, weak prompt] choice in
+            prompt.onAnswer = { [weak prompt] choice in
                 do {
                     try FolderAccessManager.shared.userGrant(root, level: level, choice: choice, chat: chat)
-                    if self?.folderPrompt === prompt { self?.folderPrompt = nil }
                 } catch {
-                    prompt?.error = "\(error)"
+                    prompt?.error = FolderAccessManager.message(error)
                 }
             }
-            // A call waiting on a card keeps it; this one shows after.
-            if folderPrompt == nil { folderPrompt = prompt }
+            prompt.onDone = { [weak self, weak prompt] in
+                if let self, self.folderPrompt === prompt { self.folderPrompt = nil }
+            }
+            folderPrompt = prompt
         }
     }
 
@@ -571,13 +581,26 @@ final class ChatClient: ObservableObject {
             card.update(plan)
         } else if folderPlan?.isBusy != true {
             // A new plan: in place of the last one's result.
-            folderPlan = FolderPlanModel(review: PlanReview(plan: plan), chatID: folderChatID)
+            let card = FolderPlanModel(review: PlanReview(plan: plan), chatID: folderChatID)
+            // A plan proposed while this one ran shows once it's done.
+            card.onSettled = { [weak self] in self?.refreshFolderPlan() }
+            folderPlan = card
         }
     }
 
-    func cancelFolderPlan() {
-        folderPlan?.cancel()
+    /// The plan card's Close (or Cancel): a plan waiting behind it shows.
+    func dismissFolderPlan() {
         folderPlan = nil
+        refreshFolderPlan()
+    }
+
+    /// Settings turned folder access off: the plan waiting for approval and
+    /// any open prompt go (a running plan finishes; its result stays).
+    func folderAccessTurnedOff() {
+        folderPrompt?.resolve(nil)
+        folderPrompt = nil
+        FolderAccessManager.shared.service.plans.cancel(chatID: folderChatID)
+        if folderPlan?.isReviewing == true { folderPlan = nil }
     }
 
     /// The turn's first request, with its project and that project's file

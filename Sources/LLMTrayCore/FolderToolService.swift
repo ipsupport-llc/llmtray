@@ -139,8 +139,22 @@ public final class FolderToolService: @unchecked Sendable {
     /// A chat ended: its per-chat and once grants, its denies and its
     /// pending plan go.
     public func endChat(_ chatID: String) {
+        lock.lock()
+        ended.insert(chatID)
+        lock.unlock()
         grants.endChat(chatID)
         plans.cancel(chatID: chatID)
+    }
+
+    private let lock = NSLock()
+    /// Chats ended (ids are never reused: a chat's id is per visit): a call
+    /// that outlived its chat writes nothing for it -- no grant, no plan.
+    private var ended: Set<String> = []
+
+    public func hasEnded(_ chatID: String) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return ended.contains(chatID)
     }
 
     enum GrantStep: Equatable {
@@ -150,18 +164,21 @@ public final class FolderToolService: @unchecked Sendable {
     }
 
     /// Hardening 9: whether to ask, asking, and what the answer does.
-    func obtain(_ request: FolderGrantRequest, chat: FolderChat, callKey: String, ask: Ask) async -> GrantStep {
+    func obtain(_ request: FolderGrantRequest, chat: FolderChat, callKey: String, ask: Ask,
+                isCancelled: @Sendable () -> Bool) async -> GrantStep {
         if chat.temporary, request.level > .read {
             return .refused("Temporary chats can only look at files, not change them.")
         }
         switch grants.shouldPrompt(path: request.root.path, identity: request.root.identity, level: request.level,
                                    chatID: chat.id, origin: .model) {
         case .refuse(let why):
-            return .refused(why + " (They can use Allow Folder… in the chat's folder menu.)")
+            return .refused(Self.blockedNote(why))
         case .prompt:
             break
         }
-        guard let choice = await ask(request) else { return .cancelled }
+        guard !isCancelled(), !hasEnded(chat.id), let choice = await ask(request),
+              // Stopped (or the chat left) while the card was up: nothing is granted.
+              !isCancelled(), !hasEnded(chat.id) else { return .cancelled }
         guard let lifetime = choice.lifetime(callKey: callKey, chatID: chat.id) else {
             grants.deny(request.root, level: request.level, chatID: chat.id)
             // The folder's name as asked (it may be a link's target) stays out.
@@ -170,16 +187,45 @@ public final class FolderToolService: @unchecked Sendable {
         }
         do {
             try grants.grant(request.root, level: request.level, lifetime: lifetime, chatID: chat.id, temporaryChat: chat.temporary)
+            // The chat ended in between: what was just granted for it goes too.
+            if hasEnded(chat.id) {
+                grants.endChat(chat.id)
+                return .cancelled
+            }
             return .granted
         } catch {
             return .refused("The access couldn't be granted (\(error)). Answer without it.")
         }
     }
 
+    static func blockedNote(_ why: String) -> String {
+        why + " (They can use Allow Folder… in the chat's folder menu.)"
+    }
+
+    /// Before anything outside the grants is looked at: whether the model
+    /// may prompt at all in this chat (after a deny it may not, and learns
+    /// nothing about the path).
+    func mayPrompt(_ path: String, level: FolderAccessLevel, chat: FolderChat) -> String? {
+        if case .refuse(let why) = grants.shouldPrompt(path: path, identity: nil, level: level, chatID: chat.id, origin: .model) {
+            return Self.blockedNote(why)
+        }
+        return nil
+    }
+
+    /// What the model is told of a path outside the grants that can't be
+    /// asked for -- missing or never grantable alike: nothing outside a
+    /// grant is visible, its existence included.
+    static func notShareable(_ raw: String) -> String {
+        "\(raw) isn't in a folder shared with this chat, and can't be asked for (it may not exist, or is a system or "
+            + "private place: the home folder itself, Library, keys)"
+    }
+
     // MARK: Paths
 
     enum PathError: Error, Equatable {
         case invalid(String)
+        /// The model may not prompt in this chat now (a deny).
+        case blocked(String)
     }
 
     /// A path as the model wrote it, made absolute: `~`, `file://`, `.` and
@@ -263,13 +309,12 @@ public final class FolderToolService: @unchecked Sendable {
     /// none (nothing there; a place never granted).
     func folderToAsk(for path: String, raw: String) throws -> FolderRoot {
         let spelled = canonicalSpelling(path) ?? path
-        guard let st = Posix.lstatPath(spelled) else { throw PathError.invalid("not found: \(raw)") }
+        guard let st = Posix.lstatPath(spelled) else { throw PathError.invalid(Self.notShareable(raw)) }
         let folder = st.isDirectory ? spelled : (spelled as NSString).deletingLastPathComponent
         do {
             return try makeRoot(folder)
         } catch {
-            throw PathError.invalid("\(raw) can't be shared with the chat: system and private places (the home folder "
-                + "itself, Library, keys) never are")
+            throw PathError.invalid(Self.notShareable(raw))
         }
     }
 
@@ -294,6 +339,7 @@ public final class FolderToolService: @unchecked Sendable {
         }
         var location = authorized(path, level: .read, chat: chat, callKey: callKey)
         if location == nil {
+            if let blocked = mayPrompt(path, level: .read, chat: chat) { return .refused(blocked) }
             let root: FolderRoot
             do {
                 root = try folderToAsk(for: path, raw: raw)
@@ -302,7 +348,8 @@ public final class FolderToolService: @unchecked Sendable {
             } catch {
                 return .text("\(name): \(error).")
             }
-            switch await obtain(FolderGrantRequest(root: root, level: .read), chat: chat, callKey: callKey, ask: ask) {
+            switch await obtain(FolderGrantRequest(root: root, level: .read), chat: chat, callKey: callKey, ask: ask,
+                                isCancelled: isCancelled) {
             case .cancelled: return .refused("Cancelled by the user.")
             case .refused(let why): return .refused(why)
             case .granted: break
@@ -359,7 +406,8 @@ public final class FolderToolService: @unchecked Sendable {
     /// added to the chat's pending plan -- nothing changes (Hardening 3).
     /// Asks for a change grant for the folders the ops need and have none
     /// for (`maxPromptsPerCall` at most). Temporary chats can't change files.
-    public func propose(_ ops: [FolderTools.RawOp], chat: FolderChat, callKey: String, ask: Ask) async -> FolderToolAnswer {
+    public func propose(_ ops: [FolderTools.RawOp], chat: FolderChat, callKey: String, ask: Ask,
+                        isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.changeName
         if chat.temporary { return .refused("Temporary chats can only look at files, not change them. Answer in text.") }
         // Each op's ends, made absolute.
@@ -411,6 +459,8 @@ public final class FolderToolService: @unchecked Sendable {
             let folders: [FolderRoot]
             do {
                 folders = try foldersToAsk(forChanges: missing, chat: chat, callKey: callKey)
+            } catch PathError.blocked(let why) {
+                return .refused(why)
             } catch PathError.invalid(let why) {
                 return .text("\(name): \(why). Nothing was added to the plan.")
             } catch {
@@ -422,7 +472,8 @@ public final class FolderToolService: @unchecked Sendable {
             }
             for root in folders {
                 asked += 1
-                switch await obtain(FolderGrantRequest(root: root, level: .change), chat: chat, callKey: callKey, ask: ask) {
+                switch await obtain(FolderGrantRequest(root: root, level: .change), chat: chat, callKey: callKey, ask: ask,
+                                    isCancelled: isCancelled) {
                 case .cancelled: return .refused("Cancelled by the user.")
                 case .refused(let why): return .refused(why)
                 case .granted: break
@@ -462,7 +513,15 @@ public final class FolderToolService: @unchecked Sendable {
         }
         rejected += result.rejected.map { (opIndex[$0.index], $0.error) }
         rejected.sort { $0.index < $1.index }
+        // Stopped, or the chat left, meanwhile: nothing lands in a plan
+        // nobody sees (a later proposal would carry it along).
+        if isCancelled() || hasEnded(chat.id) { return .refused("Cancelled by the user.") }
         let plan = result.items.isEmpty ? plans.pending(chatID: chat.id) : plans.add(result.items, chatID: chat.id)
+        // Ended in between the check and the add: taken out again.
+        if hasEnded(chat.id) {
+            plans.cancel(chatID: chat.id)
+            return .refused("Cancelled by the user.")
+        }
         return .text(proposalText(added: result.items.count, rejected: rejected, ops: ops, plan: plan))
     }
 
@@ -484,6 +543,8 @@ public final class FolderToolService: @unchecked Sendable {
                 roots.append(read.root)
                 continue
             }
+            // Outside every grant: nothing is looked at while the model may not prompt.
+            if let blocked = mayPrompt(p, level: .change, chat: chat) { throw PathError.blocked(blocked) }
             var folder = (p as NSString).deletingLastPathComponent
             while folder != "/", !folder.isEmpty, Posix.lstatPath(folder) == nil {
                 folder = (folder as NSString).deletingLastPathComponent
@@ -491,8 +552,7 @@ public final class FolderToolService: @unchecked Sendable {
             do {
                 roots.append(try makeRoot(folder))
             } catch {
-                throw PathError.invalid("\(display(p)) can't be changed: its folder can't be shared with the chat "
-                    + "(system and private places, and the home folder itself, never are)")
+                throw PathError.invalid(Self.notShareable(display(p)))
             }
         }
         var out: [FolderRoot] = []

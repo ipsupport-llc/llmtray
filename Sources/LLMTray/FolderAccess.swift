@@ -44,7 +44,12 @@ final class FolderAccessManager: ObservableObject {
         guard on != isEnabled else { return }
         isEnabled = on
         UserDefaults.standard[Pref.folderToolsEnabled] = on
-        if on { start() }
+        if on {
+            start()
+        } else {
+            // Off means off: no plan waits for approval, no prompt for an answer.
+            for chat in ChatTabs.shared.tabs { chat.folderAccessTurnedOff() }
+        }
     }
 
     func refresh() {
@@ -57,16 +62,17 @@ final class FolderAccessManager: ObservableObject {
         }
     }
 
+    /// As the one change in progress: no approval or undo runs beside it.
     private func recover() {
         guard !recovered else { return }
         recovered = true
         let service = self.service
-        Task.detached {
-            let found = service.recoverInterrupted()
-            await MainActor.run {
-                FolderAccessManager.shared.recoveries = found
-                FolderAccessManager.shared.refresh()
+        Task {
+            guard let found = await change({ service.recoverInterrupted() }) else {
+                recovered = false   // something else ran: next time
+                return
             }
+            recoveries = found
         }
     }
 
@@ -124,6 +130,26 @@ final class FolderAccessManager: ObservableObject {
 
     static func display(_ path: String) -> String { FolderToolText.display(path, home: NSHomeDirectory()) }
 
+    /// An error as the user reads it: the known ones in their language.
+    static func message(_ error: Error) -> String {
+        switch error {
+        case ChangePlanError.stale, ChangePlanError.notThePlanReviewed:
+            return NSLocalizedString("The plan changed since you looked at it: review it again.", comment: "folder plan error")
+        case ChangePlanError.nothingPending:
+            return NSLocalizedString("There's no plan waiting any more.", comment: "folder plan error")
+        case ChangePlanError.invalidated:
+            return NSLocalizedString("Some items changed on disk since they were proposed: untick them, or ask again.", comment: "folder plan error")
+        case ChangePlanError.missingDependency:
+            return NSLocalizedString("An item needs the new folder it goes into: tick that folder too.", comment: "folder plan error")
+        case FolderGrants.GrantError.temporaryChat, ChangePlanError.temporaryChat:
+            return NSLocalizedString("Temporary chats can only look in folders, for that chat only.", comment: "folder grant error")
+        case FolderAccessError.notGrantable, FolderAccessError.notFound, FolderAccessError.symlink:
+            return NSLocalizedString("System and private places (the home folder itself, Library, Applications, keys) are never shared.", comment: "folder grant error")
+        default:
+            return "\(error)"
+        }
+    }
+
     /// A grant's lifetime, for Settings and the chat's menu.
     static func lifetimeText(_ grant: FolderGrant) -> String {
         switch grant.lifetime {
@@ -155,6 +181,8 @@ final class FolderAccessPrompt: ObservableObject, Identifiable {
     private var continuation: CheckedContinuation<GrantChoice?, Never>?
     /// The user's own grant: what the answer does.
     var onAnswer: ((GrantChoice) -> Void)?
+    /// Any answer, Cancel included: the card goes (a user's own card).
+    var onDone: (() -> Void)?
     @Published var error: String?
 
     init(request: FolderGrantRequest, choices: [GrantChoice], forCall: Bool) {
@@ -178,6 +206,8 @@ final class FolderAccessPrompt: ObservableObject, Identifiable {
         if let choice { onAnswer?(choice) }
         continuation?.resume(returning: choice)
         continuation = nil
+        // Not while its grant failed: the card says why.
+        if error == nil { onDone?() }
     }
 }
 
@@ -200,6 +230,8 @@ final class FolderPlanModel: ObservableObject, Identifiable {
     /// Why the last approval was refused (stale, changed since...).
     @Published var message: String?
     @Published var expanded = false
+    /// The run or its undo ended: a plan proposed meanwhile can show.
+    var onSettled: (() -> Void)?
     private var service: FolderToolService { FolderAccessManager.shared.service }
 
     init(review: PlanReview, chatID: String) {
@@ -247,6 +279,11 @@ final class FolderPlanModel: ObservableObject, Identifiable {
     /// Approves the ticked items of the plan as reviewed, then runs them.
     func approve() {
         guard phase == .review, !review.approvable.isEmpty else { return }
+        // Turned off in Settings meanwhile: nothing runs.
+        guard FolderAccessManager.shared.isEnabled else {
+            message = NSLocalizedString("Folder access is off in Settings.", comment: "")
+            return
+        }
         let review = self.review
         let service = self.service
         message = nil
@@ -275,13 +312,14 @@ final class FolderPlanModel: ObservableObject, Identifiable {
                 self.message = NSLocalizedString("Another folder change is running: try again when it's done.", comment: "")
             case .failure(let error)?:
                 self.phase = .review
-                self.message = "\(error)"
+                self.message = FolderAccessManager.message(error)
                 if let plan = service.plans.pending(chatID: self.chatID) {
                     self.review = PlanReview(plan: plan, previous: self.review)
                     self.checkItems()
                 }
             case .success(let (result, planID))?:
                 self.phase = .finished(result, planID: planID)
+                self.onSettled?()
             }
         }
     }
@@ -293,7 +331,10 @@ final class FolderPlanModel: ObservableObject, Identifiable {
         Task { [weak self] in
             let report = await FolderAccessManager.shared.undo(planID)
             guard let self else { return }
-            if let report { self.phase = .undone(report) } else {
+            if let report {
+                self.phase = .undone(report)
+                self.onSettled?()
+            } else {
                 self.phase = .finished(outcome, planID: planID)
                 self.message = NSLocalizedString("Another folder change is running: try again when it's done.", comment: "")
             }
@@ -429,7 +470,9 @@ final class ChangeFilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let ask = context.askFolderAccess ?? { _ in nil }
         let key = context.callKey
-        let answer = await offMain { _ in await service.propose(ops, chat: chat, callKey: key, ask: ask) }
+        let answer = await offMain { isCancelled in
+            await service.propose(ops, chat: chat, callKey: key, ask: ask, isCancelled: isCancelled)
+        }
         return answer.toolResult
     }
 }

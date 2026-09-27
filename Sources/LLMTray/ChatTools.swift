@@ -380,7 +380,10 @@ final class ChatToolbox {
                                                    + "available: \(on.joined(separator: ", "))"), .error("unavailable"))
             }
         }
-        return finish(await tool.run(arguments.values, context: context))
+        let result = await tool.run(arguments.values, context: context)
+        // A web (or generator) result: no folder change is prompted by it this turn.
+        if kind == .guarded { turnTrust.record(kind) }
+        return finish(result)
     }
 
     /// The error for arguments that couldn't be understood, as the tool's

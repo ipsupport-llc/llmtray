@@ -11,16 +11,22 @@ public struct PlanReview: Equatable, Sendable {
     /// shown, never approvable.
     public var invalid: [Int: String]
 
+    /// Items a newer revision added since the review began: unticked until
+    /// the user ticks them (a Return or a quick click never approves what
+    /// they haven't seen).
+    public private(set) var added: Set<Int> = []
+
     /// A review of `plan`; a newer revision of the plan reviewed in
-    /// `previous` keeps the user's choices for the items it had (new items
-    /// start ticked).
+    /// `previous` keeps the user's choices for the items it had, and the
+    /// new items start unticked.
     public init(plan: ChangePlan, previous: PlanReview? = nil, invalid: [Int: String] = [:]) {
         self.plan = plan
         self.invalid = invalid
         let ids = Set(plan.items.map(\.id))
         if let previous, previous.plan.id == plan.id {
             let known = Set(previous.plan.items.map(\.id))
-            selected = previous.selected.intersection(ids).union(ids.subtracting(known))
+            selected = previous.selected.intersection(ids)
+            added = previous.added.intersection(ids).union(ids.subtracting(known))
         } else {
             selected = ids
         }
@@ -38,6 +44,7 @@ public struct PlanReview: Equatable, Sendable {
     /// needs; unticking a make_dir unticks what goes into it.
     public mutating func set(_ id: Int, selected on: Bool) {
         guard plan.items.contains(where: { $0.id == id }) else { return }
+        added.remove(id)   // looked at now
         if on {
             var add: [Int] = [id]
             while let next = add.popLast() {
@@ -55,6 +62,7 @@ public struct PlanReview: Equatable, Sendable {
 
     public mutating func setAll(_ on: Bool) {
         selected = on ? Set(plan.items.map(\.id)) : []
+        added = []
     }
 
     /// Without items whose make_dir parents aren't in the set.

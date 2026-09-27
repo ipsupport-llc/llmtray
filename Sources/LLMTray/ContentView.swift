@@ -295,7 +295,7 @@ struct ContentView: View {
                     // Folder access (adr/0014): the plan waiting for approval
                     // (or its result), and a grant prompt a call waits for.
                     if let plan = chat.folderPlan {
-                        FolderPlanCard(model: plan, dismiss: { chat.folderPlan = nil }).id(plan.id)
+                        FolderPlanCard(model: plan, dismiss: { chat.dismissFolderPlan() }).id(plan.id)
                     }
                     if let prompt = chat.folderPrompt {
                         FolderPromptCard(prompt: prompt).id(prompt.id)

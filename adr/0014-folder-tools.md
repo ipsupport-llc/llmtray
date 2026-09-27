@@ -230,12 +230,20 @@ into it; approval, execution, undo, launch recovery), `FolderToolText`
 names framed as data, only paths inside grants), `PlanReview` (ticks that
 follow make_dir dependencies, counts, warnings). `ToolTrust.TurnState`
 carries the barrier: a folder read (or project text) holds back folder
-changes and guarded tools, a change's result holds back guarded tools. The
+changes and guarded tools, a web result holds back folder changes, a
+change's result holds back guarded tools. Items a newer revision adds to a
+plan under review start unticked, and Approve has no Return shortcut. The
 app: `FilesTool` / `ChangeFilesTool` (`ChatTool.folderAccess`), the grant
 prompt and plan cards in the chat (`FolderViews.swift`; a call waits on the
 prompt like a Creator mode draft), the chat's folder menu (Allow Folder…, the
-chat's folders, Revoke), Settings > Folders. A chat's per-chat grants,
-denies and pending plan end when the chat is left or its tab closed.
+chat's folders, Revoke), Settings > Folders. A chat's id for the grants
+is per visit (the session id plus a visit's): its per-chat grants, denies
+and pending plan end when the chat is left or its tab closed, and a call
+that outlived the visit writes nothing (`FolderToolService.hasEnded`).
+Outside the grants nothing is looked at before the prompt rules allow a
+prompt, and a missing path reads like one never grantable. Launch
+recovery runs as the one change in progress; turning the feature off
+drops the plans waiting for approval.
 
 ## Plan
 
