@@ -90,11 +90,14 @@ final class RuntimeManager: ObservableObject {
     func applyUpdate(to commit: String) {
         checkState = .updating
         Task {
-            await MLXRuntimeInstaller.waitForSetup()
             do {
-                let archive = RuntimePin.archiveURL(RuntimePin.Pin(repo: Self.repo, ref: commit))
-                try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", archive])
-                try writePinnedVersion(commit)
+                // After a setup that's running (the setup wizard's), and a
+                // Start meanwhile waits for this one.
+                try await MLXRuntimeInstaller.exclusively { [self] in
+                    let archive = RuntimePin.archiveURL(RuntimePin.Pin(repo: Self.repo, ref: commit))
+                    try await ProcessRunner.run(venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", archive])
+                    try writePinnedVersion(commit)
+                }
                 checkState = .upToDate(commit)
             } catch {
                 checkState = .failed("update failed: \(error.localizedDescription)")

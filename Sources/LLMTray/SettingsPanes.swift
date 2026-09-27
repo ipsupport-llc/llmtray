@@ -1228,13 +1228,7 @@ struct UpdatesPane: View {
 
     private func uninstallRuntime() {
         // The setup wizard (or a Start) is making the venv this deletes.
-        guard !MLXRuntimeInstaller.isSettingUp else {
-            let busy = NSAlert()
-            busy.messageText = NSLocalizedString("The runtime is being set up.", comment: "")
-            busy.informativeText = NSLocalizedString("Try again once that's done.", comment: "")
-            busy.runModal()
-            return
-        }
+        guard !MLXRuntimeInstaller.isSettingUp else { return runtimeBusy() }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Uninstall runtime data?", comment: "")
         alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
@@ -1242,7 +1236,16 @@ struct UpdatesPane: View {
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         alert.alertStyle = .warning
         guard alert.runModal() == .alertFirstButtonReturn else { return }
+        // A setup may have started while the alert was up.
+        guard !MLXRuntimeInstaller.isSettingUp else { return runtimeBusy() }
         server.removeExternalRuntime()
+    }
+
+    private func runtimeBusy() {
+        let busy = NSAlert()
+        busy.messageText = NSLocalizedString("The runtime is being set up.", comment: "")
+        busy.informativeText = NSLocalizedString("Try again once that's done.", comment: "")
+        busy.runModal()
     }
 }
 

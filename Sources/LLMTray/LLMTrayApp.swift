@@ -275,7 +275,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // after the reap: a chat model already in place starts the
             // server at once.
             self?.downloadQueue.resume()
-            if UserDefaults.standard[Pref.autoStartOnLaunch] {
+            // Not under a resumed setup wizard (its Apps step changes the
+            // port): it starts the chosen model when it's closed.
+            if UserDefaults.standard[Pref.autoStartOnLaunch], self?.setupWizard.isOpen != true {
                 self?.quickStart()
             }
         }
@@ -537,8 +539,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .stopped, .failed:
             Task { await attemptStart(retriesLeft: 1) }
         case .running:
-            guard let model = ModelCatalog.shared.model(id: UserDefaults.standard[Pref.selectedModelID]),
-                  model.path != server.loadedModelPath, !tabs.isAnyBusy else { return }
+            // As picking it in the popover: not mid-turn or under a benchmark
+            // (the header's Load is there after).
+            guard OperationAvailability(server: server, benchmark: benchmark).canSwitchModel, !tabs.isAnyBusy,
+                  let model = ModelCatalog.shared.model(id: UserDefaults.standard[Pref.selectedModelID]),
+                  model.path != server.loadedModelPath else { return }
             let server = self.server
             Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
         default:
@@ -552,6 +557,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func downloadFinished(_ item: DownloadQueueState.Item) {
         let defaults = UserDefaults.standard
         guard item.kind == .chatModel, item.target == defaults[Pref.onboardingStartServerFor] else { return }
+        if item.status == .cancelled {
+            defaults[Pref.onboardingStartServerFor] = nil
+            return
+        }
         // Not under the open wizard (its Apps step changes the port): it
         // starts the model when it's closed or finished.
         guard !setupWizard.isOpen else { return }

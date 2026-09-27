@@ -205,4 +205,13 @@ final class SetupWizardTests: XCTestCase {
         XCTAssertEqual(progress.choices.modelsFolder, base.modelsFolder)
         XCTAssertEqual(progress.baseline.modelsFolder, base.modelsFolder)
     }
+
+    func testProgressSavedWithoutTheOpeningSettingsStillResumes() throws {
+        let saved = SetupProgress(step: .extras, choices: base, startedAutomatically: true)
+        var json = try JSONSerialization.jsonObject(with: JSONEncoder().encode(saved)) as! [String: Any]
+        json["original"] = nil
+        let decoded = try JSONDecoder().decode(SetupProgress.self, from: JSONSerialization.data(withJSONObject: json))
+        XCTAssertEqual(decoded.original, decoded.baseline)
+        XCTAssertEqual(decoded.step, .extras)
+    }
 }

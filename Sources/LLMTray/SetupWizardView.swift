@@ -110,7 +110,7 @@ struct SetupWizardView: View {
                     .help(Text("Closes this window. Settings › General › Set Up LLMTray… opens it again."))
             } else if model.step != .done {
                 Button("Skip") { model.skip() }
-                    .help(Text("Leaves this step as it was and goes on."))
+                    .help(Text("Puts this step back to how it was when setup opened, and goes on."))
             }
             Spacer()
             if model.step != .welcome, !model.isFinished {

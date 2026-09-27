@@ -157,6 +157,20 @@ public struct SetupProgress: Codable, Equatable, Sendable {
     /// once it's there.
     public var startsServer: Bool
 
+    private enum CodingKeys: String, CodingKey { case step, choices, baseline, original, startedAutomatically, startsServer }
+
+    /// Lenient: progress saved without `original` (an earlier build)
+    /// takes the baseline for it.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        step = try c.decode(SetupStep.self, forKey: .step)
+        choices = try c.decode(SetupChoices.self, forKey: .choices)
+        baseline = try c.decode(SetupChoices.self, forKey: .baseline)
+        original = try c.decodeIfPresent(SetupChoices.self, forKey: .original) ?? baseline
+        startedAutomatically = try c.decode(Bool.self, forKey: .startedAutomatically)
+        startsServer = try c.decode(Bool.self, forKey: .startsServer)
+    }
+
     public init(step: SetupStep = .welcome, choices: SetupChoices, baseline: SetupChoices? = nil,
                 startedAutomatically: Bool, startsServer: Bool = false) {
         self.step = step

@@ -157,9 +157,9 @@ guided front end to the same code, not a second configuration path.
   model still starts the server. That start waits until the wizard is
   closed (its Apps step changes the port); with another model running,
   it's switched to, as in the popover. The folder can't change while the
-  wizard's download runs into it.
+  wizard's download runs into it (Skip on that step leaves it too).
 - `MLXRuntimeInstaller.ensureReady` is shared by concurrent callers (the
-  wizard's step 2 and a Start); the runtime update waits for it and
+  wizard's step 2 and a Start); the runtime update takes the same slot (a Start waits for it) and
   Uninstall refuses meanwhile. The chat model the wizard downloads
   starts the server when it's in place (`Pref.onboardingStartServerFor`,
   AppDelegate). The queue gained the embedder (project files) and a

@@ -133,6 +133,13 @@ final class SetupWizardModel: ObservableObject {
             close?()
             return
         }
+        // The wizard's download runs into the folder applied: it stays
+        // until that's done (as the folder picker does).
+        if step == .modelsFolder, isWizardDownloadActive {
+            progress.choices.modelsFolder = progress.baseline.modelsFolder
+            progress.step = .chatModel
+            return
+        }
         perform(progress.skip())
     }
 
@@ -303,6 +310,11 @@ final class SetupWizardModel: ObservableObject {
         queue.addChatModel(repo: repo, approxBytes: pick.sizeBytes)
     }
 
+    /// `repo` waits, runs, or failed (to be retried) in the queue.
+    private func hasQueuedDownload(_ repo: String) -> Bool {
+        queue.state.items.contains { $0.kind == .chatModel && $0.target == repo && $0.status != .cancelled && $0.status != .done }
+    }
+
     /// The wizard's chat download is waiting or running.
     var isWizardDownloadActive: Bool {
         guard let repo = selectedDownloadRepo else { return false }
@@ -460,7 +472,9 @@ final class SetupWizardModel: ObservableObject {
         case .download(let repo, _):
             let root = ModelDiscovery.currentModelsRoot()
             guard DownloadQueue.isComplete(repo, root: root) else {
-                UserDefaults.standard[Pref.onboardingStartServerFor] = repo
+                // Waits for the download, unless it was cancelled (or
+                // dismissed after failing): then nothing is coming.
+                UserDefaults.standard[Pref.onboardingStartServerFor] = hasQueuedDownload(repo) ? repo : nil
                 return
             }
             UserDefaults.standard[Pref.onboardingStartServerFor] = nil
@@ -518,6 +532,7 @@ final class SetupWizardModel: ObservableObject {
                 case .local(let path):
                     return String(format: NSLocalizedString("The server starts with %@", comment: "setup summary"), LocalModel(path: path).displayName)
                 case .download(let repo, _):
+                    guard isWizardDownloadComplete || hasQueuedDownload(repo) else { return nil }
                     return String(format: NSLocalizedString("The server starts once %@ is downloaded", comment: "setup summary"), repo)
                 case nil:
                     return nil

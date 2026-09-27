@@ -205,20 +205,23 @@ final class MLXRuntimeInstaller {
     /// A setup is running (the wizard's, a Start's).
     static var isSettingUp: Bool { setup != nil }
 
-    /// Returns once no setup runs (whatever its outcome): the runtime
-    /// update mustn't pip into the venv a setup is making.
-    static func waitForSetup() async {
+    /// `body` once no other setup or runtime update runs, and none starts
+    /// until it's done: two pips never work on the venv at once. (Nothing
+    /// awaits between the wait and taking the slot.)
+    static func exclusively(_ body: @escaping @MainActor () async throws -> Void) async throws {
         while let running = setup { _ = try? await running.value }
+        let task = Task { @MainActor in
+            defer { setup = nil }
+            try await body()
+        }
+        setup = task
+        try await task.value
     }
 
+    /// A caller arriving while another setup runs waits for it; install()
+    /// then finds the runtime ready and returns at once.
     func ensureReady() async throws {
-        if let running = Self.setup { return try await running.value }
-        let task = Task { @MainActor in
-            defer { Self.setup = nil }
-            try await self.install()
-        }
-        Self.setup = task
-        try await task.value
+        try await Self.exclusively { try await self.install() }
     }
 
     private func install() async throws {

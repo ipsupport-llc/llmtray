@@ -291,7 +291,6 @@
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
 "Leave a Review" = "Leave a Review";
-"Leaves this step as it was and goes on." = "Leaves this step as it was and goes on.";
 "Let coding agents and scripts use your models." = "Let coding agents and scripts use your models.";
 "Library" = "Library";
 "Like LLMTray?" = "Like LLMTray?";
@@ -420,6 +419,7 @@
 "Prompt size" = "Prompt size";
 "Prompt size (input sent to the model):" = "Prompt size (input sent to the model):";
 "Public holidays" = "Public holidays";
+"Puts this step back to how it was when setup opened, and goes on." = "Puts this step back to how it was when setup opened, and goes on.";
 "Quantization group size for the KV cache. 64 is a good default." = "Quantization group size for the KV cache. 64 is a good default.";
 "Quantize KV from token" = "Quantize KV from token";
 "Quick benchmark" = "Quick benchmark";
