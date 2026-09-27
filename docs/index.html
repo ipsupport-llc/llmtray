@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LLMTray — Run Local AI on Mac · MLX LLM GUI for macOS</title>
 <meta name="description" content="Run local AI on Mac with LLMTray, an MLX local LLM GUI for macOS: an OpenAI-compatible local API on Apple Silicon for apps and local AI coding agents, chat with tools, and local image generation and editing.">
-<meta name="keywords" content="run local AI on Mac, MLX local LLM GUI for macOS, OpenAI-compatible local API on Apple Silicon, local image generation and editing on Mac, local AI coding agents on Mac, mlx-lm, local LLM, menu bar app">
 <meta name="robots" content="index, follow">
 <meta name="google-site-verification" content="vPSnv-ACweVU7zedD6wmncgyS5txK4xSHu5ZJ_OzHII" />
 <link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/">
@@ -18,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="LLMTray">
 <meta property="og:title" content="LLMTray — Run local AI on Mac">
-<meta property="og:description" content="An MLX local LLM GUI for macOS: an OpenAI-compatible local API on Apple Silicon, local AI coding agents, chat with tools, and local image generation and editing. Native Swift, nothing leaves your Mac.">
+<meta property="og:description" content="An MLX local LLM GUI for macOS: an OpenAI-compatible local API on Apple Silicon, local AI coding agents, chat with tools, and local image generation and editing. Native Swift; models run on your Mac.">
 <meta property="og:url" content="https://ipsupport-llc.github.io/llmtray/">
 <meta property="og:image" content="https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -34,9 +33,8 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "LLMTray",
-  "alternateName": "LLMTray — MLX local LLM GUI for macOS",
   "url": "https://ipsupport-llc.github.io/llmtray/",
-  "description": "Run local AI on Mac: LLMTray is a native MLX local LLM GUI for macOS. It serves an OpenAI-compatible local API on Apple Silicon for apps, editors and local AI coding agents, chats with tools, and does local image generation and editing and local music generation. Everything runs on the Mac.",
+  "description": "Run local AI on Mac: LLMTray is a native MLX local LLM GUI for macOS. It serves an OpenAI-compatible local API on Apple Silicon for apps, editors and local AI coding agents, chats with tools, and does local image generation and editing and local music generation. Models run on the Mac; only the optional web tools reach the internet.",
   "applicationCategory": "DeveloperApplication",
   "applicationSubCategory": "Local AI / LLM",
   "operatingSystem": "macOS 13 or later (Apple Silicon)",
@@ -47,17 +45,15 @@
     "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg",
     "https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"
   ],
-  "fileSize": "3MB (Light) / 254MB (Full)",
   "softwareRequirements": "Apple Silicon Mac; Light build: Python 3.10+",
   "screenshot": "https://ipsupport-llc.github.io/llmtray/assets/screenshot-popover.png",
   "image": "https://ipsupport-llc.github.io/llmtray/assets/og-image.jpg",
   "featureList": [
-    "Run local AI on Mac from the menu bar",
-    "MLX local LLM GUI for macOS (mlx-lm on Apple Silicon)",
-    "OpenAI-compatible local API on Apple Silicon (/v1/chat/completions), switching models per request",
-    "A local backend for local AI coding agents and editors on Mac",
+    "Menu bar control of local models (mlx-lm on Apple Silicon)",
+    "OpenAI-compatible /v1/chat/completions on localhost, switching models by request",
+    "A local backend for coding agents and editors",
     "Chat with tabs, projects, reasoning and tools (web search, Wikipedia, weather, calculator)",
-    "Local image generation and editing on Mac (Z-Image Turbo, FLUX.2 klein)",
+    "Image generation and editing (Z-Image Turbo, FLUX.2 klein)",
     "Local music generation with sung lyrics (ACE-Step 1.5)",
     "Hugging Face model browser with resumable downloads",
     "Per-model profiles, KV-cache quantization, speculative decoding"
@@ -249,7 +245,7 @@
     <header>
       <img class="icon-img" src="assets/icon-512.png" alt="LLMTray icon: run local AI on Mac">
       <h1>LLMTray</h1>
-      <p class="tagline">Run local AI on Mac, from the menu bar. An MLX local LLM GUI for macOS, and nothing leaves your Mac.</p>
+      <p class="tagline">Run local AI on Mac, from the menu bar. An MLX local LLM GUI for macOS: the models run on your own GPU.</p>
       <div class="cta">
         <div class="cta-buttons">
           <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">
@@ -275,7 +271,7 @@
 
     <section>
       <h2>Run local AI on Mac</h2>
-      <p style="color: var(--fg-muted);">Pick a model and LLMTray starts it on your Mac's GPU with <a href="https://github.com/ml-explore/mlx-lm">mlx-lm</a>. There is no terminal, no cloud account and no API key. Your prompts, files and images stay on the machine.</p>
+      <p style="color: var(--fg-muted);">Pick a model and LLMTray starts it on your Mac's GPU with <a href="https://github.com/ml-explore/mlx-lm">mlx-lm</a>. There is no terminal, no cloud account and no API key. The models, and what you give them, stay on the machine. Only the optional web tools (search, news, Wikipedia, weather) send their queries out, and only when the model calls them.</p>
     </section>
 
     <section>
@@ -302,7 +298,7 @@
 
     <section>
       <h2>OpenAI-compatible local API on Apple Silicon</h2>
-      <p style="color: var(--fg-muted);">LLMTray serves <code>http://localhost:8765/v1</code>, which is OpenAI-compatible. Each request names its model, and LLMTray switches to it. A setting decides whether an outside client may switch models at once, must ask first, or gets the loaded one. Network access is off by default and can be enabled for your local network.</p>
+      <p style="color: var(--fg-muted);">LLMTray serves <code>http://localhost:8765/v1</code>, which is OpenAI-compatible. A client can name a model in each request, and LLMTray switches to it (without one, the loaded model answers). A setting decides whether an outside client may switch models at once, must ask first, or gets the loaded one. Network access is off by default and can be enabled for your local network.</p>
       <pre><code>curl http://localhost:8765/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model": "&lt;a model from /v1/models&gt;", "messages": [{"role": "user", "content": "Hello"}]}'</code></pre>
@@ -310,7 +306,7 @@
 
     <section>
       <h2>Local AI coding agents on Mac</h2>
-      <p style="color: var(--fg-muted);">Point any OpenAI-compatible coding agent, editor extension or script at the local endpoint, and your code never leaves the Mac. The model's profile fills in its sampling defaults for external clients too. Switch between a chat model and a coding model without restarting anything.</p>
+      <p style="color: var(--fg-muted);">Point any OpenAI-compatible coding agent, editor extension or script at the local endpoint, and the model reading your code runs on the Mac. The model's profile fills in its sampling defaults for external clients too. Switch between a chat model and a coding model without restarting anything.</p>
       <pre><code>export OPENAI_BASE_URL=http://localhost:8765/v1
 export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code></pre>
     </section>

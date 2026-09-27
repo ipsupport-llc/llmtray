@@ -7,7 +7,7 @@
 - **local image generation and editing on Mac**;
 - local music generation.
 
-Nothing leaves your Mac.
+The models run on your Mac. Only the optional web tools reach the internet.
 
 <p align="center">
   <img src="docs/assets/screenshot-popover.png" width="360" alt="LLMTray's menu bar popover, showing a running server, model picker, and chat settings">
@@ -25,7 +25,7 @@ Nothing leaves your Mac.
 
 ## What it does
 
-- **OpenAI-compatible local API on Apple Silicon** at `http://localhost:8765/v1`. Each request names its model, and LLMTray switches to it. A setting decides whether outside clients may switch the loaded model, must ask first, or keep what's loaded.
+- **OpenAI-compatible local API on Apple Silicon** at `http://localhost:8765/v1`. A client can name a model in each request, and LLMTray switches to it (without one, the loaded model answers). A setting decides whether outside clients may switch the loaded model, must ask first, or keep what's loaded.
 - **Local AI coding agents on Mac.** Point any OpenAI-compatible agent or editor at that endpoint (`OPENAI_BASE_URL=http://localhost:8765/v1`), and the model's profile fills in its sampling defaults.
 - **Local image generation and editing on Mac.** The chat model calls Z-Image Turbo or FLUX.2 klein, using our GPTQ checkpoints on Hugging Face, and edits photos with klein. Also local music with sung lyrics (ACE-Step 1.5), and a Creator mode for reviewing a prompt before anything is made. All optional, and downloaded only when turned on in Settings.
 - **Chat** with tabs, projects and their instructions, and tools (web search, news, Wikipedia, weather, calculator, …).
