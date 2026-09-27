@@ -591,6 +591,11 @@ public struct ChangeUndo {
         }
         guard let staged = try Posix.lstatAt(pfd, st.name) else {
             out.restored = try trashNeverRan()
+            // Its folder made and gone, the item not under its name: the Trash
+            // may have taken it (a crash between the cleanup and `done`).
+            if !out.restored, st.kind == .trash, stagingIdentity != nil, let s = item.source {
+                throw Uncertain(description: "interrupted: \(s.location.relativePath) isn't in its place; it may be in the Trash")
+            }
             return out
         }
         // Something to change: only while a change grant still covers it.

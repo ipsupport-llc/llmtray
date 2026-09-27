@@ -51,7 +51,8 @@ public struct ListingPage: Codable, Equatable, Sendable {
     public var protectedInside: ProtectedContents? = nil
     /// Matching entries found (all of them, unless `scanTruncated`).
     public var total: Int
-    /// The scan stopped at its cap: there may be more than `total`.
+    /// The scan stopped at its cap, or a subfolder couldn't be entered: there
+    /// may be more than `total`.
     public var scanTruncated: Bool
     public var nextCursor: String?
 }
@@ -165,8 +166,10 @@ public struct FolderFiles {
                                        notDownloaded: e.stat.isDataless ? true : nil))
                 }
                 if q.recursive, e.kind == .directory, depth + 1 <= limits.maxDepth,
-                   e.identity.device == dir.descriptor.identity.device,
-                   let sub = try? walker.step(dir, e.name) {
+                   e.identity.device == dir.descriptor.identity.device {
+                    // A subfolder that can't be entered (changed or unreadable
+                    // since it was listed) makes the listing incomplete.
+                    guard let sub = try? walker.step(dir, e.name) else { truncated = true; return }
                     try scan(sub, depth: depth + 1)
                 }
             }

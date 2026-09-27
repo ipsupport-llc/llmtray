@@ -1,6 +1,6 @@
 # 0014 — Folder tools: the chat works in folders the user grants
 
-**Status: accepted** (2026-09-26, by the user). Nothing is built yet.
+**Status: accepted** (2026-09-26, by the user). Core (LLMTrayCore) in progress: PR #115.
 
 ## Decision
 

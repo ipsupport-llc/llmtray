@@ -188,6 +188,17 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(state(plan), .incomplete, "its outcome still needs a look")
     }
 
+    func testATrashCrashedAfterItsCleanupNeedsALook() throws {
+        write("t/w.txt", "w")
+        let plan = try crashed([rm("t/w.txt")], at: .trashed)
+        // As if the crash came after the staging folder went, before `done`.
+        try fm.removeItem(atPath: grant + "/t/" + StagingRecord.name(.trash, planID: plan.plan.id, item: plan.plan.items[0].id))
+        let r = undoer.recoverInterrupted()
+        XCTAssertEqual(r.map(\.planID), [plan.plan.id], "reported, not skipped")
+        XCTAssertTrue(r.first?.needsLook[plan.plan.items[0].id]?.contains("Trash") ?? false, "\(r)")
+        XCTAssertEqual(state(plan), .incomplete)
+    }
+
     func testARecoveryDoesntOverwriteANameTakenSince() throws {
         write("t/x.txt", "mine")
         let plan = try crashed([rm("t/x.txt")], at: .itemStaged)
@@ -484,6 +495,18 @@ final class FolderSecurityReviewTests: FolderTestCase {
         XCTAssertEqual(r.undone, [])
         XCTAssertEqual(try String(contentsOfFile: grant + "/u.txt"), "u")
         XCTAssertEqual(staging().count, 1, "its empty staging folder is reported, not removed")
+    }
+
+    func testARecursiveListingThatCantEnterASubfolderSaysItIsIncomplete() throws {
+        write("l/a.txt", "a")
+        write("l/locked/b.txt", "b")
+        let locked = grant + "/l/locked"
+        XCTAssertEqual(chmod(locked, 0), 0)
+        defer { _ = chmod(locked, 0o755) }
+        let files = FolderFiles(walker: walker)
+        guard case .listing(let page) = try files.run(FolderQuery(components: ["l"], recursive: true)) else { return XCTFail() }
+        XCTAssertTrue(page.scanTruncated, "a subfolder was skipped")
+        XCTAssertTrue(page.entries.contains { $0.path == "l/locked" })
     }
 
     func testTheProtectedScanIsHeldToTheItemsIdentity() throws {
