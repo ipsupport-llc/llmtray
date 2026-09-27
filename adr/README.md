@@ -19,5 +19,6 @@ here; this is where the history lives.
 | [0011](0011-creator-mode-and-media-variants.md) | Creator mode, Regenerate / Tweak / Remove, media sources |
 | [0012](0012-project-files-rag.md) | Project files, a local micro-RAG (SQLite FTS5 + vectors, bge-m3, tiered OCR) |
 | [0013](0013-first-run-wizard.md) | The first-run wizard |
+| [0014](0014-folder-tools.md) | Folder tools: listing, file info, moving and deleting in folders the user grants |
 
 New ADR: next number, one topic, the decision first, then why.
