@@ -23,6 +23,11 @@ final class ModelCatalog: ObservableObject {
     /// Free space on the models folder's volume (what macOS would make
     /// available for an important download, incl. purgeable space).
     @Published private(set) var freeBytes: Int64?
+    /// Each model's weights (its .safetensors) and this Mac's GPU limit,
+    /// for the "barely fits the GPU" notice (fit(for:)); refreshed with the
+    /// sizes, so a limit raised with sysctl shows at the next rescan.
+    @Published private(set) var weights: [String: Int64] = [:]
+    @Published private(set) var hardware: HardwareInfo?
     var totalBytes: Int64 { sizes.values.reduce(0, +) }
     private(set) var root: String = ModelDiscovery.currentModelsRoot()
     private var observers: [AnyCancellable] = []
@@ -62,17 +67,29 @@ final class ModelCatalog: ObservableObject {
         let root = root
         usageTask = Task.detached(priority: .utility) { [weak self] in
             let free = DiskUsage.freeSpace(at: root)
+            let hardware = HardwareProbe.current()
             var sizes: [String: Int64] = [:]
+            var weights: [String: Int64] = [:]
             for path in paths {
                 if Task.isCancelled { return }
                 sizes[path] = DiskUsage.directorySize(path)
+                weights[path] = ModelWeights.bytes(inFolder: path)
             }
-            await MainActor.run { [weak self, sizes] in
+            await MainActor.run { [weak self, sizes, weights] in
                 guard let self, !Task.isCancelled else { return }
                 if self.freeBytes != free { self.freeBytes = free }
                 if self.sizes != sizes { self.sizes = sizes }
+                if self.weights != weights { self.weights = weights }
+                if self.hardware != hardware { self.hardware = hardware }
             }
         }
+    }
+
+    /// The model barely fits the GPU (GPUFit), or nil: fits, or not
+    /// measured yet.
+    func fit(for modelID: String?) -> GPUFit? {
+        guard let modelID, let bytes = weights[modelID], let hardware else { return nil }
+        return GPUFit(weightsBytes: bytes, hardware: hardware)
     }
 
     static let byteFormatter: ByteCountFormatter = {

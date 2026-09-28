@@ -86,8 +86,18 @@ struct ChatHeaderView: View {
             }
             modelSwitchRow
             RestartBanner()
+            if let fit = catalog.fit(for: fitModelID) {
+                GPUFitNotice(fit: fit)
+            }
         }
         .padding(12)
+    }
+
+    /// The model the "barely fits" notice is about: the loaded one while
+    /// it runs, else the picked one (what Start would load).
+    private var fitModelID: String? {
+        if case .running = server.state, let loaded = server.loadedModelPath { return loaded }
+        return selectedModelID
     }
 
     // MARK: Model switching
@@ -383,6 +393,62 @@ struct ServerStatusLabel: View {
             return String(format: NSLocalizedString("Running — %@ on :%lld", comment: "server status: model name, port"), model, port)
         case .failed(let msg):
             return String(format: NSLocalizedString("Failed: %@", comment: "server status: error message"), msg)
+        }
+    }
+}
+
+/// A model that barely fits the GPU (GPUFit): a notice, never a block --
+/// with how to raise the GPU memory limit behind "How?". Compact in the
+/// Models list: a short line, the whole notice as its tooltip.
+struct GPUFitNotice: View {
+    let fit: GPUFit
+    var compact = false
+    @State private var showsHow = false
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+            if compact {
+                Text("Barely fits the GPU memory").foregroundStyle(.orange)
+            } else {
+                Text(Self.message(fit)).fixedSize(horizontal: false, vertical: true)
+            }
+            if fit.sysctlCommand != nil {
+                Button("How?") { showsHow.toggle() }
+                    .buttonStyle(.link)
+                    .popover(isPresented: $showsHow, arrowEdge: .bottom) { howTo }
+            }
+        }
+        .font(.system(size: 11))
+        .help(Text(Self.message(fit)))
+    }
+
+    static func message(_ fit: GPUFit) -> String {
+        let weights = GPUFit.gigabytes(fit.weightsBytes)
+        let limit = GPUFit.gigabytes(Int64(clamping: fit.gpuLimitBytes))
+        return fit.suggestedWiredLimitMB != nil
+            ? String(format: NSLocalizedString("This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.", comment: "GPU fit notice: weights GB, GPU limit GB"), weights, limit)
+            : String(format: NSLocalizedString("This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.", comment: "GPU fit notice: weights GB, GPU limit GB"), weights, limit)
+    }
+
+    @ViewBuilder
+    private var howTo: some View {
+        if let command = fit.sysctlCommand {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Raise the GPU memory limit in Terminal:")
+                HStack {
+                    Text(verbatim: command).font(.system(.body, design: .monospaced)).textSelection(.enabled)
+                    Button("Copy") {
+                        NSPasteboard.general.clearContents()
+                        NSPasteboard.general.setString(command, forType: .string)
+                    }
+                }
+                Text("Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(12)
+            .frame(width: 360)
         }
     }
 }

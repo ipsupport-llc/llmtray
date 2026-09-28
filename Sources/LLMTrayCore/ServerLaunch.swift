@@ -27,9 +27,13 @@ public enum ServerLaunch {
         /// take (the runtime shrinks the chunk as the context grows); nil
         /// when the runtime has no such flag or the GPU limit isn't known.
         public var prefillMemoryMB: Int?
+        /// GPU memory the model leaves: the GPU limit less its weights
+        /// (gpuHeadroomBytes); caps the prompt cache (promptCacheBytes). nil
+        /// when the GPU limit isn't known -- the profile's size then.
+        public var gpuHeadroomBytes: Int64?
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
-                    prefillMemoryMB: Int? = nil) {
+                    prefillMemoryMB: Int? = nil, gpuHeadroomBytes: Int64? = nil) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -38,7 +42,18 @@ public enum ServerLaunch {
             self.maxContext = maxContext
             self.verboseLogging = verboseLogging
             self.prefillMemoryMB = prefillMemoryMB
+            self.gpuHeadroomBytes = gpuHeadroomBytes
         }
+    }
+
+    /// What's kept free beside the weights for everything else a request
+    /// needs (activations, the live KV cache, Metal's own).
+    static let memoryMargin: Int64 = 3 << 29   // 1.5 GB
+
+    /// GPU memory left beside the model's weights (negative: they don't
+    /// fit); nil when the GPU limit isn't known.
+    public static func gpuHeadroomBytes(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int64? {
+        gpuLimitBytes.map { Int64(clamping: $0) - weightsBytes }
     }
 
     /// The prefill chunk's memory: half of what the GPU limit leaves beside
@@ -46,8 +61,35 @@ public enum ServerLaunch {
     /// a fixed big chunk ran a 26B model out of memory at a 30K offset).
     public static func prefillMemoryMB(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int? {
         guard let gpuLimitBytes else { return nil }
-        let free = Int64(clamping: gpuLimitBytes) - weightsBytes - (3 << 29)
+        let free = Int64(clamping: gpuLimitBytes) - weightsBytes - memoryMargin
         return min(4096, max(256, Int(free / 2 / 1_048_576)))
+    }
+
+    /// `--prompt-cache-bytes`: the profile's size, but at most half of what
+    /// the model leaves beside a 1.5 GB margin. The cached KV lives in GPU
+    /// memory too -- a 4 GB cache beside a model that leaves 1.2 GB ran a
+    /// 20K-token prefill out of memory. 0 when nothing's left: the runtime
+    /// then drops cached prompts as each new request comes in (0 is a cap
+    /// of 0 bytes there, not "unlimited").
+    public static func promptCacheBytes(profileMB: Int, gpuHeadroomBytes: Int64?) -> Int64 {
+        let profile = Int64(max(0, profileMB)) * 1_048_576
+        guard let gpuHeadroomBytes else { return profile }
+        return min(profile, max(0, (gpuHeadroomBytes - memoryMargin) / 2))
+    }
+
+    /// The prompt cache a launch gets when the GPU memory cuts it below the
+    /// profile's (for the launch log); nil when it doesn't, or when the
+    /// profile's extra arguments set `--prompt-cache-bytes` themselves.
+    public static func promptCacheCut(_ p: ResolvedProfile, _ c: Context) -> (effective: Int64, profile: Int64)? {
+        guard !extraArgsSetPromptCache(p) else { return nil }
+        let profile = Int64(max(0, p.promptCacheMB)) * 1_048_576
+        let effective = promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes)
+        return effective < profile ? (effective, profile) : nil
+    }
+
+    /// The user's own `--prompt-cache-bytes` (extra arguments) wins.
+    static func extraArgsSetPromptCache(_ p: ResolvedProfile) -> Bool {
+        p.extraServerArgs.split(separator: " ").contains { $0 == "--prompt-cache-bytes" || $0.hasPrefix("--prompt-cache-bytes=") }
     }
 
     public static func arguments(_ p: ResolvedProfile, _ c: Context) -> [String] {
@@ -55,7 +97,6 @@ public enum ServerLaunch {
             "-m", "mlx_lm.server",
             "--model", c.modelPath, "--port", String(c.internalPort),
             "--prefill-step-size", String(p.prefillStepSize),
-            "--prompt-cache-bytes", String(p.promptCacheMB * 1_048_576),
             // Server-side sampling defaults: mlx_lm.server uses these only
             // for request fields the client didn't send. Only a fallback:
             // the proxy fills the same fields from the profile's current
@@ -66,6 +107,9 @@ public enum ServerLaunch {
             "--top-p", String(p.topP),
             "--max-tokens", String(min(p.maxTokens, c.maxContext ?? p.maxTokens)),
         ]
+        if !extraArgsSetPromptCache(p) {
+            args += ["--prompt-cache-bytes", String(promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes))]
+        }
         if p.topK > 0 {
             args += ["--top-k", String(p.topK)]
         }

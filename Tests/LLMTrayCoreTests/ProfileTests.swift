@@ -355,3 +355,76 @@ final class PrefillMemoryTests: XCTestCase {
         args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
     }
 }
+
+final class PromptCacheCapTests: XCTestCase {
+    private let mib: Int64 = 1_048_576
+    private let gib: Int64 = 1 << 30
+
+    func testTheProfilesSizeWhenTheGPUHasRoom() {
+        let headroom = ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: UInt64(64 * gib), weightsBytes: 8 * gib)
+        XCTAssertEqual(headroom, 56 * gib)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: headroom), 4096 * mib)
+        // Unknown GPU limit: the profile's, as before.
+        XCTAssertNil(ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: nil, weightsBytes: 8 * gib))
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: nil), 4096 * mib)
+    }
+
+    func testHalfOfWhatTheWeightsLeaveBesideTheMargin() {
+        // 64 GB limit less 60 GB of weights: (4 - 1.5) / 2 = 1.25 GB.
+        let headroom = ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: UInt64(64 * gib), weightsBytes: 60 * gib)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: headroom), 1280 * mib)
+        // A smaller profile size still wins.
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 512, gpuHeadroomBytes: headroom), 512 * mib)
+    }
+
+    func testNothingLeftIsZeroNeverNegative() {
+        // The real OOM: a 17.84 GB model under the 19.07 GB default limit
+        // leaves ~1.2 GB, below the margin.
+        let headroom = ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: 19_069_665_280, weightsBytes: 17_840_000_000)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: headroom), 0)
+        // Weights over the limit.
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: -gib), 0)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: -5, gpuHeadroomBytes: nil), 0)
+    }
+
+    func testTheLaunchGetsTheEffectiveValueUnlessTheUserSetsIt() {
+        var c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     gpuHeadroomBytes: 4 * gib)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        p.promptCacheMB = 4096
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-bytes"), String(1280 * mib))
+        XCTAssertEqual(ServerLaunch.promptCacheCut(p, c)?.effective, 1280 * mib)
+        XCTAssertEqual(ServerLaunch.promptCacheCut(p, c)?.profile, 4096 * mib)
+
+        // The user's own flag, either spelling: theirs only, no cut logged.
+        for extra in ["--prompt-cache-bytes 8G", "--prompt-cache-bytes=8G"] {
+            p.extraServerArgs = extra
+            let args = ServerLaunch.arguments(p, c)
+            XCTAssertEqual(args.filter { $0.hasPrefix("--prompt-cache-bytes") }.count, 1, extra)
+            XCTAssertNil(ServerLaunch.promptCacheCut(p, c), extra)
+        }
+
+        // Room enough (or an unknown limit): the profile's, nothing cut.
+        p.extraServerArgs = ""
+        c.gpuHeadroomBytes = nil
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-bytes"), String(4096 * mib))
+        XCTAssertNil(ServerLaunch.promptCacheCut(p, c))
+    }
+
+    func testAMemoryCutRestartsARunningServerOnlyIfTheValueChanges() {
+        let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     gpuHeadroomBytes: 4 * gib)
+        var a = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        var b = a
+        // Both over the 1.25 GB cap: the same launch.
+        a.promptCacheMB = 2048
+        b.promptCacheMB = 4096
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: b, context: c))
+        b.promptCacheMB = 512
+        XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: b, context: c))
+    }
+
+    private func argValue(_ args: [String], _ flag: String) -> String? {
+        args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
+    }
+}

@@ -3,6 +3,13 @@
 - **Prompt cache capped at 1 GiB** (profile default). Uncapped, a long
   session's cross-request KV cache grew until a later request's own
   allocation hit Metal "Insufficient Memory".
+- **...and capped by the GPU memory the model leaves.** The cached KV
+  lives in GPU memory: a 17.8 GB model under the 19.1 GB default limit
+  with a 4 GB profile cache ran a 20K-token prefill out of memory. The
+  launch passes min(profile, (GPU limit − weights − 1.5 GB) / 2), 0 when
+  nothing's left (a 0-byte cap in mlx_lm.server, not unlimited); the
+  user's own `--prompt-cache-bytes` wins. A model leaving under 2.5 GB
+  gets a notice with the `sysctl iogpu.wired_limit_mb` way to raise it.
 - **KV quantization forced off for KV-shared models** (Gemma 4 E2B/E4B):
   they crash with quantized KV. Applied at every launch, including
   proxy-driven switches, which used to reuse the first start's KV bits.
