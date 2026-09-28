@@ -172,7 +172,8 @@ final class ProjectFilesArgumentTests: XCTestCase {
 
 // MARK: - against a real index
 
-@MainActor
+// XCTestCase is nonisolated: the tests (not the class) are main-actor
+// isolated, which Swift 5.10 and 6 both accept.
 final class ProjectFilesServiceTests: XCTestCase {
     var root: URL!
     var registry: ProjectIndexRegistry!
@@ -193,6 +194,10 @@ final class ProjectFilesServiceTests: XCTestCase {
         registry?.closeAll()
         if let root { try? FileManager.default.removeItem(at: root) }
     }
+}
+
+@MainActor
+extension ProjectFilesServiceTests {
 
     func service(timeout: TimeInterval = 5) -> ProjectFilesService {
         ProjectFilesService(environment: .init(registry: registry, queryEmbedder: { [weak self] in self?.embedder },

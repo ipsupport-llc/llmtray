@@ -30,14 +30,14 @@ private final class ScriptedUser: @unchecked Sendable {
 
     var ask: FolderToolService.Ask {
         { [self] request in
-            lock.lock()
-            defer { lock.unlock() }
-            asked.append(request)
-            return answers.isEmpty ? nil : answers.removeFirst()
+            lock.withLock {
+                asked.append(request)
+                return answers.isEmpty ? nil : answers.removeFirst()
+            }
         }
     }
 
-    var count: Int { lock.lock(); defer { lock.unlock() }; return asked.count }
+    var count: Int { lock.withLock { asked.count } }
 }
 
 /// The folder tools as the chat drives them (adr/0014): what's declared,

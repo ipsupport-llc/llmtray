@@ -1,8 +1,12 @@
 import XCTest
 @testable import LLMTrayCore
 
+// XCTestCase is nonisolated: the tests (not the class) are main-actor
+// isolated, which Swift 5.10 and 6 both accept.
+final class GenerationQueueTests: XCTestCase {}
+
 @MainActor
-final class GenerationQueueTests: XCTestCase {
+extension GenerationQueueTests {
     func testFirstComerRunsAtOnce() async throws {
         let queue = GenerationQueue(pollInterval: 0.01)
         let ticket = try await queue.acquire()
