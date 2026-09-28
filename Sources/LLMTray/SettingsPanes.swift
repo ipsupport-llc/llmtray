@@ -323,6 +323,9 @@ struct ModelsPane: View {
                 if server.loadedModelPath == m.id, case .running = server.state {
                     Text("Running").font(.caption).foregroundStyle(.green)
                 }
+                if let fit = catalog.fit(for: m.id) {
+                    GPUFitNotice(fit: fit, compact: true)
+                }
             }
         }
     }

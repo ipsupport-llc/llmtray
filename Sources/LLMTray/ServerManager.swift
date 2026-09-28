@@ -524,7 +524,8 @@ final class ServerManager: ObservableObject {
     /// The model-specific facts the launch arguments depend on; drafterRepo
     /// is the drafter *available* to the model (see ServerLaunch.drafter).
     private func launchContext(modelPath: String, alias: String, drafterRepo: String?) -> ServerLaunch.Context {
-        ServerLaunch.Context(
+        let memory = Self.memoryFacts(forModelPath: modelPath)
+        return ServerLaunch.Context(
             modelPath: modelPath,
             internalPort: internalPort,
             alias: alias,
@@ -532,25 +533,37 @@ final class ServerManager: ObservableObject {
             drafterRepo: drafterRepo,
             maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
             verboseLogging: UserDefaults.standard[Pref.verboseServerLogging],
-            prefillMemoryMB: Self.prefillMemoryMB(forModelPath: modelPath)
+            prefillMemoryMB: memory.prefillMemoryMB,
+            gpuHeadroomBytes: memory.gpuHeadroomBytes
         )
     }
 
-    /// Read once per model folder and installed runtime (a runtime update
-    /// changes the key): the flag check reads server.py, the weights' size
-    /// walks the folder.
-    private static var prefillMemoryCache: [String: Int?] = [:]
+    /// What the launch sizes by the GPU memory the model leaves.
+    private struct MemoryFacts {
+        var prefillMemoryMB: Int?
+        var gpuHeadroomBytes: Int64?
+    }
 
-    private static func prefillMemoryMB(forModelPath modelPath: String) -> Int? {
+    /// Read once per model folder, installed runtime (a runtime update
+    /// changes the key) and GPU wired limit (raising it with sysctl counts
+    /// at the next start): the flag check reads server.py, the weights'
+    /// size walks the folder.
+    private static var memoryFactsCache: [String: MemoryFacts] = [:]
+
+    private static func memoryFacts(forModelPath modelPath: String) -> MemoryFacts {
         let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
-        let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0)
-        if let known = prefillMemoryCache[key] { return known }
-        let mb = MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb")
-            ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: HardwareProbe.current().gpuLimitBytes,
-                                           weightsBytes: ModelWeights.bytes(inFolder: modelPath))
-            : nil
-        prefillMemoryCache[key] = mb
-        return mb
+        let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
+        if let known = memoryFactsCache[key] { return known }
+        let limit = HardwareProbe.current().gpuLimitBytes
+        let weights = ModelWeights.bytes(inFolder: modelPath)
+        let facts = MemoryFacts(
+            prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb")
+                ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights)
+                : nil,
+            gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)
+        )
+        memoryFactsCache[key] = facts
+        return facts
     }
 
     init() {
@@ -620,6 +633,9 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
         )
         let args = ServerLaunch.arguments(profile, context)
+        if let cut = ServerLaunch.promptCacheCut(profile, context), let headroom = context.gpuHeadroomBytes {
+            appendLog("--- prompt cache capped at \(Self.memory(cut.effective)) (of \(Self.memory(cut.profile)) in the profile): the model leaves \(Self.memory(max(0, headroom))) of GPU memory ---\n")
+        }
         launchedArguments = args
         lastRestartKey = ServerLaunch.restartKey(profile, context)
         launchedMaxContext = context.maxContext
@@ -712,8 +728,11 @@ final class ServerManager: ObservableObject {
     /// `threadDeathRestarts`; otherwise it's stopped as failed, saying why.
     private func generationThreadDied(reason: String, outOfMemory: Bool) {
         let why = outOfMemory ? "the model ran out of GPU memory" : "the model's generation thread crashed: \(reason)"
-        let hint = outOfMemory ? " — try a smaller model, a shorter prompt, or a smaller prompt cache in its profile" : ""
+        let hint = outOfMemory ? " — try a smaller model, a shorter prompt, a smaller Prompt cache in its profile, or raising the GPU memory limit" : ""
         appendLog("--- \(why) ---\n")
+        if outOfMemory, let modelPath = currentModelPath {
+            appendLog("--- \(Self.outOfMemoryAdvice(modelPath: modelPath)) ---\n")
+        }
         switch state {
         case .starting:
             // It never served anything; loading it again would fail the same way.
@@ -731,6 +750,23 @@ final class ServerManager: ObservableObject {
         default:
             break
         }
+    }
+
+    /// The full advice for a model that ran out of GPU memory, for the
+    /// log: with the sysctl command where raising the limit would help.
+    private static func outOfMemoryAdvice(modelPath: String) -> String {
+        var advice = "use a smaller model, a shorter prompt or a smaller Prompt cache (Settings > Profiles), or raise the GPU memory limit"
+        if let command = GPUFit(weightsBytes: ModelWeights.bytes(inFolder: modelPath), hardware: HardwareProbe.current())?.sysctlCommand {
+            advice += ": \(command) in Terminal (it resets when the Mac restarts)"
+        }
+        return advice
+    }
+
+    private static func memory(_ bytes: Int64) -> String {
+        let f = ByteCountFormatter()
+        f.countStyle = .memory
+        f.allowsNonnumericFormatting = false
+        return f.string(fromByteCount: bytes)
     }
 
     /// stop(), but ending in .failed with `message`: a process that can't
