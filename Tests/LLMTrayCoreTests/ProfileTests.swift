@@ -469,3 +469,29 @@ final class PromptCacheCapTests: XCTestCase {
         args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
     }
 }
+
+final class MemorySharesTests: XCTestCase {
+    func testSharesAreSettingsNotConstants() {
+        let gib: Int64 = 1 << 30
+        let headroom: Int64 = 10 * gib
+        let custom = ServerLaunch.MemoryShares(marginMB: 1024, promptCachePercent: 25, prefillPercent: 10)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 1 << 20, gpuHeadroomBytes: headroom, shares: custom),
+                       (headroom - gib) * 25 / 100)
+        XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(20 * gib), weightsBytes: 10 * gib, shares: custom),
+                       Int((10 * gib - gib) * 10 / 100 / 1_048_576))
+        let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     gpuHeadroomBytes: headroom, memoryShares: custom)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        p.promptCacheMB = 1 << 20
+        let args = ServerLaunch.arguments(p, c)
+        XCTAssertEqual(args.firstIndex(of: "--prompt-cache-bytes").map { args[$0 + 1] }, String((headroom - gib) * 25 / 100))
+    }
+
+    func testTogetherAtMostNinetyPercent() {
+        let s = ServerLaunch.MemoryShares(marginMB: -5, promptCachePercent: 80, prefillPercent: 50)
+        XCTAssertEqual(s.marginMB, 0)
+        XCTAssertEqual(s.prefillPercent, 10)
+        XCTAssertEqual(ServerLaunch.MemoryShares(marginMB: 1, promptCachePercent: 150, prefillPercent: 5).promptCachePercent, 100)
+        XCTAssertEqual(ServerLaunch.MemoryShares.default, ServerLaunch.MemoryShares(marginMB: 1536, promptCachePercent: 40, prefillPercent: 20))
+    }
+}

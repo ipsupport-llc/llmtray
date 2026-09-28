@@ -544,7 +544,8 @@ final class ServerManager: ObservableObject {
             maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
             verboseLogging: UserDefaults.standard[Pref.verboseServerLogging],
             prefillMemoryMB: memory.prefillMemoryMB,
-            gpuHeadroomBytes: memory.gpuHeadroomBytes
+            gpuHeadroomBytes: memory.gpuHeadroomBytes,
+            memoryShares: Self.memoryShares
         )
     }
 
@@ -560,15 +561,24 @@ final class ServerManager: ObservableObject {
     /// size walks the folder.
     private static var memoryFactsCache: [String: MemoryFacts] = [:]
 
+    /// Settings > Server > Memory.
+    static var memoryShares: ServerLaunch.MemoryShares {
+        let d = UserDefaults.standard
+        return ServerLaunch.MemoryShares(marginMB: d[Pref.memoryMarginMB], promptCachePercent: d[Pref.promptCacheSharePercent],
+                                         prefillPercent: d[Pref.prefillSharePercent])
+    }
+
     private static func memoryFacts(forModelPath modelPath: String) -> MemoryFacts {
         let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
+        let shares = memoryShares
         let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
+            + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
         let weights = ModelWeights.bytes(inFolder: modelPath)
         let facts = MemoryFacts(
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb")
-                ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights)
+                ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
                 : nil,
             gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)
         )

@@ -32,8 +32,12 @@ public enum ServerLaunch {
         /// when the GPU limit isn't known -- the profile's size then.
         public var gpuHeadroomBytes: Int64?
 
+        /// How the memory beside the weights is shared out (Settings >
+        /// Server > Memory).
+        public var memoryShares: MemoryShares
+
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
-                    prefillMemoryMB: Int? = nil, gpuHeadroomBytes: Int64? = nil) {
+                    prefillMemoryMB: Int? = nil, gpuHeadroomBytes: Int64? = nil, memoryShares: MemoryShares = .default) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -43,12 +47,34 @@ public enum ServerLaunch {
             self.verboseLogging = verboseLogging
             self.prefillMemoryMB = prefillMemoryMB
             self.gpuHeadroomBytes = gpuHeadroomBytes
+            self.memoryShares = memoryShares
         }
     }
 
-    /// What's kept free beside the weights for everything else a request
-    /// needs (activations, the live KV cache, Metal's own).
-    static let memoryMargin: Int64 = 3 << 29   // 1.5 GB
+    /// How the GPU memory the weights leave is shared out: a margin kept
+    /// free (activations, Metal's own), then of the rest a share for the
+    /// prompt cache and one for a prefill chunk's scratch; what neither takes
+    /// holds the live KV cache and a checkpoint's copy (both at a half ran a
+    /// 35K-token prefill out of memory with a 5 GB cache). Settings > Server.
+    public struct MemoryShares: Equatable, Sendable {
+        public var marginMB: Int
+        public var promptCachePercent: Int
+        public var prefillPercent: Int
+
+        public init(marginMB: Int, promptCachePercent: Int, prefillPercent: Int) {
+            self.marginMB = max(0, marginMB)
+            self.promptCachePercent = min(max(0, promptCachePercent), 100)
+            // Together at most 90%: the live cache needs some of it.
+            self.prefillPercent = min(max(0, prefillPercent), max(0, 90 - self.promptCachePercent))
+        }
+
+        public static let `default` = MemoryShares(marginMB: 1536, promptCachePercent: 40, prefillPercent: 20)
+
+        var marginBytes: Int64 { Int64(marginMB) * 1_048_576 }
+    }
+
+    /// The default margin, for callers without shares of their own.
+    static var memoryMargin: Int64 { MemoryShares.default.marginBytes }
 
     /// GPU memory left beside the model's weights (negative: they don't
     /// fit); nil when the GPU limit isn't known.
@@ -56,32 +82,25 @@ public enum ServerLaunch {
         gpuLimitBytes.map { Int64(clamping: $0) - weightsBytes }
     }
 
-    /// Of what the weights leave beside the margin, the shares: the prompt
-    /// cache and a prefill chunk's scratch must not add up to all of it --
-    /// the live KV cache and a checkpoint's copy need the rest (both at a
-    /// half ran a 35K-token prefill out of memory with a 5 GB cache).
-    public static let promptCacheShare: Int64 = 40
-    public static let prefillShare: Int64 = 20
-
-    /// The prefill chunk's memory: a fifth of what the GPU limit leaves
-    /// beside the weights and a 1.5 GB margin, 256 MB to 4 GB (a long prompt
-    /// with a fixed big chunk ran a 26B model out of memory at a 30K offset).
-    public static func prefillMemoryMB(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int? {
+    /// The prefill chunk's memory: its share of what the GPU limit leaves
+    /// beside the weights and the margin, 256 MB to 4 GB (a long prompt with
+    /// a fixed big chunk ran a 26B model out of memory at a 30K offset).
+    public static func prefillMemoryMB(gpuLimitBytes: UInt64?, weightsBytes: Int64, shares: MemoryShares = .default) -> Int? {
         guard let gpuLimitBytes else { return nil }
-        let free = Int64(clamping: gpuLimitBytes) - weightsBytes - memoryMargin
-        return min(4096, max(256, Int(free * prefillShare / 100 / 1_048_576)))
+        let free = Int64(clamping: gpuLimitBytes) - weightsBytes - shares.marginBytes
+        return min(4096, max(256, Int(free * Int64(shares.prefillPercent) / 100 / 1_048_576)))
     }
 
-    /// `--prompt-cache-bytes`: the profile's size, but at most 40% of what
-    /// the model leaves beside a 1.5 GB margin. The cached KV lives in GPU
+    /// `--prompt-cache-bytes`: the profile's size, but at most its share of
+    /// what the model leaves beside the margin. The cached KV lives in GPU
     /// memory too -- a 4 GB cache beside a model that leaves 1.2 GB ran a
     /// 20K-token prefill out of memory. 0 when nothing's left: the runtime
     /// then drops cached prompts as each new request comes in (0 is a cap
     /// of 0 bytes there, not "unlimited").
-    public static func promptCacheBytes(profileMB: Int, gpuHeadroomBytes: Int64?) -> Int64 {
+    public static func promptCacheBytes(profileMB: Int, gpuHeadroomBytes: Int64?, shares: MemoryShares = .default) -> Int64 {
         let profile = Int64(max(0, profileMB)) * 1_048_576
         guard let gpuHeadroomBytes else { return profile }
-        return min(profile, max(0, (gpuHeadroomBytes - memoryMargin) * promptCacheShare / 100))
+        return min(profile, max(0, (gpuHeadroomBytes - shares.marginBytes) * Int64(shares.promptCachePercent) / 100))
     }
 
     /// The prompt cache a launch gets when the GPU memory cuts it below the
@@ -90,7 +109,7 @@ public enum ServerLaunch {
     public static func promptCacheCut(_ p: ResolvedProfile, _ c: Context) -> (effective: Int64, profile: Int64)? {
         guard !extraArgsSetPromptCache(p) else { return nil }
         let profile = Int64(max(0, p.promptCacheMB)) * 1_048_576
-        let effective = promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes)
+        let effective = promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes, shares: c.memoryShares)
         return effective < profile ? (effective, profile) : nil
     }
 
@@ -128,7 +147,7 @@ public enum ServerLaunch {
             "--max-tokens", String(min(p.maxTokens, c.maxContext ?? p.maxTokens)),
         ]
         if !extraArgsSetPromptCache(p) {
-            args += ["--prompt-cache-bytes", String(promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes))]
+            args += ["--prompt-cache-bytes", String(promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes, shares: c.memoryShares))]
         }
         // No runtime check: upstream mlx-lm added it together with
         // --prompt-cache-bytes (#906), which every launch already passes.
