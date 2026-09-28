@@ -329,7 +329,9 @@
 "Full duplex" = "Dupleks penuh";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Duplex penuh: bicara kapan saja, model mendengar saat berbicara — memerlukan Mac yang mampu menjalankan secara waktu nyata. Walkie‑talkie: bicara, tekan Selesai, lalu dengarkan. Otomatis memilih berdasarkan kecepatan terukur Mac ini saat Voice Lab dimulai.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "Duplex penuh: bicara kapan saja, model mendengar saat berbicara — memerlukan Mac yang mampu menjalankan secara waktu nyata. Walkie‑talkie: bicara, tekan Selesai, lalu dengarkan. Otomatis memilih berdasarkan kecepatan terukur Mac ini.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit: build IPSupport dari model yang sama dengan model bahasa 3-bit — lebih kecil dan lebih cepat, setiap uji memberikan jawaban yang benar. 4-bit: build mlx-community. Masing‑masing hanya diunduh saat Anda memintanya.";
 "GPU memory limit" = "Batas memori GPU";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Memori GPU yang disisihkan oleh server model selain untuk bobot, untuk aktivasi dan macOS. Bagian di bawah membagi sisa setelah itu.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Terkunci: terima lisensinya di Hugging Face dan simpan token di Pengaturan › Models terlebih dahulu.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Dibatasi: terima lisensinya di halaman Hugging Face model ini, lalu tambahkan token di Pengaturan → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Dibatasi: minta akses di halaman Hugging Face model ini (penulis meninjau), lalu tambahkan token di Pengaturan → Models.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "Pertahankan pesan terakhir: %lld";
 "Keep the loaded model" = "Pertahankan model yang dimuat";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mempertahankan N token pertama konteks pada presisi penuh sebelum kuantisasi. Nilai lebih tinggi mengurangi penghematan memori demi akurasi pada prompt panjang.";
+"Kept free: %lld MB" = "Disisakan: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray tidak diizinkan menggunakan mikrofon.";
 "LLMTray status, indexing project files" = "Status LLMTray, mengindeks berkas proyek";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "Prompt & alat";
 "Prompt (last request)" = "Prompt (permintaan terakhir)";
 "Prompt cache" = "Cache prompt";
+"Prompt cache: up to %lld% of the rest" = "Cache prompt: hingga %lld% dari sisa";
 "Prompt processing" = "Pemrosesan prompt";
 "Prompt size" = "Ukuran prompt";
 "Prompt size (input sent to the model):" = "Ukuran prompt (input yang dikirim ke model):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "Indeks ulang %@";
 "Re-index this file" = "Indeks ulang berkas ini";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Mencakup %1$lld subfolder (%2$@): file‑filenya dikeluarkan dari sana.";
+"Reading a prompt: up to %lld%" = "Membaca prompt: hingga %lld%";
 "Reading what's installed…" = "Membaca yang terpasang…";
 "Ready." = "Siap.";
 "Ready. This is the Full build: the runtime is included." = "Siap. Ini adalah build Full: runtime sudah disertakan.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Runtime model belum terpasang — jalankan satu model, lalu coba lagi.";
 "The model server no longer goes online when it starts." = "Server model tidak lagi online saat dimulai.";
 "The model's license, from its card." = "Lisensi model, dari model card.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Maksimum yang boleh digunakan cache prompt sebelumnya (ukuran Prompt cache pada profil juga menjadi batas). Lebih besar mempercepat percakapan panjang dan agen; terlalu besar membuat tidak ada ruang untuk prompt yang sedang dibaca.";
 "The music generator is busy -- try again once it's done." = "Generator musik sedang sibuk — coba lagi setelah selesai.";
 "The music generator is busy with another chat -- try again once it's done." = "Generator musik sedang sibuk dengan obrolan lain — coba lagi setelah selesai.";
 "The name can be at most %lld characters." = "Nama maksimal %lld karakter.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Untuk mengembalikannya, gunakan Undo di LLMTray: Finder's Put Back tidak mengetahui foldernya.";
 "Today" = "Hari ini";
 "Today so far: %@ (sent once the day is over)" = "Hari ini sejauh ini: %@ (dikirim setelah hari berakhir)";
+"Together over 90%: reading a prompt gets %lld%." = "Jika total melebihi 90%: membaca prompt mendapat %lld%.";
 "Tokens" = "Token";
 "Too long for the selected model's room now, read by search instead: %@" = "Terlalu panjang untuk ruang model yang dipilih sekarang, dibaca lewat pencarian sebagai gantinya: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Terlalu panjang untuk dipin dengan model yang dipilih: ≈%1$@ token, tersisa ≈%2$@ dari %3$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab menggunakan sekitar %1$@ GB; ditambah %2$@ GB model chat, tetap muat dalam %3$@ GB yang dapat dipakai GPU. Namun model chat tetap dibongkar saat berjalan.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab menggunakan sekitar %@ GB memori saat berjalan.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "Model suara";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Tunggu permintaan atau benchmark saat ini selesai -- mulai ulang akan menghentikannya.";
 "Waiting for an image or song to finish…" = "Menunggu gambar atau lagu selesai…";
 "Waiting for another chat's image or music to finish…" = "Menunggu obrolan lain menyelesaikan gambar atau musik…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memori kerja untuk membaca prompt secara bertahap; lebih sedikit membaca prompt panjang dalam langkah lebih kecil dan lebih lambat. Jika cache prompt dan ini bersama-sama paling banyak 90%: sisanya memuat prompt yang sedang dibaca.";
 "Works offline" = "Bekerja secara offline";
 "Writing the song…" = "Menulis lagu…";
 "Yesterday" = "Kemarin";

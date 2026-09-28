@@ -329,7 +329,9 @@
 "Full duplex" = "Tam iki yönlü";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Tam iki yönlü: istediğiniz zaman konuşun, model konuşurken sizi de duyar — gerçek zamanlı çalıştırabilen bir Mac gerekir. Telsiz: konuşun, Bitir'e basın, sonra dinleyin. Otomatik, Voice Lab başladığında bu Mac'in ölçülen hızına göre seçer.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "Tam iki yönlü: istediğiniz zaman konuşun, model konuşurken sizi de duyar — gerçek zamanlı çalıştırabilen bir Mac gerekir. Telsiz: konuşun, Bitir'e basın, sonra dinleyin. Otomatik, bu Mac'in ölçülen hızına göre seçer.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit: IPSupport tarafından hazırlanmış, aynı modelin 3 bitlik sürümü — daha küçük ve daha hızlı, testlerde her seferinde doğru yanıtlar. 4-bit: mlx-community tarafından hazırlanmış sürüm. Her biri yalnızca siz istediğinizde indirilir.";
 "GPU memory limit" = "GPU bellek limiti";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Model sunucusunun ağırlıklar dışında aktivasyonlar ve macOS için ayırdığı GPU belleği. Aşağıdaki paylar geride kalan belleği böler.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Kısıtlı: Hugging Face'te lisansını kabul edin ve önce Settings › Models altında bir token kaydedin.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasındaki lisansını kabul edin ve Ayarlar → Models bölümüne bir token ekleyin.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasından erişim isteyin (yazarlar inceler) ve Ayarlar → Models bölümüne bir token ekleyin.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "Son iletileri koru: %lld";
 "Keep the loaded model" = "Yüklü modeli tut";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Bağlamın ilk N token’ını nicelemeden önce tam hassasiyette tutar. Daha yüksek değer, uzun istemlerde doğruluk için bellek tasarrufundan ödün verir.";
+"Kept free: %lld MB" = "Boş bırakılan: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray'ın mikrofonu kullanmasına izin verilmiyor.";
 "LLMTray status, indexing project files" = "LLMTray durumu, proje dosyaları dizine alınıyor";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "İstem ve araçlar";
 "Prompt (last request)" = "İstem (son istek)";
 "Prompt cache" = "İstem önbelleği";
+"Prompt cache: up to %lld% of the rest" = "İsteme önbelleği: geride kalanın en fazla %lld%’i";
 "Prompt processing" = "İstem işleme";
 "Prompt size" = "İstem boyutu";
 "Prompt size (input sent to the model):" = "İstem boyutu (modele gönderilen giriş):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "%@ öğesini yeniden dizine al";
 "Re-index this file" = "Bu dosyayı yeniden dizine al";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld alt klasöre (%2$@) giriliyor: dosyaları bu klasörlerden çıkarılır.";
+"Reading a prompt: up to %lld%" = "İsteme okuma: en fazla %lld%";
 "Reading what's installed…" = "Yüklüler okunuyor…";
 "Ready." = "Hazır.";
 "Ready. This is the Full build: the runtime is included." = "Hazır. Bu Full derlemesidir: runtime dahil.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Model çalışma zamanı henüz yüklü değil — bir model başlatıp sonra tekrar deneyin.";
 "The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Önceki istemlerin önbelleğinin alabileceği maksimum (profilin İsteme önbelleği boyutu da bir üst sınırdır). Daha fazla uzun sohbetleri ve ajanları hızlandırır; çok fazlası okunan istem için yer bırakmaz.";
 "The music generator is busy -- try again once it's done." = "Müzik oluşturucu meşgul — bitmesini bekleyip tekrar deneyin.";
 "The music generator is busy with another chat -- try again once it's done." = "Müzik oluşturucu başka bir sohbetle meşgul — bitmesini bekleyip tekrar deneyin.";
 "The name can be at most %lld characters." = "İsim en fazla %lld karakter olabilir.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Geri koymak için LLMTray'de Geri Al'ı kullanın: Finder'ın Put Back işlemi klasörünü bilmez.";
 "Today" = "Bugün";
 "Today so far: %@ (sent once the day is over)" = "Bugüne kadar: %@ (gün bittikten sonra gönderilir)";
+"Together over 90%: reading a prompt gets %lld%." = "Toplam %90’dan fazla: istem okumasına %lld% düşer.";
 "Tokens" = "Tokenler";
 "Too long for the selected model's room now, read by search instead: %@" = "Seçili modelin hafızası için şimdi çok uzun, bunun yerine arama ile okunacak: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Seçili model ile sabitlemek için çok uzun: ≈%1$@ token, %3$@ tokenın ≈%2$@'u kaldı";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab yaklaşık %1$@ GB alır; sohbet modelinin %2$@ GB ile birlikte GPU'nun kullanabileceği %3$@ GB'e sığar. Yine de çalışırken sohbet modeli boşaltılır.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab çalışırken yaklaşık %@ GB bellek kullanır.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "Ses modeli";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Geçerli isteğin veya karşılaştırma testinin bitmesini bekleyin -- yeniden başlatma işlemi onu yarıda keser.";
 "Waiting for an image or song to finish…" = "Bir resim veya şarkının bitmesi bekleniyor…";
 "Waiting for another chat's image or music to finish…" = "Başka bir sohbetin görseli veya müziği bitiyor…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
 "Wikipedia" = "Vikipedi";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "İstemi parça parça okumak için çalışma belleği; daha az bellek uzun istemleri daha küçük, daha yavaş adımlarla okur. İsteme önbelleği toplamda en fazla %90 ise: kalan, okunan istemi tutar.";
 "Works offline" = "Çevrimdışı çalışır";
 "Writing the song…" = "Şarkı yazılıyor…";
 "Yesterday" = "Dün";

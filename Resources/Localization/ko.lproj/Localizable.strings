@@ -329,7 +329,9 @@
 "Full duplex" = "전이중";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "전이중: 언제든 말하면 모델이 말하는 동안에도 당신의 목소리를 듣습니다 — 실시간 처리가 가능한 Mac 필요. 무전기 모드: 말하고 Done을 누른 뒤 듣기. 자동은 Voice Lab 시작 시 이 Mac의 측정 속도를 기준으로 선택합니다.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "전이중: 언제든 말하면 모델이 말하는 동안에도 당신의 목소리를 듣습니다 — 실시간 처리가 가능한 Mac 필요. 무전기 모드: 말하고 Done을 누른 뒤 듣기. 자동은 이 Mac의 측정 속도를 기준으로 선택합니다.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3비트: IPSupport가 동일한 모델을 3비트 언어 모델로 빌드한 버전 — 더 작고 빠르며 테스트에서 정확한 답을 제공합니다. 4비트: mlx-community 빌드입니다. 각 모델은 사용자가 요청할 때만 다운로드됩니다.";
 "GPU memory limit" = "GPU 메모리 제한";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "가중치 외에 모델 서버가 활성화와 macOS를 위해 비워두는 GPU 메모리입니다. 아래 비율은 그 남은 공간을 분할합니다.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: Hugging Face에서 라이선스에 동의하고 Settings › Models에 토큰을 먼저 저장하세요.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 사용권에 동의한 뒤 설정 → Models에 토큰을 추가하세요.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 접근을 요청하세요(저자가 검토함). 그 후 설정 → Models에 토큰을 추가하세요.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "마지막 메시지 유지: %lld개";
 "Keep the loaded model" = "로드된 모델 유지";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "양자화하기 전에 컨텍스트의 처음 N개 토큰을 전체 정밀도로 유지합니다. 값이 높을수록 메모리 절약은 줄지만 긴 프롬프트의 정확도가 높아집니다.";
+"Kept free: %lld MB" = "비워둠: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray에 마이크 사용 권한이 없습니다.";
 "LLMTray status, indexing project files" = "LLMTray 상태, 프로젝트 파일 인덱스 중";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "프롬프트 및 도구";
 "Prompt (last request)" = "프롬프트(마지막 요청)";
 "Prompt cache" = "프롬프트 캐시";
+"Prompt cache: up to %lld% of the rest" = "프롬프트 캐시: 나머지의 최대 %lld%";
 "Prompt processing" = "프롬프트 처리";
 "Prompt size" = "프롬프트 크기";
 "Prompt size (input sent to the model):" = "프롬프트 크기(모델로 전송되는 입력):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "다시 인덱스 %@";
 "Re-index this file" = "이 파일 다시 인덱스";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld개의 하위 폴더(%2$@)까지 검색: 해당 폴더의 파일을 꺼냄.";
+"Reading a prompt: up to %lld%" = "프롬프트 읽기: 최대 %lld%";
 "Reading what's installed…" = "설치된 항목을 확인하는 중…";
 "Ready." = "준비됨.";
 "Ready. This is the Full build: the runtime is included." = "준비됨. Full 빌드입니다: 런타임 포함.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "모델 런타임이 아직 설치되지 않았습니다 — 모델을 한 번 실행한 뒤 다시 시도하세요.";
 "The model server no longer goes online when it starts." = "모델 서버가 시작될 때 더 이상 온라인으로 전환되지 않습니다.";
 "The model's license, from its card." = "모델 카드에 기재된 사용권입니다.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "이전 프롬프트 캐시가 차지할 수 있는 최대치입니다(프로필의 Prompt cache 크기도 상한입니다). 값을 늘리면 긴 대화와 에이전트가 빨라지지만 지나치면 현재 읽는 프롬프트에 공간이 남지 않습니다.";
 "The music generator is busy -- try again once it's done." = "음악 생성기가 작업 중입니다 — 완료될 때까지 잠시 후 다시 시도하세요.";
 "The music generator is busy with another chat -- try again once it's done." = "음악 생성기가 다른 채팅 작업 중입니다 — 완료된 후 다시 시도하세요.";
 "The name can be at most %lld characters." = "이름은 최대 %lld자까지 입력할 수 있습니다.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "복원하려면 LLMTray의 Undo를 사용하세요: Finder의 Put Back은 원래 폴더를 알지 못합니다.";
 "Today" = "오늘";
 "Today so far: %@ (sent once the day is over)" = "오늘까지: %@ (하루가 끝나면 전송됨)";
+"Together over 90%: reading a prompt gets %lld%." = "합계가 90%를 넘으면: 프롬프트 읽기는 %lld%를 받습니다.";
 "Tokens" = "토큰";
 "Too long for the selected model's room now, read by search instead: %@" = "선택한 모델의 룸에 너무 깁니다. 대신 검색으로 읽습니다: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "선택한 모델로는 고정하기에 너무 깁니다: ≈%1$@ 토큰, 남음 ≈%2$@ / %3$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab은 약 %1$@ GB를 차지합니다; 채팅 모델의 %2$@ GB와 합쳐서 GPU가 사용할 수 있는 %3$@ GB에 맞습니다. 그럼에도 실행 중에는 채팅 모델이 언로드됩니다.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab은 실행 중 약 %@ GB의 메모리를 사용합니다.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "음성 모델";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "현재 요청 또는 벤치마크가 끝날 때까지 기다리십시오. 재시작하면 중단됩니다.";
 "Waiting for an image or song to finish…" = "이미지 또는 노래 완료 대기 중…";
 "Waiting for another chat's image or music to finish…" = "다른 채팅의 이미지 또는 음악 생성이 완료될 때까지 대기 중…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
 "Which model generates new images." = "어떤 모델이 새 이미지를 생성할지 선택합니다.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "프롬프트를 청크로 읽을 때 사용할 작업 메모리입니다. 값을 작게 하면 긴 프롬프트를 더 작고 느린 단계로 읽습니다. 프롬프트 캐시와 합쳐 최대 90%일 때 나머지가 현재 읽는 프롬프트를 보관합니다.";
 "Works offline" = "오프라인 작동";
 "Writing the song…" = "곡 작성 중…";
 "Yesterday" = "어제";

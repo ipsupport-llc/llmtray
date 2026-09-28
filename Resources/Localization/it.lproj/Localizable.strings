@@ -329,7 +329,9 @@
 "Full duplex" = "Full duplex";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Full duplex: parla in qualsiasi momento, il modello ti sente mentre parla — richiede un Mac in grado di eseguirlo in tempo reale. Walkie‑talkie: parla, premi Fine, poi ascolta. Automatico sceglie in base alla velocità misurata di questo Mac all'avvio di Voice Lab.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "Full duplex: parla in qualsiasi momento, il modello ti sente mentre parla — richiede un Mac in grado di eseguirlo in tempo reale. Walkie‑talkie: parla, premi Fine, poi ascolta. Automatico sceglie in base alla velocità misurata di questo Mac.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit: la build di IPSupport dello stesso modello con un language model a 3 bit — più piccolo e veloce, risponde correttamente a tutti i test. 4-bit: la build di mlx-community. Ciascuna viene scaricata solo quando la richiedi.";
 "GPU memory limit" = "Limite memoria GPU";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Memoria GPU che il server del modello lascia libera oltre ai pesi, per le attivazioni e macOS. Le percentuali qui sotto dividono ciò che resta dopo.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: accetta la licenza su Hugging Face e salva prima un token in Impostazioni › Models.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Protetto: accetta la licenza sulla pagina Hugging Face del modello e aggiungi un token in Impostazioni → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Protetto: richiedi l’accesso sulla pagina Hugging Face del modello (gli autori lo esaminano) e aggiungi un token in Impostazioni → Models.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "Mantieni gli ultimi messaggi: %lld";
 "Keep the loaded model" = "Mantieni il modello caricato";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Mantiene i primi N token di contesto a precisione piena prima della quantizzazione. Un valore più alto riduce il risparmio di memoria ma aumenta l’accuratezza nei prompt lunghi.";
+"Kept free: %lld MB" = "Mantenuto libero: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray non è autorizzato a usare il microfono.";
 "LLMTray status, indexing project files" = "Stato di LLMTray, indicizzazione file del progetto";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "Prompt e strumenti";
 "Prompt (last request)" = "Prompt (ultima richiesta)";
 "Prompt cache" = "Cache del prompt";
+"Prompt cache: up to %lld% of the rest" = "Cache dei prompt: fino al %lld% del resto";
 "Prompt processing" = "Elaborazione del prompt";
 "Prompt size" = "Dimensione del prompt";
 "Prompt size (input sent to the model):" = "Dimensione del prompt (input inviato al modello):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "Re-indicizza %@";
 "Re-index this file" = "Re-indicizza questo file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Scorre %1$lld sottocartelle (%2$@): i loro file vengono estratti.";
+"Reading a prompt: up to %lld%" = "Lettura del prompt: fino al %lld%";
 "Reading what's installed…" = "Verifica dei componenti installati…";
 "Ready." = "Pronto.";
 "Ready. This is the Full build: the runtime is included." = "Pronto. Questa è la build Full: il runtime è incluso.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Il runtime del modello non è ancora installato — avvia un modello una volta, quindi riprova.";
 "The model server no longer goes online when it starts." = "Il server del modello non va più online all'avvio.";
 "The model's license, from its card." = "La licenza del modello, dalla sua model card.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Massimo occupabile dalla cache dei prompt precedenti (la dimensione della Prompt cache del profilo è comunque un limite). Di più accelera chat lunghe e agenti; troppo spazio elimina lo spazio per il prompt in lettura.";
 "The music generator is busy -- try again once it's done." = "Il generatore musicale è occupato — riprova quando avrà terminato.";
 "The music generator is busy with another chat -- try again once it's done." = "Il generatore musicale è occupato con un'altra chat — riprova quando avrà terminato.";
 "The name can be at most %lld characters." = "Il nome può contenere al massimo %lld caratteri.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Per ripristinarlo, usa Annulla in LLMTray: Put Back del Finder non conosce la sua cartella.";
 "Today" = "Oggi";
 "Today so far: %@ (sent once the day is over)" = "Oggi finora: %@ (inviato alla fine della giornata)";
+"Together over 90%: reading a prompt gets %lld%." = "Sommandoli oltre il 90%: la lettura del prompt ottiene %lld%.";
 "Tokens" = "Token";
 "Too long for the selected model's room now, read by search instead: %@" = "Troppo lungo per lo spazio del modello selezionato ora; verrà letto tramite ricerca: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Troppo lungo per essere appuntato con il modello selezionato: ≈%1$@ token, ≈%2$@ di %3$@ rimasti";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab occupa circa %1$@ GB; con i %2$@ GB del modello di chat rientra nei %3$@ GB utilizzabili dalla GPU. Il modello di chat viene comunque scaricato mentre è attivo.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab occupa circa %@ GB di memoria mentre è attivo.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "Modello vocale";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Attendi che la richiesta o il benchmark corrente termini: un riavvio lo interromperebbe.";
 "Waiting for an image or song to finish…" = "In attesa che un'immagine o una canzone finisca…";
 "Waiting for another chat's image or music to finish…" = "In attesa che l'immagine o la musica di un'altra chat termini…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Posizione in cui LLMTray cerca i modelli MLX (una cartella per modello, ad es. <org>/<name>). Impostala su ~/.lmstudio/models per condividere i modelli con LM Studio.";
 "Which model generates new images." = "Quale modello genera nuove immagini.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memoria di lavoro per leggere il prompt a blocchi; meno memoria fa leggere prompt lunghi in passi più piccoli e lenti. Con la prompt cache complessiva al massimo 90%: il resto è riservato al prompt in lettura.";
 "Works offline" = "Funziona offline";
 "Writing the song…" = "Scrittura della canzone…";
 "Yesterday" = "Ieri";

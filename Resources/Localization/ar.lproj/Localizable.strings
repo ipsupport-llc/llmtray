@@ -329,7 +329,9 @@
 "Full duplex" = "اتصال ثنائي الاتجاه";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "اتصال ثنائي الاتجاه: تكلم في أي وقت، النموذج يسمعك أثناء نطقِه — يتطلب ماك قادرًا على التشغيل في الوقت الحقيقي. وضع الهاتف النقال: تكلم، اضغط \"تم\" ثم استمع. يختار \"تلقائي\" حسب سرعة هذا الـMac المقاسة عند بدء Voice Lab.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "اتصال ثنائي الاتجاه: تكلم في أي وقت، النموذج يسمعك أثناء نطقِه — يتطلب ماك قادرًا على التشغيل في الوقت الحقيقي. وضع الهاتف النقال: تكلم، اضغط \"تم\" ثم استمع. يختار \"تلقائي\" حسب السرعة المقاسة لهذا الـMac.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑بت: إصدار IPSupport لنفس النموذج مع نموذج لغوي 3‑بت — أصغر وأسرع، وجميع الاختبارات تجيب بشكل صحيح. 4‑بت: إصدار mlx-community. يتم تنزيل كلٍّ منها فقط عند طلبك.";
 "GPU memory limit" = "حد ذاكرة GPU";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "ذاكرة GPU التي يتركها خادم النموذج دون مساس بجانب الأوزان، للاشتغالات ونظام macOS. الحصص أدناه تقسم ما تبقى بعد ذلك.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "مقيّد: اقبل ترخيصه على Hugging Face واحفظ رمزًا في Settings › Models أولًا.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "مقيَّد: اقبل ترخيصه في صفحته على Hugging Face، ثم أضف رمزًا في الإعدادات → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "مقيَّد: اطلب الوصول من صفحته على Hugging Face (يقوم المؤلفون بمراجعته)، ثم أضف رمزًا في الإعدادات → Models.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "الاحتفاظ بالرسائل الأخيرة: %lld";
 "Keep the loaded model" = "الإبقاء على النموذج المحمّل";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "يُبقي أول N من رموز السياق بالدقة الكاملة قبل تكميمها. القيم الأعلى تقلل توفير الذاكرة مقابل دقة أفضل في الموجهات الطويلة.";
+"Kept free: %lld MB" = "محفوظة خالية: %lld ميغابايت";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray غير مسموح له باستخدام الميكروفون.";
 "LLMTray status, indexing project files" = "حالة LLMTray، جارٍ فهرسة ملفات المشروع";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "الموجّه والأدوات";
 "Prompt (last request)" = "المطالبة (آخر طلب)";
 "Prompt cache" = "ذاكرة الموجّه المؤقتة";
+"Prompt cache: up to %lld% of the rest" = "ذاكرة التخزين المؤقت للمطالبات: حتى %lld% من الباقي";
 "Prompt processing" = "معالجة المطالبة";
 "Prompt size" = "حجم الموجّه";
 "Prompt size (input sent to the model):" = "حجم الموجّه (الإدخال المرسل إلى النموذج):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "أعِد فهرسة %@";
 "Re-index this file" = "أعد فهرسة هذا الملف";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "يتعمق في %1$lld مجلدًا فرعيًا (%2$@): تُستخرج ملفاتها.";
+"Reading a prompt: up to %lld%" = "قراءة المطالبة: حتى %lld%";
 "Reading what's installed…" = "جارٍ قراءة العناصر المثبّتة…";
 "Ready." = "جاهز.";
 "Ready. This is the Full build: the runtime is included." = "جاهز. هذا هو البناء Full: الـ runtime مضمن.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "بيئة تشغيل النموذج غير مثبتة بعد — شغّل نموذجًا مرة واحدة ثم أعد المحاولة.";
 "The model server no longer goes online when it starts." = "لم يعد خادم النموذج يتصل بالإنترنت عند بدء التشغيل.";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "الحد الأقصى الذي قد تشغله ذاكرة التخزين المؤقت للمطالبات السابقة (حجم ذاكرة التخزين المؤقت للمطالبة في الملف الشخصي هو أيضاً حد أعلى). المزيد يجعل المحادثات الطويلة والوكيلات أسرع؛ الكثير يترك دون مساحة للمطالبة الجاري قراءتها.";
 "The music generator is busy -- try again once it's done." = "مولِّد الموسيقى مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The music generator is busy with another chat -- try again once it's done." = "مولِّد الموسيقى مشغول بمحادثة أخرى — حاول مرة أخرى بعد الانتهاء.";
 "The name can be at most %lld characters." = "يمكن أن يكون الاسم بحد أقصى %lld حرفًا.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "لإعادته، استخدم Undo في LLMTray: أمر Put Back في Finder لا يعرف مجلده.";
 "Today" = "اليوم";
 "Today so far: %@ (sent once the day is over)" = "ما تم اليوم حتى الآن: %@ (يُرسل عند انتهاء اليوم)";
+"Together over 90%: reading a prompt gets %lld%." = "إذا كان المجموع فوق 90%: تحصل قراءة المطالبة على %lld%.";
 "Tokens" = "الرموز";
 "Too long for the selected model's room now, read by search instead: %@" = "طويل جدًا بالنسبة لمساحة النموذج المحدد الآن، سيُقرأ عبر البحث بدلًا من ذلك: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "طويل جدًا للتثبيت مع النموذج المحدد: ≈%1$@ رمزًا، تبقّى ≈%2$@ من %3$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "يستهلك Voice Lab نحو %1$@ غيغابايت؛ بمَصاحبة %2$@ غيغابايت لنموذج الدردشة يتوافق مع %3$@ غيغابايت التي قد يستخدمها الـGPU. مع ذلك يُفرغ نموذج الدردشة أثناء تشغيله.";
 "Voice Lab takes about %@ GB of memory while it runs." = "يستخدم Voice Lab نحو %@ غيغابايت من الذاكرة أثناء التشغيل.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "نموذج الصوت";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "انتظر حتى ينتهي الطلب الحالي أو الاختبار المعياري -- فإعادة التشغيل ستقطعه.";
 "Waiting for an image or song to finish…" = "انتظار انتهاء صورة أو أغنية…";
 "Waiting for another chat's image or music to finish…" = "بانتظار انتهاء صورة أو مقطع موسيقي من محادثة أخرى…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
 "Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "ذاكرة العمل لقراءة المطالبة على أجزاء؛ القليل يقرأ المطالبات الطويلة بخطوات أصغر وأبطأ. عندما يكون مجموع ذاكرة التخزين المؤقت للمطالبات في حد أقصى 90%: الباقي يحتفظ بالمطالبة الجاري قراءتها.";
 "Works offline" = "يعمل دون اتصال";
 "Writing the song…" = "جارٍ كتابة الأغنية…";
 "Yesterday" = "أمس";
