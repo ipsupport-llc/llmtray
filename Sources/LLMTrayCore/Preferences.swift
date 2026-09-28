@@ -79,6 +79,11 @@ public enum Pref {
     /// Of the context, and of the memory the weights leave, what pinned
     /// files may take (adr/0012, "Pinned files"), in percent.
     public static let pinnedFilesPercent = PrefKey("llmtray.projectFiles.pinnedPercent", default: 50)
+    /// The model server's share-out of the GPU memory its weights leave
+    /// (ServerLaunch.MemoryShares).
+    public static let memoryMarginMB = PrefKey("llmtray.server.memoryMarginMB", default: ServerLaunch.MemoryShares.default.marginMB)
+    public static let promptCacheSharePercent = PrefKey("llmtray.server.promptCacheSharePercent", default: ServerLaunch.MemoryShares.default.promptCachePercent)
+    public static let prefillSharePercent = PrefKey("llmtray.server.prefillSharePercent", default: ServerLaunch.MemoryShares.default.prefillPercent)
     /// Each model's (by path) last bytes-a-token samples from the server's
     /// counts, which size its pinned files (PinTokenRatios).
     public static let pinTokenSamples = PrefKey<[String: [Double]]>("llmtray.projectFiles.pinTokenSamples", default: [:])

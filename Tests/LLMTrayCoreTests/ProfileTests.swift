@@ -326,17 +326,28 @@ final class ToolPolicyUpgradeTests: XCTestCase {
 }
 
 final class PrefillMemoryTests: XCTestCase {
-    func testTheBudgetIsHalfOfWhatTheWeightsLeave() {
+    func testTheBudgetIsAFifthOfWhatTheWeightsLeave() {
         let gib: Int64 = 1 << 30
-        // 19 GB limit, 15.6 GB of weights: (19 - 15.6 - 1.5) / 2 ≈ 0.95 GB.
+        // 19 GB limit, 15.6 GB of weights: (19 - 15.6 - 1.5) × 20% ≈ 0.38 GB.
         let limit: UInt64 = 19_069_665_280
         let weights: Int64 = 15_571_069_431
         let margin: Int64 = 3 << 29
-        let expected = Int((Int64(limit) - weights - margin) / 2 / 1_048_576)
+        let expected = Int((Int64(limit) - weights - margin) * 20 / 100 / 1_048_576)
         XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights), expected)
         XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(8 * gib), weightsBytes: 8 * gib), 256)
         XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(128 * gib), weightsBytes: 4 * gib), 4096)
         XCTAssertNil(ServerLaunch.prefillMemoryMB(gpuLimitBytes: nil, weightsBytes: 0))
+    }
+
+    func testCacheAndPrefillLeaveRoomTogether() {
+        // The real OOM: a 5 GB cache and a 4 GB prefill budget took all a
+        // model left. Together they now stay at 60% of it.
+        let gib: Int64 = 1 << 30
+        let limit = UInt64(28 * gib), weights = 16 * gib
+        let headroom = ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)!
+        let cache = ServerLaunch.promptCacheBytes(profileMB: 8192, gpuHeadroomBytes: headroom)
+        let prefill = Int64(ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights)!) * 1_048_576
+        XCTAssertLessThanOrEqual(cache + prefill, (headroom - (3 << 29)) * 60 / 100 + 1_048_576)
     }
 
     func testTheFlagGoesInUnlessTheUserSetsIt() {
@@ -384,10 +395,10 @@ final class PromptCacheCapTests: XCTestCase {
         XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: nil), 4096 * mib)
     }
 
-    func testHalfOfWhatTheWeightsLeaveBesideTheMargin() {
-        // 64 GB limit less 60 GB of weights: (4 - 1.5) / 2 = 1.25 GB.
+    func testFortyPercentOfWhatTheWeightsLeaveBesideTheMargin() {
+        // 64 GB limit less 60 GB of weights: (4 - 1.5) × 40% = 1 GB.
         let headroom = ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: UInt64(64 * gib), weightsBytes: 60 * gib)
-        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: headroom), 1280 * mib)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 4096, gpuHeadroomBytes: headroom), 1024 * mib)
         // A smaller profile size still wins.
         XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 512, gpuHeadroomBytes: headroom), 512 * mib)
     }
@@ -407,8 +418,8 @@ final class PromptCacheCapTests: XCTestCase {
                                      gpuHeadroomBytes: 4 * gib)
         var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
         p.promptCacheMB = 4096
-        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-bytes"), String(1280 * mib))
-        XCTAssertEqual(ServerLaunch.promptCacheCut(p, c)?.effective, 1280 * mib)
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-bytes"), String(1024 * mib))
+        XCTAssertEqual(ServerLaunch.promptCacheCut(p, c)?.effective, 1024 * mib)
         XCTAssertEqual(ServerLaunch.promptCacheCut(p, c)?.profile, 4096 * mib)
 
         // The user's own flag, either spelling: theirs only, no cut logged.
@@ -456,5 +467,31 @@ final class PromptCacheCapTests: XCTestCase {
 
     private func argValue(_ args: [String], _ flag: String) -> String? {
         args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
+    }
+}
+
+final class MemorySharesTests: XCTestCase {
+    func testSharesAreSettingsNotConstants() {
+        let gib: Int64 = 1 << 30
+        let headroom: Int64 = 10 * gib
+        let custom = ServerLaunch.MemoryShares(marginMB: 1024, promptCachePercent: 25, prefillPercent: 10)
+        XCTAssertEqual(ServerLaunch.promptCacheBytes(profileMB: 1 << 20, gpuHeadroomBytes: headroom, shares: custom),
+                       (headroom - gib) * 25 / 100)
+        XCTAssertEqual(ServerLaunch.prefillMemoryMB(gpuLimitBytes: UInt64(20 * gib), weightsBytes: 10 * gib, shares: custom),
+                       Int((10 * gib - gib) * 10 / 100 / 1_048_576))
+        let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     gpuHeadroomBytes: headroom, memoryShares: custom)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        p.promptCacheMB = 1 << 20
+        let args = ServerLaunch.arguments(p, c)
+        XCTAssertEqual(args.firstIndex(of: "--prompt-cache-bytes").map { args[$0 + 1] }, String((headroom - gib) * 25 / 100))
+    }
+
+    func testTogetherAtMostNinetyPercent() {
+        let s = ServerLaunch.MemoryShares(marginMB: -5, promptCachePercent: 80, prefillPercent: 50)
+        XCTAssertEqual(s.marginMB, 0)
+        XCTAssertEqual(s.prefillPercent, 10)
+        XCTAssertEqual(ServerLaunch.MemoryShares(marginMB: 1, promptCachePercent: 150, prefillPercent: 5).promptCachePercent, 100)
+        XCTAssertEqual(ServerLaunch.MemoryShares.default, ServerLaunch.MemoryShares(marginMB: 1536, promptCachePercent: 40, prefillPercent: 20))
     }
 }

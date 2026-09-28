@@ -1083,6 +1083,9 @@ struct ServerPane: View {
     @AppStorage(Pref.allowLAN) private var allowLAN
     @AppStorage(Pref.modelSwitchPolicy) private var modelSwitchPolicy
     @AppStorage(Pref.stallThresholdSeconds) private var stallThresholdSeconds
+    @AppStorage(Pref.memoryMarginMB) private var memoryMarginMB
+    @AppStorage(Pref.promptCacheSharePercent) private var promptCacheSharePercent
+    @AppStorage(Pref.prefillSharePercent) private var prefillSharePercent
     @AppStorage(Pref.autoRestartStallThreshold) private var autoRestartStallThreshold
     @AppStorage(Pref.verboseServerLogging) private var verboseLogging
 
@@ -1114,6 +1117,20 @@ struct ServerPane: View {
                         SettingLabel(title: "When a client asks for another model", help: "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.")
                     }
                     .onChange(of: modelSwitchPolicy) { ModelSwitchPrompter.shared.policyChanged() }
+                }
+                Section("Memory") {
+                    Stepper(value: $memoryMarginMB, in: 512...8192, step: 256) {
+                        SettingLabel(title: "Kept free: \(memoryMarginMB) MB", help: "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it.")
+                    }
+                    Stepper(value: $promptCacheSharePercent, in: 0...80, step: 5) {
+                        SettingLabel(title: "Prompt cache: up to \(promptCacheSharePercent)% of the rest", help: "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.")
+                    }
+                    Stepper(value: $prefillSharePercent, in: 5...50, step: 5) {
+                        SettingLabel(title: "Reading a prompt: up to \(prefillSharePercent)%", help: "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.")
+                    }
+                    if promptCacheSharePercent + prefillSharePercent > 90 {
+                        Text("Together over 90%: reading a prompt gets \(max(0, 90 - promptCacheSharePercent))%.").font(.caption).foregroundStyle(.orange)
+                    }
                 }
                 Section("Recovery") {
                     Stepper(value: $stallThresholdSeconds, in: 10...300, step: 10) {

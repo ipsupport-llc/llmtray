@@ -328,6 +328,7 @@
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed.";
 "GPU memory limit" = "GPU memory limit";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: accept its license on Hugging Face and save a token in Settings › Models first.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models.";
@@ -405,6 +406,7 @@
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keep the loaded model" = "Keep the loaded model";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
+"Kept free: %lld MB" = "Kept free: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";
@@ -593,6 +595,7 @@
 "Prompt & tools" = "Prompt & tools";
 "Prompt (last request)" = "Prompt (last request)";
 "Prompt cache" = "Prompt cache";
+"Prompt cache: up to %lld% of the rest" = "Prompt cache: up to %lld% of the rest";
 "Prompt processing" = "Prompt processing";
 "Prompt size" = "Prompt size";
 "Prompt size (input sent to the model):" = "Prompt size (input sent to the model):";
@@ -611,6 +614,7 @@
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
+"Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading what's installed…" = "Reading what's installed…";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
@@ -828,6 +832,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model's license, from its card." = "The model's license, from its card.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
 "The name can be at most %lld characters." = "The name can be at most %lld characters.";
@@ -882,6 +887,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder.";
 "Today" = "Today";
 "Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
+"Together over 90%: reading a prompt gets %lld%." = "Together over 90%: reading a prompt gets %lld%.";
 "Tokens" = "Tokens";
 "Too long for the selected model's room now, read by search instead: %@" = "Too long for the selected model's room now, read by search instead: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left";
@@ -984,6 +990,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";
 "Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
