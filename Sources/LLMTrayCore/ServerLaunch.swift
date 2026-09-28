@@ -56,16 +56,23 @@ public enum ServerLaunch {
         gpuLimitBytes.map { Int64(clamping: $0) - weightsBytes }
     }
 
-    /// The prefill chunk's memory: half of what the GPU limit leaves beside
-    /// the weights and a 1.5 GB margin, 256 MB to 4 GB (a long prompt with
-    /// a fixed big chunk ran a 26B model out of memory at a 30K offset).
+    /// Of what the weights leave beside the margin, the shares: the prompt
+    /// cache and a prefill chunk's scratch must not add up to all of it --
+    /// the live KV cache and a checkpoint's copy need the rest (both at a
+    /// half ran a 35K-token prefill out of memory with a 5 GB cache).
+    public static let promptCacheShare: Int64 = 40
+    public static let prefillShare: Int64 = 20
+
+    /// The prefill chunk's memory: a fifth of what the GPU limit leaves
+    /// beside the weights and a 1.5 GB margin, 256 MB to 4 GB (a long prompt
+    /// with a fixed big chunk ran a 26B model out of memory at a 30K offset).
     public static func prefillMemoryMB(gpuLimitBytes: UInt64?, weightsBytes: Int64) -> Int? {
         guard let gpuLimitBytes else { return nil }
         let free = Int64(clamping: gpuLimitBytes) - weightsBytes - memoryMargin
-        return min(4096, max(256, Int(free / 2 / 1_048_576)))
+        return min(4096, max(256, Int(free * prefillShare / 100 / 1_048_576)))
     }
 
-    /// `--prompt-cache-bytes`: the profile's size, but at most half of what
+    /// `--prompt-cache-bytes`: the profile's size, but at most 40% of what
     /// the model leaves beside a 1.5 GB margin. The cached KV lives in GPU
     /// memory too -- a 4 GB cache beside a model that leaves 1.2 GB ran a
     /// 20K-token prefill out of memory. 0 when nothing's left: the runtime
@@ -74,7 +81,7 @@ public enum ServerLaunch {
     public static func promptCacheBytes(profileMB: Int, gpuHeadroomBytes: Int64?) -> Int64 {
         let profile = Int64(max(0, profileMB)) * 1_048_576
         guard let gpuHeadroomBytes else { return profile }
-        return min(profile, max(0, (gpuHeadroomBytes - memoryMargin) / 2))
+        return min(profile, max(0, (gpuHeadroomBytes - memoryMargin) * promptCacheShare / 100))
     }
 
     /// The prompt cache a launch gets when the GPU memory cuts it below the
