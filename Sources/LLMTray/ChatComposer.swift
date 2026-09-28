@@ -3,6 +3,13 @@ import LLMTrayCore
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// An image loaded off the main thread and handed to it: nothing touches it
+/// on the loading side afterwards. Swift 6's region analysis sees that on
+/// its own; Swift 5.10 (CI) needs the promise spelled out.
+private struct HandedOff<Value>: @unchecked Sendable {
+    let value: Value
+}
+
 /// The message being composed: its text and attached images. Shared by the
 /// composer and the chat area (images can be dropped on either).
 @MainActor
@@ -64,8 +71,8 @@ final class ComposerModel: ObservableObject {
             } else if provider.canLoadObject(ofClass: NSImage.self) {
                 handled = true
                 _ = provider.loadObject(ofClass: NSImage.self) { obj, _ in
-                    let image = obj as? NSImage
-                    DispatchQueue.main.async { self.attach(image) }
+                    let image = HandedOff(value: obj as? NSImage)
+                    DispatchQueue.main.async { self.attach(image.value) }
                 }
             }
         }

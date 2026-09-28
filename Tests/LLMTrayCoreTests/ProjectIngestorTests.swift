@@ -80,7 +80,8 @@ final class FakeExtractor: @unchecked Sendable {
     }
 }
 
-@MainActor
+// XCTestCase is nonisolated: the tests (not the class) are main-actor
+// isolated, which Swift 5.10 and 6 both accept.
 final class ProjectIngestorTests: XCTestCase {
     var root: URL!
     var files: URL!
@@ -98,7 +99,7 @@ final class ProjectIngestorTests: XCTestCase {
         files = root.appendingPathComponent("sources")
         try FileManager.default.createDirectory(at: files, withIntermediateDirectories: true)
         registry = ProjectIndexRegistry(directory: { [root] in root!.appendingPathComponent($0.uuidString) }, idleDelay: 0.05)
-        queue = GenerationQueue(pollInterval: 0.01)
+        queue = await GenerationQueue(pollInterval: 0.01)
         extractor = FakeExtractor()
         embedder = FakeEmbedder()
     }
@@ -107,6 +108,10 @@ final class ProjectIngestorTests: XCTestCase {
         registry?.closeAll()
         if let root { try? FileManager.default.removeItem(at: root) }
     }
+}
+
+@MainActor
+extension ProjectIngestorTests {
 
     func environment(extract: ((URL) async throws -> DocumentExtraction.Document)? = nil) -> ProjectIngestor.Environment {
         let ex = extractor!
@@ -662,8 +667,8 @@ final class ProjectIngestorTests: XCTestCase {
 
 /// The ingest with the real extractor child (`LLMTray --extract`), as in the
 /// app: generated text and HTML files reach `searchable`.
-@MainActor
 final class ProjectIngestExtractorTests: XCTestCase {
+    @MainActor
     func testTextAndHTMLThroughTheRealExtractor() async throws {
         let beside = Bundle(for: Self.self).bundleURL.deletingLastPathComponent().appendingPathComponent("LLMTray").path
         let binary = ProcessInfo.processInfo.environment["LLMTRAY_BINARY"] ?? beside

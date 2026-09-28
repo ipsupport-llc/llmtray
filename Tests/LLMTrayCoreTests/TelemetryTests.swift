@@ -215,7 +215,8 @@ final class TelemetryCountersTests: XCTestCase {
 }
 
 /// The client and the uploader against a stub: nothing reaches ipsupport.us.
-@MainActor
+// XCTestCase is nonisolated: the tests (not the class) are main-actor
+// isolated, which Swift 5.10 and 6 both accept.
 final class TelemetryUploaderTests: XCTestCase {
     final class Stub: URLProtocol {
         static var statuses: [Int] = []
@@ -257,12 +258,16 @@ final class TelemetryUploaderTests: XCTestCase {
         storeURL = FileManager.default.temporaryDirectory.appendingPathComponent("telemetry-\(UUID().uuidString)/telemetry.json")
         let client = TelemetryClient(endpoint: endpoint, session: ReviewClient.makeSession { $0.protocolClasses = [Stub.self] },
                                      userAgent: "LLMTray/0.7.2")
-        uploader = TelemetryUploader(client: client, calendar: utc)
+        uploader = await TelemetryUploader(client: client, calendar: utc)
     }
 
     override func tearDown() async throws {
         try? FileManager.default.removeItem(at: storeURL.deletingLastPathComponent())
     }
+}
+
+@MainActor
+extension TelemetryUploaderTests {
 
     private func store(_ days: [String]) -> TelemetryCounterStore {
         let store = TelemetryCounterStore(url: storeURL)
@@ -296,7 +301,7 @@ final class TelemetryUploaderTests: XCTestCase {
         let store = store(["2026-09-25", "2026-09-26"])
         final class Box: @unchecked Sendable { var sent: [(String, Data)] = [] }
         let box = Box()
-        uploader.onSent = { day, body in box.sent.append((day, body)) }
+        uploader.onSent = { @Sendable day, body in box.sent.append((day, body)) }
         await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
         XCTAssertEqual(box.sent.map(\.0), ["2026-09-26"])   // the 400 one wasn't stored
         XCTAssertEqual(box.sent.first?.1, Stub.bodies.last)
