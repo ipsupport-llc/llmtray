@@ -195,7 +195,7 @@ struct VoiceLabView: View {
         if !store.isEnabled {
             Text("Voice Lab is off -- turn it on in Settings > Voice.")
                 .font(.caption).foregroundStyle(.orange)
-        } else if !store.isDownloaded(.default) {
+        } else if !store.isDownloaded(store.selected) {
             Text("The voice model isn't downloaded -- download it in Settings > Voice.")
                 .font(.caption).foregroundStyle(.orange)
         }

@@ -103,6 +103,9 @@ public enum Pref {
     public static let voiceLabEnabled = PrefKey("llmtray.voiceLab.enabled", default: false)
     /// `VoiceLabMode` raw value: full duplex, walkie-talkie, or picked by speed.
     public static let voiceLabMode = PrefKey("llmtray.voiceLab.mode", default: VoiceLabMode.auto.rawValue)
+    /// `VoiceLabModel.id` picked in Settings > Voice; empty: not picked yet
+    /// (`VoiceLabModel.resolve` then keeps a model already on disk).
+    public static let voiceLabModel = PrefKey("llmtray.voiceLab.model", default: "")
 
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.

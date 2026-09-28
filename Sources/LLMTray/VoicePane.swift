@@ -15,7 +15,7 @@ struct VoicePane: View {
     @State private var chatBytes: Int64?
     @State private var partial = false
     @AppStorage(Pref.voiceLabMode) private var mode
-    private let model = VoiceLabModel.default
+    private var model: VoiceLabModel { store.selected }
 
     var body: some View {
         Form {
@@ -46,7 +46,7 @@ struct VoicePane: View {
             }
         }
         .formStyle(.grouped)
-        .task(id: store.revision) {
+        .task(id: "\(store.revision)-\(model.id)") {
             partial = store.hasPartialDownload(model)
         }
         .task(id: server.loadedModelPath) {
@@ -58,6 +58,15 @@ struct VoicePane: View {
 
     private var modelSection: some View {
         Section("Model") {
+            LabeledContent {
+                Picker("", selection: $store.selected) {
+                    ForEach(VoiceLabModel.all) { Text(verbatim: $0.displayName).tag($0) }
+                }
+                .labelsHidden()
+                .disabled(store.isBusy || session.isActive)
+            } label: {
+                SettingLabel(title: "Voice model", help: "GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask.")
+            }
             LabeledContent {
                 HStack {
                     Text(verbatim: statusText).foregroundStyle(.secondary).lineLimit(2)

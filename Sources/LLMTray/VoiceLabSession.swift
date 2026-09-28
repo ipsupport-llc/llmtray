@@ -101,11 +101,13 @@ final class VoiceLabSession: ObservableObject {
     // MARK: Start
 
     /// Voice Lab is on and its model downloaded: Start can work.
-    func canStart(model: VoiceLabModel = .default) -> Bool {
-        VoiceModelStore.shared.isEnabled && VoiceModelStore.shared.isDownloaded(model)
+    func canStart(model: VoiceLabModel? = nil) -> Bool {
+        let store = VoiceModelStore.shared
+        return store.isEnabled && store.isDownloaded(model ?? store.selected)
     }
 
-    func start(model: VoiceLabModel = .default) {
+    func start(model: VoiceLabModel? = nil) {
+        let model = model ?? VoiceModelStore.shared.selected
         guard !isActive, canStart(model: model) else { return }
         generation += 1
         let run = generation

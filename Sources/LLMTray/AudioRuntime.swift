@@ -36,8 +36,12 @@ final class AudioRuntime: ObservableObject {
     /// runtime; advanced deliberately -- the runner patches internals. A
     /// tarball of the commit needs no git on the Mac. b99f797 (fork PR #2):
     /// VoiceChat loads mlx-community's (mlx-vlm v2) checkpoints offline,
-    /// tokenizer from the model folder.
-    static let mlxAudioCommit = "b99f7973cd1285d1589013fe03e877d6340106ec"
+    /// tokenizer from the model folder. 2dce524 (fork PR #3): VoiceChat
+    /// speedups -- bf16 perception with a compiled conformer, the TTS
+    /// mixture head computing only the sampled mixture, compiled TTS codes
+    /// and codec step (185 -> ~88 ms per 80 ms frame on a base M5 with
+    /// the GPTQ-3 model).
+    static let mlxAudioCommit = "2dce52460b2ff95793bb18ba93404c7bf531d141"
 
     /// mlx-audio with what both runners import. The voice models' part is
     /// mlx-audio's `sts` extras (pyproject.toml), listed here rather than
