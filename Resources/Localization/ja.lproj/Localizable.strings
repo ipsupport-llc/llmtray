@@ -329,7 +329,9 @@
 "Full duplex" = "フルデュプレックス";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "フルデュプレックス：いつでも話せます。モデルは発話中でもあなたの声を聞きます — リアルタイムで動作する Mac が必要です。ウォーキートーキー：話して Done を押し、その後に聞きます。Automatic は Voice Lab 起動時にこの Mac の測定速度で選択されます。";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "フルデュプレックス：いつでも話せます。モデルは発話中でもあなたの声を聞きます — リアルタイムで動作する Mac が必要です。ウォーキートーキー：話して Done を押し、その後に聞きます。Automatic はこの Mac の測定速度で選択されます。";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit：IPSupport が同モデルを 3 ビットでビルドしたもの。小さく高速で、テストではすべて正しい回答。4-bit：mlx-community がビルドしたもの。どちらも要求時にのみダウンロードされます。";
 "GPU memory limit" = "GPU メモリ制限";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "モデルサーバーが重みのほかに活性化やmacOSのために確保しておくGPUメモリ。以下の比率は、そこから残った部分を分割します。";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated：Hugging Face でライセンスを承認し、Settings › Models でトークンを保存してください。";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "制限付き: その Hugging Face ページでライセンスを承諾し、設定 → Models にトークンを追加してください。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "制限付き: その Hugging Face ページでアクセスを申請してください（著者による審査があります）。設定 → Models にトークンを追加してください。";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "最後のメッセージを保持: %lld";
 "Keep the loaded model" = "読み込まれているモデルを維持";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量子化前に、コンテキストの先頭Nトークンをフル精度で保持します。値を高くすると、長いプロンプトの精度は上がりますが、メモリ節約効果は下がります。";
+"Kept free: %lld MB" = "確保済み: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray にマイク使用の許可がありません。";
 "LLMTray status, indexing project files" = "LLMTray の状態 — プロジェクトファイルをインデックス化中";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "プロンプトとツール";
 "Prompt (last request)" = "プロンプト（直近のリクエスト）";
 "Prompt cache" = "プロンプトキャッシュ";
+"Prompt cache: up to %lld% of the rest" = "プロンプトキャッシュ: 残りの最大 %lld%";
 "Prompt processing" = "プロンプト処理";
 "Prompt size" = "プロンプトサイズ";
 "Prompt size (input sent to the model):" = "プロンプトサイズ（モデルに送信される入力）:";
@@ -613,6 +617,7 @@
 "Re-index %@" = "%@ を再インデックス";
 "Re-index this file" = "このファイルを再インデックス";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "%1$lld 個のサブフォルダ（%2$@）を確認します: そこからファイルは取り出されます。";
+"Reading a prompt: up to %lld%" = "プロンプト読み取り: 最大 %lld%";
 "Reading what's installed…" = "インストール済み項目を読み込んでいます…";
 "Ready." = "準備完了。";
 "Ready. This is the Full build: the runtime is included." = "準備完了。これは Full ビルドで、ランタイムが同梱されています。";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "モデルランタイムがまだインストールされていません。モデルを一度起動してから、もう一度お試しください。";
 "The model server no longer goes online when it starts." = "モデルサーバーは起動時にオンラインになりません。";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "過去プロンプトのキャッシュが占め得る最大量（プロファイルのPrompt cacheサイズも上限になります）。多いと長い会話やエージェントが高速になりますが、過剰だと現在読み取るプロンプトの余地がなくなります。";
 "The music generator is busy -- try again once it's done." = "音楽生成が使用中です。終了後にもう一度お試しください。";
 "The music generator is busy with another chat -- try again once it's done." = "音楽生成は別のチャットで使用中です。終了後にもう一度お試しください。";
 "The name can be at most %lld characters." = "名前は最大%lld文字までです。";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "元に戻すには LLMTray の Undo を使用してください：Finder の Put Back は元のフォルダを認識しません。";
 "Today" = "今日";
 "Today so far: %@ (sent once the day is over)" = "本日これまで: %@（日付が変わると送信されます）";
+"Together over 90%: reading a prompt gets %lld%." = "合計が90%を超える場合: プロンプト読み取りに %lld% が割り当てられます。";
 "Tokens" = "トークン数";
 "Too long for the selected model's room now, read by search instead: %@" = "選択されたモデルのルームには長すぎるため、代わりに検索で読み取ります: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "選択モデルではピン留め不可（長すぎます）: 約 %1$@ トークン、残り 約 %2$@ ／ %3$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab は約 %1$@ GB を使用します；チャットモデルの %2$@ GB と合わせて GPU が使用可能な %3$@ GB に収まります。それでも実行中はチャットモデルがアンロードされます。";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab は実行中に約 %@ GB のメモリを使用します。";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "音声モデル";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
 "Waiting for an image or song to finish…" = "画像または曲の生成完了を待っています…";
 "Waiting for another chat's image or music to finish…" = "別のチャットの画像または音楽の処理が終わるのを待っています…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which model generates new images." = "どのモデルが新しい画像を生成するか。";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "プロンプトを分割して読み取るための作業メモリ。小さいほど長いプロンプトはより小さく遅いステップで読み取られます。プロンプトキャッシュと合わせて最大で90%の場合: 残りが現在読み取られるプロンプトを保持します。";
 "Works offline" = "オフラインで動作";
 "Writing the song…" = "楽曲を作成中…";
 "Yesterday" = "昨日";

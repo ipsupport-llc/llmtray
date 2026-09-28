@@ -329,7 +329,9 @@
 "Full duplex" = "דו‑כיווני מלא";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "דו‑כיווני מלא: דבר בכל עת — המודל שומע אותך בזמן שהוא מדבר. דורש Mac שמריץ זאת בזמן אמת. ווקי‑טוקי: דבר, הקש על 'סיום', ואז הקשב. 'אוטומטי' נבחר לפי מהירות המדידה של ה‑Mac כש‑Voice Lab מתחיל.";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "דו‑כיווני מלא: דבר בכל עת — המודל שומע אותך בזמן שהוא מדבר. דורש Mac שמריץ זאת בזמן אמת. ווקי‑טוקי: דבר, הקש על 'סיום', ואז הקשב. 'אוטומטי' נבחר לפי מהירות המדידה של ה‑Mac.";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑bit: גרסת ה‑IPSupport של אותו מודל עם מודל שפה ב‑3‑bit — קטן ומהיר יותר, בכל המבחנים עונה נכון. 4‑bit: גרסת mlx‑community. כל אחת מורדת רק כשאתה מבקש.";
 "GPU memory limit" = "מגבלת זיכרון GPU";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "זיכרון GPU שהשרת של המודל משאיר פנוי לצד המשקלים, עבור אקטיבציות ו‑macOS. החלוקות למטה מחלקות את מה שנשאר לאחר מכן.";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: קבלו את הרישיון ב‑Hugging Face ושמרו אסימון ב‑Settings › Models קודם.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "מוגבל: קבל את הרישיון בעמוד ה‑Hugging Face שלו, והוסף אסימון ב‑Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "מוגבל: בקש גישה בעמוד ה‑Hugging Face שלו (המחברים בוחנים את הבקשה), והוסף אסימון ב‑Settings → Models.";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "השאר הודעות אחרונות: %lld";
 "Keep the loaded model" = "השאר את המודל הטעון";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "שומר את N הטוקנים הראשונים של ההקשר בדיוק מלא לפני קוונטיזציה. ערך גבוה יותר מחליף חיסכון בזיכרון בדיוק בהנחיות ארוכות.";
+"Kept free: %lld MB" = "שמורים פנויים: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "אין ל‑LLMTray הרשאה להשתמש במיקרופון.";
 "LLMTray status, indexing project files" = "סטטוס LLMTray — אינדוקס קבצי פרויקט";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "הנחיה וכלים";
 "Prompt (last request)" = "הנחיה (הבקשה האחרונה)";
 "Prompt cache" = "מטמון ההנחיה";
+"Prompt cache: up to %lld% of the rest" = "מטמון הפקודות: עד %lld% מהנותר";
 "Prompt processing" = "עיבוד ההנחיה";
 "Prompt size" = "גודל ההנחיה";
 "Prompt size (input sent to the model):" = "גודל ההנחיה (קלט שנשלח למודל):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "אונדקס מחדש %@";
 "Re-index this file" = "אונדקס את הקובץ שוב";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "נכנס ל־%1$lld תיקיות משנה (%2$@): הקבצים שלהן יוצאו מהן.";
+"Reading a prompt: up to %lld%" = "קריאת פקודה: עד %lld%";
 "Reading what's installed…" = "קורא מה מותקן…";
 "Ready." = "מוכן.";
 "Ready. This is the Full build: the runtime is included." = "מוכן. זו הבנייה Full: ה‑runtime כלול.";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "ה-runtime של המודל עדיין לא מותקן — הפעל מודל פעם אחת ואז נסה שוב.";
 "The model server no longer goes online when it starts." = "שרת המודל כבר לא מתחבר לאינטרנט כשהוא מתחיל לפעול.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "המקסימום שמטמון הפקודות הקודמות יכול לתפוס (גם הגדרת גודל מטמון הפקודות בפרופיל מהווה תקרה). יותר משפר מהירויות בצ'אטים ארוכים ובסוכנים; יותר מדי ישאיר מעט מקום לקריאת הפקודה הנוכחית.";
 "The music generator is busy -- try again once it's done." = "מחולל המוזיקה עסוק — נסה שוב כשתהליך יסתיים.";
 "The music generator is busy with another chat -- try again once it's done." = "מחולל המוזיקה עסוק בצ׳אט אחר — נסה שוב כשתהליך יסתיים.";
 "The name can be at most %lld characters." = "השם יכול להיות עד %lld תווים.";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "להשיבו חזור השתמש ב־Undo ב־LLMTray: Finder's Put Back לא יודע את התיקייה שלו.";
 "Today" = "היום";
 "Today so far: %@ (sent once the day is over)" = "היום עד כה: %@ (יימסר בסיום היום)";
+"Together over 90%: reading a prompt gets %lld%." = "בסך הכל מעל 90%: קריאת הפקודה תקבל %lld%.";
 "Tokens" = "טוקנים";
 "Too long for the selected model's room now, read by search instead: %@" = "ארוך מדי לעת עתה לחדר של המודל הנבחר, ייקרא באמצעות חיפוש במקום זאת: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "ארוך מדי לסימון עם המודל הנבחר: ≈%1$@ טוקנים, נותרו ≈%2$@ מתוך %3$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab תופס כ‑%1$@ GB; ביחד עם %2$@ GB של מודל הצ'אט זה נכנס בתוך %3$@ GB שה‑GPU עשוי להשתמש בהם. עם זאת, מודל הצ'אט מנותק בזמן הריצה.";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab צורך כ‑%@ GB זיכרון בזמן הריצה.";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "מודל קול";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
 "Waiting for an image or song to finish…" = "ממתין לסיום יצירת תמונה או שיר…";
 "Waiting for another chat's image or music to finish…" = "מחכה לסיום יצירת תמונה או מוזיקה משיחה אחרת…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
 "Works offline" = "עובד ללא חיבור";
 "Writing the song…" = "כותב את השיר…";
 "Yesterday" = "אתמול";

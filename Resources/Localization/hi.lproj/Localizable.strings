@@ -329,7 +329,9 @@
 "Full duplex" = "पूर्ण डुप्लेक्स";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "पूर्ण डुप्लेक्स: कभी भी बोलें, मॉडल बोलते हुए आपको सुनता है — इसके लिए रीयल-टाइम चलाने में सक्षम Mac चाहिए। वॉकी-टॉकी: बोलें, Done दबाएँ, फिर सुनें। Automatic Voice Lab शुरू होने पर इस Mac की मापी गई गति से चुनता है।";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "पूर्ण डुप्लेक्स: कभी भी बोलें, मॉडल बोलते हुए आपको सुनता है — इसके लिए रीयल-टाइम चलाने में सक्षम Mac चाहिए। वॉकी-टॉकी: बोलें, Done दबाएँ, फिर सुनें। Automatic इस Mac की मापी हुई गति से चुनता है।";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit: IPSupport द्वारा बनाया गया वही मॉडल 3-बिट भाषा मॉडल के साथ — छोटा और तेज़, हर टेस्ट का जवाब सही। 4-bit: mlx-community का निर्माण। हर मॉडल केवल आपके अनुरोध पर ही डाउनलोड होता है।";
 "GPU memory limit" = "GPU मेमोरी सीमा";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "मॉडल सर्वर वेट्स के अलावा सक्रियताओं और macOS के लिए जो GPU मेमोरी अलग रखता है। नीचे दिए शेयर उस बची हुई मेमोरी को विभाजित करते हैं।";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: पहले Hugging Face पर उसकी लाइसेंस स्वीकार करें और Settings › Models में टोकन सुरक्षित करें।";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "आखिरी %lld संदेश रखें";
 "Keep the loaded model" = "लोड किया गया मॉडल रखें";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "क्वांटाइज़ करने से पहले संदर्भ के पहले N टोकन को पूरी precision पर रखता है। ज़्यादा मान लंबे प्रॉम्प्ट पर सटीकता बढ़ाता है, लेकिन मेमोरी बचत कम करता है।";
+"Kept free: %lld MB" = "खाली रखा गया: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray को माइक्रोफ़ोन उपयोग करने की अनुमति नहीं है।";
 "LLMTray status, indexing project files" = "LLMTray स्थिति, प्रोजेक्ट फाइलों का इंडेक्स बन रहा है";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "प्रॉम्प्ट और टूल";
 "Prompt (last request)" = "प्रॉम्प्ट (अंतिम अनुरोध)";
 "Prompt cache" = "प्रॉम्प्ट कैश";
+"Prompt cache: up to %lld% of the rest" = "प्रॉम्प्ट कैश: बाकी का अधिकतम %lld%";
 "Prompt processing" = "प्रॉम्प्ट संसाधन";
 "Prompt size" = "प्रॉम्प्ट आकार";
 "Prompt size (input sent to the model):" = "प्रॉम्प्ट आकार (मॉडल को भेजा गया इनपुट):";
@@ -613,6 +617,7 @@
 "Re-index %@" = "फिर से इंडेक्स करें %@";
 "Re-index this file" = "इस फाइल का फिर से इंडेक्स बनाएं";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "यह %1$lld सबफ़ोल्डर (%2$@) में भी जाता है: उनकी फाइलें बाहर निकाली जाती हैं।";
+"Reading a prompt: up to %lld%" = "प्रॉम्प्ट पढ़ना: अधिकतम %lld%";
 "Reading what's installed…" = "इंस्टॉल किए जा रहे घटकों की जाँच हो रही है…";
 "Ready." = "तैयार।";
 "Ready. This is the Full build: the runtime is included." = "तैयार। यह Full बिल्ड है: runtime शामिल है।";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "मॉडल runtime अभी स्थापित नहीं है — एक बार मॉडल प्रारंभ करें, फिर पुनः प्रयास करें।";
 "The model server no longer goes online when it starts." = "मॉडल सर्वर अब शुरू होते समय ऑनलाइन नहीं जाता।";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "पहले के प्रॉम्प्ट्स का कैश अधिकतम कितना ले सकता है (प्रोफ़ाइल का Prompt cache size भी सीमा है)। अधिक रखने से लंबे चैट और एजेंट तेज़ होते हैं; बहुत ज्यादा रखने से वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए जगह नहीं बचती।";
 "The music generator is busy -- try again once it's done." = "संगीत जेनरेटर व्यस्त है — पूरा होने के बाद पुनः प्रयास करें।";
 "The music generator is busy with another chat -- try again once it's done." = "संगीत जेनरेटर किसी अन्य चैट में व्यस्त है — पूरा होने पर पुनः प्रयास करें।";
 "The name can be at most %lld characters." = "नाम अधिकतम %lld अक्षर का हो सकता है।";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "इसे वापस रखने के लिए LLMTray में Undo का उपयोग करें: Finder का Put Back उसका फ़ोल्डर नहीं जानता।";
 "Today" = "आज";
 "Today so far: %@ (sent once the day is over)" = "आज तक: %@ (दिन पूरा होने पर भेजा जाएगा)";
+"Together over 90%: reading a prompt gets %lld%." = "सर्गिक रूप से 90% से अधिक: प्रॉम्प्ट पढ़ने को %lld% मिलता है।";
 "Tokens" = "Tokens";
 "Too long for the selected model's room now, read by search instead: %@" = "चयनित मॉडल के रूम के लिए अब बहुत लंबा है, खोज द्वारा पढ़ा जाएगा: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "चयनित मॉडल के साथ पिन करने के लिए बहुत लंबा: ≈%1$@ टोकन, ≈%2$@ में से %3$@ शेष";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab लगभग %1$@ GB लेता है; चैट मॉडल के %2$@ GB के साथ यह उस %3$@ GB में समाहित हो जाता है जिसे GPU उपयोग कर सकता है। फिर भी चलने पर चैट मॉडल अनलोड रहता है।";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab चलते समय लगभग %@ GB मेमोरी लेता है।";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "वॉइस मॉडल";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "मौजूदा अनुरोध या बेंचमार्क पूरा होने तक प्रतीक्षा करें — रीस्टार्ट करने से यह अधूरा रह जाएगा।";
 "Waiting for an image or song to finish…" = "किसी छवि या गाने के समाप्त होने का इंतजार कर रहा है…";
 "Waiting for another chat's image or music to finish…" = "किसी अन्य चैट की छवि या संगीत समाप्त होने की प्रतीक्षा…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "प्रॉम्प्ट को भागों में पढ़ने के लिए वर्किंग मेमोरी; कम होने पर लंबे प्रॉम्प्ट छोटे, धीमे चरणों में पढ़े जाते हैं। यदि प्रॉम्प्ट कैश कुल मिलाकर अधिकतम 90% है तो बाकी भाग वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए सुरक्षित रहता है।";
 "Works offline" = "ऑफ़लाइन काम करता है";
 "Writing the song…" = "गाना लिखा जा रहा है…";
 "Yesterday" = "कल";

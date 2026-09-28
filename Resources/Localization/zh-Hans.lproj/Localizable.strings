@@ -329,7 +329,9 @@
 "Full duplex" = "全双工";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "全双工：随时说话，模型在说话时也能听到你——需支持实时运行的 Mac。对讲机模式：说话后按“完成”再听。自动根据本机在 Voice Lab 启动时测得的速度选择。";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "全双工：随时说话，模型在说话时也能听到你——需支持实时运行的 Mac。对讲机模式：说话后按“完成”再听。自动根据本机测得的速度选择。";
+"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit：IPSupport 提供的同一模型的 3 位版本——更小更快，所有测试答案均正确。4-bit：mlx-community 的构建。仅在您请求时下载。";
 "GPU memory limit" = "GPU 内存上限";
+"GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "模型服务器除权重外为激活和 macOS 保留的不动用 GPU 内存。下面的份额划分剩余可用内存。";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "受限：请先在 Hugging Face 接受其许可并在“设置 › 模型”中保存令牌。";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面接受许可，并在“设置 → 模型”中添加令牌。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "受限：请在其 Hugging Face 页面申请访问（作者会审核），并在“设置 → 模型”中添加令牌。";
@@ -407,6 +409,7 @@
 "Keep last messages: %lld" = "保留末尾消息：%lld";
 "Keep the loaded model" = "保持已加载的模型";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "量化前将上下文的前 N 个词元保留为全精度。数值越高，内存节省越少，但长提示词准确性越高。";
+"Kept free: %lld MB" = "保留空闲：%lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允许使用麦克风。";
 "LLMTray status, indexing project files" = "LLMTray 状态：正在为项目文件建立索引";
@@ -595,6 +598,7 @@
 "Prompt & tools" = "提示词与工具";
 "Prompt (last request)" = "提示（最近请求）";
 "Prompt cache" = "提示词缓存";
+"Prompt cache: up to %lld% of the rest" = "提示缓存：最多占其余的 %lld%";
 "Prompt processing" = "提示处理";
 "Prompt size" = "提示词大小";
 "Prompt size (input sent to the model):" = "提示词大小（发送给模型的输入）：";
@@ -613,6 +617,7 @@
 "Re-index %@" = "重新建立 %@ 索引";
 "Re-index this file" = "为此文件重新建立索引";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "将进入 %1$lld 个子文件夹（%2$@）：其文件将被移出。";
+"Reading a prompt: up to %lld%" = "读取提示：最多 %lld%";
 "Reading what's installed…" = "正在读取已安装内容…";
 "Ready." = "已就绪。";
 "Ready. This is the Full build: the runtime is included." = "已就绪。此为 Full 版本：包含运行时。";
@@ -830,6 +835,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型运行时尚未安装——先启动一次模型，然后重试。";
 "The model server no longer goes online when it starts." = "模型服务器启动时不再自动联网。";
 "The model's license, from its card." = "来自模型卡的许可。";
+"The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示缓存最多可占用的空间（配置文件中的提示缓存大小同样是上限）。更多缓存可加速长对话与代理；但过多会挤占正在读取的提示空间。";
 "The music generator is busy -- try again once it's done." = "音乐生成器正在忙碌——完成后请重试。";
 "The music generator is busy with another chat -- try again once it's done." = "音乐生成器正处理其他聊天——完成后请重试。";
 "The name can be at most %lld characters." = "名称最多可为 %lld 个字符。";
@@ -884,6 +890,7 @@
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "要恢复，请在 LLMTray 中使用“撤销”：Finder 的“放回原处”无法识别其文件夹。";
 "Today" = "今天";
 "Today so far: %@ (sent once the day is over)" = "今日至今：%@（将在当天结束后发送）";
+"Together over 90%: reading a prompt gets %lld%." = "合计超过 90%：读取提示将获得 %lld%。";
 "Tokens" = "标记数";
 "Too long for the selected model's room now, read by search instead: %@" = "对于当前选定模型的空间过长，改为通过搜索读取：%@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "对于所选模型无法置顶：约 %1$@ 令牌，剩余约 %3$@ 的 %2$@";
@@ -956,6 +963,7 @@
 "Voice Lab takes about %1$@ GB; with the chat model's %2$@ GB it fits the %3$@ GB the GPU may use. The chat model is unloaded while it runs all the same." = "Voice Lab 大约占用 %1$@ GB；加上聊天模型的 %2$@ GB 后可在 GPU 可用的 %3$@ GB 内运行，但仍会在运行时卸载聊天模型。";
 "Voice Lab takes about %@ GB of memory while it runs." = "Voice Lab 运行时大约占用 %@ GB 内存。";
 "Voice Lab…" = "Voice Lab…";
+"Voice model" = "语音模型";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "请等待当前请求或基准测试完成——重启会将其中断。";
 "Waiting for an image or song to finish…" = "等待图片或歌曲生成完成…";
 "Waiting for another chat's image or music to finish…" = "正在等待另一个聊天的图片或音乐生成完成…";
@@ -986,6 +994,7 @@
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
 "Which model generates new images." = "用于生成新图像的模型。";
 "Wikipedia" = "Wikipedia";
+"Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "分块读取提示时的工作内存；数值较小会以更小、更慢的步长读取长提示。当提示缓存与此合计最多为 90% 时：其余部分用于保存正在读取的提示。";
 "Works offline" = "支持离线使用";
 "Writing the song…" = "正在创作歌曲…";
 "Yesterday" = "昨天";
