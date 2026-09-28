@@ -35,9 +35,9 @@ to be measured on a 26 GB M5 before we commit):
 
 | Role | Model | Notes |
 |---|---|---|
-| Speech-to-speech | **PersonaPlex 7B** (NVIDIA, Moshi architecture) | full duplex, 18 voices, English |
-| Speech-to-speech | **NVIDIA VoiceChat 11B** | full duplex, text + function channels, English |
-| Speech-to-speech | Moshi (Kyutai) | the original full-duplex model, English/French |
+| Speech-to-speech | **NVIDIA VoiceChat 11B** 4-bit | full duplex via mlx-audio `create_duplex_session`, text + function channels, English; OpenMDW 1.1, not gated |
+| Speech-to-speech | PersonaPlex 7B (NVIDIA, Moshi architecture) | full duplex, 18 voices, English; gated upstream, MLX conversions tagged non-commercial, not in mlx-audio |
+| Speech-to-speech | Moshi (Kyutai) | the original full-duplex model; CC-BY 4.0; moshi_mlx pins mlx < 0.27 |
 | STT | **Parakeet TDT 0.6B v3** | 25 European languages incl. Russian, fast |
 | STT | Whisper large-v3-turbo | 99 languages, the safe fallback |
 | STT | Qwen3-ASR | strongest on accents and noise, larger |
@@ -59,8 +59,11 @@ Bold is the proposed default of each row.
   `AVAudioEngine` at 16 kHz mono in the app; nothing is recorded to disk
   unless the user saves it. The permission is asked the first time a voice
   control is used, not at launch.
-- **Runner**: one `llmtray_voice_runner.py` in the music venv (mlx-audio is
-  already there; one venv, one install stamp). The app streams PCM frames
+- **Runner**: `llmtray_voice_runner.py` in **its own voice venv** on current
+  mlx-audio (≥ 0.5.2 for the duplex session). The music venv pins an older
+  mlx-audio branch with ACE-Step (`pc/add-ace`, 572 commits behind main, which
+  has no ACE-Step), so the two can't share one venv yet; fold them together
+  once ACE-Step is on mlx-audio's main. The app streams PCM frames
   to it over stdin as length-prefixed binary chunks (new: the embed runner's
   JSON lines would base64 every frame) and reads events back the same way
   (JSON events — partial and final transcripts, errors — and audio chunks).
@@ -83,7 +86,17 @@ Bold is the proposed default of each row.
   Gemma 26B don't fit together on 26 GB), with the same notice as image
   generation, and reloaded after.
 - No tools, no projects, no history kept. English. Labelled "Experimental".
-- Default model PersonaPlex 7B; VoiceChat 11B offered where memory allows.
+- Default model **VoiceChat 11B 4-bit** (`mlx-community/NemotronLabs-VoiceChat-11B-4bit`,
+  9.2 GB download) through mlx-audio's duplex session
+  (`mlx_audio.sts.load(...).create_duplex_session()`, `push_audio(chunk,
+  16000)`; events: text deltas, function tokens, 22.05 kHz audio on an 80 ms
+  clock). Published on an M5 Pro: real-time factor ~0.93, first audio ~75 ms,
+  ~15.6 GB physical footprint — tight on 26 GB, so the chat model unloads and
+  we measure on the base M5 before shipping.
+- PersonaPlex later, opt-in: its upstream is gated (the user's own HF
+  token), the MLX conversions carry a non-commercial tag, redistribution needs
+  NVIDIA's notice, int4 is reported incoherent, and it needs speech-swift
+  (macOS 15, its own metallib) or Moshi-era code with older pins.
 
 ### Mode 2: Voice chat (the real one) — second
 
@@ -129,11 +142,19 @@ Bold is the proposed default of each row.
 
 Each step ships on its own; step 2 alone is the toy that was asked for.
 
+## Licences (checked 2026-09-27)
+
+- VoiceChat 11B: OpenMDW 1.1 — use, redistribution and commercial use
+  allowed; keep the licence and origin notices; rights end on a patent or
+  copyright suit over the model. Shown in the Voice pane with the download.
+- PersonaPlex: NVIDIA Open Model License (commercial use and distribution
+  allowed, NVIDIA notice required, terminates if safety guardrails are
+  bypassed) + CC-BY-4.0; gated on Hugging Face.
+- Moshi: weights CC-BY 4.0, moshi_mlx MIT.
+- speech-swift: Apache-2.0.
+
 ## Open questions
 
-- PersonaPlex / VoiceChat licences: NVIDIA's model licences need reading
-  before we offer the download (as we did for image models).
-- Whether mlx-audio's STS runs PersonaPlex, or we need the Swift
-  `speech-swift` package (native, no Python) — to be tried in step 2.
-- The music venv's mlx-audio version: pinning it for both features without
-  breaking ACE-Step.
+- Real-time on the base M5 (published numbers are M5 Pro / M2 Max).
+- Echo: the model hears its own voice from the speakers; headphones for the
+  Lab, echo cancellation (Voice Processing I/O) before voice chat.
