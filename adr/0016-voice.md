@@ -1,6 +1,6 @@
 # 0016 — Voice
 
-**Status: proposed** (2026-09-27). Nothing here is built yet.
+**Status: accepted** (2026-09-27, by the user). Nothing here is built yet.
 
 ## Why
 
@@ -59,11 +59,11 @@ Bold is the proposed default of each row.
   `AVAudioEngine` at 16 kHz mono in the app; nothing is recorded to disk
   unless the user saves it. The permission is asked the first time a voice
   control is used, not at launch.
-- **Runner**: `llmtray_voice_runner.py` in **its own voice venv** on current
-  mlx-audio (≥ 0.5.2 for the duplex session). The music venv pins an older
-  mlx-audio branch with ACE-Step (`pc/add-ace`, 572 commits behind main, which
-  has no ACE-Step), so the two can't share one venv yet; fold them together
-  once ACE-Step is on mlx-audio's main. The app streams PCM frames
+- **Runner**: `llmtray_voice_runner.py` in the **music venv**, which since
+  PR #155 installs mlx-audio from our fork's `llmtray` branch
+  (ipsupport-llc/mlx-audio: current upstream main + ACE-Step, bit-identical
+  music checked on real weights). One audio runtime for music and voice; the
+  voice models need mlx-audio's `sts` extras added to its requirements. The app streams PCM frames
   to it over stdin as length-prefixed binary chunks (new: the embed runner's
   JSON lines would base64 every frame) and reads events back the same way
   (JSON events — partial and final transcripts, errors — and audio chunks).
