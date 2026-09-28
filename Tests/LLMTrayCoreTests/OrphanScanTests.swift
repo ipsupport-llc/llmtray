@@ -41,6 +41,15 @@ final class OrphanScanTests: XCTestCase {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_EMBED_RUNNER", with: "LLMTRAY_MUSIC_RUNNER")), [])
     }
 
+    func testOrphanedVoiceRunner() {
+        let line = "  980     1 9500000 \(python) /Applications/LLMTray.app/Contents/Resources/runtime/llmtray_voice_runner.py --model /m/voice_models/nemotron-voicechat-11b-4bit HF_HUB_OFFLINE=1 LLMTRAY_VOICE_RUNNER=1"
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line), [
+            OrphanProcess(kind: .voiceRunner, pid: 980, residentBytes: 9_500_000 * 1024, model: "nemotron-voicechat-11b-4bit"),
+        ])
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "LLMTRAY_VOICE_RUNNER", with: "LLMTRAY_MUSIC_RUNNER")), [])
+        XCTAssertEqual(OrphanScan.orphans(inPSOutput: line.replacingOccurrences(of: "  980     1", with: "  980  2592")), [])
+    }
+
     func testRunningLLMTraysChildIsKept() {
         XCTAssertEqual(OrphanScan.orphans(inPSOutput: server(pid: 4312, ppid: 2592)), [])
     }

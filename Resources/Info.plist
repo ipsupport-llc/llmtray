@@ -24,6 +24,8 @@
 	<string>Apache License 2.0 -- ipsupport-llc</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>LLMTray listens only while Voice Lab is on, to talk with the local voice model. Nothing is recorded to disk.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>SUFeedURL</key>

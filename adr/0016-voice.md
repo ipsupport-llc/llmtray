@@ -1,6 +1,6 @@
 # 0016 — Voice
 
-**Status: accepted** (2026-09-27, by the user). Nothing here is built yet.
+**Status: accepted** (2026-09-27, by the user). Steps 1–2 (the base, Voice Lab with VoiceChat 11B) are being built.
 
 ## Why
 
@@ -93,6 +93,14 @@ Bold is the proposed default of each row.
   clock). Published on an M5 Pro: real-time factor ~0.93, first audio ~75 ms,
   ~15.6 GB physical footprint — tight on 26 GB, so the chat model unloads and
   we measure on the base M5 before shipping.
+- **Walkie-talkie fallback** (added while building it, 2026-09-27): on the
+  base M5 an 80 ms frame takes ~160 ms (RTF ≈ 2.0, peak footprint ~12.5 GB,
+  first reply audio 0.56 s after speech end), too slow for live duplex. The
+  runner measures the RTF at load (warmup frames of silence); above 1.0,
+  "Automatic" switches to walkie-talkie: the user presses Talk, speaks,
+  presses Done; the runner then steps the model on silence as fast as it
+  can until its reply ends (1.2 s quiet), and the app plays the whole reply.
+  Full duplex stays selectable.
 - PersonaPlex later, opt-in: its upstream is gated (the user's own HF
   token), the MLX conversions carry a non-commercial tag, redistribution needs
   NVIDIA's notice, int4 is reported incoherent, and it needs speech-swift
