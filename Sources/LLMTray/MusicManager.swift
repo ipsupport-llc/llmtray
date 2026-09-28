@@ -100,12 +100,15 @@ final class MusicManager: ObservableObject {
     @Published private(set) var progress: Int?
 
     /// Pinned: runtime/llmtray_music_runner.py drives mlx-audio's ACE-Step
-    /// internals, which only exist on its `pc/add-ace` branch (not in a PyPI
-    /// release). A tarball of that commit needs no git on the Mac.
-    static let mlxAudioCommit = "1e8264a487dd74d4ea327a8250c071558a7cd8f4"
+    /// internals, which upstream only has on its unmerged `pc/add-ace`
+    /// branch. Our fork's `llmtray` branch carries them on current upstream
+    /// main (where the voice models are), so music and voice can share one
+    /// runtime; advanced deliberately -- the runner patches internals. A
+    /// tarball of the commit needs no git on the Mac.
+    static let mlxAudioCommit = "8c51a800ededf5759497f6a8dcdd5f2cecbdf44e"
     static var requirements: [String] {
         [
-            "mlx-audio @ https://github.com/Blaizzy/mlx-audio/archive/\(mlxAudioCommit).tar.gz",
+            "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/\(mlxAudioCommit).tar.gz",
             "mlx==0.32.2", "mlx-lm==0.31.1", "transformers==5.17.0", "pyyaml", "huggingface_hub",
         ]
     }
