@@ -544,9 +544,14 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // until it's done, and one queued behind another (always, with
             // an MTP drafter) waits. That stretch is the request timeout's
             // (didCompleteWithError).
-            guard !finished, headersSent, Date().timeIntervalSince(lastActivityAt) > stallThreshold else { return }
+            // The server's prefill progress counts too (StallRule): a long
+            // prompt on a busy Mac sends nothing for minutes while the log
+            // shows it working.
+            guard !finished, headersSent,
+                  StallRule.isStalled(lastByteAt: lastActivityAt, serverProgressAt: server?.lastPrefillProgressAt,
+                                      now: Date(), threshold: stallThreshold) else { return }
             server?.appendLog(
-                "--- proxy: no response from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
+                "--- proxy: no response or prefill progress from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
             )
             _ = finish(stalled: true)
         }

@@ -41,6 +41,43 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertEqual(w.feed(String(repeating: "y", count: 10_000) + "\n").count, 1)
     }
 
+    func testPrefillProgressIsActivity() {
+        var w = ServerLogWatch()
+        XCTAssertEqual(w.feed("2026-09-27 10:01:02,345 - INFO - Prompt processing progress: 512/20480\n"), [.prefillProgress])
+        XCTAssertEqual(w.feed("INFO:root:Prompt processing progress: 1024/20480\n"), [.prefillProgress])
+        XCTAssertEqual(w.feed("2026-09-27 10:01:02,345 - INFO - Prefill step 2048 at 0 tokens, 512 at 20480 tokens (--prefill-memory-mb 900)\n"), [.prefillProgress])
+        XCTAssertEqual(w.feed("2026-09-27 10:01:02,345 - WARNING - Prefill step down to 64 at 90000 tokens: prefill is slow.\n"), [.prefillProgress])
+        // One per chunk, however many lines; split lines count once whole.
+        XCTAssertEqual(w.feed("INFO:root:Prompt processing progress: 1/3\nINFO:root:Prompt processing progress: 2/3\nINFO:root:Prompt proc"), [.prefillProgress])
+        XCTAssertEqual(w.feed("essing progress: 3/3\n"), [.prefillProgress])
+    }
+
+    func testPrefillProgressKeepsDeathEvents() {
+        var w = ServerLogWatch()
+        XCTAssertEqual(w.feed("INFO:root:Prompt processing progress: 512/1024\nERROR:root:mlx_lm.server generation thread died: boom\n"),
+                       [.generationThreadDied(reason: "boom", outOfMemory: false), .prefillProgress])
+    }
+
+    func testQuotedProgressIsNotActivity() {
+        var w = ServerLogWatch()
+        XCTAssertEqual(w.feed(#"2026-09-27 10:01:02,345 - DEBUG - Incoming Request Body: {"content": "INFO:root:Prompt processing progress: 1/2"}"# + "\n"), [])
+        XCTAssertEqual(w.feed("2026-09-27 10:01:02,345 - INFO - Prompt processing progress: soon\n"), [])
+        XCTAssertEqual(w.feed("Prompt processing progress: 1/2\n"), [], "not a log record")
+    }
+
+    func testStallRule() {
+        let t = Date(timeIntervalSince1970: 1000)
+        // No bytes and no progress for longer than the threshold: stalled.
+        XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: nil, now: t + 61, threshold: 60))
+        XCTAssertFalse(StallRule.isStalled(lastByteAt: t, serverProgressAt: nil, now: t + 59, threshold: 60))
+        // A slow prefill: no bytes for 74 s, but progress 10 s ago.
+        XCTAssertFalse(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 64, now: t + 74, threshold: 60))
+        // Progress that stopped (a wedged prefill) stalls too.
+        XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 5, now: t + 70, threshold: 60))
+        // Old progress, from before this request's last byte, changes nothing.
+        XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t - 100, now: t + 61, threshold: 60))
+    }
+
     func testUTF8SplitAcrossChunks() {
         let d = UTF8StreamDecoder()
         let bytes = Array("привет €𝄞".utf8)
