@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "नीचे एक परिणाम में औसत किया गया है। इनके पहले हमेशा एक अस्थायी वार्मअप रन होता है, इसलिए पहली कॉल का Metal kernel compile time कभी भी संख्याओं को प्रभावित नहीं करता।";
 "Back" = "वापस";
 "Balanced (default)" = "Balanced (Default)";
+"Barely fits the GPU memory" = "GPU मेमोरी में मुश्किल से फिट होता है";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "चित्र या गीत बनने से पहले, यह पहले प्रॉम्प्ट और बदलने योग्य सेटिंग दिखाता है। काउंटडाउन के बाद बिना छुए आगे बढ़ जाएगा।";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "छवि या गीत बनने से पहले दिखाता है कि मॉडल ने क्या माँगा — prompt, मॉडल, और नॉब्स — ताकि आप पहले बदल सकें। काउंटडाउन के बाद यह स्वतः आगे बढ़ेगा जब तक आप हस्तक्षेप न करें।";
 "Benchmark" = "बेंचमार्क";
@@ -222,6 +223,7 @@
 "Date" = "तिथि";
 "Date & time" = "तिथि और समय";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "डिबगिंग: उत्तर के नीचे दिखता है कि मॉडल ने किन टूल्स को किस आर्गुमेंट के साथ बुलाया; किसी एक को विस्तार से खोलें ताकि यह देखें कि उसने क्या लौटाया। यह केवल वर्तमान चैट के लिए है — टूल कॉल्स चैट के साथ सहेजे नहीं जाते।";
+"Default can't be renamed: every model falls back to it" = "Default का नाम बदला नहीं जा सकता: हर मॉडल इसी पर वापस आ जाता है";
 "Delete" = "हटाएँ";
 "Delete Project" = "प्रोजेक्ट हटाएँ";
 "Delete Project…" = "प्रोजेक्ट हटाएँ…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "GPU कितनी मेमोरी उपयोग कर सकता है। एक मॉडल की फ़ाइलें इस सीमा के भीतर होनी चाहिए।";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "गानों को कैसे रखा, सहेजा और साझा किया जाता है। AAC 256 kbit/s: लगभग 30 सेकंड पर 1 MB, अधिकांश सुनने के मामलों में असंभाव्य अंतर। अनकंप्रेस्ड WAV: लगभग 30 सेकंड पर 6 MB।";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "मॉडल द्वारा बताए गए स्टाइल का संगीत कितनी कड़ाई से पालन करता है। उच्च: अधिक नज़दीक; निम्न: अधिक स्वतंत्र।";
+"How?" = "कैसे?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face ने %2$@ के लिए HTTP %1$d उत्तर दिया।";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face ने %@ (HTTP %d) अस्वीकार कर दिया: यह सीमित, निजी है, या मौजूद नहीं है। यदि यह सीमित है तो huggingface.co/%@ पर लाइसेंस स्वीकार करें और Settings → Models में token जाँचें।";
 "Hugging Face token" = "Hugging Face token";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "संगीत जनरेशन सेटअप नहीं है — सेटिंग्स में इसे दोबारा चालू करें।";
 "Music model" = "Music model";
 "Music off" = "संगीत बंद";
+"Name" = "नाम";
 "Name new chats automatically" = "नई चैट का नाम स्वतः दें";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "नाम, आकार और तिथियाँ, और जिन फाइलों के बारे में यह पूछता है उनके छोटे अंश। भीतर के निजी स्थान (keys, Library) छुपे रहते हैं।";
 "Network" = "नेटवर्क";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "इस टोकन से KV क्वांटाइज़ करें";
 "Quick benchmark" = "त्वरित बेंचमार्क";
 "Quit LLMTray" = "LLMTray छोड़ें";
+"Raise the GPU memory limit in Terminal:" = "Terminal में GPU मेमोरी सीमा बढ़ाएँ:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "जवाबों की रैंडमनेस (मॉडल की प्रोफ़ाइल का हिस्सा)। कम मान अधिक केंद्रित, अधिक मान अधिक विविध होता है।";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "रैंडमनेस। कम मान अधिक केंद्रित और दोहराने योग्य, अधिक मान अधिक विविध होता है। कोडिंग: 0.2-0.6; चैट: 0.7-1.0।";
 "Rate LLMTray" = "LLMTray को रेट करें";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम और इमेज जनरेशन (इसका रनटाइम और इमेज मॉडल) %@ से हटाता है। अगली बार सर्वर शुरू होने पर या जब इमेज जनरेशन चालू किया जाएगा, तब इन्हें पुनः सेट किया जाएगा। सेव किए गए चैट और प्रोफ़ाइल बरकरार रखे जाएंगे।";
 "Rename" = "नाम बदलें";
 "Rename %1$@ to %2$@" = "%1$@ का नाम बदलकर %2$@ करें";
+"Rename Profile" = "प्रोफ़ाइल का नाम बदलें";
 "Rename this profile" = "इस प्रोफ़ाइल का नाम बदलें।";
 "Rename…" = "नाम बदलें…";
 "Repaired" = "ठीक किए गए";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "सर्वर तभी शुरू होगा जब %@ डाउनलोड हो जाएगा";
 "The server starts with %@" = "सर्वर %@ से शुरू होता है";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "इस Mac के सुझाव पहले से ही यहाँ हैं। किसी अन्य मॉडल के लिए Hugging Face ब्राउज़ करें।";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "फिर मॉडल सर्वर को पुनरारंभ करें। Mac के पुनरारंभ पर सीमा डिफ़ॉल्ट पर लौट जाती है। LLMTray इसे स्वयं नहीं बदलता।";
 "There's no plan waiting any more." = "अब और कोई योजना प्रतीक्षा में नहीं है।";
 "These models go back to Default: %@." = "ये मॉडल वापस Default पर चले जाएंगे: %@।";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "वे एक‑एक करके चलेंगे और मेनू बार की विंडो में दिखेंगे। आप इस बीच विंडो बंद कर सकते हैं।";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "यह फ़ोल्डर मौजूद नहीं है या अब अनुमति वाले फ़ोल्डरों में नहीं है: इसे रद्द करें और फिर से अनुमति दें।";
 "This folder's access has ended or was revoked." = "इस फ़ोल्डर की पहुँच समाप्त हो गई है या रद्द कर दी गई है।";
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें, या GPU मेमोरी सीमा बढ़ाएँ।";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें।";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "इस प्रोफ़ाइल की फ़ाइल पढ़ी नहीं जा सकती, इसलिए इसे यहां संपादित नहीं किया जा सकता। फ़ाइल ठीक करें या हटाएं, फिर सेटिंग्स फिर से खोलें।";
 "This version of LLMTray can't send reviews. Please update the app." = "इस संस्करण की LLMTray समीक्षाएँ नहीं भेज सकती। कृपया ऐप अपडेट करें।";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "यह LLMTray संस्करण अपना रनटाइम Python के साथ सेट करता है। python.org या Homebrew से Python इंस्टॉल करें और फिर पुन: जाँच करें। या LLMTray‑Full उपयोग करें, जिसमें आवश्यक सभी चीजें शामिल हैं।";

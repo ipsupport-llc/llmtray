@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Усереднюються в один результат нижче. Перед ними завжди йде пробний прогін, тож компіляція Metal-ядер під час першого виклику не спотворює цифри.";
 "Back" = "Назад";
 "Balanced (default)" = "Збалансовано (Default)";
+"Barely fits the GPU memory" = "Майже поміщається в пам’ять GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Перед створенням зображення чи пісні показує підказку й налаштування для зміни. Після зворотного відліку продовжить, якщо ви не торкнетесь.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Перед створенням зображення або пісні показує, що попросив модель — prompt, модель, налаштування — щоб змінити їх першочергово. Після відліку воно виконається автоматично, якщо ви не втрутитеся.";
 "Benchmark" = "Бенчмарк";
@@ -222,6 +223,7 @@
 "Date" = "Дата";
 "Date & time" = "Дата й час";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Налагодження: під відповіддю показано, які інструменти модель викликала і з якими аргументами; розгорніть виклик, щоб побачити результат. Тільки для поточної розмови — виклики інструментів не зберігаються разом із нею.";
+"Default can't be renamed: every model falls back to it" = "Не можна перейменувати «Default»: на нього скидається кожна модель";
 "Delete" = "Видалити";
 "Delete Project" = "Видалити проєкт";
 "Delete Project…" = "Видалити проєкт…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "Скільки пам’яті може використовувати GPU. Файли моделі мають вміститися в цей ліміт.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Як зберігаються, зберігаються й передаються пісні. AAC 256 кбіт/с: приблизно 1 МБ за 30 с, для більшості слухачів не відрізняється. Нестиснений WAV: приблизно 6 МБ за 30 с.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Наскільки строго музика відповідає стилю, описаному моделлю. Вище — ближче до нього; нижче — вільніше.";
+"How?" = "Як?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face відповів HTTP %d для %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face відхилив %@ (HTTP %d): модель обмежена, приватна або не існує. Якщо вона обмежена, прийміть ліцензію на huggingface.co/%@ і перевірте токен у Налаштування → Models.";
 "Hugging Face token" = "Токен Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Генерація музики не налаштована — знову увімкніть її в Налаштуваннях.";
 "Music model" = "Модель музики";
 "Music off" = "Музика вимкнено";
+"Name" = "Ім'я";
 "Name new chats automatically" = "Автоматично давати назви новим чатам";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Імена, розміри та дати, а також короткі витяги з файлів, про які запитується. Приватні місця всередині (keys, Library) залишаються прихованими.";
 "Network" = "Мережа";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "Квантувати KV з токена";
 "Quick benchmark" = "Швидкий бенчмарк";
 "Quit LLMTray" = "Вийти з LLMTray";
+"Raise the GPU memory limit in Terminal:" = "Збільште ліміт пам’яті GPU через Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Випадковість відповідей (частина профілю моделі). Нижче — точніше, вище — різноманітніше.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Випадковість. Нижче — точніше й повторюваніше, вище — різноманітніше. Код: 0.2–0.6; чат: 0.7–1.0.";
 "Rate LLMTray" = "Оцініть LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Видаляє завантажений runtime mlx-lm та моделі генерації зображень (runtime і моделі зображень) з %@. Вони будуть знову встановлені при наступному запуску сервера або коли генерація зображень буде увімкнена. Збережені чати та профілі зберігаються.";
 "Rename" = "Перейменувати";
 "Rename %1$@ to %2$@" = "Перейменувати %1$@ на %2$@";
+"Rename Profile" = "Перейменувати профіль";
 "Rename this profile" = "Перейменувати цей профіль";
 "Rename…" = "Перейменувати…";
 "Repaired" = "Виправлено";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "Сервер запуститься після завантаження %@";
 "The server starts with %@" = "Сервер запускається з %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Пропозиції для цього Mac вже тут. Перегляньте Hugging Face, щоб знайти іншу модель.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Потім перезапустіть сервер моделі. Ліміт повертається до стандартного після перезавантаження Mac. LLMTray не змінює його автоматично.";
 "There's no plan waiting any more." = "План більше не очікує.";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Вони запускаються по черзі й показуються у вікні рядка меню. Можете тимчасово закрити це вікно.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Ця папка зникла або більше не дозволена: відкличте доступ і дозвольте знову.";
 "This folder's access has ended or was revoked." = "Доступ до цієї папки закінчився або був відкликаний.";
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель або збільшіть ліміт пам’яті GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
 "This version of LLMTray can't send reviews. Please update the app." = "Ця версія LLMTray не може надсилати відгуки. Оновіть програму.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Ця версія LLMTray налаштовує середовище виконання через Python. Встановіть Python із python.org або через Homebrew, потім повторіть перевірку. Або використайте LLMTray‑Full, яка містить усе потрібне.";

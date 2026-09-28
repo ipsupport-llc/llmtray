@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "下の1つの結果に平均化されています。必ず破棄用のウォームアップ実行を先に行うため、初回呼び出し時のMetalカーネルのコンパイル時間が数値に影響することはありません。";
 "Back" = "戻る";
 "Balanced (default)" = "バランス（Default）";
+"Barely fits the GPU memory" = "GPU メモリにかろうじて収まります";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "画像や楽曲を作る前に、プロンプトと設定を表示して変更できます。カウントダウン後に自動で実行されます（操作しない場合）。";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "画像や曲が生成される前に、モデルに渡される内容（プロンプト、モデル、設定）を表示します。カウントダウン後に何も操作しなければ自動で進行します。";
 "Benchmark" = "ベンチマーク";
@@ -222,6 +223,7 @@
 "Date" = "日付";
 "Date & time" = "日付と時刻";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "デバッグ：回答の下に、モデルが呼び出したツールとその引数を表示します。展開すると返り値を確認できます。現在のチャットのみ対象で、ツール呼び出しは保存されません。";
+"Default can't be renamed: every model falls back to it" = "Default は名前を変更できません：すべてのモデルがこれにフォールバックします";
 "Delete" = "削除";
 "Delete Project" = "プロジェクトを削除";
 "Delete Project…" = "プロジェクトを削除…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "GPU が使用できるメモリ量です。モデルのファイルはこの範囲に収まる必要があります。";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "曲の保存・共有方法。AAC 256 kbit/s: 約30秒で1 MB、ほとんどのリスニングでは違いが分かりません。非圧縮 WAV: 約30秒で6 MB。";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "モデルが指定したスタイルにどれだけ厳密に従うか。高いほど近く、低いほど自由になります。";
+"How?" = "方法";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face が %2$@ に対して HTTP %1$d を返しました。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face が %@ を拒否しました (HTTP %d): 制限付き、非公開、または存在しない可能性があります。制限付きの場合は huggingface.co/%@ でライセンスを承諾し、設定 → Models のトークンを確認してください。";
 "Hugging Face token" = "Hugging Face トークン";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "音楽生成が設定されていません。設定で再度有効にしてください。";
 "Music model" = "音楽モデル";
 "Music off" = "音楽：オフ";
+"Name" = "名前";
 "Name new chats automatically" = "新しいチャットを自動で命名";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "それが参照するファイルの名前、サイズ、日付、および短い抜粋を表示します。内部のプライベートな場所（keys、Library）は非表示のままです。";
 "Network" = "ネットワーク";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "指定トークン以降の KV を量子化";
 "Quick benchmark" = "クイックベンチマーク";
 "Quit LLMTray" = "LLMTray を終了";
+"Raise the GPU memory limit in Terminal:" = "ターミナルで GPU メモリ上限を引き上げます：";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "回答のランダム性（モデルのプロファイルの一部）です。低いほど焦点が定まり、高いほど多様になります。";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "ランダム性。低いほど焦点が定まり再現性が高く、高いほど多様になります。コーディング：0.2〜0.6、チャット：0.7〜1.0。";
 "Rate LLMTray" = "LLMTrayを評価";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
 "Rename" = "名称変更";
 "Rename %1$@ to %2$@" = "%1$@ の名前を %2$@ に変更";
+"Rename Profile" = "プロファイル名を変更";
 "Rename this profile" = "このプロファイルの名前を変更します。";
 "Rename…" = "名前を変更…";
 "Repaired" = "修復";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "%@ のダウンロードが完了するとサーバーが起動します";
 "The server starts with %@" = "サーバーは %@ で起動します";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "このMac向けの提案は既にここにあります。別のモデルは Hugging Face で参照してください。";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "その後、モデルサーバーを再起動してください。Mac を再起動すると上限はデフォルトに戻ります。LLMTray が自動で変更することはありません。";
 "There's no plan waiting any more." = "待機中の計画はありません。";
 "These models go back to Default: %@." = "これらのモデルは Default に戻ります：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "それらは同時に1つずつ実行され、メニューバーのウインドウに表示されます。ウインドウはその間に閉じても構いません。";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "このフォルダは存在しないか、もはや許可されたフォルダではありません：アクセス権を取り消して再度許可してください。";
 "This folder's access has ended or was revoked." = "このフォルダへのアクセスは終了したか取り消されました。";
 "This many of the most recent messages are kept word for word when compacting." = "コンパクト化するときに、直近のメッセージをこの件数だけ原文のまま保持します。";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使うか、GPU メモリ上限を引き上げてください。";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使用してください。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "このプロファイルのファイルを読み込めないため、ここでは編集できません。ファイルを修正または削除してから、設定を開き直してください。";
 "This version of LLMTray can't send reviews. Please update the app." = "このバージョンのLLMTrayではレビューを送信できません。アプリをアップデートしてください。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "この LLMTray は Python でランタイムを設定します。python.org または Homebrew から Python をインストールしてから再確認してください。必要なものをすべて含む LLMTray‑Full を使うこともできます。";
