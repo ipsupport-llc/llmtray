@@ -133,6 +133,13 @@ final class SpeechPlayer: @unchecked Sendable {
         }
     }
 
+    /// How much is held before playing starts (or starts again after an underrun).
+    func setPrebuffer(milliseconds: Int) {
+        lock.lock()
+        jitter.prebufferSamples = Int(format.sampleRate) * milliseconds / 1000
+        lock.unlock()
+    }
+
     /// Starts what's held even below the prebuffer: a complete reply.
     func flush() {
         lock.lock()

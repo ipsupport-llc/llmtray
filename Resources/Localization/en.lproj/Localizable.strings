@@ -155,6 +155,8 @@
 "Can't switch profiles while a request or the auto-tune is running" = "Can't switch profiles while a request or the auto-tune is running";
 "Cancel" = "Cancel";
 "Cancel download" = "Cancel download";
+"Cancel reply" = "Cancel reply";
+"Cancel the reply" = "Cancel the reply";
 "Cancel this download" = "Cancel this download";
 "Canvas size" = "Canvas size";
 "Change the prompt, the model or the shape, then make another version" = "Change the prompt, the model or the shape, then make another version";
@@ -244,7 +246,6 @@
 "Doesn't open at login" = "Doesn't open at login";
 "Don't Ask Again" = "Don't Ask Again";
 "Done" = "Done";
-"Done talking" = "Done talking";
 "Done talking: the model answers" = "Done talking: the model answers";
 "Done: %lld changes made." = "Done: %lld changes made.";
 "Download" = "Download";
@@ -451,6 +452,7 @@
 "Model actions" = "Model actions";
 "Model card" = "Model card";
 "Model switching" = "Model switching";
+"Model:" = "Model:";
 "Models" = "Models";
 "Models folder" = "Models folder";
 "Models folder: %@" = "Models folder: %@";
@@ -792,7 +794,9 @@
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
+"The chat model couldn't be unloaded for Voice Lab." = "The chat model couldn't be unloaded for Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.";
+"The chat model is still loading -- try Voice Lab again once it's up." = "The chat model is still loading -- try Voice Lab again once it's up.";
 "The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.";
 "The day the counts are for." = "The day the counts are for.";
@@ -861,6 +865,7 @@
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
 "Thinking…" = "Thinking…";
+"Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";
 "This chat may use" = "This chat may use";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "This folder is gone or isn't the one allowed any more: revoke it and allow it again.";
@@ -941,6 +946,7 @@
 "View model card" = "View model card";
 "Voice" = "Voice";
 "Voice Lab" = "Voice Lab";
+"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab is off -- turn it on in Settings > Voice.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory.";
@@ -982,6 +988,7 @@
 "Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
 "You" = "You";
+"You:" = "You:";
 "Your Mac" = "Your Mac";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
 "Your name (optional)" = "Your name (optional)";

@@ -1038,20 +1038,35 @@ final class ServerManager: ObservableObject {
     /// Voice Lab starts (adr/0016): the chat model is unloaded as for an
     /// image, and -- unlike an image, which takes seconds -- held away even
     /// when it wasn't loaded, so no request loads it next to the voice
-    /// model meanwhile. One still loading is waited for first. Returns
+    /// model meanwhile. One still loading is waited for first; if it is
+    /// still loading after two minutes, or still up after the unload, this
+    /// throws (the suspension undone): the two never run together. Returns
     /// whether a model was running: `endVoiceSuspension` reloads it then.
-    func suspendForVoice() async -> Bool {
+    func suspendForVoice() async throws -> Bool {
         suspendedForVoice = true
         suspendedForImageGeneration = true
+        func giveUp(_ why: String) -> Error {
+            suspendedForVoice = false
+            suspendedForImageGeneration = false
+            return NSError(domain: "ServerManager", code: 9, userInfo: [NSLocalizedDescriptionKey: why])
+        }
         let deadline = Date().addingTimeInterval(120)
         while case .starting = state, Date() < deadline {
             try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        if case .starting = state {
+            throw giveUp(NSLocalizedString("The chat model is still loading -- try Voice Lab again once it's up.", comment: ""))
         }
         guard case .running = state else { return false }
         await unloadModel()
         // A Stop meanwhile ended the suspension: nothing to reload after.
         guard suspendedForVoice else { return false }
-        return true
+        switch state {
+        case .running, .starting:
+            throw giveUp(NSLocalizedString("The chat model couldn't be unloaded for Voice Lab.", comment: ""))
+        default:
+            return true
+        }
     }
 
     /// Voice Lab stopped: the model reloads when it was running before

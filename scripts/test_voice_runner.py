@@ -56,10 +56,10 @@ def load_runner():
 
 def test_reply_tracker(runner):
     quiet, loud = 0.001, 0.2
-    t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=0.24, no_onset=0.4, limit=10)
+    t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=0.24, zero_end=0.4, no_onset=0.4, limit=10)
     # Leading quiet is dropped.
     assert t.step(b"q0", quiet) == ([], None)
-    assert t.step(b"q1", quiet) == ([], None)
+    assert t.step(b"q1", 0.0) == ([], None)
     # Speech from the first voiced frame (text counts as voiced).
     assert t.step(b"s0", loud) == ([b"s0"], None)
     assert t.step(b"s1", quiet, "Hel") == ([b"s1"], None)
@@ -73,6 +73,18 @@ def test_reply_tracker(runner):
     assert t.step(b"e2", quiet) == ([], "done")
     assert abs(t.sent_seconds - 5 * 0.08) < 1e-9, t.sent_seconds
 
+    # The codec's exact silence ends it after 5 frames (0.4 s), text quiet;
+    # a text token in between starts the count over.
+    t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=5, zero_end=0.4, no_onset=1, limit=10)
+    assert t.step(b"s", loud) == ([b"s"], None)
+    assert [t.step(b"z", 0.0)[1] for _ in range(3)] == [None] * 3
+    assert t.step(b"t", 0.0, "Hi")[0] == [b"z", b"z", b"z", b"t"]   # text: voiced
+    assert [t.step(b"z", 0.0)[1] for _ in range(5)] == [None] * 4 + ["done"]
+    # Quiet but not exactly silent doesn't count as the codec's silence.
+    t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=5, zero_end=0.4, no_onset=1, limit=10)
+    t.step(b"s", loud)
+    assert [t.step(b"q", 0.0005)[1] for _ in range(8)] == [None] * 8
+
     # No reply within no_onset (5 frames).
     t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=1, no_onset=0.4, limit=10)
     results = [t.step(b"q", quiet) for _ in range(5)]
@@ -82,21 +94,65 @@ def test_reply_tracker(runner):
     t = runner.ReplyTracker(frame_seconds=0.08, threshold=0.01, quiet_end=1, no_onset=1, limit=0.24)
     assert [t.step(b"s", loud) for _ in range(3)][-1] == ([b"s"], "limit")
 
-    # The Inbox: audio behind audio comes in one take, D stays in order.
-    inbox = runner.Inbox()
-    inbox.put("A", b"12")
-    inbox.put("A", b"34")
+
+def test_inbox(runner):
+    # Order kept; audio behind audio in one bounded take.
+    inbox = runner.Inbox(rate=10)   # 10 Hz: 20 bytes a second
+    inbox.put_audio(b"12")
+    inbox.put_audio(b"34")
     inbox.put("D", "1")
-    inbox.put("A", b"56")
+    inbox.put_audio(b"56")
     assert inbox.get() == ("A", b"12")
     assert inbox.take_audio() == b"34"
     assert inbox.next_kind() == "D"
     assert inbox.get() == ("D", "1")
     assert inbox.next_kind() == "A"
 
+    # Full duplex: at most 2 s wait, the oldest goes; D stays.
+    inbox = runner.Inbox(duplex_backlog=2.0, rate=10)   # 40 bytes
+    for i in range(3):
+        inbox.put_audio(bytes([i]) * 20)   # 1 s each
+    inbox.put("C")
+    inbox.put_audio(b"\x09" * 20)
+    assert abs(inbox.dropped - 2.0) < 1e-9, inbox.dropped
+    assert abs(inbox.queued_seconds() - 2.0) < 1e-9
+    assert [k for k, _ in list(inbox._items)] == ["A", "C", "A"], list(inbox._items)
+    assert inbox.get() == ("A", b"\x02" * 20)
+    # take_audio stops at its bound.
+    inbox = runner.Inbox(rate=10)
+    for _ in range(5):
+        inbox.put_audio(b"x" * 8)
+    assert len(inbox.take_audio(max_bytes=16)) == 16
+    assert len(inbox.take_audio(max_bytes=100)) == 24
+
+    # Walkie-talkie: a turn takes at most turn_limit s; D starts the next.
+    inbox = runner.Inbox(turn_limit=1.0, rate=10)   # 20 bytes a turn
+    inbox.put("M", "walkie")
+    inbox.put_audio(b"a" * 16)
+    inbox.put_audio(b"b" * 16)   # 4 bytes fit
+    inbox.put_audio(b"c" * 4)    # none
+    assert abs(inbox.dropped - 0.8) < 1e-9, inbox.dropped   # 12 + 4 bytes
+    inbox.put("D", "1")
+    inbox.put_audio(b"d" * 20)
+    assert [(k, d) for k, d in list(inbox._items)] == [("M", "walkie"), ("A", b"a" * 16), ("A", b"bbbb"), ("D", "1"), ("A", b"d" * 20)]
+
+    # One log line per turn.
+    lines = []
+    runner.log = lines.append
+    turns = runner.TurnLog()
+    for d in ["Wh", "at is", " it"]:
+        turns.add("you", d)
+    turns.add("model", " It's  ")
+    turns.add("model", "Paris.")
+    turns.flush()
+    turns.flush()
+    assert lines == ["you: What is it", "model: It's Paris."], lines
+
 
 def main():
-    test_reply_tracker(load_runner())
+    runner = load_runner()
+    test_reply_tracker(runner)
+    test_inbox(runner)
 
     pcm = struct.pack("<4h", 0, 1000, -1000, 32767)
     a1, a2 = frame("A", pcm), frame("A", b"\x01\x00")
@@ -114,11 +170,11 @@ def main():
     assert any(k == "E" and b"'X'" in p for k, p in frames), frames
 
     # D: a reply (T, S..., Z with the turn), in order, before what follows.
-    code, frames = run([frame("D", b"7") + frame("A", pcm) + frame("Q")])
+    code, frames = run([frame("M", b"walkie") + frame("C") + frame("D", b"7") + frame("A", pcm) + frame("Q")])
     assert code == 0, code
     kinds = [k for k, _ in frames]
-    assert kinds == ["R", "T", "S", "S", "Z", "S", "L"], kinds
-    done = json.loads(frames[4][1])
+    assert kinds == ["R", "L", "T", "S", "S", "Z", "S", "L"], kinds
+    done = json.loads(frames[5][1])
     assert done["reason"] == "done" and done["turn"] == 7, done
     assert json.loads(frames[0][1])["rtf"] == 0.5
 

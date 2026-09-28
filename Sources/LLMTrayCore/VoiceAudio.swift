@@ -53,7 +53,11 @@ public enum PCM16 {
 /// playing, each chunk is scheduled at once. When everything scheduled has
 /// played (an underrun: the runner fell behind), it buffers again.
 public struct JitterBuffer: Sendable {
-    public let prebufferSamples: Int
+    /// Changeable between replies (walkie-talkie holds ~3 s: the model makes
+    /// its reply slower than it plays).
+    public var prebufferSamples: Int {
+        didSet { prebufferSamples = max(1, prebufferSamples) }
+    }
     /// Scheduled on the player and not yet played.
     public private(set) var scheduledSamples = 0
     /// Held back until the prebuffer fills.
@@ -118,6 +122,59 @@ public struct JitterBuffer: Sendable {
         scheduledSamples = 0
         isPlaying = false
     }
+}
+
+/// A walkie-talkie reply's leading silence (the model's thinking, the
+/// codec's warm-up), dropped before it's played: chunks are admitted from
+/// the first one at least `threshold` loud.
+public struct LeadingSilenceTrim: Sendable {
+    public var threshold: Float
+    public private(set) var started = false
+
+    public init(threshold: Float = 0.001) {
+        self.threshold = threshold
+    }
+
+    public mutating func admit(rms: Float) -> Bool {
+        if !started, rms >= threshold { started = true }
+        return started
+    }
+
+    public mutating func reset() { started = false }
+}
+
+/// The Voice Lab transcript: a paragraph per turn, "You:" or "Model:",
+/// deltas appended to the turn they belong to.
+public struct VoiceTranscript: Equatable, Sendable {
+    public enum Speaker: Equatable, Sendable { case user, model }
+
+    public private(set) var text = ""
+    private var last: Speaker?
+    private let userLabel: String
+    private let modelLabel: String
+
+    public init(userLabel: String = "You:", modelLabel: String = "Model:") {
+        self.userLabel = userLabel
+        self.modelLabel = modelLabel
+    }
+
+    public mutating func append(_ delta: String, from speaker: Speaker) {
+        guard !delta.isEmpty else { return }
+        if speaker != last {
+            // Nothing but blanks yet: no turn to start.
+            let body = delta.drop { $0.isWhitespace }
+            guard !body.isEmpty else { return }
+            if !text.isEmpty { text += "\n\n" }
+            text += (speaker == .user ? userLabel : modelLabel) + " " + body
+            last = speaker
+        } else {
+            text += delta
+        }
+    }
+
+    /// The next delta starts a new turn even from the same speaker (a
+    /// walkie-talkie turn ended).
+    public mutating func endTurn() { last = nil }
 }
 
 /// "Speaking…" vs "Listening…" in the Voice Lab window: the model sends

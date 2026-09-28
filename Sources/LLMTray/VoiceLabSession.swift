@@ -29,8 +29,11 @@ final class VoiceLabSession: ObservableObject {
     }
 
     @Published private(set) var phase: Phase = .idle
-    /// The model's text channel, as it streams.
+    /// What was said, a paragraph per turn: the user's words (the model's
+    /// own transcript of them) and the model's text channel, as they stream.
     @Published private(set) var transcript = ""
+    /// Of a walkie-talkie reply made so far (before it starts playing).
+    @Published private(set) var replyReadySeconds: Double = 0
     /// The microphone, 0...1.
     @Published private(set) var level: Float = 0
     @Published private(set) var isSpeaking = false
@@ -45,7 +48,8 @@ final class VoiceLabSession: ObservableObject {
     /// "This Mac runs the model at ~0.5× real time…", when automatic mode
     /// picked walkie-talkie for that reason.
     @Published private(set) var speedNotice: String?
-    /// About the last walkie-talkie reply, when there's something to say.
+    /// About the last reply or the conversation, when there's something to
+    /// say (no answer, cut short, the context started over).
     @Published private(set) var replyNote: String?
 
     enum Turn: Equatable {
@@ -74,6 +78,13 @@ final class VoiceLabSession: ObservableObject {
     private var ready: VoiceRunnerReady?
     /// The walkie-talkie turn a `D` was sent for; its `Z` must match.
     private var turnNumber = 0
+    private var transcriptTurns = VoiceTranscript(userLabel: NSLocalizedString("You:", comment: "Voice Lab transcript"),
+                                                  modelLabel: NSLocalizedString("Model:", comment: "Voice Lab transcript"))
+
+    /// Walkie-talkie holds this much of a reply before playing it: the model
+    /// makes it slower than it plays, so it starts with a lead.
+    static let replyPrebufferMilliseconds = 3000
+    static let duplexPrebufferMilliseconds = 160
 
     /// A session is starting, running or stopping (Settings won't remove the model meanwhile).
     var isActive: Bool {
@@ -89,13 +100,21 @@ final class VoiceLabSession: ObservableObject {
 
     // MARK: Start
 
+    /// Voice Lab is on and its model downloaded: Start can work.
+    func canStart(model: VoiceLabModel = .default) -> Bool {
+        VoiceModelStore.shared.isEnabled && VoiceModelStore.shared.isDownloaded(model)
+    }
+
     func start(model: VoiceLabModel = .default) {
-        guard !isActive else { return }
+        guard !isActive, canStart(model: model) else { return }
         generation += 1
         let run = generation
         stopRequested = false
         lastError = nil
         transcript = ""
+        transcriptTurns = VoiceTranscript(userLabel: NSLocalizedString("You:", comment: "Voice Lab transcript"),
+                                          modelLabel: NSLocalizedString("Model:", comment: "Voice Lab transcript"))
+        replyReadySeconds = 0
         log = ""
         speedNotice = nil
         replyNote = nil
@@ -147,8 +166,12 @@ final class VoiceLabSession: ObservableObject {
         guard !stopRequested, run == generation else { return finish(run: run) }
         if let server {
             phase = .preparing(NSLocalizedString("Unloading the chat model…", comment: "Voice Lab"))
-            suspended = true
-            reloadChatModel = await server.suspendForVoice()
+            do {
+                reloadChatModel = try await server.suspendForVoice()
+                suspended = true
+            } catch {
+                return fail(error.localizedDescription, run: run)
+            }
         }
         guard !stopRequested, run == generation else { return finish(run: run) }
         phase = .preparing(NSLocalizedString("Loading the voice model…", comment: "Voice Lab"))
@@ -224,7 +247,13 @@ final class VoiceLabSession: ObservableObject {
             }
             startAudio(ready, router: router, run: run)
         case .text:
-            transcript += frame.text
+            transcriptTurns.append(frame.text, from: .model)
+            transcript = transcriptTurns.text
+        case .userText:
+            transcriptTurns.append(frame.text, from: .user)
+            transcript = transcriptTurns.text
+        case .note:
+            replyNote = frame.text
         case .error:
             lastError = frame.text
             appendLog("error: " + frame.text + "\n", run: run)
@@ -269,6 +298,9 @@ final class VoiceLabSession: ObservableObject {
                 guard let self else { return }
                 self.level = self.meter.get()
                 self.isSpeaking = self.player?.isSpeaking ?? false
+                if self.turn == .thinking, let router = self.router, let rate = self.ready?.sampleRate, rate > 0 {
+                    self.replyReadySeconds = Double(router.replySamples) / Double(rate)
+                }
             }
         }
     }
@@ -276,7 +308,7 @@ final class VoiceLabSession: ObservableObject {
     // MARK: Full duplex / walkie-talkie
 
     /// The mode setting, applied now: at ready, and when it's changed
-    /// during a session (the window's picker).
+    /// during a session (the window's picker). The runner is told (`M`).
     func applyMode() {
         guard let ready else { return }
         let mode = VoiceLabMode(rawValue: UserDefaults.standard[Pref.voiceLabMode]) ?? .auto
@@ -286,33 +318,46 @@ final class VoiceLabSession: ObservableObject {
                      VoiceLabMode.speedText(rtf: ready.rtf ?? 1))
             : nil
         guard walkie != isWalkieTalkie || router?.mode == nil else { return }
+        if turn == .thinking { process?.write(VoiceFrame(.cancelReply).encoded) }
         isWalkieTalkie = walkie
         turn = .waiting
         replyNote = nil
+        process?.write(VoiceFrame(.mode, text: VoiceLabMode.runnerMode(walkieTalkie: walkie)).encoded)
+        player?.cancelPlayback()
+        player?.setPrebuffer(milliseconds: walkie ? Self.replyPrebufferMilliseconds : Self.duplexPrebufferMilliseconds)
         if walkie {
             gate.isOpen = false
             router?.mode = .discard
         } else {
-            player?.cancelPlayback()
             gate.isOpen = true
             router?.mode = .live
         }
     }
 
-    /// Walkie-talkie's Talk button: press to talk, press again when done
-    /// (the model answers then). Pressed while it thinks or speaks, the
-    /// reply is dropped and the user talks again.
+    /// Walkie-talkie's big button. Waiting: talk. Talking: done, the model
+    /// answers. Thinking: cancel the reply. A reply still playing is cut
+    /// when the user talks again.
     func toggleTalk() {
         guard phase == .running, isWalkieTalkie, let process, let router else { return }
         replyNote = nil
-        if turn == .talking {
+        switch turn {
+        case .talking:
             gate.isOpen = false
-            router.startCollecting()
+            router.startReply()
+            replyReadySeconds = 0
+            transcriptTurns.endTurn()
             process.write(VoiceFrame(.endOfTurn, text: String(turnNumber)).encoded)
             turn = .thinking
-        } else {
+        case .thinking:
+            process.write(VoiceFrame(.cancelReply).encoded)
             router.mode = .discard
             player?.cancelPlayback()
+            transcriptTurns.endTurn()
+            turn = .waiting
+        case .waiting:
+            router.mode = .discard
+            player?.cancelPlayback()
+            transcriptTurns.endTurn()
             turnNumber += 1
             gate.isOpen = true
             turn = .talking
@@ -321,19 +366,18 @@ final class VoiceLabSession: ObservableObject {
 
     private func replyDone(_ done: VoiceReplyDone?) {
         guard isWalkieTalkie, turn == .thinking, let done, done.turn == turnNumber, let router else { return }
-        let samples = router.takeCollected()
         router.mode = .discard
         turn = .waiting
+        transcriptTurns.endTurn()
         switch done.reason {
         case .noReply:
             replyNote = NSLocalizedString("The model didn't answer -- try again.", comment: "Voice Lab")
         case .limit:
             replyNote = NSLocalizedString("The reply was cut at its length limit.", comment: "Voice Lab")
-        case .done, .interrupted:
+        case .done, .interrupted, .reset:
             break
         }
-        guard !samples.isEmpty else { return }
-        player?.enqueue(samples)
+        // Complete: whatever is held below the prebuffer plays now.
         player?.flush()
     }
 
@@ -421,11 +465,12 @@ final class VoiceLabSession: ObservableObject {
         finish(run: run)
     }
 
-    /// Hands the generator queue on and brings the chat model back.
+    /// Brings the chat model back, then hands the generator queue on (not
+    /// before: the next generator would start beside the reloading model).
     private func finish(run: Int) {
         guard run == generation else { return }
-        ticket?.release()
-        ticket = nil
+        let ticket = self.ticket
+        self.ticket = nil
         startedAt = nil
         if let lastError {
             phase = .failed(lastError)
@@ -433,7 +478,10 @@ final class VoiceLabSession: ObservableObject {
         } else {
             phase = .idle
         }
-        guard suspended else { return }
+        guard suspended else {
+            ticket?.release()
+            return
+        }
         suspended = false
         let reload = reloadChatModel
         reloadChatModel = false
@@ -443,6 +491,7 @@ final class VoiceLabSession: ObservableObject {
             } catch {
                 self?.appendLog("reloading the chat model failed: \(error.localizedDescription)\n", run: run)
             }
+            ticket?.release()
         }
     }
 
@@ -470,12 +519,17 @@ private final class FrameReader: @unchecked Sendable {
 /// walkie-talkie reply's buffer until it's complete, or nowhere (the user
 /// is talking; a reply they talked over).
 private final class SpeechRouter: @unchecked Sendable {
-    enum Mode { case live, collect, discard }
+    /// `live`: to the player as it comes (full duplex). `reply`: a
+    /// walkie-talkie reply -- its leading silence dropped, the rest to the
+    /// player, which holds ~3 s before it starts. `discard`: the user is
+    /// talking, or a reply was cancelled.
+    enum Mode { case live, reply, discard }
 
     private let lock = NSLock()
     private var storedPlayer: SpeechPlayer?
     private var storedMode: Mode?
-    private var collected: [Float] = []
+    private var trim = LeadingSilenceTrim()
+    private var samples = 0
 
     var player: SpeechPlayer? {
         get { lock.lock(); defer { lock.unlock() }; return storedPlayer }
@@ -488,18 +542,18 @@ private final class SpeechRouter: @unchecked Sendable {
         set { lock.lock(); storedMode = newValue; lock.unlock() }
     }
 
-    func startCollecting() {
-        lock.lock()
-        collected = []
-        storedMode = .collect
-        lock.unlock()
+    /// Of the current reply, after the trim.
+    var replySamples: Int {
+        lock.lock(); defer { lock.unlock() }
+        return samples
     }
 
-    func takeCollected() -> [Float] {
-        lock.lock(); defer { lock.unlock() }
-        let out = collected
-        collected = []
-        return out
+    func startReply() {
+        lock.lock()
+        trim.reset()
+        samples = 0
+        storedMode = .reply
+        lock.unlock()
     }
 
     func route(_ pcm: Data) {
@@ -509,9 +563,13 @@ private final class SpeechRouter: @unchecked Sendable {
             let player = storedPlayer
             lock.unlock()
             player?.enqueue(PCM16.samples(from: pcm))
-        case .collect:
-            collected += PCM16.samples(from: pcm)
+        case .reply:
+            let chunk = PCM16.samples(from: pcm)
+            guard trim.admit(rms: PCM16.rms(chunk)) else { lock.unlock(); return }
+            samples += chunk.count
+            let player = storedPlayer
             lock.unlock()
+            player?.enqueue(chunk)
         case .discard, nil:
             lock.unlock()
         }

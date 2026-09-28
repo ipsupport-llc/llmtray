@@ -110,22 +110,29 @@ struct VoiceLabView: View {
             .frame(width: 96, height: 96)
         }
         .buttonStyle(.plain)
-        .disabled(session.phase == .stopping)
+        // Off in Settings, or no model: nothing to start.
+        .disabled(session.phase == .stopping || (!active && !session.canStart()))
         .keyboardShortcut(.space, modifiers: [])
         .help(active ? Text("Stop") : Text("Start talking"))
         .accessibilityLabel(active ? Text("Stop") : Text("Start"))
     }
 
     /// Walkie-talkie: press, talk, press again; the model answers after.
+    /// While it makes its reply, the button cancels it.
     private var talkButton: some View {
-        let talking = session.turn == .talking
+        let (symbol, title, color): (String, Text, Color) = {
+            switch session.turn {
+            case .waiting: return ("mic.fill", Text("Talk"), .accentColor)
+            case .talking: return ("paperplane.fill", Text("Done"), .red)
+            case .thinking: return ("xmark", Text("Cancel reply"), .orange)
+            }
+        }()
         return Button(action: session.toggleTalk) {
             ZStack {
-                Circle().fill(talking ? Color.red : Color.accentColor)
+                Circle().fill(color)
                 VStack(spacing: 2) {
-                    Image(systemName: talking ? "paperplane.fill" : "mic.fill")
-                        .font(.system(size: 30, weight: .semibold))
-                    Text(talking ? "Done" : "Talk").font(.caption.bold())
+                    Image(systemName: symbol).font(.system(size: 30, weight: .semibold))
+                    title.font(.caption.bold())
                 }
                 .foregroundStyle(.white)
             }
@@ -133,8 +140,8 @@ struct VoiceLabView: View {
         }
         .buttonStyle(.plain)
         .keyboardShortcut(.space, modifiers: [])
-        .help(talking ? Text("Done talking: the model answers") : Text("Press, talk, press again"))
-        .accessibilityLabel(talking ? Text("Done talking") : Text("Talk"))
+        .help(Text(session.turn == .talking ? "Done talking: the model answers" : session.turn == .thinking ? "Cancel the reply" : "Press, talk, press again"))
+        .accessibilityLabel(title)
     }
 
     @ViewBuilder
@@ -153,7 +160,16 @@ struct VoiceLabView: View {
             case .waiting: Text("Press Talk and speak.").foregroundStyle(.secondary)
             case .talking: Text("Talking… press Done when you're finished.").font(.headline)
             case .thinking:
-                HStack(spacing: 6) { ProgressView().controlSize(.small); Text("Thinking…").font(.headline) }
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    if session.replyReadySeconds > 0 {
+                        Text(String(format: NSLocalizedString("Thinking… %@ s of reply ready", comment: "Voice Lab: seconds"),
+                                    String(format: "%.1f", session.replyReadySeconds)))
+                            .font(.headline).monospacedDigit()
+                    } else {
+                        Text("Thinking…").font(.headline)
+                    }
+                }
             }
         case .running:
             Text("Listening…").font(.headline)
@@ -176,7 +192,10 @@ struct VoiceLabView: View {
 
     @ViewBuilder
     private var notice: some View {
-        if !store.isDownloaded(.default) {
+        if !store.isEnabled {
+            Text("Voice Lab is off -- turn it on in Settings > Voice.")
+                .font(.caption).foregroundStyle(.orange)
+        } else if !store.isDownloaded(.default) {
             Text("The voice model isn't downloaded -- download it in Settings > Voice.")
                 .font(.caption).foregroundStyle(.orange)
         }

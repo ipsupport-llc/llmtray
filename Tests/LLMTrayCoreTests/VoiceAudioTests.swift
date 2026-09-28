@@ -100,4 +100,40 @@ final class VoiceAudioTests: XCTestCase {
         activity.reset()
         XCTAssertFalse(activity.isSpeaking(at: 3))
     }
+
+    func testJitterPrebufferCanChange() {
+        var jitter = JitterBuffer(prebufferSamples: 100)
+        jitter.prebufferSamples = 300
+        XCTAssertEqual(jitter.push([Float](repeating: 0, count: 200)).count, 0)
+        XCTAssertEqual(jitter.push([Float](repeating: 0, count: 100)).count, 2)
+        jitter.prebufferSamples = 0
+        XCTAssertEqual(jitter.prebufferSamples, 1)
+    }
+
+    func testLeadingSilenceTrim() {
+        var trim = LeadingSilenceTrim(threshold: 0.001)
+        XCTAssertFalse(trim.admit(rms: 0))
+        XCTAssertFalse(trim.admit(rms: 0.0009))
+        XCTAssertTrue(trim.admit(rms: 0.2))
+        XCTAssertTrue(trim.admit(rms: 0))   // pauses inside the reply stay
+        trim.reset()
+        XCTAssertFalse(trim.admit(rms: 0))
+    }
+
+    func testTranscriptTurns() {
+        var t = VoiceTranscript()
+        t.append("  ", from: .user)          // blanks start no turn
+        XCTAssertEqual(t.text, "")
+        t.append(" what is", from: .user)
+        t.append(" the capital", from: .user)
+        t.append(" The", from: .model)
+        t.append(" capital is Paris.", from: .model)
+        t.append("thanks", from: .user)
+        XCTAssertEqual(t.text, "You: what is the capital\n\nModel: The capital is Paris.\n\nYou: thanks")
+        t.endTurn()
+        t.append(" again", from: .user)
+        XCTAssertTrue(t.text.hasSuffix("You: thanks\n\nYou: again"), t.text)
+        t.append("", from: .model)
+        XCTAssertTrue(t.text.hasSuffix("You: again"))
+    }
 }

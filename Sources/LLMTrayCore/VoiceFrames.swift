@@ -5,17 +5,23 @@ import Foundation
 /// big-endian payload length, the payload. Binary rather than the embed
 /// runner's JSON lines, which would base64 every 80 ms of audio.
 ///
-/// App -> runner: `A` int16 PCM, 16 kHz mono; `D` the user's turn ended
-/// (walkie-talkie: payload = the turn's number, UTF-8); `Q` quit.
-/// Runner -> app: `R` ready (JSON), `T` text delta (UTF-8), `S` speech
-/// (int16 PCM at the ready JSON's `sample_rate`), `Z` the reply to a `D`
-/// is complete (JSON), `E` error (UTF-8), `L` a log line (UTF-8).
+/// App -> runner: `A` int16 PCM, 16 kHz mono; `M` the mode ("duplex" or
+/// "walkie"); `D` the user's turn ended (walkie-talkie: payload = the turn's
+/// number, UTF-8); `C` cancel the reply in progress; `Q` quit.
+/// Runner -> app: `R` ready (JSON), `T` the model's text delta, `U` the
+/// user's transcript delta (UTF-8), `S` speech (int16 PCM at the ready
+/// JSON's `sample_rate`), `Z` the reply to a `D` is complete (JSON), `N` a
+/// note for the user, `E` error, `L` a log line (UTF-8).
 public struct VoiceFrame: Equatable, Sendable {
     public enum Kind: UInt8, Sendable {
         case audio = 0x41   // A
         case quit = 0x51    // Q
         case endOfTurn = 0x44   // D
+        case mode = 0x4D        // M
+        case cancelReply = 0x43 // C
         case replyDone = 0x5A   // Z
+        case userText = 0x55    // U
+        case note = 0x4E        // N
         case ready = 0x52   // R
         case text = 0x54    // T
         case speech = 0x53  // S
@@ -102,8 +108,10 @@ public struct VoiceReplyDone: Equatable, Sendable, Decodable {
         case noReply = "no_reply"
         /// The runner's length cap.
         case limit
-        /// The user started talking again (or quit) first.
+        /// The user started talking again, cancelled it, or quit first.
         case interrupted
+        /// The context limit: the runner started a new conversation.
+        case reset
     }
 
     public var reason: Reason
@@ -146,6 +154,9 @@ public enum VoiceLabMode: String, CaseIterable, Sendable {
         case .auto: return (rtf ?? 0) > Self.realTimeLimit
         }
     }
+
+    /// The `M` frame's payload for the runner.
+    public static func runnerMode(walkieTalkie: Bool) -> String { walkieTalkie ? "walkie" : "duplex" }
 
     /// The speed for the "~0.5× real time" notice: 1 / RTF, one decimal.
     public static func speedText(rtf: Double) -> String {

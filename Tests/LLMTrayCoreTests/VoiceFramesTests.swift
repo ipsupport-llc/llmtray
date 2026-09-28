@@ -90,7 +90,11 @@ final class VoiceFramesTests: XCTestCase {
                        VoiceReplyDone(reason: .done, turn: 3, seconds: 2.4))
         XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "no_reply"}"#.utf8))?.reason, .noReply)
         XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "interrupted", "turn": 1}"#.utf8))?.reason, .interrupted)
+        XCTAssertEqual(VoiceReplyDone(payload: Data(#"{"reason": "reset", "turn": 2}"#.utf8))?.reason, .reset)
         XCTAssertNil(VoiceReplyDone(payload: Data(#"{"reason": "bored"}"#.utf8)))
+        XCTAssertEqual([VoiceFrame.Kind.mode, .cancelReply, .userText, .note].map(\.rawValue), [UInt8]("MCUN".utf8))
+        XCTAssertEqual(VoiceLabMode.runnerMode(walkieTalkie: true), "walkie")
+        XCTAssertEqual(VoiceLabMode.runnerMode(walkieTalkie: false), "duplex")
         XCTAssertEqual(VoiceFrame(.endOfTurn, text: "7").encoded.first, UInt8(ascii: "D"))
         XCTAssertEqual(VoiceFrame(.replyDone).kind, .replyDone)
     }
