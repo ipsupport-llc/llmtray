@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Được lấy trung bình thành một kết quả bên dưới. Luôn có một lượt chạy làm nóng bỏ trước, nên thời gian biên dịch kernel Metal ở lần gọi đầu tiên không bao giờ làm lệch số liệu.";
 "Back" = "Quay lại";
 "Balanced (default)" = "Cân bằng (Default)";
+"Barely fits the GPU memory" = "Vừa đủ bộ nhớ GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Trước khi tạo ảnh hoặc nhạc, hiển thị prompt và các cài đặt để chỉnh trước. Nó sẽ tiếp tục sau đếm ngược trừ khi bạn can thiệp.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Trước khi tạo ảnh hoặc bài hát, hiển thị những gì mô hình được yêu cầu — prompt, mô hình, các tuỳ chỉnh — để bạn thay đổi trước. Nó sẽ tự chạy sau thời gian đếm ngược trừ khi bạn can thiệp.";
 "Benchmark" = "Đo hiệu năng";
@@ -222,6 +223,7 @@
 "Date" = "Ngày";
 "Date & time" = "Ngày & giờ";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Gỡ lỗi: dưới một câu trả lời, công cụ nào mô hình đã gọi và với đối số gì; mở rộng một mục để xem nó trả về gì. Chỉ cho cuộc trò chuyện hiện tại — các lần gọi công cụ không được lưu cùng cuộc trò chuyện.";
+"Default can't be renamed: every model falls back to it" = "Không thể đổi tên Default: mọi mô hình đều quay về mặc định này";
 "Delete" = "Xóa";
 "Delete Project" = "Xóa Dự án";
 "Delete Project…" = "Xóa Dự án…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "Bao nhiêu bộ nhớ GPU được phép dùng. Tệp của mô hình phải vừa dưới giới hạn này.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Cách bài hát được lưu, ghi và chia sẻ. AAC 256 kbit/s: khoảng 1 MB cho mỗi 30 giây, không phân biệt được với đa số người nghe. WAV không nén: khoảng 6 MB cho mỗi 30 giây.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Mức độ nhạc bám sát phong cách mô hình mô tả. Cao hơn: càng giống; thấp hơn: càng tự do.";
+"How?" = "Cách làm?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face trả về HTTP %d cho %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face từ chối %@ (HTTP %d): mô hình bị hạn chế hoặc riêng tư, hoặc không tồn tại. Nếu bị hạn chế, chấp nhận giấy phép trên huggingface.co/%@ và kiểm tra token trong Cài đặt → Models.";
 "Hugging Face token" = "Token Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Tạo nhạc chưa được thiết lập — bật lại trong Cài đặt.";
 "Music model" = "Mô hình nhạc";
 "Music off" = "Nhạc tắt";
+"Name" = "Tên";
 "Name new chats automatically" = "Tự đặt tên cho trò chuyện mới";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Tên, kích thước và ngày, cùng đoạn trích ngắn của các tệp mà nó hỏi. Các nơi riêng tư bên trong (keys, Library) vẫn được ẩn.";
 "Network" = "Mạng";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "Lượng tử hóa KV từ token";
 "Quick benchmark" = "Kiểm chuẩn nhanh";
 "Quit LLMTray" = "Thoát LLMTray";
+"Raise the GPU memory limit in Terminal:" = "Tăng giới hạn bộ nhớ GPU trong Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Độ ngẫu nhiên của câu trả lời (một phần trong hồ sơ của mô hình). Thấp hơn thì tập trung hơn, cao hơn thì đa dạng hơn.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Độ ngẫu nhiên. Thấp hơn thì tập trung và dễ lặp lại hơn, cao hơn thì đa dạng hơn. Lập trình: 0.2-0.6; trò chuyện: 0.7-1.0.";
 "Rate LLMTray" = "Đánh giá LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
 "Rename" = "Đổi tên";
 "Rename %1$@ to %2$@" = "Đổi tên %1$@ thành %2$@";
+"Rename Profile" = "Đổi tên Hồ sơ";
 "Rename this profile" = "Đổi tên cấu hình này.";
 "Rename…" = "Đổi tên…";
 "Repaired" = "Đã sửa";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "Server sẽ khởi động khi %@ được tải xong";
 "The server starts with %@" = "Máy chủ khởi động bằng %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Các gợi ý cho Mac này đã có sẵn. Duyệt Hugging Face để chọn mô hình khác.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Khởi động lại máy chủ mô hình. Giới hạn sẽ trở về mặc định khi Mac khởi động lại. LLMTray không tự thay đổi giá trị này.";
 "There's no plan waiting any more." = "Không còn kế hoạch nào đang chờ.";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Chúng chạy lần lượt, hiển thị trong cửa sổ thanh menu. Bạn có thể đóng cửa sổ này tạm thời.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Thư mục này đã mất hoặc không còn được cho phép: thu hồi rồi cho phép lại.";
 "This folder's access has ended or was revoked." = "Quyền truy cập thư mục này đã hết hạn hoặc bị thu hồi.";
 "This many of the most recent messages are kept word for word when compacting." = "Khi nén, số tin nhắn gần đây nhất này được giữ nguyên từng chữ.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn hoặc tăng giới hạn bộ nhớ GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";
 "This version of LLMTray can't send reviews. Please update the app." = "Phiên bản LLMTray này không gửi được đánh giá. Vui lòng cập nhật ứng dụng.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Phiên bản LLMTray này thiết lập môi trường bằng Python. Cài Python từ python.org hoặc Homebrew rồi kiểm tra lại. Hoặc dùng LLMTray-Full, đã bao gồm mọi thứ cần thiết.";

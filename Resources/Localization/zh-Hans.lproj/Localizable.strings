@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "下面显示的是汇总后的平均结果。每次都会先进行一次不计入结果的预热运行，因此首次调用时的 Metal 内核编译时间不会影响数据。";
 "Back" = "返回";
 "Balanced (default)" = "平衡（默认）";
+"Barely fits the GPU memory" = "几乎占满 GPU 内存";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "在生成图像或歌曲前，会先显示提示词与可修改的设置。倒计时结束后会继续，除非你进行操作。";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "在生成图像或歌曲之前，显示模型的请求内容——提示词、模型和参数——以便先行修改。倒计时结束后会自动继续，除非你进行操作。";
 "Benchmark" = "基准测试";
@@ -222,6 +223,7 @@
 "Date" = "日期";
 "Date & time" = "日期与时间";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "调试：在回答下显示模型调用了哪些工具及其参数；展开某项可查看返回内容。仅适用于当前聊天——工具调用不会随聊天保存。";
+"Default can't be renamed: every model falls back to it" = "“Default” 无法重命名：每个模型都会回退到它";
 "Delete" = "删除";
 "Delete Project" = "删除项目";
 "Delete Project…" = "删除项目…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "GPU 可使用的内存量。模型文件必须在此限制内。";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "歌曲的保存与共享方式。AAC 256 kbit/s：约每 30 秒 1 MB，在大多数听感下不可区分。未压缩 WAV：约每 30 秒 6 MB。";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "音乐遵循模型所述风格的严格程度。数值越高：越贴近；越低：越自由。";
+"How?" = "如何做？";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face 返回了 HTTP %d（%@）。";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face 拒绝了 %@（HTTP %d）：该模型可能受限、私有或不存在。若受限，请在 huggingface.co/%@ 接受许可，并在“设置 → 模型”中检查令牌。";
 "Hugging Face token" = "Hugging Face 令牌";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "未设置音乐生成功能——请在“设置”中重新开启。";
 "Music model" = "音乐模型";
 "Music off" = "音乐：关闭";
+"Name" = "名称";
 "Name new chats automatically" = "自动命名新对话";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "会询问的文件显示名称、大小、日期和简短摘录。内部私人位置（keys、Library）保持隐藏。";
 "Network" = "网络";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "KV 量化起始词元";
 "Quick benchmark" = "快速基准测试";
 "Quit LLMTray" = "退出 LLMTray";
+"Raise the GPU memory limit in Terminal:" = "在终端中提高 GPU 内存限制：";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "答案的随机性（模型配置方案的一部分）。越低越聚焦，越高越多样。";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "随机性。越低越聚焦且可重复，越高越多样。编程：0.2-0.6；聊天：0.7-1.0。";
 "Rate LLMTray" = "为 LLMTray 评分";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "从 %@ 删除已下载的 mlx-lm 运行时和图像生成功能（包括运行时和图像模型）。下一次服务器启动或启用图像生成功能时会重新设置。已保存的聊天和配置档会保留。";
 "Rename" = "重命名";
 "Rename %1$@ to %2$@" = "将 %1$@ 重命名为 %2$@";
+"Rename Profile" = "重命名配置文件";
 "Rename this profile" = "重命名此配置。";
 "Rename…" = "重命名…";
 "Repaired" = "已修复";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "在 %@ 下载完成后服务器将启动";
 "The server starts with %@" = "服务器使用 %@ 启动";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "该 Mac 的建议已在此处。浏览 Hugging Face 查找其它模型。";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "然后重启模型服务器。Mac 重新启动后限制会恢复为默认值。LLMTray 不会自行更改该设置。";
 "There's no plan waiting any more." = "不再有等待的计划。";
 "These models go back to Default: %@." = "这些模型会恢复为 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它们一次运行一个，在菜单栏的窗口中显示。你可以在此期间关闭该窗口。";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "该文件夹已不存在或不再被允许：撤销其权限并重新允许。";
 "This folder's access has ended or was revoked." = "此文件夹的访问已结束或被撤销。";
 "This many of the most recent messages are kept word for word when compacting." = "压缩时会逐字保留这么多条最近消息。";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型，或提高 GPU 内存限制。";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 无法发送评论。请更新应用。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 设置运行时。请从 python.org 或 Homebrew 安装 Python，然后重试。或使用包含所需全部内容的 LLMTray-Full。";

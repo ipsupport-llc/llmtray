@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "התוצאות אוחדו לממוצע אחד למטה. לפני כל אחת מהן תמיד מתבצעת הרצת חימום חד־פעמית, כך שזמן ההידור של ליבת Metal בקריאה הראשונה אף פעם לא מעוות את המספרים.";
 "Back" = "חזור";
 "Balanced (default)" = "מאוזן (Default)";
+"Barely fits the GPU memory" = "מתאים בקושי לזיכרון ה‑GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "לפני יצירת תמונה או שיר, מציג את ההנחיה וההגדרות לשינוי. הוא ממשיך אחרי הספירה לאחור אלא אם תתערבו.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "לפני יצירת תמונה או שיר, מראה מה המודל ביקש — הפרומפט, המודל, הכפתורים — לשינוי קודם. לאחר הנחסור הוא ממשיך באופן אוטומטי אחרי הספירה לאחור אלא אם תתערבו.";
 "Benchmark" = "מבחן ביצועים";
@@ -222,6 +223,7 @@
 "Date" = "תאריך";
 "Date & time" = "תאריך ושעה";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "ניפוי שגיאות: מתחת לתשובה, אילו כלים המודל קרא ואילו ארגומנטים העביר; הרחיבו אחד כדי לראות מה הוחזר. מתייחס רק לשיחה הנוכחית — קריאות כלים אינן נשמרות איתה.";
+"Default can't be renamed: every model falls back to it" = "לא ניתן לשנות את השם של Default: כל דגם חוזר אליו כברירת מחדל";
 "Delete" = "מחק";
 "Delete Project" = "מחק פרויקט";
 "Delete Project…" = "מחק פרויקט…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "כמה זיכרון GPU מותר להשתמש. קבצי המודל חייבים להתאים למגבלה זו.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "כיצד שירים נשמרים, מאוחסנים ומשותפים. AAC 256 kbit/ש: כ־1 MB לכל 30 שניות, בלתי מובחן ברוב ההאזנות. WAV ללא דחיסה: כ־6 MB לכל 30 שניות.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "כמה בקפדנות המוזיקה עוקבת אחרי הסגנון שתואר על ידי המודל. גבוה: קרוב יותר; נמוך: חופשי יותר.";
+"How?" = "איך?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face החזיר HTTP %d עבור %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face דחה את %@ (HTTP %d): הוא מוגבל, פרטי או לא קיים. אם הוא מוגבל — קבל את הרישיון ב‑huggingface.co/%@ ובדוק את האסימון ב‑Settings → Models.";
 "Hugging Face token" = "אסימון של Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "יצירת מוזיקה לא מוגדרת — הפעל שוב בהגדרות.";
 "Music model" = "מודל מוזיקה";
 "Music off" = "מוסיקה כבויה";
+"Name" = "שם";
 "Name new chats automatically" = "קרא לצ'אטים חדשים אוטומטית";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "שמות, גדלים ותאריכים, וציטוטים קצרים מהקבצים שעליהם הוא שואל. מקומות פרטיים בפנים (keys, Library) נשארים מוסתרים.";
 "Network" = "רשת";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "קוונטיזציית KV החל מאסימון";
 "Quick benchmark" = "מדידת ביצועים מהירה";
 "Quit LLMTray" = "צא מ-LLMTray";
+"Raise the GPU memory limit in Terminal:" = "הגבּל את זיכרון ה‑GPU ב‑Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "מידת האקראיות של התשובות (חלק מפרופיל המודל). ערך נמוך ממוקד יותר, ערך גבוה מגוון יותר.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "אקראיות. ערך נמוך ממוקד ועקבי יותר, ערך גבוה מגוון יותר. קידוד: 0.2-0.6; צ׳אט: 0.7-1.0.";
 "Rate LLMTray" = "דרג את LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "מסיר את הרוץ־זמן של mlx-lm והיכולות ליצירת תמונות (הרוץ‑זמן ודגמי התמונה) שהורדו מ־%@. הם יותקנו שוב בעת הפעלת השרת הבאה, או כאשר הפעלת יצירת תמונות תופעל. שיחות ושבצים פרופיל נשמרים.";
 "Rename" = "שינוי שם";
 "Rename %1$@ to %2$@" = "שנה שם %1$@ ל־%2$@";
+"Rename Profile" = "שנה שם פרופיל";
 "Rename this profile" = "משנה את שם הפרופיל הזה.";
 "Rename…" = "שנה שם…";
 "Repaired" = "תוקנו";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "השרת יופעל ברגע ש‑%@ יורד";
 "The server starts with %@" = "השרת מתחיל עם %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "ההצעות עבור Mac זה כבר כאן. דפדף ב‑Hugging Face לדגם אחר.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "אחר כך הדלק את שרת המודל מחדש. המגבלה תחזור לברירת המחדל כאשר ה‑Mac יאתחל. LLMTray לעולם לא משנה זאת בעצמו.";
 "There's no plan waiting any more." = "אין תכנית ממתינה יותר.";
 "These models go back to Default: %@." = "המודלים האלה יוחזרו ל‑Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "הם רצים אחד בכל פעם, מוצגים בחלון בשורת התפריט. ניתן לסגור חלון זה בינתיים.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "התיקיה הזו הוסרה או כבר לא מותרת: בטל את ההרשאה ואפשר אותה שוב.";
 "This folder's access has ended or was revoked." = "הגישה לתיקיה זו הסתיימה או בוטלה.";
 "This many of the most recent messages are kept word for word when compacting." = "מספר זה של ההודעות האחרונות יישמר מילה במילה בעת דחיסה.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר, או הגבּל את זיכרון ה‑GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "לא ניתן לקרוא את קובץ הפרופיל הזה, לכן אי אפשר לערוך אותו כאן. יש לתקן או למחוק את הקובץ, ואז לפתוח מחדש את ההגדרות.";
 "This version of LLMTray can't send reviews. Please update the app." = "גרסה זו של LLMTray לא יכולה לשלוח חוות דעת. עדכן את האפליקציה.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "גירסה זו של LLMTray מבקשת להתקין את סביבת ההרצה עם Python. התקן Python מ‑python.org או Homebrew ואז נסה שוב. או השתמש ב‑LLMTray‑Full, שכולל את כל הנדרש.";

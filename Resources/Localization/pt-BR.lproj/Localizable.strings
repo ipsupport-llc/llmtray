@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "A média aparece em um único resultado abaixo. Uma execução descartável de aquecimento sempre vem antes, para que o tempo de compilação do kernel Metal na primeira chamada nunca distorça os números.";
 "Back" = "Voltar";
 "Balanced (default)" = "Equilibrado (Default)";
+"Barely fits the GPU memory" = "Quase ocupa toda a memória da GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Antes de uma imagem ou música ser criada, mostra o prompt e as configurações para alterar. Prossegue após a contagem regressiva, a menos que você intervenha.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Antes de criar uma imagem ou música, mostra o que o modelo solicitou — prompt, modelo, ajustes — para você alterar primeiro. Prossegue automaticamente após a contagem regressiva, a menos que você intervenha.";
 "Benchmark" = "Teste de desempenho";
@@ -222,6 +223,7 @@
 "Date" = "Data";
 "Date & time" = "Data e hora";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Depuração: abaixo de uma resposta, quais ferramentas o modelo chamou e com quais argumentos; expanda uma para ver o que ela retornou. Só para o chat atual — chamadas de ferramentas não são salvas com ele.";
+"Default can't be renamed: every model falls back to it" = "Default não pode ser renomeado: todo modelo retorna a ele";
 "Delete" = "Apagar";
 "Delete Project" = "Apagar Projeto";
 "Delete Project…" = "Apagar Projeto…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "Quanto de memória a GPU pode usar. Os arquivos de um modelo devem caber dentro desse limite.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Como as músicas são armazenadas, salvas e compartilhadas. AAC 256 kbit/s: cerca de 1 MB a cada 30 s, indistinguível para a maioria das audições. WAV não comprimido: cerca de 6 MB a cada 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Com que rigor a música segue o estilo descrito pelo modelo. Mais alto: mais próximo; mais baixo: mais livre.";
+"How?" = "Como?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face respondeu HTTP %d para %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face recusou %@ (HTTP %d): é restrito, privado ou não existe. Se for restrito, aceite a licença em huggingface.co/%@ e verifique o token em Ajustes → Modelos.";
 "Hugging Face token" = "Token do Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Geração de música não está configurada — ative novamente em Ajustes.";
 "Music model" = "Modelo de música";
 "Music off" = "Música desligada";
+"Name" = "Nome";
 "Name new chats automatically" = "Nomear novos chats automaticamente";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Nomes, tamanhos e datas, e trechos curtos dos arquivos sobre os quais pergunta. Locais privados dentro (chaves, Library) permanecem ocultos.";
 "Network" = "Rede";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "Quantizar KV a partir do token";
 "Quick benchmark" = "Benchmark rápido";
 "Quit LLMTray" = "Encerrar LLMTray";
+"Raise the GPU memory limit in Terminal:" = "Aumente o limite de memória da GPU no Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Aleatoriedade das respostas (parte do perfil do modelo). Valores menores são mais focados; maiores, mais variados.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Aleatoriedade. Valores menores são mais focados e repetíveis; maiores, mais variados. Código: 0.2-0.6; conversa: 0.7-1.0.";
 "Rate LLMTray" = "Avaliar o LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Remove o runtime mlx-lm baixado e a geração de imagens (seu runtime e modelos de imagem) de %@. Eles serão reinstalados no próximo início do servidor ou quando a geração de imagens for ativada. Conversas salvas e perfis são mantidos.";
 "Rename" = "Renomear";
 "Rename %1$@ to %2$@" = "Renomear %1$@ para %2$@";
+"Rename Profile" = "Renomear Perfil";
 "Rename this profile" = "Renomeia este perfil.";
 "Rename…" = "Renomear…";
 "Repaired" = "Reparadas";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "O servidor inicia quando %@ for baixado";
 "The server starts with %@" = "O servidor inicia com %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "As sugestões para este Mac já estão aqui. Navegue no Hugging Face por outro modelo.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Em seguida, reinicie o servidor do modelo. O limite volta ao padrão quando o Mac reinicia. O LLMTray nunca altera isso sozinho.";
 "There's no plan waiting any more." = "Não há mais plano aguardando.";
 "These models go back to Default: %@." = "Esses modelos voltam para Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Eles rodam um por vez, mostrados na janela da barra de menus. Você pode fechar essa janela enquanto isso.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Esta pasta desapareceu ou não é mais a permitida: revogue e permita novamente.";
 "This folder's access has ended or was revoked." = "O acesso a esta pasta terminou ou foi revogado.";
 "This many of the most recent messages are kept word for word when compacting." = "Este número de mensagens mais recentes é mantido palavra por palavra ao compactar.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Este modelo usa %1$@ dos %2$@ GB que a GPU pode usar; prompts longos podem ficar sem memória. Use um modelo menor ou aumente o limite de memória da GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Este modelo usa %1$@ dos %2$@ GB que a GPU pode usar; prompts longos podem ficar sem memória. Use um modelo menor.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "O arquivo deste perfil não pode ser lido, então ele não pode ser editado aqui. Corrija ou apague o arquivo e reabra os Ajustes.";
 "This version of LLMTray can't send reviews. Please update the app." = "Esta versão do LLMTray não pode enviar avaliações. Atualize o app.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Esta versão do LLMTray configura seu runtime com Python. Instale o Python em python.org ou via Homebrew e tente novamente. Ou use LLMTray-Full, que já inclui tudo o que precisa.";

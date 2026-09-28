@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Aşağıda tek bir sonuç olarak ortalaması alındı. Öncesinde her zaman atılacak bir ısınma çalıştırması yapılır; bu nedenle ilk çağrıdaki Metal çekirdek derleme süresi sayıları asla çarpıtmaz.";
 "Back" = "Geri";
 "Balanced (default)" = "Dengeli (Varsayılan)";
+"Barely fits the GPU memory" = "GPU belleğine zar zor sığıyor";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Bir resim veya şarkı oluşturmadan önce uyarıyı ve değiştirilebilecek ayarları gösterir. Geri sayım bitince dokunmazsanız işlem devam eder.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Bir resim veya şarkı oluşturulmadan önce modelin ne istediğini — istem (prompt), model, ayarlar — değiştirmeniz için gösterir. Geri sayımdan sonra bir işlem yapmazsanız otomatik devam eder.";
 "Benchmark" = "Karşılaştırma";
@@ -222,6 +223,7 @@
 "Date" = "Tarih";
 "Date & time" = "Tarih ve saat";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Hata ayıklama: bir yanıtın altında modelin hangi araçları çağırdığını ve hangi argümanlarla çağırdığını gösterir; birini genişleterek ne döndürdüğünü görebilirsiniz. Yalnızca geçerli sohbet içindir — araç çağrıları sohbetle birlikte kaydedilmez.";
+"Default can't be renamed: every model falls back to it" = "Default yeniden adlandırılamaz: her model buna geri döner";
 "Delete" = "Sil";
 "Delete Project" = "Projeyi Sil";
 "Delete Project…" = "Projeyi Sil…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "GPU'nun kullanabileceği bellek miktarı. Bir modelin dosyaları bunun altına sığmalıdır.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Şarkıların nasıl saklandığı, kaydedildiği ve paylaşıldığı. AAC 256 kbit/s: yaklaşık 30 s için 1 MB, çoğu dinleme için farkedilmez. Sıkıştırılmamış WAV: yaklaşık 30 s için 6 MB.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Müziğin modelin tanımladığı stile ne kadar sıkı uyduğu. Yüksek: daha yakın; düşük: daha serbest.";
+"How?" = "Nasıl?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face %2$@ için HTTP %1$d döndü.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face %@ (HTTP %d) isteğini reddetti: kısıtlı, özel veya mevcut değil. Eğer kısıtlıysa, lisansını huggingface.co/%@ adresinde kabul edin ve Ayarlar → Models'teki tokenı kontrol edin.";
 "Hugging Face token" = "Hugging Face tokenı";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Müzik üretimi ayarlı değil — Açmak için Ayarlar'a gidin.";
 "Music model" = "Müzik modeli";
 "Music off" = "Müzik kapalı";
+"Name" = "Ad";
 "Name new chats automatically" = "Yeni sohbetleri otomatik adlandır";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Sorduğu dosyaların adları, boyutları, tarihleri ve kısa alıntıları. İçteki özel yerler (keys, Library) gizli kalır.";
 "Network" = "Ağ";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "KV’yi belirteçten itibaren nicemle";
 "Quick benchmark" = "Hızlı karşılaştırma testi";
 "Quit LLMTray" = "LLMTray’den Çık";
+"Raise the GPU memory limit in Terminal:" = "Terminal'de GPU bellek sınırını yükseltin:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Yanıtların rastlantısallığı (model profilinin parçası). Daha düşük değer daha odaklı, daha yüksek değer daha çeşitli yanıtlar üretir.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Rastlantısallık. Daha düşük değer daha odaklı ve tekrarlanabilir, daha yüksek değer daha çeşitlidir. Kodlama: 0.2-0.6; sohbet: 0.7-1.0.";
 "Rate LLMTray" = "LLMTray’e puan verin";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanı ve görüntü oluşturma (çalışma zamanı ve görüntü modelleri) %@ konumundan kaldırılır. Sunucu bir sonraki başlatıldığında veya görüntü oluşturma açıldığında yeniden yapılandırılır. Kaydedilmiş sohbetler ve profiller saklanır.";
 "Rename" = "Yeniden Adlandır";
 "Rename %1$@ to %2$@" = "%1$@ öğesinin adını %2$@ olarak değiştir";
+"Rename Profile" = "Profili Yeniden Adlandır";
 "Rename this profile" = "Bu profilin adını değiştirin.";
 "Rename…" = "Yeniden Adlandır…";
 "Repaired" = "Onarılan";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "Sunucu %@ indirildikten sonra başlar";
 "The server starts with %@" = "Sunucu %@ ile başlatılıyor";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Bu Mac için öneriler zaten burada. Başka bir model için Hugging Face'e göz atın.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Sonra model sunucusunu yeniden başlatın. Mac yeniden başlatıldığında sınır varsayılan değere döner. LLMTray bunu kendiliğinden değiştirmez.";
 "There's no plan waiting any more." = "Artık bekleyen bir plan yok.";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Menü çubuğundaki pencerede aynı anda birer birer çalışırlar. Bu arada bu pencereyi kapatabilirsiniz.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Bu klasör artık yok veya izin verilen klasör değil: geri alın ve yeniden izin verin.";
 "This folder's access has ended or was revoked." = "Bu klasörün erişimi sona erdi veya iptal edildi.";
 "This many of the most recent messages are kept word for word when compacting." = "Sıkıştırma sırasında en son iletilerden bu kadarı kelimesi kelimesine korunur.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın veya GPU bellek sınırını yükseltin.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";
 "This version of LLMTray can't send reviews. Please update the app." = "Bu LLMTray sürümü değerlendirme gönderemez. Lütfen uygulamayı güncelleyin.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Bu LLMTray sürümü çalışma zamanı için Python kullanır. Python'u python.org veya Homebrew üzerinden yükleyin, sonra tekrar kontrol edin. Veya gerekli her şeyi içeren LLMTray-Full'u kullanın.";

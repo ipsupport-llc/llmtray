@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "يُحسب متوسطها في نتيجة واحدة أدناه. تسبقها دائمًا عملية إحماء مؤقتة، لذلك لا يؤثر وقت ترجمة نواة Metal عند أول استدعاء في الأرقام.";
 "Back" = "رجوع";
 "Balanced (default)" = "متوازن (Default)";
+"Barely fits the GPU memory" = "يكاد يناسب ذاكرة GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "قبل إنشاء صورة أو أغنية، يعرض المطالبة والإعدادات لتغييرها أولًا. يستمر بعد العد التنازلي ما لم تتدخل.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "قبل إنشاء صورة أو أغنية، يعرض ما طُلب من النموذج — الموجه، النموذج، الضوابط — لتغيّرها أولًا. يتابع التنفيذ تلقائيًا بعد العد التنازلي ما لم تتدخل.";
 "Benchmark" = "اختبار الأداء";
@@ -222,6 +223,7 @@
 "Date" = "التاريخ";
 "Date & time" = "التاريخ والوقت";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "التصحيح: أسفل الإجابة، الأدوات التي استدعاها النموذج ومع الوسائط المستخدمة؛ وسّع أيّ استدعاء لرؤية ما أعاد. يخصّ المحادثة الحالية فقط — الاستدعاءات لا تُحفَظ معها.";
+"Default can't be renamed: every model falls back to it" = "لا يمكن إعادة تسمية Default: كل نموذج يعود إليه افتراضيًا";
 "Delete" = "حذف";
 "Delete Project" = "حذف المشروع";
 "Delete Project…" = "حذف المشروع…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "مقدار الذاكرة التي قد يستخدمها الـ GPU. يجب أن تتسع ملفات النموذج ضمن هذا الحد.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "كيف تُحفظ وتُشارك الأغاني وتُخزن. AAC 256 كيلوبت/ث: حوالي 1 ميغابايت لكل 30 ثانية، لا يمكن تمييزه لمعظم المستمعين. WAV غير مضغوط: حوالي 6 ميغابايت لكل 30 ثانية.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "مدى التزام الموسيقى بالأسلوب الذي وصفه النموذج. أعلى: أقرب إليه؛ أقل: أكثر حرية.";
+"How?" = "كيف؟";
 "Hugging Face answered HTTP %d for %@." = "أجاب Hugging Face برمز HTTP %d بالنسبة إلى %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "رفض Hugging Face %@ (HTTP %d): قد يكون مقيَّدًا أو خاصًا أو غير موجود. إذا كان مقيَّدًا، اقبل ترخيصه على huggingface.co/%@ وتحقق من الرمز في الإعدادات → Models.";
 "Hugging Face token" = "رمز Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد إنتاج الموسيقى — فعّله مرة أخرى في الإعدادات.";
 "Music model" = "نموذج الموسيقى";
 "Music off" = "الموسيقى متوقفة";
+"Name" = "الاسم";
 "Name new chats automatically" = "تسمية الدردشات الجديدة تلقائيًا";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "الأسماء والأحجام والتواريخ ومقتطفات قصيرة من الملفات التي يستفسر عنها. الأماكن الخاصة بالداخل (keys، Library) تبقى مخفية.";
 "Network" = "الشبكة";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "تكميم KV بدءًا من الرمز";
 "Quick benchmark" = "اختبار أداء سريع";
 "Quit LLMTray" = "إنهاء LLMTray";
+"Raise the GPU memory limit in Terminal:" = "زد حد ذاكرة GPU في Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "عشوائية الإجابات (جزء من ملف تعريف النموذج). كلما انخفضت كانت أكثر تركيزًا، وكلما ارتفعت كانت أكثر تنوعًا.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "العشوائية. كلما انخفضت كانت أكثر تركيزًا وقابلية للتكرار، وكلما ارتفعت كانت أكثر تنوعًا. البرمجة: 0.2-0.6؛ الدردشة: 0.7-1.0.";
 "Rate LLMTray" = "قيّم LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "يزيل وقت التشغيل mlx-lm المحمّل وتوليد الصور (وقت التشغيل ونماذج الصور) من %@. سيتم إعدادها مرة أخرى عند إعادة تشغيل الخادم أو عند تفعيل توليد الصور. المحادثات والحسابات المحفوظة تبقى محفوظة.";
 "Rename" = "إعادة تسمية";
 "Rename %1$@ to %2$@" = "إعادة تسمية %1$@ إلى %2$@";
+"Rename Profile" = "إعادة تسمية الملف الشخصي";
 "Rename this profile" = "أعد تسمية ملف التعريف هذا.";
 "Rename…" = "إعادة تسمية…";
 "Repaired" = "مُصلحة";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "يبدأ الخادم بمجرد تنزيل %@";
 "The server starts with %@" = "يبدأ الخادم باستخدام %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "الاقتراحات لهذا الـ Mac متاحة بالفعل هنا. تصفّح Hugging Face لنموذج آخر.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "ثم أعد تشغيل خادم النموذج. يعود الحد إلى الافتراضي عند إعادة تشغيل الـ Mac. لا يقوم LLMTray بتغييره بنفسه.";
 "There's no plan waiting any more." = "لا توجد خطة بانتظار الآن.";
 "These models go back to Default: %@." = "ستعود هذه النماذج إلى Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "تعمل بشكل متسلسل، وتُعرض في نافذة شريط القائمة. يمكنك إغلاق هذه النافذة أثناء ذلك.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "هذا المجلد لم يعد موجودًا أو لم يعد المسموح به: قم بإلغائه ثم أعد منحه الإذن.";
 "This folder's access has ended or was revoked." = "انتهى وصول هذا المجلد أو تم سحبه.";
 "This many of the most recent messages are kept word for word when compacting." = "يُحتفَظ بهذا العدد من أحدث الرسائل حرفيًا عند التكثيف.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر، أو زد حد ذاكرة الـ GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "لا يمكن قراءة ملف ملف التعريف هذا، لذلك لا يمكن تحريره هنا. أصلح الملف أو احذفه، ثم أعد فتح الإعدادات.";
 "This version of LLMTray can't send reviews. Please update the app." = "هذا الإصدار من LLMTray لا يمكنه إرسال المراجعات. يرجى تحديث التطبيق.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "تقوم هذه النسخة من LLMTray بضبط بيئتها التشغيلية باستخدام Python. ثبّت Python من python.org أو عبر Homebrew ثم أعد المحاولة. أو استخدم LLMTray‑Full الذي يتضمن كل ما يحتاجه.";

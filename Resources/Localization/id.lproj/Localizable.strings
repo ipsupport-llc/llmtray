@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "Dirata-ratakan menjadi satu hasil di bawah. Proses pemanasan sekali pakai selalu dijalankan sebelumnya, sehingga waktu kompilasi kernel Metal pada panggilan pertama tidak pernah membiaskan angka.";
 "Back" = "Kembali";
 "Balanced (default)" = "Seimbang (Default)";
+"Barely fits the GPU memory" = "Hampir melebihi memori GPU";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Sebelum gambar atau lagu dibuat, menampilkan prompt dan pengaturan untuk diubah dulu. Proses berlanjut setelah hitung mundur kecuali Anda membatalkannya.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Sebelum gambar atau lagu dibuat, menampilkan apa yang diminta model — prompt, model, pengaturan — agar dapat diubah terlebih dulu. Akan berjalan otomatis setelah hitungan mundur kecuali Anda mengintervensi.";
 "Benchmark" = "Tolok ukur";
@@ -222,6 +223,7 @@
 "Date" = "Tanggal";
 "Date & time" = "Tanggal & waktu";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "Debugging: di bawah jawaban, alat mana yang dipanggil model dan dengan argumen apa; kembangkan salah satunya untuk melihat apa yang dikembalikan. Hanya untuk obrolan saat ini — pemanggilan alat tidak disimpan bersamanya.";
+"Default can't be renamed: every model falls back to it" = "Default tidak bisa diubah nama: setiap model akan kembali ke sana";
 "Delete" = "Hapus";
 "Delete Project" = "Hapus Proyek";
 "Delete Project…" = "Hapus Proyek…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "Berapa banyak memori yang dapat digunakan GPU. File model harus muat di bawah batas ini.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "Bagaimana lagu disimpan, dicadangkan, dan dibagikan. AAC 256 kbit/s: ~1 MB per 30 s, tidak bisa dibedakan pada sebagian besar pendengaran. WAV tak terkompresi: ~6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "Seberapa ketat musik mengikuti gaya yang dideskripsikan model. Lebih tinggi: lebih mendekati; lebih rendah: lebih bebas.";
+"How?" = "Bagaimana?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face merespons HTTP %d untuk %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face menolak %@ (HTTP %d): model dibatasi, privat, atau tidak ada. Jika dibatasi, terima lisensinya di huggingface.co/%@ dan periksa token di Pengaturan → Models.";
 "Hugging Face token" = "Token Hugging Face";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "Pembuatan musik belum disiapkan — aktifkan kembali di Pengaturan.";
 "Music model" = "Model musik";
 "Music off" = "Musik mati";
+"Name" = "Nama";
 "Name new chats automatically" = "Beri nama chat baru secara otomatis";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Nama, ukuran, tanggal, dan kutipan singkat berkas yang diminta. Tempat pribadi di dalamnya (keys, Library) tetap disembunyikan.";
 "Network" = "Jaringan";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "Kuantisasi KV mulai token";
 "Quick benchmark" = "Benchmark cepat";
 "Quit LLMTray" = "Keluar dari LLMTray";
+"Raise the GPU memory limit in Terminal:" = "Tingkatkan batas memori GPU di Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Keacakan jawaban (bagian dari profil model). Lebih rendah lebih fokus, lebih tinggi lebih bervariasi.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Keacakan. Lebih rendah lebih fokus dan dapat diulang, lebih tinggi lebih bervariasi. Pemrograman: 0.2-0.6; obrolan: 0.7-1.0.";
 "Rate LLMTray" = "Nilai LLMTray";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Menghapus runtime mlx-lm yang diunduh dan komponen pembuatan gambar (runtime dan model gambar) dari %@. Mereka akan diatur ulang saat server dimulai berikutnya, atau saat pembuatan gambar diaktifkan. Riwayat chat dan profil yang disimpan tetap dipertahankan.";
 "Rename" = "Ubah Nama";
 "Rename %1$@ to %2$@" = "Ganti nama %1$@ menjadi %2$@";
+"Rename Profile" = "Ganti Nama Profil";
 "Rename this profile" = "Ubah nama profil ini.";
 "Rename…" = "Ganti Nama…";
 "Repaired" = "Diperbaiki";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "Server dimulai setelah %@ diunduh";
 "The server starts with %@" = "Server dimulai dengan %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Saran untuk Mac ini sudah tersedia. Jelajahi Hugging Face untuk model lain.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Lalu mulai ulang server model. Batas akan kembali ke Default saat Mac dimulai ulang. LLMTray tidak mengubahnya sendiri.";
 "There's no plan waiting any more." = "Tidak ada rencana yang menunggu lagi.";
 "These models go back to Default: %@." = "Model berikut kembali ke Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Mereka berjalan satu per satu, ditampilkan di jendela bar menu. Anda dapat menutup jendela ini sementara waktu.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Folder ini hilang atau tidak lagi diizinkan: batalkan izinnya dan izinkan lagi.";
 "This folder's access has ended or was revoked." = "Akses folder ini telah berakhir atau dicabut.";
 "This many of the most recent messages are kept word for word when compacting." = "Jumlah pesan terbaru yang dipertahankan kata demi kata saat memadatkan.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil, atau tingkatkan batas memori GPU.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
 "This version of LLMTray can't send reviews. Please update the app." = "Versi LLMTray ini tidak dapat mengirim ulasan. Silakan perbarui aplikasi.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Versi LLMTray ini menyiapkan runtime menggunakan Python. Instal Python dari python.org atau Homebrew, lalu periksa lagi. Atau gunakan LLMTray-Full yang sudah menyertakan semua yang diperlukan.";

@@ -131,6 +131,7 @@
 "Averaged into one result below. A throwaway warmup run always precedes them, so first-call Metal kernel compile time never skews the numbers." = "아래에는 평균 결과 하나로 표시됩니다. 매번 측정 전에 폐기용 워밍업 실행이 먼저 수행되므로, 첫 호출 시 Metal 커널 컴파일 시간이 수치에 영향을 주지 않습니다.";
 "Back" = "뒤로";
 "Balanced (default)" = "균형형 (Default)";
+"Barely fits the GPU memory" = "GPU 메모리에 간신히 맞음";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "이미지나 노래가 생성되기 전에 프롬프트와 설정을 먼저 표시합니다. 카운트다운 후 사용자가 건드리지 않으면 진행됩니다.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "이미지나 노래가 생성되기 전에 모델에 요청된 내용(프롬프트, 모델, 설정 등)을 먼저 보여줍니다. 카운트다운 후 사용자가 건드리지 않으면 자동으로 진행됩니다.";
 "Benchmark" = "벤치마크";
@@ -222,6 +223,7 @@
 "Date" = "날짜";
 "Date & time" = "날짜 및 시간";
 "Debugging: under an answer, which tools the model called and with what arguments; expand one to see what it returned. Only for the current chat -- tool calls aren't saved with it." = "디버깅: 답변 아래에서 모델이 어떤 도구를 호출했는지 및 어떤 인수를 사용했는지 확인합니다. 항목을 확장하면 반환값을 볼 수 있습니다. 현재 채팅에만 적용되며 도구 호출은 저장되지 않습니다.";
+"Default can't be renamed: every model falls back to it" = "Default은 이름을 바꿀 수 없습니다: 모든 모델이 이에 대해 폴백합니다";
 "Delete" = "삭제";
 "Delete Project" = "프로젝트 삭제";
 "Delete Project…" = "프로젝트 삭제…";
@@ -345,6 +347,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "GPU가 사용할 수 있는 메모리 양입니다. 모델 파일이 이 제한보다 작아야 합니다.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "노래를 보관·저장·공유하는 방식입니다. AAC 256 kbit/s: 30초당 약 1MB로 대부분의 청취자에게 구분되지 않습니다. 무압축 WAV: 30초당 약 6MB입니다.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "음악이 모델이 설명한 스타일을 얼마나 엄격히 따르는지입니다. 높게: 더 가깝게, 낮게: 더 자유롭게.";
+"How?" = "방법?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face가 %2$@에 대해 HTTP %1$d를 응답했습니다.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face가 %@을(를) 거부했습니다(HTTP %d): 접근 제한이 있거나 비공개이거나 존재하지 않습니다. 접근 제한이 있는 경우 huggingface.co/%@에서 사용권에 동의하고 설정 → Models의 토큰을 확인하세요.";
 "Hugging Face token" = "Hugging Face 토큰";
@@ -444,6 +447,7 @@
 "Music generation isn't set up -- turn it on again in Settings." = "음악 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
 "Music model" = "음악 모델";
 "Music off" = "음악 끔";
+"Name" = "이름";
 "Name new chats automatically" = "새 채팅 자동으로 이름 지정";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "요청된 파일의 이름, 크기, 날짜 및 짧은 내용 일부를 보여줍니다. 내부의 개인 영역(keys, Library 등)은 숨겨집니다.";
 "Network" = "네트워크";
@@ -568,6 +572,7 @@
 "Quantize KV from token" = "KV 양자화 시작 토큰";
 "Quick benchmark" = "빠른 벤치마크";
 "Quit LLMTray" = "LLMTray 종료";
+"Raise the GPU memory limit in Terminal:" = "터미널에서 GPU 메모리 한도를 올리세요:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "답변의 무작위성입니다(모델 프로필의 일부). 낮을수록 더 집중된 답변을, 높을수록 더 다양한 답변을 생성합니다.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "무작위성입니다. 낮을수록 더 집중적이고 반복 가능하며, 높을수록 더 다양합니다. 코딩: 0.2~0.6, 채팅: 0.7~1.0.";
 "Rate LLMTray" = "LLMTray 평가하기";
@@ -595,6 +600,7 @@
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "mlx-lm 실행 환경과 이미지 생성(실행 환경 및 이미지 모델)을 %@에서 삭제합니다. 다음 서버 시작 시나 이미지 생성을 켤 때 다시 설치됩니다. 저장된 대화와 프로필은 유지됩니다.";
 "Rename" = "이름 변경";
 "Rename %1$@ to %2$@" = "%1$@의 이름을 %2$@으로 변경";
+"Rename Profile" = "프로필 이름 변경";
 "Rename this profile" = "이 프로필의 이름을 변경합니다.";
 "Rename…" = "이름 변경…";
 "Repaired" = "복구됨";
@@ -800,6 +806,7 @@
 "The server starts once %@ is downloaded" = "%@ 다운로드가 완료되면 서버가 시작됩니다";
 "The server starts with %@" = "서버는 %@로 시작합니다";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "이 Mac에 대한 제안은 이미 여기에 있습니다. 다른 모델은 Hugging Face에서 찾아보세요.";
+"Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "그런 다음 모델 서버를 재시작하세요. Mac을 재시작하면 한도는 기본값으로 돌아갑니다. LLMTray는 이 값을 직접 변경하지 않습니다.";
 "There's no plan waiting any more." = "더 이상 대기 중인 계획이 없습니다.";
 "These models go back to Default: %@." = "다음 모델이 Default로 돌아갑니다: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "한 번에 하나씩 실행되며 메뉴 막대에 창으로 표시됩니다. 이 동안 창을 닫을 수 있습니다.";
@@ -808,6 +815,8 @@
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "이 폴더가 없어졌거나 더 이상 허용된 폴더가 아닙니다: 권한을 취소한 다음 다시 허용하세요.";
 "This folder's access has ended or was revoked." = "이 폴더의 접근 권한이 만료되었거나 취소되었습니다.";
 "This many of the most recent messages are kept word for word when compacting." = "압축할 때 가장 최근 메시지 중 이 개수만큼을 원문 그대로 유지합니다.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하거나 GPU 메모리 한도를 올리세요.";
+"This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하세요.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
 "This version of LLMTray can't send reviews. Please update the app." = "이 LLMTray 버전에서는 리뷰를 보낼 수 없습니다. 앱을 업데이트해 주세요.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "이 LLMTray 버전은 런타임을 Python으로 설정합니다. python.org 또는 Homebrew에서 Python을 설치한 뒤 다시 확인하세요. 또는 필요한 구성 요소가 모두 포함된 LLMTray-Full을 사용하세요.";
