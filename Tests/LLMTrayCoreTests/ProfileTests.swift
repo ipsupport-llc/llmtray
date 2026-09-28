@@ -351,6 +351,21 @@ final class PrefillMemoryTests: XCTestCase {
         XCTAssertFalse(ServerLaunch.arguments(p, c).contains("--prefill-memory-mb"))
     }
 
+    func testPromptCacheEntriesUnlessTheUserSetsThem() {
+        let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-size"), "64")
+        for extra in ["--prompt-cache-size 5", "--prompt-cache-size=5"] {
+            p.extraServerArgs = extra
+            let args = ServerLaunch.arguments(p, c)
+            XCTAssertEqual(args.filter { $0.hasPrefix("--prompt-cache-size") }.count, 1, extra)
+            XCTAssertTrue(args.contains { $0.hasPrefix("--prompt-cache-bytes") }, "the byte cap stays: \(extra)")
+        }
+        // A flag that only starts the same doesn't count.
+        p.extraServerArgs = "--prompt-cache-sizes 5"
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-size"), "64")
+    }
+
     private func argValue(_ args: [String], _ flag: String) -> String? {
         args.firstIndex(of: flag).flatMap { $0 + 1 < args.count ? args[$0 + 1] : nil }
     }
@@ -422,6 +437,21 @@ final class PromptCacheCapTests: XCTestCase {
         XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: b, context: c))
         b.promptCacheMB = 512
         XCTAssertTrue(ServerLaunch.needsRestart(from: a, to: b, context: c))
+    }
+
+    func testPromptCacheEntriesUnlessTheUserSetsThem() {
+        let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-size"), "64")
+        for extra in ["--prompt-cache-size 5", "--prompt-cache-size=5"] {
+            p.extraServerArgs = extra
+            let args = ServerLaunch.arguments(p, c)
+            XCTAssertEqual(args.filter { $0.hasPrefix("--prompt-cache-size") }.count, 1, extra)
+            XCTAssertTrue(args.contains { $0.hasPrefix("--prompt-cache-bytes") }, "the byte cap stays: \(extra)")
+        }
+        // A flag that only starts the same doesn't count.
+        p.extraServerArgs = "--prompt-cache-sizes 5"
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--prompt-cache-size"), "64")
     }
 
     private func argValue(_ args: [String], _ flag: String) -> String? {

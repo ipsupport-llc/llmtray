@@ -10,6 +10,15 @@
   nothing's left (a 0-byte cap in mlx_lm.server, not unlimited); the
   user's own `--prompt-cache-bytes` wins. A model leaving under 2.5 GB
   gets a notice with the `sysctl iogpu.wired_limit_mb` way to raise it.
+- **Prompt cache holds 64 entries** (`--prompt-cache-size`; the user's
+  own wins). The server's default of 10 sat full with an agent's parallel
+  conversations, each request storing several checkpoints, and evicted
+  useful ones; the byte cap is the real limit.
+- **Prefill progress keeps a request alive.** On a swapping Mac 512 prompt
+  tokens took up to 74 s with nothing on the wire, and the 60 s stall
+  watchdog reset a request the server was still working on. "Prompt
+  processing progress" / "Prefill step" log lines now count as activity
+  for every in-flight request; no bytes *and* no progress still stalls.
 - **KV quantization forced off for KV-shared models** (Gemma 4 E2B/E4B):
   they crash with quantized KV. Applied at every launch, including
   proxy-driven switches, which used to reuse the first start's KV bits.

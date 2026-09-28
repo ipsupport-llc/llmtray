@@ -92,6 +92,11 @@ final class ServerManager: ObservableObject {
     /// process's output (see generationThreadDied); reset per launch.
     private var logWatch = ServerLogWatch()
 
+    /// When the current process last logged prefill progress: the proxy's
+    /// stall watchdog counts it as activity for its in-flight requests
+    /// (StallRule), so a slow prefill that sends nothing isn't reset.
+    private(set) var lastPrefillProgressAt: Date?
+
     /// Launch values auto-tune is trying (BenchmarkRunner): applied on top
     /// of the profile at launch, in memory only -- a quit or crash
     /// mid-sweep leaves the profile as it was, never on a trial value.
@@ -648,14 +653,20 @@ final class ServerManager: ObservableObject {
         let serverProcess = ServerProcess(executable: MLXRuntimeInstaller.venvPython, arguments: args,
                                           environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
+        lastPrefillProgressAt = nil
         readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
             guard let self else { return }
             self.appendLog(text)
             guard let serverProcess, self.process === serverProcess else { return }
             self.checkForReadySignal(text, modelPath: modelPath)
-            for case let .generationThreadDied(reason, outOfMemory) in self.logWatch.feed(text) {
-                self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
+            for event in self.logWatch.feed(text) {
+                switch event {
+                case let .generationThreadDied(reason, outOfMemory):
+                    self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
+                case .prefillProgress:
+                    self.lastPrefillProgressAt = Date()
+                }
             }
         }
         serverProcess.onExit = { [weak self] exited in

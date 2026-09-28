@@ -3,11 +3,18 @@ import Foundation
 /// Watches mlx_lm.server's output for a failure the process survives: its
 /// generation thread can die (Metal out of memory, most often) while the
 /// HTTP side lives on and refuses every request at once -- nothing stalls,
-/// so the stall watchdog never fires.
+/// so the stall watchdog never fires. Also sees the server working on a
+/// prompt while it sends nothing (prefill progress), which the stall
+/// watchdog must not mistake for a stall.
 public struct ServerLogWatch {
     public enum Event: Equatable {
         /// `reason` is the exception mlx_lm logged.
         case generationThreadDied(reason: String, outOfMemory: Bool)
+        /// The server is prefilling a prompt ("Prompt processing progress:
+        /// N/M", "Prefill step ..."): alive, just slow -- a long prompt on
+        /// a swapping Mac took 74 s per 512 tokens, with no byte on the
+        /// wire meanwhile. At most one per fed chunk.
+        case prefillProgress
     }
 
     /// mlx_lm.server logs this once, at ERROR level, when the thread dies
@@ -21,6 +28,13 @@ public struct ServerLogWatch {
         pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - ERROR - |ERROR:root:)mlx_lm\.server generation thread died"#
     )
 
+    /// mlx_lm.server's prefill log records, INFO or WARNING ("Prefill step
+    /// down to ..."). Anchored to a record's start like `record`, so a
+    /// logged request body quoting one doesn't count.
+    static let progressRecord = try! NSRegularExpression(
+        pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - (?:INFO|WARNING) - |(?:INFO|WARNING):root:)(?:Prompt processing progress: \d+/\d+|Prefill step )"#
+    )
+
     /// Output arrives in arbitrary chunks; an unfinished line waits here.
     private var partial = ""
 
@@ -32,10 +46,16 @@ public struct ServerLogWatch {
         // Bounded, keeping the line's start -- that's where a record's
         // marker is; a long exception text after it can go.
         if partial.count > 4096 { partial = String(partial.prefix(1024)) }
-        return lines.compactMap { line in
+        var progress = false
+        var events: [Event] = lines.compactMap { line in
             let line = String(line)
             let ns = line as NSString
-            guard let match = Self.record.firstMatch(in: line, range: NSRange(location: 0, length: ns.length)) else { return nil }
+            let range = NSRange(location: 0, length: ns.length)
+            if Self.progressRecord.firstMatch(in: line, range: range) != nil {
+                progress = true
+                return nil
+            }
+            guard let match = Self.record.firstMatch(in: line, range: range) else { return nil }
             let rest = ns.substring(from: match.range.location + match.range.length)
             var reason = rest.trimmingCharacters(in: CharacterSet(charactersIn: ":").union(.whitespaces))
             // Metal reports it as a failed command buffer ("Insufficient
@@ -45,6 +65,23 @@ public struct ServerLogWatch {
             if reason.count > 200 { reason = String(reason.prefix(200)) + "…" }
             return .generationThreadDied(reason: reason, outOfMemory: oom)
         }
+        if progress { events.append(.prefillProgress) }
+        return events
+    }
+}
+
+/// The proxy's stall rule for a request whose response has started: stalled
+/// when neither its own bytes (`lastByteAt`) nor the server's prefill
+/// progress (`serverProgressAt`, any request's) came within `threshold`.
+/// Progress counts for every in-flight request, not just the one being
+/// prefilled: the log line doesn't say whose prompt it is, and it shows the
+/// server's generation loop alive -- requests queued behind that prefill
+/// aren't stuck either. A genuine stall (a dead worker, a wedged process)
+/// logs no progress and sends no bytes, and still trips it.
+public enum StallRule {
+    public static func isStalled(lastByteAt: Date, serverProgressAt: Date?, now: Date, threshold: TimeInterval) -> Bool {
+        let last = max(lastByteAt, serverProgressAt ?? lastByteAt)
+        return now.timeIntervalSince(last) > threshold
     }
 }
 

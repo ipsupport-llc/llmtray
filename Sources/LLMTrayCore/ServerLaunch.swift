@@ -89,7 +89,20 @@ public enum ServerLaunch {
 
     /// The user's own `--prompt-cache-bytes` (extra arguments) wins.
     static func extraArgsSetPromptCache(_ p: ResolvedProfile) -> Bool {
-        p.extraServerArgs.split(separator: " ").contains { $0 == "--prompt-cache-bytes" || $0.hasPrefix("--prompt-cache-bytes=") }
+        extraArgsSet("--prompt-cache-bytes", p)
+    }
+
+    /// `--prompt-cache-size`: how many cached prompts the server keeps. Its
+    /// default, 10, evicted useful checkpoints -- each request stores
+    /// several (system, user, junction), and an agent runs a few
+    /// conversations side by side. The byte cap (promptCacheBytes, already
+    /// sized to the free GPU memory) is the real limit; the count only has
+    /// to not evict first.
+    static let promptCacheEntries = 64
+
+    /// Whether the profile's extra arguments set `flag`, as `--x v` or `--x=v`.
+    static func extraArgsSet(_ flag: String, _ p: ResolvedProfile) -> Bool {
+        p.extraServerArgs.split(separator: " ").contains { $0 == flag || $0.hasPrefix(flag + "=") }
     }
 
     public static func arguments(_ p: ResolvedProfile, _ c: Context) -> [String] {
@@ -109,6 +122,11 @@ public enum ServerLaunch {
         ]
         if !extraArgsSetPromptCache(p) {
             args += ["--prompt-cache-bytes", String(promptCacheBytes(profileMB: p.promptCacheMB, gpuHeadroomBytes: c.gpuHeadroomBytes))]
+        }
+        // No runtime check: upstream mlx-lm added it together with
+        // --prompt-cache-bytes (#906), which every launch already passes.
+        if !extraArgsSet("--prompt-cache-size", p) {
+            args += ["--prompt-cache-size", String(promptCacheEntries)]
         }
         if p.topK > 0 {
             args += ["--top-k", String(p.topK)]
