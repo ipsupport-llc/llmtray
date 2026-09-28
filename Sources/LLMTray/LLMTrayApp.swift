@@ -164,6 +164,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hfWindow: NSWindow?
     private var aboutWindow: NSWindow?
     private var bugReportWindow: NSWindow?
+    private lazy var voiceLabWindow = VoiceLabWindowController()
     private var cancellables: Set<AnyCancellable> = []
     private var sigtermSource: DispatchSourceSignal?
     private var pulseTimer: Timer?
@@ -219,6 +220,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self, selector: #selector(showWhatsNew), name: .showWhatsNew, object: nil
         )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showVoiceLab), name: .showVoiceLab, object: nil
+        )
+        // Voice Lab (adr/0016) unloads and reloads the chat model.
+        VoiceLabSession.shared.attach(server: server)
         // The wizard's chat model starts the server once it's in place.
         downloadQueue.onFinished = { [weak self] in self?.downloadFinished($0) }
         ReviewPrompter.shared.recordLaunch()
@@ -489,6 +495,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
         logItem.target = self
         menu.addItem(logItem)
+        // Only once it's turned on and its model is here (Settings > Voice).
+        if VoiceModelStore.shared.isEnabled, VoiceModelStore.shared.isDownloaded(.default) {
+            let voiceItem = NSMenuItem(title: NSLocalizedString("Voice Lab…", comment: ""), action: #selector(showVoiceLab), keyEquivalent: "")
+            voiceItem.target = self
+            menu.addItem(voiceItem)
+        }
 
         menu.addItem(.separator())
 
@@ -662,6 +674,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showWhatsNew() {
         popover.performClose(nil)
         WhatsNewWindow.show()
+    }
+
+    @objc private func showVoiceLab() {
+        popover.performClose(nil)
+        voiceLabWindow.show()
     }
 
     /// Also after a review was sent: another one is welcome.
@@ -912,6 +929,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func killServerNow() {
+        VoiceLabSession.shared.terminateNow()
         server.terminateImmediately()
     }
 }

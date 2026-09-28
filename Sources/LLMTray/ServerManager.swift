@@ -80,6 +80,10 @@ final class ServerManager: ObservableObject {
     /// Unloaded for image generation (ChatClient): requests wait for
     /// ensureModelLoaded() instead of reloading the model next to mflux.
     @Published private(set) var suspendedForImageGeneration = false
+    /// That suspension is Voice Lab's (adr/0016), for the header's wording:
+    /// `suspendedForImageGeneration` is set too, so everything that waits
+    /// for an image waits for voice the same way.
+    @Published private(set) var suspendedForVoice = false
 
     // Consecutive endRequestStalled() calls with no successful endRequest()
     // in between -- reset to 0 by any request that actually completes.
@@ -330,6 +334,7 @@ final class ServerManager: ObservableObject {
     func ensureModelLoaded() async throws {
         let epoch = stopEpoch
         suspendedForImageGeneration = false
+        suspendedForVoice = false
         try await serialized(epoch: epoch) {
             try await self.loadIfNeeded(epoch: epoch)
         }
@@ -723,6 +728,7 @@ final class ServerManager: ObservableObject {
         stopEpoch += 1
         isIdleUnloaded = false
         suspendedForImageGeneration = false
+        suspendedForVoice = false
         proxy.stop()
         proxyStartPending = false
         state = .stopped
@@ -801,6 +807,7 @@ final class ServerManager: ObservableObject {
             case .imageRunner: what = "image-generation runner"
             case .musicRunner: what = "music-generation runner"
             case .embedRunner: what = "embed runner"
+            case .voiceRunner: what = "Voice Lab runner"
             }
             let model = orphan.model.map { ", \($0)" } ?? ""
             let memory = ByteCountFormatter.string(fromByteCount: orphan.residentBytes, countStyle: .memory)
@@ -1025,6 +1032,52 @@ final class ServerManager: ObservableObject {
             self.isIdleUnloaded = true
             self.state = .stopped
             await self.terminateAndWaitForExit()
+        }
+    }
+
+    /// Voice Lab starts (adr/0016): the chat model is unloaded as for an
+    /// image, and -- unlike an image, which takes seconds -- held away even
+    /// when it wasn't loaded, so no request loads it next to the voice
+    /// model meanwhile. One still loading is waited for first; if it is
+    /// still loading after two minutes, or still up after the unload, this
+    /// throws (the suspension undone): the two never run together. Returns
+    /// whether a model was running: `endVoiceSuspension` reloads it then.
+    func suspendForVoice() async throws -> Bool {
+        suspendedForVoice = true
+        suspendedForImageGeneration = true
+        func giveUp(_ why: String) -> Error {
+            suspendedForVoice = false
+            suspendedForImageGeneration = false
+            return NSError(domain: "ServerManager", code: 9, userInfo: [NSLocalizedDescriptionKey: why])
+        }
+        let deadline = Date().addingTimeInterval(120)
+        while case .starting = state, Date() < deadline {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        if case .starting = state {
+            throw giveUp(NSLocalizedString("The chat model is still loading -- try Voice Lab again once it's up.", comment: ""))
+        }
+        guard case .running = state else { return false }
+        await unloadModel()
+        // A Stop meanwhile ended the suspension: nothing to reload after.
+        guard suspendedForVoice else { return false }
+        switch state {
+        case .running, .starting:
+            throw giveUp(NSLocalizedString("The chat model couldn't be unloaded for Voice Lab.", comment: ""))
+        default:
+            return true
+        }
+    }
+
+    /// Voice Lab stopped: the model reloads when it was running before
+    /// (`reload`), else requests may load it again as usual.
+    func endVoiceSuspension(reload: Bool) async throws {
+        guard suspendedForVoice else { return }
+        if reload {
+            try await ensureModelLoaded()
+        } else {
+            suspendedForVoice = false
+            suspendedForImageGeneration = false
         }
     }
 

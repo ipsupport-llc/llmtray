@@ -92,6 +92,13 @@ public enum Pref {
     /// at launch until Index Now (or a new file).
     public static let projectIndexStopped = PrefKey<[String]>("llmtray.projectFiles.stopped", default: [])
 
+    // Voice (adr/0016)
+    /// Voice Lab, the experimental speech-to-speech toy: off until turned on
+    /// in Settings > Voice; nothing is downloaded or started before.
+    public static let voiceLabEnabled = PrefKey("llmtray.voiceLab.enabled", default: false)
+    /// `VoiceLabMode` raw value: full duplex, walkie-talkie, or picked by speed.
+    public static let voiceLabMode = PrefKey("llmtray.voiceLab.mode", default: VoiceLabMode.auto.rawValue)
+
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.
     public static let folderToolsEnabled = PrefKey("llmtray.folderTools.enabled", default: false)

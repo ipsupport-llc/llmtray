@@ -9,6 +9,7 @@ public struct OrphanProcess: Equatable, Sendable {
         case imageRunner
         case musicRunner
         case embedRunner
+        case voiceRunner
     }
 
     public let kind: Kind
@@ -42,6 +43,10 @@ public enum OrphanScan {
     /// Set on every embed runner (EmbedRunner). It exits by itself within
     /// 0.1 s of its parent's death; this is the backstop.
     public static let embedRunnerMarker = "LLMTRAY_EMBED_RUNNER"
+    /// Set on every Voice Lab runner (VoiceLabSession, adr/0016). It exits at
+    /// stdin EOF, which its parent's death is; this is the backstop for the
+    /// ~9 GB model it holds.
+    public static let voiceRunnerMarker = "LLMTRAY_VOICE_RUNNER"
 
     /// The arguments for `/bin/ps` whose output `orphans(inPSOutput:)` reads:
     /// every process, full width, with its environment (-E; only the
@@ -66,6 +71,8 @@ public enum OrphanScan {
             kind = .musicRunner
         } else if line.contains("llmtray_embed_runner.py"), tokens.contains(embedRunnerMarker + "=1") {
             kind = .embedRunner
+        } else if line.contains("llmtray_voice_runner.py"), tokens.contains(voiceRunnerMarker + "=1") {
+            kind = .voiceRunner
         } else {
             return nil
         }

@@ -14,6 +14,8 @@ jobs:
         run: swift build
       - name: Localizations (valid files, en base up to date, per-language coverage)
         run: python3 scripts/l10n.py check
+      - name: Voice runner framing (no model)
+        run: python3 scripts/test_voice_runner.py
       - name: swift test
         # `swift test` errors out on a package with no test target.
         run: if [ -d Tests ]; then swift test; else echo "no tests"; fi

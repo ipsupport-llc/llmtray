@@ -228,7 +228,8 @@ struct ChatHeaderView: View {
                 Button(action: startServer) { Image(systemName: "play.fill") }
                     // Not beside a generator: it reloads by itself after.
                     .disabled(selectedModelID == nil || server.suspendedForImageGeneration)
-                    .help(server.suspendedForImageGeneration ? Text("The model reloads when the image or song is done") : Text("Start server"))
+                    .help(server.suspendedForVoice ? Text("The model reloads when Voice Lab stops")
+                          : server.suspendedForImageGeneration ? Text("The model reloads when the image or song is done") : Text("Start server"))
             case .starting:
                 ProgressView().controlSize(.small).help("Starting…")
             case .running:
@@ -381,6 +382,9 @@ struct ServerStatusLabel: View {
         case .stopped:
             // Unloaded for an image or a song (ChatClient): not idle, and
             // it comes back by itself when that's done.
+            if server.suspendedForVoice {
+                return NSLocalizedString("Paused while Voice Lab is on -- the model reloads after", comment: "server status")
+            }
             if server.suspendedForImageGeneration {
                 return NSLocalizedString("Paused while an image or song is made -- the model reloads after", comment: "server status")
             }

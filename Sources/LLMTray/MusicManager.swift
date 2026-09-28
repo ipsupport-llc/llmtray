@@ -78,14 +78,11 @@ enum MusicModel: String, CaseIterable, Identifiable, Codable {
 @MainActor
 final class MusicManager: ObservableObject {
     enum MusicError: LocalizedError {
-        case noPython
         case processFailed(String)
         case outputMissing
 
         var errorDescription: String? {
             switch self {
-            case .noPython:
-                return NSLocalizedString("No Python 3.10+ found. Install one from python.org or via Homebrew (https://brew.sh).", comment: "")
             case .processFailed(let detail):
                 return String(format: NSLocalizedString("Music generation failed: %@", comment: ""), detail)
             case .outputMissing:
@@ -99,29 +96,16 @@ final class MusicManager: ObservableObject {
     /// 0...100 during generate(); nil otherwise.
     @Published private(set) var progress: Int?
 
-    /// Pinned: runtime/llmtray_music_runner.py drives mlx-audio's ACE-Step
-    /// internals, which upstream only has on its unmerged `pc/add-ace`
-    /// branch. Our fork's `llmtray` branch carries them on current upstream
-    /// main (where the voice models are), so music and voice can share one
-    /// runtime; advanced deliberately -- the runner patches internals. A
-    /// tarball of the commit needs no git on the Mac.
-    static let mlxAudioCommit = "8c51a800ededf5759497f6a8dcdd5f2cecbdf44e"
-    static var requirements: [String] {
-        [
-            "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/\(mlxAudioCommit).tar.gz",
-            "mlx==0.32.2", "mlx-lm==0.31.1", "transformers==5.17.0", "pyyaml", "huggingface_hub",
-        ]
-    }
+    /// The venv and its pins are the shared audio runtime's (AudioRuntime):
+    /// voice uses the same one.
+    static var requirements: [String] { AudioRuntime.requirements }
 
     /// The 5 Hz LM planner, 1.7B: a folder of the official repo.
     static let lmRepo = "ACE-Step/Ace-Step1.5"
     static let lmFolder = "acestep-5Hz-lm-1.7B"
 
-    static var venvDir: String { RuntimePaths.externalRuntimeDir + "/music_venv" }
-    private var venvDir: String { Self.venvDir }
-    private var venvPython: String { venvDir + "/bin/python3" }
-    /// Written after a complete install: the pins it was made with.
-    private var installStamp: String { venvDir + "/llmtray-requirements.txt" }
+    static var venvDir: String { AudioRuntime.venvDir }
+    private var venvPython: String { AudioRuntime.venvPython }
     private static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/music_models" }
     private var modelsDir: String { Self.modelsDir }
     static func ditDir(_ model: MusicModel) -> String { modelsDir + "/" + model.folderName }
@@ -144,28 +128,13 @@ final class MusicManager: ObservableObject {
     }
 
     func isReady(_ model: MusicModel) -> Bool {
-        isDownloaded(model) && installedRequirements() == Self.requirements.joined(separator: "\n")
+        isDownloaded(model) && AudioRuntime.shared.hasVenv
     }
 
-    private func installedRequirements() -> String? {
-        (try? String(contentsOfFile: installStamp, encoding: .utf8))?.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
+    /// The shared audio runtime, installed (or waited for, when Voice Lab's
+    /// download is installing it).
     private func ensurePackagesInstalled() async throws {
-        try FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
-        if !FileManager.default.fileExists(atPath: venvPython) {
-            guard let python = await PythonLocator.findModern(preferring: [MLXRuntimeInstaller.externalFrameworkPython()].compactMap { $0 })
-            else { throw MusicError.noPython }
-            statusText = NSLocalizedString("Setting up music generation (first time only)…", comment: "")
-            try await runProcess(python, ["-m", "venv", venvDir])
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
-        }
-        let wanted = Self.requirements.joined(separator: "\n")
-        if installedRequirements() != wanted {
-            statusText = NSLocalizedString("Installing mlx-audio…", comment: "")
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet"] + Self.requirements)
-            try wanted.write(toFile: installStamp, atomically: true, encoding: .utf8)
-        }
+        try await AudioRuntime.shared.ensureInstalled { [weak self] text in self?.statusText = text }
         statusText = ""
     }
 
@@ -201,15 +170,8 @@ final class MusicManager: ObservableObject {
     /// snapshot_download into `dir` (through a temporary folder when `move`).
     private func fetch(repo: String, patterns: [String]?, into dir: String, move: Bool = true) async throws {
         let target = move ? dir + ".partial-\(UUID().uuidString)" : dir
-        let allow = patterns.map { "allow_patterns=[" + $0.map { "\"\($0)\"" }.joined(separator: ",") + "], " } ?? ""
         do {
-            try await runProcess(venvPython, [
-                "-c",
-                """
-                from huggingface_hub import snapshot_download
-                snapshot_download("\(repo)", \(allow)local_dir="\(target)")
-                """,
-            ])
+            try await AudioRuntime.shared.snapshotDownload(repo: repo, patterns: patterns, into: target)
             if move { try FileManager.default.moveItem(atPath: target, toPath: dir) }
         } catch {
             if move { try? FileManager.default.removeItem(atPath: target) }
@@ -239,13 +201,16 @@ final class MusicManager: ObservableObject {
             throw MusicError.processFailed(NSLocalizedString("The music generator is busy with another chat -- try again once it's done.", comment: ""))
         }
         isBusy = true
-        statusText = NSLocalizedString("Generating music…", comment: "")
-        progress = 0
         defer {
             isBusy = false
             statusText = ""
             progress = nil
         }
+        // Its requirements changed since (an update: new pins, or voice's
+        // additions): installed now, instead of refusing until Settings.
+        try await ensurePackagesInstalled()
+        statusText = NSLocalizedString("Generating music…", comment: "")
+        progress = 0
         var fields: [String: Any] = [
             "caption": caption, "lyrics": lyrics, "duration": duration, "language": language, "mode": model.runnerMode,
         ]
@@ -305,14 +270,6 @@ final class MusicManager: ObservableObject {
         case "Composing": return NSLocalizedString("Composing…", comment: "music generation stage")
         case "Mixing": return NSLocalizedString("Mixing…", comment: "music generation stage")
         default: return stage
-        }
-    }
-
-    private func runProcess(_ executable: String, _ arguments: [String]) async throws {
-        do {
-            try await ProcessRunner.run(executable, arguments)
-        } catch let failure as ProcessRunner.Failure {
-            throw MusicError.processFailed(failure.outputTail)
         }
     }
 }
