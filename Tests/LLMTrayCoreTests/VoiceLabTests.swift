@@ -4,16 +4,34 @@ import XCTest
 final class VoiceLabTests: XCTestCase {
     private let gb: Int64 = 1_000_000_000
 
-    func testTheDefaultModel() {
+    func testTheModels() {
+        XCTAssertEqual(VoiceLabModel.default.repo, "roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit")
+        XCTAssertEqual(Set(VoiceLabModel.all.map(\.id)).count, VoiceLabModel.all.count)
+        XCTAssertEqual(Set(VoiceLabModel.all.map(\.folderName)).count, VoiceLabModel.all.count)
+        for model in VoiceLabModel.all {
+            XCTAssertEqual(model.licenseName, "OpenMDW 1.1")
+            XCTAssertEqual(model.cardURL.absoluteString, "https://huggingface.co/" + model.repo)
+            XCTAssertGreaterThan(model.footprintBytes, model.downloadBytes)
+        }
         let model = VoiceLabModel.default
-        XCTAssertEqual(model.repo, "mlx-community/NemotronLabs-VoiceChat-11B-4bit")
-        XCTAssertEqual(model.licenseName, "OpenMDW 1.1")
-        XCTAssertEqual(model.cardURL.absoluteString, "https://huggingface.co/" + model.repo)
-        XCTAssertGreaterThan(model.footprintBytes, model.downloadBytes)
         XCTAssertEqual(model.downloadFraction(bytesOnDisk: 0), 0)
         XCTAssertEqual(model.downloadFraction(bytesOnDisk: model.downloadBytes / 2), 0.5, accuracy: 1e-9)
         XCTAssertEqual(model.downloadFraction(bytesOnDisk: model.downloadBytes * 2), 1)
         XCTAssertEqual(model.downloadFraction(bytesOnDisk: -5), 0)
+    }
+
+    func testResolveKeepsThePickedModel() {
+        let picked = VoiceLabModel.resolve(id: VoiceLabModel.voiceChat11B4bit.id) { _ in false }
+        XCTAssertEqual(picked, .voiceChat11B4bit)
+    }
+
+    func testResolveWithNothingPickedKeepsAModelOnDisk() {
+        // An update must not ask for a second download: the 4-bit already
+        // there stays in use until another model is picked.
+        XCTAssertEqual(VoiceLabModel.resolve(id: "") { $0 == .voiceChat11B4bit }, .voiceChat11B4bit)
+        XCTAssertEqual(VoiceLabModel.resolve(id: "") { _ in true }, .default)
+        XCTAssertEqual(VoiceLabModel.resolve(id: "") { _ in false }, .default)
+        XCTAssertEqual(VoiceLabModel.resolve(id: "gone-model") { _ in false }, .default)
     }
 
     func testUnknownLimit() {

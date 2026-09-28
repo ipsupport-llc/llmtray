@@ -1,7 +1,7 @@
 import Foundation
 
 /// A speech-to-speech model Voice Lab can run (adr/0016).
-public struct VoiceLabModel: Equatable, Sendable, Identifiable {
+public struct VoiceLabModel: Hashable, Sendable, Identifiable {
     public var id: String
     public var displayName: String
     public var repo: String
@@ -30,8 +30,34 @@ public struct VoiceLabModel: Equatable, Sendable, Identifiable {
         cardURL: URL(string: "https://huggingface.co/mlx-community/NemotronLabs-VoiceChat-11B-4bit")!
     )
 
-    public static let all: [VoiceLabModel] = [.voiceChat11B4bit]
-    public static let `default` = voiceChat11B4bit
+    /// The same model with its language model GPTQ-quantized to 3 bits
+    /// (IPSupport's build, calibrated on real duplex conversations):
+    /// perception, TTS and codec stay bf16. 185 -> ~95 ms per 80 ms frame
+    /// with the fork's speedups on a base M5, every test answer right
+    /// (quant-ternary voicechat-quant/docs/FINDINGS.md). Footprint: the
+    /// 4-bit's published 15.6 GB scaled by the measured MLX peaks
+    /// (9.12 vs 10.64 GB).
+    public static let voiceChat11BGPTQ3 = VoiceLabModel(
+        id: "nemotron-voicechat-11b-gptq3",
+        displayName: "NVIDIA NemotronLabs VoiceChat 11B (GPTQ 3-bit)",
+        repo: "roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit",
+        folderName: "nemotron-voicechat-11b-gptq3",
+        downloadBytes: 7_630_522_550,
+        footprintBytes: 13_400_000_000,
+        licenseName: "OpenMDW 1.1",
+        cardURL: URL(string: "https://huggingface.co/roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit")!
+    )
+
+    public static let all: [VoiceLabModel] = [.voiceChat11BGPTQ3, .voiceChat11B4bit]
+    public static let `default` = voiceChat11BGPTQ3
+
+    /// The model Voice Lab uses: the one picked (`id`) while it's still in
+    /// the list; with none picked, one already on disk (the default first),
+    /// so an update never asks for a second download; else the default.
+    public static func resolve(id: String, isDownloaded: (VoiceLabModel) -> Bool) -> VoiceLabModel {
+        if let picked = all.first(where: { $0.id == id }) { return picked }
+        return all.first(where: isDownloaded) ?? .default
+    }
 
     /// A download's progress from what's on disk so far (0...1).
     public func downloadFraction(bytesOnDisk: Int64) -> Double {

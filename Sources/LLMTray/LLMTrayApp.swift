@@ -496,7 +496,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         logItem.target = self
         menu.addItem(logItem)
         // Only once it's turned on and its model is here (Settings > Voice).
-        if VoiceModelStore.shared.isEnabled, VoiceModelStore.shared.isDownloaded(.default) {
+        if VoiceModelStore.shared.isEnabled, VoiceModelStore.shared.isDownloaded(VoiceModelStore.shared.selected) {
             let voiceItem = NSMenuItem(title: NSLocalizedString("Voice Lab…", comment: ""), action: #selector(showVoiceLab), keyEquivalent: "")
             voiceItem.target = self
             menu.addItem(voiceItem)

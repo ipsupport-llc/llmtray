@@ -35,6 +35,10 @@ final class VoiceModelStore: ObservableObject {
             if !isEnabled { VoiceLabSession.shared.stop() }   // off means off
         }
     }
+    /// The model Voice Lab uses (Settings > Voice); see VoiceLabModel.resolve.
+    @Published var selected: VoiceLabModel {
+        didSet { UserDefaults.standard[Pref.voiceLabModel] = selected.id }
+    }
     @Published private(set) var isBusy = false
     @Published private(set) var statusText = ""
     /// 0...1 while the model's files download; nil otherwise.
@@ -44,15 +48,18 @@ final class VoiceModelStore: ObservableObject {
 
     private init() {
         isEnabled = UserDefaults.standard[Pref.voiceLabEnabled]
+        selected = VoiceLabModel.resolve(id: UserDefaults.standard[Pref.voiceLabModel], isDownloaded: Self.filesInPlace)
     }
 
-    static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/voice_models" }
-    static func modelDir(_ model: VoiceLabModel) -> String { modelsDir + "/" + model.folderName }
+    nonisolated static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/voice_models" }
+    nonisolated static func modelDir(_ model: VoiceLabModel) -> String { modelsDir + "/" + model.folderName }
     static func partialDir(_ model: VoiceLabModel) -> String { modelDir(model) + ".partial" }
 
     /// The files are in place (config and weights index).
-    func isDownloaded(_ model: VoiceLabModel) -> Bool {
-        let dir = Self.modelDir(model)
+    func isDownloaded(_ model: VoiceLabModel) -> Bool { Self.filesInPlace(model) }
+
+    nonisolated private static func filesInPlace(_ model: VoiceLabModel) -> Bool {
+        let dir = modelDir(model)
         return FileManager.default.fileExists(atPath: dir + "/config.json")
             && FileManager.default.fileExists(atPath: dir + "/model.safetensors.index.json")
     }
