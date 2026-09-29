@@ -272,6 +272,9 @@
 "Drop files here" = "Dosyaları buraya bırakın";
 "Drop files here to add them to the project" = "Dosyaları projeye eklemek için buraya bırakın";
 "Duplicate this profile" = "Bu profili çoğalt";
+"Echo cancellation" = "Gecikme giderme";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Gecikme giderme başlatılamadı: %@ — Kapatmak için Ayarlar > Ses’e gidin.";
+"Echo cancellation isn't available on this Mac." = "Gecikme giderme bu Mac’te kullanılamıyor.";
 "Edit Profile…" = "Profili Düzenle…";
 "Embedding model" = "Gömü modeli";
 "Enable Without It" = "Etkinleştir (Olmadan)";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Attention önbelleğinin hassasiyeti. 8 bit: neredeyse kayıpsız, belleğin yarısı. 4 bit: dörtte biri, uzun bağlamda belirgin biçimde daha kötü. Tam: en iyi, en fazla bellek.";
 "Prefill step" = "Ön doldurma adımı";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Başlat’a basıp konuşun. Hoparlörler gecikme giderme ile çalışır; en iyi sonuç için kulaklık önerilir.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Başlat'a basın ve konuşun. Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
 "Press Talk and speak." = "Konuş'a basın ve konuşun.";
 "Press, talk, press again" = "Bas, konuş, tekrar bas";
@@ -739,6 +743,7 @@
 "Sort by" = "Sıralama ölçütü";
 "Source on GitHub" = "Kaynak GitHub'da";
 "Space the models in this folder take, and what's still free on its disk." = "Bu klasördeki modellerin kapladığı alan ve disk üzerinde hâlâ ne kadar boş yer kaldığı.";
+"Speakers work with echo cancellation; headphones are still best." = "Hoparlörler gecikme giderme ile çalışır; en iyi sonuç için kulaklık önerilir.";
 "Speaking…" = "Konuşuluyor…";
 "Speculative decoding (MTP)" = "Spekülatif kod çözme (MTP)";
 "Speed" = "Hız";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "başarısız: %@";
 "for this chat" = "bu sohbet için";
 "less than a minute left" = "bir dakikadan az kaldı";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS, modelin kendi sesini mikrofondan çıkarır (Voice Processing, FaceTime’da olduğu gibi), bu yüzden hoparlörlerle çalışır. Ayrıca ses seviyesini dengeler ve arka plan gürültüsünü azaltır. Değişiklik bir sonraki başlatmada geçerli olur.";
 "make %lld folders" = "%lld klasör oluştur";
 "mlx-lm runtime" = "mlx-lm çalışma zamanı";
 "move %1$lld files into %2$lld folders" = "%1$lld dosyayı %2$lld klasöre taşı";

@@ -272,6 +272,9 @@
 "Drop files here" = "Thả tệp vào đây";
 "Drop files here to add them to the project" = "Thả tệp vào đây để thêm vào dự án";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
+"Echo cancellation" = "Hủy tiếng vọng";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động hủy tiếng vọng: %@ — tắt trong Cài đặt > Âm thanh.";
+"Echo cancellation isn't available on this Mac." = "Hủy tiếng vọng không khả dụng trên Mac này.";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
 "Embedding model" = "Mô hình embedding";
 "Enable Without It" = "Bật mà không cần nó";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Cổng: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Độ chính xác của bộ nhớ đệm attention. 8-bit: gần như không mất mát, dùng một nửa bộ nhớ. 4-bit: dùng một phần tư, kém hơn rõ rệt với ngữ cảnh dài. Đầy đủ: tốt nhất, tốn bộ nhớ nhất.";
 "Prefill step" = "Bước nạp trước";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Nhấn Bắt đầu và nói. Loa hoạt động với hủy tiếng vọng; tai nghe vẫn là lựa chọn tốt nhất.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Nhấn Bắt đầu và nói. Dùng tai nghe: mô hình sẽ nghe tiếng mình từ loa.";
 "Press Talk and speak." = "Nhấn Nói và bắt đầu.";
 "Press, talk, press again" = "Nhấn, nói, nhấn lại";
@@ -739,6 +743,7 @@
 "Sort by" = "Sắp xếp theo";
 "Source on GitHub" = "Mã nguồn trên GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Dung lượng mà các mô hình trong thư mục này chiếm và còn trống trên ổ.";
+"Speakers work with echo cancellation; headphones are still best." = "Loa hoạt động với hủy tiếng vọng; tai nghe vẫn là lựa chọn tốt nhất.";
 "Speaking…" = "Đang nói…";
 "Speculative decoding (MTP)" = "Giải mã suy đoán (MTP)";
 "Speed" = "Tốc độ";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "thất bại: %@";
 "for this chat" = "cho cuộc trò chuyện này";
 "less than a minute left" = "còn dưới một phút";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS loại bỏ chính giọng của mô hình khỏi micro (Xử lý Giọng nói, như FaceTime), nên tính năng hoạt động với loa. Nó cũng cân bằng âm lượng và giảm tiếng ồn nền. Có hiệu lực khi khởi động lại.";
 "make %lld folders" = "tạo %lld thư mục";
 "mlx-lm runtime" = "Môi trường chạy mlx-lm";
 "move %1$lld files into %2$lld folders" = "di chuyển %1$lld tệp vào %2$lld thư mục";

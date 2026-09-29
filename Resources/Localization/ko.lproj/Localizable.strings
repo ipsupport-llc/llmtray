@@ -272,6 +272,9 @@
 "Drop files here" = "여기에 파일 놓기";
 "Drop files here to add them to the project" = "여기에 파일을 놓아 프로젝트에 추가";
 "Duplicate this profile" = "이 프로파일을 복제합니다.";
+"Echo cancellation" = "에코 제거";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "에코 제거를 시작할 수 없습니다: %@ — 설정 > 음성에서 끄세요.";
+"Echo cancellation isn't available on this Mac." = "이 Mac에서는 에코 제거를 사용할 수 없습니다.";
 "Edit Profile…" = "프로파일 편집…";
 "Embedding model" = "임베딩 모델";
 "Enable Without It" = "없어도 활성화";
@@ -579,6 +582,7 @@
 "Port: %lld" = "포트: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "어텐션 캐시의 정밀도입니다. 8비트: 거의 무손실이며 메모리를 절반만 사용합니다. 4비트: 1/4만 사용하지만 긴 컨텍스트에서 품질이 눈에 띄게 떨어집니다. Full: 최상의 품질, 메모리 사용량 최대.";
 "Prefill step" = "프리필 단계";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "시작을 눌러 말하세요. 스피커에서도 에코 제거가 작동하지만 헤드폰이 더 좋습니다.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Start를 누르고 말하세요. 이어폰 사용 권장: 모델이 스피커에서 나오는 자신의 목소리를 듣습니다.";
 "Press Talk and speak." = "Talk를 눌러 말하세요.";
 "Press, talk, press again" = "눌러 말한 뒤 다시 누르세요";
@@ -739,6 +743,7 @@
 "Sort by" = "정렬 기준";
 "Source on GitHub" = "GitHub에서 소스 보기";
 "Space the models in this folder take, and what's still free on its disk." = "이 폴더의 모델들이 차지하는 공간과 디스크의 남은 여유 공간을 표시합니다.";
+"Speakers work with echo cancellation; headphones are still best." = "스피커에서도 에코 제거가 작동하지만 헤드폰이 더 좋습니다.";
 "Speaking…" = "말하는 중…";
 "Speculative decoding (MTP)" = "추측 디코딩(MTP)";
 "Speed" = "속도";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "실패: %@";
 "for this chat" = "이 채팅용";
 "less than a minute left" = "1분 미만 남음";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS가 마이크에서 모델 자신의 음성을 제거합니다(Voice Processing—FaceTime과 동일), 따라서 스피커에서도 작동합니다. 또한 레벨을 평준화하고 배경 소음을 억제합니다. 다음 시작 시 적용됩니다.";
 "make %lld folders" = "%lld개 폴더 생성";
 "mlx-lm runtime" = "mlx-lm 런타임";
 "move %1$lld files into %2$lld folders" = "%1$lld개 파일을 %2$lld개 폴더로 이동";

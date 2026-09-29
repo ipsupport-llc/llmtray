@@ -272,6 +272,9 @@
 "Drop files here" = "שחרר קבצים כאן";
 "Drop files here to add them to the project" = "שחרר קבצים כאן כדי להוסיף לפרויקט";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
+"Echo cancellation" = "הדחקת הד";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "לא ניתן להפעיל הדחקת הד: %@ — כבה אותה ב‑Settings > Voice.";
+"Echo cancellation isn't available on this Mac." = "הדחקת הד אינה זמינה במחשב Mac זה.";
 "Edit Profile…" = "עריכת פרופיל…";
 "Embedding model" = "דגם הטמעה";
 "Enable Without It" = "הפעל בלעדיו";
@@ -579,6 +582,7 @@
 "Port: %lld" = "פורט: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "דיוק מטמון הקשב. 8-bit: כמעט ללא אובדן, חצי מהזיכרון. 4-bit: רבע מהזיכרון, גרוע משמעותית בהקשרים ארוכים. מלא: הטוב ביותר, צורך הכי הרבה זיכרון.";
 "Prefill step" = "שלב מילוי מקדים";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "לחץ על Start ודבר. רמקולים פועלים עם הדחקת הד; אוזניות עדיפות עדיין.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "הקש על 'התחל' ותדבר. השתמש באוזניות: המודל שומע את קולו מהרמקולים.";
 "Press Talk and speak." = "הקש על 'דבר' ודבר.";
 "Press, talk, press again" = "הקש, דבר, הקש שוב";
@@ -739,6 +743,7 @@
 "Sort by" = "מיון לפי";
 "Source on GitHub" = "מקור ב‑GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "המרחב שתופסים המודלים בתיקייה זו וכמה מקום עדיין פנוי בדיסק.";
+"Speakers work with echo cancellation; headphones are still best." = "רמקולים עובדים עם הדחקת הד; אוזניות עדיפות.";
 "Speaking…" = "מדבר…";
 "Speculative decoding (MTP)" = "פענוח ספקולטיבי (MTP)";
 "Speed" = "מהירות";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "נכשל: %@";
 "for this chat" = "לשיחה זו";
 "less than a minute left" = "פחות מדקה נותרה";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS מסיר את קול המודל מהמיקרופון (Voice Processing, כמו ב‑FaceTime), לכן זה עובד עם רמקולים. כמו כן הוא מאזן עוצמה ומכווץ רעשי רקע. ייכנס לתוקף בהפעלה הבאה.";
 "make %lld folders" = "צור %lld תיקיות";
 "mlx-lm runtime" = "זמן ריצה של mlx-lm";
 "move %1$lld files into %2$lld folders" = "העבר %1$lld קבצים אל %2$lld תיקיות";

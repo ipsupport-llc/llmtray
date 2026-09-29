@@ -272,6 +272,9 @@
 "Drop files here" = "Upuść pliki tutaj";
 "Drop files here to add them to the project" = "Upuść pliki tutaj, aby dodać je do projektu";
 "Duplicate this profile" = "Powiela ten profil.";
+"Echo cancellation" = "Eliminacja echa";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Nie udało się włączyć eliminacji echa: %@ — wyłącz ją w Ustawieniach > Głos.";
+"Echo cancellation isn't available on this Mac." = "Eliminacja echa nie jest dostępna na tym Macu.";
 "Edit Profile…" = "Edytuj profil…";
 "Embedding model" = "Model osadzania";
 "Enable Without It" = "Włącz bez niego";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precyzja pamięci podręcznej mechanizmu uwagi. 8-bitowa: prawie bezstratna, połowa pamięci. 4-bitowa: jedna czwarta, zauważalnie gorsza przy długim kontekście. Pełna: najlepsza, zużywa najwięcej pamięci.";
 "Prefill step" = "Krok wypełniania wstępnego";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Naciśnij Start i mów. Głośniki działają z eliminacją echa; słuchawki wciąż najlepsze.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Naciśnij Start i mów. Używaj słuchawek: model usłyszy własny głos ze głośników.";
 "Press Talk and speak." = "Naciśnij Mów i mów.";
 "Press, talk, press again" = "Naciśnij, mów, naciśnij ponownie";
@@ -739,6 +743,7 @@
 "Sort by" = "Sortuj według";
 "Source on GitHub" = "Kod źródłowy na GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ilość miejsca zajmowanego przez modele w tym folderze oraz dostępne wolne miejsce na dysku.";
+"Speakers work with echo cancellation; headphones are still best." = "Głośniki działają z eliminacją echa; słuchawki wciąż najlepsze.";
 "Speaking…" = "Mówię…";
 "Speculative decoding (MTP)" = "Dekodowanie spekulatywne (MTP)";
 "Speed" = "Szybkość";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "niepowodzenie: %@";
 "for this chat" = "dla tego czatu";
 "less than a minute left" = "mniej niż minuta";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS usuwa własny głos modelu z mikrofonu (Voice Processing, jak w FaceTime), więc działa przy głośnikach. Wyrównuje też poziom i tłumi szumy tła. Zmiana zacznie działać po ponownym uruchomieniu.";
 "make %lld folders" = "utwórz %lld folderów";
 "mlx-lm runtime" = "Środowisko wykonawcze mlx-lm";
 "move %1$lld files into %2$lld folders" = "przenieś %1$lld plików do %2$lld folderów";

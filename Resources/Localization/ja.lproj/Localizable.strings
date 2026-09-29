@@ -272,6 +272,9 @@
 "Drop files here" = "ここにファイルをドロップ";
 "Drop files here to add them to the project" = "ここにファイルをドロップしてプロジェクトに追加";
 "Duplicate this profile" = "このプロファイルを複製します。";
+"Echo cancellation" = "エコーキャンセル";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "エコーキャンセルを開始できませんでした: %@ — 設定 > 音声 でオフにしてください。";
+"Echo cancellation isn't available on this Mac." = "この Mac ではエコーキャンセルは利用できません。";
 "Edit Profile…" = "プロファイルを編集…";
 "Embedding model" = "埋め込みモデル";
 "Enable Without It" = "それなしで有効化";
@@ -579,6 +582,7 @@
 "Port: %lld" = "ポート: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "attention cache の精度。8-bit：ほぼロスレスで、メモリ使用量は半分。4-bit：4分の1ですが、長いコンテキストでは著しく低下します。Full：最高品質、メモリ使用量は最大。";
 "Prefill step" = "プリフィルステップ";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "「開始」を押して話してください。スピーカーでもエコーキャンセルは機能しますが、ヘッドホンが最適です。";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Start を押して話してください。ヘッドフォンを使用してください：モデルはスピーカーの音声を聞きます。";
 "Press Talk and speak." = "Talk を押して話してください。";
 "Press, talk, press again" = "押す → 話す → 再度押す";
@@ -739,6 +743,7 @@
 "Sort by" = "並べ替え";
 "Source on GitHub" = "GitHub でソースを見る";
 "Space the models in this folder take, and what's still free on its disk." = "このフォルダ内のモデルが占める容量と、ディスク上の残りの空き容量を表示します。";
+"Speakers work with echo cancellation; headphones are still best." = "スピーカーでもエコーキャンセルは機能しますが、ヘッドホンが最適です。";
 "Speaking…" = "発話中…";
 "Speculative decoding (MTP)" = "投機的デコード（MTP）";
 "Speed" = "速度";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "失敗：%@";
 "for this chat" = "このチャット用";
 "less than a minute left" = "1分未満";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS はマイクからモデル自身の音声を除去します（FaceTime と同じ Voice Processing を使用）、そのためスピーカーでも動作します。音量を均一化し、背景雑音を低減します。次回開始時に有効になります。";
 "make %lld folders" = "%lld 個のフォルダを作成";
 "mlx-lm runtime" = "mlx-lm ランタイム";
 "move %1$lld files into %2$lld folders" = "%1$lld 個のファイルを %2$lld 個のフォルダに移動";

@@ -272,6 +272,9 @@
 "Drop files here" = "फाइलें यहाँ छोड़ें";
 "Drop files here to add them to the project" = "प्रोजेक्ट में जोड़ने के लिए फाइलें यहाँ छोड़ें";
 "Duplicate this profile" = "इस प्रोफ़ाइल की कॉपी बनाता है।";
+"Echo cancellation" = "इको रद्दीकरण";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "इको रद्दीकरण शुरू नहीं हो सका: %@ — इसे बंद करने के लिए Settings > Voice पर जाएँ।";
+"Echo cancellation isn't available on this Mac." = "यह Mac इको रद्दीकरण के लिए उपलब्ध नहीं है।";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
 "Embedding model" = "एम्बेडिंग मॉडल";
 "Enable Without It" = "बिना इसके सक्षम करें";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "अटेंशन कैश की सटीकता। 8-bit: लगभग बिना हानि, आधी मेमोरी। 4-bit: एक-चौथाई मेमोरी, लंबे संदर्भ में स्पष्ट रूप से खराब। Full: सबसे अच्छा, सबसे अधिक मेमोरी।";
 "Prefill step" = "Prefill चरण";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Start दबाएँ और बोलें। स्पीकर इको रद्दीकरण के साथ काम करते हैं; हेडफोन अभी भी श्रेष्ठ हैं।";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Start दबाएँ और बोलें। हेडफ़ोन का उपयोग करें: मॉडल स्पीकर्स से अपनी ही आवाज़ सुनता है।";
 "Press Talk and speak." = "Talk दबाएँ और बोलें।";
 "Press, talk, press again" = "दबाएँ, बोलें, फिर से दबाएँ";
@@ -739,6 +743,7 @@
 "Sort by" = "इसके अनुसार क्रमित करें";
 "Source on GitHub" = "GitHub पर स्रोत";
 "Space the models in this folder take, and what's still free on its disk." = "इस फ़ोल्डर में मॉडल कितनी जगह लेते हैं और डिस्क पर अभी कितनी खाली जगह बची है।";
+"Speakers work with echo cancellation; headphones are still best." = "स्पीकर इको रद्दीकरण के साथ काम करते हैं; हेडफोन अभी भी श्रेष्ठ हैं।";
 "Speaking…" = "बोल रहा है…";
 "Speculative decoding (MTP)" = "स्पेक्युलेटिव डिकोडिंग (MTP)";
 "Speed" = "गति";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "असफल: %@";
 "for this chat" = "इस चैट के लिए";
 "less than a minute left" = "एक मिनट से कम बचा है";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS माइक्रोफ़ोन से मॉडल की अपनी आवाज़ हटाता है (Voice Processing, जैसे FaceTime में), इसलिए यह स्पीकर पर काम करता है। यह स्तर को भी सम करता है और पृष्ठभूमि शोर को दबाता है। यह अगले स्टार्ट पर प्रभावी होगा।";
 "make %lld folders" = "%lld फ़ोल्डर बनाएं";
 "mlx-lm runtime" = "mlx-lm रनटाइम";
 "move %1$lld files into %2$lld folders" = "%1$lld फाइलें %2$lld फ़ोल्डरों में स्थानांतरित करें";

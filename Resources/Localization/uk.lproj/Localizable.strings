@@ -272,6 +272,9 @@
 "Drop files here" = "Перетягніть файли сюди";
 "Drop files here to add them to the project" = "Перетягніть файли сюди, щоб додати їх до проєкту";
 "Duplicate this profile" = "Дублювати профіль";
+"Echo cancellation" = "Поглинання ехо";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не вдалося ввімкнути поглинання ехо: %@ — вимкніть у Налаштування > Голос.";
+"Echo cancellation isn't available on this Mac." = "Поглинання ехо недоступне на цьому Mac.";
 "Edit Profile…" = "Редагувати профіль…";
 "Embedding model" = "Модель вбудовування";
 "Enable Without It" = "Увімкнути без неї";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Порт: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Точність кешу уваги. 8 біт — майже без втрат, удвічі менше пам'яті. 4 біти — вчетверо менше, але помітно гірше на довгому контексті. Повний — найкраще, але найбільше пам'яті.";
 "Prefill step" = "Крок префілу";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Натисніть «Почати» й говоріть. Динаміки працюють із поглинанням ехо; навушники все ще кращі.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Натисніть \"Start\" і говоріть. Використовуйте навушники: модель чує власний голос із динаміків.";
 "Press Talk and speak." = "Натисніть \"Talk\" і говоріть.";
 "Press, talk, press again" = "Натисніть, говоріть, натисніть знову";
@@ -739,6 +743,7 @@
 "Sort by" = "Сортування";
 "Source on GitHub" = "Джерело на GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Місце, яке займають моделі в цій папці, і скільки ще вільно на диску.";
+"Speakers work with echo cancellation; headphones are still best." = "Динаміки працюють із поглинанням ехо; навушники все ще кращі.";
 "Speaking…" = "Говорить…";
 "Speculative decoding (MTP)" = "Спекулятивне декодування (MTP)";
 "Speed" = "Швидкість";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "помилка: %@";
 "for this chat" = "для цього чату";
 "less than a minute left" = "менше хвилини залишилося";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS вилучає власний голос моделі з мікрофона (Voice Processing, як у FaceTime), тож це працює з динаміками. Також вирівнює рівень і пригнічує фонований шум. Набуде чинності при наступному запуску.";
 "make %lld folders" = "створити %lld папок";
 "mlx-lm runtime" = "Середовище виконання mlx-lm";
 "move %1$lld files into %2$lld folders" = "перемістити %1$lld файлів у %2$lld папок";

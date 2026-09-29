@@ -272,6 +272,9 @@
 "Drop files here" = "Jatuhkan berkas di sini";
 "Drop files here to add them to the project" = "Jatuhkan berkas di sini untuk menambahkannya ke proyek";
 "Duplicate this profile" = "Gandakan profil ini.";
+"Echo cancellation" = "Pembatalan gema";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Pembatalan gema tidak bisa dimulai: %@ — matikan di Pengaturan > Suara.";
+"Echo cancellation isn't available on this Mac." = "Pembatalan gema tidak tersedia di Mac ini.";
 "Edit Profile…" = "Edit profil…";
 "Embedding model" = "Model embedding";
 "Enable Without It" = "Aktifkan Tanpa Model";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Presisi cache atensi. 8-bit: hampir tanpa kehilangan, memori separuh. 4-bit: seperempat, jauh lebih buruk pada konteks panjang. Penuh: terbaik, memori terbanyak.";
 "Prefill step" = "Langkah prefill";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Tekan Mulai dan bicara. Speaker berfungsi dengan pembatalan gema; tetap disarankan menggunakan headphone.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Tekan Mulai dan bicara. Gunakan headphone: model akan mendengar suaranya dari speaker.";
 "Press Talk and speak." = "Tekan Bicara dan ucapkan.";
 "Press, talk, press again" = "Tekan, bicara, tekan lagi";
@@ -739,6 +743,7 @@
 "Sort by" = "Urutkan menurut";
 "Source on GitHub" = "Sumber di GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Ruang yang ditempati model di folder ini, dan yang masih tersisa di disknya.";
+"Speakers work with echo cancellation; headphones are still best." = "Speaker berfungsi dengan pembatalan gema; tetap disarankan menggunakan headphone.";
 "Speaking…" = "Berbicara…";
 "Speculative decoding (MTP)" = "Decoding spekulatif (MTP)";
 "Speed" = "Kecepatan";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "gagal: %@";
 "for this chat" = "untuk chat ini";
 "less than a minute left" = "kurang dari satu menit tersisa";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS menghapus suara model sendiri dari mikrofon (Voice Processing, seperti di FaceTime), sehingga berfungsi pada speaker. Fitur ini juga meratakan level dan meredam kebisingan latar. Efektif setelah dimulai ulang.";
 "make %lld folders" = "buat %lld folder";
 "mlx-lm runtime" = "Runtime mlx-lm";
 "move %1$lld files into %2$lld folders" = "pindahkan %1$lld berkas ke %2$lld folder";
