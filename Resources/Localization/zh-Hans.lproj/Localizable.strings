@@ -329,7 +329,7 @@
 "Full duplex" = "全双工";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts." = "全双工：随时说话，模型在说话时也能听到你——需支持实时运行的 Mac。对讲机模式：说话后按“完成”再听。自动根据本机在 Voice Lab 启动时测得的速度选择。";
 "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed." = "全双工：随时说话，模型在说话时也能听到你——需支持实时运行的 Mac。对讲机模式：说话后按“完成”再听。自动根据本机测得的速度选择。";
-"GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit：IPSupport 提供的同一模型的 3 位版本——更小更快，所有测试答案均正确。4-bit：mlx-community 的构建。仅在您请求时下载。";
+"GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3 位 + 8 位语音：IPSupport 的最快构建——3 位语言模型配合 8 位语音识别与语音合成，测试中表现良好。GPTQ 3 位：相同模型，但语音部分为全精度。4 位：mlx-community 的构建。仅在您选择下载时获取。";
 "GPU memory limit" = "GPU 内存上限";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "模型服务器除权重外为激活和 macOS 保留的不动用 GPU 内存。下面的份额划分剩余可用内存。";
 "Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "受限：请先在 Hugging Face 接受其许可并在“设置 › 模型”中保存令牌。";
