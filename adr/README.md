@@ -22,5 +22,6 @@ here; this is where the history lives.
 | [0014](0014-folder-tools.md) | Folder tools: listing, file info, moving and deleting in folders the user grants |
 | [0015](0015-telemetry.md) | Opt-in usage telemetry: one anonymous report a day, what's counted and what never is |
 | [0016](0016-voice.md) | Voice: a speech-to-speech Voice Lab first, then voice chat (push to talk, spoken answers) on the chat model |
+| [0017](0017-supporters.md) | Support LLMTray: optional tips (StoreKit IAP in the App Store build), opt-in supporters list from a signed manifest; nothing locked |
 
 New ADR: next number, one topic, the decision first, then why.
