@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ indirilmedi: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ kısıtlı: lisansını huggingface.co/%@ adresinde kabul edin, sonra Ayarlar → Models'te bir Hugging Face tokenı ekleyin.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ henüz indirilmiyor — Görüntü oluşturmayı Ayarlar'dan tekrar etkinleştirin.";
+"%@ isn't installed yet" = "%@ henüz yüklü değil";
 "%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
 "%@ · %@ left" = "%@ · %@ kaldı";
 "%@ · downloaded" = "%@ · indirildi";
@@ -177,6 +178,7 @@
 "Check Again" = "Yeniden Denetle";
 "Check Now" = "Şimdi Denetle";
 "Check for Runtime Updates" = "Çalışma Zamanı Güncellemelerini Denetle";
+"Check for Updates" = "Güncellemeleri Denetle";
 "Check for Updates…" = "Güncellemeleri Denetle…";
 "Check for updates automatically" = "Güncellemeleri otomatik denetle";
 "Checking the download…" = "İndiriliyor — kontrol ediliyor…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "Gecikme giderme";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Gecikme giderme başlatılamadı: %@ — Kapatmak için Ayarlar > Ses’e gidin.";
 "Echo cancellation isn't available on this Mac." = "Gecikme giderme bu Mac’te kullanılamıyor.";
+"Echo gate" = "Echo gate";
 "Edit Profile…" = "Profili Düzenle…";
 "Embedding model" = "Gömü modeli";
 "Enable Without It" = "Etkinleştir (Olmadan)";
@@ -391,6 +394,7 @@
 "Index Now" = "Şimdi Dizine Ekle";
 "Index the files that were stopped" = "Durdurulan dosyaları dizine ekle";
 "Indexing %1$lld of %2$lld files" = "%2$lld dosyanın %1$lld'i dizine alınıyor";
+"Install" = "Yükle";
 "Install ID" = "Kurulum kimliği";
 "Installed" = "Yüklü";
 "Installing mflux…" = "mflux yükleniyor…";
@@ -632,6 +636,8 @@
 "Recovery" = "Kurtarma";
 "Refused" = "Reddedilen";
 "Regenerate" = "Yeniden oluştur";
+"Reinstall" = "Yeniden yükle";
+"Reinstall failed: %@" = "Yeniden yükleme başarısız: %@";
 "Remove" = "Kaldır";
 "Remove %@" = "%@ ögesini kaldır";
 "Remove attachment" = "Eki kaldırır.";
@@ -764,6 +770,7 @@
 "Stop" = "Durdur";
 "Stop Indexing" = "Dizine Almayı Durdur";
 "Stop Server" = "Sunucuyu Durdur";
+"Stop Voice Lab and music generation to update it." = "Güncellemek için Voice Lab ve müzik üretimini durdurun.";
 "Stop Voice Lab first." = "Önce Voice Lab'i durdurun.";
 "Stop generating" = "Üretmeyi durdurur.";
 "Stop server (unload model)" = "Sunucuyu durdurur (modeli bellekten kaldırır).";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "Mikrofon başlatılamadı: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "Mikrofonun LLMTray uygulama paketine (scripts/build_app.sh) ihtiyacı var, yalnızca ikili dosya yeterli değil.";
 "The microphone's audio format isn't supported." = "Mikrofonun ses formatı desteklenmiyor.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Voice Lab ve müzik üretimini çalıştıran mlx-audio sürümü (LLMTray’ın kendi fork’una ait bir commit). Değiştiğinde bir sonraki ses veya müzik başlatıldığında yüklenir; çevrimdışıyken, yüklü olan sürüm çalışmaya devam eder.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Modelleri çalıştıran mlx-lm sürümü (LLMTray’in kendi fork’undaki bir commit). Uygulamadan ayrı olarak güncellenir.";
 "The model can make an image when you ask for one." = "Model, isterseniz bir görüntü oluşturabilir.";
 "The model didn't answer -- try again." = "Model yanıt vermedi — tekrar deneyin.";
@@ -939,10 +947,12 @@
 "Until %@" = "%@ tarihine kadar";
 "Up to date" = "Güncel";
 "Up to date." = "Güncel.";
+"Up to date; installed at the next voice or music start." = "Güncel; bir sonraki ses veya müzik başlatıldığında yüklenecek.";
 "Update" = "Güncelle";
 "Update channel" = "Güncelleme kanalı";
 "Update channel: Beta" = "Güncelleme kanalı: Beta";
 "Update channel: Stable" = "Güncelleme kanalı: Stable";
+"Update failed: %@" = "Güncelleme başarısız: %@";
 "Updates" = "Güncellemeler";
 "Usage statistics" = "Kullanım istatistikleri";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Kullanım istatistikleri kapalı: hiçbir şey gönderilmez. Bunları açsaydınız bir raporun nasıl görüneceği böyle olur (ID o zaman oluşturulur).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "LLMTray'in modelleri sakladığı yer, her model için bir klasör.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
 "Which model generates new images." = "Yeni görüntüleri hangi model oluşturur.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Model konuşurken, mikrofondan daha sessiz olan sesler buna göre sessizlik olarak algılanır: yankı engellemenin bıraktığı kendi sesinin izi dışarıda kalır, üzerine gelen bir ses yine kesintiye uğratır. Model kendini duyuyorsa artırın; sizi kesintiye uğratmayı kaçırıyorsa azaltın. Bir sonraki başlatmada geçerli olur.";
 "Wikipedia" = "Vikipedi";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "İstemi parça parça okumak için çalışma belleği; daha az bellek uzun istemleri daha küçük, daha yavaş adımlarla okur. İsteme önbelleği toplamda en fazla %90 ise: kalan, okunan istemi tutar.";
 "Works offline" = "Çevrimdışı çalışır";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "bir dakikadan az kaldı";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS, modelin kendi sesini mikrofondan çıkarır (Voice Processing, FaceTime’da olduğu gibi), bu yüzden hoparlörlerle çalışır. Ayrıca ses seviyesini dengeler ve arka plan gürültüsünü azaltır. Değişiklik bir sonraki başlatmada geçerli olur.";
 "make %lld folders" = "%lld klasör oluştur";
+"mlx-audio runtime" = "mlx-audio çalışma zamanı";
 "mlx-lm runtime" = "mlx-lm çalışma zamanı";
 "move %1$lld files into %2$lld folders" = "%1$lld dosyayı %2$lld klasöre taşı";
 "move %1$lld items into %2$lld folders" = "%1$lld öğeyi %2$lld klasöre taşı";
@@ -1043,6 +1055,7 @@
 "not indexed" = "dizine alınmamış";
 "not supported" = "desteklenmiyor";
 "not used by any model" = "hiçbir model tarafından kullanılmıyor";
+"off" = "kapalı";
 "queued" = "kuyruğa alındı";
 "reading" = "okunuyor";
 "reads images" = "görüntüleri okur";

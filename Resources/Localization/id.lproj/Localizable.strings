@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ tidak diunduh: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
+"%@ isn't installed yet" = "%@ belum terpasang";
 "%@ wasn't found on Hugging Face." = "%@ tidak ditemukan di Hugging Face.";
 "%@ · %@ left" = "%@ · %@ tersisa";
 "%@ · downloaded" = "%@ · diunduh";
@@ -177,6 +178,7 @@
 "Check Again" = "Periksa Lagi";
 "Check Now" = "Periksa Sekarang";
 "Check for Runtime Updates" = "Periksa Pembaruan Runtime";
+"Check for Updates" = "Periksa Pembaruan";
 "Check for Updates…" = "Periksa Pembaruan…";
 "Check for updates automatically" = "Periksa pembaruan secara otomatis";
 "Checking the download…" = "Memeriksa unduhan…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "Pembatalan gema";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Pembatalan gema tidak bisa dimulai: %@ — matikan di Pengaturan > Suara.";
 "Echo cancellation isn't available on this Mac." = "Pembatalan gema tidak tersedia di Mac ini.";
+"Echo gate" = "Gerbang gema";
 "Edit Profile…" = "Edit profil…";
 "Embedding model" = "Model embedding";
 "Enable Without It" = "Aktifkan Tanpa Model";
@@ -391,6 +394,7 @@
 "Index Now" = "Indeks Sekarang";
 "Index the files that were stopped" = "Indeks berkas yang dihentikan";
 "Indexing %1$lld of %2$lld files" = "Mengindeks %1$lld dari %2$lld berkas";
+"Install" = "Pasang";
 "Install ID" = "ID pemasangan";
 "Installed" = "Terinstal";
 "Installing mflux…" = "Menginstal mflux…";
@@ -632,6 +636,8 @@
 "Recovery" = "Pemulihan";
 "Refused" = "Ditolak";
 "Regenerate" = "Buat Ulang";
+"Reinstall" = "Pasang ulang";
+"Reinstall failed: %@" = "Pemasangan ulang gagal: %@";
 "Remove" = "Hapus";
 "Remove %@" = "Hapus %@";
 "Remove attachment" = "Hapus lampiran.";
@@ -764,6 +770,7 @@
 "Stop" = "Hentikan";
 "Stop Indexing" = "Hentikan Pengindeksan";
 "Stop Server" = "Hentikan Server";
+"Stop Voice Lab and music generation to update it." = "Hentikan Voice Lab dan pembuatan musik untuk memperbaruinya.";
 "Stop Voice Lab first." = "Hentikan Voice Lab terlebih dahulu.";
 "Stop generating" = "Hentikan pembuatan.";
 "Stop server (unload model)" = "Hentikan server (keluarkan model dari memori).";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "Mikrofon gagal dimulai: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "Mikrofon memerlukan bundel aplikasi LLMTray (scripts/build_app.sh), bukan binary saja.";
 "The microphone's audio format isn't supported." = "Format audio mikrofon tidak didukung.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Versi mlx-audio (sebuah commit dari fork LLMTray) yang menjalankan Voice Lab dan pembuatan musik. Terpasang pada saat suara atau musik dimulai berikutnya jika berubah; saat offline, versi yang terpasang tetap berfungsi.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Versi mlx-lm (commit dari fork milik LLMTray sendiri) yang menjalankan model. Diperbarui terpisah dari app.";
 "The model can make an image when you ask for one." = "Model dapat membuat gambar ketika Anda memintanya.";
 "The model didn't answer -- try again." = "Model tidak merespons — coba lagi.";
@@ -939,10 +947,12 @@
 "Until %@" = "Sampai %@";
 "Up to date" = "Terkini";
 "Up to date." = "Sudah versi terbaru.";
+"Up to date; installed at the next voice or music start." = "Terkini; akan terpasang saat suara atau musik dimulai berikutnya.";
 "Update" = "Perbarui";
 "Update channel" = "Kanal pembaruan";
 "Update channel: Beta" = "Saluran pembaruan: Beta";
 "Update channel: Stable" = "Saluran pembaruan: Stable";
+"Update failed: %@" = "Pembaruan gagal: %@";
 "Updates" = "Pembaruan";
 "Usage statistics" = "Statistik penggunaan";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Statistik penggunaan dimatikan: tidak ada yang dikirim. Ini tampilan laporan jika Anda mengaktifkannya (ID dibuat saat itu).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Tempat LLMTray menyimpan modelnya, satu folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
 "Which model generates new images." = "Model mana yang membuat gambar baru.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Saat model berbicara, suara mikrofon yang lebih pelan dari ambang ini diterima sebagai sunyi: jejak suaranya yang tersisa dari pembatalan gema tidak masuk, tetapi suara di atasnya tetap mengganggu. Naikkan jika model mendengar suaranya sendiri, turunkan jika model melewatkan interupsi Anda. Berlaku pada permulaan berikutnya.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memori kerja untuk membaca prompt secara bertahap; lebih sedikit membaca prompt panjang dalam langkah lebih kecil dan lebih lambat. Jika cache prompt dan ini bersama-sama paling banyak 90%: sisanya memuat prompt yang sedang dibaca.";
 "Works offline" = "Bekerja secara offline";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "kurang dari satu menit tersisa";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS menghapus suara model sendiri dari mikrofon (Voice Processing, seperti di FaceTime), sehingga berfungsi pada speaker. Fitur ini juga meratakan level dan meredam kebisingan latar. Efektif setelah dimulai ulang.";
 "make %lld folders" = "buat %lld folder";
+"mlx-audio runtime" = "runtime mlx-audio";
 "mlx-lm runtime" = "Runtime mlx-lm";
 "move %1$lld files into %2$lld folders" = "pindahkan %1$lld berkas ke %2$lld folder";
 "move %1$lld items into %2$lld folders" = "pindahkan %1$lld item ke %2$lld folder";
@@ -1043,6 +1055,7 @@
 "not indexed" = "tidak terindeks";
 "not supported" = "tidak didukung";
 "not used by any model" = "tidak digunakan oleh model mana pun";
+"off" = "mati";
 "queued" = "diantrikan";
 "reading" = "membaca";
 "reads images" = "membaca gambar";

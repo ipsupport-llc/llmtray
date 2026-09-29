@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ डाउनलोड नहीं हुआ: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ सीमित है: huggingface.co/%@ पर इसकी लाइसेंस शर्तें स्वीकार करें, फिर Settings → Models में एक Hugging Face token जोड़ें।";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ अभी डाउनलोड नहीं हुआ है — Settings में जाकर generate_image फिर से सक्षम करें।";
+"%@ isn't installed yet" = "%@ अभी इंस्टॉल नहीं है";
 "%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
 "%@ · %@ left" = "%@ · %@ बचे";
 "%@ · downloaded" = "%@ · डाउनलोड हो चुका है";
@@ -177,6 +178,7 @@
 "Check Again" = "फिर से जाँचें";
 "Check Now" = "अभी जाँचें";
 "Check for Runtime Updates" = "रनटाइम अपडेट जाँचें";
+"Check for Updates" = "अपडेट देखें";
 "Check for Updates…" = "अपडेट जाँचें…";
 "Check for updates automatically" = "अपडेट अपने-आप जाँचें";
 "Checking the download…" = "डाउनलोड की जाँच हो रही है…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "इको रद्दीकरण";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "इको रद्दीकरण शुरू नहीं हो सका: %@ — इसे बंद करने के लिए Settings > Voice पर जाएँ।";
 "Echo cancellation isn't available on this Mac." = "यह Mac इको रद्दीकरण के लिए उपलब्ध नहीं है।";
+"Echo gate" = "इको गेट";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
 "Embedding model" = "एम्बेडिंग मॉडल";
 "Enable Without It" = "बिना इसके सक्षम करें";
@@ -391,6 +394,7 @@
 "Index Now" = "अब इंडेक्स करें";
 "Index the files that were stopped" = "उन फाइलों को इंडेक्स करें जिन्हें रोका गया था";
 "Indexing %1$lld of %2$lld files" = "%2$lld में से %1$lld फाइलों का इंडेक्स बन रहा है";
+"Install" = "इंस्टॉल करें";
 "Install ID" = "इंस्टॉल ID";
 "Installed" = "इंस्टॉल किया गया";
 "Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
@@ -632,6 +636,8 @@
 "Recovery" = "रिकवरी";
 "Refused" = "अस्वीकृत";
 "Regenerate" = "फिर से जनरेट करें";
+"Reinstall" = "पुनः इंस्टॉल करें";
+"Reinstall failed: %@" = "पुनः इंस्टॉल असफल: %@";
 "Remove" = "हटाएं";
 "Remove %@" = "हटाएँ %@";
 "Remove attachment" = "अटैचमेंट हटाएँ।";
@@ -764,6 +770,7 @@
 "Stop" = "रोकें";
 "Stop Indexing" = "इंडेक्सिंग रोकें";
 "Stop Server" = "सर्वर रोकें";
+"Stop Voice Lab and music generation to update it." = "इसे अपडेट करने के लिए Voice Lab और संगीत जनरेशन बंद करें।";
 "Stop Voice Lab first." = "पहले Voice Lab बंद करें।";
 "Stop generating" = "जनरेट करना रोकें।";
 "Stop server (unload model)" = "सर्वर रोकें (मॉडल अनलोड करें)।";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "माइक्रोफ़ोन शुरू नहीं हो सका: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "माइक्रोफ़ोन को LLMTray ऐप बंडल (scripts/build_app.sh) चाहिए, सिर्फ बाइनरी नहीं।";
 "The microphone's audio format isn't supported." = "माइक्रोफ़ोन का ऑडियो फ़ॉर्मेट समर्थित नहीं है।";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Voice Lab और संगीत जनरेशन चलाने वाला mlx-audio संस्करण (LLMTray के अपने फ़ोर्क की एक commit)। बदलाव पर यह अगले आवाज़ या संगीत की शुरुआत में इंस्टॉल हो जाता है; ऑफ़लाइन होने पर जो इंस्टॉल है, वह काम करता रहता है।";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "mlx-lm संस्करण (LLMTray के अपने fork का एक commit) जो मॉडल चलाता है। यह ऐप से अलग अपडेट होता है।";
 "The model can make an image when you ask for one." = "मॉडल आपकी मांग पर इमेज बना सकता है।";
 "The model didn't answer -- try again." = "मॉडल ने उत्तर नहीं दिया — फिर से कोशिश करें।";
@@ -939,10 +947,12 @@
 "Until %@" = "तक %@";
 "Up to date" = "अप टू डेट";
 "Up to date." = "अप टू डेट है।";
+"Up to date; installed at the next voice or music start." = "अप-टू-डेट; अगले आवाज़ या संगीत की शुरुआत पर इंस्टॉल होगा।";
 "Update" = "अपडेट करें";
 "Update channel" = "अपडेट चैनल";
 "Update channel: Beta" = "अपडेट चैनल: Beta";
 "Update channel: Stable" = "अपडेट चैनल: Stable";
+"Update failed: %@" = "अपडेट असफल: %@";
 "Updates" = "अपडेट";
 "Usage statistics" = "उपयोग सांख्यिकियाँ";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "उपयोग सांख्यिकी बंद हैं: कुछ भी भेजा नहीं जाता। यह रिपोर्ट ऐसी दिखेगी यदि आप उन्हें चालू करते हैं (तब ID बनाया जाता है)।";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "जहाँ LLMTray अपने मॉडल रखता है, प्रति मॉडल एक फ़ोल्डर।";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray जहां MLX मॉडल खोजता है (हर मॉडल के लिए एक फ़ोल्डर, जैसे <org>/<name>)। LM Studio के साथ मॉडल साझा करने के लिए इसे ~/.lmstudio/models पर सेट करें।";
 "Which model generates new images." = "कौन सा मॉडल नई छवियाँ जनरेट करता है।";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "जब मॉडल बोल रहा होता है, तो माइक्रोफोन की यह सीमा से quieter ध्वनि उसे सन्नाटा (silence) के रूप में दिखेगी: इको कैंसलेशन द्वारा छोड़ी अपनी आवाज़ का निशान बाहर रहेगा, उसके ऊपर दूसरी आवाज़ फिर भी काटती है। यदि मॉडल खुद की आवाज़ सुनता है तो इसे बढ़ाएँ, यदि वह आपकी बाधा (interrupt) नहीं पकड़ता तो घटाएँ। परिवर्तन अगले स्टार्ट पर लागू होंगे।";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "प्रॉम्प्ट को भागों में पढ़ने के लिए वर्किंग मेमोरी; कम होने पर लंबे प्रॉम्प्ट छोटे, धीमे चरणों में पढ़े जाते हैं। यदि प्रॉम्प्ट कैश कुल मिलाकर अधिकतम 90% है तो बाकी भाग वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए सुरक्षित रहता है।";
 "Works offline" = "ऑफ़लाइन काम करता है";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "एक मिनट से कम बचा है";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS माइक्रोफ़ोन से मॉडल की अपनी आवाज़ हटाता है (Voice Processing, जैसे FaceTime में), इसलिए यह स्पीकर पर काम करता है। यह स्तर को भी सम करता है और पृष्ठभूमि शोर को दबाता है। यह अगले स्टार्ट पर प्रभावी होगा।";
 "make %lld folders" = "%lld फ़ोल्डर बनाएं";
+"mlx-audio runtime" = "mlx-audio रनटाइम";
 "mlx-lm runtime" = "mlx-lm रनटाइम";
 "move %1$lld files into %2$lld folders" = "%1$lld फाइलें %2$lld फ़ोल्डरों में स्थानांतरित करें";
 "move %1$lld items into %2$lld folders" = "%1$lld आइटम %2$lld फ़ोल्डरों में स्थानांतरित करें";
@@ -1043,6 +1055,7 @@
 "not indexed" = "अनुक्रमित नहीं";
 "not supported" = "समर्थित नहीं";
 "not used by any model" = "किसी भी मॉडल द्वारा उपयोग नहीं किया गया";
+"off" = "बंद";
 "queued" = "क्यू में रखा गया";
 "reading" = "पढ़ रहा है";
 "reads images" = "छवियाँ पढ़ता है";

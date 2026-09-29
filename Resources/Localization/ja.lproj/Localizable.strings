@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ をダウンロードできませんでした: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ は制限付きです: huggingface.co/%@ でライセンスを承諾し、設定 → Models に Hugging Face トークンを追加してください。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ はまだダウンロードされていません — 設定で画像生成を再度有効にしてください。";
+"%@ isn't installed yet" = "%@ はまだインストールされていません";
 "%@ wasn't found on Hugging Face." = "Hugging Face に %@ が見つかりませんでした。";
 "%@ · %@ left" = "%@ · 残り %@";
 "%@ · downloaded" = "%@ · ダウンロード済み";
@@ -177,6 +178,7 @@
 "Check Again" = "再確認";
 "Check Now" = "今すぐ確認";
 "Check for Runtime Updates" = "ランタイムアップデートを確認";
+"Check for Updates" = "アップデートを確認";
 "Check for Updates…" = "アップデートを確認…";
 "Check for updates automatically" = "アップデートを自動的に確認";
 "Checking the download…" = "ダウンロードを確認しています…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "エコーキャンセル";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "エコーキャンセルを開始できませんでした: %@ — 設定 > 音声 でオフにしてください。";
 "Echo cancellation isn't available on this Mac." = "この Mac ではエコーキャンセルは利用できません。";
+"Echo gate" = "エコーゲート";
 "Edit Profile…" = "プロファイルを編集…";
 "Embedding model" = "埋め込みモデル";
 "Enable Without It" = "それなしで有効化";
@@ -391,6 +394,7 @@
 "Index Now" = "今すぐインデックス";
 "Index the files that were stopped" = "停止したファイルをインデックス化";
 "Indexing %1$lld of %2$lld files" = "%2$lld 件中 %1$lld 件をインデックス化しています";
+"Install" = "インストール";
 "Install ID" = "インストールID";
 "Installed" = "インストール済み";
 "Installing mflux…" = "mflux をインストール中…";
@@ -632,6 +636,8 @@
 "Recovery" = "復旧";
 "Refused" = "拒否";
 "Regenerate" = "再生成";
+"Reinstall" = "再インストール";
+"Reinstall failed: %@" = "再インストールに失敗しました：%@";
 "Remove" = "削除";
 "Remove %@" = "%@ を削除";
 "Remove attachment" = "添付ファイルを削除します。";
@@ -764,6 +770,7 @@
 "Stop" = "停止";
 "Stop Indexing" = "インデックスを停止";
 "Stop Server" = "サーバを停止";
+"Stop Voice Lab and music generation to update it." = "更新するには Voice Lab と音楽生成を停止してください。";
 "Stop Voice Lab first." = "先に Voice Lab を停止してください。";
 "Stop generating" = "生成を停止します。";
 "Stop server (unload model)" = "サーバを停止します（モデルをアンロードします）。";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "マイクを開始できませんでした：%@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "マイクは実行ファイル単体ではなく、LLMTray アプリバンドル（scripts/build_app.sh）が必要です。";
 "The microphone's audio format isn't supported." = "マイクのオーディオ形式はサポートされていません。";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Voice Lab と音楽生成を実行する mlx-audio（LLMTray 独自フォークのコミット）です。変更があった場合、次回の音声または音楽開始時にインストールされます。オフライン時でも既にインストールされているものは動作し続けます。";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "モデルを実行する mlx-lm のバージョン（LLMTray 独自フォークのコミット）です。アプリとは別にアップデートされます。";
 "The model can make an image when you ask for one." = "モデルは画像を生成できます（要求時）。";
 "The model didn't answer -- try again." = "モデルが応答しませんでした — 再試行してください。";
@@ -939,10 +947,12 @@
 "Until %@" = "%@ まで";
 "Up to date" = "最新です";
 "Up to date." = "最新です。";
+"Up to date; installed at the next voice or music start." = "最新です。次回の音声または音楽開始時にインストールされます。";
 "Update" = "アップデート";
 "Update channel" = "アップデートチャンネル";
 "Update channel: Beta" = "アップデートチャネル：Beta";
 "Update channel: Stable" = "アップデートチャネル：Stable";
+"Update failed: %@" = "更新に失敗しました：%@";
 "Updates" = "アップデート";
 "Usage statistics" = "使用統計";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "使用統計はオフです：何も送信されません。これが統計を有効にしたときのレポートの例です（ID はその時に作成されます）。";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "LLMTray がモデルを保存する場所。モデルごとに1フォルダです。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
 "Which model generates new images." = "どのモデルが新しい画像を生成するか。";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "モデルが話している間、この値より小さいマイク音は無音として扱われます：エコーキャンセルが残す自己音の痕跡は除外されますが、上からの声は依然として割り込みます。モデルが自分の声を聞いている場合は値を上げ、あなたの割り込みを検出できない場合は下げてください。次回起動時に反映されます。";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "プロンプトを分割して読み取るための作業メモリ。小さいほど長いプロンプトはより小さく遅いステップで読み取られます。プロンプトキャッシュと合わせて最大で90%の場合: 残りが現在読み取られるプロンプトを保持します。";
 "Works offline" = "オフラインで動作";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "1分未満";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS はマイクからモデル自身の音声を除去します（FaceTime と同じ Voice Processing を使用）、そのためスピーカーでも動作します。音量を均一化し、背景雑音を低減します。次回開始時に有効になります。";
 "make %lld folders" = "%lld 個のフォルダを作成";
+"mlx-audio runtime" = "mlx-audio ランタイム";
 "mlx-lm runtime" = "mlx-lm ランタイム";
 "move %1$lld files into %2$lld folders" = "%1$lld 個のファイルを %2$lld 個のフォルダに移動";
 "move %1$lld items into %2$lld folders" = "%1$lld 件を %2$lld 個のフォルダに移動";
@@ -1043,6 +1055,7 @@
 "not indexed" = "未インデックス";
 "not supported" = "未対応";
 "not used by any model" = "どのモデルにも使用されていません";
+"off" = "オフ";
 "queued" = "キュー待ち";
 "reading" = "読み取り中";
 "reads images" = "画像を読み取る";

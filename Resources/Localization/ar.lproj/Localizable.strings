@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "لم يتم تنزيل %@: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ مُقيَّد: اقبل ترخيصه على huggingface.co/%@، ثم أضف رمز Hugging Face في الإعدادات → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "لم يتم تنزيل %@ بعد — أعد تمكين توليد الصور في الإعدادات.";
+"%@ isn't installed yet" = "لم يُثَبَّت %@ بعد";
 "%@ wasn't found on Hugging Face." = "لم يُعثر على %@ في Hugging Face.";
 "%@ · %@ left" = "%@ · تبقى %@";
 "%@ · downloaded" = "%@ · تم التنزيل";
@@ -177,6 +178,7 @@
 "Check Again" = "تحقق مجددًا";
 "Check Now" = "تحقق الآن";
 "Check for Runtime Updates" = "التحقق من تحديثات وقت التشغيل";
+"Check for Updates" = "البحث عن تحديثات";
 "Check for Updates…" = "التحقق من وجود تحديثات…";
 "Check for updates automatically" = "التحقق من وجود تحديثات تلقائيًا";
 "Checking the download…" = "جارٍ التحقق من التنزيل…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "إلغاء الصدى";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "تعذر بدء إلغاء الصدى: %@ — أوقفه في الإعدادات > الصوت.";
 "Echo cancellation isn't available on this Mac." = "إلغاء الصدى غير متاح على هذا الـ Mac.";
+"Echo gate" = "بوابة الصدى";
 "Edit Profile…" = "تحرير ملف التعريف…";
 "Embedding model" = "نموذج التضمين";
 "Enable Without It" = "تفعيل بدون ذلك";
@@ -391,6 +394,7 @@
 "Index Now" = "فهرس الآن";
 "Index the files that were stopped" = "فهرِس الملفات الموقوفة";
 "Indexing %1$lld of %2$lld files" = "جارٍ فهرسة %1$lld من %2$lld ملفًا";
+"Install" = "تثبيت";
 "Install ID" = "معرّف التثبيت";
 "Installed" = "مثبّت";
 "Installing mflux…" = "جارٍ تثبيت mflux…";
@@ -632,6 +636,8 @@
 "Recovery" = "الاسترداد";
 "Refused" = "مرفوضة";
 "Regenerate" = "إعادة التوليد";
+"Reinstall" = "إعادة التثبيت";
+"Reinstall failed: %@" = "فشل إعادة التثبيت: %@";
 "Remove" = "إزالة";
 "Remove %@" = "أزل %@";
 "Remove attachment" = "إزالة المرفق.";
@@ -764,6 +770,7 @@
 "Stop" = "إيقاف";
 "Stop Indexing" = "إيقاف الفهرسة";
 "Stop Server" = "إيقاف الخادم";
+"Stop Voice Lab and music generation to update it." = "أوقف Voice Lab وتوليد الموسيقى لتحديثه.";
 "Stop Voice Lab first." = "أوقف Voice Lab أولاً.";
 "Stop generating" = "أوقف التوليد.";
 "Stop server (unload model)" = "أوقف الخادم (أفرغ النموذج من الذاكرة).";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "تعذّر بدء الميكروفون: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "يحتاج الميكروفون حزمة تطبيق LLMTray (scripts/build_app.sh)، وليس الثنائي المجرّد.";
 "The microphone's audio format isn't supported." = "تنسيق صوت الميكروفون غير مدعوم.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "نسخة mlx-audio (التزام من فورك LLMTray الخاص) التي تشغّل Voice Lab وتوليد الموسيقى. تُثبَّت عند بدء الصوت أو الموسيقى التالي عند تغيّرها؛ عند عدم الاتصال يظل المُثبّت يعمل.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "إصدار mlx-lm (commit من fork الخاص بـ LLMTray) الذي يشغّل النماذج. يُحدَّث بشكل منفصل عن التطبيق.";
 "The model can make an image when you ask for one." = "يمكن للنموذج إنشاء صورة عندما تطلب ذلك.";
 "The model didn't answer -- try again." = "النموذج لم يجب — حاول مرة أخرى.";
@@ -939,10 +947,12 @@
 "Until %@" = "حتى %@";
 "Up to date" = "محدّث";
 "Up to date." = "محدّث.";
+"Up to date; installed at the next voice or music start." = "مُحدَّث؛ سيُثبَّت عند بدء الصوت أو الموسيقى التالي.";
 "Update" = "تحديث";
 "Update channel" = "قناة التحديث";
 "Update channel: Beta" = "قناة التحديث: Beta";
 "Update channel: Stable" = "قناة التحديث: Stable";
+"Update failed: %@" = "فشل التحديث: %@";
 "Updates" = "التحديثات";
 "Usage statistics" = "إحصاءات الاستخدام";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "إحصاءات الاستخدام معطلة: لا يُرسل شيء. هذا شكل التقرير إذا قمت بتشغيلها (يُنشأ المعرّف عندها).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "المكان الذي يحتفظ فيه LLMTray بالنماذج، مجلد لكل نموذج.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
 "Which model generates new images." = "أي نموذج يقوم بتوليد الصور الجديدة.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "أثناء حديث النموذج، أي صوت من الميكروفون أضعف من هذا يُعامل كصمت: أثر صوته الذي يتركه إلغاء الصدى يبقى خارجًا، لكن صوت أعلى منه لا يزال يقاطع. ارفعه إذا كان النموذج يسمع نفسه، اخفضه إذا كان يفشل في سماع مقاطعتك. يسري عند البدء التالي.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "ذاكرة العمل لقراءة المطالبة على أجزاء؛ القليل يقرأ المطالبات الطويلة بخطوات أصغر وأبطأ. عندما يكون مجموع ذاكرة التخزين المؤقت للمطالبات في حد أقصى 90%: الباقي يحتفظ بالمطالبة الجاري قراءتها.";
 "Works offline" = "يعمل دون اتصال";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "أقل من دقيقة متبقية";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "يقوم macOS بإزالة صوت النموذج من الميكروفون (معالجة الصوت، كما في FaceTime)، لذا يعمل على السماعات. كما يُوازن مستوى الصوت ويخفف الضوضاء الخلفية. يسري مفعوله بعد إعادة البدء.";
 "make %lld folders" = "إنشاء %lld مجلدات";
+"mlx-audio runtime" = "زمن تشغيل mlx-audio";
 "mlx-lm runtime" = "بيئة تشغيل mlx-lm";
 "move %1$lld files into %2$lld folders" = "نقل %1$lld ملفات إلى %2$lld مجلدات";
 "move %1$lld items into %2$lld folders" = "نقل %1$lld عناصر إلى %2$lld مجلدات";
@@ -1043,6 +1055,7 @@
 "not indexed" = "غير مفهرس";
 "not supported" = "غير مدعوم";
 "not used by any model" = "غير مستخدم من أي نموذج";
+"off" = "إيقاف";
 "queued" = "قيد الانتظار";
 "reading" = "جارٍ القراءة";
 "reads images" = "يقرأ الصور";
