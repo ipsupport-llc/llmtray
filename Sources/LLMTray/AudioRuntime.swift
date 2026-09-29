@@ -40,8 +40,9 @@ final class AudioRuntime: ObservableObject {
     /// speedups -- bf16 perception with a compiled conformer, the TTS
     /// mixture head computing only the sampled mixture, compiled TTS codes
     /// and codec step (185 -> ~88 ms per 80 ms frame on a base M5 with
-    /// the GPTQ-3 model).
-    static let mlxAudioCommit = "2dce52460b2ff95793bb18ba93404c7bf531d141"
+    /// the GPTQ-3 model). ab0b648 (fork PR #4): optional TTS/codec pause
+    /// while the model is quiet (the runner's --tts-idle-frames).
+    static let mlxAudioCommit = "ab0b648b2ce6ad261e8bb3203e08b34680eec471"
 
     /// mlx-audio with what both runners import. The voice models' part is
     /// mlx-audio's `sts` extras (pyproject.toml), listed here rather than

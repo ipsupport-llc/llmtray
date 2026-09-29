@@ -148,7 +148,9 @@ struct VoiceLabView: View {
     private var stateLine: some View {
         switch session.phase {
         case .idle:
-            Text("Press Start and talk. Use headphones: the model hears its own voice from the speakers.")
+            Text(UserDefaults.standard[Pref.voiceLabEchoCancellation]
+                 ? NSLocalizedString("Press Start and talk. Speakers work with echo cancellation; headphones are still best.", comment: "")
+                 : NSLocalizedString("Press Start and talk. Use headphones: the model hears its own voice from the speakers.", comment: ""))
                 .multilineTextAlignment(.center).foregroundStyle(.secondary)
         case .preparing(let text):
             HStack(spacing: 6) { ProgressView().controlSize(.small); Text(verbatim: text) }

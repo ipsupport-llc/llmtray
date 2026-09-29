@@ -2,11 +2,43 @@ import AVFoundation
 import Foundation
 import LLMTrayCore
 
+/// Voice Lab's audio without echo cancellation: one AVAudioEngine for the
+/// microphone and the model's speech.
+final class VoiceAudioEngine {
+    let engine = AVAudioEngine()
+
+    /// After the microphone's tap and the player are in place.
+    func start() throws {
+        engine.prepare()
+        try engine.start()
+    }
+
+    func stop() {
+        engine.stop()
+    }
+}
+
+/// Where Voice Lab's microphone frames come from: `onFrame` gets int16 PCM
+/// at the runner's rate, mono, and the chunk's RMS.
+protocol VoiceMicrophone: AnyObject {
+    func start(onFrame: @escaping (Data, Float) -> Void) throws
+    func stop()
+}
+
+/// Where the model's speech goes: chunks at the model's rate, each
+/// `completion` called once it has played (or was dropped).
+protocol SpeechOutput: AnyObject {
+    func schedule(_ samples: [Float], completion: @escaping () -> Void)
+    /// Drops what's queued; ready for more.
+    func reset()
+    func stop()
+}
+
 /// The microphone for Voice Lab (adr/0016): an AVAudioEngine input tap,
 /// converted to 16 kHz mono float32 and handed on as int16 PCM. Nothing is
 /// written to disk. `onFrame` runs on the audio thread -- it must not block
 /// (DuplexProcess.write doesn't).
-final class MicrophoneCapture {
+final class MicrophoneCapture: VoiceMicrophone {
     enum CaptureError: LocalizedError {
         case noInput
         case converter
@@ -19,10 +51,11 @@ final class MicrophoneCapture {
         }
     }
 
-    private let engine = AVAudioEngine()
+    private let engine: AVAudioEngine
     private let sampleRate: Double
 
-    init(sampleRate: Int = 16_000) {
+    init(audio: VoiceAudioEngine, sampleRate: Int = 16_000) {
+        engine = audio.engine
         self.sampleRate = Double(sampleRate)
     }
 
@@ -53,18 +86,10 @@ final class MicrophoneCapture {
             let samples = UnsafeBufferPointer(start: channel, count: Int(out.frameLength))
             onFrame(PCM16.data(from: samples), PCM16.rms(samples))
         }
-        engine.prepare()
-        do {
-            try engine.start()
-        } catch {
-            input.removeTap(onBus: 0)
-            throw error
-        }
     }
 
     func stop() {
         engine.inputNode.removeTap(onBus: 0)
-        engine.stop()
     }
 }
 
@@ -72,28 +97,21 @@ final class MicrophoneCapture {
 /// stop cuts it at once), through a small jitter buffer (JitterBuffer,
 /// 160 ms). `enqueue` may be called from any thread.
 final class SpeechPlayer: @unchecked Sendable {
-    private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
-    private let format: AVAudioFormat
+    private let output: SpeechOutput
+    private let sampleRate: Int
     private let lock = NSLock()
     private var jitter: JitterBuffer
     private var activity = SpeechActivity()
     private var stopped = false
+    /// Bumped by a cancel: a completion from before it doesn't count
+    /// against the reply after it.
+    private var generation = 0
     private let clockStart = DispatchTime.now().uptimeNanoseconds
 
-    init?(sampleRate: Int, prebufferMilliseconds: Int = 160) {
-        guard let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: Double(sampleRate), channels: 1, interleaved: false)
-        else { return nil }
-        self.format = format
+    init(output: SpeechOutput, sampleRate: Int, prebufferMilliseconds: Int = 160) {
+        self.output = output
+        self.sampleRate = sampleRate
         jitter = JitterBuffer(sampleRate: sampleRate, milliseconds: prebufferMilliseconds)
-    }
-
-    func start() throws {
-        engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: format)
-        engine.prepare()
-        try engine.start()
-        player.play()
     }
 
     private var now: TimeInterval { Double(DispatchTime.now().uptimeNanoseconds - clockStart) / 1e9 }
@@ -113,22 +131,27 @@ final class SpeechPlayer: @unchecked Sendable {
         lock.lock()
         guard !stopped else { lock.unlock(); return }
         let chunks = jitter.push(samples)
+        let current = generation
         lock.unlock()
-        for chunk in chunks { schedule(chunk) }
+        for chunk in chunks { schedule(chunk, generation: current) }
     }
 
-    private func schedule(_ samples: [Float]) {
-        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)),
-              let channel = buffer.floatChannelData?[0] else { return }
-        buffer.frameLength = AVAudioFrameCount(samples.count)
-        samples.withUnsafeBufferPointer { channel.update(from: $0.baseAddress!, count: samples.count) }
+    /// `scheduled`: the generation the chunk left the jitter buffer in; a
+    /// cancel since drops it instead of playing it.
+    private func schedule(_ samples: [Float], generation scheduled: Int) {
         let rms = PCM16.rms(samples)
         let count = samples.count
-        player.scheduleBuffer(buffer) { [weak self] in
+        lock.lock()
+        let stale = generation != scheduled
+        lock.unlock()
+        if stale { return }
+        output.schedule(samples) { [weak self] in
             guard let self else { return }
             self.lock.lock()
-            self.jitter.played(count)
-            self.activity.observe(rms: rms, at: self.now)
+            if self.generation == scheduled {
+                self.jitter.played(count)
+                self.activity.observe(rms: rms, at: self.now)
+            }
             self.lock.unlock()
         }
     }
@@ -136,7 +159,7 @@ final class SpeechPlayer: @unchecked Sendable {
     /// How much is held before playing starts (or starts again after an underrun).
     func setPrebuffer(milliseconds: Int) {
         lock.lock()
-        jitter.prebufferSamples = Int(format.sampleRate) * milliseconds / 1000
+        jitter.prebufferSamples = sampleRate * milliseconds / 1000
         lock.unlock()
     }
 
@@ -145,8 +168,9 @@ final class SpeechPlayer: @unchecked Sendable {
         lock.lock()
         guard !stopped else { lock.unlock(); return }
         let chunks = jitter.flush()
+        let current = generation
         lock.unlock()
-        for chunk in chunks { schedule(chunk) }
+        for chunk in chunks { schedule(chunk, generation: current) }
     }
 
     /// Drops whatever is queued or playing (the user talks over it); the
@@ -156,9 +180,9 @@ final class SpeechPlayer: @unchecked Sendable {
         guard !stopped else { lock.unlock(); return }
         jitter.reset()
         activity.reset()
+        generation += 1
         lock.unlock()
-        player.stop()
-        player.play()
+        output.reset()
     }
 
     func stop() {
@@ -167,7 +191,42 @@ final class SpeechPlayer: @unchecked Sendable {
         jitter.reset()
         activity.reset()
         lock.unlock()
+        output.stop()
+    }
+}
+
+/// The model's speech through an AVAudioPlayerNode on the shared engine.
+final class EngineSpeechOutput: SpeechOutput {
+    private let engine: AVAudioEngine
+    private let player = AVAudioPlayerNode()
+    private let format: AVAudioFormat
+
+    init?(audio: VoiceAudioEngine, sampleRate: Int) {
+        guard let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: Double(sampleRate), channels: 1, interleaved: false)
+        else { return nil }
+        engine = audio.engine
+        self.format = format
+        engine.attach(player)
+        engine.connect(player, to: engine.mainMixerNode, format: format)
+    }
+
+    /// Once the engine runs.
+    func play() { player.play() }
+
+    func schedule(_ samples: [Float], completion: @escaping () -> Void) {
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(samples.count)),
+              let channel = buffer.floatChannelData?[0] else { return completion() }
+        buffer.frameLength = AVAudioFrameCount(samples.count)
+        samples.withUnsafeBufferPointer { channel.update(from: $0.baseAddress!, count: samples.count) }
+        player.scheduleBuffer(buffer, completionHandler: completion)
+    }
+
+    func reset() {
         player.stop()
-        engine.stop()
+        player.play()
+    }
+
+    func stop() {
+        player.stop()
     }
 }

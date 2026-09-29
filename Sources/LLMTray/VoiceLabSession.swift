@@ -62,7 +62,8 @@ final class VoiceLabSession: ObservableObject {
 
     private weak var server: ServerManager?
     private var process: DuplexProcess?
-    private var mic: MicrophoneCapture?
+    private var audio: VoiceAudioEngine?
+    private var mic: VoiceMicrophone?
     private var player: SpeechPlayer?
     private var ticket: GenerationQueue.Ticket?
     private var reloadChatModel = false
@@ -270,26 +271,56 @@ final class VoiceLabSession: ObservableObject {
 
     private func startAudio(_ ready: VoiceRunnerReady, router: SpeechRouter, run: Int) {
         guard !stopRequested, let process else { return }
-        guard let player = SpeechPlayer(sampleRate: ready.sampleRate) else {
-            return runnerFailed(NSLocalizedString("The voice model's audio format isn't supported.", comment: ""), run: run)
-        }
         self.ready = ready
         applyMode()
-        let mic = MicrophoneCapture(sampleRate: ready.inputSampleRate)
         let meter = self.meter, gate = self.gate
+        let onFrame: (Data, Float) -> Void = { data, rms in
+            meter.set(PCM16.meterLevel(rms: rms))
+            // Walkie-talkie: only while the user talks.
+            if gate.isOpen { process.write(VoiceFrame(.audio, payload: data).encoded) }
+        }
+        let player: SpeechPlayer
+        let mic: VoiceMicrophone
+        var engine: VoiceAudioEngine?
         do {
-            try player.start()
-            router.player = player
-            try mic.start { data, rms in
-                meter.set(PCM16.meterLevel(rms: rms))
-                // Walkie-talkie: only while the user talks.
-                if gate.isOpen { process.write(VoiceFrame(.audio, payload: data).encoded) }
+            if UserDefaults.standard[Pref.voiceLabEchoCancellation] {
+                let io: VoiceProcessingIO
+                do {
+                    io = try VoiceProcessingIO(inputSampleRate: ready.inputSampleRate)
+                } catch {
+                    return runnerFailed(String(format: NSLocalizedString("Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.", comment: ""), error.localizedDescription), run: run)
+                }
+                guard let output = io.speechOutput(sampleRate: ready.sampleRate) else {
+                    return runnerFailed(NSLocalizedString("The voice model's audio format isn't supported.", comment: ""), run: run)
+                }
+                player = SpeechPlayer(output: output, sampleRate: ready.sampleRate)
+                mic = io
+                try io.start(onFrame: onFrame)
+            } else {
+                let audio = VoiceAudioEngine()
+                guard let output = EngineSpeechOutput(audio: audio, sampleRate: ready.sampleRate) else {
+                    return runnerFailed(NSLocalizedString("The voice model's audio format isn't supported.", comment: ""), run: run)
+                }
+                player = SpeechPlayer(output: output, sampleRate: ready.sampleRate)
+                let capture = MicrophoneCapture(audio: audio, sampleRate: ready.inputSampleRate)
+                mic = capture
+                engine = audio
+                try capture.start(onFrame: onFrame)
+                do {
+                    try audio.start()
+                } catch {
+                    capture.stop()
+                    throw error
+                }
+                output.play()
             }
+            router.player = player
         } catch {
-            player.stop()
+            engine?.stop()
             router.player = nil
             return runnerFailed(String(format: NSLocalizedString("The microphone couldn't start: %@", comment: ""), error.localizedDescription), run: run)
         }
+        self.audio = engine
         self.player = player
         self.mic = mic
         startedAt = Date()
@@ -433,6 +464,8 @@ final class VoiceLabSession: ObservableObject {
         mic = nil
         player?.stop()
         player = nil
+        audio?.stop()
+        audio = nil
         level = 0
         isSpeaking = false
     }

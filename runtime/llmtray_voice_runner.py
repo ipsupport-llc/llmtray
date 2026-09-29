@@ -6,6 +6,7 @@
 #   python llmtray_voice_runner.py --model <dir> [--system-prompt <text>] [--seed N]
 #                                  [--warmup-frames N] [--max-session-seconds S]
 #                                  [--voiced-rms X] [--reply-quiet-seconds S] [--reply-zero-seconds S]
+#                                  [--tts-idle-frames N] [--tts-idle-rms X]
 #   python3 llmtray_voice_runner.py --selftest [--selftest-rtf X]   # no model
 #
 # Binary frames both ways: 1 type byte, a 4-byte big-endian payload length,
@@ -37,7 +38,12 @@
 #   voiced frame, holding back pauses, ending at 0.4 s of the codec's exact
 #   silence (or 1.2 s of quiet) -- and sends Z. New audio, C or Q end it early.
 # "rtf" is measured at load: warmup frames of silence, the first few (Metal's
-# kernel compiles) not counted; their output is dropped. The context is
+# kernel compiles) not counted; their output is dropped. It is the cost of a
+# frame the model speaks on (the warm-up session never pauses its TTS):
+# speech plays as it's made, so that decides whether duplex keeps up.
+# --tts-idle-frames N (default 5, 0: off): after N quiet frames (no token,
+# silent speech) the session pauses its TTS and codec until the next token
+# -- listening frames then cost only perception and the language model. The context is
 # bounded (--max-session-seconds, 300): at the limit the session starts over.
 #
 # Nothing is written to disk. It exits at stdin EOF -- which its parent's
@@ -379,15 +385,18 @@ def run_model():
     # Bounds the context (the language model's cache grows every 80 ms);
     # at the limit the conversation starts over, with a note to the app.
     max_seconds = float(arg("--max-session-seconds", "300"))
+    idle_frames = max(0, int(arg("--tts-idle-frames", "5")))
+    idle_rms = float(arg("--tts-idle-rms", "0.001"))
     started = time.time()
     try:
         model = load(model_dir)
 
-        def new_session():
+        def new_session(idle=idle_frames):
+            extra = {"tts_idle_frames": idle, "tts_idle_rms": idle_rms} if idle else {}
             return model.create_duplex_session(system_prompt=system_prompt, seed=seed,
-                                               max_streaming_seconds=max_seconds)
+                                               max_streaming_seconds=max_seconds, **extra)
 
-        session = new_session()
+        session = new_session(0) if idle_frames and warmup_frames else new_session()
     except Exception as e:  # noqa: BLE001 -- whatever failed, the app says so
         send("E", "loading the voice model failed: %s: %s" % (type(e).__name__, e))
         return 1
@@ -415,6 +424,8 @@ def run_model():
         if measured:
             rtf = sum(measured) / len(measured) / frame_seconds
             log("warmup: %d frames, %.0f ms per 80 ms frame (rtf %.2f)" % (len(times), 1000 * rtf * frame_seconds, rtf))
+        if idle_frames and warmup_frames:
+            session = new_session()   # the warm-up one never paused; this one may
     except Exception as e:  # noqa: BLE001
         send("E", "the voice model failed at warmup: %s: %s" % (type(e).__name__, e))
         return 1

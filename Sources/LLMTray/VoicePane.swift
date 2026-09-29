@@ -15,6 +15,7 @@ struct VoicePane: View {
     @State private var chatBytes: Int64?
     @State private var partial = false
     @AppStorage(Pref.voiceLabMode) private var mode
+    @AppStorage(Pref.voiceLabEchoCancellation) private var echoCancellation
     private var model: VoiceLabModel { store.selected }
 
     var body: some View {
@@ -38,7 +39,14 @@ struct VoicePane: View {
                     } label: {
                         SettingLabel(title: "Mode", help: "Full duplex: talk any time, the model hears you while it speaks -- needs a Mac that runs it in real time. Walkie-talkie: talk, press Done, then listen. Automatic picks by this Mac's measured speed when Voice Lab starts.")
                     }
-                    Label("Use headphones: the model hears its own voice from the speakers.", systemImage: "headphones")
+                    Toggle(isOn: $echoCancellation) {
+                        SettingLabel(title: "Echo cancellation", help: "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.")
+                    }
+                    .disabled(session.isActive)
+                    Label(echoCancellation
+                          ? NSLocalizedString("Speakers work with echo cancellation; headphones are still best.", comment: "")
+                          : NSLocalizedString("Use headphones: the model hears its own voice from the speakers.", comment: ""),
+                          systemImage: "headphones")
                     if store.isDownloaded(model) {
                         Button("Open Voice Lab…") { NotificationCenter.default.post(name: .showVoiceLab, object: nil) }
                     }
