@@ -9,6 +9,12 @@ extension AppStorage where Value == Int {
     }
 }
 
+extension AppStorage where Value == Double {
+    init(_ key: PrefKey<Double>, store: UserDefaults? = nil) {
+        self.init(wrappedValue: key.defaultValue, key.name, store: store)
+    }
+}
+
 extension AppStorage where Value == Bool {
     init(_ key: PrefKey<Bool>, store: UserDefaults? = nil) {
         self.init(wrappedValue: key.defaultValue, key.name, store: store)

@@ -109,6 +109,11 @@ public enum Pref {
     /// Voice Processing I/O on Voice Lab's audio: macOS takes the model's
     /// own voice out of the microphone, so speakers work without headphones.
     public static let voiceLabEchoCancellation = PrefKey("llmtray.voiceLab.echoCancellation", default: true)
+    /// While the model's speech plays, a microphone chunk below this RMS
+    /// goes to the model as silence: what echo cancellation leaves of the
+    /// model's own voice (~0.001) stays out, a voice over it (0.03+) still
+    /// interrupts. 0: off.
+    public static let voiceLabEchoGateRMS = PrefKey("llmtray.voiceLab.echoGateRMS", default: 0.01)
 
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.

@@ -17,6 +17,7 @@
 "%@ didn't download: %@" = "%@ didn't download: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";
+"%@ isn't installed yet" = "%@ isn't installed yet";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
 "%@ · downloaded" = "%@ · downloaded";
@@ -175,6 +176,7 @@
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
 "Check for Runtime Updates" = "Check for Runtime Updates";
+"Check for Updates" = "Check for Updates";
 "Check for Updates…" = "Check for Updates…";
 "Check for updates automatically" = "Check for updates automatically";
 "Checking the download…" = "Checking the download…";
@@ -273,6 +275,7 @@
 "Echo cancellation" = "Echo cancellation";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
 "Echo cancellation isn't available on this Mac." = "Echo cancellation isn't available on this Mac.";
+"Echo gate" = "Echo gate";
 "Edit Profile…" = "Edit Profile…";
 "Embedding model" = "Embedding model";
 "Enable Without It" = "Enable Without It";
@@ -389,6 +392,7 @@
 "Index Now" = "Index Now";
 "Index the files that were stopped" = "Index the files that were stopped";
 "Indexing %1$lld of %2$lld files" = "Indexing %1$lld of %2$lld files";
+"Install" = "Install";
 "Install ID" = "Install ID";
 "Installed" = "Installed";
 "Installing mflux…" = "Installing mflux…";
@@ -630,6 +634,8 @@
 "Recovery" = "Recovery";
 "Refused" = "Refused";
 "Regenerate" = "Regenerate";
+"Reinstall" = "Reinstall";
+"Reinstall failed: %@" = "Reinstall failed: %@";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
 "Remove attachment" = "Remove attachment";
@@ -762,6 +768,7 @@
 "Stop" = "Stop";
 "Stop Indexing" = "Stop Indexing";
 "Stop Server" = "Stop Server";
+"Stop Voice Lab and music generation to update it." = "Stop Voice Lab and music generation to update it.";
 "Stop Voice Lab first." = "Stop Voice Lab first.";
 "Stop generating" = "Stop generating";
 "Stop server (unload model)" = "Stop server (unload model)";
@@ -827,6 +834,7 @@
 "The microphone couldn't start: %@" = "The microphone couldn't start: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary.";
 "The microphone's audio format isn't supported." = "The microphone's audio format isn't supported.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model can make an image when you ask for one." = "The model can make an image when you ask for one.";
 "The model didn't answer -- try again." = "The model didn't answer -- try again.";
@@ -937,10 +945,12 @@
 "Until %@" = "Until %@";
 "Up to date" = "Up to date";
 "Up to date." = "Up to date.";
+"Up to date; installed at the next voice or music start." = "Up to date; installed at the next voice or music start.";
 "Update" = "Update";
 "Update channel" = "Update channel";
 "Update channel: Beta" = "Update channel: Beta";
 "Update channel: Stable" = "Update channel: Stable";
+"Update failed: %@" = "Update failed: %@";
 "Updates" = "Updates";
 "Usage statistics" = "Usage statistics";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then).";
@@ -996,6 +1006,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";
@@ -1032,6 +1043,7 @@
 "less than a minute left" = "less than a minute left";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
 "make %lld folders" = "make %lld folders";
+"mlx-audio runtime" = "mlx-audio runtime";
 "mlx-lm runtime" = "mlx-lm runtime";
 "move %1$lld files into %2$lld folders" = "move %1$lld files into %2$lld folders";
 "move %1$lld items into %2$lld folders" = "move %1$lld items into %2$lld folders";
@@ -1041,6 +1053,7 @@
 "not indexed" = "not indexed";
 "not supported" = "not supported";
 "not used by any model" = "not used by any model";
+"off" = "off";
 "queued" = "queued";
 "reading" = "reading";
 "reads images" = "reads images";

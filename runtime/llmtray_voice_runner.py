@@ -393,8 +393,16 @@ def run_model():
 
         def new_session(idle=idle_frames):
             extra = {"tts_idle_frames": idle, "tts_idle_rms": idle_rms} if idle else {}
-            return model.create_duplex_session(system_prompt=system_prompt, seed=seed,
-                                               max_streaming_seconds=max_seconds, **extra)
+            try:
+                return model.create_duplex_session(system_prompt=system_prompt, seed=seed,
+                                                   max_streaming_seconds=max_seconds, **extra)
+            except TypeError as e:
+                # An mlx-audio without the TTS pause: run every frame.
+                if not extra or "tts_idle" not in str(e):
+                    raise
+                log("this mlx-audio has no TTS pause (%s); running without it" % e)
+                return model.create_duplex_session(system_prompt=system_prompt, seed=seed,
+                                                   max_streaming_seconds=max_seconds)
 
         session = new_session(0) if idle_frames and warmup_frames else new_session()
     except Exception as e:  # noqa: BLE001 -- whatever failed, the app says so

@@ -1248,6 +1248,10 @@ struct UpdatesPane: View {
     @AppStorage(Pref.automaticUpdateChecks) private var autoCheck
     @AppStorage(Pref.checkUpdatesAtLaunch) private var checkAtLaunch
     @AppStorage(Pref.betaUpdates) private var beta
+    @AppStorage(Pref.voiceLabEnabled) private var voiceLab
+    @ObservedObject private var audioRuntime = AudioRuntime.shared
+    @ObservedObject private var voiceSession = VoiceLabSession.shared
+    @ObservedObject private var voiceStore = VoiceModelStore.shared
 
     /// Anything that could start the model process mid-update: running,
     /// starting, or idle-unloaded (the next request reloads it).
@@ -1291,6 +1295,19 @@ struct UpdatesPane: View {
                     Text("Stop the server to update the runtime.").font(.caption).foregroundStyle(.secondary)
                 }
             }
+            if voiceLab || audioRuntime.hasVenv {
+                Section("mlx-audio runtime") {
+                    LabeledContent {
+                        Text(shortRef(AudioRuntime.mlxAudioCommit)).font(.system(.body, design: .monospaced))
+                    } label: {
+                        SettingLabel(title: "Pinned", help: "The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working.")
+                    }
+                    audioRuntimeStatus
+                    if audioBusy {
+                        Text("Stop Voice Lab and music generation to update it.").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
             Section("Maintenance") {
                 LabeledContent {
                     Button("Uninstall Runtime Data…", role: .destructive, action: uninstallRuntime)
@@ -1320,6 +1337,40 @@ struct UpdatesPane: View {
             }
         case .failed(let message):
             HStack { Text(message).foregroundStyle(.red).lineLimit(2); Spacer(); Button("Retry") { runtime.checkForUpdate() } }
+        }
+    }
+
+    /// Something running on the audio venv (or installing into it).
+    private var audioBusy: Bool {
+        voiceSession.isActive || chatTabs.music.isBusy || audioRuntime.isInstalling || voiceStore.isBusy
+    }
+
+    @ViewBuilder
+    private var audioRuntimeStatus: some View {
+        switch audioRuntime.updateState {
+        case .idle:
+            HStack {
+                Spacer()
+                Button("Reinstall") { audioRuntime.reinstall() }.disabled(audioBusy)
+                Button("Check for Updates") { audioRuntime.checkForUpdate() }.disabled(audioBusy)
+            }
+        case .checking, .updating:
+            HStack { Spacer(); ProgressView().controlSize(.small) }
+        case .upToDate:
+            HStack {
+                Text(audioRuntime.isInstalled ? "Up to date." : "Up to date; installed at the next voice or music start.").foregroundStyle(.secondary)
+                Spacer()
+                Button("Reinstall") { audioRuntime.reinstall() }.disabled(audioBusy)
+                Button("Check Again") { audioRuntime.checkForUpdate() }.disabled(audioBusy)
+            }
+        case .updateAvailable(let current, let latest):
+            HStack {
+                Text(current == latest ? "\(shortRef(current)) isn't installed yet" : "\(shortRef(current)) → \(shortRef(latest)) available")
+                Spacer()
+                Button(current == latest ? "Install" : "Update") { audioRuntime.applyUpdate(to: latest) }.disabled(audioBusy)
+            }
+        case .failed(let message):
+            HStack { Text(message).foregroundStyle(.red).lineLimit(2); Spacer(); Button("Retry") { audioRuntime.checkForUpdate() }.disabled(audioBusy) }
         }
     }
 
