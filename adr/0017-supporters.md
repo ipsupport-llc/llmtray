@@ -182,7 +182,7 @@ Settings > About can open it again.
    in place in App Store Connect (the user).
 4. **Founding Supporter is sold for the first 12 months after the App
    Store launch**, then removed from sale; buyers keep it for good
-   (decided here at the user's request). A founding tier that is always
+   (the user, 2026-09-29). A founding tier that is always
    on sale means nothing. Changing the window is a price-and-availability
    edit in App Store Connect, no app update.
 
