@@ -22,5 +22,7 @@ here; this is where the history lives.
 | [0014](0014-folder-tools.md) | Folder tools: listing, file info, moving and deleting in folders the user grants |
 | [0015](0015-telemetry.md) | Opt-in usage telemetry: one anonymous report a day, what's counted and what never is |
 | [0016](0016-voice.md) | Voice: a speech-to-speech Voice Lab first, then voice chat (push to talk, spoken answers) on the chat model |
+| [0017](0017-supporters.md) | Support LLMTray: optional tips (StoreKit IAP in the App Store build, GitHub Sponsors otherwise), opt-in supporters list moderated and signed by ipsupport-api; nothing locked |
+| [0018](0018-app-store-build.md) | A Mac App Store build beside the Developer ID one: every runtime bundled and signed, sandboxed, no Sparkle, StoreKit tips |
 
 New ADR: next number, one topic, the decision first, then why.
