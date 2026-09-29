@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ no se descargó: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ está restringido: acepta su licencia en huggingface.co/%@ y luego añade un token de Hugging Face en Ajustes → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ aún no está descargado: vuelve a activar la generación de imágenes en Ajustes.";
+"%@ isn't installed yet" = "%@ no está instalado todavía";
 "%@ wasn't found on Hugging Face." = "No se encontró %@ en Hugging Face.";
 "%@ · %@ left" = "%@ · quedan %@";
 "%@ · downloaded" = "%@ · descargado";
@@ -177,6 +178,7 @@
 "Check Again" = "Comprobar de nuevo";
 "Check Now" = "Comprobar ahora";
 "Check for Runtime Updates" = "Buscar actualizaciones del runtime";
+"Check for Updates" = "Comprobar actualizaciones";
 "Check for Updates…" = "Buscar actualizaciones…";
 "Check for updates automatically" = "Buscar actualizaciones automáticamente";
 "Checking the download…" = "Comprobando la descarga…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "Cancelación de eco";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "No se pudo iniciar la cancelación de eco: %@. Desactívala en Ajustes > Voz.";
 "Echo cancellation isn't available on this Mac." = "La cancelación de eco no está disponible en este Mac.";
+"Echo gate" = "Puerta de eco";
 "Edit Profile…" = "Editar perfil…";
 "Embedding model" = "Modelo de embeddings";
 "Enable Without It" = "Activar sin él";
@@ -391,6 +394,7 @@
 "Index Now" = "Indexar ahora";
 "Index the files that were stopped" = "Indexar los archivos que se detuvieron";
 "Indexing %1$lld of %2$lld files" = "Indexando %1$lld de %2$lld archivos";
+"Install" = "Instalar";
 "Install ID" = "ID de instalación";
 "Installed" = "Instalado";
 "Installing mflux…" = "Instalando mflux…";
@@ -632,6 +636,8 @@
 "Recovery" = "Recuperación";
 "Refused" = "Rechazadas";
 "Regenerate" = "Regenerar";
+"Reinstall" = "Reinstalar";
+"Reinstall failed: %@" = "Reinstalación fallida: %@";
 "Remove" = "Eliminar";
 "Remove %@" = "Eliminar %@";
 "Remove attachment" = "Quitar adjunto";
@@ -764,6 +770,7 @@
 "Stop" = "Detener";
 "Stop Indexing" = "Detener indexado";
 "Stop Server" = "Detener servidor";
+"Stop Voice Lab and music generation to update it." = "Detenga Voice Lab y la generación musical para actualizarlo.";
 "Stop Voice Lab first." = "Detén Voice Lab primero.";
 "Stop generating" = "Detener la generación";
 "Stop server (unload model)" = "Detener el servidor (descargar el modelo)";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "No se pudo iniciar el micrófono: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "El micrófono necesita el paquete de la app LLMTray (scripts/build_app.sh), no el binario aislado.";
 "The microphone's audio format isn't supported." = "El formato de audio del micrófono no es compatible.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "La versión de mlx-audio (un commit del fork propio de LLMTray) que ejecuta Voice Lab y la generación musical. Se instalará en el siguiente inicio de voz o música cuando cambie; sin conexión, la instalada seguirá funcionando.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "La versión de mlx-lm (un commit del fork propio de LLMTray) que ejecuta los modelos. Se actualiza aparte de la app.";
 "The model can make an image when you ask for one." = "El modelo puede crear una imagen cuando la pidas.";
 "The model didn't answer -- try again." = "El modelo no respondió — inténtalo de nuevo.";
@@ -939,10 +947,12 @@
 "Until %@" = "Hasta %@";
 "Up to date" = "Actualizado";
 "Up to date." = "Actualizado.";
+"Up to date; installed at the next voice or music start." = "Actualizado; se instalará en el siguiente inicio de voz o música.";
 "Update" = "Actualizar";
 "Update channel" = "Canal de actualizaciones";
 "Update channel: Beta" = "Canal de actualizaciones: Beta";
 "Update channel: Stable" = "Canal de actualizaciones: Stable";
+"Update failed: %@" = "Actualización fallida: %@";
 "Updates" = "Actualizaciones";
 "Usage statistics" = "Estadísticas de uso";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Las estadísticas de uso están desactivadas: no se envía nada. Así se vería un informe si las activaras (el ID se crea entonces).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Dónde LLMTray guarda sus modelos, una carpeta por modelo.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Dónde busca LLMTray los modelos MLX (una carpeta por modelo, p. ej. <org>/<name>). Usa ~/.lmstudio/models para compartir modelos con LM Studio.";
 "Which model generates new images." = "Qué modelo genera nuevas imágenes.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Mientras el modelo habla, el sonido del micrófono más silencioso que este umbral se considera silencio: el rastro de su propia voz que deja la cancelación de eco queda fuera; otra voz encima aún lo interrumpe. Auméntelo si el modelo se oye a sí mismo, redúzcalo si no detecta cuando usted interrumpe. Surte efecto en el siguiente inicio.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Memoria de trabajo para leer un prompt en trozos; menos hace que los prompts largos se lean en pasos más pequeños y lentos. Si la caché de prompts y esto suman como máximo 90%: el resto contiene el prompt que se está leyendo.";
 "Works offline" = "Funciona sin conexión";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "menos de un minuto restante";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS elimina la propia voz del modelo del micrófono (Procesamiento de voz, como en FaceTime), por lo que funciona con altavoces. También equaliza el nivel y atenúa el ruido de fondo. Surte efecto al reiniciar.";
 "make %lld folders" = "crear %lld carpetas";
+"mlx-audio runtime" = "Tiempo de ejecución de mlx-audio";
 "mlx-lm runtime" = "Entorno de ejecución de mlx-lm";
 "move %1$lld files into %2$lld folders" = "mover %1$lld archivos a %2$lld carpetas";
 "move %1$lld items into %2$lld folders" = "mover %1$lld elementos a %2$lld carpetas";
@@ -1043,6 +1055,7 @@
 "not indexed" = "no indexado";
 "not supported" = "no compatible";
 "not used by any model" = "no lo usa ningún modelo";
+"off" = "desactivado";
 "queued" = "en cola";
 "reading" = "leyendo";
 "reads images" = "lee imágenes";

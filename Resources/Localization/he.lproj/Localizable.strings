@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ לא הורד: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
+"%@ isn't installed yet" = "%@ עדיין לא מותקן";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
 "%@ · %@ left" = "%@ · נותרו %@";
 "%@ · downloaded" = "%@ · הורד";
@@ -177,6 +178,7 @@
 "Check Again" = "בדוק שוב";
 "Check Now" = "בדוק כעת";
 "Check for Runtime Updates" = "בדוק עדכוני זמן ריצה";
+"Check for Updates" = "בדוק עדכונים";
 "Check for Updates…" = "בדיקה אם יש עדכונים…";
 "Check for updates automatically" = "בדיקה אוטומטית אם יש עדכונים";
 "Checking the download…" = "בודק את ההורדה…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "הדחקת הד";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "לא ניתן להפעיל הדחקת הד: %@ — כבה אותה ב‑Settings > Voice.";
 "Echo cancellation isn't available on this Mac." = "הדחקת הד אינה זמינה במחשב Mac זה.";
+"Echo gate" = "שער הדהוד";
 "Edit Profile…" = "עריכת פרופיל…";
 "Embedding model" = "דגם הטמעה";
 "Enable Without It" = "הפעל בלעדיו";
@@ -391,6 +394,7 @@
 "Index Now" = "אונדקס עכשיו";
 "Index the files that were stopped" = "אונדקס את הקבצים שהופסקו";
 "Indexing %1$lld of %2$lld files" = "ממיין %1$lld מתוך %2$lld קבצים";
+"Install" = "התקן";
 "Install ID" = "מזהה התקנה";
 "Installed" = "מותקן";
 "Installing mflux…" = "מתקין/ה mflux…";
@@ -632,6 +636,8 @@
 "Recovery" = "התאוששות";
 "Refused" = "נדחו";
 "Regenerate" = "צור מחדש";
+"Reinstall" = "התקן שוב";
+"Reinstall failed: %@" = "ההתקנה מחדש נכשלה: %@";
 "Remove" = "הסר";
 "Remove %@" = "הסר %@";
 "Remove attachment" = "מסיר את הקובץ המצורף.";
@@ -764,6 +770,7 @@
 "Stop" = "עצור";
 "Stop Indexing" = "עצור אינדוקס";
 "Stop Server" = "עצור את השרת";
+"Stop Voice Lab and music generation to update it." = "עצור את Voice Lab ויצירת המוזיקה כדי לעדכן אותו.";
 "Stop Voice Lab first." = "עצור קודם את Voice Lab.";
 "Stop generating" = "עוצר את היצירה.";
 "Stop server (unload model)" = "עוצר את השרת ופורק את המודל.";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "לא ניתן להפעיל את המיקרופון: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "המיקרופון דורש את חבילת ה‑app של LLMTray (scripts/build_app.sh), לא הבינארי בלבד.";
 "The microphone's audio format isn't supported." = "פורמט האודיו של המיקרופון אינו נתמך.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "גרסת mlx-audio (קומיט של ה‑fork של LLMTray) שמריצה את Voice Lab ויצירת מוזיקה. תותקן בהפעלה הבאה של קול או מוזיקה כשיש שינוי; במצב לא מקוון הגרסה המותקנת תמשיך לעבוד.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "גרסת mlx-lm (commit מה‑fork של LLMTray עצמו) שמריצה את המודלים. מתעדכנת בנפרד מהיישום.";
 "The model can make an image when you ask for one." = "המודל יכול ליצור תמונה כשאתה מבקש.";
 "The model didn't answer -- try again." = "המודל לא השיב — נסה שוב.";
@@ -939,10 +947,12 @@
 "Until %@" = "עד %@";
 "Up to date" = "מעודכן";
 "Up to date." = "מעודכן.";
+"Up to date; installed at the next voice or music start." = "מעודכן; יותקן בהפעלה הבאה של קול או מוזיקה.";
 "Update" = "עדכן";
 "Update channel" = "ערוץ עדכונים";
 "Update channel: Beta" = "ערוץ עדכונים: Beta";
 "Update channel: Stable" = "ערוץ עדכונים: Stable";
+"Update failed: %@" = "העדכון נכשל: %@";
 "Updates" = "עדכונים";
 "Usage statistics" = "סטטיסטיקות שימוש";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "סטטיסטיקת שימוש כבויה: לא נשלח דבר. כך ייראה דוח אם תפעילו אותן (ה‑ID יוּצר אז).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "המיקום שבו LLMTray שומר את המודלים שלו, תיקייה אחת לכל מודל.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "המיקום שבו LLMTray מחפש מודלי MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). אפשר להפנות אותו אל ~/.lmstudio/models כדי לשתף מודלים עם LM Studio.";
 "Which model generates new images." = "איזה מודל יוצר תמונות חדשות.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "בעת דיבור המודל, צליל מהמיקרופון שחלש מ‑זה ייתפס כשתיקה: שארית הקול שהסרת הדהוד משאירה תישאר מחוץ, וקול מעליה עדיין יפריע. הגדל אם המודל שומע את עצמו, הקטן אם הוא מפספס את ההפרעות שלך. ייכנס לתוקף בהפעלה הבאה.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
 "Works offline" = "עובד ללא חיבור";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "פחות מדקה נותרה";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS מסיר את קול המודל מהמיקרופון (Voice Processing, כמו ב‑FaceTime), לכן זה עובד עם רמקולים. כמו כן הוא מאזן עוצמה ומכווץ רעשי רקע. ייכנס לתוקף בהפעלה הבאה.";
 "make %lld folders" = "צור %lld תיקיות";
+"mlx-audio runtime" = "זמן ריצה של mlx-audio";
 "mlx-lm runtime" = "זמן ריצה של mlx-lm";
 "move %1$lld files into %2$lld folders" = "העבר %1$lld קבצים אל %2$lld תיקיות";
 "move %1$lld items into %2$lld folders" = "העבר %1$lld פריטים אל %2$lld תיקיות";
@@ -1043,6 +1055,7 @@
 "not indexed" = "לא מאונדקס";
 "not supported" = "לא נתמך";
 "not used by any model" = "לא בשימוש של אף מודל";
+"off" = "מכובה";
 "queued" = "בתור";
 "reading" = "קורא";
 "reads images" = "קורא תמונות";

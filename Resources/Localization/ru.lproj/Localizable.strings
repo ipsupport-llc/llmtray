@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@ не загрузился: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ закрыт: примите его лицензию на huggingface.co/%@, затем добавьте токен Hugging Face в Настройки → Models.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ещё не загружен — снова включите генерацию изображений в Настройках.";
+"%@ isn't installed yet" = "%@ ещё не установлен";
 "%@ wasn't found on Hugging Face." = "%@ не найден на Hugging Face.";
 "%@ · %@ left" = "%@ · осталось %@";
 "%@ · downloaded" = "%@ · загружено";
@@ -177,6 +178,7 @@
 "Check Again" = "Проверить снова";
 "Check Now" = "Проверить сейчас";
 "Check for Runtime Updates" = "Проверить обновления рантайма";
+"Check for Updates" = "Проверить обновления";
 "Check for Updates…" = "Проверить обновления…";
 "Check for updates automatically" = "Проверять обновления автоматически";
 "Checking the download…" = "Проверяется загрузка…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "Ш подавление эха";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не удалось запустить подавление эха: %@ — отключите в «Настройки» > «Голос».";
 "Echo cancellation isn't available on this Mac." = "Подавление эха недоступно на этом Mac.";
+"Echo gate" = "Echo gate";
 "Edit Profile…" = "Редактировать профиль…";
 "Embedding model" = "Модель эмбеддингов";
 "Enable Without It" = "Включить без неё";
@@ -391,6 +394,7 @@
 "Index Now" = "Проиндексировать сейчас";
 "Index the files that were stopped" = "Проиндексировать остановленные файлы";
 "Indexing %1$lld of %2$lld files" = "Индексация %1$lld из %2$lld файлов";
+"Install" = "Установить";
 "Install ID" = "ID установки";
 "Installed" = "Установлен";
 "Installing mflux…" = "Установка mflux…";
@@ -632,6 +636,8 @@
 "Recovery" = "Восстановление";
 "Refused" = "Отклонено";
 "Regenerate" = "Сгенерировать заново";
+"Reinstall" = "Переустановить";
+"Reinstall failed: %@" = "Переустановка не удалась: %@";
 "Remove" = "Удалить";
 "Remove %@" = "Удалить %@";
 "Remove attachment" = "Убрать вложение";
@@ -764,6 +770,7 @@
 "Stop" = "Остановить";
 "Stop Indexing" = "Остановить индексацию";
 "Stop Server" = "Остановить сервер";
+"Stop Voice Lab and music generation to update it." = "Остановите Voice Lab и генерацию музыки для обновления.";
 "Stop Voice Lab first." = "Сначала остановите Voice Lab.";
 "Stop generating" = "Остановить генерацию";
 "Stop server (unload model)" = "Остановить сервер (выгрузить модель)";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "Не удалось запустить микрофон: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "Микрофону нужен пакет приложения LLMTray (scripts/build_app.sh), а не голый бинарник.";
 "The microphone's audio format isn't supported." = "Аудиоформат микрофона не поддерживается.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Версия mlx-audio (коммит форка LLMTray), которая запускает Voice Lab и генерацию музыки. При изменении будет установлена при следующем запуске голосовых или музыкальных функций; в офлайне установленная версия продолжит работать.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "Версия mlx-lm (коммит собственного форка LLMTray), на которой работают модели. Обновляется отдельно от приложения.";
 "The model can make an image when you ask for one." = "Модель может сгенерировать изображение по запросу.";
 "The model didn't answer -- try again." = "Модель не ответила — попробуйте ещё раз.";
@@ -939,10 +947,12 @@
 "Until %@" = "До %@";
 "Up to date" = "Актуально";
 "Up to date." = "Актуальная версия.";
+"Up to date; installed at the next voice or music start." = "Актуально; будет установлено при следующем запуске голосовых или музыкальных функций.";
 "Update" = "Обновить";
 "Update channel" = "Канал обновлений";
 "Update channel: Beta" = "Канал обновлений: Beta";
 "Update channel: Stable" = "Канал обновлений: Stable";
+"Update failed: %@" = "Обновление не удалось: %@";
 "Updates" = "Обновления";
 "Usage statistics" = "Статистика использования";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Статистика использования отключена: ничего не отправляется. Так выглядел бы отчёт при включении (ID формируется тогда).";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Где LLMTray хранит модели — по папке на каждую модель.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Где LLMTray ищет MLX-модели (по папке на модель, например <org>/<name>). Укажите ~/.lmstudio/models, чтобы делить модели с LM Studio.";
 "Which model generates new images." = "Какая модель генерирует новые изображения.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "Пока модель говорит, звук микрофона тише этого уровня воспринимается как тишина: следы собственного голоса, которые остаются после удаления эха, не учитываются, но по‑прежнему можно прерывать речь голосом. Повышайте, если модель слышит себя; понижайте, если она не замечает ваши прерывания. Вступает в силу при следующем запуске.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Рабочая память для поэтапного чтения подсказки; меньше значит чтение длинных подсказок меньшими, более медленными блоками. Если кеш подсказок и это вместе не превышают 90%: остаток держит текущую читаемую подсказку.";
 "Works offline" = "Работает офлайн";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "осталось меньше минуты";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS удаляет собственный голос модели из микрофона (Voice Processing, как в FaceTime), поэтому подавление эха работает с динамиками. Также выравнивает уровень и подавляет фоновый шум. Вступит в силу при следующем запуске.";
 "make %lld folders" = "создать %lld папок";
+"mlx-audio runtime" = "mlx-audio runtime";
 "mlx-lm runtime" = "Среда выполнения mlx-lm";
 "move %1$lld files into %2$lld folders" = "переместить %1$lld файлов в %2$lld папок";
 "move %1$lld items into %2$lld folders" = "переместить %1$lld элементов в %2$lld папок";
@@ -1043,6 +1055,7 @@
 "not indexed" = "не индексировано";
 "not supported" = "не поддерживается";
 "not used by any model" = "не используется ни одной моделью";
+"off" = "выкл.";
 "queued" = "в очереди";
 "reading" = "чтение";
 "reads images" = "читает изображения";

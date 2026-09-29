@@ -19,6 +19,7 @@
 "%@ didn't download: %@" = "%@를 다운로드하지 못함: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@은(는) 접근 제한됨: huggingface.co/%@에서 사용권에 동의한 뒤 설정 → Models에 Hugging Face 토큰을 추가하세요.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@이(가) 아직 다운로드되지 않았습니다 — 설정에서 이미지 생성을 다시 활성화하세요.";
+"%@ isn't installed yet" = "%@이(가) 아직 설치되어 있지 않습니다";
 "%@ wasn't found on Hugging Face." = "Hugging Face에서 %@을(를) 찾을 수 없습니다.";
 "%@ · %@ left" = "%@ · %@ 남음";
 "%@ · downloaded" = "%@ · 다운로드됨";
@@ -177,6 +178,7 @@
 "Check Again" = "다시 확인";
 "Check Now" = "지금 확인";
 "Check for Runtime Updates" = "런타임 업데이트 확인";
+"Check for Updates" = "업데이트 확인";
 "Check for Updates…" = "업데이트 확인…";
 "Check for updates automatically" = "업데이트 자동 확인";
 "Checking the download…" = "다운로드를 확인하는 중…";
@@ -275,6 +277,7 @@
 "Echo cancellation" = "에코 제거";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "에코 제거를 시작할 수 없습니다: %@ — 설정 > 음성에서 끄세요.";
 "Echo cancellation isn't available on this Mac." = "이 Mac에서는 에코 제거를 사용할 수 없습니다.";
+"Echo gate" = "에코 게이트";
 "Edit Profile…" = "프로파일 편집…";
 "Embedding model" = "임베딩 모델";
 "Enable Without It" = "없어도 활성화";
@@ -391,6 +394,7 @@
 "Index Now" = "지금 인덱스";
 "Index the files that were stopped" = "중단된 파일 인덱스하기";
 "Indexing %1$lld of %2$lld files" = "%2$lld개 중 %1$lld개 파일 인덱스 중";
+"Install" = "설치";
 "Install ID" = "설치 ID";
 "Installed" = "설치됨";
 "Installing mflux…" = "mflux 설치 중…";
@@ -632,6 +636,8 @@
 "Recovery" = "복구";
 "Refused" = "거부됨";
 "Regenerate" = "다시 생성";
+"Reinstall" = "재설치";
+"Reinstall failed: %@" = "재설치 실패: %@";
 "Remove" = "제거";
 "Remove %@" = "%@ 제거";
 "Remove attachment" = "첨부 파일을 제거합니다.";
@@ -764,6 +770,7 @@
 "Stop" = "중지";
 "Stop Indexing" = "인덱스 중지";
 "Stop Server" = "서버 중지";
+"Stop Voice Lab and music generation to update it." = "업데이트하려면 Voice Lab과 음악 생성 기능을 중지하세요.";
 "Stop Voice Lab first." = "먼저 Voice Lab을 중지하세요.";
 "Stop generating" = "생성을 중지합니다.";
 "Stop server (unload model)" = "서버를 중지하고 모델을 언로드합니다.";
@@ -829,6 +836,7 @@
 "The microphone couldn't start: %@" = "마이크를 시작할 수 없음: %@";
 "The microphone needs the LLMTray app bundle (scripts/build_app.sh), not the bare binary." = "마이크는 LLMTray 앱 번들(scripts/build_app.sh)을 필요로 하며, 바이너리 단독으로는 작동하지 않습니다.";
 "The microphone's audio format isn't supported." = "마이크 오디오 형식이 지원되지 않습니다.";
+"The mlx-audio version (a commit of LLMTray's own fork) that runs Voice Lab and music generation. Installed at the next voice or music start when it changes; offline, the installed one keeps working." = "Voice Lab과 음악 생성을 실행하는 mlx-audio 버전(LLMTray 자체 포크의 커밋). 변경 시 다음 음성 또는 음악 시작 시 설치됩니다. 오프라인일 때는 이미 설치된 것이 계속 작동합니다.";
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "모델을 실행하는 mlx-lm 버전(LLMTray 자체 포크의 커밋)입니다. 앱과 별도로 업데이트됩니다.";
 "The model can make an image when you ask for one." = "모델은 요청 시 이미지를 생성할 수 있습니다.";
 "The model didn't answer -- try again." = "모델이 응답하지 않았습니다 — 다시 시도하세요.";
@@ -939,10 +947,12 @@
 "Until %@" = "%@까지";
 "Up to date" = "최신 상태";
 "Up to date." = "최신 상태입니다.";
+"Up to date; installed at the next voice or music start." = "최신 상태입니다. 다음 음성 또는 음악 시작 시 설치됩니다.";
 "Update" = "업데이트";
 "Update channel" = "업데이트 채널";
 "Update channel: Beta" = "업데이트 채널: Beta";
 "Update channel: Stable" = "업데이트 채널: Stable";
+"Update failed: %@" = "업데이트 실패: %@";
 "Updates" = "업데이트";
 "Usage statistics" = "사용 통계";
 "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "사용 통계가 꺼져 있어 아무 것도 전송되지 않습니다. 사용 통계를 켰을 때 보고서가 어떻게 보이는지(그때 ID가 생성됨)를 표시합니다.";
@@ -998,6 +1008,7 @@
 "Where LLMTray keeps its models, one folder per model." = "LLMTray가 모델을 보관하는 위치로, 모델별로 하나의 폴더가 생성됩니다.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
 "Which model generates new images." = "어떤 모델이 새 이미지를 생성할지 선택합니다.";
+"While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "모델이 말하는 동안 이 값보다 더 작은 마이크 소리는 무음으로 처리됩니다. 에코 제거가 남긴 자기 목소리의 흔적은 제외되지만, 다른 사람이 말하면 여전히 끼어듭니다. 모델이 자기 목소리를 들으면 값을 올리고, 사용자의 끼어들기를 인식하지 못하면 값을 낮추세요. 다음 시작 시 적용됩니다.";
 "Wikipedia" = "Wikipedia";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "프롬프트를 청크로 읽을 때 사용할 작업 메모리입니다. 값을 작게 하면 긴 프롬프트를 더 작고 느린 단계로 읽습니다. 프롬프트 캐시와 합쳐 최대 90%일 때 나머지가 현재 읽는 프롬프트를 보관합니다.";
 "Works offline" = "오프라인 작동";
@@ -1034,6 +1045,7 @@
 "less than a minute left" = "1분 미만 남음";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS가 마이크에서 모델 자신의 음성을 제거합니다(Voice Processing—FaceTime과 동일), 따라서 스피커에서도 작동합니다. 또한 레벨을 평준화하고 배경 소음을 억제합니다. 다음 시작 시 적용됩니다.";
 "make %lld folders" = "%lld개 폴더 생성";
+"mlx-audio runtime" = "mlx-audio 런타임";
 "mlx-lm runtime" = "mlx-lm 런타임";
 "move %1$lld files into %2$lld folders" = "%1$lld개 파일을 %2$lld개 폴더로 이동";
 "move %1$lld items into %2$lld folders" = "%1$lld개 항목을 %2$lld개 폴더로 이동";
@@ -1043,6 +1055,7 @@
 "not indexed" = "인덱스되지 않음";
 "not supported" = "지원되지 않음";
 "not used by any model" = "어떤 모델에서도 사용되지 않음";
+"off" = "끔";
 "queued" = "대기 중";
 "reading" = "읽는 중";
 "reads images" = "이미지 읽음";
