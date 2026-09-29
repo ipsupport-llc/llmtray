@@ -272,6 +272,9 @@
 "Drop files here" = "將檔案放到此處";
 "Drop files here to add them to the project" = "將檔案放到此處以加入專案";
 "Duplicate this profile" = "複製此描述檔。";
+"Echo cancellation" = "迴聲消除";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "無法啟動迴聲消除：%@ — 請到「設定」>「語音」關閉。";
+"Echo cancellation isn't available on this Mac." = "此 Mac 無法使用迴聲消除。";
 "Edit Profile…" = "編輯描述檔…";
 "Embedding model" = "嵌入模型";
 "Enable Without It" = "無此仍可啟用";
@@ -579,6 +582,7 @@
 "Port: %lld" = "連接埠：%lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力快取的精度。8-bit：幾乎無損、記憶體用量減半。4-bit：記憶體用量為四分之一，但長上下文明顯較差。完整：最佳、記憶體用量最多。";
 "Prefill step" = "預填步驟";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "按下「開始」並說話。使用喇叭也能啟用迴聲消除，但耳機仍為最佳。";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "按「開始」並說話。請使用耳機：否則模型會聽到喇叭的聲音。";
 "Press Talk and speak." = "按「說話」並開始說。";
 "Press, talk, press again" = "按下、說話、再按一次";
@@ -739,6 +743,7 @@
 "Sort by" = "排序方式";
 "Source on GitHub" = "GitHub 原始碼";
 "Space the models in this folder take, and what's still free on its disk." = "此資料夾中模型佔用的空間，以及磁碟剩餘可用空間。";
+"Speakers work with echo cancellation; headphones are still best." = "使用喇叭也能啟用迴聲消除，但耳機仍為最佳。";
 "Speaking…" = "說話中…";
 "Speculative decoding (MTP)" = "推測性解碼 (MTP)";
 "Speed" = "速度";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "失敗：%@";
 "for this chat" = "用於此聊天室";
 "less than a minute left" = "剩餘不到一分鐘";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS 會從麥克風中移除模型自身的聲音（語音處理，如 FaceTime），因此在使用喇叭時也能運作。此外會平衡音量並抑制背景噪音。重新啟動後生效。";
 "make %lld folders" = "建立 %lld 個資料夾";
 "mlx-lm runtime" = "mlx-lm 執行階段";
 "move %1$lld files into %2$lld folders" = "將 %1$lld 個檔案移入 %2$lld 個資料夾";

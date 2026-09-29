@@ -272,6 +272,9 @@
 "Drop files here" = "Dateien hier ablegen";
 "Drop files here to add them to the project" = "Dateien hier ablegen, um sie dem Projekt hinzuzufügen";
 "Duplicate this profile" = "Dieses Profil duplizieren";
+"Echo cancellation" = "Echo-Unterdrückung";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ – schalten Sie sie unter „Einstellungen > Stimme“ aus.";
+"Echo cancellation isn't available on this Mac." = "Echo-Unterdrückung ist auf diesem Mac nicht verfügbar.";
 "Edit Profile…" = "Profil bearbeiten …";
 "Embedding model" = "Embedding‑Modell";
 "Enable Without It" = "Ohne Aktivieren zulassen";
@@ -579,6 +582,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Genauigkeit des Attention-Cache. 8 Bit: nahezu verlustfrei, halber Speicherbedarf. 4 Bit: ein Viertel, bei langem Kontext merklich schlechter. Voll: am besten, höchster Speicherbedarf.";
 "Prefill step" = "Prefill-Schritt";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Drücken Sie „Start“ und sprechen Sie. Lautsprecher funktionieren mit Echo-Unterdrückung; Kopfhörer sind weiterhin am besten.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Drücken Sie „Start“ und sprechen Sie. Verwenden Sie Kopfhörer: Das Modell hört seine eigene Stimme über die Lautsprecher.";
 "Press Talk and speak." = "Drücken Sie „Sprechen“ und sprechen Sie.";
 "Press, talk, press again" = "Drücken, sprechen, erneut drücken";
@@ -739,6 +743,7 @@
 "Sort by" = "Sortieren nach";
 "Source on GitHub" = "Quellcode auf GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Platz, den die Modelle in diesem Ordner belegen, und wie viel auf der Festplatte noch frei ist.";
+"Speakers work with echo cancellation; headphones are still best." = "Lautsprecher funktionieren mit Echo-Unterdrückung; Kopfhörer sind weiterhin am besten.";
 "Speaking…" = "Spreche…";
 "Speculative decoding (MTP)" = "Spekulatives Decoding (MTP)";
 "Speed" = "Geschwindigkeit";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "fehlgeschlagen: %@";
 "for this chat" = "für diesen Chat";
 "less than a minute left" = "weniger als eine Minute verbleibend";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS entfernt die vom Modell stammende Stimme aus dem Mikrofon (Voice Processing, wie bei FaceTime), sodass es mit Lautsprechern funktioniert. Außerdem gleicht es die Lautstärke an und dämpft Hintergrundgeräusche. Wird beim nächsten Start wirksam.";
 "make %lld folders" = "%lld Ordner erstellen";
 "mlx-lm runtime" = "mlx-lm-Laufzeit";
 "move %1$lld files into %2$lld folders" = "%1$lld Dateien in %2$lld Ordner verschieben";

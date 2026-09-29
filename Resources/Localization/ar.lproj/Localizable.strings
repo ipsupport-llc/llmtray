@@ -272,6 +272,9 @@
 "Drop files here" = "إفلت الملفات هنا";
 "Drop files here to add them to the project" = "إفلت الملفات هنا لإضافتها إلى المشروع";
 "Duplicate this profile" = "ينشئ نسخة من ملف التعريف هذا.";
+"Echo cancellation" = "إلغاء الصدى";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "تعذر بدء إلغاء الصدى: %@ — أوقفه في الإعدادات > الصوت.";
+"Echo cancellation isn't available on this Mac." = "إلغاء الصدى غير متاح على هذا الـ Mac.";
 "Edit Profile…" = "تحرير ملف التعريف…";
 "Embedding model" = "نموذج التضمين";
 "Enable Without It" = "تفعيل بدون ذلك";
@@ -579,6 +582,7 @@
 "Port: %lld" = "المنفذ: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "دقة ذاكرة الانتباه المؤقتة. 8 بت: شبه عديم الفقدان، بنصف الذاكرة. 4 بت: ربع الذاكرة، وأسوأ بوضوح مع السياق الطويل. كاملة: الأفضل، وتستهلك أكبر قدر من الذاكرة.";
 "Prefill step" = "خطوة الملء المسبق";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "اضغط بدء وتكلم. السماعات تعمل مع إلغاء الصدى؛ لكن سماعات الرأس لا تزال الأفضل.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "اضغط ابدأ وتكلم. استخدم سماعات رأس: النموذج يسمع صوته من مكبرات الصوت.";
 "Press Talk and speak." = "اضغط \"تكلم\" وتحدث.";
 "Press, talk, press again" = "اضغط، تكلم، اضغط مرة أخرى";
@@ -739,6 +743,7 @@
 "Sort by" = "فرز حسب";
 "Source on GitHub" = "المصدر على GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "المساحة التي تشغلها النماذج في هذا المجلد، والمساحة المتبقية الحرة على قرصه.";
+"Speakers work with echo cancellation; headphones are still best." = "تعمل السماعات مع إلغاء الصدى؛ لكن سماعات الرأس لا تزال الأفضل.";
 "Speaking…" = "قيد التحدُّث…";
 "Speculative decoding (MTP)" = "فك الترميز التخميني (MTP)";
 "Speed" = "السرعة";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "فشل: %@";
 "for this chat" = "لهذه الدردشة";
 "less than a minute left" = "أقل من دقيقة متبقية";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "يقوم macOS بإزالة صوت النموذج من الميكروفون (معالجة الصوت، كما في FaceTime)، لذا يعمل على السماعات. كما يُوازن مستوى الصوت ويخفف الضوضاء الخلفية. يسري مفعوله بعد إعادة البدء.";
 "make %lld folders" = "إنشاء %lld مجلدات";
 "mlx-lm runtime" = "بيئة تشغيل mlx-lm";
 "move %1$lld files into %2$lld folders" = "نقل %1$lld ملفات إلى %2$lld مجلدات";

@@ -272,6 +272,9 @@
 "Drop files here" = "将文件拖到此处";
 "Drop files here to add them to the project" = "将文件拖到此处以添加到项目";
 "Duplicate this profile" = "复制此配置";
+"Echo cancellation" = "回声消除";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "回声消除无法启动：%@ —— 请在「设置」>「语音」中将其关闭。";
+"Echo cancellation isn't available on this Mac." = "此 Mac 不支持回声消除。";
 "Edit Profile…" = "编辑配置…";
 "Embedding model" = "嵌入模型";
 "Enable Without It" = "在没有它的情况下启用";
@@ -579,6 +582,7 @@
 "Port: %lld" = "端口：%lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "注意力缓存的精度。8-bit：几乎无损，内存占用减半。4-bit：内存占用约为四分之一，长上下文下明显变差。完整精度：效果最佳，内存占用最多。";
 "Prefill step" = "预填充步长";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "按「开始」并说话。使用回声消除时扬声器可用，但耳机仍是最佳选择。";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "按“开始”并说话。使用耳机：模型不会从扬声器听到自身声音。";
 "Press Talk and speak." = "按“说话”并发言。";
 "Press, talk, press again" = "按下，讲话，再次按下";
@@ -739,6 +743,7 @@
 "Sort by" = "排序方式";
 "Source on GitHub" = "在 GitHub 上查看源码";
 "Space the models in this folder take, and what's still free on its disk." = "该文件夹中模型占用的空间及磁盘剩余可用空间。";
+"Speakers work with echo cancellation; headphones are still best." = "使用回声消除时扬声器可用，但耳机仍是最佳选择。";
 "Speaking…" = "正在说话…";
 "Speculative decoding (MTP)" = "推测解码（MTP）";
 "Speed" = "速度";
@@ -1027,6 +1032,7 @@
 "failed: %@" = "失败：%@";
 "for this chat" = "仅限此聊天";
 "less than a minute left" = "剩余不足 1 分钟";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS 会从麦克风中去除模型自身的音声（语音处理，类似 FaceTime），因此在使用扬声器时也有效。它还能平衡音量并抑制背景噪声。下次启动后生效。";
 "make %lld folders" = "创建 %lld 个文件夹";
 "mlx-lm runtime" = "mlx-lm 运行时";
 "move %1$lld files into %2$lld folders" = "将 %1$lld 个文件移入 %2$lld 个文件夹";
