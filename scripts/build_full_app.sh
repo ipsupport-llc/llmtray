@@ -156,7 +156,7 @@ FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses
 "$VENV_DIR/bin/python" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
 
 echo "--- re-signing app bundle with the added framework + venv ---"
-codesign --force --deep --sign - "$APP"
+"$SCRIPT_DIR/codesign_app.sh" "$APP"
 
 rm -rf "$WORK_DIR"
 echo "--- full runtime vendored into $APP ---"

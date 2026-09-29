@@ -1,11 +1,13 @@
 name: Release
 
 # Builds LLMTray.app and attaches it (as a drag-to-Applications .dmg) to a
-# GitHub Release whenever a version tag is pushed. Ad-hoc signed only (no
-# Developer ID/notarization secrets configured) -- users launch it once via
-# "Open Anyway" in Privacy & Security (macOS 15+; right-click > Open before)
-# to clear Gatekeeper, same as any unsigned/ad-hoc app
-# from outside the App Store.
+# GitHub Release whenever a version tag is pushed. Signed with IPSupport
+# LLC's Developer ID (hardened runtime) and notarized + stapled, so
+# Gatekeeper opens it with no "Open Anyway" -- when the signing secrets are
+# set (DEVELOPER_ID_P12_BASE64, DEVELOPER_ID_P12_PASSWORD, NOTARY_KEY_P8_BASE64,
+# NOTARY_KEY_ID, NOTARY_ISSUER_ID). Without them (a fork) it stays ad-hoc,
+# as before. The certificate lives only in a throwaway keychain and the API
+# key only in a runner temp file, both removed at the end whatever happens.
 #
 # Produces two DMGs from the same build: LLMTray.dmg (thin -- bootstraps
 # mlx-lm via pip on first launch) and LLMTray-Full.dmg (same app with an
@@ -48,16 +50,58 @@ jobs:
       - uses: actions/checkout@v4
       - name: Derive version from tag
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      # The Developer ID certificate into a keychain of this job only; the
+      # notary API key into a 0600 temp file. Neither is ever printed.
+      - name: Set up signing
+        env:
+          P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+          NOTARY_KEY_P8_BASE64: ${{ secrets.NOTARY_KEY_P8_BASE64 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: |
+          if [[ -z "$P12_BASE64" ]]; then
+            echo "no signing secrets: ad-hoc build"
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 24)"
+          echo "::add-mask::$KEYCHAIN_PASSWORD"
+          umask 077
+          printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/developer_id.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/developer_id.p12" -k "$KEYCHAIN" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          rm -f "$RUNNER_TEMP/developer_id.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | sed -n 's/.*"\(Developer ID Application: [^"]*\)".*/\1/p' | head -1)"
+          [[ -n "$IDENTITY" ]] || { echo "error: no Developer ID Application identity in the certificate" >&2; exit 1; }
+          printf '%s' "$NOTARY_KEY_P8_BASE64" | base64 --decode > "$RUNNER_TEMP/notary_key.p8"
+          {
+            echo "SIGN_IDENTITY=$IDENTITY"
+            echo "SIGNING_KEYCHAIN=$KEYCHAIN"
+            echo "NOTARY_KEY_PATH=$RUNNER_TEMP/notary_key.p8"
+            echo "NOTARY_KEY_ID=$NOTARY_KEY_ID"
+            echo "NOTARY_ISSUER_ID=$NOTARY_ISSUER_ID"
+          } >> "$GITHUB_ENV"
+          echo "signing as: $IDENTITY"
       - name: Build LLMTray.app
         run: ./scripts/build_app.sh
         env:
           VERSION: ${{ env.VERSION }}
       - name: Build DMG (thin)
         run: ./scripts/build_dmg.sh
+      - name: Notarize DMG (thin)
+        run: ./scripts/notarize.sh .build/app/LLMTray.dmg
       - name: Vendor full runtime into LLMTray.app
         run: ./scripts/build_full_app.sh
       - name: Build DMG (full)
         run: ./scripts/build_dmg.sh LLMTray-Full.dmg
+      - name: Notarize DMG (full)
+        run: ./scripts/notarize.sh .build/app/LLMTray-Full.dmg
+      # After stapling: stapling changes the DMG Sparkle signs.
       - name: Sign for Sparkle (writes LLMTray.dmg.sparkle.json)
         run: ./scripts/sign_release.sh
         env:
@@ -99,3 +143,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main
+      - name: Remove signing material
+        if: always()
+        run: |
+          [[ -n "${SIGNING_KEYCHAIN:-}" ]] && security delete-keychain "$SIGNING_KEYCHAIN" || true
+          rm -f "$RUNNER_TEMP/notary_key.p8" "$RUNNER_TEMP/developer_id.p12"

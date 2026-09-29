@@ -101,12 +101,9 @@ BUNDLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
 # into Contents/Frameworks at launch.
 install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/LLMTray"
 
-# Ad-hoc signing (no Developer ID here) -- enough for local use and for
-# Gatekeeper's "right-click Open" bypass; a real release build needs a
-# Developer ID cert + notarization on top of this. --deep resigns the
-# embedded framework and its nested XPC services too, not just the outer
-# app.
-codesign --force --deep --sign - "$APP"
+# Developer ID with SIGN_IDENTITY (hardened runtime, for notarization),
+# ad-hoc without it (local use; Gatekeeper's "right-click Open" bypass).
+"$SCRIPT_DIR/codesign_app.sh" "$APP"
 
 echo "--- built $APP ($VERSION) ---"
 
