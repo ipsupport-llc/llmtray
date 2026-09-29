@@ -65,7 +65,7 @@ struct VoicePane: View {
                 .labelsHidden()
                 .disabled(store.isBusy || session.isActive)
             } label: {
-                SettingLabel(title: "Voice model", help: "GPTQ 3-bit: IPSupport's build of the same model with a 3-bit language model -- smaller and faster, every test answer right. 4-bit: mlx-community's build. Each is downloaded only when you ask.")
+                SettingLabel(title: "Voice model", help: "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask.")
             }
             LabeledContent {
                 HStack {
