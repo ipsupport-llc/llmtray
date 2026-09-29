@@ -1,6 +1,6 @@
 # 0017 — Support LLMTray (tips, a supporters list)
 
-**Status: proposed** (2026-09-29, from the user's brief).
+**Status: accepted** (2026-09-29: the user's brief; the open questions answered by the user or decided here at the user's request).
 
 ## Why
 
@@ -34,10 +34,12 @@ The user's brief:
   digital goods inside an App Store app goes through IAP, so no external
   payment links in that build.
 - **Developer ID build** (GitHub, Sparkle): StoreKit IAP doesn't work
-  outside the App Store. This build gets the same **Support LLMTray**
-  window, but it links out to an external page (for example GitHub
-  Sponsors or a page on ipsupport.us; which one is open). The supporters
-  list is shared by both builds.
+  outside the App Store. This build's **Support LLMTray** section links to
+  **GitHub Sponsors** on the `ipsupport-llc` organization instead:
+  - one-time tiers of $5, $25 and $150, mirroring Coffee, Pro and Founding;
+  - no payment code in the app.
+
+  The supporters list is shared by both builds.
 
 ### 2. The products
 
@@ -82,35 +84,50 @@ Settings > About can open it again.
   nothing, and at most 40 characters.
 - **An optional link** (for example a website) is shown only if they add
   one; https only.
-- **What's sent:**
+- **What's sent, to `POST https://ipsupport.us/api/supporters`:**
   - the display name and the optional link;
   - the tier;
-  - the purchase's **StoreKit JWS** (`Transaction.jwsRepresentation`),
-    as proof of purchase.
+  - the proof of payment.
 
-  No Apple ID, no email, no device identifiers. The JWS carries Apple's
-  transaction id and the product, and nothing personal.
-- **Sent to a small submission endpoint.** The endpoint does three things:
-  1. It verifies the JWS: Apple's signature chain, our bundle id, the
-     product, not refunded (App Store Server API).
-  2. It keeps only a **salted hash** of the original transaction id. That
-     is enough to update or remove an entry, and to block duplicates.
-  3. It queues the entry for **manual approval**. A person reviews every
-     name before it's public (impersonation, slurs, spam links).
-- **After approval, a maintainer adds the entry to the manifest and signs
-  it.** No entry is ever published automatically.
+  No Apple ID, no email, no device identifiers.
+- **The proof of payment:**
+  - **App Store:** the purchase's StoreKit JWS
+    (`Transaction.jwsRepresentation`). It carries Apple's transaction id
+    and the product, and nothing personal.
+  - **GitHub Sponsors:** the sponsor's GitHub login, which is public
+    already.
+- **The server is `ipsupport-api`**, beside reviews and telemetry. Reviews
+  already have the whole moderation cycle this needs (its adr/0004–0006).
+  1. **It verifies the proof.**
+     - **For a JWS:** Apple's signature chain, our bundle id and product,
+       and not refunded (App Store Server API).
+     - **For a login:** an active or past sponsorship of `ipsupport-llc`
+       at that tier (GitHub GraphQL `sponsorshipsAsMaintainer`).
+  2. **It keeps only a salted hash** of the original transaction id or of
+     the login. That is enough to update or remove an entry, and to block
+     duplicates.
+  3. **It moderates the name and link** like a review:
+     - the asynchronous local-LLM check answers approve, reject or
+       escalate;
+     - an escalated one reaches the maintainer by email with signed
+       approve and reject links;
+     - rules: no impersonation, slurs, spam links or ads.
+  4. **It publishes only approved entries.** Nothing a purchase carries is
+     ever published automatically.
 - **Leaving the list.** The same sheet has *Remove my name*. It sends the
-  JWS again, and the entry is dropped at the next manifest release.
-  Refunded purchases are dropped too; the App Store Server Notifications
-  `REFUND` event triggers it.
+  proof again, and the entry is gone from the next response. Refunded
+  purchases are dropped too: App Store Server Notifications `REFUND`, and
+  a cancelled or refunded sponsorship on GitHub.
+- **Development builds never POST to production.** Like telemetry's
+  `LLMTRAY_TELEMETRY_ENDPOINT`, an `LLMTRAY_SUPPORTERS_ENDPOINT` points
+  them at a local server.
 
-### 5. The signed manifest
+### 5. The signed list
 
-- **Where it lives:**
-  - `supporters.json` is published with the site (GitHub Pages, next to
-    the appcast);
-  - a detached signature goes beside it as `supporters.json.sig`;
-  - a snapshot is bundled at build time.
+- **Where it comes from:**
+  - `ipsupport-api` serves `GET https://ipsupport.us/api/supporters?product=llmtray`;
+  - an app build carries a bundled snapshot (the release workflow fetches
+    and checks it).
 - **Format:**
   ```json
   {
@@ -122,14 +139,17 @@ Settings > About can open it again.
     ]
   }
   ```
-  `version` only goes up. The app ignores a manifest older than the one
-  it has, so an old copy can't be replayed to hide names.
-- **Signing:** Ed25519, the same kind of key Sparkle uses, but a
-  **separate key pair**.
+  `version` only goes up (the server bumps it on every change). The app
+  ignores a list older than the one it has, so an old copy can't be
+  replayed to hide names.
+- **Signing:**
+  - The response carries a detached Ed25519 signature of the exact body,
+    in an `X-Signature` header. The body is kept as served and never
+    re-encoded before checking.
+  - The API holds the private key: its own key, not Sparkle's, kept in
+    the cluster's secret store.
   - The public key ships in the app; the app checks it with CryptoKit
     `Curve25519.Signing`.
-  - The private key lives only in a GitHub secret. The Pages workflow
-    signs on publish.
   - If the signature is invalid or missing, the app keeps its cached or
     bundled copy.
 - **When the app refreshes it:**
@@ -137,8 +157,7 @@ Settings > About can open it again.
   - nothing is sent in the request: no identifiers and no cookies. The
     same rule as the update check ([0015](0015-telemetry.md): nothing
     leaves without consent).
-  - Opt-out: the existing "network features" rules apply; offline it is
-    simply not fetched.
+  - Offline, it is simply not fetched.
 - **Display:**
   - names are plain text, never rendered as markup;
   - links open in the browser only after a click, and only `https`;
@@ -151,37 +170,39 @@ Settings > About can open it again.
 - No leaderboard of amounts: the tier is shown, the amount isn't.
 - No automatic publishing of anything a purchase carries.
 
-## Open questions
+## Decided (were open)
 
-1. **Where the submission endpoint runs.** The bosun host is run by its
-   own agent and isn't ours to deploy to. A small serverless function
-   (Cloudflare Worker or similar) with a private queue is the simplest.
-   Needs the user's pick.
-2. **The Developer ID build's external tip page:** GitHub Sponsors,
-   Stripe Payment Links, or a page on ipsupport.us. The same listing flow
-   would need a proof of payment from that provider instead of a JWS.
-3. **Taxes and the business side:** the App Store pays out through IPSupport
-   LLC's agreements (Paid Apps agreement, banking, tax forms in App Store
-   Connect). This has to be in place before the products can be approved.
-4. **Whether Founding Supporter is limited in time** (for example, only
-   during the first year on the App Store). The brief doesn't say. A
-   `since` date keeps either possible.
+1. **Submission endpoint:** `ipsupport-api` (the user). It is a new
+   endpoint beside reviews and telemetry, and reuses the review
+   moderation.
+2. **The Developer ID build's tips:** GitHub Sponsors on `ipsupport-llc`,
+   one-time tiers (decided here: no payment code and no fees to build;
+   the listing proof is the public login).
+3. **Business side:** the Paid Apps agreement, banking and tax forms are
+   in place in App Store Connect (the user).
+4. **Founding Supporter is sold for the first 12 months after the App
+   Store launch**, then removed from sale; buyers keep it for good
+   (decided here at the user's request). A founding tier that is always
+   on sale means nothing. Changing the window is a price-and-availability
+   edit in App Store Connect, no app update.
 
 ## Steps
 
-1. This ADR accepted; the open questions answered.
-2. App Store Connect:
+1. **App Store Connect** (with the App Store build, [0018](0018-app-store-build.md)):
    - the three IAP products with review screenshots;
-   - the Paid Apps agreement;
+   - Founding's availability window;
    - a StoreKit configuration file for local testing.
-3. The manifest:
-   - `supporters.json` and the signing step in pages.yml, with a new
-     secret `SUPPORTERS_SIGNING_KEY`;
-   - the public key in the app;
-   - a verifier with tests: a good signature, a bad one, an older
-     version, a malformed file.
-4. The About section: tiers through StoreKit 2, Restore, the list with
-   Founding Supporters distinct, the offline fallback.
-5. The listing sheet and the endpoint (after open question 1): verify the
-   JWS, a hashed id, a manual approval queue, removal, refunds.
-6. The Developer ID build's external link (after open question 2).
+2. **`ipsupport-api`** (its own ADR in that repo):
+   - `POST /api/supporters`: JWS and GitHub verification, a hashed id,
+     review moderation, removal, refunds;
+   - `GET /api/supporters`: the signed list, monotonic `version`;
+   - the Ed25519 key in the cluster's secrets.
+3. **The app:**
+   - the verifier with tests: a good signature, a bad one, an older
+     version, a malformed body;
+   - the About section: StoreKit 2 tiers, Restore, the list with
+     Founding Supporters distinct, the offline fallback;
+   - the listing sheet;
+   - the Developer ID build's GitHub Sponsors link.
+4. **GitHub Sponsors** on `ipsupport-llc` with the three one-time tiers
+   (the user: the organization's Sponsors profile needs its owner).
