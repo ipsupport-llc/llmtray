@@ -208,7 +208,9 @@ final class MusicManager: ObservableObject {
         }
         // Its requirements changed since (an update: new pins, or voice's
         // additions): installed now, instead of refusing until Settings.
-        try await ensurePackagesInstalled()
+        // Offline with a venv already there, the installed one generates.
+        _ = try await AudioRuntime.shared.ensureInstalledOrKeep { [weak self] text in self?.statusText = text }
+        statusText = ""
         statusText = NSLocalizedString("Generating music…", comment: "")
         progress = 0
         var fields: [String: Any] = [

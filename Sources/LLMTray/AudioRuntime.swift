@@ -42,7 +42,24 @@ final class AudioRuntime: ObservableObject {
     /// and codec step (185 -> ~88 ms per 80 ms frame on a base M5 with
     /// the GPTQ-3 model). ab0b648 (fork PR #4): optional TTS/codec pause
     /// while the model is quiet (the runner's --tts-idle-frames).
-    static let mlxAudioCommit = "ab0b648b2ce6ad261e8bb3203e08b34680eec471"
+    static let bundledCommit = "ab0b648b2ce6ad261e8bb3203e08b34680eec471"
+
+    /// The commit in use: one picked by hand in Settings > Updates, while
+    /// it was picked over this build's own pin (a newer app's pin wins).
+    static var mlxAudioCommit: String {
+        guard let data = FileManager.default.contents(atPath: overridePath),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+              let ref = obj["pinned_ref"], obj["bundled_ref"] == bundledCommit
+        else { return bundledCommit }
+        return ref
+    }
+
+    private static var overridePath: String { RuntimePaths.externalRuntimeDir + "/audio_runtime_pin.json" }
+
+    static func setOverride(_ commit: String) throws {
+        let data = try JSONSerialization.data(withJSONObject: ["pinned_ref": commit, "bundled_ref": bundledCommit], options: [.prettyPrinted])
+        try data.write(to: URL(fileURLWithPath: overridePath), options: .atomic)
+    }
 
     /// mlx-audio with what both runners import. The voice models' part is
     /// mlx-audio's `sts` extras (pyproject.toml), listed here rather than
@@ -73,10 +90,30 @@ final class AudioRuntime: ObservableObject {
     /// brings them up to date before a run).
     var hasVenv: Bool { FileManager.default.isExecutableFile(atPath: Self.venvPython) }
 
+    /// The stamp's first line: the install method. Stamps written before
+    /// mlx-audio was force-reinstalled don't match, so those venvs (still
+    /// on an older fork commit, pip having kept it) install once more.
+    private static let stampHeader = "# llmtray audio runtime v2: mlx-audio force-reinstalled and checked"
+    private static var wantedStamp: String { ([stampHeader] + requirements).joined(separator: "\n") }
+
     /// The venv is there with exactly these requirements.
     var isInstalled: Bool {
         FileManager.default.isExecutableFile(atPath: Self.venvPython)
-            && Self.installedRequirements() == Self.requirements.joined(separator: "\n")
+            && Self.installedRequirements() == Self.wantedStamp
+    }
+
+    /// Before a run: `ensureInstalled`, but a working venv that can't be
+    /// brought up to date (offline, GitHub down) is kept -- the error comes
+    /// back for a log line instead of stopping the run. No venv at all
+    /// still throws.
+    func ensureInstalledOrKeep(status: ((String) -> Void)? = nil) async throws -> Error? {
+        do {
+            try await ensureInstalled(status: status)
+            return nil
+        } catch {
+            guard hasVenv else { throw error }
+            return error
+        }
     }
 
     private static func installedRequirements() -> String? {
@@ -114,11 +151,92 @@ final class AudioRuntime: ObservableObject {
             try await run(python, ["-m", "venv", Self.venvDir])
             try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"])
         }
-        let wanted = Self.requirements.joined(separator: "\n")
+        let wanted = Self.wantedStamp
         if Self.installedRequirements() != wanted {
             report(NSLocalizedString("Installing mlx-audio…", comment: ""))
             try await run(Self.venvPython, ["-m", "pip", "install", "--quiet"] + Self.requirements)
+            // Every fork commit has the same version number, so pip counts a
+            // new tarball URL as already satisfied and keeps the old code:
+            // replace the package itself, then check which commit it is.
+            try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", "--no-deps", Self.requirements[0]])
+            try await run(Self.venvPython, [
+                "-c",
+                """
+                import sys
+                from importlib.metadata import distribution
+                url = distribution("mlx-audio").read_text("direct_url.json") or ""
+                sys.exit(0 if "\(Self.mlxAudioCommit)" in url else "installed mlx-audio isn't \(Self.mlxAudioCommit): " + url)
+                """,
+            ])
             try wanted.write(toFile: Self.installStamp, atomically: true, encoding: .utf8)
+        }
+    }
+
+    // MARK: Updates (Settings > Updates, by hand)
+
+    enum UpdateState: Equatable {
+        case idle
+        case checking
+        case upToDate
+        case updateAvailable(current: String, latest: String)
+        case updating
+        case failed(String)
+    }
+
+    @Published private(set) var updateState: UpdateState = .idle
+    /// The fork branch the app's pins come from.
+    private static let trackedBranch = "llmtray"
+
+    /// Compares the commit in use with the fork branch's tip (GitHub API;
+    /// offline, it just fails -- nothing changes).
+    func checkForUpdate() {
+        updateState = .checking
+        Task {
+            do {
+                let url = URL(string: "https://api.github.com/repos/ipsupport-llc/mlx-audio/commits/\(Self.trackedBranch)")!
+                var request = URLRequest(url: url)
+                request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
+                let (data, _) = try await URLSession.shared.data(for: request)
+                guard let latest = (try JSONSerialization.jsonObject(with: data) as? [String: Any])?["sha"] as? String else {
+                    updateState = .failed("unexpected GitHub API response")
+                    return
+                }
+                let current = Self.mlxAudioCommit
+                updateState = latest == current && isInstalled ? .upToDate : .updateAvailable(current: current, latest: latest)
+            } catch {
+                updateState = .failed(error.localizedDescription)
+            }
+        }
+    }
+
+    /// Installs `commit` (the branch tip) and keeps it over this build's pin.
+    func applyUpdate(to commit: String) {
+        updateState = .updating
+        Task {
+            let previous = Self.mlxAudioCommit
+            do {
+                try Self.setOverride(commit)
+                try await ensureInstalled { _ in }
+                updateState = .upToDate
+            } catch {
+                try? Self.setOverride(previous)
+                updateState = .failed(String(format: NSLocalizedString("Update failed: %@", comment: ""), error.localizedDescription))
+            }
+        }
+    }
+
+    /// Installs the commit in use again from scratch (a venv that got out
+    /// of step): the stamp goes, so the full install with its check runs.
+    func reinstall() {
+        updateState = .updating
+        Task {
+            try? FileManager.default.removeItem(atPath: Self.installStamp)
+            do {
+                try await ensureInstalled { _ in }
+                updateState = .upToDate
+            } catch {
+                updateState = .failed(String(format: NSLocalizedString("Reinstall failed: %@", comment: ""), error.localizedDescription))
+            }
         }
     }
 

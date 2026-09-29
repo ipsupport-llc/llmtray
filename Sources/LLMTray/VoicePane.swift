@@ -16,6 +16,7 @@ struct VoicePane: View {
     @State private var partial = false
     @AppStorage(Pref.voiceLabMode) private var mode
     @AppStorage(Pref.voiceLabEchoCancellation) private var echoCancellation
+    @AppStorage(Pref.voiceLabEchoGateRMS) private var echoGate
     private var model: VoiceLabModel { store.selected }
 
     var body: some View {
@@ -41,6 +42,16 @@ struct VoicePane: View {
                     }
                     Toggle(isOn: $echoCancellation) {
                         SettingLabel(title: "Echo cancellation", help: "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.")
+                    }
+                    .disabled(session.isActive)
+                    LabeledContent {
+                        HStack {
+                            Slider(value: $echoGate, in: 0...0.05, step: 0.0025)
+                            Text(verbatim: echoGate > 0 ? String(format: "%.4f", echoGate) : NSLocalizedString("off", comment: "echo gate off"))
+                                .font(.system(.caption, design: .monospaced)).frame(width: 48, alignment: .trailing)
+                        }
+                    } label: {
+                        SettingLabel(title: "Echo gate", help: "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.")
                     }
                     .disabled(session.isActive)
                     Label(echoCancellation

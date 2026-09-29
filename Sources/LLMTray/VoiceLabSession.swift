@@ -159,9 +159,12 @@ final class VoiceLabSession: ObservableObject {
         }
         guard !stopRequested, run == generation else { return finish(run: run) }
         // Requirements changed since the download (an update): installed now.
+        // Offline (or GitHub down) with a venv already there: run on it.
         do {
-            try await AudioRuntime.shared.ensureInstalled { [weak self] text in
+            if let stale = try await AudioRuntime.shared.ensureInstalledOrKeep(status: { [weak self] text in
                 if !text.isEmpty, self?.generation == run { self?.phase = .preparing(text) }
+            }) {
+                appendLog("mlx-audio couldn't be updated, running the installed one: \(stale.localizedDescription)\n", run: run)
             }
         } catch {
             return fail(error.localizedDescription, run: run)
@@ -274,10 +277,13 @@ final class VoiceLabSession: ObservableObject {
         self.ready = ready
         applyMode()
         let meter = self.meter, gate = self.gate
+        let echoGate = EchoGate(threshold: Float(UserDefaults.standard[Pref.voiceLabEchoGateRMS]))
         let onFrame: (Data, Float) -> Void = { data, rms in
             meter.set(PCM16.meterLevel(rms: rms))
             // Walkie-talkie: only while the user talks.
-            if gate.isOpen { process.write(VoiceFrame(.audio, payload: data).encoded) }
+            guard gate.isOpen else { return }
+            let payload = echoGate.mutes(rms: rms) ? Data(count: data.count) : data
+            process.write(VoiceFrame(.audio, payload: payload).encoded)
         }
         let player: SpeechPlayer
         let mic: VoiceMicrophone
@@ -315,6 +321,7 @@ final class VoiceLabSession: ObservableObject {
                 output.play()
             }
             router.player = player
+            echoGate.player = player
         } catch {
             engine?.stop()
             router.player = nil
@@ -627,4 +634,22 @@ private final class LevelBox: @unchecked Sendable {
     private var value: Float = 0
     func set(_ v: Float) { lock.lock(); value = v; lock.unlock() }
     func get() -> Float { lock.lock(); defer { lock.unlock() }; return value }
+}
+
+/// Residual echo suppression: while the model's speech plays, a quiet
+/// microphone chunk -- what echo cancellation leaves of that speech --
+/// goes to the model as silence, so it doesn't take its own voice for the
+/// user's. A voice louder than the threshold still gets through (the user
+/// interrupting). Runs on the audio side's thread; `player` is set once.
+final class EchoGate: @unchecked Sendable {
+    let threshold: Float
+    weak var player: SpeechPlayer?
+
+    init(threshold: Float) {
+        self.threshold = threshold
+    }
+
+    func mutes(rms: Float) -> Bool {
+        EchoSuppression.mutes(rms: rms, threshold: threshold, modelSpeaking: player?.isSpeaking ?? false)
+    }
 }

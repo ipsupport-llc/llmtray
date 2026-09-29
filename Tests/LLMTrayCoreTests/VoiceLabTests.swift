@@ -35,6 +35,16 @@ final class VoiceLabTests: XCTestCase {
         XCTAssertEqual(VoiceLabModel.resolve(id: "gone-model") { _ in false }, .default)
     }
 
+    func testEchoSuppression() {
+        // Echo cancellation's residue of the model's voice: silenced while it speaks.
+        XCTAssertTrue(EchoSuppression.mutes(rms: 0.0008, threshold: 0.01, modelSpeaking: true))
+        // The user talking over it gets through.
+        XCTAssertFalse(EchoSuppression.mutes(rms: 0.05, threshold: 0.01, modelSpeaking: true))
+        // Not while the model is quiet, and not when turned off.
+        XCTAssertFalse(EchoSuppression.mutes(rms: 0.0008, threshold: 0.01, modelSpeaking: false))
+        XCTAssertFalse(EchoSuppression.mutes(rms: 0.0008, threshold: 0, modelSpeaking: true))
+    }
+
     func testUnknownLimit() {
         let fit = VoiceMemoryFit(voiceBytes: 15 * gb, chatBytes: 17 * gb, gpuLimitBytes: nil, physicalMemoryBytes: 26 << 30)
         XCTAssertEqual(fit.verdict, .unknown)

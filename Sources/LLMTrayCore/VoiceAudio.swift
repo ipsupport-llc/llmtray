@@ -203,3 +203,11 @@ public struct SpeechActivity: Sendable {
 
     public mutating func reset() { lastVoiced = nil }
 }
+
+/// Residual echo suppression's rule: while the model's speech plays, a
+/// microphone chunk quieter than `threshold` goes to the model as silence.
+public enum EchoSuppression {
+    public static func mutes(rms: Float, threshold: Float, modelSpeaking: Bool) -> Bool {
+        threshold > 0 && modelSpeaking && rms < threshold
+    }
+}
