@@ -18,7 +18,7 @@ The models run on your Mac. Only the optional web tools reach the internet.
   &nbsp;
   <a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg"><img src="https://img.shields.io/badge/Download-LLMTray--Full.dmg-2f7d4f?style=for-the-badge&logo=apple&logoColor=white" alt="Download LLMTray-Full.dmg"></a>
   <br>
-  <sub>Light — ~3MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~254MB, self-contained</sub>
+  <sub>Light — ~8MB, needs Python 3.10+ already on the machine &nbsp;·&nbsp; Full — ~270MB, self-contained</sub>
   <br><br>
   <a href="https://ipsupport-llc.github.io/llmtray/">ipsupport-llc.github.io/llmtray</a>
 </p>
@@ -47,11 +47,11 @@ The models run on your Mac. Only the optional web tools reach the internet.
 
 Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtray/releases/latest):
 
-- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~3MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
-- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~254MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
+- **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~8MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
+- **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~270MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
 
 1. Download one of the two above and drag it to Applications.
-2. First launch (this build isn't notarized): open it once, then **System Settings → Privacy & Security → "Open Anyway"** (macOS 15+; on macOS 14, right-click the app → Open also works). Or in Terminal: `xattr -dr com.apple.quarantine /Applications/LLMTray.app`.
+2. Open it. From 0.8.3 on, LLMTray is signed with IPSupport LLC's Developer ID and notarized by Apple, so it opens like any other app. (0.8.2 and earlier weren't. For those: open it once, then **System Settings → Privacy & Security → "Open Anyway"**, or in Terminal `xattr -dr com.apple.quarantine /Applications/LLMTray.app`.)
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
 The very first start creates the `mlx-lm` venv and installs our fork automatically (see [`runtime/`](./runtime)) — that takes a minute and shows progress in the server log window; every launch after that is instant. Changed your mind about the model? The small eject/play button next to the picker stops or restarts the server without needing to quit the app.
@@ -94,7 +94,7 @@ runtime/
 
 ## Status
 
-Working daily driver on a MacBook Air M5. Packaged as a `.app`/`.dmg` via [`scripts/build_app.sh`](./scripts/build_app.sh) and [`scripts/build_dmg.sh`](./scripts/build_dmg.sh), ad-hoc signed only -- Developer ID + notarization is the next milestone (see [Actions](../../actions) for CI build/release status).
+Working daily driver on a MacBook Air M5. Packaged as a `.app`/`.dmg` via [`scripts/build_app.sh`](./scripts/build_app.sh) and [`scripts/build_dmg.sh`](./scripts/build_dmg.sh), signed with IPSupport LLC's Developer ID (hardened runtime) and notarized by Apple from 0.8.3 on: every release is signed, notarized and stapled in CI ([`scripts/codesign_app.sh`](./scripts/codesign_app.sh), [`scripts/notarize.sh`](./scripts/notarize.sh); see [Actions](../../actions) for build/release status).
 
 ## License
 
