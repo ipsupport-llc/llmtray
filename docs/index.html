@@ -266,14 +266,14 @@
         <div class="cta-buttons">
           <a class="btn-download" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            <span>Download for macOS<span class="sub">Full · ~254MB · Python + mlx-lm inside, nothing else needed</span></span>
+            <span>Download for macOS<span class="sub">Full · ~270MB · Python + mlx-lm inside, nothing else needed</span></span>
           </a>
           <a class="btn-download alt" href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></svg>
-            <span>Download Light<span class="sub">~3MB · installs the mlx-lm runtime on first launch, needs Python 3.10+</span></span>
+            <span>Download Light<span class="sub">~8MB · installs the mlx-lm runtime on first launch, needs Python 3.10+</span></span>
           </a>
         </div>
-        <span class="cta-meta">macOS 14+ (Apple Silicon) · free · not notarized: allow it once in Privacy &amp; Security</span>
+        <span class="cta-meta">macOS 14+ (Apple Silicon) · free · signed and notarized by Apple from 0.8.3</span>
         <a class="secondary-link" href="https://github.com/ipsupport-llc/llmtray">View source on GitHub →</a>
       </div>
       <div class="badges">
@@ -355,7 +355,7 @@ export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code>
       <h2>Quick start</h2>
       <ol style="padding-left: 1.2rem; color: var(--fg-muted);">
         <li><a href="https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg">Download LLMTray</a> and drag it to Applications.</li>
-        <li>First launch (not notarized): open it once, then System Settings → Privacy &amp; Security → “Open Anyway” (macOS 15+; on macOS 14 right-click → Open also works). Or: <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.</li>
+        <li>Open it. From 0.8.3 on, LLMTray is signed by IPSupport LLC and notarized by Apple, so it opens like any other app. (0.8.2 and earlier weren't. For those: open it once, then System Settings → Privacy &amp; Security → “Open Anyway”, or <code>xattr -dr com.apple.quarantine /Applications/LLMTray.app</code>.)</li>
         <li>Click the brain icon in the menu bar and pick a model (or download one from Hugging Face in the app). The local server starts on its own, now and at every launch.</li>
         <li>Image and music generation are optional. Turn them on in Settings, and their models are downloaded then.</li>
       </ol>
@@ -363,7 +363,7 @@ export OPENAI_API_KEY=local   # any value: the local API doesn't check it</code>
 
     <section>
       <h2>Building from source</h2>
-      <p style="color: var(--fg-muted); font-size: 0.92rem;">For contributing, or if you'd rather not run an unsigned binary:</p>
+      <p style="color: var(--fg-muted); font-size: 0.92rem;">For contributing, or to run the latest code:</p>
       <pre><code>git clone https://github.com/ipsupport-llc/llmtray.git
 cd llmtray
 swift build
