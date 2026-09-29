@@ -270,6 +270,9 @@
 "Drop files here" = "Drop files here";
 "Drop files here to add them to the project" = "Drop files here to add them to the project";
 "Duplicate this profile" = "Duplicate this profile";
+"Echo cancellation" = "Echo cancellation";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
+"Echo cancellation isn't available on this Mac." = "Echo cancellation isn't available on this Mac.";
 "Edit Profile…" = "Edit Profile…";
 "Embedding model" = "Embedding model";
 "Enable Without It" = "Enable Without It";
@@ -577,6 +580,7 @@
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory.";
 "Prefill step" = "Prefill step";
+"Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Press Start and talk. Speakers work with echo cancellation; headphones are still best.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Press Start and talk. Use headphones: the model hears its own voice from the speakers.";
 "Press Talk and speak." = "Press Talk and speak.";
 "Press, talk, press again" = "Press, talk, press again";
@@ -737,6 +741,7 @@
 "Sort by" = "Sort by";
 "Source on GitHub" = "Source on GitHub";
 "Space the models in this folder take, and what's still free on its disk." = "Space the models in this folder take, and what's still free on its disk.";
+"Speakers work with echo cancellation; headphones are still best." = "Speakers work with echo cancellation; headphones are still best.";
 "Speaking…" = "Speaking…";
 "Speculative decoding (MTP)" = "Speculative decoding (MTP)";
 "Speed" = "Speed";
@@ -1025,6 +1030,7 @@
 "failed: %@" = "failed: %@";
 "for this chat" = "for this chat";
 "less than a minute left" = "less than a minute left";
+"macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
 "make %lld folders" = "make %lld folders";
 "mlx-lm runtime" = "mlx-lm runtime";
 "move %1$lld files into %2$lld folders" = "move %1$lld files into %2$lld folders";

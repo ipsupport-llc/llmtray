@@ -106,6 +106,9 @@ public enum Pref {
     /// `VoiceLabModel.id` picked in Settings > Voice; empty: not picked yet
     /// (`VoiceLabModel.resolve` then keeps a model already on disk).
     public static let voiceLabModel = PrefKey("llmtray.voiceLab.model", default: "")
+    /// Voice Processing I/O on Voice Lab's audio: macOS takes the model's
+    /// own voice out of the microphone, so speakers work without headphones.
+    public static let voiceLabEchoCancellation = PrefKey("llmtray.voiceLab.echoCancellation", default: true)
 
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.
