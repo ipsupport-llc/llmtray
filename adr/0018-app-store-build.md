@@ -37,6 +37,12 @@ The listing, in the user's words (memory: llmtray-positioning):
 
 ### 1. One codebase, two builds
 
+**The app isn't rewritten.** The standalone (Developer ID) build stays as
+it is: Sparkle, the pip-installed runtimes, plain paths, image generation.
+Everything below applies to the App Store build only, behind
+`#if APP_STORE`, which the standalone build doesn't compile. A change goes
+into the shared code only if it's the same in both builds.
+
 - A build flag `APP_STORE` (`swift build -Xswiftc -DAPP_STORE`). In
   `Package.swift`, the environment variable `LLMTRAY_APP_STORE=1` drops the
   Sparkle dependency, because an unused update framework is still a review
@@ -76,7 +82,7 @@ The listing, in the user's words (memory: llmtray-positioning):
 app launches. They run the bundle's interpreter, never a system or
 Homebrew Python.
 
-### 3. Files and folders
+### 3. Files and folders (App Store build only)
 
 - **Everything the app owns lives in the container:** models by default,
   chats, profiles, projects, caches, `HF_HOME`, `TMPDIR` and the runners'
@@ -89,7 +95,8 @@ Homebrew Python.
   - the folder tools' grants ([0014](0014-folder-tools.md));
   - attachments.
 
-  The existing grants model stays, and bookmarks replace plain paths.
+  The existing grants model stays. In the App Store build a grant also
+  keeps a bookmark; the standalone build keeps plain paths, as today.
 - **Runners reaching a granted folder:** whether a child with `inherit`
   sees the parent's security-scoped access is the spike's main question
   (step 1).
@@ -101,10 +108,11 @@ Homebrew Python.
   from LLMTray (direct download)** button asks the user to grant that
   folder once, then copies chats, profiles and settings; models are
   optional because of their size.
-- **System tools go:**
-  - `/bin/sh` in Settings: replaced by Foundation or `NSWorkspace` calls;
-  - `/usr/bin/ditto` in the bug reporter: replaced by an in-process zip;
-  - locating a system Python: not built at all.
+- **System tools** (in the App Store build only; the standalone build keeps
+  them):
+  - `/bin/sh` in Settings: a Foundation or `NSWorkspace` call instead;
+  - `/usr/bin/ditto` in the bug reporter: an in-process zip instead;
+  - locating a system Python: not compiled.
 
 ### 4. What the first App Store version has
 
