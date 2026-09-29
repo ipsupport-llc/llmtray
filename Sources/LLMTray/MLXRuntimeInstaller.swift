@@ -312,8 +312,12 @@ final class MLXRuntimeInstaller {
         if let binEntries = try? FileManager.default.contentsOfDirectory(atPath: Self.venvDir + "/bin") {
             for entry in binEntries {
                 let path = Self.venvDir + "/bin/" + entry
-                guard let target = try? FileManager.default.destinationOfSymbolicLink(atPath: path),
-                      !FileManager.default.fileExists(atPath: target),
+                // Relative (build_full_app.sh makes it so, for codesign):
+                // resolved from the link's own folder, not the cwd.
+                guard let target = try? FileManager.default.destinationOfSymbolicLink(atPath: path) else { continue }
+                let resolved = target.hasPrefix("/") ? target
+                    : (URL(fileURLWithPath: Self.venvDir + "/bin").appendingPathComponent(target).standardizedFileURL.path)
+                guard !FileManager.default.fileExists(atPath: resolved),
                       let range = target.range(of: "Python.framework/") else { continue }
                 let newTarget = newFrameworkDir + "/" + target[range.upperBound...]
                 try? FileManager.default.removeItem(atPath: path)

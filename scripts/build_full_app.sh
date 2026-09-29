@@ -138,6 +138,18 @@ PINNED_REF="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/
 echo "--- installing $PINNED_REPO@$PINNED_REF into the vendored venv ---"
 "$VENV_DIR/bin/pip" install --quiet "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
 
+# venv links bin/python3.X to the framework by absolute path -- this
+# machine's. Codesign can't seal a link out of the bundle; relative, it
+# stays inside it. (The app copies the venv out and re-points the link at
+# the copied framework anyway: MLXRuntimeInstaller.relinkVendoredInterpreter.)
+while IFS= read -r -d '' link; do
+  target="$(readlink "$link")"
+  [[ "$target" == /* && "$target" == "$APP"/* ]] || continue
+  rel="$(python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], os.path.dirname(sys.argv[2])))' "$target" "$link")"
+  ln -sfn "$rel" "$link"
+  echo "  relinked ${link#$APP/} -> $rel"
+done < <(find "$VENV_DIR" -type l -print0)
+
 # Everything redistributed in this bundle keeps its notices: CPython's
 # license (with the summary of changes PSF §3 asks for) and every package
 # in the venv, with its license files. Never vendor the image-generation
