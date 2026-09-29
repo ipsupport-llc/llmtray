@@ -5,7 +5,7 @@ final class VoiceLabTests: XCTestCase {
     private let gb: Int64 = 1_000_000_000
 
     func testTheModels() {
-        XCTAssertEqual(VoiceLabModel.default.repo, "roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit")
+        XCTAssertEqual(VoiceLabModel.default.repo, "roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-mixed")
         XCTAssertEqual(Set(VoiceLabModel.all.map(\.id)).count, VoiceLabModel.all.count)
         XCTAssertEqual(Set(VoiceLabModel.all.map(\.folderName)).count, VoiceLabModel.all.count)
         for model in VoiceLabModel.all {
@@ -29,6 +29,7 @@ final class VoiceLabTests: XCTestCase {
         // An update must not ask for a second download: the 4-bit already
         // there stays in use until another model is picked.
         XCTAssertEqual(VoiceLabModel.resolve(id: "") { $0 == .voiceChat11B4bit }, .voiceChat11B4bit)
+        XCTAssertEqual(VoiceLabModel.resolve(id: "") { $0 == .voiceChat11BGPTQ3 }, .voiceChat11BGPTQ3)
         XCTAssertEqual(VoiceLabModel.resolve(id: "") { _ in true }, .default)
         XCTAssertEqual(VoiceLabModel.resolve(id: "") { _ in false }, .default)
         XCTAssertEqual(VoiceLabModel.resolve(id: "gone-model") { _ in false }, .default)

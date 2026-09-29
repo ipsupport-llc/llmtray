@@ -48,8 +48,24 @@ public struct VoiceLabModel: Hashable, Sendable, Identifiable {
         cardURL: URL(string: "https://huggingface.co/roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit")!
     )
 
-    public static let all: [VoiceLabModel] = [.voiceChat11BGPTQ3, .voiceChat11B4bit]
-    public static let `default` = voiceChat11BGPTQ3
+    /// The GPTQ 3-bit language model with the speech parts that every step
+    /// reads in full (perception encoder, TTS backbone and mixture head) at
+    /// 8 bits: the TTS 24 -> 19 ms, ~83 ms per 80 ms frame on a base M5,
+    /// every test answer right (FINDINGS.md). Footprint: the 4-bit's
+    /// published 15.6 GB scaled by the measured MLX peaks (7.95 vs 10.64 GB).
+    public static let voiceChat11BMixed = VoiceLabModel(
+        id: "nemotron-voicechat-11b-mixed",
+        displayName: "NVIDIA NemotronLabs VoiceChat 11B (GPTQ 3-bit + 8-bit speech)",
+        repo: "roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-mixed",
+        folderName: "nemotron-voicechat-11b-mixed",
+        downloadBytes: 6_452_287_323,
+        footprintBytes: 11_700_000_000,
+        licenseName: "OpenMDW 1.1",
+        cardURL: URL(string: "https://huggingface.co/roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-mixed")!
+    )
+
+    public static let all: [VoiceLabModel] = [.voiceChat11BMixed, .voiceChat11BGPTQ3, .voiceChat11B4bit]
+    public static let `default` = voiceChat11BMixed
 
     /// The model Voice Lab uses: the one picked (`id`) while it's still in
     /// the list; with none picked, one already on disk (the default first),
