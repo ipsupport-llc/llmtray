@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The Full build's Python also creates the external venvs (image
+	     generation, audio), whose extension modules pip installs, not
+	     signed by this team. Nothing else: MLX, mlx-lm, ctypes callbacks and
+	     the in-bundle extensions (all signed by this team) run with none of
+	     the runtime exceptions, tested (neither allow-unsigned-executable-memory
+	     nor JIT). -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
+</dict>
+</plist>
