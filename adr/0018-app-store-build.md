@@ -260,7 +260,11 @@ M5, one after the other:
      ships `libgfortran`, `libgcc_s`, `libquadmath`: GPLv3 with the GCC
      Runtime Library Exception, which allows shipping them in non-GPL
      software. To settle before submission: confirm that's acceptable, or
-     keep scipy out if mlx-audio's runners don't need it;
+     keep scipy out. It can't simply be left out: `mlx_audio/resample.py`
+     imports `scipy.signal` at load, through `mlx_audio.utils` and
+     `audio_io`, which the music runner uses. A lazy import there in our
+     mlx-audio fork (the mflux way) would let it go wherever no runner
+     actually resamples;
    - notices for every bundled runtime;
    - ~~mflux without GPL~~: done (§4, "Image generation without GPL").
 5. **Tips** ([0017](0017-supporters.md)) in the App Store flavor.
