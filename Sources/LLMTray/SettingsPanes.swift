@@ -52,6 +52,13 @@ struct GeneralPane: View {
                 } label: {
                     SettingLabel(title: "Setup assistant", help: "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings.")
                 }
+                #if APP_STORE
+                LabeledContent {
+                    Button("Import…") { StandaloneImporter.run() }
+                } label: {
+                    SettingLabel(title: "Import from LLMTray (direct download)", help: "Brings over the chats, projects, profiles and downloaded models of the version from ipsupport.us. Nothing here is replaced, and models take no extra disk space.")
+                }
+                #endif
             }
             Section("Chat") {
                 Toggle(isOn: $showReasoning) {
