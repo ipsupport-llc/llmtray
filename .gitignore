@@ -5,3 +5,4 @@ runtime/.mlx_server_venv/
 .DS_Store
 __pycache__/
 docs/appcast.xml
+.build-appstore/
