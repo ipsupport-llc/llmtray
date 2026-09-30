@@ -41,6 +41,10 @@ enum BundledRuntime {
         setenv("PYTHONDONTWRITEBYTECODE", "1", 1)
         setenv("HOME", NSHomeDirectory(), 1)
         setenv("TMPDIR", NSTemporaryDirectory(), 1)
+        // Every runner exits when the app does, crashed or force-quit too
+        // (python-packages/sitecustomize.py): the sandbox lets the app see
+        // a leftover runner but not signal it.
+        setenv("LLMTRAY_EXIT_WITH_PARENT", "1", 1)
     }
 }
 #endif

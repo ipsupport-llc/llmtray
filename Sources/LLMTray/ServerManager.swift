@@ -828,7 +828,13 @@ final class ServerManager: ObservableObject {
     /// SIGTERM, then SIGKILL after 3 s: what `ps` shows as ours and
     /// orphaned. Returns what it stopped.
     nonisolated static func stopOrphans() async -> [OrphanProcess] {
-        (try? await ProcessRunner.offMain { () -> [OrphanProcess] in
+        #if APP_STORE
+        // The sandbox runs no /bin/ps and lets the app see a leftover runner
+        // but not signal it: none is left behind instead -- every runner
+        // exits with the app (python-packages/sitecustomize.py, adr/0018 §3).
+        return []
+        #else
+        return (try? await ProcessRunner.offMain { () -> [OrphanProcess] in
             let ps = Process()
             ps.executableURL = URL(fileURLWithPath: "/bin/ps")
             ps.arguments = OrphanScan.psArguments
@@ -847,6 +853,7 @@ final class ServerManager: ObservableObject {
             }
             return orphans
         }) ?? []
+        #endif
     }
 
     /// Unlike stop(), waits for the old process to exit (the replacement
