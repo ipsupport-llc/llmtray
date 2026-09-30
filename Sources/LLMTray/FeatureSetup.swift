@@ -233,6 +233,10 @@ final class FeatureSetup {
 
     /// ModelCatalog rescans when this changes.
     func setModelsFolder(_ path: String) {
+        // The App Store build reaches a folder outside its container only
+        // once the user has granted it (adr/0018 §3); a no-op otherwise.
+        guard SandboxAccess.requestAccess(to: path, message: NSLocalizedString("Allow LLMTray to use this folder for its models.", comment: "open panel: models folder access"))
+        else { return }
         UserDefaults.standard.set(path, forKey: ModelDiscovery.modelsRootDefaultsKey)
     }
 
@@ -240,7 +244,13 @@ final class FeatureSetup {
 
     /// LM Studio's folder exists and holds at least one model LLMTray can
     /// load (a folder with a config.json).
+    #if APP_STORE
+    /// The App Store build names no other app (adr/0018 §5): no preset for
+    /// its folder -- any folder can still be chosen.
+    var lmStudioFolderHasModels: Bool { false }
+    #else
     var lmStudioFolderHasModels: Bool { !ModelDiscovery.scanModels(root: Self.lmStudioFolder).isEmpty }
+    #endif
 
     func useLMStudioFolder() { setModelsFolder(Self.lmStudioFolder) }
 }

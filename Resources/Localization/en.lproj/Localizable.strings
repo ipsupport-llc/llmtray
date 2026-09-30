@@ -87,6 +87,7 @@
 "Allow Folder to Change…" = "Allow Folder to Change…";
 "Allow Folder to Look In…" = "Allow Folder to Look In…";
 "Allow Folder…" = "Allow Folder…";
+"Allow LLMTray to use this folder for its models." = "Allow LLMTray to use this folder for its models.";
 "Allow Once" = "Allow Once";
 "Allow connections from the local network" = "Allow connections from the local network";
 "Allowed folders" = "Allowed folders";
@@ -1005,6 +1006,7 @@
 "When an app asks for another model" = "When an app asks for another model";
 "When an app asks for another model: %@" = "When an app asks for another model: %@";
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";
+"Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";

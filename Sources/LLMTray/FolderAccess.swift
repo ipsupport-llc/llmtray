@@ -99,9 +99,10 @@ final class FolderAccessManager: ObservableObject {
         panel.allowsMultipleSelection = false
         panel.message = message
         panel.prompt = NSLocalizedString("Allow", comment: "open panel button: allow folder access")
-        panel.directoryURL = URL(fileURLWithPath: NSHomeDirectory())
+        panel.directoryURL = URL(fileURLWithPath: SandboxAccess.realHome)
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, let url = panel.url else { return nil }
+        SandboxAccess.remember(url)
         do {
             return .success(try service.makeRoot(url.path))
         } catch {

@@ -188,6 +188,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         #if APP_STORE
         BundledRuntime.configureEnvironment()
+        // Granted folders open again before anything reads them (the
+        // models folder, folder grants): runners inherit the access.
+        SandboxAccess.restore()
         #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
