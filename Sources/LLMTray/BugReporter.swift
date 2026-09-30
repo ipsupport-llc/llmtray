@@ -249,7 +249,18 @@ enum BugReporter {
         }
         try text.write(to: folder.appendingPathComponent("report.txt"), atomically: true, encoding: .utf8)
         let zip = root.appendingPathComponent(name + ".zip")
+        #if APP_STORE
+        // No ditto in the sandbox (adr/0018 §3): Foundation zips a folder
+        // it's asked to prepare for uploading.
+        var coordinated: NSError?
+        var copyError: Error?
+        NSFileCoordinator().coordinate(readingItemAt: folder, options: .forUploading, error: &coordinated) { zipped in
+            do { try FileManager.default.copyItem(at: zipped, to: zip) } catch { copyError = error }
+        }
+        if let error = coordinated ?? copyError { throw error }
+        #else
         try await ProcessRunner.run("/usr/bin/ditto", ["-c", "-k", "--keepParent", folder.path, zip.path])
+        #endif
         return zip
     }
 

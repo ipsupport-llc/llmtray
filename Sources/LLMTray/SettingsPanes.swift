@@ -1471,10 +1471,21 @@ enum AppLanguage {
     static func relaunch(reopening pane: SettingsPane? = nil) {
         UserDefaults.standard[Pref.settingsPaneAfterRelaunch] = pane?.rawValue
         let path = Bundle.main.bundlePath
+        #if APP_STORE
+        // No shell in the sandbox (adr/0018 §3): the new instance is started
+        // now and waits for this one to exit (AppDelegate's --after-pid).
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        configuration.arguments = ["--after-pid", String(ProcessInfo.processInfo.processIdentifier)]
+        NSWorkspace.shared.openApplication(at: URL(fileURLWithPath: path), configuration: configuration) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
+        #else
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
         task.arguments = ["-c", "while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.2; done; open \"$0\"", path]
         try? task.run()
         NSApp.terminate(nil)
+        #endif
     }
 }

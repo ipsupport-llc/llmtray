@@ -194,6 +194,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Tips bought while the Support window was closed (adr/0017).
         TipJar.shared.start()
         #endif
+        #if APP_STORE
+        // A relaunch (SettingsPane.relaunch): the old instance is exiting.
+        if let i = CommandLine.arguments.firstIndex(of: "--after-pid"), CommandLine.arguments.count > i + 1,
+           let pid = pid_t(CommandLine.arguments[i + 1]) {
+            let deadline = Date().addingTimeInterval(15)
+            while kill(pid, 0) == 0, Date() < deadline { usleep(100_000) }
+        }
+        #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
         if let other = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
