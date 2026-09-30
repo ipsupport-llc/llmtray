@@ -141,8 +141,10 @@ public enum Pref {
     public static let reviewPromptNever = PrefKey("llmtray.review.neverAsk", default: false)
 
     // Telemetry (adr/0015)
-    /// "Share anonymous usage statistics": off until the user turns it on.
-    public static let telemetryEnabled = PrefKey("llmtray.telemetry.enabled", default: false)
+    /// "Share anonymous usage statistics": on for a new install (the user's
+    /// call, 2026-09-29), off for an install from before that which never
+    /// chose (TelemetryDefault.settle writes one or the other at launch).
+    public static let telemetryEnabled = PrefKey("llmtray.telemetry.enabled", default: true)
     /// The random install ID reports go with (a UUID string); made when
     /// telemetry is turned on, removed when it's turned off.
     public static let telemetryInstallID = PrefKey<String?>("llmtray.telemetry.installID", default: nil)

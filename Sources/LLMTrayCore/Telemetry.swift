@@ -507,3 +507,19 @@ public struct TelemetryUploader {
         return done
     }
 }
+
+/// Usage statistics are on by default for a new install and never turned
+/// on by an update (adr/0015). An install that never chose gets its value
+/// written once, at launch, before anything else touches the settings: on
+/// when this is the first run (no data folder yet), off when LLMTray ran
+/// here before -- the default it had then. A choice already made is kept.
+public enum TelemetryDefault {
+    /// Returns what was written, nil when the user had chosen already.
+    @discardableResult
+    public static func settle(defaults: UserDefaults, dataFolderExists: Bool) -> Bool? {
+        guard defaults.object(forKey: Pref.telemetryEnabled.name) == nil else { return nil }
+        let on = !dataFolderExists
+        defaults.set(on, forKey: Pref.telemetryEnabled.name)
+        return on
+    }
+}

@@ -120,7 +120,7 @@ struct GeneralPane: View {
     }
 }
 
-/// "Share anonymous usage statistics" (adr/0015): off by default, the
+/// "Share anonymous usage statistics" (adr/0015): on for a new install, the
 /// consent text, exactly what a report holds, and the install ID's reset.
 struct UsageStatisticsSection: View {
     @ObservedObject private var telemetry = UsageTelemetry.shared
