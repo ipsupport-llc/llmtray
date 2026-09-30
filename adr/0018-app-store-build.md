@@ -165,7 +165,7 @@ and torch. Every `opencv-python` wheel, `-headless` too (checked:
 `libx265` (GPL): it can't be in an App Store bundle. mflux uses OpenCV only
 in the ControlNet/OpenPose preprocessors and torch only for PyTorch-format
 weights, but imported both at module load. Our fork
-(`ipsupport-llc/mflux`, branch `llmtray`, from v.0.20.0) imports them only
+(`ipsupport-llc/mflux`, branch `llmtray`, from v.0.20.0) -- offered upstream as mflux-community/mflux#782; once released there, the fork goes imports them only
 where they're used, and the App Store build installs mflux without its
 dependencies and then all of them but those two
 (`runtime/mflux_runtime.json`; `jinja2`, which torch used to bring along,
@@ -268,15 +268,11 @@ M5, one after the other:
    - the container paths for runners;
    - ~~the import from the Developer ID build~~: done (§3).
 4. **Licences:**
-   - **open:** scipy (an mlx-audio dependency, in the bundle since step 2)
-     ships `libgfortran`, `libgcc_s`, `libquadmath`: GPLv3 with the GCC
-     Runtime Library Exception, which allows shipping them in non-GPL
-     software. To settle before submission: confirm that's acceptable, or
-     keep scipy out. It can't simply be left out: `mlx_audio/resample.py`
-     imports `scipy.signal` at load, through `mlx_audio.utils` and
-     `audio_io`, which the music runner uses. A lazy import there in our
-     mlx-audio fork (the mflux way) would let it go wherever no runner
-     actually resamples;
+   - scipy (an mlx-audio dependency: `mlx_audio/resample.py` needs
+     `scipy.signal`) ships `libgfortran`, `libgcc_s`, `libquadmath`: GPLv3
+     with the GCC Runtime Library Exception, which is there precisely so
+     they can ship in non-GPL software. **Settled (maintainer, 2026-09-30):**
+     kept;
    - notices for every bundled runtime;
    - ~~mflux without GPL~~: done (§4, "Image generation without GPL").
 5. **Tips** ([0017](0017-supporters.md)) in the App Store flavor.
