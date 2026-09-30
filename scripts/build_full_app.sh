@@ -147,13 +147,60 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   # interpreter, outside the bundle, installs into it.
   BUILD_VENV="$WORK_DIR/pip_venv"
   "$FRAMEWORK_PYTHON" -m venv "$BUILD_VENV"
+  # Image generation: our mflux fork without its dependencies, then every
+  # dependency but runtime/mflux_runtime.json's "exclude" (opencv-python's
+  # GPL FFmpeg, torch) in the one resolution below (adr/0018 §4).
+  MFLUX_JSON="$REPO_ROOT/runtime/mflux_runtime.json"
+  mflux_config() { python3 -c 'import json, sys; v = json.load(open(sys.argv[1]))[sys.argv[2]]; print(" ".join(v) if isinstance(v, list) else v)' "$MFLUX_JSON" "$1"; }
+  MFLUX_URL="mflux @ https://github.com/$(mflux_config repo)/archive/$(mflux_config pinned_ref).tar.gz"
+  MFLUX_DIR="$WORK_DIR/mflux_target"
+  MFLUX_DEPS_FILE="$WORK_DIR/mflux_deps.txt"
+  rm -rf "$MFLUX_DIR"
+  "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$MFLUX_DIR" "$MFLUX_URL"
+  # Its Requires-Dist for this Python and platform, less "exclude", plus
+  # "extra". To a file first: a failure in here stops the build.
+  "$BUILD_VENV/bin/python" - "$MFLUX_DIR" "$MFLUX_JSON" > "$MFLUX_DEPS_FILE" <<'PY'
+import glob, json, sys
+from email.parser import Parser
+from pip._vendor.packaging.requirements import Requirement
+from pip._vendor.packaging.utils import canonicalize_name
+target, config = sys.argv[1], json.load(open(sys.argv[2]))
+exclude = {canonicalize_name(n) for n in config["exclude"]}
+meta = Parser().parse(open(glob.glob(f"{target}/mflux-*.dist-info/METADATA")[0]))
+for line in meta.get_all("Requires-Dist") or []:
+    req = Requirement(line)
+    if req.marker and not req.marker.evaluate({"extra": ""}):
+        continue
+    if canonicalize_name(req.name) in exclude:
+        continue
+    req.marker = None
+    print(req)
+for extra in config["extra"]:
+    print(extra)
+PY
+  [[ -s "$MFLUX_DEPS_FILE" ]] || { echo "error: no dependencies read from mflux's metadata" >&2; exit 1; }
+  MFLUX_DEPS=()
+  while IFS= read -r dep; do MFLUX_DEPS+=("$dep"); done < "$MFLUX_DEPS_FILE"
   "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --target "$PKG_DIR" \
     "mlx-lm @ https://github.com/$PINNED_REPO/archive/$PINNED_REF.zip" \
     "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/$AUDIO_COMMIT.tar.gz" \
-    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0"
+    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}"
+  cp -R "$MFLUX_DIR"/mflux "$MFLUX_DIR"/mflux-*.dist-info "$PKG_DIR"/
   # pip's own console scripts (their shebangs name this machine's path).
   rm -rf "$PKG_DIR/bin"
+  # Every runner exits with the app (the sandbox can't stop a leftover one).
+  cp "$REPO_ROOT/runtime/appstore/sitecustomize.py" "$PKG_DIR/sitecustomize.py"
   PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, sys; print('packages ok', sys.version.split()[0])"
+  # The image models LLMTray runs load without the excluded packages.
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mflux.models.z_image.variants.z_image, mflux.models.flux2.variants.txt2img.flux2_klein, mflux.models.flux2.variants.edit.flux2_klein_edit; print('mflux ok')"
+  # Nothing excluded came back through another package -- by content, not
+  # by name: every opencv-python variant (-headless, -contrib) ships the
+  # same cv2 with FFmpeg's GPL build.
+  for module in cv2 torch; do
+    [[ ! -e "$PKG_DIR/$module" ]] || { echo "error: $module is in $PKG_DIR (runtime/mflux_runtime.json keeps it out)" >&2; exit 1; }
+  done
+  GPL_HIT="$(find "$PKG_DIR" -type f \( -name "*.dylib" -o -name "*.so" \) \( -name "libx264*" -o -name "libx265*" -o -name "libavcodec*" -o -name "libpostproc*" \) | head -1)"
+  [[ -z "$GPL_HIT" ]] || { echo "error: FFmpeg/x264/x265 in the App Store bundle: $GPL_HIT" >&2; exit 1; }
   LICENSE_PYTHON=(env PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON")
 else
   VENV_DIR="$APP/Contents/Resources/runtime/.mlx_server_venv"
