@@ -1,4 +1,4 @@
-# 0015 — Opt-in usage telemetry
+# 0015 — Usage telemetry (on by default for new installs)
 
 ## Decision
 
@@ -9,13 +9,20 @@ ipsupport-api's `docs/telemetry.md`, its `api/openapi.yaml`
 (`TelemetryReport`) and its ADRs 9 (opt-in telemetry) and 10 (the
 country of a report); the app follows them.
 
-- **Offered ticked on a first run** (the user's call, 2026-09-27): the
-  first-run wizard's "Staying up to date" step shows the toggle already
-  on, with the consent text and Show Reports…; it takes effect only on
-  Finish (Skip or closing the wizard leaves it off), and the first report
-  goes only after the first day ends. Existing installs are never turned
-  on by an update: the setting stays what it was (off unless chosen).
-  Without the wizard (Settings) it stays off until turned on.
+- **On by default for a new install** (the user's call, 2026-09-29; it was
+  offered ticked in the first-run wizard since 2026-09-27):
+  - On a first run the setting is written **on**, and the wizard's
+    "Staying up to date" step shows it on, with the consent text and
+    Show Reports…; unticking it there, or in Settings, turns it off.
+    Skipping or closing the wizard leaves it on.
+  - An install from before this that never chose is written **off** at
+    its first launch of this version: an update never turns it on.
+    `TelemetryDefault.settle` decides once, at launch: no data folder
+    means a first run.
+  - The first report still goes only after the first local day ends, so
+    it can be turned off before anything is sent.
+  - The App Store privacy label declares it: usage data, not linked to
+    the user ([0018](0018-app-store-build.md)).
 - Settings → General → Usage statistics: a "Share
   anonymous usage statistics" toggle with the consent text from
   `telemetry.md`, an expandable "What's sent" list of every field (with

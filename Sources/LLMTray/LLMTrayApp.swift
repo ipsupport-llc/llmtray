@@ -16,6 +16,10 @@ struct LLMTrayApp: App {
         // otherwise sits in that buffer and never shows up until the
         // process exits, which looks exactly like "nothing happened."
         setvbuf(stdout, nil, _IONBF, 0)
+        // Before anything creates the data folder: whether this is a first
+        // run decides the usage-statistics default (adr/0015).
+        TelemetryDefault.settle(defaults: .standard,
+                                dataFolderExists: FileManager.default.fileExists(atPath: RuntimePaths.externalRuntimeDir))
         // `LLMTray --extract <path> [--caps <json>]`: the document extractor
         // child (ExtractorCLI) -- first, before anything opens a connection
         // or touches settings.

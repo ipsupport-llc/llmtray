@@ -368,4 +368,24 @@ extension TelemetryUploaderTests {
         XCTAssertEqual(Stub.requests.count, 1)
         XCTAssertEqual(store.counters.pending(today: "2026-09-27").count, 2)
     }
+
+    func testUsageStatisticsDefault() {
+        let suite = "llmtray.tests.telemetryDefault"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        // A first run: on.
+        defaults.removePersistentDomain(forName: suite)
+        XCTAssertEqual(TelemetryDefault.settle(defaults: defaults, dataFolderExists: false), true)
+        XCTAssertEqual(defaults.object(forKey: Pref.telemetryEnabled.name) as? Bool, true)
+        // Written once: later launches (the folder exists by then) keep it.
+        XCTAssertNil(TelemetryDefault.settle(defaults: defaults, dataFolderExists: true))
+        XCTAssertEqual(defaults.object(forKey: Pref.telemetryEnabled.name) as? Bool, true)
+        // An install from before that never chose: off, as it was.
+        defaults.removePersistentDomain(forName: suite)
+        XCTAssertEqual(TelemetryDefault.settle(defaults: defaults, dataFolderExists: true), false)
+        // A choice already made is never changed.
+        defaults.set(true, forKey: Pref.telemetryEnabled.name)
+        XCTAssertNil(TelemetryDefault.settle(defaults: defaults, dataFolderExists: true))
+        XCTAssertEqual(defaults.bool(forKey: Pref.telemetryEnabled.name), true)
+    }
 }
