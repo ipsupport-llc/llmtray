@@ -525,6 +525,8 @@ private struct ExtrasStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             StepHeader(Text("What else"), Text("All off unless you turn them on. Models are downloaded after Finish, one at a time."))
+            // No image runtime in the App Store build (adr/0018 §4).
+            #if !APP_STORE
             feature(isOn: Binding(get: { model.progress.choices.imageModel != nil },
                                   set: { model.progress.choices.imageModel = $0 ? model.imagePick.rawValue : nil }),
                     title: Text("Image generation"),
@@ -543,6 +545,7 @@ private struct ExtrasStep: View {
                     title: Text("Image editing"),
                     detail: Text("Changes an image you attach or one made in the chat, with FLUX.2 klein 4B."),
                     size: model.imageModelSize(.klein4b))
+            #endif
             feature(isOn: Binding(get: { model.progress.choices.musicModel != nil },
                                   set: { model.progress.choices.musicModel = $0 ? model.musicPick.rawValue : nil }),
                     title: Text("Music"),

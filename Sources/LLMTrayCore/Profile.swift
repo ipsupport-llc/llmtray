@@ -239,7 +239,9 @@ public enum ProfileResolver {
             topK: max(0, v(\.request.topK)),
             maxTokens: max(1, v(\.request.maxTokens)),
             systemPrompt: v(\.request.systemPrompt),
-            enableImageGeneration: v(\.tools.enableImageGeneration),
+            // The App Store build ships no image runtime (adr/0018 §4): off,
+            // so no image tool is ever declared, whatever a profile says.
+            enableImageGeneration: ResolvedProfile.imageGenerationInThisBuild && v(\.tools.enableImageGeneration),
             enableMusicGeneration: v(\.tools.enableMusicGeneration),
             musicModel: v(\.tools.musicModel),
             musicCreativity: min(max(v(\.tools.musicCreativity), 0), 1),
@@ -249,7 +251,7 @@ public enum ProfileResolver {
             creatorCountdown: min(max(v(\.tools.creatorCountdown), 0), 30),
             enabledTools: v(\.tools.enabledTools),
             imageGenModel: v(\.tools.imageGenModel),
-            imageEditModel: v(\.tools.imageEditModel),
+            imageEditModel: ResolvedProfile.imageGenerationInThisBuild ? v(\.tools.imageEditModel) : "",
             imageQuality: v(\.tools.imageQuality),
             unloadModelDuringImageGen: v(\.tools.unloadModelDuringImageGen),
             toolUsePolicy: v(\.tools.toolUsePolicy),
@@ -275,6 +277,11 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var maxTokens: Int
     public var systemPrompt: String
     public var enableImageGeneration: Bool
+    #if APP_STORE
+    public static let imageGenerationInThisBuild = false
+    #else
+    public static let imageGenerationInThisBuild = true
+    #endif
     public var enableMusicGeneration: Bool
     public var musicModel: String
     public var musicCreativity: Double
