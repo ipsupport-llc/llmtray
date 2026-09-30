@@ -116,6 +116,9 @@ final class MfluxManager: ObservableObject {
         case noPython
         case processFailed(String)
         case outputMissing
+        /// The App Store build ships no image runtime yet (adr/0018 §4:
+        /// mflux's dependencies carry GPL code; nothing is pip-installed).
+        case notInThisBuild
 
         var errorDescription: String? {
             switch self {
@@ -125,6 +128,8 @@ final class MfluxManager: ObservableObject {
                 return String(format: NSLocalizedString("Image generation failed: %@", comment: ""), detail)
             case .outputMissing:
                 return NSLocalizedString("Image generation finished but produced no output file.", comment: "")
+            case .notInThisBuild:
+                return NSLocalizedString("Image generation isn't in the App Store version of LLMTray yet. It's in the version from ipsupport.us.", comment: "")
             }
         }
     }
@@ -159,6 +164,9 @@ final class MfluxManager: ObservableObject {
     /// downloads itself, lazily, the first time a given model is actually
     /// loaded. Idempotent and cheap once the venv exists.
     private func ensurePackageInstalled() async throws {
+        #if APP_STORE
+        throw MfluxError.notInThisBuild
+        #else
         try FileManager.default.createDirectory(
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
@@ -176,6 +184,7 @@ final class MfluxManager: ObservableObject {
             try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", Self.mfluxRequirement, "huggingface_hub"])
         }
         statusText = ""
+        #endif
     }
 
     /// Set up for this model: the venv at the pinned mflux, the checkpoint

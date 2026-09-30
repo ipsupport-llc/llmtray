@@ -1267,6 +1267,7 @@ struct UpdatesPane: View {
         Form {
             Section("LLMTray") {
                 LabeledContent("Version", value: version)
+                #if !APP_STORE
                 Toggle(isOn: $autoCheck) {
                     SettingLabel(title: "Check for updates automatically", help: "Checks about once a day in the background and offers new versions.")
                 }
@@ -1279,11 +1280,13 @@ struct UpdatesPane: View {
                 } label: {
                     SettingLabel(title: "Update channel", help: "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it.")
                 }
+                #endif
                 HStack {
                     Spacer()
                     Button("Check Now", action: checkForAppUpdates)
                 }
             }
+            #if !APP_STORE
             Section("mlx-lm runtime") {
                 LabeledContent {
                     Text(runtime.pinnedVersion().map(shortRef) ?? "unknown").font(.system(.body, design: .monospaced))
@@ -1316,6 +1319,7 @@ struct UpdatesPane: View {
                     SettingLabel(title: "Runtime data", help: "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept.")
                 }
             }
+            #endif
         }
         .formStyle(.grouped)
     }

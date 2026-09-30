@@ -78,7 +78,11 @@ final class AudioRuntime: ObservableObject {
     }
 
     static var venvDir: String { RuntimePaths.externalRuntimeDir + "/music_venv" }
+    #if APP_STORE
+    static var venvPython: String { BundledRuntime.python }
+    #else
     static var venvPython: String { venvDir + "/bin/python3" }
+    #endif
     /// Written after a complete install: the pins it was made with.
     private static var installStamp: String { venvDir + "/llmtray-requirements.txt" }
 
@@ -90,6 +94,11 @@ final class AudioRuntime: ObservableObject {
     /// brings them up to date before a run).
     var hasVenv: Bool { FileManager.default.isExecutableFile(atPath: Self.venvPython) }
 
+    #if APP_STORE
+    /// The bundled runtime is installed with the app.
+    var isInstalled: Bool { hasVenv }
+    #endif
+
     /// The stamp's first line: the install method. Stamps written before
     /// mlx-audio was force-reinstalled don't match, so those venvs (still
     /// on an older fork commit, pip having kept it) install once more.
@@ -97,10 +106,12 @@ final class AudioRuntime: ObservableObject {
     private static var wantedStamp: String { ([stampHeader] + requirements).joined(separator: "\n") }
 
     /// The venv is there with exactly these requirements.
+    #if !APP_STORE
     var isInstalled: Bool {
         FileManager.default.isExecutableFile(atPath: Self.venvPython)
             && Self.installedRequirements() == Self.wantedStamp
     }
+    #endif
 
     /// Before a run: `ensureInstalled`, but a working venv that can't be
     /// brought up to date (offline, GitHub down) is kept -- the error comes
@@ -124,6 +135,9 @@ final class AudioRuntime: ObservableObject {
     /// (both first time only). `status` gets what's happening, for the
     /// caller's own UI.
     func ensureInstalled(status: ((String) -> Void)? = nil) async throws {
+        #if APP_STORE
+        // Inside the bundle, installed with it: nothing to install.
+        #else
         while let running = install {
             status?(statusText)
             _ = try? await running.value
@@ -137,6 +151,7 @@ final class AudioRuntime: ObservableObject {
         install = task
         defer { if install == task { install = nil } }
         try await task.value
+        #endif
     }
 
     private func performInstall(status: ((String) -> Void)?) async throws {
