@@ -112,11 +112,23 @@ Homebrew Python.
   maintainer's call before the first upload:** keep one bundle id (switching
   is the common case) or give the App Store build its own (both side by
   side, settings imported by hand). Application Support isn't moved.
-- **First-run import from the Developer ID build.** The container can't
-  read `~/Library/Application Support/LLMTray` on its own. An **Import
-  from LLMTray (direct download)** button asks the user to grant that
-  folder once, then copies chats, profiles and settings; models are
-  optional because of their size.
+- **Import from the Developer ID build.** The container can't read
+  `~/Library/Application Support/LLMTray` on its own. Settings › General ›
+  **Import from LLMTray (direct download)** asks the user to grant that
+  folder once (for that import only) and copies chats, projects, profiles,
+  tool stats and the downloaded image, music, voice and embedding models
+  (`StandaloneImport`). Nothing already in the container is overwritten;
+  three files are merged instead: the chat library (projects, pins,
+  chat→project links), the model→profile assignments (the container's
+  winning), and the Default profile (theirs replaces an untouched one,
+  else comes as "Default (ipsupport.us)"). No runtime, pin, telemetry or
+  folder grant comes along, nothing unfinished or discarded at any depth,
+  and an interrupted copy never looks finished. It runs on the main actor
+  (clones take well under a second) and the app relaunches right after, so
+  no store it holds in memory is saved over what came in. Chat models stay
+  where they are: the user grants the models folder as before. The copies are APFS clones: checked in the
+  sandbox (2026-09-30), 48 GB of models imported in under a second with no
+  change in free space. Settings arrive by themselves (above).
 - **System tools** (in the App Store build only; the standalone build keeps
   them):
   - `/bin/sh` in Settings: a Foundation or `NSWorkspace` call instead;
@@ -254,7 +266,7 @@ M5, one after the other:
      folders;
    - no system tools;
    - the container paths for runners;
-   - the import from the Developer ID build.
+   - ~~the import from the Developer ID build~~: done (§3).
 4. **Licences:**
    - **open:** scipy (an mlx-audio dependency, in the bundle since step 2)
      ships `libgfortran`, `libgcc_s`, `libquadmath`: GPLv3 with the GCC

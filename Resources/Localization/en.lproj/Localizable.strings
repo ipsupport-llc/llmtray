@@ -146,6 +146,7 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it.";
 "Beta: pre-release builds with features still being tested." = "Beta: pre-release builds with features still being tested.";
+"Brings over the chats, projects, profiles and the image, music, voice and embedding models of the version from ipsupport.us (quit it first). Nothing here is replaced, and the models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles and the image, music, voice and embedding models of the version from ipsupport.us (quit it first). Nothing here is replaced, and the models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Cached" = "Cached";
 "Calculator" = "Calculator";
@@ -176,6 +177,7 @@
 "Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Chat tools of the profile “%@” (%lld on) -- applies to every model using it";
 "Chat with language models that run on this Mac." = "Chat with language models that run on this Mac.";
 "Chats" = "Chats";
+"Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
 "Check for Runtime Updates" = "Check for Runtime Updates";
@@ -192,6 +194,8 @@
 "Choose a folder chats may use." = "Choose a folder chats may use.";
 "Choose a folder the chat may look in." = "Choose a folder the chat may look in.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Choose a folder the chat may propose changes in. You approve every change.";
+"Choose the LLMTray folder of the version from ipsupport.us (it's already selected), then Import." = "Choose the LLMTray folder of the version from ipsupport.us (it's already selected), then Import.";
+"Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us." = "Choose ~/Library/Application Support/LLMTray: the folder with sessions, projects and the models of the version from ipsupport.us.";
 "Choose…" = "Choose…";
 "Clear" = "Clear";
 "Clear search" = "Clear search";
@@ -295,6 +299,7 @@
 "Errors" = "Errors";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
+"Everything in that folder is here already." = "Everything in that folder is here already.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after.";
@@ -390,6 +395,10 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image generation off" = "Image generation off";
 "Image model" = "Image model";
+"Import" = "Import";
+"Import from LLMTray (direct download)" = "Import from LLMTray (direct download)";
+"Imported" = "Imported";
+"Import…" = "Import…";
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too.";
 "In project %@" = "In project %@";
 "In the queue: %lld ahead…" = "In the queue: %lld ahead…";
@@ -409,6 +418,7 @@
 "It goes on in the background: you can continue." = "It goes on in the background: you can continue.";
 "It is being set up or updated. Try again once that's done." = "It is being set up or updated. Try again once that's done.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Its chats stay, back among the recents; the project's instructions and files are deleted.";
 "Its memory, in GB." = "Its memory, in GB.";
 "KV cache" = "KV cache";
@@ -423,6 +433,7 @@
 "Kept free: %lld MB" = "Kept free: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
+"LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";
 "LLMTray — Chat" = "LLMTray — Chat";
 "LLMTray's version." = "LLMTray's version.";
@@ -543,6 +554,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
+"Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
 "Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
@@ -672,6 +684,7 @@
 "Reset" = "Reset";
 "Reset ID" = "Reset ID";
 "Reset: inherit this setting from Default" = "Reset: inherit this setting from Default";
+"Restart" = "Restart";
 "Restart LLMTray to change the language?" = "Restart LLMTray to change the language?";
 "Restart Now" = "Restart Now";
 "Restart Server" = "Restart Server";
@@ -826,6 +839,7 @@
 "Thanks! Your name will appear once it's been checked." = "Thanks! Your name will appear once it's been checked.";
 "Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "That folder can't be shared with the chat: %@" = "That folder can't be shared with the chat: %@";
+"That isn't LLMTray's folder" = "That isn't LLMTray's folder";
 "The App Store couldn't confirm the purchase." = "The App Store couldn't confirm the purchase.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
@@ -854,6 +868,7 @@
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
+"The import stopped" = "The import stopped";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The macOS version." = "The macOS version.";
 "The microphone couldn't start: %@" = "The microphone couldn't start: %@";
@@ -1024,6 +1039,7 @@
 "What else" = "What else";
 "What happened?" = "What happened?";
 "What the model says appears here." = "What the model says appears here.";
+"What was copied before stays; importing again goes on from there. %@" = "What was copied before stays; importing again goes on from there. %@";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "What's New" = "What's New";
 "What's New in LLMTray %@" = "What's New in LLMTray %@";
