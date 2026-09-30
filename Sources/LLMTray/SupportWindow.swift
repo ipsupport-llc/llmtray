@@ -224,8 +224,6 @@ private struct SupportView: View {
     @ObservedObject private var supporters = SupportersStore.shared
     #if APP_STORE
     @ObservedObject private var tips = TipJar.shared
-    #else
-    @State private var listingFromSponsors = false
     #endif
 
     var body: some View {
@@ -248,8 +246,6 @@ private struct SupportView: View {
         .sheet(item: $tips.justBought) { purchase in
             ListingSheet(tier: purchase.tier, proof: .appStore(jws: purchase.jws))
         }
-        #else
-        .sheet(isPresented: $listingFromSponsors) { ListingSheet(tier: .coffee, proof: nil) }
         #endif
     }
 
@@ -290,7 +286,10 @@ private struct SupportView: View {
                 Label("Support on GitHub Sponsors", systemImage: "heart.fill")
             }
             Text("One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.").font(.caption).foregroundStyle(.secondary)
-            Button("Already a sponsor? List my name…") { listingFromSponsors = true }.buttonStyle(.link)
+            // Listing a sponsor waits for signing in with GitHub (OAuth): a
+            // bare login would let anyone list or remove someone else's
+            // entry (ipsupport-api adr/0011). Until then sponsors aren't
+            // listed from the app.
         }
         #endif
     }
