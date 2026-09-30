@@ -1,10 +1,17 @@
 // swift-tools-version: 5.9
 import PackageDescription
 
+// The Mac App Store build (adr/0018): LLMTRAY_APP_STORE=1 compiles with
+// APP_STORE and without Sparkle -- the App Store updates it, and an unused
+// updater framework is itself a review risk. Without it: the standalone
+// (Developer ID) build, unchanged.
+let appStore = Context.environment["LLMTRAY_APP_STORE"] == "1"
+let flavor: [SwiftSetting] = appStore ? [.define("APP_STORE")] : []
+
 let package = Package(
     name: "LLMTray",
     platforms: [.macOS(.v14)],
-    dependencies: [
+    dependencies: appStore ? [] : [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0")
     ],
     targets: [
@@ -16,18 +23,16 @@ let package = Package(
             path: "Sources/LLMTrayCore",
             // The CBLAS interface without the macOS 13.3 deprecation
             // (DenseVectors' cblas_sgemv): same symbols, current headers.
-            swiftSettings: [.unsafeFlags(["-Xcc", "-DACCELERATE_NEW_LAPACK"])],
+            swiftSettings: [.unsafeFlags(["-Xcc", "-DACCELERATE_NEW_LAPACK"])] + flavor,
             // The system SQLite (ProjectIndex, adr/0012): FTS5 built in, no
             // extensions to load.
             linkerSettings: [.linkedLibrary("sqlite3")]
         ),
         .executableTarget(
             name: "LLMTray",
-            dependencies: [
-                "LLMTrayCore",
-                .product(name: "Sparkle", package: "Sparkle")
-            ],
-            path: "Sources/LLMTray"
+            dependencies: ["LLMTrayCore"] + (appStore ? [] : [.product(name: "Sparkle", package: "Sparkle")]),
+            path: "Sources/LLMTray",
+            swiftSettings: flavor
         ),
         .testTarget(
             name: "LLMTrayCoreTests",

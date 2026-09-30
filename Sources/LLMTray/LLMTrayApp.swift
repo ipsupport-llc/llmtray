@@ -2,7 +2,9 @@ import SwiftUI
 import LLMTrayCore
 import AppKit
 import Combine
+#if !APP_STORE
 import Sparkle
+#endif
 
 @main
 struct LLMTrayApp: App {
@@ -141,8 +143,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let setupWizard = SetupWizardWindowController()
     private lazy var settingsWindow = SettingsWindowController(.init(
         server: server, chat: tabs.imageModels, runtime: runtime, benchmark: benchmark,
-        checkForAppUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) }
+        checkForAppUpdates: { [weak self] in self?.checkForAppUpdates() }
     ))
+    #if APP_STORE
+    /// The App Store updates this build: its page is where a newer one is.
+    private func checkForAppUpdates() {
+        NSWorkspace.shared.open(URL(string: "macappstore://showUpdatesPage")!)
+    }
+    #else
+    private func checkForAppUpdates() { updaterController.checkForUpdates(nil) }
+    #endif
     // startingUpdater begins Sparkle's own automatic background check
     // schedule immediately (governed by SUEnableAutomaticChecks in
     // Info.plist) -- separate from the manual "Check for Updates…" menu
@@ -150,11 +160,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // actually having a real Info.plist (SUFeedURL etc.) so this doesn't
     // also try (and fail) to start against the bare `.build/debug/LLMTray`
     // binary used for local dev iteration, which has none.
+    #if !APP_STORE
     private let updateChannels = UpdateChannelDelegate()
     private lazy var updaterController = SPUStandardUpdaterController(
         startingUpdater: Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil,
         updaterDelegate: updateChannels, userDriverDelegate: nil
     )
+    #endif
 
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
@@ -181,6 +193,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Full build: the bundled runtime goes to Application Support now,
         // not on the first Start -- an update installed before that (the
         // feed carries the thin build) would take it away.
+        #if !APP_STORE
         let server = self.server
         Task { try? await MLXRuntimeInstaller.copyOutBundledRuntime(pinnedRef: nil, log: { server.appendLog($0) }) }
         _ = updaterController  // lazy: created (and its background checks started) at launch
@@ -191,6 +204,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
            UserDefaults.standard[Pref.checkUpdatesAtLaunch] {
             updaterController.updater.checkForUpdatesInBackground()
         }
+        #endif
         NSApp.setActivationPolicy(.accessory)
         installSignalHandlers()
         setupStatusItem()
@@ -477,6 +491,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // folder, since there's no real CFBundleName to read either).
         // Hiding the item entirely there is clearer than showing it and
         // having it error out.
+        #if !APP_STORE
         if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
             let updateItem = NSMenuItem(
                 title: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
@@ -485,6 +500,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             menu.addItem(updateItem)
             menu.addItem(.separator())
         }
+        #endif
 
         let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
         settingsItem.target = self
@@ -939,8 +955,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// published as a separate appcast item tagged <sparkle:channel>beta, which
 /// Sparkle ignores unless this returns it -- stable users never see them.
 /// Read on every check, so the toggle takes effect without a restart.
+#if !APP_STORE
 final class UpdateChannelDelegate: NSObject, SPUUpdaterDelegate {
     func allowedChannels(for updater: SPUUpdater) -> Set<String> {
         UserDefaults.standard[Pref.betaUpdates] ? ["beta"] : []
     }
 }
+#endif
