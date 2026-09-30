@@ -9,12 +9,11 @@ import LLMTrayCore
 /// container (StandaloneImport). The grant is for this import only: nothing
 /// is kept. Settings themselves come over by themselves -- macOS moves the
 /// preferences into the container on the first launch.
+/// Best with the other LLMTray quit: a project's index is copied as it is
+/// on disk.
 @MainActor
 enum StandaloneImporter {
-    private(set) static var isRunning = false
-
     static func run() {
-        guard !isRunning else { return }
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
@@ -32,16 +31,15 @@ enum StandaloneImporter {
             alert.runModal()
             return
         }
-        isRunning = true
+        // Clones: well under a second even for tens of GB, so on the main
+        // actor -- nothing the app holds in memory is saved over the files
+        // meanwhile -- and the app relaunches right after, so its stores
+        // load what came in instead of writing theirs over it.
         let destination = URL(fileURLWithPath: RuntimePaths.externalRuntimeDir)
-        Task.detached(priority: .userInitiated) {
-            let result = Result { try StandaloneImport.run(from: source, to: destination) }
-            if scoped { source.stopAccessingSecurityScopedResource() }
-            await MainActor.run {
-                isRunning = false
-                finished(result)
-            }
-        }
+        let untouched = ProfileStore.migratedDefault(from: .standard)
+        let result = Result { try StandaloneImport.run(from: source, to: destination, untouchedDefault: untouched) }
+        if scoped { source.stopAccessingSecurityScopedResource() }
+        finished(result)
     }
 
     private static func finished(_ result: Result<StandaloneImport.Summary, Error>) {
@@ -50,18 +48,22 @@ enum StandaloneImporter {
         case .failure(let error):
             alert.alertStyle = .warning
             alert.messageText = NSLocalizedString("The import stopped", comment: "")
-            alert.informativeText = String(format: NSLocalizedString("What was copied before stays. %@", comment: "import failure detail"), error.localizedDescription)
+            alert.informativeText = String(format: NSLocalizedString("What was copied before stays; importing again goes on from there. %@", comment: "import failure detail"), error.localizedDescription)
             alert.runModal()
         case .success(let summary) where summary.imported.isEmpty:
             alert.messageText = NSLocalizedString("Nothing new to import", comment: "")
             alert.informativeText = NSLocalizedString("Everything in that folder is here already.", comment: "")
             alert.runModal()
-        case .success:
+        case .success(let summary):
             alert.messageText = NSLocalizedString("Imported", comment: "")
-            alert.informativeText = NSLocalizedString("Chats, projects, profiles and downloaded models from the version from ipsupport.us are here now. Folders you'd given it access to need your OK again. Restart LLMTray to see everything?", comment: "")
-            alert.addButton(withTitle: NSLocalizedString("Restart Now", comment: ""))
-            alert.addButton(withTitle: NSLocalizedString("Later", comment: ""))
-            if alert.runModal() == .alertFirstButtonReturn { AppLanguage.relaunch(reopening: .general) }
+            var text = NSLocalizedString("Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.", comment: "")
+            if summary.defaultProfile == .addedAsProfile {
+                text += " " + NSLocalizedString("Its Default profile is in Settings › Profiles as \u{201C}Default (ipsupport.us)\u{201D}: yours here was changed, so it was kept.", comment: "")
+            }
+            alert.informativeText = text + "\n\n" + NSLocalizedString("LLMTray restarts now to load them.", comment: "")
+            alert.addButton(withTitle: NSLocalizedString("Restart", comment: ""))
+            alert.runModal()
+            AppLanguage.relaunch(reopening: .general)
         }
     }
 }

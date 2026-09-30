@@ -117,10 +117,16 @@ Homebrew Python.
   **Import from LLMTray (direct download)** asks the user to grant that
   folder once (for that import only) and copies chats, projects, profiles,
   tool stats and the downloaded image, music, voice and embedding models
-  (`StandaloneImport`). Nothing already in the container is overwritten
-  (model→profile assignments are merged, the container's winning), no
-  runtime, pin, telemetry or folder grant comes along, and an interrupted
-  copy never looks finished. The copies are APFS clones: checked in the
+  (`StandaloneImport`). Nothing already in the container is overwritten;
+  three files are merged instead: the chat library (projects, pins,
+  chat→project links), the model→profile assignments (the container's
+  winning), and the Default profile (theirs replaces an untouched one,
+  else comes as "Default (ipsupport.us)"). No runtime, pin, telemetry or
+  folder grant comes along, nothing unfinished or discarded at any depth,
+  and an interrupted copy never looks finished. It runs on the main actor
+  (clones take well under a second) and the app relaunches right after, so
+  no store it holds in memory is saved over what came in. Chat models stay
+  where they are: the user grants the models folder as before. The copies are APFS clones: checked in the
   sandbox (2026-09-30), 48 GB of models imported in under a second with no
   change in free space. Settings arrive by themselves (above).
 - **System tools** (in the App Store build only; the standalone build keeps
