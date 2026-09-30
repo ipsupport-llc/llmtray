@@ -40,7 +40,7 @@ extension ModelRecommendations {
         public var local: [String: Pick]
 
         /// The local copy of a recommended pick: marked, and listed first.
-        public func isRecommended(localPath: String) -> Bool { local[localPath]?.model.recommended == true }
+        public func isRecommended(localPath: String) -> Bool { local[localPath]?.role == .recommended }
 
         /// `models` (the local ones, by their folder) with the recommended ones
         /// first, otherwise in their order.

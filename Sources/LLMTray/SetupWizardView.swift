@@ -469,10 +469,14 @@ private struct ChatModelStep: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(verbatim: pick.model.title).fontWeight(.semibold)
-                    if pick.model.recommended { RecommendedBadge() }
+                    if pick.role == .recommended { RecommendedBadge() }
                 }
                 Text(verbatim: pick.model.summary).font(.callout).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if let note = roleNote(pick.role) {
+                    note.font(.caption).foregroundStyle(pick.role == .larger ? .orange : .secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Text(verbatim: details(pick)).font(.caption).foregroundStyle(.secondary)
                 if pick.model.gated {
                     Text("Gated: accept its license on Hugging Face and save a token in Settings › Models first.")
@@ -492,6 +496,16 @@ private struct ChatModelStep: View {
         .padding(.vertical, 2)
     }
 
+    /// Where a pick stands against this Mac's recommended model.
+    private func roleNote(_ role: ModelRecommendations.Pick.Role) -> Text? {
+        switch role {
+        case .recommended, .alternative: return nil
+        case .lighter: return Text("Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler.")
+        case .larger: return Text("Bigger than the recommended one: better answers, but slower, with less memory left for other apps.")
+        case .forCode: return Text("Made for programming and agents: coding tools and the OpenAI API.")
+        }
+    }
+
     private func details(_ pick: ModelRecommendations.Pick) -> String {
         var parts = [ModelCatalog.format(pick.sizeBytes)]
         if pick.fit == .tight { parts.append(NSLocalizedString("tight fit", comment: "setup: model fit")) }
@@ -500,6 +514,7 @@ private struct ChatModelStep: View {
             case .vision: return NSLocalizedString("reads images", comment: "setup: model capability")
             case .tools: return NSLocalizedString("calls tools", comment: "setup: model capability")
             case .reasoning: return NSLocalizedString("reasons", comment: "setup: model capability")
+            case .code: return NSLocalizedString("writes code", comment: "setup: model capability")
             }
         }
         parts += capabilities

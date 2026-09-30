@@ -23,9 +23,14 @@ final class ModelRecommendationsTests: XCTestCase {
 
     private func repos(_ picks: [ModelRecommendations.Pick]) -> [String] { picks.map(\.model.repo) }
 
-    private func model(_ repo: String, gb: Double, min: Int, tiers: [Int], recommended: Bool = false) -> RecommendedModel {
-        RecommendedModel(repo: repo, title: repo, summary: "", approxBytes: Int64(gb * 1e9), minMemoryGB: min,
-                         recommended: recommended, tiers: tiers)
+    private func model(_ repo: String, gb: Double, min: Int, recommendedFor: [Int] = [],
+                       capabilities: [RecommendedModel.Capability] = []) -> RecommendedModel {
+        RecommendedModel(repo: repo, title: repo, summary: "", capabilities: capabilities, approxBytes: Int64(gb * 1e9),
+                         minMemoryGB: min, recommendedFor: recommendedFor)
+    }
+
+    private func roles(_ picks: [ModelRecommendations.Pick]) -> [String: ModelRecommendations.Pick.Role] {
+        Dictionary(uniqueKeysWithValues: picks.map { ($0.model.repo, $0.role) })
     }
 
     func testTiers() {
@@ -38,29 +43,49 @@ final class ModelRecommendationsTests: XCTestCase {
         XCTAssertEqual(MemoryTier.tier(physicalMemoryBytes: 128 * gib), 32)
     }
 
-    func testFilterAndOrder() {
+    /// The ladder: a bigger Mac sees the smaller models too, its
+    /// recommended one first, then the general ones from the biggest down,
+    /// then the ones for code.
+    func testLadderAndOrder() {
         let list = [
-            model("a/small", gb: 3, min: 8, tiers: [8, 16]),
-            model("a/mid", gb: 7, min: 16, tiers: [16], recommended: true),
-            model("a/big", gb: 15.6, min: 24, tiers: [24, 32], recommended: true),
-            model("a/other", gb: 13, min: 24, tiers: [24, 32]),
+            model("a/small", gb: 3, min: 8, recommendedFor: [8]),
+            model("a/code", gb: 4, min: 8, capabilities: [.code]),
+            model("a/mid", gb: 7, min: 16, recommendedFor: [16]),
+            model("a/big", gb: 15.6, min: 24, recommendedFor: [24, 32]),
+            model("a/dense", gb: 18, min: 32),
         ]
-        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(8))), ["a/small"])
-        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(16))), ["a/mid", "a/small"], "recommended first")
-        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(24))), ["a/big", "a/other"])
-        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(64))), ["a/big", "a/other"])
-        // An 18 GB Mac is in the 16 tier, but has the memory.
-        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(18))), ["a/mid", "a/small"])
+        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(8))), ["a/small", "a/code"])
+        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(16))), ["a/mid", "a/small", "a/code"])
+        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(24))), ["a/big", "a/mid", "a/small", "a/code"])
+        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(64))), ["a/big", "a/dense", "a/mid", "a/small", "a/code"])
+        // An 18 GB Mac is in the 16 tier.
+        XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(18))), ["a/mid", "a/small", "a/code"])
+    }
+
+    func testRoles() {
+        let list = [
+            model("a/small", gb: 3, min: 8, recommendedFor: [8]),
+            model("a/code", gb: 4, min: 8, capabilities: [.code]),
+            model("a/big", gb: 15.6, min: 24, recommendedFor: [24, 32]),
+            model("a/dense", gb: 18, min: 32),
+        ]
+        XCTAssertEqual(roles(ModelRecommendations.picks(from: list, for: mac(64))),
+                       ["a/big": .recommended, "a/dense": .larger, "a/small": .lighter, "a/code": .forCode])
+        XCTAssertEqual(roles(ModelRecommendations.picks(from: list, for: mac(8))), ["a/small": .recommended, "a/code": .forCode])
+        // The recommended one doesn't fit this GPU: nothing to compare with.
+        let noRec = ModelRecommendations.picks(from: list, for: mac(24, workingSet: 10 * gib))
+        XCTAssertEqual(roles(noRec)["a/small"], .alternative)
+        XCTAssertNil(roles(noRec)["a/big"])
     }
 
     func testMinimumMemory() {
-        let list = [model("a/needs20", gb: 3, min: 20, tiers: [16])]
+        let list = [model("a/needs20", gb: 3, min: 20)]
         XCTAssertTrue(ModelRecommendations.picks(from: list, for: mac(16)).isEmpty)
         XCTAssertEqual(repos(ModelRecommendations.picks(from: list, for: mac(18))), [], "18 < 20")
     }
 
     func testFitAndGPULimit() {
-        let big = model("a/big", gb: 15.6, min: 24, tiers: [24])
+        let big = model("a/big", gb: 15.6, min: 24)
         let picks = ModelRecommendations.picks(from: [big], for: mac(24))
         XCTAssertEqual(picks.first?.fit, .tight, "15.6 GB of 24 GiB: the browser's tight")
         XCTAssertEqual(picks.first?.sizeBytes, big.approxBytes)
@@ -71,12 +96,12 @@ final class ModelRecommendationsTests: XCTestCase {
         // No Metal device (a VM): only the memory estimate.
         XCTAssertEqual(ModelRecommendations.picks(from: [big], for: HardwareInfo(physicalMemoryBytes: 24 * gib)).count, 1)
         // "unlikely" by the estimate is left out even if the GPU limit allows it.
-        let huge = model("a/huge", gb: 19, min: 24, tiers: [24])
+        let huge = model("a/huge", gb: 19, min: 24)
         XCTAssertTrue(ModelRecommendations.picks(from: [huge], for: mac(24, workingSet: 22 * gib)).isEmpty)
     }
 
     func testLiveSizes() {
-        let m = model("a/m", gb: 3, min: 8, tiers: [8])
+        let m = model("a/m", gb: 3, min: 8)
         let picks = ModelRecommendations.picks(from: [m], for: mac(8), liveSizes: ["a/m": 3_500_000_000])
         XCTAssertEqual(picks.first?.sizeBytes, 3_500_000_000)
         XCTAssertTrue(ModelRecommendations.picks(from: [m], for: mac(8), liveSizes: ["a/m": 7_000_000_000]).isEmpty,
@@ -87,17 +112,18 @@ final class ModelRecommendationsTests: XCTestCase {
         let json = #"""
         {"version": 2, "future": true, "models": [
           {"repo": "a/ok", "title": "OK", "summary": "Fine.", "capabilities": ["vision", "telepathy"],
-           "approxBytes": 100, "tiers": [8], "newField": 1},
-          {"repo": "no-slash", "title": "Bad", "approxBytes": 100, "tiers": [8]},
-          {"repo": "a/nosize", "title": "Bad", "tiers": [8]},
-          {"repo": "a/notiers", "title": "Bad", "approxBytes": 100, "tiers": []},
-          {"repo": "a/", "title": "Bad", "approxBytes": 100, "tiers": [8]}
+           "approxBytes": 100, "newField": 1},
+          {"repo": "a/old", "title": "Old", "approxBytes": 100, "recommended": true, "tiers": [8, 16]},
+          {"repo": "no-slash", "title": "Bad", "approxBytes": 100},
+          {"repo": "a/nosize", "title": "Bad"},
+          {"repo": "a/", "title": "Bad", "approxBytes": 100}
         ]}
         """#
         let models = try ModelRecommendations.parse(Data(json.utf8))
-        XCTAssertEqual(models.map(\.repo), ["a/ok"])
+        XCTAssertEqual(models.map(\.repo), ["a/ok", "a/old"])
         XCTAssertEqual(models.first?.capabilities, [.vision], "an unknown capability is dropped")
-        XCTAssertEqual(models.first?.recommended, false)
+        XCTAssertEqual(models.first?.recommendedFor, [])
+        XCTAssertEqual(models.last?.recommendedFor, [8, 16], "a list from before the ladder")
         XCTAssertEqual(models.first?.gated, false)
         XCTAssertEqual(models.first?.minMemoryGB, 0)
         XCTAssertThrowsError(try ModelRecommendations.parse(Data("[]".utf8)))
@@ -111,8 +137,8 @@ final class ModelRecommendationsTests: XCTestCase {
         XCTAssertEqual(Set(models.map(\.repo)).count, models.count, "no repo twice")
         for m in models {
             XCTAssertFalse(m.gated, "\(m.repo): the wizard downloads without a token")
-            XCTAssertTrue(m.tiers.allSatisfy(MemoryTier.all.contains), m.repo)
-            XCTAssertTrue(m.tiers.allSatisfy { $0 >= m.minMemoryGB || $0 == 32 }, "\(m.repo): offered below its minimum")
+            XCTAssertTrue(m.recommendedFor.allSatisfy(MemoryTier.all.contains), m.repo)
+            XCTAssertTrue(m.recommendedFor.allSatisfy { $0 >= m.minMemoryGB }, "\(m.repo): recommended below its minimum")
             XCTAssertFalse(m.summary.isEmpty, m.repo)
             XCTAssertTrue(m.summary.hasSuffix("."), "\(m.repo): a sentence")
             XCTAssertEqual(m.summary.filter { $0 == "." }.count, 1, "\(m.repo): one sentence")
@@ -121,9 +147,7 @@ final class ModelRecommendationsTests: XCTestCase {
             XCTAssertFalse(m.languages.isEmpty, m.repo)
         }
         for tier in MemoryTier.all {
-            let offered = models.filter { $0.tiers.contains(tier) }
-            XCTAssertFalse(offered.isEmpty, "tier \(tier)")
-            XCTAssertEqual(offered.filter(\.recommended).count, 1, "one recommended model in tier \(tier)")
+            XCTAssertEqual(models.filter { $0.recommendedFor.contains(tier) }.count, 1, "one recommended model in tier \(tier)")
         }
     }
 
@@ -137,7 +161,9 @@ final class ModelRecommendationsTests: XCTestCase {
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first?.model.repo, big)
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(36)).first?.model.repo, big)
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(128)).first?.model.repo, big)
-        XCTAssertTrue(ModelRecommendations.picks(from: models, for: mac(24)).first?.model.recommended == true)
+        XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first?.role, .recommended)
+        // The ladder: a 24 GB Mac may still pick the smallest.
+        XCTAssertTrue(repos(ModelRecommendations.picks(from: models, for: mac(24))).contains("mlx-community/gemma-4-e2b-it-4bit"))
         // Every tier offers something on a typical Mac of it.
         for gb: UInt64 in [8, 16, 24, 32, 64] {
             let picks = ModelRecommendations.picks(from: models, for: mac(gb))
@@ -150,7 +176,8 @@ final class ModelRecommendationsTests: XCTestCase {
 /// A pick already in the models folder isn't offered for download again.
 extension ModelRecommendationsTests {
     private func pick(_ repo: String, recommended: Bool = false) -> ModelRecommendations.Pick {
-        ModelRecommendations.Pick(model: model(repo, gb: 3, min: 8, tiers: [8], recommended: recommended), sizeBytes: 3_000_000_000, fit: .fits)
+        ModelRecommendations.Pick(model: model(repo, gb: 3, min: 8), sizeBytes: 3_000_000_000, fit: .fits,
+                                  role: recommended ? .recommended : .alternative)
     }
 
     func testLocalPathMatchesTheRepoCaseInsensitively() {
