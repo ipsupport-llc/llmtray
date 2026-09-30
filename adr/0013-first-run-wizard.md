@@ -125,13 +125,18 @@ guided front end to the same code, not a second configuration path.
   pip / `snapshot_download` child): cancelled, it finishes and its
   feature stays off. `HardwareProbe` (Core) also feeds the bug report.
 - `runtime/recommended_models.json`, bundled by `build_app.sh`: each
-  entry lists its memory `tiers` (a Mac's tier is its RAM: under 12 GB
-  → 8, under 20 → 16, under 32 → 24, else 32) and a `minMemoryGB`; one
-  entry per tier is `recommended`. `ModelRecommendations.picks` offers a
-  tier's models that the Mac has the memory for, whose weights fit the
-  GPU limit (the wired limit if the user set one, else Metal's working
-  set) and that `ModelFitLevel` (moved to Core) doesn't call unlikely;
-  recommended first, then the file's order. Repos were checked on the
+  entry has a `minMemoryGB` and `recommendedFor`, the memory tiers it's
+  recommended in (a Mac's tier is its RAM: under 12 GB → 8, under 20 →
+  16, under 32 → 24, else 32; one recommended entry per tier).
+  `ModelRecommendations.picks` offers **the ladder** (2026-09-30, replacing
+  per-entry `tiers`): every model the Mac has the memory for, whose weights
+  fit the GPU limit (the wired limit if the user set one, else Metal's
+  working set) and that `ModelFitLevel` (moved to Core) doesn't call
+  unlikely, so a bigger Mac still sees the small models. The tier's
+  recommended model first and marked, then the general models from the
+  biggest down, labelled against it (lighter: faster, simpler answers;
+  bigger: better answers, slower), then the ones with the `code` capability
+  as made for programming. Repos were checked on the
   Hub (exist, ungated, sizes from `?blobs=true`) and against the pinned
   mlx-lm's model code: no gpt-oss (no harmony tool parser there), no
   `gemma4_unified` conversions.
@@ -180,6 +185,9 @@ guided front end to the same code, not a second configuration path.
   26B-A4B (`roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang`) for 24 GB and
   up, Gemma 4 E4B (`roman220220/gemma-4-E4B-it-gptq-mlx-jang`) below;
   the rest of each tier filled in PR 2 from what fits.
+- (2026-09-30) The ladder above; our own quantizations wherever we have
+  one, another publisher's only where we don't (Gemma 4 E2B, 31B); no
+  Mistral; the Nemotron code models offered on every Mac they fit.
 - The chat-model download **starts at step 4**, right when it's picked,
   and runs on while the wizard continues; everything else after Finish.
 - The banner: `docs/assets/welcome-banner.jpg` (the app's green-brain

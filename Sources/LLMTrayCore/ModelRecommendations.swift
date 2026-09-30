@@ -4,7 +4,9 @@ import Foundation
 /// adr/0013).
 public struct RecommendedModel: Codable, Equatable, Sendable, Identifiable {
     public enum Capability: String, Codable, Sendable, CaseIterable {
-        case vision, tools, reasoning
+        /// `code`: made for programming and agents -- offered as that, not
+        /// ranked against the general models.
+        case vision, tools, reasoning, code
     }
 
     public var id: String { repo }
@@ -18,18 +20,18 @@ public struct RecommendedModel: Codable, Equatable, Sendable, Identifiable {
     public var license: String?
     /// The repo's files, until the Hub's live size is read.
     public var approxBytes: Int64
-    /// Never offered on a Mac with less memory.
+    /// Never offered on a Mac with less memory. Above it, offered on every
+    /// Mac it fits (the ladder: a bigger Mac sees the smaller models too).
     public var minMemoryGB: Int
-    /// Marked, and listed first.
-    public var recommended: Bool
-    /// The memory tiers it's offered in (MemoryTier).
-    public var tiers: [Int]
+    /// The memory tiers (MemoryTier) it's the recommended model of: marked
+    /// and listed first there.
+    public var recommendedFor: [Int]
     /// Needs a license accepted on its page and a token to download.
     public var gated: Bool
 
     public init(repo: String, title: String, summary: String, capabilities: [Capability] = [], languages: [String] = [],
-                license: String? = nil, approxBytes: Int64, minMemoryGB: Int, recommended: Bool = false,
-                tiers: [Int], gated: Bool = false) {
+                license: String? = nil, approxBytes: Int64, minMemoryGB: Int, recommendedFor: [Int] = [],
+                gated: Bool = false) {
         self.repo = repo
         self.title = title
         self.summary = summary
@@ -38,13 +40,29 @@ public struct RecommendedModel: Codable, Equatable, Sendable, Identifiable {
         self.license = license
         self.approxBytes = approxBytes
         self.minMemoryGB = minMemoryGB
-        self.recommended = recommended
-        self.tiers = tiers
+        self.recommendedFor = recommendedFor
         self.gated = gated
     }
 
     private enum CodingKeys: String, CodingKey {
-        case repo, title, summary, capabilities, languages, license, approxBytes, minMemoryGB, recommended, tiers, gated
+        case repo, title, summary, capabilities, languages, license, approxBytes, minMemoryGB, recommendedFor, gated
+        // A list from before the ladder: offered in `tiers`, recommended
+        // there when `recommended`.
+        case recommended, tiers
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(repo, forKey: .repo)
+        try c.encode(title, forKey: .title)
+        try c.encode(summary, forKey: .summary)
+        try c.encode(capabilities, forKey: .capabilities)
+        try c.encode(languages, forKey: .languages)
+        try c.encodeIfPresent(license, forKey: .license)
+        try c.encode(approxBytes, forKey: .approxBytes)
+        try c.encode(minMemoryGB, forKey: .minMemoryGB)
+        try c.encode(recommendedFor, forKey: .recommendedFor)
+        try c.encode(gated, forKey: .gated)
     }
 
     /// Lenient where a newer list may say more: a capability this version
@@ -59,8 +77,12 @@ public struct RecommendedModel: Codable, Equatable, Sendable, Identifiable {
         license = try c.decodeIfPresent(String.self, forKey: .license)
         approxBytes = try c.decode(Int64.self, forKey: .approxBytes)
         minMemoryGB = try c.decodeIfPresent(Int.self, forKey: .minMemoryGB) ?? 0
-        recommended = try c.decodeIfPresent(Bool.self, forKey: .recommended) ?? false
-        tiers = try c.decode([Int].self, forKey: .tiers)
+        if let tiers = try c.decodeIfPresent([Int].self, forKey: .recommendedFor) {
+            recommendedFor = tiers
+        } else {
+            let old = try c.decodeIfPresent(Bool.self, forKey: .recommended) ?? false
+            recommendedFor = old ? try c.decodeIfPresent([Int].self, forKey: .tiers) ?? [] : []
+        }
         gated = try c.decodeIfPresent(Bool.self, forKey: .gated) ?? false
     }
 }
@@ -91,6 +113,30 @@ public enum ModelRecommendations {
         public var model: RecommendedModel
         public var sizeBytes: Int64
         public var fit: ModelFitLevel
+        public var role: Role = .alternative
+
+        /// Where it stands on this Mac, for its label.
+        public enum Role: Equatable, Sendable {
+            /// This Mac's recommended model.
+            case recommended
+            /// Smaller than the recommended one: faster, leaves memory to
+            /// other apps, simpler answers.
+            case lighter
+            /// Bigger than the recommended one: better answers, slower, less
+            /// memory left.
+            case larger
+            /// Made for programming and agents (`code`).
+            case forCode
+            /// No recommended model to compare with here.
+            case alternative
+        }
+
+        public init(model: RecommendedModel, sizeBytes: Int64, fit: ModelFitLevel, role: Role = .alternative) {
+            self.model = model
+            self.sizeBytes = sizeBytes
+            self.fit = fit
+            self.role = role
+        }
     }
 
     private struct List: Decodable {
@@ -117,28 +163,42 @@ public enum ModelRecommendations {
 
     private static func isValid(_ m: RecommendedModel) -> Bool {
         let parts = m.repo.split(separator: "/", omittingEmptySubsequences: false)
-        return parts.count == 2 && parts.allSatisfy { !$0.isEmpty } && m.approxBytes > 0
-            && !m.title.isEmpty && !m.tiers.isEmpty
+        return parts.count == 2 && parts.allSatisfy { !$0.isEmpty } && m.approxBytes > 0 && !m.title.isEmpty
     }
 
-    /// What to offer on `hardware`: the models of its memory tier that it
-    /// has the memory for, whose weights fit the GPU's limit (when known)
-    /// and that aren't "unlikely" by the HF browser's fit estimate.
-    /// Recommended first, otherwise in the list's order. `liveSizes`: repo
-    /// -> the Hub's current size, over the list's approxBytes.
+    /// What to offer on `hardware` -- the ladder: every model it has the
+    /// memory for (`minMemoryGB`), whose weights fit the GPU's limit (when
+    /// known) and that isn't "unlikely" by the HF browser's fit estimate.
+    /// Its tier's recommended model first, then the general ones from the
+    /// biggest down, then the ones made for code; each with its role
+    /// against the recommended one. `liveSizes`: repo -> the Hub's current
+    /// size, over the list's approxBytes.
     public static func picks(from models: [RecommendedModel], for hardware: HardwareInfo,
                              liveSizes: [String: Int64] = [:]) -> [Pick] {
         let memory = hardware.physicalMemoryBytes
         let tier = MemoryTier.tier(physicalMemoryBytes: memory)
         let gpuLimit = hardware.gpuLimitBytes
-        let offered: [Pick] = models.compactMap { model in
-            guard model.tiers.contains(tier), memory >= UInt64(max(0, model.minMemoryGB)) << 30 else { return nil }
+        var offered: [Pick] = models.compactMap { model in
+            guard memory >= UInt64(max(0, model.minMemoryGB)) << 30 else { return nil }
             let size = liveSizes[model.repo] ?? model.approxBytes
             if let gpuLimit, size >= Int64(clamping: gpuLimit) { return nil }
             let fit = ModelFitLevel.estimate(sizeBytes: size, physicalMemoryBytes: memory)
             guard fit != .unlikely else { return nil }
             return Pick(model: model, sizeBytes: size, fit: fit)
         }
-        return offered.filter(\.model.recommended) + offered.filter { !$0.model.recommended }
+        let recommended = offered.first { $0.model.recommendedFor.contains(tier) }
+        for i in offered.indices {
+            let pick = offered[i]
+            if pick.id == recommended?.id {
+                offered[i].role = .recommended
+            } else if pick.model.capabilities.contains(.code) {
+                offered[i].role = .forCode
+            } else if let recommended {
+                offered[i].role = pick.sizeBytes < recommended.sizeBytes ? .lighter : .larger
+            }
+        }
+        let general = offered.filter { $0.role != .recommended && $0.role != .forCode }.sorted { $0.sizeBytes > $1.sizeBytes }
+        let forCode = offered.filter { $0.role == .forCode }.sorted { $0.sizeBytes > $1.sizeBytes }
+        return offered.filter { $0.role == .recommended } + general + forCode
     }
 }

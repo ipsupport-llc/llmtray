@@ -146,6 +146,7 @@
 "Beta" = "Beta";
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it.";
 "Beta: pre-release builds with features still being tested." = "Beta: pre-release builds with features still being tested.";
+"Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Bigger than the recommended one: better answers, but slower, with less memory left for other apps.";
 "Brings over the chats, projects, profiles and the image, music, voice and embedding models of the version from ipsupport.us (quit it first). Nothing here is replaced, and the models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Brings over the chats, projects, profiles and the image, music, voice and embedding models of the version from ipsupport.us (quit it first). Nothing here is replaced, and the models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.";
 "Browse Hugging Face…" = "Browse Hugging Face…";
 "Cached" = "Cached";
@@ -450,6 +451,7 @@
 "Let the chat propose changes in %@?" = "Let the chat propose changes in %@?";
 "Library" = "Library";
 "Licence: %@" = "Licence: %@";
+"Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler.";
 "Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
 "Link (optional, https://…)" = "Link (optional, https://…)";
@@ -463,6 +465,7 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Long conversations and pinned files come from the cache instead of being read again every turn.";
+"Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
 "Make images and edit them." = "Make images and edit them.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
@@ -1120,6 +1123,7 @@
 "until %@" = "until %@";
 "used by %@" = "used by %@";
 "waiting" = "waiting";
+"writes code" = "writes code";
 "~%1$lld h %2$lld min left" = "~%1$lld h %2$lld min left";
 "~%lld h left" = "~%lld h left";
 "~%lld min left" = "~%lld min left";
