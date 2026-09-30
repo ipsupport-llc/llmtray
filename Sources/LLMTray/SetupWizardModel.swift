@@ -250,6 +250,7 @@ final class SetupWizardModel: ObservableObject {
         panel.directoryURL = URL(fileURLWithPath: progress.choices.modelsFolder)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url, !locksModelsFolder else { return }
+        SandboxAccess.remember(url)
         progress.choices.modelsFolder = url.path
     }
 

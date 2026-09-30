@@ -233,7 +233,12 @@ struct ModelsPane: View {
                         Button("Choose…", action: chooseFolder)
                     }
                 } label: {
+                    #if APP_STORE
+                    // No other app named in the App Store build (adr/0018 §5).
+                    SettingLabel(title: "Models folder", help: "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too.")
+                    #else
                     SettingLabel(title: "Models folder", help: "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.")
+                    #endif
                 }
                 LabeledContent {
                     Text(diskUsageText).monospacedDigit().foregroundStyle(.secondary)
@@ -265,7 +270,9 @@ struct ModelsPane: View {
                     SettingLabel(title: "Hugging Face token", help: "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.")
                 }
                 HStack {
+                    #if !APP_STORE
                     Button("Use LM Studio's folder") { FeatureSetup.shared.useLMStudioFolder() }
+                    #endif
                     Button("Rescan", action: rescan)
                     Spacer()
                     Button("Browse Hugging Face…") { NotificationCenter.default.post(name: .showHFBrowser, object: nil) }
@@ -347,6 +354,7 @@ struct ModelsPane: View {
         panel.directoryURL = URL(fileURLWithPath: modelsRoot)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }
+        SandboxAccess.remember(url)
         FeatureSetup.shared.setModelsFolder(url.path)
     }
 }
