@@ -116,9 +116,6 @@ final class MfluxManager: ObservableObject {
         case noPython
         case processFailed(String)
         case outputMissing
-        /// The App Store build ships no image runtime yet (adr/0018 §4:
-        /// mflux's dependencies carry GPL code; nothing is pip-installed).
-        case notInThisBuild
 
         var errorDescription: String? {
             switch self {
@@ -128,8 +125,6 @@ final class MfluxManager: ObservableObject {
                 return String(format: NSLocalizedString("Image generation failed: %@", comment: ""), detail)
             case .outputMissing:
                 return NSLocalizedString("Image generation finished but produced no output file.", comment: "")
-            case .notInThisBuild:
-                return NSLocalizedString("Image generation isn't in the App Store version of LLMTray yet. It's in the version from ipsupport.us.", comment: "")
             }
         }
     }
@@ -145,13 +140,19 @@ final class MfluxManager: ObservableObject {
     /// (in-memory model, step callbacks), which move between releases -- a
     /// new mflux must not silently break image generation for new installs.
     /// (Never vendor this venv into a DMG: opencv-python in it bundles GPL
-    /// codecs; the user's own pip installs it.)
+    /// codecs; the user's own pip installs it. The App Store build bundles
+    /// our mflux fork instead, which runs without opencv-python and torch:
+    /// runtime/mflux_runtime.json, adr/0018 §4.)
     static let mfluxVersion = "0.20.0"
     static var mfluxRequirement: String { "mflux==\(mfluxVersion)" }
 
+    #if APP_STORE
+    private var venvPython: String { BundledRuntime.python }
+    #else
     private var venvDir: String { RuntimePaths.externalRuntimeDir + "/mflux_venv" }
     private var venvPython: String { venvDir + "/bin/python3" }
     private var saveBinary: String { venvDir + "/bin/mflux-save" }
+    #endif
 
     /// Where a model's published HF checkpoint is downloaded to -- already
     /// GPTQ-quantized and in mflux's native MLX format, so this is used
@@ -165,7 +166,7 @@ final class MfluxManager: ObservableObject {
     /// loaded. Idempotent and cheap once the venv exists.
     private func ensurePackageInstalled() async throws {
         #if APP_STORE
-        throw MfluxError.notInThisBuild
+        // Inside the bundle, installed with it: nothing to install.
         #else
         try FileManager.default.createDirectory(
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
@@ -196,8 +197,12 @@ final class MfluxManager: ObservableObject {
     /// The mflux version in the venv, from its dist-info folder's name
     /// (mflux-0.20.0.dist-info) -- no Python started for it.
     private func installedMfluxVersion() -> String? {
-        guard let site = PythonPackageLicenses.sitePackages(venv: URL(fileURLWithPath: venvDir)),
-              let items = try? FileManager.default.contentsOfDirectory(atPath: site.path) else { return nil }
+        #if APP_STORE
+        let site = URL(fileURLWithPath: BundledRuntime.packages)
+        #else
+        guard let site = PythonPackageLicenses.sitePackages(venv: URL(fileURLWithPath: venvDir)) else { return nil }
+        #endif
+        guard let items = try? FileManager.default.contentsOfDirectory(atPath: site.path) else { return nil }
         return items.first { $0.hasPrefix("mflux-") && $0.hasSuffix(".dist-info") }
             .map { String($0.dropFirst("mflux-".count).dropLast(".dist-info".count)) }
     }

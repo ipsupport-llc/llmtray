@@ -734,7 +734,6 @@ struct ProfilesPane: View {
                     TextEditor(text: b(\.tools.toolUsePolicy)).frame(minHeight: 50)
                 }
             }
-            #if !APP_STORE
             Section("Image generation") {
                 row(\.tools.enableImageGeneration, "Enable image generation", "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.") {
                     Toggle("", isOn: enableImageGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
@@ -770,7 +769,6 @@ struct ProfilesPane: View {
                     Text(imageModelDownloadError).font(.caption).foregroundStyle(.red)
                 }
             }
-            #endif
             Section("Creator mode") {
                 row(\.tools.creatorMode, "Creator mode", "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it.") {
                     Toggle("", isOn: b(\.tools.creatorMode)).labelsHidden()

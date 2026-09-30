@@ -32,7 +32,7 @@ The listing, in the user's words (memory: llmtray-positioning):
 | **Signing** | Developer ID Application, notarized | Apple Distribution plus a Mac App Store provisioning profile; the installer package signed with Mac Installer Distribution |
 | **Payments** | none (tips via GitHub Sponsors, [0017](0017-supporters.md)) | StoreKit IAP tips only, and no external payment links |
 | **Privacy label** | opt-in telemetry ([0015](0015-telemetry.md)), reviews | declared as-is: usage data, opt-in, not linked to the user; reviews (user content, moderated) |
-| **Licences** | Full build: notices generated for the vendored runtime | the same, for every vendored runtime. **No GPL** in the bundle: mflux's `opencv-python` carries GPL codecs (never vendored today) |
+| **Licences** | Full build: notices generated for the vendored runtime | the same, for every vendored runtime. **No GPL** in the bundle: mflux's `opencv-python` carries GPL codecs, so mflux ships without it (§4) |
 
 ## Decision
 
@@ -102,6 +102,16 @@ Homebrew Python.
   parent's security-scoped access; the spike proved it. The app resolves
   the bookmark, calls `startAccessingSecurityScopedResource()`, and
   passes the path. No copying and no descriptor passing.
+- **Preferences move, the rest doesn't (checked 2026-09-30).** The first
+  time a sandboxed app runs, macOS **moves** a non-sandboxed app's
+  preferences with the same bundle id (`~/Library/Preferences/<id>.plist`)
+  into its container: a test app read the value, and the original file was
+  gone. With `us.ipsupport.llmtray` for both builds, someone switching to
+  the App Store build keeps their settings, but a Developer ID build still
+  installed then starts over (setup wizard, defaults). **Open, the
+  maintainer's call before the first upload:** keep one bundle id (switching
+  is the common case) or give the App Store build its own (both side by
+  side, settings imported by hand). Application Support isn't moved.
 - **First-run import from the Developer ID build.** The container can't
   read `~/Library/Application Support/LLMTray` on its own. An **Import
   from LLMTray (direct download)** button asks the user to grant that
@@ -115,9 +125,17 @@ Homebrew Python.
   - relaunching after a setting change: the new instance starts through
     `NSWorkspace` and waits for the old one to exit (`--after-pid`), with no
     shell;
-  - **open:** the leftover-process scan (`/bin/ps`, `OrphanScan`) still runs
-    `ps` inside the sandbox, where it may see nothing. Replacing it with
-    `libproc`/`sysctl` needs a check of what the sandbox lets it read.
+  - the leftover-process scan (`OrphanScan`): not in the App Store build.
+    Checked in the sandbox (2026-09-30): `/bin/ps` can't be run ("Operation
+    not permitted"); `sysctl` `KERN_PROC_ALL` lists every process and
+    `KERN_PROCARGS2` / `proc_pidinfo` read a leftover runner's marker and
+    parent, but the app **may not signal it** (SIGTERM: "Operation not
+    permitted"), so finding one would be of no use. None is left behind
+    instead: every Python process the app starts exits when its parent goes
+    away (`python-packages/sitecustomize.py`, for processes with
+    `LLMTRAY_EXIT_WITH_PARENT=1`, which the app sets for itself at launch),
+    also when the parent was already gone as it started. Checked: both
+    exit within 0.5 s; a control without the variable stays.
 
 ### 4. What the first App Store version has
 
@@ -125,9 +143,25 @@ Homebrew Python.
 |---|---|
 | chat, the OpenAI-compatible API, projects and RAG, tools, MTP drafters | yes |
 | Voice Lab (mlx-audio) and music (ACE-Step, mlx-audio) | yes, bundled |
-| image generation (mflux) | **only if** its dependencies can ship without GPL code (`opencv-python` has GPL codecs); otherwise it's left out of v1 and the Developer ID build keeps it |
+| image generation (mflux): z-image-turbo, FLUX.2 klein generation and editing | yes, bundled: our mflux fork without `opencv-python` and torch (below) |
 | runtime "Check for Updates" | no: runtimes come with app updates |
 | bundled runtime size | about 1.5–2.5 GB. Allowed; the listing says so |
+
+**Image generation without GPL.** mflux (MIT) requires `opencv-python`
+and torch. Every `opencv-python` wheel, `-headless` too (checked:
+4.14.0.94), bundles FFmpeg built with `--enable-gpl` plus `libx264` and
+`libx265` (GPL): it can't be in an App Store bundle. mflux uses OpenCV only
+in the ControlNet/OpenPose preprocessors and torch only for PyTorch-format
+weights, but imported both at module load. Our fork
+(`ipsupport-llc/mflux`, branch `llmtray`, from v.0.20.0) imports them only
+where they're used, and the App Store build installs mflux without its
+dependencies and then all of them but those two
+(`runtime/mflux_runtime.json`; `jinja2`, which torch used to bring along,
+is added). The models LLMTray runs are MLX-native and need neither; checked
+with neither installed and no network (z-image-turbo 512² in 9 steps,
+klein generation and editing in 4). The build fails if an excluded package
+comes back through another one. It also saves torch's ~400 MB. The
+standalone build keeps pip-installing mflux from PyPI on the user's Mac.
 
 ### 5. Review risks and how they're met
 
@@ -186,6 +220,20 @@ What this settles:
   Together with the runtime-exceptions test, the whole bundled stack runs
   with no exceptions at all.
 
+### The runners in the sandbox (2026-09-30)
+
+`scripts/appstore/build_runners_spike.sh`: a sandboxed test app with the
+App Store build's Python, packages and runners (app-sandbox + inherit), the
+models read through a read-only exception only it has. On the MacBook Air
+M5, one after the other:
+
+| check | result |
+|---|---|
+| image, z-image-turbo 512², 9 steps | PASS, 65 s |
+| image, FLUX.2 klein 512², 4 steps | PASS, 21 s |
+| music, ACE-Step turbo, 10 s | PASS, 23 s |
+| voice, VoiceChat GPTQ-3 load + warm-up | PASS, 30 s (rtf 1.85 right after the others, on a fanless Mac: not compared cold) |
+
 ## Steps
 
 0. **The user, in App Store Connect / Certificates:**
@@ -208,8 +256,13 @@ What this settles:
    - the container paths for runners;
    - the import from the Developer ID build.
 4. **Licences:**
+   - **open:** scipy (an mlx-audio dependency, in the bundle since step 2)
+     ships `libgfortran`, `libgcc_s`, `libquadmath`: GPLv3 with the GCC
+     Runtime Library Exception, which allows shipping them in non-GPL
+     software. To settle before submission: confirm that's acceptable, or
+     keep scipy out if mlx-audio's runners don't need it;
    - notices for every bundled runtime;
-   - mflux without GPL, or image generation left out of v1.
+   - ~~mflux without GPL~~: done (§4, "Image generation without GPL").
 5. **Tips** ([0017](0017-supporters.md)) in the App Store flavor.
 6. **TestFlight for Mac** (internal testers), then submission with review
    notes (§5).
