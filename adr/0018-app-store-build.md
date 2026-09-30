@@ -111,7 +111,13 @@ Homebrew Python.
   them):
   - `/bin/sh` in Settings: a Foundation or `NSWorkspace` call instead;
   - `/usr/bin/ditto` in the bug reporter: an in-process zip instead;
-  - locating a system Python: not compiled.
+  - locating a system Python: not compiled;
+  - relaunching after a setting change: the new instance starts through
+    `NSWorkspace` and waits for the old one to exit (`--after-pid`), with no
+    shell;
+  - **open:** the leftover-process scan (`/bin/ps`, `OrphanScan`) still runs
+    `ps` inside the sandbox, where it may see nothing. Replacing it with
+    `libproc`/`sysctl` needs a check of what the sandbox lets it read.
 
 ### 4. What the first App Store version has
 
