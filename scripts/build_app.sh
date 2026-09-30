@@ -20,21 +20,40 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-BUILD_DIR="$REPO_ROOT/.build/app"
+# LLMTRAY_APP_STORE=1: the Mac App Store flavor (adr/0018) -- its own build
+# folder and bundle (.build/appstore/LLMTray.app), no Sparkle, the App
+# Store's Info.plist keys. Unset: the standalone build, as always.
+APP_STORE="${LLMTRAY_APP_STORE:-}"
+if [[ "$APP_STORE" == 1 ]]; then
+  BUILD_PATH="$REPO_ROOT/.build-appstore"
+  BUILD_DIR="$REPO_ROOT/.build/appstore"
+else
+  BUILD_PATH="$REPO_ROOT/.build"
+  BUILD_DIR="$REPO_ROOT/.build/app"
+fi
 APP="$BUILD_DIR/LLMTray.app"
 VERSION="${VERSION:-0.0.0-dev}"
 
-echo "--- building release binary (version $VERSION) ---"
+echo "--- building release binary (version $VERSION${APP_STORE:+, App Store flavor}) ---"
 cd "$REPO_ROOT"
-swift build -c release
+if [[ "$APP_STORE" == 1 ]]; then
+  # Without Sparkle the package has no dependencies, and SwiftPM rewrites
+  # Package.resolved without them: kept and put back after the build.
+  cp Package.resolved "$BUILD_PATH.Package.resolved" 2>/dev/null || true
+  trap 'cp "$BUILD_PATH.Package.resolved" Package.resolved 2>/dev/null || true' EXIT
+fi
+swift build -c release --build-path "$BUILD_PATH"
+[[ "$APP_STORE" == 1 ]] && cp "$BUILD_PATH.Package.resolved" Package.resolved 2>/dev/null || true
 
-RELEASE_DIR="$REPO_ROOT/.build/release"
-# -ipath: Swift 6.4+ builds into .build/out/Products/Release (capital R),
-# older toolchains into .build/<triple>/release.
-SPARKLE_FRAMEWORK="$(find "$REPO_ROOT/.build" -maxdepth 4 -iname "Sparkle.framework" -ipath "*/release/*" | head -1)"
-if [[ -z "$SPARKLE_FRAMEWORK" ]]; then
-  echo "error: could not locate built Sparkle.framework under .build/" >&2
-  exit 1
+RELEASE_DIR="$BUILD_PATH/release"
+if [[ "$APP_STORE" != 1 ]]; then
+  # -ipath: Swift 6.4+ builds into .build/out/Products/Release (capital R),
+  # older toolchains into .build/<triple>/release.
+  SPARKLE_FRAMEWORK="$(find "$BUILD_PATH" -maxdepth 4 -iname "Sparkle.framework" -ipath "*/release/*" | head -1)"
+  if [[ -z "$SPARKLE_FRAMEWORK" ]]; then
+    echo "error: could not locate built Sparkle.framework under .build/" >&2
+    exit 1
+  fi
 fi
 
 echo "--- assembling $APP ---"
@@ -60,7 +79,7 @@ for lproj in "$REPO_ROOT"/Resources/Localization/*.lproj; do
   cp -R "$lproj" "$APP/Contents/Resources/"
   LANGS+=("$(basename "$lproj" .lproj)")
 done
-cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
+[[ "$APP_STORE" == 1 ]] || cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
 # Only the scripts, the version pin and the first-run wizard's curated
 # model list -- never the venv itself, which is machine-specific and gets
 # created fresh on first run.
@@ -93,13 +112,22 @@ done
 # a beta can't just reuse "X.Y.Z-beta.N" there.
 BUNDLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP/Contents/Info.plist"
+if [[ "$APP_STORE" == 1 ]]; then
+  # No Sparkle feed; the category and export-compliance answers App Store
+  # Connect asks for (only standard encryption: HTTPS).
+  for key in SUFeedURL SUPublicEDKey SUEnableAutomaticChecks; do
+    /usr/libexec/PlistBuddy -c "Delete :$key" "$APP/Contents/Info.plist" 2>/dev/null || true
+  done
+  /usr/libexec/PlistBuddy -c "Add :LSApplicationCategoryType string public.app-category.developer-tools" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$APP/Contents/Info.plist"
+fi
 
 # The binary already carries an `@rpath/Sparkle.framework/...` load command
 # (SPM linked against it), but SPM doesn't add the standard app-bundle
 # rpath the way Xcode's "Embed Frameworks" build phase would -- without
 # this, the executable can't actually find the framework we just copied
 # into Contents/Frameworks at launch.
-install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/LLMTray"
+[[ "$APP_STORE" == 1 ]] || install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/LLMTray"
 
 # Developer ID with SIGN_IDENTITY (hardened runtime, for notarization),
 # ad-hoc without it (local use; Gatekeeper's "right-click Open" bypass).

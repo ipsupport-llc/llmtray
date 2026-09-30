@@ -20,7 +20,10 @@ if [[ -z "$IDENTITY" || "$IDENTITY" == "-" ]]; then
 fi
 
 OPTS=(--force --timestamp --options runtime --sign "$IDENTITY")
-PY_ENT="$SCRIPT_DIR/python.entitlements"
+# The App Store flavor passes the sandbox's: scripts/appstore/app.entitlements
+# for the app, runner.entitlements (app-sandbox + inherit) for Python.
+APP_ENT="${APP_ENTITLEMENTS:-$SCRIPT_DIR/LLMTray.entitlements}"
+PY_ENT="${PYTHON_ENTITLEMENTS:-$SCRIPT_DIR/python.entitlements}"
 
 is_macho() { file -b "$1" | grep -q "Mach-O"; }
 
@@ -53,6 +56,6 @@ while IFS= read -r -d '' b; do
 done < <(find "$APP/Contents" -depth -type d \( -name "*.xpc" -o -name "*.app" -o -name "*.framework" \) -print0)
 
 # 3. The app.
-codesign "${OPTS[@]}" --entitlements "$SCRIPT_DIR/LLMTray.entitlements" "$APP"
+codesign "${OPTS[@]}" --entitlements "$APP_ENT" "$APP"
 codesign --verify --deep --strict --verbose=2 "$APP"
 echo "--- signed $APP with $IDENTITY ---"

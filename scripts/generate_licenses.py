@@ -24,6 +24,7 @@ writing an entry without a name.
 """
 import importlib.metadata as md
 import json
+import os
 import pathlib
 import sys
 
@@ -75,7 +76,9 @@ def guess_license(text):
 def base(repo, out):
     entries = [{"name": "LLMTray", "license": "Apache-2.0", "url": "https://github.com/ipsupport-llc/llmtray",
                 "text": (repo / "LICENSE").read_text()}]
-    pins = json.loads((repo / "Package.resolved").read_text())["pins"]
+    # The Swift packages the app links; LLMTRAY_APP_STORE=1 builds without
+    # any (no Sparkle, adr/0018), so none of them ships.
+    pins = [] if os.environ.get("LLMTRAY_APP_STORE") == "1" else json.loads((repo / "Package.resolved").read_text())["pins"]
     for pin in pins:
         name = pin["location"].rstrip("/").split("/")[-1].removesuffix(".git")
         candidates = [repo / ".build" / d / sub for d in ("checkouts", "artifacts") for sub in (name, f"{pin['identity']}/{name}")]
