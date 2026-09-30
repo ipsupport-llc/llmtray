@@ -380,6 +380,7 @@
 "Image generation" = "Image generation";
 "Image generation failed: %@" = "Image generation failed: %@";
 "Image generation finished but produced no output file." = "Image generation finished but produced no output file.";
+"Image generation isn't in the App Store version of LLMTray yet. It's in the version from ipsupport.us." = "Image generation isn't in the App Store version of LLMTray yet. It's in the version from ipsupport.us.";
 "Image generation isn't set up -- turn it on again in Settings." = "Image generation isn't set up -- turn it on again in Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image generation off" = "Image generation off";

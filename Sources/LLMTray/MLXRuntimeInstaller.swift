@@ -65,7 +65,11 @@ final class MLXRuntimeInstaller {
     /// every single "Start Server" click -- work that only ever needs doing
     /// once, not once per app launch (or, prior to this, once per update).
     static var venvDir: String { RuntimePaths.externalRuntimeDir + "/mlx_server_venv" }
+    #if APP_STORE
+    static var venvPython: String { BundledRuntime.python }
+    #else
     static var venvPython: String { venvDir + "/bin/python3" }
+    #endif
     // Only ever used as an existence check (pip creates it as its last
     // install step, so its presence is a reliable "setup finished" signal)
     // -- never executed directly, see ServerManager.launchServerProcess.
@@ -99,21 +103,27 @@ final class MLXRuntimeInstaller {
     /// (models/<type>.py) -- e.g. the Gemma 4 MTP drafter's.
     /// Whether the installed mlx_lm.server takes `flag` (an older pinned
     /// runtime would refuse to start on an unknown one).
-    static func serverSupportsFlag(_ flag: String) -> Bool {
+    /// The installed packages' folders: the venv's site-packages, or the
+    /// App Store build's bundled packages.
+    private static var sitePackageDirs: [String] {
+        #if APP_STORE
+        return BundledRuntime.sitePackageDirs
+        #else
         let lib = venvDir + "/lib"
-        guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }
-        return pythons.contains { py in
-            guard let text = try? String(contentsOfFile: "\(lib)/\(py)/site-packages/mlx_lm/server.py", encoding: .utf8) else { return false }
+        let pythons = (try? FileManager.default.contentsOfDirectory(atPath: lib)) ?? []
+        return pythons.map { "\(lib)/\($0)/site-packages" }
+        #endif
+    }
+
+    static func serverSupportsFlag(_ flag: String) -> Bool {
+        sitePackageDirs.contains { dir in
+            guard let text = try? String(contentsOfFile: "\(dir)/mlx_lm/server.py", encoding: .utf8) else { return false }
             return text.contains("\"\(flag)\"")
         }
     }
 
     static func supportsModelType(_ modelType: String) -> Bool {
-        let lib = venvDir + "/lib"
-        guard let pythons = try? FileManager.default.contentsOfDirectory(atPath: lib) else { return false }
-        return pythons.contains { py in
-            FileManager.default.fileExists(atPath: "\(lib)/\(py)/site-packages/mlx_lm/models/\(modelType).py")
-        }
+        sitePackageDirs.contains { FileManager.default.fileExists(atPath: "\($0)/mlx_lm/models/\(modelType).py") }
     }
 
     /// Version directory name (e.g. "3.14") isn't known ahead of time, so
@@ -197,15 +207,23 @@ final class MLXRuntimeInstaller {
 
     /// The Full build: the runtime ships inside the app (nothing to
     /// download, no Python needed).
+    #if APP_STORE
+    static var isFullBuild: Bool { true }
+    #else
     static var isFullBuild: Bool { FileManager.default.fileExists(atPath: bundledVenvServerBinary) }
+    #endif
 
     /// The runtime for the current pin is set up (what ensureReady checks
     /// first).
     static var isReady: Bool {
+        #if APP_STORE
+        return FileManager.default.isExecutableFile(atPath: BundledRuntime.python)
+        #else
         guard let pin = RuntimePin.current?.ref,
               let installed = try? String(contentsOfFile: versionMarkerPath, encoding: .utf8) else { return false }
         return installed.trimmingCharacters(in: .whitespacesAndNewlines) == pin
             && FileManager.default.fileExists(atPath: venvServerBinary)
+        #endif
     }
 
     /// The setup running now, whoever started it (the first-run wizard, a
@@ -232,7 +250,12 @@ final class MLXRuntimeInstaller {
     /// A caller arriving while another setup runs waits for it; install()
     /// then finds the runtime ready and returns at once.
     func ensureReady() async throws {
+        #if APP_STORE
+        // Inside the bundle, installed with it: nothing to set up.
+        return
+        #else
         try await Self.exclusively { try await self.install() }
+        #endif
     }
 
     private func install() async throws {

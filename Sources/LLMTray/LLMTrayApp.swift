@@ -182,6 +182,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pulseTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if APP_STORE
+        BundledRuntime.configureEnvironment()
+        #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
         if let other = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
@@ -193,8 +196,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Full build: the bundled runtime goes to Application Support now,
         // not on the first Start -- an update installed before that (the
         // feed carries the thin build) would take it away.
-        #if !APP_STORE
         let server = self.server
+        #if !APP_STORE
         Task { try? await MLXRuntimeInstaller.copyOutBundledRuntime(pinnedRef: nil, log: { server.appendLog($0) }) }
         _ = updaterController  // lazy: created (and its background checks started) at launch
         // Sparkle's automatic checks are periodic (about once a day), not per
