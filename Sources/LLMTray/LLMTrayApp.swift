@@ -239,6 +239,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self, selector: #selector(showReview), name: .showReview, object: nil
         )
         NotificationCenter.default.addObserver(
+            self, selector: #selector(showSupport), name: .showSupport, object: nil
+        )
+        NotificationCenter.default.addObserver(
             self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
         )
         NotificationCenter.default.addObserver(
@@ -538,6 +541,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         rateItem.target = self
         menu.addItem(rateItem)
 
+        let supportItem = NSMenuItem(title: NSLocalizedString("Support LLMTray…", comment: ""), action: #selector(showSupport), keyEquivalent: "")
+        supportItem.target = self
+        menu.addItem(supportItem)
+
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -711,6 +718,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showReview() {
         popover.performClose(nil)
         ReviewWindow.show()
+    }
+
+    @objc private func showSupport() {
+        popover.performClose(nil)
+        SupportWindow.show()
     }
 
     @objc private func quitApp() {

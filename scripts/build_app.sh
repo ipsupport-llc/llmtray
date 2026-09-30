@@ -66,6 +66,9 @@ cp "$REPO_ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 # The setup wizard's Welcome banner (SetupWizardView; `swift run` reads it
 # from docs/assets instead).
 cp "$REPO_ROOT/docs/assets/welcome-banner.jpg" "$APP/Contents/Resources/welcome-banner.jpg"
+# The supporters list as of the build (adr/0017): shown until the signed
+# list is fetched, and offline.
+cp "$REPO_ROOT/Resources/supporters.json" "$APP/Contents/Resources/supporters.json"
 # Licenses.json (About LLMTray lists it) + THIRD_PARTY_NOTICES.txt, from
 # the real license files of what's bundled (build_full_app.sh adds the
 # vendored Python runtime).

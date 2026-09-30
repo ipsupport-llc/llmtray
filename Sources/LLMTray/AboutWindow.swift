@@ -102,6 +102,8 @@ struct AboutView: View {
                             .buttonStyle(.link)
                         Button("Rate LLMTray…") { NotificationCenter.default.post(name: .showReview, object: nil) }
                             .buttonStyle(.link)
+                        Button("Support LLMTray…") { NotificationCenter.default.post(name: .showSupport, object: nil) }
+                            .buttonStyle(.link)
                     }
                     .font(.callout)
                 }
