@@ -1,7 +1,8 @@
 # 0018 — A Mac App Store build
 
 **Status: accepted** (2026-09-29, the user: "describe what the App Store
-needs and start moving"). Step 1, the sandbox spike, is next.
+needs and start moving"). Step 1, the sandbox spike, passed on 2026-09-29
+(see "Spike results"); step 2 is next.
 
 ## Why
 
@@ -97,12 +98,10 @@ Homebrew Python.
 
   The existing grants model stays. In the App Store build a grant also
   keeps a bookmark; the standalone build keeps plain paths, as today.
-- **Runners reaching a granted folder:** whether a child with `inherit`
-  sees the parent's security-scoped access is the spike's main question
-  (step 1).
-  - If it doesn't, the app passes an open file descriptor, or copies the
-    file into the container; for models, it requires them to live in the
-    container.
+- **Runners reaching a granted folder:** a child with `inherit` sees the
+  parent's security-scoped access; the spike proved it. The app resolves
+  the bookmark, calls `startAccessingSecurityScopedResource()`, and
+  passes the path. No copying and no descriptor passing.
 - **First-run import from the Developer ID build.** The container can't
   read `~/Library/Application Support/LLMTray` on its own. An **Import
   from LLMTray (direct download)** button asks the user to grant that
@@ -153,6 +152,34 @@ Homebrew Python.
 - **Category:** Developer Tools; secondary: Productivity.
 - **Also needed:** a privacy policy URL and a support URL on ipsupport.us.
 
+## Spike results (2026-09-29, MacBook Air M5, macOS 27)
+
+`scripts/appstore/build_sandbox_spike.sh` builds `sandbox_spike.swift`
+into a sandboxed app, with the entitlements of §2 and the Full build's
+Python (runners signed with only `app-sandbox` + `inherit`, hardened
+runtime). All passed:
+
+| check | result |
+|---|---|
+| the sandbox is really on | the child is denied `~/.zshrc` (`Operation not permitted`) |
+| bundled Python + MLX | runs on the GPU (`Device(gpu, 0)`) |
+| `HF_HOME` | written in the container (`~/Library/Containers/…/Data/hf`) |
+| local server | a child binds 127.0.0.1, the app connects |
+| a user-granted folder | an app-scope bookmark resolves; the child lists it and **runs mlx_lm on the model in it** ("Paris.") |
+
+What this settles:
+
+- **Outside folders work through bookmarks** (§3), for models and
+  projects alike.
+- **No venv in the App Store build.** The framework's interpreter runs
+  with the packages on `PYTHONPATH` (plus `PYTHONNOUSERSITE`,
+  `PYTHONDONTWRITEBYTECODE`, and `HOME`, `TMPDIR`, `HF_HOME` in the
+  container). That removes the absolute paths in `pyvenv.cfg` and the
+  interpreter link.
+- **The runners need nothing but `app-sandbox` + `inherit`**, as §2 says.
+  Together with the runtime-exceptions test, the whole bundled stack runs
+  with no exceptions at all.
+
 ## Steps
 
 0. **The user, in App Store Connect / Certificates:**
@@ -162,15 +189,7 @@ Homebrew Python.
    - the Apple Distribution and Mac Installer Distribution certificates;
    - a Mac App Store provisioning profile;
    - the privacy policy and support URLs.
-1. **Sandbox spike (me).** A sandboxed, signed test build: the bundled
-   Python launched with `inherit`. It must:
-   - run mlx_lm on the GPU;
-   - bind a localhost port;
-   - read a model from a user-granted folder, both through a bookmark and
-     through an inherited file descriptor;
-   - write `HF_HOME` in the container.
-
-   Its results decide §3's open point.
+1. ~~**Sandbox spike (me).**~~ Passed; see "Spike results".
 2. **`APP_STORE` flavor:**
    - the `Package.swift` switch;
    - `#if APP_STORE` around updates, installers and support;
