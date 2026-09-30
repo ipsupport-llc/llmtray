@@ -12,6 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: swift build
         run: swift build
+      # The Mac App Store flavor (adr/0018): no Sparkle, APP_STORE code paths.
+      - name: swift build (App Store flavor)
+        run: LLMTRAY_APP_STORE=1 swift build --build-path .build-appstore
       - name: Localizations (valid files, en base up to date, per-language coverage)
         run: python3 scripts/l10n.py check
       - name: Voice runner framing (no model)
