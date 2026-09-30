@@ -20,7 +20,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-APP="$REPO_ROOT/.build/app/LLMTray.app"
+APP="${APP_BUNDLE:-$REPO_ROOT/.build/app/LLMTray.app}"
+# venv (the Full build: copied out to Application Support at first launch)
+# or packages (the App Store flavor, adr/0018: no venv, one folder of
+# packages for every runner -- the server's mlx-lm fork and mlx-audio --
+# run from the bundle with PYTHONPATH).
+RUNTIME_LAYOUT="${RUNTIME_LAYOUT:-venv}"
 WORK_DIR="$REPO_ROOT/.build/full_runtime_work"
 
 if [[ ! -d "$APP" ]]; then
@@ -127,28 +132,52 @@ while IFS= read -r -d '' bin; do
   codesign --force --sign - "$bin"
 done < <(find "$FRAMEWORK_ROOT" -type f -perm -u+x -print0)
 
-VENV_DIR="$APP/Contents/Resources/runtime/.mlx_server_venv"
-echo "--- creating vendored venv at $VENV_DIR ---"
-rm -rf "$VENV_DIR"
-"$FRAMEWORK_PYTHON" -m venv "$VENV_DIR"
-"$VENV_DIR/bin/pip" install --quiet --upgrade pip
-
 PINNED_REPO="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/mlx_lm_runtime.json'))['repo'])")"
 PINNED_REF="$(python3 -c "import json; print(json.load(open('$REPO_ROOT/runtime/mlx_lm_runtime.json'))['pinned_ref'])")"
-echo "--- installing $PINNED_REPO@$PINNED_REF into the vendored venv ---"
-"$VENV_DIR/bin/pip" install --quiet "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
 
-# venv links bin/python3.X to the framework by absolute path -- this
-# machine's. Codesign can't seal a link out of the bundle; relative, it
-# stays inside it. (The app copies the venv out and re-points the link at
-# the copied framework anyway: MLXRuntimeInstaller.relinkVendoredInterpreter.)
-while IFS= read -r -d '' link; do
-  target="$(readlink "$link")"
-  [[ "$target" == /* && "$target" == "$APP"/* ]] || continue
-  rel="$(python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], os.path.dirname(sys.argv[2])))' "$target" "$link")"
-  ln -sfn "$rel" "$link"
-  echo "  relinked ${link#$APP/} -> $rel"
-done < <(find "$VENV_DIR" -type l -print0)
+if [[ "$RUNTIME_LAYOUT" == packages ]]; then
+  PKG_DIR="$APP/Contents/Resources/python-packages"
+  # The audio runtime's pins, from AudioRuntime.swift (one place for them).
+  AUDIO_COMMIT="$(sed -n 's/.*static let bundledCommit = "\([0-9a-f]\{40\}\)".*/\1/p' "$REPO_ROOT/Sources/LLMTray/AudioRuntime.swift")"
+  [[ -n "$AUDIO_COMMIT" ]] || { echo "error: no mlx-audio commit in AudioRuntime.swift" >&2; exit 1; }
+  echo "--- installing $PINNED_REPO@$PINNED_REF + mlx-audio@$AUDIO_COMMIT into $PKG_DIR ---"
+  rm -rf "$PKG_DIR"
+  # python.org's framework has no pip (its installer adds it afterwards),
+  # and none goes into this bundle: a throwaway venv of the same
+  # interpreter, outside the bundle, installs into it.
+  BUILD_VENV="$WORK_DIR/pip_venv"
+  "$FRAMEWORK_PYTHON" -m venv "$BUILD_VENV"
+  "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --target "$PKG_DIR" \
+    "mlx-lm @ https://github.com/$PINNED_REPO/archive/$PINNED_REF.zip" \
+    "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/$AUDIO_COMMIT.tar.gz" \
+    "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0"
+  # pip's own console scripts (their shebangs name this machine's path).
+  rm -rf "$PKG_DIR/bin"
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, sys; print('packages ok', sys.version.split()[0])"
+  LICENSE_PYTHON=(env PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON")
+else
+  VENV_DIR="$APP/Contents/Resources/runtime/.mlx_server_venv"
+  echo "--- creating vendored venv at $VENV_DIR ---"
+  rm -rf "$VENV_DIR"
+  "$FRAMEWORK_PYTHON" -m venv "$VENV_DIR"
+  "$VENV_DIR/bin/pip" install --quiet --upgrade pip
+
+  echo "--- installing $PINNED_REPO@$PINNED_REF into the vendored venv ---"
+  "$VENV_DIR/bin/pip" install --quiet "git+https://github.com/$PINNED_REPO.git@$PINNED_REF"
+
+  # venv links bin/python3.X to the framework by absolute path -- this
+  # machine's. Codesign can't seal a link out of the bundle; relative, it
+  # stays inside it. (The app copies the venv out and re-points the link at
+  # the copied framework anyway: MLXRuntimeInstaller.relinkVendoredInterpreter.)
+  while IFS= read -r -d '' link; do
+    target="$(readlink "$link")"
+    [[ "$target" == /* && "$target" == "$APP"/* ]] || continue
+    rel="$(python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], os.path.dirname(sys.argv[2])))' "$target" "$link")"
+    ln -sfn "$rel" "$link"
+    echo "  relinked ${link#$APP/} -> $rel"
+  done < <(find "$VENV_DIR" -type l -print0)
+  LICENSE_PYTHON=("$VENV_DIR/bin/python")
+fi
 
 # Everything redistributed in this bundle keeps its notices: CPython's
 # license (with the summary of changes PSF §3 asks for) and every package
@@ -165,7 +194,7 @@ textutil -convert txt -output "$WORK_DIR/python-bundled-licenses.txt" "$DOC_LICE
 FRAMEWORK_EXTRAS=("$WORK_DIR/python-bundled-licenses.txt")
 while IFS= read -r -d '' terms; do FRAMEWORK_EXTRAS+=("$terms"); done < <(find "$VERSIONS_ROOT/Frameworks" -name license.terms -print0 2>/dev/null)
 FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses/ncurses-COPYING.txt")
-"$VENV_DIR/bin/python" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
+"${LICENSE_PYTHON[@]}" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
 
 echo "--- re-signing app bundle with the added framework + venv ---"
 "$SCRIPT_DIR/codesign_app.sh" "$APP"
