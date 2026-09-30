@@ -191,6 +191,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Granted folders open again before anything reads them (the
         // models folder, folder grants): runners inherit the access.
         SandboxAccess.restore()
+        // Tips bought while the Support window was closed (adr/0017).
+        TipJar.shared.start()
         #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
@@ -237,6 +239,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showReview), name: .showReview, object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(showSupport), name: .showSupport, object: nil
         )
         NotificationCenter.default.addObserver(
             self, selector: #selector(showSetupWizard), name: .showSetupWizard, object: nil
@@ -538,6 +543,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         rateItem.target = self
         menu.addItem(rateItem)
 
+        let supportItem = NSMenuItem(title: NSLocalizedString("Support LLMTray…", comment: ""), action: #selector(showSupport), keyEquivalent: "")
+        supportItem.target = self
+        menu.addItem(supportItem)
+
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
@@ -711,6 +720,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showReview() {
         popover.performClose(nil)
         ReviewWindow.show()
+    }
+
+    @objc private func showSupport() {
+        popover.performClose(nil)
+        SupportWindow.show()
     }
 
     @objc private func quitApp() {

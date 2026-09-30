@@ -93,6 +93,7 @@
 "Allowed folders" = "Allowed folders";
 "Allowed in a chat" = "Allowed in a chat";
 "Almost done" = "Almost done";
+"Already a sponsor? List my name…" = "Already a sponsor? List my name…";
 "Already in the project: %@." = "Already in the project: %@.";
 "Already on this Mac" = "Already on this Mac";
 "Already open in another tab" = "Already open in another tab";
@@ -103,6 +104,7 @@
 "An alias: the alias itself, not what it points to." = "An alias: the alias itself, not what it points to.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
 "An item needs the new folder it goes into: tick that folder too." = "An item needs the new folder it goes into: tick that folder too.";
+"An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.";
 "Another folder change is running: try again when it's done." = "Another folder change is running: try again when it's done.";
 "Another model already uses this alias." = "Another model already uses this alias.";
@@ -137,6 +139,7 @@
 "Back" = "Back";
 "Balanced (default)" = "Balanced (default)";
 "Barely fits the GPU memory" = "Barely fits the GPU memory";
+"Be the first to be listed here." = "Be the first to be listed here.";
 "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it." = "Before an image or song is made, shows the prompt and settings to change first. It goes ahead after the countdown unless you touch it.";
 "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it." = "Before an image or song is made, shows what the model asked for -- the prompt, the model, the knobs -- to change first. It goes ahead by itself after the countdown unless you touch it.";
 "Benchmark" = "Benchmark";
@@ -197,6 +200,7 @@
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
+"Coffee" = "Coffee";
 "Compact" = "Compact";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word.";
 "Compaction" = "Compaction";
@@ -215,6 +219,7 @@
 "Couldn't be added: %@" = "Couldn't be added: %@";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
+"Couldn't reach the server -- please try again later." = "Couldn't reach the server -- please try again later.";
 "Couldn't start the voice runner: %@" = "Couldn't start the voice runner: %@";
 "Countdown" = "Countdown";
 "Countdown: %lld s" = "Countdown: %lld s";
@@ -327,6 +332,7 @@
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
 "Found after an interruption" = "Found after an interruption";
+"Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";
 "Free on disk: %@ · your models: %@" = "Free on disk: %@ · your models: %@";
 "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay." = "Frees the memory a loaded model holds after this long without requests. It reloads automatically on the next request, with the usual loading delay.";
@@ -437,6 +443,9 @@
 "Licence: %@" = "Licence: %@";
 "Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
+"Link (optional, https://…)" = "Link (optional, https://…)";
+"List my name" = "List my name";
+"List my name in Supporters" = "List my name in Supporters";
 "Listening…" = "Listening…";
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
@@ -483,6 +492,7 @@
 "Music off" = "Music off";
 "Name" = "Name";
 "Name new chats automatically" = "Name new chats automatically";
+"Name to show (up to 40 characters)" = "Name to show (up to 40 characters)";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden.";
 "Network" = "Network";
 "Never" = "Never";
@@ -522,7 +532,9 @@
 "No models found in this folder." = "No models found in this folder.";
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
 "No runs yet." = "No runs yet.";
+"No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
+"No thanks" = "No thanks";
 "No tool calls yet in this version." = "No tool calls yet in this version.";
 "No update check at launch" = "No update check at launch";
 "No usage statistics" = "No usage statistics";
@@ -542,9 +554,11 @@
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
+"One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
+"Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
 "Open %@, page %lld" = "Open %@, page %lld";
 "Open LLMTray when you log in" = "Open LLMTray when you log in";
 "Open Privacy Settings…" = "Open Privacy Settings…";
@@ -592,6 +606,7 @@
 "Press, talk, press again" = "Press, talk, press again";
 "Previous 30 Days" = "Previous 30 Days";
 "Previous 7 Days" = "Previous 7 Days";
+"Pro Supporters" = "Pro Supporters";
 "Profile" = "Profile";
 "Profiles" = "Profiles";
 "Project files" = "Project files";
@@ -664,6 +679,7 @@
 "Restart Server" = "Restart Server";
 "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Restarts the model process with the new settings (a few seconds to reload).";
+"Restore Purchases" = "Restore Purchases";
 "Resume" = "Resume";
 "Resume Download" = "Resume Download";
 "Resume Indexing" = "Resume Indexing";
@@ -784,6 +800,11 @@
 "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory." = "Stops the chat model while an image or music generates, and reloads it after. Both at once can exceed this Mac's memory.";
 "Sunrise & sunset" = "Sunrise & sunset";
 "Support" = "Support";
+"Support LLMTray" = "Support LLMTray";
+"Support LLMTray…" = "Support LLMTray…";
+"Support development" = "Support development";
+"Support on GitHub Sponsors" = "Support on GitHub Sponsors";
+"Supporters" = "Supporters";
 "Switch" = "Switch";
 "Switch at once" = "Switch at once";
 "Switch models?" = "Switch models?";
@@ -802,8 +823,12 @@
 "Temporary chats can only look in folders, for that chat only." = "Temporary chats can only look in folders, for that chat only.";
 "Temporary — not saved" = "Temporary — not saved";
 "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed.";
+"Thank you!" = "Thank you!";
+"Thank you! List your name in Supporters?" = "Thank you! List your name in Supporters?";
+"Thanks! Your name will appear once it's been checked." = "Thanks! Your name will appear once it's been checked.";
 "Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "That folder can't be shared with the chat: %@" = "That folder can't be shared with the chat: %@";
+"The App Store couldn't confirm the purchase." = "The App Store couldn't confirm the purchase.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
 "The MTP drafter has downloaded -- restart the server to use it." = "The MTP drafter has downloaded -- restart the server to use it.";
@@ -876,6 +901,7 @@
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "The suggestions for this Mac are already here. Browse Hugging Face for another model.";
+"The tips aren't available right now." = "The tips aren't available right now.";
 "The voice model is being downloaded -- try again once it's done." = "The voice model is being downloaded -- try again once it's done.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "The voice model isn't downloaded -- download it in Settings > Voice.";
 "The voice model's audio format isn't supported." = "The voice model's audio format isn't supported.";
@@ -889,6 +915,7 @@
 "Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";
 "This chat may use" = "This chat may use";
+"This couldn't be listed: the payment wasn't found, or the name was refused." = "This couldn't be listed: the payment wasn't found, or the name was refused.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "This folder is gone or isn't the one allowed any more: revoke it and allow it again.";
 "This folder's access has ended or was revoked." = "This folder's access has ended or was revoked.";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
@@ -898,6 +925,7 @@
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs.";
 "Thought process" = "Thought process";
+"Tier" = "Tier";
 "Tight -- may not leave room for context" = "Tight -- may not leave room for context";
 "Time in a city" = "Time in a city";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder.";
@@ -909,6 +937,7 @@
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
 "Too many reviews from this network. Try again later." = "Too many reviews from this network. Try again later.";
+"Too many tries -- please try again later." = "Too many tries -- please try again later.";
 "Tool" = "Tool";
 "Tool Settings…" = "Tool Settings…";
 "Tool call statistics" = "Tool call statistics";
@@ -1017,6 +1046,7 @@
 "Yesterday" = "Yesterday";
 "You" = "You";
 "You:" = "You:";
+"Your GitHub login (the sponsoring account)" = "Your GitHub login (the sponsoring account)";
 "Your Mac" = "Your Mac";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
 "Your name (optional)" = "Your name (optional)";

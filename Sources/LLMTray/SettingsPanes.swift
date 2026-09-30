@@ -103,6 +103,11 @@ struct GeneralPane: View {
                 } label: {
                     SettingLabel(title: "Like LLMTray?", help: "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.")
                 }
+                LabeledContent {
+                    Button("Support LLMTray…") { NotificationCenter.default.post(name: .showSupport, object: nil) }
+                } label: {
+                    SettingLabel(title: "Support development", help: "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type.")
+                }
             }
         }
         .formStyle(.grouped)
