@@ -39,11 +39,12 @@ cd "$REPO_ROOT"
 if [[ "$APP_STORE" == 1 ]]; then
   # Without Sparkle the package has no dependencies, and SwiftPM rewrites
   # Package.resolved without them: kept and put back after the build.
-  cp Package.resolved "$BUILD_PATH.Package.resolved" 2>/dev/null || true
-  trap 'cp "$BUILD_PATH.Package.resolved" Package.resolved 2>/dev/null || true' EXIT
+  RESOLVED_BACKUP="$(mktemp)"
+  cp Package.resolved "$RESOLVED_BACKUP" 2>/dev/null || true
+  trap 'cp "$RESOLVED_BACKUP" Package.resolved 2>/dev/null || true; rm -f "$RESOLVED_BACKUP"' EXIT
 fi
 swift build -c release --build-path "$BUILD_PATH"
-[[ "$APP_STORE" == 1 ]] && cp "$BUILD_PATH.Package.resolved" Package.resolved 2>/dev/null || true
+[[ "$APP_STORE" == 1 ]] && cp "$RESOLVED_BACKUP" Package.resolved 2>/dev/null || true
 
 RELEASE_DIR="$BUILD_PATH/release"
 if [[ "$APP_STORE" != 1 ]]; then
