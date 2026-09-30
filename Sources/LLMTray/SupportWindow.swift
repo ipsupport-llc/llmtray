@@ -20,7 +20,16 @@ final class SupportersStore: ObservableObject {
 
     @Published private(set) var list: SupportersList = .empty
     private let client = SupportersClient(userAgent: "LLMTray/" + (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"))
+    /// Set only when a fetch succeeded: an offline try doesn't wait a day.
     private var lastFetch: Date?
+    private var fetching = false
+    /// The highest version ever accepted, kept apart from the cached copy:
+    /// an older signed pair put back in the cache can't roll the list back.
+    private static let floorKey = "llmtray.supporters.version"
+    private var versionFloor: Int {
+        get { UserDefaults.standard.integer(forKey: Self.floorKey) }
+        set { UserDefaults.standard.set(max(newValue, versionFloor), forKey: Self.floorKey) }
+    }
 
     private static var cacheBody: URL { URL(fileURLWithPath: RuntimePaths.externalRuntimeDir).appendingPathComponent("supporters.json") }
     private static var cacheSignature: URL { cacheBody.appendingPathExtension("sig") }
@@ -28,8 +37,10 @@ final class SupportersStore: ObservableObject {
     private init() {
         if let body = try? Data(contentsOf: Self.cacheBody),
            let signature = try? String(contentsOf: Self.cacheSignature, encoding: .utf8),
-           let cached = try? SupportersVerifier.verify(body: body, signature: signature) {
+           let cached = try? SupportersVerifier.verify(body: body, signature: signature),
+           cached.version >= versionFloor {
             list = cached
+            versionFloor = cached.version
         }
         if let url = Bundle.main.url(forResource: "supporters", withExtension: "json"),
            let data = try? Data(contentsOf: url), let bundled = try? SupportersVerifier.decode(data),
@@ -40,10 +51,15 @@ final class SupportersStore: ObservableObject {
 
     func refreshIfDue() {
         if let lastFetch, Date().timeIntervalSince(lastFetch) < 86_400 { return }
-        lastFetch = Date()
+        guard !fetching else { return }
+        fetching = true
         Task {
-            guard let fetched = await client.fetch(), SupportersVerifier.isNewer(fetched.list, than: list) else { return }
+            defer { fetching = false }
+            guard let fetched = await client.fetch() else { return }
+            lastFetch = Date()
+            guard SupportersVerifier.isNewer(fetched.list, than: list), fetched.list.version >= versionFloor else { return }
             list = fetched.list
+            versionFloor = fetched.list.version
             try? FileManager.default.createDirectory(at: Self.cacheBody.deletingLastPathComponent(), withIntermediateDirectories: true)
             try? fetched.body.write(to: Self.cacheBody, options: .atomic)
             try? fetched.signature.write(to: Self.cacheSignature, atomically: true, encoding: .utf8)
@@ -76,14 +92,57 @@ final class TipJar: ObservableObject {
     @Published var error: String?
     private var updates: Task<Void, Never>?
 
-    private init() {
-        // Purchases finished elsewhere (Ask to Buy, another Mac) arrive here.
+    /// Purchases not offered for listing yet (one that arrived while the
+    /// window was closed: Ask to Buy approved later, bought before the
+    /// window was ever opened): offered the next time it opens. Only the
+    /// tier and StoreKit's signed transaction -- the proof a listing sends.
+    private static let pendingKey = "llmtray.supporters.pendingListings"
+    private var pending: [[String: String]] {
+        get { UserDefaults.standard.array(forKey: Self.pendingKey) as? [[String: String]] ?? [] }
+        set { UserDefaults.standard.set(newValue, forKey: Self.pendingKey) }
+    }
+
+    private init() {}
+
+    /// At launch: purchases that arrive at any time (Ask to Buy, another
+    /// Mac) and ones never finished (the app quit mid-purchase) are
+    /// finished and kept for listing.
+    func start() {
+        guard updates == nil else { return }
         updates = Task { [weak self] in
-            for await result in Transaction.updates {
-                if case .verified(let transaction) = result { await transaction.finish() }
-                await self?.refreshFounding()
+            for await result in StoreKit.Transaction.updates { await self?.handle(result) }
+        }
+        Task { [weak self] in
+            for await result in StoreKit.Transaction.unfinished { await self?.handle(result) }
+            await self?.refreshFounding()
+        }
+    }
+
+    private func handle(_ result: VerificationResult<StoreKit.Transaction>) async {
+        guard case .verified(let transaction) = result else { return }
+        await transaction.finish()
+        guard transaction.revocationDate == nil, let tier = SupporterTier(productID: transaction.productID) else { return }
+        remember(Purchase(tier: tier, jws: result.jwsRepresentation))
+        await refreshFounding()
+    }
+
+    private func remember(_ purchase: Purchase) {
+        guard !pending.contains(where: { $0["jws"] == purchase.jws }) else { return }
+        pending.append(["tier": purchase.tier.rawValue, "jws": purchase.jws])
+    }
+
+    /// The oldest purchase not offered yet, taken off the queue.
+    func takePending() -> Purchase? {
+        var queue = pending
+        while !queue.isEmpty {
+            let entry = queue.removeFirst()
+            if let tier = entry["tier"].flatMap(SupporterTier.init(rawValue:)), let jws = entry["jws"] {
+                pending = queue
+                return Purchase(tier: tier, jws: jws)
             }
         }
+        pending = queue
+        return nil
     }
 
     func load() async {
@@ -129,7 +188,7 @@ final class TipJar: ObservableObject {
 
     private func refreshFounding() async {
         var owned = false
-        for await result in Transaction.currentEntitlements {
+        for await result in StoreKit.Transaction.currentEntitlements {
             if case .verified(let t) = result, t.productID == SupporterTier.founding.productID, t.revocationDate == nil { owned = true }
         }
         foundingOwned = owned
@@ -182,7 +241,10 @@ private struct SupportView: View {
         .padding(18)
         .frame(minWidth: 420, minHeight: 460)
         #if APP_STORE
-        .task { await tips.load() }
+        .task {
+            await tips.load()
+            if tips.justBought == nil { tips.justBought = tips.takePending() }
+        }
         .sheet(item: $tips.justBought) { purchase in
             ListingSheet(tier: purchase.tier, proof: .appStore(jws: purchase.jws))
         }

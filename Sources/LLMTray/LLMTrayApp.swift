@@ -191,6 +191,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Granted folders open again before anything reads them (the
         // models folder, folder grants): runners inherit the access.
         SandboxAccess.restore()
+        // Tips bought while the Support window was closed (adr/0017).
+        TipJar.shared.start()
         #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
