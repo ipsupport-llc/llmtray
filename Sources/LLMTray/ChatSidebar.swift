@@ -481,10 +481,7 @@ struct ChatSidebar: View {
     /// A project named "New project" (numbered if taken), renamed in place.
     @discardableResult
     private func newProject() -> ChatLibrary.Project? {
-        let base = NSLocalizedString("New project", comment: "")
-        let names = Set(store.library.projects.map(\.name))
-        let name = names.contains(base) ? (2...).lazy.map { "\(base) \($0)" }.first { !names.contains($0) }! : base
-        guard let project = store.addProject(named: name) else { return nil }
+        guard let project = store.addNewProject() else { return nil }
         collapsedProjects.remove(project.id)
         renameHadFocus = false
         renaming = nil

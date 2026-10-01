@@ -56,9 +56,13 @@ struct MessageBubble: View {
 
     private var bubble: some View {
         VStack(alignment: isUser ? .trailing : .leading, spacing: 2) {
-            Text(isUser ? "You" : "Assistant")
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.secondary)
+            HStack(spacing: 4) {
+                // The answers are LLMTray's: its own mark, not a generic glyph.
+                if !isUser { BrainMark(size: 13) }
+                Text(isUser ? "You" : "Assistant")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(.secondary)
+            }
 
             if showReasoning && !message.reasoning.isEmpty {
                 // Folded once anything follows it: the answer, a tool call, media.

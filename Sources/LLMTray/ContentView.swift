@@ -1,5 +1,6 @@
 import SwiftUI
 import LLMTrayCore
+import UniformTypeIdentifiers
 
 /// The popover: header, chat and composer. Holds what they share -- the
 /// selected model, the draft (ComposerModel) -- and sends turns to ChatClient
@@ -44,6 +45,8 @@ struct ContentView: View {
     // Starts true: a new view (the chat just moved between the popover and
     // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    /// Files dragged over the chat: an empty project chat's drop zone lights up.
+    @State private var chatDropTargeted = false
     /// Following the end before a Tweak draft paused it: restored after.
     @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
@@ -214,7 +217,7 @@ struct ContentView: View {
     private var conversation: some View {
         VStack(spacing: 0) {
             chatArea
-                .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+                .onDrop(of: [.fileURL, .image], isTargeted: $chatDropTargeted) { handleChatDrop($0) }
             Divider()
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
@@ -355,16 +358,24 @@ struct ContentView: View {
                 // position jumped whenever the estimate was corrected.
                 VStack(alignment: .leading, spacing: 10) {
                     if chat.messages.isEmpty {
-                        VStack(spacing: 2) {
-                            Text("No messages yet")
-                                .font(.system(size: 12))
-                            // A chat started in a project isn't in the sidebar
-                            // until its first turn: where it will be.
-                            if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
+                        if showsEmptyIntro {
+                            VStack(spacing: 8) {
+                                // A chat started in a project isn't in the sidebar
+                                // until its first turn: where it will be.
+                                if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
+                                EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
+                                               insertPrompt: insertPrompt, dropTargeted: chatDropTargeted)
+                            }
+                        } else {
+                            VStack(spacing: 2) {
+                                Text("No messages yet")
+                                    .font(.system(size: 12))
+                                if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
+                            }
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 8)
                         }
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 8)
                     }
                     // "tool" messages are protocol plumbing: the image a
                     // tool produced is attached to the assistant message
@@ -481,7 +492,10 @@ struct ContentView: View {
             // Small for an empty chat, capped so a long one scrolls inside
             // a fixed viewport instead of growing the popover. Detached, it
             // takes whatever height the window leaves it.
-            .frame(minHeight: 48, maxHeight: presentation.isDetached ? .infinity : (chat.messages.isEmpty ? 48 : 380))
+            // The popover's empty chat with its intro: as tall as the intro
+            // (measured, the content's own height), within the same cap.
+            .frame(minHeight: popoverIntroHeight ?? 48,
+                   maxHeight: presentation.isDetached ? .infinity : (popoverIntroHeight ?? (chat.messages.isEmpty ? 48 : 380)))
             // A draft wants the user's eyes: brought into view, wherever it is.
             .onChange(of: chat.draft?.id) { _, id in
                 guard let id else {
@@ -517,6 +531,50 @@ struct ContentView: View {
             // Every token, reasoning or answer, a tool call, an image or song.
             .onChange(of: chatEndKey) { followToEnd(proxy) }
         }
+    }
+
+    /// An empty chat with nothing under way: its intro (EmptyChatIntro) --
+    /// the showcase, or a project's drop zone.
+    private var showsEmptyIntro: Bool {
+        chat.messages.isEmpty && chat.draft == nil && !chat.isBusy && !chat.isGeneratingMedia
+            && chat.errorText == nil && chat.folderPlan == nil && chat.folderPrompt == nil
+    }
+
+    /// The popover's chat height while the intro shows; nil otherwise.
+    private var popoverIntroHeight: CGFloat? {
+        guard !presentation.isDetached, showsEmptyIntro else { return nil }
+        return min(380, max(48, lastChatGeometry.height))
+    }
+
+    /// A tile's sample prompt: into the composer, after what's there.
+    private func insertPrompt(_ text: String) {
+        let draft = composer.draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        composer.draft = draft.isEmpty ? text : draft + "\n\n" + text
+        isInputFocused = true
+    }
+
+    /// Files dropped on a project's chat go into the project (adr/0012),
+    /// as on its Files window -- but images still go to a vision model's
+    /// message, as they always have. Elsewhere, the composer's images only.
+    private func handleChatDrop(_ providers: [NSItemProvider]) -> Bool {
+        guard ProjectIndexer.shared.isEnabled, let id = chat.currentSessionID,
+              let project = ChatLibraryStore.shared.library.projectContext(forChat: id)?.id,
+              ProjectFileDropLoader.carriesFiles(providers) else { return composer.handleDrop(providers) }
+        // Image data without a file (dragged from a browser): the composer's.
+        let others = providers.filter { !$0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
+        if !others.isEmpty { _ = composer.handleDrop(others) }
+        let acceptsImages = composer.acceptsImages
+        ProjectFileDropLoader.load(providers) { urls in
+            let isImage = { (url: URL) in acceptsImages && (UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false) }
+            // An image NSImage can't open goes to the project, which says
+            // what it made of it.
+            var files: [URL] = []
+            for url in urls {
+                if isImage(url), let image = NSImage(contentsOf: url) { composer.attach(image) } else { files.append(url) }
+            }
+            if !files.isEmpty { Task { await ProjectIndexer.shared.addFiles(files, to: project) } }
+        }
+        return true
     }
 
     /// A model is picked and here: sending starts it if it isn't running
@@ -592,52 +650,6 @@ private struct EmptyChatProjectNote: View {
             Label(String(format: NSLocalizedString("In project %@", comment: ""), project.name), systemImage: "folder")
                 .font(.system(size: 11))
                 .lineLimit(1)
-        }
-    }
-}
-
-/// "Searches N files" above a project chat whose project has searchable
-/// files (adr/0012), "· N pinned" with pinned ones; clicking it shows them. Nothing while Project files are
-/// off or nothing is searchable yet.
-private struct ProjectChatFilesRow: View {
-    let sessionID: UUID
-    @ObservedObject private var store = ChatLibraryStore.shared
-    @ObservedObject private var indexer = ProjectIndexer.shared
-
-    var body: some View {
-        if indexer.isEnabled, let project = store.library.projectContext(forChat: sessionID) {
-            let searchable = ProjectFileTotals(indexer.documents[project.id] ?? []).searchable
-            if searchable > 0 {
-                VStack(spacing: 0) {
-                    Button { ProjectFilesWindow.show(project.id) } label: {
-                        HStack(spacing: 6) {
-                            ProjectRingIcon(ring: indexer.ring(for: project.id))
-                            Text(project.name).lineLimit(1).truncationMode(.tail)
-                            Text(verbatim: "·")
-                            Text(String(format: NSLocalizedString("Searches %lld files", comment: "a project chat's header: how many files its tools search"),
-                                        Int64(searchable)))
-                                .lineLimit(1)
-                                // The name truncates first, not the count.
-                                .layoutPriority(1)
-                            if let pinned = indexer.pins[project.id], !pinned.isEmpty {
-                                Text(String(format: NSLocalizedString("· %lld pinned", comment: "a project chat's header: how many files are pinned (whole in its requests)"),
-                                            Int64(pinned.count)))
-                                    .lineLimit(1)
-                                    .layoutPriority(1)
-                            }
-                            Spacer(minLength: 0)
-                        }
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .help(indexer.statusText(for: project.id) ?? NSLocalizedString("Show the project's files", comment: ""))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    Divider()
-                }
-            }
         }
     }
 }
