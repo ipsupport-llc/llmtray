@@ -155,7 +155,7 @@ final class ModelRecommendationsTests: XCTestCase {
     func testShippedListLeadsWithOurGemmas() throws {
         let models = try shipped()
         let big = "roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang"
-        let small = "roman220220/gemma-4-E4B-it-gptq-mlx-jang"
+        let small = "roman220220/gemma-4-E4B-it-qat-mlx"
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(16)).first?.model.repo, small)
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(18)).first?.model.repo, small)
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first?.model.repo, big)
@@ -163,7 +163,7 @@ final class ModelRecommendationsTests: XCTestCase {
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(128)).first?.model.repo, big)
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first?.role, .recommended)
         // The ladder: a 24 GB Mac may still pick the smallest.
-        XCTAssertTrue(repos(ModelRecommendations.picks(from: models, for: mac(24))).contains("mlx-community/gemma-4-e2b-it-4bit"))
+        XCTAssertTrue(repos(ModelRecommendations.picks(from: models, for: mac(24))).contains("roman220220/gemma-4-E2B-it-qat-mlx"))
         // Every tier offers something on a typical Mac of it.
         for gb: UInt64 in [8, 16, 24, 32, 64] {
             let picks = ModelRecommendations.picks(from: models, for: mac(gb))
