@@ -506,61 +506,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(.separator())
 
-        // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.) to
-        // do anything -- the bare `.build/debug/LLMTray` binary used for
-        // local dev iteration has none, so "Check for Updates…" would just
-        // fail with a confusing "updater failed to start" dialog (and
-        // report the app's name as "debug", the executable's containing
-        // folder, since there's no real CFBundleName to read either).
-        // Hiding the item entirely there is clearer than showing it and
-        // having it error out.
-        #if !APP_STORE
-        if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
-            let updateItem = NSMenuItem(
-                title: NSLocalizedString("Check for Updates…", comment: ""), action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)), keyEquivalent: ""
-            )
-            updateItem.target = updaterController
-            menu.addItem(updateItem)
-            menu.addItem(.separator())
-        }
-        #endif
-
         let settingsItem = NSMenuItem(title: NSLocalizedString("Settings…", comment: ""), action: #selector(showSettingsWindow), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
-        let setupItem = NSMenuItem(title: NSLocalizedString("Set Up LLMTray…", comment: ""), action: #selector(showSetupWizard), keyEquivalent: "")
-        setupItem.target = self
-        menu.addItem(setupItem)
-        let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
-        logItem.target = self
-        menu.addItem(logItem)
         // Only once it's turned on and its model is here (Settings > Voice).
         if VoiceModelStore.shared.isEnabled, VoiceModelStore.shared.isDownloaded(VoiceModelStore.shared.selected) {
             let voiceItem = NSMenuItem(title: NSLocalizedString("Voice Lab…", comment: ""), action: #selector(showVoiceLab), keyEquivalent: "")
             voiceItem.target = self
             menu.addItem(voiceItem)
         }
+        let logItem = NSMenuItem(title: NSLocalizedString("Server Log", comment: ""), action: #selector(showServerLogWindow), keyEquivalent: "")
+        logItem.target = self
+        menu.addItem(logItem)
 
         menu.addItem(.separator())
 
-        let bugItem = NSMenuItem(title: NSLocalizedString("Report a Bug…", comment: ""), action: #selector(showBugReport), keyEquivalent: "")
-        bugItem.target = self
-        menu.addItem(bugItem)
-
-        let rateItem = NSMenuItem(title: NSLocalizedString("Rate LLMTray…", comment: ""), action: #selector(showReview), keyEquivalent: "")
-        rateItem.target = self
-        menu.addItem(rateItem)
-
-        let supportItem = NSMenuItem(title: NSLocalizedString("Support LLMTray…", comment: ""), action: #selector(showSupport), keyEquivalent: "")
-        supportItem.target = self
-        menu.addItem(supportItem)
+        // What's used now and then goes one level down.
+        let help = NSMenu()
+        func add(_ title: String, _ action: Selector, target: AnyObject? = nil) {
+            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            item.target = target ?? self
+            help.addItem(item)
+        }
+        add(NSLocalizedString("Set Up LLMTray…", comment: ""), #selector(showSetupWizard))
+        add(NSLocalizedString("What's New…", comment: ""), #selector(showWhatsNew))
+        // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.):
+        // the bare `.build/debug/LLMTray` binary has none, and the item
+        // would only fail with "updater failed to start".
+        #if !APP_STORE
+        if Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") != nil {
+            add(NSLocalizedString("Check for Updates…", comment: ""), #selector(SPUStandardUpdaterController.checkForUpdates(_:)), target: updaterController)
+        }
+        #endif
+        help.addItem(.separator())
+        add(NSLocalizedString("Report a Bug…", comment: ""), #selector(showBugReport))
+        add(NSLocalizedString("Rate LLMTray…", comment: ""), #selector(showReview))
+        add(NSLocalizedString("Support LLMTray…", comment: ""), #selector(showSupport))
+        let helpItem = NSMenuItem(title: NSLocalizedString("Help", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
+        helpItem.submenu = help
+        menu.addItem(helpItem)
 
         let aboutItem = NSMenuItem(title: NSLocalizedString("About LLMTray", comment: ""), action: #selector(showAboutPanel), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
-        let whatsNewItem = NSMenuItem(title: NSLocalizedString("What's New…", comment: ""), action: #selector(showWhatsNew), keyEquivalent: "")
-        whatsNewItem.target = self
-        menu.addItem(whatsNewItem)
 
         menu.addItem(.separator())
 

@@ -365,6 +365,7 @@
 "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings." = "Goes through the models folder, a chat model, the optional features, the API and updates again, starting from your current settings.";
 "Hacker News" = "Hacker News";
 "Has other names (a hard link): they keep the file." = "Has other names (a hard link): they keep the file.";
+"Help" = "Help";
 "Help improve LLMTray?" = "Help improve LLMTray?";
 "Hide chats" = "Hide chats";
 "Hide the reasoning" = "Hide the reasoning";
