@@ -178,9 +178,17 @@ Homebrew Python.
   panel, but a temporary exception is a review risk and stays in every
   version for a one-time import).
   - **What comes:** LLMTray's own keys (`llmtray.*`, `selectedModelID`,
-    the per-app `AppleLanguages`), **theirs in place of ours** — the user
-    asked for their settings, and it's what the same-id move gave; the
-    data import, by contrast, overwrites nothing. That includes the models
+    the per-app `AppleLanguages`), **theirs in place of ours**, a true
+    replace: an importable key they don't have (still at its default
+    there) is removed here, so the result is their settings, defaults
+    included. The user asked for their settings, and it's what the same-id
+    move gave; the data import, by contrast, overwrites nothing. A file
+    with none of LLMTray's keys changes nothing (removing ours would only
+    reset them). The one-time migrations that run at launch
+    (`KVSettings.migrateIfNeeded`, the only one keyed by a marker in the
+    preferences) run again on what came in: their marker comes with their
+    values, so values from a build before the migration are migrated, and
+    a choice made after it isn't touched. That includes the models
     folder path (still to be granted in Settings › Models, as the alert
     says), the server, chat, voice and project settings, profiles' inputs,
     the telemetry opt-in itself and the setup wizard's "done".
@@ -198,8 +206,19 @@ Homebrew Python.
     file is read as it is on disk; with the standalone quit (it can't run
     beside this one) that's its latest. The second panel's preselection
     is the open panel's (a file URL as `directoryURL`); if a macOS version
-    doesn't select it, the message names the file. Picking another file
-    is refused by name.
+    doesn't select it, the message names the file. Only that file in the
+    user's real `~/Library/Preferences` is taken (links resolved; the real
+    home, not the container's): a copy elsewhere, or a link to one, is
+    refused. The final alert says what became of the settings: brought,
+    the same already, none to bring, kept (the panel was cancelled), or
+    refused.
+- **The command-line tool** (adr/0019, standalone only) starts the
+  standalone when no socket answers. With the App Store build running it
+  fails at once instead ("the App Store version of LLMTray is running …
+  quit it, or use its window"), without starting anything: the start
+  would only show the other-build alert and time out. It finds the App
+  Store build through libproc (the executable's bundle and its id), as it
+  has no AppKit.
 - **System tools** (in the App Store build only; the standalone build keeps
   them):
   - `/bin/sh` in Settings: a Foundation or `NSWorkspace` call instead;

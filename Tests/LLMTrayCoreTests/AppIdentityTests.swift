@@ -64,6 +64,18 @@ final class AppIdentityTests: XCTestCase {
         XCTAssertEqual(conflict(own: "us.ipsupport.llmtray.test", [(appStore, 8)]), .otherBuild(bundleID: appStore, pid: 8))
     }
 
+    func testAppBundleOfAnExecutable() {
+        XCTAssertEqual(AppIdentity.appBundle(ofExecutable: "/Applications/LLMTray.app/Contents/MacOS/LLMTray"), "/Applications/LLMTray.app")
+        XCTAssertEqual(AppIdentity.appBundle(ofExecutable: "/x/Copy 2.app/Contents/MacOS/LLMTray"), "/x/Copy 2.app")
+        XCTAssertNil(AppIdentity.appBundle(ofExecutable: "/Applications/LLMTray.app/Contents/Helpers/llmtray"))
+        XCTAssertNil(AppIdentity.appBundle(ofExecutable: "/usr/local/bin/LLMTray"))
+        XCTAssertNil(AppIdentity.appBundle(ofExecutable: "/x/Contents/MacOS/LLMTray"))
+    }
+
+    func testNothingRunsUnderAnUnknownID() {
+        XCTAssertEqual(AppIdentity.runningPIDs(bundleID: "us.ipsupport.llmtray.nothing-\(UUID().uuidString)"), [])
+    }
+
     // MARK: - The build scripts say the same
 
     private var repo: URL {

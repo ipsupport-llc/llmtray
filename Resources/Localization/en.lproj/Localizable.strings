@@ -440,13 +440,15 @@
 "Instructions for %@" = "Instructions for %@";
 "Instructions…" = "Instructions…";
 "It goes on in the background: you can continue." = "It goes on in the background: you can continue.";
+"It had no settings of its own to bring; the ones here were kept." = "It had no settings of its own to bring; the ones here were kept.";
 "It is being set up or updated. Try again once that's done." = "It is being set up or updated. Try again once that's done.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder.";
 "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Its chats stay, back among the recents; the project's instructions and files are deleted.";
 "Its memory, in GB." = "Its memory, in GB.";
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Its settings came too; a Hugging Face token has to be entered again in Settings › Models.";
-"Its settings weren't imported: that isn't %@." = "Its settings weren't imported: that isn't %@.";
+"Its settings were the same as these already." = "Its settings were the same as these already.";
+"Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Its settings weren't imported: that isn't %@ in ~/Library/Preferences.";
 "KV cache" = "KV cache";
 "KV group size" = "KV group size";
 "Keep" = "Keep";
@@ -960,6 +962,7 @@
 "The server log" = "The server log";
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
+"The settings here were kept." = "The settings here were kept.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "The suggestions for this Mac are already here. Browse Hugging Face for another model.";
 "The tips aren't available right now." = "The tips aren't available right now.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";

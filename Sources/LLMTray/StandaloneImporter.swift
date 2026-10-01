@@ -49,7 +49,7 @@ enum StandaloneImporter {
     }
 
     enum SettingsOutcome: Equatable {
-        case imported(changed: Int), skipped, unreadable
+        case imported(changed: Int), empty, skipped, unreadable
     }
 
     /// The Developer ID build's ~/Library/Preferences/us.ipsupport.llmtray.plist:
@@ -69,7 +69,8 @@ enum StandaloneImporter {
         panel.prompt = NSLocalizedString("Import", comment: "import open panel button")
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, let url = panel.url else { return .skipped }
-        guard url.lastPathComponent == StandaloneImport.settingsFileName else { return .unreadable }
+        // That file where the standalone keeps it, not a copy elsewhere.
+        guard StandaloneImport.isStandalonePreferencesFile(url, home: SandboxAccess.realHome) else { return .unreadable }
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         guard let data = try? Data(contentsOf: url) else { return .unreadable }
@@ -78,7 +79,11 @@ enum StandaloneImporter {
 
     private static func apply(_ data: Data) -> SettingsOutcome {
         guard let settings = StandaloneImport.settings(fromPlist: data) else { return .unreadable }
-        return .imported(changed: StandaloneImport.apply(settings: settings, to: .standard))
+        // None of LLMTray's (it never ran, or was reset): nothing to make
+        // this install match -- removing ours would only reset it.
+        guard !settings.isEmpty else { return .empty }
+        let domain = Bundle.main.bundleIdentifier ?? AppIdentity.bundleID
+        return .imported(changed: StandaloneImport.apply(settings: settings, to: .standard, domain: domain))
     }
 
     private static func finished(_ result: Result<StandaloneImport.Summary, Error>, settings: SettingsOutcome) {
@@ -94,7 +99,7 @@ enum StandaloneImporter {
         case .success(let summary) where summary.imported.isEmpty && settingsChanged == 0:
             alert.messageText = NSLocalizedString("Nothing new to import", comment: "")
             alert.informativeText = NSLocalizedString("Everything in that folder is here already.", comment: "")
-            if settings == .unreadable { alert.informativeText += " " + settingsUnreadable }
+            alert.informativeText += " " + settingsNote(settings)
             alert.runModal()
         case .success(let summary):
             alert.messageText = NSLocalizedString("Imported", comment: "")
@@ -104,14 +109,7 @@ enum StandaloneImporter {
             if summary.defaultProfile == .addedAsProfile {
                 text += " " + NSLocalizedString("Its Default profile is in Settings › Profiles as \u{201C}Default (ipsupport.us)\u{201D}: yours here was changed, so it was kept.", comment: "")
             }
-            switch settings {
-            case .imported:
-                // The token is a Keychain item of the other app's: the
-                // sandbox doesn't reach it.
-                text += " " + NSLocalizedString("Its settings came too; a Hugging Face token has to be entered again in Settings › Models.", comment: "")
-            case .unreadable: text += " " + settingsUnreadable
-            case .skipped: break
-            }
+            text += " " + settingsNote(settings)
             alert.informativeText = text + "\n\n" + NSLocalizedString("LLMTray restarts now to load them.", comment: "")
             alert.addButton(withTitle: NSLocalizedString("Restart", comment: ""))
             alert.runModal()
@@ -119,8 +117,22 @@ enum StandaloneImporter {
         }
     }
 
-    private static var settingsUnreadable: String {
-        String(format: NSLocalizedString("Its settings weren't imported: that isn't %@.", comment: "settings import: wrong or unreadable file"), StandaloneImport.settingsFileName)
+    /// What became of the settings, for either alert.
+    private static func settingsNote(_ settings: SettingsOutcome) -> String {
+        switch settings {
+        case .imported(let changed) where changed > 0:
+            // The token is a Keychain item of the other app's: the sandbox
+            // doesn't reach it.
+            return NSLocalizedString("Its settings came too; a Hugging Face token has to be entered again in Settings › Models.", comment: "")
+        case .imported:
+            return NSLocalizedString("Its settings were the same as these already.", comment: "settings import: nothing changed")
+        case .empty:
+            return NSLocalizedString("It had no settings of its own to bring; the ones here were kept.", comment: "settings import: no LLMTray keys in the file")
+        case .skipped:
+            return NSLocalizedString("The settings here were kept.", comment: "settings import: the user cancelled the file panel")
+        case .unreadable:
+            return String(format: NSLocalizedString("Its settings weren't imported: that isn't %@ in ~/Library/Preferences.", comment: "settings import: wrong or unreadable file"), StandaloneImport.settingsFileName)
+        }
     }
 }
 #endif

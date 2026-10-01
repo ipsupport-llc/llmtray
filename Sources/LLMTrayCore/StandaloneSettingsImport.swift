@@ -47,20 +47,42 @@ extension StandaloneImport {
         return all.filter { isImportedSetting($0.key) }
     }
 
-    /// `settings` written into `defaults`, theirs in place of ours: the user
-    /// asked for their settings, and it's what the same-id move gave (the
-    /// data import, by contrast, never overwrites). Returns how many keys
-    /// changed.
+    /// Whether `url` is the Developer ID build's preferences file itself:
+    /// the right name, directly in `home`'s Library/Preferences (links
+    /// resolved) -- not a stale copy elsewhere. `home`: the user's real one
+    /// (SandboxAccess.realHome), not the container's.
+    public static func isStandalonePreferencesFile(_ url: URL, home: String) -> Bool {
+        let file = url.resolvingSymlinksInPath().standardizedFileURL
+        let preferences = URL(fileURLWithPath: home).appendingPathComponent("Library/Preferences")
+            .resolvingSymlinksInPath().standardizedFileURL
+        return file.lastPathComponent == settingsFileName
+            && file.deletingLastPathComponent().standardizedFileURL.path == preferences.path
+    }
+
+    /// `settings` (the whole imported set) made this install's: theirs in
+    /// place of ours, and each imported key they don't have removed here,
+    /// so the result is their settings, defaults included -- what the
+    /// same-id move gave (the data import, by contrast, never overwrites).
+    /// `domain`: this app's own (persistent) domain in `defaults`, whose
+    /// keys are the "ours" to remove. Then the one-time migrations run on
+    /// what came in: the app ran them at launch, before these values were
+    /// here. Returns how many keys changed.
     @discardableResult
-    public static func apply(settings: [String: Any], to defaults: UserDefaults) -> Int {
+    public static func apply(settings: [String: Any], to defaults: UserDefaults, domain: String) -> Int {
         var changed = 0
-        for (key, value) in settings.sorted(by: { $0.key < $1.key }) {
-            if let current = defaults.object(forKey: key) as? NSObject, let new = value as? NSObject, current.isEqual(new) {
-                continue
-            }
+        let ours = defaults.persistentDomain(forName: domain) ?? [:]
+        for key in ours.keys.sorted() where isImportedSetting(key) && settings[key] == nil {
+            defaults.removeObject(forKey: key)
+            changed += 1
+        }
+        for (key, value) in settings.sorted(by: { $0.key < $1.key }) where isImportedSetting(key) {
+            if let current = ours[key] as? NSObject, let new = value as? NSObject, current.isEqual(new) { continue }
             defaults.set(value, forKey: key)
             changed += 1
         }
+        // Their marker came with their values (or went, if their build
+        // predates it): values from before the migration get it now.
+        KVSettings.migrateIfNeeded(defaults)
         return changed
     }
 }

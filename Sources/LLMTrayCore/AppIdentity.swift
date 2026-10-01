@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 /// The two builds' bundle ids (adr/0018 §1): the App Store build has its
@@ -54,5 +55,34 @@ public enum AppIdentity {
             return .otherBuild(bundleID: id, pid: other.pid)
         }
         return nil
+    }
+
+    /// The .app an LLMTray executable path is inside of
+    /// (`…/LLMTray.app/Contents/MacOS/LLMTray` -> `…/LLMTray.app`); nil for
+    /// anything else.
+    public static func appBundle(ofExecutable path: String) -> String? {
+        let parts = path.split(separator: "/", omittingEmptySubsequences: false)
+        guard parts.count >= 4, parts[parts.count - 1] == "LLMTray", parts[parts.count - 2] == "MacOS",
+              parts[parts.count - 3] == "Contents", parts[parts.count - 4].hasSuffix(".app")
+        else { return nil }
+        return parts.dropLast(3).joined(separator: "/")
+    }
+
+    /// The pids of running processes whose executable is an app with
+    /// `bundleID` -- for the command-line tool, which has no AppKit
+    /// (NSRunningApplication): libproc's paths, each bundle's Info.plist.
+    /// Processes of other users aren't seen, which is what's wanted.
+    public static func runningPIDs(bundleID: String) -> [Int32] {
+        let capacity = proc_listallpids(nil, 0)
+        guard capacity > 0 else { return [] }
+        var pids = [pid_t](repeating: 0, count: Int(capacity) + 64)
+        let count = proc_listallpids(&pids, Int32(pids.count * MemoryLayout<pid_t>.size))
+        guard count > 0 else { return [] }
+        var path = [CChar](repeating: 0, count: 4 * Int(MAXPATHLEN))
+        return pids.prefix(Int(count)).filter { pid in
+            guard pid > 0, proc_pidpath(pid, &path, UInt32(path.count)) > 0,
+                  let bundle = appBundle(ofExecutable: String(cString: path)) else { return false }
+            return Bundle(path: bundle)?.bundleIdentifier == bundleID
+        }
     }
 }
