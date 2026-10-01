@@ -97,12 +97,13 @@ final class FeatureMemoryTests: XCTestCase {
     func testWhatA16GBMacGets() throws {
         let table = try shipped()
         let mac16 = mac(16)
-        // Z-Image and klein's edits need more; klein generates, music runs.
-        XCTAssertEqual(table.fit(FeatureMemory.image("gptqMixed"), on: mac16)?.level, .doesNotFit)
-        XCTAssertEqual(table.fit(FeatureMemory.imageEdit("klein4b"), on: mac16)?.level, .doesNotFit)
-        XCTAssertEqual(table.fit(FeatureMemory.image("klein4b"), on: mac16)?.level, .tight)
+        // Images, edits and music all run.
+        XCTAssertEqual(table.fit(FeatureMemory.image("gptqMixed"), on: mac16)?.level, .fits)
+        XCTAssertEqual(table.fit(FeatureMemory.imageEdit("klein4b"), on: mac16)?.level, .fits)
+        XCTAssertEqual(table.fit(FeatureMemory.image("klein4b"), on: mac16)?.level, .fits)
         XCTAssertEqual(table.fit(FeatureMemory.music("turbo"), on: mac16)?.level, .fits)
-        // 8 GB: no music either.
+        // 8 GB: neither images nor music.
+        XCTAssertEqual(table.fit(FeatureMemory.image("gptqMixed"), on: mac(8))?.level, .doesNotFit)
         XCTAssertEqual(table.fit(FeatureMemory.music("sftGPTQ4"), on: mac(8))?.level, .doesNotFit)
     }
 }

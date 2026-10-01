@@ -45,7 +45,7 @@ The models run on your Mac. Only the optional web tools reach the internet.
 
 ### Memory
 
-What each model takes while it runs, measured on an M5 MacBook with 24 GiB of RAM (Metal's default GPU limit 17.8 GiB, 19.07 GB) on 2026-09-30. Peak is the kernel's `phys_footprint_peak` of the runner and its children, which on Apple Silicon includes GPU memory. Harness: [`scripts/measure_memory.py`](./scripts/measure_memory.py); the app reads the same numbers from [`runtime/feature_memory.json`](./runtime/feature_memory.json).
+What each model takes while it runs, measured on an M5 MacBook with 24 GiB of RAM (Metal's default GPU limit 17.8 GiB, 19.07 GB) on 2026-09-30 (the image rows 2026-10-01). Peak is the kernel's `phys_footprint_peak` of the runner and its children, which on Apple Silicon includes GPU memory. Harness: [`scripts/measure_memory.py`](./scripts/measure_memory.py); the app reads the same numbers from [`runtime/feature_memory.json`](./runtime/feature_memory.json).
 
 | What | Model | Peak GiB | Time |
 |---|---|---|---|
@@ -54,13 +54,15 @@ What each model takes while it runs, measured on an M5 MacBook with 24 GiB of RA
 | Chat, 4K | Nemotron 3 Nano 4B (ipsupport-code LoRA) | 9.25 | 13 s |
 | Chat, 4K / 16K | Gemma 4 26B-A4B (GPTQ) | 16.97 / 17.15 | 25 / 60 s |
 | Chat, 4K | Nemotron 3.5 30B-A3B | 19.27 | 17 s |
-| Image 1024², 9 steps | Z-Image Turbo GPTQ mixed | 19.69 | 204 s |
-| Image 1024², 4 steps | FLUX.2 klein 4B | 10.93 | 46 s |
-| Image edit, one 1024² reference | FLUX.2 klein 4B | 17.84 | 128 s |
+| Image 1024², 9 steps | Z-Image Turbo GPTQ mixed | 6.93 | 145 s |
+| Image 1024², 4 steps | FLUX.2 klein 4B | 7.56 | 45 s |
+| Image edit, one 1024² reference | FLUX.2 klein 4B | 9.54 | 106 s |
 | Music 30 s / 120 s | ACE-Step turbo 4-bit + 1.7B planner | 7.24 / 8.42 | 33 / 97 s |
 | Music 30 s | ACE-Step sft GPTQ 4-bit | 7.15 | 32 s |
 | Voice, 20 s listening | VoiceChat 11B GPTQ 3-bit | 9.71 | 70 s |
 | Voice, 20 s listening | VoiceChat 11B GPTQ 3-bit + 8-bit speech | 8.73 | 62 s |
+
+The image runner caps MLX's buffer cache at 256 MB (by default MLX keeps freed buffers up to its memory limit: Z-Image peaked at 19.7 GiB that way, klein editing at 17.8) and, for Z-Image, drops each model once it's done: the text encoder after the prompt, the transformer -- and the compiled denoising step that holds its weights -- before the VAE decode, which is the run's peak. Same image, byte for byte.
 
 Not measured yet, so estimated in the JSON from a measured sibling plus the difference in files: Z-Image GPTQ 8-bit and 4-bit, ACE-Step sft 8-bit and full precision. Image, music and voice run alone (the chat model is unloaded for them). Peaks near the GPU limit may be held down by it (MLX frees its cache under memory pressure), so on a bigger Mac they can be higher.
 
