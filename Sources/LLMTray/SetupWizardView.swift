@@ -678,23 +678,24 @@ private struct AppsStep: View {
         .onAppear { model.checkPort() }
         .onChange(of: model.progress.choices.port) { model.checkPort() }
         .onChange(of: model.canEditNetwork) { model.checkPort() }
+        .onChange(of: model.progress.choices.allowLAN) { model.checkPort() }
     }
 }
 
-/// The chosen port is already held by another app: says so, with the next
-/// free port one click away and (`showsField`, where there's no port field
-/// of the step's own) any other one to type in.
+/// The chosen port is already held by another app, or out of range: says
+/// so, with the next free port one click away, Use Anyway for a check that
+/// may be wrong and (`showsField`, where there's no port field of the
+/// step's own) any other port to type in.
 private struct PortInUseNote: View {
     @ObservedObject var model: SetupWizardModel
     let showsField: Bool
-    @State private var candidate = 0
+    @State private var candidate = Pref.port.defaultValue
 
     var body: some View {
-        if let taken = model.portTaken {
+        if let problem = model.portProblem {
             VStack(alignment: .leading, spacing: 6) {
                 Label {
-                    Text(String(format: NSLocalizedString("Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port.", comment: "setup: port in use"), taken))
-                        .fixedSize(horizontal: false, vertical: true)
+                    Text(message(problem)).fixedSize(horizontal: false, vertical: true)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                 }
@@ -707,16 +708,40 @@ private struct PortInUseNote: View {
                             .frame(width: 70)
                         Stepper("", value: $candidate, in: PortCheck.validRange).labelsHidden()
                         Button("Use This Port") { model.usePort(candidate) }
-                            .disabled(!PortCheck.validRange.contains(candidate) || candidate == taken)
+                            .disabled(!PortCheck.validRange.contains(candidate) || problem == .inUse(candidate))
+                    }
+                    if case .inUse = problem {
+                        Button("Use Anyway") { model.usePortAnyway() }
+                            .help(Text("Keeps this port. If another app really has it, the server won't start until you change the port in Settings."))
                     }
                 }
                 .padding(.leading, 22)
             }
             .padding(10)
             .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-            .onAppear { candidate = model.freePort ?? taken + 1 }
-            .onChange(of: model.freePort) { candidate = $1 ?? candidate }
+            .onAppear { candidate = Self.clamped(model.freePort ?? port(problem) + 1) }
+            .onChange(of: model.freePort) { candidate = Self.clamped($1 ?? candidate) }
         }
+    }
+
+    private func message(_ problem: SetupWizardModel.PortProblem) -> String {
+        switch problem {
+        case .inUse(let port):
+            return String(format: NSLocalizedString("Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port.", comment: "setup: port in use"), port)
+        case .outOfRange(let port):
+            return String(format: NSLocalizedString("Port %1$lld is out of range: choose one from %2$lld to %3$lld.", comment: "setup: port out of range"),
+                          port, PortCheck.validRange.lowerBound, PortCheck.validRange.upperBound)
+        }
+    }
+
+    private func port(_ problem: SetupWizardModel.PortProblem) -> Int {
+        switch problem {
+        case .inUse(let port), .outOfRange(let port): return port
+        }
+    }
+
+    private static func clamped(_ port: Int) -> Int {
+        min(max(port, PortCheck.validRange.lowerBound), PortCheck.validRange.upperBound)
     }
 }
 
@@ -774,6 +799,8 @@ private struct DoneStep: View {
                 ForEach(model.finishErrors, id: \.self) { Text(verbatim: $0).foregroundStyle(.red) }
             } else {
                 StepHeader(Text("Done"), Text("Finish applies what you chose. You can change all of it later in Settings."))
+                // Finish stops here while the port is taken (SetupWizardModel.finish).
+                PortInUseNote(model: model, showsField: true)
                 let lines = model.summaryLines
                 if lines.isEmpty && model.summaryDownloads.isEmpty && queue.state.items.isEmpty {
                     Text("Nothing to change.").foregroundStyle(.secondary)
@@ -795,6 +822,7 @@ private struct DoneStep: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+        .onAppear { if !model.isFinished { model.checkPort() } }
     }
 
     private func status(_ item: DownloadQueueState.Item) -> String {

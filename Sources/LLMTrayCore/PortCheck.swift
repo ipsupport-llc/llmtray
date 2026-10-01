@@ -8,20 +8,37 @@ public enum PortCheck {
     /// Ports the API may use: above the privileged range.
     public static let validRange = 1024...65535
 
-    /// Something holds `port` on this Mac: a listener answers on
-    /// localhost, or the port can't be bound (as the server would bind it).
-    public static func isInUse(_ port: Int) -> Bool {
+    public enum Status: Equatable, Sendable {
+        case free
+        case inUse
+        /// Not a port the API may use (validRange).
+        case outOfRange
+    }
+
+    /// `port` as the server would bind it: 127.0.0.1 only (`loopbackOnly`,
+    /// Allow connections from the local network off) or every interface,
+    /// as ModelProxyServer's listener does.
+    public static func status(_ port: Int, loopbackOnly: Bool) -> Status {
+        guard validRange.contains(port) else { return .outOfRange }
+        return isInUse(port, loopbackOnly: loopbackOnly) ? .inUse : .free
+    }
+
+    /// Something holds `port` where the server would listen: a listener
+    /// answers there, or the port can't be bound. Out of range counts as
+    /// taken (never offered).
+    public static func isInUse(_ port: Int, loopbackOnly: Bool) -> Bool {
         guard validRange.contains(port) else { return true }
-        if acceptsConnections(port: port, ipv6: false) || acceptsConnections(port: port, ipv6: true) { return true }
+        if acceptsConnections(port: port, ipv6: false) { return true }
+        // Every interface includes IPv6 (NWListener's "*:port").
+        if !loopbackOnly, acceptsConnections(port: port, ipv6: true) { return true }
         // SO_REUSEADDR: a port the server just let go of (TIME_WAIT) isn't
-        // taken. Loopback and every interface: the server binds one or the
-        // other (Settings › Allow connections from the local network).
-        return !canBind(port: port, loopbackOnly: true) || !canBind(port: port, loopbackOnly: false)
+        // taken.
+        return !canBind(port: port, loopbackOnly: loopbackOnly)
     }
 
     /// The first free port after `port` (wrapping round the valid range),
     /// or nil after `limit` tries. `isInUse` is injectable for the tests.
-    public static func nextFree(after port: Int, limit: Int = 200, isInUse: (Int) -> Bool = PortCheck.isInUse) -> Int? {
+    public static func nextFree(after port: Int, limit: Int = 200, isInUse: (Int) -> Bool) -> Int? {
         var candidate = port
         for _ in 0..<limit {
             candidate = candidate >= validRange.upperBound || candidate < validRange.lowerBound ? validRange.lowerBound : candidate + 1

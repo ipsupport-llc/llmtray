@@ -458,6 +458,7 @@
 "Keep last messages: %lld" = "Keep last messages: %lld";
 "Keep the loaded model" = "Keep the loaded model";
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
+"Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
 "Kept free: %lld MB" = "Kept free: %lld MB";
 "LLMTray" = "LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
@@ -650,6 +651,7 @@
 "Play" = "Play";
 "Point an app or agent at LLMTray:" = "Point an app or agent at LLMTray:";
 "Port" = "Port";
+"Port %1$lld is out of range: choose one from %2$lld to %3$lld." = "Port %1$lld is out of range: choose one from %2$lld to %3$lld.";
 "Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port." = "Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port.";
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory.";
@@ -1058,6 +1060,7 @@
 "Usage statistics: the reports" = "Usage statistics: the reports";
 "Use" = "Use";
 "Use %lld" = "Use %lld";
+"Use Anyway" = "Use Anyway";
 "Use Folder" = "Use Folder";
 "Use LM Studio's folder" = "Use LM Studio's folder";
 "Use This Port" = "Use This Port";

@@ -180,6 +180,10 @@ final class SetupWizardModel: ObservableObject {
     /// first). The window stays open to show what failed, if anything.
     func finish() {
         guard !isFinished else { return }
+        // A port that's taken (or out of range) isn't applied unseen: the
+        // Done step shows the note, with Use Anyway for a wrong check.
+        checkPort()
+        guard portProblem == nil else { return }
         finishErrors = actions.compactMap(perform)
         markDone()
         if finishErrors.isEmpty {
@@ -416,23 +420,41 @@ final class SetupWizardModel: ObservableObject {
 
     var baseURLSnippet: String { "OPENAI_BASE_URL=http://localhost:\(progress.choices.port)/v1" }
 
-    /// The chosen port, when another app already holds it -- checked
-    /// before the server first starts on it (checkPort).
-    @Published private(set) var portTaken: Int?
+    /// What's wrong with the chosen port, checked before the server first
+    /// starts on it (checkPort): another app holds it, or it's out of range.
+    @Published private(set) var portProblem: PortProblem?
     /// The first free port after it, for the note's button.
     @Published private(set) var freePort: Int?
+    /// "Use Anyway": a port the check calls taken, kept -- the check could
+    /// be wrong, and must never stop Finish for good.
+    private var portAcceptedAnyway: Int?
+
+    enum PortProblem: Equatable {
+        case inUse(Int)
+        case outOfRange(Int)
+    }
 
     /// Only while the server is stopped (not idle-unloaded): otherwise
-    /// it's LLMTray's own listener holding the port.
+    /// it's LLMTray's own listener holding the port. Bound as the server
+    /// would bind it (the LAN choice).
     func checkPort() {
         let port = progress.choices.port
-        guard canEditNetwork, !server.isIdleUnloaded, PortCheck.isInUse(port) else {
-            portTaken = nil
+        let loopbackOnly = !progress.choices.allowLAN
+        guard canEditNetwork, !server.isIdleUnloaded, port != portAcceptedAnyway else {
+            portProblem = nil
             freePort = nil
             return
         }
-        portTaken = port
-        freePort = PortCheck.nextFree(after: port)
+        switch PortCheck.status(port, loopbackOnly: loopbackOnly) {
+        case .free:
+            portProblem = nil
+            freePort = nil
+            return
+        case .inUse: portProblem = .inUse(port)
+        case .outOfRange: portProblem = .outOfRange(port)
+        }
+        let start = PortCheck.validRange.contains(port) ? port : Pref.port.defaultValue - 1
+        freePort = PortCheck.nextFree(after: start) { PortCheck.isInUse($0, loopbackOnly: loopbackOnly) }
     }
 
     /// The port picked in the note: saved at once to the Pref Settings'
@@ -440,6 +462,14 @@ final class SetupWizardModel: ObservableObject {
     func usePort(_ port: Int) {
         guard canEditNetwork, PortCheck.validRange.contains(port) else { return }
         perform(progress.adoptPort(port))
+        checkPort()
+    }
+
+    /// Keeps a port the check calls taken (it may be wrong): no note, and
+    /// Finish goes ahead.
+    func usePortAnyway() {
+        guard case .inUse(let port) = portProblem else { return }
+        portAcceptedAnyway = port
         checkPort()
     }
 

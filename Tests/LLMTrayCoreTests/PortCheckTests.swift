@@ -28,20 +28,24 @@ final class PortCheckTests: XCTestCase {
 
     func testAListeningPortIsInUseAndFreeOnceClosed() throws {
         let (fd, port) = try listen()
-        XCTAssertTrue(PortCheck.isInUse(port))
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: true), .inUse)
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: false), .inUse)
         close(fd)
-        XCTAssertFalse(PortCheck.isInUse(port), "closed: free again")
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: true), .free, "closed: free again")
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: false), .free)
     }
 
     func testAListenerOnEveryInterfaceCounts() throws {
         let (fd, port) = try listen(loopback: false)
         defer { close(fd) }
-        XCTAssertTrue(PortCheck.isInUse(port))
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: false), .inUse)
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: true), .inUse, "it answers on 127.0.0.1 too")
     }
 
-    func testPortsOutsideTheRangeAreNeverOffered() {
-        XCTAssertTrue(PortCheck.isInUse(80))
-        XCTAssertTrue(PortCheck.isInUse(70000))
+    func testPortsOutsideTheRangeAreOutOfRange() {
+        XCTAssertEqual(PortCheck.status(80, loopbackOnly: true), .outOfRange)
+        XCTAssertEqual(PortCheck.status(70000, loopbackOnly: false), .outOfRange)
+        XCTAssertTrue(PortCheck.isInUse(80, loopbackOnly: true), "never offered as free")
     }
 
     func testNextFreeSkipsTakenPortsAndWraps() {
@@ -54,8 +58,8 @@ final class PortCheckTests: XCTestCase {
     func testNextFreeFindsARealOne() throws {
         let (fd, port) = try listen()
         defer { close(fd) }
-        let next = try XCTUnwrap(PortCheck.nextFree(after: port - 1))
+        let next = try XCTUnwrap(PortCheck.nextFree(after: port - 1) { PortCheck.isInUse($0, loopbackOnly: true) })
         XCTAssertNotEqual(next, port)
-        XCTAssertFalse(PortCheck.isInUse(next))
+        XCTAssertFalse(PortCheck.isInUse(next, loopbackOnly: true))
     }
 }

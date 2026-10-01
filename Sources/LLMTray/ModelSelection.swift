@@ -40,10 +40,24 @@ enum ModelCapabilities {
     private static var cache: [String: [RecommendedModel.Capability]] = [:]
     private static var recommended: [RecommendedModel]?
 
+    /// A download (or a model replaced in place) can change a folder's
+    /// config.json: read again. The list ships in the app bundle
+    /// (Resources/runtime), so a runtime install doesn't change it -- it's
+    /// read again here anyway.
+    private static let invalidation = NotificationCenter.default.addObserver(
+        forName: .modelsDidChange, object: nil, queue: .main
+    ) { _ in
+        MainActor.assumeIsolated {
+            cache = [:]
+            recommended = nil
+        }
+    }
+
     static func of(_ path: String) -> [RecommendedModel.Capability] {
+        _ = invalidation
         if let known = cache[path] { return known }
         if recommended == nil {
-            // Not there (a Light build before its runtime): just the config's.
+            // Missing or unreadable (a dev checkout without it): just the config's.
             let url = URL(fileURLWithPath: RuntimePaths.runtimeDir).appendingPathComponent(ModelRecommendations.fileName)
             recommended = (try? ModelRecommendations.load(contentsOf: url)) ?? []
         }

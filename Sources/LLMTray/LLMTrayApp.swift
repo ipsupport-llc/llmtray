@@ -637,12 +637,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func quickOpenChat() {
-        detachChatSoon()
+        showChatWhereItIs()
     }
 
-    /// A new chat, shown where the chat is: its window, or the popover.
     @objc private func quickNewChat() {
         tabs.newChat()
+        showChatWhereItIs()
+    }
+
+    /// The chat where it is: its window while detached, else the popover --
+    /// not moved out (the popover's Open in Window does that).
+    private func showChatWhereItIs() {
         // After the menu's tracking ends (the popover shows from the button).
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
