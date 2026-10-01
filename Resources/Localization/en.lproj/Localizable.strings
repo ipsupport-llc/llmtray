@@ -885,7 +885,9 @@
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model can make an image when you ask for one." = "The model can make an image when you ask for one.";
 "The model didn't answer -- try again." = "The model didn't answer -- try again.";
+"The model didn't start: %@" = "The model didn't start: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "The model downloaded, but its folder couldn't be marked complete.";
+"The model isn't running. Send again to start it." = "The model isn't running. Send again to start it.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model reloads when Voice Lab stops" = "The model reloads when Voice Lab stops";

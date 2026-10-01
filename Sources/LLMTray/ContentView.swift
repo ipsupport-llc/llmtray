@@ -497,11 +497,7 @@ struct ContentView: View {
     // Only with a meaningful middle to replace -- compactSession's own guard.
     private var canCompact: Bool {
         // A one-shot summary request: it doesn't wait for a model to start.
-        let modelUp: Bool = {
-            if case .running = server.state { return true }
-            return server.isIdleUnloaded
-        }()
-        return modelUp && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+        server.canAnswer && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
     }
 
     private func mediaAction(_ messageID: UUID, _ kind: ChatClient.MediaKind, _ index: Int, _ action: ChatClient.MediaAction) {
@@ -517,7 +513,8 @@ struct ContentView: View {
     private func send() {
         // The field stays enabled (and focused) while streaming; this is
         // what stops Return from sending a second message mid-stream.
-        guard canChat, !chat.isBusy else { return }
+        // Return in an empty field mustn't start loading a model.
+        guard canChat, !chat.isBusy, !composer.isEmpty else { return }
         startModelIfStopped()
         let (text, images) = composer.take()
         chat.send(prompt: text, images: images, port: port, modelAlias: requestModelName, settings: chatSettings, server: server)

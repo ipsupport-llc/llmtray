@@ -49,6 +49,12 @@ final class ServerManager: ObservableObject {
         if case .starting = state { return true }
         return false
     }
+
+    /// A model answers now or reloads on the next request (idle-unloaded).
+    var canAnswer: Bool {
+        if case .running = state { return true }
+        return isIdleUnloaded
+    }
     private var activeRequestCount = 0
 
     /// The current model process. Callbacks of an older one (still on its
