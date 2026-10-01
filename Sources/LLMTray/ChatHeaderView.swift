@@ -95,17 +95,13 @@ struct ChatHeaderView: View {
 
     // MARK: Model card
 
-    /// The model picker in a small card: what the selected model can do
-    /// (its symbol) and its size on disk under the name. The picker itself
-    /// is unchanged.
+    /// The model picker in a small card: its size on disk and what it can
+    /// do under the name -- small grey symbols with their names on hover
+    /// (a big leading one read as a button, an eye as "hide"). The picker
+    /// itself is unchanged.
     private var modelCard: some View {
         let capabilities = selectedModelID.map(ModelCapabilities.of) ?? []
         return HStack(spacing: 6) {
-            Image(systemName: capabilities.first.map(ModelCapabilities.symbol) ?? "text.bubble")
-                .font(.system(size: 13))
-                .foregroundColor(.accentColor)
-                .frame(width: 18)
-                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Picker("Model", selection: Binding(get: { selectedModelID }, set: { pickModel($0) })) {
                     ForEach(catalog.models) { m in
