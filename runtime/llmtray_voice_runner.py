@@ -41,9 +41,14 @@
 # kernel compiles) not counted; their output is dropped. It is the cost of a
 # frame the model speaks on (the warm-up session never pauses its TTS):
 # speech plays as it's made, so that decides whether duplex keeps up.
-# --tts-idle-frames N (default 5, 0: off): after N quiet frames (no token,
-# silent speech) the session pauses its TTS and codec until the next token
-# -- listening frames then cost only perception and the language model. The context is
+# --tts-idle-frames N (default 25 = 2 s, 0: off): after N quiet frames (no
+# token, silent speech) the session pauses its TTS and codec until the next
+# token -- listening frames then cost only perception and the language model.
+# Not 5: the pause between two sentences of one reply is that long, and a
+# TTS resumed mid-reply stays silent -- the reply was spoken up to its first
+# sentence and no further, its text going on unheard (a 3-sentence answer:
+# 2.7 s of speech at 5, 8.2 s at 25, 10.5 s off; a second turn after a long
+# listening pause speaks in full at 25). The context is
 # bounded (--max-session-seconds, 300): at the limit the session starts over.
 #
 # Nothing is written to disk. It exits at stdin EOF -- which its parent's
@@ -385,7 +390,7 @@ def run_model():
     # Bounds the context (the language model's cache grows every 80 ms);
     # at the limit the conversation starts over, with a note to the app.
     max_seconds = float(arg("--max-session-seconds", "300"))
-    idle_frames = max(0, int(arg("--tts-idle-frames", "5")))
+    idle_frames = max(0, int(arg("--tts-idle-frames", "25")))
     idle_rms = float(arg("--tts-idle-rms", "0.001"))
     started = time.time()
     try:
