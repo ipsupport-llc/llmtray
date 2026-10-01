@@ -184,6 +184,9 @@ def main() -> None:
                     "/System/Library/Desktop Pictures/.thumbnails/Big Sur Coastline.heic", "--out", png],
                    capture_output=True)
     png_b64 = base64.b64encode(open(png, "rb").read()).decode() if os.path.exists(png) else ""
+    if not png_b64 and any("edit" in n for n in names):
+        # Without a reference the edit case would measure generation.
+        sys.exit("no reference image for the edit case (sips couldn't make one)")
     ctx = {"text": text, "png_b64": png_b64}
     results = {}
     for i, name in enumerate(names):
@@ -191,8 +194,10 @@ def main() -> None:
             time.sleep(args.cool)
         argv, stdin_bytes, env = CASES[name](ctx)
         r = run_case(argv, stdin_bytes, env, args.timeout)
-        results[name] = r
         print(f"{name:24} peak {r['peak_gb']:6.2f} GB  {r['seconds']:4d} s  rc={r['rc']} {r['error'][:80]}", flush=True)
+        # A failed or timed-out run's peak isn't what the feature needs.
+        if r["rc"] == 0:
+            results[name] = r
     if args.json:
         json.dump(results, open(args.json, "w"), indent=1)
 
