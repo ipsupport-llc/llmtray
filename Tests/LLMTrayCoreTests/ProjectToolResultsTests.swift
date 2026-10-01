@@ -104,8 +104,33 @@ final class ProjectToolResultsTests: XCTestCase {
         let text = "По договору [1:2] оплата — 10 дней [1:2]; неустойка [2:5, 1:3]. См. также [ 4 : 7 ] и [x:1], [1], [1:2:3]."
         let markers = CitationMarkers.markers(in: text)
         XCTAssertEqual(markers.map(\.doc), [1, 2, 1, 4])
-        XCTAssertEqual(markers.map(\.page), [2, 5, 3, 7])
+        XCTAssertEqual(markers.map(\.page), [2, 5, 3, 7] as [Int?])
         XCTAssertTrue(CitationMarkers.markers(in: "[99999999999999999999:1] no digits overflow").isEmpty)
+    }
+
+    func testCitationMarkersModelsWrite() {
+        // What models write instead of [3:12]: the file, without its page.
+        let text = "see [doc:3] and [doc 4, 5], [DOC#6], [doc:3:12], but not [7] or [1, 2] (footnotes)"
+        let markers = CitationMarkers.markers(in: text)
+        XCTAssertEqual(markers.map(\.doc), [3, 4, 5, 6, 3])
+        XCTAssertEqual(markers.map(\.page), [nil, nil, nil, nil, 12] as [Int?])
+        let returned = [
+            Citation(project: project, doc: 3, rev: 1, page: 4, name: "gptq.pdf"),
+            Citation(project: project, doc: 3, rev: 1, page: 2, name: "gptq.pdf"),
+            Citation(project: project, doc: 4, rev: 1, page: 1, name: "b.pdf"),
+        ]
+        let resolved = CitationMarkers.resolve("[doc:3] and [doc:4, 9]", returned: returned)
+        XCTAssertEqual(resolved.map(\.doc), [3, 4])
+        XCTAssertEqual(resolved.map(\.page), [2, 1], "a file cites its first page the turn returned")
+    }
+
+    func testLinkifiedFileMarkers() throws {
+        let source = "the error [doc:3] and [doc:3, 4]; not [5] or [doc:9]"
+        let line = CitationMarkers.linkified(source, page: known([(3, 2), (3, 7), (4, 1)]))
+        let found = try links(line)
+        XCTAssertEqual(found.map(\.text), ["[doc:3]", "doc:3", "4"])
+        XCTAssertEqual(found.map(\.page), [2, 2, 1])
+        XCTAssertEqual(try plain(line), source)
     }
 
     func testResolveOnlyReturnedPages() {
@@ -123,8 +148,13 @@ final class ProjectToolResultsTests: XCTestCase {
 
     // MARK: - inline citation links
 
-    private func known(_ pages: [(Int, Int)]) -> (Int, Int) -> Bool {
-        { doc, page in pages.contains { $0.0 == doc && $0.1 == page } }
+    /// The page each item links to: its own if cited, a file's first for
+    /// `[doc:3]` (as ChatMarkdownView's check).
+    private func known(_ pages: [(Int, Int)]) -> (Int, Int?) -> Int? {
+        { doc, page in
+            guard let page else { return pages.filter { $0.0 == doc }.map(\.1).min() }
+            return pages.contains { $0.0 == doc && $0.1 == page } ? page : nil
+        }
     }
 
     /// The linked text and its (doc, page) as the chat's parser shows them.
@@ -154,7 +184,7 @@ final class ProjectToolResultsTests: XCTestCase {
     }
 
     func testLinkifiedSingleMarker() throws {
-        let line = CitationMarkers.linkified("Оплата — 10 дней [1:5].", isKnown: known([(1, 5)]))
+        let line = CitationMarkers.linkified("Оплата — 10 дней [1:5].", page: known([(1, 5)]))
         let found = try links(line)
         XCTAssertEqual(found.map(\.text), ["[1:5]"], "the whole marker is the link")
         XCTAssertEqual(found.first?.doc, 1)
@@ -164,7 +194,7 @@ final class ProjectToolResultsTests: XCTestCase {
 
     func testLinkifiedListWithSpaces() throws {
         let source = "Fees [1:6, 2:4] and [ 3 : 7 ;2:9 ]"
-        let line = CitationMarkers.linkified(source, isKnown: known([(1, 6), (2, 4), (3, 7)]))
+        let line = CitationMarkers.linkified(source, page: known([(1, 6), (2, 4), (3, 7)]))
         let found = try links(line)
         XCTAssertEqual(found.map(\.text), ["1:6", "2:4", "3 : 7"], "in a list, each known pair")
         XCTAssertEqual(found.map(\.page), [6, 4, 7])
@@ -173,32 +203,32 @@ final class ProjectToolResultsTests: XCTestCase {
 
     func testLinkifiedLeavesUnknownMarkers() {
         let source = "No such page [9:9], [1:5, 9:1] out of range, [x:1], [1], [1:2:3]"
-        XCTAssertEqual(CitationMarkers.linkified(source, isKnown: known([(1, 6)])), source)
-        XCTAssertEqual(CitationMarkers.linkified(source, isKnown: { _, _ in false }), source)
-        XCTAssertEqual(CitationMarkers.linkified("plain text", isKnown: { _, _ in true }), "plain text")
+        XCTAssertEqual(CitationMarkers.linkified(source, page: known([(1, 6)])), source)
+        XCTAssertEqual(CitationMarkers.linkified(source, page: { _, _ in nil }), source)
+        XCTAssertEqual(CitationMarkers.linkified("plain text", page: { _, p in p ?? 1 }), "plain text")
     }
 
     func testLinkifiedSkipsCode() throws {
         let source = "Call `f([1:5])` or ``x [1:5] y`` but see [1:5]"
-        let line = CitationMarkers.linkified(source, isKnown: known([(1, 5)]))
+        let line = CitationMarkers.linkified(source, page: known([(1, 5)]))
         XCTAssertEqual(try links(line).count, 1, "only the marker outside code")
         XCTAssertTrue(line.hasPrefix("Call `f([1:5])` or ``x [1:5] y`` but see "))
         // An unclosed backtick is text: its marker is linked.
-        XCTAssertEqual(try links(CitationMarkers.linkified("a ` b [1:5]", isKnown: known([(1, 5)]))).count, 1)
+        XCTAssertEqual(try links(CitationMarkers.linkified("a ` b [1:5]", page: known([(1, 5)]))).count, 1)
     }
 
     func testLinkifiedAdjacentPunctuation() throws {
-        let line = CitationMarkers.linkified("(see [1:5]), [2:3]; «[1:5]»—[2:3]!", isKnown: known([(1, 5), (2, 3)]))
+        let line = CitationMarkers.linkified("(see [1:5]), [2:3]; «[1:5]»—[2:3]!", page: known([(1, 5), (2, 3)]))
         XCTAssertEqual(try links(line).map(\.text), ["[1:5]", "[2:3]", "[1:5]", "[2:3]"])
         XCTAssertEqual(try plain(line), "(see [1:5]), [2:3]; «[1:5]»—[2:3]!")
         // **bold** around it still parses.
-        XCTAssertEqual(try links(CitationMarkers.linkified("**due [1:5]**", isKnown: known([(1, 5)]))).count, 1)
+        XCTAssertEqual(try links(CitationMarkers.linkified("**due [1:5]**", page: known([(1, 5)]))).count, 1)
     }
 
     func testLinkifiedLeavesLinksAndEscapes() {
         let isKnown = known([(1, 5)])
         for source in ["[1:5](https://example.com)", "[see [1:5]](https://example.com)", #"\[1:5]"#] {
-            XCTAssertEqual(CitationMarkers.linkified(source, isKnown: isKnown), source)
+            XCTAssertEqual(CitationMarkers.linkified(source, page: isKnown), source)
         }
     }
 

@@ -17,9 +17,10 @@ import LLMTrayCore
 /// SwiftUI's Text doesn't lay out. Streaming-safe: an unclosed `**` or
 /// ``` fence just renders literally / as code until the rest arrives.
 enum ChatMarkdown {
-    /// Which `[doc:page]` markers are this answer's citations (adr/0012):
-    /// those become links (CitationMarkers.linkified), the rest stay text.
-    typealias CitationCheck = (_ doc: Int, _ page: Int) -> Bool
+    /// The page a marker's item links to if it's one of this answer's
+    /// citations (adr/0012), nil otherwise: `[3:12]` its page, `[doc:3]`
+    /// (page nil) one of the file's (CitationMarkers.linkified).
+    typealias CitationCheck = (_ doc: Int, _ page: Int?) -> Int?
 
     static func render(_ source: String, baseSize: CGFloat, cite: CitationCheck? = nil) -> AttributedString {
         var out = AttributedString()
@@ -129,7 +130,7 @@ enum ChatMarkdown {
     }
 
     private static func inline(_ baseSize: CGFloat, _ text: String, _ cite: CitationCheck? = nil) -> AttributedString {
-        func linked(_ s: String) -> String { cite.map { CitationMarkers.linkified(s, isKnown: $0) } ?? s }
+        func linked(_ s: String) -> String { cite.map { CitationMarkers.linkified(s, page: $0) } ?? s }
         guard text.contains("$") || text.contains("\\(") || text.contains("\\[") else { return markdown(linked(text)) }
         var maths: [(latex: String, display: Bool)] = []
         var masked = ""
@@ -322,7 +323,12 @@ struct ChatMarkdownView: View {
     private var cite: ChatMarkdown.CitationCheck? {
         guard !citations.isEmpty else { return nil }
         let pages = Set(citations.map { "\($0.doc):\($0.page)" })
-        return { doc, page in pages.contains("\(doc):\(page)") }
+        // A file without a page: its first cited one (CitationMarkers.resolve).
+        let first = Dictionary(citations.map { ($0.doc, $0.page) }, uniquingKeysWith: min)
+        return { doc, page in
+            guard let page else { return first[doc] }
+            return pages.contains("\(doc):\(page)") ? page : nil
+        }
     }
 }
 
