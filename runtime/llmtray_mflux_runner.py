@@ -40,6 +40,8 @@ def drop(model, name):
     """One image per run: a model goes once it's done -- its weights, not
     just the attribute (mflux's loops may still hold the module)."""
     module = getattr(model, name)
+    if module is None:
+        return
     module.update(tree_map(lambda x: mx.zeros((0,), x.dtype), module.parameters()))
     setattr(model, name, None)
     gc.collect()
@@ -49,9 +51,12 @@ def half_size(packed):
     """(B, C, H, W) latents at half the size, for a preview: a full-size
     decode at every step costs gigabytes for a 512 px picture."""
     b, c, h, w = packed.shape
-    if h % 2 or w % 2:
+    # An odd side loses its last row or column: it's a preview.
+    packed = packed[:, :, : h - h % 2, : w - w % 2]
+    h, w = h // 2, w // 2
+    if not h or not w:
         return packed
-    return packed.reshape(b, c, h // 2, 2, w // 2, 2).mean(axis=(3, 5))
+    return packed.reshape(b, c, h, 2, w, 2).mean(axis=(3, 5))
 
 # FLUX.2 klein (generation and editing): the prompt and any reference
 # images (base64 PNG / JPEG) arrive as one JSON object on stdin, the images
@@ -109,7 +114,10 @@ if arg("--base-model") == "flux2-klein-4b":
         if timestep + 1 < steps:   # not kept for the last step: no preview there
             # Back to the latents' dtype: the float32 sigma promotes it, and a
             # float32 VAE decode peaks ~0.6GB above the final one (measured).
-            predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
+            try:   # a preview is cosmetic: never the reason a generation fails
+                predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
+            except Exception:
+                predicted.pop("x0", None)
         return scheduler_step(self, noise, timestep, latents, **kwargs)
     FlowMatchEulerDiscreteScheduler.step = step
 
