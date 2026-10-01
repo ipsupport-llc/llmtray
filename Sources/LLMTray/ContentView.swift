@@ -360,6 +360,7 @@ struct ContentView: View {
                     if chat.messages.isEmpty {
                         if showsEmptyIntro {
                             VStack(spacing: 8) {
+                                Color.clear.frame(height: 0).id(Self.chatTopID)
                                 // A chat started in a project isn't in the sidebar
                                 // until its first turn: where it will be.
                                 if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
@@ -486,7 +487,9 @@ struct ContentView: View {
                 // Not while a Tweak draft up the chat is what the user looks at.
                 // Never while the user scrolls: that would take the end back from
                 // under them before they're 40 pt away.
-                if grew > 0.5, geometry.bottom > chatViewportHeight + 1, !userScroll.isScrolling {
+                // An empty chat's intro has no end to follow: it grows as it's
+                // measured, and following cut its tiles off at the top.
+                if grew > 0.5, geometry.bottom > chatViewportHeight + 1, !userScroll.isScrolling, !showsEmptyIntro {
                     followToEnd(proxy)
                 }
             }
@@ -495,6 +498,7 @@ struct ContentView: View {
             // takes whatever height the window leaves it.
             // The popover's empty chat with its intro: as tall as the intro
             // (measured, the content's own height), within the same cap.
+            .onChange(of: showsEmptyIntro) { if $1 { proxy.scrollTo(Self.chatTopID, anchor: .top) } }
             .frame(minHeight: popoverIntroHeight ?? 48,
                    maxHeight: presentation.isDetached ? .infinity : (popoverIntroHeight ?? (chat.messages.isEmpty ? 48 : 380)))
             // A draft wants the user's eyes: brought into view, wherever it is.
@@ -540,6 +544,9 @@ struct ContentView: View {
         chat.messages.isEmpty && chat.draft == nil && !chat.isBusy && !chat.isGeneratingMedia
             && chat.errorText == nil && chat.folderPlan == nil && chat.folderPrompt == nil
     }
+
+    /// The top of an empty chat's intro (scrolled to when it shows).
+    private static let chatTopID = "chat-top"
 
     /// The popover's chat height while the intro shows; nil otherwise.
     private var popoverIntroHeight: CGFloat? {

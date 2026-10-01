@@ -636,27 +636,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return item
     }
 
+    /// The full chat window -- the menu's way of saying LLMTray is more than
+    /// its popover (a left click already opens that). Raised if it's open.
     @objc private func quickOpenChat() {
-        showChatWhereItIs()
+        detachChatSoon()
     }
 
+    /// A new chat, in the chat window.
     @objc private func quickNewChat() {
         tabs.newChat()
-        showChatWhereItIs()
-    }
-
-    /// The chat where it is: its window while detached, else the popover --
-    /// not moved out (the popover's Open in Window does that).
-    private func showChatWhereItIs() {
-        // After the menu's tracking ends (the popover shows from the button).
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            if self.chatPresentation.isDetached {
-                self.showChatWindow()
-            } else if !self.popover.isShown {
-                self.togglePopover()
-            }
-        }
+        detachChatSoon()
     }
 
     /// As picking it in the popover: selected, and loaded now while
