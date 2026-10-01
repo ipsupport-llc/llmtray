@@ -357,6 +357,14 @@ struct ContentView: View {
                             ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
                         }
                     }
+                    if chat.isWaitingForModelLoad {
+                        HStack(spacing: 6) {
+                            ProgressView().controlSize(.small)
+                            Text(String(format: NSLocalizedString("Loading %@…", comment: "chat: the picked model is starting"),
+                                        catalog.model(id: selectedModelID)?.displayName ?? NSLocalizedString("the model", comment: "")))
+                                .font(.callout).foregroundStyle(.secondary)
+                        }
+                    }
                     if let err = chat.errorText {
                         Text(err)
                             .font(.system(size: 11))
@@ -473,11 +481,11 @@ struct ContentView: View {
         }
     }
 
-    /// The server is running, or idle-unloaded (the proxy reloads it on
-    /// the request).
+    /// A model is picked and here: sending starts it if it isn't running
+    /// (send), or the proxy reloads an idle-unloaded one. A grey field read
+    /// as a broken app.
     private var canChat: Bool {
-        if case .running = server.state { return true }
-        return server.isIdleUnloaded
+        catalog.model(id: selectedModelID) != nil
     }
 
     // Only once a reply has finished -- mid-stream there's nothing to redo.
@@ -488,7 +496,12 @@ struct ContentView: View {
 
     // Only with a meaningful middle to replace -- compactSession's own guard.
     private var canCompact: Bool {
-        canChat && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
+        // A one-shot summary request: it doesn't wait for a model to start.
+        let modelUp: Bool = {
+            if case .running = server.state { return true }
+            return server.isIdleUnloaded
+        }()
+        return modelUp && !chat.isBusy && chat.messages.count > compactKeepStart + compactKeepEnd + 1
     }
 
     private func mediaAction(_ messageID: UUID, _ kind: ChatClient.MediaKind, _ index: Int, _ action: ChatClient.MediaAction) {
@@ -505,14 +518,29 @@ struct ContentView: View {
         // The field stays enabled (and focused) while streaming; this is
         // what stops Return from sending a second message mid-stream.
         guard canChat, !chat.isBusy else { return }
+        startModelIfStopped()
         let (text, images) = composer.take()
         chat.send(prompt: text, images: images, port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
         isInputFocused = true
     }
 
+    /// Sending is asking for the model: a stopped (or failed) server starts
+    /// with the picked one, as the tray's Start does. Only the in-app chat:
+    /// an outside client through the API never wakes a server the user
+    /// stopped (ServerManager.checkAutoLoadAllowed).
+    private func startModelIfStopped() {
+        switch server.state {
+        case .stopped, .failed: break
+        default: return
+        }
+        guard !server.isIdleUnloaded, let model = catalog.model(id: selectedModelID) else { return }
+        server.start(modelPath: model.path, port: port, alias: catalog.alias(for: model.id))
+    }
+
     private func regenerate() {
         // The new answer is what the user asked to see.
         followChatBottom = true
+        startModelIfStopped()
         chat.regenerate(port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
     }
 

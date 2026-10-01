@@ -10,6 +10,8 @@ final class ChatClient: ObservableObject {
     @Published var messages: [ChatMessage] = [] {
         didSet { hasUnsavedChanges = true }
     }
+    /// The answer waits for a model being loaded (shown as such).
+    @Published private(set) var isWaitingForModelLoad = false
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
@@ -1029,13 +1031,17 @@ final class ChatClient: ObservableObject {
         // Another tab unloaded the model for an image: this answer waits for
         // it to come back (the server refuses requests meanwhile) instead
         // of failing. Stop / leaving the chat ends the wait.
-        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() }
+        // Also a model the chat's own send just started (ContentView.send):
+        // the message is in, the answer comes once it's loaded.
+        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting }
         guard modelAway() else { return startStream(request) }
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             while let self, modelAway(), token == self.turnToken, epoch == self.conversationEpoch {
+                self.isWaitingForModelLoad = server.isStarting
                 try? await Task.sleep(nanoseconds: 300_000_000)
             }
+            self?.isWaitingForModelLoad = false
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
             self.startStream(request)
         }

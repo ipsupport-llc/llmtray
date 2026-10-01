@@ -43,6 +43,12 @@ final class ServerManager: ObservableObject {
     /// listening, so the next request (in-app or external) reloads it.
     /// The in-app chat stays usable in this state.
     @Published private(set) var isIdleUnloaded: Bool = false
+
+    /// Launching or loading a model (a chat waits for it).
+    var isStarting: Bool {
+        if case .starting = state { return true }
+        return false
+    }
     private var activeRequestCount = 0
 
     /// The current model process. Callbacks of an older one (still on its
