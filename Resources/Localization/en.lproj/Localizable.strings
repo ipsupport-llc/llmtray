@@ -257,6 +257,7 @@
 "Dismiss" = "Dismiss";
 "Doesn't open at login" = "Doesn't open at login";
 "Don't Ask Again" = "Don't Ask Again";
+"Don't show again" = "Don't show again";
 "Done" = "Done";
 "Done talking: the model answers" = "Done talking: the model answers";
 "Done: %lld changes made." = "Done: %lld changes made.";
@@ -468,6 +469,7 @@
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
 "Long conversations and pinned files come from the cache instead of being read again every turn." = "Long conversations and pinned files come from the cache instead of being read again every turn.";
+"Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Longer chats are easier in the window: projects, files and every chat in a sidebar.";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
 "Make images and edit them." = "Make images and edit them.";
@@ -873,6 +875,7 @@
 "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent." = "The exact JSON LLMTray sends: the reports waiting to go, today's so far, and the last one sent.";
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
+"The full chat window, with projects and every chat (⌘⇧O)" = "The full chat window, with projects and every chat (⌘⇧O)";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";

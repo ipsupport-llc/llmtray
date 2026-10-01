@@ -25,6 +25,7 @@ struct ContentView: View {
     @AppStorage(Pref.port) private var port: Int
     @AppStorage(Pref.showReasoning) private var showReasoning: Bool
     @AppStorage(Pref.showToolCalls) private var showToolCalls: Bool
+    @AppStorage(Pref.chatWindowTipShown) private var chatWindowTipShown: Bool
     // Compaction keeps these many messages verbatim at the start and end
     // of a session, replacing everything in between with one
     // model-generated summary (see ChatClient.compactSession).
@@ -94,6 +95,7 @@ struct ContentView: View {
             ReviewPromptRow()
             if let id = chat.currentSessionID { ProjectChatFilesRow(sessionID: id) }
             conversation
+            openInWindowRow
         }
         .frame(width: 420)
         // The popover is as tall as its content, and an empty chat is short:
@@ -173,6 +175,39 @@ struct ContentView: View {
         .foregroundColor(.secondary)
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+    }
+
+    /// The popover's way to the full chat window, in words: a small icon in
+    /// the header was all there was, and people took LLMTray for a menu-bar
+    /// widget. After a few messages here, once, a line says why.
+    private var openInWindowRow: some View {
+        VStack(spacing: 6) {
+            Divider()
+            if !chatWindowTipShown, chat.messages.filter({ $0.role == "user" }).count >= 3 {
+                HStack(spacing: 6) {
+                    Image(systemName: "lightbulb").foregroundStyle(.yellow)
+                    Text("Longer chats are easier in the window: projects, files and every chat in a sidebar.")
+                        .font(.caption).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                    Button { chatWindowTipShown = true } label: { Image(systemName: "xmark") }
+                        .buttonStyle(.plain).foregroundStyle(.secondary)
+                        .help("Don't show again")
+                }
+                .padding(.horizontal, 12)
+            }
+            Button {
+                chatWindowTipShown = true
+                NotificationCenter.default.post(name: .detachChat, object: nil)
+            } label: {
+                Label("Open in Window", systemImage: "macwindow.on.rectangle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderless)
+            .keyboardShortcut("o", modifiers: [.command, .shift])
+            .help("The full chat window, with projects and every chat (⌘⇧O)")
+            .padding(.bottom, 8)
+        }
     }
 
     /// The messages and the composer: the same in both.

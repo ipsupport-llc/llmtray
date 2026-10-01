@@ -419,6 +419,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Moves the chat out of the popover into its own window.
     private func detachChat() {
+        // Found the window: the popover's tip about it has nothing to tell.
+        UserDefaults.standard[Pref.chatWindowTipShown] = true
         guard !chatPresentation.isDetached else {
             showChatWindow()
             return
