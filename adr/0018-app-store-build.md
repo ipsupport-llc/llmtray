@@ -61,10 +61,44 @@ into the shared code only if it's the same in both builds.
   - generated notices;
   - signing with the sandbox entitlements;
   - `productbuild` into a signed `.pkg`;
-  - upload with the App Store Connect API key (the one notarization uses).
-- **The same bundle id `us.ipsupport.llmtray`.** One app on one Mac: the
-  App Store copy replaces the Developer ID one, and a first-run import
-  (§3) brings the user's data into the container.
+  - upload with the App Store Connect API key (the one notarization uses),
+    by hand and only on the maintainer's say-so: the script never uploads.
+  The provisioning profile is `APPSTORE_PROFILE` (a path, nothing
+  personal in the script); with an App Store identity or
+  `INSTALLER_IDENTITY` and no profile, or a profile for another app
+  identifier than `<team>.us.ipsupport.llmtray.appstore`, it stops before
+  building.
+- **Its own bundle id, `us.ipsupport.llmtray.appstore`** (decided by the
+  maintainer, 2026-10-01; the App ID and its Mac App Store profile exist).
+  The standalone keeps `us.ipsupport.llmtray`. Both can be installed side
+  by side, each with its own preferences, container, login item and
+  notifications; the import (§3) brings the standalone's data **and
+  settings** in. `AppIdentity` (LLMTrayCore) has both ids; `build_app.sh`
+  writes the App Store one into that flavor's Info.plist, and a test keeps
+  the scripts, `Resources/Info.plist` and `AppIdentity` in step. What
+  depends on the bundle id, per build:
+
+  | | standalone | App Store |
+  |---|---|---|
+  | `CFBundleIdentifier` | `us.ipsupport.llmtray` (Resources/Info.plist) | `us.ipsupport.llmtray.appstore` (build_app.sh) |
+  | App ID / profile / `application-identifier` entitlement | Developer ID, none | `PP59UU9DSQ.us.ipsupport.llmtray.appstore`, from the profile |
+  | preferences | `~/Library/Preferences/us.ipsupport.llmtray.plist` | `~/Library/Containers/us.ipsupport.llmtray.appstore/Data/Library/Preferences/…` |
+  | data | `~/Library/Application Support/LLMTray` | the same path inside that container |
+  | login item (`SMAppService.mainApp`), notifications, per-app language | its own | its own |
+  | Keychain (the Hugging Face token) | its own item | its own; the standalone's isn't reachable (entered again) |
+  | in-app purchase ids | — | `us.ipsupport.llmtray.tip.*`: **not** derived from the bundle id; App Store Connect and the supporters API know them by this prefix |
+  | the CLI's `open -b` (adr/0019) | `us.ipsupport.llmtray` | no CLI |
+  | Sparkle | yes | not linked |
+
+  No app group or keychain access group: the two builds share nothing.
+- **One of them runs at a time.** Both serve the same port and load the
+  same models into the same memory. The single-instance check at launch
+  looks for both ids (`AppIdentity.conflict`): another copy of the same
+  build is brought forward and this one quits, as before; the other build
+  gets an alert naming it ("The App Store version of LLMTray is open. Quit
+  it first …") and this one quits. A sandboxed app can't quit another app,
+  so the user does. With both set to open at login, whichever starts
+  second shows that alert.
 
 ### 2. Sandbox entitlements
 
@@ -102,16 +136,17 @@ Homebrew Python.
   parent's security-scoped access; the spike proved it. The app resolves
   the bookmark, calls `startAccessingSecurityScopedResource()`, and
   passes the path. No copying and no descriptor passing.
-- **Preferences move, the rest doesn't (checked 2026-09-30).** The first
+- **Preferences don't move by themselves (checked 2026-09-30).** The first
   time a sandboxed app runs, macOS **moves** a non-sandboxed app's
-  preferences with the same bundle id (`~/Library/Preferences/<id>.plist`)
+  preferences *with the same bundle id* (`~/Library/Preferences/<id>.plist`)
   into its container: a test app read the value, and the original file was
-  gone. With `us.ipsupport.llmtray` for both builds, someone switching to
-  the App Store build keeps their settings, but a Developer ID build still
-  installed then starts over (setup wizard, defaults). **Open, the
-  maintainer's call before the first upload:** keep one bundle id (switching
-  is the common case) or give the App Store build its own (both side by
-  side, settings imported by hand). Application Support isn't moved.
+  gone, so a Developer ID build still installed started over. That's why
+  the App Store build has its own id (§1): nothing is moved, the
+  standalone keeps its settings, and the App Store build imports them
+  (below). Application Support isn't moved either way. (A sandboxed test
+  build made earlier with `us.ipsupport.llmtray` may have taken the
+  standalone's preferences into `~/Library/Containers/us.ipsupport.llmtray`;
+  that container can be deleted once they're copied back.)
 - **Import from the Developer ID build.** The container can't read
   `~/Library/Application Support/LLMTray` on its own. Settings › General ›
   **Import from LLMTray (direct download)** asks the user to grant that
@@ -128,7 +163,43 @@ Homebrew Python.
   no store it holds in memory is saved over what came in. Chat models stay
   where they are: the user grants the models folder as before. The copies are APFS clones: checked in the
   sandbox (2026-09-30), 48 GB of models imported in under a second with no
-  change in free space. Settings arrive by themselves (above).
+  change in free space.
+- **Settings, in the same import.** The sandbox can't read another app's
+  preference domain: `UserDefaults(suiteName: "us.ipsupport.llmtray")` and
+  CFPreferences look inside the container, and the folder granted for the
+  data (`Application Support/LLMTray`) doesn't cover
+  `~/Library/Preferences`. What works is the domain's plist file, granted
+  like any user-selected file: right after the data, a second open panel
+  starts in `~/Library/Preferences` with `us.ipsupport.llmtray.plist`
+  selected; Import reads it (binary or XML) and Cancel keeps the settings
+  as they are. Considered and not taken: granting all of `~/Library` in
+  one panel (one click less, far more access than the import needs), and
+  the `temporary-exception.shared-preference.read-only` entitlement (no
+  panel, but a temporary exception is a review risk and stays in every
+  version for a one-time import).
+  - **What comes:** LLMTray's own keys (`llmtray.*`, `selectedModelID`,
+    the per-app `AppleLanguages`), **theirs in place of ours** — the user
+    asked for their settings, and it's what the same-id move gave; the
+    data import, by contrast, overwrites nothing. That includes the models
+    folder path (still to be granted in Settings › Models, as the alert
+    says), the server, chat, voice and project settings, profiles' inputs,
+    the telemetry opt-in itself and the setup wizard's "done".
+  - **What doesn't** (`StandaloneImport.leftOutSettings`): state of the
+    moment (the pane to reopen after a relaunch, a wizard mid-way, the
+    download queue with the other build's destinations, the open chat tabs,
+    which this app writes over as it quits), the update channel and every
+    `SU*` key (no Sparkle), the telemetry install id and last report (a new
+    install), `llmtray.supporters.*` (this build's proof is its
+    purchases), the sandbox's own bookmarks, and anything of AppKit's or
+    the system's (window frames, open-panel state).
+  - **Limits:** the Hugging Face token is a Keychain item of the other
+    app's and isn't reachable: entered again. Folder grants and the models
+    folder need the user's OK again (no bookmark comes with a path). The
+    file is read as it is on disk; with the standalone quit (it can't run
+    beside this one) that's its latest. The second panel's preselection
+    is the open panel's (a file URL as `directoryURL`); if a macOS version
+    doesn't select it, the message names the file. Picking another file
+    is refused by name.
 - **System tools** (in the App Store build only; the standalone build keeps
   them):
   - `/bin/sh` in Settings: a Foundation or `NSWorkspace` call instead;
@@ -249,8 +320,9 @@ M5, one after the other:
 ## Steps
 
 0. **The user, in App Store Connect / Certificates:**
-   - an App ID `us.ipsupport.llmtray` with the In-App Purchase
-     capability;
+   - ~~an App ID `us.ipsupport.llmtray.appstore` with the In-App Purchase
+     capability~~ and its Mac App Store provisioning profile: done
+     (2026-10-01; §1);
    - the app record;
    - the Apple Distribution and Mac Installer Distribution certificates;
    - a Mac App Store provisioning profile;

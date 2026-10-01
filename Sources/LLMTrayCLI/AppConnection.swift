@@ -26,7 +26,8 @@ struct CLIError: Error, CustomStringConvertible {
 
 /// Reaching the app, starting it first when it isn't running.
 enum AppConnection {
-    static let bundleID = "us.ipsupport.llmtray"
+    /// The standalone's: the CLI comes only with that build (adr/0019).
+    static let bundleID = AppIdentity.standaloneBundleID
     static let launchTimeout: TimeInterval = 20
 
     static func connect() throws -> ControlClient {

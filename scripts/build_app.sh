@@ -22,7 +22,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 # LLMTRAY_APP_STORE=1: the Mac App Store flavor (adr/0018) -- its own build
 # folder and bundle (.build/appstore/LLMTray.app), no Sparkle, the App
-# Store's Info.plist keys. Unset: the standalone build, as always.
+# Store's Info.plist keys and bundle id (us.ipsupport.llmtray.appstore).
+# Unset: the standalone build (us.ipsupport.llmtray), as always.
 APP_STORE="${LLMTRAY_APP_STORE:-}"
 if [[ "$APP_STORE" == 1 ]]; then
   BUILD_PATH="$REPO_ROOT/.build-appstore"
@@ -131,6 +132,10 @@ if [[ "$APP_STORE" == 1 ]]; then
   for key in SUFeedURL SUPublicEDKey SUEnableAutomaticChecks; do
     /usr/libexec/PlistBuddy -c "Delete :$key" "$APP/Contents/Info.plist" 2>/dev/null || true
   done
+  # Its own bundle id (adr/0018 §1; AppIdentity.appStoreBundleID): both
+  # builds can be installed, each with its own preferences, container and
+  # login item. The App ID and provisioning profile are for this id.
+  /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier us.ipsupport.llmtray.appstore" "$APP/Contents/Info.plist"
   /usr/libexec/PlistBuddy -c "Add :LSApplicationCategoryType string public.app-category.developer-tools" "$APP/Contents/Info.plist"
   /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$APP/Contents/Info.plist"
 fi
