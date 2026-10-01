@@ -1,0 +1,31 @@
+{
+  "_comment": "Measured memory of the models LLMTray runs, read by LLMTrayCore.FeatureMemory to gate the heavy features (Settings, the first-run wizard). peakBytes: the kernel's phys_footprint_peak of the runner's process tree, which on Apple Silicon counts the GPU's memory too, from scripts/measure_memory.py (case: its case name) on measuredOn's Mac, 2026-09-30. A feature's peak is the highest of its cases. Image, music and voice run alone (the chat model is unloaded for them). Peaks near measuredOn's GPU limit may be held down by it (MLX frees its cache under pressure): on a bigger Mac they can be higher. estimatedFrom: not measured yet -- that case's peak plus the difference in the repos' files (HF API, ?blobs=true); replace with a measurement when the model is on hand. Feature ids: chat.<repo>, image.<ImageGenModel>, imageEdit.<ImageGenModel>, music.<MusicModel>, voice.<VoiceLabModel id>.",
+  "version": 1,
+  "measuredOn": {
+    "chip": "Apple M5",
+    "physicalMemoryBytes": 25769803776,
+    "gpuLimitBytes": 19069665280
+  },
+  "cases": [
+    { "case": "chat-e2b-4k", "feature": "chat.roman220220/gemma-4-E2B-it-qat-mlx", "detail": "4K-token prompt", "peakBytes": 5476083302, "seconds": 6 },
+    { "case": "chat-e2b-16k", "feature": "chat.roman220220/gemma-4-E2B-it-qat-mlx", "detail": "16K-token prompt", "peakBytes": 5959267123, "seconds": 12 },
+    { "case": "chat-e4b-4k", "feature": "chat.roman220220/gemma-4-E4B-it-qat-mlx", "detail": "4K-token prompt", "peakBytes": 7730941133, "seconds": 12 },
+    { "case": "chat-e4b-16k", "feature": "chat.roman220220/gemma-4-E4B-it-qat-mlx", "detail": "16K-token prompt", "peakBytes": 8450348155, "seconds": 22 },
+    { "case": "chat-nano4b-4k", "feature": "chat.roman220220/NVIDIA-Nemotron-3-Nano-4B-JANG-GPTQ-ipsupport-code-lora", "detail": "4K-token prompt", "peakBytes": 9932111872, "seconds": 13 },
+    { "case": "chat-26b-4k", "feature": "chat.roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang", "detail": "4K-token prompt", "peakBytes": 18221398753, "seconds": 25 },
+    { "case": "chat-26b-16k", "feature": "chat.roman220220/gemma-4-26B-A4B-it-gptq-mlx-jang", "detail": "16K-token prompt", "peakBytes": 18414672282, "seconds": 60 },
+    { "case": "chat-nemotron30b-4k", "feature": "chat.roman220220/Nemotron-3.5-Lightning-30B-A3B-JANG-GPTQ-ipsupport-code-lora", "detail": "4K-token prompt", "peakBytes": 20691004948, "seconds": 17 },
+    { "case": "image-zimage-1024", "feature": "image.gptqMixed", "detail": "1024x1024, 9 steps", "peakBytes": 21141976515, "seconds": 204 },
+    { "case": "estimate", "feature": "image.gptq8bit", "estimatedFrom": "image-zimage-1024", "detail": "1024x1024, 9 steps; 4.2 GB more files than mixed", "peakBytes": 25345902774 },
+    { "case": "estimate", "feature": "image.gptq4bit", "estimatedFrom": "image-zimage-1024", "detail": "1024x1024, 9 steps; 0.9 GB less files than mixed", "peakBytes": 20256789432 },
+    { "case": "image-klein-1024", "feature": "image.klein4b", "detail": "1024x1024, 4 steps", "peakBytes": 11735998136, "seconds": 46 },
+    { "case": "image-klein-edit-1024", "feature": "imageEdit.klein4b", "detail": "an edit with one 1024x1024 reference", "peakBytes": 19155554140, "seconds": 128 },
+    { "case": "music-turbo-30s", "feature": "music.turbo", "detail": "30 s of music, with the 1.7B planner", "peakBytes": 7773890806, "seconds": 33 },
+    { "case": "music-turbo-120s", "feature": "music.turbo", "detail": "120 s of music, with the 1.7B planner", "peakBytes": 9040906158, "seconds": 97 },
+    { "case": "music-sft-30s", "feature": "music.sftGPTQ4", "detail": "30 s of music, no planner", "peakBytes": 7677254042, "seconds": 32 },
+    { "case": "estimate", "feature": "music.sft8bit", "estimatedFrom": "music-sft-30s", "detail": "30 s of music; 1.1 GB more files than GPTQ 4-bit", "peakBytes": 8768363561 },
+    { "case": "estimate", "feature": "music.sftBF16", "estimatedFrom": "music-sft-30s", "detail": "30 s of music; 3.1 GB more files than GPTQ 4-bit", "peakBytes": 10814107839 },
+    { "case": "voice-gptq3", "feature": "voice.nemotron-voicechat-11b-gptq3", "detail": "a 20 s listening session", "peakBytes": 10426033111, "seconds": 70 },
+    { "case": "voice-mixed", "feature": "voice.nemotron-voicechat-11b-mixed", "detail": "a 20 s listening session", "peakBytes": 9373766124, "seconds": 62 }
+  ]
+}

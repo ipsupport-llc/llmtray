@@ -544,12 +544,15 @@ private struct ExtrasStep: View {
                                   set: { model.progress.choices.imageModel = $0 ? model.imagePick.rawValue : nil }),
                     title: Text("Image generation"),
                     detail: Text("The model can make an image when you ask for one."),
-                    size: model.imageModelSize(model.imagePick)) {
+                    size: model.imageModelSize(model.imagePick), fit: model.imageFit(model.imagePick)) {
                 Picker("", selection: Binding(get: { model.imagePick }, set: { pick in
+                    guard SetupWizardModel.fits(model.imageFit(pick)) else { return }
                     model.imagePick = pick
                     if model.progress.choices.imageModel != nil { model.progress.choices.imageModel = pick.rawValue }
                 })) {
-                    ForEach(ImageGenModel.selectable) { Text(verbatim: $0.displayName).tag($0) }
+                    ForEach(ImageGenModel.selectable) {
+                        Text(verbatim: $0.displayName).tag($0).disabled(!SetupWizardModel.fits(model.imageFit($0)))
+                    }
                 }
                 .labelsHidden().frame(maxWidth: 340)
             }
@@ -557,17 +560,20 @@ private struct ExtrasStep: View {
                                   set: { model.progress.choices.editModel = $0 ? ImageGenModel.klein4b.rawValue : nil }),
                     title: Text("Image editing"),
                     detail: Text("Changes an image you attach or one made in the chat, with FLUX.2 klein 4B."),
-                    size: model.imageModelSize(.klein4b))
+                    size: model.imageModelSize(.klein4b), fit: model.editFit(.klein4b))
             feature(isOn: Binding(get: { model.progress.choices.musicModel != nil },
                                   set: { model.progress.choices.musicModel = $0 ? model.musicPick.rawValue : nil }),
                     title: Text("Music"),
                     detail: Text("A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)."),
-                    size: model.musicModelSize(model.musicPick)) {
+                    size: model.musicModelSize(model.musicPick), fit: model.musicFit(model.musicPick)) {
                 Picker("", selection: Binding(get: { model.musicPick }, set: { pick in
+                    guard SetupWizardModel.fits(model.musicFit(pick)) else { return }
                     model.musicPick = pick
                     if model.progress.choices.musicModel != nil { model.progress.choices.musicModel = pick.rawValue }
                 })) {
-                    ForEach(MusicManager.selectable) { Text(verbatim: $0.displayName).tag($0) }
+                    ForEach(MusicManager.selectable) {
+                        Text(verbatim: $0.displayName).tag($0).disabled(!SetupWizardModel.fits(model.musicFit($0)))
+                    }
                 }
                 .labelsHidden().frame(maxWidth: 340)
             }
@@ -595,12 +601,15 @@ private struct ExtrasStep: View {
         }
     }
 
-    private func feature(isOn: Binding<Bool>, title: Text, detail: Text, size: String?, usesInternet: Bool = false) -> some View {
-        feature(isOn: isOn, title: title, detail: detail, size: size, usesInternet: usesInternet) { EmptyView() }
+    private func feature(isOn: Binding<Bool>, title: Text, detail: Text, size: String?, usesInternet: Bool = false,
+                         fit: FeatureFit? = nil) -> some View {
+        feature(isOn: isOn, title: title, detail: detail, size: size, usesInternet: usesInternet, fit: fit) { EmptyView() }
     }
 
+    /// `fit`: the model's memory on this Mac -- one that doesn't fit can't
+    /// be turned on (only off), a tight one is on offer with the warning.
     private func feature<Extra: View>(isOn: Binding<Bool>, title: Text, detail: Text, size: String?, usesInternet: Bool = false,
-                                      @ViewBuilder extra: () -> Extra) -> some View {
+                                      fit: FeatureFit? = nil, @ViewBuilder extra: () -> Extra) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Toggle(isOn: isOn) {
                 HStack(spacing: 6) {
@@ -611,8 +620,10 @@ private struct ExtrasStep: View {
                     }
                 }
             }
+            .disabled(!isOn.wrappedValue && !SetupWizardModel.fits(fit))
             detail.font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 .padding(.leading, 20)
+            MemoryFitNote(fit: fit).padding(.leading, 20)
             extra().padding(.leading, 20)
         }
     }

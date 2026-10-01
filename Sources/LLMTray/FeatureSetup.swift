@@ -216,6 +216,38 @@ final class FeatureSetup {
         if enabled { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
     }
 
+    // MARK: - Memory
+
+    /// The measured peaks (runtime/feature_memory.json); empty when the
+    /// file can't be read -- nothing is gated then.
+    private(set) lazy var featureMemory: FeatureMemory = {
+        let url = URL(fileURLWithPath: RuntimePaths.runtimeDir).appendingPathComponent(FeatureMemory.fileName)
+        return (try? FeatureMemory.load(contentsOf: url)) ?? FeatureMemory(cases: [])
+    }()
+
+    /// Probed once: a GPU limit raised with sysctl shows after a relaunch.
+    private(set) lazy var hardware = HardwareProbe.current()
+
+    /// Whether the model fits this Mac (nil: not measured, not gated).
+    func memoryFit(_ model: ImageGenModel) -> FeatureFit? {
+        featureMemory.fit(FeatureMemory.image(model.rawValue), on: hardware)
+    }
+
+    /// Editing takes more than generating (the reference image's latents).
+    func memoryFit(editingWith model: ImageGenModel) -> FeatureFit? {
+        featureMemory.fit(FeatureMemory.imageEdit(model.rawValue), on: hardware)
+    }
+
+    func memoryFit(_ model: MusicModel) -> FeatureFit? {
+        featureMemory.fit(FeatureMemory.music(model.rawValue), on: hardware)
+    }
+
+    /// Voice Lab's memory: the measured peak, else the model's published
+    /// footprint (VoiceMemoryFit sets it against the GPU limit).
+    func voiceBytes(_ model: VoiceLabModel) -> Int64 {
+        featureMemory.peakBytes(FeatureMemory.voice(model.id)) ?? model.footprintBytes
+    }
+
     // MARK: - Recommended chat models
 
     /// The curated list (runtime/recommended_models.json) filtered for this

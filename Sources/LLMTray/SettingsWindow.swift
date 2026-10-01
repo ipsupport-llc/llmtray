@@ -150,6 +150,24 @@ struct SettingLabel: View {
     }
 }
 
+/// Why a heavy feature can't be turned on here, or may run short of
+/// memory (FeatureFit); nothing when it fits.
+struct MemoryFitNote: View {
+    let fit: FeatureFit?
+
+    var body: some View {
+        if let fit, let reason = fit.reason {
+            Label {
+                Text(verbatim: reason).fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: fit.isAvailable ? "exclamationmark.triangle.fill" : "memorychip")
+                    .foregroundStyle(fit.isAvailable ? .orange : .secondary)
+            }
+            .font(.caption).foregroundStyle(.secondary)
+        }
+    }
+}
+
 /// "The running server was started with other settings" + Restart.
 struct RestartBanner: View {
     // A turn in any chat tab holds these back, not just the one on screen.

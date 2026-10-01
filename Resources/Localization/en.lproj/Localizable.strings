@@ -516,6 +516,8 @@
 "Name new chats automatically" = "Name new chats automatically";
 "Name to show (up to 40 characters)" = "Name to show (up to 40 characters)";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden.";
+"Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open.";
+"Needs about %1$@ GB; this Mac has %2$@ GB." = "Needs about %1$@ GB; this Mac has %2$@ GB.";
 "Network" = "Network";
 "Never" = "Never";
 "New Chat" = "New Chat";

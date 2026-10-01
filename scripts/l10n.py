@@ -36,6 +36,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCES = sorted((ROOT / "Sources" / "LLMTray").glob("*.swift")) + [
     # Core text the app shows as is (already localized there).
     ROOT / "Sources" / "LLMTrayCore" / "WhatsNew.swift",
+    ROOT / "Sources" / "LLMTrayCore" / "FeatureMemory.swift",
 ]
 LOC = ROOT / "Resources" / "Localization"
 BASE = LOC / "en.lproj" / "Localizable.strings"
