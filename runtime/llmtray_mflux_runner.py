@@ -34,6 +34,30 @@ def arg(name, default=None):
 import mlx.core as mx
 mx.set_cache_limit(256 << 20)
 
+import gc
+from mlx.utils import tree_flatten, tree_map
+def drop(model, name):
+    """One image per run: a model goes once it's done -- its weights, not
+    just the attribute (mflux's loops may still hold the module)."""
+    module = getattr(model, name)
+    if module is None:
+        return
+    module.update(tree_map(lambda x: mx.zeros((0,), x.dtype), module.parameters()))
+    setattr(model, name, None)
+    gc.collect()
+    mx.clear_cache()
+
+def half_size(packed):
+    """(B, C, H, W) latents at half the size, for a preview: a full-size
+    decode at every step costs gigabytes for a 512 px picture."""
+    b, c, h, w = packed.shape
+    # An odd side loses its last row or column: it's a preview.
+    packed = packed[:, :, : h - h % 2, : w - w % 2]
+    h, w = h // 2, w // 2
+    if not h or not w:
+        return packed
+    return packed.reshape(b, c, h, 2, w, 2).mean(axis=(3, 5))
+
 # FLUX.2 klein (generation and editing): the prompt and any reference
 # images (base64 PNG / JPEG) arrive as one JSON object on stdin, the images
 # decoded in memory -- no file is written, not even for editing.
@@ -66,6 +90,16 @@ if arg("--base-model") == "flux2-klein-4b":
     # and the VAE decodes in 256 px tiles (its untiled peak doubles memory).
     model.text_encoder.layers = model.text_encoder.layers[:27]
     model.tiling_config = TilingConfig(vae_decode_tile_size=256)
+    # The text encoder (3.1 GB) only encodes the prompt: it goes after, and
+    # the denoising and the decodes have its room (an edit peaked at 8.8 GB
+    # of MLX memory with it).
+    encode_prompt_pair = model._encode_prompt_pair
+    def encode_once(*args, **kwargs):
+        encodings = encode_prompt_pair(*args, **kwargs)
+        mx.eval([v for _, v in tree_flatten(encodings) if isinstance(v, mx.array)])
+        drop(model, "text_encoder")
+        return encodings
+    model._encode_prompt_pair = encode_once
     steps = int(arg("--steps", "4"))
     width, height = int(arg("--width", "1024")), int(arg("--height", "1024"))
 
@@ -80,7 +114,10 @@ if arg("--base-model") == "flux2-klein-4b":
         if timestep + 1 < steps:   # not kept for the last step: no preview there
             # Back to the latents' dtype: the float32 sigma promotes it, and a
             # float32 VAE decode peaks ~0.6GB above the final one (measured).
-            predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
+            try:   # a preview is cosmetic: never the reason a generation fails
+                predicted["x0"] = (latents - kwargs.get("sigmas", self._sigmas)[timestep] * noise).astype(latents.dtype)
+            except Exception:
+                predicted.pop("x0", None)
         return scheduler_step(self, noise, timestep, latents, **kwargs)
     FlowMatchEulerDiscreteScheduler.step = step
 
@@ -96,7 +133,7 @@ if arg("--base-model") == "flux2-klein-4b":
                 return
             try:   # a preview is cosmetic: never the reason a generation fails
                 packed = latents.reshape(latents.shape[0], config.height // 16, config.width // 16, latents.shape[-1]).transpose(0, 3, 1, 2)
-                decoded = model.vae.decode_packed_latents(packed, tiling_config=model.tiling_config)
+                decoded = model.vae.decode_packed_latents(half_size(packed), tiling_config=model.tiling_config)
                 emit("PREVIEW", png_b64(ImageUtil.to_image(
                     decoded_latents=decoded, config=config, seed=0, prompt="", quantization=model.bits,
                     lora_paths=None, lora_scales=None, generation_time=0,
@@ -150,12 +187,9 @@ class Preview:
             if hasattr(model.vae, "decode_packed_latents") and unpacked.shape[1] > channels:
                 decoded = model.vae.decode_packed_latents(unpacked)
             else:
-                # From latents at half the size: a full-size decode at every step
-                # cost 1.4 GB more peak and ~28 s at 1024 px, for a 512 px preview.
-                b, c, h, w = unpacked.shape
-                if h % 2 == 0 and w % 2 == 0:
-                    unpacked = unpacked.reshape(b, c, h // 2, 2, w // 2, 2).mean(axis=(3, 5))
-                decoded = model.vae.decode(unpacked)
+                # Z-Image: a full-size decode at every step cost 1.4 GB more
+                # peak and ~28 s at 1024 px.
+                decoded = model.vae.decode(half_size(unpacked))
             image = ImageUtil.to_image(
                 decoded_latents=decoded, config=config, seed=seed, prompt=prompt,
                 quantization=model.bits, lora_paths=None, lora_scales=None, generation_time=0,
@@ -168,16 +202,6 @@ class Preview:
 # (2 GB) after the prompt, the transformer (4 GB) before the VAE decode,
 # whose 1024 px activations (6.6 GB) are the run's peak. 10.8 GB of MLX
 # memory at that peak otherwise (measured).
-import gc
-from mlx.utils import tree_map
-def drop(name):
-    # Its weights, not just the attribute: mflux's denoising loop holds the
-    # transformer until generate_image returns.
-    module = getattr(model, name)
-    module.update(tree_map(lambda x: mx.zeros((0,), x.dtype), module.parameters()))
-    setattr(model, name, None)
-    gc.collect()
-    mx.clear_cache()
 
 # mflux compiles the denoising step (M3 and later), and the compiled graph
 # keeps the transformer's weights as constants: the step goes with them.
@@ -192,7 +216,7 @@ encode_prompts = model._encode_prompts
 def encode_once(**kwargs):
     encodings = encode_prompts(**kwargs)
     mx.eval([e for e in encodings if e is not None])
-    drop("text_encoder")
+    drop(model, "text_encoder")
     return encodings
 model._encode_prompts = encode_once
 
@@ -200,7 +224,7 @@ decode_latents = model._decode_latents
 def decode_once(**kwargs):
     mx.eval(kwargs["latents"])
     compiled.clear()
-    drop("transformer")
+    drop(model, "transformer")
     return decode_latents(**kwargs)
 model._decode_latents = decode_once
 
