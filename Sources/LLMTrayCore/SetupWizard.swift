@@ -208,6 +208,17 @@ public struct SetupProgress: Codable, Equatable, Sendable {
         baseline = target
         return actions
     }
+
+    /// A port picked because the one set is taken (PortCheck): applied at
+    /// once, so Skip or closing the wizard keeps it -- going back to a port
+    /// another app holds is never what they mean.
+    public mutating func adoptPort(_ port: Int) -> [SetupAction] {
+        let actions = baseline.port == port ? [] : [SetupAction.setPort(port)]
+        choices.port = port
+        baseline.port = port
+        original.port = port
+        return actions
+    }
 }
 
 /// One thing Finish (or an early step) does, in the order it's done.

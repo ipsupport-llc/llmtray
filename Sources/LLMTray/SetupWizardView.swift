@@ -95,7 +95,7 @@ struct SetupWizardView: View {
     @ViewBuilder
     private var content: some View {
         switch model.step {
-        case .welcome: WelcomeStep()
+        case .welcome: WelcomeStep(model: model)
         case .yourMac: YourMacStep(model: model)
         case .modelsFolder: ModelsFolderStep(model: model)
         case .chatModel: ChatModelStep(model: model)
@@ -182,6 +182,8 @@ private struct StepHeader: View {
 // MARK: - 1 Welcome
 
 private struct WelcomeStep: View {
+    @ObservedObject var model: SetupWizardModel
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             if let banner = Self.banner {
@@ -211,7 +213,11 @@ private struct WelcomeStep: View {
             Text("The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it.")
                 .font(.callout).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            // Before the server first starts: a port another app holds
+            // would only show up later as a failed start.
+            PortInUseNote(model: model, showsField: true)
         }
+        .onAppear { model.checkPort() }
     }
 
     private func capability(_ symbol: String, _ text: Text) -> some View {
@@ -509,15 +515,7 @@ private struct ChatModelStep: View {
     private func details(_ pick: ModelRecommendations.Pick) -> String {
         var parts = [ModelCatalog.format(pick.sizeBytes)]
         if pick.fit == .tight { parts.append(NSLocalizedString("tight fit", comment: "setup: model fit")) }
-        let capabilities = pick.model.capabilities.map { capability -> String in
-            switch capability {
-            case .vision: return NSLocalizedString("reads images", comment: "setup: model capability")
-            case .tools: return NSLocalizedString("calls tools", comment: "setup: model capability")
-            case .reasoning: return NSLocalizedString("reasons", comment: "setup: model capability")
-            case .code: return NSLocalizedString("writes code", comment: "setup: model capability")
-            }
-        }
-        parts += capabilities
+        parts += pick.model.capabilities.map(ModelCapabilities.name)
         if let license = pick.model.license { parts.append(license) }
         return parts.joined(separator: " · ")
     }
@@ -644,6 +642,8 @@ private struct AppsStep: View {
                 TextField("", value: $model.progress.choices.port, format: .number.grouping(.never))
                     .frame(width: 80).disabled(!editable)
             }
+            // The field above picks any port; the note offers a free one.
+            PortInUseNote(model: model, showsField: false)
             Toggle(isOn: $model.progress.choices.allowLAN) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Allow connections from the local network")
@@ -674,6 +674,48 @@ private struct AppsStep: View {
                 Button("Copy") { model.copySnippet() }
             }
             Text("No API key is needed; if an app asks for one, any text works.").font(.caption).foregroundStyle(.secondary)
+        }
+        .onAppear { model.checkPort() }
+        .onChange(of: model.progress.choices.port) { model.checkPort() }
+        .onChange(of: model.canEditNetwork) { model.checkPort() }
+    }
+}
+
+/// The chosen port is already held by another app: says so, with the next
+/// free port one click away and (`showsField`, where there's no port field
+/// of the step's own) any other one to type in.
+private struct PortInUseNote: View {
+    @ObservedObject var model: SetupWizardModel
+    let showsField: Bool
+    @State private var candidate = 0
+
+    var body: some View {
+        if let taken = model.portTaken {
+            VStack(alignment: .leading, spacing: 6) {
+                Label {
+                    Text(String(format: NSLocalizedString("Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port.", comment: "setup: port in use"), taken))
+                        .fixedSize(horizontal: false, vertical: true)
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                }
+                HStack(spacing: 8) {
+                    if let free = model.freePort {
+                        Button(String(format: NSLocalizedString("Use %lld", comment: "setup: use this free port"), free)) { model.usePort(free) }
+                    }
+                    if showsField {
+                        TextField("", value: $candidate, format: .number.grouping(.never))
+                            .frame(width: 70)
+                        Stepper("", value: $candidate, in: PortCheck.validRange).labelsHidden()
+                        Button("Use This Port") { model.usePort(candidate) }
+                            .disabled(!PortCheck.validRange.contains(candidate) || candidate == taken)
+                    }
+                }
+                .padding(.leading, 22)
+            }
+            .padding(10)
+            .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
+            .onAppear { candidate = model.freePort ?? taken + 1 }
+            .onChange(of: model.freePort) { candidate = $1 ?? candidate }
         }
     }
 }

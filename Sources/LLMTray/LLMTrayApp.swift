@@ -501,14 +501,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// A short menu for the common case -- toggle the server and quit --
-    /// without opening the full chat window. Attaching NSStatusItem.menu
+    /// A short menu for the common case -- the chat, its model and profile,
+    /// toggle the server and quit -- without opening the full chat window. Attaching NSStatusItem.menu
     /// makes AppKit handle this one click itself (statusItemClicked never
     /// fires for it), so the menu is detached again right after: leaving it
     /// attached would swallow the *next* left click too and stop the popover
     /// from ever opening via the button's own action.
     private func showQuickMenu() {
         let menu = NSMenu()
+
+        // The chat and its model, without opening the popover first.
+        let openItem = NSMenuItem(title: NSLocalizedString("Open Chat", comment: "tray menu"), action: #selector(quickOpenChat), keyEquivalent: "o")
+        openItem.keyEquivalentModifierMask = [.command, .shift]
+        openItem.target = self
+        menu.addItem(openItem)
+        let newItem = NSMenuItem(title: NSLocalizedString("New Chat", comment: "tray menu"), action: #selector(quickNewChat), keyEquivalent: "n")
+        newItem.target = self
+        menu.addItem(newItem)
+        menu.addItem(modelMenuItem())
+        menu.addItem(profileMenuItem())
+
+        menu.addItem(.separator())
 
         let toggleItem: NSMenuItem
         if isServerRunning {
@@ -576,6 +589,86 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.menu = nil
     }
 
+    /// Select Model ▸ -- what the popover's picker lists, the selected one
+    /// checked, disabled when the picker is (ModelSelection).
+    private func modelMenuItem() -> NSMenuItem {
+        let selected = UserDefaults.standard[Pref.selectedModelID]
+        let canSwitch = OperationAvailability(server: server, benchmark: benchmark).canSwitchModel
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+        for model in ModelCatalog.shared.models {
+            let item = NSMenuItem(title: model.displayName, action: #selector(quickSelectModel(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = model.id
+            item.state = model.id == selected ? .on : .off
+            item.isEnabled = canSwitch
+            submenu.addItem(item)
+        }
+        if submenu.items.isEmpty {
+            let none = NSMenuItem(title: NSLocalizedString("No Models", comment: "tray menu: no models downloaded"), action: nil, keyEquivalent: "")
+            none.isEnabled = false
+            submenu.addItem(none)
+        }
+        let item = NSMenuItem(title: NSLocalizedString("Select Model", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
+        item.submenu = submenu
+        return item
+    }
+
+    /// Profiles ▸ -- the selected model's, checked; picking one assigns it
+    /// as the popover's profile picker does.
+    private func profileMenuItem() -> NSMenuItem {
+        let profiles = ProfileManager.shared
+        let modelID = UserDefaults.standard[Pref.selectedModelID]
+        let current = profiles.profileID(for: modelID)
+        let canAssign = ModelSelection.canAssignProfile(to: modelID, server: server, benchmark: benchmark)
+        let submenu = NSMenu()
+        submenu.autoenablesItems = false
+        for profile in profiles.profiles {
+            let item = NSMenuItem(title: profile.name, action: #selector(quickAssignProfile(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = profile.id
+            item.state = profile.id == current ? .on : .off
+            item.isEnabled = canAssign
+            submenu.addItem(item)
+        }
+        let item = NSMenuItem(title: NSLocalizedString("Profiles", comment: "tray menu: submenu"), action: nil, keyEquivalent: "")
+        item.submenu = submenu
+        return item
+    }
+
+    @objc private func quickOpenChat() {
+        detachChatSoon()
+    }
+
+    /// A new chat, shown where the chat is: its window, or the popover.
+    @objc private func quickNewChat() {
+        tabs.newChat()
+        // After the menu's tracking ends (the popover shows from the button).
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if self.chatPresentation.isDetached {
+                self.showChatWindow()
+            } else if !self.popover.isShown {
+                self.togglePopover()
+            }
+        }
+    }
+
+    /// As picking it in the popover: selected, and loaded now while
+    /// another model runs (ModelSelection).
+    @objc private func quickSelectModel(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? String else { return }
+        UserDefaults.standard[Pref.selectedModelID] = id
+        guard let model = ModelSelection.modelToLoad(afterPicking: id, server: server, benchmark: benchmark) else { return }
+        let server = self.server
+        Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
+    }
+
+    @objc private func quickAssignProfile(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? String else { return }
+        ModelSelection.assignProfile(id, to: UserDefaults.standard[Pref.selectedModelID], server: server, benchmark: benchmark)
+    }
+
     @objc private func quickStart() {
         guard case .stopped = server.state else { return }
         Task { await attemptStart(retriesLeft: 1) }
@@ -627,9 +720,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .running:
             // As picking it in the popover: not mid-turn or under a benchmark
             // (the header's Load is there after).
-            guard OperationAvailability(server: server, benchmark: benchmark).canSwitchModel, !tabs.isAnyBusy,
-                  let model = ModelCatalog.shared.model(id: UserDefaults.standard[Pref.selectedModelID]),
-                  model.path != server.loadedModelPath else { return }
+            guard let model = ModelSelection.modelToLoad(afterPicking: UserDefaults.standard[Pref.selectedModelID],
+                                                         server: server, benchmark: benchmark) else { return }
             let server = self.server
             Task { try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id)) }
         default:

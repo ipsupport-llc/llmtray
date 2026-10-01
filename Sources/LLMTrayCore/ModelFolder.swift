@@ -59,6 +59,16 @@ extension ModelRecommendations {
         }
     }
 
+    /// What the curated list says a local model can do (the popover's model
+    /// card); `vision`: what its config.json says (ModelDiscovery), for the
+    /// models the list doesn't know. In the list's Capability order.
+    public static func capabilities(ofLocalPath path: String, in models: [RecommendedModel],
+                                    vision: Bool) -> [RecommendedModel.Capability] {
+        var found = Set(models.first { localPath(of: $0.repo, in: [path]) != nil }?.capabilities ?? [])
+        if vision { found.insert(.vision) }
+        return RecommendedModel.Capability.allCases.filter(found.contains)
+    }
+
     /// `isComplete` is asked of a matching folder (`ModelFolder.isComplete`).
     public static func offer(_ picks: [Pick], localPaths: [String], isComplete: (String) -> Bool) -> Offer {
         var offer = Offer(downloads: [], local: [:])

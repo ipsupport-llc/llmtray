@@ -248,4 +248,16 @@ final class SetupWizardTests: XCTestCase {
         XCTAssertEqual(decoded.original, decoded.baseline)
         XCTAssertEqual(decoded.step, .extras)
     }
+
+    // MARK: A port another app holds
+
+    func testAnAdoptedPortIsAppliedAtOnceAndSurvivesSkip() {
+        var progress = SetupProgress(step: .apps, choices: base, startedAutomatically: true)
+        XCTAssertEqual(progress.adoptPort(8766), [.setPort(8766)])
+        XCTAssertEqual(progress.adoptPort(8766), [], "already set")
+        XCTAssertTrue(SetupPlan.actions(from: progress.choices, baseline: progress.baseline, startsServer: false).isEmpty,
+                      "Finish doesn't set it again")
+        _ = progress.skip()
+        XCTAssertEqual(progress.choices.port, 8766, "Skip doesn't go back to the taken port")
+    }
 }

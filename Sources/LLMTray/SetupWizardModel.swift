@@ -416,6 +416,33 @@ final class SetupWizardModel: ObservableObject {
 
     var baseURLSnippet: String { "OPENAI_BASE_URL=http://localhost:\(progress.choices.port)/v1" }
 
+    /// The chosen port, when another app already holds it -- checked
+    /// before the server first starts on it (checkPort).
+    @Published private(set) var portTaken: Int?
+    /// The first free port after it, for the note's button.
+    @Published private(set) var freePort: Int?
+
+    /// Only while the server is stopped (not idle-unloaded): otherwise
+    /// it's LLMTray's own listener holding the port.
+    func checkPort() {
+        let port = progress.choices.port
+        guard canEditNetwork, !server.isIdleUnloaded, PortCheck.isInUse(port) else {
+            portTaken = nil
+            freePort = nil
+            return
+        }
+        portTaken = port
+        freePort = PortCheck.nextFree(after: port)
+    }
+
+    /// The port picked in the note: saved at once to the Pref Settings'
+    /// port field uses (SetupProgress.adoptPort), then checked again.
+    func usePort(_ port: Int) {
+        guard canEditNetwork, PortCheck.validRange.contains(port) else { return }
+        perform(progress.adoptPort(port))
+        checkPort()
+    }
+
     func copySnippet() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(baseURLSnippet, forType: .string)
