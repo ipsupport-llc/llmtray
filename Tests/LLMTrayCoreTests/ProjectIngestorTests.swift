@@ -587,7 +587,10 @@ extension ProjectIngestorTests {
         busy = true
         let i = ingestor()
         _ = await i.add(try corpus(3), to: project)
-        try await Task.sleep(nanoseconds: 300_000_000)
+        // Long against the real work (a few files, tenths of a second on a
+        // slow CI runner -- 0.33 s once beat a 0.3 s wait), so counting the
+        // wait as work can't hide in it.
+        try await Task.sleep(nanoseconds: 1_000_000_000)
         busy = false
         embedder!.delay = 0.05   // the second file's embedding keeps the run open
         try await waitUntil("one finished") {
@@ -595,7 +598,7 @@ extension ProjectIngestorTests {
             return p.done >= 1 && p.state != .idle
         }
         let eta = try XCTUnwrap(i.progress(for: project).remainingSeconds)
-        XCTAssertLessThan(eta, 0.3, "the 0.3 s waited for the chat isn't work")
+        XCTAssertLessThan(eta, 1.0, "the 1 s waited for the chat isn't work")
         try await settle(i)
     }
 
