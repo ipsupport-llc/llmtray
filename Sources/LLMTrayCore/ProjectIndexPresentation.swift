@@ -223,3 +223,44 @@ public struct ProjectFileTotals: Equatable, Sendable {
         }
     }
 }
+
+/// What a project chat's status line says about its files (`N files ·
+/// ● Indexed · RAG on`): one state, from the index's totals and the ring.
+public enum ProjectChatStatus: Equatable, Sendable {
+    case noFiles
+    /// Indexing, waiting or paused: the ring and its text say which.
+    case indexing
+    /// Something is searchable; `failed` files need a look.
+    case indexed(failed: Int)
+    /// Nothing searchable: every file failed or isn't supported.
+    case failed(Int)
+    /// Stopped before anything was indexed (Index Now resumes).
+    case notIndexed
+
+    public init(totals: ProjectFileTotals, ring: ProjectRing) {
+        if ring.isActive {
+            self = .indexing
+        } else if totals.files == 0 {
+            self = .noFiles
+        } else if totals.searchable > 0 {
+            self = .indexed(failed: totals.failed)
+        } else if totals.failed > 0 {
+            self = .failed(totals.failed)
+        } else if totals.notIndexed > 0 {
+            self = .notIndexed
+        } else {
+            // Only files without text: nothing to search, nothing wrong.
+            self = .indexed(failed: 0)
+        }
+    }
+
+    /// The hover text of a failed state: "name: why" for the first `limit`
+    /// files that failed, aren't supported, or whose last re-index failed
+    /// (the ones ProjectFileTotals counts as failed).
+    public static func failureLines(_ documents: [IndexedDocument], limit: Int = 5) -> [String] {
+        let failed = documents.filter { d in
+            d.status != .removing && (d.status == .failed || d.status == .unsupported || (d.status.isSearchable && d.error != nil))
+        }
+        return failed.prefix(limit).map { d in d.error.map { "\(d.name): \($0)" } ?? d.name }
+    }
+}

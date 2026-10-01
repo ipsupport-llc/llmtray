@@ -140,6 +140,16 @@ final class ChatLibraryStore: ObservableObject {
         return project
     }
 
+    /// A project named "New project" (numbered if taken): the sidebar's +
+    /// and the empty chat's "Chat with your files".
+    @discardableResult
+    func addNewProject() -> ChatLibrary.Project? {
+        let base = NSLocalizedString("New project", comment: "")
+        let names = Set(library.projects.map(\.name))
+        let name = names.contains(base) ? (2...).lazy.map { "\(base) \($0)" }.first { !names.contains($0) }! : base
+        return addProject(named: name)
+    }
+
     func renameProject(_ id: UUID, to name: String) {
         let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }

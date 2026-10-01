@@ -39,6 +39,7 @@
 "%lld can still be undone from Settings > Files." = "%lld can still be undone from Settings > Files.";
 "%lld downloads" = "%lld downloads";
 "%lld failed" = "%lld failed";
+"%lld files" = "%lld files";
 "%lld files couldn't be indexed" = "%lld files couldn't be indexed";
 "%lld interrupted: look at them in Finder" = "%lld interrupted: look at them in Finder";
 "%lld items put back under their names." = "%lld items put back under their names.";
@@ -66,6 +67,7 @@
 "A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
+"A song from a description" = "A song from a description";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "A symbolic link: the link itself, not what it points to.";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
@@ -77,6 +79,7 @@
 "Add" = "Add";
 "Add Files…" = "Add Files…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
+"Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
 "Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
@@ -123,6 +126,7 @@
 "Apps and agents" = "Apps and agents";
 "Ask Later" = "Ask Later";
 "Ask again in two weeks" = "Ask again in two weeks";
+"Ask anything, or try one of these:" = "Ask anything, or try one of these:";
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
@@ -180,6 +184,7 @@
 "Chat tools" = "Chat tools";
 "Chat tools of the profile “%@” (%lld on) -- applies to every model using it" = "Chat tools of the profile “%@” (%lld on) -- applies to every model using it";
 "Chat with language models that run on this Mac." = "Chat with language models that run on this Mac.";
+"Chat with the files of a project" = "Chat with the files of a project";
 "Chats" = "Chats";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
 "Check Again" = "Check Again";
@@ -195,6 +200,7 @@
 "Checks for updates automatically" = "Checks for updates automatically";
 "Chip" = "Chip";
 "Choose Another Folder…" = "Choose Another Folder…";
+"Choose Files…" = "Choose Files…";
 "Choose a folder chats may use." = "Choose a folder chats may use.";
 "Choose a folder the chat may look in." = "Choose a folder the chat may look in.";
 "Choose a folder the chat may propose changes in. You approve every change." = "Choose a folder the chat may propose changes in. You approve every change.";
@@ -207,6 +213,7 @@
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
+"Coding agents" = "Coding agents";
 "Coffee" = "Coffee";
 "Command-line tool" = "Command-line tool";
 "Compact" = "Compact";
@@ -218,6 +225,7 @@
 "Concurrent requests" = "Concurrent requests";
 "Context" = "Context";
 "Continue" = "Continue";
+"Copied" = "Copied";
 "Copies %1$@ · index %2$@ on disk" = "Copies %1$@ · index %2$@ on disk";
 "Copy" = "Copy";
 "Copy the details as text" = "Copy the details as text";
@@ -256,6 +264,7 @@
 "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept." = "Deletes the downloaded mlx-lm runtime (and the image-generation runtime). It's set up again from scratch on the next server start. Saved chats and profiles are kept.";
 "Delete…" = "Delete…";
 "Deny" = "Deny";
+"Describe a picture, drawn on this Mac" = "Describe a picture, drawn on this Mac";
 "Diagnostics" = "Diagnostics";
 "Disk usage" = "Disk usage";
 "Dismiss" = "Dismiss";
@@ -358,6 +367,7 @@
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models.";
 "General" = "General";
 "Generate" = "Generate";
+"Generate an image: a lighthouse at dawn, in watercolor" = "Generate an image: a lighthouse at dawn, in watercolor";
 "Generated in %.1fs" = "Generated in %.1fs";
 "Generating image…" = "Generating image…";
 "Generating music…" = "Generating music…";
@@ -403,6 +413,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image generation off" = "Image generation off";
 "Image model" = "Image model";
+"Images" = "Images";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import from LLMTray (direct download)";
 "Imported" = "Imported";
@@ -414,7 +425,10 @@
 "Include the server log" = "Include the server log";
 "Index Now" = "Index Now";
 "Index the files that were stopped" = "Index the files that were stopped";
+"Indexed" = "Indexed";
+"Indexing" = "Indexing";
 "Indexing %1$lld of %2$lld files" = "Indexing %1$lld of %2$lld files";
+"Indexing failed" = "Indexing failed";
 "Install" = "Install";
 "Install ID" = "Install ID";
 "Installed" = "Installed";
@@ -477,6 +491,7 @@
 "Longer chats are easier in the window: projects, files and every chat in a sidebar." = "Longer chats are easier in the window: projects, files and every chat in a sidebar.";
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
+"Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make images and edit them." = "Make images and edit them.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Makes a new random ID: later reports can't be matched to earlier ones.";
@@ -569,6 +584,7 @@
 "Not enough free disk space for this model." = "Not enough free disk space for this model.";
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
+"Not indexed" = "Not indexed";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
@@ -577,6 +593,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.";
 "Off" = "Off";
+"Off · turn on in Settings" = "Off · turn on in Settings";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
@@ -595,6 +612,7 @@
 "Open in Preview" = "Open in Preview";
 "Open in Window" = "Open in Window";
 "Open in Window -- closing the window puts the chat back in the menu bar" = "Open in Window -- closing the window puts the chat back in the menu bar";
+"OpenAI-compatible: point a coding agent or app at this address (copies it)" = "OpenAI-compatible: point a coding agent or app at this address (copies it)";
 "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first." = "Opens an email to the LLMTray team with a report attached: versions, the Mac, the model and server settings, the server log and recent crash reports. Your chats are never included, and you see the whole report first.";
 "Opens at login" = "Opens at login";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Other apps reach your models through an OpenAI-compatible API on this Mac.";
@@ -637,6 +655,7 @@
 "Profile" = "Profile";
 "Profiles" = "Profiles";
 "Project files" = "Project files";
+"Project files are off" = "Project files are off";
 "Project files are turned off" = "Project files are turned off";
 "Project files are turned off in Settings." = "Project files are turned off in Settings.";
 "Project files off" = "Project files off";
@@ -658,6 +677,7 @@
 "Quantize KV from token" = "Quantize KV from token";
 "Quick benchmark" = "Quick benchmark";
 "Quit LLMTray" = "Quit LLMTray";
+"RAG on" = "RAG on";
 "Raise the GPU memory limit in Terminal:" = "Raise the GPU memory limit in Terminal:";
 "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied." = "Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied.";
 "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0." = "Randomness. Lower is more focused and repeatable, higher more varied. Coding: 0.2-0.6; chat: 0.7-1.0.";
@@ -734,7 +754,6 @@
 "Search by meaning is off for now: %@" = "Search by meaning is off for now: %@";
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
-"Searches %lld files" = "Searches %lld files";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
 "Select All" = "Select All";
 "Select None" = "Select None";
@@ -844,6 +863,7 @@
 "Tab %lld" = "Tab %lld";
 "Talk" = "Talk";
 "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept." = "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept.";
+"Talk with the model in Voice Lab" = "Talk with the model in Voice Lab";
 "Talking… press Done when you're finished." = "Talking… press Done when you're finished.";
 "Target: %@ · profile %@" = "Target: %@ · profile %@";
 "Temperature" = "Temperature";
@@ -984,6 +1004,7 @@
 "Try Again" = "Try Again";
 "Turn On Project Files…" = "Turn On Project Files…";
 "Turn On…" = "Turn On…";
+"Turn on Project files in Settings to add files to the project and let its chats search them." = "Turn on Project files in Settings to add files to the project and let its chats search them.";
 "Turn on Project files to add files" = "Turn on Project files to add files";
 "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
 "Turn on project files?" = "Turn on project files?";
@@ -1074,6 +1095,7 @@
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
 "Wikipedia" = "Wikipedia";
+"Words only" = "Words only";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";
 "Writing the song…" = "Writing the song…";
@@ -1082,6 +1104,7 @@
 "You:" = "You:";
 "Your GitHub login (the sponsoring account)" = "Your GitHub login (the sponsoring account)";
 "Your Mac" = "Your Mac";
+"Your files" = "Your files";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
 "Your name (optional)" = "Your name (optional)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";

@@ -168,4 +168,42 @@ final class ProjectIndexPresentationTests: XCTestCase {
         XCTAssertEqual(DocumentDisplayStatus(.embedded, activity: .reading, reindexQueued: true), .reading)
         XCTAssertEqual(DocumentDisplayStatus(.embedded), .ready)
     }
+
+    // MARK: - a project chat's status line
+
+    private func doc(_ n: Int64, _ status: DocumentStatus, error: String? = nil) -> IndexedDocument {
+        IndexedDocument(doc: n, source: 1, rev: 1, name: "f\(n).txt", ext: "txt", relativePath: nil, sha256: "", bytes: 1,
+                        status: status, kind: nil, pages: nil, error: error)
+    }
+
+    private func chatStatus(_ docs: [IndexedDocument], progress: ProjectIndexProgress? = nil) -> ProjectChatStatus {
+        let totals = ProjectFileTotals(docs)
+        return ProjectChatStatus(totals: totals, ring: ProjectRing(progress: progress, failedDocuments: totals.failed))
+    }
+
+    func testChatStatusStates() {
+        XCTAssertEqual(chatStatus([]), .noFiles)
+        // Removing ones don't count.
+        XCTAssertEqual(chatStatus([doc(1, .removing)]), .noFiles)
+        XCTAssertEqual(chatStatus([doc(1, .embedded), doc(2, .searchable)]), .indexed(failed: 0))
+        XCTAssertEqual(chatStatus([doc(1, .embedded), doc(2, .failed)]), .indexed(failed: 1))
+        XCTAssertEqual(chatStatus([doc(1, .failed), doc(2, .unsupported)]), .failed(2))
+        XCTAssertEqual(chatStatus([doc(1, .notIndexed)]), .notIndexed)
+        XCTAssertEqual(chatStatus([doc(1, .empty)]), .indexed(failed: 0))
+    }
+
+    func testChatStatusIndexingWinsWhileTheRingRuns() {
+        XCTAssertEqual(chatStatus([doc(1, .staged)], progress: progress(.running)), .indexing)
+        XCTAssertEqual(chatStatus([doc(1, .embedded)], progress: progress(.paused)), .indexing)
+        XCTAssertEqual(chatStatus([doc(1, .embedded)], progress: progress(.waiting)), .indexing)
+        // Idle progress is nothing under way.
+        XCTAssertEqual(chatStatus([doc(1, .embedded)], progress: .idle), .indexed(failed: 0))
+    }
+
+    func testChatStatusFailureLines() {
+        let docs = [doc(1, .embedded), doc(2, .failed, error: "encrypted PDF"), doc(3, .unsupported),
+                    doc(4, .embedded, error: "re-index failed"), doc(5, .removing, error: "x")]
+        XCTAssertEqual(ProjectChatStatus.failureLines(docs), ["f2.txt: encrypted PDF", "f3.txt", "f4.txt: re-index failed"])
+        XCTAssertEqual(ProjectChatStatus.failureLines(docs, limit: 1), ["f2.txt: encrypted PDF"])
+    }
 }
