@@ -664,14 +664,15 @@ extension ProjectFilesServiceTests {
         func rows(_ o: ProjectToolOutput) -> [String] {
             o.preamble.split(separator: "\n").map(String.init).filter { $0.range(of: #"^\d+\. "#, options: .regularExpression) != nil }
         }
-        let first = output(await run(.list(from: 0), budget: 700))
+        // Room for a few rows a page (the framing line takes its share).
+        let first = output(await run(.list(from: 0), budget: 760))
         let shown = rows(first)
         XCTAssertGreaterThan(shown.count, 1)
         let range = try XCTUnwrap(first.epilogue.range(of: #"(?<="cursor":"list:)\d+"#, options: .regularExpression))
         // One of the files shown is removed before the next page.
         let h = try await registry.open(project)
         try await h.write { try $0.remove(doc: 1) }
-        let second = output(await run(.list(from: Int(first.epilogue[range])!), budget: 700))
+        let second = output(await run(.list(from: Int(first.epilogue[range])!), budget: 760))
         XCTAssertTrue(rows(second).first?.hasPrefix("\(shown.count + 1). ") == true, "\(rows(second))")
     }
 
