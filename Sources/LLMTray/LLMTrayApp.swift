@@ -145,6 +145,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// The wizard's downloads (adr/0013), shown in the popover.
     private lazy var downloadQueue = DownloadQueue(browser: hfBrowser)
     private let setupWizard = SetupWizardWindowController()
+    #if !APP_STORE
+    /// `llmtray`'s socket (adr/0019): up from launch to quit.
+    private lazy var controlCommands = ControlCommands(
+        server: server, downloads: downloadQueue, benchmark: benchmark,
+        startSelectedModel: { [weak self] in await self?.attemptStart(retriesLeft: 1) }
+    )
+    private lazy var controlServer = ControlSocketServer(path: ControlCommands.socketPath) { [weak self] command, reply in
+        await self?.controlCommands.handle(command, reply: reply)
+    }
+    #endif
     private lazy var settingsWindow = SettingsWindowController(.init(
         server: server, chat: tabs.imageModels, runtime: runtime, benchmark: benchmark,
         checkForAppUpdates: { [weak self] in self?.checkForAppUpdates() }
@@ -210,6 +220,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.terminate(nil)
             return
         }
+        #if !APP_STORE
+        // After the single-instance check: the copy that stays owns the socket.
+        do { try controlServer.start() } catch {
+            NSLog("LLMTray: the command-line tool's socket isn't available: %@", error.localizedDescription)
+        }
+        #endif
         // Full build: the bundled runtime goes to Application Support now,
         // not on the first Start -- an update installed before that (the
         // feed carries the thin build) would take it away.
@@ -967,6 +983,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func killServerNow() {
+        #if !APP_STORE
+        controlServer.stop()
+        #endif
         VoiceLabSession.shared.terminateNow()
         server.terminateImmediately()
     }

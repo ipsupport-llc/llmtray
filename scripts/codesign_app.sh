@@ -29,6 +29,8 @@ is_macho() { file -b "$1" | grep -q "Mach-O"; }
 
 # 1. Loose Mach-O files, deepest paths first. Executables of the vendored
 #    Python get its entitlements; the app's own executable is signed last.
+#    Contents/Helpers/llmtray (the CLI, adr/0019) is one of these: hardened
+#    runtime, no entitlements.
 count=0
 while IFS= read -r -d '' f; do
   [[ -L "$f" ]] && continue

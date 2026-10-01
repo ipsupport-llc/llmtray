@@ -60,6 +60,10 @@ struct GeneralPane: View {
                 }
                 #endif
             }
+            #if !APP_STORE
+            // adr/0019: not in the App Store build (the sandbox can't link it).
+            CommandLineToolSection()
+            #endif
             Section("Chat") {
                 Toggle(isOn: $showReasoning) {
                     SettingLabel(title: "Show reasoning", help: "Shows the model's thinking (the collapsible \u{201C}Thought process\u{201D} block) above its answer.")

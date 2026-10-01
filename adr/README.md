@@ -24,5 +24,6 @@ here; this is where the history lives.
 | [0016](0016-voice.md) | Voice: a speech-to-speech Voice Lab first, then voice chat (push to talk, spoken answers) on the chat model |
 | [0017](0017-supporters.md) | Support LLMTray: optional tips (StoreKit IAP in the App Store build, GitHub Sponsors otherwise), opt-in supporters list moderated and signed by ipsupport-api; nothing locked |
 | [0018](0018-app-store-build.md) | A Mac App Store build beside the Developer ID one: every runtime bundled and signed, sandboxed, no Sparkle, StoreKit tips |
+| [0019](0019-command-line.md) | The `llmtray` command-line tool: an owner-only control socket, the tray's own actions, a symlink in ~/.local/bin; not in the App Store build |
 
 New ADR: next number, one topic, the decision first, then why.

@@ -62,6 +62,14 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/runtime" "$APP/Contents/Frameworks"
 
 cp "$RELEASE_DIR/LLMTray" "$APP/Contents/MacOS/LLMTray"
+# The command-line tool (adr/0019), standalone build only: in
+# Contents/Helpers, not MacOS -- `llmtray` and `LLMTray` are one name on a
+# case-insensitive volume (and SwiftPM builds it as LLMTrayCLI for the same
+# reason). Settings > General links ~/.local/bin/llmtray to it.
+if [[ "$APP_STORE" != 1 ]]; then
+  mkdir -p "$APP/Contents/Helpers"
+  cp "$RELEASE_DIR/LLMTrayCLI" "$APP/Contents/Helpers/llmtray"
+fi
 cp "$REPO_ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 cp "$REPO_ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 # The setup wizard's Welcome banner (SetupWizardView; `swift run` reads it

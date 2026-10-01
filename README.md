@@ -67,6 +67,25 @@ swift build
 .build/debug/LLMTray
 ```
 
+## Command line
+
+The app comes with `llmtray`, a command-line tool for terminals, scripts and agents. Install it in **Settings › General › Command-line tool**: it links `~/.local/bin/llmtray` to the copy inside the app, so updates keep it current, and shows the line to add to your shell profile if `~/.local/bin` isn't on your `PATH`.
+
+```bash
+llmtray status                     # server state, loaded model, API address
+llmtray models                     # the chat models in your models folder (* = selected)
+llmtray start gemma-4              # start the server, or switch it to this model
+llmtray stop
+llmtray chat "Explain mmap in two sentences"
+git diff | llmtray chat --system "Review this diff"   # the prompt from stdin
+llmtray pull mlx-community/Qwen3-4B-4bit              # download through the app's queue
+llmtray image "a lighthouse at dusk" -o lighthouse.png
+llmtray api                        # the OpenAI endpoint, and how to point a client at it
+llmtray help chat
+```
+
+If LLMTray isn't running, `llmtray` starts it in the background. It talks to the app over a socket only your user account can open (`~/Library/Application Support/LLMTray/control.sock`); `chat` uses the OpenAI-compatible endpoint like any other client. `image` uses the image model set up in Settings and waits its turn behind the chat's own generations. `--json` gives machine-readable output for `status`, `models` and `chat`. Exit status: 0 ok, 1 error, 2 usage. The App Store version doesn't include the tool. Design: [adr/0019](adr/0019-command-line.md).
+
 ## Why our own mlx-lm fork?
 
 Stock (PyPI) `mlx_lm.server` is missing things this app relies on, and [`ipsupport-llc/mlx-lm`](https://github.com/ipsupport-llc/mlx-lm) carries them natively:

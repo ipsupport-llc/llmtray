@@ -14,8 +14,11 @@
 "%1$lld items, at least %2$@." = "%1$lld items, at least %2$@.";
 "%1$lld of %2$lld changes selected" = "%1$lld of %2$lld changes selected";
 "%@ (LM Studio's, shared with it)" = "%@ (LM Studio's, shared with it)";
+"%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's.";
+"%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
+"%@ isn't LLMTray's link, so it was left as it is." = "%@ isn't LLMTray's link, so it was left as it is.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";
 "%@ isn't installed yet" = "%@ isn't installed yet";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
@@ -205,6 +208,7 @@
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
 "Coffee" = "Coffee";
+"Command-line tool" = "Command-line tool";
 "Compact" = "Compact";
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word.";
 "Compaction" = "Compaction";
@@ -417,6 +421,7 @@
 "Installing mflux…" = "Installing mflux…";
 "Installing mlx-audio failed: %@" = "Installing mlx-audio failed: %@";
 "Installing mlx-audio…" = "Installing mlx-audio…";
+"Installs the llmtray command in ~/.local/bin: start and stop the server, list and download models, chat, and generate images from a terminal or a script. Run llmtray help for the commands." = "Installs the llmtray command in ~/.local/bin: start and stop the server, list and download models, chat, and generate images from a terminal or a script. Run llmtray help for the commands.";
 "Instructions for %@" = "Instructions for %@";
 "Instructions…" = "Instructions…";
 "It goes on in the background: you can continue." = "It goes on in the background: you can continue.";
@@ -575,6 +580,7 @@
 "Older" = "Older";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
+"Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
@@ -1100,6 +1106,7 @@
 "failed: %@" = "failed: %@";
 "for this chat" = "for this chat";
 "less than a minute left" = "less than a minute left";
+"llmtray in the terminal" = "llmtray in the terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
 "make %lld folders" = "make %lld folders";
 "mlx-audio runtime" = "mlx-audio runtime";
@@ -1137,6 +1144,7 @@
 "~%1$lld h %2$lld min left" = "~%1$lld h %2$lld min left";
 "~%lld h left" = "~%lld h left";
 "~%lld min left" = "~%lld min left";
+"~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:" = "~/.local/bin isn't on your shell's PATH yet. Add this line to %@, then open a new terminal window:";
 "· %lld pinned" = "· %lld pinned";
 "· size…" = "· size…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” couldn't be removed: %2$@";

@@ -25,6 +25,9 @@ final class ChatTabs: ObservableObject {
     /// Settings' image- and music-model downloads run on a client of their
     /// own (their progress is shown there), not on whichever tab is open.
     private(set) lazy var imageModels = ChatClient(mflux: mflux, music: music)
+    /// `llmtray image` (ControlCommands, adr/0019) unloads the model for an
+    /// image: the tabs' answers wait for it, as for another tab's.
+    var isControlUnloadingModel = false
     private var busyWatch: AnyCancellable?
     /// Closed tabs still finishing something (see close).
     private var closing: [ChatClient] = []
@@ -142,7 +145,8 @@ final class ChatTabs: ObservableObject {
         let client = ChatClient(mflux: mflux, music: music)
         client.isAnotherChatUnloadingModel = { [weak self, weak client] in
             guard let self, let client else { return false }
-            return (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForMedia }
+            return self.isControlUnloadingModel
+                || (self.tabs + self.closing).contains { $0 !== client && $0.isUnloadingModelForMedia }
         }
         return client
     }
