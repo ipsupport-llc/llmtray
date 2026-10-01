@@ -149,6 +149,8 @@ public final class ControlSocketServer {
     }
 
     /// Closes the socket and removes its file (quit).
+    static let maxConnections = 64
+
     public func stop() {
         guard listenFD >= 0 else { return }
         acceptSource?.cancel()
@@ -167,6 +169,12 @@ public final class ControlSocketServer {
             // mode ends up as, only this user's processes get in.
             var uid: uid_t = 0, gid: gid_t = 0
             guard getpeereid(fd, &uid, &gid) == 0, uid == getuid() else {
+                close(fd)
+                continue
+            }
+            // A client that opens connections and never closes them runs
+            // out of these, not the app out of descriptors.
+            guard connections.count < Self.maxConnections else {
                 close(fd)
                 continue
             }

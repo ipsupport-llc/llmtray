@@ -97,10 +97,13 @@ enum CLIInfo {
 /// Unbuffered writes (an answer shows as it streams). write(2), not
 /// FileHandle: FileHandle raises an Objective-C exception -- a crash -- on
 /// a closed pipe. stdout closed (`llmtray chat ... | head -1`): done, as
-/// `head`'s other side would be.
+/// `head`'s other side would be; any other failure (a full disk) is one.
 enum Output {
     static func out(_ text: String, terminator: String = "\n") {
-        if !write(STDOUT_FILENO, text + terminator), errno == EPIPE { exit(0) }
+        guard !write(STDOUT_FILENO, text + terminator) else { return }
+        if errno == EPIPE { exit(0) }
+        err("llmtray: couldn't write the output: \(String(cString: strerror(errno)))")
+        exit(1)
     }
 
     static func err(_ text: String, terminator: String = "\n") {

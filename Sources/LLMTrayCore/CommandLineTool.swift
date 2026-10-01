@@ -84,14 +84,18 @@ public enum CommandLineTool {
 
     /// What the login shell is asked to print, between markers: an
     /// interactive login shell may print a banner or a prompt around it.
+    /// printenv, not `$PATH`: fish's own `$PATH` is a list, joined by
+    /// spaces -- the exported one is colon-separated in every shell.
     public static let pathProbeMarker = "__LLMTRAY_PATH__"
-    public static var pathProbeCommand: String { "printf '\\n\(pathProbeMarker)%s\(pathProbeMarker)\\n' \"$PATH\"" }
+    public static var pathProbeCommand: String {
+        "printf '\\n\(pathProbeMarker)'; /usr/bin/printenv PATH; printf '\(pathProbeMarker)\\n'"
+    }
 
     /// The PATH in a probe's output; nil when the markers aren't there.
     public static func parsePathProbe(_ output: String) -> String? {
         guard let start = output.range(of: pathProbeMarker),
               let end = output.range(of: pathProbeMarker, range: start.upperBound..<output.endIndex) else { return nil }
-        return String(output[start.upperBound..<end.lowerBound])
+        return String(output[start.upperBound..<end.lowerBound]).trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// The file and the line that put `~/.local/bin` on a login shell's PATH,

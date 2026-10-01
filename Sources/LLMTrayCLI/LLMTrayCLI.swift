@@ -75,7 +75,11 @@ enum LLMTrayCLI {
     /// status once it's running.
     @discardableResult
     static func start(_ model: String?, quiet: Bool = false) throws -> ControlStatus {
-        let done = try AppConnection.connect().run(.start(model: model)) { event in
+        let client = try AppConnection.connect()
+        Interrupt.onInterrupt {
+            Output.err("\nstopped waiting -- the model goes on loading in LLMTray")
+        }
+        let done = try client.run(.start(model: model)) { event in
             guard !quiet, event.event == ControlReply.Event.state, let state = event.state else { return }
             switch state {
             case ControlStatus.starting: Output.err("loading \(model ?? "the selected model")…")
@@ -109,8 +113,14 @@ enum LLMTrayCLI {
         let output = options.output ?? CommandLineOutput.defaultImageName(at: Date())
         let url = URL(fileURLWithPath: (output as NSString).expandingTildeInPath)
         // Checked before minutes of generation, not after.
-        guard FileManager.default.isWritableFile(atPath: url.deletingLastPathComponent().path) else {
-            throw CLIError("can't write to \(url.deletingLastPathComponent().path)")
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue {
+            throw CLIError("\(url.path) is a folder -- name the image file (-o \(url.path)/image.png)")
+        }
+        let parent = url.deletingLastPathComponent().path
+        guard FileManager.default.fileExists(atPath: parent, isDirectory: &isDirectory), isDirectory.boolValue,
+              FileManager.default.isWritableFile(atPath: parent) else {
+            throw CLIError("can't write to \(parent)")
         }
         let client = try AppConnection.connect()
         Interrupt.onInterrupt {
@@ -204,8 +214,11 @@ enum Interrupt {
         let source = DispatchSource.makeSignalSource(signal: SIGINT, queue: .global())
         source.setEventHandler {
             lock.lock()
+            let again = interrupted
             interrupted = true
             lock.unlock()
+            // A second Ctrl-C quits whatever the first one is waiting for.
+            if again { exit(130) }
             handler()
             if exits { exit(130) }
         }

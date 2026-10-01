@@ -60,7 +60,7 @@ final class CommandLineToolTests: XCTestCase {
         let marker = CommandLineTool.pathProbeMarker
         XCTAssertEqual(CommandLineTool.parsePathProbe("Last login: today\n\(marker)/usr/bin:/bin\(marker)\n% "), "/usr/bin:/bin")
         XCTAssertNil(CommandLineTool.parsePathProbe("zsh: command not found"))
-        XCTAssertTrue(CommandLineTool.pathProbeCommand.contains("$PATH"))
+        XCTAssertTrue(CommandLineTool.pathProbeCommand.contains("printenv PATH"))
     }
 
     func testTheProbeCommandRunsInARealShell() throws {
