@@ -117,8 +117,9 @@ final class ControlCommands {
             }
             target = id
         }
-        // The selected model from now on, as picking it in the popover makes it.
-        UserDefaults.standard[Pref.selectedModelID] = target
+        // The selected model from now on, as picking it in the popover makes
+        // it -- once it's being started, not when the start is refused.
+        func select() { UserDefaults.standard[Pref.selectedModelID] = target }
 
         var sent: ServerState?
         // Every state change is an event line, the current state first.
@@ -136,6 +137,7 @@ final class ControlCommands {
                                                loaded: server.loadedModelPath, target: target)
             switch plan {
             case .alreadyRunning:
+                select()
                 return reply.send(ControlReply(done: true, status: status()))
             case .refuse(let why):
                 return reply.send(.failure(why))
@@ -144,16 +146,19 @@ final class ControlCommands {
                 // send): its outcome first, then this model if it's another.
                 await waitWhileStarting(reply)
                 switch server.state {
-                case .failed(let message): return reply.send(.failure(message))
                 // Stopped meanwhile (Stop in the menu bar): not started again.
                 case .stopped where !server.isIdleUnloaded: return reply.send(.failure("the server was stopped"))
+                // Failed too: that was another start's outcome -- this
+                // one is decided again (a failed server is started).
                 default: continue
                 }
             case .start:
+                select()
                 await startSelectedModel()
                 await waitWhileStarting(reply)
                 return finishStart(target, reply: reply)
             case .load:
+                select()
                 do {
                     try await server.switchLoadedModel(to: target, alias: catalog.alias(for: target))
                 } catch {
