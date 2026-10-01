@@ -384,7 +384,8 @@ struct ContentView: View {
                         MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
                                       citations: citations[msg.id] ?? [], openCitation: { openCitation($0) },
                                       regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
-                                      draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil)
+                                      draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil,
+                                      isAnswering: chat.isBusy && msg.id == chat.messages.last?.id)
                             .environment(\.visibleChatHeight, chatViewportHeight)
                             .id(msg.id)
                     }

@@ -26,6 +26,8 @@ struct MessageBubble: View {
     var regenerateMedia: ((ChatClient.MediaKind, Int, ChatClient.MediaAction) -> Void)?
     /// A Tweak draft of one of this message's images or songs: shown under it.
     var draft: GenerationDraft?
+    /// The answer still under way (the chat's last message while it's busy).
+    var isAnswering = false
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
@@ -92,6 +94,17 @@ struct MessageBubble: View {
                 .padding(8)
                 .background(Color.gray.opacity(0.06))
                 .cornerRadius(8)
+            }
+
+            if !showReasoning && isAnswering && !message.reasoning.isEmpty && message.content.isEmpty {
+                // The reasoning is hidden, not the fact that it's under way:
+                // a thinking model can take a while before its first word
+                // (also after a tool round). Only while it answers: a turn
+                // stopped mid-thought isn't still thinking.
+                Label("Thinking…", systemImage: "brain")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .help(Text("The model is reasoning before it answers (Settings shows the reasoning itself)"))
             }
 
             if !message.content.isEmpty || message.reasoning.isEmpty {
