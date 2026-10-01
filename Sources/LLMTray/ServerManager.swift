@@ -556,6 +556,7 @@ final class ServerManager: ObservableObject {
             maxContext: ModelDiscovery.maxContextLength(forModelPath: modelPath),
             verboseLogging: UserDefaults.standard[Pref.verboseServerLogging],
             prefillMemoryMB: memory.prefillMemoryMB,
+            bufferCacheMB: memory.bufferCacheMB,
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
             memoryShares: Self.memoryShares
         )
@@ -564,6 +565,7 @@ final class ServerManager: ObservableObject {
     /// What the launch sizes by the GPU memory the model leaves.
     private struct MemoryFacts {
         var prefillMemoryMB: Int?
+        var bufferCacheMB: Int?
         var gpuHeadroomBytes: Int64?
     }
 
@@ -588,10 +590,10 @@ final class ServerManager: ObservableObject {
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
         let weights = ModelWeights.bytes(inFolder: modelPath)
+        let scratchMB = ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
         let facts = MemoryFacts(
-            prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb")
-                ? ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
-                : nil,
+            prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
+            bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
             gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)
         )
         memoryFactsCache[key] = facts
