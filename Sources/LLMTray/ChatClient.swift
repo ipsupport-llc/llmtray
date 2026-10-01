@@ -10,6 +10,8 @@ final class ChatClient: ObservableObject {
     @Published var messages: [ChatMessage] = [] {
         didSet { hasUnsavedChanges = true }
     }
+    /// The answer waits for a model being loaded (shown as such).
+    @Published private(set) var isWaitingForModelLoad = false
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
@@ -901,7 +903,9 @@ final class ChatClient: ObservableObject {
             }
             defer { ticket?.release() }
             guard stillCurrent() else { return }
-            let unload = runs && settings.unloadModelDuringImageGen
+            // Only a model that's up comes back after: a stopped server stays
+            // stopped (a reload would fail with "the server isn't running").
+            let unload = runs && settings.unloadModelDuringImageGen && server.canAnswer
             if unload {
                 isUnloadingModelForMedia = true
                 await server.unloadModel()
@@ -1029,16 +1033,36 @@ final class ChatClient: ObservableObject {
         // Another tab unloaded the model for an image: this answer waits for
         // it to come back (the server refuses requests meanwhile) instead
         // of failing. Stop / leaving the chat ends the wait.
-        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() }
-        guard modelAway() else { return startStream(request) }
+        // Also a model the chat's own send just started (ContentView.send):
+        // the message is in, the answer comes once it's loaded.
+        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting }
+        guard modelAway() else { return startStreamIfModelUp(request, server: server) }
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             while let self, modelAway(), token == self.turnToken, epoch == self.conversationEpoch {
+                self.isWaitingForModelLoad = server.isStarting
                 try? await Task.sleep(nanoseconds: 300_000_000)
             }
+            self?.isWaitingForModelLoad = false
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
-            self.startStream(request)
+            self.startStreamIfModelUp(request, server: server)
         }
+    }
+
+    /// Streams the request, or -- the model failed to start, or nothing
+    /// will start it -- ends the turn with why: a request to a port nobody
+    /// listens on only said "Could not connect to the server".
+    private func startStreamIfModelUp(_ request: URLRequest, server: ServerManager) {
+        if server.canAnswer { return startStream(request) }
+        isStreaming = false
+        if case .failed(let reason) = server.state {
+            errorText = String(format: NSLocalizedString("The model didn't start: %@", comment: "chat: the auto-start failed"), reason)
+        } else {
+            errorText = NSLocalizedString("The model isn't running. Send again to start it.", comment: "chat")
+        }
+        dropEmptyAssistantPlaceholder()
+        closeDanglingToolCalls()
+        persistCurrentSession()
     }
 
     private func startStream(_ request: URLRequest) {
@@ -1050,6 +1074,7 @@ final class ChatClient: ObservableObject {
     }
 
     func cancel() {
+        isWaitingForModelLoad = false
         draft?.resolve(nil)
         draft = nil
         // A call waiting on a folder prompt stops; one the user opened stays.

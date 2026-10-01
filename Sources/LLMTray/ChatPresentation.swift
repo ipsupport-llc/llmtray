@@ -19,14 +19,16 @@ final class ChatPresentation: ObservableObject {
     @Published var isDetached = false
 
     private let tabs: ChatTabs
+    private let server: ServerManager
     /// Per tab: its draft (survives a detach / attach and a tab switch) and
     /// its turn tracker.
     private var composers: [UUID: ComposerModel] = [:]
     private var trackers: [UUID: TurnTracker] = [:]
     private var cancellables: Set<AnyCancellable> = []
 
-    init(tabs: ChatTabs) {
+    init(tabs: ChatTabs, server: ServerManager) {
         self.tabs = tabs
+        self.server = server
         tabs.$tabs
             .sink { [weak self] in self?.syncTabs($0) }
             .store(in: &cancellables)
@@ -88,7 +90,9 @@ final class ChatPresentation: ObservableObject {
 
     private func autoCompactIfNeeded(_ chat: ChatClient, epoch: Int) {
         let threshold = UserDefaults.standard[Pref.autoCompactThreshold]
-        guard threshold > 0, chat.messages.count > threshold else { return }
+        // A one-shot request: only with a model up (a turn can end because
+        // the model didn't start).
+        guard threshold > 0, chat.messages.count > threshold, server.canAnswer else { return }
         Task {
             // Still that chat, still idle: the task runs later still.
             guard chat.conversationEpoch == epoch, !chat.isBusy else { return }

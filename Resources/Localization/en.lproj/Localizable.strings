@@ -358,6 +358,7 @@
 "Generating music…" = "Generating music…";
 "Generation" = "Generation";
 "Get Started" = "Get Started";
+"Get a Model…" = "Get a Model…";
 "Get one" = "Get one";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
@@ -462,6 +463,7 @@
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
+"Loading %@…" = "Loading %@…";
 "Loading the voice model…" = "Loading the voice model…";
 "Loads the last-used model right away, so it's ready without pressing Play." = "Loads the last-used model right away, so it's ready without pressing Play.";
 "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start." = "Logs every generated token (DEBUG). Only for troubleshooting the model process -- it slows things down. Takes effect on the next server start.";
@@ -534,6 +536,7 @@
 "No access" = "No access";
 "No auto-tune run yet." = "No auto-tune run yet.";
 "No automatic update checks" = "No automatic update checks";
+"No chat model yet." = "No chat model yet.";
 "No chats found" = "No chats found";
 "No details for this answer." = "No details for this answer.";
 "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.";
@@ -882,7 +885,9 @@
 "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app." = "The mlx-lm version (a commit of LLMTray's own fork) that runs the models. Updated separately from the app.";
 "The model can make an image when you ask for one." = "The model can make an image when you ask for one.";
 "The model didn't answer -- try again." = "The model didn't answer -- try again.";
+"The model didn't start: %@" = "The model didn't start: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "The model downloaded, but its folder couldn't be marked complete.";
+"The model isn't running. Send again to start it." = "The model isn't running. Send again to start it.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
 "The model reloads when Voice Lab stops" = "The model reloads when Voice Lab stops";
@@ -1115,6 +1120,7 @@
 "rename %lld" = "rename %lld";
 "search by words only" = "search by words only";
 "the download finished incomplete" = "the download finished incomplete";
+"the model" = "the model";
 "the model runtime isn't installed yet" = "the model runtime isn't installed yet";
 "then" = "then";
 "this call only" = "this call only";

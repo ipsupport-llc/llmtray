@@ -127,6 +127,17 @@ struct ChatComposer: View {
             if !composer.attachments.isEmpty {
                 attachmentStrip
             }
+            if !canChat {
+                // No model on this Mac yet: say what to do rather than a grey
+                // field that reads as a broken app.
+                HStack(spacing: 8) {
+                    Image(systemName: "shippingbox").foregroundStyle(.secondary)
+                    Text("No chat model yet.").foregroundStyle(.secondary)
+                    Button("Get a Model…") { NotificationCenter.default.post(name: .showSetupWizard, object: nil) }
+                }
+                .font(.callout)
+                .padding(.horizontal, 12)
+            }
             HStack(spacing: 8) {
                 if composer.acceptsImages {
                     Button { composer.pickImages() } label: { Image(systemName: "paperclip") }
