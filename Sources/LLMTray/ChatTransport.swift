@@ -107,10 +107,16 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
 
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         let taskID = dataTask.taskIdentifier
-        guard let lines = streams.receive(data, for: taskID) else { return }
+        guard streams.receive(data, for: taskID) else { return }
+        // Main-actor tasks don't run in the order they were made, so a task
+        // doesn't carry its own chunk -- it takes everything received so
+        // far, in order. Carrying chunks, a busy main actor (a long answer
+        // re-rendering) swapped them: words came out spliced, a heading
+        // landed mid-line.
         Task { @MainActor in
             guard self.task?.taskIdentifier == taskID else { return }
-            self.handlers?.onText(lines)
+            let lines = self.streams.take(taskID)
+            if !lines.isEmpty { self.handlers?.onText(lines) }
         }
     }
 
@@ -144,7 +150,8 @@ private final class StreamStates: @unchecked Sendable {
         var errorBody = Data()
         var firstByteDate: Date?
         var firstDataDate: Date?
-        /// Bytes after the last newline, decoded (normally empty).
+        /// What wasn't delivered yet: lines not taken, then the bytes after
+        /// the last newline (normally empty), decoded.
         var rest = ""
     }
 
@@ -156,6 +163,8 @@ private final class StreamStates: @unchecked Sendable {
         /// Undecoded bytes: a network chunk can end inside a UTF-8
         /// character, so only complete lines are decoded.
         var pending = Data()
+        /// Complete lines received and not yet taken by the main actor.
+        var ready = ""
     }
 
     private static let dataPrefix = Data("data:".utf8)
@@ -172,20 +181,20 @@ private final class StreamStates: @unchecked Sendable {
         states[id]?.statusCode = code
     }
 
-    /// The complete lines received so far (newline-terminated), or nil
-    /// when there's nothing to parse yet (or the response is an error body).
-    func receive(_ data: Data, for id: Int) -> String? {
+    /// Whether complete lines are now waiting for take() (false while a
+    /// line is unfinished, or the response is an error body).
+    func receive(_ data: Data, for id: Int) -> Bool {
         lock.lock(); defer { lock.unlock() }
-        guard var state = states[id] else { return nil }
+        guard var state = states[id] else { return false }
         defer { states[id] = state }
         if let code = state.statusCode, !(200..<300).contains(code) {
             state.errorBody.append(data)
-            return nil
+            return false
         }
         if state.firstByteDate == nil { state.firstByteDate = Date() }
         state.pending.append(data)
         // 0x0A never occurs inside a multi-byte UTF-8 sequence.
-        guard let newline = state.pending.lastIndex(of: 0x0A) else { return nil }
+        guard let newline = state.pending.lastIndex(of: 0x0A) else { return false }
         let end = state.pending.index(after: newline)
         let complete = state.pending[state.pending.startIndex..<end]
         // A whole line, so a chunk boundary can't split the prefix.
@@ -193,9 +202,17 @@ private final class StreamStates: @unchecked Sendable {
            complete.split(separator: 0x0A).contains(where: { $0.starts(with: Self.dataPrefix) }) {
             state.firstDataDate = Date()
         }
-        let text = String(decoding: complete, as: UTF8.self)
+        state.ready += String(decoding: complete, as: UTF8.self)
         state.pending = Data(state.pending[end...])
-        return text
+        return true
+    }
+
+    /// The complete lines waiting, in the order they arrived; empties them.
+    func take(_ id: Int) -> String {
+        lock.lock(); defer { lock.unlock() }
+        guard let ready = states[id]?.ready, !ready.isEmpty else { return "" }
+        states[id]?.ready = ""
+        return ready
     }
 
     func finish(_ id: Int) -> Result {
@@ -203,7 +220,9 @@ private final class StreamStates: @unchecked Sendable {
         guard let state = states.removeValue(forKey: id) else { return Result() }
         return Result(
             statusCode: state.statusCode, errorBody: state.errorBody,
-            firstByteDate: state.firstByteDate, firstDataDate: state.firstDataDate, rest: String(decoding: state.pending, as: UTF8.self)
+            firstByteDate: state.firstByteDate, firstDataDate: state.firstDataDate,
+            // Lines no main-actor task took yet, then a last unterminated one.
+            rest: state.ready + String(decoding: state.pending, as: UTF8.self)
         )
     }
 }
