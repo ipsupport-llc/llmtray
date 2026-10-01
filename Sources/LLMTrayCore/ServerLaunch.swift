@@ -27,10 +27,12 @@ public enum ServerLaunch {
         /// take (the runtime shrinks the chunk as the context grows); nil
         /// when the runtime has no such flag or the GPU limit isn't known.
         public var prefillMemoryMB: Int?
-        /// `--buffer-cache-mb`: MLX's cache of freed buffers, the same share
-        /// as a prefill chunk's (both are scratch memory). Uncapped, a draft
-        /// model's buffers of a new size every step piled up to ~4 GB and a
-        /// 24 GB Mac swapped. nil when the runtime has no such flag.
+        /// `--buffer-cache-mb`: MLX's cache of freed buffers, the prefill
+        /// chunk's share -- not on top of it: what it caches is that scratch,
+        /// freed (the next chunk reuses its buffers; in decoding there's no
+        /// chunk). Uncapped, a draft model's buffers of a new size every step
+        /// piled up to ~4 GB and a 24 GB Mac swapped. nil when the runtime
+        /// has no such flag.
         public var bufferCacheMB: Int?
         /// GPU memory the model leaves: the GPU limit less its weights
         /// (gpuHeadroomBytes); caps the prompt cache (promptCacheBytes). nil
