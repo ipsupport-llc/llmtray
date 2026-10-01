@@ -27,6 +27,11 @@ public enum ServerLaunch {
         /// take (the runtime shrinks the chunk as the context grows); nil
         /// when the runtime has no such flag or the GPU limit isn't known.
         public var prefillMemoryMB: Int?
+        /// `--buffer-cache-mb`: MLX's cache of freed buffers, the same share
+        /// as a prefill chunk's (both are scratch memory). Uncapped, a draft
+        /// model's buffers of a new size every step piled up to ~4 GB and a
+        /// 24 GB Mac swapped. nil when the runtime has no such flag.
+        public var bufferCacheMB: Int?
         /// GPU memory the model leaves: the GPU limit less its weights
         /// (gpuHeadroomBytes); caps the prompt cache (promptCacheBytes). nil
         /// when the GPU limit isn't known -- the profile's size then.
@@ -37,7 +42,8 @@ public enum ServerLaunch {
         public var memoryShares: MemoryShares
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
-                    prefillMemoryMB: Int? = nil, gpuHeadroomBytes: Int64? = nil, memoryShares: MemoryShares = .default) {
+                    prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
+                    memoryShares: MemoryShares = .default) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -46,6 +52,7 @@ public enum ServerLaunch {
             self.maxContext = maxContext
             self.verboseLogging = verboseLogging
             self.prefillMemoryMB = prefillMemoryMB
+            self.bufferCacheMB = bufferCacheMB
             self.gpuHeadroomBytes = gpuHeadroomBytes
             self.memoryShares = memoryShares
         }
@@ -176,6 +183,9 @@ public enum ServerLaunch {
         }
         if let mb = c.prefillMemoryMB, !p.extraServerArgs.contains("--prefill-memory-mb") {
             args += ["--prefill-memory-mb", String(mb)]
+        }
+        if let mb = c.bufferCacheMB, !p.extraServerArgs.contains("--buffer-cache-mb") {
+            args += ["--buffer-cache-mb", String(mb)]
         }
         args += p.extraServerArgs.split(separator: " ").map(String.init)
         return args

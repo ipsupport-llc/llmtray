@@ -362,6 +362,19 @@ final class PrefillMemoryTests: XCTestCase {
         XCTAssertFalse(ServerLaunch.arguments(p, c).contains("--prefill-memory-mb"))
     }
 
+    func testTheBufferCacheCapGoesInUnlessTheUserSetsIt() {
+        var c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil,
+                                     bufferCacheMB: 818)
+        var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
+        XCTAssertEqual(argValue(ServerLaunch.arguments(p, c), "--buffer-cache-mb"), "818")
+        p.extraServerArgs = "--buffer-cache-mb 2000"
+        XCTAssertEqual(ServerLaunch.arguments(p, c).filter { $0 == "--buffer-cache-mb" }.count, 1)
+        // A runtime without the flag gets none.
+        c.bufferCacheMB = nil
+        p.extraServerArgs = ""
+        XCTAssertFalse(ServerLaunch.arguments(p, c).contains("--buffer-cache-mb"))
+    }
+
     func testPromptCacheEntriesUnlessTheUserSetsThem() {
         let c = ServerLaunch.Context(modelPath: "/m", internalPort: 1, alias: "", disallowQuantizedKV: false, drafterRepo: nil)
         var p = ProfileResolver.resolve(overlay: nil, base: Profile.builtIn)
