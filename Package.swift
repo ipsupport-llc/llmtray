@@ -34,6 +34,20 @@ let package = Package(
             path: "Sources/LLMTray",
             swiftSettings: flavor
         ),
+    ] + (appStore ? [] : [
+        // `llmtray`, the command-line tool (adr/0019): the standalone build
+        // only -- the App Store build neither bundles it nor serves its
+        // socket. LLMTrayCore only: no AppKit, no UI; it talks to the running
+        // app over the control socket and to the OpenAI endpoint. Built as
+        // `LLMTrayCLI` and renamed in the bundle (build_app.sh): an
+        // `llmtray` binary would overwrite `LLMTray` in .build/release on a
+        // case-insensitive volume.
+        .executableTarget(
+            name: "LLMTrayCLI",
+            dependencies: ["LLMTrayCore"],
+            path: "Sources/LLMTrayCLI"
+        ),
+    ]) + [
         .testTarget(
             name: "LLMTrayCoreTests",
             dependencies: ["LLMTrayCore"],
