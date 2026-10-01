@@ -10,11 +10,14 @@ struct EmptyChatIntro: View {
     let port: Int
     /// Puts a sample prompt in the composer (not sent).
     let insertPrompt: (String) -> Void
+    /// The chat's own drop handling (a vision model's images to the
+    /// message, other files to the project), for the drop zone too.
+    let handleDrop: ([NSItemProvider]) -> Bool
     @ObservedObject private var store = ChatLibraryStore.shared
 
     var body: some View {
         if let sessionID, store.library.projectContext(forChat: sessionID) != nil {
-            ProjectChatDropZone(sessionID: sessionID)
+            ProjectChatDropZone(sessionID: sessionID, handleDrop: handleDrop)
         } else {
             EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt)
         }

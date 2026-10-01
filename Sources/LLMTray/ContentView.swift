@@ -362,7 +362,7 @@ struct ContentView: View {
                                 // until its first turn: where it will be.
                                 if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
                                 EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
-                                               insertPrompt: insertPrompt)
+                                               insertPrompt: insertPrompt, handleDrop: handleChatDrop)
                             }
                         } else {
                             VStack(spacing: 2) {
