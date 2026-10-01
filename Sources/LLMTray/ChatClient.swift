@@ -315,8 +315,7 @@ final class ChatClient: ObservableObject {
             ["role": "system", "content": Self.titleSystemPrompt],
             ["role": "user", "content": "User: \(question.content.prefix(1500))\n\nAssistant: \(answer.content.prefix(1500))"],
         ]
-        // Six words, and no reasoning before them (completion).
-        guard let request = ChatRequestBuilder.completion(port: port, modelAlias: modelAlias, messages: requestMessages, maxTokens: 64) else { return }
+        guard let request = ChatRequestBuilder.completion(port: port, modelAlias: modelAlias, messages: requestMessages) else { return }
         titleIsFinal = true
         titleTask = Task { [weak self] in
             guard let raw = try? await ChatTransport.completion(request), !Task.isCancelled,
