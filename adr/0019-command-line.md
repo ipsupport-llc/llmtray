@@ -139,7 +139,7 @@ socket (`#if !APP_STORE`):
 - the sandbox can't write a symlink to `~/.local/bin`, or anywhere on the
   user's `PATH`;
 - its Application Support is inside the container
-  (`~/Library/Containers/us.ipsupport.llmtray/Data/...`), and a CLI outside
+  (`~/Library/Containers/us.ipsupport.llmtray.appstore/Data/...`), and a CLI outside
   the container can't count on reaching a socket there (a sandboxed
   listener's socket path and its permissions are the sandbox's business).
 

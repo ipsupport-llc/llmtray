@@ -214,12 +214,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         #endif
         // One LLMTray at a time (the /Applications copy started at login and
         // another from the DMG would both load a model): hand over and quit.
-        if let other = NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
-            .first(where: { $0 != .current && !$0.isTerminated }) {
-            other.activate()
-            NSApp.terminate(nil)
-            return
-        }
+        // The other build (adr/0018: its own bundle id) counts too -- the
+        // port, the models, the memory -- but can't be handed over to.
+        if handOverToRunningCopy() { return }
         #if !APP_STORE
         // After the single-instance check: the copy that stays owns the socket.
         do { try controlServer.start() } catch {
@@ -950,6 +947,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .starting: return "brain.head.profile"
         default: return "brain"
         }
+    }
+
+    // MARK: - Single instance
+
+    /// True when this copy is quitting for another running LLMTray: the
+    /// same build is brought forward; the other build (the App Store one,
+    /// or the one from ipsupport.us) is named in an alert, since it can't
+    /// take over this one's launch.
+    private func handOverToRunningCopy() -> Bool {
+        let running = AppIdentity.bundleIDs.flatMap { NSRunningApplication.runningApplications(withBundleIdentifier: $0) }
+            + NSRunningApplication.runningApplications(withBundleIdentifier: Bundle.main.bundleIdentifier ?? "")
+        let live = running.filter { !$0.isTerminated }
+        let conflict = AppIdentity.conflict(
+            ownBundleID: Bundle.main.bundleIdentifier, ownPID: ProcessInfo.processInfo.processIdentifier,
+            running: live.map { AppIdentity.Running(bundleID: $0.bundleIdentifier, pid: $0.processIdentifier) })
+        switch conflict {
+        case nil:
+            return false
+        case .sameBuild(let pid):
+            live.first { $0.processIdentifier == pid }?.activate()
+        case .otherBuild(let id, _):
+            let alert = NSAlert()
+            alert.messageText = NSLocalizedString("Another LLMTray is running", comment: "single instance alert title")
+            alert.informativeText = id == AppIdentity.appStoreBundleID
+                ? NSLocalizedString("The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.", comment: "single instance alert: the App Store build runs")
+                : NSLocalizedString("The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.", comment: "single instance alert: the standalone build runs")
+            alert.addButton(withTitle: NSLocalizedString("Quit", comment: ""))
+            NSApp.activate(ignoringOtherApps: true)
+            alert.runModal()
+        }
+        NSApp.terminate(nil)
+        return true
     }
 
     // MARK: - SIGTERM handling

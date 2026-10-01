@@ -56,7 +56,7 @@ struct GeneralPane: View {
                 LabeledContent {
                     Button("Import…") { StandaloneImporter.run() }
                 } label: {
-                    SettingLabel(title: "Import from LLMTray (direct download)", help: "Brings over the chats, projects, profiles and the image, music, voice and embedding models of the version from ipsupport.us (quit it first). Nothing here is replaced, and the models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.")
+                    SettingLabel(title: "Import from LLMTray (direct download)", help: "Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models.")
                 }
                 #endif
             }

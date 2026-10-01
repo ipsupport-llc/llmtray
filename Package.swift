@@ -54,7 +54,9 @@ let package = Package(
             path: "Tests/LLMTrayCoreTests",
             // Only what can't be generated at test time: the RTF that loops
             // Apple's importer (ExtractorIntegrationTests).
-            resources: [.copy("Fixtures")]
+            resources: [.copy("Fixtures")],
+            // The flavor's flag too, for what differs per build (AppIdentityTests).
+            swiftSettings: flavor
         )
     ]
 )

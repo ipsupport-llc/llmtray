@@ -26,7 +26,8 @@ struct CLIError: Error, CustomStringConvertible {
 
 /// Reaching the app, starting it first when it isn't running.
 enum AppConnection {
-    static let bundleID = "us.ipsupport.llmtray"
+    /// The standalone's: the CLI comes only with that build (adr/0019).
+    static let bundleID = AppIdentity.standaloneBundleID
     static let launchTimeout: TimeInterval = 20
 
     static func connect() throws -> ControlClient {
@@ -36,6 +37,12 @@ enum AppConnection {
         // started by whoever set it, not by `open`.
         if ProcessInfo.processInfo.environment[ControlProtocol.socketPathEnvironment] != nil {
             throw CLIError("nothing answers at \(path) (\(ControlProtocol.socketPathEnvironment))")
+        }
+        // The App Store build has no socket, and starting this one beside
+        // it only shows its "another LLMTray is running" alert (adr/0018).
+        if !AppIdentity.runningPIDs(bundleID: AppIdentity.appStoreBundleID).isEmpty {
+            throw CLIError("the App Store version of LLMTray is running, and the command-line tool works only with the "
+                           + "version from ipsupport.us: quit the App Store one (its menu bar icon > Quit), or use its window")
         }
         try launchApp()
         let deadline = Date().addingTimeInterval(launchTimeout)
