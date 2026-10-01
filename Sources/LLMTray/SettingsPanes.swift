@@ -747,23 +747,29 @@ struct ProfilesPane: View {
             }
             Section("Image generation") {
                 row(\.tools.enableImageGeneration, "Enable image generation", "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.") {
-                    Toggle("", isOn: enableImageGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
+                    Toggle("", isOn: enableImageGenerationBinding).labelsHidden()
+                        .disabled(chat.isDownloadingModel || (!setup.isImageGenerationEnabled(profileID: selectedID) && !fits(setup.memoryFit(imageGenModel))))
                 }
                 row(\.tools.imageGenModel, "Image model", "Which model generates new images.") {
                     Picker("", selection: imageGenModelBinding) {
                         ForEach(ImageGenModel.selectable + (ImageGenModel.selectable.contains(imageGenModel) ? [] : [imageGenModel])) {
-                            Text($0.displayName).tag($0)
+                            Text($0.displayName).tag($0).disabled(!fits(setup.memoryFit($0)))
                         }
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
+                MemoryFitNote(fit: setup.memoryFit(imageGenModel))
                 row(\.tools.imageEditModel, "Image editing", "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.") {
                     Picker("", selection: imageEditModelBinding) {
                         Text("Off").tag(ImageGenModel?.none)
-                        ForEach(ImageGenModel.selectable.filter(\.supportsEditing)) { Text($0.displayName).tag(Optional($0)) }
+                        ForEach(ImageGenModel.selectable.filter(\.supportsEditing)) {
+                            Text($0.displayName).tag(Optional($0)).disabled(!fits(setup.memoryFit(editingWith: $0)))
+                        }
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
+                // Nothing to say about editing that's off.
+                MemoryFitNote(fit: setup.imageEditModel(profileID: selectedID).flatMap { setup.memoryFit(editingWith: $0) })
                 row(\.tools.imageQuality, "Canvas size", "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is.") {
                     Picker("", selection: imageQualityBinding) {
                         ForEach(ImageQuality.allCases) { Text($0.displayName).tag($0) }
@@ -793,16 +799,18 @@ struct ProfilesPane: View {
             }
             Section("Music generation") {
                 row(\.tools.enableMusicGeneration, "Enable music generation", "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.") {
-                    Toggle("", isOn: enableMusicGenerationBinding).labelsHidden().disabled(chat.isDownloadingModel)
+                    Toggle("", isOn: enableMusicGenerationBinding).labelsHidden()
+                        .disabled(chat.isDownloadingModel || (!setup.isMusicGenerationEnabled(profileID: selectedID) && !fits(setup.memoryFit(musicModel))))
                 }
                 row(\.tools.musicModel, "Music model", "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.") {
                     Picker("", selection: musicModelBinding) {
                         ForEach(MusicManager.selectable + (MusicManager.selectable.contains(musicModel) ? [] : [musicModel])) {
-                            Text($0.displayName).tag($0)
+                            Text($0.displayName).tag($0).disabled(!fits(setup.memoryFit($0)))
                         }
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
+                MemoryFitNote(fit: setup.memoryFit(musicModel))
                 row(\.tools.musicCreativity, "Creativity", "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.") {
                     SliderValue(value: b(\.tools.musicCreativity), range: 0...1, step: 0.05, format: "%.2f")
                         .disabled(!musicModel.hasCreativity)
@@ -936,13 +944,16 @@ struct ProfilesPane: View {
 
     private var setup: FeatureSetup { .shared }
 
+    /// Not measured is no gate: only a model known not to fit is held back.
+    private func fits(_ fit: FeatureFit?) -> Bool { fit?.isAvailable ?? true }
+
     private var imageGenModel: ImageGenModel { setup.imageGenModel(profileID: selectedID) }
 
     private var imageGenModelBinding: Binding<ImageGenModel> {
         Binding(
             get: { imageGenModel },
             set: { newModel in
-                guard newModel != imageGenModel else { return }
+                guard newModel != imageGenModel, fits(setup.memoryFit(newModel)) else { return }
                 setup.setImageGenModel(newModel, profileID: selectedID)
                 // Switching models while generation is on goes through the
                 // same confirm-and-download step as enabling, instead of
@@ -960,6 +971,7 @@ struct ProfilesPane: View {
         Binding(
             get: { setup.imageEditModel(profileID: selectedID) },
             set: { newModel in
+                if let newModel, !fits(setup.memoryFit(editingWith: newModel)) { return }
                 // Off, or one already downloaded: set as is.
                 guard let newModel, !newModel.isDownloaded else {
                     setup.setImageEditModel(newModel, profileID: selectedID)
@@ -990,6 +1002,7 @@ struct ProfilesPane: View {
                     return
                 }
                 let model = musicModel
+                guard fits(setup.memoryFit(model)) else { return }
                 confirmMusicDownload(model, title: NSLocalizedString("Enable music generation?", comment: ""),
                                      whenReady: { setup.setMusicGenerationEnabled(true, profileID: $0) },
                                      download: { await setup.enableMusicGeneration(model, profileID: $0) })
@@ -1005,7 +1018,7 @@ struct ProfilesPane: View {
         Binding(
             get: { musicModel },
             set: { newModel in
-                guard newModel != musicModel else { return }
+                guard newModel != musicModel, fits(setup.memoryFit(newModel)) else { return }
                 guard setup.isMusicGenerationEnabled(profileID: selectedID), !setup.isMusicModelReady(newModel) else {
                     setup.setMusicModel(newModel, profileID: selectedID)
                     return
@@ -1051,6 +1064,7 @@ struct ProfilesPane: View {
     /// of GB, better with visible progress now than a stalled chat later.
     private func confirmAndEnableImageGeneration() {
         let model = imageGenModel
+        guard fits(setup.memoryFit(model)) else { return }
         confirmImageDownload(model, title: NSLocalizedString("Enable image generation?", comment: "")) { id in
             await setup.enableImageGeneration(model, profileID: id)
         }

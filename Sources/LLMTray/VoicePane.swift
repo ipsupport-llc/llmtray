@@ -25,6 +25,8 @@ struct VoicePane: View {
                 Toggle(isOn: $store.isEnabled) {
                     SettingLabel(title: "Voice Lab", help: "Talk with a local speech-to-speech model that listens and answers in its own voice, both at once, like a phone call. Experimental and English only: no tools, no projects, nothing kept.")
                 }
+                // Off for good on a Mac where no voice model can run.
+                .disabled(!store.isEnabled && !VoiceLabModel.all.contains(where: isRunnable))
                 Text("Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after.")
                     .font(.caption).foregroundStyle(.secondary)
             } header: {
@@ -79,7 +81,7 @@ struct VoicePane: View {
         Section("Model") {
             LabeledContent {
                 Picker("", selection: $store.selected) {
-                    ForEach(VoiceLabModel.all) { Text(verbatim: $0.displayName).tag($0) }
+                    ForEach(VoiceLabModel.all) { Text(verbatim: $0.displayName).tag($0).disabled(!isRunnable($0)) }
                 }
                 .labelsHidden()
                 .disabled(store.isBusy || session.isActive)
@@ -93,8 +95,12 @@ struct VoicePane: View {
                         ProgressView().controlSize(.small)
                     } else if store.isDownloaded(model) {
                         Button("Remove", action: remove).disabled(session.isActive)
+                    } else if partial && !isRunnable(model) {
+                        // Started before this Mac was found too small: its
+                        // gigabytes can still go.
+                        Button("Remove", action: remove).disabled(session.isActive)
                     } else {
-                        Button(partial ? "Resume Download" : "Download", action: download)
+                        Button(partial ? "Resume Download" : "Download", action: download).disabled(!isRunnable(model))
                     }
                 }
             } label: {
@@ -134,8 +140,7 @@ struct VoicePane: View {
     @ViewBuilder
     private var memorySection: some View {
         if let hardware {
-            let fit = VoiceMemoryFit(voiceBytes: model.footprintBytes, chatBytes: chatBytes,
-                                     gpuLimitBytes: hardware.gpuLimitBytes, physicalMemoryBytes: hardware.physicalMemoryBytes)
+            let fit = memoryFit(model, on: hardware)
             Section("Memory") {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     if fit.verdict == .tooBig {
@@ -156,6 +161,16 @@ struct VoicePane: View {
                 }
             }
         }
+    }
+
+    private func memoryFit(_ model: VoiceLabModel, on hardware: HardwareInfo) -> VoiceMemoryFit {
+        VoiceMemoryFit(voiceBytes: FeatureSetup.shared.voiceBytes(model), chatBytes: chatBytes,
+                       gpuLimitBytes: hardware.gpuLimitBytes, physicalMemoryBytes: hardware.physicalMemoryBytes)
+    }
+
+    /// Not yet probed is no gate.
+    private func isRunnable(_ model: VoiceLabModel) -> Bool {
+        hardware.map { memoryFit(model, on: $0).isRunnable } ?? true
     }
 
     static func memoryText(_ fit: VoiceMemoryFit) -> String {

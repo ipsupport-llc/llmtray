@@ -27,6 +27,13 @@ def arg(name, default=None):
         return sys.argv[sys.argv.index(name) + 1]
     return default
 
+# MLX keeps freed buffers for reuse, by default up to its memory limit:
+# a 1024 px Z-Image held 19.7 GB that way and 12.8 GB with this cache, and
+# ran no slower (155 s vs 204 s on a 24 GB Mac -- scripts/measure_memory.py,
+# 2026-10-01); FLUX.2 klein editing 17.8 GB vs about half.
+import mlx.core as mx
+mx.set_cache_limit(256 << 20)
+
 # FLUX.2 klein (generation and editing): the prompt and any reference
 # images (base64 PNG / JPEG) arrive as one JSON object on stdin, the images
 # decoded in memory -- no file is written, not even for editing.
@@ -133,17 +140,69 @@ class Preview:
 
     def send(self, step, seed, prompt, latents, config):
         emit("STEP", f"{step} {config.num_inference_steps}")
-        unpacked = ZImageLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
-        channels = getattr(model.vae, "latent_channels", 32)
-        if hasattr(model.vae, "decode_packed_latents") and unpacked.shape[1] > channels:
-            decoded = model.vae.decode_packed_latents(unpacked)
-        else:
-            decoded = model.vae.decode(unpacked)
-        image = ImageUtil.to_image(
-            decoded_latents=decoded, config=config, seed=seed, prompt=prompt,
-            quantization=model.bits, lora_paths=None, lora_scales=None, generation_time=0,
-        )
-        emit("PREVIEW", png_b64(image.image, max_side=512))
+        # mflux calls this before evaluating the step: the step first, so
+        # its activations are gone before the decode's.
+        mx.eval(latents)
+        # A preview is cosmetic: never the reason a generation fails.
+        try:
+            unpacked = ZImageLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
+            channels = getattr(model.vae, "latent_channels", 32)
+            if hasattr(model.vae, "decode_packed_latents") and unpacked.shape[1] > channels:
+                decoded = model.vae.decode_packed_latents(unpacked)
+            else:
+                # From latents at half the size: a full-size decode at every step
+                # cost 1.4 GB more peak and ~28 s at 1024 px, for a 512 px preview.
+                b, c, h, w = unpacked.shape
+                if h % 2 == 0 and w % 2 == 0:
+                    unpacked = unpacked.reshape(b, c, h // 2, 2, w // 2, 2).mean(axis=(3, 5))
+                decoded = model.vae.decode(unpacked)
+            image = ImageUtil.to_image(
+                decoded_latents=decoded, config=config, seed=seed, prompt=prompt,
+                quantization=model.bits, lora_paths=None, lora_scales=None, generation_time=0,
+            )
+            emit("PREVIEW", png_b64(image.image, max_side=512))
+        except Exception:
+            pass
+
+# One image per run: each model goes once it's done -- the text encoder
+# (2 GB) after the prompt, the transformer (4 GB) before the VAE decode,
+# whose 1024 px activations (6.6 GB) are the run's peak. 10.8 GB of MLX
+# memory at that peak otherwise (measured).
+import gc
+from mlx.utils import tree_map
+def drop(name):
+    # Its weights, not just the attribute: mflux's denoising loop holds the
+    # transformer until generate_image returns.
+    module = getattr(model, name)
+    module.update(tree_map(lambda x: mx.zeros((0,), x.dtype), module.parameters()))
+    setattr(model, name, None)
+    gc.collect()
+    mx.clear_cache()
+
+# mflux compiles the denoising step (M3 and later), and the compiled graph
+# keeps the transformer's weights as constants: the step goes with them.
+compiled = {}
+make_predict = ZImage._predict
+def predict_handle(transformer):
+    compiled["predict"] = make_predict(transformer)
+    return lambda *args, **kwargs: compiled["predict"](*args, **kwargs)
+ZImage._predict = staticmethod(predict_handle)
+
+encode_prompts = model._encode_prompts
+def encode_once(**kwargs):
+    encodings = encode_prompts(**kwargs)
+    mx.eval([e for e in encodings if e is not None])
+    drop("text_encoder")
+    return encodings
+model._encode_prompts = encode_once
+
+decode_latents = model._decode_latents
+def decode_once(**kwargs):
+    mx.eval(kwargs["latents"])
+    compiled.clear()
+    drop("transformer")
+    return decode_latents(**kwargs)
+model._decode_latents = decode_once
 
 model.callbacks.register(Preview())
 width, height = args.width, args.height

@@ -11,6 +11,8 @@ public struct VoiceLabModel: Hashable, Sendable, Identifiable {
     public var downloadBytes: Int64
     /// What it takes in memory while it runs: the published physical
     /// footprint, well above the weights (caches, the codec, Metal's own).
+    /// The app takes runtime/feature_memory.json's measured peak over it
+    /// where there is one.
     public var footprintBytes: Int64
     public var licenseName: String
     /// The model card, which carries the licence text and NVIDIA's notices.
@@ -136,4 +138,8 @@ public struct VoiceMemoryFit: Equatable, Sendable {
     public var sysctlCommand: String? {
         suggestedWiredLimitMB.map { "sudo sysctl iogpu.wired_limit_mb=\($0)" }
     }
+
+    /// Can run here: too big only when no raised limit within the RAM
+    /// would fit it either (the download is then offered no more).
+    public var isRunnable: Bool { verdict != .tooBig || suggestedWiredLimitMB != nil }
 }

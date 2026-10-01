@@ -69,6 +69,15 @@ final class SetupWizardModel: ObservableObject {
         musicPick = FeatureSetup.shared.musicModel()
         if let model = progress.choices.imageModel.flatMap(ImageGenModel.init(rawValue:)) { imagePick = model }
         if let model = progress.choices.musicModel.flatMap(MusicModel.init(rawValue:)) { musicPick = model }
+        // Offered while off: one that fits this Mac, if the current one doesn't.
+        if progress.choices.imageModel == nil, !Self.fits(imageFit(imagePick)),
+           let model = ImageGenModel.selectable.first(where: { Self.fits(imageFit($0)) }) {
+            imagePick = model
+        }
+        if progress.choices.musicModel == nil, !Self.fits(musicFit(musicPick)),
+           let model = MusicManager.selectable.first(where: { Self.fits(musicFit($0)) }) {
+            musicPick = model
+        }
         save()
     }
 
@@ -376,6 +385,13 @@ final class SetupWizardModel: ObservableObject {
     func imageModelSize(_ model: ImageGenModel) -> String {
         model.isDownloaded ? NSLocalizedString("downloaded", comment: "setup: model size") : model.approximateDownloadDescription
     }
+
+    func imageFit(_ model: ImageGenModel) -> FeatureFit? { setup.memoryFit(model) }
+    func editFit(_ model: ImageGenModel) -> FeatureFit? { setup.memoryFit(editingWith: model) }
+    func musicFit(_ model: MusicModel) -> FeatureFit? { setup.memoryFit(model) }
+
+    /// Not measured is no gate: only a model known not to fit is held back.
+    static func fits(_ fit: FeatureFit?) -> Bool { fit?.isAvailable ?? true }
 
     func musicModelSize(_ model: MusicModel) -> String {
         setup.isMusicModelReady(model) ? NSLocalizedString("downloaded", comment: "setup: model size") : model.approximateDownloadDescription

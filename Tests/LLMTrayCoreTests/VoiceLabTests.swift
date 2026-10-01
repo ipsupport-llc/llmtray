@@ -63,6 +63,7 @@ final class VoiceLabTests: XCTestCase {
         let fit = VoiceMemoryFit(voiceBytes: 15_600_000_000, chatBytes: 17_800_000_000, gpuLimitBytes: limit, physicalMemoryBytes: 26 << 30)
         XCTAssertEqual(fit.verdict, .fitsAlone)
         XCTAssertNil(fit.sysctlCommand)
+        XCTAssertTrue(fit.isRunnable)
     }
 
     func testNoChatModelFitsBeside() {
@@ -80,6 +81,7 @@ final class VoiceLabTests: XCTestCase {
         let mb = Int((15_600_000_000 + Int64(VoiceMemoryFit.marginBytes) + 1_048_575) / 1_048_576)
         XCTAssertEqual(fit.suggestedWiredLimitMB, mb)
         XCTAssertEqual(fit.sysctlCommand, "sudo sysctl iogpu.wired_limit_mb=\(mb)")
+        XCTAssertTrue(fit.isRunnable, "with a raised limit")
     }
 
     func testTooBigWithoutEnoughRAM() {
@@ -87,5 +89,6 @@ final class VoiceLabTests: XCTestCase {
         let fit = VoiceMemoryFit(voiceBytes: 15_600_000_000, chatBytes: nil, gpuLimitBytes: 11 << 30, physicalMemoryBytes: 16 << 30)
         XCTAssertEqual(fit.verdict, .tooBig)
         XCTAssertNil(fit.suggestedWiredLimitMB)
+        XCTAssertFalse(fit.isRunnable)
     }
 }
