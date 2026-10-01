@@ -52,19 +52,21 @@ final class RuntimeManager: ObservableObject {
 
         Task {
             do {
-                var latest = try await Self.tipCommit(of: Self.trackedBranch)
-                if latest == nil, Self.trackedBranch != Self.stableBranch {
-                    latest = try await Self.tipCommit(of: Self.stableBranch)
+                // The tracked branch first, then main: a beta branch that
+                // lags main must not hold a beta tester back -- nor, being
+                // older, be offered as an update (GitHubCommits).
+                var branches = [Self.trackedBranch]
+                if Self.trackedBranch != Self.stableBranch { branches.append(Self.stableBranch) }
+                var anyTip = false
+                for branch in branches {
+                    guard let tip = try await Self.tipCommit(of: branch) else { continue }
+                    anyTip = true
+                    if tip != current, try await GitHubCommits.isNewer(tip, than: current, in: Self.repo) {
+                        checkState = .updateAvailable(current: current, latest: tip)
+                        return
+                    }
                 }
-                guard let latest else {
-                    checkState = .failed("unexpected GitHub API response")
-                    return
-                }
-                if latest == current {
-                    checkState = .upToDate(current)
-                } else {
-                    checkState = .updateAvailable(current: current, latest: latest)
-                }
+                checkState = anyTip ? .upToDate(current) : .failed("unexpected GitHub API response")
             } catch {
                 checkState = .failed(error.localizedDescription)
             }

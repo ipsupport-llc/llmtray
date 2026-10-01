@@ -217,7 +217,15 @@ final class AudioRuntime: ObservableObject {
                     return
                 }
                 let current = Self.mlxAudioCommit
-                updateState = latest == current && isInstalled ? .upToDate : .updateAvailable(current: current, latest: latest)
+                if !isInstalled {
+                    // Not installed (or out of step): installing is the update.
+                    updateState = .updateAvailable(current: current, latest: latest == current ? current : latest)
+                } else if latest != current, try await GitHubCommits.isNewer(latest, than: current, in: "ipsupport-llc/mlx-audio") {
+                    updateState = .updateAvailable(current: current, latest: latest)
+                } else {
+                    // The same commit, or a branch tip behind the one in use.
+                    updateState = .upToDate
+                }
             } catch {
                 updateState = .failed(error.localizedDescription)
             }
