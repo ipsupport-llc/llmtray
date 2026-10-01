@@ -188,6 +188,17 @@ extension ModelRecommendationsTests {
         XCTAssertNil(ModelRecommendations.localPath(of: "man220220/gemma-4-26B-A4B-it-gptq-mlx-jang", in: paths), "whole components")
     }
 
+    func testCapabilitiesOfALocalModel() {
+        let list = [RecommendedModel(repo: "o/coder", title: "Coder", summary: "", capabilities: [.code, .tools],
+                                     approxBytes: 1, minMemoryGB: 8)]
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/O/Coder", in: list, vision: false), [.tools, .code],
+                       "the list's, in its order")
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/o/coder", in: list, vision: true), [.vision, .tools, .code])
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/x/other", in: list, vision: true), [.vision],
+                       "one the list doesn't know: only what its config says")
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/x/other", in: list, vision: false), [])
+    }
+
     func testOfferMovesCompleteLocalCopiesOutOfDownloads() {
         let picks = [pick("o/rec", recommended: true), pick("o/partial"), pick("o/plain"), pick("o/missing")]
         let local = ["/m/a/first", "/m/o/plain", "/m/o/partial", "/m/O/Rec"]

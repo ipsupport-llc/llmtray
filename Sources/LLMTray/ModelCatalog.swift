@@ -57,6 +57,9 @@ final class ModelCatalog: ObservableObject {
         let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
         if scanned != models { models = scanned }
         if scannedAliases != aliases { aliases = scannedAliases }
+        // Every rescan goes through here: the model card reads each model's
+        // capabilities again (its next render, or the sizes landing).
+        ModelCapabilities.invalidate()
         refreshUsage()
     }
 

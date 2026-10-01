@@ -49,14 +49,7 @@ struct ChatHeaderView: View {
                 }
             }
             HStack(spacing: 6) {
-                Picker("Model", selection: Binding(get: { selectedModelID }, set: { pickModel($0) })) {
-                    ForEach(catalog.models) { m in
-                        Text(m.displayName).tag(m.id as String?)
-                    }
-                }
-                .labelsHidden()
-                .disabled(!ops.canSwitchModel)
-                .help(Text(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model"))
+                modelCard
 
                 Button { NotificationCenter.default.post(name: .showHFBrowser, object: nil) } label: {
                     Image(systemName: "arrow.down.circle")
@@ -100,18 +93,62 @@ struct ChatHeaderView: View {
         return selectedModelID
     }
 
+    // MARK: Model card
+
+    /// The model picker in a small card: what the selected model can do
+    /// (its symbol) and its size on disk under the name. The picker itself
+    /// is unchanged.
+    private var modelCard: some View {
+        let capabilities = selectedModelID.map(ModelCapabilities.of) ?? []
+        return HStack(spacing: 6) {
+            Image(systemName: capabilities.first.map(ModelCapabilities.symbol) ?? "text.bubble")
+                .font(.system(size: 13))
+                .foregroundColor(.accentColor)
+                .frame(width: 18)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 1) {
+                Picker("Model", selection: Binding(get: { selectedModelID }, set: { pickModel($0) })) {
+                    ForEach(catalog.models) { m in
+                        Text(m.displayName).tag(m.id as String?)
+                    }
+                }
+                .labelsHidden()
+                .disabled(!ops.canSwitchModel)
+                .help(Text(benchmark.isRunning ? "Can't change models while auto-tune is running" : "Model"))
+                if let details = modelDetails(capabilities) {
+                    HStack(spacing: 4) {
+                        Text(verbatim: details.size).lineLimit(1)
+                        ForEach(capabilities, id: \.self) { c in
+                            Image(systemName: ModelCapabilities.symbol(c)).help(ModelCapabilities.name(c))
+                        }
+                    }
+                    .font(.system(size: 10))
+                    .foregroundColor(.secondary)
+                    .padding(.leading, 4)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(verbatim: details.spoken))
+                }
+            }
+        }
+        .padding(.leading, 6).padding(.trailing, 2).padding(.vertical, 3)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color.secondary.opacity(0.08)))
+    }
+
+    /// The size line, once the catalog has measured the folder.
+    private func modelDetails(_ capabilities: [RecommendedModel.Capability]) -> (size: String, spoken: String)? {
+        guard let id = selectedModelID, let bytes = catalog.sizes[id] else { return nil }
+        let size = ModelCatalog.format(bytes)
+        return (size, ([size] + capabilities.map(ModelCapabilities.name)).joined(separator: ", "))
+    }
+
     // MARK: Model switching
 
     /// Picking another model while one is running loads it now (as LM
     /// Studio does); stopped or idle-unloaded, nothing loads until a
-    /// message or Start, as before.
+    /// message or Start, as before (ModelSelection).
     private func pickModel(_ id: String?) {
         selectedModelID = id
-        // Not mid-turn: the turn's next round would ask for its own model
-        // back. The header's Load is there once it ends.
-        guard case .running = server.state, ops.canSwitchModel, !tabs.isAnyBusy,
-              let model = catalog.model(id: id), model.path != server.loadedModelPath else { return }
-        loadModel(model)
+        if let model = ModelSelection.modelToLoad(afterPicking: id, server: server, benchmark: benchmark) { loadModel(model) }
     }
 
     private func loadModel(_ model: LocalModel) {
@@ -271,7 +308,7 @@ struct ChatHeaderView: View {
     /// For the loaded model a switch can change launch arguments -- not
     /// while a request or the auto-tune could be cut off.
     private var canSwitchProfile: Bool {
-        selectedModelID != nil && ops.canAssignProfile(toLoadedModel: selectedModelID == server.loadedModelPath)
+        ModelSelection.canAssignProfile(to: selectedModelID, server: server, benchmark: benchmark)
     }
 
     private var profilePicker: some View {
@@ -301,11 +338,8 @@ struct ChatHeaderView: View {
         .help(Text(canSwitchProfile ? "Settings profile for this model" : "Can't switch profiles while a request or the auto-tune is running"))
     }
 
-    /// Launch-setting differences are applied by the "Restart Server"
-    /// prompt, not by restarting here (that would cut off requests).
     private func switchProfile(to id: String) {
-        guard canSwitchProfile, let modelID = selectedModelID else { return }
-        profiles.assign(profileID: id, to: modelID)
+        ModelSelection.assignProfile(id, to: selectedModelID, server: server, benchmark: benchmark)
     }
 
     /// Quick on/off for the model's chat tools; edits its profile.
