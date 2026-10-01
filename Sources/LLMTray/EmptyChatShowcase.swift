@@ -10,14 +10,15 @@ struct EmptyChatIntro: View {
     let port: Int
     /// Puts a sample prompt in the composer (not sent).
     let insertPrompt: (String) -> Void
-    /// The chat's own drop handling (a vision model's images to the
-    /// message, other files to the project), for the drop zone too.
-    let handleDrop: ([NSItemProvider]) -> Bool
+    /// Something is dragged over the chat: the drop zone lights up (the
+    /// chat takes the drop -- a vision model's images to the message,
+    /// other files to the project).
+    let dropTargeted: Bool
     @ObservedObject private var store = ChatLibraryStore.shared
 
     var body: some View {
         if let sessionID, store.library.projectContext(forChat: sessionID) != nil {
-            ProjectChatDropZone(sessionID: sessionID, handleDrop: handleDrop)
+            ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)
         } else {
             EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt)
         }
@@ -36,6 +37,7 @@ private struct EmptyChatShowcase: View {
     @ObservedObject private var indexer = ProjectIndexer.shared
     @ObservedObject private var voice = VoiceModelStore.shared
     @State private var copied = false
+    @State private var copiedReset: Task<Void, Never>?
 
     private var apiURL: String { "http://localhost:\(port)/v1" }
 
@@ -105,9 +107,10 @@ private struct EmptyChatShowcase: View {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(apiURL, forType: .string)
             copied = true
-            Task {
+            copiedReset?.cancel()
+            copiedReset = Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
-                copied = false
+                if !Task.isCancelled { copied = false }
             }
         }
         .help(Text("OpenAI-compatible: point a coding agent or app at this address (copies it)"))

@@ -158,7 +158,7 @@ private struct DotLabelStyle: LabelStyle {
 /// (nothing is turned on or downloaded from here).
 struct ProjectChatDropZone: View {
     let sessionID: UUID
-    let handleDrop: ([NSItemProvider]) -> Bool
+    let dropTargeted: Bool
     @ObservedObject private var store = ChatLibraryStore.shared
     @ObservedObject private var indexer = ProjectIndexer.shared
 
@@ -166,7 +166,7 @@ struct ProjectChatDropZone: View {
         if let project = store.library.projectContext(forChat: sessionID) {
             if indexer.isEnabled {
                 ProjectDropZoneCard(project: project.id, hasFiles: ProjectFileTotals(indexer.documents[project.id] ?? []).files > 0,
-                                    handleDrop: handleDrop)
+                                    targeted: dropTargeted)
             } else {
                 VStack(spacing: 6) {
                     Image(systemName: "folder.badge.questionmark").font(.title3)
@@ -188,10 +188,9 @@ struct ProjectChatDropZone: View {
 struct ProjectDropZoneCard: View {
     let project: UUID
     let hasFiles: Bool
-    /// The chat's: an image dropped here goes where it would anywhere else
-    /// in the chat.
-    let handleDrop: ([NSItemProvider]) -> Bool
-    @State private var targeted = false
+    /// Dragged over the chat, which takes the drop (one handler: an image
+    /// goes where it would anywhere else in the chat).
+    let targeted: Bool
 
     var body: some View {
         VStack(spacing: 6) {
@@ -208,7 +207,6 @@ struct ProjectDropZoneCard: View {
         .background(RoundedRectangle(cornerRadius: 8).fill(Color.accentColor.opacity(targeted ? 0.12 : 0)))
         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5, 4]))
             .foregroundColor(targeted ? .accentColor : .secondary.opacity(0.5)))
-        .onDrop(of: ProjectFileDropLoader.types, isTargeted: $targeted) { handleDrop($0) }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Drop files here to add them to the project")
     }

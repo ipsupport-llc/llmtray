@@ -209,6 +209,8 @@ public struct ProjectFileTotals: Equatable, Sendable {
     public var failed = 0
     /// Stopped before they were indexed (Index Now).
     public var notIndexed = 0
+    /// Added, not read yet (staged or being read).
+    public var pending = 0
 
     public init() {}
 
@@ -220,6 +222,7 @@ public struct ProjectFileTotals: Equatable, Sendable {
             bytes += d.bytes
             if d.status == .failed || d.status == .unsupported || (d.status.isSearchable && d.error != nil) { failed += 1 }
             if d.status == .notIndexed { notIndexed += 1 }
+            if d.status == .staged || d.status == .extracting { pending += 1 }
         }
     }
 }
@@ -248,6 +251,9 @@ public enum ProjectChatStatus: Equatable, Sendable {
             self = .failed(totals.failed)
         } else if totals.notIndexed > 0 {
             self = .notIndexed
+        } else if totals.pending > 0 {
+            // Just added, before the run's ring shows it.
+            self = .indexing
         } else {
             // Only files without text: nothing to search, nothing wrong.
             self = .indexed(failed: 0)

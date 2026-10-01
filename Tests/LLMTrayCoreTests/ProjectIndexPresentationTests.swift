@@ -198,6 +198,8 @@ final class ProjectIndexPresentationTests: XCTestCase {
         XCTAssertEqual(chatStatus([doc(1, .embedded)], progress: progress(.waiting)), .indexing)
         // Idle progress is nothing under way.
         XCTAssertEqual(chatStatus([doc(1, .embedded)], progress: .idle), .indexed(failed: 0))
+        // Just added, before the run's ring shows it: not "Indexed".
+        XCTAssertEqual(chatStatus([doc(1, .staged), doc(2, .extracting)], progress: .idle), .indexing)
     }
 
     func testChatStatusFailureLines() {

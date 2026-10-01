@@ -45,6 +45,8 @@ struct ContentView: View {
     // Starts true: a new view (the chat just moved between the popover and
     // its window) is scrolled to the end on first appearance, below.
     @State private var followChatBottom = true
+    /// Files dragged over the chat: an empty project chat's drop zone lights up.
+    @State private var chatDropTargeted = false
     /// Following the end before a Tweak draft paused it: restored after.
     @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
@@ -215,7 +217,7 @@ struct ContentView: View {
     private var conversation: some View {
         VStack(spacing: 0) {
             chatArea
-                .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleChatDrop($0) }
+                .onDrop(of: [.fileURL, .image], isTargeted: $chatDropTargeted) { handleChatDrop($0) }
             Divider()
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
@@ -362,7 +364,7 @@ struct ContentView: View {
                                 // until its first turn: where it will be.
                                 if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
                                 EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
-                                               insertPrompt: insertPrompt, handleDrop: handleChatDrop)
+                                               insertPrompt: insertPrompt, dropTargeted: chatDropTargeted)
                             }
                         } else {
                             VStack(spacing: 2) {
@@ -564,8 +566,12 @@ struct ContentView: View {
         let acceptsImages = composer.acceptsImages
         ProjectFileDropLoader.load(providers) { urls in
             let isImage = { (url: URL) in acceptsImages && (UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false) }
-            for url in urls where isImage(url) { composer.attach(NSImage(contentsOf: url)) }
-            let files = urls.filter { !isImage($0) }
+            // An image NSImage can't open goes to the project, which says
+            // what it made of it.
+            var files: [URL] = []
+            for url in urls {
+                if isImage(url), let image = NSImage(contentsOf: url) { composer.attach(image) } else { files.append(url) }
+            }
             if !files.isEmpty { Task { await ProjectIndexer.shared.addFiles(files, to: project) } }
         }
         return true
