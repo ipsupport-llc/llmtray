@@ -203,21 +203,39 @@ public enum ProjectTextBudget {
 
 /// The `[doc:page]` markers of an answer (adr/0012, "Citations").
 public enum CitationMarkers {
+    /// `[3:12]`, `[3:12, 4:1]` -- the form the files are labelled with --
+    /// and what models write instead: `[doc:3]`, `[doc 3, 4]`, `[doc:3:12]`
+    /// (a file, or a file and page). Without "doc" every item needs its page:
+    /// `[3]` and `[1, 2]` are footnotes, not citations.
     private static let bracket = try! NSRegularExpression(
-        pattern: #"\[\s*\d{1,9}\s*:\s*\d{1,9}\s*(?:[,;]\s*\d{1,9}\s*:\s*\d{1,9}\s*)*\]"#)
-    private static let pair = try! NSRegularExpression(pattern: #"(\d{1,9})\s*:\s*(\d{1,9})"#)
+        pattern: #"\[\s*(?:doc\s*[:#]?\s*)?\d{1,9}(?:\s*:\s*\d{1,9})?\s*(?:[,;]\s*(?:doc\s*[:#]?\s*)?\d{1,9}(?:\s*:\s*\d{1,9})?\s*)*\]"#,
+        options: [.caseInsensitive])
+    private static let item = try! NSRegularExpression(
+        pattern: #"(?:doc\s*[:#]?\s*)?(\d{1,9})(?:\s*:\s*(\d{1,9}))?"#, options: [.caseInsensitive])
 
-    /// `[3:12]`, `[3:12, 4:1]`: each (doc, page) in order of first
-    /// appearance, duplicates collapsed.
-    public static func markers(in text: String) -> [(doc: Int, page: Int)] {
+    /// The (doc, page) items of one bracketed marker (page nil: the file),
+    /// with their ranges; nil if it isn't a citation (a footnote).
+    private static func items(_ ns: NSString, _ range: NSRange) -> [(range: NSRange, doc: Int, page: Int?)]? {
+        let text = ns.substring(with: range)
+        let mentionsDoc = text.range(of: "doc", options: .caseInsensitive) != nil
+        var out: [(range: NSRange, doc: Int, page: Int?)] = []
+        for m in item.matches(in: ns as String, range: range) {
+            guard let doc = Int(ns.substring(with: m.range(at: 1))) else { continue }
+            let page = m.range(at: 2).location == NSNotFound ? nil : Int(ns.substring(with: m.range(at: 2)))
+            if page == nil && !mentionsDoc { return nil }
+            out.append((m.range, doc, page))
+        }
+        return out.isEmpty ? nil : out
+    }
+
+    /// Each (doc, page) in order of first appearance, duplicates collapsed;
+    /// page nil for a marker that names only the file.
+    public static func markers(in text: String) -> [(doc: Int, page: Int?)] {
         let ns = text as NSString
-        var out: [(doc: Int, page: Int)] = []
+        var out: [(doc: Int, page: Int?)] = []
         for match in bracket.matches(in: text, range: NSRange(location: 0, length: ns.length)) {
-            for p in pair.matches(in: text, range: match.range) {
-                guard let doc = Int(ns.substring(with: p.range(at: 1))),
-                      let page = Int(ns.substring(with: p.range(at: 2))),
-                      !out.contains(where: { $0.doc == doc && $0.page == page }) else { continue }
-                out.append((doc, page))
+            for i in items(ns, match.range) ?? [] where !out.contains(where: { $0.doc == i.doc && $0.page == i.page }) {
+                out.append((i.doc, i.page))
             }
         }
         return out
@@ -225,11 +243,17 @@ public enum CitationMarkers {
 
     /// The citations an answer's markers make among the pages returned in
     /// its turn (`returned`, oldest first: a later revision of a page wins).
-    /// A marker none matches is plain text.
+    /// A file without a page cites its first page the turn returned. A
+    /// marker none matches is plain text.
     public static func resolve(_ text: String, returned: [Citation]) -> [Citation] {
         guard !returned.isEmpty else { return [] }
         return markers(in: text).compactMap { marker in
-            returned.last { $0.doc == marker.doc && $0.page == marker.page }
+            if let page = marker.page {
+                return returned.last { $0.doc == marker.doc && $0.page == page }
+            }
+            let pages = returned.filter { $0.doc == marker.doc }
+            guard let first = pages.map(\.page).min() else { return nil }
+            return pages.last { $0.page == first }
         }
     }
 
@@ -250,12 +274,13 @@ public enum CitationMarkers {
 
     /// One line of markdown with its known markers as links (`linkURL`), for
     /// the chat's inline-markdown parser: `[1:5]` becomes a link as a whole,
-    /// in `[1:6, 2:4]` each known pair is one and the brackets stay text. A
-    /// pair `isKnown` rejects stays plain text, as does a marker in a code
-    /// span, an escaped one (`\[1:5]`) and one that already is a link's
-    /// text (`[1:5](...)`, `[see [1:5]](...)`).
-    public static func linkified(_ line: String, isKnown: (_ doc: Int, _ page: Int) -> Bool) -> String {
-        guard line.contains(":"), line.contains("[") else { return line }
+    /// in `[1:6, 2:4]` each known pair is one and the brackets stay text.
+    /// `page(doc, page)` names the page an item links to: the page itself
+    /// when it's cited, one of the file's for `[doc:3]`; nil leaves it plain
+    /// text, as is a marker in a code span, an escaped one (`\[1:5]`) and
+    /// one that already is a link's text (`[1:5](...)`, `[see [1:5]](...)`).
+    public static func linkified(_ line: String, page: (_ doc: Int, _ page: Int?) -> Int?) -> String {
+        guard line.contains("["), line.contains(":") || line.range(of: "doc", options: .caseInsensitive) != nil else { return line }
         let ns = line as NSString
         let matches = bracket.matches(in: line, range: NSRange(location: 0, length: ns.length))
         guard !matches.isEmpty else { return line }
@@ -273,11 +298,10 @@ public enum CitationMarkers {
             if first > 0, chars[first - 1] == "\\" { continue }
             if last + 1 < chars.count, chars[last + 1] == "(" { continue }
             if last + 2 < chars.count, chars[last + 1] == "]", chars[last + 2] == "(" { continue }
-            var pairs: [(range: NSRange, doc: Int, page: Int, known: Bool)] = []
-            for p in pair.matches(in: line, range: r) {
-                guard let doc = Int(ns.substring(with: p.range(at: 1))),
-                      let page = Int(ns.substring(with: p.range(at: 2))) else { continue }
-                pairs.append((p.range, doc, page, isKnown(doc, page)))
+            guard let found = items(ns, r) else { continue }
+            let pairs = found.map { i -> (range: NSRange, doc: Int, page: Int, known: Bool) in
+                let linked = page(i.doc, i.page)
+                return (i.range, i.doc, linked ?? 0, linked != nil)
             }
             guard pairs.contains(where: \.known) else { continue }
             out += ns.substring(with: NSRange(location: copied, length: r.location - copied))
