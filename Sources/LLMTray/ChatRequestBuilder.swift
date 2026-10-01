@@ -97,15 +97,20 @@ enum ChatRequestBuilder {
         }
     }
 
-    /// A one-shot (non-streaming) request, e.g. for a compaction summary.
-    static func completion(port: Int, modelAlias: String, messages: [[String: Any]]) -> URLRequest? {
+    /// A one-shot (non-streaming) request of the app's own -- a chat's
+    /// title, a compaction summary: no reasoning first. Gemma 4's template
+    /// thinks unless told not to (a title used to spend up to 2048 tokens
+    /// thinking), and with an MTP drafter the server answers one request
+    /// at a time, so the user's next message waited for it. Templates
+    /// without the switch ignore it.
+    static func completion(port: Int, modelAlias: String, messages: [[String: Any]], maxTokens: Int = 2048) -> URLRequest? {
         request(port: port, body: [
             "model": modelAlias,
             "messages": messages,
             "stream": false,
             "temperature": 0.3,
-            // Room for a thinking model's reasoning before the summary.
-            "max_tokens": 2048,
+            "max_tokens": maxTokens,
+            "chat_template_kwargs": ["enable_thinking": false],
         ])
     }
 

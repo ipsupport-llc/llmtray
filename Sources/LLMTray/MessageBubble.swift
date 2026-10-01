@@ -94,6 +94,15 @@ struct MessageBubble: View {
                 .cornerRadius(8)
             }
 
+            if !showReasoning && !message.reasoning.isEmpty && message.content.isEmpty
+                && message.toolCalls.isEmpty && message.images.isEmpty && message.audios.isEmpty {
+                // The reasoning is hidden, not the fact that it's under way:
+                // a thinking model can take a while before its first word.
+                Label("Thinking…", systemImage: "brain")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            }
+
             if !message.content.isEmpty || message.reasoning.isEmpty {
                 // Assistant output is markdown (see ChatMarkdown); the
                 // user's own text is shown exactly as typed.
