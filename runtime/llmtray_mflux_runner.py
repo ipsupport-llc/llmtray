@@ -143,22 +143,26 @@ class Preview:
         # mflux calls this before evaluating the step: the step first, so
         # its activations are gone before the decode's.
         mx.eval(latents)
-        unpacked = ZImageLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
-        channels = getattr(model.vae, "latent_channels", 32)
-        if hasattr(model.vae, "decode_packed_latents") and unpacked.shape[1] > channels:
-            decoded = model.vae.decode_packed_latents(unpacked)
-        else:
-            # From latents at half the size: a full-size decode at every step
-            # cost 1.4 GB more peak and ~28 s at 1024 px, for a 512 px preview.
-            b, c, h, w = unpacked.shape
-            if h % 2 == 0 and w % 2 == 0:
-                unpacked = unpacked.reshape(b, c, h // 2, 2, w // 2, 2).mean(axis=(3, 5))
-            decoded = model.vae.decode(unpacked)
-        image = ImageUtil.to_image(
-            decoded_latents=decoded, config=config, seed=seed, prompt=prompt,
-            quantization=model.bits, lora_paths=None, lora_scales=None, generation_time=0,
-        )
-        emit("PREVIEW", png_b64(image.image, max_side=512))
+        # A preview is cosmetic: never the reason a generation fails.
+        try:
+            unpacked = ZImageLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
+            channels = getattr(model.vae, "latent_channels", 32)
+            if hasattr(model.vae, "decode_packed_latents") and unpacked.shape[1] > channels:
+                decoded = model.vae.decode_packed_latents(unpacked)
+            else:
+                # From latents at half the size: a full-size decode at every step
+                # cost 1.4 GB more peak and ~28 s at 1024 px, for a 512 px preview.
+                b, c, h, w = unpacked.shape
+                if h % 2 == 0 and w % 2 == 0:
+                    unpacked = unpacked.reshape(b, c, h // 2, 2, w // 2, 2).mean(axis=(3, 5))
+                decoded = model.vae.decode(unpacked)
+            image = ImageUtil.to_image(
+                decoded_latents=decoded, config=config, seed=seed, prompt=prompt,
+                quantization=model.bits, lora_paths=None, lora_scales=None, generation_time=0,
+            )
+            emit("PREVIEW", png_b64(image.image, max_side=512))
+        except Exception:
+            pass
 
 # One image per run: each model goes once it's done -- the text encoder
 # (2 GB) after the prompt, the transformer (4 GB) before the VAE decode,

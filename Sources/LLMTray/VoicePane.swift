@@ -95,6 +95,10 @@ struct VoicePane: View {
                         ProgressView().controlSize(.small)
                     } else if store.isDownloaded(model) {
                         Button("Remove", action: remove).disabled(session.isActive)
+                    } else if partial && !isRunnable(model) {
+                        // Started before this Mac was found too small: its
+                        // gigabytes can still go.
+                        Button("Remove", action: remove).disabled(session.isActive)
                     } else {
                         Button(partial ? "Resume Download" : "Download", action: download).disabled(!isRunnable(model))
                     }

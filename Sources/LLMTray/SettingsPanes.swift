@@ -768,7 +768,8 @@ struct ProfilesPane: View {
                     }
                     .labelsHidden().disabled(chat.isDownloadingModel)
                 }
-                MemoryFitNote(fit: setup.memoryFit(editingWith: setup.imageEditModel(profileID: selectedID) ?? .klein4b))
+                // Nothing to say about editing that's off.
+                MemoryFitNote(fit: setup.imageEditModel(profileID: selectedID).flatMap { setup.memoryFit(editingWith: $0) })
                 row(\.tools.imageQuality, "Canvas size", "Scales whatever width/height the model asks for. Balanced keeps 1024x1024 as is.") {
                     Picker("", selection: imageQualityBinding) {
                         ForEach(ImageQuality.allCases) { Text($0.displayName).tag($0) }
