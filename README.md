@@ -54,15 +54,15 @@ What each model takes while it runs, measured on an M5 MacBook with 24 GiB of RA
 | Chat, 4K | Nemotron 3 Nano 4B (ipsupport-code LoRA) | 9.25 | 13 s |
 | Chat, 4K / 16K | Gemma 4 26B-A4B (GPTQ) | 16.97 / 17.15 | 25 / 60 s |
 | Chat, 4K | Nemotron 3.5 30B-A3B | 19.27 | 17 s |
-| Image 1024², 9 steps | Z-Image Turbo GPTQ mixed | 6.93 | 145 s |
-| Image 1024², 4 steps | FLUX.2 klein 4B | 7.56 | 45 s |
-| Image edit, one 1024² reference | FLUX.2 klein 4B | 9.54 | 106 s |
+| Image 1024², 9 steps | Z-Image Turbo GPTQ mixed | 7.83 | 124 s |
+| Image 1024², 4 steps | FLUX.2 klein 4B | 4.44 | 28 s |
+| Image edit, one 1024² reference | FLUX.2 klein 4B | 6.45 | 70 s |
 | Music 30 s / 120 s | ACE-Step turbo 4-bit + 1.7B planner | 7.24 / 8.42 | 33 / 97 s |
 | Music 30 s | ACE-Step sft GPTQ 4-bit | 7.15 | 32 s |
 | Voice, 20 s listening | VoiceChat 11B GPTQ 3-bit | 9.71 | 70 s |
 | Voice, 20 s listening | VoiceChat 11B GPTQ 3-bit + 8-bit speech | 8.73 | 62 s |
 
-The image runner caps MLX's buffer cache at 256 MB (by default MLX keeps freed buffers up to its memory limit: Z-Image peaked at 19.7 GiB that way, klein editing at 17.8) and, for Z-Image, drops each model once it's done: the text encoder after the prompt, the transformer -- and the compiled denoising step that holds its weights -- before the VAE decode, which is the run's peak. Same image, byte for byte.
+The image runner caps MLX's buffer cache at 256 MB (by default MLX keeps freed buffers up to its memory limit: Z-Image peaked at 19.7 GiB that way, klein editing at 17.8) and drops each model once it's done: the text encoder after the prompt; for Z-Image also the transformer -- and the compiled denoising step that holds its weights -- before the VAE decode, which is its peak. Previews decode from half-size latents. Same images, byte for byte. A run's peak can differ by up to ~0.9 GiB between days (the system's memory state); the table keeps the higher.
 
 Not measured yet, so estimated in the JSON from a measured sibling plus the difference in files: Z-Image GPTQ 8-bit and 4-bit, ACE-Step sft 8-bit and full precision. Image, music and voice run alone (the chat model is unloaded for them). Peaks near the GPU limit may be held down by it (MLX frees its cache under memory pressure), so on a bigger Mac they can be higher.
 
