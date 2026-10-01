@@ -232,7 +232,10 @@ struct ContentView: View {
     /// line wraps, and whose callbacks coalesce).
     private var chatEndKey: String {
         guard let m = chat.messages.last else { return "" }
-        return "\(m.id)|\(m.reasoning.count)|\(m.content.count)|\(m.toolCalls.count)|\(m.images.count)|\(m.audios.count)"
+        // And the turn ending: the composer then grows a row (Regenerate,
+        // Compact, tok/s), which shrinks the chat -- without a scroll the
+        // answer's last line and its Copy / Share went under it.
+        return "\(m.id)|\(m.reasoning.count)|\(m.content.count)|\(m.toolCalls.count)|\(m.images.count)|\(m.audios.count)|\(chat.isBusy)"
     }
 
     /// Brings the end into view while following: after the layout the
