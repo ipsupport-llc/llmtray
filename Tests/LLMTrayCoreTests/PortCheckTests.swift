@@ -42,6 +42,28 @@ final class PortCheckTests: XCTestCase {
         XCTAssertEqual(PortCheck.status(port, loopbackOnly: true), .inUse, "it answers on 127.0.0.1 too")
     }
 
+    func testAnIPv6OnlyListenerCountsWithLANAccess() throws {
+        let fd = socket(AF_INET6, SOCK_STREAM, 0)
+        guard fd >= 0 else { throw XCTSkip("no IPv6") }
+        defer { close(fd) }
+        var on: Int32 = 1
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &on, socklen_t(MemoryLayout<Int32>.size))
+        var address = sockaddr_in6()
+        address.sin6_len = UInt8(MemoryLayout<sockaddr_in6>.size)
+        address.sin6_family = sa_family_t(AF_INET6)
+        address.sin6_addr = in6addr_any
+        let bound = withUnsafePointer(to: &address) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { Darwin.bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in6>.size)) }
+        }
+        guard bound == 0, Darwin.listen(fd, 4) == 0 else { throw XCTSkip("can't listen on IPv6 here") }
+        var length = socklen_t(MemoryLayout<sockaddr_in6>.size)
+        _ = withUnsafeMutablePointer(to: &address) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &length) }
+        }
+        let port = Int(UInt16(bigEndian: address.sin6_port))
+        XCTAssertEqual(PortCheck.status(port, loopbackOnly: false), .inUse, "the listener's dual-stack *:port can't have it")
+    }
+
     func testPortsOutsideTheRangeAreOutOfRange() {
         XCTAssertEqual(PortCheck.status(80, loopbackOnly: true), .outOfRange)
         XCTAssertEqual(PortCheck.status(70000, loopbackOnly: false), .outOfRange)

@@ -40,21 +40,16 @@ enum ModelCapabilities {
     private static var cache: [String: [RecommendedModel.Capability]] = [:]
     private static var recommended: [RecommendedModel]?
 
-    /// A download (or a model replaced in place) can change a folder's
-    /// config.json: read again. The list ships in the app bundle
-    /// (Resources/runtime), so a runtime install doesn't change it -- it's
-    /// read again here anyway.
-    private static let invalidation = NotificationCenter.default.addObserver(
-        forName: .modelsDidChange, object: nil, queue: .main
-    ) { _ in
-        MainActor.assumeIsolated {
-            cache = [:]
-            recommended = nil
-        }
+    /// Read again after every catalog rescan (ModelCatalog.rescan: Rescan
+    /// Models, a download, the popover opening): a model replaced in place
+    /// has a new config.json under the same path. The list ships in the
+    /// app bundle (Resources/runtime); it's read again with it.
+    static func invalidate() {
+        cache = [:]
+        recommended = nil
     }
 
     static func of(_ path: String) -> [RecommendedModel.Capability] {
-        _ = invalidation
         if let known = cache[path] { return known }
         if recommended == nil {
             // Missing or unreadable (a dev checkout without it): just the config's.

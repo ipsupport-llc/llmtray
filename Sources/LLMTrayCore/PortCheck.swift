@@ -32,8 +32,10 @@ public enum PortCheck {
         // Every interface includes IPv6 (NWListener's "*:port").
         if !loopbackOnly, acceptsConnections(port: port, ipv6: true) { return true }
         // SO_REUSEADDR: a port the server just let go of (TIME_WAIT) isn't
-        // taken.
-        return !canBind(port: port, loopbackOnly: loopbackOnly)
+        // taken. Every interface: the IPv6 wildcard too (dual-stack, as the
+        // listener's) -- a process on another IPv6 address holds it there.
+        if !canBind(port: port, loopbackOnly: loopbackOnly) { return true }
+        return !loopbackOnly && !canBindIPv6Wildcard(port: port)
     }
 
     /// The first free port after `port` (wrapping round the valid range),
@@ -59,6 +61,25 @@ public enum PortCheck {
         var address = ipv4(port: port, loopback: loopbackOnly)
         let result = withUnsafePointer(to: &address) {
             $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) }
+        }
+        return result == 0 || errno != EADDRINUSE
+    }
+
+    private static func canBindIPv6Wildcard(port: Int) -> Bool {
+        let fd = socket(AF_INET6, SOCK_STREAM, 0)
+        guard fd >= 0 else { return true }   // no IPv6 here: nothing holds it there
+        defer { close(fd) }
+        var on: Int32 = 1
+        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, socklen_t(MemoryLayout<Int32>.size))
+        var off: Int32 = 0
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &off, socklen_t(MemoryLayout<Int32>.size))
+        var address = sockaddr_in6()
+        address.sin6_len = UInt8(MemoryLayout<sockaddr_in6>.size)
+        address.sin6_family = sa_family_t(AF_INET6)
+        address.sin6_port = in_port_t(UInt16(port)).bigEndian
+        address.sin6_addr = in6addr_any
+        let result = withUnsafePointer(to: &address) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in6>.size)) }
         }
         return result == 0 || errno != EADDRINUSE
     }
