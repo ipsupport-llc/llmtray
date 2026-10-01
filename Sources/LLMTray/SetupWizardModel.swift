@@ -173,7 +173,13 @@ final class SetupWizardModel: ObservableObject {
         guard !isFinished else { return }
         finishErrors = actions.compactMap(perform)
         markDone()
-        if finishErrors.isEmpty { close?() }
+        if finishErrors.isEmpty {
+            close?()
+            // What a first look should show is the app, not a menu-bar icon:
+            // the chat in its own window (and the Dock), where the chat
+            // model's download goes on.
+            DispatchQueue.main.async { NotificationCenter.default.post(name: .detachChat, object: nil) }
+        }
     }
 
     /// What Finish will do.

@@ -41,6 +41,9 @@ public enum Pref {
     public static let compactKeepEnd = PrefKey("llmtray.compactKeepEnd", default: 6)
     /// 0 = off.
     public static let autoCompactThreshold = PrefKey("llmtray.autoCompactThreshold", default: 0)
+    /// The one-time tip in the popover that the chat has a window of its
+    /// own was shown (or the window was opened: nothing to tell).
+    public static let chatWindowTipShown = PrefKey("llmtray.chatWindowTipShown", default: false)
     /// The chat window shows the chats sidebar.
     public static let chatWindowSidebar = PrefKey("llmtray.chatWindowSidebar", default: true)
     /// The chat window shows the model, profile, tools and temperature
