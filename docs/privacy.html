@@ -202,41 +202,43 @@
     </ul>
     <p>Turning statistics off stops sending at once and deletes the counters not yet sent and the install ID.</p>
 
-    <h2>Downloading models</h2>
-    <p>Models are downloaded from <a href="https://huggingface.co">Hugging Face</a> when you choose one. That request goes to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
+    <h2>Finding and downloading models</h2>
+    <p>When you browse for models, your search words and the models you look at are requested from <a href="https://huggingface.co">Hugging Face</a>; models are downloaded from there when you choose one. Those requests go to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
     <p>A Hugging Face token, if you save one (only for gated models), is kept in your Mac's Keychain and sent only to Hugging Face.</p>
 
     <h2>Tools that look things up</h2>
-    <p>A chat model can use LLMTray's lookup tools when you ask for something it can't know: a web search, the news, the weather, a Wikipedia summary. Then the tool's query (the search words, a city, a country or a currency) goes from your Mac straight to the service that answers it, never to us, and that service's privacy policy applies:</p>
+    <p>A chat model can use LLMTray's lookup tools when you ask for something it can't know: a web search, the news, the weather, the time somewhere, a Wikipedia summary. Then what the tool needs goes from your Mac straight to the service that answers it, never to us, and that service's privacy policy applies:</p>
     <ul>
       <li>web search: <a href="https://duckduckgo.com/privacy">DuckDuckGo</a>;</li>
       <li>news: Google News; tech news: Hacker News;</li>
       <li>summaries and facts: Wikipedia and Wikidata;</li>
-      <li>weather and air quality: <a href="https://open-meteo.com">Open-Meteo</a>;</li>
+      <li>weather, air quality and the time in a city: <a href="https://open-meteo.com">Open-Meteo</a>, which gets the city's name and then its coordinates. Asked for the weather without a city, the tool uses the city of your Mac's time zone;</li>
       <li>public holidays: Nager.Date; currency rates: ExchangeRate-API.</li>
     </ul>
-    <p>Only the query is sent, not your chat. The time, dates and calculations are worked out on your Mac.</p>
+    <p>Only what the lookup needs is sent (the search words, a city, a country or a currency), not your chat. Today's date, your own time and calculations are worked out on your Mac.</p>
 
     <h2>Reviews</h2>
-    <p>If you use <b>Rate LLMTray…</b>, the rating, the text you write, the name you choose to show (optional) and the LLMTray version are sent to <code>ipsupport.us</code>. A review is checked for spam before it is published on our site. We don't ask for an email, and the address it came from is kept only as a keyed hash, to limit repeated submissions.</p>
+    <p>The <b>Rate LLMTray…</b> window loads the published reviews' summary from <code>ipsupport.us</code>. If you send a review, the rating, the text you write, the name you choose to show (optional) and the LLMTray version are sent to <code>ipsupport.us</code>. A review is checked for spam before it is published on our site. We don't ask for an email, and the address it came from is kept only as a keyed hash, to limit repeated submissions.</p>
 
     <h2>Supporting LLMTray</h2>
-    <p>Tips in the Mac App Store version are In-App Purchases handled by Apple: we never see your Apple ID, name, email or payment details. After a tip you can choose to be listed as a supporter. Then the name and optional link you type, your tier, and Apple's signed proof of the purchase are sent to <code>ipsupport.us</code>. We check the proof and keep only a keyed hash of it, to match your entry to you if you ask us to remove it. Entries are reviewed before they appear in the list that LLMTray shows. To be removed, write to us (below).</p>
+    <p>The <b>Support LLMTray</b> window loads the list of supporters from <code>ipsupport.us</code> (again after a day).</p>
+    <p>Tips in the Mac App Store version are In-App Purchases handled by Apple: we never see your Apple ID, name, email or payment details. After a tip you can choose to be listed as a supporter. Then the name and optional link you type, your tier, and Apple's signed proof of the purchase are sent to <code>ipsupport.us</code>. We check the proof and keep only a keyed hash of it, to match your entry to you if you ask us to remove it. A GitHub sponsor can ask to be listed too: then your GitHub login, the name and optional link you type, and your tier are sent, and we check the sponsorship on GitHub. Entries are reviewed before they appear in the list that LLMTray shows. To be removed, write to us (below).</p>
 
     <h2>Bug reports</h2>
     <p><b>Report a Bug…</b> prepares a report on your Mac and opens it in your mail app, addressed to <code>bugreport@ipsupport.us</code>. You see everything in it before you choose to send it.</p>
 
     <h2>Updates</h2>
-    <p>The Mac App Store version is updated by the App Store. The version downloaded from our site checks for updates (Sparkle) on GitHub, where the releases are published, and, when you ask it to, for updates of its model runtime there. That version's smaller download sets up its runtime on first launch from GitHub and the Python Package Index (PyPI).</p>
+    <p>The Mac App Store version is updated by the App Store and installs nothing else.</p>
+    <p>The version downloaded from our site checks for updates (Sparkle) automatically, by reading the update feed on our GitHub Pages site (<code>ipsupport-llc.github.io</code>); updates are downloaded from GitHub. Its smaller download sets up its model runtime on first launch, and image generation and voice when you turn them on, by downloading packages from GitHub and the Python Package Index (PyPI). It checks GitHub for updates of those runtimes when you ask it to.</p>
 
     <h2>The local API server</h2>
-    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet, except that an image an app sends as a web link is downloaded from that link.</p>
+    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet (it doesn't fetch images given as web links).</p>
 
     <h2>Microphone</h2>
     <p>Voice Lab uses the microphone only while you use it. The audio is processed on your Mac and is not recorded or sent anywhere.</p>
 
     <h2>Children</h2>
-    <p>LLMTray is not directed at children and collects no personal information from anyone.</p>
+    <p>LLMTray is not directed at children. It asks no one for personal information: the only personal details we receive are the ones you choose to type into a review or a supporter entry.</p>
 
     <h2>Changes and contact</h2>
     <p>If this policy changes, the new version is published on this page with a new date. Questions: <code>bugreport@ipsupport.us</code>.</p>
