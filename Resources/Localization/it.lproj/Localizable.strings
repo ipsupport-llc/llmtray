@@ -83,6 +83,7 @@
 "Add Files…" = "Aggiungi file…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Aggiungi PDF, file Word e file di testo a un progetto. Le chat li cercano e citano la pagina; fissa un file per mantenerlo tutto nella conversazione.";
 "Add more files: every chat of the project can search them." = "Aggiungi altri file: ogni chat del progetto può cercarli.";
+"Added %@" = "Aggiunto %@";
 "Added here" = "Aggiunto qui";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Aggiunto al prompt di sistema ogni volta che vengono offerti strumenti. Il template per gli strumenti del modello indica solo come chiamare uno strumento, mai quando non farlo. Vuoto lo disabilita.";
 "Adding files" = "Aggiunta file";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "Copia il runtime incluso…";
 "Couldn't be added: %@" = "Impossibile aggiungere: %@";
 "Couldn't create the report: %@" = "Impossibile creare il rapporto: %@";
+"Couldn't move “%@” to the Trash: %@" = "Impossibile spostare “%@” nel Cestino: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Impossibile contattare ipsupport.us. La tua recensione è salvata: riprova più tardi.";
 "Couldn't reach the server -- please try again later." = "Impossibile contattare il server — riprova più tardi.";
 "Couldn't start the voice runner: %@" = "Impossibile avviare il voice runner: %@";
@@ -261,6 +263,7 @@
 "Delete" = "Elimina";
 "Delete Project" = "Elimina progetto";
 "Delete Project…" = "Elimina progetto…";
+"Delete model" = "Elimina modello";
 "Delete profile “%@”?" = "Eliminare il profilo “%@”?";
 "Delete this chat?" = "Eliminare questa chat?";
 "Delete this profile (models using it go back to Default)" = "Elimina questo profilo (i modelli che lo usano tornano a Default).";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "Modelli: %@ · libero: %@";
 "Move %1$@ to %2$@" = "Sposta %1$@ in %2$@";
 "Move %@ to the Trash" = "Sposta %@ nel Cestino";
+"Move this model to the Trash?" = "Spostare questo modello nel Cestino?";
+"Move this model to the Trash…" = "Sposta questo modello nel Cestino…";
 "Move to Project" = "Sposta nel progetto";
+"Move to Trash" = "Sposta nel Cestino";
 "Music" = "Musica";
 "Music generation" = "Generazione musicale";
 "Music generation failed: %@" = "Generazione musicale fallita: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Il runtime è occupato.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "Il server aggiunge il paese approssimativo dalla connessione. Mai inviati: prompt, contenuti delle chat, immagini o audio generati, nomi o percorsi di file, nomi o repository dei modelli, chiavi API, dati account o contatti. Le chat temporanee non vengono conteggiate.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "Il server annota anche il paese approssimativo della connessione; LLMTray non lo invia e non può impostarlo.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Il server sta usando questo modello o è occupato con una richiesta: interrompilo (o scegli un altro modello), oppure aspetta che sia inattivo.";
 "The server log" = "Il log del server";
 "The server starts once %@ is downloaded" = "Il server si avvia una volta scaricato %@";
 "The server starts with %@" = "Il server avvia con %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "Questa chat può usare";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Impossibile elencarlo: pagamento non trovato o nome rifiutato.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Questa cartella non esiste più o non è più autorizzata: revoca l'autorizzazione e concedila di nuovo.";
+"This folder is shared with LM Studio: the model is gone there too." = "Questa cartella è condivisa con LM Studio: il modello è stato rimosso anche lì.";
 "This folder's access has ended or was revoked." = "L'accesso a questa cartella è terminato o è stato revocato.";
 "This many of the most recent messages are kept word for word when compacting." = "Durante la compattazione, questo numero di messaggi più recenti viene mantenuto parola per parola.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Questo modello usa %1$@ dei %2$@ GB utilizzabili dalla GPU; prompt lunghi potrebbero esaurire la memoria. Usa un modello più piccolo oppure aumenta il limite di memoria GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "impossibile costruire la richiesta";
 "failed: %@" = "fallito: %@";
 "for this chat" = "per questa chat";
+"it isn't a model folder in the models folder" = "non è una cartella modello nella cartella models";
+"it's being downloaded" = "è in fase di download";
 "less than a minute left" = "meno di un minuto rimasto";
 "llmtray in the terminal" = "llmtray nel terminale";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS rimuove la voce generata dal modello dal microfono (Voice Processing, come in FaceTime), quindi funziona anche con gli altoparlanti. Uniforma inoltre i livelli e attenua il rumore di fondo. Avrà effetto al prossimo avvio.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "Runtime mlx-lm";
 "move %1$lld files into %2$lld folders" = "sposta %1$lld file in %2$lld cartelle";
 "move %1$lld items into %2$lld folders" = "sposta %1$lld elementi in %2$lld cartelle";
+"never used" = "mai usato";
 "no changes" = "nessuna modifica";
 "no text" = "nessun testo";
 "not downloaded" = "non scaricato";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "sposta nel Cestino %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: mix più pieno e rifinito. sft: testo cantato chiaramente, voce in primo piano, richiede circa il doppio del tempo.";
 "until %@" = "fino a %@";
+"used %@" = "usato %@";
 "used by %@" = "usato da %@";
 "waiting" = "in attesa";
 "writes code" = "scrive codice";
@@ -1202,4 +1214,6 @@
 "· size…" = "· dimensione…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» non è stato possibile rimuoverlo: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: impossibile modificare l'appunto: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) viene spostato nel Cestino, da dove puoi ancora ripristinarlo. Il suo alias e la scelta del profilo verranno dimenticati.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» e il suo indice sono stati eliminati dal progetto. Il file da cui lo hai aggiunto non viene modificato.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” non è stato rimosso: il server è occupato o lo sta usando. Riprova quando sarà inattivo.";

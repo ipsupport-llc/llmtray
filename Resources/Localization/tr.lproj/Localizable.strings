@@ -83,6 +83,7 @@
 "Add Files…" = "Dosyalar Ekle…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Bir projeye PDF, Word ve metin dosyaları ekleyin. Sohbetler bunlarda arama yapar ve sayfayı referans verir; bir dosyayı sabitleyerek tüm içeriğini sohbette tutabilirsiniz.";
 "Add more files: every chat of the project can search them." = "Daha fazla dosya ekleyin: projenin her sohbeti bunlarda arama yapabilir.";
+"Added %@" = "Eklendi: %@";
 "Added here" = "Buraya eklendi";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
 "Adding files" = "Dosyalar ekleniyor";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "Dahil edilen runtime kopyalanıyor…";
 "Couldn't be added: %@" = "Eklenemedi: %@";
 "Couldn't create the report: %@" = "Rapor oluşturulamadı: %@";
+"Couldn't move “%@” to the Trash: %@" = "“%@” Çöp Kutusu'na taşınamadı: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us adresine ulaşılamadı. Değerlendirmeniz saklandı: daha sonra tekrar deneyin.";
 "Couldn't reach the server -- please try again later." = "Sunucuya ulaşılamadı — lütfen daha sonra tekrar deneyin.";
 "Couldn't start the voice runner: %@" = "Ses çalıştırıcısı başlatılamadı: %@";
@@ -261,6 +263,7 @@
 "Delete" = "Sil";
 "Delete Project" = "Projeyi Sil";
 "Delete Project…" = "Projeyi Sil…";
+"Delete model" = "Modeli sil";
 "Delete profile “%@”?" = "“%@” profili silinsin mi?";
 "Delete this chat?" = "Bu sohbet silinsin mi?";
 "Delete this profile (models using it go back to Default)" = "Bu profili sil (onu kullanan modeller Default profiline döner)";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "Move %1$@ to %2$@" = "%1$@ öğesini %2$@ konumuna taşı";
 "Move %@ to the Trash" = "%@ öğesini Çöp'e taşı";
+"Move this model to the Trash?" = "Bu modeli Çöp Kutusu'na taşımak istiyor musunuz?";
+"Move this model to the Trash…" = "Bu modeli Çöp Kutusu'na taşı…";
 "Move to Project" = "Projeye Taşı";
+"Move to Trash" = "Çöp Kutusu'na Taşı";
 "Music" = "Müzik";
 "Music generation" = "Müzik üretimi";
 "Music generation failed: %@" = "Müzik üretimi başarısız oldu: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Runtime meşgul.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "Sunucu, bağlantıdan yaklaşık ülkeyi ekler. Asla gönderilmez: istemler, sohbet içeriği, oluşturulan görüntü veya ses, dosya adları veya yolları, model adları veya depoları, API anahtarları, hesap veya iletişim bilgileri. Geçici sohbetler sayılmaz.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "Sunucu ayrıca bağlantıdan tahmini ülkeyi kaydeder; bunu LLMTray göndermez ve ayarlayamaz.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Sunucu bu modeli kullanıyor veya bir istekle meşgul: durdurun (veya başka bir model seçin) ya da sunucu boşalana kadar bekleyin.";
 "The server log" = "Sunucu kaydı";
 "The server starts once %@ is downloaded" = "Sunucu %@ indirildikten sonra başlar";
 "The server starts with %@" = "Sunucu %@ ile başlatılıyor";
@@ -994,6 +1001,7 @@
 "This chat may use" = "Bu sohbet kullanabilir";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Bu listelenemedi: ödeme bulunamadı veya isim reddedildi.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Bu klasör artık yok veya izin verilen klasör değil: geri alın ve yeniden izin verin.";
+"This folder is shared with LM Studio: the model is gone there too." = "Bu klasör LM Studio ile paylaşılıyor: model orada da kaldırıldı.";
 "This folder's access has ended or was revoked." = "Bu klasörün erişimi sona erdi veya iptal edildi.";
 "This many of the most recent messages are kept word for word when compacting." = "Sıkıştırma sırasında en son iletilerden bu kadarı kelimesi kelimesine korunur.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın veya GPU bellek sınırını yükseltin.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "istek oluşturulamadı";
 "failed: %@" = "başarısız: %@";
 "for this chat" = "bu sohbet için";
+"it isn't a model folder in the models folder" = "models klasöründe model klasörü değil";
+"it's being downloaded" = "indiriliyor";
 "less than a minute left" = "bir dakikadan az kaldı";
 "llmtray in the terminal" = "Terminalde llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS, modelin kendi sesini mikrofondan çıkarır (Voice Processing, FaceTime’da olduğu gibi), bu yüzden hoparlörlerle çalışır. Ayrıca ses seviyesini dengeler ve arka plan gürültüsünü azaltır. Değişiklik bir sonraki başlatmada geçerli olur.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "mlx-lm çalışma zamanı";
 "move %1$lld files into %2$lld folders" = "%1$lld dosyayı %2$lld klasöre taşı";
 "move %1$lld items into %2$lld folders" = "%1$lld öğeyi %2$lld klasöre taşı";
+"never used" = "hiç kullanılmadı";
 "no changes" = "değişiklik yok";
 "no text" = "metin yok";
 "not downloaded" = "indirilmedi";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "%lld Çöp'e taşı";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: daha dolu, daha tamamlanmış bir miks. sft: sözleri net söyler, vokal önde; yapmak yaklaşık iki kat daha uzun sürer.";
 "until %@" = "%@ tarihine kadar";
+"used %@" = "kullanıldı: %@";
 "used by %@" = "%@ tarafından kullanılıyor";
 "waiting" = "bekleniyor";
 "writes code" = "kod yazar";
@@ -1202,4 +1214,6 @@
 "· size…" = "· boyut…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” kaldırılamadı: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: sabitleme değiştirilemedi: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) Çöp Kutusu'na taşınacak; buradan geri yükleyebilirsiniz. Takma adı ve profil seçimi unutulacak.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” ve indeksi projeden silindi. Eklediğiniz kaynak dosya etkilenmez.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” kaldırılmadı: sunucu meşgul veya modeli kullanıyor. Sunucu boşaldığında tekrar deneyin.";

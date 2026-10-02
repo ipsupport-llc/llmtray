@@ -83,6 +83,7 @@
 "Add Files…" = "파일 추가…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF, Word 및 텍스트 파일을 프로젝트에 추가하세요. 대화는 파일을 검색하고 페이지를 인용합니다; 파일을 고정하면 전체 내용을 대화에 보관합니다.";
 "Add more files: every chat of the project can search them." = "파일을 더 추가하세요: 프로젝트의 모든 채팅에서 검색할 수 있습니다.";
+"Added %@" = "추가됨 %@";
 "Added here" = "여기에 추가됨";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "도구가 제공될 때마다 시스템 프롬프트에 추가됩니다. 모델 자체 도구 템플릿은 도구 호출 방법만 설명하며, 호출하지 말아야 할 때는 설명하지 않습니다. 비워 두면 비활성화됩니다.";
 "Adding files" = "파일 추가 중";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "포함된 런타임 복사 중…";
 "Couldn't be added: %@" = "추가할 수 없음: %@";
 "Couldn't create the report: %@" = "보고서를 생성할 수 없습니다: %@";
+"Couldn't move “%@” to the Trash: %@" = "“%@”을(를) 휴지통으로 옮길 수 없음: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us에 연결할 수 없습니다. 작성하신 리뷰는 보관됩니다: 나중에 다시 시도하세요.";
 "Couldn't reach the server -- please try again later." = "서버에 연결할 수 없습니다 — 나중에 다시 시도해 주세요.";
 "Couldn't start the voice runner: %@" = "음성 실행기를 시작할 수 없음: %@";
@@ -261,6 +263,7 @@
 "Delete" = "삭제";
 "Delete Project" = "프로젝트 삭제";
 "Delete Project…" = "프로젝트 삭제…";
+"Delete model" = "모델 삭제";
 "Delete profile “%@”?" = "“%@” 프로파일을 삭제하겠습니까?";
 "Delete this chat?" = "이 채팅을 삭제하시겠습니까?";
 "Delete this profile (models using it go back to Default)" = "이 프로파일을 삭제합니다. 이 프로파일을 사용하는 모델은 Default로 돌아갑니다.";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "모델: %@ · 여유: %@";
 "Move %1$@ to %2$@" = "%1$@을(를) %2$@로 이동";
 "Move %@ to the Trash" = "%@을(를) 휴지통으로 이동";
+"Move this model to the Trash?" = "이 모델을 휴지통으로 옮기시겠습니까?";
+"Move this model to the Trash…" = "이 모델을 휴지통으로 옮깁니다…";
 "Move to Project" = "프로젝트로 이동";
+"Move to Trash" = "휴지통으로 이동";
 "Music" = "음악";
 "Music generation" = "음악 생성";
 "Music generation failed: %@" = "음악 생성 실패: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "런타임이 사용 중입니다.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "서버는 연결 정보를 통해 대략적인 국가를 추가합니다. 절대 전송되지 않는 항목: 프롬프트, 채팅 내용, 생성된 이미지나 오디오, 파일 이름·경로, 모델 이름이나 저장소, API 키, 계정 또는 연락처 정보. 임시 채팅은 집계되지 않습니다.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "서버는 연결로부터 대략적인 국가를 기록하지만 LLMTray는 이를 전송하지 않으며 설정할 수 없습니다.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "서버가 이 모델을 사용 중이거나 요청 처리로 바쁩니다: 중지하거나(또는 다른 모델을 선택) 서버가 유휴 상태가 될 때까지 기다리십시오.";
 "The server log" = "서버 로그";
 "The server starts once %@ is downloaded" = "%@ 다운로드가 완료되면 서버가 시작됩니다";
 "The server starts with %@" = "서버는 %@로 시작합니다";
@@ -994,6 +1001,7 @@
 "This chat may use" = "이 채팅이 사용할 수 있음";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "등록할 수 없습니다: 결제가 확인되지 않거나 이름이 거부되었습니다.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "이 폴더가 없어졌거나 더 이상 허용된 폴더가 아닙니다: 권한을 취소한 다음 다시 허용하세요.";
+"This folder is shared with LM Studio: the model is gone there too." = "이 폴더는 LM Studio와 공유됩니다: 해당 모델도 거기서 제거되었습니다.";
 "This folder's access has ended or was revoked." = "이 폴더의 접근 권한이 만료되었거나 취소되었습니다.";
 "This many of the most recent messages are kept word for word when compacting." = "압축할 때 가장 최근 메시지 중 이 개수만큼을 원문 그대로 유지합니다.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하거나 GPU 메모리 한도를 올리세요.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "요청 구성 실패";
 "failed: %@" = "실패: %@";
 "for this chat" = "이 채팅용";
+"it isn't a model folder in the models folder" = "models 폴더 안의 모델 폴더가 아님";
+"it's being downloaded" = "다운로드 중";
 "less than a minute left" = "1분 미만 남음";
 "llmtray in the terminal" = "터미널의 llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS가 마이크에서 모델 자신의 음성을 제거합니다(Voice Processing—FaceTime과 동일), 따라서 스피커에서도 작동합니다. 또한 레벨을 평준화하고 배경 소음을 억제합니다. 다음 시작 시 적용됩니다.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "mlx-lm 런타임";
 "move %1$lld files into %2$lld folders" = "%1$lld개 파일을 %2$lld개 폴더로 이동";
 "move %1$lld items into %2$lld folders" = "%1$lld개 항목을 %2$lld개 폴더로 이동";
+"never used" = "사용된 적 없음";
 "no changes" = "변경 없음";
 "no text" = "텍스트 없음";
 "not downloaded" = "다운로드되지 않음";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "휴지통으로 %lld개 이동";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: 더 풍성하고 완성도 높은 믹스입니다. sft: 가사를 명확히 부르고 보컬이 전면에 나오며 제작 시간이 약 2배 더 걸립니다.";
 "until %@" = "%@까지";
+"used %@" = "사용됨 %@";
 "used by %@" = "%@에서 사용 중";
 "waiting" = "대기 중";
 "writes code" = "코드를 작성합니다";
@@ -1202,4 +1214,6 @@
 "· size…" = "· 크기…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@”을(를) 제거할 수 없음: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: 고정을 변경할 수 없습니다: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@)가 휴지통으로 이동됩니다. 복원할 수 있습니다. 별칭과 프로필 선택은 삭제됩니다.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” 및 해당 인덱스가 프로젝트에서 삭제되었습니다. 해당 파일은 변경되지 않습니다.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@”을(를) 제거하지 못했습니다: 서버가 바쁘거나 사용 중입니다. 서버가 유휴 상태일 때 다시 시도하십시오.";

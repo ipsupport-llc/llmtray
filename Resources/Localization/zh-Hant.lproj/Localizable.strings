@@ -83,6 +83,7 @@
 "Add Files…" = "加入檔案…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "將 PDF、Word 與文字檔加入專案。對話會搜尋並引用頁面；將檔案釘選可將整個檔案保留在對話中。";
 "Add more files: every chat of the project can search them." = "新增更多檔案：專案中的每個對話都能搜尋這些檔案。";
+"Added %@" = "已新增 %@";
 "Added here" = "已新增於此處";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具時，一律加入系統提示。模型本身的工具範本只說明如何呼叫工具，從不說明何時不要呼叫。留空則停用。";
 "Adding files" = "加入檔案中";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "正在複製內建執行環境…";
 "Couldn't be added: %@" = "無法加入：%@";
 "Couldn't create the report: %@" = "無法建立報告：%@";
+"Couldn't move “%@” to the Trash: %@" = "無法將「%@」移到資源回收筒：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "無法連到 ipsupport.us。已保留您的評論，請稍後再試。";
 "Couldn't reach the server -- please try again later." = "無法連線至伺服器 — 請稍後再試。";
 "Couldn't start the voice runner: %@" = "無法啟動語音執行程式：%@";
@@ -261,6 +263,7 @@
 "Delete" = "刪除";
 "Delete Project" = "刪除專案";
 "Delete Project…" = "刪除專案…";
+"Delete model" = "刪除模型";
 "Delete profile “%@”?" = "要刪除描述檔「%@」嗎？";
 "Delete this chat?" = "要刪除此對話嗎？";
 "Delete this profile (models using it go back to Default)" = "刪除此描述檔（使用它的模型會改回 Default）。";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "Move %1$@ to %2$@" = "將 %1$@ 移到 %2$@";
 "Move %@ to the Trash" = "將 %@ 移到垃圾桶";
+"Move this model to the Trash?" = "要將此模型移到資源回收筒嗎？";
+"Move this model to the Trash…" = "將此模型移到資源回收筒…";
 "Move to Project" = "移至專案";
+"Move to Trash" = "移到資源回收筒";
 "Music" = "音樂";
 "Music generation" = "音樂生成";
 "Music generation failed: %@" = "音樂生成失敗：%@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "執行環境忙碌中。";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "伺服器會根據連線新增近似國家資訊。絕不會傳送：提示、聊天內容、產生的影像或音訊、檔案名稱或路徑、模型名稱或倉庫、API 金鑰、帳戶或連絡資料。暫存聊天不計入任何資料。";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "伺服器會記錄連線來源的近似國家；LLMTray 並不會寄送此資料，也無法設定它。";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "伺服器正在使用此模型或忙於處理請求：請停止伺服器（或選擇其他模型），或等待它閒置。";
 "The server log" = "伺服器日誌";
 "The server starts once %@ is downloaded" = "在 %@ 下載完成後伺服器即會啟動";
 "The server starts with %@" = "伺服器以 %@ 啟動";
@@ -994,6 +1001,7 @@
 "This chat may use" = "此聊天室可使用";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "無法列出：找不到付款紀錄或名稱被拒絕。";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "此資料夾已移除或不再被允許：請撤銷其權限後重新允許。";
+"This folder is shared with LM Studio: the model is gone there too." = "此資料夾與 LM Studio 共用：該模型在那裡也已刪除。";
 "This folder's access has ended or was revoked." = "此資料夾的存取權已到期或已被撤銷。";
 "This many of the most recent messages are kept word for word when compacting." = "壓縮時會逐字保留這麼多則最近訊息。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "此模型使用 GPU 可用 %2$@ GB 中的 %1$@；長輸入提示可能會耗盡記憶體。請使用較小的模型，或提高 GPU 記憶體上限。";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "建立請求失敗";
 "failed: %@" = "失敗：%@";
 "for this chat" = "用於此聊天室";
+"it isn't a model folder in the models folder" = "它不是 models 資料夾中的模型資料夾";
+"it's being downloaded" = "正在下載中";
 "less than a minute left" = "剩餘不到一分鐘";
 "llmtray in the terminal" = "終端中的 llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS 會從麥克風中移除模型自身的聲音（語音處理，如 FaceTime），因此在使用喇叭時也能運作。此外會平衡音量並抑制背景噪音。重新啟動後生效。";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "mlx-lm 執行階段";
 "move %1$lld files into %2$lld folders" = "將 %1$lld 個檔案移入 %2$lld 個資料夾";
 "move %1$lld items into %2$lld folders" = "將 %1$lld 項移入 %2$lld 個資料夾";
+"never used" = "從未使用";
 "no changes" = "無變更";
 "no text" = "無文字";
 "not downloaded" = "尚未下載";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "移至垃圾桶 %lld 項";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo：音色更豐滿、聽起來較完成。sft：歌詞清晰、人聲靠前，生成時間約為 turbo 的兩倍。";
 "until %@" = "直到 %@";
+"used %@" = "使用於 %@";
 "used by %@" = "由 %@ 使用";
 "waiting" = "等待中";
 "writes code" = "撰寫程式碼";
@@ -1202,4 +1214,6 @@
 "· size…" = "· 大小…";
 "“%1$@” couldn't be removed: %2$@" = "「%1$@」無法移除：%2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "「%1$@」：無法變更釘選：%2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）將移到資源回收筒，您仍可從中還原。其別名與設定檔選擇將一併遺失。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」及其索引已從專案刪除。您用來加入該項目的原始檔不受影響。";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」未被移除：伺服器正忙或正在使用。待伺服器閒置時再試。";

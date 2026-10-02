@@ -83,6 +83,7 @@
 "Add Files…" = "Tambah Berkas…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Tambahkan file PDF, Word, dan teks ke proyek. Percakapan dalam proyek akan mencari dan mengutip halaman; sematkan file untuk menyertakan seluruh isinya dalam percakapan.";
 "Add more files: every chat of the project can search them." = "Tambahkan lebih banyak file: setiap obrolan proyek bisa mencarinya.";
+"Added %@" = "Ditambahkan %@";
 "Added here" = "Ditambahkan di sini";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Ditambahkan ke prompt sistem setiap kali alat ditawarkan. Templat alat bawaan model hanya menjelaskan cara memanggil alat, bukan kapan tidak memanggilnya. Kosongkan untuk menonaktifkannya.";
 "Adding files" = "Menambahkan berkas";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "Menyalin runtime yang disertakan…";
 "Couldn't be added: %@" = "Tidak dapat ditambahkan: %@";
 "Couldn't create the report: %@" = "Gagal membuat laporan: %@";
+"Couldn't move “%@” to the Trash: %@" = "Tidak dapat memindahkan “%@” ke Sampah: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Tidak dapat menghubungi ipsupport.us. Ulasan Anda disimpan: coba lagi nanti.";
 "Couldn't reach the server -- please try again later." = "Tidak dapat menghubungi server — coba lagi nanti.";
 "Couldn't start the voice runner: %@" = "Gagal memulai voice runner: %@";
@@ -261,6 +263,7 @@
 "Delete" = "Hapus";
 "Delete Project" = "Hapus Proyek";
 "Delete Project…" = "Hapus Proyek…";
+"Delete model" = "Hapus model";
 "Delete profile “%@”?" = "Hapus profil “%@”?";
 "Delete this chat?" = "Hapus chat ini?";
 "Delete this profile (models using it go back to Default)" = "Hapus profil ini (model yang menggunakannya kembali ke Default).";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "Model: %@ · tersisa: %@";
 "Move %1$@ to %2$@" = "Pindahkan %1$@ ke %2$@";
 "Move %@ to the Trash" = "Pindahkan %@ ke Trash";
+"Move this model to the Trash?" = "Pindahkan model ini ke Sampah?";
+"Move this model to the Trash…" = "Pindahkan model ini ke Sampah…";
 "Move to Project" = "Pindah ke Proyek";
+"Move to Trash" = "Pindahkan ke Sampah";
 "Music" = "Musik";
 "Music generation" = "Pembuatan musik";
 "Music generation failed: %@" = "Pembuatan musik gagal: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Runtime sedang sibuk.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "Server menambahkan perkiraan negara dari koneksi. Yang tidak pernah dikirim: prompt, isi obrolan, gambar atau audio yang dihasilkan, nama atau jalur file, nama model atau repositori, kunci API, detail akun atau kontak. Obrolan sementara tidak dihitung.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "Server juga mencatat perkiraan negara dari koneksi; LLMTray tidak mengirimkannya dan tidak dapat mengaturnya.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Server sedang menggunakan model ini atau sibuk memproses permintaan: hentikan (atau pilih model lain), atau tunggu hingga idle.";
 "The server log" = "Log server";
 "The server starts once %@ is downloaded" = "Server dimulai setelah %@ diunduh";
 "The server starts with %@" = "Server dimulai dengan %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "Chat ini boleh menggunakan";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Ini tidak dapat dicantumkan: pembayaran tidak ditemukan, atau nama ditolak.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Folder ini hilang atau tidak lagi diizinkan: batalkan izinnya dan izinkan lagi.";
+"This folder is shared with LM Studio: the model is gone there too." = "Folder ini dibagikan dengan LM Studio: model juga hilang di sana.";
 "This folder's access has ended or was revoked." = "Akses folder ini telah berakhir atau dicabut.";
 "This many of the most recent messages are kept word for word when compacting." = "Jumlah pesan terbaru yang dipertahankan kata demi kata saat memadatkan.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil, atau tingkatkan batas memori GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "gagal membangun permintaan";
 "failed: %@" = "gagal: %@";
 "for this chat" = "untuk chat ini";
+"it isn't a model folder in the models folder" = "bukan folder model di dalam folder models";
+"it's being downloaded" = "sedang diunduh";
 "less than a minute left" = "kurang dari satu menit tersisa";
 "llmtray in the terminal" = "llmtray di Terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS menghapus suara model sendiri dari mikrofon (Voice Processing, seperti di FaceTime), sehingga berfungsi pada speaker. Fitur ini juga meratakan level dan meredam kebisingan latar. Efektif setelah dimulai ulang.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "Runtime mlx-lm";
 "move %1$lld files into %2$lld folders" = "pindahkan %1$lld berkas ke %2$lld folder";
 "move %1$lld items into %2$lld folders" = "pindahkan %1$lld item ke %2$lld folder";
+"never used" = "belum pernah digunakan";
 "no changes" = "tidak ada perubahan";
 "no text" = "tidak ada teks";
 "not downloaded" = "belum diunduh";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "buang %lld ke Trash";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: mix yang lebih penuh dan terdengar matang. sft: lirik terdengar jelas, vokal di depan, membutuhkan waktu kira-kira dua kali lebih lama untuk dibuat.";
 "until %@" = "hingga %@";
+"used %@" = "digunakan %@";
 "used by %@" = "digunakan oleh %@";
 "waiting" = "menunggu";
 "writes code" = "menulis kode";
@@ -1202,4 +1214,6 @@
 "· size…" = "· ukuran…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” tidak dapat dihapus: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: pin tidak dapat diubah: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) akan dipindahkan ke Sampah, di mana Anda masih bisa mengembalikannya. alias dan pilihan profilnya akan dilupakan.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” dan indeksnya dihapus dari proyek. Berkas sumber yang Anda tambahkan tidak diubah.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” tidak dihapus: server sedang sibuk atau sedang menggunakannya. Coba lagi saat idle.";

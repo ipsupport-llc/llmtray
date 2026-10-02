@@ -83,6 +83,7 @@
 "Add Files…" = "ファイルを追加…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF、Word、テキストファイルをプロジェクトに追加できます。チャットはそれらを検索してページを引用します。ファイルをピン留めすると会話内で全体を保持します。";
 "Add more files: every chat of the project can search them." = "ファイルを追加すると、プロジェクト内のすべてのチャットで検索できます。";
+"Added %@" = "追加しました：%@";
 "Added here" = "ここに追加済み";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "ツールが提供されるたびにシステムプロンプトへ追加されます。モデル自身のツールテンプレートはツールの呼び出し方法だけを示し、呼び出さない条件は示しません。空にすると無効になります。";
 "Adding files" = "ファイルを追加中";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "同梱のランタイムをコピーしています…";
 "Couldn't be added: %@" = "追加できませんでした: %@";
 "Couldn't create the report: %@" = "レポートを作成できませんでした: %@";
+"Couldn't move “%@” to the Trash: %@" = "「%@」をゴミ箱に移動できませんでした：%@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.usに接続できませんでした。レビューは保存されています。後で再試行してください。";
 "Couldn't reach the server -- please try again later." = "サーバーに接続できませんでした — 後で再試行してください。";
 "Couldn't start the voice runner: %@" = "音声ランナーを起動できませんでした：%@";
@@ -261,6 +263,7 @@
 "Delete" = "削除";
 "Delete Project" = "プロジェクトを削除";
 "Delete Project…" = "プロジェクトを削除…";
+"Delete model" = "モデルを削除";
 "Delete profile “%@”?" = "プロファイル“%@”を削除しますか？";
 "Delete this chat?" = "このチャットを削除しますか？";
 "Delete this profile (models using it go back to Default)" = "このプロファイルを削除します（使用中のモデルはDefaultに戻ります）。";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
 "Move %1$@ to %2$@" = "%1$@ を %2$@ に移動";
 "Move %@ to the Trash" = "%@ をゴミ箱に移動";
+"Move this model to the Trash?" = "このモデルをゴミ箱に移動しますか？";
+"Move this model to the Trash…" = "このモデルをゴミ箱に移動します…";
 "Move to Project" = "プロジェクトに移動";
+"Move to Trash" = "ゴミ箱に移動";
 "Music" = "ミュージック";
 "Music generation" = "音楽生成";
 "Music generation failed: %@" = "音楽生成に失敗しました：%@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "ランタイムは使用中です。";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "サーバー側で接続情報から概算の国を付加します。送信されないもの：プロンプト、チャット内容、生成された画像や音声、ファイル名やパス、モデル名やリポジトリ、APIキー、アカウントや連絡先情報。一時チャットは集計に含めません。";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "サーバーは接続元のおおよその国を記録します。LLMTray はそれを送信せず、設定することもできません。";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "サーバーがこのモデルを使用中、またはリクエストで忙しいです：停止する（または別のモデルを選ぶ）か、アイドルになるまで待ってください。";
 "The server log" = "サーバーログ";
 "The server starts once %@ is downloaded" = "%@ のダウンロードが完了するとサーバーが起動します";
 "The server starts with %@" = "サーバーは %@ で起動します";
@@ -994,6 +1001,7 @@
 "This chat may use" = "このチャットが使用可能";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "掲載できませんでした：支払いが見つからないか、名前が拒否されました。";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "このフォルダは存在しないか、もはや許可されたフォルダではありません：アクセス権を取り消して再度許可してください。";
+"This folder is shared with LM Studio: the model is gone there too." = "このフォルダは LM Studio と共有されています：そのモデルはそちらでも削除されています。";
 "This folder's access has ended or was revoked." = "このフォルダへのアクセスは終了したか取り消されました。";
 "This many of the most recent messages are kept word for word when compacting." = "コンパクト化するときに、直近のメッセージをこの件数だけ原文のまま保持します。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使うか、GPU メモリ上限を引き上げてください。";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "リクエストの作成に失敗しました";
 "failed: %@" = "失敗：%@";
 "for this chat" = "このチャット用";
+"it isn't a model folder in the models folder" = "models フォルダ内のモデルフォルダではありません";
+"it's being downloaded" = "ダウンロード中です";
 "less than a minute left" = "1分未満";
 "llmtray in the terminal" = "ターミナルでの llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS はマイクからモデル自身の音声を除去します（FaceTime と同じ Voice Processing を使用）、そのためスピーカーでも動作します。音量を均一化し、背景雑音を低減します。次回開始時に有効になります。";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "mlx-lm ランタイム";
 "move %1$lld files into %2$lld folders" = "%1$lld 個のファイルを %2$lld 個のフォルダに移動";
 "move %1$lld items into %2$lld folders" = "%1$lld 件を %2$lld 個のフォルダに移動";
+"never used" = "未使用";
 "no changes" = "変更なし";
 "no text" = "テキストなし";
 "not downloaded" = "未ダウンロード";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "%lld 件をゴミ箱へ移動";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo：より豊かで完成度の高いミックス。sft：歌詞が明瞭でボーカルが前面に出るが、生成時間はおよそ2倍になります。";
 "until %@" = "%@ まで";
+"used %@" = "使用済み：%@";
 "used by %@" = "%@で使用中";
 "waiting" = "待機中";
 "writes code" = "コードを生成します";
@@ -1202,4 +1214,6 @@
 "· size…" = "・サイズ…";
 "“%1$@” couldn't be removed: %2$@" = "「%1$@」を削除できませんでした: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "「%1$@」のピンを変更できませんでした: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）はゴミ箱に移動されます。そこから復元できますが、エイリアスとプロファイルの選択は失われます。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」は削除されませんでした：サーバーがビジー状態か使用中です。アイドル時に再試行してください。";

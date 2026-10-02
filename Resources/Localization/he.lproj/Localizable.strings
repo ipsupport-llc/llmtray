@@ -83,6 +83,7 @@
 "Add Files…" = "הוסף קבצים…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "הוסף קבצי PDF, Word וטקסט לפרויקט. השיחות שלו מחפשות בהם וציטטות את הדף; צמיד קובץ כדי לשמור את כל תוכנו בשיחה.";
 "Add more files: every chat of the project can search them." = "הוסף קבצים נוספים: כל שיחה בפרויקט תוכל לחפש בהם.";
+"Added %@" = "נוסף %@";
 "Added here" = "נוסף כאן";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "מתווסף להנחיית המערכת בכל פעם שמוצעים כלים. תבנית הכלים של המודל עצמו אומרת רק איך לקרוא לכלי, ולעולם לא מתי לא. שדה ריק משבית זאת.";
 "Adding files" = "מוסיף קבצים";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "מעתיק את ה‑runtime הכלול…";
 "Couldn't be added: %@" = "לא נוכל להוסיף: %@";
 "Couldn't create the report: %@" = "לא ניתן ליצור את הדוח: %@";
+"Couldn't move “%@” to the Trash: %@" = "לא ניתן להעביר את “%@” לפח: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "לא ניתן היה להגיע ל-ipsupport.us. הביקורת נשמרה: נסה שוב מאוחר יותר.";
 "Couldn't reach the server -- please try again later." = "לא ניתן היה להגיע לשרת — נסה שוב מאוחר יותר.";
 "Couldn't start the voice runner: %@" = "לא ניתן להפעיל את ה־voice runner: %@";
@@ -261,6 +263,7 @@
 "Delete" = "מחק";
 "Delete Project" = "מחק פרויקט";
 "Delete Project…" = "מחק פרויקט…";
+"Delete model" = "מחק דגם";
 "Delete profile “%@”?" = "למחוק את הפרופיל ״%@״?";
 "Delete this chat?" = "למחוק את הצ'אט הזה?";
 "Delete this profile (models using it go back to Default)" = "מוחק את הפרופיל הזה (מודלים שמשתמשים בו חוזרים ל־Default).";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
 "Move %1$@ to %2$@" = "העבר %1$@ אל %2$@";
 "Move %@ to the Trash" = "העבר %@ אל ה־Trash";
+"Move this model to the Trash?" = "להעביר דגם זה לפח?";
+"Move this model to the Trash…" = "העבר דגם זה לפח…";
 "Move to Project" = "העבר לפרויקט";
+"Move to Trash" = "העבר לפח";
 "Music" = "מוסיקה";
 "Music generation" = "יצירת מוזיקה";
 "Music generation failed: %@" = "יצירת מוזיקה נכשלה: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "ה‑runtime עסוק.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "השרת מוסיף את המדינה המשוערת מהחיבור. לעולם לא נשלחים: בקשות, תוכן שיחה, תמונות או אודיו שנוצרו, שמות או נתיבי קבצים, שמות מודלים או מאגריהם, מפתחות API, פרטי חשבון או אנשי קשר. שיחות זמניות אינן נספרות.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "השרת גם רושם את המדינה המשוערת לפי החיבור; LLMTray לא שולח את זה ולא יכול לשנותה.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "השרת משתמש בדגם זה או עסוק בבקשה: עצור אותו (או בחר דגם אחר), או המתן עד שיהיה פנוי.";
 "The server log" = "לוג השרת";
 "The server starts once %@ is downloaded" = "השרת יופעל ברגע ש‑%@ יורד";
 "The server starts with %@" = "השרת מתחיל עם %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "שיחה זו רשאית להשתמש ב";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "לא ניתן לפרסם זאת: לא נמצאה תשלום, או שהשם נדחה.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "התיקיה הזו הוסרה או כבר לא מותרת: בטל את ההרשאה ואפשר אותה שוב.";
+"This folder is shared with LM Studio: the model is gone there too." = "תיקייה זו משותפת עם LM Studio: הדגם הוסר גם שם.";
 "This folder's access has ended or was revoked." = "הגישה לתיקיה זו הסתיימה או בוטלה.";
 "This many of the most recent messages are kept word for word when compacting." = "מספר זה של ההודעות האחרונות יישמר מילה במילה בעת דחיסה.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר, או הגבּל את זיכרון ה‑GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "בניית הבקשה נכשלה";
 "failed: %@" = "נכשל: %@";
 "for this chat" = "לשיחה זו";
+"it isn't a model folder in the models folder" = "זו אינה תיקיית דגם בתוך תיקיית models";
+"it's being downloaded" = "מוריד/ה כעת";
 "less than a minute left" = "פחות מדקה נותרה";
 "llmtray in the terminal" = "llmtray בטרמינל";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS מסיר את קול המודל מהמיקרופון (Voice Processing, כמו ב‑FaceTime), לכן זה עובד עם רמקולים. כמו כן הוא מאזן עוצמה ומכווץ רעשי רקע. ייכנס לתוקף בהפעלה הבאה.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "זמן ריצה של mlx-lm";
 "move %1$lld files into %2$lld folders" = "העבר %1$lld קבצים אל %2$lld תיקיות";
 "move %1$lld items into %2$lld folders" = "העבר %1$lld פריטים אל %2$lld תיקיות";
+"never used" = "לא בשימוש מעולם";
 "no changes" = "אין שינויים";
 "no text" = "אין טקסט";
 "not downloaded" = "לא הורד";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "שלח ל־Trash %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: מיקס מלא ומעובד יותר. sft: שר את המילים בבירור, הקול בחזית, לוקח בערך פי שניים להכנה.";
 "until %@" = "עד %@";
+"used %@" = " בשימוש %@";
 "used by %@" = "בשימוש על ידי %@";
 "waiting" = "ממתין";
 "writes code" = "כותב קוד";
@@ -1202,4 +1214,6 @@
 "· size…" = "· גודל…";
 "“%1$@” couldn't be removed: %2$@" = "לא ניתן להסיר “%1$@”: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: לא ניתן לשנות את הסימון: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) מועבר/ת לפח, שם ניתן לשחזר אותו/אותה. הכינוי ובחירת הפרופיל נשכחים.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” לא הוסר: השרת עסוק או משתמש בו. נסה/י שוב כשיופסק העומס.";

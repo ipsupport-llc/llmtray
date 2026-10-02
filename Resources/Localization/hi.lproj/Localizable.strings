@@ -83,6 +83,7 @@
 "Add Files…" = "फाइलें जोड़ें…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "एक परियोजना में PDF, Word और टेक्स्ट फ़ाइलें जोड़ें। इसकी चैट्स उन्हें खोजती हैं और पृष्ठ का हवाला देती हैं; किसी फ़ाइल को पिन करें ताकि उसकी पूरी सामग्री बातचीत में बनी रहे।";
 "Add more files: every chat of the project can search them." = "और फ़ाइलें जोड़ें: परियोजना की हर चैट इन्हें खोज सकती है।";
+"Added %@" = "जोड़ दिया %@";
 "Added here" = "यहाँ जोड़ा गया";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "जब भी टूल दिए जाते हैं, इसे सिस्टम प्रॉम्प्ट में जोड़ा जाता है। मॉडल का अपना टूल टेम्पलेट केवल यह बताता है कि टूल कैसे कॉल करना है, कब नहीं करना है यह नहीं। खाली रखने पर यह बंद रहता है।";
 "Adding files" = "फाइलें जोड़ रहा है";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "शामिल runtime की कॉपी कर रहा है…";
 "Couldn't be added: %@" = "जोड़ नहीं पाए: %@";
 "Couldn't create the report: %@" = "रिपोर्ट बनायी़ नहीं जा सकी: %@";
+"Couldn't move “%@” to the Trash: %@" = "“%@” को ट्रैश में नहीं भेजा जा सका: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "ipsupport.us से संपर्क नहीं हो सका। आपकी समीक्षा सुरक्षित रखी गई है: बाद में फिर कोशिश करें।";
 "Couldn't reach the server -- please try again later." = "सर्वर तक पहुंच नहीं हो पाई — कृपया बाद में पुन: प्रयास करें।";
 "Couldn't start the voice runner: %@" = "वॉइस रनर शुरू नहीं हो सका: %@";
@@ -261,6 +263,7 @@
 "Delete" = "हटाएँ";
 "Delete Project" = "प्रोजेक्ट हटाएँ";
 "Delete Project…" = "प्रोजेक्ट हटाएँ…";
+"Delete model" = "मॉडल हटाएँ";
 "Delete profile “%@”?" = "प्रोफ़ाइल “%@” हटाएँ?";
 "Delete this chat?" = "क्या इस चैट को हटाएं?";
 "Delete this profile (models using it go back to Default)" = "इस प्रोफ़ाइल को हटाता है (इसका उपयोग करने वाले मॉडल Default पर वापस चले जाते हैं)।";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "मॉडल: %@ · खाली: %@";
 "Move %1$@ to %2$@" = "%1$@ को %2$@ में स्थानांतरित करें";
 "Move %@ to the Trash" = "%@ को Trash में भेजें";
+"Move this model to the Trash?" = "क्या इस मॉडल को ट्रैश में भेजना है?";
+"Move this model to the Trash…" = "इस मॉडल को ट्रैश में भेजें…";
 "Move to Project" = "प्रोजेक्ट में ले जाएँ";
+"Move to Trash" = "ट्रैश में भेजें";
 "Music" = "संगीत";
 "Music generation" = "संगीत जनरेशन";
 "Music generation failed: %@" = "संगीत जनरेशन विफल रहा: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Runtime व्यस्त है।";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "सर्वर कनेक्शन से अनुमानित देश जोड़ता है। कभी नहीं भेजा जाता: प्रॉम्प्ट, चैट सामग्री, जनरेट की गई इमेज या ऑडियो, फाइल नाम या पाथ, मॉडल नाम या रिपॉज़िटरी, API कुंजियाँ, अकाउंट या संपर्क विवरण। अस्थायी चैट गिनती में नहीं आते।";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "सर्वर कनेक्शन से अनुमानित देश भी नोट करता है; इसे LLMTray भेजता नहीं है और यह इसे सेट नहीं कर सकता।";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "सर्वर इस मॉडल का उपयोग कर रहा है या किसी अनुरोध में व्यस्त है: इसे बंद करें (या कोई और मॉडल चुनें), या जब तक यह निष्क्रिय न हो तब तक प्रतीक्षा करें।";
 "The server log" = "सर्वर लॉग";
 "The server starts once %@ is downloaded" = "सर्वर तभी शुरू होगा जब %@ डाउनलोड हो जाएगा";
 "The server starts with %@" = "सर्वर %@ से शुरू होता है";
@@ -994,6 +1001,7 @@
 "This chat may use" = "यह चैट उपयोग कर सकता है";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "इसे सूचीबद्ध नहीं किया जा सका: भुगतान नहीं मिला या नाम अस्वीकार कर दिया गया।";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "यह फ़ोल्डर मौजूद नहीं है या अब अनुमति वाले फ़ोल्डरों में नहीं है: इसे रद्द करें और फिर से अनुमति दें।";
+"This folder is shared with LM Studio: the model is gone there too." = "यह फ़ोल्डर LM Studio के साथ साझा किया गया है: वहां से भी मॉडल हट चुका है।";
 "This folder's access has ended or was revoked." = "इस फ़ोल्डर की पहुँच समाप्त हो गई है या रद्द कर दी गई है।";
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें, या GPU मेमोरी सीमा बढ़ाएँ।";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "request बनाना विफल हुआ";
 "failed: %@" = "असफल: %@";
 "for this chat" = "इस चैट के लिए";
+"it isn't a model folder in the models folder" = "यह models फ़ोल्डर में एक मॉडल फ़ोल्डर नहीं है";
+"it's being downloaded" = "यह डाउनलोड हो रहा है";
 "less than a minute left" = "एक मिनट से कम बचा है";
 "llmtray in the terminal" = "टर्मिनल में llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS माइक्रोफ़ोन से मॉडल की अपनी आवाज़ हटाता है (Voice Processing, जैसे FaceTime में), इसलिए यह स्पीकर पर काम करता है। यह स्तर को भी सम करता है और पृष्ठभूमि शोर को दबाता है। यह अगले स्टार्ट पर प्रभावी होगा।";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "mlx-lm रनटाइम";
 "move %1$lld files into %2$lld folders" = "%1$lld फाइलें %2$lld फ़ोल्डरों में स्थानांतरित करें";
 "move %1$lld items into %2$lld folders" = "%1$lld आइटम %2$lld फ़ोल्डरों में स्थानांतरित करें";
+"never used" = "कभी उपयोग नहीं हुआ";
 "no changes" = "कोई परिवर्तन नहीं";
 "no text" = "कोई टेक्स्ट नहीं";
 "not downloaded" = "डाउनलोड नहीं हुआ";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "Trash में %lld भेजें";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: अधिक भरा‑पूरा, अधिक तैयार सुनाई देने वाला मिक्स। sft: गीत की पंक्तियाँ स्पष्ट गाता है, आवाज़ आगे; बनाने में लगभग दोगुना समय लग सकता है।";
 "until %@" = "जब तक %@";
+"used %@" = "उपयोग हुआ %@";
 "used by %@" = "%@ द्वारा उपयोग किया गया";
 "waiting" = "प्रतीक्षारत";
 "writes code" = "कोड लिखता है";
@@ -1202,4 +1214,6 @@
 "· size…" = "· आकार…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” हटाया नहीं जा पाया: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: पिन बदला नहीं जा सका: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) ट्रैश में भेज दिया जाएगा, जहाँ आप इसे फिर भी पुनर्स्थापित कर सकते हैं। इसकी एलियास और प्रोफ़ाइल विकल्प भूल दिए जाएंगे।";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” और उसका इंडेक्स प्रोजेक्ट से हटा दिया गया है। जिस फाइल से आपने इसे जोड़ा था वह प्रभावित नहीं हुई।";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” हटाया नहीं गया: सर्वर व्यस्त है या इसे उपयोग कर रहा है। जब यह निष्क्रिय हो तो फिर प्रयास करें।";
