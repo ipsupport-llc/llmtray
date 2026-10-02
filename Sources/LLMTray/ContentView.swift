@@ -343,6 +343,85 @@ struct ContentView: View {
         }
     }
 
+    /// The chat's rows, out of `chatArea`: in one expression with its
+    /// scroll modifiers, Xcode 16's type checker gave up on it.
+    @ViewBuilder
+    private func chatRows(results: [String: String]?, sources: [UUID: [String]], citations: [UUID: [Citation]]) -> some View {
+        if chat.messages.isEmpty {
+            if showsEmptyIntro {
+                VStack(spacing: 8) {
+                    Color.clear.frame(height: 0).id(Self.chatTopID)
+                    // A chat started in a project isn't in the sidebar
+                    // until its first turn: where it will be.
+                    if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
+                    EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
+                                   insertPrompt: insertPrompt, dropTargeted: chatDropTargeted)
+                }
+            } else {
+                VStack(spacing: 2) {
+                    Text("No messages yet")
+                        .font(.system(size: 12))
+                    if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
+                }
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 8)
+            }
+        }
+        // "tool" messages are protocol plumbing: the image a
+        // tool produced is attached to the assistant message
+        // that called it.
+        ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
+            MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
+                          citations: citations[msg.id] ?? [], openCitation: { openCitation($0) },
+                          regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
+                          draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil,
+                          isAnswering: chat.isBusy && msg.id == chat.messages.last?.id)
+                .environment(\.visibleChatHeight, chatViewportHeight)
+                .id(msg.id)
+        }
+        if let draft = chat.draft, draft.anchor == nil {
+            GenerationDraftView(draft: draft).id(draft.id)
+                .environment(\.visibleChatHeight, chatViewportHeight)
+        }
+        // Folder access (adr/0014): the plan waiting for approval
+        // (or its result), and a grant prompt a call waits for.
+        if let plan = chat.folderPlan {
+            FolderPlanCard(model: plan, dismiss: { chat.dismissFolderPlan() }).id(plan.id)
+        }
+        if let prompt = chat.folderPrompt {
+            FolderPromptCard(prompt: prompt).id(prompt.id)
+        }
+        if chat.isGeneratingMedia {
+            if chat.generatingKind == .music {
+                MusicGenerationProgressView()
+            } else {
+                ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
+            }
+        }
+        if chat.isWaitingForModelLoad {
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text(String(format: NSLocalizedString("Loading %@…", comment: "chat: the picked model is starting"),
+                            catalog.model(id: selectedModelID)?.displayName ?? NSLocalizedString("the model", comment: "")))
+                    .font(.callout).foregroundStyle(.secondary)
+            }
+        }
+        if let err = chat.errorText {
+            Text(err)
+                .font(.system(size: 11))
+                .foregroundColor(.red)
+        }
+        if let note = citationNote {
+            Text(note)
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+        }
+        // Where the bottom of the content is, relative to the
+        // viewport: tells whether the user is reading the end.
+        Color.clear.frame(height: 1).id(Self.chatBottomID)
+    }
+
     private var chatArea: some View {
         // Once per evaluation, not per message (it scans the whole history).
         let results = showToolCalls ? toolResults : nil
@@ -357,79 +436,7 @@ struct ContentView: View {
                 // hasn't laid out (long markdown answers), and the scroll
                 // position jumped whenever the estimate was corrected.
                 VStack(alignment: .leading, spacing: 10) {
-                    if chat.messages.isEmpty {
-                        if showsEmptyIntro {
-                            VStack(spacing: 8) {
-                                Color.clear.frame(height: 0).id(Self.chatTopID)
-                                // A chat started in a project isn't in the sidebar
-                                // until its first turn: where it will be.
-                                if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id).foregroundColor(.secondary) }
-                                EmptyChatIntro(sessionID: chat.currentSessionID, selectedModelID: selectedModelID, port: port,
-                                               insertPrompt: insertPrompt, dropTargeted: chatDropTargeted)
-                            }
-                        } else {
-                            VStack(spacing: 2) {
-                                Text("No messages yet")
-                                    .font(.system(size: 12))
-                                if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
-                            }
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 8)
-                        }
-                    }
-                    // "tool" messages are protocol plumbing: the image a
-                    // tool produced is attached to the assistant message
-                    // that called it.
-                    ForEach(chat.messages.filter { $0.role != "tool" && !$0.isToolContext }) { msg in
-                        MessageBubble(message: msg, showReasoning: showReasoning, toolResults: results, sources: sources[msg.id] ?? [],
-                                      citations: citations[msg.id] ?? [], openCitation: { openCitation($0) },
-                                      regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
-                                      draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil,
-                                      isAnswering: chat.isBusy && msg.id == chat.messages.last?.id)
-                            .environment(\.visibleChatHeight, chatViewportHeight)
-                            .id(msg.id)
-                    }
-                    if let draft = chat.draft, draft.anchor == nil {
-                        GenerationDraftView(draft: draft).id(draft.id)
-                            .environment(\.visibleChatHeight, chatViewportHeight)
-                    }
-                    // Folder access (adr/0014): the plan waiting for approval
-                    // (or its result), and a grant prompt a call waits for.
-                    if let plan = chat.folderPlan {
-                        FolderPlanCard(model: plan, dismiss: { chat.dismissFolderPlan() }).id(plan.id)
-                    }
-                    if let prompt = chat.folderPrompt {
-                        FolderPromptCard(prompt: prompt).id(prompt.id)
-                    }
-                    if chat.isGeneratingMedia {
-                        if chat.generatingKind == .music {
-                            MusicGenerationProgressView()
-                        } else {
-                            ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
-                        }
-                    }
-                    if chat.isWaitingForModelLoad {
-                        HStack(spacing: 6) {
-                            ProgressView().controlSize(.small)
-                            Text(String(format: NSLocalizedString("Loading %@…", comment: "chat: the picked model is starting"),
-                                        catalog.model(id: selectedModelID)?.displayName ?? NSLocalizedString("the model", comment: "")))
-                                .font(.callout).foregroundStyle(.secondary)
-                        }
-                    }
-                    if let err = chat.errorText {
-                        Text(err)
-                            .font(.system(size: 11))
-                            .foregroundColor(.red)
-                    }
-                    if let note = citationNote {
-                        Text(note)
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                    // Where the bottom of the content is, relative to the
-                    // viewport: tells whether the user is reading the end.
-                    Color.clear.frame(height: 1).id(Self.chatBottomID)
+                    chatRows(results: results, sources: sources, citations: citations)
                 }
                 .padding(12)
                 // The content's height and where its bottom is in the
