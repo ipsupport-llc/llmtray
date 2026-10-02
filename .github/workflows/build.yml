@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: swift build
@@ -28,7 +28,7 @@ jobs:
   # This runs the same steps as release.yml on every PR, minus signing
   # with the real key and publishing.
   release-dry-run:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Version mapping (Sparkle ordering)
