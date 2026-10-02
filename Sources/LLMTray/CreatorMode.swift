@@ -63,10 +63,10 @@ final class GenerationDraft: ObservableObject, Identifiable {
     private let requestedAspect: Aspect
     private var continuation: CheckedContinuation<Outcome?, Never>?
     private var ticker: Task<Void, Never>?
-    /// The countdown decide() was given, started once the draft is on
-    /// screen (shown()): one made while the popover was closed, or below the
-    /// visible chat, went ahead unseen after its seconds.
-    private var pendingCountdown: Int?
+    /// Its view is on screen in a visible window (setVisible): the countdown
+    /// only runs then. Counted from creation, a draft made while the popover
+    /// was closed, in another tab or below the visible chat went ahead unseen.
+    private var isVisible = false
 
     init(kind: Kind, call: ToolCall, settings: ChatSettings) {
         self.kind = kind
@@ -97,7 +97,7 @@ final class GenerationDraft: ObservableObject, Identifiable {
                     resolve(nil)
                     return
                 }
-                pendingCountdown = countdown
+                startCountdown(countdown)
             }
         } onCancel: {
             Task { @MainActor [weak self] in self?.resolve(nil) }
@@ -115,27 +115,23 @@ final class GenerationDraft: ObservableObject, Identifiable {
                     return
                 }
                 try? await Task.sleep(nanoseconds: 100_000_000)
-                if self.remaining != nil { self.remaining = max(0, left - 0.1) }
+                if self.remaining != nil, self.isVisible { self.remaining = max(0, left - 0.1) }
             }
         }
     }
 
-    /// The draft's view is up: its countdown starts now (once).
-    func shown() {
-        guard let countdown = pendingCountdown, continuation != nil else { return }
-        pendingCountdown = nil
-        startCountdown(countdown)
+    /// Seen or not: the countdown pauses while it isn't (its seconds kept).
+    func setVisible(_ visible: Bool) {
+        isVisible = visible
     }
 
     /// Any edit: the countdown stops, the user starts it.
     func hold() {
-        pendingCountdown = nil
         remaining = nil
         ticker?.cancel()
     }
 
     func resolve(_ outcome: Outcome?) {
-        pendingCountdown = nil
         ticker?.cancel()
         remaining = nil
         continuation?.resume(returning: outcome)
@@ -292,8 +288,10 @@ struct GenerationDraftView: View {
         .background(Color.accentColor.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .frame(maxWidth: 560, alignment: .leading)
-        // Its seconds count from here: not while the popover is closed.
-        .onAppear { draft.shown() }
+        // Its seconds count only while it's seen: not with the popover
+        // closed, in another tab, or its window hidden.
+        .background(WindowVisibility { draft.setVisible($0) })
+        .onDisappear { draft.setVisible(false) }
     }
 
     /// Editing anything stops the countdown.
@@ -309,5 +307,48 @@ struct GenerationDraftView: View {
         }
         .disabled(!enabled)
         .help(enabled ? Text(label) : Text("Only turbo has this knob: sft has no song planner to vary."))
+    }
+}
+
+/// Whether the view it backs is on screen: in a window that's visible and
+/// not covered (a closed popover's window is ordered out; a tab not shown
+/// has no view). Reports on every change.
+struct WindowVisibility: NSViewRepresentable {
+    let changed: (Bool) -> Void
+
+    func makeNSView(context: Context) -> Probe {
+        let probe = Probe()
+        probe.changed = changed
+        return probe
+    }
+
+    func updateNSView(_ probe: Probe, context: Context) {
+        probe.changed = changed
+    }
+
+    final class Probe: NSView {
+        var changed: ((Bool) -> Void)?
+        private var observers: [NSObjectProtocol] = []
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            observers.forEach(NotificationCenter.default.removeObserver)
+            observers = []
+            if let window {
+                for name in [NSWindow.didChangeOcclusionStateNotification, NSWindow.willCloseNotification] {
+                    observers.append(NotificationCenter.default.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
+                        MainActor.assumeIsolated { self?.report() }
+                    })
+                }
+            }
+            report()
+        }
+
+        private func report() {
+            let visible = window.map { $0.isVisible && $0.occlusionState.contains(.visible) } ?? false
+            changed?(visible)
+        }
+
+        deinit { observers.forEach(NotificationCenter.default.removeObserver) }
     }
 }

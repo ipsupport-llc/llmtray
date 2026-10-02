@@ -1,5 +1,6 @@
 import AppKit
 import AVFoundation
+import ImageIO
 import SwiftUI
 import LLMTrayCore
 import UniformTypeIdentifiers
@@ -189,7 +190,7 @@ struct AudioClipView: View {
                         .font(.system(size: 10))
                 }
                 if source != nil {
-                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds) }
+                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: length) }
                 }
             }
             .foregroundColor(.secondary)
@@ -293,8 +294,17 @@ struct MediaInfoButton: View {
         }
     }
 
+    /// From the file's header: nothing is decoded.
+    private static func pixelSize(_ data: Data) -> (width: Int, height: Int)? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let w = props[kCGImagePropertyPixelWidth] as? Int, let h = props[kCGImagePropertyPixelHeight] as? Int else { return nil }
+        return (w, h)
+    }
+
     /// Its rows: model, prompt, size (images) or length (songs), time.
-    static func rows(source: MediaSource?, prompt: String, seconds: Double?, imageData: Data? = nil) -> [(label: String, value: String)] {
+    static func rows(source: MediaSource?, prompt: String, seconds: Double?, imageData: Data? = nil,
+                     songLength: TimeInterval? = nil) -> [(label: String, value: String)] {
         var rows: [(label: String, value: String)] = []
         if let name = source?.madeWithName {
             rows.append((NSLocalizedString("Model", comment: "a generated image's or song's details"), name))
@@ -304,11 +314,13 @@ struct MediaInfoButton: View {
         }
         let args = source.map { ChatToolbox.parseArguments($0.arguments) } ?? [:]
         if source?.tool == MusicToolRunner.toolName {
+            // The clip's own, not the length asked for.
+            let length = songLength.map { Int($0.rounded()) } ?? MusicToolRunner.duration(args["duration"])
             rows.append((NSLocalizedString("Length", comment: "a generated song's details"),
-                         String(format: NSLocalizedString("%lld s", comment: "a song's length"), MusicToolRunner.duration(args["duration"]))))
-        } else if let imageData, let rep = NSBitmapImageRep(data: imageData) {
+                         String(format: NSLocalizedString("%lld s", comment: "a song's length"), length)))
+        } else if let imageData, let size = pixelSize(imageData) {
             // As made, not as asked: the canvas setting scales the request.
-            rows.append((NSLocalizedString("Size", comment: "a generated image's details"), "\(rep.pixelsWide)×\(rep.pixelsHigh)"))
+            rows.append((NSLocalizedString("Size", comment: "a generated image's details"), "\(size.width)×\(size.height)"))
         }
         if let seconds {
             rows.append((NSLocalizedString("Time", comment: "a generated image's or song's details"),
