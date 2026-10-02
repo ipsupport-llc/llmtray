@@ -81,6 +81,7 @@
 "Add Files…" = "Add Files…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
+"Added %@" = "Added %@";
 "Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
@@ -236,6 +237,7 @@
 "Copying the included runtime…" = "Copying the included runtime…";
 "Couldn't be added: %@" = "Couldn't be added: %@";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
+"Couldn't move “%@” to the Trash: %@" = "Couldn't move “%@” to the Trash: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Couldn't reach ipsupport.us. Your review is kept: try again later.";
 "Couldn't reach the server -- please try again later." = "Couldn't reach the server -- please try again later.";
 "Couldn't start the voice runner: %@" = "Couldn't start the voice runner: %@";
@@ -259,6 +261,7 @@
 "Delete" = "Delete";
 "Delete Project" = "Delete Project";
 "Delete Project…" = "Delete Project…";
+"Delete model" = "Delete model";
 "Delete profile “%@”?" = "Delete profile “%@”?";
 "Delete this chat?" = "Delete this chat?";
 "Delete this profile (models using it go back to Default)" = "Delete this profile (models using it go back to Default)";
@@ -528,7 +531,10 @@
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Move %1$@ to %2$@" = "Move %1$@ to %2$@";
 "Move %@ to the Trash" = "Move %@ to the Trash";
+"Move this model to the Trash?" = "Move this model to the Trash?";
+"Move this model to the Trash…" = "Move this model to the Trash…";
 "Move to Project" = "Move to Project";
+"Move to Trash" = "Move to Trash";
 "Music" = "Music";
 "Music generation" = "Music generation";
 "Music generation failed: %@" = "Music generation failed: %@";
@@ -970,6 +976,7 @@
 "The runtime is busy." = "The runtime is busy.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
+"The server is using this model: stop it first (or pick another model)." = "The server is using this model: stop it first (or pick another model).";
 "The server log" = "The server log";
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
@@ -992,6 +999,7 @@
 "This chat may use" = "This chat may use";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "This couldn't be listed: the payment wasn't found, or the name was refused.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "This folder is gone or isn't the one allowed any more: revoke it and allow it again.";
+"This folder is shared with LM Studio: the model is gone there too." = "This folder is shared with LM Studio: the model is gone there too.";
 "This folder's access has ended or was revoked." = "This folder's access has ended or was revoked.";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
@@ -1164,6 +1172,7 @@
 "mlx-lm runtime" = "mlx-lm runtime";
 "move %1$lld files into %2$lld folders" = "move %1$lld files into %2$lld folders";
 "move %1$lld items into %2$lld folders" = "move %1$lld items into %2$lld folders";
+"never used" = "never used";
 "no changes" = "no changes";
 "no text" = "no text";
 "not downloaded" = "not downloaded";
@@ -1189,6 +1198,7 @@
 "trash %lld" = "trash %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.";
 "until %@" = "until %@";
+"used %@" = "used %@";
 "used by %@" = "used by %@";
 "waiting" = "waiting";
 "writes code" = "writes code";
@@ -1200,4 +1210,5 @@
 "· size…" = "· size…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” couldn't be removed: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: the pin couldn't be changed: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” and its index are deleted from the project. The file you added it from isn't touched.";

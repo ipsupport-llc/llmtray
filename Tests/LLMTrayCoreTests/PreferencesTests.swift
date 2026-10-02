@@ -77,6 +77,20 @@ final class OperationAvailabilityTests: XCTestCase {
         }
     }
 
+    func testRemovingAModelNeverPullsItFromUnderTheServer() {
+        for s: ActivitySnapshot.Server in [.stopped, .failed, .idleUnloaded, .running] {
+            XCTAssertTrue(ops(s).canRemoveModel(isLoaded: false), "\(s)")
+        }
+        for s: ActivitySnapshot.Server in [.stopped, .failed] {
+            XCTAssertTrue(ops(s).canRemoveModel(isLoaded: true), "\(s)")
+        }
+        for s: ActivitySnapshot.Server in [.idleUnloaded, .running, .starting] {
+            XCTAssertFalse(ops(s).canRemoveModel(isLoaded: true), "\(s)")
+        }
+        XCTAssertFalse(ops(.starting).canRemoveModel(isLoaded: false))
+        XCTAssertFalse(ops(.stopped, bench: true).canRemoveModel(isLoaded: false))
+    }
+
     func testModelSwitchAndProfileEditing() {
         XCTAssertFalse(ops(.starting).canSwitchModel)
         XCTAssertFalse(ops(.running, bench: true).canSwitchModel)
