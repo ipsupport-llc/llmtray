@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "«%@» змінилося з часу, коли ця відповідь посилалася на нього: сторінка %lld тепер може читатися інакше.";
 "\"%@\" is no longer in the project." = "«%@» більше не входить до проєкту.";
+"%.1f s" = "%.1f с";
 "%1$@ and %2$lld more" = "%1$@ і ще %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запитує %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запитує %2$@. Переключення розвантажить поточну модель.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Наведіть на кнопку інформації під відповіддю, щоб побачити модель, швидкість і обсяг використаного контексту.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Наскільки музика авантюрна й несподівана. Лише turbo: sft не має планувальника пісень для варіацій.";
 "How do you like LLMTray?" = "Як вам LLMTray?";
+"How it was made" = "Як це створено";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Скільки разів ви використали кожну з функцій: чат, виклики інструментів, API‑сервер (інші додатки), генерація зображень, редагування зображень, музика, завантаження моделей.";
@@ -475,6 +477,7 @@
 "Launch at login" = "Запускати під час входу";
 "Launch at login: %@" = "Відкривати при вході: %@";
 "Leave a Review" = "Залишити відгук";
+"Length" = "Довжина";
 "Let chats work in folders" = "Дозволити чатам працювати в папках";
 "Let coding agents and scripts use your models." = "Дозволити кодувальним агентам і скриптам використовувати ваші моделі.";
 "Let the chat look in %@?" = "Дозволити чату переглянути %@?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "Показує вікно чату";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Показує міркування моделі (згортуваний блок «Thought process») над відповіддю.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Співає слова чітко, голос попереду. Приблизно 40 с для 30 с музики.";
+"Size" = "Розмір";
 "Skip" = "Пропустити";
 "Skip Setup" = "Пропустити налаштування";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Найменший і найагресивніший — може помітно змінювати композицію зображення на деяких підказках.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "Хід міркувань";
 "Tier" = "Рівень";
 "Tight -- may not leave room for context" = "Тісно — може не залишатися місця для контексту";
+"Time" = "Час";
 "Time in a city" = "Час у місті";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Щоб повернути його, використовуйте Undo в LLMTray: Put Back у Finder не знає його папки.";
 "Today" = "Сьогодні";

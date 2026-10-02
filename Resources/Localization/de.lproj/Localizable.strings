@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" hat sich geändert, seit diese Antwort darauf verwiesen hat: Seite %lld könnte jetzt anders aussehen.";
 "\"%@\" is no longer in the project." = "\"%@\" ist nicht mehr im Projekt.";
+"%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ und %2$lld weitere";
 "%1$@ asks for %2$@" = "%1$@ fordert %2$@ an";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ fordert %2$@ an. Ein Wechsel entlädt das aktuell geladene Modell.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Fahren Sie über die Info‑Taste unter einer Antwort, um Modell, Geschwindigkeit und die verwendete Kontextmenge zu sehen.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Wie gewagt und unerwartet die Musik ist. Nur turbo: sft hat keinen Song‑Planer zur Variation.";
 "How do you like LLMTray?" = "Wie gefällt Ihnen LLMTray?";
+"How it was made" = "Wie es entstanden ist";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Wie viele Prompt-Token pro Schritt verarbeitet werden. Größer ist bei langen Prompts schneller, benötigt aber mehr Arbeitsspeicher. Die automatische Abstimmung des Benchmarks kann den Wert auswählen.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Wie viele Anfragen zu einem GPU-Schritt gebündelt werden. Hilft nur, wenn mehrere Clients den Server gleichzeitig verwenden; benötigt mehr Arbeitsspeicher.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Wie oft Sie jeweils Folgendes genutzt haben: Chat, Tool-Aufrufe, der API‑Server (andere Apps), Bilderzeugung, Bildbearbeitung, Musik, Modell‑Downloads.";
@@ -475,6 +477,7 @@
 "Launch at login" = "Beim Anmelden öffnen";
 "Launch at login: %@" = "Beim Anmelden öffnen: %@";
 "Leave a Review" = "Bewertung abgeben";
+"Length" = "Länge";
 "Let chats work in folders" = "Chats in Ordnern arbeiten lassen";
 "Let coding agents and scripts use your models." = "Ermöglichen, dass Coding‑Agents und Skripte Ihre Modelle nutzen.";
 "Let the chat look in %@?" = "Soll der Chat in %@ schauen?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "Zeigt das Chatfenster";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Zeigt den Gedankengang des Modells (den einklappbaren Block „Gedankengang“) über seiner Antwort.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Singt die Lyrics klar, Stimme steht vorn. Etwa 40 s für 30 s Musik.";
+"Size" = "Größe";
 "Skip" = "Überspringen";
 "Skip Setup" = "Einrichtung überspringen";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Kleinste und aggressivste Einstellung – kann bei manchen Prompts sichtbar die Komposition verändern.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "Gedankengang";
 "Tier" = "Stufe";
 "Tight -- may not leave room for context" = "Eng – lässt möglicherweise keinen Platz für Kontext";
+"Time" = "Zeit";
 "Time in a city" = "Uhrzeit in Stadt";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Zum Zurücklegen 'Widerrufen' in LLMTray verwenden: Finder's Put Back kennt seinen Ordner nicht.";
 "Today" = "Heute";

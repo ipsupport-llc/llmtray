@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "تغير «%@» منذ اقتباس هذا الجواب منه: قد يكون محتوى الصفحة %lld مختلفًا الآن.";
 "\"%@\" is no longer in the project." = "لم يعد «%@» موجودًا في المشروع.";
+"%.1f s" = "%.1f ث";
 "%1$@ and %2$lld more" = "%1$@ و%2$lld أخرى";
 "%1$@ asks for %2$@" = "%1$@ يطلب %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ يطلب %2$@. التبديل يفرغ النموذج المحمّل حالياً.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "مرّر المؤشر فوق زر المعلومات أسفل الإجابة لرؤية النموذج والسرعة ومقدار السياق المستخدم.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "مدى جرأة الموسيقى وغرابتها. متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
 "How do you like LLMTray?" = "ما رأيك في LLMTray؟";
+"How it was made" = "كيف تم إنشاؤها";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "عدد الطلبات التي تُجمع في خطوة GPU واحدة. لا يفيد إلا عند استخدام عدة عملاء للخادم في الوقت نفسه؛ ويستخدم ذاكرة أكثر.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "عدد المرات التي استخدمت فيها كل من: المحادثة، استدعاءات الأدوات، خادم API (تطبيقات أخرى)، توليد الصور، تحرير الصور، الموسيقى، تنزيل النماذج.";
@@ -475,6 +477,7 @@
 "Launch at login" = "الفتح عند تسجيل الدخول";
 "Launch at login: %@" = "فتح عند تسجيل الدخول: %@";
 "Leave a Review" = "اترك مراجعة";
+"Length" = "الطول";
 "Let chats work in folders" = "السماح للدردشات بالعمل في المجلدات";
 "Let coding agents and scripts use your models." = "اسمح للـ agents والنصوص البرمجية باستخدام نماذجك.";
 "Let the chat look in %@?" = "هل تسمح للدردشة بالنظر داخل %@؟";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "يعرض نافذة الدردشة";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "يعرض تفكير النموذج (كتلة «عملية التفكير» القابلة للطي) فوق إجابته.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "يغني الكلمات بوضوح، الصوت في المقدمة. حوالي 40 s لمقطع مدته 30 s.";
+"Size" = "الحجم";
 "Skip" = "تخطى";
 "Skip Setup" = "تخطي الإعداد";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "الأصغر والأكثر عدوانية — قد يغيّر تكوين التوليد بشكل مرئي مع بعض المُحفِّزات.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "عملية التفكير";
 "Tier" = "فئة";
 "Tight -- may not leave room for context" = "محكم — قد لا يترك مساحة للسياق";
+"Time" = "الوقت";
 "Time in a city" = "الوقت في مدينة";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "لإعادته، استخدم Undo في LLMTray: أمر Put Back في Finder لا يعرف مجلده.";
 "Today" = "اليوم";
