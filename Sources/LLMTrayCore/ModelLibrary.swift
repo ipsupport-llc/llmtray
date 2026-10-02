@@ -57,19 +57,34 @@ public enum ModelRemoval {
         return p.count >= f.count && Array(p.prefix(f.count)) == f
     }
 
-    /// The model folder, checked: strictly inside `root` (symlinks in the
-    /// root's own path resolved, the model's last component not -- a linked
-    /// model is removed as the link, never what it points to), and holding a
-    /// config.json.
+    /// The model folder, checked: strictly inside `root` (the root's own
+    /// path may run through symlinks), through real folders only -- a
+    /// linked <org>/ folder is refused (removing through it would remove
+    /// the model where it really is) -- and holding a config.json. A model
+    /// that is itself a link is removed as the link, never what it points to.
     public static func check(modelPath: String, root: String) throws -> URL {
-        let rootURL = URL(fileURLWithPath: (root as NSString).expandingTildeInPath).resolvingSymlinksInPath().standardizedFileURL
+        let rootPlain = URL(fileURLWithPath: (root as NSString).expandingTildeInPath).standardizedFileURL
+        let rootURL = rootPlain.resolvingSymlinksInPath().standardizedFileURL
         let model = URL(fileURLWithPath: (modelPath as NSString).expandingTildeInPath).standardizedFileURL
-        let parent = model.deletingLastPathComponent().resolvingSymlinksInPath().standardizedFileURL
-        let modelURL = parent.appendingPathComponent(model.lastPathComponent)
-        let rootParts = rootURL.pathComponents, parts = modelURL.pathComponents
-        guard parts.count > rootParts.count, Array(parts.prefix(rootParts.count)) == rootParts,
-              !model.lastPathComponent.isEmpty, model.lastPathComponent != "..", model.lastPathComponent != "." else {
+        // The model's path below the root, as listed (under the root as set
+        // or as resolved).
+        let parts = model.pathComponents
+        let below: [String]
+        if parts.count > rootPlain.pathComponents.count, Array(parts.prefix(rootPlain.pathComponents.count)) == rootPlain.pathComponents {
+            below = Array(parts.dropFirst(rootPlain.pathComponents.count))
+        } else if parts.count > rootURL.pathComponents.count, Array(parts.prefix(rootURL.pathComponents.count)) == rootURL.pathComponents {
+            below = Array(parts.dropFirst(rootURL.pathComponents.count))
+        } else {
             throw Refusal.outsideModelsFolder
+        }
+        guard !below.contains(where: { $0 == ".." || $0 == "." || $0.isEmpty }) else { throw Refusal.outsideModelsFolder }
+        var modelURL = rootURL
+        for (i, name) in below.enumerated() {
+            modelURL.appendPathComponent(name)
+            if i < below.count - 1 {
+                let values = try? modelURL.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
+                guard values?.isSymbolicLink == false, values?.isDirectory == true else { throw Refusal.outsideModelsFolder }
+            }
         }
         guard FileManager.default.fileExists(atPath: modelURL.appendingPathComponent("config.json").path) else {
             throw Refusal.notAModel

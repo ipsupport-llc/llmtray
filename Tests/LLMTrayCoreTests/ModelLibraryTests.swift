@@ -62,6 +62,27 @@ final class ModelLibraryTests: XCTestCase {
         XCTAssertEqual(url.deletingLastPathComponent().resolvingSymlinksInPath(), root.resolvingSymlinksInPath())
     }
 
+    func testALinkedOrgFolderIsRefused() throws {
+        // root/alias -> root/org: removing alias/a would remove org/a.
+        let root = try tree()
+        try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("alias"), withDestinationURL: root.appendingPathComponent("org"))
+        XCTAssertThrowsError(try ModelRemoval.check(modelPath: root.path + "/alias/a", root: root.path)) {
+            XCTAssertEqual($0 as? ModelRemoval.Refusal, .outsideModelsFolder)
+        }
+        XCTAssertNoThrow(try ModelRemoval.check(modelPath: root.path + "/org/a", root: root.path))
+    }
+
+    func testARootReachedThroughALinkStillWorks() throws {
+        // The models folder set as a link (or /tmp vs /private/tmp).
+        let root = try tree()
+        let linkRoot = FileManager.default.temporaryDirectory.appendingPathComponent("root-link-\(UUID())")
+        try FileManager.default.createSymbolicLink(at: linkRoot, withDestinationURL: root)
+        addTeardownBlock { try? FileManager.default.removeItem(at: linkRoot) }
+        let url = try ModelRemoval.check(modelPath: linkRoot.path + "/org/a", root: linkRoot.path)
+        XCTAssertEqual(url.resolvingSymlinksInPath(), root.appendingPathComponent("org/a").resolvingSymlinksInPath())
+        XCTAssertNoThrow(try ModelRemoval.check(modelPath: root.resolvingSymlinksInPath().path + "/org/a", root: linkRoot.path))
+    }
+
     func testEmptyOrgFolderIsLeftForRemovalButNotTheRoot() throws {
         let root = try tree()
         let fm = FileManager.default

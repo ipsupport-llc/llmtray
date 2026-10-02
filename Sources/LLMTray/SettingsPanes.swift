@@ -229,6 +229,7 @@ struct ModelsPane: View {
     /// The model the Delete confirmation is for, and why the last removal failed.
     @State private var toRemove: LocalModel?
     @State private var removeError: String?
+    @ObservedObject private var switchPrompter = ModelSwitchPrompter.shared
 
     private func saveToken() {
         let token = hfToken.trimmingCharacters(in: .whitespaces)
@@ -342,7 +343,7 @@ struct ModelsPane: View {
     private func remove(_ m: LocalModel) {
         // Again at the confirmation: the server may have started on this
         // model (or a request for it) while the dialog was open.
-        guard OperationAvailability(server: server, benchmark: benchmark).canRemoveModel(isLoaded: server.loadedModelPath == m.id) else {
+        guard OperationAvailability(server: server, benchmark: benchmark).canRemoveModel(isLoaded: isInUse(m)) else {
             removeError = String(format: NSLocalizedString("\u{201C}%@\u{201D} wasn't removed: the server is busy or using it. Try again when it's idle.",
                                                            comment: "deleting a model refused at confirmation: name"), m.displayName)
             return
@@ -362,6 +363,12 @@ struct ModelsPane: View {
             removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
                                  m.displayName, error.localizedDescription)
         }
+    }
+
+    /// The server has it loaded, or a client's switch to it waits for the
+    /// user's answer (approved, the proxy would load it).
+    private func isInUse(_ m: LocalModel) -> Bool {
+        server.loadedModelPath == m.id || switchPrompter.pending?.target == m.id
     }
 
     /// "Added 3 Sep 2026 · used 2 hours ago" (or "never used").
@@ -401,7 +408,7 @@ struct ModelsPane: View {
                 .disabled(!OperationAvailability(server: server, benchmark: benchmark)
                     .canAssignProfile(toLoadedModel: server.loadedModelPath == m.id))
                 let canRemove = OperationAvailability(server: server, benchmark: benchmark)
-                    .canRemoveModel(isLoaded: server.loadedModelPath == m.id)
+                    .canRemoveModel(isLoaded: isInUse(m))
                 Button { toRemove = m } label: { Image(systemName: "trash") }
                     .buttonStyle(.borderless)
                     .disabled(!canRemove)
