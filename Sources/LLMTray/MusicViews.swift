@@ -303,6 +303,7 @@ struct MediaInfoButton: View {
     }
 
     /// Its rows: model, prompt, size (images) or length (songs), time.
+    @MainActor
     static func rows(source: MediaSource?, prompt: String, seconds: Double?, imageData: Data? = nil,
                      songLength: TimeInterval? = nil) -> [(label: String, value: String)] {
         var rows: [(label: String, value: String)] = []
