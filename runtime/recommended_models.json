@@ -1,5 +1,5 @@
 {
-  "_comment": "The first-run wizard's curated chat models (adr/0013), read by LLMTrayCore.ModelRecommendations. The ladder: a model is offered on every Mac with at least minMemoryGB whose GPU limit and memory it fits, so a bigger Mac sees the smaller ones too; recommendedFor: the memory tiers (GB of RAM: 8, 16, 24, 32 = 32 and up) it's the recommended model of, marked and listed first (one per tier); the others are labelled lighter or bigger than it, and those with the code capability as made for programming. approxBytes: the repo's current files (HF API, ?blobs=true), used until the Hub's live size is read. Our own quantizations first; another publisher's only where we have none (Gemma 4 31B). Gemma 4 E2B and E4B are Google's QAT on its exact q4_0 grid (quant-ternary gemma4-quant FINDINGS: better than mlx-community's qat builds, which don't load in older runtimes either). Every repo here was checked to exist, be ungated and load with the pinned mlx-lm's model code (2026-09-26).",
+  "_comment": "The first-run wizard's curated chat models (adr/0013), read by LLMTrayCore.ModelRecommendations. The ladder: a model is offered on every Mac with at least minMemoryGB whose GPU limit and memory it fits, so a bigger Mac sees the smaller ones too; recommendedFor: the memory tiers (GB of RAM: 8, 16, 24, 32 = 32 and up) it's the recommended model of, marked and listed first (one per tier); the others are labelled lighter or bigger than it, and those with the code capability as made for programming. approxBytes: the repo's current files (HF API, ?blobs=true), used until the Hub's live size is read. All our own quantizations. Gemma 4 E2B, E4B, 12B and 31B are Google's QAT on its exact q4_0 grid (quant-ternary gemma4-quant FINDINGS: as faithful as mlx-community's qat builds or better, and smaller); the E2B Phone build trades a little quality for ~1 GB; 12B and 31B are dense, slower than the 26B-A4B mixture of experts. The 12B's images and audio need the runtime pin from 17ab9af (ipsupport-llc/mlx-lm#22). Every repo here was checked to exist, be ungated and load with the pinned mlx-lm's model code (2026-10-02).",
   "version": 2,
   "models": [
     {
@@ -21,6 +21,23 @@
         24,
         32
       ]
+    },
+    {
+      "repo": "roman220220/gemma-4-12B-it-qat-mlx",
+      "title": "Gemma 4 12B (QAT)",
+      "summary": "A dense Gemma 4 on Google's QAT grid, quantized by LLMTray's authors: better answers than E4B, but slower than 26B-A4B, which runs only 4B of its parameters per token; reads images, hears audio and calls tools.",
+      "capabilities": [
+        "vision",
+        "tools",
+        "reasoning"
+      ],
+      "languages": [
+        "multilingual"
+      ],
+      "license": "apache-2.0",
+      "approxBytes": 7928785195,
+      "minMemoryGB": 16,
+      "recommendedFor": []
     },
     {
       "repo": "roman220220/gemma-4-E4B-it-qat-mlx",
@@ -61,6 +78,23 @@
       ]
     },
     {
+      "repo": "roman220220/gemma-4-E2B-it-qat-phone-mlx",
+      "title": "Gemma 4 E2B Phone (QAT)",
+      "summary": "The smallest build here, almost a gigabyte under Gemma 4 E2B, for a Mac short on memory: quick, reads images and hears audio, but its answers are the simplest of the list.",
+      "capabilities": [
+        "vision",
+        "tools",
+        "reasoning"
+      ],
+      "languages": [
+        "multilingual"
+      ],
+      "license": "apache-2.0",
+      "approxBytes": 3246497295,
+      "minMemoryGB": 8,
+      "recommendedFor": []
+    },
+    {
       "repo": "roman220220/NVIDIA-Nemotron-3-Nano-4B-JANG-GPTQ-ipsupport-code-lora",
       "title": "Nemotron 3 Nano 4B, coding agent",
       "summary": "NVIDIA's small Nemotron, fine-tuned by LLMTray's authors for tool calling in a terminal coding agent; text only.",
@@ -95,9 +129,9 @@
       "recommendedFor": []
     },
     {
-      "repo": "mlx-community/gemma-4-31b-it-4bit",
-      "title": "Gemma 4 31B (4-bit)",
-      "summary": "The largest Gemma 4, a dense model: slower than 26B-A4B, stronger on hard questions; reads images and calls tools.",
+      "repo": "roman220220/gemma-4-31B-it-qat-mlx",
+      "title": "Gemma 4 31B (QAT)",
+      "summary": "The largest Gemma 4 on Google's QAT grid, quantized by LLMTray's authors: a dense model, the slowest here and the strongest on hard questions; reads images and calls tools.",
       "capabilities": [
         "vision",
         "tools",
@@ -107,7 +141,7 @@
         "multilingual"
       ],
       "license": "apache-2.0",
-      "approxBytes": 18444421751,
+      "approxBytes": 20645888223,
       "minMemoryGB": 32,
       "recommendedFor": []
     }
