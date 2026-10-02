@@ -35,7 +35,7 @@ concurrency:
 
 jobs:
   translate:
-    runs-on: macos-14   # plutil (the .strings parser the checks use) is macOS-only
+    runs-on: macos-15   # plutil (the .strings parser the checks use) is macOS-only
     steps:
       - uses: actions/checkout@v4
       # One branch for the proposal: while its PR is open, what it already
