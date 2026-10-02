@@ -910,7 +910,8 @@ final class ChatClient: ObservableObject {
                 isUnloadingModelForMedia = true
                 await server.unloadModel()
             }
-            let variantSource = MediaSource(tool: call.name, arguments: call.argumentsJSON, model: model)
+            let variantSource = MediaSource(tool: call.name, arguments: call.argumentsJSON, model: model,
+                                            madeWith: MediaSource.generatorModel(call.name, settings))
             let result = await toolbox.run(call, context: ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages))
             if unload {
                 do { try await server.ensureModelLoaded() } catch {
@@ -1429,7 +1430,7 @@ final class ChatClient: ObservableObject {
                 generatingKind = .image
             }
             let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
-                                     model: drafts[call.id]?.modelID)
+                                     model: drafts[call.id]?.modelID, madeWith: MediaSource.generatorModel(call.name, settings))
             var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
             let chatID = folderChatID
             toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }

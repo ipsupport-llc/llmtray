@@ -15,6 +15,25 @@ struct MediaSource: Codable, Equatable {
     /// The model a Creator mode draft chose for it (a rawValue), so that
     /// making it again uses that one, not whatever the profile has now.
     var model: String? = nil
+    /// The model that made it (a rawValue), whoever chose it -- for the
+    /// (i) under it; `model` only pins one a draft chose.
+    var madeWith: String? = nil
+
+    /// The model that made it, as Settings names it (a chat saved before
+    /// madeWith: the model a draft pinned, if any).
+    var madeWithName: String? {
+        (madeWith ?? model).flatMap { ImageGenModel(rawValue: $0)?.displayName ?? MusicModel(rawValue: $0)?.displayName }
+    }
+
+    /// The model a generator call runs with these settings (a rawValue).
+    static func generatorModel(_ tool: String, _ settings: ChatSettings) -> String? {
+        switch tool {
+        case ImageToolRunner.toolName: return settings.imageGenModel.rawValue
+        case EditImageTool.toolName: return settings.imageEditModel?.rawValue
+        case MusicToolRunner.toolName: return settings.musicModel.rawValue
+        default: return nil
+        }
+    }
 }
 
 struct ChatMessage: Identifiable, Equatable {

@@ -1,5 +1,6 @@
 import AppKit
 import AVFoundation
+import ImageIO
 import SwiftUI
 import LLMTrayCore
 import UniformTypeIdentifiers
@@ -96,6 +97,8 @@ struct AudioClipView: View {
     let id: String
     let prompt: String
     let generationSeconds: Double?
+    /// What made it, for its (i); nil for a song not made here.
+    var source: MediaSource? = nil
     /// It came from a tool call that can run again.
     var canRegenerate: Bool = false
     /// Regenerate / Tweak / Remove; nil while the chat can't (busy, no server).
@@ -186,6 +189,9 @@ struct AudioClipView: View {
                     Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
                         .font(.system(size: 10))
                 }
+                if source != nil {
+                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
+                }
             }
             .foregroundColor(.secondary)
         }
@@ -256,5 +262,72 @@ struct MusicGenerationProgressView: View {
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// The (i) under a generated image or song: what made it -- the model,
+/// the prompt, the size or length, the time it took.
+struct MediaInfoButton: View {
+    /// Read when it opens (an image's size from its file's header).
+    let rows: () -> [(label: String, value: String)]
+    @State private var shown = false
+
+    var body: some View {
+        Button { shown.toggle() } label: {
+            Image(systemName: "info.circle").font(.system(size: 10))
+        }
+        .buttonStyle(.plain)
+        .help(Text("How it was made"))
+        .accessibilityLabel(Text("How it was made"))
+        .popover(isPresented: $shown, arrowEdge: .bottom) {
+            Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 4) {
+                ForEach(Array(rows().enumerated()), id: \.offset) { _, row in
+                    GridRow {
+                        Text(row.label).foregroundColor(.secondary)
+                        Text(verbatim: row.value).textSelection(.enabled).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+            .font(.system(size: 11))
+            .padding(10)
+            .frame(maxWidth: 360, alignment: .leading)
+        }
+    }
+
+    /// From the file's header: nothing is decoded.
+    private static func pixelSize(_ data: Data) -> (width: Int, height: Int)? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let props = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let w = props[kCGImagePropertyPixelWidth] as? Int, let h = props[kCGImagePropertyPixelHeight] as? Int else { return nil }
+        return (w, h)
+    }
+
+    /// Its rows: model, prompt, size (images) or length (songs), time.
+    @MainActor
+    static func rows(source: MediaSource?, prompt: String, seconds: Double?, imageData: Data? = nil,
+                     songLength: TimeInterval? = nil) -> [(label: String, value: String)] {
+        var rows: [(label: String, value: String)] = []
+        if let name = source?.madeWithName {
+            rows.append((NSLocalizedString("Model", comment: "a generated image's or song's details"), name))
+        }
+        if !prompt.isEmpty {
+            rows.append((NSLocalizedString("Prompt", comment: "a generated image's or song's details"), prompt))
+        }
+        let args = source.map { ChatToolbox.parseArguments($0.arguments) } ?? [:]
+        if source?.tool == MusicToolRunner.toolName {
+            // The clip's own, not the length asked for.
+            // Whole seconds down, as the player's clock.
+            let length = songLength.map { Int($0.rounded(.down)) } ?? MusicToolRunner.duration(args["duration"])
+            rows.append((NSLocalizedString("Length", comment: "a generated song's details"),
+                         String(format: NSLocalizedString("%lld s", comment: "a song's length"), length)))
+        } else if let imageData, let size = pixelSize(imageData) {
+            // As made, not as asked: the canvas setting scales the request.
+            rows.append((NSLocalizedString("Size", comment: "a generated image's details"), "\(size.width)×\(size.height)"))
+        }
+        if let seconds {
+            rows.append((NSLocalizedString("Time", comment: "a generated image's or song's details"),
+                         String(format: NSLocalizedString("%.1f s", comment: "generation time"), seconds)))
+        }
+        return rows
     }
 }

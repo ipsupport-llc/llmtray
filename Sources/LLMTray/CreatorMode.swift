@@ -63,6 +63,13 @@ final class GenerationDraft: ObservableObject, Identifiable {
     private let requestedAspect: Aspect
     private var continuation: CheckedContinuation<Outcome?, Never>?
     private var ticker: Task<Void, Never>?
+    /// The views that see it right now (setVisible): the countdown only runs
+    /// while one does. Counted from creation, a draft made while the popover
+    /// was closed, in another tab or below the visible chat went ahead unseen.
+    /// By view: when the chat moves to its window, the old view's "gone"
+    /// can come after the new one's "seen".
+    private var seenBy: Set<UUID> = []
+    private var isVisible: Bool { !seenBy.isEmpty }
 
     init(kind: Kind, call: ToolCall, settings: ChatSettings) {
         self.kind = kind
@@ -110,10 +117,21 @@ final class GenerationDraft: ObservableObject, Identifiable {
                     self.resolve(.run)
                     return
                 }
-                try? await Task.sleep(nanoseconds: 100_000_000)
-                if self.remaining != nil { self.remaining = max(0, left - 0.1) }
+                // Paused (unseen): checked less often. A step counts only if
+                // the draft was seen through it -- shown halfway through a
+                // paused one, it would take the whole step.
+                let seenBefore = self.isVisible
+                let step = seenBefore ? 0.1 : 0.5
+                try? await Task.sleep(nanoseconds: UInt64(step * 1e9))
+                if self.remaining != nil, seenBefore, self.isVisible { self.remaining = max(0, left - step) }
             }
         }
+    }
+
+    /// Seen by `view` or not: the countdown pauses while no view sees it
+    /// (its seconds kept).
+    func setVisible(_ visible: Bool, by view: UUID) {
+        if visible { seenBy.insert(view) } else { seenBy.remove(view) }
     }
 
     /// Any edit: the countdown stops, the user starts it.
@@ -202,6 +220,17 @@ final class GenerationDraft: ObservableObject, Identifiable {
 /// countdown; any change holds it until "Generate".
 struct GenerationDraftView: View {
     @ObservedObject var draft: GenerationDraft
+    @Environment(\.visibleChatHeight) private var viewportHeight
+    @State private var viewID = UUID()
+    @State private var windowShown = false
+    @State private var frame: CGRect = .zero
+
+    /// Seen: shown in its window and at least partly within the chat's
+    /// visible part (no viewport known: the window decides).
+    private func report() {
+        let inView = viewportHeight <= 0 || (frame.maxY > 0 && frame.minY < viewportHeight)
+        draft.setVisible(windowShown && inView, by: viewID)
+    }
 
     private var title: LocalizedStringKey {
         switch draft.kind {
@@ -279,6 +308,17 @@ struct GenerationDraftView: View {
         .background(Color.accentColor.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .frame(maxWidth: 560, alignment: .leading)
+        // Its seconds count only while it's seen: its window shown, the app
+        // not hidden, and the draft within the chat's visible part -- not
+        // with the popover closed, in another tab, or scrolled away.
+        .background(WindowVisibility { windowShown = $0; report() })
+        .background(GeometryReader { geo in
+            Color.clear
+                .onAppear { frame = geo.frame(in: .named(ChatScroll.space)); report() }
+                .onChange(of: geo.frame(in: .named(ChatScroll.space))) { frame = $1; report() }
+        })
+        .onChange(of: viewportHeight) { report() }
+        .onDisappear { windowShown = false; report() }
     }
 
     /// Editing anything stops the countdown.
@@ -295,4 +335,63 @@ struct GenerationDraftView: View {
         .disabled(!enabled)
         .help(enabled ? Text(label) : Text("Only turbo has this knob: sft has no song planner to vary."))
     }
+}
+
+/// Whether the view it backs is on screen: in a window that's visible and
+/// not covered (a closed popover's window is ordered out; a tab not shown
+/// has no view). Reports on every change.
+struct WindowVisibility: NSViewRepresentable {
+    let changed: (Bool) -> Void
+
+    func makeNSView(context: Context) -> Probe {
+        let probe = Probe()
+        probe.changed = changed
+        return probe
+    }
+
+    func updateNSView(_ probe: Probe, context: Context) {
+        probe.changed = changed
+    }
+
+    final class Probe: NSView {
+        var changed: ((Bool) -> Void)?
+        private var observers: [NSObjectProtocol] = []
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            observers.forEach(NotificationCenter.default.removeObserver)
+            observers = []
+            let center = NotificationCenter.default
+            if let window {
+                observers.append(center.addObserver(forName: NSWindow.didChangeOcclusionStateNotification, object: window, queue: .main) { [weak self] _ in
+                    Task { @MainActor in self?.report() }
+                })
+                observers.append(center.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
+                    Task { @MainActor in self?.changed?(false) }
+                })
+            }
+            // A popover's window is ordered out and in, not closed; the app
+            // can be hidden whole.
+            for name in [NSPopover.didCloseNotification, NSPopover.didShowNotification,
+                         NSApplication.didHideNotification, NSApplication.didUnhideNotification] {
+                observers.append(center.addObserver(forName: name, object: nil, queue: .main) { [weak self] _ in
+                    Task { @MainActor in self?.report() }
+                })
+            }
+            report()
+        }
+
+        private func report() {
+            let visible = !NSApp.isHidden && (window.map { $0.isVisible && $0.occlusionState.contains(.visible) } ?? false)
+            changed?(visible)
+        }
+
+        deinit { observers.forEach(NotificationCenter.default.removeObserver) }
+    }
+}
+
+/// The chat's scroll view as a coordinate space: a draft checks its frame in
+/// it against the visible height (visibleChatHeight).
+enum ChatScroll {
+    static let space = "chat-scroll"
 }
