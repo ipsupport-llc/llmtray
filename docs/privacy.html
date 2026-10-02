@@ -187,7 +187,7 @@
 <body>
   <div class="wrap page">
     <h1>LLMTray Privacy Policy</h1>
-    <p class="meta">IPSupport LLC · effective September 30, 2026</p>
+    <p class="meta">IPSupport LLC · effective October 2, 2026</p>
 
     <p>LLMTray runs AI models on your Mac. Your prompts, chats, attached files, projects, generated images, music and voice audio stay on your Mac: LLMTray has no account, no ads and no tracking, and none of that content is ever sent to us.</p>
 
@@ -204,6 +204,18 @@
 
     <h2>Downloading models</h2>
     <p>Models are downloaded from <a href="https://huggingface.co">Hugging Face</a> when you choose one. That request goes to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
+    <p>A Hugging Face token, if you save one (only for gated models), is kept in your Mac's Keychain and sent only to Hugging Face.</p>
+
+    <h2>Tools that look things up</h2>
+    <p>A chat model can use LLMTray's lookup tools when you ask for something it can't know: a web search, the news, the weather, a Wikipedia summary. Then the tool's query (the search words, a city, a country or a currency) goes from your Mac straight to the service that answers it, never to us, and that service's privacy policy applies:</p>
+    <ul>
+      <li>web search: <a href="https://duckduckgo.com/privacy">DuckDuckGo</a>;</li>
+      <li>news: Google News; tech news: Hacker News;</li>
+      <li>summaries and facts: Wikipedia and Wikidata;</li>
+      <li>weather and air quality: <a href="https://open-meteo.com">Open-Meteo</a>;</li>
+      <li>public holidays: Nager.Date; currency rates: ExchangeRate-API.</li>
+    </ul>
+    <p>Only the query is sent, not your chat. The time, dates and calculations are worked out on your Mac.</p>
 
     <h2>Reviews</h2>
     <p>If you use <b>Rate LLMTray…</b>, the rating, the text you write, the name you choose to show (optional) and the LLMTray version are sent to <code>ipsupport.us</code>. A review is checked for spam before it is published on our site. We don't ask for an email, and the address it came from is kept only as a keyed hash, to limit repeated submissions.</p>
@@ -215,10 +227,10 @@
     <p><b>Report a Bug…</b> prepares a report on your Mac and opens it in your mail app, addressed to <code>bugreport@ipsupport.us</code>. You see everything in it before you choose to send it.</p>
 
     <h2>Updates</h2>
-    <p>The Mac App Store version is updated by the App Store. The version downloaded from our site checks for updates (Sparkle) on GitHub, where the releases are published.</p>
+    <p>The Mac App Store version is updated by the App Store. The version downloaded from our site checks for updates (Sparkle) on GitHub, where the releases are published, and, when you ask it to, for updates of its model runtime there. That version's smaller download sets up its runtime on first launch from GitHub and the Python Package Index (PyPI).</p>
 
     <h2>The local API server</h2>
-    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet.</p>
+    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet, except that an image an app sends as a web link is downloaded from that link.</p>
 
     <h2>Microphone</h2>
     <p>Voice Lab uses the microphone only while you use it. The audio is processed on your Mac and is not recorded or sent anywhere.</p>
