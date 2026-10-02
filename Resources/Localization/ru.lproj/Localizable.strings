@@ -83,7 +83,7 @@
 "Add Files…" = "Добавить файлы…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Добавляйте PDF, Word и текстовые файлы в проект. Чаты ищут в них и ссылаются на страницу; прикрепите файл, чтобы сохранить его содержимое в разговоре.";
 "Add more files: every chat of the project can search them." = "Добавьте файлы: каждый чат проекта сможет их искать.";
-"Added %@" = "Добавлено %@";
+"Added %@" = "Добавлена %@";
 "Added here" = "Добавлено здесь";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Добавляется к системному промпту, когда модели доступны инструменты. Шаблон инструментов самой модели говорит только, как их вызывать, но не когда этого делать не нужно. Пусто — выключено.";
 "Adding files" = "Добавление файлов";
@@ -1001,7 +1001,7 @@
 "This chat may use" = "Этот чат может использовать";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Не удалось добавить в список: платёж не найден или имя отклонено.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Этой папки больше нет или она больше не разрешена: отзовите доступ и разрешите снова.";
-"This folder is shared with LM Studio: the model is gone there too." = "Эта папка совместно используется с LM Studio: модель удалена и там.";
+"This folder is shared with LM Studio: the model is gone there too." = "Эта папка общая с LM Studio: модель исчезнет и там.";
 "This folder's access has ended or was revoked." = "Доступ к этой папке закончился или был отозван.";
 "This many of the most recent messages are kept word for word when compacting." = "Столько последних сообщений при сжатии сохраняются дословно.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель или увеличьте лимит памяти GPU.";
@@ -1166,8 +1166,8 @@
 "failed to build request" = "не удалось составить запрос";
 "failed: %@" = "сбой: %@";
 "for this chat" = "для этого чата";
-"it isn't a model folder in the models folder" = "это не папка модели в папке models";
-"it's being downloaded" = "загружается";
+"it isn't a model folder in the models folder" = "это не папка модели внутри папки моделей";
+"it's being downloaded" = "она сейчас скачивается";
 "less than a minute left" = "осталось меньше минуты";
 "llmtray in the terminal" = "llmtray в терминале";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS удаляет собственный голос модели из микрофона (Voice Processing, как в FaceTime), поэтому подавление эха работает с динамиками. Также выравнивает уровень и подавляет фоновый шум. Вступит в силу при следующем запуске.";
@@ -1202,7 +1202,7 @@
 "trash %lld" = "отправить в Корзину %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: более плотный, готовый микс. sft: отчётливый вокал, голос спереди, занимает примерно вдвое больше времени.";
 "until %@" = "до %@";
-"used %@" = "использовано %@";
+"used %@" = "использовалась %@";
 "used by %@" = "используют: %@";
 "waiting" = "ожидание";
 "writes code" = "пишет код";
@@ -1214,6 +1214,6 @@
 "· size…" = "· размер…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» невозможно удалить: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не удалось изменить закрепление: %2$@";
-"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) перемещается в Корзину — её ещё можно восстановить. Псевдоним и выбор профиля будут забыты.";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) будет перемещена в Корзину — оттуда её можно восстановить. Её алиас и выбор профиля будут забыты.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» и её индекс удалены из проекта. Исходный файл, из которого вы добавляли, не затронут.";
-"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» не был удалён: сервер занят или использует её. Повторите, когда он освободится.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Модель «%@» не удалена: сервер занят или использует её. Повторите, когда он освободится.";
