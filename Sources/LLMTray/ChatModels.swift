@@ -19,9 +19,10 @@ struct MediaSource: Codable, Equatable {
     /// (i) under it; `model` only pins one a draft chose.
     var madeWith: String? = nil
 
-    /// The model that made it, as Settings names it.
+    /// The model that made it, as Settings names it (a chat saved before
+    /// madeWith: the model a draft pinned, if any).
     var madeWithName: String? {
-        madeWith.flatMap { ImageGenModel(rawValue: $0)?.displayName ?? MusicModel(rawValue: $0)?.displayName }
+        (madeWith ?? model).flatMap { ImageGenModel(rawValue: $0)?.displayName ?? MusicModel(rawValue: $0)?.displayName }
     }
 
     /// The model a generator call runs with these settings (a rawValue).
