@@ -190,7 +190,7 @@ struct AudioClipView: View {
                         .font(.system(size: 10))
                 }
                 if source != nil {
-                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: length) }
+                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
                 }
             }
             .foregroundColor(.secondary)
@@ -268,7 +268,7 @@ struct MusicGenerationProgressView: View {
 /// The (i) under a generated image or song: what made it -- the model,
 /// the prompt, the size or length, the time it took.
 struct MediaInfoButton: View {
-    /// Read when it opens (an image's size means decoding it).
+    /// Read when it opens (an image's size from its file's header).
     let rows: () -> [(label: String, value: String)]
     @State private var shown = false
 
@@ -315,7 +315,8 @@ struct MediaInfoButton: View {
         let args = source.map { ChatToolbox.parseArguments($0.arguments) } ?? [:]
         if source?.tool == MusicToolRunner.toolName {
             // The clip's own, not the length asked for.
-            let length = songLength.map { Int($0.rounded()) } ?? MusicToolRunner.duration(args["duration"])
+            // Whole seconds down, as the player's clock.
+            let length = songLength.map { Int($0.rounded(.down)) } ?? MusicToolRunner.duration(args["duration"])
             rows.append((NSLocalizedString("Length", comment: "a generated song's details"),
                          String(format: NSLocalizedString("%lld s", comment: "a song's length"), length)))
         } else if let imageData, let size = pixelSize(imageData) {

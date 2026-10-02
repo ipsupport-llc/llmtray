@@ -392,6 +392,7 @@ struct ContentView: View {
                     }
                     if let draft = chat.draft, draft.anchor == nil {
                         GenerationDraftView(draft: draft).id(draft.id)
+                            .environment(\.visibleChatHeight, chatViewportHeight)
                     }
                     // Folder access (adr/0014): the plan waiting for approval
                     // (or its result), and a grant prompt a call waits for.
@@ -456,6 +457,8 @@ struct ContentView: View {
                 Color.clear.onAppear { chatViewportHeight = g.size.height }
                     .onChange(of: g.size.height) { chatViewportHeight = $1 }
             })
+            // A draft checks it's within the visible part (GenerationDraftView).
+            .coordinateSpace(name: ChatScroll.space)
             // Follow new text only while the user is at (or near) the end;
             // scrolled up to read something, they stay where they are.
             .onPreferenceChange(ChatBottomKey.self) { geometry in
