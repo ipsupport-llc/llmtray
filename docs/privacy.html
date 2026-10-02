@@ -203,7 +203,7 @@
     <p>Turning statistics off stops sending at once and deletes the counters not yet sent and the install ID.</p>
 
     <h2>Finding and downloading models</h2>
-    <p>When you browse for models, your search words and the models you look at are requested from <a href="https://huggingface.co">Hugging Face</a>; models are downloaded from there when you choose one. Those requests go to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
+    <p>When you browse for models, your search words and the models you look at are requested from <a href="https://huggingface.co">Hugging Face</a>; models are downloaded from there when you choose one. When a model you start has a speed-up drafter (MTP) that isn't on your Mac yet, LLMTray downloads it from Hugging Face in the background, unless you turn the drafter off in the model's profile. Those requests go to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
     <p>A Hugging Face token, if you save one (only for gated models), is kept in your Mac's Keychain and sent only to Hugging Face.</p>
 
     <h2>Tools that look things up</h2>
@@ -225,7 +225,7 @@
     <p>Tips in the Mac App Store version are In-App Purchases handled by Apple: we never see your Apple ID, name, email or payment details. After a tip you can choose to be listed as a supporter. Then the name and optional link you type, your tier, and Apple's signed proof of the purchase are sent to <code>ipsupport.us</code>. We check the proof and keep only a keyed hash of it, to match your entry to you if you ask us to remove it. A GitHub sponsor can ask to be listed too: then your GitHub login, the name and optional link you type, and your tier are sent, and we check the sponsorship on GitHub. Entries are reviewed before they appear in the list that LLMTray shows. To be removed, write to us (below).</p>
 
     <h2>Bug reports</h2>
-    <p><b>Report a Bug…</b> prepares a report on your Mac and opens it in your mail app, addressed to <code>bugreport@ipsupport.us</code>. You see everything in it before you choose to send it.</p>
+    <p><b>Report a Bug…</b> prepares a report on your Mac and opens it in your mail app, addressed to <code>bugreport@ipsupport.us</code>. You choose what goes in (LLMTray's logs, crash reports), the report is attached to the email, where you can open and read it, and nothing is sent until you send that email yourself.</p>
 
     <h2>Updates</h2>
     <p>The Mac App Store version is updated by the App Store and installs nothing else.</p>
