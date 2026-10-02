@@ -164,6 +164,17 @@ final class ModelRecommendationsTests: XCTestCase {
         XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first?.role, .recommended)
         // The ladder: a 24 GB Mac may still pick the smallest.
         XCTAssertTrue(repos(ModelRecommendations.picks(from: models, for: mac(24))).contains("roman220220/gemma-4-E2B-it-qat-mlx"))
+        // The phone build: offered from 8 GB, as lighter than the 8 GB pick.
+        let phone = "roman220220/gemma-4-E2B-it-qat-phone-mlx"
+        XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(8)).first { $0.model.repo == phone }?.role, .lighter)
+        // The dense 12B: bigger than a 16 GB Mac's pick, lighter than 24's.
+        let twelve = "roman220220/gemma-4-12B-it-qat-mlx"
+        XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(16)).first { $0.model.repo == twelve }?.role, .larger)
+        XCTAssertEqual(ModelRecommendations.picks(from: models, for: mac(24)).first { $0.model.repo == twelve }?.role, .lighter)
+        XCTAssertFalse(repos(ModelRecommendations.picks(from: models, for: mac(8))).contains(twelve))
+        // Our 31B fits a 32 GB Mac's GPU limit.
+        XCTAssertTrue(repos(ModelRecommendations.picks(from: models, for: mac(32))).contains("roman220220/gemma-4-31B-it-qat-mlx"))
+        XCTAssertFalse(repos(ModelRecommendations.picks(from: models, for: mac(24))).contains("roman220220/gemma-4-31B-it-qat-mlx"))
         // Every tier offers something on a typical Mac of it.
         for gb: UInt64 in [8, 16, 24, 32, 64] {
             let picks = ModelRecommendations.picks(from: models, for: mac(gb))
