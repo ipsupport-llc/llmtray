@@ -340,9 +340,24 @@ struct ModelsPane: View {
     }
 
     private func remove(_ m: LocalModel) {
+        // Again at the confirmation: the server may have started on this
+        // model (or a request for it) while the dialog was open.
+        guard OperationAvailability(server: server, benchmark: benchmark).canRemoveModel(isLoaded: server.loadedModelPath == m.id) else {
+            removeError = String(format: NSLocalizedString("\u{201C}%@\u{201D} wasn't removed: the server is busy or using it. Try again when it's idle.",
+                                                           comment: "deleting a model refused at confirmation: name"), m.displayName)
+            return
+        }
         do {
             try catalog.remove(m)
             removeError = nil
+        } catch let refusal as ModelRemoval.Refusal {
+            let reason: String
+            switch refusal {
+            case .downloading: reason = NSLocalizedString("it's being downloaded", comment: "deleting a model refused: reason")
+            case .notAModel, .outsideModelsFolder: reason = NSLocalizedString("it isn't a model folder in the models folder", comment: "deleting a model refused: reason")
+            }
+            removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
+                                 m.displayName, reason)
         } catch {
             removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
                                  m.displayName, error.localizedDescription)
@@ -390,7 +405,7 @@ struct ModelsPane: View {
                 Button { toRemove = m } label: { Image(systemName: "trash") }
                     .buttonStyle(.borderless)
                     .disabled(!canRemove)
-                    .help(Text(canRemove ? "Move this model to the Trash…" : "The server is using this model: stop it first (or pick another model)."))
+                    .help(Text(canRemove ? "Move this model to the Trash…" : "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle."))
                     .accessibilityLabel(Text("Delete model"))
             }
         } label: {

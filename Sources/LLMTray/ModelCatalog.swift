@@ -105,10 +105,15 @@ final class ModelCatalog: ObservableObject {
     /// profile assignment, last use, and the chat's selection of it. The
     /// caller makes sure it isn't loaded.
     func remove(_ model: LocalModel) throws {
+        let download = HFModelBrowser.activeDownload.map { root + "/" + $0 }
+        if let download, ModelRemoval.isSameOrInside(download, model.path) {
+            throw ModelRemoval.Refusal.downloading
+        }
         let url = try ModelRemoval.check(modelPath: model.path, root: root)
         let fm = FileManager.default
         try fm.trashItem(at: url, resultingItemURL: nil)
-        for dir in ModelRemoval.emptyParents(of: url, root: root) {
+        // An emptied <org>/ folder, unless a download is filling it.
+        for dir in ModelRemoval.emptyParents(of: url, root: root) where download.map({ !ModelRemoval.isSameOrInside($0, dir.path) }) ?? true {
             try? fm.trashItem(at: dir, resultingItemURL: nil)
         }
         ModelAliasStore.forget(model.id)

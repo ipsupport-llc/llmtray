@@ -976,7 +976,7 @@
 "The runtime is busy." = "The runtime is busy.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it.";
-"The server is using this model: stop it first (or pick another model)." = "The server is using this model: stop it first (or pick another model).";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle.";
 "The server log" = "The server log";
 "The server starts once %@ is downloaded" = "The server starts once %@ is downloaded";
 "The server starts with %@" = "The server starts with %@";
@@ -1164,6 +1164,8 @@
 "failed to build request" = "failed to build request";
 "failed: %@" = "failed: %@";
 "for this chat" = "for this chat";
+"it isn't a model folder in the models folder" = "it isn't a model folder in the models folder";
+"it's being downloaded" = "it's being downloaded";
 "less than a minute left" = "less than a minute left";
 "llmtray in the terminal" = "llmtray in the terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
@@ -1212,3 +1214,4 @@
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: the pin couldn't be changed: %2$@";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” and its index are deleted from the project. The file you added it from isn't touched.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” wasn't removed: the server is busy or using it. Try again when it's idle.";

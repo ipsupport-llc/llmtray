@@ -89,6 +89,7 @@ final class OperationAvailabilityTests: XCTestCase {
         }
         XCTAssertFalse(ops(.starting).canRemoveModel(isLoaded: false))
         XCTAssertFalse(ops(.stopped, bench: true).canRemoveModel(isLoaded: false))
+        XCTAssertFalse(OperationAvailability(ActivitySnapshot(server: .running, serverBusy: true)).canRemoveModel(isLoaded: false))
     }
 
     func testModelSwitchAndProfileEditing() {

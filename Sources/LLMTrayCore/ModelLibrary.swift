@@ -45,6 +45,16 @@ public enum ModelRemoval {
         case outsideModelsFolder
         /// No config.json: not a model folder ModelDiscovery lists.
         case notAModel
+        /// Being downloaded right now.
+        case downloading
+    }
+
+    /// `path` is `folder` or below it (by path components, tildes expanded,
+    /// no symlinks resolved).
+    public static func isSameOrInside(_ path: String, _ folder: String) -> Bool {
+        let p = URL(fileURLWithPath: (path as NSString).expandingTildeInPath).standardizedFileURL.pathComponents
+        let f = URL(fileURLWithPath: (folder as NSString).expandingTildeInPath).standardizedFileURL.pathComponents
+        return p.count >= f.count && Array(p.prefix(f.count)) == f
     }
 
     /// The model folder, checked: strictly inside `root` (symlinks in the

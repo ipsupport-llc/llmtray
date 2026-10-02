@@ -77,6 +77,15 @@ final class ModelLibraryTests: XCTestCase {
         XCTAssertEqual(ModelRemoval.emptyParents(of: solo, root: root.path), [], "never the root")
     }
 
+    func testSameOrInside() {
+        XCTAssertTrue(ModelRemoval.isSameOrInside("/m/org/a", "/m/org/a"))
+        XCTAssertTrue(ModelRemoval.isSameOrInside("/m/org/a", "/m/org"))
+        XCTAssertTrue(ModelRemoval.isSameOrInside("/m/org/a/", "/m/org"))
+        XCTAssertFalse(ModelRemoval.isSameOrInside("/m/org/a", "/m/org/ab"))
+        XCTAssertFalse(ModelRemoval.isSameOrInside("/m/orga/b", "/m/org"))
+        XCTAssertFalse(ModelRemoval.isSameOrInside("/m/org", "/m/org/a"))
+    }
+
     func testAddedDateIsTheFolderCreation() throws {
         let root = try tree()
         let added = try XCTUnwrap(ModelRemoval.addedDate(modelPath: root.path + "/org/a"))
