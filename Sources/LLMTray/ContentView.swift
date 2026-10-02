@@ -516,7 +516,10 @@ struct ContentView: View {
                     if followBeforeDraft == nil { followBeforeDraft = followChatBottom }
                     followChatBottom = false
                 }
-                DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
+                // After the layout the draft causes: one main-queue turn
+                // scrolled against the old content height, the draft below
+                // the view (followToEnd).
+                DispatchQueue.main.async { DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } } }
             }
             // A folder prompt or plan wants the user's eyes too.
             .onChange(of: chat.folderPrompt?.id) { _, id in

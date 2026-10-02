@@ -154,6 +154,7 @@ struct MessageBubble: View {
             ForEach(Array(message.audios.enumerated()), id: \.offset) { i, data in
                 AudioClipView(data: data, id: "\(message.id.uuidString)-\(i)", prompt: message.audioPrompts[safe: i] ?? "",
                               generationSeconds: message.audioDurations[safe: i],
+                              source: message.audioSources.count == message.audios.count ? message.audioSources[safe: i] : nil,
                               canRegenerate: canRegenerate(.music, i),
                               action: regenerateMedia.map { act in { act(.music, i, $0) } })
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -288,6 +289,13 @@ struct MessageBubble: View {
                     }
                     if let seconds = message.imageDurations[safe: i] {
                         Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.system(size: 10))
+                    }
+                    // Sources line up with the images only when there's one each.
+                    if !isUser, message.imageSources.count == message.images.count, let source = message.imageSources[safe: i] {
+                        MediaInfoButton {
+                            MediaInfoButton.rows(source: source, prompt: message.imagePrompts[safe: i] ?? "",
+                                                 seconds: message.imageDurations[safe: i], imageData: data)
+                        }
                     }
                 }
                 .foregroundColor(.secondary)

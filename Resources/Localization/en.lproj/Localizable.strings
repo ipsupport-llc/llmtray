@@ -2,6 +2,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" has changed since this answer cited it: page %lld may read differently now.";
 "\"%@\" is no longer in the project." = "\"%@\" is no longer in the project.";
+"%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";
@@ -392,6 +393,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Hover the info button under an answer to see the model, speed and how much context it used.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.";
 "How do you like LLMTray?" = "How do you like LLMTray?";
+"How it was made" = "How it was made";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
@@ -473,6 +475,7 @@
 "Launch at login" = "Launch at login";
 "Launch at login: %@" = "Launch at login: %@";
 "Leave a Review" = "Leave a Review";
+"Length" = "Length";
 "Let chats work in folders" = "Let chats work in folders";
 "Let coding agents and scripts use your models." = "Let coding agents and scripts use your models.";
 "Let the chat look in %@?" = "Let the chat look in %@?";
@@ -816,6 +819,7 @@
 "Shows the chat window" = "Shows the chat window";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Shows the model's thinking (the collapsible “Thought process” block) above its answer.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music.";
+"Size" = "Size";
 "Skip" = "Skip";
 "Skip Setup" = "Skip Setup";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
@@ -998,6 +1002,7 @@
 "Thought process" = "Thought process";
 "Tier" = "Tier";
 "Tight -- may not leave room for context" = "Tight -- may not leave room for context";
+"Time" = "Time";
 "Time in a city" = "Time in a city";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder.";
 "Today" = "Today";

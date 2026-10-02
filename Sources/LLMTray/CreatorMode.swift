@@ -63,6 +63,10 @@ final class GenerationDraft: ObservableObject, Identifiable {
     private let requestedAspect: Aspect
     private var continuation: CheckedContinuation<Outcome?, Never>?
     private var ticker: Task<Void, Never>?
+    /// The countdown decide() was given, started once the draft is on
+    /// screen (shown()): one made while the popover was closed, or below the
+    /// visible chat, went ahead unseen after its seconds.
+    private var pendingCountdown: Int?
 
     init(kind: Kind, call: ToolCall, settings: ChatSettings) {
         self.kind = kind
@@ -93,7 +97,7 @@ final class GenerationDraft: ObservableObject, Identifiable {
                     resolve(nil)
                     return
                 }
-                startCountdown(countdown)
+                pendingCountdown = countdown
             }
         } onCancel: {
             Task { @MainActor [weak self] in self?.resolve(nil) }
@@ -116,13 +120,22 @@ final class GenerationDraft: ObservableObject, Identifiable {
         }
     }
 
+    /// The draft's view is up: its countdown starts now (once).
+    func shown() {
+        guard let countdown = pendingCountdown, continuation != nil else { return }
+        pendingCountdown = nil
+        startCountdown(countdown)
+    }
+
     /// Any edit: the countdown stops, the user starts it.
     func hold() {
+        pendingCountdown = nil
         remaining = nil
         ticker?.cancel()
     }
 
     func resolve(_ outcome: Outcome?) {
+        pendingCountdown = nil
         ticker?.cancel()
         remaining = nil
         continuation?.resume(returning: outcome)
@@ -279,6 +292,8 @@ struct GenerationDraftView: View {
         .background(Color.accentColor.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .frame(maxWidth: 560, alignment: .leading)
+        // Its seconds count from here: not while the popover is closed.
+        .onAppear { draft.shown() }
     }
 
     /// Editing anything stops the countdown.
