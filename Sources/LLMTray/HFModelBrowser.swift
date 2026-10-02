@@ -360,6 +360,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 }
                 if files.values.allSatisfy(\.isDone) { finishIfComplete() }
             } catch {
+                // A cancelled download's late failure: another may have
+                // started since, and is not this one to end.
+                guard generation == downloadGeneration else { return }
                 downloadError = error.localizedDescription
                 downloadingID = nil
             }

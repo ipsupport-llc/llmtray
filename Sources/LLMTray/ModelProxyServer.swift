@@ -361,7 +361,7 @@ final class ModelProxyServer {
             // usage statistics.
             if !fromApp, activity { UsageTelemetry.shared.record(.apiServer, model: self.server.loadedModelPath) }
             // Settings → Models' "last used" (the app's own chats too).
-            if activity { ModelCatalog.shared.recordUse(self.server.loadedModelPath) }
+            if activity { await MainActor.run { ModelCatalog.shared.recordUse(self.server.loadedModelPath) } }
             let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
             self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort, activity: activity)
         }
