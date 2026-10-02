@@ -117,10 +117,13 @@ final class GenerationDraft: ObservableObject, Identifiable {
                     self.resolve(.run)
                     return
                 }
-                // Paused (unseen): checked less often.
-                let step = self.isVisible ? 0.1 : 0.5
+                // Paused (unseen): checked less often. A step counts only if
+                // the draft was seen through it -- shown halfway through a
+                // paused one, it would take the whole step.
+                let seenBefore = self.isVisible
+                let step = seenBefore ? 0.1 : 0.5
                 try? await Task.sleep(nanoseconds: UInt64(step * 1e9))
-                if self.remaining != nil, self.isVisible { self.remaining = max(0, left - step) }
+                if self.remaining != nil, seenBefore, self.isVisible { self.remaining = max(0, left - step) }
             }
         }
     }
