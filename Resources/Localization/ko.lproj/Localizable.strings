@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\"는 이 답변이 인용한 이후 변경되었습니다: %lld쪽의 내용이 지금은 다르게 보일 수 있습니다.";
 "\"%@\" is no longer in the project." = "\"%@\"는 더 이상 프로젝트에 없습니다.";
+"%.1f s" = "%.1f초";
 "%1$@ and %2$lld more" = "%1$@ 및 %2$lld개 더";
 "%1$@ asks for %2$@" = "%1$@이(가) %2$@을(를) 요청합니다";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@이(가) %2$@을(를) 요청합니다. 전환하면 현재 로드된 모델이 언로드됩니다.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "응답 아래의 정보 버튼에 마우스를 올리면 모델, 속도 및 사용한 컨텍스트 양을 확인할 수 있습니다.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "음악이 얼마나 대담하고 예상 밖인지입니다. turbo만 해당: sft에는 변화를 주는 곡 계획자가 없습니다.";
 "How do you like LLMTray?" = "LLMTray는 어떠신가요?";
+"How it was made" = "어떻게 만들어졌는지";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "다음 항목을 각각 몇 번 사용했는지: 채팅, 도구 호출, API 서버(다른 앱), 이미지 생성, 이미지 편집, 음악, 모델 다운로드.";
@@ -475,6 +477,7 @@
 "Launch at login" = "로그인 시 열기";
 "Launch at login: %@" = "로그인 시 실행: %@";
 "Leave a Review" = "리뷰 남기기";
+"Length" = "길이";
 "Let chats work in folders" = "채팅에 폴더 작업 허용";
 "Let coding agents and scripts use your models." = "코딩 에이전트와 스크립트가 모델을 사용하도록 허용합니다.";
 "Let the chat look in %@?" = "%@을(를) 채팅이 열람하도록 허용할까요?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "채팅 창 표시";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "답변 위에 모델의 생각(접을 수 있는 ‘사고 과정’ 블록)을 표시합니다.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "가사를 명확히 부르고 보컬이 전면에 나옵니다. 30초 분량의 음악을 만드는 데 약 40초 소요됩니다.";
+"Size" = "크기";
 "Skip" = "건너뛰기";
 "Skip Setup" = "설정 건너뛰기";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "가장 작고 공격적임 — 일부 프롬프트에서 생성 구성이 눈에 띄게 변할 수 있습니다.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "사고 과정";
 "Tier" = "등급";
 "Tight -- may not leave room for context" = "타이트함 — 문맥을 위한 여지가 없을 수 있음";
+"Time" = "시간";
 "Time in a city" = "도시별 시간";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "복원하려면 LLMTray의 Undo를 사용하세요: Finder의 Put Back은 원래 폴더를 알지 못합니다.";
 "Today" = "오늘";

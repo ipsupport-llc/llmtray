@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "この回答で引用した「%@」は変更されています：ページ %lld の内容が現在とは異なる可能性があります。";
 "\"%@\" is no longer in the project." = "「%@」はプロジェクトに含まれていません。";
+"%.1f s" = "%.1f 秒";
 "%1$@ and %2$lld more" = "%1$@ 他 %2$lld 件";
 "%1$@ asks for %2$@" = "%1$@ が %2$@ を要求しています";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ が %2$@ を要求しています。切り替えると現在読み込まれているモデルはアンロードされます。";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "回答の下にある情報ボタンにカーソルを合わせると、モデル、速度、使用したコンテキスト量が表示されます。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音楽の冒険性・予測不能さ。turboのみ適用：sftには曲のプランナーがありません。";
 "How do you like LLMTray?" = "LLMTrayのご感想をお聞かせください";
+"How it was made" = "作成方法の詳細です。";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "使用回数を集計します：チャット、ツール呼び出し、APIサーバー（他のアプリ）、画像生成、画像編集、音楽、モデルのダウンロード。";
@@ -475,6 +477,7 @@
 "Launch at login" = "ログイン時に起動";
 "Launch at login: %@" = "ログイン時に起動: %@";
 "Leave a Review" = "レビューを書く";
+"Length" = "長さ";
 "Let chats work in folders" = "チャットにフォルダ操作を許可";
 "Let coding agents and scripts use your models." = "コーディングエージェントやスクリプトにモデルの利用を許可します。";
 "Let the chat look in %@?" = "チャットに %@ を参照させますか？";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "チャットウインドウを表示";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "モデルの思考（折りたたみ可能な「思考プロセス」ブロック）を回答の上に表示します。";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌詞がはっきり歌われ、ボーカルが前面に出ます。30秒の音楽に約40秒かかります。";
+"Size" = "サイズ";
 "Skip" = "スキップ";
 "Skip Setup" = "セットアップをスキップ";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "最小かつ最もアグレッシブ — 一部のプロンプトでは生成の構成が目に見えて変化することがあります。";
@@ -1000,6 +1004,7 @@
 "Thought process" = "思考プロセス";
 "Tier" = "ランク";
 "Tight -- may not leave room for context" = "タイト — コンテキストの余地がない場合があります";
+"Time" = "時間";
 "Time in a city" = "都市の時刻";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "元に戻すには LLMTray の Undo を使用してください：Finder の Put Back は元のフォルダを認識しません。";
 "Today" = "今日";

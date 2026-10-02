@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "自本回答引用後，「%@」已變更：第 %lld 頁的內容可能已不同。";
 "\"%@\" is no longer in the project." = "「%@」已不再包含於專案中。";
+"%.1f s" = "%.1f 秒";
 "%1$@ and %2$lld more" = "%1$@ 與其他 %2$lld 筆";
 "%1$@ asks for %2$@" = "%1$@ 請求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 請求 %2$@。切換會卸載目前載入的模型。";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "將滑鼠移至答案下方的資訊按鈕，可查看所用模型、速度與使用的上下文量。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音樂的冒險度與意外性。僅限 turbo：sft 無歌曲規劃器可變化。";
 "How do you like LLMTray?" = "您覺得 LLMTray 如何？";
+"How it was made" = "此作品的製作方式";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "每個 GPU 步驟合併批次處理的要求數量。只有多個用戶端同時使用伺服器時才有幫助；會使用更多記憶體。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "您使用下列功能的次數：聊天、工具呼叫、API 伺服器（其他應用程式）、圖像產生、圖像編輯、音樂、模型下載。";
@@ -475,6 +477,7 @@
 "Launch at login" = "登入時啟動";
 "Launch at login: %@" = "登入時開啟：%@";
 "Leave a Review" = "撰寫評論";
+"Length" = "長度";
 "Let chats work in folders" = "允許聊天室在資料夾中作業";
 "Let coding agents and scripts use your models." = "允許編碼代理與腳本使用你的模型。";
 "Let the chat look in %@?" = "是否允許聊天室檢視 %@？";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "顯示對話視窗";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方顯示模型的思考內容（可收合的「思考過程」區塊）。";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌詞清晰，人聲靠前。生成約需 30 秒音樂的 40 秒。";
+"Size" = "大小";
 "Skip" = "略過";
 "Skip Setup" = "跳過設定";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "最小且最激進 — 在某些提示下可能明顯改變生成構圖。";
@@ -1000,6 +1004,7 @@
 "Thought process" = "思考過程";
 "Tier" = "等級";
 "Tight -- may not leave room for context" = "緊湊 — 可能無足夠空間容納上下文";
+"Time" = "時間";
 "Time in a city" = "城市時間";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "要還原請在 LLMTray 中使用 Undo：Finder 的 Put Back 無法辨識其資料夾。";
 "Today" = "今天";

@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" telah berubah sejak jawaban ini mengutipnya: halaman %lld mungkin terbaca berbeda sekarang.";
 "\"%@\" is no longer in the project." = "\"%@\" sudah tidak ada lagi dalam proyek.";
+"%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ dan %2$lld lagi";
 "%1$@ asks for %2$@" = "%1$@ meminta %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ meminta %2$@. Beralih akan memuat keluar model yang sedang dimuat.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Arahkan penunjuk ke tombol info di bawah jawaban untuk melihat model, kecepatan, dan berapa banyak konteks yang digunakan.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Seberapa berani dan tak terduga musiknya. hanya turbo: sft tidak memiliki perencana lagu untuk variasi.";
 "How do you like LLMTray?" = "Bagaimana menurut Anda tentang LLMTray?";
+"How it was made" = "Bagaimana ini dibuat";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Berapa kali Anda menggunakan masing‑masing: obrolan, pemanggilan alat, server API (aplikasi lain), pembuatan gambar, pengeditan gambar, musik, unduhan model.";
@@ -475,6 +477,7 @@
 "Launch at login" = "Buka saat masuk";
 "Launch at login: %@" = "Buka saat masuk: %@";
 "Leave a Review" = "Tinggalkan Ulasan";
+"Length" = "Panjang";
 "Let chats work in folders" = "Izinkan chat bekerja di folder";
 "Let coding agents and scripts use your models." = "Biarkan agen pengkodean dan skrip menggunakan model Anda.";
 "Let the chat look in %@?" = "Izinkan chat melihat %@?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "Menampilkan jendela obrolan";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Menampilkan pemikiran model (blok “Proses berpikir” yang dapat diciutkan) di atas jawabannya.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Menyanyikan lirik dengan jelas, vokal di depan. Sekitar 40 s untuk 30 s musik.";
+"Size" = "Ukuran";
 "Skip" = "Lewati";
 "Skip Setup" = "Lewati Setelan";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Paling kecil dan agresif — dapat menggeser komposisi hasil pada beberapa prompt.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "Proses berpikir";
 "Tier" = "Tingkat";
 "Tight -- may not leave room for context" = "Sempit — mungkin tidak memberi ruang untuk konteks";
+"Time" = "Waktu";
 "Time in a city" = "Waktu di kota";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Untuk mengembalikannya, gunakan Undo di LLMTray: Finder's Put Back tidak mengetahui foldernya.";
 "Today" = "Hari ini";

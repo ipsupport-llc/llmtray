@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" bu yanıtta belirtiltiğinden beri değişti: %lld. sayfa şimdi farklı görünebilir.";
 "\"%@\" is no longer in the project." = "\"%@\" artık projede değil.";
+"%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ ve %2$lld tane daha";
 "%1$@ asks for %2$@" = "%1$@, %2$@ istiyor";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@, %2$@ istiyor. Değiştirirseniz şu anda yüklü olan model boşaltılır.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Bir cevabın altındaki bilgi düğmesinin üzerine gelin; modeli, hızı ve ne kadar bağlam kullandığını görebilirsiniz.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Müziğin ne kadar maceracı ve beklenmedik olduğu. Sadece turbo: sft’de şarkı planlayıcısı yok.";
 "How do you like LLMTray?" = "LLMTray’i nasıl buluyorsunuz?";
+"How it was made" = "Nasıl yapıldı";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Aşağıdakileri kaç kez kullandığınız: sohbet, araç çağrıları, API sunucusu (diğer uygulamalar), görüntü oluşturma, görüntü düzenleme, müzik, model indirmeleri.";
@@ -475,6 +477,7 @@
 "Launch at login" = "Girişte aç";
 "Launch at login: %@" = "Girişte aç: %@";
 "Leave a Review" = "Değerlendirme bırak";
+"Length" = "Uzunluk";
 "Let chats work in folders" = "Sohbetlerin klasörlerde çalışmasına izin ver";
 "Let coding agents and scripts use your models." = "Kodlama ajanlarının ve scriptlerin modellerinizi kullanmasına izin verin.";
 "Let the chat look in %@?" = "Sohbetin %@ içinde bakmasına izin verilsin mi?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "Sohbet penceresini gösterir";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Modelin düşünme sürecini (daraltılabilir “Düşünce süreci” bloğunu) yanıtının üstünde gösterir.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Sözleri net söyler, vokal önde. 30 sn’lik müzik için yaklaşık 40 sn sürer.";
+"Size" = "Boyut";
 "Skip" = "Atla";
 "Skip Setup" = "Kurulumu Atla";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "En küçük ve en agresif — bazı istemlerde oluşturulan görselin kompozisyonu belirgin şekilde kayabilir.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "Düşünme süreci";
 "Tier" = "Seviye";
 "Tight -- may not leave room for context" = "Sıkı — bağlam için yer bırakmayabilir";
+"Time" = "Zaman";
 "Time in a city" = "Şehir saati";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Geri koymak için LLMTray'de Geri Al'ı kullanın: Finder'ın Put Back işlemi klasörünü bilmez.";
 "Today" = "Bugün";

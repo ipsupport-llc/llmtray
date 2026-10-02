@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" 自本答案引用以来已发生更改：第 %lld 页的内容现在可能不同。";
 "\"%@\" is no longer in the project." = "\"%@\" 不再在项目中。";
+"%.1f s" = "%.1f 秒";
 "%1$@ and %2$lld more" = "%1$@，另有 %2$lld 项";
 "%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "将鼠标悬停在答案下方的信息按钮上，可查看模型、速度及其使用了多少上下文。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音乐的冒险与意外程度。仅 turbo 可用：sft 无歌曲规划器以供变化。";
 "How do you like LLMTray?" = "您觉得 LLMTray 如何？";
+"How it was made" = "说明创作过程";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "统计您使用下列功能的次数：对话、工具调用、API 服务器（其他应用）、图像生成、图像编辑、音乐、模型下载。";
@@ -475,6 +477,7 @@
 "Launch at login" = "登录时打开";
 "Launch at login: %@" = "登录时启动：%@";
 "Leave a Review" = "留下评价";
+"Length" = "长度";
 "Let chats work in folders" = "允许聊天在文件夹中工作";
 "Let coding agents and scripts use your models." = "允许代码代理和脚本使用你的模型。";
 "Let the chat look in %@?" = "允许聊天查看 %@ 吗？";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "显示对话窗口";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "在回答上方显示模型的思考内容（可折叠的“思考过程”块）。";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "歌词清晰可闻，人声靠前。制作约需 30 秒音乐的 40 秒。";
+"Size" = "大小";
 "Skip" = "跳过";
 "Skip Setup" = "跳过设置";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "体积最小且最激进 —— 在某些提示下可能明显偏移生成构图。";
@@ -1000,6 +1004,7 @@
 "Thought process" = "思考过程";
 "Tier" = "级别";
 "Tight -- may not leave room for context" = "紧凑 —— 可能无足够空间放置上下文";
+"Time" = "时间";
 "Time in a city" = "城市时间";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "要恢复，请在 LLMTray 中使用“撤销”：Finder 的“放回原处”无法识别其文件夹。";
 "Today" = "今天";

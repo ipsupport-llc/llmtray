@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" đã thay đổi kể từ khi câu trả lời này trích dẫn nó: trang %lld có thể hiển thị khác bây giờ.";
 "\"%@\" is no longer in the project." = "\"%@\" không còn trong dự án nữa.";
+"%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ và %2$lld mục khác";
 "%1$@ asks for %2$@" = "%1$@ yêu cầu %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ yêu cầu %2$@. Chuyển sẽ tháo mô hình đang tải.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Di chuột lên nút thông tin dưới câu trả lời để xem mô hình, tốc độ và lượng ngữ cảnh đã dùng.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Mức độ táo bạo và bất ngờ của nhạc. Chỉ turbo: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "How do you like LLMTray?" = "Bạn đánh giá LLMTray thế nào?";
+"How it was made" = "Cách tạo ra";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Số lần bạn đã dùng từng mục: chat, gọi công cụ, máy chủ API (ứng dụng khác), tạo ảnh, chỉnh sửa ảnh, âm nhạc, tải xuống mô hình.";
@@ -475,6 +477,7 @@
 "Launch at login" = "Mở khi đăng nhập";
 "Launch at login: %@" = "Mở khi đăng nhập: %@";
 "Leave a Review" = "Gửi đánh giá";
+"Length" = "Độ dài";
 "Let chats work in folders" = "Cho phép trò chuyện thao tác trong thư mục";
 "Let coding agents and scripts use your models." = "Cho agents và script sử dụng mô hình của bạn.";
 "Let the chat look in %@?" = "Cho phép cuộc trò chuyện xem trong %@?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "Hiển thị cửa sổ trò chuyện";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Hiển thị phần suy nghĩ của mô hình (khối “Quá trình suy nghĩ” có thể thu gọn) phía trên câu trả lời.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Hát lời rõ, giọng nổi lên phía trước. Khoảng 40 giây cho 30 giây nhạc.";
+"Size" = "Kích thước";
 "Skip" = "Bỏ qua";
 "Skip Setup" = "Bỏ qua thiết lập";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Nhỏ nhất và quyết liệt nhất — có thể làm lệch bố cục tạo ảnh với một số prompt.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "Quá trình suy nghĩ";
 "Tier" = "Hạng";
 "Tight -- may not leave room for context" = "Chật — có thể không còn chỗ cho ngữ cảnh";
+"Time" = "Thời gian";
 "Time in a city" = "Giờ ở thành phố";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "Để đặt lại, dùng Undo trong LLMTray: Finder's Put Back không biết thư mục của nó.";
 "Today" = "Hôm nay";

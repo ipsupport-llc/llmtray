@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "״%@״ השתנה מאז שהתשובה הזאת ציינה אותו: ייתכן שעמוד %lld ייראה שונה עכשיו.";
 "\"%@\" is no longer in the project." = "״%@״ כבר לא חלק מהפרויקט.";
+"%.1f s" = "%.1f שנ'";
 "%1$@ and %2$lld more" = "%1$@ ועוד %2$lld";
 "%1$@ asks for %2$@" = "%1$@ מבקש את %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ מבקש את %2$@. החלפה תסיר את המודל הטעון כעת.";
@@ -394,6 +395,7 @@
 "Hover the info button under an answer to see the model, speed and how much context it used." = "העבר את הסמן מעל כפתור המידע מתחת לתשובה כדי לראות את המודל, המהירות וכמה הקשר הוא השתמש.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "כמה הרמוני ובלתי צפוי יהיה המוזיקה. זמין רק ב‑turbo: ל‑sft אין מתכנן שירים לשונות.";
 "How do you like LLMTray?" = "מה דעתך על LLMTray?";
+"How it was made" = "איך זה נוצר";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
 "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "כמה בקשות מקובצות לצעד GPU אחד. עוזר רק כשכמה לקוחות משתמשים בשרת בו־זמנית; משתמש ביותר זיכרון.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "כמה פעמים השתמשת בכל אחד מהבאים: צ'אט, קריאות כלים, שרת ה-API (יישומים אחרים), יצירת תמונות, עריכת תמונות, מוזיקה, הורדות מודלים.";
@@ -475,6 +477,7 @@
 "Launch at login" = "פתח בעת ההתחברות";
 "Launch at login: %@" = "התפתח בכניסה: %@";
 "Leave a Review" = "השאר חוות דעת";
+"Length" = "אורך";
 "Let chats work in folders" = "אפשר לשיחות לפעול בתיקיות";
 "Let coding agents and scripts use your models." = "אפשר לסוכני קוד וסקריפטים להשתמש במודלים שלך.";
 "Let the chat look in %@?" = "להרשות לשיחה להסתכל ב־%@?";
@@ -818,6 +821,7 @@
 "Shows the chat window" = "מציג את חלון הצ'אט";
 "Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "מציג את החשיבה של המודל (המקטע המתקפל „תהליך החשיבה”) מעל התשובה שלו.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "שרה את המילים בבירור, הקול בחזית. כ‑40 שנ׳ להכנת 30 שנ׳ מוזיקה.";
+"Size" = "גודל";
 "Skip" = "דלג";
 "Skip Setup" = "דלג על ההתקנה";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "הכי קטן והכי אגרסיבי — עלול לשנות באופן ניכר את הרכבת התמונה בכמה קריאות.";
@@ -1000,6 +1004,7 @@
 "Thought process" = "תהליך החשיבה";
 "Tier" = "רמה";
 "Tight -- may not leave room for context" = "צפוף — עשוי שלא להשאיר מקום להקשר";
+"Time" = "זמן";
 "Time in a city" = "שעה בעיר";
 "To put it back, use Undo in LLMTray: Finder's Put Back doesn't know its folder." = "להשיבו חזור השתמש ב־Undo ב־LLMTray: Finder's Put Back לא יודע את התיקייה שלו.";
 "Today" = "היום";
