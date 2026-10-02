@@ -28,6 +28,9 @@ final class ModelCatalog: ObservableObject {
     /// sizes, so a limit raised with sysctl shows at the next rescan.
     @Published private(set) var weights: [String: Int64] = [:]
     @Published private(set) var hardware: HardwareInfo?
+    /// When each model was last loaded or sent a request (ModelUsageStore),
+    /// for the Models list.
+    @Published private(set) var lastUsed: [String: Date] = [:]
     var totalBytes: Int64 { sizes.values.reduce(0, +) }
     private(set) var root: String = ModelDiscovery.currentModelsRoot()
     private var observers: [AnyCancellable] = []
@@ -57,6 +60,9 @@ final class ModelCatalog: ObservableObject {
         let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
         if scanned != models { models = scanned }
         if scannedAliases != aliases { aliases = scannedAliases }
+        let usage = ModelUsageStore()
+        let used = Dictionary(uniqueKeysWithValues: scanned.compactMap { m in usage.lastUsed(m.id).map { (m.id, $0) } })
+        if used != lastUsed { lastUsed = used }
         // Every rescan goes through here: the model card reads each model's
         // capabilities again (its next render, or the sizes landing).
         ModelCapabilities.invalidate()
@@ -86,6 +92,35 @@ final class ModelCatalog: ObservableObject {
                 if self.hardware != hardware { self.hardware = hardware }
             }
         }
+    }
+
+    /// The model was loaded or sent a request (at most one write a minute).
+    func recordUse(_ modelID: String?) {
+        guard let modelID, ModelUsageStore().record(modelID) else { return }
+        lastUsed[modelID] = ModelUsageStore().lastUsed(modelID)
+    }
+
+    /// Moves an installed model's folder to the Trash (an emptied <org>/
+    /// folder with it) and forgets what LLMTray kept about it: its alias,
+    /// profile assignment, last use, and the chat's selection of it. The
+    /// caller makes sure it isn't loaded.
+    func remove(_ model: LocalModel) throws {
+        let download = HFModelBrowser.activeDownload.map { root + "/" + $0 }
+        if let download, ModelRemoval.isSameOrInside(download, model.path) {
+            throw ModelRemoval.Refusal.downloading
+        }
+        let url = try ModelRemoval.check(modelPath: model.path, root: root)
+        let fm = FileManager.default
+        try fm.trashItem(at: url, resultingItemURL: nil)
+        // An emptied <org>/ folder, unless a download is filling it.
+        for dir in ModelRemoval.emptyParents(of: url, root: root) where download.map({ !ModelRemoval.isSameOrInside($0, dir.path) }) ?? true {
+            try? fm.trashItem(at: dir, resultingItemURL: nil)
+        }
+        ModelAliasStore.forget(model.id)
+        ProfileManager.shared.assign(profileID: Profile.defaultID, to: model.id)
+        ModelUsageStore().forget(model.id)
+        if UserDefaults.standard[Pref.selectedModelID] == model.id { UserDefaults.standard[Pref.selectedModelID] = nil }
+        rescan()
     }
 
     /// The model barely fits the GPU (GPUFit), or nil: fits, or not

@@ -226,6 +226,10 @@ struct ModelsPane: View {
     @State private var hfTokenSaved = HFToken.value != nil
 
     @State private var hfTokenError: String?
+    /// The model the Delete confirmation is for, and why the last removal failed.
+    @State private var toRemove: LocalModel?
+    @State private var removeError: String?
+    @ObservedObject private var switchPrompter = ModelSwitchPrompter.shared
 
     private func saveToken() {
         let token = hfToken.trimmingCharacters(in: .whitespaces)
@@ -298,6 +302,9 @@ struct ModelsPane: View {
                 if models.isEmpty {
                     Text("No models found in this folder.").foregroundStyle(.secondary)
                 }
+                if let removeError {
+                    Text(removeError).font(.caption).foregroundStyle(.red).fixedSize(horizontal: false, vertical: true)
+                }
                 ForEach(models) { m in
                     modelRow(m)
                 }
@@ -310,6 +317,70 @@ struct ModelsPane: View {
         }
         .formStyle(.grouped)
         .onAppear(perform: rescan)
+        .confirmationDialog(
+            Text("Move this model to the Trash?"), isPresented: Binding(get: { toRemove != nil }, set: { if !$0 { toRemove = nil } }),
+            presenting: toRemove
+        ) { m in
+            Button("Move to Trash", role: .destructive) { remove(m) }
+        } message: { m in
+            Text(removeMessage(m))
+        }
+    }
+
+    private func removeMessage(_ m: LocalModel) -> String {
+        let size = catalog.sizes[m.id].map(ModelCatalog.format) ?? "…"
+        var text = String(format: NSLocalizedString("\u{201C}%@\u{201D} (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten.",
+                                                    comment: "deleting a model: name, size"), m.displayName, size)
+        #if !APP_STORE
+        // No other app named in the App Store build (adr/0018 §5).
+        if modelsRoot.contains("/.lmstudio/") {
+            text += " " + NSLocalizedString("This folder is shared with LM Studio: the model is gone there too.", comment: "deleting a model from LM Studio's folder")
+        }
+        #endif
+        return text
+    }
+
+    private func remove(_ m: LocalModel) {
+        // Again at the confirmation: the server may have started on this
+        // model (or a request for it) while the dialog was open.
+        guard OperationAvailability(server: server, benchmark: benchmark).canRemoveModel(isLoaded: isInUse(m)) else {
+            removeError = String(format: NSLocalizedString("\u{201C}%@\u{201D} wasn't removed: the server is busy or using it. Try again when it's idle.",
+                                                           comment: "deleting a model refused at confirmation: name"), m.displayName)
+            return
+        }
+        do {
+            try catalog.remove(m)
+            removeError = nil
+        } catch let refusal as ModelRemoval.Refusal {
+            let reason: String
+            switch refusal {
+            case .downloading: reason = NSLocalizedString("it's being downloaded", comment: "deleting a model refused: reason")
+            case .notAModel, .outsideModelsFolder: reason = NSLocalizedString("it isn't a model folder in the models folder", comment: "deleting a model refused: reason")
+            }
+            removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
+                                 m.displayName, reason)
+        } catch {
+            removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
+                                 m.displayName, error.localizedDescription)
+        }
+    }
+
+    /// The server has it loaded, or a client's switch to it waits for the
+    /// user's answer (approved, the proxy would load it).
+    private func isInUse(_ m: LocalModel) -> Bool {
+        server.loadedModelPath == m.id || switchPrompter.pending?.target == m.id
+    }
+
+    /// "Added 3 Sep 2026 · used 2 hours ago" (or "never used").
+    private func datesText(_ m: LocalModel) -> String? {
+        guard let added = ModelRemoval.addedDate(modelPath: m.path) else { return nil }
+        let addedText = String(format: NSLocalizedString("Added %@", comment: "model list: when the model arrived"),
+                               added.formatted(date: .abbreviated, time: .omitted))
+        let usedText = catalog.lastUsed[m.id].map {
+            String(format: NSLocalizedString("used %@", comment: "model list: when the model was last used, e.g. \"2 hours ago\""),
+                   $0.formatted(.relative(presentation: .named)))
+        } ?? NSLocalizedString("never used", comment: "model list: the model was never loaded")
+        return addedText + " · " + usedText
     }
 
     private func modelRow(_ m: LocalModel) -> some View {
@@ -336,12 +407,22 @@ struct ModelsPane: View {
                 // restarts it between measurements.
                 .disabled(!OperationAvailability(server: server, benchmark: benchmark)
                     .canAssignProfile(toLoadedModel: server.loadedModelPath == m.id))
+                let canRemove = OperationAvailability(server: server, benchmark: benchmark)
+                    .canRemoveModel(isLoaded: isInUse(m))
+                Button { toRemove = m } label: { Image(systemName: "trash") }
+                    .buttonStyle(.borderless)
+                    .disabled(!canRemove)
+                    .help(Text(canRemove ? "Move this model to the Trash…" : "The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle."))
+                    .accessibilityLabel(Text("Delete model"))
             }
         } label: {
             VStack(alignment: .leading) {
                 Text(m.displayName).lineLimit(1)
                 if let size = catalog.sizes[m.id] {
                     Text(ModelCatalog.format(size)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                }
+                if let dates = datesText(m) {
+                    Text(dates).font(.caption).foregroundStyle(.secondary)
                 }
                 if server.loadedModelPath == m.id, case .running = server.state {
                     Text("Running").font(.caption).foregroundStyle(.green)

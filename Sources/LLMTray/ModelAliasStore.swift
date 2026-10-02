@@ -25,6 +25,14 @@ enum ModelAliasStore {
         UserDefaults.standard.set(dict, forKey: key)
     }
 
+    /// A removed model's alias: a model installed at the same path later
+    /// starts from its own default again.
+    static func forget(_ modelID: String) {
+        var dict = UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
+        guard dict.removeValue(forKey: modelID) != nil else { return }
+        UserDefaults.standard.set(dict, forKey: key)
+    }
+
     /// True if some *other* model already resolves to this exact alias --
     /// two models sharing one alias means only whichever the client's
     /// `model` field happens to route to "wins," and the other becomes

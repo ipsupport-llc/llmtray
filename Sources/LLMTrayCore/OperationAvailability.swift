@@ -77,6 +77,15 @@ public struct OperationAvailability: Equatable {
         snapshot.server == .stopped || snapshot.server == .failed
     }
 
+    /// Remove an installed model from disk: not the loaded one while it can
+    /// run (idle-unloaded, the next request reloads it), nothing while a
+    /// model is starting (it may be this one), a request is in flight (one
+    /// queued for this model would switch to it) or the benchmark runs.
+    public func canRemoveModel(isLoaded: Bool) -> Bool {
+        guard !snapshot.benchmarkRunning, !snapshot.serverBusy, snapshot.server != .starting else { return false }
+        return !isLoaded || snapshot.server == .stopped || snapshot.server == .failed
+    }
+
     /// Update or uninstall the runtime: nothing may start the model process
     /// meanwhile -- idle-unloaded counts, the next request reloads it.
     public var canChangeRuntime: Bool {

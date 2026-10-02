@@ -132,7 +132,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     let physicalMemoryBytes = ProcessInfo.processInfo.physicalMemory
 
-    @Published var downloadingID: String?
+    @Published var downloadingID: String? {
+        didSet { Self.activeDownload = downloadingID }
+    }
+    /// The repo any browser is downloading into the models folder, for a
+    /// model removal: not that model, nor its <org>/ folder meanwhile.
+    private(set) static var activeDownload: String?
     @Published var isPaused = false
     @Published var downloadProgress: Double = 0
     @Published var downloadSpeedBytesPerSec: Double = 0
@@ -355,6 +360,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 }
                 if files.values.allSatisfy(\.isDone) { finishIfComplete() }
             } catch {
+                // A cancelled download's late failure: another may have
+                // started since, and is not this one to end.
+                guard generation == downloadGeneration else { return }
                 downloadError = error.localizedDescription
                 downloadingID = nil
             }

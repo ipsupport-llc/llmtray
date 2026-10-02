@@ -971,6 +971,7 @@ final class ServerManager: ObservableObject {
 
     private func markRunning(port: Int, model: String) {
         state = .running(port: port, model: model)
+        ModelCatalog.shared.recordUse(currentModelPath)
         startContinuation?.resume()
         startContinuation = nil
     }
