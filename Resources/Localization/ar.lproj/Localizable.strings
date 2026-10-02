@@ -83,6 +83,7 @@
 "Add Files…" = "إضافة ملفات…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "أضف ملفات PDF وWord والنص إلى مشروع. محادثاته تبحث فيها وتستشهد بالصفحة؛ ثبّت ملفًا للاحتفاظ بكل محتواه في المحادثة.";
 "Add more files: every chat of the project can search them." = "أضف مزيدًا من الملفات: يمكن لكل محادثة في المشروع البحث فيها.";
+"Added %@" = "أضيف %@";
 "Added here" = "أُضيف هنا";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "تُضاف إلى موجه النظام كلما توفرت الأدوات. لا يوضح قالب الأدوات الخاص بالنموذج إلا كيفية استدعاء أداة، وليس متى يجب عدم استخدامها. اتركه فارغًا لتعطيله.";
 "Adding files" = "جارٍ إضافة الملفات";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "جارٍ نسخ الـ runtime المضمن…";
 "Couldn't be added: %@" = "تعذّر الإضافة: %@";
 "Couldn't create the report: %@" = "تعذّر إنشاء التقرير: %@";
+"Couldn't move “%@” to the Trash: %@" = "تعذر نقل «%@» إلى سلة المحذوفات: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "تعذّر الوصول إلى ipsupport.us. تم الاحتفاظ بمراجعتك؛ حاول لاحقًا.";
 "Couldn't reach the server -- please try again later." = "تعذر الوصول إلى الخادم — حاول مرة أخرى لاحقاً.";
 "Couldn't start the voice runner: %@" = "تعذر بدء مشغّل الصوت: %@";
@@ -261,6 +263,7 @@
 "Delete" = "حذف";
 "Delete Project" = "حذف المشروع";
 "Delete Project…" = "حذف المشروع…";
+"Delete model" = "حذف النموذج";
 "Delete profile “%@”?" = "حذف ملف التعريف «%@»؟";
 "Delete this chat?" = "حذف هذه الدردشة؟";
 "Delete this profile (models using it go back to Default)" = "يحذف ملف التعريف هذا (تعود النماذج التي تستخدمه إلى Default).";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "نماذج: %@ · مساحة حرة: %@";
 "Move %1$@ to %2$@" = "نقل %1$@ إلى %2$@";
 "Move %@ to the Trash" = "نقل %@ إلى Trash";
+"Move this model to the Trash?" = "هل تريد نقل هذا النموذج إلى سلة المحذوفات؟";
+"Move this model to the Trash…" = "نقل هذا النموذج إلى سلة المحذوفات…";
 "Move to Project" = "نقل إلى المشروع";
+"Move to Trash" = "نقل إلى سلة المحذوفات";
 "Music" = "موسيقى";
 "Music generation" = "إنتاج الموسيقى";
 "Music generation failed: %@" = "فشل إنتاج الموسيقى: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "الـ runtime مشغول.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "يضيف الخادم البلد التقريبي من الاتصال. لا يُرسل أبداً: المطالبات، محتوى المحادثات، الصور أو الصوت المولّد، أسماء الملفات أو المسارات، أسماء النماذج أو المستودعات، مفاتيح API، بيانات الحساب أو الاتصال. المحادثات المؤقتة لا تُحتسب.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "يُسجل الخادم أيضًا البلد التقريبي من الاتصال؛ LLMTray لا يرسله ولا يمكنه تحديده.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "الخادم يستخدم هذا النموذج أو مشغول بمعالجة طلب: أوقفه (أو اختر نموذجًا آخر)، أو انتظر حتى يصبح الخادم خاملًا.";
 "The server log" = "سجل الخادم";
 "The server starts once %@ is downloaded" = "يبدأ الخادم بمجرد تنزيل %@";
 "The server starts with %@" = "يبدأ الخادم باستخدام %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "قد تستخدم هذه الدردشة";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "تعذّر الإدراج: لم يُعثر على الدفعة أو رُفض الاسم.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "هذا المجلد لم يعد موجودًا أو لم يعد المسموح به: قم بإلغائه ثم أعد منحه الإذن.";
+"This folder is shared with LM Studio: the model is gone there too." = "هذا المجلد مشترك مع LM Studio: النموذج مفقود هناك أيضًا.";
 "This folder's access has ended or was revoked." = "انتهى وصول هذا المجلد أو تم سحبه.";
 "This many of the most recent messages are kept word for word when compacting." = "يُحتفَظ بهذا العدد من أحدث الرسائل حرفيًا عند التكثيف.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر، أو زد حد ذاكرة الـ GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "فشل في إنشاء الطلب";
 "failed: %@" = "فشل: %@";
 "for this chat" = "لهذه الدردشة";
+"it isn't a model folder in the models folder" = "ليس مجلداً لنموذج داخل مجلد models";
+"it's being downloaded" = "قيد التنزيل";
 "less than a minute left" = "أقل من دقيقة متبقية";
 "llmtray in the terminal" = "llmtray في الطرفية";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "يقوم macOS بإزالة صوت النموذج من الميكروفون (معالجة الصوت، كما في FaceTime)، لذا يعمل على السماعات. كما يُوازن مستوى الصوت ويخفف الضوضاء الخلفية. يسري مفعوله بعد إعادة البدء.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "بيئة تشغيل mlx-lm";
 "move %1$lld files into %2$lld folders" = "نقل %1$lld ملفات إلى %2$lld مجلدات";
 "move %1$lld items into %2$lld folders" = "نقل %1$lld عناصر إلى %2$lld مجلدات";
+"never used" = "لم يُستخدم أبداً";
 "no changes" = "لا تغييرات";
 "no text" = "لا يوجد نص";
 "not downloaded" = "لم يتم تنزيله";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "إرسال %lld إلى Trash";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: مكس أكثر امتلاءً ومظهرًا مكتملًا. sft: يغني الكلمات بوضوح، الصوت في المقدمة، يستغرق حوالي ضعف الوقت للصنع.";
 "until %@" = "حتى %@";
+"used %@" = "مُستخدم %@";
 "used by %@" = "مستخدم بواسطة %@";
 "waiting" = "بانتظار";
 "writes code" = "يكتب شفرة";
@@ -1202,4 +1214,6 @@
 "· size…" = "· الحجم…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» لم يتم إزالته: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: لم يتمكن من تغيير التثبيت: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) سيُنقل إلى سلة المحذوفات، حيث يمكن استعادته بعد. سيتم نسيان الاسم المستعار وخيار الملف الشخصي.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» وفهرسه حُذفا من المشروع. الملف الذي أضفته منه لم يتأثر.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» لم يُحذف: الخادم مشغول أو يستخدمه. حاول مجدداً عندما يصبح الخادم خالياً.";

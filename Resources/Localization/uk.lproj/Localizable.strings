@@ -83,6 +83,7 @@
 "Add Files…" = "Додати файли…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Додайте PDF, Word та текстові файли до проєкту. Чати шукають у них і цитують сторінки; закріпіть файл, щоб увесь його вміст був у розмові.";
 "Add more files: every chat of the project can search them." = "Додайте більше файлів: кожен чат проєкту зможе їх шукати.";
+"Added %@" = "Додано %@";
 "Added here" = "Додано сюди";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Додається до системного промпту, коли моделі доступні інструменти. Шаблон інструментів самої моделі каже лише, як їх викликати, але не коли цього робити не треба. Порожньо — вимкнено.";
 "Adding files" = "Додавання файлів";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "Копіювання вбудованого runtime…";
 "Couldn't be added: %@" = "Не вдалося додати: %@";
 "Couldn't create the report: %@" = "Не вдалося створити звіт: %@";
+"Couldn't move “%@” to the Trash: %@" = "Не вдалось перемістити «%@» у Кошик: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Не вдалося зв’язатися з ipsupport.us. Ваш відгук збережено — спробуйте пізніше.";
 "Couldn't reach the server -- please try again later." = "Не вдається зв’язатися із сервером — спробуйте пізніше.";
 "Couldn't start the voice runner: %@" = "Не вдалося запустити voice runner: %@";
@@ -261,6 +263,7 @@
 "Delete" = "Видалити";
 "Delete Project" = "Видалити проєкт";
 "Delete Project…" = "Видалити проєкт…";
+"Delete model" = "Видалити модель";
 "Delete profile “%@”?" = "Видалити профіль «%@»?";
 "Delete this chat?" = "Видалити цей чат?";
 "Delete this profile (models using it go back to Default)" = "Видалити профіль (його моделі повернуться на Default)";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "Моделі: %@ · вільно: %@";
 "Move %1$@ to %2$@" = "Перемістити %1$@ до %2$@";
 "Move %@ to the Trash" = "Перемістити %@ у Кошик";
+"Move this model to the Trash?" = "Перемістити цю модель у Кошик?";
+"Move this model to the Trash…" = "Перемістити цю модель у Кошик…";
 "Move to Project" = "Перемістити в проєкт";
+"Move to Trash" = "Перемістити в Кошик";
 "Music" = "Музика";
 "Music generation" = "Генерація музики";
 "Music generation failed: %@" = "Генерація музики не вдалася: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Runtime зайнятий.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "Сервер додає приблизну країну за підключенням. Ніколи не надсилаються: підказки, вміст чатів, згенеровані зображення або аудіо, імена файлів або шляхи, назви моделей чи репозиторії, ключі API, дані облікового запису або контакти. Тимчасові чати не враховуються.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "Сервер також фіксує приблизну країну за з’єднанням; LLMTray цього не надсилає й не може її встановити.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Сервер використовує цю модель або обробляє запит: зупиніть його (або оберіть іншу модель) або зачекайте, доки він не стане неактивним.";
 "The server log" = "Серверний лог";
 "The server starts once %@ is downloaded" = "Сервер запуститься після завантаження %@";
 "The server starts with %@" = "Сервер запускається з %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "Цей чат може використовувати";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Не вдалося додати: платіж не знайдено або ім’я відхилено.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Ця папка зникла або більше не дозволена: відкличте доступ і дозвольте знову.";
+"This folder is shared with LM Studio: the model is gone there too." = "Ця папка спільна з LM Studio: модель видалена й там.";
 "This folder's access has ended or was revoked." = "Доступ до цієї папки закінчився або був відкликаний.";
 "This many of the most recent messages are kept word for word when compacting." = "Стільки останніх повідомлень під час стиснення зберігаються дослівно.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель або збільшіть ліміт пам’яті GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "не вдалося сформувати запит";
 "failed: %@" = "помилка: %@";
 "for this chat" = "для цього чату";
+"it isn't a model folder in the models folder" = "це не папка моделі в папці models";
+"it's being downloaded" = "йде завантаження";
 "less than a minute left" = "менше хвилини залишилося";
 "llmtray in the terminal" = "llmtray у терміналі";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS вилучає власний голос моделі з мікрофона (Voice Processing, як у FaceTime), тож це працює з динаміками. Також вирівнює рівень і пригнічує фонований шум. Набуде чинності при наступному запуску.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "Середовище виконання mlx-lm";
 "move %1$lld files into %2$lld folders" = "перемістити %1$lld файлів у %2$lld папок";
 "move %1$lld items into %2$lld folders" = "перемістити %1$lld елементів у %2$lld папок";
+"never used" = "ніколи не використовувався";
 "no changes" = "без змін";
 "no text" = "немає тексту";
 "not downloaded" = "не завантажено";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "перемістити в Кошик %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: більш насичений, завершеніший мікс. sft: чітко співає слова, голос попереду, приблизно вдвічі довше на створення.";
 "until %@" = "до %@";
+"used %@" = "використано %@";
 "used by %@" = "використовують: %@";
 "waiting" = "очікування";
 "writes code" = "пише код";
@@ -1202,4 +1214,6 @@
 "· size…" = "· розмір…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» не вдалося видалити: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не вдалося змінити закріплення: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) переміщено в Кошик — звідти її можна відновити. Її псевдонім та вибір профілю будуть забуті.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» та його індекс видалено з проєкту. Файл, з якого ви його додали, не змінюється.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» не було видалено: сервер зайнятий або використовує її. Спробуйте ще раз, коли він буде неактивний.";

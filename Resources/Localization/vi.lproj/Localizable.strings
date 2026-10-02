@@ -83,6 +83,7 @@
 "Add Files…" = "Thêm tệp…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Thêm PDF, Word và tệp văn bản vào dự án. Các cuộc trò chuyện có thể tìm kiếm trong đó và trích dẫn trang; ghim tệp để giữ toàn bộ nội dung trong cuộc hội thoại.";
 "Add more files: every chat of the project can search them." = "Thêm tệp: mọi cuộc trò chuyện trong dự án đều có thể tìm kiếm chúng.";
+"Added %@" = "Đã thêm %@";
 "Added here" = "Đã thêm ở đây";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Adding files" = "Đang thêm tệp";
@@ -238,6 +239,7 @@
 "Copying the included runtime…" = "Đang sao chép runtime kèm theo…";
 "Couldn't be added: %@" = "Không thể thêm: %@";
 "Couldn't create the report: %@" = "Không thể tạo báo cáo: %@";
+"Couldn't move “%@” to the Trash: %@" = "Không thể chuyển “%@” vào Thùng Rác: %@";
 "Couldn't reach ipsupport.us. Your review is kept: try again later." = "Không liên lạc được với ipsupport.us. Đánh giá của bạn được lưu: thử lại sau.";
 "Couldn't reach the server -- please try again later." = "Không thể kết nối đến máy chủ — vui lòng thử lại sau.";
 "Couldn't start the voice runner: %@" = "Không thể khởi động voice runner: %@";
@@ -261,6 +263,7 @@
 "Delete" = "Xóa";
 "Delete Project" = "Xóa Dự án";
 "Delete Project…" = "Xóa Dự án…";
+"Delete model" = "Xóa mô hình";
 "Delete profile “%@”?" = "Xóa hồ sơ “%@”?";
 "Delete this chat?" = "Xóa cuộc trò chuyện này?";
 "Delete this profile (models using it go back to Default)" = "Xóa hồ sơ này (các mô hình dùng hồ sơ này sẽ quay về Default)";
@@ -530,7 +533,10 @@
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "Move %1$@ to %2$@" = "Di chuyển %1$@ tới %2$@";
 "Move %@ to the Trash" = "Di chuyển %@ vào Trash";
+"Move this model to the Trash?" = "Chuyển mô hình này vào Thùng Rác?";
+"Move this model to the Trash…" = "Chuyển mô hình này vào Thùng Rác…";
 "Move to Project" = "Chuyển vào Dự án";
+"Move to Trash" = "Chuyển vào Thùng Rác";
 "Music" = "Nhạc";
 "Music generation" = "Tạo nhạc";
 "Music generation failed: %@" = "Tạo nhạc thất bại: %@";
@@ -972,6 +978,7 @@
 "The runtime is busy." = "Runtime đang bận.";
 "The server adds the approximate country from the connection. Never sent: prompts, chat content, generated images or audio, file names or paths, model names or repositories, API keys, account or contact details. Temporary chats count nothing." = "Máy chủ sẽ bổ sung quốc gia gần đúng từ kết nối. Không bao giờ gửi: lời nhắc, nội dung chat, ảnh hoặc âm thanh đã tạo, tên tệp hoặc đường dẫn, tên mô hình hoặc kho lưu trữ, khóa API, thông tin tài khoản hoặc liên hệ. Các chat tạm thời không được tính.";
 "The server also notes the approximate country from the connection; LLMTray doesn't send it and can't set it." = "Máy chủ cũng ghi nhận quốc gia ước lượng từ kết nối; LLMTray không gửi thông tin đó và không thể thiết lập nó.";
+"The server is using this model or busy with a request: stop it (or pick another model), or wait until it's idle." = "Máy chủ đang dùng mô hình này hoặc đang xử lý yêu cầu: dừng nó (hoặc chọn mô hình khác), hoặc chờ đến khi máy chủ rảnh.";
 "The server log" = "Nhật ký máy chủ";
 "The server starts once %@ is downloaded" = "Server sẽ khởi động khi %@ được tải xong";
 "The server starts with %@" = "Máy chủ khởi động bằng %@";
@@ -994,6 +1001,7 @@
 "This chat may use" = "Cuộc trò chuyện này có thể dùng";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "Không thể liệt kê: không tìm thấy thanh toán hoặc tên bị từ chối.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "Thư mục này đã mất hoặc không còn được cho phép: thu hồi rồi cho phép lại.";
+"This folder is shared with LM Studio: the model is gone there too." = "Thư mục này được chia sẻ với LM Studio: mô hình cũng đã bị xoá ở đó.";
 "This folder's access has ended or was revoked." = "Quyền truy cập thư mục này đã hết hạn hoặc bị thu hồi.";
 "This many of the most recent messages are kept word for word when compacting." = "Khi nén, số tin nhắn gần đây nhất này được giữ nguyên từng chữ.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn hoặc tăng giới hạn bộ nhớ GPU.";
@@ -1158,6 +1166,8 @@
 "failed to build request" = "không thể tạo yêu cầu";
 "failed: %@" = "thất bại: %@";
 "for this chat" = "cho cuộc trò chuyện này";
+"it isn't a model folder in the models folder" = "nó không phải là thư mục mô hình trong thư mục models";
+"it's being downloaded" = "đang được tải xuống";
 "less than a minute left" = "còn dưới một phút";
 "llmtray in the terminal" = "llmtray trong Terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS loại bỏ chính giọng của mô hình khỏi micro (Xử lý Giọng nói, như FaceTime), nên tính năng hoạt động với loa. Nó cũng cân bằng âm lượng và giảm tiếng ồn nền. Có hiệu lực khi khởi động lại.";
@@ -1166,6 +1176,7 @@
 "mlx-lm runtime" = "Môi trường chạy mlx-lm";
 "move %1$lld files into %2$lld folders" = "di chuyển %1$lld tệp vào %2$lld thư mục";
 "move %1$lld items into %2$lld folders" = "di chuyển %1$lld mục vào %2$lld thư mục";
+"never used" = "chưa từng sử dụng";
 "no changes" = "không có thay đổi";
 "no text" = "không có văn bản";
 "not downloaded" = "chưa tải về";
@@ -1191,6 +1202,7 @@
 "trash %lld" = "chuyển %lld vào Trash";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: bản dày hơn, nghe như hoàn chỉnh. sft: lời rõ, giọng nổi, thời gian tạo khoảng gấp đôi.";
 "until %@" = "đến %@";
+"used %@" = "đã sử dụng %@";
 "used by %@" = "được %@ dùng";
 "waiting" = "đang chờ";
 "writes code" = "viết mã";
@@ -1202,4 +1214,6 @@
 "· size…" = "· kích thước…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” không thể gỡ: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: không thể thay đổi ghim: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) sẽ được chuyển vào Thùng Rác, nơi bạn vẫn có thể khôi phục. Bí danh và lựa chọn cấu hình của nó sẽ bị quên.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” và chỉ mục của nó đã bị xóa khỏi dự án. Tệp bạn thêm từ đó không bị ảnh hưởng.";
+"“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Không xoá được “%@”: máy chủ đang bận hoặc đang sử dụng mô hình. Thử lại khi máy chủ rảnh.";
