@@ -285,12 +285,12 @@
 "Download" = "Скачать";
 "Download LLMTray-Full" = "Загрузить LLMTray‑Full";
 "Download and Enable" = "Скачать и включить";
-"Download for %@, into the models folder" = "Загрузить для %@ в папку models";
+"Download for %@, into the models folder" = "Скачать для «%@» в папку моделей";
 "Download into the models folder" = "Скачивать в папку models";
 "Download models" = "Загрузить модели";
 "Download models from Hugging Face" = "Загрузить модели с Hugging Face";
 "Downloaded" = "Скачано";
-"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Загружено более ранней версией на другом диске, не в папке models: останется на том месте.";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Скачана более ранней версией, на другом диске, чем папка моделей: остаётся на своём месте.";
 "Downloading" = "Загрузка";
 "Downloading %@" = "Загрузка %@";
 "Downloading %@…" = "Загрузка %@…";
@@ -959,7 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Среда выполнения модели ещё не установлена — запустите модель один раз, затем попробуйте снова.";
 "The model server no longer goes online when it starts." = "Сервер модели больше не выходит в сеть при запуске.";
 "The model's license, from its card." = "Лицензия модели с её карточки.";
-"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка models недоступна — подключён ли её диск? Выберите её заново в Настройках → Models.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка моделей недоступна — подключён ли её диск? Выберите её заново в Настройках → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Максимум памяти, которую может занять кеш предыдущих подсказок (размер кеша подсказок в профиле тоже является ограничением). Больше ускоряет длинные беседы и агентов; слишком много не оставит места для текущей читаемой подсказки.";
 "The music generator is busy -- try again once it's done." = "Генератор музыки занят — попробуйте позже, когда он завершит работу.";
 "The music generator is busy with another chat -- try again once it's done." = "Генератор музыки занят другим чатом — попробуйте позже, когда он завершит работу.";
@@ -1175,7 +1175,7 @@
 "for this chat" = "для этого чата";
 "hears audio" = "слышит аудио";
 "in LLMTray's own folder" = "в собственной папке LLMTray";
-"in an earlier models folder" = "в прежней папке models";
+"in an earlier models folder" = "в прежней папке моделей";
 "it isn't a model folder in the models folder" = "это не папка модели внутри папки моделей";
 "it's being downloaded" = "она сейчас скачивается";
 "it's in use or downloading" = "используется или загружается";
@@ -1225,7 +1225,7 @@
 "· size…" = "· размер…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» невозможно удалить: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не удалось изменить закрепление: %2$@";
-"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) перемещён в Корзину — вы всё ещё можете восстановить его. %@ нужен: загрузите его снова в Настройках, чтобы использовать.";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) будет перемещена в Корзину — оттуда её можно восстановить. Она нужна для «%@»: чтобы пользоваться, скачайте её снова в Настройках.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) будет перемещена в Корзину — оттуда её можно восстановить. Её алиас и выбор профиля будут забыты.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» и её индекс удалены из проекта. Исходный файл, из которого вы добавляли, не затронут.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Модель «%@» не удалена: сервер занят или использует её. Повторите, когда он освободится.";
