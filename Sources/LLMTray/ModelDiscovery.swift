@@ -122,12 +122,15 @@ enum ModelDiscovery {
         return weightNames(inFolder: path).contains { $0.contains(needed) }
     }
 
-    /// The checkpoint's tensor names: its index's weight map, or the header
-    /// of a lone model.safetensors (an 8-byte length, then JSON).
+    /// The checkpoint's tensor names: its index's weight map -- only those
+    /// whose shard file is there (a download that stopped part way has the
+    /// index without every shard) -- or the header of a lone
+    /// model.safetensors (an 8-byte length, then JSON).
     private static func weightNames(inFolder path: String) -> [String] {
         if let index = FileManager.default.contents(atPath: path + "/model.safetensors.index.json"),
-           let map = (try? JSONSerialization.jsonObject(with: index) as? [String: Any])?["weight_map"] as? [String: Any] {
-            return Array(map.keys)
+           let map = (try? JSONSerialization.jsonObject(with: index) as? [String: Any])?["weight_map"] as? [String: String] {
+            let present = Set(Set(map.values).filter { FileManager.default.fileExists(atPath: path + "/" + $0) })
+            return map.filter { present.contains($0.value) }.map(\.key)
         }
         guard let file = FileHandle(forReadingAtPath: path + "/model.safetensors") else { return [] }
         defer { try? file.close() }
