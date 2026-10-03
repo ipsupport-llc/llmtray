@@ -57,7 +57,8 @@ enum ModelCapabilities {
             recommended = (try? ModelRecommendations.load(contentsOf: url)) ?? []
         }
         let capabilities = ModelRecommendations.capabilities(ofLocalPath: path, in: recommended ?? [],
-                                                             vision: ModelDiscovery.supportsVision(forModelPath: path))
+                                                             vision: ModelDiscovery.supportsVision(forModelPath: path),
+                                                             audio: ModelDiscovery.supportsAudio(forModelPath: path))
         cache[path] = capabilities
         return capabilities
     }
@@ -66,6 +67,7 @@ enum ModelCapabilities {
     static func symbol(_ capability: RecommendedModel.Capability) -> String {
         switch capability {
         case .vision: return "eye"
+        case .audio: return "waveform"
         case .tools: return "wrench.and.screwdriver"
         case .reasoning: return "brain"
         case .code: return "chevron.left.forwardslash.chevron.right"
@@ -76,6 +78,7 @@ enum ModelCapabilities {
     static func name(_ capability: RecommendedModel.Capability) -> String {
         switch capability {
         case .vision: return NSLocalizedString("reads images", comment: "setup: model capability")
+        case .audio: return NSLocalizedString("hears audio", comment: "setup: model capability")
         case .tools: return NSLocalizedString("calls tools", comment: "setup: model capability")
         case .reasoning: return NSLocalizedString("reasons", comment: "setup: model capability")
         case .code: return NSLocalizedString("writes code", comment: "setup: model capability")

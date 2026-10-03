@@ -392,7 +392,7 @@ struct ModelsPane: View {
                     set: { catalog.setAlias($0, for: m.id) }
                 ))
                 .textFieldStyle(.roundedBorder)
-                .frame(width: 180)
+                .frame(width: 150)
                 .foregroundStyle(taken ? .red : .primary)
                 .help(Text(taken ? "Another model already uses this alias." : "The model name API clients send."))
                 Picker("", selection: Binding(
@@ -417,10 +417,19 @@ struct ModelsPane: View {
             }
         } label: {
             VStack(alignment: .leading) {
-                Text(m.displayName).lineLimit(1)
-                if let size = catalog.sizes[m.id] {
-                    Text(ModelCatalog.format(size)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                // The whole name, on two lines when it's long.
+                Text(m.displayName).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                    .help(Text(verbatim: m.path))
+                HStack(spacing: 6) {
+                    if let size = catalog.sizes[m.id] {
+                        Text(ModelCatalog.format(size)).monospacedDigit()
+                    }
+                    ForEach(ModelCapabilities.of(m.path), id: \.self) { c in
+                        Image(systemName: ModelCapabilities.symbol(c)).help(Text(ModelCapabilities.name(c)))
+                            .accessibilityLabel(Text(ModelCapabilities.name(c)))
+                    }
                 }
+                .font(.caption).foregroundStyle(.secondary)
                 if let dates = datesText(m) {
                     Text(dates).font(.caption).foregroundStyle(.secondary)
                 }

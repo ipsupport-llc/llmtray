@@ -28,6 +28,7 @@
       "summary": "A dense Gemma 4 on Google's QAT grid, quantized by LLMTray's authors: better answers than E4B, but slower than 26B-A4B, which runs only 4B of its parameters per token; reads images, hears audio and calls tools.",
       "capabilities": [
         "vision",
+        "audio",
         "tools",
         "reasoning"
       ],
@@ -45,6 +46,7 @@
       "summary": "A small Gemma 4 on Google's QAT grid, quantized by LLMTray's authors, that leaves room for other apps on a 16 GB Mac; reads images, hears audio and calls tools.",
       "capabilities": [
         "vision",
+        "audio",
         "tools",
         "reasoning"
       ],
@@ -64,6 +66,7 @@
       "summary": "The small Gemma 4 on Google's QAT grid, quantized by LLMTray's authors, for an 8 GB Mac; reads images, hears audio and calls tools.",
       "capabilities": [
         "vision",
+        "audio",
         "tools",
         "reasoning"
       ],
@@ -83,6 +86,7 @@
       "summary": "The smallest build here, almost a gigabyte under Gemma 4 E2B, for a Mac short on memory: quick, reads images and hears audio, but its answers are the simplest of the list.",
       "capabilities": [
         "vision",
+        "audio",
         "tools",
         "reasoning"
       ],
