@@ -106,8 +106,8 @@ struct SetupWizardView: View {
         }
     }
 
-    /// Back on its own at the left, forward on the right: the next step's
-    /// button is where Get Started was, Skip beside it.
+    /// Back and Skip at the left, the forward button alone on the right,
+    /// where Get Started was.
     private var buttons: some View {
         HStack {
             if model.step == .welcome {
@@ -116,11 +116,11 @@ struct SetupWizardView: View {
             } else if !model.isFinished {
                 Button { model.back() } label: { Label("Back", systemImage: "chevron.backward") }
             }
-            Spacer()
             if model.step != .welcome, model.step != .done {
                 Button("Skip") { model.skip() }
                     .help(Text("Puts this step back to how it was when setup opened, and goes on."))
             }
+            Spacer()
             if model.step == .done {
                 if model.isFinished {
                     Button("Close") { model.close?() }.keyboardShortcut(.defaultAction)
