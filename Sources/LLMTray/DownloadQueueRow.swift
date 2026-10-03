@@ -40,6 +40,14 @@ struct DownloadQueueRow: View {
         }
     }
 
+    /// "42% · 2.1 GB of 5 GB" (or just the percentage, size unknown).
+    static func progressText(_ progress: Double, of total: Int64?) -> String {
+        let percent = String(format: NSLocalizedString("%lld%%", comment: "download progress percentage"), Int(progress * 100))
+        guard let total, total > 0 else { return percent }
+        return String(format: NSLocalizedString("%@ · %@ of %@", comment: "download progress: percentage, done, total"),
+                      percent, ModelCatalog.format(Int64(Double(total) * progress)), ModelCatalog.format(total))
+    }
+
     private func runningRow(_ item: DownloadQueueState.Item, waiting: Int) -> some View {
         let progress: Double? = { if case .running(let p) = item.status { return p } else { return nil } }()
         return VStack(alignment: .leading, spacing: 3) {
@@ -57,7 +65,11 @@ struct DownloadQueueRow: View {
                     .help(Text("Cancel this download"))
             }
             if let progress {
-                ProgressView(value: progress).controlSize(.small)
+                HStack(spacing: 6) {
+                    ProgressView(value: progress).controlSize(.small)
+                    Text(Self.progressText(progress, of: item.approxBytes))
+                        .font(.caption).monospacedDigit().foregroundStyle(.secondary).fixedSize()
+                }
             } else {
                 ProgressView().progressViewStyle(.linear).controlSize(.small)
             }

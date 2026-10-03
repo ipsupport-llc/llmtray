@@ -213,6 +213,8 @@ final class DownloadQueue: ObservableObject {
             // Downloaded into the models folder (MediaModels): its volume's space.
             if !model.isDownloaded, let refusal = spaceRefusal(item, at: ModelDiscovery.currentModelsRoot()) { return refusal }
             watch(setup.media.$mfluxStatusText)
+            let progress = watchProgress(item, of: [MediaModels.entry(model)])
+            defer { progress.cancel() }
             if let error = await setup.downloadImageModel(model) { return error.localizedDescription }
             // Cancelled while it ran: downloaded, but not turned on.
             guard isStillWanted(item) else { return nil }
@@ -229,6 +231,8 @@ final class DownloadQueue: ObservableObject {
             if !setup.isMusicModelReady(model) {
                 if let refusal = spaceRefusal(item, at: ModelDiscovery.currentModelsRoot()) { return refusal }
                 watch(setup.media.$musicStatusText)
+                let progress = watchProgress(item, of: [MediaModels.entry(model)] + (model.usesPlanner ? [MediaModels.musicPlanner] : []))
+                defer { progress.cancel() }
                 if let error = await setup.downloadMusicModel(model) { return error.localizedDescription }
             }
             guard isStillWanted(item) else { return nil }
@@ -268,6 +272,21 @@ final class DownloadQueue: ObservableObject {
             guard isStillWanted(item) else { return false }
         }
         return isStillWanted(item)
+    }
+
+    /// An image or music model's progress, which its manager doesn't
+    /// report: what its download folders hold against the item's size, once
+    /// a second (never quite 100% before it's done).
+    private func watchProgress(_ item: DownloadQueueState.Item, of entries: [MediaModels.Entry]) -> Task<Void, Never> {
+        Task { @MainActor [weak self] in
+            guard let total = item.approxBytes, total > 0 else { return }
+            while !Task.isCancelled {
+                let bytes = await Task.detached(priority: .utility) { MediaModels.bytesDownloading(entries) }.value
+                guard !Task.isCancelled, let self else { return }
+                if bytes > 0 { self.state.setProgress(item.id, min(0.99, Double(bytes) / Double(total))) }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+        }
     }
 
     private func watch(_ status: Published<String>.Publisher) {
