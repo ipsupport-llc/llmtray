@@ -51,17 +51,17 @@ final class VoiceModelStore: ObservableObject {
         selected = VoiceLabModel.resolve(id: UserDefaults.standard[Pref.voiceLabModel], isDownloaded: Self.filesInPlace)
     }
 
-    nonisolated static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/voice_models" }
-    nonisolated static func modelDir(_ model: VoiceLabModel) -> String { modelsDir + "/" + model.folderName }
-    static func partialDir(_ model: VoiceLabModel) -> String { modelDir(model) + ".partial" }
+    /// Where the model is: the models folder, or the app's old folder for
+    /// one downloaded before (MediaModels).
+    nonisolated static func modelDir(_ model: VoiceLabModel) -> String { MediaModels.path(MediaModels.entry(model)) }
+    /// A download goes to the models folder, through this.
+    static func partialDir(_ model: VoiceLabModel) -> String { MediaModels.downloadPath(MediaModels.entry(model)) + ".partial" }
 
     /// The files are in place (config and weights index).
     func isDownloaded(_ model: VoiceLabModel) -> Bool { Self.filesInPlace(model) }
 
     nonisolated private static func filesInPlace(_ model: VoiceLabModel) -> Bool {
-        let dir = modelDir(model)
-        return FileManager.default.fileExists(atPath: dir + "/config.json")
-            && FileManager.default.fileExists(atPath: dir + "/model.safetensors.index.json")
+        MediaModels.isInstalled(MediaModels.entry(model))
     }
 
     /// A download that stopped part way, to continue.
@@ -84,11 +84,11 @@ final class VoiceModelStore: ObservableObject {
         }
         guard !isDownloaded(model) else { return }
         let fm = FileManager.default
-        try fm.createDirectory(atPath: Self.modelsDir, withIntermediateDirectories: true)
         let partial = Self.partialDir(model)
+        try fm.createDirectory(atPath: (partial as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
         let have = fm.fileExists(atPath: partial) ? await Self.size(partial) : 0
         let needed = max(0, model.downloadBytes - have)
-        if let free = DiskUsage.freeSpace(at: Self.modelsDir), free < needed + (1 << 30) {
+        if let free = DiskUsage.freeSpace(at: partial), free < needed + (1 << 30) {
             throw StoreError.diskFull(needed: needed, free: free)
         }
         statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
@@ -107,7 +107,7 @@ final class VoiceModelStore: ObservableObject {
         try await AudioRuntime.shared.snapshotDownload(repo: model.repo, into: partial)
         // huggingface_hub's own bookkeeping isn't part of the model.
         try? fm.removeItem(atPath: partial + "/.cache")
-        try fm.moveItem(atPath: partial, toPath: Self.modelDir(model))
+        try fm.moveItem(atPath: partial, toPath: MediaModels.downloadPath(MediaModels.entry(model)))
     }
 
     /// The model's files, and a partial download, go.

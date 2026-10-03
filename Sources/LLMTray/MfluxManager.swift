@@ -63,12 +63,14 @@ enum ImageGenModel: String, CaseIterable, Identifiable, Codable {
     }
 
     /// Where the checkpoint lives once downloaded.
-    var localDir: String { RuntimePaths.externalRuntimeDir + "/mflux_models/\(rawValue)" }
+    /// Where the checkpoint is: the models folder (`<root>/<repo>`), or
+    /// the app's old folder for one downloaded before (MediaModels).
+    var localDir: String { MediaModels.path(MediaModels.entry(self)) }
 
     /// The models the Settings pickers offer: all are published.
     static var selectable: [ImageGenModel] { allCases }
 
-    var isDownloaded: Bool { FileManager.default.fileExists(atPath: localDir) }
+    var isDownloaded: Bool { MediaModels.isInstalled(MediaModels.entry(self)) }
 
     var mfluxModelName: String { self == .klein4b ? "flux2-klein-4b" : "z-image-turbo" }
     var stepCount: String { self == .klein4b ? "4" : "9" }
@@ -224,19 +226,21 @@ final class MfluxManager: ObservableObject {
         isBusy = true
         defer { isBusy = false }
         try await ensurePackageInstalled()
-        if FileManager.default.fileExists(atPath: savedModelDir(for: model)) { return }
+        if model.isDownloaded { return }
 
         statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
         defer { statusText = "" }
 
+        // Into the models folder, under its repo.
+        let target = MediaModels.downloadPath(MediaModels.entry(model))
         try FileManager.default.createDirectory(
-            atPath: RuntimePaths.externalRuntimeDir + "/mflux_models", withIntermediateDirectories: true
+            atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true
         )
         // Write to a temp path and rename into place atomically -- a
         // crash/quit partway through the download must not leave a
         // half-written directory that a later fileExists() check above
         // would wrongly treat as "already done."
-        let tempDir = savedModelDir(for: model) + ".partial-\(UUID().uuidString)"
+        let tempDir = target + ".partial-\(UUID().uuidString)"
         do {
             try await runProcess(venvPython, [
                 "-c",
@@ -245,7 +249,7 @@ final class MfluxManager: ObservableObject {
                 snapshot_download("\(model.hfRepo)", local_dir="\(tempDir)")
                 """,
             ])
-            try FileManager.default.moveItem(atPath: tempDir, toPath: savedModelDir(for: model))
+            try FileManager.default.moveItem(atPath: tempDir, toPath: target)
         } catch {
             try? FileManager.default.removeItem(atPath: tempDir)
             throw error

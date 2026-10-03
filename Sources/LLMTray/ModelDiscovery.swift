@@ -1,4 +1,5 @@
 import Foundation
+import LLMTrayCore
 
 struct LocalModel: Identifiable, Hashable {
     let id: String        // full path, unique
@@ -46,6 +47,9 @@ enum ModelDiscovery {
         guard let publishers = try? fm.contentsOfDirectory(atPath: root) else { return [] }
 
         var found: [LocalModel] = []
+        // Image, music and voice models share the folder (MediaModels):
+        // not chat models.
+        let media = MediaModels.repos
         for publisher in publishers {
             let publisherPath = root + "/" + publisher
             var isDir: ObjCBool = false
@@ -53,6 +57,8 @@ enum ModelDiscovery {
             guard let modelNames = try? fm.contentsOfDirectory(atPath: publisherPath) else { continue }
             for modelName in modelNames {
                 let modelPath = publisherPath + "/" + modelName
+                // A download still running or left over isn't a model.
+                if MediaModelLocation.isPartial(modelName) || MediaModelLocation.isOneOf(media, path: modelPath, root: root) { continue }
                 var modelIsDir: ObjCBool = false
                 guard fm.fileExists(atPath: modelPath, isDirectory: &modelIsDir), modelIsDir.boolValue else { continue }
                 let configPath = modelPath + "/config.json"

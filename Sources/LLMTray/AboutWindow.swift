@@ -25,7 +25,7 @@ final class AboutLicenses: ObservableObject {
         let runtimeDir = RuntimePaths.externalRuntimeDir
         let modelPaths = ModelCatalog.shared.models.map { ($0.path, $0.path.split(separator: "/").suffix(2).joined(separator: "/")) }
         // Image models live under their own names; their repo is known.
-        let imageModels = ImageGenModel.allCases.map { (runtimeDir + "/mflux_models/" + $0.rawValue, $0.hfRepo) }
+        let imageModels = ImageGenModel.allCases.map { ($0.localDir, $0.hfRepo) }
             .filter { FileManager.default.fileExists(atPath: $0.0) }
         let musicModels = MusicManager.modelPaths.filter { FileManager.default.fileExists(atPath: $0.0) }
         let voiceModels = VoiceLabModel.all.map { (VoiceModelStore.modelDir($0), $0.repo) }

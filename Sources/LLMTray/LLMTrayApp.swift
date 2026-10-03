@@ -217,6 +217,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // The other build (adr/0018: its own bundle id) counts too -- the
         // port, the models, the memory -- but can't be handed over to.
         if handOverToRunningCopy() { return }
+        // Image, music and voice models from the app's old folder join the
+        // models folder (a rename on one volume), before anything uses them.
+        let moved = MediaModels.moveIntoModelsFolder()
+        if !moved.isEmpty { NSLog("LLMTray: moved into the models folder: %@", moved.joined(separator: ", ")) }
         #if !APP_STORE
         // After the single-instance check: the copy that stays owns the socket.
         do { try controlServer.start() } catch {

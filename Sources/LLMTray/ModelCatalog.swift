@@ -31,7 +31,10 @@ final class ModelCatalog: ObservableObject {
     /// When each model was last loaded or sent a request (ModelUsageStore),
     /// for the Models list.
     @Published private(set) var lastUsed: [String: Date] = [:]
-    var totalBytes: Int64 { sizes.values.reduce(0, +) }
+    /// Each installed image, music and voice model's size (by repo), in
+    /// the models folder or the app's old one -- with the chat models'.
+    @Published private(set) var mediaSizes: [String: Int64] = [:]
+    var totalBytes: Int64 { sizes.values.reduce(0, +) + mediaSizes.values.reduce(0, +) }
     private(set) var root: String = ModelDiscovery.currentModelsRoot()
     private var observers: [AnyCancellable] = []
     private var usageTask: Task<Void, Never>?
@@ -73,6 +76,7 @@ final class ModelCatalog: ObservableObject {
     func refreshUsage() {
         usageTask?.cancel()
         let paths = models.map(\.path)
+        let media = MediaModels.all.filter(MediaModels.isInstalled).map { ($0.repo, MediaModels.path($0)) }
         let root = root
         usageTask = Task.detached(priority: .utility) { [weak self] in
             let free = DiskUsage.freeSpace(at: root)
@@ -84,8 +88,14 @@ final class ModelCatalog: ObservableObject {
                 sizes[path] = DiskUsage.directorySize(path)
                 weights[path] = ModelWeights.bytes(inFolder: path)
             }
-            await MainActor.run { [weak self, sizes, weights] in
+            var mediaSizes: [String: Int64] = [:]
+            for (repo, path) in media {
+                if Task.isCancelled { return }
+                mediaSizes[repo] = DiskUsage.directorySize(path)
+            }
+            await MainActor.run { [weak self, sizes, weights, mediaSizes] in
                 guard let self, !Task.isCancelled else { return }
+                if self.mediaSizes != mediaSizes { self.mediaSizes = mediaSizes }
                 if self.freeBytes != free { self.freeBytes = free }
                 if self.sizes != sizes { self.sizes = sizes }
                 if self.weights != weights { self.weights = weights }
@@ -121,6 +131,31 @@ final class ModelCatalog: ObservableObject {
         ModelUsageStore().forget(model.id)
         if UserDefaults.standard[Pref.selectedModelID] == model.id { UserDefaults.standard[Pref.selectedModelID] = nil }
         rescan()
+    }
+
+    /// Moves an image, music or voice model to the Trash: from the models
+    /// folder (checked like a chat model's, no config.json needed) or the
+    /// app's old folder. Not while its generator works or downloads.
+    func removeMedia(_ entry: MediaModels.Entry) throws {
+        let busy: Bool
+        switch entry.kind {
+        case .image: busy = ChatTabs.shared.mflux.isBusy
+        case .music: busy = ChatTabs.shared.music.isBusy
+        case .voice: busy = VoiceModelStore.shared.isBusy || VoiceLabSession.shared.isActive
+        }
+        guard !busy else { throw ModelRemoval.Refusal.inUse }
+        let path = MediaModels.path(entry)
+        let fm = FileManager.default
+        if path == entry.legacy {
+            try fm.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
+        } else {
+            let url = try ModelRemoval.check(modelPath: path, root: root, requireConfig: false)
+            try fm.trashItem(at: url, resultingItemURL: nil)
+            for dir in ModelRemoval.emptyParents(of: url, root: root) {
+                try? fm.trashItem(at: dir, resultingItemURL: nil)
+            }
+        }
+        refreshUsage()
     }
 
     /// The model barely fits the GPU (GPUFit), or nil: fits, or not

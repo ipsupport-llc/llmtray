@@ -106,13 +106,14 @@ final class MusicManager: ObservableObject {
 
     static var venvDir: String { AudioRuntime.venvDir }
     private var venvPython: String { AudioRuntime.venvPython }
-    private static var modelsDir: String { RuntimePaths.externalRuntimeDir + "/music_models" }
-    private var modelsDir: String { Self.modelsDir }
-    static func ditDir(_ model: MusicModel) -> String { modelsDir + "/" + model.folderName }
-    private var lmDir: String { Self.modelsDir + "/ace-step-1.5-lm-1.7B" }
+    /// Where each checkpoint is: the models folder, or the app's old folder
+    /// for one downloaded before (MediaModels).
+    static func ditDir(_ model: MusicModel) -> String { MediaModels.path(MediaModels.entry(model)) }
+    private static var lmDir: String { MediaModels.path(MediaModels.musicPlanner) }
+    private var lmDir: String { Self.lmDir }
     /// Where the checkpoints are, with their repos (About › Licenses).
     static var modelPaths: [(String, String)] {
-        MusicModel.allCases.map { (ditDir($0), $0.hfRepo) } + [(modelsDir + "/ace-step-1.5-lm-1.7B", lmRepo)]
+        MusicModel.allCases.map { (ditDir($0), $0.hfRepo) } + [(lmDir, lmRepo)]
     }
 
     /// The models Settings offers.
@@ -123,8 +124,8 @@ final class MusicManager: ObservableObject {
     func isDownloaded(_ model: MusicModel) -> Bool { Self.isDownloadedStatic(model) }
 
     static func isDownloadedStatic(_ model: MusicModel) -> Bool {
-        FileManager.default.fileExists(atPath: ditDir(model))
-            && (!model.usesPlanner || FileManager.default.fileExists(atPath: modelsDir + "/ace-step-1.5-lm-1.7B"))
+        MediaModels.isInstalled(MediaModels.entry(model))
+            && (!model.usesPlanner || MediaModels.isInstalled(MediaModels.musicPlanner))
     }
 
     func isReady(_ model: MusicModel) -> Bool {
@@ -148,17 +149,21 @@ final class MusicManager: ObservableObject {
         isBusy = true
         defer { isBusy = false; statusText = "" }
         try await ensurePackagesInstalled()
-        try FileManager.default.createDirectory(atPath: modelsDir, withIntermediateDirectories: true)
-        if !FileManager.default.fileExists(atPath: Self.ditDir(model)) {
+        // Into the models folder, each under its repo.
+        if !MediaModels.isInstalled(MediaModels.entry(model)) {
+            let target = MediaModels.downloadPath(MediaModels.entry(model))
+            try FileManager.default.createDirectory(atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
-            try await fetch(repo: model.hfRepo, patterns: nil, into: Self.ditDir(model))
+            try await fetch(repo: model.hfRepo, patterns: nil, into: target)
         }
-        if model.usesPlanner, !FileManager.default.fileExists(atPath: lmDir) {
+        if model.usesPlanner, !MediaModels.isInstalled(MediaModels.musicPlanner) {
+            let target = MediaModels.downloadPath(MediaModels.musicPlanner)
+            try FileManager.default.createDirectory(atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), "ACE-Step 1.5 LM")
-            let temp = lmDir + ".partial-\(UUID().uuidString)"
+            let temp = target + ".partial-\(UUID().uuidString)"
             do {
                 try await fetch(repo: Self.lmRepo, patterns: [Self.lmFolder + "/*"], into: temp, move: false)
-                try FileManager.default.moveItem(atPath: temp + "/" + Self.lmFolder, toPath: lmDir)
+                try FileManager.default.moveItem(atPath: temp + "/" + Self.lmFolder, toPath: target)
                 try? FileManager.default.removeItem(atPath: temp)
             } catch {
                 try? FileManager.default.removeItem(atPath: temp)
