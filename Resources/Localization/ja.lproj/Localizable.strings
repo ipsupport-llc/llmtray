@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ はまだインストールされていません";
 "%@ wasn't found on Hugging Face." = "Hugging Face に %@ が見つかりませんでした。";
 "%@ · %@ left" = "%@ · 残り %@";
+"%@ · %@ of %@" = "%@ · %@ ／ %@";
 "%@ · downloaded" = "%@ · ダウンロード済み";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · ダウンロード済み；mlx-audio は初回起動時にインストールされます";
 "%@ · not downloaded" = "%@ · 未ダウンロード";

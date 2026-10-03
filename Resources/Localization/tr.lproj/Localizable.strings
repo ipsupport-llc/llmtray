@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ henüz yüklü değil";
 "%@ wasn't found on Hugging Face." = "%@ Hugging Face'de bulunamadı.";
 "%@ · %@ left" = "%@ · %@ kaldı";
+"%@ · %@ of %@" = "%@ · %@ içinde %@";
 "%@ · downloaded" = "%@ · indirildi";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · indirildi; mlx-audio ilk çalıştırmada kuruldu";
 "%@ · not downloaded" = "%@ · indirilmedi";

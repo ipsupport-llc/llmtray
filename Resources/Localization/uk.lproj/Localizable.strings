@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ ще не встановлено";
 "%@ wasn't found on Hugging Face." = "%@ не знайдено на Hugging Face.";
 "%@ · %@ left" = "%@ · залишилось %@";
+"%@ · %@ of %@" = "%@ · %@ із %@";
 "%@ · downloaded" = "%@ · завантажено";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · завантажено; mlx-audio встановлено при першому запуску";
 "%@ · not downloaded" = "%@ · не завантажено";
