@@ -66,15 +66,15 @@ public enum MediaModelLocation {
     /// disk).
     public static func canCreate(root: String) -> Bool {
         let path = URL(fileURLWithPath: (root as NSString).expandingTildeInPath).standardizedFileURL.path
-        var isDir: ObjCBool = false
-        if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) { return isDir.boolValue }
+        // First the disk: a folder left at an external disk's mount point
+        // after it went (even the models folder itself) is on the boot disk.
         let parts = (path as NSString).pathComponents
         if parts.count >= 3, parts[1] == "Volumes" {
-            // Mounted: a folder left at the mount point after the disk went
-            // is on the boot disk.
             let mount = URL(fileURLWithPath: "/Volumes/" + parts[2])
-            return (try? mount.resourceValues(forKeys: [.isVolumeKey]))?.isVolume == true
+            guard (try? mount.resourceValues(forKeys: [.isVolumeKey]))?.isVolume == true else { return false }
         }
+        var isDir: ObjCBool = false
+        if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) { return isDir.boolValue }
         return true
     }
 
