@@ -210,7 +210,8 @@ final class DownloadQueue: ObservableObject {
             guard let model = ImageGenModel(rawValue: item.target) else { return String(format: NSLocalizedString("Unknown image model %@", comment: "download queue"), item.target) }
             // A Settings download first; it may take the space this needs.
             guard await waitForSettingsDownload(item) else { return nil }
-            if !model.isDownloaded, let refusal = spaceRefusal(item, at: RuntimePaths.externalRuntimeDir) { return refusal }
+            // Downloaded into the models folder (MediaModels): its volume's space.
+            if !model.isDownloaded, let refusal = spaceRefusal(item, at: ModelDiscovery.currentModelsRoot()) { return refusal }
             watch(setup.media.$mfluxStatusText)
             if let error = await setup.downloadImageModel(model) { return error.localizedDescription }
             // Cancelled while it ran: downloaded, but not turned on.
@@ -226,7 +227,7 @@ final class DownloadQueue: ObservableObject {
             guard let model = MusicModel(rawValue: item.target) else { return String(format: NSLocalizedString("Unknown music model %@", comment: "download queue"), item.target) }
             guard await waitForSettingsDownload(item) else { return nil }
             if !setup.isMusicModelReady(model) {
-                if let refusal = spaceRefusal(item, at: RuntimePaths.externalRuntimeDir) { return refusal }
+                if let refusal = spaceRefusal(item, at: ModelDiscovery.currentModelsRoot()) { return refusal }
                 watch(setup.media.$musicStatusText)
                 if let error = await setup.downloadMusicModel(model) { return error.localizedDescription }
             }

@@ -149,7 +149,11 @@ struct HFBrowserView: View {
 
     @ViewBuilder
     private func downloadControl(for model: HFModelSummary) -> some View {
-        if browser.downloadingID == model.id {
+        if let media = MediaModels.entry(repo: model.id) {
+            // An image, music or voice model: its own manager downloads it,
+            // into the models folder, with what it needs to run.
+            MediaDownloadControl(entry: media)
+        } else if browser.downloadingID == model.id {
             VStack(alignment: .trailing, spacing: 2) {
                 HStack(spacing: 6) {
                     ProgressView(value: browser.downloadProgress)
@@ -222,5 +226,82 @@ struct HFBrowserView: View {
         if m < 60 { return "\(m)m \(s % 60)s" }
         let h = m / 60
         return "\(h)h \(m % 60)m"
+    }
+}
+
+
+/// The Hugging Face browser's control for an image, music or voice model
+/// (MediaModels): installed, downloading (its manager's status), or a
+/// Download through that manager -- never into the chat models' path.
+private struct MediaDownloadControl: View {
+    let entry: MediaModels.Entry
+    @ObservedObject private var mflux = ChatTabs.shared.mflux
+    @ObservedObject private var music = ChatTabs.shared.music
+    @ObservedObject private var voice = VoiceModelStore.shared
+    @State private var running = false
+    @State private var error: String?
+
+    private var busy: Bool {
+        switch entry.kind {
+        case .image: return mflux.isBusy
+        case .music: return music.isBusy
+        case .voice: return voice.isBusy
+        }
+    }
+
+    private var status: String {
+        switch entry.kind {
+        case .image: return mflux.statusText
+        case .music: return music.statusText
+        case .voice: return voice.statusText
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            if running {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text(status.isEmpty ? NSLocalizedString("Downloading…", comment: "") : status)
+                        .font(.system(size: 10)).foregroundColor(.secondary).lineLimit(1)
+                }
+            } else if MediaModels.isReady(entry) {
+                Label(String(format: NSLocalizedString("Installed · %@", comment: "HF browser: a media model installed, its kind"), entry.kind.title),
+                      systemImage: "checkmark.circle.fill")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            } else {
+                Button("Download") { start() }
+                    .disabled(busy)
+                    .help(Text(String(format: NSLocalizedString("Download for %@, into the models folder", comment: "HF browser: a media model's download, its kind"),
+                                      entry.kind.title)))
+            }
+            if let error {
+                Text(error).font(.system(size: 9)).foregroundColor(.red).lineLimit(2)
+            }
+        }
+    }
+
+    private func start() {
+        running = true
+        error = nil
+        Task { @MainActor in
+            defer { running = false }
+            do {
+                switch entry.kind {
+                case .image:
+                    guard let m = ImageGenModel.allCases.first(where: { MediaModels.entry($0) == entry }) else { return }
+                    try await mflux.downloadModel(m)
+                case .music:
+                    guard let m = MusicModel.allCases.first(where: { MediaModels.entry($0) == entry }) else { return }
+                    try await music.download(m)
+                case .voice:
+                    guard let m = VoiceLabModel.all.first(where: { MediaModels.entry($0) == entry }) else { return }
+                    try await voice.download(m)
+                }
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
     }
 }

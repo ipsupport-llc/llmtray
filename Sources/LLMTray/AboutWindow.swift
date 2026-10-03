@@ -25,11 +25,12 @@ final class AboutLicenses: ObservableObject {
         let runtimeDir = RuntimePaths.externalRuntimeDir
         let modelPaths = ModelCatalog.shared.models.map { ($0.path, $0.path.split(separator: "/").suffix(2).joined(separator: "/")) }
         // Image models live under their own names; their repo is known.
-        let imageModels = ImageGenModel.allCases.map { (runtimeDir + "/mflux_models/" + $0.rawValue, $0.hfRepo) }
-            .filter { FileManager.default.fileExists(atPath: $0.0) }
-        let musicModels = MusicManager.modelPaths.filter { FileManager.default.fileExists(atPath: $0.0) }
-        let voiceModels = VoiceLabModel.all.map { (VoiceModelStore.modelDir($0), $0.repo) }
-            .filter { FileManager.default.fileExists(atPath: $0.0) }
+        // Installed (MediaModels), wherever they are.
+        let installed = MediaModels.all.filter(MediaModels.isInstalled)
+        let imageModels = installed.filter { $0.kind == .image }.map { (MediaModels.path($0), $0.repo) }
+        let musicModels = installed.filter { $0.kind == .music }
+            .map { (MediaModels.path($0), $0.repo == MediaModels.musicPlannerFolder ? MusicManager.lmRepo : $0.repo) }
+        let voiceModels = installed.filter { $0.kind == .voice }.map { (MediaModels.path($0), $0.repo) }
         let musicVenv = MusicManager.venvDir
         let serverVenv = MLXRuntimeInstaller.venvDir
         scanning = true

@@ -98,6 +98,19 @@ final class ModelLibraryTests: XCTestCase {
         XCTAssertEqual(ModelRemoval.emptyParents(of: solo, root: root.path), [], "never the root")
     }
 
+    func testAMediaModelNeedsNoConfig() throws {
+        // An image model's folder holds its parts, no config.json.
+        let root = try tree()
+        let image = root.appendingPathComponent("org/image")
+        try FileManager.default.createDirectory(at: image.appendingPathComponent("transformer"), withIntermediateDirectories: true)
+        XCTAssertThrowsError(try ModelRemoval.check(modelPath: image.path, root: root.path))
+        XCTAssertEqual(try ModelRemoval.check(modelPath: image.path, root: root.path, requireConfig: false).lastPathComponent, "image")
+        // Still never the root, nor outside it, nor a file.
+        XCTAssertThrowsError(try ModelRemoval.check(modelPath: root.path, root: root.path, requireConfig: false))
+        try Data().write(to: root.appendingPathComponent("org/file"))
+        XCTAssertThrowsError(try ModelRemoval.check(modelPath: root.path + "/org/file", root: root.path, requireConfig: false))
+    }
+
     func testSameOrInside() {
         XCTAssertTrue(ModelRemoval.isSameOrInside("/m/org/a", "/m/org/a"))
         XCTAssertTrue(ModelRemoval.isSameOrInside("/m/org/a", "/m/org"))

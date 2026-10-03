@@ -18,6 +18,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ isn't LLMTray's link, so it was left as it is.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";
@@ -282,10 +283,12 @@
 "Download" = "Download";
 "Download LLMTray-Full" = "Download LLMTray-Full";
 "Download and Enable" = "Download and Enable";
+"Download for %@, into the models folder" = "Download for %@, into the models folder";
 "Download into the models folder" = "Download into the models folder";
 "Download models" = "Download models";
 "Download models from Hugging Face" = "Download models from Hugging Face";
 "Downloaded" = "Downloaded";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Downloaded by an earlier version, on another disk than the models folder: it stays where it is.";
 "Downloading" = "Downloading";
 "Downloading %@" = "Downloading %@";
 "Downloading %@…" = "Downloading %@…";
@@ -419,6 +422,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
 "Image generation off" = "Image generation off";
 "Image model" = "Image model";
+"Image, music and voice models" = "Image, music and voice models";
 "Images" = "Images";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import from LLMTray (direct download)";
@@ -438,6 +442,7 @@
 "Install" = "Install";
 "Install ID" = "Install ID";
 "Installed" = "Installed";
+"Installed · %@" = "Installed · %@";
 "Installing mflux…" = "Installing mflux…";
 "Installing mlx-audio failed: %@" = "Installing mlx-audio failed: %@";
 "Installing mlx-audio…" = "Installing mlx-audio…";
@@ -952,6 +957,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model's license, from its card." = "The model's license, from its card.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
@@ -1079,6 +1085,7 @@
 "Use This Port" = "Use This Port";
 "Use headphones: the model hears its own voice from the speakers." = "Use headphones: the model hears its own voice from the speakers.";
 "Used" = "Used";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.";
 "Uses the internet" = "Uses the internet";
 "Verbose server logging" = "Verbose server logging";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem.";
@@ -1165,8 +1172,11 @@
 "failed: %@" = "failed: %@";
 "for this chat" = "for this chat";
 "hears audio" = "hears audio";
+"in LLMTray's own folder" = "in LLMTray's own folder";
+"in an earlier models folder" = "in an earlier models folder";
 "it isn't a model folder in the models folder" = "it isn't a model folder in the models folder";
 "it's being downloaded" = "it's being downloaded";
+"it's in use or downloading" = "it's in use or downloading";
 "less than a minute left" = "less than a minute left";
 "llmtray in the terminal" = "llmtray in the terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start.";
@@ -1213,6 +1223,7 @@
 "· size…" = "· size…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” couldn't be removed: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: the pin couldn't be changed: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” and its index are deleted from the project. The file you added it from isn't touched.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” wasn't removed: the server is busy or using it. Try again when it's idle.";

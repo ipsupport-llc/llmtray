@@ -47,6 +47,8 @@ public enum ModelRemoval {
         case notAModel
         /// Being downloaded right now.
         case downloading
+        /// Its generator is running or downloading.
+        case inUse
     }
 
     /// `path` is `folder` or below it (by path components, tildes expanded,
@@ -62,7 +64,10 @@ public enum ModelRemoval {
     /// linked <org>/ folder is refused (removing through it would remove
     /// the model where it really is) -- and holding a config.json. A model
     /// that is itself a link is removed as the link, never what it points to.
-    public static func check(modelPath: String, root: String) throws -> URL {
+    /// `requireConfig: false` for image and music models, whose folders
+    /// hold their parts (transformer/, vae/, ...) and no config.json of
+    /// their own.
+    public static func check(modelPath: String, root: String, requireConfig: Bool = true) throws -> URL {
         let rootPlain = URL(fileURLWithPath: (root as NSString).expandingTildeInPath).standardizedFileURL
         let rootURL = rootPlain.resolvingSymlinksInPath().standardizedFileURL
         let model = URL(fileURLWithPath: (modelPath as NSString).expandingTildeInPath).standardizedFileURL
@@ -86,7 +91,9 @@ public enum ModelRemoval {
                 guard values?.isSymbolicLink == false, values?.isDirectory == true else { throw Refusal.outsideModelsFolder }
             }
         }
-        guard FileManager.default.fileExists(atPath: modelURL.appendingPathComponent("config.json").path) else {
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: modelURL.path, isDirectory: &isDir), isDir.boolValue,
+              !requireConfig || FileManager.default.fileExists(atPath: modelURL.appendingPathComponent("config.json").path) else {
             throw Refusal.notAModel
         }
         return modelURL

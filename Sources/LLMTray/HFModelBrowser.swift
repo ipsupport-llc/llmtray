@@ -274,6 +274,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// nil: the one set when the file list arrives.
     func download(_ model: HFModelSummary, root: String? = nil, completion: @escaping () -> Void) {
         guard downloadingID == nil else { return }
+        // An image, music or voice model goes through its own manager
+        // (MediaModels), never into the chat models' path.
+        guard MediaModels.entry(repo: model.id) == nil else { return }
         HFToken.refresh()
         // A gated model's files answer 401 without a token (seen live: the
         // listing is open, the files aren't).

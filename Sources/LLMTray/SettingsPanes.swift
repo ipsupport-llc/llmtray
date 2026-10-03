@@ -228,6 +228,7 @@ struct ModelsPane: View {
     @State private var hfTokenError: String?
     /// The model the Delete confirmation is for, and why the last removal failed.
     @State private var toRemove: LocalModel?
+    @State private var mediaToRemove: MediaModels.Entry?
     @State private var removeError: String?
     @ObservedObject private var switchPrompter = ModelSwitchPrompter.shared
 
@@ -314,9 +315,30 @@ struct ModelsPane: View {
                     SettingHelp(text: "Alias: the \u{201C}model\u{201D} name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.")
                 }
             }
+            let media = MediaModels.all.filter(MediaModels.isInstalled)
+            if !media.isEmpty {
+                Section {
+                    ForEach(media) { mediaRow($0) }
+                } header: {
+                    HStack(spacing: 4) {
+                        Text("Image, music and voice models")
+                        SettingHelp(text: "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names.")
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
         .onAppear(perform: rescan)
+        .confirmationDialog(
+            Text("Move this model to the Trash?"), isPresented: Binding(get: { mediaToRemove != nil }, set: { if !$0 { mediaToRemove = nil } }),
+            presenting: mediaToRemove
+        ) { e in
+            Button("Move to Trash", role: .destructive) { removeMedia(e) }
+        } message: { e in
+            Text(String(format: NSLocalizedString("\u{201C}%@\u{201D} (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it.",
+                                                  comment: "deleting a media model: name, size, its kind"),
+                        e.name, catalog.mediaSizes[e.repo].map(ModelCatalog.format) ?? "…", e.kind.title))
+        }
         .confirmationDialog(
             Text("Move this model to the Trash?"), isPresented: Binding(get: { toRemove != nil }, set: { if !$0 { toRemove = nil } }),
             presenting: toRemove
@@ -355,6 +377,7 @@ struct ModelsPane: View {
             let reason: String
             switch refusal {
             case .downloading: reason = NSLocalizedString("it's being downloaded", comment: "deleting a model refused: reason")
+            case .inUse: reason = NSLocalizedString("it's in use or downloading", comment: "deleting a model refused: reason")
             case .notAModel, .outsideModelsFolder: reason = NSLocalizedString("it isn't a model folder in the models folder", comment: "deleting a model refused: reason")
             }
             removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
@@ -369,6 +392,49 @@ struct ModelsPane: View {
     /// user's answer (approved, the proxy would load it).
     private func isInUse(_ m: LocalModel) -> Bool {
         server.loadedModelPath == m.id || switchPrompter.pending?.target == m.id
+    }
+
+    private func mediaRow(_ e: MediaModels.Entry) -> some View {
+        LabeledContent {
+            Button { mediaToRemove = e } label: { Image(systemName: "trash") }
+                .buttonStyle(.borderless)
+                .help(Text("Move this model to the Trash…"))
+                .accessibilityLabel(Text("Delete model"))
+        } label: {
+            VStack(alignment: .leading) {
+                Text(e.name).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                    .help(Text(verbatim: MediaModels.path(e)))
+                HStack(spacing: 6) {
+                    Text(e.kind.title)
+                    if let size = catalog.mediaSizes[e.repo] { Text(ModelCatalog.format(size)).monospacedDigit() }
+                    if let added = ModelRemoval.addedDate(modelPath: MediaModels.path(e)) {
+                        Text(String(format: NSLocalizedString("Added %@", comment: "model list: when the model arrived"),
+                                    added.formatted(date: .abbreviated, time: .omitted)))
+                    }
+                    if MediaModels.isInAppFolder(e) {
+                        Text("in LLMTray's own folder").help(Text("Downloaded by an earlier version, on another disk than the models folder: it stays where it is."))
+                    } else if MediaModels.isInOldPlace(e) {
+                        Text("in an earlier models folder").help(Text(verbatim: MediaModels.path(e)))
+                    }
+                }
+                .font(.caption).foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    private func removeMedia(_ e: MediaModels.Entry) {
+        do {
+            try catalog.removeMedia(e)
+            removeError = nil
+        } catch let refusal as ModelRemoval.Refusal {
+            let reason = refusal == .inUse ? NSLocalizedString("it's in use or downloading", comment: "deleting a model refused: reason")
+                : NSLocalizedString("it isn't a model folder in the models folder", comment: "deleting a model refused: reason")
+            removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
+                                 e.name, reason)
+        } catch {
+            removeError = String(format: NSLocalizedString("Couldn't move \u{201C}%@\u{201D} to the Trash: %@", comment: "deleting a model failed: name, reason"),
+                                 e.name, error.localizedDescription)
+        }
     }
 
     /// "Added 3 Sep 2026 · used 2 hours ago" (or "never used").
