@@ -208,6 +208,11 @@ extension ModelRecommendationsTests {
         XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/x/other", in: list, vision: true), [.vision],
                        "one the list doesn't know: only what its config says")
         XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/x/other", in: list, vision: false), [])
+        // Audio from the config, in the list's order (after vision)...
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/o/coder", in: list, vision: true, audio: true), [.vision, .audio, .tools, .code])
+        // ...and only from it: a listed audio model converted text-only hears nothing.
+        let listedAudio = [model("o/talker", gb: 3, min: 8, capabilities: [.vision, .audio])]
+        XCTAssertEqual(ModelRecommendations.capabilities(ofLocalPath: "/m/o/talker", in: listedAudio, vision: true, audio: false), [.vision])
     }
 
     func testOfferMovesCompleteLocalCopiesOutOfDownloads() {
