@@ -500,7 +500,16 @@ private struct ChatModelStep: View {
             if model.selectedDownloadRepo == pick.model.repo, model.isWizardDownloadComplete {
                 Label("Downloaded", systemImage: "checkmark").foregroundStyle(.green)
             } else if model.selectedDownloadRepo == pick.model.repo, model.isWizardDownloadActive {
-                Label("Downloading", systemImage: "arrow.down.circle").foregroundStyle(.green)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Label("Downloading", systemImage: "arrow.down.circle").foregroundStyle(.green)
+                    // How far it is (the queue's progress for this repo).
+                    if let item = queue.state.items.first(where: { $0.kind == .chatModel && $0.target == pick.model.repo }),
+                       case .running(let progress?) = item.status {
+                        ProgressView(value: progress).controlSize(.small).frame(width: 120)
+                        Text(DownloadQueueRow.progressText(progress, of: item.approxBytes))
+                            .font(.caption).monospacedDigit().foregroundStyle(.secondary)
+                    }
+                }
             } else {
                 Button("Download") { model.pick(download: pick) }
                     .disabled(model.needsToken(pick))

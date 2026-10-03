@@ -25,6 +25,7 @@
 "%@ isn't installed yet" = "%@ isn't installed yet";
 "%@ wasn't found on Hugging Face." = "%@ wasn't found on Hugging Face.";
 "%@ · %@ left" = "%@ · %@ left";
+"%@ · %@ of %@" = "%@ · %@ of %@";
 "%@ · downloaded" = "%@ · downloaded";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · downloaded; mlx-audio is installed at the first start";
 "%@ · not downloaded" = "%@ · not downloaded";
