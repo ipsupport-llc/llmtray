@@ -180,6 +180,8 @@ enum MediaModels {
     /// Returns what moved, for the log.
     @discardableResult
     static func moveIntoModelsFolder() -> [String] {
+        // Looked in later, should the folder change.
+        rememberCurrentRoot()
         let root = ModelDiscovery.currentModelsRoot()
         let fm = FileManager.default
         var moved: [String] = []
@@ -200,7 +202,7 @@ enum MediaModels {
         // from the models folder.
         for entry in all where entry.kind == .voice {
             let old = entry.legacy + ".partial", new = MediaModelLocation.preferred(repo: entry.repo, root: root) + ".partial"
-            guard fm.fileExists(atPath: old), !fm.fileExists(atPath: new), MediaModelLocation.sameVolume(old, root) else { continue }
+            guard fm.fileExists(atPath: old), !MediaModelLocation.exists(new), MediaModelLocation.canRename(old, into: root) else { continue }
             try? fm.createDirectory(atPath: (new as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             try? MediaModelLocation.rename(old, to: new)
         }

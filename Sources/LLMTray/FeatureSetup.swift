@@ -269,6 +269,8 @@ final class FeatureSetup {
         // once the user has granted it (adr/0018 §3); a no-op otherwise.
         guard SandboxAccess.requestAccess(to: path, message: NSLocalizedString("Allow LLMTray to use this folder for its models.", comment: "open panel: models folder access"))
         else { return }
+        // The folder left keeps its image, music and voice models in reach.
+        MediaModels.rememberCurrentRoot()
         UserDefaults.standard.set(path, forKey: ModelDiscovery.modelsRootDefaultsKey)
     }
 

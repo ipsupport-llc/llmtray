@@ -41,9 +41,9 @@ public enum MediaModelLocation {
     /// copy's volume: a rename, never a copy.
     public static func migration(repo: String, root: String, legacy: String?,
                                  isInPlace: (String) -> Bool) -> Migration {
-        guard let legacy, isInPlace(legacy), canCreate(root: root) else { return .none }
+        guard let legacy, isInPlace(legacy) else { return .none }
         let target = preferred(repo: repo, root: root)
-        guard !exists(target), sameVolume(legacy, nearestExisting((root as NSString).expandingTildeInPath)) else { return .none }
+        guard !exists(target), canRename(legacy, into: root) else { return .none }
         return .move(from: legacy, to: target)
     }
 
@@ -70,9 +70,19 @@ public enum MediaModelLocation {
         if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) { return isDir.boolValue }
         let parts = (path as NSString).pathComponents
         if parts.count >= 3, parts[1] == "Volumes" {
-            return FileManager.default.fileExists(atPath: "/Volumes/" + parts[2])
+            // Mounted: a folder left at the mount point after the disk went
+            // is on the boot disk.
+            let mount = URL(fileURLWithPath: "/Volumes/" + parts[2])
+            return (try? mount.resourceValues(forKeys: [.isVolumeKey]))?.isVolume == true
         }
         return true
+    }
+
+    /// `from` can be renamed into `root` (made if need be): canCreate, and
+    /// the same volume as root -- or, not made yet, its nearest existing
+    /// folder.
+    public static func canRename(_ from: String, into root: String) -> Bool {
+        canCreate(root: root) && sameVolume(from, nearestExisting((root as NSString).expandingTildeInPath))
     }
 
     /// A browser download of the folder started and didn't finish: its

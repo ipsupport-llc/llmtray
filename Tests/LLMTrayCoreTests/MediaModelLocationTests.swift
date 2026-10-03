@@ -86,6 +86,12 @@ final class MediaModelLocationTests: XCTestCase {
         XCTAssertTrue(MediaModelLocation.canCreate(root: base.appendingPathComponent("a/b").path), "a fresh install's default folder")
         XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())"))
         XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())/models"))
+        // The boot volume's own entry under /Volumes is a mount; a plain
+        // folder there isn't one.
+        let boot = (try? FileManager.default.contentsOfDirectory(atPath: "/Volumes"))?.first { name in
+            (try? URL(fileURLWithPath: "/Volumes/" + name).resourceValues(forKeys: [.isVolumeKey]))?.isVolume == true
+        }
+        if let boot { XCTAssertTrue(MediaModelLocation.canCreate(root: "/Volumes/" + boot + "/tmp-not-made-\(UUID())")) }
     }
 
     func testRenameNeverCopies() throws {
