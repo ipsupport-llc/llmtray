@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMTray — Support</title>
+<meta name="description" content="How to get help with LLMTray: bug reports, email, GitHub issues and common questions.">
+<link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/support.html">
+<meta name="theme-color" content="#0d2818">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --fg-muted: #5f6368;
+    --card: #f6f6f7;
+    --border: #e3e3e6;
+    --accent: #2f7d4f;
+    --code-bg: #0f1115;
+    --code-fg: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14151a;
+      --fg: #eaeaec;
+      --fg-muted: #a0a3ab;
+      --card: #1c1e24;
+      --border: #2a2c33;
+      --accent: #5fd394;
+      --code-bg: #0a0b0d;
+      --code-fg: #e6e6e6;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --fg: #1a1a1a; --fg-muted: #5f6368; --card: #f6f6f7;
+    --border: #e3e3e6; --accent: #2f7d4f; --code-bg: #0f1115; --code-fg: #e6e6e6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14151a; --fg: #eaeaec; --fg-muted: #a0a3ab; --card: #1c1e24;
+    --border: #2a2c33; --accent: #5fd394; --code-bg: #0a0b0d; --code-fg: #e6e6e6;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+  header { text-align: center; margin-bottom: 3.5rem; }
+  .icon-img {
+    width: 84px;
+    height: 84px;
+    border-radius: 20px;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+  h1 { font-size: 2.3rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+  .tagline { color: var(--fg-muted); font-size: 1.08rem; margin: 0 0 2rem; }
+
+  .screenshot {
+    max-width: 340px;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    margin: 2.5rem 0;
+  }
+
+  .hero-banner {
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    border-radius: 16px;
+    margin: 2.5rem 0 0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+  .cta { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--accent);
+    color: #0b1210;
+    box-shadow: 0 6px 20px rgba(47, 125, 79, 0.35);
+    transition: transform 0.15s ease;
+  }
+  .btn-download:hover { transform: translateY(-1px); }
+  .cta-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 100%; }
+  .cta-buttons .btn-download { max-width: 100%; box-sizing: border-box; }
+  .btn-download .sub { display: block; font-size: 0.72rem; font-weight: 500; opacity: 0.8; }
+  .btn-download.alt {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    box-shadow: none;
+  }
+  .btn-download svg { width: 20px; height: 20px; }
+  .cta-meta {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+  }
+  .secondary-link {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .secondary-link:hover { color: var(--fg); }
+
+  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+
+  section { margin: 3rem 0; }
+  h2 { font-size: 1.3rem; margin: 0 0 1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .grid .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 0.35rem; font-size: 0.98rem; }
+  .card p { margin: 0; color: var(--fg-muted); font-size: 0.9rem; }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  p code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  .reviews-summary { color: var(--fg-muted); margin: -0.4rem 0 1rem; }
+  .reviews { display: grid; gap: 0.9rem; }
+  .stars { color: #e0a800; letter-spacing: 0.05em; }
+  .card.review p { color: var(--fg); margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+  .card.review p.review-meta { color: var(--fg-muted); font-size: 0.8rem; margin: 0; }
+  footer {
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+  footer a { color: inherit; }
+
+  .page h1 { font-size: 2rem; }
+  .page h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+  .page li { margin: 0.35rem 0; }
+  .meta { color: var(--fg-muted); }
+</style>
+</head>
+<body>
+  <div class="wrap page">
+    <h1>LLMTray Support</h1>
+    <p class="meta">IPSupport LLC</p>
+
+    <h2>Get help</h2>
+    <ul>
+      <li><b>In the app:</b> <b>Settings › General › Report a Bug…</b> prepares a report with LLMTray's logs and opens it in your mail app, attached to the email (or shown in Finder for you to attach): you can open and read it, and nothing is sent until you send it.</li>
+      <li><b>Email:</b> <code>bugreport@ipsupport.us</code></li>
+      <li><b>GitHub:</b> <a href="https://github.com/ipsupport-llc/llmtray/issues">issues</a> for bugs and ideas.</li>
+    </ul>
+
+    <h2>Requirements</h2>
+    <p>macOS 14 or later on a Mac with Apple Silicon (M1 or later). Models need free memory and disk space: the setup assistant shows each one's size.</p>
+
+    <h2>Common questions</h2>
+    <p><b>Where are my models?</b> In the folder chosen in <b>Settings › Models</b>. You can point LLMTray at a folder of MLX models you already have; the Mac App Store version asks you once to allow access to it.</p>
+    <p><b>How do other apps use LLMTray?</b> Start the server, then use the address shown in <b>Settings › Server</b> in any app that speaks the OpenAI API.</p>
+    <p><b>Coming from the version downloaded from our site?</b> In the Mac App Store version, <b>Settings › General › Import from LLMTray (direct download)</b> brings over your chats, projects, profiles and downloaded models, with no second copy of the models on disk.</p>
+    <p><b>How do I turn off usage statistics?</b> <b>Settings › General › Usage statistics</b>. See the <a href="privacy.html">privacy policy</a> for what is sent.</p>
+
+    <footer>
+      <a href="./">LLMTray</a> · <a href="privacy.html">Privacy</a> · <a href="support.html">Support</a> · made by <a href="https://github.com/ipsupport-llc">IP Support</a>
+    </footer>
+  </div>
+</body>
+</html>

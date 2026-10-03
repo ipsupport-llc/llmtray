@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMTray — Privacy Policy</title>
+<meta name="description" content="What LLMTray sends over the network, what it never sends, and what IPSupport LLC keeps.">
+<link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/privacy.html">
+<meta name="theme-color" content="#0d2818">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --fg-muted: #5f6368;
+    --card: #f6f6f7;
+    --border: #e3e3e6;
+    --accent: #2f7d4f;
+    --code-bg: #0f1115;
+    --code-fg: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14151a;
+      --fg: #eaeaec;
+      --fg-muted: #a0a3ab;
+      --card: #1c1e24;
+      --border: #2a2c33;
+      --accent: #5fd394;
+      --code-bg: #0a0b0d;
+      --code-fg: #e6e6e6;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --fg: #1a1a1a; --fg-muted: #5f6368; --card: #f6f6f7;
+    --border: #e3e3e6; --accent: #2f7d4f; --code-bg: #0f1115; --code-fg: #e6e6e6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14151a; --fg: #eaeaec; --fg-muted: #a0a3ab; --card: #1c1e24;
+    --border: #2a2c33; --accent: #5fd394; --code-bg: #0a0b0d; --code-fg: #e6e6e6;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+  header { text-align: center; margin-bottom: 3.5rem; }
+  .icon-img {
+    width: 84px;
+    height: 84px;
+    border-radius: 20px;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+  h1 { font-size: 2.3rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+  .tagline { color: var(--fg-muted); font-size: 1.08rem; margin: 0 0 2rem; }
+
+  .screenshot {
+    max-width: 340px;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    margin: 2.5rem 0;
+  }
+
+  .hero-banner {
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    border-radius: 16px;
+    margin: 2.5rem 0 0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+  .cta { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--accent);
+    color: #0b1210;
+    box-shadow: 0 6px 20px rgba(47, 125, 79, 0.35);
+    transition: transform 0.15s ease;
+  }
+  .btn-download:hover { transform: translateY(-1px); }
+  .cta-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 100%; }
+  .cta-buttons .btn-download { max-width: 100%; box-sizing: border-box; }
+  .btn-download .sub { display: block; font-size: 0.72rem; font-weight: 500; opacity: 0.8; }
+  .btn-download.alt {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    box-shadow: none;
+  }
+  .btn-download svg { width: 20px; height: 20px; }
+  .cta-meta {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+  }
+  .secondary-link {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .secondary-link:hover { color: var(--fg); }
+
+  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+
+  section { margin: 3rem 0; }
+  h2 { font-size: 1.3rem; margin: 0 0 1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .grid .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 0.35rem; font-size: 0.98rem; }
+  .card p { margin: 0; color: var(--fg-muted); font-size: 0.9rem; }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  p code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  .reviews-summary { color: var(--fg-muted); margin: -0.4rem 0 1rem; }
+  .reviews { display: grid; gap: 0.9rem; }
+  .stars { color: #e0a800; letter-spacing: 0.05em; }
+  .card.review p { color: var(--fg); margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+  .card.review p.review-meta { color: var(--fg-muted); font-size: 0.8rem; margin: 0; }
+  footer {
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+  footer a { color: inherit; }
+
+  .page h1 { font-size: 2rem; }
+  .page h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+  .page li { margin: 0.35rem 0; }
+  .meta { color: var(--fg-muted); }
+</style>
+</head>
+<body>
+  <div class="wrap page">
+    <h1>LLMTray Privacy Policy</h1>
+    <p class="meta">IPSupport LLC · effective October 2, 2026</p>
+
+    <p>LLMTray runs AI models on your Mac. Your prompts, chats, attached files, projects, generated images, music and voice audio stay on your Mac: LLMTray has no account, no ads and no tracking, and none of that content is ever sent to us.</p>
+
+    <p>A few things do use the network. Each is listed here, with what is sent and what we keep.</p>
+
+    <h2>Anonymous usage statistics</h2>
+    <p>Once a day LLMTray can send an anonymous report of the previous day to <code>ipsupport.us</code>. It is on by default for a new install. You can turn it off during setup or at any time in <b>Settings › General › Usage statistics</b>, which also shows exactly what is sent, with your Mac's values. The first report is sent only after your first day ends, so you can turn it off before anything is sent.</p>
+    <ul>
+      <li><b>Sent:</b> a random install ID (a new one each time you turn it on or press Reset ID), the day, the LLMTray and macOS versions, the chip (for example “Apple M5”), the memory size, the interface language, how many times each feature was used (chat answers, tool calls, API requests from other apps, images made or edited, music made, model downloads), and the families of the models you used (for example “gemma” or “qwen”, anything else as “other”).</li>
+      <li><b>Never sent:</b> prompts, chat content, generated images or audio, file names or paths, exact model names or repositories, API keys, and account or contact details. Temporary chats are not counted at all.</li>
+      <li><b>What we keep:</b> a keyed hash of the install ID (never the ID itself), the approximate country of the connection, and the report's fields, for 400 days. The address the report came from is used only to limit how often reports are accepted, as a keyed hash; the address itself is never stored.</li>
+    </ul>
+    <p>Turning statistics off stops sending at once and deletes the counters not yet sent and the install ID.</p>
+
+    <h2>Finding and downloading models</h2>
+    <p>When you browse for models, your search words and the models you look at are requested from <a href="https://huggingface.co">Hugging Face</a>; models are downloaded from there when you choose one. When a model you start has a speed-up drafter (MTP) that isn't on your Mac yet, LLMTray downloads it from Hugging Face in the background, unless you turn the drafter off in the model's profile. Those requests go to Hugging Face, not to us, and <a href="https://huggingface.co/privacy">their privacy policy</a> applies. After a model is downloaded, it runs without a network connection.</p>
+    <p>A Hugging Face token, if you save one (only for gated models), is kept in your Mac's Keychain and sent only to Hugging Face.</p>
+
+    <h2>Tools that look things up</h2>
+    <p>A chat model can use LLMTray's lookup tools when you ask for something it can't know: a web search, the news, the weather, the time somewhere, a Wikipedia summary. Then what the tool needs goes from your Mac straight to the service that answers it, never to us, and that service's privacy policy applies:</p>
+    <ul>
+      <li>web search: <a href="https://duckduckgo.com/privacy">DuckDuckGo</a>;</li>
+      <li>news: Google News; tech news: Hacker News;</li>
+      <li>summaries and facts: Wikipedia and Wikidata;</li>
+      <li>weather, air quality and the time in a city: <a href="https://open-meteo.com">Open-Meteo</a>, which gets the city's name and then its coordinates. Asked for the weather without a city, the tool uses the city of your Mac's time zone;</li>
+      <li>public holidays: Nager.Date; currency rates: ExchangeRate-API.</li>
+    </ul>
+    <p>Only what the lookup needs is sent (the search words, a city, a country or a currency), not your chat. Today's date, your own time and calculations are worked out on your Mac.</p>
+
+    <h2>Reviews</h2>
+    <p>The <b>Rate LLMTray…</b> window loads the published reviews' summary from <code>ipsupport.us</code>. If you send a review, the rating, the text you write, the name you choose to show (optional) and the LLMTray version are sent to <code>ipsupport.us</code>. A review is checked for spam before it is published on our site. We don't ask for an email, and the address it came from is kept only as a keyed hash, to limit repeated submissions.</p>
+
+    <h2>Supporting LLMTray</h2>
+    <p>The <b>Support LLMTray</b> window loads the list of supporters from <code>ipsupport.us</code> (again after a day).</p>
+    <p>Tips in the Mac App Store version are In-App Purchases handled by Apple: we never see your Apple ID, name, email or payment details. After a tip you can choose to be listed as a supporter. Then the name and optional link you type, your tier, and Apple's signed proof of the purchase are sent to <code>ipsupport.us</code>. We check the proof and keep only a keyed hash of it, to match your entry to you if you ask us to remove it. A GitHub sponsor can ask to be listed too: then your GitHub login, the name and optional link you type, and your tier are sent, and we check the sponsorship on GitHub. Entries are reviewed before they appear in the list that LLMTray shows. To be removed, write to us (below).</p>
+
+    <h2>Bug reports</h2>
+    <p><b>Report a Bug…</b> prepares a report on your Mac and opens it in your mail app, addressed to <code>bugreport@ipsupport.us</code>. You choose what goes in (LLMTray's logs, crash reports), the report is attached to the email (or, if your mail app can't take an attachment that way, shown in Finder for you to attach), where you can open and read it, and nothing is sent until you send that email yourself.</p>
+
+    <h2>Updates</h2>
+    <p>The Mac App Store version is updated by the App Store and installs nothing else.</p>
+    <p>The version downloaded from our site checks for updates (Sparkle) automatically, by reading the update feed on our GitHub Pages site (<code>ipsupport-llc.github.io</code>); updates are downloaded from GitHub. Its smaller download sets up its model runtime on first launch, and image generation, music and voice when you turn them on, by downloading packages from GitHub and the Python Package Index (PyPI). It checks GitHub for updates of those runtimes when you ask it to.</p>
+
+    <h2>The local API server</h2>
+    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet (it doesn't fetch images given as web links).</p>
+
+    <h2>Microphone</h2>
+    <p>Voice Lab uses the microphone only while you use it. The audio is processed on your Mac and is not recorded or sent anywhere.</p>
+
+    <h2>Children</h2>
+    <p>LLMTray is not directed at children. It asks no one for personal information: the only personal details we receive are the ones you choose to type into a review or a supporter entry.</p>
+
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, the new version is published on this page with a new date. Questions: <code>bugreport@ipsupport.us</code>.</p>
+
+    <footer>
+      <a href="./">LLMTray</a> · <a href="privacy.html">Privacy</a> · <a href="support.html">Support</a> · made by <a href="https://github.com/ipsupport-llc">IP Support</a>
+    </footer>
+  </div>
+</body>
+</html>
