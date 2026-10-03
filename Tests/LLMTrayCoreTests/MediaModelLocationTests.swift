@@ -48,14 +48,24 @@ final class MediaModelLocationTests: XCTestCase {
         XCTAssertEqual(MediaModelLocation.migration(repo: "o/v", root: root, legacy: legacy.path, isInPlace: inPlace), .none)
     }
 
-    func testNoMigrationIntoAModelsFolderThatIsntThere() throws {
+    func testNoMigrationOntoAMissingDisk() throws {
         // An external disk not mounted: its mount point must not be created
         // on the boot disk.
         let base = try temp()
         let legacy = base.appendingPathComponent("app/x")
         try model(legacy)
-        let root = base.appendingPathComponent("Volumes/External/models").path
-        XCTAssertEqual(MediaModelLocation.migration(repo: "o/x", root: root, legacy: legacy.path, isInPlace: inPlace), .none)
+        XCTAssertEqual(MediaModelLocation.migration(repo: "o/x", root: "/Volumes/Gone-\(UUID())/models", legacy: legacy.path,
+                                                    isInPlace: inPlace), .none)
+    }
+
+    func testMigrationIntoAModelsFolderNotMadeYet() throws {
+        // A fresh default folder (~/.llmtray/models before its first use).
+        let base = try temp()
+        let legacy = base.appendingPathComponent("app/x")
+        try model(legacy)
+        let root = base.appendingPathComponent("home/.llmtray/models").path
+        XCTAssertEqual(MediaModelLocation.migration(repo: "o/x", root: root, legacy: legacy.path, isInPlace: inPlace),
+                       .move(from: legacy.path, to: root + "/o/x"))
     }
 
     func testADanglingLinkAtTheTargetIsKept() throws {

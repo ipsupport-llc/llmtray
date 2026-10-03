@@ -34,19 +34,23 @@ public enum MediaModelLocation {
         case none
     }
 
-    /// The old copy moves when it's complete, the models folder exists (an
-    /// external disk that isn't mounted is no place to create one), has
-    /// nothing at the target (not even a partial one), and is on the old
+    /// The old copy moves when it's complete, the models folder is there
+    /// or can be made (canCreate: never an external disk's missing mount
+    /// point), has nothing at the target (not even a partial one), and is
+    /// -- or, not made yet, its nearest existing folder is -- on the old
     /// copy's volume: a rename, never a copy.
     public static func migration(repo: String, root: String, legacy: String?,
                                  isInPlace: (String) -> Bool) -> Migration {
-        guard let legacy, isInPlace(legacy) else { return .none }
-        var isDir: ObjCBool = false
-        let rootPath = (root as NSString).expandingTildeInPath
-        guard FileManager.default.fileExists(atPath: rootPath, isDirectory: &isDir), isDir.boolValue else { return .none }
+        guard let legacy, isInPlace(legacy), canCreate(root: root) else { return .none }
         let target = preferred(repo: repo, root: root)
-        guard !exists(target), sameVolume(legacy, rootPath) else { return .none }
+        guard !exists(target), sameVolume(legacy, nearestExisting((root as NSString).expandingTildeInPath)) else { return .none }
         return .move(from: legacy, to: target)
+    }
+
+    private static func nearestExisting(_ path: String) -> String {
+        var url = URL(fileURLWithPath: path).standardizedFileURL
+        while !FileManager.default.fileExists(atPath: url.path), url.pathComponents.count > 1 { url.deleteLastPathComponent() }
+        return url.path
     }
 
     /// Anything at `path`, a dangling link included (fileExists follows
