@@ -161,12 +161,17 @@ enum MediaModels {
 
     /// What the downloads of these models have written so far: their
     /// temporary folders next to where they go (`<repo>.partial-<UUID>`,
-    /// a voice model's `<repo>.partial`) -- for a progress the managers
-    /// don't report.
+    /// a voice model's `<repo>.partial`), and the parts already in place
+    /// (a turbo model's DiT while its planner downloads) -- for a progress
+    /// the managers don't report.
     static func bytesDownloading(_ entries: [Entry]) -> Int64 {
         let fm = FileManager.default
         var total: Int64 = 0
         for entry in entries {
+            if isInstalled(entry) {
+                total += DiskUsage.directorySize(path(entry))
+                continue
+            }
             let target = MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot())
             let dir = (target as NSString).deletingLastPathComponent, name = (target as NSString).lastPathComponent
             for item in (try? fm.contentsOfDirectory(atPath: dir)) ?? []
