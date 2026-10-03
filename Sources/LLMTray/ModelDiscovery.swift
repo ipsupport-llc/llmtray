@@ -109,18 +109,33 @@ enum ModelDiscovery {
     }
 
     /// The model hears audio: its config describes an audio part
-    /// (audio_config) and the checkpoint has its weights -- a text-only
-    /// conversion can keep audio_config without them. A single-file model
-    /// (no index) is taken at its config's word.
+    /// (an audio_config object) and the checkpoint has the weights it runs
+    /// on -- a text-only conversion can keep audio_config without them. A
+    /// tower model (Gemma 4 E2B/E4B) needs its audio_tower; an encoder-free
+    /// one (gemma4_unified, the 12B) its embed_audio. The weight names come
+    /// from the index, or a single file's safetensors header.
     static func supportsAudio(forModelPath path: String) -> Bool {
         guard let data = FileManager.default.contents(atPath: path + "/config.json"),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              obj["audio_config"] != nil else { return false }
-        guard let index = FileManager.default.contents(atPath: path + "/model.safetensors.index.json"),
-              let map = (try? JSONSerialization.jsonObject(with: index) as? [String: Any])?["weight_map"] as? [String: Any] else {
-            return true
+              obj["audio_config"] is [String: Any] else { return false }
+        let needed = (obj["model_type"] as? String) == "gemma4_unified" ? "embed_audio." : "audio_tower."
+        return weightNames(inFolder: path).contains { $0.contains(needed) }
+    }
+
+    /// The checkpoint's tensor names: its index's weight map, or the header
+    /// of a lone model.safetensors (an 8-byte length, then JSON).
+    private static func weightNames(inFolder path: String) -> [String] {
+        if let index = FileManager.default.contents(atPath: path + "/model.safetensors.index.json"),
+           let map = (try? JSONSerialization.jsonObject(with: index) as? [String: Any])?["weight_map"] as? [String: Any] {
+            return Array(map.keys)
         }
-        return map.keys.contains { $0.contains("audio_tower.") || $0.contains("embed_audio.") }
+        guard let file = FileHandle(forReadingAtPath: path + "/model.safetensors") else { return [] }
+        defer { try? file.close() }
+        guard let lengthData = try? file.read(upToCount: 8), lengthData.count == 8 else { return [] }
+        let length = lengthData.withUnsafeBytes { $0.loadUnaligned(as: UInt64.self) }.littleEndian
+        guard length > 0, length < 100_000_000, let header = try? file.read(upToCount: Int(length)),
+              let obj = try? JSONSerialization.jsonObject(with: header) as? [String: Any] else { return [] }
+        return obj.keys.filter { $0 != "__metadata__" }
     }
 
     /// HF repo of a Multi-Token-Prediction drafter for this model, if we

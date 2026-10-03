@@ -114,7 +114,7 @@ struct SetupWizardView: View {
                 Button("Skip Setup") { model.skip() }
                     .help(Text("Closes this window. Settings › General › Set Up LLMTray… opens it again."))
             } else if !model.isFinished {
-                Button { model.back() } label: { Label("Back", systemImage: "chevron.left") }
+                Button { model.back() } label: { Label("Back", systemImage: "chevron.backward") }
             }
             Spacer()
             if model.step != .welcome, model.step != .done {
@@ -131,7 +131,7 @@ struct SetupWizardView: View {
                 Button { model.next() } label: {
                     HStack(spacing: 4) {
                         model.step == .welcome ? Text("Get Started") : Text("Next")
-                        Image(systemName: "chevron.right")
+                        Image(systemName: "chevron.forward")
                     }
                 }
                 .keyboardShortcut(.defaultAction)

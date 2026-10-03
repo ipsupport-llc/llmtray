@@ -61,13 +61,14 @@ extension ModelRecommendations {
 
     /// What the curated list says a local model can do (the popover's model
     /// card); `vision`: what its config.json says (ModelDiscovery), for the
-    /// models the list doesn't know; `audio` the same. In the list's
-    /// Capability order.
+    /// models the list doesn't know. `audio` from the folder alone: the
+    /// list's own claim gives way to it, a text-only conversion in a listed
+    /// model's folder hears nothing. In the list's Capability order.
     public static func capabilities(ofLocalPath path: String, in models: [RecommendedModel],
                                     vision: Bool, audio: Bool = false) -> [RecommendedModel.Capability] {
         var found = Set(models.first { localPath(of: $0.repo, in: [path]) != nil }?.capabilities ?? [])
         if vision { found.insert(.vision) }
-        if audio { found.insert(.audio) }
+        if audio { found.insert(.audio) } else { found.remove(.audio) }
         return RecommendedModel.Capability.allCases.filter(found.contains)
     }
 
