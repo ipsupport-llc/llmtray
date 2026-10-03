@@ -411,8 +411,10 @@ struct ModelsPane: View {
                         Text(String(format: NSLocalizedString("Added %@", comment: "model list: when the model arrived"),
                                     added.formatted(date: .abbreviated, time: .omitted)))
                     }
-                    if MediaModels.isInOldPlace(e) {
+                    if MediaModels.isInAppFolder(e) {
                         Text("in LLMTray's own folder").help(Text("Downloaded by an earlier version, on another disk than the models folder: it stays where it is."))
+                    } else if MediaModels.isInOldPlace(e) {
+                        Text("in an earlier models folder").help(Text(verbatim: MediaModels.path(e)))
                     }
                 }
                 .font(.caption).foregroundStyle(.secondary)

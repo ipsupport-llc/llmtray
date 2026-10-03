@@ -83,6 +83,7 @@ final class VoiceModelStore: ObservableObject {
             if !text.isEmpty { self?.statusText = text }
         }
         guard !isDownloaded(model) else { return }
+        try MediaModels.checkModelsFolder()
         let fm = FileManager.default
         let partial = Self.partialDir(model)
         try fm.createDirectory(atPath: (partial as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
@@ -117,11 +118,15 @@ final class VoiceModelStore: ObservableObject {
         guard !VoiceLabSession.shared.isActive else { throw StoreError.inUse }
         isBusy = true
         defer { isBusy = false; revision += 1 }
-        for dir in [Self.modelDir(model), Self.partialDir(model)] {
-            try await ProcessRunner.offMain {
-                if FileManager.default.fileExists(atPath: dir) { try FileManager.default.removeItem(atPath: dir) }
-            }
+        // The model to the Trash (restorable, as from Settings → Models),
+        // a partial download deleted.
+        let dir = Self.modelDir(model), partial = Self.partialDir(model)
+        try await ProcessRunner.offMain {
+            let fm = FileManager.default
+            if fm.fileExists(atPath: dir) { try fm.trashItem(at: URL(fileURLWithPath: dir), resultingItemURL: nil) }
+            if fm.fileExists(atPath: partial) { try fm.removeItem(atPath: partial) }
         }
+        MediaModels.didDownload()
     }
 
     nonisolated private static func size(_ path: String) async -> Int64 {

@@ -227,6 +227,7 @@ final class MfluxManager: ObservableObject {
         defer { isBusy = false }
         try await ensurePackageInstalled()
         if model.isDownloaded { return }
+        try MediaModels.checkModelsFolder()
 
         statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
         defer { statusText = "" }

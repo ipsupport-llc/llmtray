@@ -265,7 +265,7 @@ private struct MediaDownloadControl: View {
                     Text(status.isEmpty ? NSLocalizedString("Downloading…", comment: "") : status)
                         .font(.system(size: 10)).foregroundColor(.secondary).lineLimit(1)
                 }
-            } else if MediaModels.isInstalled(entry) {
+            } else if MediaModels.isReady(entry) {
                 Label(String(format: NSLocalizedString("Installed · %@", comment: "HF browser: a media model installed, its kind"), entry.kind.title),
                       systemImage: "checkmark.circle.fill")
                     .font(.system(size: 11))

@@ -150,6 +150,7 @@ final class MusicManager: ObservableObject {
         defer { isBusy = false; statusText = "" }
         try await ensurePackagesInstalled()
         // Into the models folder, each under its repo.
+        if !Self.isDownloadedStatic(model) { try MediaModels.checkModelsFolder() }
         if !MediaModels.isInstalled(MediaModels.entry(model)) {
             let target = MediaModels.downloadPath(MediaModels.entry(model))
             try FileManager.default.createDirectory(atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true)

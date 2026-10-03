@@ -67,9 +67,12 @@ enum MediaModels {
         let fm = FileManager.default
         switch check {
         case .folder:
+            // The managers move a download in whole; a browser download of
+            // it from before (into the chat path) may have stopped part way.
             var isDir: ObjCBool = false
             return fm.fileExists(atPath: path, isDirectory: &isDir) && isDir.boolValue
                 && !((try? fm.contentsOfDirectory(atPath: path)) ?? []).isEmpty
+                && !MediaModelLocation.isUnfinishedBrowserDownload(path)
         case .configAndIndex:
             return fm.fileExists(atPath: path + "/config.json") && fm.fileExists(atPath: path + "/model.safetensors.index.json")
         }
@@ -108,6 +111,30 @@ enum MediaModels {
         rememberCurrentRoot()
         return MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot())
     }
+
+    struct FolderUnavailable: LocalizedError {
+        var errorDescription: String? {
+            NSLocalizedString("The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.", comment: "")
+        }
+    }
+
+    /// Before a download: the models folder is there (or can be made).
+    static func checkModelsFolder() throws {
+        guard MediaModelLocation.canCreate(root: ModelDiscovery.currentModelsRoot()) else { throw FolderUnavailable() }
+    }
+
+    /// Usable: installed, with the music planner a turbo model needs.
+    static func isReady(_ entry: Entry) -> Bool {
+        guard isInstalled(entry) else { return false }
+        if entry.kind == .music, let model = MusicModel.allCases.first(where: { $0.hfRepo == entry.repo }), model.usesPlanner {
+            return isInstalled(musicPlanner)
+        }
+        return true
+    }
+
+    /// In the app's own folder (downloaded by an earlier version, on
+    /// another volume than the models folder).
+    static func isInAppFolder(_ entry: Entry) -> Bool { isInstalled(entry) && path(entry) == entry.legacy }
 
     /// A download landed: Settings' list and disk use read the disk again.
     static func didDownload() {
@@ -154,10 +181,18 @@ enum MediaModels {
             try? fm.createDirectory(atPath: (new as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             try? MediaModelLocation.rename(old, to: new)
         }
-        // Image and music downloads' leftovers in the app's folder (they
-        // restart, nothing to resume; nothing downloads this early).
+        // Image and music downloads' leftovers (<name>.partial-<UUID>: they
+        // restart, nothing to resume; nothing downloads this early), in the
+        // app's folder and next to each model in the models folder.
         for dir in ["mflux_models", "music_models"].map({ RuntimePaths.externalRuntimeDir + "/" + $0 }) {
             for name in (try? fm.contentsOfDirectory(atPath: dir)) ?? [] where MediaModelLocation.isPartial(name) && !name.hasSuffix(".partial") {
+                try? fm.removeItem(atPath: dir + "/" + name)
+            }
+        }
+        for entry in all where entry.kind != .voice {
+            let target = MediaModelLocation.preferred(repo: entry.repo, root: root)
+            let dir = (target as NSString).deletingLastPathComponent, prefix = (target as NSString).lastPathComponent + ".partial-"
+            for name in (try? fm.contentsOfDirectory(atPath: dir)) ?? [] where name.hasPrefix(prefix) && MediaModelLocation.isPartial(name) {
                 try? fm.removeItem(atPath: dir + "/" + name)
             }
         }

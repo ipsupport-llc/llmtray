@@ -956,6 +956,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model's license, from its card." = "The model's license, from its card.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
@@ -1170,6 +1171,7 @@
 "failed: %@" = "failed: %@";
 "for this chat" = "for this chat";
 "in LLMTray's own folder" = "in LLMTray's own folder";
+"in an earlier models folder" = "in an earlier models folder";
 "it isn't a model folder in the models folder" = "it isn't a model folder in the models folder";
 "it's being downloaded" = "it's being downloaded";
 "it's in use or downloading" = "it's in use or downloading";

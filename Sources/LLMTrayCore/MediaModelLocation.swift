@@ -45,8 +45,34 @@ public enum MediaModelLocation {
         let rootPath = (root as NSString).expandingTildeInPath
         guard FileManager.default.fileExists(atPath: rootPath, isDirectory: &isDir), isDir.boolValue else { return .none }
         let target = preferred(repo: repo, root: root)
-        guard !FileManager.default.fileExists(atPath: target), sameVolume(legacy, rootPath) else { return .none }
+        guard !exists(target), sameVolume(legacy, rootPath) else { return .none }
         return .move(from: legacy, to: target)
+    }
+
+    /// Anything at `path`, a dangling link included (fileExists follows
+    /// links: a model linked to a disk that isn't mounted reads as absent,
+    /// and a rename would replace the link).
+    public static func exists(_ path: String) -> Bool {
+        (try? FileManager.default.attributesOfItem(atPath: path)) != nil
+    }
+
+    /// The models folder can take a download: it's there, or its parent is
+    /// and isn't /Volumes (an external disk's mount point, absent while it
+    /// isn't connected, must not be created on the boot disk).
+    public static func canCreate(root: String) -> Bool {
+        let path = (root as NSString).expandingTildeInPath
+        var isDir: ObjCBool = false
+        if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) { return isDir.boolValue }
+        let parent = (path as NSString).deletingLastPathComponent
+        return parent != "/Volumes" && !parent.hasPrefix("/Volumes/") && FileManager.default.fileExists(atPath: parent)
+    }
+
+    /// A browser download of the folder started and didn't finish: its
+    /// manifest is there, its completion marker isn't.
+    public static func isUnfinishedBrowserDownload(_ path: String) -> Bool {
+        let fm = FileManager.default
+        return fm.fileExists(atPath: path + "/" + ModelFolder.manifestName)
+            && !fm.fileExists(atPath: path + "/" + ModelFolder.completionMarkerName)
     }
 
     /// Both existing paths, links resolved, are on one volume.

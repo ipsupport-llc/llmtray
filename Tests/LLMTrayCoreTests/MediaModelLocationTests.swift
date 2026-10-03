@@ -58,6 +58,26 @@ final class MediaModelLocationTests: XCTestCase {
         XCTAssertEqual(MediaModelLocation.migration(repo: "o/x", root: root, legacy: legacy.path, isInPlace: inPlace), .none)
     }
 
+    func testADanglingLinkAtTheTargetIsKept() throws {
+        let base = try temp()
+        let root = base.appendingPathComponent("models")
+        let legacy = base.appendingPathComponent("app/x")
+        try model(legacy)
+        try FileManager.default.createDirectory(at: root.appendingPathComponent("o"), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(atPath: root.path + "/o/x", withDestinationPath: "/Volumes/Gone-\(UUID())/x")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: root.path + "/o/x"))
+        XCTAssertEqual(MediaModelLocation.migration(repo: "o/x", root: root.path, legacy: legacy.path, isInPlace: inPlace), .none)
+    }
+
+    func testCanCreateTheModelsFolder() throws {
+        let base = try temp()
+        XCTAssertTrue(MediaModelLocation.canCreate(root: base.path))
+        XCTAssertTrue(MediaModelLocation.canCreate(root: base.appendingPathComponent("new").path))
+        XCTAssertFalse(MediaModelLocation.canCreate(root: base.appendingPathComponent("a/b").path), "no parent")
+        XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())"))
+        XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())/models"))
+    }
+
     func testRenameNeverCopies() throws {
         let base = try temp()
         let a = base.appendingPathComponent("a"), b = base.appendingPathComponent("sub/b")
