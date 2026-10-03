@@ -18,6 +18,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ already exists and points to %@. Remove it first to install LLMTray's.";
 "%@ didn't download: %@" = "%@ didn't download: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ is a link to a folder that isn't available: connect its disk, or remove the link.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ isn't LLMTray's link, so it was left as it is.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ isn't downloaded yet -- re-enable image generation in Settings.";

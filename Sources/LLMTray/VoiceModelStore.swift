@@ -108,6 +108,7 @@ final class VoiceModelStore: ObservableObject {
         try await AudioRuntime.shared.snapshotDownload(repo: model.repo, into: partial)
         // huggingface_hub's own bookkeeping isn't part of the model.
         try? fm.removeItem(atPath: partial + "/.cache")
+        try MediaModels.clearIncompleteTarget(MediaModels.entry(model))
         try fm.moveItem(atPath: partial, toPath: MediaModels.downloadPath(MediaModels.entry(model)))
         MediaModels.didDownload()
     }

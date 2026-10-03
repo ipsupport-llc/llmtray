@@ -74,7 +74,13 @@ enum MediaModels {
                 && !((try? fm.contentsOfDirectory(atPath: path)) ?? []).isEmpty
                 && !MediaModelLocation.isUnfinishedBrowserDownload(path)
         case .configAndIndex:
-            return fm.fileExists(atPath: path + "/config.json") && fm.fileExists(atPath: path + "/model.safetensors.index.json")
+            // Every shard the index names, too: a stopped download can have
+            // the small files without the weights.
+            guard fm.fileExists(atPath: path + "/config.json"), !MediaModelLocation.isUnfinishedBrowserDownload(path),
+                  let data = fm.contents(atPath: path + "/model.safetensors.index.json"),
+                  let map = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["weight_map"] as? [String: String],
+                  !map.isEmpty else { return false }
+            return Set(map.values).allSatisfy { fm.fileExists(atPath: path + "/" + $0) }
         }
     }
 
@@ -121,6 +127,23 @@ enum MediaModels {
     /// Before a download: the models folder is there (or can be made).
     static func checkModelsFolder() throws {
         guard MediaModelLocation.canCreate(root: ModelDiscovery.currentModelsRoot()) else { throw FolderUnavailable() }
+    }
+
+    struct TargetIsALink: LocalizedError {
+        let path: String
+        var errorDescription: String? {
+            String(format: NSLocalizedString("%@ is a link to a folder that isn't available: connect its disk, or remove the link.", comment: ""), path)
+        }
+    }
+
+    /// Before a download lands: what's at its place is no installed model
+    /// (a download that stopped there, an empty folder) -- to the Trash, so
+    /// the new one can move in. A link is the user's: left alone.
+    static func clearIncompleteTarget(_ entry: Entry) throws {
+        let target = MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot())
+        guard MediaModelLocation.exists(target), !isInPlace(target, entry.check) else { return }
+        if (try? FileManager.default.destinationOfSymbolicLink(atPath: target)) != nil { throw TargetIsALink(path: target) }
+        try FileManager.default.trashItem(at: URL(fileURLWithPath: target), resultingItemURL: nil)
     }
 
     /// Usable: installed, with the music planner a turbo model needs.

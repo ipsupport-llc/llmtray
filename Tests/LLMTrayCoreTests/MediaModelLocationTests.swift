@@ -73,7 +73,7 @@ final class MediaModelLocationTests: XCTestCase {
         let base = try temp()
         XCTAssertTrue(MediaModelLocation.canCreate(root: base.path))
         XCTAssertTrue(MediaModelLocation.canCreate(root: base.appendingPathComponent("new").path))
-        XCTAssertFalse(MediaModelLocation.canCreate(root: base.appendingPathComponent("a/b").path), "no parent")
+        XCTAssertTrue(MediaModelLocation.canCreate(root: base.appendingPathComponent("a/b").path), "a fresh install's default folder")
         XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())"))
         XCTAssertFalse(MediaModelLocation.canCreate(root: "/Volumes/Gone-\(UUID())/models"))
     }

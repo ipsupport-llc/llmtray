@@ -250,6 +250,7 @@ final class MfluxManager: ObservableObject {
                 snapshot_download("\(model.hfRepo)", local_dir="\(tempDir)")
                 """,
             ])
+            try MediaModels.clearIncompleteTarget(MediaModels.entry(model))
             try FileManager.default.moveItem(atPath: tempDir, toPath: target)
             MediaModels.didDownload()
         } catch {

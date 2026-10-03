@@ -155,7 +155,7 @@ final class MusicManager: ObservableObject {
             let target = MediaModels.downloadPath(MediaModels.entry(model))
             try FileManager.default.createDirectory(atPath: (target as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
             statusText = String(format: NSLocalizedString("Downloading %@…", comment: ""), model.displayName)
-            try await fetch(repo: model.hfRepo, patterns: nil, into: target)
+            try await fetch(repo: model.hfRepo, patterns: nil, into: target, clearing: MediaModels.entry(model))
         }
         if model.usesPlanner, !MediaModels.isInstalled(MediaModels.musicPlanner) {
             let target = MediaModels.downloadPath(MediaModels.musicPlanner)
@@ -164,6 +164,7 @@ final class MusicManager: ObservableObject {
             let temp = target + ".partial-\(UUID().uuidString)"
             do {
                 try await fetch(repo: Self.lmRepo, patterns: [Self.lmFolder + "/*"], into: temp, move: false)
+                try MediaModels.clearIncompleteTarget(MediaModels.musicPlanner)
                 try FileManager.default.moveItem(atPath: temp + "/" + Self.lmFolder, toPath: target)
                 try? FileManager.default.removeItem(atPath: temp)
             } catch {
@@ -175,10 +176,11 @@ final class MusicManager: ObservableObject {
     }
 
     /// snapshot_download into `dir` (through a temporary folder when `move`).
-    private func fetch(repo: String, patterns: [String]?, into dir: String, move: Bool = true) async throws {
+    private func fetch(repo: String, patterns: [String]?, into dir: String, move: Bool = true, clearing entry: MediaModels.Entry? = nil) async throws {
         let target = move ? dir + ".partial-\(UUID().uuidString)" : dir
         do {
             try await AudioRuntime.shared.snapshotDownload(repo: repo, patterns: patterns, into: target)
+            if let entry { try MediaModels.clearIncompleteTarget(entry) }
             if move { try FileManager.default.moveItem(atPath: target, toPath: dir) }
         } catch {
             if move { try? FileManager.default.removeItem(atPath: target) }

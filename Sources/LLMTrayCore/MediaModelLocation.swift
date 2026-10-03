@@ -56,15 +56,19 @@ public enum MediaModelLocation {
         (try? FileManager.default.attributesOfItem(atPath: path)) != nil
     }
 
-    /// The models folder can take a download: it's there, or its parent is
-    /// and isn't /Volumes (an external disk's mount point, absent while it
-    /// isn't connected, must not be created on the boot disk).
+    /// The models folder can take a download: it's there, or can be made
+    /// -- unless it's on an external disk that isn't connected (its mount
+    /// point under /Volumes is missing: making it would write to the boot
+    /// disk).
     public static func canCreate(root: String) -> Bool {
-        let path = (root as NSString).expandingTildeInPath
+        let path = URL(fileURLWithPath: (root as NSString).expandingTildeInPath).standardizedFileURL.path
         var isDir: ObjCBool = false
         if FileManager.default.fileExists(atPath: path, isDirectory: &isDir) { return isDir.boolValue }
-        let parent = (path as NSString).deletingLastPathComponent
-        return parent != "/Volumes" && !parent.hasPrefix("/Volumes/") && FileManager.default.fileExists(atPath: parent)
+        let parts = (path as NSString).pathComponents
+        if parts.count >= 3, parts[1] == "Volumes" {
+            return FileManager.default.fileExists(atPath: "/Volumes/" + parts[2])
+        }
+        return true
     }
 
     /// A browser download of the folder started and didn't finish: its
