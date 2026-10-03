@@ -108,6 +108,21 @@ enum ModelDiscovery {
         return false
     }
 
+    /// The model hears audio: its config describes an audio part
+    /// (audio_config) and the checkpoint has its weights -- a text-only
+    /// conversion can keep audio_config without them. A single-file model
+    /// (no index) is taken at its config's word.
+    static func supportsAudio(forModelPath path: String) -> Bool {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              obj["audio_config"] != nil else { return false }
+        guard let index = FileManager.default.contents(atPath: path + "/model.safetensors.index.json"),
+              let map = (try? JSONSerialization.jsonObject(with: index) as? [String: Any])?["weight_map"] as? [String: Any] else {
+            return true
+        }
+        return map.keys.contains { $0.contains("audio_tower.") || $0.contains("embed_audio.") }
+    }
+
     /// HF repo of a Multi-Token-Prediction drafter for this model, if we
     /// publish one: mlx_lm.server's `--draft-model` then speculatively
     /// decodes with it (same output, faster -- ~+50% tok/s on short prompts

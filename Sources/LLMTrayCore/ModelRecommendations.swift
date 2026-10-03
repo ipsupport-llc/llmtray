@@ -5,8 +5,9 @@ import Foundation
 public struct RecommendedModel: Codable, Equatable, Sendable, Identifiable {
     public enum Capability: String, Codable, Sendable, CaseIterable {
         /// `code`: made for programming and agents -- offered as that, not
-        /// ranked against the general models.
-        case vision, tools, reasoning, code
+        /// ranked against the general models. `audio`: hears speech and
+        /// sounds (an audio tower or audio embedder).
+        case vision, audio, tools, reasoning, code
     }
 
     public var id: String { repo }

@@ -106,18 +106,20 @@ struct SetupWizardView: View {
         }
     }
 
+    /// Back on its own at the left, forward on the right: the next step's
+    /// button is where Get Started was, Skip beside it.
     private var buttons: some View {
         HStack {
             if model.step == .welcome {
                 Button("Skip Setup") { model.skip() }
                     .help(Text("Closes this window. Settings › General › Set Up LLMTray… opens it again."))
-            } else if model.step != .done {
-                Button("Skip") { model.skip() }
-                    .help(Text("Puts this step back to how it was when setup opened, and goes on."))
+            } else if !model.isFinished {
+                Button { model.back() } label: { Label("Back", systemImage: "chevron.left") }
             }
             Spacer()
-            if model.step != .welcome, !model.isFinished {
-                Button("Back") { model.back() }
+            if model.step != .welcome, model.step != .done {
+                Button("Skip") { model.skip() }
+                    .help(Text("Puts this step back to how it was when setup opened, and goes on."))
             }
             if model.step == .done {
                 if model.isFinished {
@@ -126,8 +128,13 @@ struct SetupWizardView: View {
                     Button("Finish") { model.finish() }.keyboardShortcut(.defaultAction)
                 }
             } else {
-                Button(model.step == .welcome ? "Get Started" : "Next") { model.next() }
-                    .keyboardShortcut(.defaultAction)
+                Button { model.next() } label: {
+                    HStack(spacing: 4) {
+                        model.step == .welcome ? Text("Get Started") : Text("Next")
+                        Image(systemName: "chevron.right")
+                    }
+                }
+                .keyboardShortcut(.defaultAction)
             }
         }
     }
