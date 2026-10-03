@@ -198,6 +198,10 @@ final class ControlCommands {
         guard HubRepoName.isValid(repo) else {
             return reply.send(.failure("\"\(repo)\" isn't a Hugging Face repo -- expected org/name"))
         }
+        // Not a chat model: its generator downloads it, with what it needs.
+        if let media = MediaModels.entry(repo: repo) {
+            return reply.send(.failure("\(repo) is a model for \(media.kind.title.lowercased()): download it in LLMTray's Settings or its Hugging Face browser"))
+        }
         let before = Set(downloads.state.items.map(\.id))
         downloads.addChatModel(repo: repo)
         // The new item, or the same download already waiting or running

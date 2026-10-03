@@ -108,6 +108,7 @@ final class VoiceModelStore: ObservableObject {
         // huggingface_hub's own bookkeeping isn't part of the model.
         try? fm.removeItem(atPath: partial + "/.cache")
         try fm.moveItem(atPath: partial, toPath: MediaModels.downloadPath(MediaModels.entry(model)))
+        MediaModels.didDownload()
     }
 
     /// The model's files, and a partial download, go.

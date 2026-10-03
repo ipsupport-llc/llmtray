@@ -170,6 +170,7 @@ final class MusicManager: ObservableObject {
                 throw error
             }
         }
+        MediaModels.didDownload()
     }
 
     /// snapshot_download into `dir` (through a temporary folder when `move`).

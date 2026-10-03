@@ -75,23 +75,50 @@ enum MediaModels {
         }
     }
 
+    /// Models folders media models were kept in before the current one
+    /// (the user picked another since): still looked in, and moved from at
+    /// launch when that's a rename.
+    private static let rootsKey = "llmtray.mediaModelRoots"
+
+    static func rememberCurrentRoot() {
+        let root = ModelDiscovery.currentModelsRoot()
+        var roots = UserDefaults.standard.stringArray(forKey: rootsKey) ?? []
+        guard !roots.contains(root) else { return }
+        roots.append(root)
+        UserDefaults.standard.set(roots, forKey: rootsKey)
+    }
+
+    /// Where else it may be, in order: earlier models folders, then the
+    /// app's own folder.
+    static func oldPlaces(_ entry: Entry) -> [String] {
+        let root = ModelDiscovery.currentModelsRoot()
+        let roots = (UserDefaults.standard.stringArray(forKey: rootsKey) ?? []).filter { $0 != root }
+        return roots.map { MediaModelLocation.preferred(repo: entry.repo, root: $0) } + [entry.legacy]
+    }
+
     /// Where the model is (or a download puts it).
     static func path(_ entry: Entry) -> String {
-        MediaModelLocation.resolve(repo: entry.repo, root: ModelDiscovery.currentModelsRoot(), legacy: entry.legacy) {
+        MediaModelLocation.resolve(repo: entry.repo, root: ModelDiscovery.currentModelsRoot(), oldPlaces: oldPlaces(entry)) {
             isInPlace($0, entry.check)
         }
     }
 
     /// Where a download goes: the models folder.
     static func downloadPath(_ entry: Entry) -> String {
-        MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot())
+        rememberCurrentRoot()
+        return MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot())
+    }
+
+    /// A download landed: Settings' list and disk use read the disk again.
+    static func didDownload() {
+        NotificationCenter.default.post(name: .modelsDidChange, object: nil)
     }
 
     static func isInstalled(_ entry: Entry) -> Bool { isInPlace(path(entry), entry.check) }
 
-    /// Only in the app's old folder (on another volume than the models
-    /// folder, or not moved yet).
-    static func isInOldPlace(_ entry: Entry) -> Bool { path(entry) == entry.legacy }
+    /// Not in the current models folder (an earlier one, or the app's own
+    /// folder, on another volume).
+    static func isInOldPlace(_ entry: Entry) -> Bool { path(entry) != MediaModelLocation.preferred(repo: entry.repo, root: ModelDiscovery.currentModelsRoot()) && isInstalled(entry) }
 
     static func entry(_ model: ImageGenModel) -> Entry { entry(repo: model.hfRepo)! }
     static func entry(_ model: MusicModel) -> Entry { entry(repo: model.hfRepo)! }
@@ -104,18 +131,37 @@ enum MediaModels {
     @discardableResult
     static func moveIntoModelsFolder() -> [String] {
         let root = ModelDiscovery.currentModelsRoot()
+        let fm = FileManager.default
         var moved: [String] = []
         for entry in all {
-            guard case let .move(from, to) = MediaModelLocation.migration(repo: entry.repo, root: root, legacy: entry.legacy,
+            // The first old place it's complete in.
+            guard let source = oldPlaces(entry).first(where: { isInPlace($0, entry.check) }),
+                  case let .move(from, to) = MediaModelLocation.migration(repo: entry.repo, root: root, legacy: source,
                                                                           isInPlace: { isInPlace($0, entry.check) }) else { continue }
             do {
-                try FileManager.default.createDirectory(atPath: (to as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
-                try FileManager.default.moveItem(atPath: from, toPath: to)
+                try fm.createDirectory(atPath: (to as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+                try MediaModelLocation.rename(from, to: to)
                 moved.append(entry.repo)
             } catch {
                 NSLog("LLMTray: couldn't move %@ into the models folder: %@", from, error.localizedDescription)
             }
         }
+        // A voice download stopped part way in the app's folder goes on
+        // from the models folder.
+        for entry in all where entry.kind == .voice {
+            let old = entry.legacy + ".partial", new = MediaModelLocation.preferred(repo: entry.repo, root: root) + ".partial"
+            guard fm.fileExists(atPath: old), !fm.fileExists(atPath: new), MediaModelLocation.sameVolume(old, root) else { continue }
+            try? fm.createDirectory(atPath: (new as NSString).deletingLastPathComponent, withIntermediateDirectories: true)
+            try? MediaModelLocation.rename(old, to: new)
+        }
+        // Image and music downloads' leftovers in the app's folder (they
+        // restart, nothing to resume; nothing downloads this early).
+        for dir in ["mflux_models", "music_models"].map({ RuntimePaths.externalRuntimeDir + "/" + $0 }) {
+            for name in (try? fm.contentsOfDirectory(atPath: dir)) ?? [] where MediaModelLocation.isPartial(name) && !name.hasSuffix(".partial") {
+                try? fm.removeItem(atPath: dir + "/" + name)
+            }
+        }
+        if !moved.isEmpty { rememberCurrentRoot() }
         return moved
     }
 }

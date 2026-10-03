@@ -250,6 +250,7 @@ final class MfluxManager: ObservableObject {
                 """,
             ])
             try FileManager.default.moveItem(atPath: tempDir, toPath: target)
+            MediaModels.didDownload()
         } catch {
             try? FileManager.default.removeItem(atPath: tempDir)
             throw error
@@ -275,7 +276,7 @@ final class MfluxManager: ObservableObject {
         }
 
         let savedDir = savedModelDir(for: model)
-        guard FileManager.default.fileExists(atPath: savedDir) else {
+        guard model.isDownloaded else {
             // The Settings toggle only turns on after downloadModel() has
             // succeeded; fail clearly rather than silently do something else.
             throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))

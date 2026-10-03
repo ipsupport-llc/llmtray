@@ -145,8 +145,12 @@ final class ModelCatalog: ObservableObject {
         }
         guard !busy else { throw ModelRemoval.Refusal.inUse }
         let path = MediaModels.path(entry)
+        if let download = HFModelBrowser.activeDownload.map({ root + "/" + $0 }), ModelRemoval.isSameOrInside(download, path) {
+            throw ModelRemoval.Refusal.downloading
+        }
         let fm = FileManager.default
-        if path == entry.legacy {
+        if path != MediaModelLocation.preferred(repo: entry.repo, root: root) {
+            // An earlier models folder's copy, or the app's own folder's.
             try fm.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
         } else {
             let url = try ModelRemoval.check(modelPath: path, root: root, requireConfig: false)
