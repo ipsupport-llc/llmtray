@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "لم يُثَبَّت %@ بعد";
 "%@ wasn't found on Hugging Face." = "لم يُعثر على %@ في Hugging Face.";
 "%@ · %@ left" = "%@ · تبقى %@";
+"%@ · %@ of %@" = "%@ · %@ من %@";
 "%@ · downloaded" = "%@ · تم التنزيل";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · تم التنزيل؛ تم تثبيت mlx-audio عند التشغيل الأول";
 "%@ · not downloaded" = "%@ · غير محمّل";

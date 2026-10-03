@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ עדיין לא מותקן";
 "%@ wasn't found on Hugging Face." = "%@ לא נמצא ב‑Hugging Face.";
 "%@ · %@ left" = "%@ · נותרו %@";
+"%@ · %@ of %@" = "%@ · %@ מתוך %@";
 "%@ · downloaded" = "%@ · הורד";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · הורד; mlx-audio מותקן בהרצה הראשונה";
 "%@ · not downloaded" = "%@ · לא הורד";

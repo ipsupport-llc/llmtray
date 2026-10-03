@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ chưa được cài đặt";
 "%@ wasn't found on Hugging Face." = "Không tìm thấy %@ trên Hugging Face.";
 "%@ · %@ left" = "%@ · còn %@";
+"%@ · %@ of %@" = "%@ · %@ trong %@";
 "%@ · downloaded" = "%@ · đã tải về";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · đã tải về; mlx-audio được cài khi chạy lần đầu";
 "%@ · not downloaded" = "%@ · chưa tải về";

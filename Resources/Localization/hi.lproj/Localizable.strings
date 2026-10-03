@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ अभी इंस्टॉल नहीं है";
 "%@ wasn't found on Hugging Face." = "Hugging Face पर %@ नहीं मिला।";
 "%@ · %@ left" = "%@ · %@ बचे";
+"%@ · %@ of %@" = "%@ · %@ में से %@";
 "%@ · downloaded" = "%@ · डाउनलोड हो चुका है";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · डाउनलोड हो चुका है; mlx-audio पहली बार शुरू करने पर इंस्टॉल किया गया है";
 "%@ · not downloaded" = "%@ · डाउनलोड नहीं हुआ";

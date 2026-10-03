@@ -27,6 +27,7 @@
 "%@ isn't installed yet" = "%@ ainda não está instalado";
 "%@ wasn't found on Hugging Face." = "Não foi possível encontrar %@ no Hugging Face.";
 "%@ · %@ left" = "%@ · %@ restantes";
+"%@ · %@ of %@" = "%@ · %@ de %@";
 "%@ · downloaded" = "%@ · baixado";
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · baixado; mlx-audio é instalado no primeiro início";
 "%@ · not downloaded" = "%@ · não baixado";
