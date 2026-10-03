@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "المسار %@ موجود بالفعل وليس تابعًا لـ LLMTray. أزله أولاً لتثبيت إصدار LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "المسار %@ موجود بالفعل ويشير إلى %@. أزله أولاً لتثبيت إصدار LLMTray.";
 "%@ didn't download: %@" = "لم يتم تنزيل %@: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‏%@ رابط لمجلد غير متاح: صِل القرص الخاص به، أو أزل الرابط.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ مُقيَّد: اقبل ترخيصه على huggingface.co/%@، ثم أضف رمز Hugging Face في الإعدادات → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "الرمز %@ ليس رابطًا لـ LLMTray، لذا تُرك كما هو.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "لم يتم تنزيل %@ بعد — أعد تمكين توليد الصور في الإعدادات.";
@@ -284,10 +285,12 @@
 "Download" = "تنزيل";
 "Download LLMTray-Full" = "تنزيل LLMTray-Full";
 "Download and Enable" = "تنزيل وتمكين";
+"Download for %@, into the models folder" = "تنزيل لـ %@ داخل مجلد النماذج";
 "Download into the models folder" = "التنزيل إلى مجلد النماذج";
 "Download models" = "تنزيل النماذج";
 "Download models from Hugging Face" = "تنزيل النماذج من Hugging Face";
 "Downloaded" = "تم التنزيل";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "تم تنزيله بواسطة إصدار أقدم، على قرص مختلف عن مجلد النماذج: سيبقى في مكانه.";
 "Downloading" = "جارٍ التنزيل";
 "Downloading %@" = "جارٍ تنزيل %@";
 "Downloading %@…" = "جارٍ تنزيل %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image generation off" = "توليد الصور متوقف";
 "Image model" = "نموذج الصور";
+"Image, music and voice models" = "نماذج الصور والموسيقى والصوت";
 "Images" = "صور";
 "Import" = "استيراد";
 "Import from LLMTray (direct download)" = "استيراد من LLMTray (تنزيل مباشر)";
@@ -440,6 +444,7 @@
 "Install" = "تثبيت";
 "Install ID" = "معرّف التثبيت";
 "Installed" = "مثبّت";
+"Installed · %@" = "مثبت · %@";
 "Installing mflux…" = "جارٍ تثبيت mflux…";
 "Installing mlx-audio failed: %@" = "فشل تثبيت mlx-audio: %@";
 "Installing mlx-audio…" = "جارٍ تثبيت mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "بيئة تشغيل النموذج غير مثبتة بعد — شغّل نموذجًا مرة واحدة ثم أعد المحاولة.";
 "The model server no longer goes online when it starts." = "لم يعد خادم النموذج يتصل بالإنترنت عند بدء التشغيل.";
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "مجلد النماذج غير متاح — هل تم توصيل قرصه؟ حدده مجدداً في الإعدادات → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "الحد الأقصى الذي قد تشغله ذاكرة التخزين المؤقت للمطالبات السابقة (حجم ذاكرة التخزين المؤقت للمطالبة في الملف الشخصي هو أيضاً حد أعلى). المزيد يجعل المحادثات الطويلة والوكيلات أسرع؛ الكثير يترك دون مساحة للمطالبة الجاري قراءتها.";
 "The music generator is busy -- try again once it's done." = "مولِّد الموسيقى مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The music generator is busy with another chat -- try again once it's done." = "مولِّد الموسيقى مشغول بمحادثة أخرى — حاول مرة أخرى بعد الانتهاء.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "استخدم هذا المنفذ";
 "Use headphones: the model hears its own voice from the speakers." = "استخدم سماعات رأس: النموذج يسمع صوته من مكبرات الصوت.";
 "Used" = "المستخدم";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "تُستخدم في توليد الصور والموسيقى وVoice Lab التي تقوم بتنزيلها. تُخزن أيضاً في مجلد النماذج تحت أسمائها على Hugging Face.";
 "Uses the internet" = "يستخدم الإنترنت";
 "Verbose server logging" = "تسجيل مفصّل للخادم";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "كان تسجيل الخادم التفصيلي مفعلًا، لذا السجل يحتوي محادثاتك: لم يُرفق. لإدراجه، أوقف التسجيل التفصيلي في الإعدادات › Server، أعد تشغيل الخادم وأعد إنتاج المشكلة.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "فشل في إنشاء الطلب";
 "failed: %@" = "فشل: %@";
 "for this chat" = "لهذه الدردشة";
+"hears audio" = "يسمع الصوت";
+"in LLMTray's own folder" = "في مجلد LLMTray الخاص";
+"in an earlier models folder" = "في مجلد النماذج السابق";
 "it isn't a model folder in the models folder" = "ليس مجلداً لنموذج داخل مجلد models";
 "it's being downloaded" = "قيد التنزيل";
+"it's in use or downloading" = "قيد الاستخدام أو جارٍ تنزيله";
 "less than a minute left" = "أقل من دقيقة متبقية";
 "llmtray in the terminal" = "llmtray في الطرفية";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "يقوم macOS بإزالة صوت النموذج من الميكروفون (معالجة الصوت، كما في FaceTime)، لذا يعمل على السماعات. كما يُوازن مستوى الصوت ويخفف الضوضاء الخلفية. يسري مفعوله بعد إعادة البدء.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· الحجم…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» لم يتم إزالته: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: لم يتمكن من تغيير التثبيت: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) ينتقل إلى سلة المهملات، حيث يمكنك استعادته. %@ بحاجة إليه: أعد تنزيله من الإعدادات لاستخدامه.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) سيُنقل إلى سلة المحذوفات، حيث يمكن استعادته بعد. سيتم نسيان الاسم المستعار وخيار الملف الشخصي.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» وفهرسه حُذفا من المشروع. الملف الذي أضفته منه لم يتأثر.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» لم يُحذف: الخادم مشغول أو يستخدمه. حاول مجدداً عندما يصبح الخادم خالياً.";

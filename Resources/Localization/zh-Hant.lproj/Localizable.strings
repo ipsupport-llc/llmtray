@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ 已存在且不是 LLMTray 的。請先移除它以安裝 LLMTray 的版本。";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ 已存在且指向 %@。請先移除它以安裝 LLMTray 的版本。";
 "%@ didn't download: %@" = "%@ 未下載：%@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ 是一個指向目前無法使用之資料夾的連結：請連接其磁碟，或移除該連結。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ 已受限制：請在 huggingface.co/%@ 接受其授權，然後在「設定 → Models」新增 Hugging Face 代幣。";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ 不是 LLMTray 的連結，已保留原樣。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ 尚未下載 — 請在「設定」中重新啟用影像生成功能。";
@@ -284,10 +285,12 @@
 "Download" = "下載";
 "Download LLMTray-Full" = "下載 LLMTray-Full";
 "Download and Enable" = "下載並啟用";
+"Download for %@, into the models folder" = "為 %@ 下載，放入 models 資料夾";
 "Download into the models folder" = "下載至 models 資料夾";
 "Download models" = "下載模型";
 "Download models from Hugging Face" = "從 Hugging Face 下載模型";
 "Downloaded" = "已下載";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "由較早版本下載，位於不同於 models 資料夾的磁碟：會保留在原處。";
 "Downloading" = "下載中";
 "Downloading %@" = "正在下載 %@";
 "Downloading %@…" = "正在下載 %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image generation off" = "影像生成：關";
 "Image model" = "影像模型";
+"Image, music and voice models" = "影像、音樂與語音 模型";
 "Images" = "影像";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "從 LLMTray 匯入（直接下載）";
@@ -440,6 +444,7 @@
 "Install" = "安裝";
 "Install ID" = "安裝識別碼";
 "Installed" = "已安裝";
+"Installed · %@" = "已安裝 · %@";
 "Installing mflux…" = "正在安裝 mflux…";
 "Installing mlx-audio failed: %@" = "安裝 mlx-audio 失敗：%@";
 "Installing mlx-audio…" = "正在安裝 mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型執行環境尚未安裝——請先啟動一個模型，然後再試一次。";
 "The model server no longer goes online when it starts." = "模型伺服器啟動時不再自動上線。";
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 資料夾目前無法使用 — 磁碟是否已連接？請於「設定 → Models」中重新選擇。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示快取最多可佔的空間（設定檔的「Prompt cache」大小也會作為上限）。快取越大可讓長對話與 agents 更流暢；太大則會留不到空間給正在讀取的提示。";
 "The music generator is busy -- try again once it's done." = "音樂產生器正忙碌中 —— 完成後再試。";
 "The music generator is busy with another chat -- try again once it's done." = "音樂產生器正為其他聊天處理中 —— 完成後再試。";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "使用此連接埠";
 "Use headphones: the model hears its own voice from the speakers." = "請使用耳機：否則模型會聽到喇叭輸出的聲音。";
 "Used" = "已使用";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "供影像生成、音樂與 Voice Lab 使用，這些功能會下載所需檔案。檔案也會保存在 models 資料夾中，使用其 Hugging Face 名稱。";
 "Uses the internet" = "會使用網際網路";
 "Verbose server logging" = "詳細伺服器記錄";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "因為已啟用詳細伺服器記錄，日誌中包含您的對話，因此不會自動附上。若要附上，請在「設定 › Server」關閉詳細記錄，重新啟動伺服器並重現問題。";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "建立請求失敗";
 "failed: %@" = "失敗：%@";
 "for this chat" = "用於此聊天室";
+"hears audio" = "能聽到音訊";
+"in LLMTray's own folder" = "在 LLMTray 自身的資料夾中";
+"in an earlier models folder" = "在早期的 models 資料夾中";
 "it isn't a model folder in the models folder" = "它不是 models 資料夾中的模型資料夾";
 "it's being downloaded" = "正在下載中";
+"it's in use or downloading" = "正在使用或下載中";
 "less than a minute left" = "剩餘不到一分鐘";
 "llmtray in the terminal" = "終端中的 llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS 會從麥克風中移除模型自身的聲音（語音處理，如 FaceTime），因此在使用喇叭時也能運作。此外會平衡音量並抑制背景噪音。重新啟動後生效。";
@@ -1214,6 +1225,7 @@
 "· size…" = "· 大小…";
 "“%1$@” couldn't be removed: %2$@" = "「%1$@」無法移除：%2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "「%1$@」：無法變更釘選：%2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "「%@」（%@）會移到垃圾桶，您仍可復原。%@ 需要此檔：請於設定重新下載以使用。";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）將移到資源回收筒，您仍可從中還原。其別名與設定檔選擇將一併遺失。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」及其索引已從專案刪除。您用來加入該項目的原始檔不受影響。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」未被移除：伺服器正忙或正在使用。待伺服器閒置時再試。";

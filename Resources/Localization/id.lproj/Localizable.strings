@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ sudah ada dan bukan milik LLMTray. Hapus dulu untuk memasang milik LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ sudah ada dan mengarah ke %@. Hapus dulu untuk memasang milik LLMTray.";
 "%@ didn't download: %@" = "%@ tidak diunduh: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ adalah tautan ke folder yang tidak tersedia: sambungkan disknya, atau hapus tautan tersebut.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ dibatasi: terima lisensinya di huggingface.co/%@, lalu tambahkan token Hugging Face di Pengaturan → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ bukan tautan milik LLMTray, jadi tidak diubah.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ belum diunduh — aktifkan ulang pembuatan gambar di Pengaturan.";
@@ -284,10 +285,12 @@
 "Download" = "Unduh";
 "Download LLMTray-Full" = "Unduh LLMTray‑Full";
 "Download and Enable" = "Unduh dan Aktifkan";
+"Download for %@, into the models folder" = "Unduh untuk %@, ke folder models";
 "Download into the models folder" = "Unduh ke folder models";
 "Download models" = "Unduh model";
 "Download models from Hugging Face" = "Unduh model dari Hugging Face";
 "Downloaded" = "Diunduh";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Diunduh oleh versi sebelumnya, pada disk yang berbeda dari folder models: tetap di tempatnya.";
 "Downloading" = "Mengunduh";
 "Downloading %@" = "Mengunduh %@";
 "Downloading %@…" = "Mengunduh %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
 "Image generation off" = "Pembuatan gambar mati";
 "Image model" = "Model gambar";
+"Image, music and voice models" = "Model gambar, musik, dan suara";
 "Images" = "Gambar";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import dari LLMTray (unduhan langsung)";
@@ -440,6 +444,7 @@
 "Install" = "Pasang";
 "Install ID" = "ID pemasangan";
 "Installed" = "Terinstal";
+"Installed · %@" = "Terpasang · %@";
 "Installing mflux…" = "Menginstal mflux…";
 "Installing mlx-audio failed: %@" = "Pemasangan mlx-audio gagal: %@";
 "Installing mlx-audio…" = "Menginstal mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Runtime model belum terpasang — jalankan satu model, lalu coba lagi.";
 "The model server no longer goes online when it starts." = "Server model tidak lagi online saat dimulai.";
 "The model's license, from its card." = "Lisensi model, dari model card.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Folder models tidak tersedia — apakah disknya terhubung? Pilih kembali di Pengaturan → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Maksimum yang boleh digunakan cache prompt sebelumnya (ukuran Prompt cache pada profil juga menjadi batas). Lebih besar mempercepat percakapan panjang dan agen; terlalu besar membuat tidak ada ruang untuk prompt yang sedang dibaca.";
 "The music generator is busy -- try again once it's done." = "Generator musik sedang sibuk — coba lagi setelah selesai.";
 "The music generator is busy with another chat -- try again once it's done." = "Generator musik sedang sibuk dengan obrolan lain — coba lagi setelah selesai.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "Gunakan Port Ini";
 "Use headphones: the model hears its own voice from the speakers." = "Gunakan headphone: model mendengar suaranya dari speaker.";
 "Used" = "Digunakan";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Digunakan oleh pembuatan gambar, musik, dan Voice Lab, yang mengunduhnya. Mereka juga disimpan di folder models dengan nama Hugging Face mereka.";
 "Uses the internet" = "Menggunakan internet";
 "Verbose server logging" = "Pencatatan log server mendetail";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Pencatatan server rinci aktif, sehingga log berisi obrolan Anda: tidak dilampirkan. Untuk menyertakannya, matikan pencatatan rinci di Pengaturan › Server, mulai ulang server, dan ulangi masalahnya.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "gagal membangun permintaan";
 "failed: %@" = "gagal: %@";
 "for this chat" = "untuk chat ini";
+"hears audio" = "mendengar audio";
+"in LLMTray's own folder" = "di folder LLMTray";
+"in an earlier models folder" = "di folder models sebelumnya";
 "it isn't a model folder in the models folder" = "bukan folder model di dalam folder models";
 "it's being downloaded" = "sedang diunduh";
+"it's in use or downloading" = "sedang digunakan atau mengunduh";
 "less than a minute left" = "kurang dari satu menit tersisa";
 "llmtray in the terminal" = "llmtray di Terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS menghapus suara model sendiri dari mikrofon (Voice Processing, seperti di FaceTime), sehingga berfungsi pada speaker. Fitur ini juga meratakan level dan meredam kebisingan latar. Efektif setelah dimulai ulang.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· ukuran…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” tidak dapat dihapus: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: pin tidak dapat diubah: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) dipindahkan ke Sampah, Anda masih bisa memulihkannya. %@ membutuhkannya: unduh lagi di Pengaturan untuk menggunakannya.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) akan dipindahkan ke Sampah, di mana Anda masih bisa mengembalikannya. alias dan pilihan profilnya akan dilupakan.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” dan indeksnya dihapus dari proyek. Berkas sumber yang Anda tambahkan tidak diubah.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” tidak dihapus: server sedang sibuk atau sedang menggunakannya. Coba lagi saat idle.";

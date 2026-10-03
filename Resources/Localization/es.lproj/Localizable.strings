@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ ya existe y no pertenece a LLMTray. Elimínalo primero para instalar el de LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ ya existe y apunta a %@. Elimínalo primero para instalar el de LLMTray.";
 "%@ didn't download: %@" = "%@ no se descargó: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ es un alias a una carpeta que no está disponible: conecte su disco o elimine el alias.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ está restringido: acepta su licencia en huggingface.co/%@ y luego añade un token de Hugging Face en Ajustes → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ no es un enlace de LLMTray, así que se dejó tal cual.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ aún no está descargado: vuelve a activar la generación de imágenes en Ajustes.";
@@ -284,10 +285,12 @@
 "Download" = "Descargar";
 "Download LLMTray-Full" = "Descargar LLMTray-Full";
 "Download and Enable" = "Descargar y activar";
+"Download for %@, into the models folder" = "Descargar para %@, en la carpeta Models";
 "Download into the models folder" = "Descargar en la carpeta de modelos";
 "Download models" = "Descargar modelos";
 "Download models from Hugging Face" = "Descargar modelos desde Hugging Face";
 "Downloaded" = "Descargado";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Descargado por una versión anterior, en otro disco distinto a la carpeta Models: permanecerá donde está.";
 "Downloading" = "Descargando";
 "Downloading %@" = "Descargando %@";
 "Downloading %@…" = "Descargando %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "La generación de imagen necesita una actualización: apágala y vuélvela a activar en Ajustes.";
 "Image generation off" = "Generación de imágenes desactivada";
 "Image model" = "Modelo de imágenes";
+"Image, music and voice models" = "Modelos de imagen, música y voz";
 "Images" = "Imágenes";
 "Import" = "Importar";
 "Import from LLMTray (direct download)" = "Importar desde LLMTray (descarga directa)";
@@ -440,6 +444,7 @@
 "Install" = "Instalar";
 "Install ID" = "ID de instalación";
 "Installed" = "Instalado";
+"Installed · %@" = "Instalado · %@";
 "Installing mflux…" = "Instalando mflux…";
 "Installing mlx-audio failed: %@" = "Fallo al instalar mlx-audio: %@";
 "Installing mlx-audio…" = "Instalando mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "El runtime del modelo no está instalado; inicia un modelo una vez y vuelve a intentarlo.";
 "The model server no longer goes online when it starts." = "El servidor de modelos ya no se conecta a Internet al iniciarse.";
 "The model's license, from its card." = "La licencia del modelo, según su card.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "La carpeta Models no está disponible: ¿está conectado su disco? Selecciónela de nuevo en Ajustes → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Máximo que puede ocupar la caché de prompts anteriores (el tamaño de Caché de prompts del perfil también es un límite). Más hace que chats largos y agentes vayan más rápido; demasiado no deja espacio para el prompt que se está leyendo.";
 "The music generator is busy -- try again once it's done." = "El generador de música está ocupado: inténtalo de nuevo cuando termine.";
 "The music generator is busy with another chat -- try again once it's done." = "El generador de música está ocupado con otro chat: inténtalo de nuevo cuando termine.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "Usar este puerto";
 "Use headphones: the model hears its own voice from the speakers." = "Usa auriculares: el modelo oirá su propia voz desde los altavoces.";
 "Used" = "Usado";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Usados por generación de imagen, music y Voice Lab, que los descargan. También se guardan en la carpeta Models, con sus nombres de Hugging Face.";
 "Uses the internet" = "Usa Internet";
 "Verbose server logging" = "Registro detallado del servidor";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "El registro detallado del servidor estaba activado, por lo que el registro contiene tus chats: no se adjunta. Para incluirlo, desactiva el registro detallado en Ajustes › Server, reinicia el servidor y reproduce el problema.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "no se pudo construir la solicitud";
 "failed: %@" = "error: %@";
 "for this chat" = "para este chat";
+"hears audio" = "oye audio";
+"in LLMTray's own folder" = "en la carpeta de LLMTray";
+"in an earlier models folder" = "en una carpeta Models anterior";
 "it isn't a model folder in the models folder" = "no es una carpeta de modelo dentro de la carpeta models";
 "it's being downloaded" = "se está descargando";
+"it's in use or downloading" = "está en uso o descargándose";
 "less than a minute left" = "menos de un minuto restante";
 "llmtray in the terminal" = "llmtray en el terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS elimina la propia voz del modelo del micrófono (Procesamiento de voz, como en FaceTime), por lo que funciona con altavoces. También equaliza el nivel y atenúa el ruido de fondo. Surte efecto al reiniciar.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· tamaño…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» no se pudo eliminar: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: no se pudo modificar el anclaje: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) se mueve a la Papelera, donde aún puede restaurarlo. %@ lo necesita: descárguelo de nuevo en Ajustes para usarlo.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) se moverá a la Papelera, donde aún podrá restaurarse. Su alias y la elección de perfil se perderán.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» y su índice se han eliminado del proyecto. El archivo desde el que lo añadiste no se modifica.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» no se pudo eliminar: el servidor está ocupado o lo está usando. Inténtalo de nuevo cuando esté inactivo.";

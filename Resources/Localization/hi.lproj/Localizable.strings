@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ पहले से मौजूद है और LLMTray का नहीं है। LLMTray स्थापित करने से पहले इसे हटाएँ।";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ पहले से मौजूद है और यह %@ की ओर इशारा करता है। LLMTray स्थापित करने से पहले इसे हटाएँ।";
 "%@ didn't download: %@" = "%@ डाउनलोड नहीं हुआ: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ एक फ़ोल्डर का लिंक है जो उपलब्ध नहीं है: इसका डिस्क कनेक्ट करें, या लिंक हटाएँ।";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ सीमित है: huggingface.co/%@ पर इसकी लाइसेंस शर्तें स्वीकार करें, फिर Settings → Models में एक Hugging Face token जोड़ें।";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ LLMTray का लिंक नहीं है, इसलिए इसे जैसा है वैसा ही छोड़ा गया।";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ अभी डाउनलोड नहीं हुआ है — Settings में जाकर generate_image फिर से सक्षम करें।";
@@ -284,10 +285,12 @@
 "Download" = "डाउनलोड करें";
 "Download LLMTray-Full" = "LLMTray‑Full डाउनलोड करें";
 "Download and Enable" = "डाउनलोड करें और सक्षम करें";
+"Download for %@, into the models folder" = "%@ के लिए डाउनलोड करें, models फ़ोल्डर में";
 "Download into the models folder" = "मॉडल फ़ोल्डर में डाउनलोड करें";
 "Download models" = "मॉडलों को डाउनलोड करें";
 "Download models from Hugging Face" = "Hugging Face से मॉडल डाउनलोड करें";
 "Downloaded" = "डाउनलोड किया गया";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "पहले के संस्करण द्वारा डाउनलोड किया गया, models फ़ोल्डर से अलग डिस्क पर: यह वहीं रहेगा जहाँ है।";
 "Downloading" = "डाउनलोड कर रहा है";
 "Downloading %@" = "डाउनलोड कर रहा है %@";
 "Downloading %@…" = "%@ डाउनलोड हो रहा है…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image generation off" = "इमेज जनरेशन बंद";
 "Image model" = "इमेज मॉडल";
+"Image, music and voice models" = "चित्र, संगीत और वॉइस मॉडल";
 "Images" = "छवियाँ";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray से Import (direct download)";
@@ -440,6 +444,7 @@
 "Install" = "इंस्टॉल करें";
 "Install ID" = "इंस्टॉल ID";
 "Installed" = "इंस्टॉल किया गया";
+"Installed · %@" = "इंस्टॉल किया गया · %@";
 "Installing mflux…" = "mflux इंस्टॉल किया जा रहा है…";
 "Installing mlx-audio failed: %@" = "mlx-audio इंस्टॉल करना विफल रहा: %@";
 "Installing mlx-audio…" = "mlx-audio इंस्टॉल किया जा रहा है…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "मॉडल runtime अभी स्थापित नहीं है — एक बार मॉडल प्रारंभ करें, फिर पुनः प्रयास करें।";
 "The model server no longer goes online when it starts." = "मॉडल सर्वर अब शुरू होते समय ऑनलाइन नहीं जाता।";
 "The model's license, from its card." = "मॉडल की लाइसेंस जानकारी, उसके कार्ड से।";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models फ़ोल्डर उपलब्ध नहीं है — क्या इसका डिस्क जुड़ा हुआ है? Settings → Models में जाकर फिर चुनें।";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "पहले के प्रॉम्प्ट्स का कैश अधिकतम कितना ले सकता है (प्रोफ़ाइल का Prompt cache size भी सीमा है)। अधिक रखने से लंबे चैट और एजेंट तेज़ होते हैं; बहुत ज्यादा रखने से वर्तमान पढ़े जा रहे प्रॉम्प्ट के लिए जगह नहीं बचती।";
 "The music generator is busy -- try again once it's done." = "संगीत जेनरेटर व्यस्त है — पूरा होने के बाद पुनः प्रयास करें।";
 "The music generator is busy with another chat -- try again once it's done." = "संगीत जेनरेटर किसी अन्य चैट में व्यस्त है — पूरा होने पर पुनः प्रयास करें।";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "यह पोर्ट उपयोग करें";
 "Use headphones: the model hears its own voice from the speakers." = "हेडफ़ोन का उपयोग करें: मॉडल स्पीकर्स से अपनी ही आवाज़ सुनता है।";
 "Used" = "उपयोग किया गया";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "इन्हें इमेज जेनरेशन, म्यूजिक और Voice Lab उपयोग करते हैं, जो इन्हें डाउनलोड करते हैं। इन्हें उनके Hugging Face नामों के साथ models फ़ोल्डर में भी रखा जाता है।";
 "Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "वर्बोज़ सर्वर लॉगिंग चालू थी, इसलिए लॉग में आपकी चैटें हैं: इसे संलग्न नहीं किया गया है। इसे शामिल करने के लिए Settings › Server में वर्बोज़ लॉगिंग बंद करें, सर्वर पुनरारंभ करें और समस्या दोहराएँ।";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "request बनाना विफल हुआ";
 "failed: %@" = "असफल: %@";
 "for this chat" = "इस चैट के लिए";
+"hears audio" = "ऑडियो सुनता है";
+"in LLMTray's own folder" = "LLMTray के खुद के फ़ोल्डर में";
+"in an earlier models folder" = "पहले के models फ़ोल्डर में";
 "it isn't a model folder in the models folder" = "यह models फ़ोल्डर में एक मॉडल फ़ोल्डर नहीं है";
 "it's being downloaded" = "यह डाउनलोड हो रहा है";
+"it's in use or downloading" = "यह उपयोग में है या डाउनलोड हो रहा है";
 "less than a minute left" = "एक मिनट से कम बचा है";
 "llmtray in the terminal" = "टर्मिनल में llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS माइक्रोफ़ोन से मॉडल की अपनी आवाज़ हटाता है (Voice Processing, जैसे FaceTime में), इसलिए यह स्पीकर पर काम करता है। यह स्तर को भी सम करता है और पृष्ठभूमि शोर को दबाता है। यह अगले स्टार्ट पर प्रभावी होगा।";
@@ -1214,6 +1225,7 @@
 "· size…" = "· आकार…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” हटाया नहीं जा पाया: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: पिन बदला नहीं जा सका: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) ट्रैश में भेजा जाएगा, जहाँ आप इसे वापस भी ला सकते हैं। %@ को इसकी आवश्यकता है: उपयोग करने के लिए Settings में जाकर इसे फिर से डाउनलोड करें।";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) ट्रैश में भेज दिया जाएगा, जहाँ आप इसे फिर भी पुनर्स्थापित कर सकते हैं। इसकी एलियास और प्रोफ़ाइल विकल्प भूल दिए जाएंगे।";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” और उसका इंडेक्स प्रोजेक्ट से हटा दिया गया है। जिस फाइल से आपने इसे जोड़ा था वह प्रभावित नहीं हुई।";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” हटाया नहीं गया: सर्वर व्यस्त है या इसे उपयोग कर रहा है। जब यह निष्क्रिय हो तो फिर प्रयास करें।";

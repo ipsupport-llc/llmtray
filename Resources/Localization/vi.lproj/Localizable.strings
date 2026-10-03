@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ đã tồn tại và không thuộc LLMTray. Xóa trước để cài LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ đã tồn tại và trỏ tới %@. Xóa trước để cài LLMTray.";
 "%@ didn't download: %@" = "%@ không tải về: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ là một liên kết đến một thư mục không khả dụng: kết nối đĩa của thư mục đó hoặc xóa liên kết.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ bị hạn chế: chấp nhận giấy phép trên huggingface.co/%@, sau đó thêm token Hugging Face trong Cài đặt → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ không phải là liên kết của LLMTray, nên để nguyên.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ chưa được tải xuống — bật lại tạo ảnh trong Cài đặt.";
@@ -284,10 +285,12 @@
 "Download" = "Tải về";
 "Download LLMTray-Full" = "Tải LLMTray-Full";
 "Download and Enable" = "Tải về và bật";
+"Download for %@, into the models folder" = "Tải về cho %@, vào thư mục models";
 "Download into the models folder" = "Tải về vào thư mục models";
 "Download models" = "Tải mô hình";
 "Download models from Hugging Face" = "Tải mô hình từ Hugging Face";
 "Downloaded" = "Đã tải về";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Được tải xuống bởi phiên bản trước, trên một đĩa khác với thư mục models: nó sẽ ở nguyên vị trí.";
 "Downloading" = "Đang tải về";
 "Downloading %@" = "Đang tải về %@";
 "Downloading %@…" = "Đang tải %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image generation off" = "Tạo ảnh tắt";
 "Image model" = "Mô hình hình ảnh";
+"Image, music and voice models" = "Mô hình ảnh, nhạc và giọng nói";
 "Images" = "Ảnh";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import từ LLMTray (tải trực tiếp)";
@@ -440,6 +444,7 @@
 "Install" = "Cài đặt";
 "Install ID" = "ID cài đặt";
 "Installed" = "Đã cài đặt";
+"Installed · %@" = "Đã cài · %@";
 "Installing mflux…" = "Đang cài mflux…";
 "Installing mlx-audio failed: %@" = "Cài mlx-audio thất bại: %@";
 "Installing mlx-audio…" = "Đang cài mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Chưa cài runtime mô hình — khởi chạy một mô hình rồi thử lại.";
 "The model server no longer goes online when it starts." = "Máy chủ mô hình không còn tự động lên mạng khi khởi động.";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Thư mục models không khả dụng — đĩa của nó đã được kết nối chưa? Chọn lại trong Cài đặt → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Dung lượng tối đa bộ nhớ đệm cho các prompt trước (kích thước Prompt cache của cấu hình cũng là giới hạn). Nhiều hơn làm các cuộc trò chuyện dài và agents nhanh hơn; quá nhiều sẽ không còn chỗ cho prompt đang được đọc.";
 "The music generator is busy -- try again once it's done." = "Trình tạo nhạc đang bận — thử lại khi hoàn tất.";
 "The music generator is busy with another chat -- try again once it's done." = "Trình tạo nhạc đang bận với cuộc chat khác — thử lại khi hoàn tất.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "Dùng cổng này";
 "Use headphones: the model hears its own voice from the speakers." = "Dùng tai nghe: mô hình sẽ nghe tiếng mình từ loa.";
 "Used" = "Đã dùng";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Được sử dụng cho tạo ảnh, nhạc và Voice Lab, nơi tải chúng về. Chúng cũng được lưu trong thư mục models, theo tên trên Hugging Face.";
 "Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ghi nhật ký chi tiết máy chủ đang bật, nên nhật ký chứa các cuộc trò chuyện của bạn: nó không được đính kèm. Để đính kèm, tắt ghi nhật ký chi tiết trong Settings › Server, khởi động lại máy chủ và tái tạo sự cố.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "không thể tạo yêu cầu";
 "failed: %@" = "thất bại: %@";
 "for this chat" = "cho cuộc trò chuyện này";
+"hears audio" = "nghe âm thanh";
+"in LLMTray's own folder" = "trong thư mục riêng của LLMTray";
+"in an earlier models folder" = "trong thư mục models trước đây";
 "it isn't a model folder in the models folder" = "nó không phải là thư mục mô hình trong thư mục models";
 "it's being downloaded" = "đang được tải xuống";
+"it's in use or downloading" = "đang được sử dụng hoặc đang tải về";
 "less than a minute left" = "còn dưới một phút";
 "llmtray in the terminal" = "llmtray trong Terminal";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS loại bỏ chính giọng của mô hình khỏi micro (Xử lý Giọng nói, như FaceTime), nên tính năng hoạt động với loa. Nó cũng cân bằng âm lượng và giảm tiếng ồn nền. Có hiệu lực khi khởi động lại.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· kích thước…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” không thể gỡ: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: không thể thay đổi ghim: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) sẽ được chuyển vào Thùng rác, nơi bạn vẫn có thể khôi phục. %@ cần nó: tải lại trong Cài đặt để sử dụng.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) sẽ được chuyển vào Thùng Rác, nơi bạn vẫn có thể khôi phục. Bí danh và lựa chọn cấu hình của nó sẽ bị quên.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” và chỉ mục của nó đã bị xóa khỏi dự án. Tệp bạn thêm từ đó không bị ảnh hưởng.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Không xoá được “%@”: máy chủ đang bận hoặc đang sử dụng mô hình. Thử lại khi máy chủ rảnh.";

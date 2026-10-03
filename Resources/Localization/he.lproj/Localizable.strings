@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ כבר קיים ואינו שייך ל‑LLMTray. הסר אותו תחילה כדי להתקין את של LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ כבר קיים ומצביע אל %@. הסר אותו תחילה כדי להתקין את של LLMTray.";
 "%@ didn't download: %@" = "%@ לא הורד: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "‎%@ הוא קישור לתיקיה שאינה זמינה: חבר/י את הדיסק שלה או הסר/י את הקישור.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ מוגבל: קבל את הרישיון בעמוד huggingface.co/%@, ואז הוסף אסימון של Hugging Face ב‑Settings → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ אינו קישור של LLMTray, לכן הוא נשאר כמות שהוא.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "ה‑%@ עדיין לא הורד — אפשר/י שוב יצירת תמונות ב‑Settings.";
@@ -284,10 +285,12 @@
 "Download" = "הורד";
 "Download LLMTray-Full" = "הורד LLMTray‑Full";
 "Download and Enable" = "הורד והפעל";
+"Download for %@, into the models folder" = "הורד עבור %@ אל תיקיית ה‑models";
 "Download into the models folder" = "הורדה לתיקיית models";
 "Download models" = "הורדת דגמים";
 "Download models from Hugging Face" = "הורדת דגמים מ‑Hugging Face.";
 "Downloaded" = "הורד";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "הורד על‑ידי גרסה קודמת על דיסק שונה מתיקיית ה‑models: יישאר במקום בו נמצא.";
 "Downloading" = "מוריד";
 "Downloading %@" = "מוריד %@";
 "Downloading %@…" = "מוריד/ת %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image generation off" = "יצירת תמונה כבויה";
 "Image model" = "מודל תמונה";
+"Image, music and voice models" = "דגמי תמונה, מוזיקה וקול";
 "Images" = "תמונות";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import מ‑LLMTray (הורדה ישירה)";
@@ -440,6 +444,7 @@
 "Install" = "התקן";
 "Install ID" = "מזהה התקנה";
 "Installed" = "מותקן";
+"Installed · %@" = "מותקן/ת · %@";
 "Installing mflux…" = "מתקין/ה mflux…";
 "Installing mlx-audio failed: %@" = "התקנת mlx-audio נכשלה: %@";
 "Installing mlx-audio…" = "מתקין mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "ה-runtime של המודל עדיין לא מותקן — הפעל מודל פעם אחת ואז נסה שוב.";
 "The model server no longer goes online when it starts." = "שרת המודל כבר לא מתחבר לאינטרנט כשהוא מתחיל לפעול.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "תיקיית ה‑models אינה זמינה — האם הדיסק שלה מחובר? בחרי/ה בחר/י אותה שוב ב‑Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "המקסימום שמטמון הפקודות הקודמות יכול לתפוס (גם הגדרת גודל מטמון הפקודות בפרופיל מהווה תקרה). יותר משפר מהירויות בצ'אטים ארוכים ובסוכנים; יותר מדי ישאיר מעט מקום לקריאת הפקודה הנוכחית.";
 "The music generator is busy -- try again once it's done." = "מחולל המוזיקה עסוק — נסה שוב כשתהליך יסתיים.";
 "The music generator is busy with another chat -- try again once it's done." = "מחולל המוזיקה עסוק בצ׳אט אחר — נסה שוב כשתהליך יסתיים.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "השתמש בפורט הזה";
 "Use headphones: the model hears its own voice from the speakers." = "השתמש באוזניות: המודל שומע את קולו מהרמקולים.";
 "Used" = "בשימוש";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "משמש/ת להפקת תמונה, למוזיקה ול‑Voice Lab, שהורדות אותן. גם נשמרות בתיקיית ה‑models תחת שמותיהן ב‑Hugging Face.";
 "Uses the internet" = "משתמש באינטרנט";
 "Verbose server logging" = "רישום שרת מפורט";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "לוג מפורט של השרת היה מופעל, ולכן הלוג מכיל את השיחות שלך — הוא לא מצורף. כדי לכלול אותו, כבה את הלוג המפורט ב‑Settings › Server, הפעל מחדש את השרת ושחזר את הבעיה.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "בניית הבקשה נכשלה";
 "failed: %@" = "נכשל: %@";
 "for this chat" = "לשיחה זו";
+"hears audio" = "שומע אודיו";
+"in LLMTray's own folder" = "בתיקייה של LLMTray";
+"in an earlier models folder" = "בתיקיית models קודמת";
 "it isn't a model folder in the models folder" = "זו אינה תיקיית דגם בתוך תיקיית models";
 "it's being downloaded" = "מוריד/ה כעת";
+"it's in use or downloading" = "נעשה בו שימוש או מוריד/ת אותו";
 "less than a minute left" = "פחות מדקה נותרה";
 "llmtray in the terminal" = "llmtray בטרמינל";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS מסיר את קול המודל מהמיקרופון (Voice Processing, כמו ב‑FaceTime), לכן זה עובד עם רמקולים. כמו כן הוא מאזן עוצמה ומכווץ רעשי רקע. ייכנס לתוקף בהפעלה הבאה.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· גודל…";
 "“%1$@” couldn't be removed: %2$@" = "לא ניתן להסיר “%1$@”: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: לא ניתן לשנות את הסימון: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) מועבר לשמור־אשפה, שם ניתן לשחזרו. %@ זקוק/ה לו: הורד/י אותו שוב ב‑Settings כדי להשתמש בו.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) מועבר/ת לפח, שם ניתן לשחזר אותו/אותה. הכינוי ובחירת הפרופיל נשכחים.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” לא הוסר: השרת עסוק או משתמש בו. נסה/י שוב כשיופסק העומס.";
