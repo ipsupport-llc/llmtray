@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ уже существует и не принадлежит LLMTray. Удалите его сначала, чтобы установить LLMTray.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ уже существует и указывает на %@. Удалите его сначала, чтобы установить LLMTray.";
 "%@ didn't download: %@" = "%@ не загрузился: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ — ссылка на папку, которая недоступна: подключите диск или удалите ссылку.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ закрыт: примите его лицензию на huggingface.co/%@, затем добавьте токен Hugging Face в Настройки → Models.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ не является ссылкой LLMTray, поэтому оставлен без изменений.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ ещё не загружен — снова включите генерацию изображений в Настройках.";
@@ -284,10 +285,12 @@
 "Download" = "Скачать";
 "Download LLMTray-Full" = "Загрузить LLMTray‑Full";
 "Download and Enable" = "Скачать и включить";
+"Download for %@, into the models folder" = "Загрузить для %@ в папку models";
 "Download into the models folder" = "Скачивать в папку models";
 "Download models" = "Загрузить модели";
 "Download models from Hugging Face" = "Загрузить модели с Hugging Face";
 "Downloaded" = "Скачано";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Загружено более ранней версией на другом диске, не в папке models: останется на том месте.";
 "Downloading" = "Загрузка";
 "Downloading %@" = "Загрузка %@";
 "Downloading %@…" = "Загрузка %@…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
 "Image generation off" = "Генерация изображений отключена";
 "Image model" = "Модель картинок";
+"Image, music and voice models" = "Модели для изображений, музыки и голоса";
 "Images" = "Изображения";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import из LLMTray (прямое скачивание)";
@@ -440,6 +444,7 @@
 "Install" = "Установить";
 "Install ID" = "ID установки";
 "Installed" = "Установлен";
+"Installed · %@" = "Установлено · %@";
 "Installing mflux…" = "Установка mflux…";
 "Installing mlx-audio failed: %@" = "Установка mlx-audio не удалась: %@";
 "Installing mlx-audio…" = "Установка mlx-audio…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Среда выполнения модели ещё не установлена — запустите модель один раз, затем попробуйте снова.";
 "The model server no longer goes online when it starts." = "Сервер модели больше не выходит в сеть при запуске.";
 "The model's license, from its card." = "Лицензия модели с её карточки.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка models недоступна — подключён ли её диск? Выберите её заново в Настройках → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Максимум памяти, которую может занять кеш предыдущих подсказок (размер кеша подсказок в профиле тоже является ограничением). Больше ускоряет длинные беседы и агентов; слишком много не оставит места для текущей читаемой подсказки.";
 "The music generator is busy -- try again once it's done." = "Генератор музыки занят — попробуйте позже, когда он завершит работу.";
 "The music generator is busy with another chat -- try again once it's done." = "Генератор музыки занят другим чатом — попробуйте позже, когда он завершит работу.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "Использовать этот порт";
 "Use headphones: the model hears its own voice from the speakers." = "Используйте наушники: модель слышит свой голос из колонок.";
 "Used" = "Использовано";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Используются генерацией изображений, музыкой и Voice Lab, которые их загружают. Они также хранятся в папке models под своими именами Hugging Face.";
 "Uses the internet" = "Использует интернет";
 "Verbose server logging" = "Подробный лог сервера";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Подробное логирование сервера включено, поэтому в журнале содержатся ваши чаты: он не прикреплён. Чтобы включить его, отключите подробное логирование в Настройках › Server, перезапустите сервер и воспроизведите проблему.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "не удалось составить запрос";
 "failed: %@" = "сбой: %@";
 "for this chat" = "для этого чата";
+"hears audio" = "слышит аудио";
+"in LLMTray's own folder" = "в собственной папке LLMTray";
+"in an earlier models folder" = "в прежней папке models";
 "it isn't a model folder in the models folder" = "это не папка модели внутри папки моделей";
 "it's being downloaded" = "она сейчас скачивается";
+"it's in use or downloading" = "используется или загружается";
 "less than a minute left" = "осталось меньше минуты";
 "llmtray in the terminal" = "llmtray в терминале";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS удаляет собственный голос модели из микрофона (Voice Processing, как в FaceTime), поэтому подавление эха работает с динамиками. Также выравнивает уровень и подавляет фоновый шум. Вступит в силу при следующем запуске.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· размер…";
 "“%1$@” couldn't be removed: %2$@" = "«%1$@» невозможно удалить: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "«%1$@»: не удалось изменить закрепление: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "«%@» (%@) перемещён в Корзину — вы всё ещё можете восстановить его. %@ нужен: загрузите его снова в Настройках, чтобы использовать.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) будет перемещена в Корзину — оттуда её можно восстановить. Её алиас и выбор профиля будут забыты.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» и её индекс удалены из проекта. Исходный файл, из которого вы добавляли, не затронут.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Модель «%@» не удалена: сервер занят или использует её. Повторите, когда он освободится.";

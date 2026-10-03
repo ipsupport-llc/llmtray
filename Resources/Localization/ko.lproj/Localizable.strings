@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@이(가) 이미 존재하며 LLMTray 소유가 아닙니다. LLMTray 것을 설치하려면 먼저 제거하세요.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@이(가 이미 존재하며 %@를 가리킵니다. LLMTray 것을 설치하려면 먼저 제거하세요.";
 "%@ didn't download: %@" = "%@를 다운로드하지 못함: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@는 사용할 수 없는 폴더로 가는 링크입니다: 해당 디스크를 연결하거나 링크를 제거하세요.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@은(는) 접근 제한됨: huggingface.co/%@에서 사용권에 동의한 뒤 설정 → Models에 Hugging Face 토큰을 추가하세요.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@은(는) LLMTray의 링크가 아니므로 그대로 두었습니다.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@이(가) 아직 다운로드되지 않았습니다 — 설정에서 이미지 생성을 다시 활성화하세요.";
@@ -284,10 +285,12 @@
 "Download" = "다운로드";
 "Download LLMTray-Full" = "LLMTray-Full 다운로드";
 "Download and Enable" = "다운로드하고 활성화";
+"Download for %@, into the models folder" = "%@용으로 models 폴더에 다운로드";
 "Download into the models folder" = "models 폴더에 다운로드합니다";
 "Download models" = "모델 다운로드";
 "Download models from Hugging Face" = "Hugging Face에서 모델을 다운로드합니다.";
 "Downloaded" = "다운로드됨";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "이전 버전이 models 폴더와 다른 디스크에 다운로드했습니다: 원래 위치에 그대로 남아 있습니다.";
 "Downloading" = "다운로드 중";
 "Downloading %@" = "%@ 다운로드 중";
 "Downloading %@…" = "%@ 다운로드 중…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
 "Image generation off" = "이미지 생성 끔";
 "Image model" = "이미지 모델";
+"Image, music and voice models" = "이미지·음악·음성 모델";
 "Images" = "이미지";
 "Import" = "가져오기";
 "Import from LLMTray (direct download)" = "LLMTray에서 가져오기(직접 다운로드)";
@@ -440,6 +444,7 @@
 "Install" = "설치";
 "Install ID" = "설치 ID";
 "Installed" = "설치됨";
+"Installed · %@" = "설치됨 · %@";
 "Installing mflux…" = "mflux 설치 중…";
 "Installing mlx-audio failed: %@" = "mlx-audio 설치 실패: %@";
 "Installing mlx-audio…" = "mlx-audio 설치 중…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "모델 런타임이 아직 설치되지 않았습니다 — 모델을 한 번 실행한 뒤 다시 시도하세요.";
 "The model server no longer goes online when it starts." = "모델 서버가 시작될 때 더 이상 온라인으로 전환되지 않습니다.";
 "The model's license, from its card." = "모델 카드에 기재된 사용권입니다.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 폴더를 사용할 수 없습니다 — 해당 디스크가 연결되어 있나요? 설정 → Models에서 다시 선택하세요.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "이전 프롬프트 캐시가 차지할 수 있는 최대치입니다(프로필의 Prompt cache 크기도 상한입니다). 값을 늘리면 긴 대화와 에이전트가 빨라지지만 지나치면 현재 읽는 프롬프트에 공간이 남지 않습니다.";
 "The music generator is busy -- try again once it's done." = "음악 생성기가 작업 중입니다 — 완료될 때까지 잠시 후 다시 시도하세요.";
 "The music generator is busy with another chat -- try again once it's done." = "음악 생성기가 다른 채팅 작업 중입니다 — 완료된 후 다시 시도하세요.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "이 포트 사용";
 "Use headphones: the model hears its own voice from the speakers." = "이어폰 사용: 모델이 스피커에서 나오는 자신의 목소리를 듣습니다.";
 "Used" = "사용됨";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "이미지 생성, 음악 및 Voice Lab에서 사용하며 해당 기능들이 모델을 다운로드합니다. 모델은 Hugging Face 이름으로 models 폴더에도 보관됩니다.";
 "Uses the internet" = "인터넷 사용";
 "Verbose server logging" = "자세한 서버 로깅";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "상세 서버 로깅이 켜져 있어 로그에 대화 내용이 포함되어 있으므로 첨부되지 않습니다. 포함하려면 설정 › Server에서 상세 로깅을 끄고 서버를 재시작한 뒤 문제를 재현하세요.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "요청 구성 실패";
 "failed: %@" = "실패: %@";
 "for this chat" = "이 채팅용";
+"hears audio" = "오디오를 듣습니다";
+"in LLMTray's own folder" = "LLMTray 자체 폴더에";
+"in an earlier models folder" = "이전 models 폴더에";
 "it isn't a model folder in the models folder" = "models 폴더 안의 모델 폴더가 아님";
 "it's being downloaded" = "다운로드 중";
+"it's in use or downloading" = "사용 중이거나 다운로드 중입니다";
 "less than a minute left" = "1분 미만 남음";
 "llmtray in the terminal" = "터미널의 llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS가 마이크에서 모델 자신의 음성을 제거합니다(Voice Processing—FaceTime과 동일), 따라서 스피커에서도 작동합니다. 또한 레벨을 평준화하고 배경 소음을 억제합니다. 다음 시작 시 적용됩니다.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· 크기…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@”을(를) 제거할 수 없음: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: 고정을 변경할 수 없습니다: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@)가 휴지통으로 이동됩니다. 복원할 수 있습니다. %@에서 필요로 합니다: 사용하려면 설정에서 다시 다운로드하세요.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@)가 휴지통으로 이동됩니다. 복원할 수 있습니다. 별칭과 프로필 선택은 삭제됩니다.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” 및 해당 인덱스가 프로젝트에서 삭제되었습니다. 해당 파일은 변경되지 않습니다.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@”을(를) 제거하지 못했습니다: 서버가 바쁘거나 사용 중입니다. 서버가 유휴 상태일 때 다시 시도하십시오.";

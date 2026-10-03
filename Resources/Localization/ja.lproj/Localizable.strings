@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ は既に存在しますが LLMTray のものではありません。LLMTray をインストールするには先に削除してください。";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ は既に存在し %@ を指しています。LLMTray をインストールするには先に削除してください。";
 "%@ didn't download: %@" = "%@ をダウンロードできませんでした: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@ は利用できないフォルダへのリンクです。ディスクを接続するか、リンクを削除してください。";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ は制限付きです: huggingface.co/%@ でライセンスを承諾し、設定 → Models に Hugging Face トークンを追加してください。";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ は LLMTray のリンクではないため、そのままにしてあります。";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ はまだダウンロードされていません — 設定で画像生成を再度有効にしてください。";
@@ -284,10 +285,12 @@
 "Download" = "ダウンロード";
 "Download LLMTray-Full" = "LLMTray-Full をダウンロード";
 "Download and Enable" = "ダウンロードして有効にする";
+"Download for %@, into the models folder" = "モデルフォルダへ %@ をダウンロード";
 "Download into the models folder" = "models フォルダにダウンロードします";
 "Download models" = "モデルをダウンロード";
 "Download models from Hugging Face" = "Hugging Face からモデルをダウンロードします。";
 "Downloaded" = "ダウンロード済み";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "以前のバージョンにより、モデルフォルダとは別のディスクにダウンロードされています: そのままの場所に残ります。";
 "Downloading" = "ダウンロード中";
 "Downloading %@" = "%@ をダウンロード中";
 "Downloading %@…" = "%@ をダウンロード中…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image generation off" = "画像生成：オフ";
 "Image model" = "画像モデル";
+"Image, music and voice models" = "画像・音楽・音声用モデル";
 "Images" = "画像";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray からインポート（直接ダウンロード）";
@@ -440,6 +444,7 @@
 "Install" = "インストール";
 "Install ID" = "インストールID";
 "Installed" = "インストール済み";
+"Installed · %@" = "インストール済 · %@";
 "Installing mflux…" = "mflux をインストール中…";
 "Installing mlx-audio failed: %@" = "mlx-audio のインストールに失敗しました：%@";
 "Installing mlx-audio…" = "mlx-audio をインストール中…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "モデルランタイムがまだインストールされていません。モデルを一度起動してから、もう一度お試しください。";
 "The model server no longer goes online when it starts." = "モデルサーバーは起動時にオンラインになりません。";
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "モデルフォルダが利用できません — ディスクは接続されていますか？ 設定 → Models で再度選択してください。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "過去プロンプトのキャッシュが占め得る最大量（プロファイルのPrompt cacheサイズも上限になります）。多いと長い会話やエージェントが高速になりますが、過剰だと現在読み取るプロンプトの余地がなくなります。";
 "The music generator is busy -- try again once it's done." = "音楽生成が使用中です。終了後にもう一度お試しください。";
 "The music generator is busy with another chat -- try again once it's done." = "音楽生成は別のチャットで使用中です。終了後にもう一度お試しください。";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "このポートを使用";
 "Use headphones: the model hears its own voice from the speakers." = "ヘッドフォンを使用してください：モデルはスピーカーの自声を聞きます。";
 "Used" = "使用済み";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "画像生成、音楽、Voice Lab で使用され、これらはダウンロードされます。Hugging Face の名前のままでモデルフォルダに保存されます。";
 "Uses the internet" = "インターネットを使用";
 "Verbose server logging" = "詳細なサーバログ";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "詳細なサーバーログが有効になっているため、ログにチャットが含まれています。ログは添付されていません。添付するには、設定 › Server で詳細ログをオフにし、サーバーを再起動して問題を再現してください。";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "リクエストの作成に失敗しました";
 "failed: %@" = "失敗：%@";
 "for this chat" = "このチャット用";
+"hears audio" = "音声を検出します";
+"in LLMTray's own folder" = "LLMTray のフォルダ内";
+"in an earlier models folder" = "以前のモデルフォルダ内";
 "it isn't a model folder in the models folder" = "models フォルダ内のモデルフォルダではありません";
 "it's being downloaded" = "ダウンロード中です";
+"it's in use or downloading" = "使用中またはダウンロード中です";
 "less than a minute left" = "1分未満";
 "llmtray in the terminal" = "ターミナルでの llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS はマイクからモデル自身の音声を除去します（FaceTime と同じ Voice Processing を使用）、そのためスピーカーでも動作します。音量を均一化し、背景雑音を低減します。次回開始時に有効になります。";
@@ -1214,6 +1225,7 @@
 "· size…" = "・サイズ…";
 "“%1$@” couldn't be removed: %2$@" = "「%1$@」を削除できませんでした: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "「%1$@」のピンを変更できませんでした: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@”（%@）はゴミ箱に移されます。まだ復元できます。%@ がこれを必要とします: 使用するには設定で再度ダウンロードしてください。";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）はゴミ箱に移動されます。そこから復元できますが、エイリアスとプロファイルの選択は失われます。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」は削除されませんでした：サーバーがビジー状態か使用中です。アイドル時に再試行してください。";

@@ -20,6 +20,7 @@
 "%@ already exists and isn't LLMTray's. Remove it first to install LLMTray's." = "%@ zaten var ve LLMTray'e ait değil. LLMTray'i yüklemek için önce onu kaldırın.";
 "%@ already exists and points to %@. Remove it first to install LLMTray's." = "%@ zaten var ve %@ öğesine işaret ediyor. LLMTray'i yüklemek için önce onu kaldırın.";
 "%@ didn't download: %@" = "%@ indirilmedi: %@";
+"%@ is a link to a folder that isn't available: connect its disk, or remove the link." = "%@, erişilemeyen bir klasöre bağlantı: diskini bağlayın ya da bağlantıyı kaldırın.";
 "%@ is gated: accept its license on huggingface.co/%@, then add a Hugging Face token in Settings → Models." = "%@ kısıtlı: lisansını huggingface.co/%@ adresinde kabul edin, sonra Ayarlar → Models'te bir Hugging Face tokenı ekleyin.";
 "%@ isn't LLMTray's link, so it was left as it is." = "%@ LLMTray'in bağlantısı değil, bu yüzden olduğu gibi bırakıldı.";
 "%@ isn't downloaded yet -- re-enable image generation in Settings." = "%@ henüz indirilmiyor — Görüntü oluşturmayı Ayarlar'dan tekrar etkinleştirin.";
@@ -284,10 +285,12 @@
 "Download" = "İndir";
 "Download LLMTray-Full" = "LLMTray‑Full indir";
 "Download and Enable" = "İndir ve Etkinleştir";
+"Download for %@, into the models folder" = "%@ için indir, models klasörüne";
 "Download into the models folder" = "Modeller klasörüne indir";
 "Download models" = "Modelleri indir";
 "Download models from Hugging Face" = "Hugging Face'ten modelleri indir";
 "Downloaded" = "İndirildi";
+"Downloaded by an earlier version, on another disk than the models folder: it stays where it is." = "Daha eski bir sürüm tarafından, models klasöründen farklı bir diske indirildi: bulunduğu yerde kalır.";
 "Downloading" = "İndiriliyor";
 "Downloading %@" = "%@ indiriliyor";
 "Downloading %@…" = "%@ indiriliyor…";
@@ -421,6 +424,7 @@
 "Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image generation off" = "Görüntü oluşturma kapalı";
 "Image model" = "Görüntü modeli";
+"Image, music and voice models" = "Görüntü, müzik ve ses modelleri";
 "Images" = "Görseller";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray'den içe aktar (doğrudan indirme)";
@@ -440,6 +444,7 @@
 "Install" = "Yükle";
 "Install ID" = "Kurulum kimliği";
 "Installed" = "Yüklü";
+"Installed · %@" = "Yüklendi · %@";
 "Installing mflux…" = "mflux yükleniyor…";
 "Installing mlx-audio failed: %@" = "mlx-audio kurulamadı: %@";
 "Installing mlx-audio…" = "mlx-audio yükleniyor…";
@@ -954,6 +959,7 @@
 "The model runtime isn't installed yet -- start a model once, then try again." = "Model çalışma zamanı henüz yüklü değil — bir model başlatıp sonra tekrar deneyin.";
 "The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
+"The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Models klasörü kullanılamıyor — diski bağlı mı? Ayarlar → Models'den tekrar seçin.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Önceki istemlerin önbelleğinin alabileceği maksimum (profilin İsteme önbelleği boyutu da bir üst sınırdır). Daha fazla uzun sohbetleri ve ajanları hızlandırır; çok fazlası okunan istem için yer bırakmaz.";
 "The music generator is busy -- try again once it's done." = "Müzik oluşturucu meşgul — bitmesini bekleyip tekrar deneyin.";
 "The music generator is busy with another chat -- try again once it's done." = "Müzik oluşturucu başka bir sohbetle meşgul — bitmesini bekleyip tekrar deneyin.";
@@ -1081,6 +1087,7 @@
 "Use This Port" = "Bu Portu Kullan";
 "Use headphones: the model hears its own voice from the speakers." = "Kulaklık kullanın: model hoparlörlerden kendi sesini duyar.";
 "Used" = "Kullanıldı";
+"Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Görüntü oluşturma, müzik ve Voice Lab tarafından kullanılır; bunlar tarafından indirilir. Hugging Face adlarıyla models klasöründe saklanırlar.";
 "Uses the internet" = "İnterneti kullanır";
 "Verbose server logging" = "Ayrıntılı sunucu günlüklemesi";
 "Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ayrıntılı sunucu kaydı açıktı, bu yüzden kayıt sohbetlerinizi içerir: eklenmemiştir. Eklemek için Ayarlar › Server’da ayrıntılı kaydı kapatın, sunucuyu yeniden başlatın ve sorunu yeniden oluşturun.";
@@ -1166,8 +1173,12 @@
 "failed to build request" = "istek oluşturulamadı";
 "failed: %@" = "başarısız: %@";
 "for this chat" = "bu sohbet için";
+"hears audio" = "ses duyuyor";
+"in LLMTray's own folder" = "LLMTray'in kendi klasöründe";
+"in an earlier models folder" = "önceki models klasöründe";
 "it isn't a model folder in the models folder" = "models klasöründe model klasörü değil";
 "it's being downloaded" = "indiriliyor";
+"it's in use or downloading" = "kullanımda veya indiriliyor";
 "less than a minute left" = "bir dakikadan az kaldı";
 "llmtray in the terminal" = "Terminalde llmtray";
 "macOS takes the model's own voice out of the microphone (Voice Processing, as in FaceTime), so it works on speakers. It also evens out the level and damps background noise. Takes effect at the next start." = "macOS, modelin kendi sesini mikrofondan çıkarır (Voice Processing, FaceTime’da olduğu gibi), bu yüzden hoparlörlerle çalışır. Ayrıca ses seviyesini dengeler ve arka plan gürültüsünü azaltır. Değişiklik bir sonraki başlatmada geçerli olur.";
@@ -1214,6 +1225,7 @@
 "· size…" = "· boyut…";
 "“%1$@” couldn't be removed: %2$@" = "“%1$@” kaldırılamadı: %2$@";
 "“%1$@”: the pin couldn't be changed: %2$@" = "“%1$@”: sabitleme değiştirilemedi: %2$@";
+"“%@” (%@) goes to the Trash, where you can still restore it. %@ needs it: download it again in Settings to use it." = "“%@” (%@) Çöp'e taşınacak; yine de geri yükleyebilirsiniz. %@ buna ihtiyaç duyuyor: kullanmak için Ayarlar'dan tekrar indirin.";
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) Çöp Kutusu'na taşınacak; buradan geri yükleyebilirsiniz. Takma adı ve profil seçimi unutulacak.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” ve indeksi projeden silindi. Eklediğiniz kaynak dosya etkilenmez.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” kaldırılmadı: sunucu meşgul veya modeli kullanıyor. Sunucu boşaldığında tekrar deneyin.";
