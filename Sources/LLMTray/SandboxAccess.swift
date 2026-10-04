@@ -87,6 +87,8 @@ enum SandboxAccess {
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
         panel.canCreateDirectories = true
+        // ~/.llmtray, ~/.lmstudio: the folders it asks for are often hidden.
+        panel.showsHiddenFiles = true
         panel.message = message
         panel.prompt = NSLocalizedString("Allow", comment: "open panel button: allow folder access")
         panel.directoryURL = URL(fileURLWithPath: path)
