@@ -103,7 +103,7 @@ public enum ToolTrust {
     /// then on): whether the user's next message turns them back on -- not
     /// while files are pinned. What makes `files` say so (the chat has a
     /// change grant for the folder).
-    public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { false }
+    public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { !state.pinnedText }
 
     /// Whether a call of `kind` may run now.
     public static func allows(_ kind: Kind, _ state: TurnState) -> Bool {
@@ -140,10 +140,10 @@ public enum ToolTrust {
     public static let folderRefusal = "Not run: file names from the user's folders are part of this turn, so web and "
         + "generator tools are off until the user's next message. Answer in text."
 
-    /// The refusal of a folder change after (or beside) a read.
-    public static let changeRefusal = "Not run: folder, file or web contents were read in this turn, so changes wait for "
-        + "the user's next message. Don't call it again now: describe the changes you'd make and ask the user to confirm; then call "
-        + "change_files first thing in that turn, without reading again."
+    /// The refusal of a folder change while files are pinned (the only
+    /// refusal of a change since Hardening 2 was revised: after a read a
+    /// change runs, flagged in the review).
+    public static var changeRefusal: String { pinnedRefusal }
 
     /// The refusal of a guarded or change call while files are pinned: the
     /// next message won't lift it.

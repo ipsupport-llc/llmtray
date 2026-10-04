@@ -159,7 +159,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         // runs into the plan, flagged. Pinned files keep changes off.
         var t = ToolTrust.TurnState()
         t.record(.folderRead)
-        XCTAssertFalse(ToolTrust.changeWaitsForNextMessage(t))
+        XCTAssertTrue(ToolTrust.changeWaitsForNextMessage(t), "the listing says how to propose the changes")
         XCTAssertTrue(ToolTrust.allows(.folderChange, t))
         XCTAssertTrue(ToolTrust.changeIsAfterRead(t))
         t.pinnedText = true
@@ -174,7 +174,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         }
         try service.grants.grant(root, level: .read, lifetime: .chat(chat.id), chatID: chat.id)
         var text = await files("~/grant")
-        XCTAssertFalse(text.contains("change_files works from"), "a read grant: nothing to say")
+        XCTAssertFalse(text.contains(FolderToolText.nextMessageNote), "a read grant: nothing to say")
         try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
         text = await files("~/grant")
         XCTAssertTrue(text.hasSuffix("\n" + FolderToolText.nextMessageNote), text)
@@ -450,7 +450,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false), ["files", "change_files"])
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false, changeRefused: true),
                        ["files"])
-        XCTAssertTrue(ToolTrust.changeRefusal.contains("Don't call it again now"), ToolTrust.changeRefusal)
+        XCTAssertEqual(ToolTrust.changeRefusal, ToolTrust.pinnedRefusal, "only pinned files refuse a change now")
     }
 
     func testAChangedCopyIsntCheckedAgainstItsOriginal() async throws {
