@@ -699,6 +699,7 @@
 "Prompt processing" = "プロンプト処理";
 "Prompt size" = "プロンプトサイズ";
 "Prompt size (input sent to the model):" = "プロンプトサイズ（モデルに送信される入力）:";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "ファイルを読み終えた直後に提案されています：承認する前にこれらの %lld 件の変更をそれぞれ確認してください。";
 "Public holidays" = "祝日";
 "Puts this step back to how it was when setup opened, and goes on." = "このステップをセットアップ開始時の状態に戻して続行します。";
 "Quantization group size for the KV cache. 64 is a good default." = "KV キャッシュの量子化グループサイズ。64 が適切な既定値です。";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "ありがとうございます。レビューは審査後に掲載されます。";
 "That folder can't be shared with the chat: %@" = "そのフォルダはチャットと共有できません：%@";
 "That isn't LLMTray's folder" = "LLMTray のフォルダではありません";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "%lld 件のゴミ箱への移動は未選択です：必要なものにチェックを入れてください。";
 "The App Store couldn't confirm the purchase." = "App Storeが購入を確認できませんでした。";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store 版の LLMTray が開かれています。先にそちらを終了してください（メニューバーアイコン › Quit）、その後こちらを再度開いてください：両方が同じポートを使用し、モデルを二重に読み込みます。";
 "The Keychain refused to remove the token." = "Keychain がトークンの削除を拒否しました。";
@@ -1083,6 +1085,7 @@
 "Use" = "使用";
 "Use %lld" = "%lld を使用";
 "Use Anyway" = "このまま使用";
+"Use Default Folder" = "既定のフォルダを使用";
 "Use Folder" = "フォルダを使用";
 "Use LM Studio's folder" = "LM Studioのフォルダを使用";
 "Use This Port" = "このポートを使用";

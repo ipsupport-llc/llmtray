@@ -699,6 +699,7 @@
 "Prompt processing" = "프롬프트 처리";
 "Prompt size" = "프롬프트 크기";
 "Prompt size (input sent to the model):" = "프롬프트 크기(모델로 전송되는 입력):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "파일을 읽은 즉시 제안되었습니다: 승인하기 전에 이 %lld개의 변경사항을 각각 확인하세요.";
 "Public holidays" = "공휴일";
 "Puts this step back to how it was when setup opened, and goes on." = "설정 시작 시 상태로 이 단계를 되돌리고 계속 진행합니다.";
 "Quantization group size for the KV cache. 64 is a good default." = "KV 캐시의 양자화 그룹 크기입니다. 64가 적절한 기본값입니다.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "감사합니다! 작성하신 리뷰는 검토 후 게시됩니다.";
 "That folder can't be shared with the chat: %@" = "해당 폴더는 채팅과 공유할 수 없음: %@";
 "That isn't LLMTray's folder" = "해당 폴더는 LLMTray 폴더가 아닙니다";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "%lld개의 휴지통으로 이동 항목이 선택 해제되어 있습니다: 원하는 항목을 선택하세요.";
 "The App Store couldn't confirm the purchase." = "App Store가 구매를 확인할 수 없습니다.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store 버전의 LLMTray가 열려 있습니다. 먼저 종료하세요(메뉴 막대 아이콘 › Quit), 그런 다음 이 앱을 다시 여세요: 두 앱이 같은 포트를 사용하고 모델을 두 번 로드합니다.";
 "The Keychain refused to remove the token." = "키체인이 토큰 삭제를 거부했습니다.";
@@ -1083,6 +1085,7 @@
 "Use" = "사용";
 "Use %lld" = "%lld 사용";
 "Use Anyway" = "어쨌든 사용";
+"Use Default Folder" = "기본 폴더 사용";
 "Use Folder" = "폴더 사용";
 "Use LM Studio's folder" = "LM Studio 폴더 사용";
 "Use This Port" = "이 포트 사용";

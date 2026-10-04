@@ -699,6 +699,7 @@
 "Prompt processing" = "提示处理";
 "Prompt size" = "提示词大小";
 "Prompt size (input sent to the model):" = "提示词大小（发送给模型的输入）：";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "文件阅读后立即提出：在批准前请检查这 %lld 项更改。";
 "Public holidays" = "公共假期";
 "Puts this step back to how it was when setup opened, and goes on." = "将此步骤恢复为打开设置时的状态，然后继续。";
 "Quantization group size for the KV cache. 64 is a good default." = "KV 缓存的量化组大小。64 是不错的默认值。";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "感谢！您的评价将在审核后显示。";
 "That folder can't be shared with the chat: %@" = "该文件夹无法与聊天共享：%@";
 "That isn't LLMTray's folder" = "那不是 LLMTray 的文件夹";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "已取消选中 %lld 个移至废纸篓的项目：请勾选你想要的项目。";
 "The App Store couldn't confirm the purchase." = "App Store 无法确认该购买。";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store 版 LLMTray 正在运行。请先退出该版本（菜单栏图标 › 退出），然后再打开此版本：两者会使用相同端口并重复加载模型。";
 "The Keychain refused to remove the token." = "钥匙串拒绝移除该令牌。";
@@ -1083,6 +1085,7 @@
 "Use" = "使用";
 "Use %lld" = "使用 %lld";
 "Use Anyway" = "仍然使用";
+"Use Default Folder" = "使用默认文件夹";
 "Use Folder" = "使用文件夹";
 "Use LM Studio's folder" = "使用 LM Studio 的文件夹";
 "Use This Port" = "使用此端口";

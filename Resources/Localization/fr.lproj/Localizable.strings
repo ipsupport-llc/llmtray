@@ -699,6 +699,7 @@
 "Prompt processing" = "Traitement de l’invite";
 "Prompt size" = "Taille de l’invite";
 "Prompt size (input sent to the model):" = "Taille de l’invite (entrée envoyée au modèle) :";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Proposé juste après la lecture de vos fichiers : vérifiez chacune de ces %lld modifications avant d’approuver.";
 "Public holidays" = "Jours fériés";
 "Puts this step back to how it was when setup opened, and goes on." = "Ramène cette étape à son état initial lorsque l’installation a été ouverte, puis continue.";
 "Quantization group size for the KV cache. 64 is a good default." = "Taille des groupes de quantification du cache KV. 64 est une bonne valeur par défaut.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Merci ! Votre avis paraîtra après modération.";
 "That folder can't be shared with the chat: %@" = "Ce dossier ne peut pas être partagé avec le chat : %@";
 "That isn't LLMTray's folder" = "Ce n’est pas le dossier de LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "Les %lld déplacements vers la Corbeille ne sont pas cochés : cochez ceux que vous souhaitez.";
 "The App Store couldn't confirm the purchase." = "L’App Store n’a pas pu confirmer l’achat.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La version App Store de LLMTray est ouverte. Quittez-la d’abord (icône de la barre des menus › Quit), puis rouvrez celle-ci : les deux utiliseraient le même port et chargeraient les modèles deux fois.";
 "The Keychain refused to remove the token." = "Le trousseau a refusé de supprimer le token.";
@@ -1083,6 +1085,7 @@
 "Use" = "Utiliser";
 "Use %lld" = "Utiliser %lld";
 "Use Anyway" = "Utiliser quand même";
+"Use Default Folder" = "Utiliser le dossier par défaut";
 "Use Folder" = "Utiliser le dossier";
 "Use LM Studio's folder" = "Utiliser le dossier de LM Studio";
 "Use This Port" = "Utiliser ce port";

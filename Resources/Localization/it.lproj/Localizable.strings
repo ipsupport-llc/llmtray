@@ -699,6 +699,7 @@
 "Prompt processing" = "Elaborazione del prompt";
 "Prompt size" = "Dimensione del prompt";
 "Prompt size (input sent to the model):" = "Dimensione del prompt (input inviato al modello):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Proposto subito dopo la lettura dei tuoi file: controlla ciascuna di queste %lld modifiche prima di approvare.";
 "Public holidays" = "Festività";
 "Puts this step back to how it was when setup opened, and goes on." = "Riporta questo passaggio allo stato iniziale all'apertura della configurazione e procede.";
 "Quantization group size for the KV cache. 64 is a good default." = "Dimensione del gruppo di quantizzazione per la cache KV. 64 è un buon valore predefinito.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Grazie! La tua recensione apparirà dopo la moderazione.";
 "That folder can't be shared with the chat: %@" = "Questa cartella non può essere condivisa con la chat: %@";
 "That isn't LLMTray's folder" = "Quella non è la cartella di LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "Le %lld operazioni di spostamento nel Cestino non sono selezionate: seleziona quelle che desideri.";
 "The App Store couldn't confirm the purchase." = "L'App Store non ha potuto confermare l'acquisto.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versione di LLMTray da App Store è aperta. Chiudila prima (icona nella barra dei menu › Quit), poi riapri questa: entrambi userebbero la stessa porta e caricherebbero i modelli due volte.";
 "The Keychain refused to remove the token." = "Il Keychain ha rifiutato la rimozione del token.";
@@ -1083,6 +1085,7 @@
 "Use" = "Usa";
 "Use %lld" = "Usa %lld";
 "Use Anyway" = "Usa comunque";
+"Use Default Folder" = "Usa la cartella predefinita";
 "Use Folder" = "Usa cartella";
 "Use LM Studio's folder" = "Usa la cartella di LM Studio";
 "Use This Port" = "Usa questa porta";

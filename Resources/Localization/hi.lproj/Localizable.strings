@@ -699,6 +699,7 @@
 "Prompt processing" = "प्रॉम्प्ट संसाधन";
 "Prompt size" = "प्रॉम्प्ट आकार";
 "Prompt size (input sent to the model):" = "प्रॉम्प्ट आकार (मॉडल को भेजा गया इनपुट):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "फ़ाइलें पढ़ने के तुरंत बाद प्रस्तावित: स्वीकृति से पहले इन %lld परिवर्तन‑किए हुए आइटमों की जाँच करें।";
 "Public holidays" = "सरकारी छुट्टियाँ";
 "Puts this step back to how it was when setup opened, and goes on." = "इस चरण को उसी स्थिति पर वापस रखता है जब setup खुला था, और आगे बढ़ता है।";
 "Quantization group size for the KV cache. 64 is a good default." = "KV कैश का क्वांटाइज़ेशन समूह आकार। 64 अच्छा Default है।";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "धन्यवाद! आपकी समीक्षा moderation के बाद दिखाई देगी।";
 "That folder can't be shared with the chat: %@" = "उस फ़ोल्डर को चैट के साथ साझा नहीं किया जा सकता: %@";
 "That isn't LLMTray's folder" = "वह LLMTray का फ़ोल्डर नहीं है";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "ट्रैश में भेजे जाने वाले %lld आइटमों के चयन हटाए गए हैं: जिन्हें आप रखना चाहते हैं, उन्हें चुनें।";
 "The App Store couldn't confirm the purchase." = "App Store खरीद की पुष्टि नहीं कर सका।";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "LLMTray का App Store संस्करण खुला है। पहले उसे बंद करें (इसका मेनू बार आइकन › Quit), फिर इसको फिर खोलें: दोनों एक ही पोर्ट उपयोग करेंगे और मॉडल दो बार लोड होंगे।";
 "The Keychain refused to remove the token." = "Keychain ने token हटाने से मना कर दिया।";
@@ -1083,6 +1085,7 @@
 "Use" = "उपयोग करें";
 "Use %lld" = "%lld का उपयोग करें";
 "Use Anyway" = "फिर भी उपयोग करें";
+"Use Default Folder" = "डिफ़ॉल्ट फ़ोल्डर उपयोग करें";
 "Use Folder" = "फ़ोल्डर उपयोग करें";
 "Use LM Studio's folder" = "LM Studio का फ़ोल्डर उपयोग करें";
 "Use This Port" = "यह पोर्ट उपयोग करें";

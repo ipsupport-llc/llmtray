@@ -699,6 +699,7 @@
 "Prompt processing" = "Xử lý lời nhắc";
 "Prompt size" = "Kích cỡ lời nhắc";
 "Prompt size (input sent to the model):" = "Kích cỡ lời nhắc (đầu vào gửi đến mô hình):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Đề xuất ngay sau khi đọc các tệp của bạn: kiểm tra từng %lld thay đổi này trước khi phê duyệt.";
 "Public holidays" = "Ngày nghỉ lễ";
 "Puts this step back to how it was when setup opened, and goes on." = "Đặt bước này về trạng thái khi mở trình thiết lập, rồi tiếp tục.";
 "Quantization group size for the KV cache. 64 is a good default." = "Kích cỡ nhóm lượng tử hóa cho bộ nhớ đệm KV. 64 là mặc định phù hợp.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Cảm ơn! Đánh giá của bạn sẽ xuất hiện sau khi kiểm duyệt.";
 "That folder can't be shared with the chat: %@" = "Thư mục đó không thể chia sẻ với cuộc trò chuyện: %@";
 "That isn't LLMTray's folder" = "Đó không phải là thư mục của LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "%lld mục chuyển vào Thùng rác chưa được chọn: đánh dấu những mục bạn muốn.";
 "The App Store couldn't confirm the purchase." = "App Store không thể xác nhận giao dịch mua.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray trên App Store đang mở. Đóng nó trước (biểu tượng trên thanh menu › Quit), rồi mở lại cái này: hai bản sẽ dùng cùng một cổng và tải mô hình hai lần.";
 "The Keychain refused to remove the token." = "Keychain từ chối xóa token.";
@@ -1083,6 +1085,7 @@
 "Use" = "Sử dụng";
 "Use %lld" = "Sử dụng %lld";
 "Use Anyway" = "Vẫn sử dụng";
+"Use Default Folder" = "Sử dụng Thư mục Mặc định";
 "Use Folder" = "Dùng thư mục";
 "Use LM Studio's folder" = "Dùng thư mục của LM Studio";
 "Use This Port" = "Dùng cổng này";

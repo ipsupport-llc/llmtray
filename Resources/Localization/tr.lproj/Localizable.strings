@@ -699,6 +699,7 @@
 "Prompt processing" = "İstem işleme";
 "Prompt size" = "İstem boyutu";
 "Prompt size (input sent to the model):" = "İstem boyutu (modele gönderilen giriş):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Dosyalarınızı okuduktan hemen sonra önerildi: onaylamadan önce bu %lld değişikliğin her birini kontrol edin.";
 "Public holidays" = "Resmi tatiller";
 "Puts this step back to how it was when setup opened, and goes on." = "Bu adımı kurulum açıldığındaki hâline geri döndürür ve devam eder.";
 "Quantization group size for the KV cache. 64 is a good default." = "KV önbelleği için nicemleme grubu boyutu. 64 iyi bir varsayılandır.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Teşekkürler! Değerlendirmeniz denetlemeden sonra görünecek.";
 "That folder can't be shared with the chat: %@" = "O klasör sohbetle paylaşılamaz: %@";
 "That isn't LLMTray's folder" = "Bu LLMTray klasörü değil";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "%lld çöp kutusuna taşıma seçeneği işaretlenmemiş: istediğiniz öğeleri işaretleyin.";
 "The App Store couldn't confirm the purchase." = "App Store satın alımı doğrulayamadı.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store'dan yüklenen LLMTray açık. Önce onu kapatın (menü çubuğu simgesi › Quit), sonra bunu yeniden açın: ikisi aynı porta bağlanır ve modeller iki kez yüklenir.";
 "The Keychain refused to remove the token." = "Keychain tokenı kaldırmayı reddetti.";
@@ -1083,6 +1085,7 @@
 "Use" = "Kullan";
 "Use %lld" = "%lld kullan";
 "Use Anyway" = "Yine de Kullan";
+"Use Default Folder" = "Varsayılan Klasörü Kullan";
 "Use Folder" = "Klasörü Kullan";
 "Use LM Studio's folder" = "LM Studio’nun klasörünü kullan";
 "Use This Port" = "Bu Portu Kullan";
