@@ -21,7 +21,9 @@ extension StandaloneImport {
     /// it quits), the update channel (no Sparkle here), this install's
     /// telemetry id and last report (the opt-in itself comes), supporter
     /// proofs (the App Store build's are its purchases), and the sandbox's
-    /// bookmarks.
+    /// bookmarks. Nor the Getting Started project's keys: they name a
+    /// project of this install's library (the other's is merged in as a
+    /// project like any other).
     static let leftOutSettings: Set<String> = [
         "llmtray.settingsPaneAfterRelaunch",
         "llmtray.onboarding.progress", "llmtray.onboarding.startServerFor",
@@ -29,6 +31,8 @@ extension StandaloneImport {
         "llmtray.betaUpdates", "llmtray.checkUpdatesAtLaunch",
         "llmtray.telemetry.installID", "llmtray.telemetry.lastSentJSON", "llmtray.telemetry.lastSentDay",
         "llmtray.sandbox.bookmarks",
+        "llmtray.gettingStarted.project", "llmtray.gettingStarted.guidePending",
+        "llmtray.gettingStarted.wrote", "llmtray.gettingStarted.hidden",
     ]
 
     /// Whether the Developer ID build's `key` comes over: LLMTray's own

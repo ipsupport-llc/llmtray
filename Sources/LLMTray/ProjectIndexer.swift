@@ -89,6 +89,8 @@ final class ProjectIndexer: ObservableObject {
         UserDefaults.standard[Pref.projectFilesEnabled] = on
         guard started else { return }
         if on { activate() } else { deactivate() }
+        // The Getting Started project's guide waits for this.
+        if on { GettingStarted.addGuideIfPending() }
     }
 
     /// Anything indexing (the menu bar's dot), waiting included; not paused.

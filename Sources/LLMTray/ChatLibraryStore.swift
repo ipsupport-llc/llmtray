@@ -214,6 +214,7 @@ final class ChatLibraryStore: ObservableObject {
             let chat = tabs.tabs[index]
             chat.forgetCurrentSession()
             chat.newSession()
+            tabs.intoDefaultProject(chat)
         }
         ChatSessionStore.delete(id: id)
     }

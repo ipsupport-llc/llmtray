@@ -99,6 +99,7 @@ done
 cp "$REPO_ROOT/runtime/run_server.sh" \
    "$REPO_ROOT/runtime/mlx_lm_runtime.json" \
    "$REPO_ROOT/runtime/recommended_models.json" \
+   "$REPO_ROOT/runtime/LLMTray Guide.md" \
    "$REPO_ROOT/runtime/feature_memory.json" \
    "$REPO_ROOT/runtime/llmtray_mflux_runner.py" \
    "$REPO_ROOT/runtime/llmtray_music_runner.py" \

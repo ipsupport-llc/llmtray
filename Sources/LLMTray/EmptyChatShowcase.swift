@@ -15,10 +15,25 @@ struct EmptyChatIntro: View {
     /// other files to the project).
     let dropTargeted: Bool
     @ObservedObject private var store = ChatLibraryStore.shared
+    // What the Getting Started card's visibility depends on (Hide, its
+    // steps): watched here, where it's shown or not.
+    @ObservedObject private var indexer = ProjectIndexer.shared
+    @ObservedObject private var profiles = ProfileManager.shared
+    @ObservedObject private var voice = VoiceModelStore.shared
+    @AppStorage(Pref.gettingStartedHidden.name) private var gettingStartedHidden = false
+    @AppStorage(Pref.gettingStartedWrote.name) private var gettingStartedWrote = false
 
     var body: some View {
-        if let sessionID, store.library.projectContext(forChat: sessionID) != nil {
-            ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)
+        if let sessionID, let project = store.library.projectContext(forChat: sessionID) {
+            // A fresh install's first project: its four steps above the drop zone.
+            if GettingStarted.isProject(project.id), !gettingStartedHidden, GettingStarted.cardVisible {
+                VStack(spacing: 10) {
+                    GettingStartedCard(selectedModelID: selectedModelID, insertPrompt: insertPrompt)
+                    ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)
+                }
+            } else {
+                ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)
+            }
         } else {
             EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt)
         }
@@ -152,5 +167,86 @@ private struct ShowcaseTile: View {
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
+    }
+}
+
+
+/// The Getting Started project's card (GettingStarted): four steps, each
+/// ticked once done, each a click away; hidden for good with Hide or once
+/// all are done.
+struct GettingStartedCard: View {
+    let selectedModelID: String?
+    let insertPrompt: (String) -> Void
+    @ObservedObject private var indexer = ProjectIndexer.shared
+    @ObservedObject private var profiles = ProfileManager.shared
+    @ObservedObject private var voice = VoiceModelStore.shared
+    // Read again when they change (the steps' state).
+    @AppStorage(Pref.gettingStartedWrote.name) private var wrote = false
+    @AppStorage(Pref.gettingStartedHidden.name) private var hidden = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                BrainMark(size: 16)
+                Text("Getting started").font(.system(size: 13, weight: .semibold))
+                Spacer()
+                Button("Hide") { GettingStarted.hideCard() }
+                    .buttonStyle(.borderless).font(.system(size: 11))
+                    .help(Text("Hide these steps for good"))
+            }
+            step(.write, 1, Text("Write here"),
+                 Text("Type a message below and press Return. Try: \u{201C}What can you do?\u{201D}")) {
+                insertPrompt(NSLocalizedString("What can you do?", comment: "getting started: a first prompt"))
+            }
+            step(.files, 2, Text("Drop files here"),
+                 Text("Drag documents onto this chat: they join the project, and the model answers from them.")) {
+                if indexer.isEnabled, let project = GettingStarted.projectID { ProjectFilesWindow.show(project) } else { openFilesSettings() }
+            }
+            step(.ask, 3, Text("Ask about LLMTray"),
+                 indexer.isEnabled
+                    ? Text("The LLMTray guide is in this project: ask, for example, how to connect your coding agent.")
+                    : Text("Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.")) {
+                if indexer.isEnabled {
+                    insertPrompt(NSLocalizedString("How do I connect my coding agent to LLMTray?", comment: "getting started: a prompt about the guide"))
+                } else {
+                    openFilesSettings()
+                }
+            }
+            step(.create, 4, Text("Turn on images, music and voice"),
+                 Text("Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings.")) {
+                NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: [
+                    "pane": SettingsPane.profiles.rawValue, "profileID": profiles.profile(for: selectedModelID).id,
+                ])
+            }
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.07)))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor.opacity(0.25)))
+    }
+
+    private func step(_ s: GettingStarted.Step, _ number: Int, _ title: Text, _ detail: Text,
+                      action: @escaping () -> Void) -> some View {
+        let done = GettingStarted.isDone(s, selectedModelID: selectedModelID)
+        return Button(action: action) {
+            HStack(alignment: .top, spacing: 8) {
+                ZStack {
+                    Circle().fill(done ? Color.green : Color.accentColor.opacity(0.18)).frame(width: 20, height: 20)
+                    if done {
+                        Image(systemName: "checkmark").font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+                    } else {
+                        Text(verbatim: "\(number)").font(.system(size: 11, weight: .semibold)).foregroundColor(.accentColor)
+                    }
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    title.font(.system(size: 12, weight: .semibold)).strikethrough(done, color: .secondary)
+                        .foregroundColor(done ? .secondary : .primary)
+                    detail.font(.system(size: 11)).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(done ? Text("Done") : Text(verbatim: "\(number)"))
     }
 }
