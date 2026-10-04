@@ -15,11 +15,18 @@ struct EmptyChatIntro: View {
     /// other files to the project).
     let dropTargeted: Bool
     @ObservedObject private var store = ChatLibraryStore.shared
+    // What the Getting Started card's visibility depends on (Hide, its
+    // steps): watched here, where it's shown or not.
+    @ObservedObject private var indexer = ProjectIndexer.shared
+    @ObservedObject private var profiles = ProfileManager.shared
+    @ObservedObject private var voice = VoiceModelStore.shared
+    @AppStorage(Pref.gettingStartedHidden.name) private var gettingStartedHidden = false
+    @AppStorage(Pref.gettingStartedWrote.name) private var gettingStartedWrote = false
 
     var body: some View {
         if let sessionID, let project = store.library.projectContext(forChat: sessionID) {
             // A fresh install's first project: its four steps above the drop zone.
-            if GettingStarted.isProject(project.id), GettingStarted.cardVisible {
+            if GettingStarted.isProject(project.id), !gettingStartedHidden, GettingStarted.cardVisible {
                 VStack(spacing: 10) {
                     GettingStartedCard(selectedModelID: selectedModelID, insertPrompt: insertPrompt)
                     ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)

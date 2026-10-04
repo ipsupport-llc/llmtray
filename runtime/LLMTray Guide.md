@@ -37,9 +37,9 @@ model through the API (below); the chat takes images.
 
 ### Downloading and removing models
 
-- **Download:** Settings › Models › Browse Hugging Face…, or from the
-  terminal: `llmtray pull org/name`. Models are MLX models (one folder per
-  model, `org/name`).
+- **Download:** Settings › Models › Browse Hugging Face… (in the version
+  from our website also from the terminal: `llmtray pull org/name`). Models
+  are MLX models (one folder per model, `org/name`).
 - **Remove:** the trash button next to a model in Settings › Models. It goes
   to the Trash, so you can still restore it.
 - **Models folder:** Settings › Models › Models folder. Image, music and voice
@@ -140,7 +140,9 @@ LLMTray serves an OpenAI-compatible API on your Mac.
 - **Switching models:** a request for another model can load it; Settings ›
   Server › Model switching decides whether apps may switch it.
 
-From the terminal (`llmtray`; install it in Settings › General):
+From the terminal, in the version downloaded from our website (the Mac App
+Store version has no command-line tool): `llmtray`, installed in Settings ›
+General.
 
 - `llmtray status` — the server's state and address
 - `llmtray models` — your chat models
