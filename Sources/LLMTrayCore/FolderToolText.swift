@@ -78,10 +78,8 @@ public enum FolderToolText {
     }
 
     /// The last line of a `files` result when the chat may propose changes
-    /// in that folder but not in this turn (the trust barrier): a model
-    /// otherwise says "starting now" and can't.
-    /// Under a folder listing the chat may change: what to do next (the
-    /// changes go to the user's review).
+    /// in that folder: what to do next (the changes go to the user's review,
+    /// flagged as proposed after a read -- adr/0014, Hardening 2 revised).
     public static let nextMessageNote = "To sort or tidy this folder, call \(FolderTools.changeName) with the moves "
         + "(new folders, moves, renames, Trash): the user reviews and approves them."
 
