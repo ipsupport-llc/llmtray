@@ -1,0 +1,367 @@
+<!doctype html>
+<!-- Generated from runtime/LLMTray Guide.md by scripts/build_guide_page.py: edit the guide, not this page. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLMTray — Guide</title>
+<meta name="description" content="How to use LLMTray: models, chat, projects and files, tools, images, music, voice, and connecting coding agents and apps to its OpenAI-compatible API.">
+<link rel="canonical" href="https://ipsupport-llc.github.io/llmtray/guide.html">
+<meta name="theme-color" content="#0d2818">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --fg-muted: #5f6368;
+    --card: #f6f6f7;
+    --border: #e3e3e6;
+    --accent: #2f7d4f;
+    --code-bg: #0f1115;
+    --code-fg: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14151a;
+      --fg: #eaeaec;
+      --fg-muted: #a0a3ab;
+      --card: #1c1e24;
+      --border: #2a2c33;
+      --accent: #5fd394;
+      --code-bg: #0a0b0d;
+      --code-fg: #e6e6e6;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --fg: #1a1a1a; --fg-muted: #5f6368; --card: #f6f6f7;
+    --border: #e3e3e6; --accent: #2f7d4f; --code-bg: #0f1115; --code-fg: #e6e6e6;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14151a; --fg: #eaeaec; --fg-muted: #a0a3ab; --card: #1c1e24;
+    --border: #2a2c33; --accent: #5fd394; --code-bg: #0a0b0d; --code-fg: #e6e6e6;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+  }
+  header { text-align: center; margin-bottom: 3.5rem; }
+  .icon-img {
+    width: 84px;
+    height: 84px;
+    border-radius: 20px;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+  h1 { font-size: 2.3rem; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+  .tagline { color: var(--fg-muted); font-size: 1.08rem; margin: 0 0 2rem; }
+
+  .screenshot {
+    max-width: 340px;
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    margin: 2.5rem 0;
+  }
+
+  .hero-banner {
+    width: 100%;
+    max-width: 960px;
+    height: auto;
+    border-radius: 16px;
+    margin: 2.5rem 0 0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+  .cta { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.95rem 2.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--accent);
+    color: #0b1210;
+    box-shadow: 0 6px 20px rgba(47, 125, 79, 0.35);
+    transition: transform 0.15s ease;
+  }
+  .btn-download:hover { transform: translateY(-1px); }
+  .cta-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; max-width: 100%; }
+  .cta-buttons .btn-download { max-width: 100%; box-sizing: border-box; }
+  .btn-download .sub { display: block; font-size: 0.72rem; font-weight: 500; opacity: 0.8; }
+  .btn-download.alt {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    box-shadow: none;
+  }
+  .btn-download svg { width: 20px; height: 20px; }
+  .cta-meta {
+    font-size: 0.8rem;
+    color: var(--fg-muted);
+  }
+  .secondary-link {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .secondary-link:hover { color: var(--fg); }
+
+  .badges { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--fg-muted);
+  }
+
+  section { margin: 3rem 0; }
+  h2 { font-size: 1.3rem; margin: 0 0 1rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.9rem;
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .grid .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+  .card h3 { margin: 0 0 0.35rem; font-size: 0.98rem; }
+  .card p { margin: 0; color: var(--fg-muted); font-size: 0.9rem; }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 1rem 1.1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  p code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+
+  .reviews-summary { color: var(--fg-muted); margin: -0.4rem 0 1rem; }
+  .reviews { display: grid; gap: 0.9rem; }
+  .stars { color: #e0a800; letter-spacing: 0.05em; }
+  .card.review p { color: var(--fg); margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+  .card.review p.review-meta { color: var(--fg-muted); font-size: 0.8rem; margin: 0; }
+  footer {
+    text-align: center;
+    color: var(--fg-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+  footer a { color: inherit; }
+
+  .page h1 { font-size: 2rem; }
+  .page h2 { font-size: 1.25rem; margin-top: 2.2rem; }
+  .page li { margin: 0.35rem 0; }
+  .meta { color: var(--fg-muted); }
+
+  .page h3 { font-size: 1.05rem; margin-top: 1.6rem; }
+  li code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.4rem;
+    border-radius: 5px;
+    font-size: 0.88em;
+  }
+  .toc { columns: 2; padding-left: 1.2rem; color: var(--fg-muted); }
+  @media (max-width: 560px) { .toc { columns: 1; } }
+  .toc a { color: inherit; }
+  .page a { color: var(--accent); }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+  <div class="wrap page">
+    <h1>LLMTray Guide</h1>
+    <p class="meta">The same guide is in the app: ask about LLMTray in the Getting Started project.</p>
+
+    <p>LLMTray runs AI models on your Mac: chat, images, music and voice, plus an OpenAI-compatible server for your coding agents and apps. Everything runs locally; nothing you type, attach or generate is sent to a cloud.</p>
+
+    <ul class="toc">
+      <li><a href="#getting-started">Getting started</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#chat">Chat</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#working-with-your-folders">Working with your folders</a></li>
+      <li><a href="#images">Images</a></li>
+      <li><a href="#music">Music</a></li>
+      <li><a href="#voice">Voice</a></li>
+      <li><a href="#connect-your-coding-agents-and-apps">Connect your coding agents and apps</a></li>
+      <li><a href="#speed-and-memory">Speed and memory</a></li>
+      <li><a href="#privacy">Privacy</a></li>
+      <li><a href="#getting-help">Getting help</a></li>
+    </ul>
+
+    <h2 id="getting-started">Getting started</h2>
+
+    <ol>
+      <li>Pick a chat model. The setup assistant suggests the ones that fit your Mac's memory; you can download others from Hugging Face later.</li>
+      <li>Start chatting. The model loads the first time you send a message.</li>
+      <li>Turn on the extras you want in Settings: image generation, music, voice, project files. Each one downloads what it needs only when you turn it on.</li>
+    </ol>
+
+    <p>LLMTray lives in the menu bar. Click its icon for the chat; Open Chat (or New Chat) opens it in its own window.</p>
+
+    <h2 id="models">Models</h2>
+
+    <h3 id="which-model-should-i-use">Which model should I use?</h3>
+
+    <ul>
+      <li><strong>Gemma 4 E2B / E2B Phone</strong> (8 GB Macs): quick, simple answers; reads images and hears audio.</li>
+      <li><strong>Gemma 4 E4B</strong> (16 GB): a good everyday model; reads images, hears audio, calls tools.</li>
+      <li><strong>Gemma 4 12B</strong> (16 GB and up): better answers than E4B, slower; images and audio too.</li>
+      <li><strong>Gemma 4 26B-A4B</strong> (24 GB and up): the strongest everyday model for its speed: a mixture of experts with 4B parameters active per token.</li>
+      <li><strong>Gemma 4 31B</strong> (32 GB and up): the strongest on hard questions, the slowest.</li>
+      <li><strong>Nemotron coding models</strong>: made for tool calling in coding agents.</li>
+    </ul>
+
+    <p>Smaller models are faster and leave memory for other apps; bigger ones answer better. Settings › Models shows each model's size and what it can do (reads images, hears audio, calls tools, reasons, writes code). Audio goes to a model through the API (below); the chat takes images.</p>
+
+    <h3 id="downloading-and-removing-models">Downloading and removing models</h3>
+
+    <ul>
+      <li><strong>Download:</strong> Settings › Models › Browse Hugging Face… (in the version from our website also from the terminal: <code>llmtray pull org/name</code>). Models are MLX models (one folder per model, <code>org/name</code>).</li>
+      <li><strong>Remove:</strong> the trash button next to a model in Settings › Models. It goes to the Trash, so you can still restore it.</li>
+      <li><strong>Models folder:</strong> Settings › Models › Models folder. Image, music and voice models live there too, under their Hugging Face names.</li>
+    </ul>
+
+    <h3 id="profiles-per-model-settings">Profiles: per-model settings</h3>
+
+    <p>Settings › Profiles holds a model's settings: temperature and sampling, the system prompt, which tools it may use, image and music generation, context and performance. Each model uses a profile (Default unless you pick another in Settings › Models).</p>
+
+    <h2 id="chat">Chat</h2>
+
+    <ul>
+      <li><strong>Attach images</strong> with the paperclip or by dragging them into the chat (with a model that reads images). Documents dragged into a project's chat are added to the project's files.</li>
+      <li><strong>Thinking:</strong> models that reason show a "Thought process" you can open.</li>
+      <li><strong>Temporary chats</strong> aren't saved and can't change files.</li>
+      <li><strong>Compact</strong> shortens a long chat into a summary so it fits the model's context; it can also happen automatically (Settings › General › Compaction).</li>
+      <li><strong>Regenerate</strong> asks for the last answer again.</li>
+    </ul>
+
+    <h2 id="projects">Projects</h2>
+
+    <p>A project groups chats with their own instructions and files.</p>
+
+    <ul>
+      <li><strong>Instructions:</strong> the project's system prompt, used in every chat in it.</li>
+      <li><strong>Files:</strong> add documents (PDF, text, Markdown, Office files…) in the project's Files window. The model searches them and cites the pages it used; click a citation to open the page.</li>
+      <li><strong>Searching files needs Project files turned on:</strong> Settings › Files › Project files. Without an embedding model the search matches words; with one (downloaded there, about 1 GB) it also finds passages by meaning.</li>
+      <li><strong>Pinned files</strong> go into every request of the project's chats as a whole (good for a short reference the model must always see).</li>
+    </ul>
+
+    <h2 id="tools">Tools</h2>
+
+    <p>Models that call tools can use LLMTray's built-in tools when you ask for something they can't know:</p>
+
+    <ul>
+      <li>On your Mac: date and time, calculator.</li>
+      <li>On the web (off until you turn them on in the profile): web search, news, Hacker News, Wikipedia, country facts, public holidays, currency rates, weather, hourly forecast, air quality, sunrise and sunset, the time in a city.</li>
+    </ul>
+
+    <p>Turn tools on or off per profile: Settings › Profiles › Prompt &amp; tools.</p>
+
+    <h2 id="working-with-your-folders">Working with your folders</h2>
+
+    <p>A chat can look at and tidy a folder you allow (for example Downloads): list it, find duplicates, and propose new folders, moves, renames and moves to the Trash.</p>
+
+    <ul>
+      <li>Allow a folder from the chat's folder menu (Allow Folder…). Nothing outside the folders you allow is touched.</li>
+      <li><strong>Nothing changes until you approve:</strong> the proposed changes appear as a plan card; tick what you want and press Approve. Undo takes the changes back.</li>
+      <li>Changes proposed right after the model read your files are marked so; any move to the Trash among them starts unticked.</li>
+    </ul>
+
+    <h2 id="images">Images</h2>
+
+    <p>Turn on image generation in Settings › Profiles › Image generation and pick a model (Z-Image Turbo, or FLUX.2 klein, which can also edit an image). Then ask in the chat: "draw a fox in the snow". To change an image, attach it and say what to change.</p>
+
+    <p><strong>Creator mode</strong> shows a draft of the request first, so you can adjust the prompt, size and model before the image is made.</p>
+
+    <h2 id="music">Music</h2>
+
+    <p>Turn on music generation in Settings › Profiles › Music generation. Ask for a song with a style and lyrics: "a calm piano song about the sea". Songs play in the chat and can be saved or shared.</p>
+
+    <h2 id="voice">Voice</h2>
+
+    <p>Voice Lab (Settings › Voice) lets you talk with a voice model in real time. It uses the microphone only while you use it; the audio stays on your Mac.</p>
+
+    <h2 id="connect-your-coding-agents-and-apps">Connect your coding agents and apps</h2>
+
+    <p>LLMTray serves an OpenAI-compatible API on your Mac.</p>
+
+    <ul>
+      <li><strong>Address:</strong> <code>http://127.0.0.1:8765/v1</code> (Settings › Server shows it; the port can be changed there).</li>
+      <li><strong>Model name:</strong> each model's alias in Settings › Models (by default its folder name). <code>GET /v1/models</code> lists them.</li>
+      <li><strong>API key:</strong> any value; the server runs on your Mac only.</li>
+      <li>Point any app or coding agent that speaks the OpenAI API at that address: set the base URL to <code>http://127.0.0.1:8765/v1</code> and the model to an alias.</li>
+      <li><strong>Other devices</strong> on your network can use it after you turn on network access in Settings › Server › Network.</li>
+      <li><strong>Switching models:</strong> a request for another model can load it; Settings › Server › Model switching decides whether apps may switch it.</li>
+    </ul>
+
+    <p>From the terminal, in the version downloaded from our website (the Mac App Store version has no command-line tool): <code>llmtray</code>, installed in Settings › General.</p>
+
+    <ul>
+      <li><code>llmtray status</code> — the server's state and address</li>
+      <li><code>llmtray models</code> — your chat models</li>
+      <li><code>llmtray start [model]</code>, <code>llmtray stop</code></li>
+      <li><code>llmtray chat &quot;prompt&quot;</code> — ask the model in the terminal</li>
+      <li><code>llmtray pull org/name</code> — download a model</li>
+      <li><code>llmtray image &quot;prompt&quot;</code> — make an image, saved as a PNG</li>
+      <li><code>llmtray api</code> — the endpoint for other apps</li>
+    </ul>
+
+    <h2 id="speed-and-memory">Speed and memory</h2>
+
+    <ul>
+      <li>A model must fit in your Mac's memory; the setup assistant and Settings › Models warn when one barely fits.</li>
+      <li>Smaller models answer faster. Long chats and big documents take more memory and time; Compact helps.</li>
+      <li>Settings › Benchmark measures your Mac's speed with a model and can tune the profile's performance settings.</li>
+    </ul>
+
+    <h2 id="privacy">Privacy</h2>
+
+    <p>Your chats, files, images and audio stay on your Mac. LLMTray has no account and no ads. Web tools, model downloads and anonymous usage statistics (which you can turn off in Settings › General) are the only things that use the network; the privacy policy lists exactly what is sent.</p>
+
+    <h2 id="getting-help">Getting help</h2>
+
+    <ul>
+      <li>Settings › General › Report a Bug… prepares a report you can read before sending it.</li>
+      <li>Email: <code>bugreport@ipsupport.us</code></li>
+    </ul>
+
+    <footer>
+      <a href="./">LLMTray</a> · <a href="guide.html">Guide</a> · <a href="privacy.html">Privacy</a> · <a href="support.html">Support</a> · made by <a href="https://github.com/ipsupport-llc">IP Support</a>
+    </footer>
+  </div>
+</body>
+</html>

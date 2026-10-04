@@ -17,6 +17,8 @@ jobs:
         run: LLMTRAY_APP_STORE=1 swift build --build-path .build-appstore
       - name: Localizations (valid files, en base up to date, per-language coverage)
         run: python3 scripts/l10n.py check
+      - name: Website guide page matches the app's guide
+        run: python3 scripts/build_guide_page.py --check
       - name: Voice runner framing (no model)
         run: python3 scripts/test_voice_runner.py
       - name: swift test

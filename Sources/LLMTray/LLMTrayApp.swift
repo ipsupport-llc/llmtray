@@ -566,6 +566,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         add(NSLocalizedString("Set Up LLMTray…", comment: ""), #selector(showSetupWizard))
         add(NSLocalizedString("What's New…", comment: ""), #selector(showWhatsNew))
+        add(NSLocalizedString("LLMTray Guide", comment: "tray menu: opens the guide on the website"), #selector(showGuide))
         // Sparkle needs a real .app bundle's Info.plist (SUFeedURL etc.):
         // the bare `.build/debug/LLMTray` binary has none, and the item
         // would only fail with "updater failed to start".
@@ -814,6 +815,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showWhatsNew() {
         popover.performClose(nil)
         WhatsNewWindow.show()
+    }
+
+    /// The guide on the website (the same text as the Getting Started
+    /// project's file, docs/guide.html).
+    @objc private func showGuide() {
+        popover.performClose(nil)
+        NSWorkspace.shared.open(URL(string: "https://ipsupport-llc.github.io/llmtray/guide.html")!)
     }
 
     @objc private func showVoiceLab() {

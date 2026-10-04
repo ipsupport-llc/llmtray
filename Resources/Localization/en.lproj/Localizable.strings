@@ -479,6 +479,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
 "Kept free: %lld MB" = "Kept free: %lld MB";
 "LLMTray" = "LLMTray";
+"LLMTray Guide" = "LLMTray Guide";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";

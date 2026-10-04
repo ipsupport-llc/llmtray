@@ -6,6 +6,10 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://ipsupport-llc.github.io/llmtray/guide.html</loc>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
     <loc>https://ipsupport-llc.github.io/llmtray/privacy.html</loc>
     <changefreq>monthly</changefreq>
   </url>
