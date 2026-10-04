@@ -147,12 +147,12 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   # interpreter, outside the bundle, installs into it.
   BUILD_VENV="$WORK_DIR/pip_venv"
   "$FRAMEWORK_PYTHON" -m venv "$BUILD_VENV"
-  # Image generation: our mflux fork without its dependencies, then every
+  # Image generation: mflux (PyPI, its version pinned) without its dependencies, then every
   # dependency but runtime/mflux_runtime.json's "exclude" (opencv-python's
   # GPL FFmpeg, torch) in the one resolution below (adr/0018 §4).
   MFLUX_JSON="$REPO_ROOT/runtime/mflux_runtime.json"
   mflux_config() { python3 -c 'import json, sys; v = json.load(open(sys.argv[1]))[sys.argv[2]]; print(" ".join(v) if isinstance(v, list) else v)' "$MFLUX_JSON" "$1"; }
-  MFLUX_URL="mflux @ https://github.com/$(mflux_config repo)/archive/$(mflux_config pinned_ref).tar.gz"
+  MFLUX_URL="mflux==$(mflux_config version)"
   MFLUX_DIR="$WORK_DIR/mflux_target"
   MFLUX_DEPS_FILE="$WORK_DIR/mflux_deps.txt"
   rm -rf "$MFLUX_DIR"

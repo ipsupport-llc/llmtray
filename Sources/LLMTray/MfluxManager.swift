@@ -143,9 +143,10 @@ final class MfluxManager: ObservableObject {
     /// new mflux must not silently break image generation for new installs.
     /// (Never vendor this venv into a DMG: opencv-python in it bundles GPL
     /// codecs; the user's own pip installs it. The App Store build bundles
-    /// our mflux fork instead, which runs without opencv-python and torch:
-    /// runtime/mflux_runtime.json, adr/0018 §4.)
-    static let mfluxVersion = "0.20.0"
+    /// the same version without opencv-python and torch, which it imports
+    /// only where used since 0.21.0: runtime/mflux_runtime.json, adr/0018
+    /// §4. Keep the two versions equal.)
+    static let mfluxVersion = "0.21.0"
     static var mfluxRequirement: String { "mflux==\(mfluxVersion)" }
 
     #if APP_STORE
