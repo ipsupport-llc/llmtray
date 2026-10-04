@@ -292,7 +292,13 @@ struct ModelsPane: View {
                 }
                 HStack {
                     #if !APP_STORE
-                    Button("Use LM Studio's folder") { FeatureSetup.shared.useLMStudioFolder() }
+                    // A toggle: one click back from LM Studio's folder to ours.
+                    if FeatureSetup.shared.isUsingLMStudioFolder {
+                        Button("Use Default Folder") { FeatureSetup.shared.useDefaultFolder() }
+                            .help(Text(verbatim: ModelDiscovery.defaultModelsRoot))
+                    } else {
+                        Button("Use LM Studio's folder") { FeatureSetup.shared.useLMStudioFolder() }
+                    }
                     #endif
                     Button("Rescan", action: rescan)
                     Spacer()
@@ -523,6 +529,8 @@ struct ModelsPane: View {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
+        // ~/.llmtray, ~/.lmstudio: model folders are often hidden ones.
+        panel.showsHiddenFiles = true
         panel.directoryURL = URL(fileURLWithPath: modelsRoot)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url else { return }

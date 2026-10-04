@@ -266,6 +266,8 @@ final class SetupWizardModel: ObservableObject {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
+        // ~/.llmtray, ~/.lmstudio: model folders are often hidden ones.
+        panel.showsHiddenFiles = true
         panel.directoryURL = URL(fileURLWithPath: progress.choices.modelsFolder)
         panel.prompt = NSLocalizedString("Use Folder", comment: "")
         guard panel.runModal() == .OK, let url = panel.url, !locksModelsFolder else { return }

@@ -287,4 +287,19 @@ final class FeatureSetup {
     #endif
 
     func useLMStudioFolder() { setModelsFolder(Self.lmStudioFolder) }
+
+    /// The models folder is LM Studio's now: Settings offers the way back.
+    var isUsingLMStudioFolder: Bool {
+        Self.samePath(ModelDiscovery.currentModelsRoot(), Self.lmStudioFolder)
+    }
+
+    /// Back to LLMTray's own models folder (~/.llmtray/models).
+    func useDefaultFolder() { setModelsFolder(ModelDiscovery.defaultModelsRoot) }
+
+    static func samePath(_ a: String, _ b: String) -> Bool {
+        func norm(_ p: String) -> String {
+            URL(fileURLWithPath: (p as NSString).expandingTildeInPath).resolvingSymlinksInPath().standardizedFileURL.path
+        }
+        return norm(a) == norm(b)
+    }
 }
