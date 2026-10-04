@@ -88,9 +88,16 @@ public enum ToolTrust {
     /// one pinned could never pin a second). Unpinning is always allowed.
     public static func allowsPin(_ state: TurnState) -> Bool { !state.hasToolText }
 
-    /// Folder changes may be declared and run: not after file or folder
-    /// text in this turn.
-    public static func allowsChange(_ state: TurnState) -> Bool { !state.hasFileText }
+    /// Folder changes may be declared and run: anytime but with pinned files
+    /// (adr/0014, Hardening 2 as revised 2026-10-04 with the user's approval).
+    /// After file, folder or web text in the turn they still only go to the
+    /// plan, marked as proposed after a read (`changeIsAfterRead`): the
+    /// review says so, and a Trash among them starts unticked.
+    public static func allowsChange(_ state: TurnState) -> Bool { !state.pinnedText }
+
+    /// A change proposed now comes after outside text in the turn: the plan
+    /// review flags it.
+    public static func changeIsAfterRead(_ state: TurnState) -> Bool { state.hasFileText }
 
     /// After a folder read in `state` (a turn in which changes are off from
     /// then on): whether the user's next message turns them back on -- not
@@ -133,10 +140,10 @@ public enum ToolTrust {
     public static let folderRefusal = "Not run: file names from the user's folders are part of this turn, so web and "
         + "generator tools are off until the user's next message. Answer in text."
 
-    /// The refusal of a folder change after (or beside) a read.
-    public static let changeRefusal = "Not run: folder, file or web contents were read in this turn, so changes wait for "
-        + "the user's next message. Don't call it again now: describe the changes you'd make and ask the user to confirm; then call "
-        + "change_files first thing in that turn, without reading again."
+    /// The refusal of a folder change while files are pinned (the only
+    /// refusal of a change since Hardening 2 was revised: after a read a
+    /// change runs, flagged in the review).
+    public static var changeRefusal: String { pinnedRefusal }
 
     /// The refusal of a guarded or change call while files are pinned: the
     /// next message won't lift it.

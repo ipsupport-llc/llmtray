@@ -154,12 +154,16 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         XCTAssertLessThanOrEqual(d.utf8.count, 300, "\(d.utf8.count) bytes")
     }
 
-    func testChangesWaitForTheNextMessageUnlessFilesArePinned() {
+    func testChangesAfterAReadRunFlaggedUnlessFilesArePinned() {
+        // Hardening 2 as revised: no wait for the next message; the change
+        // runs into the plan, flagged. Pinned files keep changes off.
         var t = ToolTrust.TurnState()
         t.record(.folderRead)
-        XCTAssertTrue(ToolTrust.changeWaitsForNextMessage(t))
+        XCTAssertTrue(ToolTrust.changeWaitsForNextMessage(t), "the listing says how to propose the changes")
+        XCTAssertTrue(ToolTrust.allows(.folderChange, t))
+        XCTAssertTrue(ToolTrust.changeIsAfterRead(t))
         t.pinnedText = true
-        XCTAssertFalse(ToolTrust.changeWaitsForNextMessage(t), "pinned files keep changes off after the next message too")
+        XCTAssertFalse(ToolTrust.allows(.folderChange, t), "pinned files keep changes off")
     }
 
     func testAFilesResultSaysChangesWaitOnlyWhereTheChatMayChange() async throws {
@@ -170,7 +174,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         }
         try service.grants.grant(root, level: .read, lifetime: .chat(chat.id), chatID: chat.id)
         var text = await files("~/grant")
-        XCTAssertFalse(text.contains("change_files works from"), "a read grant: nothing to say")
+        XCTAssertFalse(text.contains(FolderToolText.nextMessageNote), "a read grant: nothing to say")
         try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
         text = await files("~/grant")
         XCTAssertTrue(text.hasSuffix("\n" + FolderToolText.nextMessageNote), text)
@@ -188,10 +192,36 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
 
     // MARK: The plan's warnings
 
-    private func propose(_ ops: [FolderTools.RawOp], key: String = UUID().uuidString) async throws -> ChangePlan {
-        let answer = await service.propose(ops, chat: chat, callKey: key, ask: { _ in nil })
+    private func propose(_ ops: [FolderTools.RawOp], key: String = UUID().uuidString, afterRead: Bool = false) async throws -> ChangePlan {
+        let answer = await service.propose(ops, chat: chat, callKey: key, ask: { _ in nil }, afterRead: afterRead)
         XCTAssertTrue(answer.text.hasPrefix("Added"), answer.text)
         return try XCTUnwrap(service.plans.pending(chatID: chat.id))
+    }
+
+    func testChangesProposedAfterAReadAreFlaggedAndTheirTrashStartsUnticked() async throws {
+        write("a.dmg", "a")
+        write("b.zip", "b")
+        write("c (1).txt", "c")
+        write("c.txt", "c")
+        try service.grants.grant(root, level: .change, lifetime: .chat(chat.id), chatID: chat.id)
+        let plan = try await propose([.init(kind: .makeDir, path: "~/grant/Apps"),
+                                      .init(kind: .move, path: "~/grant/a.dmg", to: "~/grant/Apps/"),
+                                      .init(kind: .trash, path: "~/grant/b.zip"),
+                                      .init(kind: .trash, path: "~/grant/c (1).txt")], afterRead: true)
+        XCTAssertTrue(plan.items.allSatisfy { $0.afterRead == true })
+        var review = PlanReview(plan: plan)
+        let move = try XCTUnwrap(plan.items.first { $0.kind == .move })
+        let trash = plan.items.filter { $0.kind == .trash }
+        XCTAssertTrue(review.isSelected(move.id), "a move is ticked: Undo takes it back")
+        XCTAssertTrue(trash.allSatisfy { !review.isSelected($0.id) }, "a Trash after a read starts unticked")
+        XCTAssertTrue(review.isSelected(try XCTUnwrap(plan.items.first { $0.kind == .makeDir }).id), "a new folder is ticked")
+        XCTAssertEqual(review.planWarnings.first, .proposedAfterRead(items: 3, trash: 2))
+        // The copy check finds c (1).txt identical: still not ticked for the user.
+        review.apply(service.checks(plan), planID: plan.id, revision: plan.revision)
+        XCTAssertTrue(trash.allSatisfy { !review.isSelected($0.id) })
+        // The user ticks one: it's theirs.
+        review.set(trash[0].id, selected: true)
+        XCTAssertTrue(review.isSelected(trash[0].id))
     }
 
     func testAPlanThatTakesFilesOutOfASubfolderSaysSo() async throws {
@@ -420,7 +450,7 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false), ["files", "change_files"])
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: t, fileTextRoomSpent: false, changeRefused: true),
                        ["files"])
-        XCTAssertTrue(ToolTrust.changeRefusal.contains("Don't call it again now"), ToolTrust.changeRefusal)
+        XCTAssertEqual(ToolTrust.changeRefusal, ToolTrust.pinnedRefusal, "only pinned files refuse a change now")
     }
 
     func testAChangedCopyIsntCheckedAgainstItsOriginal() async throws {

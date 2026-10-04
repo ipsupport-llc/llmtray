@@ -455,6 +455,12 @@ final class FolderPlanModel: ObservableObject, Identifiable {
         case .uncompared(let count, let names):
             return String(format: NSLocalizedString("%1$lld copies couldn't be compared with their originals, so they're unticked: %2$@", comment: "plan warning"),
                           count, names.joined(separator: ", ") + (count > names.count ? ", …" : ""))
+        case .proposedAfterRead(let items, let trash):
+            let base = String(format: NSLocalizedString("Proposed right after reading your files: check each of these %lld changes before approving.",
+                                                        comment: "plan warning: changes proposed after a read"), items)
+            guard trash > 0 else { return base }
+            return base + " " + String(format: NSLocalizedString("The %lld moves to the Trash are unticked: tick the ones you want.",
+                                                                 comment: "plan warning: trash after a read"), trash)
         }
     }
 
@@ -557,8 +563,9 @@ final class ChangeFilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let ask = context.askFolderAccess ?? { _ in nil }
         let key = context.callKey
+        let afterRead = context.changeAfterRead
         let answer = await offMain { isCancelled in
-            await service.propose(ops, chat: chat, callKey: key, ask: ask, isCancelled: isCancelled)
+            await service.propose(ops, chat: chat, callKey: key, ask: ask, afterRead: afterRead, isCancelled: isCancelled)
         }
         return answer.toolResult
     }

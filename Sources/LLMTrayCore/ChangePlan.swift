@@ -105,6 +105,13 @@ public struct PlanItem: Codable, Equatable, Identifiable, Sendable {
     /// The call key of the `change_files` call that proposed it: a `once`
     /// grant covers the item only for that call (nil: no `once` grant does).
     public var proposal: String? = nil
+    /// Proposed after file, folder or web text in its turn (adr/0014,
+    /// Hardening 2): the review flags it; a Trash of it starts unticked and
+    /// is never ticked for the user.
+    public var afterRead: Bool? = nil
+
+    /// A Trash proposed after a read: only the user ticks it.
+    public var isTrashAfterRead: Bool { kind == .trash && afterRead == true }
 
     /// A one-line description for the plan review.
     public var summary: String {

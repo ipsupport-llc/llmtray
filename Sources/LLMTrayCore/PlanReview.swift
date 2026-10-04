@@ -47,7 +47,7 @@ public struct PlanReview: Equatable, Sendable {
             autoUnticked = previous.autoUnticked
             touched = previous.touched
         } else {
-            selected = ids.subtracting(plan.items.filter(PlanChecker.isCopyCandidate).map(\.id))
+            selected = ids.subtracting(plan.items.filter { PlanChecker.isCopyCandidate($0) || $0.isTrashAfterRead }.map(\.id))
         }
         selected = closed(selected)
     }
@@ -102,7 +102,8 @@ public struct PlanReview: Equatable, Sendable {
         checkedRevision = revision
         for (id, c) in new.copies.sorted(by: { $0.key < $1.key }) where ids.contains(id) {
             if c.verdict == .identical {
-                if !touched.contains(id), !added.contains(id) { select(id, true) }
+                let afterRead = plan.items.first { $0.id == id }?.isTrashAfterRead ?? false
+                if !touched.contains(id), !added.contains(id), !afterRead { select(id, true) }
             } else if autoUnticked.insert(id).inserted {
                 select(id, false)
             }
@@ -214,6 +215,9 @@ public struct PlanReview: Equatable, Sendable {
         case notIdentical(count: Int, names: [String])
         /// Trashed "copies" that couldn't be compared with their originals.
         case uncompared(count: Int, names: [String])
+        /// Items the model proposed right after reading folder, file or web
+        /// text: how many, and how many of them go to the Trash (unticked).
+        case proposedAfterRead(items: Int, trash: Int)
     }
 
     /// For what Approve would do now (the ticked, valid items), and every
@@ -232,6 +236,10 @@ public struct PlanReview: Equatable, Sendable {
         if !differ.isEmpty { out.append(.notIdentical(count: differ.count, names: Array(differ.prefix(3)))) }
         let unknown = plan.items.filter { checks.uncompared[$0.id] != nil }.compactMap { $0.source?.location.name }
         if !unknown.isEmpty { out.append(.uncompared(count: unknown.count, names: Array(unknown.prefix(3)))) }
+        let afterRead = plan.items.filter { $0.afterRead == true && $0.kind != .makeDir }
+        if !afterRead.isEmpty {
+            out.insert(.proposedAfterRead(items: afterRead.count, trash: afterRead.filter(\.isTrashAfterRead).count), at: 0)
+        }
         return out
     }
 

@@ -65,6 +65,9 @@ struct ToolContext {
     /// user's next message turns them back on (set by ChatToolbox): `files`
     /// then says so where the chat may propose changes.
     var changeNextMessage = false
+    /// A `change_files` call comes after file, folder or web text in the
+    /// turn: its items are flagged in the review (adr/0014, Hardening 2).
+    var changeAfterRead = false
 }
 
 /// What a tool does in the user's folders (adr/0014).
@@ -383,6 +386,7 @@ final class ChatToolbox {
             context.fileTextAllowed = !fileTextRoomSpent
             context.pinAllowed = ToolTrust.allowsPin(turnTrust)
             context.changeNextMessage = ToolTrust.changeWaitsForNextMessage(turnTrust)
+            context.changeAfterRead = ToolTrust.changeIsAfterRead(turnTrust)
             let result = await tool.run(arguments.values, context: context)
             // A folder read that found no room: no file text for the rest of the turn.
             if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }

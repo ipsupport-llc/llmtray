@@ -329,7 +329,7 @@ final class PinTrustTests: XCTestCase {
             let s = state(after: listing)
             XCTAssertTrue(ToolTrust.allowsPin(s), listing)
             XCTAssertFalse(ToolTrust.allows(.guarded, s), "names are file text: \(listing)")
-            XCTAssertFalse(ToolTrust.allows(.folderChange, s), listing)
+            XCTAssertTrue(ToolTrust.changeIsAfterRead(s), listing)
             XCTAssertEqual(ToolTrust.refusalText(for: .guarded, s), ToolTrust.refusal)
         }
         for content in [#"{"query":"deadline"}"#, #"{"doc":2,"pages":"1-3"}"#, #"{"doc":2}"#, #"{"cursor":"2:1:0:3"}"#] {

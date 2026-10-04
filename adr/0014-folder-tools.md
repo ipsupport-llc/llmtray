@@ -335,6 +335,23 @@ took `change_files` for a text editor and wrote a shell script.
 - After its first refusal in a turn `change_files` isn't declared again
   until the user's next message (like a spent generator); the refusal says
   "Don't call it again now".
+- **Hardening 2 revised (2026-10-04, the user's decision).** The turn
+  boundary made bulk sorting impossible for small models: earlier folder
+  results are pruned from later requests (HistoryPruning), so after the user
+  confirmed the model re-read the folder for the names it needed -- and was
+  refused again, every turn (a user's E2B sorting Downloads). Now
+  `change_files` runs after file, folder or web text in the turn (only
+  pinned files keep it off), and the human review is the barrier:
+  - its items are marked `afterRead`; the review says above Approve
+    "Proposed right after reading your files: check each of these N
+    changes";
+  - a Trash among them starts unticked and is never ticked for the user
+    (not even a copy found identical); moves and new folders start ticked
+    (Undo takes them back);
+  - nothing runs without Approve, inside the chat's grants only, as before.
+  The trade: an instruction hidden in a file's name or text can now put a
+  move into the plan in the same turn; what stops it is the user reading
+  the flagged plan.
 
 ## Plan
 

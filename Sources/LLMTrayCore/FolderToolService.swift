@@ -495,7 +495,9 @@ public final class FolderToolService: @unchecked Sendable {
     /// added to the chat's pending plan -- nothing changes (Hardening 3).
     /// Asks for a change grant for the folders the ops need and have none
     /// for (`maxPromptsPerCall` at most). Temporary chats can't change files.
-    public func propose(_ ops: [FolderTools.RawOp], chat: FolderChat, callKey: String, ask: Ask,
+    /// `afterRead`: proposed after file, folder or web text in the turn --
+    /// its items are marked so (adr/0014, Hardening 2).
+    public func propose(_ ops: [FolderTools.RawOp], chat: FolderChat, callKey: String, ask: Ask, afterRead: Bool = false,
                         isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.changeName
         if chat.temporary { return .refused("Temporary chats can only look at files, not change them. Answer in text.") }
@@ -607,13 +609,19 @@ public final class FolderToolService: @unchecked Sendable {
         // Stopped, or the chat left, meanwhile: nothing lands in a plan
         // nobody sees (a later proposal would carry it along).
         if isCancelled() || hasEnded(chat.id) { return .refused("Cancelled by the user.") }
-        let plan = result.items.isEmpty ? plans.pending(chatID: chat.id) : plans.add(result.items, chatID: chat.id)
+        let marked = afterRead ? result.items.map { item -> PlanItem in var i = item; i.afterRead = true; return i } : result.items
+        let plan = marked.isEmpty ? plans.pending(chatID: chat.id) : plans.add(marked, chatID: chat.id)
         // Ended in between the check and the add: taken out again.
         if hasEnded(chat.id) {
             plans.cancel(chatID: chat.id)
             return .refused("Cancelled by the user.")
         }
-        return .text(proposalText(added: result.items.count, rejected: rejected, ops: ops, plan: plan))
+        var text = proposalText(added: result.items.count, rejected: rejected, ops: ops, plan: plan)
+        if afterRead, !result.items.isEmpty {
+            text += "\nThey were proposed after reading files in this turn, so the review marks them, and any Trash among "
+                + "them starts unticked for the user to tick."
+        }
+        return .text(text)
     }
 
     static func roots(_ r: ChangeRequest) -> [FolderRoot] {
