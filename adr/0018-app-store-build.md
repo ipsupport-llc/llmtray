@@ -245,7 +245,7 @@ Homebrew Python.
 |---|---|
 | chat, the OpenAI-compatible API, projects and RAG, tools, MTP drafters | yes |
 | Voice Lab (mlx-audio) and music (ACE-Step, mlx-audio) | yes, bundled |
-| image generation (mflux): z-image-turbo, FLUX.2 klein generation and editing | yes, bundled: our mflux fork without `opencv-python` and torch (below) |
+| image generation (mflux): z-image-turbo, FLUX.2 klein generation and editing | yes, bundled: mflux from PyPI without `opencv-python` and torch (below) |
 | runtime "Check for Updates" | no: runtimes come with app updates |
 | bundled runtime size | about 1.5–2.5 GB. Allowed; the listing says so |
 

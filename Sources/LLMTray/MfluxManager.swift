@@ -198,7 +198,7 @@ final class MfluxManager: ObservableObject {
     }
 
     /// The mflux version in the venv, from its dist-info folder's name
-    /// (mflux-0.20.0.dist-info) -- no Python started for it.
+    /// (mflux-0.21.0.dist-info) -- no Python started for it.
     private func installedMfluxVersion() -> String? {
         #if APP_STORE
         let site = URL(fileURLWithPath: BundledRuntime.packages)
