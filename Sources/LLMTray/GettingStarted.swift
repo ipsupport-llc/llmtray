@@ -49,17 +49,31 @@ enum GettingStarted {
         addGuideIfPending()
     }
 
+    private static var addingGuide = false
+
     /// The guide into the project, once Project files are on (called again
-    /// when they're turned on).
+    /// when they're turned on, and at launch). Still pending until it's
+    /// among the project's files: a failed or cut-short add is tried again.
     static func addGuideIfPending() {
-        guard UserDefaults.standard[Pref.gettingStartedGuidePending], let project = projectID,
+        guard UserDefaults.standard[Pref.gettingStartedGuidePending], !addingGuide, let project = projectID,
               ProjectIndexer.shared.isEnabled, FileManager.default.fileExists(atPath: guideURL.path) else { return }
-        UserDefaults.standard[Pref.gettingStartedGuidePending] = false
-        Task {
-            await ProjectIndexer.shared.addFiles([guideURL], to: project)
-            // Turned off meanwhile: nothing was added, so again next time.
-            if !ProjectIndexer.shared.isEnabled { UserDefaults.standard[Pref.gettingStartedGuidePending] = true }
+        if hasGuide(project) {
+            UserDefaults.standard[Pref.gettingStartedGuidePending] = false
+            return
         }
+        addingGuide = true
+        Task {
+            let result = await ProjectIndexer.shared.add([guideURL], to: project).first
+            addingGuide = false
+            switch result {
+            case .added, .duplicate: UserDefaults.standard[Pref.gettingStartedGuidePending] = false
+            default: break
+            }
+        }
+    }
+
+    private static func hasGuide(_ project: UUID) -> Bool {
+        (ProjectIndexer.shared.documents[project] ?? []).contains { $0.name == guideName }
     }
 
     /// The project new chats go into: this one, while its card is shown.
@@ -91,9 +105,14 @@ enum GettingStarted {
         }
     }
 
+    /// All four done hides it for good, like Hide: turning a feature off
+    /// later doesn't bring it (and new chats going into the project) back.
     static var cardVisible: Bool {
-        projectID != nil && !UserDefaults.standard[Pref.gettingStartedHidden]
-            && !Step.allCases.allSatisfy { isDone($0, selectedModelID: UserDefaults.standard[Pref.selectedModelID]) }
+        guard projectID != nil, !UserDefaults.standard[Pref.gettingStartedHidden] else { return false }
+        guard Step.allCases.allSatisfy({ isDone($0, selectedModelID: UserDefaults.standard[Pref.selectedModelID]) }) else { return true }
+        // Not while a view is being drawn (this is read there).
+        DispatchQueue.main.async { hideCard() }
+        return false
     }
 
     static func hideCard() { UserDefaults.standard[Pref.gettingStartedHidden] = true }

@@ -54,9 +54,10 @@ final class ChatTabs: ObservableObject {
     }
 
     /// A fresh install's first project takes new chats while its card is
-    /// shown (GettingStarted): the selected tab's new chat goes into it.
-    private func intoDefaultProject() {
-        if let project = GettingStarted.defaultProjectForNewChats, let id = selected.currentSessionID,
+    /// shown (GettingStarted): a tab's new chat (the selected one's by
+    /// default) goes into it.
+    func intoDefaultProject(_ chat: ChatClient? = nil) {
+        if let project = GettingStarted.defaultProjectForNewChats, let id = (chat ?? selected).currentSessionID,
            ChatLibraryStore.shared.library.projectContext(forChat: id) == nil {
             ChatLibraryStore.shared.move(id, to: project)
         }
