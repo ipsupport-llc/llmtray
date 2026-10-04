@@ -1478,6 +1478,9 @@ final class ChatClient: ObservableObject {
             // A proposal went to the chat's plan: its card shows it.
             if call.name == FolderTools.changeName { refreshFolderPlan() }
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
+            // A new image or song changes what other tools would answer
+            // (view_image "no image yet"): earlier answers are stale.
+            if generates { turnCallResults.removeAll() }
             switch result {
             case .text(let text):
                 turnCallResults[repeatKey] = text

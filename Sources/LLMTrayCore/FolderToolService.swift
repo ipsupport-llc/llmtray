@@ -283,11 +283,13 @@ public final class FolderToolService: @unchecked Sendable {
 
     /// A path as the model wrote it, made absolute: `~`, `file://`, `.` and
     /// empty components taken; `..` refused. A relative path is under the
-    /// granted folder of that name, else under the chat's one grant --
-    /// whether or not it exists there yet ("Applications/" as the place to
-    /// move a Downloads file to: a new folder there, not ~/Applications) --
-    /// else under the home folder.
-    func absolute(_ raw: String, usable: [FolderGrant]) throws -> String {
+    /// granted folder of that name, else under the chat's one grant when it
+    /// exists there -- or, for a place things are made or moved to
+    /// (`creating`), whether it exists yet or not ("Applications/" to sort
+    /// Downloads into: a new folder there, not ~/Applications) -- else under
+    /// the home folder (an item to read or move from: "Documents/x" is
+    /// ~/Documents/x).
+    func absolute(_ raw: String, usable: [FolderGrant], creating: Bool = false) throws -> String {
         var p = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if p.hasPrefix("file://") { p = URL(string: p)?.path ?? String(p.dropFirst(7)) }
         if p.utf8.contains(0) { throw PathError.invalid("a path can't contain NUL") }
@@ -299,7 +301,7 @@ public final class FolderToolService: @unchecked Sendable {
             if let named = roots.first(where: { ($0 as NSString).lastPathComponent == first })
                 ?? roots.first(where: { ($0 as NSString).lastPathComponent.caseInsensitiveCompare(first) == .orderedSame }) {
                 p = (named as NSString).deletingLastPathComponent + "/" + p
-            } else if Set(roots).count == 1, let only = roots.first {
+            } else if Set(roots).count == 1, let only = roots.first, creating || Posix.lstatPath(only + "/" + p) != nil {
                 p = only + "/" + p
             } else {
                 p = home + "/" + p
@@ -503,11 +505,13 @@ public final class FolderToolService: @unchecked Sendable {
         let usable = usableGrants(chat, callKey: callKey)
         do {
             for op in ops {
-                let from = try absolute(op.path, usable: usable)
+                // A folder to make, and a move's destination: where things
+                // go, under the chat's grant even before they exist.
+                let from = try absolute(op.path, usable: usable, creating: op.kind == .makeDir)
                 var to: String?
                 if op.kind == .move {
                     if let t = op.to {
-                        to = try absolute(t, usable: usable)
+                        to = try absolute(t, usable: usable, creating: true)
                     } else if let n = op.newName {
                         try SafeFolderWalker.validateName(n)
                         to = (from as NSString).deletingLastPathComponent + "/" + n

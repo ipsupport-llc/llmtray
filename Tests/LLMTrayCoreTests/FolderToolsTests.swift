@@ -73,7 +73,10 @@ final class FolderToolsTests: FolderTestCase {
         // folder to make in the grant, never ~/Applications.
         let g = FolderGrant(root: root, level: .change, lifetime: .until(Date().addingTimeInterval(3600)), created: Date())
         try fm.createDirectory(atPath: base + "/Applications", withIntermediateDirectories: true)
-        XCTAssertEqual(try service.absolute("Applications/", usable: [g]), grant + "/Applications")
+        XCTAssertEqual(try service.absolute("Applications/", usable: [g], creating: true), grant + "/Applications")
+        // Something to read or move from that isn't in the grant: under home, as before.
+        XCTAssertEqual(try service.absolute("Applications/", usable: [g]), base + "/Applications")
+        write("x.dmg", "x")
         XCTAssertEqual(try service.absolute("x.dmg", usable: [g]), grant + "/x.dmg")
         // The grant named first: as before.
         XCTAssertEqual(try service.absolute("grant/x.dmg", usable: [g]), grant + "/x.dmg")
