@@ -171,6 +171,10 @@ final class ChatClient: ObservableObject {
     // A model that keeps calling a tool after being refused (cap reached,
     // tool off) would otherwise loop request -> refusal -> request forever.
     private var toolRoundsThisTurn = 0
+    /// What each call already run in this turn answered, by its name and
+    /// arguments: the same call again (a small model looping on a result it
+    /// didn't follow) gets that answer back, not a second run.
+    private var turnCallResults: [String: String] = [:]
     private let maxToolRoundsPerTurn = 4
 
     init(mflux: MfluxManager? = nil, music: MusicManager? = nil) {
@@ -244,6 +248,7 @@ final class ChatClient: ObservableObject {
         lastTokensPerSecond = nil
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnCallResults = [:]
         turnStats = nil
         tokenEstimator = PromptTokenEstimator()
         lastRequest = nil
@@ -506,6 +511,7 @@ final class ChatClient: ObservableObject {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnCallResults = [:]
         turnStats = nil
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
@@ -715,6 +721,7 @@ final class ChatClient: ObservableObject {
         AudioPlayback.shared.stop(ifAnyOf: messages)   // the song being played may be the one replaced
         toolbox.startTurn()
         toolRoundsThisTurn = 0
+        turnCallResults = [:]
         turnStats = nil
         // The whole last response: assistant turns, tool results and the
         // hidden view_image message, back to the user's own message.
@@ -1265,6 +1272,17 @@ final class ChatClient: ObservableObject {
         }
     }
 
+    /// A call's name and arguments, the keys sorted (the same request
+    /// written in another order is the same call).
+    static func repeatKey(_ call: ToolCall) -> String {
+        guard let data = call.argumentsJSON.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data),
+              let canonical = try? JSONSerialization.data(withJSONObject: obj, options: [.sortedKeys]) else {
+            return call.name + "|" + call.argumentsJSON
+        }
+        return call.name + "|" + String(decoding: canonical, as: UTF8.self)
+    }
+
     private func executeToolCalls(_ calls: [ToolCall], sourceIndex: Int, context: RequestContext, token: Int) async {
         // Read once, before anything acts on them: the declared tool names
         // and the arguments as the tools expect them (a fenced or
@@ -1423,6 +1441,20 @@ final class ChatClient: ObservableObject {
                 messages.append(refusal)
                 continue
             }
+            // The same call as earlier in this turn (not a generator: a new
+            // image or song for the same request is a real ask).
+            let repeatKey = Self.repeatKey(call)
+            let generates = call.name == MusicToolRunner.toolName || ImageToolRunner.runsGenerator(call.name, settings)
+            if !generates, let earlier = turnCallResults[repeatKey] {
+                toolbox.recordRefusal(call)
+                var note = ChatMessage(role: "tool", content: "Not run again: this exact call already ran in this turn and answered:\n"
+                                       + String(earlier.prefix(1200))
+                                       + "\nDon't repeat it. Act on that answer (change what it says to change) or tell the user.",
+                                       toolCallID: call.id)
+                note.isRefusal = true
+                messages.append(note)
+                continue
+            }
             settings = settingsFor(call, currentSettings(context.settings))
             if willActuallyGenerate, call.name == MusicToolRunner.toolName {
                 generatingKind = .music
@@ -1448,8 +1480,10 @@ final class ChatClient: ObservableObject {
             recordToolUsage(call, result, settings: settings, chatModel: context.settings.modelPath, asToolCall: true)
             switch result {
             case .text(let text):
+                turnCallResults[repeatKey] = text
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .refused(let text):
+                turnCallResults[repeatKey] = text
                 var refusal = ChatMessage(role: "tool", content: text, toolCallID: call.id)
                 refusal.isRefusal = true
                 messages.append(refusal)

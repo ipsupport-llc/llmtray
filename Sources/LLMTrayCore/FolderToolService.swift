@@ -283,8 +283,10 @@ public final class FolderToolService: @unchecked Sendable {
 
     /// A path as the model wrote it, made absolute: `~`, `file://`, `.` and
     /// empty components taken; `..` refused. A relative path is under the
-    /// granted folder of that name, under the chat's one grant (when it
-    /// exists there), else under the home folder.
+    /// granted folder of that name, else under the chat's one grant --
+    /// whether or not it exists there yet ("Applications/" as the place to
+    /// move a Downloads file to: a new folder there, not ~/Applications) --
+    /// else under the home folder.
     func absolute(_ raw: String, usable: [FolderGrant]) throws -> String {
         var p = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if p.hasPrefix("file://") { p = URL(string: p)?.path ?? String(p.dropFirst(7)) }
@@ -297,7 +299,7 @@ public final class FolderToolService: @unchecked Sendable {
             if let named = roots.first(where: { ($0 as NSString).lastPathComponent == first })
                 ?? roots.first(where: { ($0 as NSString).lastPathComponent.caseInsensitiveCompare(first) == .orderedSame }) {
                 p = (named as NSString).deletingLastPathComponent + "/" + p
-            } else if Set(roots).count == 1, let only = roots.first, Posix.lstatPath(only + "/" + p) != nil {
+            } else if Set(roots).count == 1, let only = roots.first {
                 p = only + "/" + p
             } else {
                 p = home + "/" + p

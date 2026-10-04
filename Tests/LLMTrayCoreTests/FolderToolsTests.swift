@@ -66,6 +66,21 @@ final class FolderToolsTests: FolderTestCase {
         ToolArgumentParser.parse(json, schema: schema)
     }
 
+    // MARK: Paths
+
+    func testARelativePathGoesUnderTheChatsOneGrantEvenBeforeItExists() throws {
+        // A small model sorting Downloads writes "to": "Applications/": a
+        // folder to make in the grant, never ~/Applications.
+        let g = FolderGrant(root: root, level: .change, lifetime: .until(Date().addingTimeInterval(3600)), created: Date())
+        try fm.createDirectory(atPath: base + "/Applications", withIntermediateDirectories: true)
+        XCTAssertEqual(try service.absolute("Applications/", usable: [g]), grant + "/Applications")
+        XCTAssertEqual(try service.absolute("x.dmg", usable: [g]), grant + "/x.dmg")
+        // The grant named first: as before.
+        XCTAssertEqual(try service.absolute("grant/x.dmg", usable: [g]), grant + "/x.dmg")
+        // No grant: under home, as before.
+        XCTAssertEqual(try service.absolute("Applications/", usable: []), base + "/Applications")
+    }
+
     // MARK: Declaration
 
     func testDeclarationRules() {
