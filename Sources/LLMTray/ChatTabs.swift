@@ -104,6 +104,7 @@ final class ChatTabs: ObservableObject {
             tabs[index].cancel()
             tabs[index].newSession()
             tabsChanged()
+            intoDefaultProject()
             return
         }
         let closed = tabs[index]

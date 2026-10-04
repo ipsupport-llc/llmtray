@@ -35,6 +35,14 @@ final class StandaloneSettingsImportTests: XCTestCase {
         }
     }
 
+    func testTheGettingStartedProjectsKeysStay() {
+        // They name a project of this install's library.
+        for key in [Pref.gettingStartedProject.name, Pref.gettingStartedGuidePending.name,
+                    Pref.gettingStartedWrote.name, Pref.gettingStartedHidden.name] {
+            XCTAssertFalse(StandaloneImport.isImportedSetting(key), key)
+        }
+    }
+
     func testReadsABinaryPreferencesFile() throws {
         let file: [String: Any] = ["llmtray.port": 9000, "llmtray.allowLAN": true, "selectedModelID": "m",
                                    "llmtray.telemetry.installID": "abc", "NSWindow Frame x": "0 0 1 1"]

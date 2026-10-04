@@ -55,7 +55,11 @@ enum GettingStarted {
         guard UserDefaults.standard[Pref.gettingStartedGuidePending], let project = projectID,
               ProjectIndexer.shared.isEnabled, FileManager.default.fileExists(atPath: guideURL.path) else { return }
         UserDefaults.standard[Pref.gettingStartedGuidePending] = false
-        Task { await ProjectIndexer.shared.addFiles([guideURL], to: project) }
+        Task {
+            await ProjectIndexer.shared.addFiles([guideURL], to: project)
+            // Turned off meanwhile: nothing was added, so again next time.
+            if !ProjectIndexer.shared.isEnabled { UserDefaults.standard[Pref.gettingStartedGuidePending] = true }
+        }
     }
 
     /// The project new chats go into: this one, while its card is shown.
