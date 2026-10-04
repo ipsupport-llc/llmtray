@@ -1444,7 +1444,9 @@ final class ChatClient: ObservableObject {
             // The same call as earlier in this turn (not a generator: a new
             // image or song for the same request is a real ask).
             let repeatKey = Self.repeatKey(call)
-            let generates = call.name == MusicToolRunner.toolName || ImageToolRunner.runsGenerator(call.name, settings)
+            // With the call's own settings (an edited draft's).
+            let generates = call.name == MusicToolRunner.toolName
+                || ImageToolRunner.runsGenerator(call.name, settingsFor(call, currentSettings(context.settings)))
             if !generates, let earlier = turnCallResults[repeatKey] {
                 toolbox.recordRefusal(call)
                 var note = ChatMessage(role: "tool", content: "Not run again: this exact call already ran in this turn and answered:\n"
