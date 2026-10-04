@@ -697,6 +697,7 @@
 "Prompt processing" = "Prompt processing";
 "Prompt size" = "Prompt size";
 "Prompt size (input sent to the model):" = "Prompt size (input sent to the model):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Proposed right after reading your files: check each of these %lld changes before approving.";
 "Public holidays" = "Public holidays";
 "Puts this step back to how it was when setup opened, and goes on." = "Puts this step back to how it was when setup opened, and goes on.";
 "Quantization group size for the KV cache. 64 is a good default." = "Quantization group size for the KV cache. 64 is a good default.";
@@ -906,6 +907,7 @@
 "Thanks! Your review will appear after moderation." = "Thanks! Your review will appear after moderation.";
 "That folder can't be shared with the chat: %@" = "That folder can't be shared with the chat: %@";
 "That isn't LLMTray's folder" = "That isn't LLMTray's folder";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "The %lld moves to the Trash are unticked: tick the ones you want.";
 "The App Store couldn't confirm the purchase." = "The App Store couldn't confirm the purchase.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";

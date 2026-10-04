@@ -169,29 +169,33 @@ final class FolderToolsTests: FolderTestCase {
         let web = (id: "w", kind: ToolTrust.Kind.guarded)
         let calc = (id: "x", kind: ToolTrust.Kind.ordinary)
         let fresh = ToolTrust.TurnState()
-        // A batch with a folder read: its change and its web call refused up front.
-        XCTAssertEqual(ToolTrust.refusedUpFront([change, read, web, calc], state: fresh), ["c", "w"])
+        // A batch with a folder read: its web call refused up front; its
+        // change runs into the plan, flagged as after a read (Hardening 2,
+        // revised).
+        XCTAssertEqual(ToolTrust.refusedUpFront([change, read, web, calc], state: fresh), ["w"])
         XCTAssertEqual(ToolTrust.refusedUpFront([read, web], state: fresh), ["w"])
-        // A proposal alone runs; beside web, neither (its result names files, web text prompts no change).
+        // A proposal alone runs; beside web, the web call is refused (its result names files).
         XCTAssertEqual(ToolTrust.refusedUpFront([change, calc], state: fresh), [])
-        XCTAssertEqual(ToolTrust.refusedUpFront([change, web], state: fresh), ["c", "w"])
-        // Project file text holds back changes too, and so does web text.
-        XCTAssertEqual(ToolTrust.refusedUpFront([(id: "p", kind: .project), change], state: fresh), ["c"])
-        XCTAssertEqual(ToolTrust.refusedUpFront([web, change], state: fresh), ["c", "w"])
+        XCTAssertEqual(ToolTrust.refusedUpFront([change, web], state: fresh), ["w"])
+        // Project file text and web text: the change runs, flagged.
+        XCTAssertEqual(ToolTrust.refusedUpFront([(id: "p", kind: .project), change], state: fresh), [])
+        XCTAssertEqual(ToolTrust.refusedUpFront([web, change], state: fresh), ["w"])
         var afterWeb = fresh
         afterWeb.record(.guarded)
-        XCTAssertFalse(ToolTrust.allows(.folderChange, afterWeb), "a web result can't prompt a change")
+        XCTAssertTrue(ToolTrust.allows(.folderChange, afterWeb))
+        XCTAssertTrue(ToolTrust.changeIsAfterRead(afterWeb), "a change after web text is flagged")
         XCTAssertTrue(ToolTrust.allows(.guarded, afterWeb), "web after web still runs")
         XCTAssertEqual(FolderTools.declared(featureOn: true, temporaryChat: false, turn: afterWeb, fileTextRoomSpent: false),
                        ["files", "change_files"], "declared, refused when called")
-        // After a folder result in the turn, both stay refused.
+        // After a folder result in the turn: web refused, a change flagged.
         var state = fresh
         state.record(.folderRead)
-        XCTAssertFalse(ToolTrust.allows(.folderChange, state))
+        XCTAssertTrue(ToolTrust.allows(.folderChange, state))
+        XCTAssertTrue(ToolTrust.changeIsAfterRead(state))
+        XCTAssertFalse(ToolTrust.changeIsAfterRead(fresh))
         XCTAssertFalse(ToolTrust.allows(.guarded, state))
         XCTAssertTrue(ToolTrust.allows(.folderRead, state))
-        XCTAssertEqual(ToolTrust.refusedUpFront([change, calc], state: state), ["c"])
-        XCTAssertEqual(ToolTrust.refusalText(for: .folderChange, state), ToolTrust.changeRefusal)
+        XCTAssertEqual(ToolTrust.refusedUpFront([change, calc], state: state), [])
         XCTAssertEqual(ToolTrust.refusalText(for: .guarded, state), ToolTrust.folderRefusal)
         // After a change's result: more changes may come, web may not.
         var proposed = fresh
@@ -545,7 +549,7 @@ final class FolderToolsTests: FolderTestCase {
         let listing = await files("~/grant", user: user)
         turn.record(.folderRead)
         XCTAssertTrue(listing.text.contains("report-2024.pdf") && listing.text.contains("photo.jpg"), listing.text)
-        XCTAssertFalse(ToolTrust.allows(.folderChange, turn), "no change in the turn that read")
+        XCTAssertTrue(ToolTrust.changeIsAfterRead(turn), "a change in the turn that read is flagged")
         // Turn 2 (the user said yes): change_files, asking for the change level.
         turn = ToolTrust.TurnState()
         XCTAssertTrue(ToolTrust.allows(.folderChange, turn))

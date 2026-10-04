@@ -88,15 +88,22 @@ public enum ToolTrust {
     /// one pinned could never pin a second). Unpinning is always allowed.
     public static func allowsPin(_ state: TurnState) -> Bool { !state.hasToolText }
 
-    /// Folder changes may be declared and run: not after file or folder
-    /// text in this turn.
-    public static func allowsChange(_ state: TurnState) -> Bool { !state.hasFileText }
+    /// Folder changes may be declared and run: anytime but with pinned files
+    /// (adr/0014, Hardening 2 as revised 2026-10-04 with the user's approval).
+    /// After file, folder or web text in the turn they still only go to the
+    /// plan, marked as proposed after a read (`changeIsAfterRead`): the
+    /// review says so, and a Trash among them starts unticked.
+    public static func allowsChange(_ state: TurnState) -> Bool { !state.pinnedText }
+
+    /// A change proposed now comes after outside text in the turn: the plan
+    /// review flags it.
+    public static func changeIsAfterRead(_ state: TurnState) -> Bool { state.hasFileText }
 
     /// After a folder read in `state` (a turn in which changes are off from
     /// then on): whether the user's next message turns them back on -- not
     /// while files are pinned. What makes `files` say so (the chat has a
     /// change grant for the folder).
-    public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { !state.pinnedText }
+    public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { false }
 
     /// Whether a call of `kind` may run now.
     public static func allows(_ kind: Kind, _ state: TurnState) -> Bool {
