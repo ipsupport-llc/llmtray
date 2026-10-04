@@ -61,6 +61,10 @@ struct ToolContext {
     /// Asks the user about a folder in the chat (a folder tool's grant
     /// prompt); nil answers: Stop or another chat.
     var askFolderAccess: FolderToolService.Ask? = nil
+    /// The tool results the chat had before the user's latest message: a
+    /// folder read that answers exactly one of them brings nothing new into
+    /// the turn (adr/0014, Hardening 2).
+    var resultsBeforeThisTurn: Set<String> = []
     /// A folder read now turns changes off for the rest of the turn, and the
     /// user's next message turns them back on (set by ChatToolbox): `files`
     /// then says so where the chat may propose changes.
@@ -377,7 +381,15 @@ final class ChatToolbox {
             // Whatever it answers -- file names count as file text too; only
             // content (a search, a read) stops a pin.
             let namesOnly = tool is ProjectFilesTool && ProjectFiles.returnsNamesOnly(arguments.values)
-            defer { if namesOnly { turnTrust.recordProjectNames() } else { turnTrust.record(kind) } }
+            // A folder read that returns exactly what the chat already had
+            // before the user's message -- the listing the plan they just
+            // confirmed was made from -- doesn't keep changes off: nothing
+            // new came in (a small model reads again before acting). Any
+            // difference counts as a read, as before.
+            var unchangedRead = false
+            defer {
+                if namesOnly { turnTrust.recordProjectNames() } else if !unchangedRead { turnTrust.record(kind) }
+            }
             if let problem = Self.argumentError(arguments, tool) { return finish(problem.result, .error(problem.kind)) }
             var context = context
             context.fileTextAllowed = !fileTextRoomSpent
@@ -386,6 +398,8 @@ final class ChatToolbox {
             let result = await tool.run(arguments.values, context: context)
             // A folder read that found no room: no file text for the rest of the turn.
             if tool.folderAccess == .read, case .text(let text) = result, text == ProjectTextBudget.noRoomText { fileTextRoomSpent = true }
+            if kind == .folderRead, case .text(let text) = result,
+               !ToolTrust.readBringsNewText(text, resultsBeforeThisTurn: context.resultsBeforeThisTurn) { unchangedRead = true }
             return finish(result)
         }
         // generate_image, edit_image and generate_music explain their own refusals (the model often keeps

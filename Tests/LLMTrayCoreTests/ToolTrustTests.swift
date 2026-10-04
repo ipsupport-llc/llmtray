@@ -24,4 +24,17 @@ final class ToolTrustTests: XCTestCase {
         XCTAssertFalse(ToolTrust.allowsGuarded(projectTextThisTurn: true))
         XCTAssertEqual(ToolTrust.refusedUpFront([search, calc], projectTextThisTurn: true), [], "project and ordinary tools still run")
     }
+
+    func testAnUnchangedReReadBringsNothingNew() {
+        let listing = "Folder ~/Downloads: 2 items.\na.dmg  1 MB\nb.zip  2 MB"
+        // The listing the confirmed plan came from, read again: no new text.
+        XCTAssertFalse(ToolTrust.readBringsNewText(listing, resultsBeforeThisTurn: [listing, "other"]))
+        // Anything else -- a changed folder, another one, a first read -- does.
+        XCTAssertTrue(ToolTrust.readBringsNewText(listing + "\nc.pdf  3 KB", resultsBeforeThisTurn: [listing]))
+        XCTAssertTrue(ToolTrust.readBringsNewText(listing, resultsBeforeThisTurn: []))
+        // And the barrier itself is unchanged: a read in the turn keeps changes off.
+        var state = ToolTrust.TurnState()
+        state.record(.folderRead)
+        XCTAssertFalse(ToolTrust.allowsChange(state))
+    }
 }

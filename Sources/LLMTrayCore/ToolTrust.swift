@@ -98,6 +98,15 @@ public enum ToolTrust {
     /// change grant for the folder).
     public static func changeWaitsForNextMessage(_ state: TurnState) -> Bool { !state.pinnedText }
 
+    /// A folder read keeps changes off for the rest of the turn -- unless it
+    /// returned exactly a result the chat already had before the user's
+    /// latest message: the listing the plan the user confirmed was made
+    /// from, read again (small models do before acting). Nothing new came
+    /// into the turn; any difference counts as a read.
+    public static func readBringsNewText(_ result: String, resultsBeforeThisTurn: Set<String>) -> Bool {
+        !resultsBeforeThisTurn.contains(result)
+    }
+
     /// Whether a call of `kind` may run now.
     public static func allows(_ kind: Kind, _ state: TurnState) -> Bool {
         switch kind {

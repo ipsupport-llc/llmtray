@@ -335,6 +335,15 @@ took `change_files` for a text editor and wrote a shell script.
 - After its first refusal in a turn `change_files` isn't declared again
   until the user's next message (like a spent generator); the refusal says
   "Don't call it again now".
+- **An unchanged re-read doesn't keep changes off** (2026-10-04): small
+  models read the folder again first thing in the turn after the user
+  confirms, and were refused again, every turn. A `files` result that is
+  exactly one the chat already had before the user's latest message (the
+  listing the confirmed plan came from) brings no new text into the turn,
+  so it isn't recorded as a read (`ToolTrust.readBringsNewText`). Any
+  difference -- a file added or renamed, another folder, a first read --
+  counts as before; a read beside `change_files` in one response is still
+  refused up front.
 
 ## Plan
 

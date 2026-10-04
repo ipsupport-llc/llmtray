@@ -1272,6 +1272,12 @@ final class ChatClient: ObservableObject {
         }
     }
 
+    /// The tool results (not refusals) before the user's latest message.
+    private func toolResultsBeforeLatestUserMessage() -> Set<String> {
+        guard let lastUser = messages.lastIndex(where: { $0.role == "user" }) else { return [] }
+        return Set(messages[..<lastUser].filter { $0.role == "tool" && !$0.isRefusal }.map(\.content))
+    }
+
     /// A call's name and arguments, the keys sorted (the same request
     /// written in another order is the same call).
     static func repeatKey(_ call: ToolCall) -> String {
@@ -1468,6 +1474,7 @@ final class ChatClient: ObservableObject {
             var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
             let chatID = folderChatID
             toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }
+            toolContext.resultsBeforeThisTurn = toolResultsBeforeLatestUserMessage()
             if toolbox.budgetedToolNames.contains(call.name) {
                 // What the next request has room for now, the results before
                 // this one counted: the tool sizes its answer to it.
