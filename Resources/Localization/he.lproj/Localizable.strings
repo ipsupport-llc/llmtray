@@ -699,6 +699,7 @@
 "Prompt processing" = "עיבוד ההנחיה";
 "Prompt size" = "גודל ההנחיה";
 "Prompt size (input sent to the model):" = "גודל ההנחיה (קלט שנשלח למודל):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "מוצעים מיד לאחר קריאת הקבצים שלך: בדוק כל אחת מ־%lld השינויים האלה לפני האישור.";
 "Public holidays" = "חגים רשמיים";
 "Puts this step back to how it was when setup opened, and goes on." = "מחזיר שלב זה למצב שבו היה כשפותח ההתקנה, וממשיך.";
 "Quantization group size for the KV cache. 64 is a good default." = "גודל קבוצת הקוונטיזציה של מטמון KV. 64 היא ברירת מחדל טובה.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "תודה! חוות הדעת שלך תופיע לאחר בדיקה.";
 "That folder can't be shared with the chat: %@" = "לא ניתן לשתף תיקייה זו עם השיחה: %@";
 "That isn't LLMTray's folder" = "זו לא התיקיה של LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "העברות ה־%lld לסל המחזור לא מסומנות: סמן את אלה שברצונך.";
 "The App Store couldn't confirm the purchase." = "App Store לא הצליח לאשר את הרכישה.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "גרסת ה‑App Store של LLMTray פתוחה. סגור אותה קודם (באייקון בשורת התפריטים › Quit), ואז פתח את זו שוב: שתיהן ישתמשו באותו פורט ויטענו מודלים פעמיים.";
 "The Keychain refused to remove the token." = "Keychain סרב להסיר את האסימון.";
@@ -1083,6 +1085,7 @@
 "Use" = "השתמש";
 "Use %lld" = "השתמש ב־%lld";
 "Use Anyway" = "השתמש בכל זאת";
+"Use Default Folder" = "השתמש בתיקיית Default";
 "Use Folder" = "השתמש בתיקייה";
 "Use LM Studio's folder" = "השתמש בתיקייה של LM Studio";
 "Use This Port" = "השתמש בפורט הזה";

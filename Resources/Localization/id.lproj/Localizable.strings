@@ -699,6 +699,7 @@
 "Prompt processing" = "Pemrosesan prompt";
 "Prompt size" = "Ukuran prompt";
 "Prompt size (input sent to the model):" = "Ukuran prompt (input yang dikirim ke model):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Diajukan segera setelah membaca berkas Anda: periksa masing‑masing %lld perubahan ini sebelum menyetujui.";
 "Public holidays" = "Hari libur nasional";
 "Puts this step back to how it was when setup opened, and goes on." = "Mengembalikan langkah ini ke kondisi saat setup dibuka, lalu melanjutkan.";
 "Quantization group size for the KV cache. 64 is a good default." = "Ukuran grup kuantisasi untuk cache KV. 64 adalah default yang baik.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Terima kasih! Ulasan Anda akan muncul setelah dimoderasi.";
 "That folder can't be shared with the chat: %@" = "Folder itu tidak bisa dibagikan dengan chat: %@";
 "That isn't LLMTray's folder" = "Itu bukan folder LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "Ada %lld pemindahan ke Sampah yang belum dicentang: beri centang pada yang Anda inginkan.";
 "The App Store couldn't confirm the purchase." = "App Store tidak dapat mengonfirmasi pembelian.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari App Store sedang terbuka. Tutup terlebih dahulu (ikon di menu bar › Quit), lalu buka yang ini lagi: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
 "The Keychain refused to remove the token." = "Keychain menolak menghapus token.";
@@ -1083,6 +1085,7 @@
 "Use" = "Gunakan";
 "Use %lld" = "Gunakan %lld";
 "Use Anyway" = "Tetap Gunakan";
+"Use Default Folder" = "Gunakan Folder Default";
 "Use Folder" = "Gunakan Folder";
 "Use LM Studio's folder" = "Gunakan folder LM Studio";
 "Use This Port" = "Gunakan Port Ini";

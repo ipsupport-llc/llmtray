@@ -699,6 +699,7 @@
 "Prompt processing" = "Обработка подсказки";
 "Prompt size" = "Размер промпта";
 "Prompt size (input sent to the model):" = "Размер промпта (что отправляется модели):";
+"Proposed right after reading your files: check each of these %lld changes before approving." = "Предложено сразу после просмотра файлов: проверьте каждое из этих %lld изменений перед подтверждением.";
 "Public holidays" = "Праздничные дни";
 "Puts this step back to how it was when setup opened, and goes on." = "Возвращает этот шаг в состояние при открытии настройки и продолжает.";
 "Quantization group size for the KV cache. 64 is a good default." = "Размер группы квантования KV-кэша. 64 — хороший вариант по умолчанию.";
@@ -908,6 +909,7 @@
 "Thanks! Your review will appear after moderation." = "Спасибо! Ваш отзыв появится после модерации.";
 "That folder can't be shared with the chat: %@" = "Эту папку нельзя предоставить чату: %@";
 "That isn't LLMTray's folder" = "Это не папка LLMTray";
+"The %lld moves to the Trash are unticked: tick the ones you want." = "%lld перемещений в корзину не отмечены: отметьте те, которые хотите.";
 "The App Store couldn't confirm the purchase." = "App Store не смог подтвердить покупку.";
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Версия LLMTray из App Store запущена. Сначала закройте её (иконка в строке меню › Quit), затем снова откройте эту: обе будут использовать один порт и загружать модели дважды.";
 "The Keychain refused to remove the token." = "Keychain отказался удалить токен.";
@@ -1083,6 +1085,7 @@
 "Use" = "Использовать";
 "Use %lld" = "Использовать %lld";
 "Use Anyway" = "Использовать всё равно";
+"Use Default Folder" = "Использовать папку по умолчанию";
 "Use Folder" = "Выбрать папку";
 "Use LM Studio's folder" = "Папка LM Studio";
 "Use This Port" = "Использовать этот порт";
