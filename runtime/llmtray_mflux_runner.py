@@ -105,7 +105,7 @@ if arg("--base-model") == "flux2-klein-4b":
 
     # The preview shows each step's predicted clean image, x0 = x_t - sigma_t * v
     # (flow matching): with 4 steps the latents themselves are noise until
-    # the end. mflux 0.20's FLUX.2 loop doesn't hand it to callbacks, so the
+    # the end. mflux's FLUX.2 loop (0.20, 0.21) doesn't hand it to callbacks, so the
     # scheduler step keeps it.
     from mflux.models.common.schedulers.flow_match_euler_discrete_scheduler import FlowMatchEulerDiscreteScheduler
     predicted = {}

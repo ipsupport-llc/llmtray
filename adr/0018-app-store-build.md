@@ -245,7 +245,7 @@ Homebrew Python.
 |---|---|
 | chat, the OpenAI-compatible API, projects and RAG, tools, MTP drafters | yes |
 | Voice Lab (mlx-audio) and music (ACE-Step, mlx-audio) | yes, bundled |
-| image generation (mflux): z-image-turbo, FLUX.2 klein generation and editing | yes, bundled: our mflux fork without `opencv-python` and torch (below) |
+| image generation (mflux): z-image-turbo, FLUX.2 klein generation and editing | yes, bundled: mflux from PyPI without `opencv-python` and torch (below) |
 | runtime "Check for Updates" | no: runtimes come with app updates |
 | bundled runtime size | about 1.5–2.5 GB. Allowed; the listing says so |
 
@@ -254,9 +254,10 @@ and torch. Every `opencv-python` wheel, `-headless` too (checked:
 4.14.0.94), bundles FFmpeg built with `--enable-gpl` plus `libx264` and
 `libx265` (GPL): it can't be in an App Store bundle. mflux uses OpenCV only
 in the ControlNet/OpenPose preprocessors and torch only for PyTorch-format
-weights, but imported both at module load. Our fork
-(`ipsupport-llc/mflux`, branch `llmtray`, from v.0.20.0) -- offered upstream as mflux-community/mflux#782; once released there, the fork goes imports them only
-where they're used, and the App Store build installs mflux without its
+weights, but imported both at module load. Since 0.21.0 mflux imports them
+only where they're used (mflux-community/mflux#787, carrying our #782; our
+fork `ipsupport-llc/mflux` served until that release, 2026-10-04), and the
+App Store build installs mflux from PyPI without its
 dependencies and then all of them but those two
 (`runtime/mflux_runtime.json`; `jinja2`, which torch used to bring along,
 is added). The models LLMTray runs are MLX-native and need neither; checked

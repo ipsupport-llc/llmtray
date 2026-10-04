@@ -54,7 +54,7 @@ aspect ratio (`LLMTrayCore.EditCanvas`).
   PNGs, read while still being written: top rows, black below (9b349c0).
   bd92ccc moved to the streamed runner.
 - **The prompt is on stdin**, not in the arguments `ps` shows.
-- **mflux is pinned** (`MfluxManager.mfluxVersion`, 0.20.0): the runner
+- **mflux is pinned** (`MfluxManager.mfluxVersion`, 0.21.0): the runner
   drives its internals (in-memory model, callbacks). A venv from before
   the pin is brought to it (version read from the dist-info folder,
   53ea7d7); a mismatched one refuses to generate. mlx-audio is pinned to a

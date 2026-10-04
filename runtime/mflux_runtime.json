@@ -1,6 +1,5 @@
 {
-  "repo": "ipsupport-llc/mflux",
-  "pinned_ref": "eb27b4603afb0b1896da4f24a914ac61e8e3802f",
+  "version": "0.21.0",
   "exclude": [
     "torch",
     "opencv-python"
@@ -8,5 +7,5 @@
   "extra": [
     "jinja2"
   ],
-  "_comment": "The App Store build's image runtime (adr/0018 §4): our mflux fork (branch llmtray, from v.0.20.0), which imports OpenCV and torch only where they're used (ControlNet/OpenPose preprocessors, PyTorch-format weights). The MLX-native models LLMTray runs -- z-image-turbo, FLUX.2 klein -- need neither, so mflux is installed without its dependencies and then with every one but 'exclude': opencv-python bundles FFmpeg built with --enable-gpl (x264, x265), which the App Store build can't ship; torch is ~400 MB nothing calls. 'extra': what torch used to bring along that transformers' chat templates need. The standalone build keeps pip-installing mflux==MfluxManager.mfluxVersion from PyPI on the user's Mac. Its pins apply to the whole App Store package set (one resolution with the mlx-lm fork and mlx-audio): mflux 0.20.0 wants mlx >=0.32,<0.33, so moving the mlx-lm fork to mlx 0.33 needs a newer mflux here too."
+  "_comment": "The App Store build's image runtime (adr/0018 §4): mflux from PyPI -- since 0.21.0 it imports OpenCV and torch only where they're used (ControlNet/OpenPose preprocessors, PyTorch-format weights: mflux-community/mflux#787, which carried our #782; our fork ipsupport-llc/mflux is retired). The MLX-native models LLMTray runs -- z-image-turbo, FLUX.2 klein -- need neither, so mflux is installed without its dependencies and then with every one but 'exclude': opencv-python bundles FFmpeg built with --enable-gpl (x264, x265), which the App Store build can't ship; torch is ~400 MB nothing calls. 'extra': what torch used to bring along that transformers' chat templates need. The standalone build pip-installs the same version (MfluxManager.mfluxVersion) with its dependencies on the user's Mac. Its pins apply to the whole App Store package set (one resolution with the mlx-lm fork and mlx-audio): mflux 0.21.0 wants mlx >=0.32,<0.33, so moving the mlx-lm fork to mlx 0.33 needs a newer mflux here too."
 }
