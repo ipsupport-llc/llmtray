@@ -246,6 +246,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         installSignalHandlers()
         setupStatusItem()
         setupPopover()
+        // A fresh install: the "Getting Started" project, a chat open in it.
+        GettingStarted.setUpIfFreshInstall()
         observeStateForIcon()
         NotificationCenter.default.addObserver(
             self, selector: #selector(showServerLogWindow), name: .showServerLog, object: nil

@@ -50,6 +50,11 @@ final class ChatTabs: ObservableObject {
     /// (starting over here would stop its answer).
     func newChat() {
         if selected.isBusy { newTab() } else { selected.newSession() }
+        // A fresh install's first project takes new chats while its card is shown.
+        if let project = GettingStarted.defaultProjectForNewChats, let id = selected.currentSessionID,
+           ChatLibraryStore.shared.library.projectContext(forChat: id) == nil {
+            ChatLibraryStore.shared.move(id, to: project)
+        }
     }
 
     /// A new chat already in `project`: its id is mapped as it's made, in

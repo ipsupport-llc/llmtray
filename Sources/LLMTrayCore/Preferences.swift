@@ -79,6 +79,13 @@ public enum Pref {
     /// Off until turned on in Settings: nothing is indexed, downloaded or
     /// started before, and the project tools aren't declared.
     public static let projectFilesEnabled = PrefKey("llmtray.projectFiles.enabled", default: false)
+    /// The "Getting Started" project made on a fresh install (its id), and
+    /// what its card knows: the LLMTray guide still to add (once Project
+    /// files are on), a message written there, the card hidden.
+    public static let gettingStartedProject = PrefKey<String?>("llmtray.gettingStarted.project", default: nil)
+    public static let gettingStartedGuidePending = PrefKey("llmtray.gettingStarted.guidePending", default: false)
+    public static let gettingStartedWrote = PrefKey("llmtray.gettingStarted.wrote", default: false)
+    public static let gettingStartedHidden = PrefKey("llmtray.gettingStarted.hidden", default: false)
     /// Of the context, and of the memory the weights leave, what pinned
     /// files may take (adr/0012, "Pinned files"), in percent.
     public static let pinnedFilesPercent = PrefKey("llmtray.projectFiles.pinnedPercent", default: 50)

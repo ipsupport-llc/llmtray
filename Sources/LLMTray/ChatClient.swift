@@ -514,6 +514,7 @@ final class ChatClient: ObservableObject {
         turnCallResults = [:]
         turnStats = nil
         messages.append(ChatMessage(role: "user", content: prompt, images: images))
+        GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
     }
 

@@ -130,6 +130,7 @@
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
 "Ask Later" = "Ask Later";
+"Ask about LLMTray" = "Ask about LLMTray";
 "Ask again in two weeks" = "Ask again in two weeks";
 "Ask anything, or try one of these:" = "Ask anything, or try one of these:";
 "Ask first" = "Ask first";
@@ -300,6 +301,7 @@
 "Downloads waiting: %lld" = "Downloads waiting: %lld";
 "Drag chats here, or use a chat's menu" = "Drag chats here, or use a chat's menu";
 "Drag chats or files here, or use a chat's menu" = "Drag chats or files here, or use a chat's menu";
+"Drag documents onto this chat: they join the project, and the model answers from them." = "Drag documents onto this chat: they join the project, and the model answers from them.";
 "Drop chats here to move them to the project" = "Drop chats here to move them to the project";
 "Drop chats or files here to add them to the project" = "Drop chats or files here to add them to the project";
 "Drop files here" = "Drop files here";
@@ -384,6 +386,8 @@
 "Get Started" = "Get Started";
 "Get a Model…" = "Get a Model…";
 "Get one" = "Get one";
+"Getting Started" = "Getting Started";
+"Getting started" = "Getting started";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it.";
@@ -392,13 +396,16 @@
 "Has other names (a hard link): they keep the file." = "Has other names (a hard link): they keep the file.";
 "Help" = "Help";
 "Help improve LLMTray?" = "Help improve LLMTray?";
+"Hide" = "Hide";
 "Hide chats" = "Hide chats";
 "Hide the reasoning" = "Hide the reasoning";
+"Hide these steps for good" = "Hide these steps for good";
 "High quality (larger canvas)" = "High quality (larger canvas)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Highest fidelity, largest download -- a correctness baseline you can trust.";
 "Hourly forecast" = "Hourly forecast";
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Hover the info button under an answer to see the model, speed and how much context it used.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary.";
+"How do I connect my coding agent to LLMTray?" = "How do I connect my coding agent to LLMTray?";
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How it was made" = "How it was made";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
@@ -511,6 +518,7 @@
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make images and edit them." = "Make images and edit them.";
+"Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Makes a new random ID: later reports can't be matched to earlier ones.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it.";
@@ -912,6 +920,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice.";
 "The Keychain refused to remove the token." = "The Keychain refused to remove the token.";
 "The Keychain refused to save the token." = "The Keychain refused to save the token.";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "The LLMTray guide is in this project: ask, for example, how to connect your coding agent.";
 "The MTP drafter has downloaded -- restart the server to use it." = "The MTP drafter has downloaded -- restart the server to use it.";
 "The Mac's chip." = "The Mac's chip.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
@@ -1045,11 +1054,14 @@
 "Turn On Project Files…" = "Turn On Project Files…";
 "Turn On…" = "Turn On…";
 "Turn on Project files in Settings to add files to the project and let its chats search them." = "Turn on Project files in Settings to add files to the project and let its chats search them.";
+"Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.";
 "Turn on Project files to add files" = "Turn on Project files to add files";
 "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
+"Turn on images, music and voice" = "Turn on images, music and voice";
 "Turn on project files?" = "Turn on project files?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
+"Type a message below and press Return. Try: “What can you do?”" = "Type a message below and press Return. Try: “What can you do?”";
 "Unavailable" = "Unavailable";
 "Uncompressed (WAV)" = "Uncompressed (WAV)";
 "Undo" = "Undo";
@@ -1121,6 +1133,7 @@
 "Web tools on" = "Web tools on";
 "Welcome" = "Welcome";
 "Welcome to LLMTray" = "Welcome to LLMTray";
+"What can you do?" = "What can you do?";
 "What decides which models run well here." = "What decides which models run well here.";
 "What else" = "What else";
 "What happened?" = "What happened?";
@@ -1143,6 +1156,7 @@
 "Words only" = "Words only";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read.";
 "Works offline" = "Works offline";
+"Write here" = "Write here";
 "Writing the song…" = "Writing the song…";
 "Yesterday" = "Yesterday";
 "You" = "You";
@@ -1214,6 +1228,8 @@
 "tight fit" = "tight fit";
 "trash %lld" = "trash %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.";
+"turn on in Settings" = "turn on in Settings";
+"turn on in Settings to add the LLMTray guide" = "turn on in Settings to add the LLMTray guide";
 "until %@" = "until %@";
 "used %@" = "used %@";
 "used by %@" = "used by %@";

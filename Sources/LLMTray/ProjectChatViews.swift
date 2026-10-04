@@ -70,6 +70,12 @@ struct ProjectChatStatusLine: View {
             HStack(spacing: 6) {
                 dot
                 Text("Project files are off")
+                dot
+                // What a click on the line does: Settings › Files.
+                Text(GettingStarted.isProject(project)
+                     ? NSLocalizedString("turn on in Settings to add the LLMTray guide", comment: "a project chat's status line: Getting Started's guide waits for Project files")
+                     : NSLocalizedString("turn on in Settings", comment: "a project chat's status line: Project files are off"))
+                    .foregroundColor(.accentColor)
             }
         } else {
             let docs = indexer.documents[project] ?? []
