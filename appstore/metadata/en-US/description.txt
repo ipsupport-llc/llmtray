@@ -1,0 +1,40 @@
+LLMTray runs AI models on your Mac. Chat, draw pictures, make songs and give your apps an OpenAI-compatible API, all on Apple silicon, with no account and no cloud.
+
+LESS DATA CENTER. MORE MAC.
+Your Mac is already a capable AI machine. LLMTray puts it to work: the models run right here, so your prompts, files and results never leave it, and nothing waits in a server queue.
+
+CHAT WITH OPEN MODELS
+• Pick a model that fits your Mac: a guided setup suggests the right size for your memory.
+• Download more MLX models from Hugging Face in Settings.
+• Models that see read your images; models that reason show their thought process.
+• Tabs, history, search, temporary chats and automatic compaction of long chats.
+
+YOUR FILES, WITH SOURCES
+• Projects group chats with their own instructions and documents.
+• Drop PDFs, Word, Markdown and text files into a project: the model searches them and cites the pages it used.
+• Pin a short reference so every answer in the project sees it.
+
+IMAGES AND SONGS, MADE ON YOUR MAC
+• Ask for a picture in the chat: it is drawn right on your Mac.
+• Edit an image by attaching it and saying what to change.
+• Make a song with vocals and lyrics, or an instrumental, from a short description.
+• Creator mode lets you adjust the prompt, size and model before anything is made.
+
+TOOLS THAT STAY UNDER YOUR CONTROL
+• Built-in tools for date and time, a calculator, and, only if you turn them on, web search, news, Wikipedia, weather and more.
+• Let a chat tidy a folder you allow: it proposes new folders, moves and renames, and nothing changes until you approve. Undo takes it back.
+
+CONNECT YOUR CODING AGENTS AND APPS
+• LLMTray serves an OpenAI-compatible API on your Mac (localhost). Point any app or coding agent that speaks the OpenAI API at it.
+• Each model gets a short alias; apps can switch models by name.
+• Network access for other devices is off unless you turn it on.
+
+MADE FAST
+• Per-model profiles for sampling, KV cache quantization and speculative decoding.
+• A built-in benchmark measures your Mac and can tune the server for it.
+
+NOTHING YOU DIDN'T ASK FOR
+• Every heavy feature is off until you turn it on, and nothing is downloaded before you choose it.
+• No account, no ads, no tracking. Anonymous usage statistics are optional and can be turned off in Settings.
+
+Requires a Mac with Apple silicon (M1 or later). Models need free memory and disk space: the setup shows each one's size before you download it.

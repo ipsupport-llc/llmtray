@@ -370,3 +370,5 @@ M5, one after the other:
 5. **Tips** ([0017](0017-supporters.md)) in the App Store flavor.
 6. **TestFlight for Mac** (internal testers), then submission with review
    notes (§5).
+
+How to build, upload and publish each App Store version: [RELEASING.md](../RELEASING.md).

@@ -1,0 +1,1 @@
+local ai,llm,offline,private,chatbot,mlx,image generator,music,openai api,rag,coding,agent,model

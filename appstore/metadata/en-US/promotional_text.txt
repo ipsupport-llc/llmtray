@@ -1,0 +1,1 @@
+Run open AI models on your own Mac: chat, draw, make songs and serve an OpenAI-compatible API to your apps. Private, offline-ready, and fast on Apple silicon.
