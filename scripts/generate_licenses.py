@@ -13,7 +13,7 @@ Writes <out>/Licenses.json (what the About window lists) and
         Appends the bundled Python runtime (Full build): CPython, with the
         summary of changes PSF §3 asks for, the licenses of the libraries
         the framework ships (`extra` files: python.org's license page for
-        OpenSSL, expat, libffi, ...; Tcl/Tk; zstd; ncurses), and every
+        OpenSSL, expat, libffi, ...; zstd; ncurses), and every
         package in the venv this runs from, with the license files it
         ships. A package that ships none but declares Apache-2.0 gets the
         Apache text; any other gets a pointer to its project page and a

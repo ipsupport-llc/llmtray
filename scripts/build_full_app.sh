@@ -232,9 +232,9 @@ fi
 # venv (mflux_venv) this way: its opencv-python bundles GPL codecs.
 echo "--- writing third-party notices for the vendored runtime ---"
 # The framework's own libraries: python.org's license page (OpenSSL, expat,
-# libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, Tcl/Tk
-# from their frameworks, and libzstd / ncurses (dylibs the page doesn't
-# cover) from scripts/licenses.
+# libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, and
+# libzstd / ncurses (dylibs the page doesn't cover) from scripts/licenses.
+# (Tcl/Tk isn't shipped: removed above.)
 # Tcl/Tk with tkinter and IDLE out, in both builds (before the license list,
 # so it lists only what ships): LLMTray has no Tk UI. Their frameworks carry
 # unsigned files (*Config.sh, stub .a, headers): App Store Connect refuses
