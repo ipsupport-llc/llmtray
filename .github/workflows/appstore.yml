@@ -82,10 +82,23 @@ jobs:
           rm -f "$RUNNER_TEMP/appstore.p12"
           security set-key-partition-list -S apple-tool:,apple:,codesign:,productbuild: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
           security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
-          # By hash: names can repeat (a renewed certificate next to the old one).
-          APP_ID="$(security find-identity -v -p codesigning "$KEYCHAIN" | awk '/"Apple Distribution: /{print $2; exit}')"
+          # By hash: names can repeat (a renewed certificate next to the old
+          # one). The Apple Distribution identity must be one the profile
+          # lists, or App Store Connect refuses the upload.
+          security cms -D -i "$RUNNER_TEMP/appstore.provisionprofile" > "$RUNNER_TEMP/profile.plist"
+          ALLOWED=""
+          COUNT="$(plutil -extract DeveloperCertificates raw "$RUNNER_TEMP/profile.plist")"
+          for ((i = 0; i < COUNT; i++)); do
+            ALLOWED+=" $(plutil -extract "DeveloperCertificates.$i" raw "$RUNNER_TEMP/profile.plist" | base64 --decode \
+              | openssl x509 -inform der -noout -fingerprint -sha1 | cut -d= -f2 | tr -d :)"
+          done
+          rm -f "$RUNNER_TEMP/profile.plist"
+          APP_ID=""
+          for hash in $(security find-identity -v -p codesigning "$KEYCHAIN" | awk '/"Apple Distribution: /{print $2}'); do
+            [[ " $ALLOWED " == *" $hash "* ]] && { APP_ID="$hash"; break; }
+          done
+          [[ -n "$APP_ID" ]] || { echo "error: no Apple Distribution identity in APPSTORE_P12_BASE64 is in the provisioning profile (profile allows:$ALLOWED)" >&2; exit 1; }
           PKG_ID="$(security find-identity -v "$KEYCHAIN" | awk '/"3rd Party Mac Developer Installer: /{print $2; exit}')"
-          [[ -n "$APP_ID" ]] || { echo "error: no Apple Distribution identity in APPSTORE_P12_BASE64" >&2; exit 1; }
           [[ -n "$PKG_ID" ]] || { echo "error: no 3rd Party Mac Developer Installer identity in APPSTORE_P12_BASE64" >&2; exit 1; }
           {
             echo "SIGN_IDENTITY=$APP_ID"

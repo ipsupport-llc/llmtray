@@ -34,6 +34,8 @@ Tags `v*` are admin-only. Never retag a published version: make a new one.
 | `APPSTORE_P12_PASSWORD` | That `.p12`'s password. |
 | `APPSTORE_PROFILE_BASE64` | The "LLMTray App Store" Mac App Store provisioning profile (developer.apple.com > Profiles). |
 
+The Apple Distribution certificate in the `.p12` must be **the one the profile lists** (a profile names its certificates; a second certificate with the same name won't do). The workflow checks it and stops with "no Apple Distribution identity … is in the provisioning profile" otherwise. To see which one: `security cms -D -i <profile> | plutil -extract DeveloperCertificates.0 raw - | base64 -d | openssl x509 -inform der -noout -fingerprint -sha1 -enddate`, and compare with `security find-identity -v`.
+
 ```bash
 base64 -i appstore.p12 | gh secret set APPSTORE_P12_BASE64 -R ipsupport-llc/llmtray
 gh secret set APPSTORE_P12_PASSWORD -R ipsupport-llc/llmtray
