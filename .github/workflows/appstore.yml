@@ -123,8 +123,17 @@ jobs:
           done < <(find "$APP" -type f -print0)
           echo "Mach-O files: $total, unsigned: $unsigned"
           [[ "$unsigned" == 0 ]]
-          LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" \) | head -1)"
+          LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) | head -1)"
           [[ -z "$LEFT" ]] || { echo "error: $LEFT" >&2; exit 1; }
+          # ITMS-90332: every link resolves, inside the app.
+          ROOT="$(cd "$APP" && pwd -P)"
+          while IFS= read -r -d '' link; do
+            target="$(cd "$(dirname "$link")" && realpath "$(readlink "$link")" 2>/dev/null || true)"
+            [[ -n "$target" && -e "$target" && "$target" == "$ROOT"/* ]] || { echo "error: link to nothing or outside the app: ${link#$APP/}" >&2; exit 1; }
+          done < <(find "$APP" -type l -print0)
+          # ITMS-91109: no quarantine (or any other) extended attribute.
+          XATTRS="$(xattr -lr "$APP" | head -3)"
+          [[ -z "$XATTRS" ]] || { echo "error: extended attributes in the app: $XATTRS" >&2; exit 1; }
           SHORT="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist")"
           BUNDLE="$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP/Contents/Info.plist")"
           ID="$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist")"

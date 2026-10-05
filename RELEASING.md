@@ -54,7 +54,7 @@ When a certificate or the profile expires (yearly), export again and replace the
    - The app is built from the tag; the build scripts from `main` (packaging fixes apply to older tags too).
    - The job checks the bundle (every Mach-O signed, no `.o`/`.a`, version, bundle id, installer signature) and attaches **`LLMTray-X.Y.Z-AppStore.pkg`** as the run's artifact (kept 30 days).
 3. **Upload:** download the artifact, unzip, open **Transporter** (signed in with an Apple ID of the IPSupport LLC team), drag the `.pkg` in, **Deliver**. Nothing uploads automatically.
-4. Wait for *Delivered* then *Processing* (10–30 min, an email when done). The build shows up under TestFlight > macOS. Export compliance: standard HTTPS only ("None of the algorithms mentioned above"; the Info.plist already answers it).
+4. Wait for *Delivered* then *Processing* (10–30 min, an email when done). Processing can still **fail** after *Delivered*, by email: fix, then upload again with a **higher build number** (a delivered build number is used up even when its processing failed). The build shows up under TestFlight > macOS. Export compliance: standard HTTPS only ("None of the algorithms mentioned above"; the Info.plist already answers it).
 5. **The version page in App Store Connect:** select the build, then fill in what's new. Metadata is kept in this repo:
    - `appstore/metadata/en-US/`: `promotional_text.txt` (≤170), `description.txt` (≤4000), `keywords.txt` (≤100, comma-separated, no other products' names), `urls.txt`, `review_notes.txt` (App Review Information > Notes).
    - `appstore/screenshots/`: 2880×1800, sRGB, no alpha — upload in file order.
@@ -81,7 +81,9 @@ codesign --verify --deep --strict "$APP"
 find "$APP" -type f -print0 | while IFS= read -r -d '' f; do
   file "$f" | grep -q Mach-O && { codesign -v "$f" 2>/dev/null || echo "UNSIGNED $f"; }
 done
-find "$APP" \( -name '*.o' -o -name '*.a' \)          # must print nothing
+find "$APP" \( -name '*.o' -o -name '*.a' -o -name '*Config.sh' \)   # must print nothing
+find "$APP" -type l ! -exec test -e {} \; -print      # links to nothing: must print nothing
+xattr -lr "$APP"                                       # must print nothing (no quarantine)
 ```
 
 The bundled Python is signed with `inherit` and exits 133 outside the app. To smoke-test it, copy the app, ad-hoc re-sign `bin/python3.X` in the copy, run it with `PYTHONPATH=…/Contents/Resources/python-packages`.
@@ -102,6 +104,8 @@ Titles, subtitles and crops are in the script's `shots` list.
 |---|---|
 | Transporter: *No suitable application records were found. Verify your bundle identifier "us.ipsupport.llmtray.appstore"* | The App Store Connect record has the website build's bundle id, or Transporter is signed in with an Apple ID outside the team. See One-time setup. |
 | Transporter: *Invalid Code Signing … python.o must be signed … (90284)* | Unsigned Mach-O files (object files, static libraries) in the bundle. `build_full_app.sh` removes them in the App Store layout; the CI check fails if any is left. |
+| Email after processing: *Invalid Symbolic Link … Tk.framework/PrivateHeaders (90332)*, *tkConfig.sh must be signed (90284)* | Tcl/Tk in the bundle. The App Store build removes Tcl/Tk, tkinter and IDLE, and any link to nothing. |
+| Email after processing: *com.apple.quarantine extended file attribute … embedded.provisionprofile (91109)* | The profile (or another file) was downloaded in a browser. The build clears all extended attributes (`xattr -cr`) before signing. |
 | A re-upload is refused as a duplicate build | Same `CFBundleVersion`: run the workflow again with a higher `build_number`. |
 | Local `build_full_app.sh` on macOS 27: `Killed: 9` while creating the venv, and `.build/app/LLMTray.app` disappears | macOS 27 kills an ad-hoc-signed binary run inside a bundle already signed with Developer ID, and removes the bundle. Build the base unsigned (`env -u SIGN_IDENTITY ./scripts/build_app.sh`), then run `build_full_app.sh` with `SIGN_IDENTITY` (it signs everything at the end). CI (macOS 15) isn't affected. |
 | A fresh install isn't treated as fresh (no Getting Started project) | Leftovers of an earlier install: `defaults delete us.ipsupport.llmtray` and move `~/Library/Application Support/LLMTray/{sessions,projects}` aside. |
