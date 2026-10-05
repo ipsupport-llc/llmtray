@@ -370,7 +370,7 @@ private struct ListingSheet: View {
                 }
             }
             TextField("Name to show (up to 40 characters)", text: $name)
-            TextField("Link (optional, https://…)", text: $link)
+            TextField("Your site or profile (optional, https://…)", text: $link)
             if let result { Text(verbatim: message(result)).font(.callout).foregroundStyle(result == .accepted ? .green : .red) }
             HStack {
                 Spacer()
