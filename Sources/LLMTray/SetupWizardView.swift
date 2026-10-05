@@ -27,7 +27,7 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
         let model = SetupWizardModel(queue: queue, server: server, automatic: automatic, startServer: startServer,
                                      serverLog: { [weak server] in server?.appendLog($0) })
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 680, height: 600),
+            contentRect: NSRect(x: 0, y: 0, width: 680, height: SetupWizardView.height),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -76,6 +76,14 @@ extension SetupStep {
 struct SetupWizardView: View {
     @ObservedObject var model: SetupWizardModel
 
+    /// Tall enough for the welcome page without scrolling; less on a short
+    /// screen (a "Larger Text" scaling leaves ~600 pt), where the pages
+    /// scroll and the title bar and buttons stay on screen.
+    static var height: CGFloat {
+        let available = (NSScreen.main?.visibleFrame.height ?? 800) - 60   // title bar, a margin
+        return min(600, max(420, available))
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             SetupStepIndicator(current: model.step)
@@ -89,7 +97,7 @@ struct SetupWizardView: View {
             Divider()
             buttons.padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .frame(width: 680, height: 600)
+        .frame(width: 680, height: Self.height)
     }
 
     @ViewBuilder

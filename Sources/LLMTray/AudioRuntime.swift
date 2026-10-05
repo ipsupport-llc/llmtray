@@ -139,8 +139,10 @@ final class AudioRuntime: ObservableObject {
         // Inside the bundle, installed with it: nothing to install.
         #else
         while let running = install {
-            status?(statusText)
+            // Another caller's install: its progress here too.
+            let watch = $statusText.sink { status?($0) }
             _ = try? await running.value
+            watch.cancel()
             // Another caller may have started the next one meanwhile.
             if install == running { install = nil }
         }

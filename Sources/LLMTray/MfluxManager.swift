@@ -194,6 +194,9 @@ final class MfluxManager: ObservableObject {
             } catch let failure as ProcessRunner.Failure {
                 statusText = ""
                 throw MfluxError.processFailed(failure.outputTail)
+            } catch {
+                statusText = ""   // cancelled
+                throw error
             }
         }
         statusText = ""
