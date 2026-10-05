@@ -171,6 +171,8 @@ final class MfluxManager: ObservableObject {
         #if APP_STORE
         // Inside the bundle, installed with it: nothing to install.
         #else
+        // Cleared however it ends (done, failed, cancelled).
+        defer { statusText = "" }
         try FileManager.default.createDirectory(
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
@@ -184,10 +186,17 @@ final class MfluxManager: ObservableObject {
         }
         // Also when an install from before the pin has another version.
         if !FileManager.default.fileExists(atPath: saveBinary) || installedMfluxVersion() != Self.mfluxVersion {
-            statusText = NSLocalizedString("Installing mflux…", comment: "")
-            try await runProcess(venvPython, ["-m", "pip", "install", "--quiet", Self.mfluxRequirement, "huggingface_hub"])
+            let installing = NSLocalizedString("Installing mflux…", comment: "")
+            statusText = installing
+            do {
+                // Minutes on a first run: which package it's on, not a bare "Installing…".
+                try await PipProgress.install(venvPython, [Self.mfluxRequirement, "huggingface_hub"]) { [weak self] detail in
+                    self?.statusText = installing + " " + detail
+                }
+            } catch let failure as ProcessRunner.Failure {
+                throw MfluxError.processFailed(failure.outputTail)
+            }
         }
-        statusText = ""
         #endif
     }
 

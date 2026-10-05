@@ -37,6 +37,7 @@ SOURCES = sorted((ROOT / "Sources" / "LLMTray").glob("*.swift")) + [
     # Core text the app shows as is (already localized there).
     ROOT / "Sources" / "LLMTrayCore" / "WhatsNew.swift",
     ROOT / "Sources" / "LLMTrayCore" / "FeatureMemory.swift",
+    ROOT / "Sources" / "LLMTrayCore" / "PipProgress.swift",
 ]
 LOC = ROOT / "Resources" / "Localization"
 BASE = LOC / "en.lproj" / "Localizable.strings"

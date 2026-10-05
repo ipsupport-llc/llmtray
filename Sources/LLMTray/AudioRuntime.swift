@@ -139,8 +139,10 @@ final class AudioRuntime: ObservableObject {
         // Inside the bundle, installed with it: nothing to install.
         #else
         while let running = install {
-            status?(statusText)
+            // Another caller's install: its progress here too.
+            let watch = $statusText.sink { status?($0) }
             _ = try? await running.value
+            watch.cancel()
             // Another caller may have started the next one meanwhile.
             if install == running { install = nil }
         }
@@ -168,11 +170,18 @@ final class AudioRuntime: ObservableObject {
         }
         let wanted = Self.wantedStamp
         if Self.installedRequirements() != wanted {
-            report(NSLocalizedString("Installing mlx-audio…", comment: ""))
-            try await run(Self.venvPython, ["-m", "pip", "install", "--quiet"] + Self.requirements)
+            let installing = NSLocalizedString("Installing mlx-audio…", comment: "")
+            report(installing)
+            do {
+                // Minutes on a first run: which package it's on, not a bare "Installing…".
+                try await PipProgress.install(Self.venvPython, Self.requirements) { detail in report(installing + " " + detail) }
+            } catch let error as ProcessRunner.Failure {
+                throw RuntimeError.installFailed(error.outputTail)
+            }
             // Every fork commit has the same version number, so pip counts a
             // new tarball URL as already satisfied and keeps the old code:
             // replace the package itself, then check which commit it is.
+            report(installing + " " + NSLocalizedString("finishing", comment: "pip install detail: the last step of an install"))
             try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", "--no-deps", Self.requirements[0]])
             try await run(Self.venvPython, [
                 "-c",
