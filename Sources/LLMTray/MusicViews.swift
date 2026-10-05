@@ -146,59 +146,77 @@ struct AudioClipView: View {
                     .lineLimit(2)
                     .textSelection(.enabled)
             }
-            HStack(spacing: 8) {
-                Button { Self.save(data, prompt: prompt) } label: {
-                    Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
-                }
-                .buttonStyle(.plain)
-                // Icons only: the row must fit the popover.
-                Button { MediaSharing.copyAudio(data, prompt: prompt) } label: {
-                    Image(systemName: "doc.on.doc").font(.system(size: 10))
-                }
-                .buttonStyle(.plain)
-                .help(Text("Copy the song as an audio file"))
-                .accessibilityLabel(Text("Copy"))
-                ShareLink(item: SharedAudio(data: data, prompt: prompt),
-                          preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Music", comment: "") : prompt,
-                                                image: Image(systemName: "music.note"))) {
-                    Image(systemName: "square.and.arrow.up").font(.system(size: 10))
-                }
-                .buttonStyle(.plain)
-                .help(Text("Share…"))
-                .accessibilityLabel(Text("Share…"))
-                if canRegenerate {
-                    Button { action?(.regenerate) } label: {
-                        Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(action == nil)
-                    .help(Text("Another version next to this one (a new seed, the same request)"))
-                    Button { action?(.tweak) } label: {
-                        Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(action == nil)
-                    .help(Text("Change the style, lyrics, model or knobs, then make another version"))
-                }
-                Button { action?(.remove) } label: {
-                    Label("Remove", systemImage: "trash").font(.system(size: 10))
-                }
-                .buttonStyle(.plain)
-                .disabled(action == nil)
-                if let generationSeconds {
-                    Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
-                        .font(.system(size: 10))
-                }
-                if source != nil {
-                    MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
-                }
+            // Titled only at its full width (fixed, so it can't fit by
+            // truncating "Regener…"), else icons.
+            ViewThatFits(in: .horizontal) {
+                actions(titles: true).fixedSize(horizontal: true, vertical: false)
+                actions(titles: false)
             }
-            .foregroundColor(.secondary)
         }
         .padding(10)
         .frame(maxWidth: 420, alignment: .leading)
         .background(Color.gray.opacity(0.10))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    /// The actions under the player; icons only when their titles don't fit
+    /// the card (a narrow popover, a language with long words).
+    private func actions(titles: Bool) -> some View {
+        HStack(spacing: 8) {
+            Button { Self.save(data, prompt: prompt) } label: {
+                Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Save…"))
+            // Icons only: the row must fit the popover.
+            Button { MediaSharing.copyAudio(data, prompt: prompt) } label: {
+                Image(systemName: "doc.on.doc").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Copy the song as an audio file"))
+            .accessibilityLabel(Text("Copy"))
+            ShareLink(item: SharedAudio(data: data, prompt: prompt),
+                      preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Music", comment: "") : prompt,
+                                            image: Image(systemName: "music.note"))) {
+                Image(systemName: "square.and.arrow.up").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .help(Text("Share…"))
+            .accessibilityLabel(Text("Share…"))
+            if canRegenerate {
+                Button { action?(.regenerate) } label: {
+                    Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                }
+                .buttonStyle(.plain)
+                .disabled(action == nil)
+                .help(Text("Another version next to this one (a new seed, the same request)"))
+                Button { action?(.tweak) } label: {
+                    Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                }
+                .buttonStyle(.plain)
+                .disabled(action == nil)
+                .help(Text("Change the style, lyrics, model or knobs, then make another version"))
+            }
+            Button { action?(.remove) } label: {
+                Label("Remove", systemImage: "trash").font(.system(size: 10))
+            }
+            .buttonStyle(.plain)
+            .disabled(action == nil)
+            .help(Text("Remove"))
+            // The info button shows the time too: the row must fit the card.
+            if source != nil {
+                MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
+            } else if let generationSeconds {
+                // No info button (a song from before): the time stays, short when the row is.
+                Text(titles ? String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)
+                            : String(format: NSLocalizedString("%.1f s", comment: "generation time"), generationSeconds))
+                    .font(.system(size: 10))
+                    .help(Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)))
+            }
+        }
+        .labelStyle(ActionLabelStyle(titles: titles))
+        .lineLimit(1)
+        .foregroundColor(.secondary)
     }
 
     static func clock(_ seconds: TimeInterval) -> String {
@@ -329,5 +347,19 @@ struct MediaInfoButton: View {
                          String(format: NSLocalizedString("%.1f s", comment: "generation time"), seconds)))
         }
         return rows
+    }
+}
+
+/// A media card's action: its icon and title, or the icon alone.
+private struct ActionLabelStyle: LabelStyle {
+    let titles: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        if titles {
+            HStack(spacing: 3) { configuration.icon; configuration.title }
+        } else {
+            // The title stays its accessibility label.
+            Label(configuration).labelStyle(.iconOnly)
+        }
     }
 }

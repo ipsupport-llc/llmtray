@@ -68,15 +68,17 @@ struct MessageBubble: View {
 
             if showReasoning && !message.reasoning.isEmpty {
                 // Folded once anything follows it: the answer, a tool call, media.
-                let expanded = reasoningExpanded ?? (message.content.isEmpty && message.toolCalls.isEmpty
-                    && message.images.isEmpty && message.audios.isEmpty)
+                let nothingFollows = message.content.isEmpty && message.toolCalls.isEmpty
+                    && message.images.isEmpty && message.audios.isEmpty
+                let expanded = reasoningExpanded ?? nothingFollows
                 VStack(alignment: .leading, spacing: 3) {
                     Button {
                         reasoningExpanded = !expanded
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: expanded ? "chevron.down" : "chevron.right").imageScale(.small)
-                            Label(message.content.isEmpty ? "Thinking…" : "Thought process", systemImage: "brain")
+                            // A tool call, an image or a song followed: done thinking.
+                            Label(nothingFollows ? "Thinking…" : "Thought process", systemImage: "brain")
                         }
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundColor(.secondary)
