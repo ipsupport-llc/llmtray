@@ -203,9 +203,12 @@ struct AudioClipView: View {
             // The info button shows the time too: the row must fit the card.
             if source != nil {
                 MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
-            } else if titles, let generationSeconds {
-                Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
+            } else if let generationSeconds {
+                // No info button (a song from before): the time stays, short when the row is.
+                Text(titles ? String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)
+                            : String(format: NSLocalizedString("%.1f s", comment: "generation time"), generationSeconds))
                     .font(.system(size: 10))
+                    .help(Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)))
             }
         }
         .labelStyle(ActionLabelStyle(titles: titles))
