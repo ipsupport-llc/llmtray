@@ -92,6 +92,8 @@ swift build
 .build/debug/LLMTray
 ```
 
+Releases (the website build and the Mac App Store build): [RELEASING.md](RELEASING.md).
+
 ## Command line
 
 The app comes with `llmtray`, a command-line tool for terminals, scripts and agents. Install it in **Settings › General › Command-line tool**: it links `~/.local/bin/llmtray` to the copy inside the app, so updates keep it current, and shows the line to add to your shell profile if `~/.local/bin` isn't on your `PATH`.

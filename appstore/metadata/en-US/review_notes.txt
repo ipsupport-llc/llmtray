@@ -1,0 +1,8 @@
+LLMTray runs AI models locally on the Mac. No account or sign-in is needed.
+
+How to try it:
+1. On first launch, the setup assistant suggests a chat model that fits the Mac's memory and downloads it from Hugging Face (huggingface.co) at the user's choice. A small model (about 3 GB) is enough for review.
+2. Chat in the window that opens. Image and music generation are off by default; turn them on in Settings > Profiles (each downloads its model only when turned on).
+3. The OpenAI-compatible server listens on localhost:8765 only. Access from other devices is off unless the user turns it on in Settings > Server.
+
+All prompts, files and generated media stay on the Mac. Optional web tools (search, news, weather) are off until the user enables them. Anonymous usage statistics are optional and can be turned off in Settings > General.
