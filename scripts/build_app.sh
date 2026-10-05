@@ -127,7 +127,7 @@ done
 # a beta can't just reuse "X.Y.Z-beta.N" there.
 BUNDLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
 # App Store: another upload of the same version needs a higher build
-# number (0.8.6 -> 0.8.6.1); BUILD_NUMBER sets it.
+# number (0.8.6 -> 0.8.601: at most three numbers); BUILD_NUMBER sets it.
 if [[ "$APP_STORE" == 1 && -n "${BUILD_NUMBER:-}" ]]; then BUNDLE_VERSION="$BUILD_NUMBER"; fi
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP/Contents/Info.plist"
 if [[ "$APP_STORE" == 1 ]]; then
