@@ -27,7 +27,7 @@ final class SetupWizardWindowController: NSObject, NSWindowDelegate {
         let model = SetupWizardModel(queue: queue, server: server, automatic: automatic, startServer: startServer,
                                      serverLog: { [weak server] in server?.appendLog($0) })
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 680, height: 520),
+            contentRect: NSRect(x: 0, y: 0, width: 680, height: 600),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -89,7 +89,7 @@ struct SetupWizardView: View {
             Divider()
             buttons.padding(.horizontal, 20).padding(.vertical, 12)
         }
-        .frame(width: 680, height: 520)
+        .frame(width: 680, height: 600)
     }
 
     @ViewBuilder
@@ -198,7 +198,7 @@ private struct WelcomeStep: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .frame(maxWidth: .infinity, maxHeight: 220)
+                    .frame(maxWidth: .infinity, maxHeight: 200)
                     .accessibilityLabel(Text("Welcome to LLMTray"))
             } else {
                 StepHeader(Text("Welcome to LLMTray"))

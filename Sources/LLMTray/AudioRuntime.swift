@@ -168,8 +168,14 @@ final class AudioRuntime: ObservableObject {
         }
         let wanted = Self.wantedStamp
         if Self.installedRequirements() != wanted {
-            report(NSLocalizedString("Installing mlx-audio…", comment: ""))
-            try await run(Self.venvPython, ["-m", "pip", "install", "--quiet"] + Self.requirements)
+            let installing = NSLocalizedString("Installing mlx-audio…", comment: "")
+            report(installing)
+            do {
+                // Minutes on a first run: which package it's on, not a bare "Installing…".
+                try await PipProgress.install(Self.venvPython, Self.requirements) { detail in report(installing + " " + detail) }
+            } catch let error as ProcessRunner.Failure {
+                throw RuntimeError.installFailed(error.outputTail)
+            }
             // Every fork commit has the same version number, so pip counts a
             // new tarball URL as already satisfied and keeps the old code:
             // replace the package itself, then check which commit it is.

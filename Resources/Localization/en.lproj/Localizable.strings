@@ -1174,10 +1174,12 @@
 "and %lld more" = "and %lld more";
 "at least %1$@ items, %2$@" = "at least %1$@ items, %2$@";
 "at least %@" = "at least %@";
+"building %@" = "building %@";
 "calls tools" = "calls tools";
 "can look" = "can look";
 "can look and propose changes" = "can look and propose changes";
 "cancelled" = "cancelled";
+"checking %@" = "checking %@";
 "copy" = "copy";
 "copying" = "copying";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1185,6 +1187,8 @@
 "done" = "done";
 "downloaded" = "downloaded";
 "downloading" = "downloading";
+"downloading %@" = "downloading %@";
+"downloading %@ (%@)" = "downloading %@ (%@)";
 "embedding" = "embedding";
 "failed" = "failed";
 "failed to build request" = "failed to build request";
@@ -1193,6 +1197,7 @@
 "hears audio" = "hears audio";
 "in LLMTray's own folder" = "in LLMTray's own folder";
 "in an earlier models folder" = "in an earlier models folder";
+"installing %d packages" = "installing %d packages";
 "it isn't a model folder in the models folder" = "it isn't a model folder in the models folder";
 "it's being downloaded" = "it's being downloaded";
 "it's in use or downloading" = "it's in use or downloading";
