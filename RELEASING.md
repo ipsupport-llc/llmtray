@@ -73,7 +73,7 @@ INSTALLER_IDENTITY=<3rd Party Mac Developer Installer identity hash> \
 
 Identity hashes: `security find-identity -v`. Use hashes, not names: renewed certificates repeat the name. Build from a checkout of the tag (`git worktree add <dir> vX.Y.Z`) with current `scripts/` copied in. App Store builds delete `Package.resolved`: restore it (`git checkout -- Package.resolved`) and never commit with `-a` after one.
 
-Check before uploading — the same checks `appstore.yml` runs:
+Check before uploading (most of what `appstore.yml` checks; it also rejects links that point outside the app):
 
 ```bash
 APP=.build/appstore/LLMTray.app
