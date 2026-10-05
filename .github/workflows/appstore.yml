@@ -129,7 +129,7 @@ jobs:
           ROOT="$(cd "$APP" && pwd -P)"
           while IFS= read -r -d '' link; do
             # The link read before the cd: its path is relative to here.
-            rel="$(readlink "$link")"
+            rel="$(readlink "$link" || true)"
             target="$(cd "$(dirname "$link")" && realpath "$rel" 2>/dev/null || true)"
             [[ -n "$target" && -e "$target" && "$target" == "$ROOT"/* ]] || { echo "error: link to nothing or outside the app: ${link#$APP/}" >&2; exit 1; }
           done < <(find "$APP" -type l -print0)
