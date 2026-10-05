@@ -30,6 +30,7 @@
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · downloaded; mlx-audio is installed at the first start";
 "%@ · not downloaded" = "%@ · not downloaded";
 "%@ · partly downloaded" = "%@ · partly downloaded";
+"%@ — in project %@" = "%@ — in project %@";
 "%@ — page %lld" = "%@ — page %lld";
 "%@ → %@ available" = "%@ → %@ available";
 "%@ ★ from %lld reviews" = "%@ ★ from %lld reviews";
