@@ -10,6 +10,9 @@ final class PipProgressTests: XCTestCase {
         XCTAssertEqual(PipProgress.detail(for: "  Downloading sentencepiece-0.2.0.tar.gz (2.6 MB)"), "downloading sentencepiece (2.6 MB)")
         XCTAssertEqual(PipProgress.detail(for: "  Building wheel for antlr4-python3-runtime (pyproject.toml): started"), "building antlr4-python3-runtime")
         XCTAssertEqual(PipProgress.detail(for: "Installing collected packages: mlx, numpy, mflux"), "installing 3 packages")
+        // An archive by URL (mlx-audio at a commit) names no package.
+        XCTAssertEqual(PipProgress.detail(for: "  Downloading ab0b648b2ce6ad261e8bb3203e08b34680eec471.tar.gz (14.3 MB)"), "downloading (14.3 MB)")
+        XCTAssertEqual(PipProgress.detail(for: "  Resuming download mlx-0.29.1-cp314-cp314-macosx_15_0_arm64.whl (12.0 MB/34.5 MB)"), "downloading mlx (34.5 MB)")
     }
 
     func testLinesThatDont() {

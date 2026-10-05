@@ -1189,6 +1189,7 @@
 "downloading" = "downloading";
 "downloading %@" = "downloading %@";
 "downloading %@ (%@)" = "downloading %@ (%@)";
+"downloading (%@)" = "downloading (%@)";
 "embedding" = "embedding";
 "failed" = "failed";
 "failed to build request" = "failed to build request";

@@ -31,17 +31,26 @@ public enum PipProgress {
             let name = package(fromRequirement: String(text.dropFirst("Collecting ".count)))
             return name.isEmpty ? nil : String(format: NSLocalizedString("checking %@", comment: "pip install detail: a package being resolved"), name)
         }
-        if text.hasPrefix("Downloading ") || text.hasPrefix("Using cached ") {
-            let rest = text.hasPrefix("Downloading ") ? text.dropFirst("Downloading ".count) : text.dropFirst("Using cached ".count)
-            let parts = rest.split(separator: " ", maxSplits: 1).map(String.init)
+        if let prefix = ["Downloading ", "Using cached ", "Resuming download "].first(where: text.hasPrefix) {
+            let parts = text.dropFirst(prefix.count).split(separator: " ", maxSplits: 1).map(String.init)
             guard let file = parts.first, !file.hasSuffix(".metadata") else { return nil }
+            // A wheel or sdist names its package; an archive by URL (a
+            // commit's <sha>.tar.gz) doesn't.
             let name = package(fromFile: file)
-            guard !name.isEmpty else { return nil }
-            // "(34.5 MB)" after the file name.
-            if parts.count > 1, let size = parts[1].split(separator: "(").last?.split(separator: ")").first {
-                return String(format: NSLocalizedString("downloading %@ (%@)", comment: "pip install detail: a package and its size"), name, String(size))
+            // "(34.5 MB)" after the file name; resumed: "(12.0 MB/34.5 MB)", its total.
+            let size = parts.count > 1
+                ? parts[1].split(separator: "(").last?.split(separator: ")").first?.split(separator: "/").last.map(String.init)
+                : nil
+            switch (name.isEmpty, size) {
+            case (false, let size?):
+                return String(format: NSLocalizedString("downloading %@ (%@)", comment: "pip install detail: a package and its size"), name, size)
+            case (false, nil):
+                return String(format: NSLocalizedString("downloading %@", comment: "pip install detail: a package"), name)
+            case (true, let size?):
+                return String(format: NSLocalizedString("downloading (%@)", comment: "pip install detail: an archive's size"), size)
+            case (true, nil):
+                return NSLocalizedString("downloading", comment: "pip install detail")
             }
-            return String(format: NSLocalizedString("downloading %@", comment: "pip install detail: a package"), name)
         }
         if text.hasPrefix("Building wheel for ") {
             let name = text.dropFirst("Building wheel for ".count).split(separator: " ").first.map(String.init) ?? ""
