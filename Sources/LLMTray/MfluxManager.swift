@@ -171,6 +171,8 @@ final class MfluxManager: ObservableObject {
         #if APP_STORE
         // Inside the bundle, installed with it: nothing to install.
         #else
+        // Cleared however it ends (done, failed, cancelled).
+        defer { statusText = "" }
         try FileManager.default.createDirectory(
             atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true
         )
@@ -192,14 +194,9 @@ final class MfluxManager: ObservableObject {
                     self?.statusText = installing + " " + detail
                 }
             } catch let failure as ProcessRunner.Failure {
-                statusText = ""
                 throw MfluxError.processFailed(failure.outputTail)
-            } catch {
-                statusText = ""   // cancelled
-                throw error
             }
         }
-        statusText = ""
         #endif
     }
 
