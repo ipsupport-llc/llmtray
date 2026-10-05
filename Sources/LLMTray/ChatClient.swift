@@ -284,7 +284,9 @@ final class ChatClient: ObservableObject {
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
-        titleIsFinal = true
+        // An untitled one (an empty chat kept on disk, e.g. Getting
+        // Started's) still gets its title from its first exchange.
+        titleIsFinal = !file.title.isEmpty
         hasUnsavedChanges = false
     }
 
