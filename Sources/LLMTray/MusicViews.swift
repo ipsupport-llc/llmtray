@@ -168,13 +168,13 @@ struct AudioClipView: View {
                 .accessibilityLabel(Text("Share…"))
                 if canRegenerate {
                     Button { action?(.regenerate) } label: {
-                        Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                        Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10)).lineLimit(1).fixedSize()
                     }
                     .buttonStyle(.plain)
                     .disabled(action == nil)
                     .help(Text("Another version next to this one (a new seed, the same request)"))
                     Button { action?(.tweak) } label: {
-                        Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                        Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10)).lineLimit(1).fixedSize()
                     }
                     .buttonStyle(.plain)
                     .disabled(action == nil)
@@ -185,12 +185,12 @@ struct AudioClipView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(action == nil)
-                if let generationSeconds {
-                    Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
-                        .font(.system(size: 10))
-                }
+                // The info button shows the time too: the row must fit the card.
                 if source != nil {
                     MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }
+                } else if let generationSeconds {
+                    Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds))
+                        .font(.system(size: 10)).lineLimit(1)
                 }
             }
             .foregroundColor(.secondary)
