@@ -181,6 +181,7 @@ final class AudioRuntime: ObservableObject {
             // Every fork commit has the same version number, so pip counts a
             // new tarball URL as already satisfied and keeps the old code:
             // replace the package itself, then check which commit it is.
+            report(installing + " " + NSLocalizedString("finishing", comment: "pip install detail: the last step of an install"))
             try await run(Self.venvPython, ["-m", "pip", "install", "--quiet", "--force-reinstall", "--no-deps", Self.requirements[0]])
             try await run(Self.venvPython, [
                 "-c",
