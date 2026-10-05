@@ -38,6 +38,14 @@ final class TransferRateTests: XCTestCase {
         XCTAssertEqual(rate.add(bytes: 100, total: 1_000, at: 4.5)?.speed ?? 0, 100 / 1.5, accuracy: 0.01)
     }
 
+    func testARestartBetweenSamplesIsSeen() {
+        var rate = TransferRate(window: 10, interval: 1)
+        _ = rate.add(bytes: 0, total: 1_000_000, at: 0)
+        _ = rate.add(bytes: 100_000, total: 1_000_000, at: 0.1)   // not sampled
+        _ = rate.add(bytes: 95_000, total: 1_000_000, at: 0.2)    // one file restarted: still above the last sample
+        XCTAssertNil(rate.add(bytes: 96_000, total: 1_000_000, at: 1.1), "the rate starts over at the restart")
+    }
+
     func testManyCallbacksKeepFewSamples() {
         var rate = TransferRate(window: 10, interval: 1)
         var last: Double = 0
