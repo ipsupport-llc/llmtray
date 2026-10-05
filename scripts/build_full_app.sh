@@ -252,10 +252,10 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   rm -f "$LIB"/lib-dynload/_tkinter.*.so "$VERSIONS_ROOT"/bin/idle3*
   rmdir "$VERSIONS_ROOT/Frameworks" 2>/dev/null || true
   find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
-  # Links to nothing (a framework's headers once its Headers went).
-  find "$APP" -type l ! -exec test -e {} \; -print -delete | sed "s|^$APP/|  removed link |"
-  LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) | head -1)"
+  LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) -print -quit)"
   [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
+  # What ships still imports (the checks above ran before the strip).
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy; print('stripped packages ok')"
 fi
 
 DOC_LICENSE="$WORK_DIR/expanded/Python_Documentation.pkg/Payload/license.html"
@@ -265,6 +265,10 @@ FRAMEWORK_EXTRAS=("$WORK_DIR/python-bundled-licenses.txt")
 while IFS= read -r -d '' terms; do FRAMEWORK_EXTRAS+=("$terms"); done < <(find "$VERSIONS_ROOT/Frameworks" -name license.terms -print0 2>/dev/null)
 FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses/ncurses-COPYING.txt")
 "${LICENSE_PYTHON[@]}" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
+
+# Links to nothing (python.org's Tcl/Tk PrivateHeaders, in both builds):
+# App Store Connect refuses them (ITMS-90332), and xattr -r below fails on one.
+find "$APP" -type l ! -exec test -e {} \; -print -delete | sed "s|^$APP/|  removed link |"
 
 # No extended attributes: a quarantine flag (a provisioning profile or a
 # python.org file downloaded in a browser) is refused by App Store Connect
