@@ -361,7 +361,7 @@ public struct ProjectIngestQueue: Sendable {
 /// "not yet supported"; the extractor then tells the type from the content
 /// (a spreadsheet renamed .txt still ends `unsupported`, never searchable).
 public enum ProjectFileFormats {
-    public static let documents: Set<String> = ["pdf", "docx", "doc", "odt", "rtf", "html", "htm", "xhtml"]
+    public static let documents: Set<String> = ["pdf", "docx", "doc", "odt", "rtf", "html", "htm", "xhtml", "xlsx", "xlsm", "ods"]
     public static let text: Set<String> = [
         "txt", "text", "md", "markdown", "mdown", "mkd", "rst", "org", "adoc", "asciidoc", "tex", "log",
         "csv", "tsv", "json", "jsonl", "ndjson", "yaml", "yml", "toml", "ini", "cfg", "conf", "env", "properties", "xml",

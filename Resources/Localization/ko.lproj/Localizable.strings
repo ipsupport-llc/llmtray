@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "디스크 여유 공간이 부족합니다: %@에 약 %@가 필요하지만 %@만 남아 있습니다.";
 "Not identical to %@: not a duplicate." = "%@와(과) 동일하지 않음: 중복 아님.";
 "Not indexed" = "인덱스되지 않음";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "아직 지원되지 않음: %@. 이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF 및 HTML을 인덱스합니다.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "아직 지원되지 않음: %@. 이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods)을 인덱스합니다.";
 "Nothing new to import" = "가져올 새 항목이 없습니다";
 "Nothing sent yet." = "아직 전송된 항목이 없습니다.";
 "Nothing to change." = "변경할 항목 없음.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "임시 채팅";
 "Temporary chats can only look in folders, for that chat only." = "임시 채팅은 해당 채팅에서만 폴더를 열람할 수 있습니다.";
 "Temporary — not saved" = "임시 — 저장되지 않음";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF 및 HTML 파일이 인덱스됩니다.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods) 파일이 인덱스됩니다.";
 "Thank you!" = "감사합니다!";
 "Thank you! List your name in Supporters?" = "감사합니다! 후원자 명단에 이름을 등록하시겠습니까?";
 "Thanks! Your name will appear once it's been checked." = "감사합니다! 이름은 확인 후 공개됩니다.";

@@ -144,6 +144,8 @@ private struct Extractor {
             try attributed(data, kind: kind)
         case .doc, .rtf:
             try attributed(data, kind: kind)
+        case .xlsx, .ods:
+            for text in try SpreadsheetText.pages(data, kind: kind, caps: caps) { try page(text) }
         case .html:
             // Markup around little text is fine; a file this far past the
             // text cap is not a document.

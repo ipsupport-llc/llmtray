@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостаточно свободного места: %@ требует примерно %@, свободно %@.";
 "Not identical to %@: not a duplicate." = "Не совпадает с %@ — не дубликат.";
 "Not indexed" = "Не проиндексировано";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ещё не поддерживается: %@. Эта версия индексирует текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF и HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Ещё не поддерживается: %@. Эта версия индексирует текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods).";
 "Nothing new to import" = "Нечего импортировать";
 "Nothing sent yet." = "Ещё ничего не отправлено.";
 "Nothing to change." = "Нечего менять.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Временный чат";
 "Temporary chats can only look in folders, for that chat only." = "Временные чаты могут только просматривать папки и только для этого чата.";
 "Temporary — not saved" = "Временный — не сохраняется";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Индексируются файлы: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF и HTML.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Индексируются файлы: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods).";
 "Thank you!" = "Спасибо!";
 "Thank you! List your name in Supporters?" = "Спасибо! Добавить ваше имя в список спонсоров?";
 "Thanks! Your name will appear once it's been checked." = "Спасибо! Ваше имя появится после проверки.";

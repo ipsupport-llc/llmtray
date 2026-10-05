@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁盘空间不足：%@ 需要约 %@，当前可用 %@。";
 "Not identical to %@: not a duplicate." = "与 %@ 不相同：不是重复项。";
 "Not indexed" = "未索引";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "暂不支持：%@。此版本可建立文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF 和 HTML 的索引。";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "暂不支持：%@。此版本可建立文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods） 的索引。";
 "Nothing new to import" = "无可导入的新内容";
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
@@ -902,7 +902,7 @@
 "Temporary chat" = "临时对话";
 "Temporary chats can only look in folders, for that chat only." = "临时聊天只能查看文件夹，且仅限该聊天。";
 "Temporary — not saved" = "临时——未保存";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "会为文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF 和 HTML 文件建立索引。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "会为文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods） 文件建立索引。";
 "Thank you!" = "谢谢！";
 "Thank you! List your name in Supporters?" = "谢谢！要在赞助者中列出你的名字吗？";
 "Thanks! Your name will appear once it's been checked." = "谢谢！你的名字将在审核通过后显示。";

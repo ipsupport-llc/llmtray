@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостатньо вільного місця на диску: %@ потребує приблизно %@, вільно %@.";
 "Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
 "Not indexed" = "Не проіндексовано";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Ще не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF і HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Ще не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods).";
 "Nothing new to import" = "Немає нічого нового для імпорту";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Тимчасовий чат";
 "Temporary chats can only look in folders, for that chat only." = "Тимчасові чати можуть лише переглядати папки, тільки для цього чату.";
 "Temporary — not saved" = "Тимчасовий — не зберігається";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Індексуються файли: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF і HTML.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Індексуються файли: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods).";
 "Thank you!" = "Дякуємо!";
 "Thank you! List your name in Supporters?" = "Дякуємо! Додати ваше ім’я до Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Дякуємо! Ваше ім’я з’явиться після перевірки.";

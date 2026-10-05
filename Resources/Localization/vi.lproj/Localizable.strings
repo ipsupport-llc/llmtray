@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Không đủ dung lượng đĩa trống: %@ cần khoảng %@, hiện có %@.";
 "Not identical to %@: not a duplicate." = "Không giống %@: không phải bản trùng lặp.";
 "Not indexed" = "Chưa lập chỉ mục";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF và HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods).";
 "Nothing new to import" = "Không có gì mới để import";
 "Nothing sent yet." = "Chưa gửi gì.";
 "Nothing to change." = "Không có gì để thay đổi.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Trò chuyện tạm";
 "Temporary chats can only look in folders, for that chat only." = "Cuộc trò chuyện tạm thời chỉ có thể xem trong thư mục, và chỉ cho cuộc trò chuyện đó.";
 "Temporary — not saved" = "Tạm thời — không được lưu";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Các tệp văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF và HTML được lập chỉ mục.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Các tệp văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods) được lập chỉ mục.";
 "Thank you!" = "Cảm ơn!";
 "Thank you! List your name in Supporters?" = "Cảm ơn! Liệt kê tên bạn trong Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Cảm ơn! Tên của bạn sẽ hiển thị sau khi được kiểm duyệt.";

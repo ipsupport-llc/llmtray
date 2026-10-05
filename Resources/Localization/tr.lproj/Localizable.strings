@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Yeterli boş disk alanı yok: %@ yaklaşık %@ gerektiriyor, %@ boş.";
 "Not identical to %@: not a duplicate." = "%@ ile aynı değil: yinelenen değil.";
 "Not indexed" = "Dizine eklenmedi";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF ve HTML dosyalarını dizine alır.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını dizine alır.";
 "Nothing new to import" = "İçe aktarılacak yeni bir şey yok";
 "Nothing sent yet." = "Henüz gönderilen yok.";
 "Nothing to change." = "Değiştirilecek bir şey yok.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Geçici sohbet";
 "Temporary chats can only look in folders, for that chat only." = "Geçici sohbetler yalnızca klasörlere bakabilir, sadece o sohbet için.";
 "Temporary — not saved" = "Geçici — kaydedilmez";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF ve HTML dosyaları dizine alınır.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyaları dizine alınır.";
 "Thank you!" = "Teşekkürler!";
 "Thank you! List your name in Supporters?" = "Teşekkürler! Adınızı Destekçilerde listelemek ister misiniz?";
 "Thanks! Your name will appear once it's been checked." = "Teşekkürler! İsminiz kontrol edildikten sonra görünecek.";

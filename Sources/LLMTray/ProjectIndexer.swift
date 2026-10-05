@@ -287,7 +287,7 @@ final class ProjectIndexer: ObservableObject {
         addNotes[project] = nil
         var notes: [String] = []
         if !sorted.notSupported.isEmpty {
-            notes.append(String(format: NSLocalizedString("Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.",
+            notes.append(String(format: NSLocalizedString("Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).",
                                                           comment: "files refused at add: their names"), Self.nameList(sorted.notSupported)))
         }
         if !sorted.folders.isEmpty {

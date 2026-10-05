@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "لم يتبقَّ مساحة كافية على القرص: %@ يحتاج نحو %@، و%@ متاح.";
 "Not identical to %@: not a duplicate." = "ليس مطابقًا لـ %@: ليس مكررًا.";
 "Not indexed" = "غير مفهرَس";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "غير مدعوم بعد: %@. هذه النسخة تفهرِس النصوص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "غير مدعوم بعد: %@. هذه النسخة تفهرِس النصوص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML وجداول البيانات (xlsx, ods).";
 "Nothing new to import" = "لا يوجد شيء جديد للاستيراد";
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "دردشة مؤقتة";
 "Temporary chats can only look in folders, for that chat only." = "الدردشات المؤقتة يمكنها فقط النظر داخل المجلدات، لتلك الدردشة فقط.";
 "Temporary — not saved" = "مؤقت — غير محفوظ";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "يتم فهرسة ملفات النص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "يتم فهرسة ملفات النص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML وجداول البيانات (xlsx, ods).";
 "Thank you!" = "شكراً لك!";
 "Thank you! List your name in Supporters?" = "شكراً لك! هل تريد إدراج اسمك بين الرعاة؟";
 "Thanks! Your name will appear once it's been checked." = "تمّ، سيظهر اسمك بعد مراجعته.";

@@ -4,9 +4,9 @@ import Foundation
 /// named .docx, a pdf named .txt or a doc named .xls come out as what they
 /// are. Containers (zip, OLE2) are told apart by their members.
 public enum DocumentKind: String, Codable, Equatable, Sendable {
-    case pdf, docx, odt, doc, rtf, html, text
+    case pdf, docx, odt, doc, rtf, html, text, xlsx, ods
     // Recognized, not indexed by this version.
-    case xlsx, pptx, xls, ppt, image
+    case pptx, xls, ppt, image
     case encryptedOffice = "encrypted-office"
     case zip
     case compoundFile = "cfb"
@@ -16,7 +16,7 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
     /// and code (all `text`), the PDF text layer, docx/doc/odt/rtf, HTML.
     public var isSupported: Bool {
         switch self {
-        case .pdf, .docx, .odt, .doc, .rtf, .html, .text: return true
+        case .pdf, .docx, .odt, .doc, .rtf, .html, .text, .xlsx, .ods: return true
         default: return false
         }
     }
@@ -92,6 +92,8 @@ public enum DocumentKind: String, Codable, Equatable, Sendable {
         if zip.entry("ppt/presentation.xml") != nil { return .pptx }
         if let m = try? zip.read("mimetype"), String(decoding: m.prefix(100), as: UTF8.self)
             .hasPrefix("application/vnd.oasis.opendocument.text") { return .odt }
+        if let m = try? zip.read("mimetype"), String(decoding: m.prefix(100), as: UTF8.self)
+            .hasPrefix("application/vnd.oasis.opendocument.spreadsheet") { return .ods }
         // A renamed main part, named only by [Content_Types].xml.
         if let ct = try? zip.read("[Content_Types].xml") {
             let s = String(decoding: ct, as: UTF8.self)

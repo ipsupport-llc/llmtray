@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "空きディスク容量が不足しています：%@ は約 %@ が必要で、%@ の空きがあります。";
 "Not identical to %@: not a duplicate." = "%@ と同一ではないため、重複ではありません。";
 "Not indexed" = "未インデックス";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "未対応です: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML をインデックス化します。";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "未対応です: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化します。";
 "Nothing new to import" = "新しい項目はありません";
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
@@ -902,7 +902,7 @@
 "Temporary chat" = "一時チャット";
 "Temporary chats can only look in folders, for that chat only." = "一時的なチャットは、そのチャットのみでフォルダを参照できます。";
 "Temporary — not saved" = "一時的 — 保存されません";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "テキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML をインデックス化します。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "テキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化します。";
 "Thank you!" = "ありがとうございます！";
 "Thank you! List your name in Supporters?" = "ありがとうございます！Supportersに名前を掲載しますか？";
 "Thanks! Your name will appear once it's been checked." = "ありがとうございます！名前は確認後に表示されます。";
