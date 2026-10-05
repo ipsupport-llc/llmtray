@@ -235,6 +235,29 @@ echo "--- writing third-party notices for the vendored runtime ---"
 # libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, Tcl/Tk
 # from their frameworks, and libzstd / ncurses (dylibs the page doesn't
 # cover) from scripts/licenses.
+# App Store: what App Store Connect refuses, out (before the license list, so
+# it lists only what ships). Nothing runs pip inside this bundle, so nothing
+# builds an extension against the build-time files; the Developer ID build
+# keeps them all (its venv's pip may).
+# - Object files and static libraries (python.o and libpython in
+#   config-X.Y-darwin, numpy's .a): no code signature possible (ITMS-90284).
+# - Tcl/Tk with tkinter and IDLE: LLMTray has no Tk UI, and their frameworks
+#   carry unsigned *Config.sh scripts (90284) and PrivateHeaders links to
+#   nothing (ITMS-90332).
+if [[ "$RUNTIME_LAYOUT" == packages ]]; then
+  LIB="$VERSIONS_ROOT/lib/python$PY_SHORT_VERSION"
+  rm -rf "$LIB/config-$PY_SHORT_VERSION-darwin" \
+    "$VERSIONS_ROOT/Frameworks/Tcl.framework" "$VERSIONS_ROOT/Frameworks/Tk.framework" \
+    "$LIB/tkinter" "$LIB/idlelib" "$LIB/turtledemo" "$LIB/turtle.py"
+  rm -f "$LIB"/lib-dynload/_tkinter.*.so "$VERSIONS_ROOT"/bin/idle3*
+  rmdir "$VERSIONS_ROOT/Frameworks" 2>/dev/null || true
+  find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
+  # Links to nothing (a framework's headers once its Headers went).
+  find "$APP" -type l ! -exec test -e {} \; -print -delete | sed "s|^$APP/|  removed link |"
+  LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) | head -1)"
+  [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
+fi
+
 DOC_LICENSE="$WORK_DIR/expanded/Python_Documentation.pkg/Payload/license.html"
 [[ -f "$DOC_LICENSE" ]] || { echo "error: $DOC_LICENSE not found -- installer layout changed?" >&2; exit 1; }
 textutil -convert txt -output "$WORK_DIR/python-bundled-licenses.txt" "$DOC_LICENSE"
@@ -243,18 +266,10 @@ while IFS= read -r -d '' terms; do FRAMEWORK_EXTRAS+=("$terms"); done < <(find "
 FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses/ncurses-COPYING.txt")
 "${LICENSE_PYTHON[@]}" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
 
-# App Store: build-time-only Mach-O files out. Object files and static
-# libraries (python.o and libpython in config-X.Y-darwin, numpy's and Tcl/Tk's
-# .a) can't carry a code signature, and App Store Connect refuses the upload
-# for any unsigned Mach-O (ITMS-90284). Nothing runs pip inside this bundle,
-# so nothing builds an extension against them; the Developer ID build keeps
-# them (its venv's pip may).
-if [[ "$RUNTIME_LAYOUT" == packages ]]; then
-  rm -rf "$VERSIONS_ROOT/lib/python$PY_SHORT_VERSION/config-$PY_SHORT_VERSION-darwin"
-  find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
-  LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" \) | head -1)"
-  [[ -z "$LEFT" ]] || { echo "error: a build-time Mach-O file is still in the App Store bundle: $LEFT" >&2; exit 1; }
-fi
+# No extended attributes: a quarantine flag (a provisioning profile or a
+# python.org file downloaded in a browser) is refused by App Store Connect
+# (ITMS-91109), and codesign wants none on what it signs.
+xattr -cr "$APP"
 
 echo "--- re-signing app bundle with the added framework + venv ---"
 "$SCRIPT_DIR/codesign_app.sh" "$APP"
