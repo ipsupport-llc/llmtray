@@ -36,10 +36,14 @@ final class ChatTabs: ObservableObject {
     var selected: ChatClient { tabs[selectedIndex] }
 
     /// The saved chats that were open come back, and a new chat is on
-    /// screen -- every launch starts one, as it always has.
+    /// screen -- every launch starts one, as it always has. An empty one
+    /// that came back is that new chat (a project's, kept on disk as it was
+    /// made, e.g. Getting Started's): not a second empty tab next to it.
     private init() {
         restore()
-        tabs.append(makeClient())
+        if tabs.last.map({ $0.messages.isEmpty }) != true {
+            tabs.append(makeClient())
+        }
         selectedIndex = tabs.count - 1
         tabsChanged()
     }
@@ -274,6 +278,13 @@ struct ChatTabStrip: View {
         let select: () -> Void
         let close: () -> Void
         @State private var hovered = false
+        @ObservedObject private var store = ChatLibraryStore.shared
+
+        /// The project the chat is in: a folder on the pill, its name on
+        /// hover (two "New chat" tabs otherwise look the same).
+        private var project: String? {
+            chat.currentSessionID.flatMap { store.library.projectContext(forChat: $0)?.name }
+        }
 
         var body: some View {
             HStack(spacing: 5) {
@@ -281,6 +292,8 @@ struct ChatTabStrip: View {
                     ProgressView().controlSize(.mini)
                 } else if chat.currentSessionID == nil {
                     Image(systemName: "eye.slash").font(.caption2)
+                } else if project != nil {
+                    Image(systemName: "folder").font(.caption2)
                 }
                 Text(title).lineLimit(1).truncationMode(.tail).frame(maxWidth: 160, alignment: .leading)
                 Button(action: close) { Image(systemName: "xmark").font(.system(size: 8, weight: .bold)) }
@@ -299,7 +312,7 @@ struct ChatTabStrip: View {
             .contentShape(Rectangle())
             .onTapGesture(perform: select)
             .onHover { hovered = $0 }
-            .help(title)
+            .help(project.map { String(format: NSLocalizedString("%@ — in project %@", comment: "a tab's tooltip: chat title, project name"), title, $0) } ?? title)
         }
 
         private var title: String {
