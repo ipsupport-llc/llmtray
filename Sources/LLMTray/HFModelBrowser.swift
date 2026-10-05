@@ -179,9 +179,6 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     /// Bumped by every download() and cancelDownload(): an earlier one's
     /// steps still in flight (the file listing) see they're stale.
     private var downloadGeneration = 0
-    // Speed is measured between samples, not per didWriteData call (those
-    // fire far too often for a stable rate) -- these track the last sample
-    // point so publishProgress can rate-limit itself to ~2x/sec.
     /// Speed and time left over the last 10 s (TransferRate), not per chunk.
     nonisolated(unsafe) private var rate = TransferRate()
 
