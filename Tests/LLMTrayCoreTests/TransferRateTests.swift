@@ -28,6 +28,25 @@ final class TransferRateTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(count, 8)
     }
 
+    func testAFileThatStartsOverStartsTheRateOver() {
+        var rate = TransferRate(window: 10, interval: 1)
+        _ = rate.add(bytes: 0, total: 1_000, at: 0)
+        _ = rate.add(bytes: 500, total: 1_000, at: 2)
+        // Restarted from zero: no rate from the old high-water samples...
+        XCTAssertNil(rate.add(bytes: 0, total: 1_000, at: 3))
+        // ...then the new download's own.
+        XCTAssertEqual(rate.add(bytes: 100, total: 1_000, at: 4.5)?.speed ?? 0, 100 / 1.5, accuracy: 0.01)
+    }
+
+    func testManyCallbacksKeepFewSamples() {
+        var rate = TransferRate(window: 10, interval: 1)
+        var last: Double = 0
+        for step in 0..<20_000 {
+            if let r = rate.add(bytes: Int64(step) * 500, total: 100_000_000, at: Double(step) * 0.001) { last = r.speed }
+        }
+        XCTAssertEqual(last, 500_000, accuracy: 25_000)
+    }
+
     func testTimeLeftAndReset() {
         var rate = TransferRate(window: 10, interval: 1)
         XCTAssertNil(rate.add(bytes: 0, total: 100, at: 0), "no rate from one sample")
