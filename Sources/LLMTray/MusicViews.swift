@@ -146,8 +146,10 @@ struct AudioClipView: View {
                     .lineLimit(2)
                     .textSelection(.enabled)
             }
+            // Titled only at its full width (fixed, so it can't fit by
+            // truncating "Regener…"), else icons.
             ViewThatFits(in: .horizontal) {
-                actions(titles: true)
+                actions(titles: true).fixedSize(horizontal: true, vertical: false)
                 actions(titles: false)
             }
         }
@@ -165,6 +167,7 @@ struct AudioClipView: View {
                 Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
             }
             .buttonStyle(.plain)
+            .help(Text("Save…"))
             // Icons only: the row must fit the popover.
             Button { MediaSharing.copyAudio(data, prompt: prompt) } label: {
                 Image(systemName: "doc.on.doc").font(.system(size: 10))
