@@ -243,6 +243,19 @@ while IFS= read -r -d '' terms; do FRAMEWORK_EXTRAS+=("$terms"); done < <(find "
 FRAMEWORK_EXTRAS+=("$SCRIPT_DIR/licenses/zstd-LICENSE.txt" "$SCRIPT_DIR/licenses/ncurses-COPYING.txt")
 "${LICENSE_PYTHON[@]}" "$SCRIPT_DIR/generate_licenses.py" runtime "$APP/Contents/Resources" "$FRAMEWORK_ROOT" "$REPO_ROOT/LICENSE" "${FRAMEWORK_EXTRAS[@]}"
 
+# App Store: build-time-only Mach-O files out. Object files and static
+# libraries (python.o and libpython in config-X.Y-darwin, numpy's and Tcl/Tk's
+# .a) can't carry a code signature, and App Store Connect refuses the upload
+# for any unsigned Mach-O (ITMS-90284). Nothing runs pip inside this bundle,
+# so nothing builds an extension against them; the Developer ID build keeps
+# them (its venv's pip may).
+if [[ "$RUNTIME_LAYOUT" == packages ]]; then
+  rm -rf "$VERSIONS_ROOT/lib/python$PY_SHORT_VERSION/config-$PY_SHORT_VERSION-darwin"
+  find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
+  LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" \) | head -1)"
+  [[ -z "$LEFT" ]] || { echo "error: a build-time Mach-O file is still in the App Store bundle: $LEFT" >&2; exit 1; }
+fi
+
 echo "--- re-signing app bundle with the added framework + venv ---"
 "$SCRIPT_DIR/codesign_app.sh" "$APP"
 
