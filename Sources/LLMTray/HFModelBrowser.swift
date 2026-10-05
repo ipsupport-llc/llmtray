@@ -182,8 +182,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     // Speed is measured between samples, not per didWriteData call (those
     // fire far too often for a stable rate) -- these track the last sample
     // point so publishProgress can rate-limit itself to ~2x/sec.
-    nonisolated(unsafe) private var lastSampleDate: Date?
-    nonisolated(unsafe) private var lastSampleBytes: Int64 = 0
+    /// Speed and time left over the last 10 s (TransferRate), not per chunk.
+    nonisolated(unsafe) private var rate = TransferRate()
 
     override init() {
         super.init()
@@ -341,8 +341,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 pathByTaskID.removeAll()
                 downloadFailed = false
                 totalBytesExpected = entries.reduce(0) { $0 + Int64($1.size ?? 0) }
-                lastSampleDate = nil
-                lastSampleBytes = 0
+                rate.reset()
                 downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
                 for entry in entries {
@@ -399,8 +398,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadStatusText = NSLocalizedString("Downloading…", comment: "")
         // Reset the speed sample so the paused interval itself isn't
         // counted as zero-throughput time in the next rate calculation.
-        lastSampleDate = nil
-        lastSampleBytes = files.values.reduce(0) { $0 + $1.writtenBytes }
+        rate.reset()
         for path in files.keys where files[path]?.isDone == false {
             startTask(forPath: path)
         }
@@ -460,21 +458,9 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             self.downloadProgress = progress
         }
 
-        let now = Date()
-        guard let last = lastSampleDate else {
-            lastSampleDate = now
-            lastSampleBytes = sum
-            return
-        }
-        let dt = now.timeIntervalSince(last)
-        // Rate-limit speed/ETA updates to ~2x/sec -- per-chunk instantaneous
-        // rate is too noisy (chunk sizes vary a lot) to display directly.
-        guard dt >= 0.5 else { return }
-        let speed = Double(sum - lastSampleBytes) / dt
-        lastSampleDate = now
-        lastSampleBytes = sum
-        let remaining = max(0, total - sum)
-        let eta = speed > 0 ? Double(remaining) / speed : nil
+        // A 10 s average, shown once a second: chunk sizes vary a lot, and
+        // a per-chunk (or half-second) rate jumps too much to read.
+        guard let (speed, eta) = rate.add(bytes: sum, total: total, at: ProcessInfo.processInfo.systemUptime) else { return }
         Task { @MainActor in
             self.downloadSpeedBytesPerSec = speed
             self.downloadETASeconds = eta
