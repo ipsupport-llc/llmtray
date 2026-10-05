@@ -245,6 +245,10 @@ rm -rf "$VERSIONS_ROOT/Frameworks/Tcl.framework" "$VERSIONS_ROOT/Frameworks/Tk.f
   "$LIB/tkinter" "$LIB/idlelib" "$LIB/turtledemo" "$LIB/turtle.py"
 rm -f "$LIB"/lib-dynload/_tkinter.*.so "$VERSIONS_ROOT"/bin/idle3*
 rmdir "$VERSIONS_ROOT/Frameworks" 2>/dev/null || true
+# Object files (python.o: only for relinking the interpreter) out of both
+# builds: python.org signs it in extended attributes, which xattr -cr below
+# clears, and notarization then refuses it ("The binary is not signed").
+find "$APP" \( -type f -o -type l \) -name "*.o" -print -delete | sed "s|^$APP/|  removed |"
 if [[ "$RUNTIME_LAYOUT" != packages ]]; then
   "$VENV_DIR/bin/python" -c "import mlx_lm; print('venv after Tcl/Tk strip ok')"
 fi
