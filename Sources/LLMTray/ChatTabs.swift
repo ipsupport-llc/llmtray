@@ -46,6 +46,9 @@ final class ChatTabs: ObservableObject {
         }
         selectedIndex = tabs.count - 1
         tabsChanged()
+        // Into Getting Started while its card is shown, as any new chat --
+        // after this init, which the project's lookups mustn't re-enter.
+        DispatchQueue.main.async { [weak self] in self?.intoDefaultProject() }
     }
 
     // MARK: - Tabs
