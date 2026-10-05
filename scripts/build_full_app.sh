@@ -232,25 +232,29 @@ fi
 # venv (mflux_venv) this way: its opencv-python bundles GPL codecs.
 echo "--- writing third-party notices for the vendored runtime ---"
 # The framework's own libraries: python.org's license page (OpenSSL, expat,
-# libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, Tcl/Tk
-# from their frameworks, and libzstd / ncurses (dylibs the page doesn't
-# cover) from scripts/licenses.
-# App Store: what App Store Connect refuses, out (before the license list, so
-# it lists only what ships). Nothing runs pip inside this bundle, so nothing
-# builds an extension against the build-time files; the Developer ID build
-# keeps them all (its venv's pip may).
-# - Object files and static libraries (python.o and libpython in
-#   config-X.Y-darwin, numpy's .a): no code signature possible (ITMS-90284).
-# - Tcl/Tk with tkinter and IDLE: LLMTray has no Tk UI, and their frameworks
-#   carry unsigned *Config.sh scripts (90284) and PrivateHeaders links to
-#   nothing (ITMS-90332).
+# libffi, zlib, libmpdec, mimalloc, ...) from the installer's docs, and
+# libzstd / ncurses (dylibs the page doesn't cover) from scripts/licenses.
+# (Tcl/Tk isn't shipped: removed above.)
+# Tcl/Tk with tkinter and IDLE out, in both builds (before the license list,
+# so it lists only what ships): LLMTray has no Tk UI. Their frameworks carry
+# unsigned files (*Config.sh, stub .a, headers): App Store Connect refuses
+# them (ITMS-90284), and a Developer ID signature of a well-formed
+# Tk.framework fails on them ("code object is not signed at all").
+LIB="$VERSIONS_ROOT/lib/python$PY_SHORT_VERSION"
+rm -rf "$VERSIONS_ROOT/Frameworks/Tcl.framework" "$VERSIONS_ROOT/Frameworks/Tk.framework" \
+  "$LIB/tkinter" "$LIB/idlelib" "$LIB/turtledemo" "$LIB/turtle.py"
+rm -f "$LIB"/lib-dynload/_tkinter.*.so "$VERSIONS_ROOT"/bin/idle3*
+rmdir "$VERSIONS_ROOT/Frameworks" 2>/dev/null || true
+if [[ "$RUNTIME_LAYOUT" != packages ]]; then
+  "$VENV_DIR/bin/python" -c "import mlx_lm; print('venv after Tcl/Tk strip ok')"
+fi
+
+# App Store: build-time files out too. Nothing runs pip inside this bundle,
+# so nothing builds an extension against them; the Developer ID build keeps
+# them (its venv's pip may). Object files and static libraries (python.o and
+# libpython in config-X.Y-darwin, numpy's .a) can't be signed (ITMS-90284).
 if [[ "$RUNTIME_LAYOUT" == packages ]]; then
-  LIB="$VERSIONS_ROOT/lib/python$PY_SHORT_VERSION"
-  rm -rf "$LIB/config-$PY_SHORT_VERSION-darwin" \
-    "$VERSIONS_ROOT/Frameworks/Tcl.framework" "$VERSIONS_ROOT/Frameworks/Tk.framework" \
-    "$LIB/tkinter" "$LIB/idlelib" "$LIB/turtledemo" "$LIB/turtle.py"
-  rm -f "$LIB"/lib-dynload/_tkinter.*.so "$VERSIONS_ROOT"/bin/idle3*
-  rmdir "$VERSIONS_ROOT/Frameworks" 2>/dev/null || true
+  rm -rf "$LIB/config-$PY_SHORT_VERSION-darwin"
   find "$APP" \( -type f -o -type l \) \( -name "*.o" -o -name "*.a" \) -print -delete | sed "s|^$APP/|  removed |"
   LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) -print -quit)"
   [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
