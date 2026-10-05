@@ -502,7 +502,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler.";
 "Like LLMTray?" = "Like LLMTray?";
 "Likes" = "Likes";
-"Link (optional, https://…)" = "Link (optional, https://…)";
 "List my name" = "List my name";
 "List my name in Supporters" = "List my name in Supporters";
 "Listening…" = "Listening…";
@@ -1167,6 +1166,7 @@
 "Your files" = "Your files";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email.";
 "Your name (optional)" = "Your name (optional)";
+"Your site or profile (optional, https://…)" = "Your site or profile (optional, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (recommended)";
