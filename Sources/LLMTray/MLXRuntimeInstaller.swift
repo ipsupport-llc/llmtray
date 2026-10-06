@@ -122,6 +122,21 @@ final class MLXRuntimeInstaller {
         }
     }
 
+    /// The lookup-only tables the installed runtime's models declare
+    /// (what --mmap-lookup-tables reads from disk).
+    static func declaredLookupTables() -> Set<String> {
+        var names: Set<String> = []
+        for dir in sitePackageDirs {
+            let models = "\(dir)/mlx_lm/models"
+            for file in (try? FileManager.default.contentsOfDirectory(atPath: models)) ?? [] where file.hasSuffix(".py") {
+                guard let text = try? String(contentsOfFile: "\(models)/\(file)", encoding: .utf8),
+                      text.contains("lookup_tables") else { continue }
+                names.formUnion(ModelWeights.declaredLookupTables(inSource: text))
+            }
+        }
+        return names
+    }
+
     static func supportsModelType(_ modelType: String) -> Bool {
         sitePackageDirs.contains { FileManager.default.fileExists(atPath: "\($0)/mlx_lm/models/\(modelType).py") }
     }

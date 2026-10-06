@@ -401,6 +401,57 @@ public enum KVCacheSize {
 /// A model's weights on disk: its `*.safetensors`, through symlinks (a
 /// Hugging Face snapshot links its files to blobs).
 public enum ModelWeights {
+    /// Bytes of the tensors of the named lookup-only tables (a module name
+    /// such as "embed_tokens_per_layer", followed by weight/scales/biases),
+    /// from the safetensors headers: what --mmap-lookup-tables leaves on
+    /// disk.
+    public static func lookupTableBytes(inFolder path: String, tables: Set<String>) -> Int64 {
+        guard !tables.isEmpty, let names = try? FileManager.default.contentsOfDirectory(atPath: path) else { return 0 }
+        return names.filter { $0.hasSuffix(".safetensors") }.reduce(Int64(0)) { sum, name in
+            let file = URL(fileURLWithPath: path).appendingPathComponent(name).resolvingSymlinksInPath()
+            return sum + lookupTableBytes(header: safetensorsHeader(file), tables: tables)
+        }
+    }
+
+    static func lookupTableBytes(header: [String: Any], tables: Set<String>) -> Int64 {
+        header.reduce(Int64(0)) { sum, entry in
+            let parts = entry.key.split(separator: ".")
+            guard parts.count >= 2, ["weight", "scales", "biases"].contains(parts[parts.count - 1]),
+                  tables.contains(String(parts[parts.count - 2])),
+                  let info = entry.value as? [String: Any], let offsets = info["data_offsets"] as? [NSNumber],
+                  offsets.count == 2 else { return sum }
+            return sum + max(0, offsets[1].int64Value - offsets[0].int64Value)
+        }
+    }
+
+    /// A safetensors file's JSON header (empty when unreadable).
+    static func safetensorsHeader(_ url: URL) -> [String: Any] {
+        guard let handle = try? FileHandle(forReadingFrom: url) else { return [:] }
+        defer { try? handle.close() }
+        guard let size = try? handle.read(upToCount: 8), size.count == 8 else { return [:] }
+        let n = size.withUnsafeBytes { $0.loadUnaligned(as: UInt64.self) }.littleEndian
+        // Headers are kilobytes to a few megabytes.
+        guard n > 0, n < 100_000_000, let json = try? handle.read(upToCount: Int(n)), json.count == Int(n) else { return [:] }
+        return (try? JSONSerialization.jsonObject(with: json)) as? [String: Any] ?? [:]
+    }
+
+    /// The `lookup_tables = ("a", "b")` names a runtime's model source
+    /// declares (mlx-lm fork, mapped_embedding).
+    public static func declaredLookupTables(inSource source: String) -> Set<String> {
+        var names: Set<String> = []
+        guard let decl = try? NSRegularExpression(pattern: #"lookup_tables\s*=\s*\(([^)]*)\)"#),
+              let quoted = try? NSRegularExpression(pattern: #"["']([A-Za-z0-9_]+)["']"#) else { return names }
+        let ns = source as NSString
+        for m in decl.matches(in: source, range: NSRange(location: 0, length: ns.length)) {
+            let body = ns.substring(with: m.range(at: 1))
+            let b = body as NSString
+            for q in quoted.matches(in: body, range: NSRange(location: 0, length: b.length)) {
+                names.insert(b.substring(with: q.range(at: 1)))
+            }
+        }
+        return names
+    }
+
     public static func bytes(inFolder path: String) -> Int64 {
         let fm = FileManager.default
         guard let names = try? fm.contentsOfDirectory(atPath: path) else { return 0 }
