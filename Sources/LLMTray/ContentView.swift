@@ -399,7 +399,14 @@ struct ContentView: View {
                 ImageGenerationProgressView().environment(\.visibleChatHeight, chatViewportHeight)
             }
         }
-        if chat.isWaitingForModelLoad {
+        if chat.isWaitingForModelDownload {
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text(NSLocalizedString("The model is still downloading: your message goes out as soon as it's ready.",
+                                       comment: "chat: sent during the first run's model download"))
+                    .font(.callout).foregroundStyle(.secondary)
+            }
+        } else if chat.isWaitingForModelLoad {
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
                 Text(String(format: NSLocalizedString("Loading %@…", comment: "chat: the picked model is starting"),
@@ -648,6 +655,9 @@ struct ContentView: View {
         default: return
         }
         guard !server.isIdleUnloaded, let model = catalog.model(id: selectedModelID) else { return }
+        // Still downloading (its folder shows up before it's whole): the
+        // chat waits, and the download's end starts it.
+        guard !DownloadQueue.isFetching(modelPath: model.path) else { return }
         server.start(modelPath: model.path, port: port, alias: catalog.alias(for: model.id))
     }
 

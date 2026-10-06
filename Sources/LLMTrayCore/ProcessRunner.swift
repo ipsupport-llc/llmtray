@@ -21,13 +21,29 @@ public enum ProcessRunner {
     /// 64 KB and blocks the child forever (a chatty pip install did exactly
     /// that when output was only read after exit) -- passed to `log` when
     /// given, and its tail is kept for the error. `environment`: added to
-    /// the app's own.
+    /// the app's own. `cancellable`: cancelling the calling task terminates
+    /// the child -- for a download into a temporary folder; never for an
+    /// install (pip stopped part way leaves a broken environment).
     public static func run(
         _ executable: String, _ arguments: [String],
         environment: [String: String]? = nil,
+        cancellable: Bool = false,
         log: (@MainActor @Sendable (String) -> Void)? = nil
     ) async throws {
         let tail = OutputTail()
+        let started = StartedProcess()
+        try await withTaskCancellationHandler {
+            try await runChild(executable, arguments, environment: environment, tail: tail,
+                               started: cancellable ? started : nil, log: log)
+        } onCancel: {
+            if cancellable { started.terminate() }
+        }
+    }
+
+    private static func runChild(
+        _ executable: String, _ arguments: [String], environment: [String: String]?,
+        tail: OutputTail, started: StartedProcess?, log: (@MainActor @Sendable (String) -> Void)?
+    ) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             let task = Process()
             task.executableURL = URL(fileURLWithPath: executable)
@@ -65,6 +81,7 @@ public enum ProcessRunner {
             }
             do {
                 try task.run()
+                started?.set(task)
             } catch {
                 pipe.fileHandleForReading.readabilityHandler = nil
                 continuation.resume(throwing: error)
@@ -293,5 +310,29 @@ private final class RunningProcess: @unchecked Sendable {
         let p = process
         lock.unlock()
         if let p, p.isRunning { p.terminate() }
+    }
+}
+
+/// The child of a cancellable run(): terminated on cancel, also when the
+/// cancel comes before it started (it's then terminated as it starts).
+private final class StartedProcess: @unchecked Sendable {
+    private let lock = NSLock()
+    private var process: Process?
+    private var cancelled = false
+
+    func set(_ process: Process) {
+        lock.lock()
+        self.process = process
+        let stopNow = cancelled
+        lock.unlock()
+        if stopNow, process.isRunning { process.terminate() }
+    }
+
+    func terminate() {
+        lock.lock()
+        cancelled = true
+        let process = self.process
+        lock.unlock()
+        if let process, process.isRunning { process.terminate() }
     }
 }

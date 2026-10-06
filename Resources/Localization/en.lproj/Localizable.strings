@@ -964,6 +964,7 @@
 "The model didn't start: %@" = "The model didn't start: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "The model downloaded, but its folder couldn't be marked complete.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "The model is reasoning before it answers (Settings shows the reasoning itself)";
+"The model is still downloading: your message goes out as soon as it's ready." = "The model is still downloading: your message goes out as soon as it's ready.";
 "The model isn't running. Send again to start it." = "The model isn't running. Send again to start it.";
 "The model name API clients send." = "The model name API clients send.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar.";
@@ -1123,6 +1124,7 @@
 "Voice Lab…" = "Voice Lab…";
 "Voice model" = "Voice model";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Wait for the current request or benchmark to finish -- a restart would cut it off.";
+"Waiting for a model download to finish…" = "Waiting for a model download to finish…";
 "Waiting for an image or song to finish…" = "Waiting for an image or song to finish…";
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";

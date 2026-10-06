@@ -140,10 +140,11 @@ final class DownloadQueue: ObservableObject {
 
     // MARK: - Control
 
-    /// Stops `id`: a waiting item never runs; the running chat model's
-    /// download stops. An image, music or drafter download can't be
-    /// stopped part way (it's a pip / snapshot_download child); it finishes
-    /// in the background and its feature is left off.
+    /// Stops `id`: a waiting item never runs; a running chat-model, image
+    /// or music download stops (its temporary folder is removed). A runtime
+    /// install in progress (pip) finishes first: stopped part way it would
+    /// leave a broken environment. A drafter download finishes in the
+    /// background, its model left off.
     func cancel(_ id: UUID) {
         guard state.cancel(id) else { return }
         stopRunning(id)
@@ -172,7 +173,14 @@ final class DownloadQueue: ObservableObject {
     }
 
     private func stopRunning(_ id: UUID) {
-        guard let item = state.item(id), item.kind == .chatModel else { return }
+        guard let item = state.item(id) else { return }
+        // Image and music downloads stop with their task (cancellable
+        // snapshot_download children); the generator is free again after.
+        if [.imageModel, .editModel, .musicModel].contains(item.kind) {
+            runner?.cancel()
+            return
+        }
+        guard item.kind == .chatModel else { return }
         if ownsBrowserDownload, browser.downloadingID == item.target {
             browser.cancelDownload()
         } else {
@@ -185,12 +193,25 @@ final class DownloadQueue: ObservableObject {
 
     // MARK: - Running
 
+    /// The chat model (repo) downloading now: a chat waits for it rather
+    /// than start its half-downloaded folder (first run: the wizard starts
+    /// it once it's in).
+    static private(set) var fetchingChatModel: String?
+
+    /// `path` is the chat model downloading now (its folder is already in
+    /// the models folder, half-written).
+    static func isFetching(modelPath path: String) -> Bool {
+        fetchingChatModel.map { path.hasSuffix("/" + $0) } ?? false
+    }
+
     /// Starts the next item unless one runs.
     private func pump() {
         guard runner == nil, let item = state.startNext() else { return }
         detail = ""
+        Self.fetchingChatModel = item.kind == .chatModel ? item.target : nil
         runner = Task { [weak self] in
             let error = await self?.run(item)
+            Self.fetchingChatModel = nil
             guard let self else { return }
             self.state.finish(item.id, error: error)
             self.detail = ""

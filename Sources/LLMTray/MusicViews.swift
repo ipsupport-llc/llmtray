@@ -275,7 +275,9 @@ struct MusicGenerationProgressView: View {
                 ProgressView().controlSize(.small)
             }
             Image(systemName: "music.note").foregroundColor(.secondary)
-            Text(chat.musicStatusText.isEmpty ? NSLocalizedString("Generating music…", comment: "") : chat.musicStatusText)
+            Text(chat.isWaitingForMediaDownload
+                 ? NSLocalizedString("Waiting for a model download to finish…", comment: "chat: music waits for a download")
+                 : chat.musicStatusText.isEmpty ? NSLocalizedString("Generating music…", comment: "") : chat.musicStatusText)
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
         }

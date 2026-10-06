@@ -275,9 +275,11 @@ final class AudioRuntime: ObservableObject {
     /// `snapshot_download` of `repo` into `dir` with the venv's
     /// huggingface_hub (`patterns`: allow_patterns). Resumable: files already
     /// complete in `dir` are kept, partial ones continue.
-    func snapshotDownload(repo: String, patterns: [String]? = nil, into dir: String) async throws {
+    /// `cancellable`: cancelling the caller's task stops it -- for a caller
+    /// that removes `dir` on failure (music); voice keeps its partial download.
+    func snapshotDownload(repo: String, patterns: [String]? = nil, into dir: String, cancellable: Bool = false) async throws {
         let allow = patterns.map { "allow_patterns=[" + $0.map { "\"\($0)\"" }.joined(separator: ",") + "], " } ?? ""
-        try await run(Self.venvPython, failure: RuntimeError.downloadFailed, [
+        try await run(Self.venvPython, failure: RuntimeError.downloadFailed, cancellable: cancellable, [
             "-c",
             """
             from huggingface_hub import snapshot_download
@@ -287,9 +289,9 @@ final class AudioRuntime: ObservableObject {
     }
 
     private func run(_ executable: String, failure: (String) -> RuntimeError = RuntimeError.installFailed,
-                     _ arguments: [String]) async throws {
+                     cancellable: Bool = false, _ arguments: [String]) async throws {
         do {
-            try await ProcessRunner.run(executable, arguments)
+            try await ProcessRunner.run(executable, arguments, cancellable: cancellable)
         } catch let error as ProcessRunner.Failure {
             throw failure(error.outputTail)
         }
