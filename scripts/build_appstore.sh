@@ -94,6 +94,7 @@ APP_BUNDLE="$APP" RUNTIME_LAYOUT=packages \
 if [[ -n "${INSTALLER_IDENTITY:-}" ]]; then
   # The installer writes the files as root: anything not world-readable can't
   # be read (or its signature verified) by the user running the app.
+  # Directories need read too (verifying the seal lists them), and search.
   unreadable=$(find "$APP" \( ! -perm -o=r -o \( -type d ! -perm -o=x \) \))
   if [[ -n "$unreadable" ]]; then
     echo "error: not readable by everyone (ITMS-90255):" >&2
