@@ -91,12 +91,12 @@ final class ProjectIndexPresentationTests: XCTestCase {
     func testDropsAreSortedByFormat() {
         let u = { (n: String) in URL(fileURLWithPath: "/tmp/in/" + n) }
         let sorted = ProjectFileDrop.sort([
-            (u("a.pdf"), false), (u("b.XLSX"), false), (u("c.md"), false), (u("Folder"), true), (u(".DS_Store"), false),
+            (u("a.pdf"), false), (u("b.PPTX"), false), (u("c.md"), false), (u("Folder"), true), (u(".DS_Store"), false),
             (u("Makefile"), false), (u("a.pdf"), false), (u("photo.png"), false), (u("main.swift"), false),
             (URL(string: "https://example.com/x.pdf")!, false),
         ])
         XCTAssertEqual(sorted.accepted.map(\.lastPathComponent), ["a.pdf", "c.md", "Makefile", "main.swift"], "each once, in order")
-        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["b.XLSX", "photo.png"])
+        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["b.PPTX", "photo.png"])
         XCTAssertEqual(sorted.folders.map(\.lastPathComponent), ["Folder"])
         XCTAssertTrue(ProjectFileDrop.sort([(u(".hidden"), false)]).isEmpty)
     }
@@ -105,16 +105,16 @@ final class ProjectIndexPresentationTests: XCTestCase {
         let dir = indexTempDir()
         defer { try? FileManager.default.removeItem(at: dir) }
         let fm = FileManager.default
-        for name in ["b.md", "a.txt", "sheet.xlsx"] {
+        for name in ["b.md", "a.txt", "deck.pptx"] {
             try "x".write(to: dir.appendingPathComponent(name), atomically: true, encoding: .utf8)
         }
         try fm.createDirectory(at: dir.appendingPathComponent("Folder"), withIntermediateDirectories: true)
         // A package is one file to the user (refused as a format, not as a folder).
         try fm.createDirectory(at: dir.appendingPathComponent("Tool.app/Contents"), withIntermediateDirectories: true)
-        let urls = ["b.md", "Folder", "a.txt", "Tool.app", "sheet.xlsx", "missing.pdf", ".DS_Store"].map { dir.appendingPathComponent($0) }
+        let urls = ["b.md", "Folder", "a.txt", "Tool.app", "deck.pptx", "missing.pdf", ".DS_Store"].map { dir.appendingPathComponent($0) }
         let sorted = await Task { @MainActor in await ProjectFileDrop.sort(urls) }.value
         XCTAssertEqual(sorted.accepted.map(\.lastPathComponent), ["b.md", "a.txt", "missing.pdf"], "in the order dropped")
-        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["Tool.app", "sheet.xlsx"])
+        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["Tool.app", "deck.pptx"])
         XCTAssertEqual(sorted.folders.map(\.lastPathComponent), ["Folder"])
     }
 

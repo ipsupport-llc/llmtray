@@ -66,7 +66,7 @@ enum ProjectFilesWindow {
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = true
         panel.prompt = NSLocalizedString("Add", comment: "the Add Files panel's button")
-        panel.message = NSLocalizedString("Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed.", comment: "the Add Files panel")
+        panel.message = NSLocalizedString("Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed.", comment: "the Add Files panel")
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
         let urls = panel.urls
@@ -452,6 +452,7 @@ private struct ProjectFilesView: View {
         case "pdf": return "doc.richtext"
         case "html", "htm", "xhtml": return "globe"
         case "doc", "docx", "odt", "rtf": return "doc.text"
+        case "xlsx", "xlsm", "ods", "csv", "tsv": return "tablecells"
         case "md", "markdown", "txt", "text": return "text.alignleft"
         default: return ProjectFileFormats.code.contains(ext.lowercased()) ? "chevron.left.forwardslash.chevron.right" : "doc"
         }

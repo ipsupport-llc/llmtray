@@ -70,6 +70,6 @@ final class DocumentExtractionTests: XCTestCase {
         // One good page is enough; the junk one stays flagged.
         let doc = try? run([page(1, "Íàñòîÿùèé", junk: 0.9), page(2, "fine", junk: 0), summary(.pdf, 2)]).get()
         XCTAssertEqual(doc?.pages.map(\.isJunk), [true, false])
-        XCTAssertEqual(run([summary(.xlsx, 0)]), .failure(.unsupported("xlsx")))
+        XCTAssertEqual(run([summary(.pptx, 0)]), .failure(.unsupported("pptx")))
     }
 }

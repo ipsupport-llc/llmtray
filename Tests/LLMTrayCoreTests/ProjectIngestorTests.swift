@@ -199,7 +199,7 @@ extension ProjectIngestorTests {
     func testFailuresAndRefusals() async throws {
         let i = ingestor()
         let results = await i.add([try file("a.txt", "UNSUPPORTED"), try file("b.txt", "EMPTY"), try file("c.txt", "BROKEN"),
-                                   try file("d.xlsx", "sheet"), try file("e.txt", "fine words here")], to: project)
+                                   try file("d.pptx", "deck"), try file("e.txt", "fine words here")], to: project)
         XCTAssertEqual(results[3], .notSupported, "refused at add by extension")
         try await settle(i)
         let docs = i.documents[project] ?? []

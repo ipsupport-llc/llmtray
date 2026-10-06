@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Brak wystarczającej ilości wolnego miejsca: %@ wymaga około %@, dostępne jest %@.";
 "Not identical to %@: not a duplicate." = "Nieidentyczne z %@: nie jest duplikatem.";
 "Not indexed" = "Nie zindeksowano";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Jeszcze nieobsługiwane: %@. Ta wersja indeksuje tekst, Markdown, kod, PDF, Word (docx, doc), ODT, RTF i HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Jeszcze nieobsługiwane: %@. Ta wersja indeksuje tekst, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML i arkusze kalkulacyjne (xlsx, ods).";
 "Nothing new to import" = "Brak nowych elementów do importu";
 "Nothing sent yet." = "Nic jeszcze nie wysłano.";
 "Nothing to change." = "Brak rzeczy do zmiany.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Czat tymczasowy";
 "Temporary chats can only look in folders, for that chat only." = "Tymczasowe czaty mogą jedynie przeglądać foldery, tylko dla tego czatu.";
 "Temporary — not saved" = "Tymczasowe — niezapisane";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Indeksowane są pliki: tekst, Markdown, kod, PDF, Word (docx, doc), ODT, RTF i HTML.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Indeksowane są pliki: tekst, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML i arkusze kalkulacyjne (xlsx, ods).";
 "Thank you!" = "Dziękujemy!";
 "Thank you! List your name in Supporters?" = "Dziękujemy! Umieścić Twoje imię w Sponsorach?";
 "Thanks! Your name will appear once it's been checked." = "Dziękujemy! Twoje imię pojawi się po weryfikacji.";

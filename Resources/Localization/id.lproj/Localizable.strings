@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Ruang disk tidak cukup: %@ memerlukan sekitar %@, tersedia %@.";
 "Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
 "Not indexed" = "Belum diindeks";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, dan HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML, dan spreadsheet (xlsx, ods).";
 "Nothing new to import" = "Tidak ada yang baru untuk diimport";
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "Chat sementara";
 "Temporary chats can only look in folders, for that chat only." = "Chat sementara hanya bisa melihat folder, hanya untuk chat itu.";
 "Temporary — not saved" = "Sementara — tidak disimpan";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Berkas Teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, dan HTML diindeks.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Berkas Teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML, dan spreadsheet (xlsx, ods) diindeks.";
 "Thank you!" = "Terima kasih!";
 "Thank you! List your name in Supporters?" = "Terima kasih! Cantumkan nama Anda di Penyokong?";
 "Thanks! Your name will appear once it's been checked." = "Terima kasih! Nama Anda akan muncul setelah diperiksa.";

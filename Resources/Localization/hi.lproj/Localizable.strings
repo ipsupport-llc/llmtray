@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "डिस्क में पर्याप्त खाली स्थान नहीं: %@ को लगभग %@ चाहिए, %@ खाली है।";
 "Not identical to %@: not a duplicate." = "%@ के समान नहीं: डुप्लिकेट नहीं।";
 "Not indexed" = "अनुक्रमित नहीं";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "अभी समर्थित नहीं: %@। यह संस्करण टेक्स्ट, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF और HTML को इंडेक्स करता है।";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "अभी समर्थित नहीं: %@। यह संस्करण टेक्स्ट, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF, HTML और स्प्रेडशीट (xlsx, ods) को इंडेक्स करता है।";
 "Nothing new to import" = "इम्पोर्ट करने के लिए कुछ नया नहीं है";
 "Nothing sent yet." = "अभी कुछ भी नहीं भेजा गया।";
 "Nothing to change." = "बदलने के लिए कुछ नहीं।";
@@ -902,7 +902,7 @@
 "Temporary chat" = "अस्थायी चैट";
 "Temporary chats can only look in folders, for that chat only." = "अस्थायी चैट केवल फ़ोल्डरों में ही देख सकते हैं, केवल उसी चैट के लिए।";
 "Temporary — not saved" = "अस्थायी — सहेजा नहीं गया";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Text, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF और HTML फाइलें इंडेक्स की जाती हैं।";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Text, Markdown, कोड, PDF, Word (docx, doc), ODT, RTF, HTML और स्प्रेडशीट (xlsx, ods) फाइलें इंडेक्स की जाती हैं।";
 "Thank you!" = "धन्यवाद!";
 "Thank you! List your name in Supporters?" = "धन्यवाद! क्या आप अपना नाम Supporters में सूचीबद्ध करना चाहेंगे?";
 "Thanks! Your name will appear once it's been checked." = "धन्यवाद! आपका नाम जाँच होने के बाद दिखाई देगा।";

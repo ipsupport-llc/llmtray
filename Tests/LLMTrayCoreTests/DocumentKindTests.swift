@@ -77,7 +77,7 @@ final class DocumentKindTests: XCTestCase {
         odt.add("content.xml", "<office:document-content/>")
         XCTAssertEqual(DocumentKind.detect(odt.finish()), .odt)
         let ods = TestZip(); ods.add("mimetype", "application/vnd.oasis.opendocument.spreadsheet", store: true)
-        XCTAssertEqual(DocumentKind.detect(ods.finish()), .zip)
+        XCTAssertEqual(DocumentKind.detect(ods.finish()), .ods)
         // The main part renamed, found through [Content_Types].xml.
         let renamed = TestZip()
         renamed.add("[Content_Types].xml", "<Types><Override PartName=\"/w/main.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\"/></Types>")
@@ -99,10 +99,10 @@ final class DocumentKindTests: XCTestCase {
         XCTAssertEqual(DocumentKind.detect(Self.compoundFile(stream: "WordDocument").prefix(600)), .compoundFile)
     }
 
-    func testSupportedSetIsV1a() {
-        XCTAssertEqual(Set([DocumentKind.pdf, .docx, .odt, .doc, .rtf, .html, .text, .xlsx, .pptx, .xls, .ppt, .image,
+    func testSupportedSet() {
+        XCTAssertEqual(Set([DocumentKind.pdf, .docx, .odt, .doc, .rtf, .html, .text, .xlsx, .ods, .pptx, .xls, .ppt, .image,
                             .encryptedOffice, .zip, .compoundFile, .unknown].filter(\.isSupported)),
-                       [.pdf, .docx, .odt, .doc, .rtf, .html, .text])
+                       [.pdf, .docx, .odt, .doc, .rtf, .html, .text, .xlsx, .ods])
         XCTAssertEqual(Set([DocumentKind.pdf, .docx, .odt, .doc, .rtf, .html, .text].filter(\.needsAppleImporter)),
                        [.docx, .odt, .doc, .rtf])
     }

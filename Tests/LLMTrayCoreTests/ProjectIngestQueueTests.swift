@@ -164,7 +164,7 @@ final class ProjectIngestQueueTests: XCTestCase {
         for name in ["a.txt", "b.MD", "c.swift", "d.pdf", "e.docx", "f.doc", "g.odt", "h.rtf", "i.html", "Makefile", "j.csv"] {
             XCTAssertTrue(ProjectFileFormats.isOffered(URL(fileURLWithPath: "/x/" + name)), name)
         }
-        for name in ["a.xlsx", "b.pptx", "c.xls", "d.ppt", "e.png", "f.jpg", "g.zip", "h.mp3", "i.heic"] {
+        for name in ["a.key", "b.pptx", "c.xls", "d.ppt", "e.png", "f.jpg", "g.zip", "h.mp3", "i.heic"] {
             XCTAssertFalse(ProjectFileFormats.isOffered(URL(fileURLWithPath: "/x/" + name)), name)
         }
     }

@@ -609,7 +609,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "אין מספיק מקום פנוי בדיסק: %@ זקוק/ה לכ־%@, זמינים %@.";
 "Not identical to %@: not a duplicate." = "לא זהה ל־%@: לא עותק כפול.";
 "Not indexed" = "לא מנוקד";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "עדיין לא נתמך: %@. גרסה זו מאונדקסת טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF ו‑HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "עדיין לא נתמך: %@. גרסה זו מאונדקסת טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF, HTML וגיליונות אלקטרוניים (xlsx, ods).";
 "Nothing new to import" = "אין משהו חדש לייבא";
 "Nothing sent yet." = "טרם נשלח דבר.";
 "Nothing to change." = "אין דבר לשנות.";
@@ -902,7 +902,7 @@
 "Temporary chat" = "צ'אט זמני";
 "Temporary chats can only look in folders, for that chat only." = "שיחות זמניות יכולות רק להסתכל בתיקיות, ורק עבור אותה שיחה.";
 "Temporary — not saved" = "זמני — לא נשמר";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "מאונדקסים קבצי טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF ו‑HTML.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "מאונדקסים קבצי טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF, HTML וגיליונות אלקטרוניים (xlsx, ods).";
 "Thank you!" = "תודה!";
 "Thank you! List your name in Supporters?" = "תודה! לפרסם את שמך ברשימת התומכים?";
 "Thanks! Your name will appear once it's been checked." = "תודה! שמך יופיע ברגע שיבדקו אותו.";

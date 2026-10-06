@@ -617,7 +617,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not indexed" = "Not indexed";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
@@ -911,7 +911,7 @@
 "Temporary chat" = "Temporary chat";
 "Temporary chats can only look in folders, for that chat only." = "Temporary chats can only look in folders, for that chat only.";
 "Temporary — not saved" = "Temporary — not saved";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF and HTML files are indexed.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed.";
 "Thank you!" = "Thank you!";
 "Thank you! List your name in Supporters?" = "Thank you! List your name in Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Thanks! Your name will appear once it's been checked.";
