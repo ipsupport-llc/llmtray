@@ -42,10 +42,12 @@ public enum ServerLaunch {
         /// How the memory beside the weights is shared out (Settings >
         /// Server > Memory).
         public var memoryShares: MemoryShares
+        /// The runtime has --mmap-lookup-tables and --lazy-towers.
+        public var supportsLowMemoryWeights: Bool
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
-                    memoryShares: MemoryShares = .default) {
+                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -57,6 +59,7 @@ public enum ServerLaunch {
             self.bufferCacheMB = bufferCacheMB
             self.gpuHeadroomBytes = gpuHeadroomBytes
             self.memoryShares = memoryShares
+            self.supportsLowMemoryWeights = supportsLowMemoryWeights
         }
     }
 
@@ -179,6 +182,9 @@ public enum ServerLaunch {
         }
         if let drafter = c.drafterRepo {
             args += ["--draft-model", drafter]
+        }
+        if p.lowMemoryWeights, c.supportsLowMemoryWeights {
+            args += ["--mmap-lookup-tables", "--lazy-towers"]
         }
         if c.verboseLogging {
             args += ["--log-level", "DEBUG"]

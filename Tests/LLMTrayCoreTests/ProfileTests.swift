@@ -192,6 +192,19 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertNil(value(ServerLaunch.arguments(resolved(), ctx), "--top-k"))
     }
 
+    func testLowMemoryWeightsOnlyWhenTheRuntimeHasTheFlags() {
+        let on = resolved { $0.launch.lowMemoryWeights = true }
+        XCTAssertFalse(ServerLaunch.arguments(resolved(), ctx).contains("--mmap-lookup-tables"))
+        XCTAssertFalse(ServerLaunch.arguments(on, ctx).contains("--mmap-lookup-tables"))
+        var c = ctx
+        c.supportsLowMemoryWeights = true
+        let args = ServerLaunch.arguments(on, c)
+        XCTAssertTrue(args.contains("--mmap-lookup-tables"))
+        XCTAssertTrue(args.contains("--lazy-towers"))
+        XCTAssertFalse(ServerLaunch.arguments(resolved(), c).contains("--lazy-towers"))
+        XCTAssertNotEqual(ServerLaunch.restartKey(on, c), ServerLaunch.restartKey(resolved(), c))
+    }
+
     func testKVSharedModelForcesKVOff() {
         var c = ctx
         c.disallowQuantizedKV = true

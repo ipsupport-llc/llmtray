@@ -558,7 +558,8 @@ final class ServerManager: ObservableObject {
             prefillMemoryMB: memory.prefillMemoryMB,
             bufferCacheMB: memory.bufferCacheMB,
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
-            memoryShares: Self.memoryShares
+            memoryShares: Self.memoryShares,
+            supportsLowMemoryWeights: memory.supportsLowMemoryWeights
         )
     }
 
@@ -567,6 +568,7 @@ final class ServerManager: ObservableObject {
         var prefillMemoryMB: Int?
         var bufferCacheMB: Int?
         var gpuHeadroomBytes: Int64?
+        var supportsLowMemoryWeights = false
     }
 
     /// Read once per model folder, installed runtime (a runtime update
@@ -594,7 +596,8 @@ final class ServerManager: ObservableObject {
         let facts = MemoryFacts(
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
             bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
-            gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)
+            gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights),
+            supportsLowMemoryWeights: MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
         )
         memoryFactsCache[key] = facts
         return facts
