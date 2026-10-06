@@ -545,8 +545,10 @@ final class ServerManager: ObservableObject {
 
     /// The model-specific facts the launch arguments depend on; drafterRepo
     /// is the drafter *available* to the model (see ServerLaunch.drafter).
-    private func launchContext(modelPath: String, alias: String, drafterRepo: String?) -> ServerLaunch.Context {
-        let memory = Self.memoryFacts(forModelPath: modelPath)
+    /// `lowMemoryWeights`: the profile's Save memory, which leaves the
+    /// lookup tables out of the weights the GPU memory is sized by.
+    private func launchContext(modelPath: String, alias: String, drafterRepo: String?, lowMemoryWeights: Bool) -> ServerLaunch.Context {
+        let memory = Self.memoryFacts(forModelPath: modelPath, lowMemoryWeights: lowMemoryWeights)
         return ServerLaunch.Context(
             modelPath: modelPath,
             internalPort: internalPort,
@@ -584,7 +586,7 @@ final class ServerManager: ObservableObject {
                                          prefillPercent: d[Pref.prefillSharePercent])
     }
 
-    private static func memoryFacts(forModelPath modelPath: String) -> MemoryFacts {
+    private static func memoryFacts(forModelPath modelPath: String, lowMemoryWeights: Bool) -> MemoryFacts {
         let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
         // An in-place reinstall rewrites server.py without touching lib/.
         let server = MLXRuntimeInstaller.sitePackageDirs.compactMap {
@@ -592,17 +594,24 @@ final class ServerManager: ObservableObject {
         }.map { String($0.timeIntervalSince1970) }.joined(separator: ",")
         let shares = memoryShares
         let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + server + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
-            + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)"
+            + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)|\(lowMemoryWeights)"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
-        let weights = ModelWeights.bytes(inFolder: modelPath)
+        let supportsLowMemory = MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
+            && MLXRuntimeInstaller.serverSupportsFlag("--lazy-towers")
+        // Tables read from disk take no GPU memory: the prompt cache and the
+        // prefill get that room (an 8 GB Mac had none left for a cache).
+        var weights = ModelWeights.bytes(inFolder: modelPath)
+        if lowMemoryWeights, supportsLowMemory {
+            let tables = MLXRuntimeInstaller.declaredLookupTables(modelTypes: ModelWeights.modelTypes(inFolder: modelPath))
+            weights = max(0, weights - ModelWeights.lookupTableBytes(inFolder: modelPath, tables: tables))
+        }
         let scratchMB = ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
         let facts = MemoryFacts(
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
             bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
             gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights),
-            supportsLowMemoryWeights: MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
-                && MLXRuntimeInstaller.serverSupportsFlag("--lazy-towers")
+            supportsLowMemoryWeights: supportsLowMemory
         )
         memoryFactsCache[key] = facts
         return facts
@@ -637,7 +646,8 @@ final class ServerManager: ObservableObject {
         let profile = withLaunchTrial(ProfileManager.shared.resolved(for: modelPath), modelPath: modelPath)
         var context = launchContext(
             modelPath: modelPath, alias: currentAlias,
-            drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath))
+            drafterRepo: ServerLaunch.drafter(for: profile, available: availableDrafter(forModelPath: modelPath)),
+            lowMemoryWeights: profile.lowMemoryWeights
         )
         guard ServerLaunch.restartKey(profile, context) != last else { return (false, false) }
         let hasDrafter = context.drafterRepo != nil
@@ -656,7 +666,9 @@ final class ServerManager: ObservableObject {
     /// change its real launch arguments (so a restart is needed).
     func needsRestart(modelPath: String, from a: ResolvedProfile, to b: ResolvedProfile) -> Bool {
         ServerLaunch.needsRestart(from: a, to: b, context: launchContext(
-            modelPath: modelPath, alias: currentAlias, drafterRepo: availableDrafter(forModelPath: modelPath)
+            modelPath: modelPath, alias: currentAlias, drafterRepo: availableDrafter(forModelPath: modelPath),
+            // A change of the switch itself changes the flags: a restart either way.
+            lowMemoryWeights: b.lowMemoryWeights
         ))
     }
 
@@ -672,7 +684,8 @@ final class ServerManager: ObservableObject {
         appendLog("--- profile: \(profile.profileName) ---\n")
         let context = launchContext(
             modelPath: modelPath, alias: alias,
-            drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile)
+            drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile),
+            lowMemoryWeights: profile.lowMemoryWeights
         )
         let args = ServerLaunch.arguments(profile, context)
         if let cut = ServerLaunch.promptCacheCut(profile, context), let headroom = context.gpuHeadroomBytes {

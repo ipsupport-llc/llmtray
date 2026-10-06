@@ -401,6 +401,102 @@ public enum KVCacheSize {
 /// A model's weights on disk: its `*.safetensors`, through symlinks (a
 /// Hugging Face snapshot links its files to blobs).
 public enum ModelWeights {
+    /// Bytes of the tensors of the named lookup-only tables (a module name
+    /// such as "embed_tokens_per_layer", followed by weight/scales/biases),
+    /// from the safetensors headers: what --mmap-lookup-tables leaves on
+    /// disk.
+    public static func lookupTableBytes(inFolder path: String, tables: Set<String>) -> Int64 {
+        guard !tables.isEmpty, let names = try? FileManager.default.contentsOfDirectory(atPath: path) else { return 0 }
+        return names.filter { $0.hasSuffix(".safetensors") }.reduce(Int64(0)) { sum, name in
+            let file = URL(fileURLWithPath: path).appendingPathComponent(name).resolvingSymlinksInPath()
+            let (header, dataBytes) = safetensorsHeader(file)
+            return sum + lookupTableBytes(header: header, dataBytes: dataBytes, tables: tables)
+        }
+    }
+
+    /// `dataBytes`: the file's size past its header; offsets outside it make
+    /// the header untrusted, and nothing of the file is counted.
+    static func lookupTableBytes(header: [String: Any], dataBytes: Int64, tables: Set<String>) -> Int64 {
+        var sum: Int64 = 0
+        for (key, value) in header where key != "__metadata__" {
+            guard let info = value as? [String: Any], let offsets = info["data_offsets"] as? [NSNumber], offsets.count == 2
+            else { return 0 }
+            let (start, end) = (offsets[0].int64Value, offsets[1].int64Value)
+            guard start >= 0, end >= start, end <= dataBytes else { return 0 }
+            let parts = key.split(separator: ".")
+            guard parts.count >= 2, ["weight", "scales", "biases"].contains(parts[parts.count - 1]),
+                  tables.contains(String(parts[parts.count - 2])) else { continue }
+            sum += end - start  // each <= dataBytes: no overflow for real files
+            if sum > dataBytes { return 0 }
+        }
+        return sum
+    }
+
+    /// A safetensors file's JSON header and the size of the data after it
+    /// (empty and 0 when unreadable).
+    static func safetensorsHeader(_ url: URL) -> ([String: Any], Int64) {
+        guard let handle = try? FileHandle(forReadingFrom: url),
+              let size = (try? FileManager.default.attributesOfItem(atPath: url.path))?[.size] as? NSNumber else { return ([:], 0) }
+        defer { try? handle.close() }
+        guard let prefix = try? handle.read(upToCount: 8), prefix.count == 8 else { return ([:], 0) }
+        let n = UInt64(littleEndian: prefix.withUnsafeBytes { $0.loadUnaligned(as: UInt64.self) })
+        // Headers are kilobytes to a few megabytes.
+        guard n > 0, n < 100_000_000, Int64(n) + 8 <= size.int64Value,
+              let json = try? handle.read(upToCount: Int(n)), json.count == Int(n),
+              let header = (try? JSONSerialization.jsonObject(with: json)) as? [String: Any] else { return ([:], 0) }
+        return (header, size.int64Value - 8 - Int64(n))
+    }
+
+    /// The `lookup_tables = ("a", "b")` names a runtime's model source
+    /// declares (mlx-lm fork, mapped_embedding).
+    public static func declaredLookupTables(inSource source: String) -> Set<String> {
+        var names: Set<String> = []
+        // Comments don't declare anything.
+        let source = source.split(separator: "\n", omittingEmptySubsequences: false)
+            .map { line in line.firstIndex(of: "#").map { String(line[..<$0]) } ?? String(line) }
+            .joined(separator: "\n")
+        guard let decl = try? NSRegularExpression(pattern: #"lookup_tables\s*=\s*\(([^)]*)\)"#),
+              let quoted = try? NSRegularExpression(pattern: #"["']([A-Za-z0-9_]+)["']"#) else { return names }
+        let ns = source as NSString
+        for m in decl.matches(in: source, range: NSRange(location: 0, length: ns.length)) {
+            let body = ns.substring(with: m.range(at: 1))
+            let b = body as NSString
+            for q in quoted.matches(in: body, range: NSRange(location: 0, length: b.length)) {
+                names.insert(b.substring(with: q.range(at: 1)))
+            }
+        }
+        return names
+    }
+
+    /// The runtime model files (mlx_lm/models/<name>.py) a checkpoint's
+    /// config names: its model_type and its text model's.
+    public static func modelTypes(inFolder path: String) -> [String] {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let config = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return [] }
+        let text = config["text_config"] as? [String: Any]
+        // Names of files to read: nothing that could leave the folder.
+        return [config["model_type"] as? String, text?["model_type"] as? String].compactMap { $0 }
+            .filter { !$0.isEmpty && $0.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") } }
+    }
+
+    /// The sibling modules a model file imports (`from . import a, b`,
+    /// `from .a import X`): where a wrapper's text model is declared.
+    public static func importedModules(inSource source: String) -> Set<String> {
+        var names: Set<String> = []
+        guard let fromPackage = try? NSRegularExpression(pattern: #"(?m)^from \. import ([A-Za-z0-9_, ]+)"#),
+              let fromModule = try? NSRegularExpression(pattern: #"(?m)^from \.([A-Za-z0-9_]+) import"#) else { return names }
+        let ns = source as NSString
+        let all = NSRange(location: 0, length: ns.length)
+        for m in fromPackage.matches(in: source, range: all) {
+            for part in ns.substring(with: m.range(at: 1)).split(separator: ",") {
+                let name = part.split(separator: " ").first.map(String.init) ?? ""
+                if !name.isEmpty { names.insert(name) }
+            }
+        }
+        for m in fromModule.matches(in: source, range: all) { names.insert(ns.substring(with: m.range(at: 1))) }
+        return names
+    }
+
     public static func bytes(inFolder path: String) -> Int64 {
         let fm = FileManager.default
         guard let names = try? fm.contentsOfDirectory(atPath: path) else { return 0 }
