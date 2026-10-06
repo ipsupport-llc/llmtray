@@ -84,7 +84,7 @@ struct VoiceLabView: View {
             DisclosureGroup("Log", isExpanded: $showsLog) {
                 ScrollView {
                     Text(verbatim: session.log.isEmpty ? "—" : session.log)
-                        .font(.system(size: 10, design: .monospaced))
+                        .font(.system(.caption, design: .monospaced))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
                 }

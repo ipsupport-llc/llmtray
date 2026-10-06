@@ -577,7 +577,7 @@ struct ProjectRingIcon: View {
 
     private var failedBadge: some View {
         Text(verbatim: "\(ring.failed)")
-            .font(.system(size: 9, weight: .semibold))
+            .font(.caption.weight(.semibold))
             .foregroundColor(.orange)
             .monospacedDigit()
     }

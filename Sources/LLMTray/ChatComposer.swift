@@ -180,19 +180,19 @@ struct ChatComposer: View {
         HStack {
             if chat.currentSessionID == nil {
                 Label("Temporary — not saved", systemImage: "eye.slash")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
             if canRegenerate {
                 Button(action: regenerate) {
-                    Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                    Label("Regenerate", systemImage: "arrow.clockwise").font(.caption)
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.secondary)
             }
             if canCompact {
                 Button(action: compact) {
-                    Label("Compact", systemImage: "arrow.down.right.and.arrow.up.left").font(.system(size: 10))
+                    Label("Compact", systemImage: "arrow.down.right.and.arrow.up.left").font(.caption)
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.secondary)
@@ -201,7 +201,7 @@ struct ChatComposer: View {
             Spacer()
             if let tps = chat.lastTokensPerSecond {
                 Text(String(format: "%.1f tok/s", tps))
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
         }
@@ -229,7 +229,7 @@ struct ChatComposer: View {
                                 composer.attachments.remove(at: i)
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
-                                    .font(.system(size: 12))
+                                    .font(.callout)
                                     .foregroundColor(.white)
                                     .background(Circle().fill(Color.black.opacity(0.5)))
                             }

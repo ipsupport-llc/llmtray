@@ -7,7 +7,7 @@ struct ModelCardView: View {
         VStack(spacing: 0) {
             HStack {
                 Text(browser.modelCardID ?? "Model card")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.body.weight(.semibold))
                 Spacer()
                 Button("Close") {
                     browser.dismissModelCard()

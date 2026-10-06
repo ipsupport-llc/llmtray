@@ -11,7 +11,7 @@ struct ServerLogView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 Text(server.log.isEmpty ? "(no server output yet)" : server.log)
-                    .font(.system(size: 11, design: .monospaced))
+                    .font(.system(.subheadline, design: .monospaced))
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(10)

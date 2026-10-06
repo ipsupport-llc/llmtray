@@ -243,10 +243,10 @@ struct GenerationDraftView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label(title, systemImage: draft.kind == .music ? "music.note" : "photo")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundColor(.secondary)
             TextEditor(text: held($draft.prompt))
-                .font(.system(size: 12))
+                .font(.callout)
                 .frame(minHeight: 44, maxHeight: 90)
                 .scrollContentBackground(.hidden)
                 .padding(4)
@@ -274,10 +274,10 @@ struct GenerationDraftView: View {
             case .music:
                 DisclosureGroup("Lyrics") {
                     TextEditor(text: held($draft.lyrics))
-                        .font(.system(size: 11))
+                        .font(.subheadline)
                         .frame(minHeight: 60, maxHeight: 140)
                 }
-                .font(.system(size: 11))
+                .font(.subheadline)
                 HStack {
                     Picker("Model", selection: held($draft.musicModel)) {
                         ForEach(MusicManager.selectable.filter { MusicManager.isDownloadedStatic($0) || $0 == draft.musicModel }) {
@@ -296,7 +296,7 @@ struct GenerationDraftView: View {
                 if let left = draft.remaining {
                     ProgressView(value: left, total: draft.countdownTotal).frame(width: 60).opacity(0.6)
                     Text(String(format: NSLocalizedString("Starting in %.0f s…", comment: "creator mode countdown"), left.rounded(.up)))
-                        .font(.system(size: 11)).foregroundColor(.secondary)
+                        .font(.subheadline).foregroundColor(.secondary)
                 }
                 Spacer()
                 Button("Skip") { draft.resolve(.skip) }
@@ -328,9 +328,9 @@ struct GenerationDraftView: View {
 
     private func knob(_ label: LocalizedStringKey, _ value: Binding<Double>, enabled: Bool) -> some View {
         HStack {
-            Text(label).font(.system(size: 11)).frame(width: 150, alignment: .leading)
+            Text(label).font(.subheadline).frame(width: 150, alignment: .leading)
             Slider(value: value, in: 0...1)
-            Text(String(format: "%.2f", value.wrappedValue)).font(.system(size: 10).monospacedDigit()).frame(width: 32)
+            Text(String(format: "%.2f", value.wrappedValue)).font(.caption.monospacedDigit()).frame(width: 32)
         }
         .disabled(!enabled)
         .help(enabled ? Text(label) : Text("Only turbo has this knob: sft has no song planner to vary."))

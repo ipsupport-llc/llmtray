@@ -135,13 +135,13 @@ struct AudioClipView: View {
                         Spacer()
                         Text(verbatim: Self.clock(total))
                     }
-                    .font(.system(size: 10).monospacedDigit())
+                    .font(.caption.monospacedDigit())
                     .foregroundColor(.secondary)
                 }
             }
             if !prompt.isEmpty {
                 Label(prompt, systemImage: "music.note")
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
                     .textSelection(.enabled)
@@ -164,13 +164,13 @@ struct AudioClipView: View {
     private func actions(titles: Bool) -> some View {
         HStack(spacing: 8) {
             Button { Self.save(data, prompt: prompt) } label: {
-                Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
+                Label("Save…", systemImage: "square.and.arrow.down").font(.caption)
             }
             .buttonStyle(.plain)
             .help(Text("Save…"))
             // Icons only: the row must fit the popover.
             Button { MediaSharing.copyAudio(data, prompt: prompt) } label: {
-                Image(systemName: "doc.on.doc").font(.system(size: 10))
+                Image(systemName: "doc.on.doc").font(.caption)
             }
             .buttonStyle(.plain)
             .help(Text("Copy the song as an audio file"))
@@ -178,27 +178,27 @@ struct AudioClipView: View {
             ShareLink(item: SharedAudio(data: data, prompt: prompt),
                       preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Music", comment: "") : prompt,
                                             image: Image(systemName: "music.note"))) {
-                Image(systemName: "square.and.arrow.up").font(.system(size: 10))
+                Image(systemName: "square.and.arrow.up").font(.caption)
             }
             .buttonStyle(.plain)
             .help(Text("Share…"))
             .accessibilityLabel(Text("Share…"))
             if canRegenerate {
                 Button { action?(.regenerate) } label: {
-                    Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                    Label("Regenerate", systemImage: "arrow.clockwise").font(.caption)
                 }
                 .buttonStyle(.plain)
                 .disabled(action == nil)
                 .help(Text("Another version next to this one (a new seed, the same request)"))
                 Button { action?(.tweak) } label: {
-                    Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                    Label("Tweak…", systemImage: "slider.horizontal.3").font(.caption)
                 }
                 .buttonStyle(.plain)
                 .disabled(action == nil)
                 .help(Text("Change the style, lyrics, model or knobs, then make another version"))
             }
             Button { action?(.remove) } label: {
-                Label("Remove", systemImage: "trash").font(.system(size: 10))
+                Label("Remove", systemImage: "trash").font(.caption)
             }
             .buttonStyle(.plain)
             .disabled(action == nil)
@@ -210,7 +210,7 @@ struct AudioClipView: View {
                 // No info button (a song from before): the time stays, short when the row is.
                 Text(titles ? String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)
                             : String(format: NSLocalizedString("%.1f s", comment: "generation time"), generationSeconds))
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .help(Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), generationSeconds)))
             }
         }
@@ -248,7 +248,7 @@ struct MediaQueueView: View {
             Text(ahead == 1
                  ? NSLocalizedString("Waiting for another chat's image or music to finish…", comment: "generator queue")
                  : String(format: NSLocalizedString("In the queue: %lld ahead…", comment: "generator queue"), ahead))
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -278,7 +278,7 @@ struct MusicGenerationProgressView: View {
             Text(chat.isWaitingForMediaDownload
                  ? NSLocalizedString("Waiting for a model download to finish…", comment: "chat: music waits for a download")
                  : chat.musicStatusText.isEmpty ? NSLocalizedString("Generating music…", comment: "") : chat.musicStatusText)
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -294,7 +294,7 @@ struct MediaInfoButton: View {
 
     var body: some View {
         Button { shown.toggle() } label: {
-            Image(systemName: "info.circle").font(.system(size: 10))
+            Image(systemName: "info.circle").font(.caption)
         }
         .buttonStyle(.plain)
         .help(Text("How it was made"))
@@ -308,7 +308,7 @@ struct MediaInfoButton: View {
                     }
                 }
             }
-            .font(.system(size: 11))
+            .font(.subheadline)
             .padding(10)
             .frame(maxWidth: 360, alignment: .leading)
         }

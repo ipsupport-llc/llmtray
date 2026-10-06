@@ -360,7 +360,7 @@ struct ContentView: View {
             } else {
                 VStack(spacing: 2) {
                     Text("No messages yet")
-                        .font(.system(size: 12))
+                        .font(.callout)
                     if let id = chat.currentSessionID { EmptyChatProjectNote(sessionID: id) }
                 }
                 .foregroundColor(.secondary)
@@ -416,12 +416,12 @@ struct ContentView: View {
         }
         if let err = chat.errorText {
             Text(err)
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.red)
         }
         if let note = citationNote {
             Text(note)
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         }
         // Where the bottom of the content is, relative to the
@@ -679,7 +679,7 @@ private struct EmptyChatProjectNote: View {
     var body: some View {
         if let project = store.library.projectContext(forChat: sessionID) {
             Label(String(format: NSLocalizedString("In project %@", comment: ""), project.name), systemImage: "folder")
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .lineLimit(1)
         }
     }

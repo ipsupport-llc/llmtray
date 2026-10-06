@@ -138,7 +138,7 @@ private struct PDFCitationViewerView: View {
             HStack(spacing: 8) {
                 if let note = state.note {
                     Label { Text(verbatim: note) } icon: { Image(systemName: "exclamationmark.triangle") }
-                        .font(.system(size: 11))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                         .help(note)

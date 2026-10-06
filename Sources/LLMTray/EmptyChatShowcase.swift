@@ -60,7 +60,7 @@ private struct EmptyChatShowcase: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 BrainMark(size: 16)
-                Text("Ask anything, or try one of these:").font(.system(size: 12)).foregroundColor(.secondary)
+                Text("Ask anything, or try one of these:").font(.callout).foregroundColor(.secondary)
             }
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 8, alignment: .top)], alignment: .leading, spacing: 8) {
                 filesTile
@@ -155,9 +155,9 @@ private struct ShowcaseTile: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 5) {
                     Image(systemName: symbol).foregroundColor(isOn ? .accentColor : .secondary).frame(width: 16)
-                    title.font(.system(size: 11, weight: .semibold)).lineLimit(1).minimumScaleFactor(0.85)
+                    title.font(.subheadline.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.85)
                 }
-                detail.font(.system(size: 10)).foregroundColor(.secondary)
+                detail.font(.caption).foregroundColor(.secondary)
                     .lineLimit(2).fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)
@@ -188,10 +188,10 @@ struct GettingStartedCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 BrainMark(size: 16)
-                Text("Getting started").font(.system(size: 13, weight: .semibold))
+                Text("Getting started").font(.body.weight(.semibold))
                 Spacer()
                 Button("Hide") { GettingStarted.hideCard() }
-                    .buttonStyle(.borderless).font(.system(size: 11))
+                    .buttonStyle(.borderless).font(.subheadline)
                     .help(Text("Hide these steps for good"))
             }
             step(.write, 1, Text("Write here"),
@@ -232,15 +232,15 @@ struct GettingStartedCard: View {
                 ZStack {
                     Circle().fill(done ? Color.green : Color.accentColor.opacity(0.18)).frame(width: 20, height: 20)
                     if done {
-                        Image(systemName: "checkmark").font(.system(size: 10, weight: .bold)).foregroundColor(.white)
+                        Image(systemName: "checkmark").font(.caption.weight(.bold)).foregroundColor(.white)
                     } else {
-                        Text(verbatim: "\(number)").font(.system(size: 11, weight: .semibold)).foregroundColor(.accentColor)
+                        Text(verbatim: "\(number)").font(.subheadline.weight(.semibold)).foregroundColor(.accentColor)
                     }
                 }
                 VStack(alignment: .leading, spacing: 2) {
-                    title.font(.system(size: 12, weight: .semibold)).strikethrough(done, color: .secondary)
+                    title.font(.callout.weight(.semibold)).strikethrough(done, color: .secondary)
                         .foregroundColor(done ? .secondary : .primary)
-                    detail.font(.system(size: 11)).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
+                    detail.font(.subheadline).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 0)
             }

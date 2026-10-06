@@ -72,7 +72,7 @@ struct ChatHeaderView: View {
                 serverToggleButton
             }
             HStack(spacing: 8) {
-                Image(systemName: "slider.horizontal.3").foregroundColor(.secondary).font(.system(size: 11))
+                Image(systemName: "slider.horizontal.3").foregroundColor(.secondary).font(.subheadline)
                 profilePicker
                 toolsMenu
                 temperatureRow
@@ -118,7 +118,7 @@ struct ChatHeaderView: View {
                             Image(systemName: ModelCapabilities.symbol(c)).help(ModelCapabilities.name(c))
                         }
                     }
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.leading, 4)
                     .accessibilityElement(children: .ignore)
@@ -178,7 +178,7 @@ struct ChatHeaderView: View {
                           ?? Text("Keep the loaded model"))
                 Button("Switch") { switchPrompter.answer(true) }
             }
-            .font(.system(size: 11))
+            .font(.subheadline)
             .controlSize(.small)
         } else if case .running = server.state, switchingTo == nil, let loaded = server.loadedModelPath,
                   let selected = catalog.model(id: selectedModelID), loaded != selected.path {
@@ -195,7 +195,7 @@ struct ChatHeaderView: View {
                 .lineLimit(1)
                 .disabled(!ops.canSwitchModel || tabs.isAnyBusy)
             }
-            .font(.system(size: 11))
+            .font(.subheadline)
             .controlSize(.small)
         }
     }
@@ -367,13 +367,13 @@ struct ChatHeaderView: View {
     /// The one sampling knob kept in the popover; edits the model's profile.
     private var temperatureRow: some View {
         HStack(spacing: 6) {
-            Text("Temperature").font(.system(size: 11)).foregroundColor(.secondary)
+            Text("Temperature").font(.subheadline).foregroundColor(.secondary)
             Slider(value: Binding(
                 get: { profiles.value(\.request.temperature, for: selectedModelID) },
                 set: { profiles.set(\.request.temperature, $0, for: selectedModelID) }
             ), in: 0...2, step: 0.05).controlSize(.mini)
             Text(String(format: "%.2f", profiles.resolved(for: selectedModelID).temperature))
-                .font(.system(size: 11)).monospacedDigit().frame(width: 32, alignment: .trailing)
+                .font(.subheadline).monospacedDigit().frame(width: 32, alignment: .trailing)
         }
         .help(Text("Randomness of the answers (part of the model's profile). Lower is more focused, higher more varied."))
     }
@@ -394,7 +394,7 @@ struct ServerStatusLabel: View {
     var body: some View {
         HStack(spacing: 6) {
             Circle().fill(statusColor).frame(width: 8, height: 8)
-            Text(statusText).font(.system(size: 12, weight: .medium)).lineLimit(1).truncationMode(.middle)
+            Text(statusText).font(.callout.weight(.medium)).lineLimit(1).truncationMode(.middle)
         }
     }
 
@@ -453,7 +453,7 @@ struct GPUFitNotice: View {
                     .popover(isPresented: $showsHow, arrowEdge: .bottom) { howTo }
             }
         }
-        .font(.system(size: 11))
+        .font(.subheadline)
         .help(Text(Self.message(fit)))
     }
 

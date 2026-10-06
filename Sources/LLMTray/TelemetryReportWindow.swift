@@ -79,7 +79,7 @@ private struct TelemetryReportView: View {
                 }
             }
             Text(verbatim: json)
-                .font(.system(size: 11, design: .monospaced))
+                .font(.system(.subheadline, design: .monospaced))
                 .textSelection(.enabled)
                 .padding(8)
                 .frame(maxWidth: .infinity, alignment: .leading)

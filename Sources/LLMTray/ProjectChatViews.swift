@@ -38,7 +38,7 @@ struct ProjectChatStatusLine: View {
                     status(project).lineLimit(1).layoutPriority(1)
                     Spacer(minLength: 0)
                 }
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
                 .contentShape(Rectangle())
             }
@@ -56,7 +56,7 @@ struct ProjectChatStatusLine: View {
                         .buttonStyle(.plain)
                         .accessibilityLabel("Dismiss")
                 }
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 12)
                 .padding(.bottom, 5)
