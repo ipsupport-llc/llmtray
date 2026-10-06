@@ -278,7 +278,15 @@ extension ModelRecommendationsTests {
         // A file it hadn't got to (put there by hand): stays, with its folder.
         let mixed = try folder("mixed", [ModelFolder.manifestName: manifest, "config.json": "{}", "model.safetensors": "mine"])
         ModelFolder.removeUnfinishedDownload(atPath: mixed, files: ["config.json"])
-        XCTAssertEqual(try fm.contentsOfDirectory(atPath: mixed), ["model.safetensors"])
+        XCTAssertEqual(Set(try fm.contentsOfDirectory(atPath: mixed)), ["model.safetensors", ModelFolder.manifestName],
+                       "the manifest stays: still an unfinished download, not a model")
+
+        // A config it hadn't verified as its own stays, and so does the
+        // manifest: the folder doesn't pass for a model.
+        let foreignConfig = try folder("foreignConfig", [ModelFolder.manifestName: manifest, "config.json": "{}", "model.safetensors": ""])
+        ModelFolder.removeUnfinishedDownload(atPath: foreignConfig, files: ["model.safetensors"])
+        XCTAssertFalse(ModelFolder.isComplete(atPath: foreignConfig))
+        XCTAssertTrue(MediaModelLocation.isUnfinishedBrowserDownload(foreignConfig))
 
         // Complete: untouched.
         let done = try folder("done", [ModelFolder.completionMarkerName: "", ModelFolder.manifestName: manifest, "config.json": "{}"])
@@ -296,5 +304,11 @@ extension ModelRecommendationsTests {
         XCTAssertTrue(fm.fileExists(atPath: outside + "/sub/keep.txt"))
         XCTAssertFalse(fm.fileExists(atPath: escape + "/file-link"))
         XCTAssertTrue(fm.fileExists(atPath: escape + "/linked"), "the linked folder itself isn't its to remove")
+
+        // The model folder itself a link: nothing goes where it points.
+        let real = try folder("real", [ModelFolder.manifestName: manifest, "config.json": "{}"])
+        try fm.createSymbolicLink(atPath: dir + "/org/linkedModel", withDestinationPath: real)
+        ModelFolder.removeUnfinishedDownload(atPath: dir + "/org/linkedModel", files: ["config.json"])
+        XCTAssertTrue(fm.fileExists(atPath: real + "/config.json"))
     }
 }
