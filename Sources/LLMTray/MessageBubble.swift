@@ -46,7 +46,7 @@ struct MessageBubble: View {
     /// something anyone said.
     private var summary: some View {
         Label(message.content, systemImage: "arrow.down.right.and.arrow.up.left")
-            .font(.system(size: 11).italic())
+            .font(.subheadline.italic())
             .foregroundColor(.secondary)
             .padding(8)
             .background(Color.gray.opacity(0.06))
@@ -62,7 +62,7 @@ struct MessageBubble: View {
                 // The answers are LLMTray's: its own mark, not a generic glyph.
                 if !isUser { BrainMark(size: 13) }
                 Text(isUser ? "You" : "Assistant")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.caption.weight(.semibold))
                     .foregroundColor(.secondary)
             }
 
@@ -80,7 +80,7 @@ struct MessageBubble: View {
                             // A tool call, an image or a song followed: done thinking.
                             Label(nothingFollows ? "Thinking…" : "Thought process", systemImage: "brain")
                         }
-                        .font(.system(size: 9, weight: .semibold))
+                        .font(.caption.weight(.semibold))
                         .foregroundColor(.secondary)
                         .contentShape(Rectangle())
                     }
@@ -88,7 +88,7 @@ struct MessageBubble: View {
                     .help(expanded ? Text("Hide the reasoning") : Text("Show the reasoning"))
                     if expanded {
                         Text(ChatMarkdown.render(message.reasoning, baseSize: 11))
-                            .font(.system(size: 11).italic())
+                            .font(.subheadline.italic())
                             .foregroundColor(.secondary)
                             .textSelection(.enabled)
                     }
@@ -104,7 +104,7 @@ struct MessageBubble: View {
                 // (also after a tool round). Only while it answers: a turn
                 // stopped mid-thought isn't still thinking.
                 Label("Thinking…", systemImage: "brain")
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                     .help(Text("The model is reasoning before it answers (Settings shows the reasoning itself)"))
             }
@@ -135,7 +135,7 @@ struct MessageBubble: View {
                             }
                     }
                 }
-                .font(.system(size: 13))
+                .font(.body)
                 .textSelection(.enabled)
                 .padding(8)
                 .background(isUser ? Color.accentColor.opacity(0.15) : Color.gray.opacity(0.12))
@@ -166,7 +166,7 @@ struct MessageBubble: View {
 
             ForEach(sources, id: \.self) { source in
                 Text(verbatim: source)
-                    .font(.system(size: 9))
+                    .font(.caption)
                     .foregroundColor(.secondary)
                     .textSelection(.enabled)
             }
@@ -203,12 +203,12 @@ struct MessageBubble: View {
     private var textActions: some View {
         HStack(spacing: 8) {
             Button { MediaSharing.copyText(message.content) } label: {
-                Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+                Label("Copy", systemImage: "doc.on.doc").font(.caption)
             }
             .buttonStyle(.plain)
             .help(Text("Copy the text"))
             ShareLink(item: message.content) {
-                Label("Share…", systemImage: "square.and.arrow.up").font(.system(size: 10))
+                Label("Share…", systemImage: "square.and.arrow.up").font(.caption)
             }
             .buttonStyle(.plain)
             // How the answer was made: an LLM text answer's, when known.
@@ -250,12 +250,12 @@ struct MessageBubble: View {
                     }
                 HStack(spacing: 8) {
                     Button { ImageActions.save(data, prompt: prompt) } label: {
-                        Label("Save…", systemImage: "square.and.arrow.down").font(.system(size: 10))
+                        Label("Save…", systemImage: "square.and.arrow.down").font(.caption)
                     }
                     .buttonStyle(.plain)
                     // Icons only: the row must fit the popover.
                     Button { ImageActions.copy(data) } label: {
-                        Image(systemName: "doc.on.doc").font(.system(size: 10))
+                        Image(systemName: "doc.on.doc").font(.caption)
                     }
                     .buttonStyle(.plain)
                     .help(Text("Copy"))
@@ -263,20 +263,20 @@ struct MessageBubble: View {
                     ShareLink(item: SharedImage(data: data, prompt: prompt),
                               preview: SharePreview(prompt.isEmpty ? NSLocalizedString("Image", comment: "") : prompt,
                                                     image: Image(nsImage: nsImage))) {
-                        Image(systemName: "square.and.arrow.up").font(.system(size: 10))
+                        Image(systemName: "square.and.arrow.up").font(.caption)
                     }
                     .buttonStyle(.plain)
                     .help(Text("Share…"))
                     .accessibilityLabel(Text("Share…"))
                     if canRegenerate(.image, i) {
                         Button { regenerateMedia?(.image, i, .regenerate) } label: {
-                            Label("Regenerate", systemImage: "arrow.clockwise").font(.system(size: 10))
+                            Label("Regenerate", systemImage: "arrow.clockwise").font(.caption)
                         }
                         .buttonStyle(.plain)
                         .disabled(regenerateMedia == nil)
                         .help(Text("Another version next to this one (a new seed, the same request)"))
                         Button { regenerateMedia?(.image, i, .tweak) } label: {
-                            Label("Tweak…", systemImage: "slider.horizontal.3").font(.system(size: 10))
+                            Label("Tweak…", systemImage: "slider.horizontal.3").font(.caption)
                         }
                         .buttonStyle(.plain)
                         .disabled(regenerateMedia == nil)
@@ -284,13 +284,13 @@ struct MessageBubble: View {
                     }
                     if !isUser {
                         Button { regenerateMedia?(.image, i, .remove) } label: {
-                            Label("Remove", systemImage: "trash").font(.system(size: 10))
+                            Label("Remove", systemImage: "trash").font(.caption)
                         }
                         .buttonStyle(.plain)
                         .disabled(regenerateMedia == nil)
                     }
                     if let seconds = message.imageDurations[safe: i] {
-                        Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.system(size: 10))
+                        Text(String(format: NSLocalizedString("Generated in %.1fs", comment: "image generation time"), seconds)).font(.caption)
                     }
                     // Sources line up with the images only when there's one each.
                     if !isUser, message.imageSources.count == message.images.count, let source = message.imageSources[safe: i] {
@@ -351,14 +351,14 @@ struct ImageGenerationProgressView: View {
                     ProgressView(value: Double(progress.step), total: Double(progress.total))
                         .frame(width: 100)
                     Text("Step \(progress.step)/\(progress.total)")
-                        .font(.system(size: 11))
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 } else {
                     ProgressView().controlSize(.small)
                     Text(chat.isWaitingForMediaDownload
                          ? NSLocalizedString("Waiting for a model download to finish…", comment: "chat: an image waits for a download")
                          : chat.mfluxStatusText.isEmpty ? NSLocalizedString("Generating image…", comment: "") : chat.mfluxStatusText)
-                        .font(.system(size: 11))
+                        .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
             }
@@ -394,7 +394,7 @@ private struct ToolCallRow: View {
     var body: some View {
         DisclosureGroup(isExpanded: $expanded) {
             Text(result.map { $0.count > 4000 ? String($0.prefix(4000)) + "…" : $0 } ?? NSLocalizedString("(no result yet)", comment: "tool call debug view"))
-                .font(.system(size: 10, design: .monospaced))
+                .font(.system(.caption, design: .monospaced))
                 .foregroundColor(.secondary)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -404,7 +404,7 @@ private struct ToolCallRow: View {
         } label: {
             Label {
                 Text("\(call.name)(\(label))")
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(.system(.caption, design: .monospaced))
                     .lineLimit(expanded ? nil : 1)
                     .truncationMode(.tail)
             } icon: {

@@ -17,21 +17,21 @@ struct FolderPromptCard: View {
         VStack(alignment: .leading, spacing: 8) {
             Label(prompt.request.level == .change ? LocalizedStringKey("Folder changes") : LocalizedStringKey("Folder access"),
                   systemImage: prompt.request.level == .change ? "folder.badge.gearshape" : "folder")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundColor(.secondary)
             if prompt.request.level == .change {
                 Text("Let the chat propose changes in \(path)?")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.callout.weight(.medium))
                 Text("Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it.")
-                    .font(.system(size: 11)).foregroundColor(.secondary)
+                    .font(.subheadline).foregroundColor(.secondary)
             } else {
                 Text("Let the chat look in \(path)?")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.callout.weight(.medium))
                 Text("Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden.")
-                    .font(.system(size: 11)).foregroundColor(.secondary)
+                    .font(.subheadline).foregroundColor(.secondary)
             }
             if let error = prompt.error {
-                Text(error).font(.system(size: 11)).foregroundColor(.red)
+                Text(error).font(.subheadline).foregroundColor(.red)
             }
             HStack(spacing: 6) {
                 ForEach(prompt.choices.filter { $0 != .deny }, id: \.self) { choice in
@@ -44,7 +44,7 @@ struct FolderPromptCard: View {
                     Button("Cancel") { prompt.resolve(nil) }
                 }
             }
-            .font(.system(size: 11))
+            .font(.subheadline)
         }
         .padding(10)
         .background(Color.accentColor.opacity(0.06))
@@ -73,22 +73,22 @@ struct FolderPlanCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Folder changes", systemImage: "folder.badge.gearshape")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundColor(.secondary)
             switch model.phase {
             case .review: review
             case .running(let done, let total):
                 ProgressView(value: Double(done), total: Double(max(total, 1)))
                 Text(String(format: NSLocalizedString("Changing files: %1$lld of %2$lld…", comment: ""), done, total))
-                    .font(.system(size: 11)).foregroundColor(.secondary)
+                    .font(.subheadline).foregroundColor(.secondary)
             case .finished(let outcome, _): finished(outcome)
             case .undoing:
                 ProgressView().controlSize(.small)
-                Text("Undoing…").font(.system(size: 11)).foregroundColor(.secondary)
+                Text("Undoing…").font(.subheadline).foregroundColor(.secondary)
             case .undone(let report): undone(report)
             }
             if let message = model.message {
-                Text(message).font(.system(size: 11)).foregroundColor(.red)
+                Text(message).font(.subheadline).foregroundColor(.red)
             }
         }
         .padding(10)
@@ -101,21 +101,21 @@ struct FolderPlanCard: View {
     private var review: some View {
         let r = model.review
         Text(FolderPlanModel.summary(r.counts).capitalizedFirst)
-            .font(.system(size: 12, weight: .medium))
+            .font(.callout.weight(.medium))
         let warned = r.items.filter {
             !PlanReview.warnings($0).filter { $0 != .trashRestore }.isEmpty || r.invalid[$0.id] != nil || r.checks.notIdentical[$0.id] != nil
         }.count
         if warned > 0 {
             Text(String(format: NSLocalizedString("%lld need a look: see the list.", comment: "plan review"), warned))
-                .font(.system(size: 11)).foregroundColor(.orange)
+                .font(.subheadline).foregroundColor(.orange)
         }
         if !r.added.isEmpty {
             Text(String(format: NSLocalizedString("%lld new since you opened the list: unticked until you tick them.", comment: "plan review"), r.added.count))
-                .font(.system(size: 11)).foregroundColor(.orange)
+                .font(.subheadline).foregroundColor(.orange)
         }
         if r.counts.trashes > 0 {
             Text("Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder.")
-                .font(.system(size: 11)).foregroundColor(.secondary)
+                .font(.subheadline).foregroundColor(.secondary)
         }
         DisclosureGroup(isExpanded: $model.expanded) {
             VStack(alignment: .leading, spacing: 4) {
@@ -124,7 +124,7 @@ struct FolderPlanCard: View {
                     Button("Select None") { model.setAll(false) }
                 }
                 .buttonStyle(.link)
-                .font(.system(size: 10))
+                .font(.caption)
                 ScrollView {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(r.items) { item in row(item, review: r) }
@@ -135,12 +135,12 @@ struct FolderPlanCard: View {
         } label: {
             Text(String(format: NSLocalizedString("%1$lld of %2$lld changes selected", comment: "plan review"),
                         r.approvable.count, r.items.count))
-                .font(.system(size: 11))
+                .font(.subheadline)
         }
         // Above Approve: what the whole plan does that needs a look.
         ForEach(Array(r.planWarnings.enumerated()), id: \.offset) { _, w in
             Label(FolderPlanModel.planWarning(w), systemImage: "exclamationmark.triangle")
-                .font(.system(size: 11)).foregroundColor(.orange)
+                .font(.subheadline).foregroundColor(.orange)
         }
         HStack {
             Spacer()
@@ -157,17 +157,17 @@ struct FolderPlanCard: View {
                     .disabled(!r.canApprove || manager.isChanging)
             }
         }
-        .font(.system(size: 11))
+        .font(.subheadline)
     }
 
     private func row(_ item: PlanItem, review r: PlanReview) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Toggle(isOn: Binding(get: { r.isSelected(item.id) }, set: { model.set(item.id, selected: $0) })) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(FolderPlanModel.describe(item)).font(.system(size: 11)).lineLimit(2).truncationMode(.middle)
+                    Text(FolderPlanModel.describe(item)).font(.subheadline).lineLimit(2).truncationMode(.middle)
                     if let size = r.trashSize(item) {
                         Text(FolderPlanModel.size(size, folder: item.source?.kind == .directory))
-                            .font(.system(size: 10)).foregroundColor(.secondary)
+                            .font(.caption).foregroundColor(.secondary)
                     }
                 }
             }
@@ -186,7 +186,7 @@ struct FolderPlanCard: View {
                     Text(FolderPlanModel.warning(w)).foregroundColor(w == .trashRestore ? .secondary : .orange)
                 }
             }
-            .font(.system(size: 10))
+            .font(.caption)
             .padding(.leading, 20)
         }
     }
@@ -194,17 +194,17 @@ struct FolderPlanCard: View {
     @ViewBuilder
     private func finished(_ o: PlanOutcome) -> some View {
         Text(String(format: NSLocalizedString("Done: %lld changes made.", comment: "plan result"), o.done))
-            .font(.system(size: 12, weight: .medium))
+            .font(.callout.weight(.medium))
         if o.failed > 0 || o.uncertain > 0 || o.notRun > 0 {
             Text(String(format: NSLocalizedString("Stopped at a problem: %1$lld failed, %2$lld unsure, %3$lld not run. Nothing past it was changed.", comment: "plan result"),
                         o.failed, o.uncertain, o.notRun))
-                .font(.system(size: 11)).foregroundColor(.orange)
+                .font(.subheadline).foregroundColor(.orange)
             if let problem = o.problem {
-                Text(problem).font(.system(size: 10)).foregroundColor(.secondary).lineLimit(4)
+                Text(problem).font(.caption).foregroundColor(.secondary).lineLimit(4)
             }
             if o.uncertain > 0 {
                 Text("An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.")
-                    .font(.system(size: 11)).foregroundColor(.secondary)
+                    .font(.subheadline).foregroundColor(.secondary)
             }
         }
         HStack {
@@ -214,27 +214,27 @@ struct FolderPlanCard: View {
                 Button("Undo") { model.undo() }.disabled(manager.isChanging)
             }
         }
-        .font(.system(size: 11))
+        .font(.subheadline)
     }
 
     @ViewBuilder
     private func undone(_ report: ChangeUndo.Report) -> some View {
         Text(String(format: NSLocalizedString("Undone: %lld changes reversed.", comment: "plan result"), report.undone.count))
-            .font(.system(size: 12, weight: .medium))
+            .font(.callout.weight(.medium))
         if let stopped = report.stopped {
             Text(String(format: NSLocalizedString("Stopped: %@", comment: "undo result"), stopped.reason ?? ""))
-                .font(.system(size: 11)).foregroundColor(.orange)
+                .font(.subheadline).foregroundColor(.orange)
         }
         let left = report.remaining.filter(\.reversible).count
         if left > 0 {
             Text(String(format: NSLocalizedString("%lld can still be undone from Settings > Files.", comment: "undo result"), left))
-                .font(.system(size: 11)).foregroundColor(.secondary)
+                .font(.subheadline).foregroundColor(.secondary)
         }
         HStack {
             Spacer()
             Button("Close", action: dismiss)
         }
-        .font(.system(size: 11))
+        .font(.subheadline)
     }
 }
 

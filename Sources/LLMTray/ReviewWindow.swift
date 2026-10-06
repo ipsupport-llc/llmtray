@@ -188,7 +188,7 @@ struct ReviewPromptRow: View {
                         .help(Text("Ask again in two weeks"))
                     Button("Don't Ask Again") { prompter.never() }
                 }
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .buttonStyle(.link)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)

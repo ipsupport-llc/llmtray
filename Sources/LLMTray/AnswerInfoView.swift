@@ -85,7 +85,7 @@ struct AnswerInfoButton: View {
 
     var body: some View {
         Button { presenter.toggle(id) } label: {
-            Image(systemName: "info.circle").font(.system(size: 10))
+            Image(systemName: "info.circle").font(.caption)
         }
         .buttonStyle(.plain)
         .help(Text("Answer details"))
@@ -112,14 +112,14 @@ struct AnswerDetailsView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     if section.kind != .date {
                         Text(Self.heading(section.kind))
-                            .font(.system(size: 9, weight: .semibold))
+                            .font(.caption.weight(.semibold))
                             .foregroundColor(.secondary)
                             .textCase(.uppercase)
                     }
                     if section.kind == .speed, stats.requestCount > 1 {
                         Text(String(format: NSLocalizedString("Rates and first token: the last of %lld requests.", comment: "answer details"),
                                     stats.requestCount))
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -132,12 +132,12 @@ struct AnswerDetailsView: View {
                 }
             }
             if sections.isEmpty {
-                Text("No details for this answer.").font(.system(size: 11)).foregroundColor(.secondary)
+                Text("No details for this answer.").font(.subheadline).foregroundColor(.secondary)
             } else {
                 Button {
                     MediaSharing.copyText(stats.plainText(heading: Self.heading, label: Self.label))
                 } label: {
-                    Label("Copy", systemImage: "doc.on.doc").font(.system(size: 10))
+                    Label("Copy", systemImage: "doc.on.doc").font(.caption)
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(.secondary)
@@ -152,11 +152,11 @@ struct AnswerDetailsView: View {
     private func rowView(_ row: AnswerStats.Row) -> some View {
         switch row.kind {
         case .date:
-            Text(verbatim: row.value).font(.system(size: 10)).foregroundColor(.secondary)
+            Text(verbatim: row.value).font(.caption).foregroundColor(.secondary)
         case .model:
-            Text(verbatim: row.value).font(.system(size: 11, weight: .medium)).lineLimit(2).textSelection(.enabled)
+            Text(verbatim: row.value).font(.subheadline.weight(.medium)).lineLimit(2).textSelection(.enabled)
         case .folder:
-            Text(verbatim: row.value).font(.system(size: 10)).foregroundColor(.secondary)
+            Text(verbatim: row.value).font(.caption).foregroundColor(.secondary)
                 .lineLimit(1).truncationMode(.middle).textSelection(.enabled)
         default:
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -164,7 +164,7 @@ struct AnswerDetailsView: View {
                 Spacer(minLength: 4)
                 Text(verbatim: row.value).monospacedDigit().lineLimit(1).textSelection(.enabled)
             }
-            .font(.system(size: 11))
+            .font(.subheadline)
         }
     }
 

@@ -305,7 +305,7 @@ struct ChatTabStrip: View {
                     .help("Close Tab")
                     .accessibilityLabel("Close Tab")
             }
-            .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+            .font(.callout.weight(isSelected ? .semibold : .regular))
             .foregroundColor(isSelected ? .primary : .secondary)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)

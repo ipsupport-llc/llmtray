@@ -53,7 +53,7 @@ struct ChatSidebar: View {
             if store.isReadOnly {
                 Label("Pins and projects couldn't be loaded. Changes to them aren't saved until LLMTray restarts; a copy of the file is kept next to it.",
                       systemImage: "exclamationmark.triangle")
-                    .font(.system(size: 10))
+                    .font(.caption)
                     .foregroundColor(.orange)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(8)

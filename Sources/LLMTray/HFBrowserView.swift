@@ -19,7 +19,7 @@ struct HFBrowserView: View {
             .padding([.horizontal, .top], 12)
 
             HStack(spacing: 6) {
-                Text("Sort by").font(.system(size: 11)).foregroundColor(.secondary)
+                Text("Sort by").font(.subheadline).foregroundColor(.secondary)
                 Picker("", selection: $browser.sortOption) {
                     ForEach(HFSortOption.allCases) { option in
                         Text(option.label).tag(option)
@@ -39,7 +39,7 @@ struct HFBrowserView: View {
                 Text(diskLine).monospacedDigit()
                 Spacer()
             }
-            .font(.system(size: 10))
+            .font(.caption)
             .foregroundColor(.secondary)
             .padding(.horizontal, 12)
             .padding(.bottom, 8)
@@ -47,7 +47,7 @@ struct HFBrowserView: View {
 
             if let err = browser.searchError {
                 Text(err)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundColor(.red)
                     .padding(.horizontal, 12)
             }
@@ -72,7 +72,7 @@ struct HFBrowserView: View {
                                 fitDot(for: size)
                             }
                             Text(model.id)
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.callout.weight(.medium))
                             if case .gated(let manual)? = browser.infoByID[model.id]?.access {
                                 Image(systemName: "lock.fill")
                                     .font(.system(size: 9))
@@ -101,7 +101,7 @@ struct HFBrowserView: View {
                                     .help(Text(info.isNonCommercial ? "Non-commercial license: read it on the model card before using the model." : "The model's license, from its card."))
                             }
                         }
-                        .font(.system(size: 10))
+                        .font(.caption)
                         .foregroundColor(.secondary)
                     }
                     Spacer()
@@ -112,7 +112,7 @@ struct HFBrowserView: View {
 
             if let err = browser.downloadError {
                 Text(err)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundColor(.red)
                     .padding(12)
             }
@@ -143,7 +143,7 @@ struct HFBrowserView: View {
                 }
             }
         }
-        .font(.system(size: 9))
+        .font(.caption)
         .foregroundColor(.secondary)
     }
 
@@ -181,12 +181,12 @@ struct HFBrowserView: View {
                     .accessibilityLabel("Cancel download")
                 }
                 Text(statusLine)
-                    .font(.system(size: 9))
+                    .font(.caption)
                     .foregroundColor(.secondary)
             }
         } else if ModelDiscovery.isDownloaded(repoID: model.id, root: ModelDiscovery.currentModelsRoot()) {
             Label("Downloaded", systemImage: "checkmark.circle.fill")
-                .font(.system(size: 11))
+                .font(.subheadline)
                 .foregroundColor(.secondary)
         } else {
             let tooBig = browser.sizesByID[model.id].map { size in catalog.freeBytes.map { size > $0 } ?? false } ?? false
@@ -263,12 +263,12 @@ private struct MediaDownloadControl: View {
                 HStack(spacing: 6) {
                     ProgressView().controlSize(.small)
                     Text(status.isEmpty ? NSLocalizedString("Downloading…", comment: "") : status)
-                        .font(.system(size: 10)).foregroundColor(.secondary).lineLimit(1)
+                        .font(.caption).foregroundColor(.secondary).lineLimit(1)
                 }
             } else if MediaModels.isReady(entry) {
                 Label(String(format: NSLocalizedString("Installed · %@", comment: "HF browser: a media model installed, its kind"), entry.kind.title),
                       systemImage: "checkmark.circle.fill")
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
             } else {
                 Button("Download") { start() }
@@ -277,7 +277,7 @@ private struct MediaDownloadControl: View {
                                       entry.kind.title)))
             }
             if let error {
-                Text(error).font(.system(size: 9)).foregroundColor(.red).lineLimit(2)
+                Text(error).font(.caption).foregroundColor(.red).lineLimit(2)
             }
         }
     }

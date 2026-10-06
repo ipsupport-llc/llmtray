@@ -30,7 +30,7 @@ struct BugReportView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("What happened?").font(.headline)
             TextEditor(text: $options.description)
-                .font(.system(size: 13))
+                .font(.body)
                 .frame(minHeight: 90)
                 .focused($descriptionFocused)
                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.primary.opacity(0.15)))
@@ -49,7 +49,7 @@ struct BugReportView: View {
             DisclosureGroup {
                 ScrollView {
                     Text(report.text())
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(.system(.subheadline, design: .monospaced))
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(8)
@@ -63,7 +63,7 @@ struct BugReportView: View {
                 DisclosureGroup {
                     ScrollView {
                         Text(BugReporter.serverLogForReport(server))
-                            .font(.system(size: 10, design: .monospaced))
+                            .font(.system(.caption, design: .monospaced))
                             .textSelection(.enabled)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(8)
@@ -83,7 +83,7 @@ struct BugReportView: View {
                                 ForEach(crashes, id: \.name) { crash in
                                     Text(verbatim: crash.name).font(.caption.weight(.semibold))
                                     Text(verbatim: String(crash.text.prefix(20_000)))
-                                        .font(.system(size: 10, design: .monospaced))
+                                        .font(.system(.caption, design: .monospaced))
                                         .textSelection(.enabled)
                                 }
                             }
