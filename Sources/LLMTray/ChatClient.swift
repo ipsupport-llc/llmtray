@@ -1062,7 +1062,10 @@ final class ChatClient: ObservableObject {
         // the message is in, the answer comes once it's loaded.
         // Also a chat model still downloading (sent during the first run's
         // download): the answer comes once it's in and started.
-        func downloading() -> Bool { DownloadQueue.isFetchingChatModel && !server.canAnswer }
+        // Only this chat's own model: another one downloading isn't what it waits for.
+        func downloading() -> Bool {
+            settings.modelPath.map(DownloadQueue.isFetching(modelPath:)) == true && !server.canAnswer
+        }
         func modelAway() -> Bool {
             server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting || downloading()
         }

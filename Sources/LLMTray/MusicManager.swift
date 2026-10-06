@@ -182,7 +182,8 @@ final class MusicManager: ObservableObject {
     private func fetch(repo: String, patterns: [String]?, into dir: String, move: Bool = true, clearing entry: MediaModels.Entry? = nil) async throws {
         let target = move ? dir + ".partial-\(UUID().uuidString)" : dir
         do {
-            try await AudioRuntime.shared.snapshotDownload(repo: repo, patterns: patterns, into: target)
+            // Cancellable: the download queue's Cancel stops it (the temp folder goes).
+            try await AudioRuntime.shared.snapshotDownload(repo: repo, patterns: patterns, into: target, cancellable: true)
             if let entry { try MediaModels.clearIncompleteTarget(entry) }
             if move { try FileManager.default.moveItem(atPath: target, toPath: dir) }
         } catch {
@@ -213,7 +214,6 @@ final class MusicManager: ObservableObject {
             throw MusicError.processFailed(NSLocalizedString("The music generator is busy with another chat -- try again once it's done.", comment: ""))
         }
         isBusy = true
-        isGenerating = true
         defer {
             isBusy = false
             isGenerating = false
@@ -225,6 +225,8 @@ final class MusicManager: ObservableObject {
         // Offline with a venv already there, the installed one generates.
         _ = try await AudioRuntime.shared.ensureInstalledOrKeep { [weak self] text in self?.statusText = text }
         statusText = ""
+        // From here it takes the memory (an install before doesn't).
+        isGenerating = true
         statusText = NSLocalizedString("Generating music…", comment: "")
         progress = 0
         var fields: [String: Any] = [

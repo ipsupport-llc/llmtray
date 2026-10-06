@@ -197,7 +197,6 @@ final class DownloadQueue: ObservableObject {
     /// than start its half-downloaded folder (first run: the wizard starts
     /// it once it's in).
     static private(set) var fetchingChatModel: String?
-    static var isFetchingChatModel: Bool { fetchingChatModel != nil }
 
     /// `path` is the chat model downloading now (its folder is already in
     /// the models folder, half-written).

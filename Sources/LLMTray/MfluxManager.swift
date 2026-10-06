@@ -134,9 +134,7 @@ final class MfluxManager: ObservableObject {
     @Published private(set) var isBusy: Bool = false
 
     /// A generation running -- not a download: what another chat's image or
-
     /// song waits for (both take most of the memory).
-
     @Published private(set) var isGenerating = false
     @Published private(set) var statusText: String = ""
     // Streamed by the runner during generate() (a decoded preview per
