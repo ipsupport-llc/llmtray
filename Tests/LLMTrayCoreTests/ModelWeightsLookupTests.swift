@@ -30,6 +30,8 @@ final class ModelWeightsLookupTests: XCTestCase {
         try Data(#"{"model_type": "gemma4", "text_config": {"model_type": "gemma4_text"}}"#.utf8).write(to: dir.appendingPathComponent("config.json"))
         XCTAssertEqual(ModelWeights.modelTypes(inFolder: dir.path), ["gemma4", "gemma4_text"])
         XCTAssertEqual(ModelWeights.modelTypes(inFolder: dir.appendingPathComponent("missing").path), [])
+        try Data(#"{"model_type": "../../etc/x", "text_config": {"model_type": "ok_1"}}"#.utf8).write(to: dir.appendingPathComponent("config.json"))
+        XCTAssertEqual(ModelWeights.modelTypes(inFolder: dir.path), ["ok_1"])
     }
 
     func testOffsetsOutsideTheFileCountNothing() {
@@ -39,6 +41,9 @@ final class ModelWeightsLookupTests: XCTestCase {
         XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [50, 10]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
         XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [-5, 10]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
         XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [0, Int64.max]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
+        // Any tensor out of range makes the whole header untrusted.
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [0, 10]], "m.other.weight": ["data_offsets": [10, 500]]],
+                                                     dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
     }
 
     private func safetensors(_ tensors: [(String, Int)]) -> Data {

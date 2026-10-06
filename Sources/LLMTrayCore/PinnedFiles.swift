@@ -418,14 +418,14 @@ public enum ModelWeights {
     /// the header untrusted, and nothing of the file is counted.
     static func lookupTableBytes(header: [String: Any], dataBytes: Int64, tables: Set<String>) -> Int64 {
         var sum: Int64 = 0
-        for (key, value) in header {
-            let parts = key.split(separator: ".")
-            guard parts.count >= 2, ["weight", "scales", "biases"].contains(parts[parts.count - 1]),
-                  tables.contains(String(parts[parts.count - 2])) else { continue }
+        for (key, value) in header where key != "__metadata__" {
             guard let info = value as? [String: Any], let offsets = info["data_offsets"] as? [NSNumber], offsets.count == 2
             else { return 0 }
             let (start, end) = (offsets[0].int64Value, offsets[1].int64Value)
             guard start >= 0, end >= start, end <= dataBytes else { return 0 }
+            let parts = key.split(separator: ".")
+            guard parts.count >= 2, ["weight", "scales", "biases"].contains(parts[parts.count - 1]),
+                  tables.contains(String(parts[parts.count - 2])) else { continue }
             sum += end - start  // each <= dataBytes: no overflow for real files
             if sum > dataBytes { return 0 }
         }
@@ -474,7 +474,9 @@ public enum ModelWeights {
         guard let data = FileManager.default.contents(atPath: path + "/config.json"),
               let config = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return [] }
         let text = config["text_config"] as? [String: Any]
+        // Names of files to read: nothing that could leave the folder.
         return [config["model_type"] as? String, text?["model_type"] as? String].compactMap { $0 }
+            .filter { !$0.isEmpty && $0.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") } }
     }
 
     /// The sibling modules a model file imports (`from . import a, b`,
