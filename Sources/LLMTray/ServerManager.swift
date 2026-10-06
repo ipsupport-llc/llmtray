@@ -603,7 +603,8 @@ final class ServerManager: ObservableObject {
         // prefill get that room (an 8 GB Mac had none left for a cache).
         var weights = ModelWeights.bytes(inFolder: modelPath)
         if lowMemoryWeights, supportsLowMemory {
-            weights -= ModelWeights.lookupTableBytes(inFolder: modelPath, tables: MLXRuntimeInstaller.declaredLookupTables())
+            let tables = MLXRuntimeInstaller.declaredLookupTables(modelTypes: ModelWeights.modelTypes(inFolder: modelPath))
+            weights = max(0, weights - ModelWeights.lookupTableBytes(inFolder: modelPath, tables: tables))
         }
         let scratchMB = ServerLaunch.prefillMemoryMB(gpuLimitBytes: limit, weightsBytes: weights, shares: shares)
         let facts = MemoryFacts(

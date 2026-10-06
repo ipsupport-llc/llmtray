@@ -13,6 +13,32 @@ final class ModelWeightsLookupTests: XCTestCase {
         """
         XCTAssertEqual(ModelWeights.declaredLookupTables(inSource: source), ["embed_tokens_per_layer", "a_table", "b_table"])
         XCTAssertEqual(ModelWeights.declaredLookupTables(inSource: "x = 1"), [])
+        XCTAssertEqual(ModelWeights.declaredLookupTables(inSource: "    # lookup_tables = (\"embed_tokens\",)\n"), [])
+    }
+
+    func testImportedModulesAndModelTypes() throws {
+        let source = """
+        import mlx.core as mx
+        from . import gemma4_audio, gemma4_text, gemma4_vision
+        from .base import BaseModelArgs
+        from .cache import KVCache as Cache
+        """
+        XCTAssertEqual(ModelWeights.importedModules(inSource: source), ["gemma4_audio", "gemma4_text", "gemma4_vision", "base", "cache"])
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try Data(#"{"model_type": "gemma4", "text_config": {"model_type": "gemma4_text"}}"#.utf8).write(to: dir.appendingPathComponent("config.json"))
+        XCTAssertEqual(ModelWeights.modelTypes(inFolder: dir.path), ["gemma4", "gemma4_text"])
+        XCTAssertEqual(ModelWeights.modelTypes(inFolder: dir.appendingPathComponent("missing").path), [])
+    }
+
+    func testOffsetsOutsideTheFileCountNothing() {
+        let table = "m.embed_tokens_per_layer.weight"
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [0, 100]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 100)
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [0, 101]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [50, 10]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [-5, 10]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
+        XCTAssertEqual(ModelWeights.lookupTableBytes(header: [table: ["data_offsets": [0, Int64.max]]], dataBytes: 100, tables: ["embed_tokens_per_layer"]), 0)
     }
 
     private func safetensors(_ tensors: [(String, Int)]) -> Data {

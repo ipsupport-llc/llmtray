@@ -122,17 +122,19 @@ final class MLXRuntimeInstaller {
         }
     }
 
-    /// The lookup-only tables the installed runtime's models declare
-    /// (what --mmap-lookup-tables reads from disk).
-    static func declaredLookupTables() -> Set<String> {
+    /// The lookup-only tables the installed runtime declares for these
+    /// model types (what --mmap-lookup-tables reads from disk): their model
+    /// files and the sibling modules those import.
+    static func declaredLookupTables(modelTypes: [String]) -> Set<String> {
         var names: Set<String> = []
         for dir in sitePackageDirs {
             let models = "\(dir)/mlx_lm/models"
-            for file in (try? FileManager.default.contentsOfDirectory(atPath: models)) ?? [] where file.hasSuffix(".py") {
-                guard let text = try? String(contentsOfFile: "\(models)/\(file)", encoding: .utf8),
-                      text.contains("lookup_tables") else { continue }
-                names.formUnion(ModelWeights.declaredLookupTables(inSource: text))
+            func source(_ module: String) -> String? {
+                try? String(contentsOfFile: "\(models)/\(module).py", encoding: .utf8)
             }
+            var modules = Set(modelTypes)
+            for type in modelTypes { modules.formUnion(source(type).map(ModelWeights.importedModules(inSource:)) ?? []) }
+            for module in modules { names.formUnion(source(module).map(ModelWeights.declaredLookupTables(inSource:)) ?? []) }
         }
         return names
     }
