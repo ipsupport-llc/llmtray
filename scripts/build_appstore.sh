@@ -76,7 +76,9 @@ SIGN_IDENTITY= LLMTRAY_APP_STORE=1 "$SCRIPT_DIR/build_app.sh"
 # 2. The sandbox entitlements, plus the profile's identity when there is one.
 cp "$SCRIPT_DIR/appstore/app.entitlements" "$ENTITLEMENTS"
 if [[ -n "$PROFILE" ]]; then
-  cp "$PROFILE" "$APP/Contents/embedded.provisionprofile"
+  # Readable by everyone: a decoded CI secret is 0600, and App Store Connect
+  # rejects a package with root-only files (ITMS-90255).
+  install -m 0644 "$PROFILE" "$APP/Contents/embedded.provisionprofile"
   /usr/libexec/PlistBuddy -c "Add :com.apple.application-identifier string $APP_IDENTIFIER" "$ENTITLEMENTS"
   /usr/libexec/PlistBuddy -c "Add :com.apple.developer.team-identifier string $TEAM" "$ENTITLEMENTS"
 fi
@@ -90,6 +92,15 @@ APP_BUNDLE="$APP" RUNTIME_LAYOUT=packages \
 
 # 4. The installer package for App Store Connect (built, never uploaded here).
 if [[ -n "${INSTALLER_IDENTITY:-}" ]]; then
+  # The installer writes the files as root: anything not world-readable can't
+  # be read (or its signature verified) by the user running the app.
+  # Directories need read too (verifying the seal lists them), and search.
+  unreadable=$(find "$APP" \( ! -perm -o=r -o \( -type d ! -perm -o=x \) \))
+  if [[ -n "$unreadable" ]]; then
+    echo "error: not readable by everyone (ITMS-90255):" >&2
+    echo "$unreadable" >&2
+    exit 1
+  fi
   productbuild --component "$APP" /Applications --sign "$INSTALLER_IDENTITY" "$REPO_ROOT/.build/appstore/LLMTray.pkg"
   echo "--- built $REPO_ROOT/.build/appstore/LLMTray.pkg ---"
 fi
