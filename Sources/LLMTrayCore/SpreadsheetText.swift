@@ -87,8 +87,8 @@ public enum SpreadsheetText {
     /// What a row adds to the text, as `line` writes it: the parsers stop at
     /// the text cap while reading, before repeated rows pile up.
     static func lineBytes(_ cells: [String]) -> Int {
-        let used = (cells.lastIndex { !$0.isEmpty }).map { $0 + 1 } ?? 0
-        return cells.prefix(used).reduce(0) { $0 + $1.utf8.count + 3 }
+        guard let last = cells.lastIndex(where: { !$0.isEmpty }) else { return 0 }
+        return cells[...last].reduce(0) { $0 + $1.utf8.count } + 3 * last
     }
 
     static func parse(_ data: Data, part: String, caps: ExtractionCaps, delegate: XMLParserDelegate) throws {
@@ -182,14 +182,24 @@ enum XLSX {
     /// (serial 60, shown as Excel shows it); serials before it are a day on.
     static func date(_ serial: Double, date1904: Bool) -> String {
         var serial = serial
+        let frac = serial - serial.rounded(.down)
         if !date1904, serial >= 1, serial < 61 {
-            if serial.rounded(.down) == 60 { return "1900-02-29" }
+            if serial.rounded(.down) == 60 {
+                return frac < 1e-9 ? "1900-02-29" : "1900-02-29 " + format(timeFormat, Date(timeIntervalSince1970: frac * 86_400))
+            }
             serial += 1
         }
         let epoch = date1904 ? -2_082_844_800.0 : -2_209_161_600.0  // 1904-01-01, 1899-12-30 (UTC)
         let date = Date(timeIntervalSince1970: epoch + serial * 86_400)
-        let frac = serial - serial.rounded(.down)
         let f = frac < 1e-9 ? dayFormat : (serial < 1 ? timeFormat : dateTimeFormat)
+        return format(f, date)
+    }
+
+    /// DateFormatter isn't thread-safe; these are shared.
+    private static let formatLock = NSLock()
+    private static func format(_ f: DateFormatter, _ date: Date) -> String {
+        formatLock.lock()
+        defer { formatLock.unlock() }
         return f.string(from: date)
     }
 
@@ -467,7 +477,8 @@ enum ODS {
                     let filled = row.filter { !$0.isEmpty }.count
                     for k in 0..<min(rowRepeat, ODS.maxRepeat) {
                         bytes += line
-                        cells += filled
+                        // The first copy's cells were counted as they closed.
+                        if k > 0 { cells += filled }
                         if bytes > maxBytes || cells > SpreadsheetText.maxCells {
                             stopped = .tooLarge(.text); p.abortParsing(); return
                         }

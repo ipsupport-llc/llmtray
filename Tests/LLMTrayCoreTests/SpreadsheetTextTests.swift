@@ -111,6 +111,7 @@ final class SpreadsheetTextTests: XCTestCase {
         XCTAssertEqual(XLSX.date(1, date1904: false), "1900-01-01")
         XCTAssertEqual(XLSX.date(59, date1904: false), "1900-02-28")
         XCTAssertEqual(XLSX.date(60, date1904: false), "1900-02-29")
+        XCTAssertEqual(XLSX.date(60.5, date1904: false), "1900-02-29 12:00:00")
         XCTAssertEqual(XLSX.date(61, date1904: false), "1900-03-01")
         XCTAssertEqual(XLSX.date(45000.5625, date1904: false), "2023-03-15 13:30:00")
         XCTAssertEqual(XLSX.date(0.25, date1904: false), "06:00:00")
@@ -144,6 +145,17 @@ final class SpreadsheetTextTests: XCTestCase {
         XCTAssertThrowsError(try SpreadsheetText.pages(ods(String(repeating: row, count: 5)), kind: .ods, caps: caps)) {
             XCTAssertEqual($0 as? ExtractionError, .tooLarge(.text))
         }
+    }
+
+    func testLineBytesMatchesTheLine() {
+        for cells in [["a", "", "bc", "", ""], ["x"], ["", "y"], []] {
+            XCTAssertEqual(SpreadsheetText.lineBytes(cells), SpreadsheetText.line(cells).utf8.count, "\(cells)")
+        }
+    }
+
+    func testODSContentRowWithTrailingEmptyRepeatsIsKept() throws {
+        let row = "<table:table-row table:number-rows-repeated=\"3\"><table:table-cell office:value-type=\"string\"><text:p>v</text:p></table:table-cell><table:table-cell table:number-columns-repeated=\"16383\"/></table:table-row>"
+        XCTAssertEqual(try SpreadsheetText.pages(ods(row), kind: .ods, caps: ExtractionCaps()), ["Sheet \"S\", rows 1–3\nv\nv\nv"])
     }
 
     func testODSSpaceCountIsBounded() throws {
