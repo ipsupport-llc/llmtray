@@ -92,6 +92,9 @@ final class MusicManager: ObservableObject {
     }
 
     @Published private(set) var isBusy = false
+    /// A generation running -- not a download: what another chat's image or
+    /// song waits for (both take most of the memory).
+    @Published private(set) var isGenerating = false
     @Published private(set) var statusText = ""
     /// 0...100 during generate(); nil otherwise.
     @Published private(set) var progress: Int?
@@ -210,8 +213,10 @@ final class MusicManager: ObservableObject {
             throw MusicError.processFailed(NSLocalizedString("The music generator is busy with another chat -- try again once it's done.", comment: ""))
         }
         isBusy = true
+        isGenerating = true
         defer {
             isBusy = false
+            isGenerating = false
             statusText = ""
             progress = nil
         }

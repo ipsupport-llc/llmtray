@@ -132,6 +132,12 @@ final class MfluxManager: ObservableObject {
     }
 
     @Published private(set) var isBusy: Bool = false
+
+    /// A generation running -- not a download: what another chat's image or
+
+    /// song waits for (both take most of the memory).
+
+    @Published private(set) var isGenerating = false
     @Published private(set) var statusText: String = ""
     // Streamed by the runner during generate() (a decoded preview per
     // denoising step, in memory). nil when not generating.
@@ -259,7 +265,7 @@ final class MfluxManager: ObservableObject {
                 from huggingface_hub import snapshot_download
                 snapshot_download("\(model.hfRepo)", local_dir="\(tempDir)")
                 """,
-            ])
+            ], cancellable: true)   // Cancel in the download queue: the temp folder goes
             try MediaModels.clearIncompleteTarget(MediaModels.entry(model))
             try FileManager.default.moveItem(atPath: tempDir, toPath: target)
             MediaModels.didDownload()
@@ -300,11 +306,13 @@ final class MfluxManager: ObservableObject {
             throw MfluxError.processFailed(NSLocalizedString("The image generator is busy with another chat -- try again once it's done.", comment: ""))
         }
         isBusy = true
+        isGenerating = true
         statusText = NSLocalizedString("Generating image…", comment: "")
         stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
         previewImage = nil
         defer {
             isBusy = false
+            isGenerating = false
             statusText = ""
             stepProgress = nil
             previewImage = nil
@@ -360,9 +368,9 @@ final class MfluxManager: ObservableObject {
         return data
     }
 
-    private func runProcess(_ executable: String, _ arguments: [String]) async throws {
+    private func runProcess(_ executable: String, _ arguments: [String], cancellable: Bool = false) async throws {
         do {
-            try await ProcessRunner.run(executable, arguments)
+            try await ProcessRunner.run(executable, arguments, cancellable: cancellable)
         } catch let failure as ProcessRunner.Failure {
             throw MfluxError.processFailed(failure.outputTail)
         }

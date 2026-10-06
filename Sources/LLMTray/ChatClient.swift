@@ -12,6 +12,8 @@ final class ChatClient: ObservableObject {
     }
     /// The answer waits for a model being loaded (shown as such).
     @Published private(set) var isWaitingForModelLoad = false
+    /// The message waits for the chat model's download (first run).
+    @Published private(set) var isWaitingForModelDownload = false
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
@@ -56,6 +58,9 @@ final class ChatClient: ObservableObject {
     /// Waiting in the app-wide generator queue: how many are ahead (the
     /// running one included); nil once it runs.
     @Published private(set) var mediaQueuePosition: Int?
+    /// Waiting for a model download of the generator this needs (a
+    /// Settings or setup download holds it until done), not generating yet.
+    @Published private(set) var isWaitingForMediaDownload = false
     /// What isGeneratingMedia is making (the progress view shown).
     @Published private(set) var generatingKind: MediaKind?
     // True only during the explicit, Settings-initiated warm-up download
@@ -770,8 +775,17 @@ final class ChatClient: ObservableObject {
     /// A model download from Settings (not in the queue) holds the image or
     /// music generator: a granted turn waits for it rather than unloading
     /// the chat model for a "busy" error.
-    private func waitWhileGeneratorsBusy(_ stillCurrent: () -> Bool) async {
-        while (mfluxManager.isBusy || musicManager.isBusy), stillCurrent() {
+    /// Until no generation runs (either kind: each takes most of the
+    /// memory) and the generator this needs isn't downloading a model. A
+    /// download of the other kind doesn't hold this one up: a music model
+    /// downloading in the background kept an image waiting for its 9 GB.
+    private func waitWhileGeneratorsBusy(_ stillCurrent: () -> Bool, image: Bool, music: Bool) async {
+        defer { isWaitingForMediaDownload = false }
+        while stillCurrent() {
+            let generating = mfluxManager.isGenerating || musicManager.isGenerating
+            let downloading = (image && mfluxManager.isBusy) || (music && musicManager.isBusy)
+            guard generating || downloading else { return }
+            isWaitingForMediaDownload = !generating
             try? await Task.sleep(nanoseconds: 250_000_000)
         }
     }
@@ -906,7 +920,7 @@ final class ChatClient: ObservableObject {
                         isCancelled: { !stillCurrent() },
                         onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
                     )
-                    await waitWhileGeneratorsBusy(stillCurrent)
+                    await waitWhileGeneratorsBusy(stillCurrent, image: kind == .image, music: kind == .music)
                 } catch {
                     return
                 }
@@ -1046,14 +1060,21 @@ final class ChatClient: ObservableObject {
         // of failing. Stop / leaving the chat ends the wait.
         // Also a model the chat's own send just started (ContentView.send):
         // the message is in, the answer comes once it's loaded.
-        func modelAway() -> Bool { server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting }
+        // Also a chat model still downloading (sent during the first run's
+        // download): the answer comes once it's in and started.
+        func downloading() -> Bool { DownloadQueue.isFetchingChatModel && !server.canAnswer }
+        func modelAway() -> Bool {
+            server.suspendedForImageGeneration || isAnotherChatUnloadingModel() || server.isStarting || downloading()
+        }
         guard modelAway() else { return startStreamIfModelUp(request, server: server) }
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             while let self, modelAway(), token == self.turnToken, epoch == self.conversationEpoch {
+                self.isWaitingForModelDownload = downloading()
                 self.isWaitingForModelLoad = server.isStarting
                 try? await Task.sleep(nanoseconds: 300_000_000)
             }
+            self?.isWaitingForModelDownload = false
             self?.isWaitingForModelLoad = false
             guard let self, token == self.turnToken, epoch == self.conversationEpoch else { return }
             self.startStreamIfModelUp(request, server: server)
@@ -1086,6 +1107,7 @@ final class ChatClient: ObservableObject {
 
     func cancel() {
         isWaitingForModelLoad = false
+        isWaitingForModelDownload = false
         draft?.resolve(nil)
         draft = nil
         // A call waiting on a folder prompt stops; one the user opened stays.
@@ -1390,7 +1412,7 @@ final class ChatClient: ObservableObject {
                     onPosition: { [weak self] in self?.mediaQueuePosition = $0 }
                 )
                 // A Settings download holds a generator too: its turn waits for that.
-                await waitWhileGeneratorsBusy(stillCurrent)
+                await waitWhileGeneratorsBusy(stillCurrent, image: wantsImage, music: wantsMusic)
             } catch {
                 return   // Stop / another chat: cancel() and the reset tidy up
             }

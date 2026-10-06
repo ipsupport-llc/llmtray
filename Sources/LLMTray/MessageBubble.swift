@@ -355,7 +355,9 @@ struct ImageGenerationProgressView: View {
                         .foregroundColor(.secondary)
                 } else {
                     ProgressView().controlSize(.small)
-                    Text(chat.mfluxStatusText.isEmpty ? "Generating image…" : chat.mfluxStatusText)
+                    Text(chat.isWaitingForMediaDownload
+                         ? NSLocalizedString("Waiting for a model download to finish…", comment: "chat: an image waits for a download")
+                         : chat.mfluxStatusText.isEmpty ? NSLocalizedString("Generating image…", comment: "") : chat.mfluxStatusText)
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }
