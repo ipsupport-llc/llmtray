@@ -26,6 +26,53 @@ public enum ModelFolder {
         let names = (try? fm.contentsOfDirectory(atPath: path)) ?? []
         return names.contains { $0.hasSuffix(".safetensors") }
     }
+
+    /// Removes a cancelled download from `path`: the files it has in place
+    /// (`files`, paths in the folder), then the folders left empty, `path`
+    /// itself included. Anything else there stays, and with it the manifest
+    /// (the folder stays an unfinished download, not a model); nothing at
+    /// all goes once the download completed (its marker is there), or when
+    /// `path` is a link. A file is reached through real folders only: a
+    /// linked folder on the way is skipped (removing through it would reach
+    /// outside), and a file that is a link goes as the link.
+    public static func removeUnfinishedDownload(atPath path: String, files: [String], fileManager fm: FileManager = .default) {
+        let dir = URL(fileURLWithPath: path).standardizedFileURL
+        let values = try? dir.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
+        guard values?.isSymbolicLink == false, values?.isDirectory == true,
+              !fm.fileExists(atPath: dir.appendingPathComponent(completionMarkerName).path) else { return }
+        func isRealFolder(_ url: URL) -> Bool {
+            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+            return values?.isDirectory == true && values?.isSymbolicLink == false
+        }
+        for file in files {
+            let parts = file.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+            guard !file.hasPrefix("/"), !parts.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else { continue }
+            var url = dir
+            var reachable = true
+            for (i, name) in parts.enumerated() {
+                url.appendPathComponent(name)
+                if i < parts.count - 1 {
+                    let values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
+                    guard values?.isSymbolicLink == false, values?.isDirectory == true else { reachable = false; break }
+                }
+            }
+            // A file only: a folder by that name may hold anything.
+            if reachable, !isRealFolder(url) { try? fm.removeItem(at: url) }
+        }
+        // The manifest goes once nothing but (real, empty) folders is left.
+        // Paths below the folder; linked folders aren't gone into. Unreadable:
+        // the manifest stays.
+        guard let below = try? fm.subpathsOfDirectory(atPath: dir.path) else { return }
+        if below.allSatisfy({ $0 == manifestName || isRealFolder(dir.appendingPathComponent($0)) }) {
+            try? fm.removeItem(at: dir.appendingPathComponent(manifestName))
+        }
+        // Deepest first, so a parent is empty once its children are gone.
+        let subfolders = below.map { dir.appendingPathComponent($0) }.filter(isRealFolder)
+            .sorted { $0.pathComponents.count > $1.pathComponents.count }
+        for folder in subfolders + [dir] where (try? fm.contentsOfDirectory(atPath: folder.path))?.isEmpty == true {
+            try? fm.removeItem(at: folder)
+        }
+    }
 }
 
 extension ModelRecommendations {

@@ -91,9 +91,9 @@ private struct FileDownload {
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
-    /// Already on disk at its expected size when the download started (a
-    /// relaunch mid-download, or a copy put there by hand): not fetched
-    /// again, and never removed if this attempt fails -- it isn't ours.
+    /// Already on disk at its expected size and Hub revision when the
+    /// download started (a relaunch mid-download): not fetched again, and
+    /// kept if this attempt fails -- removed only by a cancel.
     var preexisting = false
     /// Restarted once from scratch after the file CDN refused it (its
     /// signed link expires an hour after the redirect: a long pause).
@@ -287,6 +287,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         let generation = downloadGeneration
         downloadingID = model.id
         currentModelID = model.id
+        // Set once the folder is made: a cancel before that has none.
+        currentDestRoot = nil
         isPaused = false
         downloadProgress = 0
         downloadError = nil
@@ -379,10 +381,13 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadStatusText = NSLocalizedString("Paused", comment: "")
         downloadSpeedBytesPerSec = 0
         downloadETASeconds = nil
+        let generation = downloadGeneration
         for (path, task) in tasksByPath {
             task.cancel(byProducingResumeData: { [weak self] data in
                 Task { @MainActor [weak self] in
-                    self?.files[path]?.resumeData = data
+                    // Late, after a cancel: not for whatever downloads now.
+                    guard let self, self.downloadGeneration == generation else { return }
+                    self.files[path]?.resumeData = data
                 }
             })
         }
@@ -403,9 +408,23 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     /// Abandons the download entirely -- cancels whatever's in flight
     /// (without bothering to collect resume data, since it's being thrown
-    /// away) and clears state so the row goes back to a plain "Download"
-    /// button.
+    /// away), removes its files from the models folder (paused or not: half
+    /// a model with a config.json passed for one), and clears
+    /// state so the row goes back to a plain "Download" button.
     func cancelDownload() {
+        let root = downloadingID != nil ? currentDestRoot : nil
+        // In place: what this attempt saved, and what it found there from
+        // an earlier one (its size and Hub revision in the manifest).
+        let inPlace = files.values.filter(\.isDone).map(\.path)
+        stopDownload()
+        guard let root else { return }
+        ModelFolder.removeUnfinishedDownload(atPath: root.path, files: inPlace)
+        // No object: that would read as this repo finished (ChatPresentation).
+        NotificationCenter.default.post(name: .modelsDidChange, object: nil)
+    }
+
+    /// Ends the download, leaving its files where they are.
+    private func stopDownload() {
         downloadGeneration += 1
         for task in tasksByPath.values {
             task.cancel()
@@ -620,11 +639,13 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadFailed = true
         let written = files.values.filter { $0.isDone && !$0.preexisting }.map(\.destination)
         let root = currentDestRoot
-        cancelDownload()   // clears downloadError: set after
+        stopDownload()   // clears downloadError: set after
         for url in written { try? FileManager.default.removeItem(at: url) }
         if let root, (try? FileManager.default.contentsOfDirectory(atPath: root.path))?.isEmpty == true {
             try? FileManager.default.removeItem(at: root)
         }
         downloadError = message
+        // The picker drops the unfinished folder.
+        NotificationCenter.default.post(name: .modelsDidChange, object: nil)
     }
 }
