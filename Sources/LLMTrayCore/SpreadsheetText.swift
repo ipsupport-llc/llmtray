@@ -8,7 +8,8 @@ import Foundation
 /// Cells show what the spreadsheet shows where the file stores it: shared
 /// and inline strings, a formula's last computed value, dates from date
 /// formats (xlsx) or the date value (ods). Read through CappedZip; every
-/// XML part passes XMLPartCheck before it is parsed.
+/// part it reads passes XMLPartCheck before it is parsed (the others are
+/// never inflated or parsed).
 public enum SpreadsheetText {
     /// Rows and text per page: a few chunks' worth.
     static let pageRows = 60
@@ -83,6 +84,13 @@ public enum SpreadsheetText {
         return String(format: "%.15g", d)
     }
 
+    /// What a row adds to the text, as `line` writes it: the parsers stop at
+    /// the text cap while reading, before repeated rows pile up.
+    static func lineBytes(_ cells: [String]) -> Int {
+        let used = (cells.lastIndex { !$0.isEmpty }).map { $0 + 1 } ?? 0
+        return cells.prefix(used).reduce(0) { $0 + $1.utf8.count + 3 }
+    }
+
     static func parse(_ data: Data, part: String, caps: ExtractionCaps, delegate: XMLParserDelegate) throws {
         try XMLPartCheck.check(data, part: part, maxDepth: caps.maxXMLDepth)
         let parser = XMLParser(data: data)
@@ -125,43 +133,76 @@ enum XLSX {
             dateStyles = styles.dateStyles
         }
         var cells = 0
+        var bytes = 0
         var result: [SpreadsheetText.Sheet] = []
         for (name, rid) in book.sheets {
             guard let target = rels.targets[rid] else { continue }
-            let path = target.hasPrefix("/") ? String(target.dropFirst()) : "xl/" + target
+            let path = partPath(target)
             // Chartsheets and missing parts: nothing to index.
             guard path.contains("worksheets/"), zip.entry(path) != nil else { continue }
-            let sheet = SheetParser(strings: strings, dateStyles: dateStyles, date1904: book.date1904, cellsBefore: cells)
+            let sheet = SheetParser(strings: strings, dateStyles: dateStyles, date1904: book.date1904,
+                                    cellsBefore: cells, bytesBefore: bytes, maxBytes: caps.maxTextBytes)
             try SpreadsheetText.parse(try zip.read(path), part: path, caps: caps, delegate: sheet)
             cells = sheet.cells
+            bytes = sheet.bytes
             result.append(SpreadsheetText.Sheet(name: name, rows: sheet.rows))
         }
         return result
     }
 
-    /// Column letters of a cell reference: "AB12" -> 27 (0-based).
-    static func column(_ ref: String) -> Int? {
-        var n = 0
-        var any = false
-        for ch in ref.uppercased() {
-            guard let v = ch.asciiValue, v >= 65, v <= 90 else { break }
-            n = n * 26 + Int(v - 64)
-            any = true
+    /// A workbook relationship target as a part name: relative to xl/, or
+    /// absolute from the package root; "." and ".." resolved.
+    static func partPath(_ target: String) -> String {
+        let joined = target.hasPrefix("/") ? String(target.dropFirst()) : "xl/" + target
+        var parts: [Substring] = []
+        for part in joined.split(separator: "/") {
+            if part == "." || part.isEmpty { continue }
+            if part == ".." { if !parts.isEmpty { parts.removeLast() }; continue }
+            parts.append(part)
         }
-        return any ? n - 1 : nil
+        return parts.joined(separator: "/")
     }
 
-    /// An Excel serial date as text: 45000 -> 2023-03-15; with a time part, "... 13:30".
+    /// Column letters of a cell reference: "AB12" -> 27 (0-based); "$" is
+    /// skipped. Excel has at most 3 letters (XFD): more is not a reference.
+    static func column(_ ref: String) -> Int? {
+        var n = 0
+        var letters = 0
+        for ch in ref.uppercased() where ch != "$" {
+            guard let v = ch.asciiValue, v >= 65, v <= 90 else { break }
+            letters += 1
+            if letters > 3 { return nil }
+            n = n * 26 + Int(v - 64)
+        }
+        return letters > 0 ? n - 1 : nil
+    }
+
+    /// An Excel serial date as text: 45000 -> 2023-03-15; with a time part,
+    /// "... 13:30:05". The 1900 system counts a 1900-02-29 that never was
+    /// (serial 60, shown as Excel shows it); serials before it are a day on.
     static func date(_ serial: Double, date1904: Bool) -> String {
+        var serial = serial
+        if !date1904, serial >= 1, serial < 61 {
+            if serial.rounded(.down) == 60 { return "1900-02-29" }
+            serial += 1
+        }
         let epoch = date1904 ? -2_082_844_800.0 : -2_209_161_600.0  // 1904-01-01, 1899-12-30 (UTC)
         let date = Date(timeIntervalSince1970: epoch + serial * 86_400)
+        let frac = serial - serial.rounded(.down)
+        let f = frac < 1e-9 ? dayFormat : (serial < 1 ? timeFormat : dateTimeFormat)
+        return f.string(from: date)
+    }
+
+    private static func formatter(_ format: String) -> DateFormatter {
         let f = DateFormatter()
         f.locale = Locale(identifier: "en_US_POSIX")
         f.timeZone = TimeZone(identifier: "UTC")
-        let frac = serial - serial.rounded(.down)
-        f.dateFormat = frac < 1e-9 ? "yyyy-MM-dd" : (serial < 1 ? "HH:mm:ss" : "yyyy-MM-dd HH:mm")
-        return f.string(from: date)
+        f.dateFormat = format
+        return f
     }
+    private static let dayFormat = formatter("yyyy-MM-dd")
+    private static let timeFormat = formatter("HH:mm:ss")
+    private static let dateTimeFormat = formatter("yyyy-MM-dd HH:mm:ss")
 
     final class WorkbookParser: NSObject, XMLParserDelegate {
         var sheets: [(String, String)] = []
@@ -253,7 +294,10 @@ enum XLSX {
         let date1904: Bool
         var rows: [(Int, [String])] = []
         var cells: Int
+        var bytes: Int
+        let maxBytes: Int
         var stopped: ExtractionError?
+        private var phonetic = 0
         private var rowNumber = 0
         private var row: [String] = []
         private var col = 0
@@ -263,11 +307,13 @@ enum XLSX {
         private var inValue = false
         private var inInline = false
 
-        init(strings: [String], dateStyles: Set<Int>, date1904: Bool, cellsBefore: Int) {
+        init(strings: [String], dateStyles: Set<Int>, date1904: Bool, cellsBefore: Int, bytesBefore: Int = 0, maxBytes: Int = .max) {
             self.strings = strings
             self.dateStyles = dateStyles
             self.date1904 = date1904
             self.cells = cellsBefore
+            self.bytes = bytesBefore
+            self.maxBytes = maxBytes
         }
 
         func parser(_ p: XMLParser, didStartElement e: String, namespaceURI: String?, qualifiedName q: String?, attributes a: [String: String]) {
@@ -283,7 +329,8 @@ enum XLSX {
                 value = ""
             case "v": inValue = true
             case "is": inInline = true
-            case "t" where inInline: inValue = true
+            case "rPh": phonetic += 1
+            case "t" where inInline: inValue = phonetic == 0
             default: break
             }
         }
@@ -294,6 +341,7 @@ enum XLSX {
             switch e {
             case "v", "t": inValue = false
             case "is": inInline = false
+            case "rPh": phonetic -= 1
             case "c":
                 cells += 1
                 if cells > SpreadsheetText.maxCells { stopped = .tooLarge(.text); p.abortParsing(); return }
@@ -304,7 +352,11 @@ enum XLSX {
                 }
                 col += 1
             case "row":
-                if row.contains(where: { !$0.isEmpty }) { rows.append((rowNumber, row)) }
+                if row.contains(where: { !$0.isEmpty }) {
+                    bytes += SpreadsheetText.lineBytes(row)
+                    if bytes > maxBytes { stopped = .tooLarge(.text); p.abortParsing(); return }
+                    rows.append((rowNumber, row))
+                }
             default: break
             }
         }
@@ -331,8 +383,11 @@ enum ODS {
     /// trailing "1048576 empty rows" cost nothing.
     static let maxRepeat = 10_000
 
+    /// Spaces one text:s gives at most.
+    static let maxSpaces = 64
+
     static func sheets(_ zip: CappedZip, caps: ExtractionCaps) throws -> [SpreadsheetText.Sheet] {
-        let parser = ContentParser()
+        let parser = ContentParser(maxBytes: caps.maxTextBytes)
         try SpreadsheetText.parse(try zip.read("content.xml"), part: "content.xml", caps: caps, delegate: parser)
         return parser.sheets
     }
@@ -340,6 +395,8 @@ enum ODS {
     final class ContentParser: NSObject, XMLParserDelegate, CellCounting {
         var sheets: [SpreadsheetText.Sheet] = []
         var stopped: ExtractionError?
+        let maxBytes: Int
+        private var bytes = 0
         private var cells = 0
         private var sheet: SpreadsheetText.Sheet?
         private var rowNumber = 0
@@ -351,6 +408,9 @@ enum ODS {
         private var paragraph = ""
         private var inParagraph = 0
         private var inCell = false
+        private var numberValue: String?
+
+        init(maxBytes: Int = .max) { self.maxBytes = maxBytes }
 
         func parser(_ p: XMLParser, didStartElement e: String, namespaceURI: String?, qualifiedName q: String?, attributes a: [String: String]) {
             switch e {
@@ -364,15 +424,19 @@ enum ODS {
                 inCell = true
                 cellRepeat = max(1, a["table:number-columns-repeated"].flatMap(Int.init) ?? 1)
                 cellText = []
+                numberValue = nil
                 switch a["office:value-type"] {
                 case "date": cellValue = a["office:date-value"].map { $0.replacingOccurrences(of: "T", with: " ") }
                 case "boolean": cellValue = a["office:boolean-value"].map { $0 == "true" ? "TRUE" : "FALSE" }
+                case "float", "percentage", "currency":
+                    cellValue = nil
+                    numberValue = a["office:value"].map(SpreadsheetText.number)
                 default: cellValue = nil
                 }
             case "text:p", "text:h":
                 if inCell { inParagraph += 1; paragraph = "" }
             case "text:s" where inParagraph > 0:
-                paragraph += String(repeating: " ", count: max(1, a["text:c"].flatMap(Int.init) ?? 1))
+                paragraph += String(repeating: " ", count: min(ODS.maxSpaces, max(1, a["text:c"].flatMap(Int.init) ?? 1)))
             case "text:tab" where inParagraph > 0: paragraph += "\t"
             case "text:line-break" where inParagraph > 0: paragraph += " "
             default: break
@@ -387,20 +451,28 @@ enum ODS {
                 if inParagraph > 0 { inParagraph -= 1; cellText.append(paragraph) }
             case "table:table-cell", "table:covered-table-cell":
                 inCell = false
-                let text = cellValue ?? cellText.joined(separator: " ")
-                let n = text.isEmpty ? cellRepeat : min(cellRepeat, ODS.maxRepeat)
+                var text = cellValue ?? cellText.joined(separator: " ")
+                if text.isEmpty, let numberValue { text = numberValue }
+                if text.utf8.count > maxBytes { stopped = .tooLarge(.text); p.abortParsing(); return }
+                // Only the columns still in the row's range are built.
+                let room = max(0, SpreadsheetText.maxColumns - row.count)
+                let n = min(cellRepeat, room)
                 cells += text.isEmpty ? 1 : n
                 if cells > SpreadsheetText.maxCells { stopped = .tooLarge(.text); p.abortParsing(); return }
-                if text.isEmpty {
-                    row += Array(repeating: "", count: min(cellRepeat, SpreadsheetText.maxColumns))
-                } else {
-                    row += Array(repeating: text, count: n)
-                }
-                if row.count > SpreadsheetText.maxColumns { row = Array(row.prefix(SpreadsheetText.maxColumns)) }
+                row += Array(repeating: text, count: n)
             case "table:table-row":
                 let hasContent = row.contains { !$0.isEmpty }
                 if hasContent {
-                    for k in 0..<min(rowRepeat, ODS.maxRepeat) { sheet?.rows.append((rowNumber + 1 + k, row)) }
+                    let line = SpreadsheetText.lineBytes(row)
+                    let filled = row.filter { !$0.isEmpty }.count
+                    for k in 0..<min(rowRepeat, ODS.maxRepeat) {
+                        bytes += line
+                        cells += filled
+                        if bytes > maxBytes || cells > SpreadsheetText.maxCells {
+                            stopped = .tooLarge(.text); p.abortParsing(); return
+                        }
+                        sheet?.rows.append((rowNumber + 1 + k, row))
+                    }
                 }
                 rowNumber += rowRepeat
             case "table:table":
