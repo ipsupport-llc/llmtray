@@ -91,9 +91,9 @@ private struct FileDownload {
     var writtenBytes: Int64 = 0
     var resumeData: Data?
     var isDone = false
-    /// Already on disk at its expected size when the download started (a
-    /// relaunch mid-download, or a copy put there by hand): not fetched
-    /// again, and never removed if this attempt fails -- it isn't ours.
+    /// Already on disk at its expected size and Hub revision when the
+    /// download started (a relaunch mid-download): not fetched again, and
+    /// kept if this attempt fails -- removed only by a cancel.
     var preexisting = false
     /// Restarted once from scratch after the file CDN refused it (its
     /// signed link expires an hour after the redirect: a long pause).
@@ -381,10 +381,13 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadStatusText = NSLocalizedString("Paused", comment: "")
         downloadSpeedBytesPerSec = 0
         downloadETASeconds = nil
+        let generation = downloadGeneration
         for (path, task) in tasksByPath {
             task.cancel(byProducingResumeData: { [weak self] data in
                 Task { @MainActor [weak self] in
-                    self?.files[path]?.resumeData = data
+                    // Late, after a cancel: not for whatever downloads now.
+                    guard let self, self.downloadGeneration == generation else { return }
+                    self.files[path]?.resumeData = data
                 }
             })
         }
@@ -405,16 +408,19 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     /// Abandons the download entirely -- cancels whatever's in flight
     /// (without bothering to collect resume data, since it's being thrown
-    /// away), removes what it put in the models folder (paused or not: half
+    /// away), removes its files from the models folder (paused or not: half
     /// a model with a config.json passed for one), and clears
     /// state so the row goes back to a plain "Download" button.
     func cancelDownload() {
         let root = downloadingID != nil ? currentDestRoot : nil
-        let wrote = files.values.filter(\.isDone).map(\.path)
+        // In place: what this attempt saved, and what it found there from
+        // an earlier one (its size and Hub revision in the manifest).
+        let inPlace = files.values.filter(\.isDone).map(\.path)
         stopDownload()
         guard let root else { return }
-        ModelFolder.removeUnfinishedDownload(atPath: root.path, wrote: wrote)
-        NotificationCenter.default.post(name: .modelsDidChange, object: currentModelID)
+        ModelFolder.removeUnfinishedDownload(atPath: root.path, files: inPlace)
+        // No object: that would read as this repo finished (ChatPresentation).
+        NotificationCenter.default.post(name: .modelsDidChange, object: nil)
     }
 
     /// Ends the download, leaving its files where they are.
@@ -639,5 +645,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             try? FileManager.default.removeItem(at: root)
         }
         downloadError = message
+        // The picker drops the unfinished folder.
+        NotificationCenter.default.post(name: .modelsDidChange, object: nil)
     }
 }

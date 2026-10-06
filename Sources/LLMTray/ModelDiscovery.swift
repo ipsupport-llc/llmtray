@@ -43,8 +43,9 @@ enum ModelDiscovery {
     /// Silently skips anything that doesn't match -- an unreadable or
     /// unexpected directory shouldn't crash model discovery.
     /// A browser download that started and didn't finish (its manifest
-    /// without the completion marker) isn't a model, unless it's
-    /// `downloading` ("org/name") now.
+    /// without the completion marker) isn't a model, unless it's the
+    /// download queue's chat model now (`downloading`, "org/name"): the
+    /// wizard's pick, which a chat waits for rather than starts.
     static func scanModels(root: String, downloading: String? = nil) -> [LocalModel] {
         let fm = FileManager.default
         guard let publishers = try? fm.contentsOfDirectory(atPath: root) else { return [] }

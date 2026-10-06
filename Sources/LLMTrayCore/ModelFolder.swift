@@ -27,27 +27,37 @@ public enum ModelFolder {
         return names.contains { $0.hasSuffix(".safetensors") }
     }
 
-    /// Removes a cancelled download from `path`: the files it `wrote`, the
-    /// ones its manifest lists (an earlier attempt's), the manifest, then the
-    /// folders left empty, `path` itself included. Anything else there (a
-    /// copy put in by hand that the download hadn't replaced yet) stays, and
-    /// nothing at all goes once the download completed (its marker is there).
-    public static func removeUnfinishedDownload(atPath path: String, wrote: [String], fileManager fm: FileManager = .default) {
-        let dir = URL(fileURLWithPath: path).standardizedFileURL
+    /// Removes a cancelled download from `path`: the files it has in place
+    /// (`files`, paths in the folder), its manifest, then the folders left
+    /// empty, `path` itself included. Anything else there stays, and nothing
+    /// at all goes once the download completed (its marker is there). A
+    /// file is reached through real folders only: a linked folder on the
+    /// way is skipped (removing through it would reach outside), and a
+    /// file that is a link goes as the link.
+    public static func removeUnfinishedDownload(atPath path: String, files: [String], fileManager fm: FileManager = .default) {
+        let dir = URL(fileURLWithPath: path).standardizedFileURL.resolvingSymlinksInPath()
         guard !fm.fileExists(atPath: dir.appendingPathComponent(completionMarkerName).path) else { return }
-        let manifestURL = dir.appendingPathComponent(manifestName)
-        let listed = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL)))?.keys
-        for file in Set(wrote).union(listed ?? [:].keys) {
-            let url = dir.appendingPathComponent(file).standardizedFileURL
-            // A listed path stays inside the folder ("../" in a repo's file
-            // list must not reach out).
-            guard url.path.hasPrefix(dir.path + "/") else { continue }
-            try? fm.removeItem(at: url)
+        for file in files + [manifestName] {
+            let parts = file.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
+            guard !file.hasPrefix("/"), !parts.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else { continue }
+            var url = dir
+            var reachable = true
+            for (i, name) in parts.enumerated() {
+                url.appendPathComponent(name)
+                if i < parts.count - 1 {
+                    let values = try? url.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
+                    guard values?.isSymbolicLink == false, values?.isDirectory == true else { reachable = false; break }
+                }
+            }
+            if reachable { try? fm.removeItem(at: url) }
         }
-        try? fm.removeItem(at: manifestURL)
         // Deepest first, so a parent is empty once its children are gone.
-        let subfolders = (fm.enumerator(at: dir, includingPropertiesForKeys: [.isDirectoryKey])?.allObjects as? [URL] ?? [])
-            .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }
+        // The enumerator doesn't go into linked folders.
+        let subfolders = (fm.enumerator(at: dir, includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey])?.allObjects as? [URL] ?? [])
+            .filter {
+                let values = try? $0.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+                return values?.isDirectory == true && values?.isSymbolicLink == false
+            }
             .sorted { $0.path.count > $1.path.count }
         for folder in subfolders + [dir] where (try? fm.contentsOfDirectory(atPath: folder.path))?.isEmpty == true {
             try? fm.removeItem(at: folder)

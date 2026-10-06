@@ -59,7 +59,7 @@ final class ModelCatalog: ObservableObject {
     /// same models doesn't re-render every view observing the catalog.
     func rescan() {
         root = ModelDiscovery.currentModelsRoot()
-        let scanned = ModelDiscovery.scanModels(root: root, downloading: HFModelBrowser.activeDownload)
+        let scanned = ModelDiscovery.scanModels(root: root, downloading: DownloadQueue.fetchingChatModel)
         let scannedAliases = Dictionary(uniqueKeysWithValues: scanned.map { ($0.id, ModelAliasStore.alias(for: $0.id)) })
         if scanned != models { models = scanned }
         if scannedAliases != aliases { aliases = scannedAliases }
