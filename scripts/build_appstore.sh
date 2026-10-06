@@ -69,8 +69,11 @@ else
     || fail "APPSTORE_PROFILE=$PROFILE is for $APP_IDENTIFIER, not $TEAM.$BUNDLE_ID"
 fi
 
-# 1. The app, the App Store flavor (signed at the end, once).
-SIGN_IDENTITY= LLMTRAY_APP_STORE=1 "$SCRIPT_DIR/build_app.sh"
+# 1. The app, the App Store flavor (signed at the end, once). With a
+# profile it can be uploaded: its real name; without one, "LLMTray Local".
+RELEASE_BUILD=0
+[[ -n "$PROFILE" ]] && RELEASE_BUILD=1
+SIGN_IDENTITY= LLMTRAY_APP_STORE=1 LLMTRAY_RELEASE="$RELEASE_BUILD" "$SCRIPT_DIR/build_app.sh"
 /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" "$APP/Contents/Info.plist"
 
 # 2. The sandbox entitlements, plus the profile's identity when there is one.

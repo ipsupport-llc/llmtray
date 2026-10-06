@@ -130,6 +130,15 @@ BUNDLE_VERSION="$("$SCRIPT_DIR/sparkle_version.sh" "$VERSION")"
 # number (0.8.6 -> 0.8.601: at most three numbers); BUILD_NUMBER sets it.
 if [[ "$APP_STORE" == 1 && -n "${BUILD_NUMBER:-}" ]]; then BUNDLE_VERSION="$BUILD_NUMBER"; fi
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUNDLE_VERSION" "$APP/Contents/Info.plist"
+# A build that isn't for distribution says so where macOS shows the name
+# (Launchpad, Spotlight, Finder), next to an installed release:
+# LLMTRAY_RELEASE=1 (the release workflow; build_appstore.sh with a
+# provisioning profile) keeps "LLMTray".
+if [[ "${LLMTRAY_RELEASE:-0}" != 1 ]]; then
+  LOCAL_NAME="LLMTray Local"
+  [[ "$APP_STORE" == 1 ]] && LOCAL_NAME="LLMTray Local (App Store)"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $LOCAL_NAME" "$APP/Contents/Info.plist"
+fi
 if [[ "$APP_STORE" == 1 ]]; then
   # No Sparkle feed; the category and export-compliance answers App Store
   # Connect asks for (only standard encryption: HTTPS).

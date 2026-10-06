@@ -32,6 +32,11 @@ on:
   push:
     tags: ["v*"]
 
+# Distributed builds keep the name "LLMTray" (build_app.sh names local
+# builds "LLMTray Local").
+env:
+  LLMTRAY_RELEASE: "1"
+
 permissions:
   contents: write
   actions: write   # dispatch pages.yml
