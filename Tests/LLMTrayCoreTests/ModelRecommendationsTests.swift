@@ -305,6 +305,11 @@ extension ModelRecommendationsTests {
         XCTAssertFalse(fm.fileExists(atPath: escape + "/file-link"))
         XCTAssertTrue(fm.fileExists(atPath: escape + "/linked"), "the linked folder itself isn't its to remove")
 
+        // A listed name that is now a folder: not removed with what it holds.
+        let folderNamed = try folder("folderNamed", [ModelFolder.manifestName: manifest, "config.json/inside.txt": "x"])
+        ModelFolder.removeUnfinishedDownload(atPath: folderNamed, files: ["config.json"])
+        XCTAssertTrue(fm.fileExists(atPath: folderNamed + "/config.json/inside.txt"))
+
         // The model folder itself a link: nothing goes where it points.
         let real = try folder("real", [ModelFolder.manifestName: manifest, "config.json": "{}"])
         try fm.createSymbolicLink(atPath: dir + "/org/linkedModel", withDestinationPath: real)

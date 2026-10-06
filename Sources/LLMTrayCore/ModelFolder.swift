@@ -40,6 +40,10 @@ public enum ModelFolder {
         let values = try? dir.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey])
         guard values?.isSymbolicLink == false, values?.isDirectory == true,
               !fm.fileExists(atPath: dir.appendingPathComponent(completionMarkerName).path) else { return }
+        func isRealFolder(_ url: URL) -> Bool {
+            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
+            return values?.isDirectory == true && values?.isSymbolicLink == false
+        }
         for file in files {
             let parts = file.split(separator: "/", omittingEmptySubsequences: false).map(String.init)
             guard !file.hasPrefix("/"), !parts.contains(where: { $0.isEmpty || $0 == "." || $0 == ".." }) else { continue }
@@ -52,15 +56,13 @@ public enum ModelFolder {
                     guard values?.isSymbolicLink == false, values?.isDirectory == true else { reachable = false; break }
                 }
             }
-            if reachable { try? fm.removeItem(at: url) }
+            // A file only: a folder by that name may hold anything.
+            if reachable, !isRealFolder(url) { try? fm.removeItem(at: url) }
         }
         // The manifest goes once nothing but (real, empty) folders is left.
-        func isRealFolder(_ url: URL) -> Bool {
-            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey])
-            return values?.isDirectory == true && values?.isSymbolicLink == false
-        }
-        // Paths below the folder; linked folders aren't gone into.
-        let below = (try? fm.subpathsOfDirectory(atPath: dir.path)) ?? []
+        // Paths below the folder; linked folders aren't gone into. Unreadable:
+        // the manifest stays.
+        guard let below = try? fm.subpathsOfDirectory(atPath: dir.path) else { return }
         if below.allSatisfy({ $0 == manifestName || isRealFolder(dir.appendingPathComponent($0)) }) {
             try? fm.removeItem(at: dir.appendingPathComponent(manifestName))
         }
