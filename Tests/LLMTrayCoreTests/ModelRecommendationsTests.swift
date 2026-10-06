@@ -249,4 +249,47 @@ extension ModelRecommendationsTests {
         XCTAssertTrue(ModelFolder.isComplete(atPath: try folder("sharded", ["config.json": "{}", "model.safetensors.index.json": index,
                                                                            "model-1.safetensors": "", "model-2.safetensors": ""])))
     }
+
+    /// A cancelled download (#224): its files, earlier attempts' (manifest)
+    /// and the empty folders go; a hand-put file it hadn't replaced stays.
+    func testRemoveUnfinishedDownload() throws {
+        let fm = FileManager.default
+        let dir = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("llmtray-cancel-\(UUID().uuidString)").path
+        defer { try? fm.removeItem(atPath: dir) }
+        func folder(_ name: String, _ files: [String: String]) throws -> String {
+            let path = dir + "/org/" + name
+            for (file, text) in files {
+                let url = URL(fileURLWithPath: path + "/" + file)
+                try fm.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+                fm.createFile(atPath: url.path, contents: Data(text.utf8))
+            }
+            return path
+        }
+        let manifest = #"{"config.json": "r1", "model-1.safetensors": "r2"}"#
+
+        // Ours only: the folder goes, its <org>/ stays.
+        let ours = try folder("ours", [ModelFolder.manifestName: manifest, "config.json": "{}", "model-1.safetensors": "",
+                                       "vision/tower.safetensors": ""])
+        ModelFolder.removeUnfinishedDownload(atPath: ours, wrote: ["vision/tower.safetensors"])
+        XCTAssertFalse(fm.fileExists(atPath: ours))
+        XCTAssertTrue(fm.fileExists(atPath: dir + "/org"))
+
+        // A file it hadn't got to, put there by hand: stays, with its folder.
+        let mixed = try folder("mixed", [ModelFolder.manifestName: manifest, "config.json": "{}", "model-1.safetensors": "",
+                                         "model-2.safetensors": "mine"])
+        ModelFolder.removeUnfinishedDownload(atPath: mixed, wrote: [])
+        XCTAssertEqual(try fm.contentsOfDirectory(atPath: mixed), ["model-2.safetensors"])
+
+        // Complete: untouched.
+        let done = try folder("done", [ModelFolder.completionMarkerName: "", ModelFolder.manifestName: manifest, "config.json": "{}"])
+        ModelFolder.removeUnfinishedDownload(atPath: done, wrote: ["config.json"])
+        XCTAssertTrue(fm.fileExists(atPath: done + "/config.json"))
+
+        // A path leading out of the folder isn't followed.
+        let outside = try folder("victim", ["keep.txt": "x"])
+        let escape = try folder("escape", [ModelFolder.manifestName: #"{"../victim/keep.txt": "r"}"#])
+        ModelFolder.removeUnfinishedDownload(atPath: escape, wrote: ["../victim/keep.txt"])
+        XCTAssertTrue(fm.fileExists(atPath: outside + "/keep.txt"))
+        XCTAssertFalse(fm.fileExists(atPath: escape))
+    }
 }

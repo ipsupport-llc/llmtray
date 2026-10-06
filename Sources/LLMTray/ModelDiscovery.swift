@@ -42,7 +42,10 @@ enum ModelDiscovery {
     /// a config.json (the LM Studio / mlx_lm convention), two levels deep.
     /// Silently skips anything that doesn't match -- an unreadable or
     /// unexpected directory shouldn't crash model discovery.
-    static func scanModels(root: String) -> [LocalModel] {
+    /// A browser download that started and didn't finish (its manifest
+    /// without the completion marker) isn't a model, unless it's
+    /// `downloading` ("org/name") now.
+    static func scanModels(root: String, downloading: String? = nil) -> [LocalModel] {
         let fm = FileManager.default
         guard let publishers = try? fm.contentsOfDirectory(atPath: root) else { return [] }
 
@@ -62,6 +65,7 @@ enum ModelDiscovery {
                 var modelIsDir: ObjCBool = false
                 guard fm.fileExists(atPath: modelPath, isDirectory: &modelIsDir), modelIsDir.boolValue else { continue }
                 let configPath = modelPath + "/config.json"
+                if MediaModelLocation.isUnfinishedBrowserDownload(modelPath), publisher + "/" + modelName != downloading { continue }
                 if fm.fileExists(atPath: configPath) {
                     found.append(LocalModel(path: modelPath))
                 }
@@ -71,10 +75,11 @@ enum ModelDiscovery {
     }
 
     /// A Hugging Face repo id ("org/name") maps directly onto the two-level
-    /// <root>/<org>/<name> layout this scanner expects, so checking
-    /// "already downloaded" is just checking that exact path.
+    /// <root>/<org>/<name> layout this scanner expects: "already
+    /// downloaded" is that folder being complete (ModelFolder), not just
+    /// its config.json, which a cancelled download left behind.
     static func isDownloaded(repoID: String, root: String) -> Bool {
-        FileManager.default.fileExists(atPath: root + "/\(repoID)/config.json")
+        ModelFolder.isComplete(atPath: root + "/" + repoID)
     }
 
     /// The model's own trained context ceiling, straight from its

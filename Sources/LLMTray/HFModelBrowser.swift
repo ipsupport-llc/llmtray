@@ -287,6 +287,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         let generation = downloadGeneration
         downloadingID = model.id
         currentModelID = model.id
+        // Set once the folder is made: a cancel before that has none.
+        currentDestRoot = nil
         isPaused = false
         downloadProgress = 0
         downloadError = nil
@@ -403,9 +405,20 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     /// Abandons the download entirely -- cancels whatever's in flight
     /// (without bothering to collect resume data, since it's being thrown
-    /// away) and clears state so the row goes back to a plain "Download"
-    /// button.
+    /// away), removes what it put in the models folder (paused or not: half
+    /// a model with a config.json passed for one), and clears
+    /// state so the row goes back to a plain "Download" button.
     func cancelDownload() {
+        let root = downloadingID != nil ? currentDestRoot : nil
+        let wrote = files.values.filter(\.isDone).map(\.path)
+        stopDownload()
+        guard let root else { return }
+        ModelFolder.removeUnfinishedDownload(atPath: root.path, wrote: wrote)
+        NotificationCenter.default.post(name: .modelsDidChange, object: currentModelID)
+    }
+
+    /// Ends the download, leaving its files where they are.
+    private func stopDownload() {
         downloadGeneration += 1
         for task in tasksByPath.values {
             task.cancel()
@@ -620,7 +633,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadFailed = true
         let written = files.values.filter { $0.isDone && !$0.preexisting }.map(\.destination)
         let root = currentDestRoot
-        cancelDownload()   // clears downloadError: set after
+        stopDownload()   // clears downloadError: set after
         for url in written { try? FileManager.default.removeItem(at: url) }
         if let root, (try? FileManager.default.contentsOfDirectory(atPath: root.path))?.isEmpty == true {
             try? FileManager.default.removeItem(at: root)

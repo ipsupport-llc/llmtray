@@ -26,6 +26,33 @@ public enum ModelFolder {
         let names = (try? fm.contentsOfDirectory(atPath: path)) ?? []
         return names.contains { $0.hasSuffix(".safetensors") }
     }
+
+    /// Removes a cancelled download from `path`: the files it `wrote`, the
+    /// ones its manifest lists (an earlier attempt's), the manifest, then the
+    /// folders left empty, `path` itself included. Anything else there (a
+    /// copy put in by hand that the download hadn't replaced yet) stays, and
+    /// nothing at all goes once the download completed (its marker is there).
+    public static func removeUnfinishedDownload(atPath path: String, wrote: [String], fileManager fm: FileManager = .default) {
+        let dir = URL(fileURLWithPath: path).standardizedFileURL
+        guard !fm.fileExists(atPath: dir.appendingPathComponent(completionMarkerName).path) else { return }
+        let manifestURL = dir.appendingPathComponent(manifestName)
+        let listed = (try? JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL)))?.keys
+        for file in Set(wrote).union(listed ?? [:].keys) {
+            let url = dir.appendingPathComponent(file).standardizedFileURL
+            // A listed path stays inside the folder ("../" in a repo's file
+            // list must not reach out).
+            guard url.path.hasPrefix(dir.path + "/") else { continue }
+            try? fm.removeItem(at: url)
+        }
+        try? fm.removeItem(at: manifestURL)
+        // Deepest first, so a parent is empty once its children are gone.
+        let subfolders = (fm.enumerator(at: dir, includingPropertiesForKeys: [.isDirectoryKey])?.allObjects as? [URL] ?? [])
+            .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }
+            .sorted { $0.path.count > $1.path.count }
+        for folder in subfolders + [dir] where (try? fm.contentsOfDirectory(atPath: folder.path))?.isEmpty == true {
+            try? fm.removeItem(at: folder)
+        }
+    }
 }
 
 extension ModelRecommendations {
