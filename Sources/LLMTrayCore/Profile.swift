@@ -103,6 +103,10 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         /// Use the model's MTP drafter when one is known for it
         /// (`ModelDiscovery.mtpDrafterRepo`).
         public var mtpDrafter: Bool?
+        /// Lookup-only tables (Gemma 4 E2B/E4B's per-layer embeddings) read
+        /// from the file as needed, and image and audio towers loaded on
+        /// first use: up to ~2 GB less memory, decoding ~10% slower.
+        public var lowMemoryWeights: Bool?
         public var extraServerArgs: String?
         // Verbose (DEBUG) server logging is a global diagnostics setting
         // (Settings > Server), not a per-profile one. An older profile file
@@ -211,6 +215,7 @@ extension Profile {
         p.launch.decodeConcurrency = 1
         p.launch.promptCacheMB = 1024
         p.launch.mtpDrafter = true
+        p.launch.lowMemoryWeights = false
         p.launch.extraServerArgs = ""
         return p
     }()
@@ -275,6 +280,7 @@ public enum ProfileResolver {
             decodeConcurrency: max(1, v(\.launch.decodeConcurrency)),
             promptCacheMB: max(0, v(\.launch.promptCacheMB)),
             mtpDrafter: v(\.launch.mtpDrafter),
+            lowMemoryWeights: v(\.launch.lowMemoryWeights),
             extraServerArgs: v(\.launch.extraServerArgs)
         )
     }
@@ -312,6 +318,7 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var decodeConcurrency: Int
     public var promptCacheMB: Int
     public var mtpDrafter: Bool
+    public var lowMemoryWeights: Bool
     public var extraServerArgs: String
 }
 
@@ -363,6 +370,7 @@ extension Profile {
         ProfileField("decodeConcurrency", \.launch.decodeConcurrency),
         ProfileField("promptCacheMB", \.launch.promptCacheMB),
         ProfileField("mtpDrafter", \.launch.mtpDrafter),
+        ProfileField("lowMemoryWeights", \.launch.lowMemoryWeights),
         ProfileField("extraServerArgs", \.launch.extraServerArgs),
     ]
 }

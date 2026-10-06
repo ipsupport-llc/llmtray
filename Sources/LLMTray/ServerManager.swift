@@ -558,7 +558,8 @@ final class ServerManager: ObservableObject {
             prefillMemoryMB: memory.prefillMemoryMB,
             bufferCacheMB: memory.bufferCacheMB,
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
-            memoryShares: Self.memoryShares
+            memoryShares: Self.memoryShares,
+            supportsLowMemoryWeights: memory.supportsLowMemoryWeights
         )
     }
 
@@ -567,6 +568,7 @@ final class ServerManager: ObservableObject {
         var prefillMemoryMB: Int?
         var bufferCacheMB: Int?
         var gpuHeadroomBytes: Int64?
+        var supportsLowMemoryWeights = false
     }
 
     /// Read once per model folder, installed runtime (a runtime update
@@ -584,8 +586,12 @@ final class ServerManager: ObservableObject {
 
     private static func memoryFacts(forModelPath modelPath: String) -> MemoryFacts {
         let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
+        // An in-place reinstall rewrites server.py without touching lib/.
+        let server = MLXRuntimeInstaller.sitePackageDirs.compactMap {
+            (try? FileManager.default.attributesOfItem(atPath: "\($0)/mlx_lm/server.py"))?[.modificationDate] as? Date
+        }.map { String($0.timeIntervalSince1970) }.joined(separator: ",")
         let shares = memoryShares
-        let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
+        let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + server + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
             + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
@@ -594,7 +600,9 @@ final class ServerManager: ObservableObject {
         let facts = MemoryFacts(
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
             bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
-            gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights)
+            gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights),
+            supportsLowMemoryWeights: MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
+                && MLXRuntimeInstaller.serverSupportsFlag("--lazy-towers")
         )
         memoryFactsCache[key] = facts
         return facts

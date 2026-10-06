@@ -105,7 +105,7 @@ final class MLXRuntimeInstaller {
     /// runtime would refuse to start on an unknown one).
     /// The installed packages' folders: the venv's site-packages, or the
     /// App Store build's bundled packages.
-    private static var sitePackageDirs: [String] {
+    static var sitePackageDirs: [String] {
         #if APP_STORE
         return BundledRuntime.sitePackageDirs
         #else
