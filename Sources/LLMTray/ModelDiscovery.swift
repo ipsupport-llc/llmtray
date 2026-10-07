@@ -175,6 +175,58 @@ enum ModelDiscovery {
         return nil
     }
 
+    /// The file a model's own MTP head ships in (our Qwen 3.5 quants): an
+    /// installed model gets it alone, mlx-lm loads it with the weights.
+    static let mtpHeadFile = "model-mtp.safetensors"
+
+    /// The model's config declares an MTP head (Qwen 3.5:
+    /// `mtp_num_hidden_layers`), whether or not its weights are here.
+    static func declaresMTPHead(forModelPath path: String) -> Bool {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return false }
+        let text = (obj["text_config"] as? [String: Any]) ?? obj
+        return (text["mtp_num_hidden_layers"] as? Int ?? 0) > 0
+    }
+
+    static func hasMTPHead(forModelPath path: String) -> Bool {
+        FileManager.default.fileExists(atPath: path + "/" + mtpHeadFile)
+    }
+
+    /// Publishers whose repos a missing MTP head is fetched from: ours. The
+    /// repo is read from the folder's name (<root>/<org>/<name>, ours and LM
+    /// Studio's alike), which proves nothing on its own -- so not from any
+    /// org a renamed or copied folder may name.
+    static let mtpHeadPublishers: Set<String> = ["roman220220"]
+
+    /// The text configs of two config.json files agree on the shape an MTP
+    /// head depends on: the sizes both must give, and every other one that
+    /// both give (a newer export may spell out one the older derived, such
+    /// as head_dim).
+    static func sameArchitecture(_ a: String, _ b: String) -> Bool {
+        func text(_ path: String) -> [String: Any]? {
+            guard let data = FileManager.default.contents(atPath: path),
+                  let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+            return (obj["text_config"] as? [String: Any]) ?? obj
+        }
+        guard let x = text(a), let y = text(b) else { return false }
+        let required = ["hidden_size", "num_hidden_layers", "vocab_size"]
+        let optional = ["model_type", "num_attention_heads", "num_key_value_heads", "head_dim", "intermediate_size",
+                        "num_experts", "moe_intermediate_size", "mtp_num_hidden_layers"]
+        for key in required where x[key] == nil || y[key] == nil { return false }
+        for key in required + optional {
+            if let u = x[key], let v = y[key], "\(u)" != "\(v)" { return false }
+        }
+        return true
+    }
+
+    /// The repo a model folder's MTP head would come from, or nil.
+    static func mtpHeadRepo(forModelPath path: String) -> String? {
+        let parts = Array(URL(fileURLWithPath: path).standardizedFileURL.pathComponents.suffix(2))
+        guard parts.count == 2, mtpHeadPublishers.contains(parts[0]),
+              !parts[1].isEmpty, !parts[1].hasPrefix(".") else { return nil }
+        return parts.joined(separator: "/")
+    }
+
     /// Models with KV-shared layers (e.g. Gemma 4's `num_kv_shared_layers`)
     /// reuse an earlier layer's raw cache-internal (keys, values) tuple
     /// directly inside the shared layer's attention call, bypassing that

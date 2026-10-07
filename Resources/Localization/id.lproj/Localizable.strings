@@ -360,7 +360,7 @@
 "For This Chat" = "Untuk Chat Ini";
 "For an Hour" = "Untuk Satu Jam";
 "For faster answers (speculative decoding)" = "Untuk jawaban lebih cepat (spekulatif decoding)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan model draf yang dipublikasikan (Gemma 4 26B): model ekstra kecil menebak token berikutnya terlebih dahulu dan model utama memeriksanya dalam satu lintasan. Output sama, lebih cepat. Permintaan kemudian dilayani satu per satu.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan drafter yang dipublikasikan (Gemma 4 26B) atau kepala MTP sendiri (model Qwen 3.5 kami, diunduh bersamanya): menebak token di depan dan model utama memeriksanya dalam satu langkah. Hasil sama, lebih cepat. Permintaan lalu dilayani satu per satu.";
 "Found after an interruption" = "Ditemukan setelah terhenti";
 "Founding Supporters" = "Penyokong Pendiri";
 "Free disk space" = "Ruang disk tersedia";

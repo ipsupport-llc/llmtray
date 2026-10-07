@@ -17,6 +17,10 @@ public enum ServerLaunch {
         /// `--draft-model` value, already decided by the caller (profile's
         /// `mtpDrafter`, a known drafter for this model, runtime support).
         public var drafterRepo: String?
+        /// The model folder has its own MTP head (`model-mtp.safetensors`,
+        /// Qwen 3.5) and the runtime uses it: the server drafts with it
+        /// unless the profile turns `mtpDrafter` off.
+        public var mtpHead: Bool
         /// The model's trained context length, if known: caps the
         /// server-side `--max-tokens` default (Default is shared across
         /// models, so its max_tokens may be sized for a bigger one).
@@ -47,7 +51,7 @@ public enum ServerLaunch {
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
-                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false) {
+                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -60,6 +64,7 @@ public enum ServerLaunch {
             self.gpuHeadroomBytes = gpuHeadroomBytes
             self.memoryShares = memoryShares
             self.supportsLowMemoryWeights = supportsLowMemoryWeights
+            self.mtpHead = mtpHead
         }
     }
 
@@ -183,6 +188,13 @@ public enum ServerLaunch {
         if let drafter = c.drafterRepo {
             args += ["--draft-model", drafter]
         }
+        // Said either way: a head that has just been downloaded changes the
+        // launch, so a restart is offered (pendingLaunchChange). 3: the most
+        // drafts per step; the runtime picks 0...3 by what's fastest.
+        // Not with a drafter model: that one is drafted with instead.
+        if c.mtpHead, c.drafterRepo == nil, !extraArgsSetDrafter(p), !extraArgsSet("--num-draft-tokens", p) {
+            args += ["--num-draft-tokens", p.mtpDrafter ? "3" : "0"]
+        }
         if p.lowMemoryWeights, c.supportsLowMemoryWeights {
             args += ["--mmap-lookup-tables", "--lazy-towers"]
         }
@@ -272,7 +284,13 @@ public enum ServerLaunch {
     public static func restartKey(_ p: ResolvedProfile, _ c: Context) -> [String] {
         var generated = p
         generated.extraServerArgs = ""
+        // What `arguments` leaves out for the user's own flags stays out;
+        // the head's weights still load only at a start: marked apart.
+        var c = c
+        let head = c.mtpHead
+        if extraArgsSet("--num-draft-tokens", p) || extraArgsSetDrafter(p) { c.mtpHead = false }
         return withoutSampling(arguments(generated, c)) + p.extraServerArgs.split(separator: " ").map(String.init)
+            + (head ? ["#mtp-head"] : [])
     }
 
     /// The sampling flags `arguments` sets; each takes one value.

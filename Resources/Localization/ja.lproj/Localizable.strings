@@ -360,7 +360,7 @@
 "For This Chat" = "このチャット用";
 "For an Hour" = "1 時間だけ";
 "For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "公開済みの下書きモデルがあるモデル（Gemma 4 26B）では、小さな追加モデルが先のトークンを予測し、メインモデルが1回のパスで確認します。出力は同じで、より高速です。その場合、リクエストは1件ずつ処理されます。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "ドラフターが公開されているモデル（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデル、モデルと一緒にダウンロード）向け：先のトークンを推測し、メインモデルが 1 回のパスで確認します。出力は同じで、より高速です。リクエストは 1 件ずつ処理されます。";
 "Found after an interruption" = "中断後に見つかった項目";
 "Founding Supporters" = "創設支援者";
 "Free disk space" = "空きディスク容量";

@@ -360,7 +360,7 @@
 "For This Chat" = "Для этого чата";
 "For an Hour" = "На час";
 "For faster answers (speculative decoding)" = "Для более быстрых ответов (спекулятивная декодировка)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей с опубликованным драфтером (Gemma 4 26B): маленькая модель угадывает токены наперёд, а основная проверяет их за один проход. Ответ тот же, но быстрее. Запросы при этом обрабатываются по одному.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей с опубликованным черновиком (Gemma 4 26B) или собственной головой MTP (наши модели Qwen 3.5, скачивается вместе с ними): она угадывает токены наперёд, а основная модель проверяет их за один проход. Тот же ответ, быстрее. Запросы при этом обслуживаются по одному.";
 "Found after an interruption" = "Найдено после прерывания";
 "Founding Supporters" = "Основатели-спонсоры";
 "Free disk space" = "Свободное место на диске";

@@ -360,7 +360,7 @@
 "For This Chat" = "Bu Sohbet İçin";
 "For an Hour" = "Bir Saat İçin";
 "For faster answers (speculative decoding)" = "Daha hızlı yanıtlar için (spekülatif çözümleme)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış taslak modeli olan modellerde (Gemma 4 26B): küçük bir ek model ilerideki token’ları tahmin eder ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. İstekler bu durumda teker teker işlenir.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış bir taslakçısı olan (Gemma 4 26B) ya da kendi MTP başlığı olan modeller için (bizim Qwen 3.5 modellerimiz, onlarla birlikte indirilir): ileriki token’ları tahmin eder, ana model bunları tek geçişte doğrular. Aynı çıktı, daha hızlı. İstekler o zaman tek tek işlenir.";
 "Found after an interruption" = "Kesintiden sonra bulunanlar";
 "Founding Supporters" = "Kurucu Destekçiler";
 "Free disk space" = "Boş disk alanı";

@@ -247,10 +247,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         }
     }
 
-    /// Fetches each shown result's exact on-disk size from HF's per-model
+    /// Fetches each shown result's download size from HF's per-model
     /// detail endpoint -- not available in bulk on the search/list endpoint
     /// itself (its `expand[]` allowlist doesn't include usedStorage,
-    /// confirmed live: the API rejects it as an invalid option). Races
+    /// confirmed live: the API rejects it as an invalid option). The
+    /// current files' total (?blobs=true), not usedStorage: that counts
+    /// every stored revision (a re-uploaded 3.5 GB model showed 10 GB). Races
     /// every result's fetch concurrently and lets each one update
     /// sizesByID independently as it lands, rather than waiting for all
     /// ~30 to finish before showing any -- this is a one-time burst per
@@ -258,11 +260,11 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     private func fetchSizes(for models: [HFModelSummary]) {
         for model in models {
             Task {
-                guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)") else { return }
+                guard let url = URL(string: "https://huggingface.co/api/models/\(model.id)?blobs=true") else { return }
                 guard let (data, _) = try? await URLSession.shared.data(from: url),
                       let info = HubModelInfo.parse(data) else { return }
                 infoByID[model.id] = info
-                if let size = info.sizeBytes { sizesByID[model.id] = size }
+                if let size = HubModelInfo.filesSize(data) ?? info.sizeBytes { sizesByID[model.id] = size }
             }
         }
     }

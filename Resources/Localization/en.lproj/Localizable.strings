@@ -362,7 +362,7 @@
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";

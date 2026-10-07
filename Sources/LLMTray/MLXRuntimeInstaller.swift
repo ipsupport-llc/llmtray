@@ -143,6 +143,16 @@ final class MLXRuntimeInstaller {
         sitePackageDirs.contains { FileManager.default.fileExists(atPath: "\($0)/mlx_lm/models/\(modelType).py") }
     }
 
+    /// The installed mlx-lm drafts with a model's own MTP head (Qwen 3.5,
+    /// model-mtp.safetensors). An older one drops the head's weights on
+    /// load, so the file does no harm there, it just isn't used.
+    static var supportsMTPHead: Bool {
+        serverSupportsFlag("--num-draft-tokens") && sitePackageDirs.contains { dir in
+            guard let text = try? String(contentsOfFile: "\(dir)/mlx_lm/generate.py", encoding: .utf8) else { return false }
+            return text.contains("def mtp_generate_step(")
+        }
+    }
+
     /// Version directory name (e.g. "3.14") isn't known ahead of time, so
     /// this just looks at whatever's actually there instead of hardcoding it.
     /// The Full build's Python, once copied out (also good for mflux).
