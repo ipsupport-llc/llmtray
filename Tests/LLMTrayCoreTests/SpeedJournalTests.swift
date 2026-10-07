@@ -81,6 +81,13 @@ final class SpeedJournalTests: XCTestCase {
         f.begin()
         _ = f.end(prompt: 7, tokens: 7, now: t0)
         XCTAssertEqual(f.offer(stats(7, 7), "later", now: t0.addingTimeInterval(120)).map(\.payload), ["later"])
+        // Concurrent benchmark requests (auto-tune): held until the last ends.
+        f.begin(); f.begin()
+        XCTAssertTrue(f.offer(stats(512, 128), "bench1").isEmpty)
+        XCTAssertTrue(f.offer(stats(40, 9), "chat").isEmpty)
+        XCTAssertTrue(f.end(prompt: 512, tokens: 128).isEmpty)
+        XCTAssertTrue(f.offer(stats(513, 128), "bench2").isEmpty)
+        XCTAssertEqual(f.end(prompt: 513, tokens: 128).map(\.payload), ["chat"])
         // A failed benchmark request releases what waited for it.
         f.begin()
         XCTAssertTrue(f.offer(stats(1, 1), "x").isEmpty)

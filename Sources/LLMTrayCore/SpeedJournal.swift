@@ -161,12 +161,14 @@ public struct SpeedJournal: Codable, Equatable, Sendable {
     }
 }
 
-/// Keeps the Benchmark tab's own requests out of the speed journal, and
-/// only those: a benchmark request reports its prompt and completion tokens
-/// (usage), the server's stats line has the same two numbers. A stats line
-/// that comes while a benchmark request is open waits until that request
-/// reports; a line that comes after its request ended is dropped when its
-/// numbers were reported in the last minute.
+/// Keeps the Benchmark tab's own requests out of the speed journal: a
+/// benchmark request reports its prompt and completion tokens (usage), the
+/// server's stats line has the same two numbers. A stats line that comes
+/// while a benchmark request is open waits until that request reports; a
+/// line that comes after its request ended is dropped when its numbers were
+/// reported in the last minute. The lines carry no request id, so another
+/// request with the very same two numbers at that moment can swap places
+/// with the benchmark's (one entry).
 public struct BenchmarkStatsFilter<Payload> {
     struct Signature: Equatable {
         var prompt: Int
