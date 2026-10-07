@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）將移到資源回收筒，您仍可從中還原。其別名與設定檔選擇將一併遺失。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」及其索引已從專案刪除。您用來加入該項目的原始檔不受影響。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」未被移除：伺服器正忙或正在使用。待伺服器閒置時再試。";
+"%.0f%% from drafts" = "%.0f%% 來自草稿";
+"%lld requests" = "%lld 個請求";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "伺服器回答的每個請求（聊天，以及透過 API 的其他 App 與代理）都保存在這台 Mac 上。依模型與設定取中位數。";
+"In real use" = "實際使用";
+"No requests yet." = "還沒有請求。";
+"first token %.1f s" = "首個詞元 %.1f 秒";
+"generation %.1f tok/s" = "生成 %.1f tok/s";
+"prompt %.0f tok/s" = "提示 %.0f tok/s";

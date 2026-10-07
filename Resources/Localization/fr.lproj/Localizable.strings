@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "« %@ » (%@) est déplacé dans la Corbeille, où vous pouvez encore le restaurer. Son alias et son choix de profil sont oubliés.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "« %@ » et son index sont supprimés du projet. Le fichier d'origine que vous avez ajouté n'est pas modifié.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "« %@ » n'a pas été supprimé : le serveur est occupé ou l'utilise. Réessayez lorsqu'il sera inactif.";
+"%.0f%% from drafts" = "%.0f %% issus des brouillons";
+"%lld requests" = "%lld requêtes";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Chaque requête à laquelle le serveur répond, du chat et des autres apps et agents via l’API, conservée sur ce Mac. Médianes par modèle et réglages.";
+"In real use" = "En usage réel";
+"No requests yet." = "Aucune requête pour l’instant.";
+"first token %.1f s" = "premier token %.1f s";
+"generation %.1f tok/s" = "génération %.1f tok/s";
+"prompt %.0f tok/s" = "prompt %.0f tok/s";

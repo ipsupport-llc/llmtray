@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) سيُنقل إلى سلة المحذوفات، حيث يمكن استعادته بعد. سيتم نسيان الاسم المستعار وخيار الملف الشخصي.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» وفهرسه حُذفا من المشروع. الملف الذي أضفته منه لم يتأثر.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» لم يُحذف: الخادم مشغول أو يستخدمه. حاول مجدداً عندما يصبح الخادم خالياً.";
+"%.0f%% from drafts" = "%.0f%% من المسودات";
+"%lld requests" = "%lld طلبات";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "كل طلب يجيب عنه الخادم، من الدردشة ومن التطبيقات والوكلاء الأخرى عبر الواجهة البرمجية، محفوظ على هذا الـ Mac. الوسيط لكل نموذج وإعدادات.";
+"In real use" = "في الاستخدام الفعلي";
+"No requests yet." = "لا طلبات بعد.";
+"first token %.1f s" = "أول رمز %.1f ث";
+"generation %.1f tok/s" = "التوليد %.1f رمز/ث";
+"prompt %.0f tok/s" = "الموجّه %.0f رمز/ث";

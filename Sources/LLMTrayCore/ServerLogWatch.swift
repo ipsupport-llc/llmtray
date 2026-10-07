@@ -15,6 +15,8 @@ public struct ServerLogWatch {
         /// a swapping Mac took 74 s per 512 tokens, with no byte on the
         /// wire meanwhile. At most one per fed chunk.
         case prefillProgress
+        /// A request ended ("Request stats: ..."): for the speed journal.
+        case requestStats(RequestStats)
     }
 
     /// mlx_lm.server logs this once, at ERROR level, when the thread dies
@@ -33,6 +35,11 @@ public struct ServerLogWatch {
     /// logged request body quoting one doesn't count.
     static let progressRecord = try! NSRegularExpression(
         pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - (?:INFO|WARNING) - |(?:INFO|WARNING):root:)(?:Prompt processing progress: \d+/\d+|Prefill step )"#
+    )
+
+    /// The fork's per-request summary, a record's start like `record`.
+    static let statsRecord = try! NSRegularExpression(
+        pattern: #"^(?:\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d+ - INFO - |INFO:root:)Request stats: "#
     )
 
     /// Output arrives in arbitrary chunks; an unfinished line waits here.
@@ -54,6 +61,9 @@ public struct ServerLogWatch {
             if Self.progressRecord.firstMatch(in: line, range: range) != nil {
                 progress = true
                 return nil
+            }
+            if let m = Self.statsRecord.firstMatch(in: line, range: range) {
+                return RequestStats.parse(ns.substring(from: m.range.location)).map { .requestStats($0) }
             }
             guard let match = Self.record.firstMatch(in: line, range: range) else { return nil }
             let rest = ns.substring(from: match.range.location + match.range.length)

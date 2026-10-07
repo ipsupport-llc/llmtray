@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) переміщено в Кошик — звідти її можна відновити. Її псевдонім та вибір профілю будуть забуті.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» та його індекс видалено з проєкту. Файл, з якого ви його додали, не змінюється.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» не було видалено: сервер зайнятий або використовує її. Спробуйте ще раз, коли він буде неактивний.";
+"%.0f%% from drafts" = "%.0f%% з чернеток";
+"%lld requests" = "запитів: %lld";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Кожен запит, на який відповів сервер, — з чату та від інших застосунків і агентів через API — зберігається на цьому Mac. Медіани за моделлю й налаштуваннями.";
+"In real use" = "У реальній роботі";
+"No requests yet." = "Запитів поки немає.";
+"first token %.1f s" = "перший токен %.1f с";
+"generation %.1f tok/s" = "генерація %.1f ток/с";
+"prompt %.0f tok/s" = "промпт %.0f ток/с";

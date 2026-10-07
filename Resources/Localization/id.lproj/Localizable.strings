@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) akan dipindahkan ke Sampah, di mana Anda masih bisa mengembalikannya. alias dan pilihan profilnya akan dilupakan.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” dan indeksnya dihapus dari proyek. Berkas sumber yang Anda tambahkan tidak diubah.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” tidak dihapus: server sedang sibuk atau sedang menggunakannya. Coba lagi saat idle.";
+"%.0f%% from drafts" = "%.0f%% dari draf";
+"%lld requests" = "%lld permintaan";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Setiap permintaan yang dijawab server, dari chat dan dari aplikasi serta agen lain lewat API, disimpan di Mac ini. Median per model dan pengaturan.";
+"In real use" = "Dalam pemakaian nyata";
+"No requests yet." = "Belum ada permintaan.";
+"first token %.1f s" = "token pertama %.1f d";
+"generation %.1f tok/s" = "generasi %.1f tok/d";
+"prompt %.0f tok/s" = "prompt %.0f tok/d";

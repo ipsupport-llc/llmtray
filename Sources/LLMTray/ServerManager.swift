@@ -804,6 +804,8 @@ final class ServerManager: ObservableObject {
                     self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
                 case .prefillProgress:
                     self.lastPrefillProgressAt = Date()
+                case let .requestStats(stats):
+                    SpeedJournalStore.shared.record(stats, modelPath: modelPath, arguments: self.launchedArguments)
                 }
             }
         }

@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) sẽ được chuyển vào Thùng Rác, nơi bạn vẫn có thể khôi phục. Bí danh và lựa chọn cấu hình của nó sẽ bị quên.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” và chỉ mục của nó đã bị xóa khỏi dự án. Tệp bạn thêm từ đó không bị ảnh hưởng.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Không xoá được “%@”: máy chủ đang bận hoặc đang sử dụng mô hình. Thử lại khi máy chủ rảnh.";
+"%.0f%% from drafts" = "%.0f%% từ bản nháp";
+"%lld requests" = "%lld yêu cầu";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Mọi yêu cầu máy chủ trả lời, từ cuộc trò chuyện và từ ứng dụng, agent khác qua API, được lưu trên máy Mac này. Trung vị theo mô hình và cài đặt.";
+"In real use" = "Khi dùng thực tế";
+"No requests yet." = "Chưa có yêu cầu nào.";
+"first token %.1f s" = "token đầu %.1f giây";
+"generation %.1f tok/s" = "tạo %.1f tok/giây";
+"prompt %.0f tok/s" = "prompt %.0f tok/giây";

@@ -98,4 +98,12 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertTrue(b.take(now: t + 600), "the first restart left the window")
         XCTAssertFalse(b.take(now: t + 601))
     }
+
+    func testRequestStats() {
+        var w = ServerLogWatch()
+        let line = "2026-10-07 02:30:00,123 - INFO - Request stats: prompt=10 cached=2 first_token_s=0.500 tokens=4 decode_s=1.000 drafted=1\n"
+        XCTAssertEqual(w.feed(line), [.requestStats(RequestStats(prompt: 10, cached: 2, firstTokenSeconds: 0.5, tokens: 4, decodeSeconds: 1, drafted: 1))])
+        // Quoted in a logged request body: not a record.
+        XCTAssertEqual(w.feed("    \"content\": \"Request stats: prompt=10 cached=2 first_token_s=0.5 tokens=4 decode_s=1 drafted=1\"\n"), [])
+    }
 }
