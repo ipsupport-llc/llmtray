@@ -102,7 +102,6 @@ private struct FileDownload {
     /// (DownloadParts) into `partial`, then is renamed into place.
     var fetcher: PartFetcher?
     var fetcherStarted = false
-    var partial: URL { destination.appendingPathExtension("llmtray-partial") }
 }
 
 /// Searches the HF Hub for mlx-format models and downloads one straight
@@ -350,6 +349,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 rate.reset()
                 downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
+                let bigFiles = entries.filter { DownloadParts.ranges(size: Int64($0.size ?? 0)) != nil }.count
                 for entry in entries {
                     let destination = destRoot.appendingPathComponent(entry.path)
                     let expected = Int64(entry.size ?? 0)
@@ -364,10 +364,14 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                         file.writtenBytes = expected
                     }
                     // A previous attempt's half-written big file: started over.
-                    try? FileManager.default.removeItem(at: file.partial)
+                    Self.removePartials(of: destination)
                     if !file.isDone, let ranges = DownloadParts.ranges(size: expected),
                        let url = Self.resolveURL(repo: model.id, path: entry.path) {
-                        file.fetcher = makeFetcher(path: entry.path, url: url, partial: file.partial, ranges: ranges,
+                        // Its own name per attempt: an earlier attempt's
+                        // fetcher, still winding down, never touches it.
+                        let partial = destination.appendingPathExtension(UUID().uuidString + ".llmtray-partial")
+                        file.fetcher = makeFetcher(path: entry.path, url: url, partial: partial, size: expected,
+                                                   ranges: ranges, connections: DownloadParts.connections(bigFiles: bigFiles),
                                                    generation: generation)
                     }
                     files[entry.path] = file
@@ -431,7 +435,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         // In place: what this attempt saved, and what it found there from
         // an earlier one (its size and Hub revision in the manifest).
         let inPlace = files.values.filter(\.isDone).map(\.path)
-        let partials = files.values.filter { $0.fetcher != nil }.map(\.partial)
+        let partials = files.values.compactMap { $0.fetcher?.partial }
         stopDownload()
         for url in partials { try? FileManager.default.removeItem(at: url) }
         guard let root else { return }
@@ -468,9 +472,10 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
     /// A big file's fetcher: its progress counts in, its end puts the file
     /// in place (or ends the download).
-    private func makeFetcher(path: String, url: URL, partial: URL, ranges: [ClosedRange<Int64>],
-                             generation: Int) -> PartFetcher {
-        let fetcher = PartFetcher(url: url, token: HFToken.value, partial: partial, ranges: ranges)
+    private func makeFetcher(path: String, url: URL, partial: URL, size: Int64, ranges: [ClosedRange<Int64>],
+                             connections: Int, generation: Int) -> PartFetcher {
+        let fetcher = PartFetcher(url: url, token: HFToken.value, partial: partial, size: size, ranges: ranges,
+                                  connections: connections)
         fetcher.onProgress = { [weak self] written in
             MainActor.assumeIsolated {
                 guard let self, self.downloadGeneration == generation, self.files[path] != nil else { return }
@@ -478,19 +483,23 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 self.publishProgress()
             }
         }
-        fetcher.onFinish = { [weak self] error in
+        fetcher.onFinish = { [weak self] outcome in
             MainActor.assumeIsolated {
                 guard let self, self.downloadGeneration == generation, !self.downloadFailed,
                       let file = self.files[path] else { return }
-                if let error { return self.failDownload("\(file.destination.lastPathComponent): \(error)") }
-                let fm = FileManager.default
-                let size = (try? fm.attributesOfItem(atPath: file.partial.path)[.size] as? NSNumber)?.int64Value ?? -1
-                guard size == file.expectedBytes else {
-                    return self.failDownload("\(file.destination.lastPathComponent): expected \(file.expectedBytes) bytes, got \(size)")
+                switch outcome {
+                case .refused(let status):
+                    return self.failDownload(Self.accessMessage(status: status, repo: self.currentModelID))
+                case .failed(let error):
+                    return self.failDownload("\(file.destination.lastPathComponent): \(error)")
+                case .done:
+                    break
                 }
+                // Every range's bytes are in (the fetcher counts them).
+                let fm = FileManager.default
                 do {
                     try? fm.removeItem(at: file.destination)
-                    try fm.moveItem(at: file.partial, to: file.destination)
+                    try fm.moveItem(at: partial, to: file.destination)
                 } catch {
                     return self.failDownload("Failed to save \(file.destination.lastPathComponent): \(error.localizedDescription)")
                 }
@@ -501,6 +510,16 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             }
         }
         return fetcher
+    }
+
+    /// Removes a file's half-written big-file attempts (<file>.<id>.llmtray-partial).
+    nonisolated static func removePartials(of destination: URL) {
+        let dir = destination.deletingLastPathComponent()
+        let prefix = destination.lastPathComponent + "."
+        for name in (try? FileManager.default.contentsOfDirectory(atPath: dir.path)) ?? []
+        where name.hasPrefix(prefix) && name.hasSuffix(".llmtray-partial") {
+            try? FileManager.default.removeItem(at: dir.appendingPathComponent(name))
+        }
     }
 
     private func startTask(forPath path: String) {
@@ -702,7 +721,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     private func failDownload(_ message: String) {
         downloadFailed = true
         let written = files.values.filter { $0.isDone && !$0.preexisting }.map(\.destination)
-            + files.values.filter { $0.fetcher != nil }.map(\.partial)
+            + files.values.compactMap { $0.fetcher?.partial }
         let root = currentDestRoot
         stopDownload()   // clears downloadError: set after
         for url in written { try? FileManager.default.removeItem(at: url) }

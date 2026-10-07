@@ -28,11 +28,23 @@ public enum DownloadParts {
         "bytes=\(range.lowerBound)-\(range.upperBound)"
     }
 
-    /// Whether a response is the part asked for: 206 with a matching
-    /// Content-Range (a server that ignores Range answers 200 with the
-    /// whole file).
-    public static func isPart(status: Int, contentRange: String?, of range: ClosedRange<Int64>) -> Bool {
-        guard status == 206, let contentRange else { return false }
-        return contentRange.hasPrefix("bytes \(range.lowerBound)-\(range.upperBound)/")
+    /// Whether a response is (the start of) the range asked for: 206 with a
+    /// Content-Range from the same first byte, not past its end, of a file
+    /// of `size` bytes. A shorter range is legal: the rest is asked for
+    /// again. A server that ignores Range answers 200 with the whole file.
+    public static func isPart(status: Int, contentRange: String?, of range: ClosedRange<Int64>, size: Int64) -> Bool {
+        guard status == 206, let contentRange, contentRange.hasPrefix("bytes ") else { return false }
+        let body = contentRange.dropFirst("bytes ".count)
+        let halves = body.split(separator: "/", maxSplits: 1)
+        guard halves.count == 2 else { return false }
+        let bounds = halves[0].split(separator: "-", maxSplits: 1)
+        guard bounds.count == 2, let first = Int64(bounds[0]), let last = Int64(bounds[1]) else { return false }
+        if halves[1] != "*" && Int64(halves[1]) != size { return false }
+        return first == range.lowerBound && last >= first && last <= range.upperBound
+    }
+
+    /// Connections per big file: 16 in all, at least 2 each.
+    public static func connections(bigFiles: Int) -> Int {
+        max(2, min(maxParts, 16 / max(1, bigFiles)))
     }
 }

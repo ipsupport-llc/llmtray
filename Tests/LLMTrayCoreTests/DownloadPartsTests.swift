@@ -27,8 +27,21 @@ final class DownloadPartsTests: XCTestCase {
     func testResponseMustBeThePart() {
         let r: ClosedRange<Int64> = 100...199
         XCTAssertEqual(DownloadParts.header(r), "bytes=100-199")
-        XCTAssertTrue(DownloadParts.isPart(status: 206, contentRange: "bytes 100-199/1000", of: r))
-        XCTAssertFalse(DownloadParts.isPart(status: 200, contentRange: nil, of: r))
-        XCTAssertFalse(DownloadParts.isPart(status: 206, contentRange: "bytes 0-999/1000", of: r))
+        XCTAssertTrue(DownloadParts.isPart(status: 206, contentRange: "bytes 100-199/1000", of: r, size: 1000))
+        // Shorter is legal (the rest is asked for again); total may be unknown.
+        XCTAssertTrue(DownloadParts.isPart(status: 206, contentRange: "bytes 100-149/1000", of: r, size: 1000))
+        XCTAssertTrue(DownloadParts.isPart(status: 206, contentRange: "bytes 100-199/*", of: r, size: 1000))
+        XCTAssertFalse(DownloadParts.isPart(status: 200, contentRange: nil, of: r, size: 1000))
+        XCTAssertFalse(DownloadParts.isPart(status: 206, contentRange: "bytes 0-999/1000", of: r, size: 1000))
+        XCTAssertFalse(DownloadParts.isPart(status: 206, contentRange: "bytes 100-299/1000", of: r, size: 1000))
+        XCTAssertFalse(DownloadParts.isPart(status: 206, contentRange: "bytes 100-199/2000", of: r, size: 1000))
+        XCTAssertFalse(DownloadParts.isPart(status: 206, contentRange: "garbage", of: r, size: 1000))
+    }
+
+    func testConnectionBudget() {
+        XCTAssertEqual(DownloadParts.connections(bigFiles: 1), 8)
+        XCTAssertEqual(DownloadParts.connections(bigFiles: 2), 8)
+        XCTAssertEqual(DownloadParts.connections(bigFiles: 4), 4)
+        XCTAssertEqual(DownloadParts.connections(bigFiles: 10), 2)
     }
 }

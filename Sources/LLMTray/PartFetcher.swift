@@ -10,62 +10,87 @@ import LLMTrayCore
 /// resolve URL, so a CDN link that expired during a pause doesn't matter.
 ///
 /// Its own session and serial queue: the writes stay off the main thread.
-/// Callbacks come on the main queue.
+/// Only a part's current task may write to it or end it: a cancelled one's
+/// late callbacks are ignored. Callbacks come on the main queue.
 final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
+    enum Outcome: Equatable {
+        case done
+        /// An HTTP status that won't change on a retry (401, 403, 404...).
+        case refused(Int)
+        case failed(String)
+    }
+
     private struct Part {
         let range: ClosedRange<Int64>
         var written: Int64 = 0
         var task: URLSessionDataTask?
-        var retries = 0
+        var attempts = 0
         var isDone: Bool { written == Int64(range.count) }
+        var next: ClosedRange<Int64> { (range.lowerBound + written)...range.upperBound }
     }
 
     /// Bytes written so far, at most once per ~0.25 s.
     var onProgress: ((Int64) -> Void)?
-    /// nil: every part is in; else why the file failed.
-    var onFinish: ((String?) -> Void)?
+    var onFinish: ((Outcome) -> Void)?
 
+    let partial: URL
     private let url: URL
     private let token: String?
-    private let partial: URL
+    private let size: Int64
     private let queue = OperationQueue()
     private var session: URLSession!
     private var handle: FileHandle?
     private var parts: [Part]
-    private var taskPart: [Int: Int] = [:]
     private var paused = false
     private var finished = false
     private var lastReport: TimeInterval = 0
-    private static let maxRetries = 3
+    /// Set at once by cancel() (not through the queue): a start still
+    /// waiting on the queue mustn't touch the file system after it.
+    private let cancelLock = NSLock()
+    private var cancelledNow = false
+    /// Attempts per part (connection drops, 429, 5xx), with a growing wait.
+    private static let maxAttempts = 8
 
-    init(url: URL, token: String?, partial: URL, ranges: [ClosedRange<Int64>]) {
+    init(url: URL, token: String?, partial: URL, size: Int64, ranges: [ClosedRange<Int64>], connections: Int) {
         self.url = url
         self.token = token
         self.partial = partial
+        self.size = size
         self.parts = ranges.map { Part(range: $0) }
         super.init()
         queue.maxConcurrentOperationCount = 1
         let config = URLSessionConfiguration.default
-        config.httpMaximumConnectionsPerHost = DownloadParts.maxParts
+        config.httpMaximumConnectionsPerHost = max(1, connections)
         session = URLSession(configuration: config, delegate: self, delegateQueue: queue)
+    }
+
+    private var isCancelled: Bool {
+        cancelLock.lock()
+        defer { cancelLock.unlock() }
+        return cancelledNow
     }
 
     /// Creates `partial` at the file's full size (sparse until written) and
     /// starts every part.
     func start() {
         queue.addOperation { [self] in
+            guard !isCancelled, !finished else { return }
             let fm = FileManager.default
             do {
                 try fm.createDirectory(at: partial.deletingLastPathComponent(), withIntermediateDirectories: true)
-                try? fm.removeItem(at: partial)
                 guard fm.createFile(atPath: partial.path, contents: nil) else {
-                    return finish("can't create \(partial.lastPathComponent)")
+                    return finish(.failed("can't create \(partial.lastPathComponent)"))
                 }
                 let h = try FileHandle(forWritingTo: partial)
-                try h.truncate(atOffset: UInt64(parts.last.map { $0.range.upperBound + 1 } ?? 0))
+                do {
+                    try h.truncate(atOffset: UInt64(size))
+                } catch {
+                    try? h.close()
+                    throw error
+                }
                 handle = h
             } catch {
-                return finish(error.localizedDescription)
+                return finish(.failed(error.localizedDescription))
             }
             for i in parts.indices { startPart(i) }
         }
@@ -73,6 +98,7 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
 
     func pause() {
         queue.addOperation { [self] in
+            guard !finished else { return }
             paused = true
             for i in parts.indices {
                 parts[i].task?.cancel()
@@ -85,14 +111,22 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         queue.addOperation { [self] in
             guard paused, !finished else { return }
             paused = false
+            // Paused after the last byte, before its task ended: done.
+            if parts.allSatisfy(\.isDone) { return complete() }
             for i in parts.indices where !parts[i].isDone { startPart(i) }
         }
     }
 
-    /// Stops for good; `partial` is the caller's to remove.
+    /// Stops for good, no callbacks after it; `partial` is the caller's to
+    /// remove (the fetcher won't create it afterwards).
     func cancel() {
+        cancelLock.lock()
+        cancelledNow = true
+        cancelLock.unlock()
         queue.addOperation { [self] in
             finished = true
+            onProgress = nil
+            onFinish = nil
             for i in parts.indices { parts[i].task?.cancel() }
             try? handle?.close()
             handle = nil
@@ -100,89 +134,121 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         }
     }
 
-    // On the queue.
+    // MARK: - On the queue
+
     private func startPart(_ i: Int) {
-        guard !finished, !paused, !parts[i].isDone, parts[i].task == nil else { return }
+        guard !finished, !paused, !isCancelled, !parts[i].isDone, parts[i].task == nil else { return }
         var request = URLRequest(url: url)
         if let token, url.host == "huggingface.co" { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
-        let from = parts[i].range.lowerBound + parts[i].written
-        request.setValue(DownloadParts.header(from...parts[i].range.upperBound), forHTTPHeaderField: "Range")
+        request.setValue(DownloadParts.header(parts[i].next), forHTTPHeaderField: "Range")
         let task = session.dataTask(with: request)
+        task.taskDescription = String(i)
         parts[i].task = task
-        taskPart[task.taskIdentifier] = i
+        parts[i].attempts += 1
         task.resume()
     }
 
-    private func finish(_ error: String?) {
+    /// The part `task` is the current task of, or nil (a cancelled one's
+    /// late callback).
+    private func part(of task: URLSessionTask) -> Int? {
+        guard let i = task.taskDescription.flatMap(Int.init), parts.indices.contains(i), parts[i].task === task else { return nil }
+        return i
+    }
+
+    private func complete() {
+        report(force: true)
+        finish(.done)
+    }
+
+    private func finish(_ outcome: Outcome) {
         guard !finished else { return }
         finished = true
-        for i in parts.indices { parts[i].task?.cancel() }
-        try? handle?.synchronize()
+        for i in parts.indices {
+            parts[i].task?.cancel()
+            parts[i].task = nil
+        }
+        if outcome == .done { try? handle?.synchronize() }
         try? handle?.close()
         handle = nil
-        session.finishTasksAndInvalidate()
+        // Cancel, not finish: a failed file's other ranges stop now.
+        session.invalidateAndCancel()
+        guard !isCancelled else { return }
         let onFinish = onFinish
-        DispatchQueue.main.async { onFinish?(error) }
+        DispatchQueue.main.async { onFinish?(outcome) }
     }
 
     private func report(force: Bool = false) {
         let now = ProcessInfo.processInfo.systemUptime
-        guard force || now - lastReport >= 0.25 else { return }
+        guard force || now - lastReport >= 0.25, !isCancelled else { return }
         lastReport = now
         let total = parts.reduce(0) { $0 + $1.written }
         let onProgress = onProgress
         DispatchQueue.main.async { onProgress?(total) }
     }
 
+    /// A part that stopped short (dropped, or a 429 / 5xx): again from
+    /// where it stopped, after a growing wait; the file fails after
+    /// maxAttempts.
+    private func retry(_ i: Int, _ why: String) {
+        parts[i].task = nil
+        guard parts[i].attempts < Self.maxAttempts else {
+            return finish(.failed("\(url.lastPathComponent): \(why)"))
+        }
+        let wait = min(30.0, pow(2.0, Double(parts[i].attempts - 1)))
+        DispatchQueue.global().asyncAfter(deadline: .now() + wait) { [weak self] in
+            self?.queue.addOperation { self?.startPart(i) }
+        }
+    }
+
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
                     completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        guard let i = taskPart[dataTask.taskIdentifier], let http = response as? HTTPURLResponse else {
-            return completionHandler(.cancel)
+        guard !finished, let i = part(of: dataTask) else { return completionHandler(.cancel) }
+        guard let http = response as? HTTPURLResponse else {
+            completionHandler(.cancel)
+            return finish(.failed("not an HTTP response"))
         }
-        let from = parts[i].range.lowerBound + parts[i].written
-        let range = from...parts[i].range.upperBound
-        if DownloadParts.isPart(status: http.statusCode, contentRange: http.value(forHTTPHeaderField: "Content-Range"), of: range) {
+        let status = http.statusCode
+        if DownloadParts.isPart(status: status, contentRange: http.value(forHTTPHeaderField: "Content-Range"),
+                                of: parts[i].next, size: size) {
             return completionHandler(.allow)
         }
         completionHandler(.cancel)
-        finish(http.statusCode == 200
-               ? "the server sent the whole file for a part"
-               : "HTTP \(http.statusCode) for a part of \(url.lastPathComponent)")
+        switch status {
+        case 200:
+            finish(.failed("the server sent the whole file for a part"))
+        case 429, 500...599:
+            retry(i, "HTTP \(status)")
+        case 206:
+            finish(.failed("an unexpected range in the answer"))
+        default:
+            finish(.refused(status))
+        }
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard !finished, let i = taskPart[dataTask.taskIdentifier], let handle else { return }
+        guard !finished, let i = part(of: dataTask), let handle else { return }
         let left = Int64(parts[i].range.count) - parts[i].written
         let chunk = Int64(data.count) > left ? data.prefix(Int(left)) : data
         do {
             try handle.seek(toOffset: UInt64(parts[i].range.lowerBound + parts[i].written))
             try handle.write(contentsOf: chunk)
         } catch {
-            return finish(error.localizedDescription)
+            return finish(.failed(error.localizedDescription))
         }
         parts[i].written += Int64(chunk.count)
-        parts[i].retries = 0   // getting somewhere: the retries are for a stuck part
         report()
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard let i = taskPart.removeValue(forKey: task.taskIdentifier), !finished else { return }
+        guard !finished, let i = part(of: task) else { return }
         parts[i].task = nil
         if paused { return }
         if parts[i].isDone {
-            if parts.allSatisfy(\.isDone) {
-                report(force: true)
-                finish(nil)
-            }
+            if parts.allSatisfy(\.isDone) { complete() }
             return
         }
-        // Cut off (an error, or a clean end short of the range): from where
-        // it stopped, a few times.
-        guard parts[i].retries < Self.maxRetries else {
-            return finish(error?.localizedDescription ?? "a part of \(url.lastPathComponent) ended early")
-        }
-        parts[i].retries += 1
-        startPart(i)
+        // Cut off, or a short 206: the rest of the range.
+        retry(i, error?.localizedDescription ?? "a range ended early")
     }
 
     /// The token is for huggingface.co: a redirect to the file CDN (signed
@@ -195,10 +261,8 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         } else {
             request.setValue(nil, forHTTPHeaderField: "Authorization")
         }
-        if request.value(forHTTPHeaderField: "Range") == nil,
-           let i = taskPart[task.taskIdentifier] {
-            let from = parts[i].range.lowerBound + parts[i].written
-            request.setValue(DownloadParts.header(from...parts[i].range.upperBound), forHTTPHeaderField: "Range")
+        if request.value(forHTTPHeaderField: "Range") == nil, let i = part(of: task) {
+            request.setValue(DownloadParts.header(parts[i].next), forHTTPHeaderField: "Range")
         }
         completionHandler(request)
     }
