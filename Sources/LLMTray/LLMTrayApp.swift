@@ -376,6 +376,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         tabs.saveAll()
         ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
+        SpeedJournalStore.shared.flush()
         killServerNow()
     }
 

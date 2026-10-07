@@ -193,12 +193,17 @@ final class BenchmarkRunner: ObservableObject {
 
     // MARK: - Manual benchmark (current live settings, no restarts)
 
+    /// A quick benchmark is running: its requests stay out of the speed
+    /// journal (ServerManager).
+    static var quickRunning = false
+
     func runBenchmark(port: Int, modelAlias: String, promptTokens: Int, maxTokens: Int, trials: Int) async {
         guard !isRunning else { return }
         isRunning = true
+        Self.quickRunning = true
         cancelRequested = false
         quickBenchmarkError = nil
-        defer { isRunning = false; statusText = "" }
+        defer { isRunning = false; Self.quickRunning = false; statusText = "" }
 
         // A fresh (prompt-size, kv-bits, ...) combination pays a one-time
         // Metal kernel compile cost on its first call -- confirmed live

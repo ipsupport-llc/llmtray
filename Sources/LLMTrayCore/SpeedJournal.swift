@@ -129,18 +129,34 @@ public struct SpeedJournal: Codable, Equatable, Sendable {
 
     /// The launch settings that change speed, in words, from mlx_lm.server's
     /// arguments: KV quantization, speculative decoding (an MTP head or a
-    /// drafter), the prefill step.
+    /// drafter), decode concurrency, the prefill step. As the server reads
+    /// them: the last occurrence wins (the profile's extra arguments come
+    /// after the generated ones), "--flag=value" and "--flag_name" too.
     public static func settings(of arguments: [String]) -> String {
-        func value(_ flag: String) -> String? {
-            guard let i = arguments.firstIndex(of: flag), i + 1 < arguments.count else { return nil }
-            return arguments[i + 1]
+        var values: [String: String] = [:]
+        var i = 0
+        while i < arguments.count {
+            let arg = arguments[i]
+            guard arg.hasPrefix("--") else { i += 1; continue }
+            let parts = arg.split(separator: "=", maxSplits: 1).map(String.init)
+            let flag = parts[0].replacingOccurrences(of: "_", with: "-")
+            if parts.count == 2 {
+                values[flag] = parts[1]
+            } else if i + 1 < arguments.count, !arguments[i + 1].hasPrefix("--") {
+                values[flag] = arguments[i + 1]
+                i += 1
+            } else {
+                values[flag] = ""
+            }
+            i += 1
         }
+        func number(_ flag: String) -> Int? { values[flag].flatMap { Int($0) } }
         var parts: [String] = []
-        parts.append(value("--kv-bits").map { "KV \($0)-bit" } ?? "KV full")
-        if arguments.contains("--draft-model") || (value("--num-draft-tokens").map { $0 != "0" } ?? false) {
-            parts.append("MTP")
-        }
-        if let step = value("--prefill-step-size") { parts.append("prefill \(step)") }
+        if let bits = number("--kv-bits"), bits > 0 { parts.append("KV \(bits)-bit") } else { parts.append("KV full") }
+        let drafter = values["--draft-model"].map { !$0.isEmpty } ?? false
+        if drafter || (number("--num-draft-tokens").map { $0 > 0 } ?? false) { parts.append("MTP") }
+        if let n = number("--decode-concurrency"), n > 1 { parts.append("concurrency \(n)") }
+        if let step = number("--prefill-step-size") { parts.append("prefill \(step)") }
         return parts.joined(separator: " · ")
     }
 }

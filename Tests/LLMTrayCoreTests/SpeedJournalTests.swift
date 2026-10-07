@@ -48,5 +48,13 @@ final class SpeedJournalTests: XCTestCase {
                        "KV 4-bit · MTP · prefill 512")
         XCTAssertEqual(SpeedJournal.settings(of: ["--num-draft-tokens", "0"]), "KV full")
         XCTAssertEqual(SpeedJournal.settings(of: ["--draft-model", "/x"]), "KV full · MTP")
+        // As the server reads them: the last one wins, = and _ spellings.
+        XCTAssertEqual(SpeedJournal.settings(of: ["--prefill-step-size", "512", "--decode-concurrency", "4",
+                                                  "--prefill-step-size=64", "--kv_bits", "8"]),
+                       "KV 8-bit · concurrency 4 · prefill 64")
+        XCTAssertEqual(SpeedJournal.settings(of: ["--kv-bits", "4", "--num-draft-tokens", "3", "--num-draft-tokens", "0"]),
+                       "KV 4-bit")
+        // A flag without its value doesn't take the next flag as one.
+        XCTAssertEqual(SpeedJournal.settings(of: ["--kv-bits", "--draft-model", "/x"]), "KV full · MTP")
     }
 }

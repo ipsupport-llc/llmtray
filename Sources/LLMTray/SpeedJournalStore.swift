@@ -3,46 +3,72 @@ import LLMTrayCore
 
 /// The speed journal (LLMTrayCore.SpeedJournal) on disk, fed by the
 /// server's per-request log line: every request, the chat's and external
-/// clients' through the proxy. Saved a few seconds after the last request,
-/// not per request.
+/// clients' through the proxy -- not the Benchmark tab's own runs. Written
+/// at most every few seconds (a busy agent doesn't postpone it), again
+/// after a failed write, and at quit.
 @MainActor
 final class SpeedJournalStore: ObservableObject {
     static let shared = SpeedJournalStore()
 
     @Published private(set) var journal: SpeedJournal
+    /// Per model and settings, kept with the journal (not per view render).
+    @Published private(set) var summaries: [SpeedJournal.Summary]
     private var saveTask: Task<Void, Never>?
+    private var dirty = false
 
     static var path: String { RuntimePaths.externalRuntimeDir + "/speed-journal.json" }
 
     private init() {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        journal = FileManager.default.contents(atPath: Self.path)
+        let loaded = FileManager.default.contents(atPath: Self.path)
             .flatMap { try? decoder.decode(SpeedJournal.self, from: $0) } ?? SpeedJournal()
+        journal = loaded
+        summaries = loaded.summaries()
     }
 
     func record(_ stats: RequestStats, modelPath: String, arguments: [String]) {
         journal.add(.init(date: Date(), model: URL(fileURLWithPath: modelPath).lastPathComponent,
                           settings: SpeedJournal.settings(of: arguments), stats: stats))
-        scheduleSave()
+        changed()
     }
 
     func clear() {
         journal.clear()
-        scheduleSave()
+        changed()
+        save()
     }
 
-    private func scheduleSave() {
-        saveTask?.cancel()
-        let snapshot = journal
-        saveTask = Task {
+    /// Now, e.g. at quit.
+    func flush() {
+        guard dirty else { return }
+        save()
+    }
+
+    private func changed() {
+        summaries = journal.summaries()
+        dirty = true
+        // A save already waiting takes this change along.
+        guard saveTask == nil else { return }
+        saveTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 3_000_000_000)
-            guard !Task.isCancelled else { return }
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            guard let data = try? encoder.encode(snapshot) else { return }
-            try? FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
-            try? data.write(to: URL(fileURLWithPath: Self.path), options: .atomic)
+            guard let self else { return }
+            self.saveTask = nil
+            self.save()
+        }
+    }
+
+    private func save() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        do {
+            let data = try encoder.encode(journal)
+            try FileManager.default.createDirectory(atPath: RuntimePaths.externalRuntimeDir, withIntermediateDirectories: true)
+            try data.write(to: URL(fileURLWithPath: Self.path), options: .atomic)
+            dirty = false
+        } catch {
+            // Tried again with the next change, or at quit.
+            dirty = true
         }
     }
 }

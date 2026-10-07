@@ -53,7 +53,7 @@ struct BenchmarkView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-            let summaries = journal.journal.summaries()
+            let summaries = journal.summaries
             if summaries.isEmpty {
                 Text("No requests yet.")
                     .font(.caption)
