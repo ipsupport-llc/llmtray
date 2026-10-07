@@ -147,7 +147,7 @@ final class MLXRuntimeInstaller {
     /// model-mtp.safetensors). An older one drops the head's weights on
     /// load, so the file does no harm there, it just isn't used.
     static var supportsMTPHead: Bool {
-        sitePackageDirs.contains { dir in
+        serverSupportsFlag("--num-draft-tokens") && sitePackageDirs.contains { dir in
             guard let text = try? String(contentsOfFile: "\(dir)/mlx_lm/generate.py", encoding: .utf8) else { return false }
             return text.contains("def mtp_generate_step(")
         }

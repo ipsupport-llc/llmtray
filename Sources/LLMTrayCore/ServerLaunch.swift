@@ -191,7 +191,8 @@ public enum ServerLaunch {
         // Said either way: a head that has just been downloaded changes the
         // launch, so a restart is offered (pendingLaunchChange). 3: the most
         // drafts per step; the runtime picks 0...3 by what's fastest.
-        if c.mtpHead, !extraArgsSet("--num-draft-tokens", p) {
+        // Not with a drafter model: that one is drafted with instead.
+        if c.mtpHead, c.drafterRepo == nil, !extraArgsSetDrafter(p), !extraArgsSet("--num-draft-tokens", p) {
             args += ["--num-draft-tokens", p.mtpDrafter ? "3" : "0"]
         }
         if p.lowMemoryWeights, c.supportsLowMemoryWeights {
@@ -283,6 +284,9 @@ public enum ServerLaunch {
     public static func restartKey(_ p: ResolvedProfile, _ c: Context) -> [String] {
         var generated = p
         generated.extraServerArgs = ""
+        // What `arguments` leaves out for the user's own flags stays out.
+        var c = c
+        if extraArgsSet("--num-draft-tokens", p) || extraArgsSetDrafter(p) { c.mtpHead = false }
         return withoutSampling(arguments(generated, c)) + p.extraServerArgs.split(separator: " ").map(String.init)
     }
 

@@ -528,24 +528,34 @@ final class ServerManager: ObservableObject {
     private var reposWithoutHead: Set<String> = []
 
     /// A Qwen 3.5 model whose config declares an MTP head but whose folder
-    /// hasn't got it (installed before we published heads): its repo's
-    /// model-mtp.safetensors is fetched in the background, the model starts
-    /// without it, and a restart is offered once it's there. Only when the
-    /// profile wants drafting and the runtime can use the head.
+    /// hasn't got it (installed before we published heads): the head is
+    /// fetched from its repo in the background, the model runs without it,
+    /// and a restart is offered once it's there. Only our own repos
+    /// (ModelDiscovery.mtpHeadRepo), only when the profile wants drafting
+    /// and the runtime can use the head; it's put in place only if the
+    /// model is still there and still wants it.
     private func fetchMTPHeadIfMissing(modelPath: String, profile: ResolvedProfile) {
-        guard profile.mtpDrafter, !ServerLaunch.extraArgsSetDrafter(profile),
+        guard Self.wantsMTPHead(profile),
               ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
               !ModelDiscovery.hasMTPHead(forModelPath: modelPath),
               MLXRuntimeInstaller.supportsMTPHead,
-              let repo = ModelDiscovery.hubRepo(forModelPath: modelPath),
+              let repo = ModelDiscovery.mtpHeadRepo(forModelPath: modelPath),
               !reposWithoutHead.contains(repo),
               headFetches.insert(modelPath).inserted else { return }
         Task { [weak self] in
-            let result = await MTPHeadDownload.fetch(repo: repo, into: modelPath)
+            let result = await MTPHeadDownload.fetch(repo: repo)
             guard let self else { return }
             self.headFetches.remove(modelPath)
             switch result {
-            case .downloaded:
+            case .downloaded(let staged):
+                defer { try? FileManager.default.removeItem(at: staged.deletingLastPathComponent()) }
+                // Removed meanwhile, or the switch turned off: not put back.
+                guard FileManager.default.fileExists(atPath: modelPath + "/config.json"),
+                      Self.wantsMTPHead(ProfileManager.shared.resolved(for: modelPath)) else { return }
+                if let error = MTPHeadDownload.install(staged, into: modelPath) {
+                    self.appendLog("--- MTP head for \(repo) didn't install (\(error)); trying again at a later start ---\n")
+                    return
+                }
                 self.appendLog("--- MTP head for \(repo) downloaded: restart the server to use it ---\n")
                 self.refreshPendingLaunchChange()
             case .notPublished:
@@ -554,6 +564,12 @@ final class ServerManager: ObservableObject {
                 self.appendLog("--- MTP head for \(repo) didn't download (\(error)); trying again at a later start ---\n")
             }
         }
+    }
+
+    /// The profile drafts with an MTP head: its switch is on and its own
+    /// extra arguments don't pick a drafter.
+    private static func wantsMTPHead(_ profile: ResolvedProfile) -> Bool {
+        profile.mtpDrafter && !ServerLaunch.extraArgsSetDrafter(profile)
     }
 
     /// Drafters a server start is fetching (MTPDrafterDownload); one that
@@ -581,8 +597,12 @@ final class ServerManager: ObservableObject {
     /// is the drafter *available* to the model (see ServerLaunch.drafter).
     /// `lowMemoryWeights`: the profile's Save memory, which leaves the
     /// lookup tables out of the weights the GPU memory is sized by.
-    private func launchContext(modelPath: String, alias: String, drafterRepo: String?, lowMemoryWeights: Bool) -> ServerLaunch.Context {
-        let memory = Self.memoryFacts(forModelPath: modelPath, lowMemoryWeights: lowMemoryWeights)
+    /// `withoutMTPHead`: as if the folder had no MTP head (weights included),
+    /// to tell a restart that only brings in a downloaded head.
+    private func launchContext(modelPath: String, alias: String, drafterRepo: String?, lowMemoryWeights: Bool,
+                               withoutMTPHead: Bool = false) -> ServerLaunch.Context {
+        let head = !withoutMTPHead && ModelDiscovery.hasMTPHead(forModelPath: modelPath)
+        let memory = Self.memoryFacts(forModelPath: modelPath, lowMemoryWeights: lowMemoryWeights, withMTPHead: head)
         return ServerLaunch.Context(
             modelPath: modelPath,
             internalPort: internalPort,
@@ -596,7 +616,7 @@ final class ServerManager: ObservableObject {
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
             memoryShares: Self.memoryShares,
             supportsLowMemoryWeights: memory.supportsLowMemoryWeights,
-            mtpHead: memory.supportsMTPHead && ModelDiscovery.hasMTPHead(forModelPath: modelPath)
+            mtpHead: head && memory.supportsMTPHead && ModelDiscovery.declaresMTPHead(forModelPath: modelPath)
         )
     }
 
@@ -622,7 +642,7 @@ final class ServerManager: ObservableObject {
                                          prefillPercent: d[Pref.prefillSharePercent])
     }
 
-    private static func memoryFacts(forModelPath modelPath: String, lowMemoryWeights: Bool) -> MemoryFacts {
+    private static func memoryFacts(forModelPath modelPath: String, lowMemoryWeights: Bool, withMTPHead: Bool) -> MemoryFacts {
         let runtime = (try? FileManager.default.attributesOfItem(atPath: MLXRuntimeInstaller.venvDir + "/lib"))?[.modificationDate] as? Date
         // An in-place reinstall rewrites server.py without touching lib/.
         let server = MLXRuntimeInstaller.sitePackageDirs.compactMap {
@@ -632,7 +652,7 @@ final class ServerManager: ObservableObject {
         let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + server + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
             + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)|\(lowMemoryWeights)"
             // A downloaded MTP head adds to the weights.
-            + "|\(ModelDiscovery.hasMTPHead(forModelPath: modelPath))"
+            + "|\(withMTPHead)"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
         let supportsLowMemory = MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
@@ -640,6 +660,10 @@ final class ServerManager: ObservableObject {
         // Tables read from disk take no GPU memory: the prompt cache and the
         // prefill get that room (an 8 GB Mac had none left for a cache).
         var weights = ModelWeights.bytes(inFolder: modelPath)
+        if !withMTPHead, let head = (try? FileManager.default.attributesOfItem(
+            atPath: modelPath + "/" + ModelDiscovery.mtpHeadFile))?[.size] as? Int64 {
+            weights = max(0, weights - head)
+        }
         if lowMemoryWeights, supportsLowMemory {
             let tables = MLXRuntimeInstaller.declaredLookupTables(modelTypes: ModelWeights.modelTypes(inFolder: modelPath))
             weights = max(0, weights - ModelWeights.lookupTableBytes(inFolder: modelPath, tables: tables))
@@ -673,6 +697,10 @@ final class ServerManager: ObservableObject {
     }
 
     private func refreshPendingLaunchChange() {
+        // Drafting turned on for the running model: its head, if missing.
+        if case .running = state, let modelPath = currentModelPath {
+            fetchMTPHeadIfMissing(modelPath: modelPath, profile: ProfileManager.shared.resolved(for: modelPath))
+        }
         let (changed, drafterOnly) = computePendingLaunchChange()
         if changed != pendingLaunchChange { pendingLaunchChange = changed }
         if drafterOnly != pendingChangeIsDrafter { pendingChangeIsDrafter = drafterOnly }
@@ -689,10 +717,11 @@ final class ServerManager: ObservableObject {
             lowMemoryWeights: profile.lowMemoryWeights
         )
         guard ServerLaunch.restartKey(profile, context) != last else { return (false, false) }
-        // A downloaded MTP head counts as a drafter too.
+        // A downloaded MTP head counts as a drafter too: without it (and
+        // its weights in the memory sizing) the launch would be the last one.
         let hasDrafter = context.drafterRepo != nil || context.mtpHead
-        context.drafterRepo = nil
-        context.mtpHead = false
+        context = launchContext(modelPath: modelPath, alias: currentAlias, drafterRepo: nil,
+                                lowMemoryWeights: profile.lowMemoryWeights, withoutMTPHead: true)
         return (true, hasDrafter && ServerLaunch.restartKey(profile, context) == last)
     }
 

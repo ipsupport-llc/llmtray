@@ -192,11 +192,17 @@ enum ModelDiscovery {
         FileManager.default.fileExists(atPath: path + "/" + mtpHeadFile)
     }
 
-    /// The Hugging Face repo a model folder came from: models are kept as
-    /// <root>/<org>/<name> (ours and LM Studio's alike).
-    static func hubRepo(forModelPath path: String) -> String? {
-        let parts = URL(fileURLWithPath: path).standardizedFileURL.pathComponents.suffix(2)
-        guard parts.count == 2, !parts.contains(where: { $0.isEmpty || $0 == "/" || $0.hasPrefix(".") }) else { return nil }
+    /// Publishers whose repos a missing MTP head is fetched from: ours. The
+    /// repo is read from the folder's name (<root>/<org>/<name>, ours and LM
+    /// Studio's alike), which proves nothing on its own -- so not from any
+    /// org a renamed or copied folder may name.
+    static let mtpHeadPublishers: Set<String> = ["roman220220"]
+
+    /// The repo a model folder's MTP head would come from, or nil.
+    static func mtpHeadRepo(forModelPath path: String) -> String? {
+        let parts = Array(URL(fileURLWithPath: path).standardizedFileURL.pathComponents.suffix(2))
+        guard parts.count == 2, mtpHeadPublishers.contains(parts[0]),
+              !parts[1].isEmpty, !parts[1].hasPrefix(".") else { return nil }
         return parts.joined(separator: "/")
     }
 

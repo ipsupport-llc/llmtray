@@ -57,15 +57,16 @@ enum MTPDrafterDownload {
 }
 
 /// A model's own MTP head (ModelDiscovery.mtpHeadFile) from its Hugging
-/// Face repo into the model folder, for a model installed before the head
-/// was published. Through the runtime's huggingface_hub, like the drafter:
-/// the token, retries and resumes are its. Into a hidden folder next to it
-/// first, so the model folder never holds half a file.
+/// Face repo, for a model installed before the head was published. Through
+/// the runtime's huggingface_hub, like the drafter: the token and retries
+/// are its. Into a fresh temporary folder, never the model's: the caller
+/// puts it in place (`install`) only if the model is still there.
 @MainActor
 enum MTPHeadDownload {
     enum Result: Equatable {
-        case downloaded
-        /// The repo has no head.
+        /// The file, in a temporary folder of its own (the caller removes it).
+        case downloaded(URL)
+        /// The repo has no head, or is missing or gated.
         case notPublished
         case failed(String)
     }
@@ -73,15 +74,11 @@ enum MTPHeadDownload {
     /// The exit code the script uses for a repo without the file.
     private static let notFoundStatus: Int32 = 3
 
-    static func fetch(repo: String, into folder: String) async -> Result {
-        let fm = FileManager.default
-        let target = folder + "/" + ModelDiscovery.mtpHeadFile
-        if fm.fileExists(atPath: target) { return .downloaded }
-        guard fm.isExecutableFile(atPath: MLXRuntimeInstaller.venvPython) else {
+    static func fetch(repo: String) async -> Result {
+        guard FileManager.default.isExecutableFile(atPath: MLXRuntimeInstaller.venvPython) else {
             return .failed(NSLocalizedString("the model runtime isn't installed yet", comment: "MTP drafter download"))
         }
-        let staging = folder + "/.mtp-head-download"
-        defer { try? fm.removeItem(atPath: staging) }
+        let staging = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-mtp-head-" + UUID().uuidString)
         HFToken.refresh()
         var environment = ["HF_HUB_OFFLINE": "0", "HF_HUB_DISABLE_PROGRESS_BARS": "1"]
         if let token = HFToken.value { environment["HF_TOKEN"] = token }
@@ -91,25 +88,35 @@ enum MTPHeadDownload {
                 """
                 import sys
                 from huggingface_hub import hf_hub_download
-                from huggingface_hub.errors import EntryNotFoundError
+                from huggingface_hub.errors import EntryNotFoundError, GatedRepoError, RepositoryNotFoundError
                 try:
                     hf_hub_download(repo_id=sys.argv[1], filename=sys.argv[2], local_dir=sys.argv[3])
-                except EntryNotFoundError:
+                except (EntryNotFoundError, GatedRepoError, RepositoryNotFoundError):
                     sys.exit(\(notFoundStatus))
                 """,
-                repo, ModelDiscovery.mtpHeadFile, staging,
+                repo, ModelDiscovery.mtpHeadFile, staging.path,
             ], environment: environment)
         } catch let failure as ProcessRunner.Failure {
+            try? FileManager.default.removeItem(at: staging)
             if failure.status == notFoundStatus { return .notPublished }
             return .failed(failure.outputTail.split(separator: "\n").last.map(String.init) ?? failure.localizedDescription)
         } catch {
+            try? FileManager.default.removeItem(at: staging)
             return .failed(error.localizedDescription)
         }
+        return .downloaded(staging.appendingPathComponent(ModelDiscovery.mtpHeadFile))
+    }
+
+    /// Moves a fetched head into the model folder; nil when it's there
+    /// (also when one arrived meanwhile), else why not.
+    static func install(_ staged: URL, into folder: String) -> String? {
+        let target = folder + "/" + ModelDiscovery.mtpHeadFile
         do {
-            try fm.moveItem(atPath: staging + "/" + ModelDiscovery.mtpHeadFile, toPath: target)
+            try FileManager.default.moveItem(atPath: staged.path, toPath: target)
         } catch {
-            return .failed(error.localizedDescription)
+            if FileManager.default.fileExists(atPath: target) { return nil }
+            return error.localizedDescription
         }
-        return .downloaded
+        return nil
     }
 }
