@@ -1241,3 +1241,8 @@
 "first token %.1f s" = "首个词元 %.1f 秒";
 "generation %.1f tok/s" = "生成 %.1f tok/s";
 "prompt %.0f tok/s" = "提示 %.0f tok/s";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "模型是工具，不是权威";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "它可能出错，也可能编造内容：重要的事情请务必核实。它不是医生、律师、心理咨询师，也不是朋友。使用其回答的风险由您自行承担。";
+"Models can make mistakes. Check important information." = "模型可能会出错。请核实重要信息。";

@@ -1243,3 +1243,8 @@
 "first token %.1f s" = "первый токен %.1f с";
 "generation %.1f tok/s" = "генерация %.1f ток/с";
 "prompt %.0f tok/s" = "промпт %.0f ток/с";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "Модель — инструмент, а не авторитет";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "Она может ошибаться и выдумывать: проверяйте всё важное. Она не врач, не юрист, не психолог и не друг. Вы используете её ответы на свой страх и риск.";
+"Models can make mistakes. Check important information." = "Модели ошибаются. Проверяйте важное.";

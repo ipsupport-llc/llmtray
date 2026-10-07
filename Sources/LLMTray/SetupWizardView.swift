@@ -206,7 +206,8 @@ private struct WelcomeStep: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .frame(maxWidth: .infinity, maxHeight: 200)
+                    // 150, not taller: the page then fits 600 pt with the disclaimer.
+                    .frame(maxWidth: .infinity, maxHeight: 150)
                     .accessibilityLabel(Text("Welcome to LLMTray"))
             } else {
                 StepHeader(Text("Welcome to LLMTray"))
@@ -225,6 +226,7 @@ private struct WelcomeStep: View {
                 Image(systemName: "lock")
             }
             .foregroundStyle(.secondary)
+            ModelDisclaimer.Card()
             Text("The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it.")
                 .font(.callout).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

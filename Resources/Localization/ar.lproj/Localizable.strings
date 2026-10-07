@@ -1241,3 +1241,8 @@
 "first token %.1f s" = "أول رمز %.1f ث";
 "generation %.1f tok/s" = "التوليد %.1f رمز/ث";
 "prompt %.0f tok/s" = "الموجّه %.0f رمز/ث";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "النموذج أداة، وليس مرجعًا";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "قد يخطئ ويختلق معلومات: تحقّق من كل ما هو مهم. ليس طبيبًا ولا محاميًا ولا طبيبًا نفسيًا ولا صديقًا. أنت تستخدم إجاباته على مسؤوليتك الخاصة.";
+"Models can make mistakes. Check important information." = "قد تخطئ النماذج. تحقّق من المعلومات المهمة.";

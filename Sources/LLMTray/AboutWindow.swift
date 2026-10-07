@@ -111,6 +111,8 @@ struct AboutView: View {
                 Spacer()
             }
             .padding(16)
+            ModelDisclaimer.Card()
+                .padding(.horizontal, 16).padding(.bottom, 12)
             Divider()
             HSplitView {
                 List(selection: $selection) {
