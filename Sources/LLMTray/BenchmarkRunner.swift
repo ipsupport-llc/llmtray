@@ -151,6 +151,8 @@ final class BenchmarkRunner: ObservableObject {
         var firstByteDate: Date?
         var usagePromptTokens: Int?
         var usageCompletionTokens: Int?
+        Self.journalFilter.begin()
+        defer { Self.record(Self.journalFilter.end(prompt: usagePromptTokens, tokens: usageCompletionTokens)) }
 
         let (bytes, response) = try await session.bytes(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
@@ -192,6 +194,24 @@ final class BenchmarkRunner: ObservableObject {
     }
 
     // MARK: - Manual benchmark (current live settings, no restarts)
+
+    /// The server's stats lines go through this: the benchmark's own
+    /// requests stay out of the speed journal, everything else is recorded.
+    static var journalFilter = BenchmarkStatsFilter<JournalLine>()
+    struct JournalLine {
+        var modelPath: String
+        var arguments: [String]
+    }
+
+    private static func record(_ lines: [(stats: RequestStats, payload: JournalLine)]) {
+        for line in lines {
+            SpeedJournalStore.shared.record(line.stats, modelPath: line.payload.modelPath, arguments: line.payload.arguments)
+        }
+    }
+
+    static func serverReported(_ stats: RequestStats, modelPath: String, arguments: [String]) {
+        record(journalFilter.offer(stats, JournalLine(modelPath: modelPath, arguments: arguments)))
+    }
 
     func runBenchmark(port: Int, modelAlias: String, promptTokens: Int, maxTokens: Int, trials: Int) async {
         guard !isRunning else { return }

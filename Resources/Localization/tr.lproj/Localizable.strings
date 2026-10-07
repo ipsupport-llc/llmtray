@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) Çöp Kutusu'na taşınacak; buradan geri yükleyebilirsiniz. Takma adı ve profil seçimi unutulacak.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” ve indeksi projeden silindi. Eklediğiniz kaynak dosya etkilenmez.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” kaldırılmadı: sunucu meşgul veya modeli kullanıyor. Sunucu boşaldığında tekrar deneyin.";
+"%.0f%% from drafts" = "%%%.0f taslaklardan";
+"%lld requests" = "%lld istek";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Sunucunun yanıtladığı her istek — sohbetten ve API üzerinden diğer uygulama ve ajanlardan — bu Mac'te tutulur. Model ve ayar başına medyanlar.";
+"In real use" = "Gerçek kullanımda";
+"No requests yet." = "Henüz istek yok.";
+"first token %.1f s" = "ilk token %.1f sn";
+"generation %.1f tok/s" = "üretim %.1f tok/sn";
+"prompt %.0f tok/s" = "istem %.0f tok/sn";

@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）はゴミ箱に移動されます。そこから復元できますが、エイリアスとプロファイルの選択は失われます。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」は削除されませんでした：サーバーがビジー状態か使用中です。アイドル時に再試行してください。";
+"%.0f%% from drafts" = "ドラフト由来 %.0f%%";
+"%lld requests" = "%lld 件のリクエスト";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
+"In real use" = "実際の使用";
+"No requests yet." = "まだリクエストはありません。";
+"first token %.1f s" = "最初のトークン %.1f 秒";
+"generation %.1f tok/s" = "生成 %.1f tok/s";
+"prompt %.0f tok/s" = "プロンプト %.0f tok/s";

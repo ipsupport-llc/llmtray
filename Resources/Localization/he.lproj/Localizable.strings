@@ -1233,3 +1233,11 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) מועבר/ת לפח, שם ניתן לשחזר אותו/אותה. הכינוי ובחירת הפרופיל נשכחים.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” לא הוסר: השרת עסוק או משתמש בו. נסה/י שוב כשיופסק העומס.";
+"%.0f%% from drafts" = "%.0f%% מטיוטות";
+"%lld requests" = "%lld בקשות";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
+"In real use" = "בשימוש אמיתי";
+"No requests yet." = "אין עדיין בקשות.";
+"first token %.1f s" = "טוקן ראשון %.1f ש׳";
+"generation %.1f tok/s" = "יצירה %.1f טוקנים/ש׳";
+"prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";

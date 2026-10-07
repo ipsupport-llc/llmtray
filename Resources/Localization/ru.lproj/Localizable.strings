@@ -1235,3 +1235,11 @@
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "Модель «%@» не удалена: сервер занят или использует её. Повторите, когда он освободится.";
 "Save memory" = "Экономить память";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Таблица эмбеддингов по слоям (Gemma 4 E2B, E4B) читается с диска по мере надобности, а части для картинок и звука (Gemma 4, Qwen 3.5) загружаются при первом использовании. До ~2 ГБ меньше памяти, для Маков с 8 ГБ; с таблицей на диске генерация примерно на 10% медленнее. Ответы те же.";
+"%.0f%% from drafts" = "%.0f%% из черновиков";
+"%lld requests" = "запросов: %lld";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Каждый запрос, на который ответил сервер, — из чата и от других приложений и агентов через API — хранится на этом Mac. Медианы по модели и настройкам.";
+"In real use" = "В реальной работе";
+"No requests yet." = "Запросов пока нет.";
+"first token %.1f s" = "первый токен %.1f с";
+"generation %.1f tok/s" = "генерация %.1f ток/с";
+"prompt %.0f tok/s" = "промпт %.0f ток/с";

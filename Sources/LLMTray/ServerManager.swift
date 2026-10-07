@@ -804,6 +804,8 @@ final class ServerManager: ObservableObject {
                     self.generationThreadDied(reason: reason, outOfMemory: outOfMemory)
                 case .prefillProgress:
                     self.lastPrefillProgressAt = Date()
+                case let .requestStats(stats):
+                    BenchmarkRunner.serverReported(stats, modelPath: modelPath, arguments: self.launchedArguments)
                 }
             }
         }
@@ -1021,7 +1023,7 @@ final class ServerManager: ObservableObject {
     func removeExternalRuntime() {
         stop()
         let dir = RuntimePaths.externalRuntimeDir
-        let keep: Set<String> = ["sessions", "profiles"]
+        let keep: Set<String> = ["sessions", "profiles", SpeedJournalStore.fileName]
         for item in (try? FileManager.default.contentsOfDirectory(atPath: dir)) ?? [] where !keep.contains(item) {
             try? FileManager.default.removeItem(atPath: dir + "/" + item)
         }

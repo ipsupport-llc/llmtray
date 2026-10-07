@@ -2,6 +2,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" has changed since this answer cited it: page %lld may read differently now.";
 "\"%@\" is no longer in the project." = "\"%@\" is no longer in the project.";
+"%.0f%% from drafts" = "%.0f%% from drafts";
 "%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
@@ -52,6 +53,7 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld new since you opened the list: unticked until you tick them.";
 "%lld of 5 stars" = "%lld of 5 stars";
 "%lld pages" = "%lld pages";
+"%lld requests" = "%lld requests";
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
@@ -327,6 +329,7 @@
 "Errors" = "Errors";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned.";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.";
 "Everything in that folder is here already." = "Everything in that folder is here already.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
@@ -440,6 +443,7 @@
 "Import…" = "Import…";
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too.";
 "In project %@" = "In project %@";
+"In real use" = "In real use";
 "In the queue: %lld ahead…" = "In the queue: %lld ahead…";
 "Include LLMTray crash reports from the last two weeks" = "Include LLMTray crash reports from the last two weeks";
 "Include the server log" = "Include the server log";
@@ -603,6 +607,7 @@
 "No model uses it." = "No model uses it.";
 "No models found in this folder." = "No models found in this folder.";
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
+"No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "No suggestions for this Mac's memory. Browse Hugging Face for a model.";
@@ -1200,7 +1205,9 @@
 "failed to build request" = "failed to build request";
 "failed: %@" = "failed: %@";
 "finishing" = "finishing";
+"first token %.1f s" = "first token %.1f s";
 "for this chat" = "for this chat";
+"generation %.1f tok/s" = "generation %.1f tok/s";
 "hears audio" = "hears audio";
 "in LLMTray's own folder" = "in LLMTray's own folder";
 "in an earlier models folder" = "in an earlier models folder";
@@ -1224,6 +1231,7 @@
 "not supported" = "not supported";
 "not used by any model" = "not used by any model";
 "off" = "off";
+"prompt %.0f tok/s" = "prompt %.0f tok/s";
 "queued" = "queued";
 "reading" = "reading";
 "reads images" = "reads images";

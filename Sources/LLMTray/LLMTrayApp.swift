@@ -376,6 +376,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         tabs.saveAll()
         ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
+        SpeedJournalStore.shared.flush()
         killServerNow()
     }
 
@@ -1105,6 +1106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // one call site.
             MainActor.assumeIsolated {
                 ProfileManager.shared.flushPendingWrites()
+                SpeedJournalStore.shared.flush()
                 self?.killServerNow()
                 exit(0)
             }

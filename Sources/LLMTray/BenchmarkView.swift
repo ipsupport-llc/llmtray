@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import LLMTrayCore
 
 struct BenchmarkView: View {
     @EnvironmentObject var server: ServerManager
@@ -7,6 +8,7 @@ struct BenchmarkView: View {
     let port: Int
     let modelAlias: String
 
+    @ObservedObject private var journal = SpeedJournalStore.shared
     @State private var promptPreset: BenchmarkPreset = .medium
     @State private var maxTokens: Double = 128
     @State private var trials: Int = 3
@@ -24,10 +26,71 @@ struct BenchmarkView: View {
                     .foregroundColor(.secondary)
             }
 
+            realUseSection
+            Divider().padding(.vertical, 4)
             quickBenchmarkSection
             Divider().padding(.vertical, 4)
             autoTuneSection
         }
+    }
+
+    // MARK: - In real use
+
+    /// Every request the server served (the chat's, and apps' and agents'
+    /// through the API), per model and launch settings: medians.
+    private var realUseSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("In real use").foregroundColor(.secondary)
+                Spacer()
+                if !journal.journal.entries.isEmpty {
+                    Button("Clear") { journal.clear() }
+                        .buttonStyle(.borderless)
+                        .font(.caption)
+                }
+            }
+            Text("Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            let summaries = journal.summaries
+            if summaries.isEmpty {
+                Text("No requests yet.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(Array(summaries.prefix(8).enumerated()), id: \.offset) { _, row in
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("\(row.model)  ·  \(row.settings)")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Text(Self.describe(row))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .monospacedDigit()
+                    }
+                }
+            }
+        }
+    }
+
+    static func describe(_ row: SpeedJournal.Summary) -> String {
+        var parts = [String(format: NSLocalizedString("%lld requests", comment: "speed journal: request count"), row.requests)]
+        if let v = row.prefillTokensPerSecond {
+            parts.append(String(format: NSLocalizedString("prompt %.0f tok/s", comment: "speed journal: prefill speed"), v))
+        }
+        if let v = row.decodeTokensPerSecond {
+            parts.append(String(format: NSLocalizedString("generation %.1f tok/s", comment: "speed journal: decode speed"), v))
+        }
+        if let v = row.firstTokenSeconds {
+            parts.append(String(format: NSLocalizedString("first token %.1f s", comment: "speed journal: time to first token"), v))
+        }
+        if let v = row.draftedShare {
+            parts.append(String(format: NSLocalizedString("%.0f%% from drafts", comment: "speed journal: share of tokens from speculative drafts"), v * 100))
+        }
+        return parts.joined(separator: "  ·  ")
     }
 
     // MARK: - Quick benchmark
