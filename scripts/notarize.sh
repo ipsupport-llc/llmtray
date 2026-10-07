@@ -27,8 +27,47 @@ else
 fi
 
 codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"
-echo "--- submitting $DMG for notarization ---"
-OUT="$(xcrun notarytool submit "$DMG" "${AUTH[@]}" --wait --output-format json)"
+
+# An upload can hang with no submission created (2026-10-07: 20 min on the
+# 316 MB DMG, nothing at Apple); notarytool's --timeout covers only the
+# wait. Each attempt is stopped after NOTARY_ATTEMPT_MINUTES, then retried.
+ATTEMPT_SECONDS=$(( ${NOTARY_ATTEMPT_MINUTES:-30} * 60 ))
+ATTEMPTS="${NOTARY_ATTEMPTS:-3}"
+OUT_FILE="$(mktemp)"
+trap 'rm -f "$OUT_FILE"' EXIT
+submit_once() {
+  # exec: no shell of ours in between, so no EXIT trap of ours runs (and
+  # deletes OUT_FILE) when the attempt is stopped.
+  { trap - EXIT; exec xcrun notarytool submit "$DMG" "${AUTH[@]}" --wait --output-format json; } > "$OUT_FILE" &
+  local pid=$! waited=0
+  while kill -0 "$pid" 2>/dev/null; do
+    if (( waited >= ATTEMPT_SECONDS )); then
+      kill "$pid" 2>/dev/null || true
+      # Up to 10 s to go, then killed outright: the wait below can't hang.
+      for _ in 1 2 3 4 5 6 7 8 9 10; do kill -0 "$pid" 2>/dev/null || break; sleep 1; done
+      kill -9 "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+      echo "--- notarization attempt stopped after $(( ATTEMPT_SECONDS / 60 )) min ---"
+      return 124
+    fi
+    sleep 5
+    waited=$(( waited + 5 ))
+  done
+  wait "$pid"
+}
+OUT=""
+for (( attempt = 1; attempt <= ATTEMPTS; attempt++ )); do
+  echo "--- submitting $DMG for notarization (attempt $attempt of $ATTEMPTS) ---"
+  submit_once || true
+  # A verdict (Accepted, Invalid ...) ends it, whatever the exit code and
+  # even if it came just as the attempt was stopped; no status (a network
+  # error, a stopped upload) is tried again.
+  OUT="$(cat "$OUT_FILE" 2>/dev/null || true)"
+  STATUS="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read() or "{}").get("status",""))' <<<"$OUT" 2>/dev/null || true)"
+  [[ -n "$STATUS" ]] && break
+  OUT=""
+done
+[[ -n "$OUT" ]] || { echo "error: notarization of $DMG didn't finish in $ATTEMPTS attempts" >&2; exit 1; }
 echo "$OUT"
 STATUS="$(python3 -c 'import json,sys; print(json.loads(sys.stdin.read()).get("status",""))' <<<"$OUT")"
 if [[ "$STATUS" != "Accepted" ]]; then
