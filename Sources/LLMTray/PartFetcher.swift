@@ -78,6 +78,7 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     func start() {
         queue.addOperation { [self] in
             guard !isCancelled, !finished else { return }
+            paused = false   // starting means fetching now
             let fm = FileManager.default
             do {
                 try fm.createDirectory(at: partial.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -127,8 +128,8 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         }
     }
 
-    /// Stops for good, no callbacks after it; `partial` is the caller's to
-    /// remove (the fetcher won't create it afterwards).
+    /// Stops for good, no callbacks after it, and removes `partial` (the
+    /// fetcher won't create it afterwards).
     func cancel() {
         cancelLock.lock()
         cancelledNow = true

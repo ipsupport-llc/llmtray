@@ -181,6 +181,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     private var activeFetchers: Set<String> = []
     private var waitingFetchers: [String] = []
     private var maxActiveFetchers = 1
+    /// The commit this download's files come from (see download()).
+    private var currentRevision = "main"
     /// Set on the delegate queue the moment a file comes back as an HTTP
     /// error: later completions of the same download are ignored (none may
     /// declare it done), until the next download() resets it.
@@ -308,10 +310,17 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
 
         Task {
             do {
+                // The commit main is at now: the listing and every file come
+                // from it, so a repo updated during the download can't mix
+                // two versions. Unknown (an older Hub API, a hiccup): main,
+                // and big files in one piece (no ranges to mix).
+                let commit = await Self.repoCommit(model.id)
+                guard generation == downloadGeneration else { return }
+                currentRevision = commit ?? "main"
                 // Every file, subfolders included, over all pages (the
                 // listing is paginated by a Link header).
                 var entries: [HFTreeEntry] = []
-                var next: URL? = URL(string: "https://huggingface.co/api/models/\(model.id)/tree/main?recursive=true")
+                var next: URL? = URL(string: "https://huggingface.co/api/models/\(model.id)/tree/\(currentRevision)?recursive=true")
                 var pages = 0
                 while let url = next, pages < 100 {
                     pages += 1
@@ -359,10 +368,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 maxActiveFetchers = max(1, 16 / connections)
                 activeFetchers.removeAll()
                 waitingFetchers.removeAll()
-                // Every range of a big file from one commit: a file replaced
-                // on the Hub during the download can't mix two versions.
-                let commit = await Self.repoCommit(model.id) ?? "main"
-                guard generation == downloadGeneration else { return }
+
                 for entry in entries {
                     let destination = destRoot.appendingPathComponent(entry.path)
                     let expected = Int64(entry.size ?? 0)
@@ -378,8 +384,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     }
                     // A previous attempt's half-written big file: started over.
                     Self.removePartials(of: destination)
-                    if !file.isDone, let ranges = DownloadParts.ranges(size: expected),
-                       let url = Self.resolveURL(repo: model.id, path: entry.path, revision: commit) {
+                    if !file.isDone, commit != nil, let ranges = DownloadParts.ranges(size: expected),
+                       let url = Self.resolveURL(repo: model.id, path: entry.path, revision: currentRevision) {
                         // Its own name per attempt: an earlier attempt's
                         // fetcher, still winding down, never touches it.
                         let partial = destination.appendingPathExtension(UUID().uuidString + ".llmtray-partial")
@@ -413,7 +419,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         downloadSpeedBytesPerSec = 0
         downloadETASeconds = nil
         let generation = downloadGeneration
-        for file in files.values { file.fetcher?.pause() }
+        // A fetcher still waiting for its turn has nothing to pause.
+        for file in files.values where file.fetcherStarted { file.fetcher?.pause() }
         for (path, task) in tasksByPath {
             task.cancel(byProducingResumeData: { [weak self] data in
                 Task { @MainActor [weak self] in
@@ -564,7 +571,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     }
 
     private func startTask(forPath path: String) {
-        guard let file = files[path] else { return }
+        // Paused: resumeDownload() starts every unfinished file.
+        guard !isPaused, let file = files[path] else { return }
         if let fetcher = file.fetcher {
             if file.fetcherStarted {
                 fetcher.resume()
@@ -581,7 +589,7 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         if let resumeData = file.resumeData {
             task = session.downloadTask(withResumeData: resumeData)
         } else {
-            guard let url = Self.resolveURL(repo: currentModelID, path: path) else { return }
+            guard let url = Self.resolveURL(repo: currentModelID, path: path, revision: currentRevision) else { return }
             var request = URLRequest(url: url)
             HFToken.authorize(&request)
             task = session.downloadTask(with: request)
