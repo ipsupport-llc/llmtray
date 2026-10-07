@@ -16,7 +16,9 @@ final class SpeedJournalStore: ObservableObject {
     private var saveTask: Task<Void, Never>?
     private var dirty = false
 
-    static var path: String { RuntimePaths.externalRuntimeDir + "/speed-journal.json" }
+    /// Kept by "Uninstall Runtime Data", like the sessions.
+    static let fileName = "speed-journal.json"
+    static var path: String { RuntimePaths.externalRuntimeDir + "/" + fileName }
 
     private init() {
         let decoder = JSONDecoder()

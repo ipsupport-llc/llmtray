@@ -57,4 +57,33 @@ final class SpeedJournalTests: XCTestCase {
         // A flag without its value doesn't take the next flag as one.
         XCTAssertEqual(SpeedJournal.settings(of: ["--kv-bits", "--draft-model", "/x"]), "KV full · MTP")
     }
+
+    func testBenchmarkStatsFilter() {
+        func stats(_ prompt: Int, _ tokens: Int) -> RequestStats {
+            RequestStats(prompt: prompt, cached: 0, firstTokenSeconds: 1, tokens: tokens, decodeSeconds: 1, drafted: 0)
+        }
+        var f = BenchmarkStatsFilter<String>()
+        // Nothing running: recorded at once.
+        XCTAssertEqual(f.offer(stats(10, 5), "a").map(\.payload), ["a"])
+        // A benchmark request and a chat request at the same time: the
+        // benchmark's line is dropped, the chat's recorded when it ends.
+        f.begin()
+        XCTAssertTrue(f.offer(stats(2048, 8), "bench").isEmpty)
+        XCTAssertTrue(f.offer(stats(300, 40), "chat").isEmpty)
+        XCTAssertEqual(f.end(prompt: 2048, tokens: 8).map(\.payload), ["chat"])
+        // The line comes after the request ended: dropped once.
+        f.begin()
+        XCTAssertTrue(f.end(prompt: 512, tokens: 128).isEmpty)
+        XCTAssertTrue(f.offer(stats(512, 128), "bench").isEmpty)
+        XCTAssertEqual(f.offer(stats(512, 128), "chat").map(\.payload), ["chat"])
+        // A reported signature expires.
+        let t0 = Date()
+        f.begin()
+        _ = f.end(prompt: 7, tokens: 7, now: t0)
+        XCTAssertEqual(f.offer(stats(7, 7), "later", now: t0.addingTimeInterval(120)).map(\.payload), ["later"])
+        // A failed benchmark request releases what waited for it.
+        f.begin()
+        XCTAssertTrue(f.offer(stats(1, 1), "x").isEmpty)
+        XCTAssertEqual(f.end(prompt: nil, tokens: nil).map(\.payload), ["x"])
+    }
 }

@@ -151,6 +151,8 @@ final class BenchmarkRunner: ObservableObject {
         var firstByteDate: Date?
         var usagePromptTokens: Int?
         var usageCompletionTokens: Int?
+        Self.journalFilter.begin()
+        defer { Self.record(Self.journalFilter.end(prompt: usagePromptTokens, tokens: usageCompletionTokens)) }
 
         let (bytes, response) = try await session.bytes(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
@@ -193,25 +195,30 @@ final class BenchmarkRunner: ObservableObject {
 
     // MARK: - Manual benchmark (current live settings, no restarts)
 
-    /// A quick benchmark or an auto-tune is running, or ended moments ago
-    /// (its last stats line comes through the server's log a little after
-    /// its response): its requests stay out of the speed journal.
-    static var excludingFromJournal: Bool { quickRunning || Date() < journalGraceUntil }
-    private static var quickRunning = false
-    private static var journalGraceUntil = Date.distantPast
+    /// The server's stats lines go through this: the benchmark's own
+    /// requests stay out of the speed journal, everything else is recorded.
+    static var journalFilter = BenchmarkStatsFilter<JournalLine>()
+    struct JournalLine {
+        var modelPath: String
+        var arguments: [String]
+    }
 
-    static func benchmarkEnded() {
-        quickRunning = false
-        journalGraceUntil = Date().addingTimeInterval(2)
+    private static func record(_ lines: [(stats: RequestStats, payload: JournalLine)]) {
+        for line in lines {
+            SpeedJournalStore.shared.record(line.stats, modelPath: line.payload.modelPath, arguments: line.payload.arguments)
+        }
+    }
+
+    static func serverReported(_ stats: RequestStats, modelPath: String, arguments: [String]) {
+        record(journalFilter.offer(stats, JournalLine(modelPath: modelPath, arguments: arguments)))
     }
 
     func runBenchmark(port: Int, modelAlias: String, promptTokens: Int, maxTokens: Int, trials: Int) async {
         guard !isRunning else { return }
         isRunning = true
-        Self.quickRunning = true
         cancelRequested = false
         quickBenchmarkError = nil
-        defer { isRunning = false; Self.benchmarkEnded(); statusText = "" }
+        defer { isRunning = false; statusText = "" }
 
         // A fresh (prompt-size, kv-bits, ...) combination pays a one-time
         // Metal kernel compile cost on its first call -- confirmed live
@@ -268,7 +275,7 @@ final class BenchmarkRunner: ObservableObject {
         // Candidates go to the server as a launch trial, in memory only:
         // the profile itself is written just once, if the user accepts the
         // proposal. Whatever ends the sweep, the trial ends with it.
-        defer { isRunning = false; statusText = ""; server.launchTrial = .init(); Self.benchmarkEnded() }
+        defer { isRunning = false; statusText = ""; server.launchTrial = .init() }
         let profiles = ProfileManager.shared
         let modelPath = server.loadedModelPath
         // Pinned once: every candidate and the final restore go to this

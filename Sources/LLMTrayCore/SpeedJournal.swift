@@ -160,3 +160,59 @@ public struct SpeedJournal: Codable, Equatable, Sendable {
         return parts.joined(separator: " · ")
     }
 }
+
+/// Keeps the Benchmark tab's own requests out of the speed journal, and
+/// only those: a benchmark request reports its prompt and completion tokens
+/// (usage), the server's stats line has the same two numbers. A stats line
+/// that comes while a benchmark request is open waits until that request
+/// reports; a line that comes after its request ended is dropped when its
+/// numbers were reported in the last minute.
+public struct BenchmarkStatsFilter<Payload> {
+    struct Signature: Equatable {
+        var prompt: Int
+        var tokens: Int
+    }
+
+    private var open = 0
+    private var held: [(stats: RequestStats, payload: Payload)] = []
+    private var reported: [(signature: Signature, until: Date)] = []
+
+    public init() {}
+
+    /// A benchmark request starts.
+    public mutating func begin() {
+        open += 1
+    }
+
+    /// A benchmark request ended, with its usage when it had one. Returns
+    /// the held lines that are real use.
+    public mutating func end(prompt: Int?, tokens: Int?, now: Date = Date()) -> [(stats: RequestStats, payload: Payload)] {
+        open = max(0, open - 1)
+        if let prompt, let tokens {
+            let signature = Signature(prompt: prompt, tokens: tokens)
+            if let i = held.firstIndex(where: { Signature(prompt: $0.stats.prompt, tokens: $0.stats.tokens) == signature }) {
+                held.remove(at: i)
+            } else {
+                reported.append((signature, now.addingTimeInterval(60)))
+            }
+        }
+        guard open == 0 else { return [] }
+        defer { held = [] }
+        return held
+    }
+
+    /// A stats line from the server: what to record now.
+    public mutating func offer(_ stats: RequestStats, _ payload: Payload, now: Date = Date()) -> [(stats: RequestStats, payload: Payload)] {
+        reported.removeAll { $0.until < now }
+        let signature = Signature(prompt: stats.prompt, tokens: stats.tokens)
+        if let i = reported.firstIndex(where: { $0.signature == signature }) {
+            reported.remove(at: i)
+            return []
+        }
+        if open > 0 {
+            held.append((stats, payload))
+            return []
+        }
+        return [(stats, payload)]
+    }
+}
