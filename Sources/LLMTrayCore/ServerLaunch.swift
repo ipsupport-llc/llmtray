@@ -17,6 +17,10 @@ public enum ServerLaunch {
         /// `--draft-model` value, already decided by the caller (profile's
         /// `mtpDrafter`, a known drafter for this model, runtime support).
         public var drafterRepo: String?
+        /// The model folder has its own MTP head (`model-mtp.safetensors`,
+        /// Qwen 3.5) and the runtime uses it: the server drafts with it
+        /// unless the profile turns `mtpDrafter` off.
+        public var mtpHead: Bool
         /// The model's trained context length, if known: caps the
         /// server-side `--max-tokens` default (Default is shared across
         /// models, so its max_tokens may be sized for a bigger one).
@@ -47,7 +51,7 @@ public enum ServerLaunch {
 
         public init(modelPath: String, internalPort: Int, alias: String, disallowQuantizedKV: Bool, drafterRepo: String?, maxContext: Int? = nil, verboseLogging: Bool = false,
                     prefillMemoryMB: Int? = nil, bufferCacheMB: Int? = nil, gpuHeadroomBytes: Int64? = nil,
-                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false) {
+                    memoryShares: MemoryShares = .default, supportsLowMemoryWeights: Bool = false, mtpHead: Bool = false) {
             self.modelPath = modelPath
             self.internalPort = internalPort
             self.alias = alias
@@ -60,6 +64,7 @@ public enum ServerLaunch {
             self.gpuHeadroomBytes = gpuHeadroomBytes
             self.memoryShares = memoryShares
             self.supportsLowMemoryWeights = supportsLowMemoryWeights
+            self.mtpHead = mtpHead
         }
     }
 
@@ -182,6 +187,12 @@ public enum ServerLaunch {
         }
         if let drafter = c.drafterRepo {
             args += ["--draft-model", drafter]
+        }
+        // Said either way: a head that has just been downloaded changes the
+        // launch, so a restart is offered (pendingLaunchChange). 3: the most
+        // drafts per step; the runtime picks 0...3 by what's fastest.
+        if c.mtpHead, !extraArgsSet("--num-draft-tokens", p) {
+            args += ["--num-draft-tokens", p.mtpDrafter ? "3" : "0"]
         }
         if p.lowMemoryWeights, c.supportsLowMemoryWeights {
             args += ["--mmap-lookup-tables", "--lazy-towers"]

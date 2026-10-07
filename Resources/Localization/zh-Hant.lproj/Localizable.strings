@@ -360,7 +360,7 @@
 "For This Chat" = "用於此聊天室";
 "For an Hour" = "一小時內";
 "For faster answers (speculative decoding)" = "可加速回應（推測解碼）";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "適用於有發布 drafter 的模型（Gemma 4 26B）：一個額外的小模型會預先猜測 token，主模型再一次檢查。輸出相同，但速度更快。接著要求會一次處理一個。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "適用於有已發佈草稿模型的模型（Gemma 4 26B）或自帶 MTP 頭的模型（我們的 Qwen 3.5 模型，隨模型一起下載）：它會預先猜測詞元，主模型一次檢查。輸出相同，速度更快。此時請求會逐一處理。";
 "Found after an interruption" = "中斷後找到的項目";
 "Founding Supporters" = "創始贊助者";
 "Free disk space" = "剩餘磁碟空間";

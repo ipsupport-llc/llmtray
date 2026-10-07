@@ -175,6 +175,31 @@ enum ModelDiscovery {
         return nil
     }
 
+    /// The file a model's own MTP head ships in (our Qwen 3.5 quants): an
+    /// installed model gets it alone, mlx-lm loads it with the weights.
+    static let mtpHeadFile = "model-mtp.safetensors"
+
+    /// The model's config declares an MTP head (Qwen 3.5:
+    /// `mtp_num_hidden_layers`), whether or not its weights are here.
+    static func declaresMTPHead(forModelPath path: String) -> Bool {
+        guard let data = FileManager.default.contents(atPath: path + "/config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return false }
+        let text = (obj["text_config"] as? [String: Any]) ?? obj
+        return (text["mtp_num_hidden_layers"] as? Int ?? 0) > 0
+    }
+
+    static func hasMTPHead(forModelPath path: String) -> Bool {
+        FileManager.default.fileExists(atPath: path + "/" + mtpHeadFile)
+    }
+
+    /// The Hugging Face repo a model folder came from: models are kept as
+    /// <root>/<org>/<name> (ours and LM Studio's alike).
+    static func hubRepo(forModelPath path: String) -> String? {
+        let parts = URL(fileURLWithPath: path).standardizedFileURL.pathComponents.suffix(2)
+        guard parts.count == 2, !parts.contains(where: { $0.isEmpty || $0 == "/" || $0.hasPrefix(".") }) else { return nil }
+        return parts.joined(separator: "/")
+    }
+
     /// Models with KV-shared layers (e.g. Gemma 4's `num_kv_shared_layers`)
     /// reuse an earlier layer's raw cache-internal (keys, values) tuple
     /// directly inside the shared layer's attention call, bypassing that

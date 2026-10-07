@@ -522,6 +522,40 @@ final class ServerManager: ObservableObject {
         return HFHubCache.localSnapshot(repo: repo)
     }
 
+    /// Model folders whose MTP head a start is fetching, and repos known to
+    /// have none (asked once per run).
+    private var headFetches: Set<String> = []
+    private var reposWithoutHead: Set<String> = []
+
+    /// A Qwen 3.5 model whose config declares an MTP head but whose folder
+    /// hasn't got it (installed before we published heads): its repo's
+    /// model-mtp.safetensors is fetched in the background, the model starts
+    /// without it, and a restart is offered once it's there. Only when the
+    /// profile wants drafting and the runtime can use the head.
+    private func fetchMTPHeadIfMissing(modelPath: String, profile: ResolvedProfile) {
+        guard profile.mtpDrafter, !ServerLaunch.extraArgsSetDrafter(profile),
+              ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
+              !ModelDiscovery.hasMTPHead(forModelPath: modelPath),
+              MLXRuntimeInstaller.supportsMTPHead,
+              let repo = ModelDiscovery.hubRepo(forModelPath: modelPath),
+              !reposWithoutHead.contains(repo),
+              headFetches.insert(modelPath).inserted else { return }
+        Task { [weak self] in
+            let result = await MTPHeadDownload.fetch(repo: repo, into: modelPath)
+            guard let self else { return }
+            self.headFetches.remove(modelPath)
+            switch result {
+            case .downloaded:
+                self.appendLog("--- MTP head for \(repo) downloaded: restart the server to use it ---\n")
+                self.refreshPendingLaunchChange()
+            case .notPublished:
+                self.reposWithoutHead.insert(repo)
+            case .failed(let error):
+                self.appendLog("--- MTP head for \(repo) didn't download (\(error)); trying again at a later start ---\n")
+            }
+        }
+    }
+
     /// Drafters a server start is fetching (MTPDrafterDownload); one that
     /// failed (offline) is tried again at a later start.
     private var drafterFetches: Set<String> = []
@@ -561,7 +595,8 @@ final class ServerManager: ObservableObject {
             bufferCacheMB: memory.bufferCacheMB,
             gpuHeadroomBytes: memory.gpuHeadroomBytes,
             memoryShares: Self.memoryShares,
-            supportsLowMemoryWeights: memory.supportsLowMemoryWeights
+            supportsLowMemoryWeights: memory.supportsLowMemoryWeights,
+            mtpHead: memory.supportsMTPHead && ModelDiscovery.hasMTPHead(forModelPath: modelPath)
         )
     }
 
@@ -571,6 +606,7 @@ final class ServerManager: ObservableObject {
         var bufferCacheMB: Int?
         var gpuHeadroomBytes: Int64?
         var supportsLowMemoryWeights = false
+        var supportsMTPHead = false
     }
 
     /// Read once per model folder, installed runtime (a runtime update
@@ -595,6 +631,8 @@ final class ServerManager: ObservableObject {
         let shares = memoryShares
         let key = modelPath + "|" + String(runtime?.timeIntervalSince1970 ?? 0) + "|" + server + "|" + String(HardwareProbe.wiredLimitMB ?? -1)
             + "|\(shares.marginMB)/\(shares.promptCachePercent)/\(shares.prefillPercent)|\(lowMemoryWeights)"
+            // A downloaded MTP head adds to the weights.
+            + "|\(ModelDiscovery.hasMTPHead(forModelPath: modelPath))"
         if let known = memoryFactsCache[key] { return known }
         let limit = HardwareProbe.current().gpuLimitBytes
         let supportsLowMemory = MLXRuntimeInstaller.serverSupportsFlag("--mmap-lookup-tables")
@@ -611,7 +649,8 @@ final class ServerManager: ObservableObject {
             prefillMemoryMB: MLXRuntimeInstaller.serverSupportsFlag("--prefill-memory-mb") ? scratchMB : nil,
             bufferCacheMB: MLXRuntimeInstaller.serverSupportsFlag("--buffer-cache-mb") ? scratchMB : nil,
             gpuHeadroomBytes: ServerLaunch.gpuHeadroomBytes(gpuLimitBytes: limit, weightsBytes: weights),
-            supportsLowMemoryWeights: supportsLowMemory
+            supportsLowMemoryWeights: supportsLowMemory,
+            supportsMTPHead: MLXRuntimeInstaller.supportsMTPHead
         )
         memoryFactsCache[key] = facts
         return facts
@@ -650,8 +689,10 @@ final class ServerManager: ObservableObject {
             lowMemoryWeights: profile.lowMemoryWeights
         )
         guard ServerLaunch.restartKey(profile, context) != last else { return (false, false) }
-        let hasDrafter = context.drafterRepo != nil
+        // A downloaded MTP head counts as a drafter too.
+        let hasDrafter = context.drafterRepo != nil || context.mtpHead
         context.drafterRepo = nil
+        context.mtpHead = false
         return (true, hasDrafter && ServerLaunch.restartKey(profile, context) == last)
     }
 
@@ -687,6 +728,7 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile),
             lowMemoryWeights: profile.lowMemoryWeights
         )
+        fetchMTPHeadIfMissing(modelPath: modelPath, profile: profile)
         let args = ServerLaunch.arguments(profile, context)
         if let cut = ServerLaunch.promptCacheCut(profile, context), let headroom = context.gpuHeadroomBytes {
             appendLog("--- prompt cache capped at \(Self.memory(cut.effective)) (of \(Self.memory(cut.profile)) in the profile): the model leaves \(Self.memory(max(0, headroom))) of GPU memory ---\n")

@@ -212,6 +212,23 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertFalse(args.contains("--kv-bits"))
     }
 
+    func testMTPHeadDraftCount() {
+        var c = ctx
+        // No head: no flag (the server's default).
+        XCTAssertNil(value(ServerLaunch.arguments(resolved(), c), "--num-draft-tokens"))
+        c.mtpHead = true
+        XCTAssertEqual(value(ServerLaunch.arguments(resolved(), c), "--num-draft-tokens"), "3")
+        // Off in the profile: the head isn't drafted with.
+        XCTAssertEqual(value(ServerLaunch.arguments(resolved { $0.launch.mtpDrafter = false }, c), "--num-draft-tokens"), "0")
+        // The user's own wins.
+        let own = ServerLaunch.arguments(resolved { $0.launch.extraServerArgs = "--num-draft-tokens 1" }, c)
+        XCTAssertEqual(own.filter { $0 == "--num-draft-tokens" }.count, 1)
+        XCTAssertEqual(value(own, "--num-draft-tokens"), "1")
+        // A head downloaded since the start changes the launch: a restart is offered.
+        XCTAssertNotEqual(ServerLaunch.restartKey(resolved(), ctx), ServerLaunch.restartKey(resolved(), c))
+        XCTAssertTrue(ServerLaunch.needsRestart(from: resolved(), to: resolved { $0.launch.mtpDrafter = false }, context: c))
+    }
+
     func testDrafterConcurrencyVerboseExtra() {
         var c = ctx
         c.drafterRepo = "org/drafter"

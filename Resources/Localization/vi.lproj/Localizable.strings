@@ -360,7 +360,7 @@
 "For This Chat" = "Cho cuộc trò chuyện này";
 "For an Hour" = "Trong một giờ";
 "For faster answers (speculative decoding)" = "Để trả lời nhanh hơn (giải mã suy đoán)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Với các mô hình có mô hình nháp đã được công bố (Gemma 4 26B): một mô hình nhỏ bổ sung đoán trước các token, rồi mô hình chính kiểm tra chúng trong một lượt. Kết quả như cũ, nhanh hơn. Khi đó, các yêu cầu được phục vụ lần lượt từng cái.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Cho các mô hình có drafter đã công bố (Gemma 4 26B) hoặc có đầu MTP riêng (các mô hình Qwen 3.5 của chúng tôi, được tải cùng mô hình): nó đoán trước các token và mô hình chính kiểm tra chúng trong một lượt. Cùng kết quả, nhanh hơn. Khi đó các yêu cầu được xử lý lần lượt từng cái.";
 "Found after an interruption" = "Tìm thấy sau khi gián đoạn";
 "Founding Supporters" = "Những người ủng hộ sáng lập";
 "Free disk space" = "Dung lượng đĩa trống";

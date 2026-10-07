@@ -360,7 +360,7 @@
 "For This Chat" = "לעבור שיחה זו";
 "For an Hour" = "לשעה";
 "For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם drafter שפורסם (Gemma 4 26B): מודל קטן נוסף מנחש מראש אסימונים, והמודל הראשי בודק אותם במעבר אחד. אותו פלט, מהר יותר. לאחר מכן הבקשות מטופלות אחת בכל פעם.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "למודלים עם מנסח שפורסם (Gemma 4 26B) או עם ראש MTP משלהם (מודלי Qwen 3.5 שלנו, יורד יחד איתם): הוא מנחש טוקנים מראש והמודל הראשי בודק אותם במעבר אחד. אותה תוצאה, מהר יותר. הבקשות מטופלות אז אחת אחרי השנייה.";
 "Found after an interruption" = "נמצאו אחרי הפרעה";
 "Founding Supporters" = "תומכי ביסוס";
 "Free disk space" = "שטח דיסק פנוי";

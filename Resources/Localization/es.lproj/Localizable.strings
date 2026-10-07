@@ -360,7 +360,7 @@
 "For This Chat" = "Para este chat";
 "For an Hour" = "Durante una hora";
 "For faster answers (speculative decoding)" = "Para respuestas más rápidas (decodificación especulativa)";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Para modelos con un drafter publicado (Gemma 4 26B): un modelo pequeño adivina tokens por adelantado y el principal los verifica en una pasada. Misma salida, más rápido. Las solicitudes se atienden de una en una.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Para modelos con un borrador publicado (Gemma 4 26B) o con su propia cabeza MTP (nuestros modelos Qwen 3.5, se descarga con ellos): adivina tokens por adelantado y el modelo principal los comprueba en una sola pasada. La misma salida, más rápido. Las solicitudes se atienden entonces de una en una.";
 "Found after an interruption" = "Encontrados tras una interrupción";
 "Founding Supporters" = "Patrocinadores fundadores";
 "Free disk space" = "Espacio libre en disco";

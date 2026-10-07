@@ -360,7 +360,7 @@
 "For This Chat" = "针对本聊天";
 "For an Hour" = "一小时内";
 "For faster answers (speculative decoding)" = "用于更快的回答（猜测解码）";
-"For models with a published drafter (Gemma 4 26B): a small extra model guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "对于发布了草稿模型的模型（Gemma 4 26B）：一个额外的小模型会提前猜测词元，主模型会在一次传递中检查它们。输出相同，速度更快。随后请求会逐个处理。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "适用于有已发布草稿模型的模型（Gemma 4 26B）或自带 MTP 头的模型（我们的 Qwen 3.5 模型，随模型一起下载）：它提前猜测词元，主模型一次性检查。输出相同，速度更快。此时请求会逐个处理。";
 "Found after an interruption" = "中断后发现";
 "Founding Supporters" = "创始赞助者";
 "Free disk space" = "可用磁盘空间";
