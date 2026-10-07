@@ -1243,6 +1243,6 @@
 "prompt %.0f tok/s" = "प्रॉम्प्ट %.0f tok/s";
 
 /* The model disclaimer (welcome page, About, under the chat field) */
-"A model is a tool, not an authority" = "मॉडल एक साधन है, कोई प्रमाण नहीं";
+"A model is a tool, not an authority" = "मॉडल एक साधन है, कोई प्राधिकारी नहीं";
 "It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "यह गलत हो सकता है और बातें गढ़ सकता है: हर ज़रूरी बात जाँच लें। यह डॉक्टर, वकील, मनोवैज्ञानिक या दोस्त नहीं है। इसके उत्तरों का उपयोग आप अपने जोखिम पर करते हैं।";
 "Models can make mistakes. Check important information." = "मॉडल गलतियाँ कर सकते हैं। ज़रूरी जानकारी जाँच लें।";

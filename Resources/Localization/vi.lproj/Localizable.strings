@@ -1243,6 +1243,6 @@
 "prompt %.0f tok/s" = "prompt %.0f tok/giây";
 
 /* The model disclaimer (welcome page, About, under the chat field) */
-"A model is a tool, not an authority" = "Mô hình là công cụ, không phải thẩm quyền";
+"A model is a tool, not an authority" = "Mô hình là công cụ, không phải chuyên gia";
 "It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "Nó có thể sai và bịa ra thông tin: hãy kiểm tra mọi điều quan trọng. Nó không phải bác sĩ, luật sư, nhà tâm lý hay bạn bè. Bạn tự chịu rủi ro khi dùng câu trả lời của nó.";
 "Models can make mistakes. Check important information." = "Mô hình có thể mắc lỗi. Hãy kiểm tra thông tin quan trọng.";
