@@ -190,12 +190,10 @@ PY
   # wheels call Accelerate's legacy BLAS / LAPACK names (_sgemm, _lsame_ ...),
   # which App Review refuses as deprecated API; this one carries its own
   # OpenBLAS (scipy_-prefixed symbols, libgfortran: settled for the store).
-  SCIPY_VERSION="$(PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c 'import importlib.metadata as m; print(m.version("scipy"))' 2>/dev/null || true)"
-  if [[ -n "$SCIPY_VERSION" ]]; then
-    rm -rf "$PKG_DIR"/scipy "$PKG_DIR"/scipy-*.dist-info
-    "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$PKG_DIR" \
-      --only-binary=:all: --platform macosx_12_0_arm64 "scipy==$SCIPY_VERSION"
-  fi
+  SCIPY_VERSION="$(PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c 'import importlib.metadata as m; print(m.version("scipy"))')"
+  rm -rf "$PKG_DIR"/scipy "$PKG_DIR"/scipy-*.dist-info
+  "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$PKG_DIR" \
+    --only-binary=:all: --platform macosx_12_0_arm64 "scipy==$SCIPY_VERSION"
   # pip's own console scripts (their shebangs name this machine's path).
   rm -rf "$PKG_DIR/bin"
   # Every runner exits with the app (the sandbox can't stop a leftover one).
@@ -276,10 +274,14 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy, scipy.sparse.linalg; print('stripped packages ok')"
   # No binary calls what App Review lists as deprecated Accelerate API (its
   # 2026-10-07 rejection of 0.8.8: scipy's _superlu, cython_blas / _lapack).
+  # Fails closed: no list, or a binary it can't read, stops the build.
   DEPRECATED="$SCRIPT_DIR/appstore/deprecated_accelerate_symbols.txt"
+  [[ -s "$DEPRECATED" ]] || { echo "error: $DEPRECATED is missing" >&2; exit 1; }
   while IFS= read -r -d '' f; do
-    case "$(file -b "$f")" in *Mach-O*) ;; *) continue ;; esac
-    imports="$(nm -u "$f" 2>/dev/null | awk '{print $NF}' || true)"
+    kind="$(file -b "$f")" || { echo "error: file can't read $f" >&2; exit 1; }
+    case "$kind" in *Mach-O*) ;; *) continue ;; esac
+    raw="$(nm -u "$f")" || { echo "error: nm can't read $f" >&2; exit 1; }
+    imports="$(awk '{print $NF}' <<< "$raw")"
     if [[ -n "$imports" ]] && grep -qxFf "$DEPRECATED" <<< "$imports"; then
       echo "error: $f calls deprecated Accelerate API (App Review refuses it): $(grep -xFf "$DEPRECATED" <<< "$imports" | head -3 | tr '\n' ' ')" >&2
       exit 1
