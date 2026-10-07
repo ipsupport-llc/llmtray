@@ -1241,3 +1241,8 @@
 "first token %.1f s" = "טוקן ראשון %.1f ש׳";
 "generation %.1f tok/s" = "יצירה %.1f טוקנים/ש׳";
 "prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "מודל הוא כלי, לא סמכות";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "הוא עלול לטעות ולהמציא: בדקו כל דבר חשוב. הוא לא רופא, לא עורך דין, לא פסיכולוג ולא חבר. השימוש בתשובות שלו הוא באחריותכם בלבד.";
+"Models can make mistakes. Check important information." = "מודלים עלולים לטעות. בדקו מידע חשוב.";

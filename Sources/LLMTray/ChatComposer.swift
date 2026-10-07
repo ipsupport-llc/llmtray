@@ -172,7 +172,9 @@ struct ChatComposer: View {
                 }
             }
             .padding(.horizontal, 12)
-            .padding(.bottom, 10)
+            ModelDisclaimer.Line()
+                .padding(.horizontal, 12)
+                .padding(.bottom, 6)
         }
     }
 

@@ -1241,3 +1241,8 @@
 "first token %.1f s" = "最初のトークン %.1f 秒";
 "generation %.1f tok/s" = "生成 %.1f tok/s";
 "prompt %.0f tok/s" = "プロンプト %.0f tok/s";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "モデルは道具であり、権威ではありません";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "間違えたり、事実でないことを作り出したりすることがあります。重要なことは必ず確認してください。医師、弁護士、心理士、友人の代わりにはなりません。回答の利用はご自身の責任で行ってください。";
+"Models can make mistakes. Check important information." = "モデルは間違えることがあります。重要な情報は確認してください。";

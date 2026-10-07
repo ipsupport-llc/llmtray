@@ -1241,3 +1241,8 @@
 "first token %.1f s" = "primeiro token %.1f s";
 "generation %.1f tok/s" = "geração %.1f tok/s";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";
+
+/* The model disclaimer (welcome page, About, under the chat field) */
+"A model is a tool, not an authority" = "Um modelo é uma ferramenta, não uma autoridade";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "Ele pode errar e inventar coisas: verifique tudo o que importa. Ele não é médico, advogado, psicólogo nem amigo. Você usa as respostas dele por sua conta e risco.";
+"Models can make mistakes. Check important information." = "Modelos podem cometer erros. Verifique informações importantes.";
