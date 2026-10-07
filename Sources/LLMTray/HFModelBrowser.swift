@@ -176,6 +176,11 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
     nonisolated(unsafe) private var tasksByPath: [String: URLSessionDownloadTask] = [:]
     nonisolated(unsafe) private var pathByTaskID: [Int: String] = [:]
     nonisolated(unsafe) private var totalBytesExpected: Int64 = 0
+    /// Big files fetching now, and those waiting for a turn: as many at once
+    /// as the connection budget allows (DownloadParts.connections).
+    private var activeFetchers: Set<String> = []
+    private var waitingFetchers: [String] = []
+    private var maxActiveFetchers = 1
     /// Set on the delegate queue the moment a file comes back as an HTTP
     /// error: later completions of the same download are ignored (none may
     /// declare it done), until the next download() resets it.
@@ -350,6 +355,14 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
 
                 let bigFiles = entries.filter { DownloadParts.ranges(size: Int64($0.size ?? 0)) != nil }.count
+                let connections = DownloadParts.connections(bigFiles: bigFiles)
+                maxActiveFetchers = max(1, 16 / connections)
+                activeFetchers.removeAll()
+                waitingFetchers.removeAll()
+                // Every range of a big file from one commit: a file replaced
+                // on the Hub during the download can't mix two versions.
+                let commit = await Self.repoCommit(model.id) ?? "main"
+                guard generation == downloadGeneration else { return }
                 for entry in entries {
                     let destination = destRoot.appendingPathComponent(entry.path)
                     let expected = Int64(entry.size ?? 0)
@@ -366,12 +379,12 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                     // A previous attempt's half-written big file: started over.
                     Self.removePartials(of: destination)
                     if !file.isDone, let ranges = DownloadParts.ranges(size: expected),
-                       let url = Self.resolveURL(repo: model.id, path: entry.path) {
+                       let url = Self.resolveURL(repo: model.id, path: entry.path, revision: commit) {
                         // Its own name per attempt: an earlier attempt's
                         // fetcher, still winding down, never touches it.
                         let partial = destination.appendingPathExtension(UUID().uuidString + ".llmtray-partial")
                         file.fetcher = makeFetcher(path: entry.path, url: url, partial: partial, size: expected,
-                                                   ranges: ranges, connections: DownloadParts.connections(bigFiles: bigFiles),
+                                                   ranges: ranges, connections: connections,
                                                    generation: generation)
                     }
                     files[entry.path] = file
@@ -451,6 +464,8 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             task.cancel()
         }
         for file in files.values { file.fetcher?.cancel() }
+        activeFetchers.removeAll()
+        waitingFetchers.removeAll()
         tasksByPath.removeAll()
         pathByTaskID.removeAll()
         files.removeAll()
@@ -462,12 +477,23 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         onAllDone = nil
     }
 
-    nonisolated static func resolveURL(repo: String, path: String) -> URL? {
+    /// The commit `main` is at now, or nil.
+    static func repoCommit(_ repo: String) async -> String? {
+        guard let url = URL(string: "https://huggingface.co/api/models/\(repo)/revision/main") else { return nil }
+        var request = URLRequest(url: url, timeoutInterval: 20)
+        HFToken.authorize(&request)
+        guard let (data, response) = try? await URLSession.shared.data(for: request),
+              (response as? HTTPURLResponse)?.statusCode == 200,
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+        return obj["sha"] as? String
+    }
+
+    nonisolated static func resolveURL(repo: String, path: String, revision: String = "main") -> URL? {
         let encodedPath = path
             .split(separator: "/")
             .map { $0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }
             .joined(separator: "/")
-        return URL(string: "https://huggingface.co/\(repo)/resolve/main/\(encodedPath)")
+        return URL(string: "https://huggingface.co/\(repo)/resolve/\(revision)/\(encodedPath)")
     }
 
     /// A big file's fetcher: its progress counts in, its end puts the file
@@ -487,7 +513,14 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
             MainActor.assumeIsolated {
                 guard let self, self.downloadGeneration == generation, !self.downloadFailed,
                       let file = self.files[path] else { return }
+                self.fetcherEnded(path)
                 switch outcome {
+                case .rangeIgnored:
+                    // In one piece, as before this path existed.
+                    self.files[path]?.fetcher = nil
+                    self.files[path]?.writtenBytes = 0
+                    try? FileManager.default.removeItem(at: partial)
+                    return self.startTask(forPath: path)
                 case .refused(let status):
                     return self.failDownload(Self.accessMessage(status: status, repo: self.currentModelID))
                 case .failed(let error):
@@ -522,11 +555,26 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
         }
     }
 
+    /// A big file's fetcher is through: the next waiting one starts (not
+    /// while paused: resume starts it).
+    private func fetcherEnded(_ path: String) {
+        activeFetchers.remove(path)
+        guard !isPaused, !waitingFetchers.isEmpty else { return }
+        startTask(forPath: waitingFetchers.removeFirst())
+    }
+
     private func startTask(forPath path: String) {
         guard let file = files[path] else { return }
         if let fetcher = file.fetcher {
-            if file.fetcherStarted { fetcher.resume() } else { fetcher.start() }
-            files[path]?.fetcherStarted = true
+            if file.fetcherStarted {
+                fetcher.resume()
+            } else if activeFetchers.count < maxActiveFetchers {
+                activeFetchers.insert(path)
+                fetcher.start()
+                files[path]?.fetcherStarted = true
+            } else if !waitingFetchers.contains(path) {
+                waitingFetchers.append(path)
+            }
             return
         }
         let task: URLSessionDownloadTask

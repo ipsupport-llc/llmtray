@@ -43,7 +43,8 @@ public enum DownloadParts {
         return first == range.lowerBound && last >= first && last <= range.upperBound
     }
 
-    /// Connections per big file: 16 in all, at least 2 each.
+    /// Connections per big file: 16 in all, at least 2 each (with more than
+    /// 8 big files, only 16 / that many fetch at once).
     public static func connections(bigFiles: Int) -> Int {
         max(2, min(maxParts, 16 / max(1, bigFiles)))
     }

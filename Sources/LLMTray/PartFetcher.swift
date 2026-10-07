@@ -15,6 +15,9 @@ import LLMTrayCore
 final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     enum Outcome: Equatable {
         case done
+        /// The server sent the whole file for a range (a proxy that strips
+        /// Range, say): the caller fetches it in one piece.
+        case rangeIgnored
         /// An HTTP status that won't change on a retry (401, 403, 404...).
         case refused(Int)
         case failed(String)
@@ -92,6 +95,13 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
             } catch {
                 return finish(.failed(error.localizedDescription))
             }
+            // Cancelled while the file was being made: not left behind.
+            if isCancelled {
+                try? handle?.close()
+                handle = nil
+                try? fm.removeItem(at: partial)
+                return
+            }
             for i in parts.indices { startPart(i) }
         }
     }
@@ -131,6 +141,7 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
             try? handle?.close()
             handle = nil
             session.invalidateAndCancel()
+            try? FileManager.default.removeItem(at: partial)
         }
     }
 
@@ -144,7 +155,6 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         let task = session.dataTask(with: request)
         task.taskDescription = String(i)
         parts[i].task = task
-        parts[i].attempts += 1
         task.resume()
     }
 
@@ -191,6 +201,8 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
     /// maxAttempts.
     private func retry(_ i: Int, _ why: String) {
         parts[i].task = nil
+        // Only failures count: a pause and resume isn't one.
+        parts[i].attempts += 1
         guard parts[i].attempts < Self.maxAttempts else {
             return finish(.failed("\(url.lastPathComponent): \(why)"))
         }
@@ -215,7 +227,7 @@ final class PartFetcher: NSObject, URLSessionDataDelegate, @unchecked Sendable {
         completionHandler(.cancel)
         switch status {
         case 200:
-            finish(.failed("the server sent the whole file for a part"))
+            finish(.rangeIgnored)
         case 429, 500...599:
             retry(i, "HTTP \(status)")
         case 206:
