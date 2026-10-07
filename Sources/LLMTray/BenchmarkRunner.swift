@@ -193,9 +193,17 @@ final class BenchmarkRunner: ObservableObject {
 
     // MARK: - Manual benchmark (current live settings, no restarts)
 
-    /// A quick benchmark is running: its requests stay out of the speed
-    /// journal (ServerManager).
-    static var quickRunning = false
+    /// A quick benchmark or an auto-tune is running, or ended moments ago
+    /// (its last stats line comes through the server's log a little after
+    /// its response): its requests stay out of the speed journal.
+    static var excludingFromJournal: Bool { quickRunning || Date() < journalGraceUntil }
+    private static var quickRunning = false
+    private static var journalGraceUntil = Date.distantPast
+
+    static func benchmarkEnded() {
+        quickRunning = false
+        journalGraceUntil = Date().addingTimeInterval(2)
+    }
 
     func runBenchmark(port: Int, modelAlias: String, promptTokens: Int, maxTokens: Int, trials: Int) async {
         guard !isRunning else { return }
@@ -203,7 +211,7 @@ final class BenchmarkRunner: ObservableObject {
         Self.quickRunning = true
         cancelRequested = false
         quickBenchmarkError = nil
-        defer { isRunning = false; Self.quickRunning = false; statusText = "" }
+        defer { isRunning = false; Self.benchmarkEnded(); statusText = "" }
 
         // A fresh (prompt-size, kv-bits, ...) combination pays a one-time
         // Metal kernel compile cost on its first call -- confirmed live
@@ -260,7 +268,7 @@ final class BenchmarkRunner: ObservableObject {
         // Candidates go to the server as a launch trial, in memory only:
         // the profile itself is written just once, if the user accepts the
         // proposal. Whatever ends the sweep, the trial ends with it.
-        defer { isRunning = false; statusText = ""; server.launchTrial = .init() }
+        defer { isRunning = false; statusText = ""; server.launchTrial = .init(); Self.benchmarkEnded() }
         let profiles = ProfileManager.shared
         let modelPath = server.loadedModelPath
         // Pinned once: every candidate and the final restore go to this

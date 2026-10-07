@@ -806,9 +806,10 @@ final class ServerManager: ObservableObject {
                     self.lastPrefillProgressAt = Date()
                 case let .requestStats(stats):
                     // The Benchmark tab's runs aren't real use: skipped while
-                    // one runs (it sets a launch trial for its model, or runs
-                    // its quick trials).
-                    guard self.launchTrial.modelPath == nil, !BenchmarkRunner.quickRunning else { break }
+                    // one runs and moments after (an auto-tune's trials are
+                    // its own model's; another model a client switches to
+                    // meanwhile is recorded).
+                    guard self.launchTrial.modelPath != modelPath, !BenchmarkRunner.excludingFromJournal else { break }
                     SpeedJournalStore.shared.record(stats, modelPath: modelPath, arguments: self.launchedArguments)
                 }
             }

@@ -35,12 +35,16 @@ final class SpeedJournalStore: ObservableObject {
 
     func clear() {
         journal.clear()
-        changed()
+        summaries = journal.summaries()
+        saveTask?.cancel()
+        saveTask = nil
         save()
     }
 
     /// Now, e.g. at quit.
     func flush() {
+        saveTask?.cancel()
+        saveTask = nil
         guard dirty else { return }
         save()
     }
@@ -50,9 +54,13 @@ final class SpeedJournalStore: ObservableObject {
         dirty = true
         // A save already waiting takes this change along.
         guard saveTask == nil else { return }
-        saveTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
-            guard let self else { return }
+        scheduleSave(after: 3)
+    }
+
+    private func scheduleSave(after seconds: Double) {
+        saveTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            guard let self, !Task.isCancelled else { return }
             self.saveTask = nil
             self.save()
         }
@@ -67,8 +75,9 @@ final class SpeedJournalStore: ObservableObject {
             try data.write(to: URL(fileURLWithPath: Self.path), options: .atomic)
             dirty = false
         } catch {
-            // Tried again with the next change, or at quit.
+            // Tried again in a while (and at quit).
             dirty = true
+            if saveTask == nil { scheduleSave(after: 30) }
         }
     }
 }

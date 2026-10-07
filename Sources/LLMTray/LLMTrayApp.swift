@@ -1106,6 +1106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // one call site.
             MainActor.assumeIsolated {
                 ProfileManager.shared.flushPendingWrites()
+                SpeedJournalStore.shared.flush()
                 self?.killServerNow()
                 exit(0)
             }
