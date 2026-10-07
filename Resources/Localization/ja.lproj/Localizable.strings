@@ -1233,3 +1233,4 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）はゴミ箱に移動されます。そこから復元できますが、エイリアスとプロファイルの選択は失われます。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」は削除されませんでした：サーバーがビジー状態か使用中です。アイドル時に再試行してください。";
+"the head is for another model" = "このヘッドは別のモデル用です";

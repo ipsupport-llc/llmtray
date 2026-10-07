@@ -1233,3 +1233,4 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) Çöp Kutusu'na taşınacak; buradan geri yükleyebilirsiniz. Takma adı ve profil seçimi unutulacak.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” ve indeksi projeden silindi. Eklediğiniz kaynak dosya etkilenmez.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” kaldırılmadı: sunucu meşgul veya modeli kullanıyor. Sunucu boşaldığında tekrar deneyin.";
+"the head is for another model" = "başlık başka bir modele ait";

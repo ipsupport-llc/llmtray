@@ -1233,3 +1233,4 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) ट्रैश में भेज दिया जाएगा, जहाँ आप इसे फिर भी पुनर्स्थापित कर सकते हैं। इसकी एलियास और प्रोफ़ाइल विकल्प भूल दिए जाएंगे।";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” और उसका इंडेक्स प्रोजेक्ट से हटा दिया गया है। जिस फाइल से आपने इसे जोड़ा था वह प्रभावित नहीं हुई।";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” हटाया नहीं गया: सर्वर व्यस्त है या इसे उपयोग कर रहा है। जब यह निष्क्रिय हो तो फिर प्रयास करें।";
+"the head is for another model" = "हेड किसी दूसरे मॉडल का है";

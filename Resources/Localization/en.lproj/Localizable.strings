@@ -1234,6 +1234,7 @@
 "rename %lld" = "rename %lld";
 "search by words only" = "search by words only";
 "the download finished incomplete" = "the download finished incomplete";
+"the head is for another model" = "the head is for another model";
 "the model" = "the model";
 "the model runtime isn't installed yet" = "the model runtime isn't installed yet";
 "then" = "then";

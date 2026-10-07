@@ -90,6 +90,7 @@ enum MTPHeadDownload {
                 from huggingface_hub import hf_hub_download
                 from huggingface_hub.errors import EntryNotFoundError, GatedRepoError, RepositoryNotFoundError
                 try:
+                    hf_hub_download(repo_id=sys.argv[1], filename="config.json", local_dir=sys.argv[3])
                     hf_hub_download(repo_id=sys.argv[1], filename=sys.argv[2], local_dir=sys.argv[3])
                 except (EntryNotFoundError, GatedRepoError, RepositoryNotFoundError):
                     sys.exit(\(notFoundStatus))
@@ -108,9 +109,15 @@ enum MTPHeadDownload {
     }
 
     /// Moves a fetched head into the model folder; nil when it's there
-    /// (also when one arrived meanwhile), else why not.
+    /// (also when one arrived meanwhile), else why not. The repo's config
+    /// (fetched with it) must describe the same architecture as the
+    /// model's: the folder's name alone doesn't say which model it holds.
     static func install(_ staged: URL, into folder: String) -> String? {
         let target = folder + "/" + ModelDiscovery.mtpHeadFile
+        let repoConfig = staged.deletingLastPathComponent().appendingPathComponent("config.json").path
+        guard ModelDiscovery.sameArchitecture(repoConfig, folder + "/config.json") else {
+            return NSLocalizedString("the head is for another model", comment: "MTP head download: the repo's config differs from the model's")
+        }
         do {
             try FileManager.default.moveItem(atPath: staged.path, toPath: target)
         } catch {

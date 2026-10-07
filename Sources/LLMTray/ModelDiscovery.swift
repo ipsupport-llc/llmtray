@@ -198,6 +198,22 @@ enum ModelDiscovery {
     /// org a renamed or copied folder may name.
     static let mtpHeadPublishers: Set<String> = ["roman220220"]
 
+    /// The text configs of two config.json files agree on the shape an MTP
+    /// head depends on.
+    static func sameArchitecture(_ a: String, _ b: String) -> Bool {
+        func shape(_ path: String) -> [String: String]? {
+            guard let data = FileManager.default.contents(atPath: path),
+                  let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
+            let text = (obj["text_config"] as? [String: Any]) ?? obj
+            let keys = ["model_type", "hidden_size", "num_hidden_layers", "vocab_size", "num_attention_heads",
+                        "num_key_value_heads", "head_dim", "intermediate_size", "num_experts",
+                        "moe_intermediate_size", "mtp_num_hidden_layers"]
+            return Dictionary(uniqueKeysWithValues: keys.map { ($0, text[$0].map { "\($0)" } ?? "") })
+        }
+        guard let x = shape(a), let y = shape(b) else { return false }
+        return x == y
+    }
+
     /// The repo a model folder's MTP head would come from, or nil.
     static func mtpHeadRepo(forModelPath path: String) -> String? {
         let parts = Array(URL(fileURLWithPath: path).standardizedFileURL.pathComponents.suffix(2))

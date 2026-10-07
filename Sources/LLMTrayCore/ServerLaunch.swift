@@ -284,10 +284,13 @@ public enum ServerLaunch {
     public static func restartKey(_ p: ResolvedProfile, _ c: Context) -> [String] {
         var generated = p
         generated.extraServerArgs = ""
-        // What `arguments` leaves out for the user's own flags stays out.
+        // What `arguments` leaves out for the user's own flags stays out;
+        // the head's weights still load only at a start: marked apart.
         var c = c
+        let head = c.mtpHead
         if extraArgsSet("--num-draft-tokens", p) || extraArgsSetDrafter(p) { c.mtpHead = false }
         return withoutSampling(arguments(generated, c)) + p.extraServerArgs.split(separator: " ").map(String.init)
+            + (head ? ["#mtp-head"] : [])
     }
 
     /// The sampling flags `arguments` sets; each takes one value.

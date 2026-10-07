@@ -1233,3 +1233,4 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) viene spostato nel Cestino, da dove puoi ancora ripristinarlo. Il suo alias e la scelta del profilo verranno dimenticati.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» e il suo indice sono stati eliminati dal progetto. Il file da cui lo hai aggiunto non viene modificato.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” non è stato rimosso: il server è occupato o lo sta usando. Riprova quando sarà inattivo.";
+"the head is for another model" = "la testa è di un altro modello";

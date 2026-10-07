@@ -1,5 +1,5 @@
 {
   "repo": "ipsupport-llc/mlx-lm",
-  "pinned_ref": "15a6892b925a7937d51769ec333cc96bb8e3b6c3",
+  "pinned_ref": "5938c720cd6127e06375905485608c417f3ee6f2",
   "_comment": "Pinned commit of our own mlx-lm fork's main branch -- installed via 'pip install git+https://github.com/ipsupport-llc/mlx-lm.git@<pinned_ref>'. This app no longer installs anything from PyPI: our fork's main carries real fixes/features PyPI's official mlx-lm doesn't have (NemotronH MTP self-speculative decode, RotatingKVCache quantization, native prism_hadamard_qwen35 support, --model-alias/--kv-bits/api-v0-models/disconnect-safety server flags, muse_glimmer model.-prefixed vision-tower filtering and raw-checkpoint quantization-key normalization, Qwen3.5 image inputs, --mmap-lookup-tables and --lazy-towers for small Macs, Qwen3.5-MoE image inputs, keepalive while a tool call is generated, Qwen3.5 MTP-head self-speculative decoding). Bump deliberately via LLMTray's Check for Updates action, not by hand -- see the doc comment on RuntimeManager.swift."
 }

@@ -1233,3 +1233,4 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@)가 휴지통으로 이동됩니다. 복원할 수 있습니다. 별칭과 프로필 선택은 삭제됩니다.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” 및 해당 인덱스가 프로젝트에서 삭제되었습니다. 해당 파일은 변경되지 않습니다.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@”을(를) 제거하지 못했습니다: 서버가 바쁘거나 사용 중입니다. 서버가 유휴 상태일 때 다시 시도하십시오.";
+"the head is for another model" = "헤드가 다른 모델용입니다";

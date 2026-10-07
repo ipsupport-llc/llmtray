@@ -553,7 +553,9 @@ final class ServerManager: ObservableObject {
                 guard FileManager.default.fileExists(atPath: modelPath + "/config.json"),
                       Self.wantsMTPHead(ProfileManager.shared.resolved(for: modelPath)) else { return }
                 if let error = MTPHeadDownload.install(staged, into: modelPath) {
-                    self.appendLog("--- MTP head for \(repo) didn't install (\(error)); trying again at a later start ---\n")
+                    self.appendLog("--- MTP head for \(repo) didn't install (\(error)) ---\n")
+                    // Not this model's head: not asked for again this run.
+                    self.reposWithoutHead.insert(repo)
                     return
                 }
                 self.appendLog("--- MTP head for \(repo) downloaded: restart the server to use it ---\n")

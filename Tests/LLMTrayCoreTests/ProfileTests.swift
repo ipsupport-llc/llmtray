@@ -228,6 +228,10 @@ final class ServerLaunchTests: XCTestCase {
         let ownFlag = resolved { $0.launch.extraServerArgs = "--num-draft-tokens 1" }
         XCTAssertFalse(ServerLaunch.needsRestart(from: ownFlag, to: resolved {
             $0.launch.extraServerArgs = "--num-draft-tokens 1"; $0.launch.mtpDrafter = false }, context: c))
+        // ...but a head that arrives still needs a restart to load.
+        var noHead = c
+        noHead.mtpHead = false
+        XCTAssertNotEqual(ServerLaunch.restartKey(ownFlag, noHead), ServerLaunch.restartKey(ownFlag, c))
         // A drafter model is drafted with instead.
         var both = c
         both.drafterRepo = "org/d"
