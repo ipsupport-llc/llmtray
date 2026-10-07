@@ -529,6 +529,8 @@ final class ServerManager: ObservableObject {
     /// Folders whose fetch failed (offline...): tried again at their next
     /// start, not at every settings change meanwhile.
     private var failedHeadFetches: Set<String> = []
+    /// Folders whose repo's head is for another architecture.
+    private var foldersWithOtherModel: Set<String> = []
 
     /// A Qwen 3.5 model whose config declares an MTP head but whose folder
     /// hasn't got it (installed before we published heads): the head is
@@ -539,7 +541,7 @@ final class ServerManager: ObservableObject {
     /// model is still there and still wants it.
     private func fetchMTPHeadIfMissing(modelPath: String, profile: ResolvedProfile, atStart: Bool = false) {
         if atStart { failedHeadFetches.remove(modelPath) }
-        guard Self.wantsMTPHead(profile), !failedHeadFetches.contains(modelPath),
+        guard Self.wantsMTPHead(profile), !failedHeadFetches.contains(modelPath), !foldersWithOtherModel.contains(modelPath),
               ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
               !ModelDiscovery.hasMTPHead(forModelPath: modelPath),
               MLXRuntimeInstaller.supportsMTPHead,
@@ -560,9 +562,10 @@ final class ServerManager: ObservableObject {
                 case .installed:
                     break
                 case .otherModel:
-                    // Not asked for again this run.
+                    // This folder holds another model: not asked for again
+                    // this run (another folder of the repo may still fit).
                     self.appendLog("--- MTP head for \(repo) not installed: its config describes another model ---\n")
-                    self.reposWithoutHead.insert(repo)
+                    self.foldersWithOtherModel.insert(modelPath)
                     return
                 case .failed(let error):
                     self.appendLog("--- MTP head for \(repo) didn't install (\(error)); trying again at a later start ---\n")
