@@ -186,11 +186,21 @@ PY
     "mlx-audio @ https://github.com/ipsupport-llc/mlx-audio/archive/$AUDIO_COMMIT.tar.gz" \
     "transformers==5.17.0" pyyaml huggingface_hub "sentencepiece>=0.2.0" "${MFLUX_DEPS[@]}"
   cp -R "$MFLUX_DIR"/mflux "$MFLUX_DIR"/mflux-*.dist-info "$PKG_DIR"/
+  # scipy (mlx-audio's) from its macOS 12 wheel, same version: the macOS 14
+  # wheels call Accelerate's legacy BLAS / LAPACK names (_sgemm, _lsame_ ...),
+  # which App Review refuses as deprecated API; this one carries its own
+  # OpenBLAS (scipy_-prefixed symbols, libgfortran: settled for the store).
+  SCIPY_VERSION="$(PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c 'import importlib.metadata as m; print(m.version("scipy"))' 2>/dev/null || true)"
+  if [[ -n "$SCIPY_VERSION" ]]; then
+    rm -rf "$PKG_DIR"/scipy "$PKG_DIR"/scipy-*.dist-info
+    "$BUILD_VENV/bin/python" -m pip install --quiet --disable-pip-version-check --no-compile --no-deps --target "$PKG_DIR" \
+      --only-binary=:all: --platform macosx_12_0_arm64 "scipy==$SCIPY_VERSION"
+  fi
   # pip's own console scripts (their shebangs name this machine's path).
   rm -rf "$PKG_DIR/bin"
   # Every runner exits with the app (the sandbox can't stop a leftover one).
   cp "$REPO_ROOT/runtime/appstore/sitecustomize.py" "$PKG_DIR/sitecustomize.py"
-  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, sys; print('packages ok', sys.version.split()[0])"
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, scipy.sparse.linalg, scipy.signal, sys; print('packages ok', sys.version.split()[0])"
   # The image models LLMTray runs load without the excluded packages.
   PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mflux.models.z_image.variants.z_image, mflux.models.flux2.variants.txt2img.flux2_klein, mflux.models.flux2.variants.edit.flux2_klein_edit; print('mflux ok')"
   # Nothing excluded came back through another package -- by content, not
@@ -263,7 +273,19 @@ if [[ "$RUNTIME_LAYOUT" == packages ]]; then
   LEFT="$(find "$APP" \( -name "*.o" -o -name "*.a" -o -name "*Config.sh" \) -print -quit)"
   [[ -z "$LEFT" ]] || { echo "error: a build-time file is still in the App Store bundle: $LEFT" >&2; exit 1; }
   # What ships still imports (the checks above ran before the strip).
-  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy; print('stripped packages ok')"
+  PYTHONPATH="$PKG_DIR" "$FRAMEWORK_PYTHON" -c "import mlx_lm, mlx_audio, mflux, numpy, scipy.sparse.linalg; print('stripped packages ok')"
+  # No binary calls what App Review lists as deprecated Accelerate API (its
+  # 2026-10-07 rejection of 0.8.8: scipy's _superlu, cython_blas / _lapack).
+  DEPRECATED="$SCRIPT_DIR/appstore/deprecated_accelerate_symbols.txt"
+  while IFS= read -r -d '' f; do
+    case "$(file -b "$f")" in *Mach-O*) ;; *) continue ;; esac
+    imports="$(nm -u "$f" 2>/dev/null | awk '{print $NF}' || true)"
+    if [[ -n "$imports" ]] && grep -qxFf "$DEPRECATED" <<< "$imports"; then
+      echo "error: $f calls deprecated Accelerate API (App Review refuses it): $(grep -xFf "$DEPRECATED" <<< "$imports" | head -3 | tr '\n' ' ')" >&2
+      exit 1
+    fi
+  done < <(find "$APP" -type f \( -name "*.so" -o -name "*.dylib" -o -perm -u+x \) -print0)
+  echo "no deprecated Accelerate calls"
 fi
 
 DOC_LICENSE="$WORK_DIR/expanded/Python_Documentation.pkg/Payload/license.html"
