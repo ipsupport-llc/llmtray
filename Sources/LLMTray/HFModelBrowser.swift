@@ -361,9 +361,20 @@ final class HFModelBrowser: NSObject, ObservableObject, URLSessionDownloadDelega
                 downloadFailed = false
                 totalBytesExpected = entries.reduce(0) { $0 + Int64($1.size ?? 0) }
                 rate.reset()
-                downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
+                // Paused while the list came: it still says so.
+                if !isPaused {
+                    downloadStatusText = String(format: NSLocalizedString("Downloading %lld files…", comment: ""), entries.count)
+                }
 
-                let bigFiles = entries.filter { DownloadParts.ranges(size: Int64($0.size ?? 0)) != nil }.count
+                // Big files still to fetch share the connections (one
+                // already on disk from an interrupted attempt doesn't).
+                let bigFiles = entries.filter { entry in
+                    let size = Int64(entry.size ?? 0)
+                    let onDisk = (try? FileManager.default.attributesOfItem(
+                        atPath: destRoot.appendingPathComponent(entry.path).path)[.size] as? NSNumber)?.int64Value
+                    let done = size > 0 && onDisk == size && entry.revision != nil && manifest[entry.path] == entry.revision
+                    return !done && DownloadParts.ranges(size: size) != nil
+                }.count
                 let connections = DownloadParts.connections(bigFiles: bigFiles)
                 maxActiveFetchers = max(1, 16 / connections)
                 activeFetchers.removeAll()
