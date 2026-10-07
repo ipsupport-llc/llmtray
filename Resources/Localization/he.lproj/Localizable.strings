@@ -1233,4 +1233,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) מועבר/ת לפח, שם ניתן לשחזר אותו/אותה. הכינוי ובחירת הפרופיל נשכחים.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” לא הוסר: השרת עסוק או משתמש בו. נסה/י שוב כשיופסק העומס.";
-"the head is for another model" = "הראש שייך למודל אחר";

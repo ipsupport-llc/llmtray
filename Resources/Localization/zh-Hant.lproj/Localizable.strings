@@ -1233,4 +1233,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）將移到資源回收筒，您仍可從中還原。其別名與設定檔選擇將一併遺失。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」及其索引已從專案刪除。您用來加入該項目的原始檔不受影響。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」未被移除：伺服器正忙或正在使用。待伺服器閒置時再試。";
-"the head is for another model" = "該頭部屬於另一個模型";

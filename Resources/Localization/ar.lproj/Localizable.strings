@@ -1233,4 +1233,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) سيُنقل إلى سلة المحذوفات، حيث يمكن استعادته بعد. سيتم نسيان الاسم المستعار وخيار الملف الشخصي.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» وفهرسه حُذفا من المشروع. الملف الذي أضفته منه لم يتأثر.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» لم يُحذف: الخادم مشغول أو يستخدمه. حاول مجدداً عندما يصبح الخادم خالياً.";
-"the head is for another model" = "الرأس لنموذج آخر";

@@ -199,19 +199,24 @@ enum ModelDiscovery {
     static let mtpHeadPublishers: Set<String> = ["roman220220"]
 
     /// The text configs of two config.json files agree on the shape an MTP
-    /// head depends on.
+    /// head depends on: the sizes both must give, and every other one that
+    /// both give (a newer export may spell out one the older derived, such
+    /// as head_dim).
     static func sameArchitecture(_ a: String, _ b: String) -> Bool {
-        func shape(_ path: String) -> [String: String]? {
+        func text(_ path: String) -> [String: Any]? {
             guard let data = FileManager.default.contents(atPath: path),
                   let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
-            let text = (obj["text_config"] as? [String: Any]) ?? obj
-            let keys = ["model_type", "hidden_size", "num_hidden_layers", "vocab_size", "num_attention_heads",
-                        "num_key_value_heads", "head_dim", "intermediate_size", "num_experts",
-                        "moe_intermediate_size", "mtp_num_hidden_layers"]
-            return Dictionary(uniqueKeysWithValues: keys.map { ($0, text[$0].map { "\($0)" } ?? "") })
+            return (obj["text_config"] as? [String: Any]) ?? obj
         }
-        guard let x = shape(a), let y = shape(b) else { return false }
-        return x == y
+        guard let x = text(a), let y = text(b) else { return false }
+        let required = ["hidden_size", "num_hidden_layers", "vocab_size"]
+        let optional = ["model_type", "num_attention_heads", "num_key_value_heads", "head_dim", "intermediate_size",
+                        "num_experts", "moe_intermediate_size", "mtp_num_hidden_layers"]
+        for key in required where x[key] == nil || y[key] == nil { return false }
+        for key in required + optional {
+            if let u = x[key], let v = y[key], "\(u)" != "\(v)" { return false }
+        }
+        return true
     }
 
     /// The repo a model folder's MTP head would come from, or nil.

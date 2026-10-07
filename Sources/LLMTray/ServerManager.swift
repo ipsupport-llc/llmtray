@@ -526,6 +526,9 @@ final class ServerManager: ObservableObject {
     /// have none (asked once per run).
     private var headFetches: Set<String> = []
     private var reposWithoutHead: Set<String> = []
+    /// Folders whose fetch failed (offline...): tried again at their next
+    /// start, not at every settings change meanwhile.
+    private var failedHeadFetches: Set<String> = []
 
     /// A Qwen 3.5 model whose config declares an MTP head but whose folder
     /// hasn't got it (installed before we published heads): the head is
@@ -534,8 +537,9 @@ final class ServerManager: ObservableObject {
     /// (ModelDiscovery.mtpHeadRepo), only when the profile wants drafting
     /// and the runtime can use the head; it's put in place only if the
     /// model is still there and still wants it.
-    private func fetchMTPHeadIfMissing(modelPath: String, profile: ResolvedProfile) {
-        guard Self.wantsMTPHead(profile),
+    private func fetchMTPHeadIfMissing(modelPath: String, profile: ResolvedProfile, atStart: Bool = false) {
+        if atStart { failedHeadFetches.remove(modelPath) }
+        guard Self.wantsMTPHead(profile), !failedHeadFetches.contains(modelPath),
               ModelDiscovery.declaresMTPHead(forModelPath: modelPath),
               !ModelDiscovery.hasMTPHead(forModelPath: modelPath),
               MLXRuntimeInstaller.supportsMTPHead,
@@ -552,10 +556,17 @@ final class ServerManager: ObservableObject {
                 // Removed meanwhile, or the switch turned off: not put back.
                 guard FileManager.default.fileExists(atPath: modelPath + "/config.json"),
                       Self.wantsMTPHead(ProfileManager.shared.resolved(for: modelPath)) else { return }
-                if let error = MTPHeadDownload.install(staged, into: modelPath) {
-                    self.appendLog("--- MTP head for \(repo) didn't install (\(error)) ---\n")
-                    // Not this model's head: not asked for again this run.
+                switch MTPHeadDownload.install(staged, into: modelPath) {
+                case .installed:
+                    break
+                case .otherModel:
+                    // Not asked for again this run.
+                    self.appendLog("--- MTP head for \(repo) not installed: its config describes another model ---\n")
                     self.reposWithoutHead.insert(repo)
+                    return
+                case .failed(let error):
+                    self.appendLog("--- MTP head for \(repo) didn't install (\(error)); trying again at a later start ---\n")
+                    self.failedHeadFetches.insert(modelPath)
                     return
                 }
                 self.appendLog("--- MTP head for \(repo) downloaded: restart the server to use it ---\n")
@@ -564,6 +575,7 @@ final class ServerManager: ObservableObject {
                 self.reposWithoutHead.insert(repo)
             case .failed(let error):
                 self.appendLog("--- MTP head for \(repo) didn't download (\(error)); trying again at a later start ---\n")
+                self.failedHeadFetches.insert(modelPath)
             }
         }
     }
@@ -759,7 +771,7 @@ final class ServerManager: ObservableObject {
             drafterRepo: mtpDrafterArgument(forModelPath: modelPath, profile: profile),
             lowMemoryWeights: profile.lowMemoryWeights
         )
-        fetchMTPHeadIfMissing(modelPath: modelPath, profile: profile)
+        fetchMTPHeadIfMissing(modelPath: modelPath, profile: profile, atStart: true)
         let args = ServerLaunch.arguments(profile, context)
         if let cut = ServerLaunch.promptCacheCut(profile, context), let headroom = context.gpuHeadroomBytes {
             appendLog("--- prompt cache capped at \(Self.memory(cut.effective)) (of \(Self.memory(cut.profile)) in the profile): the model leaves \(Self.memory(max(0, headroom))) of GPU memory ---\n")

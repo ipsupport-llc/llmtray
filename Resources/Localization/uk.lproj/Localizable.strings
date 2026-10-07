@@ -1233,4 +1233,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "«%@» (%@) переміщено в Кошик — звідти її можна відновити. Її псевдонім та вибір профілю будуть забуті.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "«%@» та його індекс видалено з проєкту. Файл, з якого ви його додали, не змінюється.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "«%@» не було видалено: сервер зайнятий або використовує її. Спробуйте ще раз, коли він буде неактивний.";
-"the head is for another model" = "голова від іншої моделі";

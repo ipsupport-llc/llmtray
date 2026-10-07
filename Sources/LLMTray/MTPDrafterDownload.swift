@@ -108,22 +108,27 @@ enum MTPHeadDownload {
         return .downloaded(staging.appendingPathComponent(ModelDiscovery.mtpHeadFile))
     }
 
-    /// Moves a fetched head into the model folder; nil when it's there
-    /// (also when one arrived meanwhile), else why not. The repo's config
-    /// (fetched with it) must describe the same architecture as the
-    /// model's: the folder's name alone doesn't say which model it holds.
-    static func install(_ staged: URL, into folder: String) -> String? {
+    enum InstallResult: Equatable {
+        /// In place (also when one arrived meanwhile).
+        case installed
+        /// The repo's config (fetched with the head) describes another
+        /// architecture than the model's: the folder's name alone doesn't
+        /// say which model it holds.
+        case otherModel
+        case failed(String)
+    }
+
+    /// Moves a fetched head into the model folder.
+    static func install(_ staged: URL, into folder: String) -> InstallResult {
         let target = folder + "/" + ModelDiscovery.mtpHeadFile
         let repoConfig = staged.deletingLastPathComponent().appendingPathComponent("config.json").path
-        guard ModelDiscovery.sameArchitecture(repoConfig, folder + "/config.json") else {
-            return NSLocalizedString("the head is for another model", comment: "MTP head download: the repo's config differs from the model's")
-        }
+        guard ModelDiscovery.sameArchitecture(repoConfig, folder + "/config.json") else { return .otherModel }
         do {
             try FileManager.default.moveItem(atPath: staged.path, toPath: target)
         } catch {
-            if FileManager.default.fileExists(atPath: target) { return nil }
-            return error.localizedDescription
+            if FileManager.default.fileExists(atPath: target) { return .installed }
+            return .failed(error.localizedDescription)
         }
-        return nil
+        return .installed
     }
 }
