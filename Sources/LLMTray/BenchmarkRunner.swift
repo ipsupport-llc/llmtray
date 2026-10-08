@@ -398,14 +398,15 @@ final class BenchmarkRunner: ObservableObject {
         if !cancelRequested {
             statusText = "Restoring original settings…"
             _ = await restart()
-            pendingProposal = AutoTuneProposal(
+            // Cancelled while restoring: no proposal either.
+            if !cancelRequested { pendingProposal = AutoTuneProposal(
                 modelPath: modelPath,
                 profileID: profileID,
                 currentConcurrency: originalConcurrency,
                 proposedConcurrency: bestConcurrency,
                 currentPrefillStep: originalPrefillStep,
                 proposedPrefillStep: bestPrefillStep
-            )
+            ) }
         } else {
             statusText = "Cancelled -- restoring original settings…"
             _ = await restart()

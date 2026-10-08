@@ -1132,6 +1132,9 @@ final class ChatClient: ObservableObject {
         // this one waits for it -- said so, not just a spinner.
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
+            // A moment first: with decode concurrency above one the server
+            // takes a second request at once, and its headers come then.
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
             while let self, number == self.streamNumber, !self.answerStarted, self.isStreaming,
                   token == self.turnToken, epoch == self.conversationEpoch {
                 let behind: WaitingBehind? = server.activeRequestCount > 1
