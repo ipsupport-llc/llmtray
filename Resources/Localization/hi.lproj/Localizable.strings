@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "मॉडल ने उत्तर नहीं दिया — फिर से कोशिश करें।";
 "The model didn't start: %@" = "मॉडल शुरू नहीं हुआ: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "मॉडल डाउनलोड हो गया, पर उसकी फ़ोल्डर को पूर्ण के रूप में चिन्हित नहीं किया जा सका।";
+"The model is answering another chat: yours starts as soon as it's free." = "मॉडल किसी दूसरी चैट का जवाब दे रहा है: खाली होते ही आपका अनुरोध शुरू होगा।";
+"The model is busy with another request: yours starts as soon as it's free." = "मॉडल किसी दूसरे अनुरोध में व्यस्त है: खाली होते ही आपका अनुरोध शुरू होगा।";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "मॉडल उत्तर देने से पहले तर्क कर रहा है (Settings में वही तर्क दिखता है)";
 "The model isn't running. Send again to start it." = "मॉडल चल नहीं रहा है। शुरू करने के लिए फिर से भेजें।";
 "The model name API clients send." = "API क्लाइंट द्वारा भेजा जाने वाला मॉडल नाम।";

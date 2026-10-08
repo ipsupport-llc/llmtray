@@ -426,7 +426,11 @@ final class ModelProxyServer {
         if !body.isEmpty {
             request.httpBody = body
         }
-        request.timeoutInterval = 300
+        // The stall watchdog below ends a request (before its response too,
+        // StallRule.isStalledWaiting): a fixed idle timeout would also end
+        // one waiting behind another request that takes long, while the
+        // server is at work.
+        request.timeoutInterval = 24 * 3600
 
         // Balances route()'s beginRequest() -- called once, exactly when the
         // internal mlx_lm.server call fully finishes (success or failure)
@@ -479,10 +483,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     // once regardless of which path gets there first.
     private var finished = false
     private var lastActivityAt = Date()
+    /// When the request went to mlx_lm.server.
+    private let sentAt = Date()
     private var stallTimer: Timer?
 
-    // No headers and no data for this long = stuck, not slow; fires well
-    // inside the request's 300 s timeout (Settings; adr/0002).
+    // Once the response has started: no data for this long = stuck, not
+    // slow (Settings; adr/0002).
     private let stallThreshold: TimeInterval
 
     /// Counts toward idle (see ServerManager.beginRequest).
@@ -541,16 +547,25 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
 
     private func checkForStall() {
         MainActor.assumeIsolated {
-            // Only once the response has started: before its headers,
-            // silence is normal -- a non-streaming request sends nothing
-            // until it's done, and one queued behind another (always, with
-            // an MTP drafter) waits. That stretch is the request timeout's
-            // (didCompleteWithError).
+            guard !finished else { return }
+            guard headersSent else {
+                // Before its headers, silence is normal -- a non-streaming
+                // request sends nothing until it's done, and one queued
+                // behind another (always, with an MTP drafter) waits for it.
+                // Stalled only once the server shows no life at all for
+                // anyone (bytes to any request, prefill progress).
+                guard StallRule.isStalledWaiting(sentAt: sentAt, serverActivityAt: server?.lastServerActivityAt,
+                                                 now: Date()) else { return }
+                server?.appendLog(
+                    "--- proxy: no response and no activity from mlx_lm.server for \(Int(StallRule.waitTimeout))s -- treating as stalled and resetting ---\n"
+                )
+                _ = finish(stalled: true)
+                return
+            }
             // The server's prefill progress counts too (StallRule): a long
             // prompt on a busy Mac sends nothing for minutes while the log
             // shows it working.
-            guard !finished, headersSent,
-                  StallRule.isStalled(lastByteAt: lastActivityAt, serverProgressAt: server?.lastPrefillProgressAt,
+            guard StallRule.isStalled(lastByteAt: lastActivityAt, serverProgressAt: server?.lastPrefillProgressAt,
                                       now: Date(), threshold: stallThreshold) else { return }
             server?.appendLog(
                 "--- proxy: no response or prefill progress from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
@@ -602,7 +617,10 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         _ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse,
         completionHandler: @escaping (URLSession.ResponseDisposition) -> Void
     ) {
-        MainActor.assumeIsolated { lastActivityAt = Date() }
+        MainActor.assumeIsolated {
+            lastActivityAt = Date()
+            server?.noteResponseBytes()
+        }
         guard let http = response as? HTTPURLResponse else {
             completionHandler(.cancel)
             return
@@ -621,7 +639,10 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        MainActor.assumeIsolated { lastActivityAt = Date() }
+        MainActor.assumeIsolated {
+            lastActivityAt = Date()
+            server?.noteResponseBytes()
+        }
         guard !data.isEmpty else { return }
         var chunk = Data(String(format: "%x\r\n", data.count).utf8)
         chunk.append(data)

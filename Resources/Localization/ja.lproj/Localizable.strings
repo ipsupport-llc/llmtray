@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "モデルが応答しませんでした — 再試行してください。";
 "The model didn't start: %@" = "モデルが起動しませんでした: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "モデルはダウンロードされましたが、フォルダを完了としてマークできませんでした。";
+"The model is answering another chat: yours starts as soon as it's free." = "モデルは別のチャットに回答中です。空き次第、このチャットの回答を始めます。";
+"The model is busy with another request: yours starts as soon as it's free." = "モデルは別のリクエストを処理中です。空き次第、このリクエストを始めます。";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "モデルは回答の前に推論しています（設定で推論内容を表示します）";
 "The model isn't running. Send again to start it." = "モデルは実行されていません。再送信すると起動します。";
 "The model name API clients send." = "APIクライアントが送信するモデル名です。";

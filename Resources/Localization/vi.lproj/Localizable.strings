@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "Mô hình không trả lời — thử lại.";
 "The model didn't start: %@" = "Mô hình không khởi động: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "Mô hình đã tải xuống, nhưng không thể đánh dấu thư mục là hoàn tất.";
+"The model is answering another chat: yours starts as soon as it's free." = "Mô hình đang trả lời ở cuộc trò chuyện khác: yêu cầu của bạn sẽ bắt đầu ngay khi mô hình rảnh.";
+"The model is busy with another request: yours starts as soon as it's free." = "Mô hình đang bận với yêu cầu khác: yêu cầu của bạn sẽ bắt đầu ngay khi mô hình rảnh.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "Mô hình đang suy luận trước khi trả lời (Cài đặt hiển thị chính suy luận)";
 "The model isn't running. Send again to start it." = "Mô hình chưa chạy. Gửi lại để khởi động.";
 "The model name API clients send." = "Tên mô hình mà các máy khách API gửi.";

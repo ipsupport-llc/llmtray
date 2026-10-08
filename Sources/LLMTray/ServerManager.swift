@@ -55,7 +55,9 @@ final class ServerManager: ObservableObject {
         if case .running = state { return true }
         return isIdleUnloaded
     }
-    private var activeRequestCount = 0
+    /// Requests in flight through the proxy: more than one means some
+    /// wait for the model (a chat shows it).
+    @Published private(set) var activeRequestCount = 0
 
     /// The current model process. Callbacks of an older one (still on its
     /// way out) are recognized by identity and don't touch state.
@@ -112,6 +114,18 @@ final class ServerManager: ObservableObject {
     /// stall watchdog counts it as activity for its in-flight requests
     /// (StallRule), so a slow prefill that sends nothing isn't reset.
     private(set) var lastPrefillProgressAt: Date?
+
+    /// When the current process last sent response bytes to any request.
+    private(set) var lastResponseBytesAt: Date?
+
+    /// The last sign of the server at work for anyone: bytes to a request
+    /// or prefill progress. A request still waiting for its response
+    /// doesn't time out while there is some (StallRule.isStalledWaiting).
+    var lastServerActivityAt: Date? {
+        [lastPrefillProgressAt, lastResponseBytesAt].compactMap { $0 }.max()
+    }
+
+    func noteResponseBytes() { lastResponseBytesAt = Date() }
 
     /// Launch values auto-tune is trying (BenchmarkRunner): applied on top
     /// of the profile at launch, in memory only -- a quit or crash
@@ -792,6 +806,7 @@ final class ServerManager: ObservableObject {
                                           environment: ServerLaunch.extraArgsSetDrafter(profile) ? [:] : ServerLaunch.offlineEnvironment)
         logWatch = ServerLogWatch()
         lastPrefillProgressAt = nil
+        lastResponseBytesAt = nil
         readyLine = ""
         serverProcess.onOutput = { [weak self, weak serverProcess] text in
             guard let self else { return }

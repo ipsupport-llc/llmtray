@@ -413,6 +413,16 @@ struct ContentView: View {
                             catalog.model(id: selectedModelID)?.displayName ?? NSLocalizedString("the model", comment: "")))
                     .font(.callout).foregroundStyle(.secondary)
             }
+        } else if let behind = chat.waitingBehind {
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text(behind == .anotherChat
+                     ? NSLocalizedString("The model is answering another chat: yours starts as soon as it's free.",
+                                         comment: "chat: the request waits behind another chat's answer")
+                     : NSLocalizedString("The model is busy with another request: yours starts as soon as it's free.",
+                                         comment: "chat: the request waits behind another request (an app using the API, a chat title)"))
+                    .font(.callout).foregroundStyle(.secondary)
+            }
         }
         if let err = chat.errorText {
             Text(err)

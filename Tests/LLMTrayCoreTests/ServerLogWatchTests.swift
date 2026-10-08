@@ -78,6 +78,21 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t - 100, now: t + 61, threshold: 60))
     }
 
+    func testStallRuleWaiting() {
+        let t = Date(timeIntervalSince1970: 1000)
+        // Queued behind another chat's long answer: its bytes 5 s ago keep
+        // this one waiting, 20 minutes after it was sent.
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 1195, now: t + 1200, timeout: 300))
+        // Nothing from the server at all since it was sent: stalled.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: nil, now: t + 301, timeout: 300))
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: nil, now: t + 299, timeout: 300))
+        // Activity from before it was sent doesn't extend it.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t - 50, now: t + 301, timeout: 300))
+        // Activity that stopped: stalled once the timeout passes after it.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 600, now: t + 901, timeout: 300))
+        XCTAssertEqual(StallRule.waitTimeout, 300)
+    }
+
     func testUTF8SplitAcrossChunks() {
         let d = UTF8StreamDecoder()
         let bytes = Array("привет €𝄞".utf8)

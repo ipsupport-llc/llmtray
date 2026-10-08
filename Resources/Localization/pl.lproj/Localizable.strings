@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "Model nie odpowiedział — spróbuj ponownie.";
 "The model didn't start: %@" = "Model nie uruchomił się: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "Model został pobrany, ale nie można oznaczyć jego folderu jako ukończony.";
+"The model is answering another chat: yours starts as soon as it's free." = "Model odpowiada w innym czacie: Twoje zapytanie zacznie się, gdy tylko będzie wolny.";
+"The model is busy with another request: yours starts as soon as it's free." = "Model obsługuje inne zapytanie: Twoje zacznie się, gdy tylko będzie wolny.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "Model rozważa odpowiedź przed jej wygenerowaniem (W ustawieniach widać sam tok rozumowania)";
 "The model isn't running. Send again to start it." = "Model nie działa. Wyślij ponownie, aby go uruchomić.";
 "The model name API clients send." = "To nazwa modelu wysyłana przez klientów API.";

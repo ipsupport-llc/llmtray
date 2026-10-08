@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "המודל לא השיב — נסה שוב.";
 "The model didn't start: %@" = "המודל לא התחיל: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "המודל הועלה אך לא ניתן לסמן את התיקיה כהושלמה.";
+"The model is answering another chat: yours starts as soon as it's free." = "המודל עונה בצ'אט אחר: הבקשה שלך תתחיל ברגע שיתפנה.";
+"The model is busy with another request: yours starts as soon as it's free." = "המודל עסוק בבקשה אחרת: הבקשה שלך תתחיל ברגע שיתפנה.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "המודל חושב לפני שהוא עונה (הגדרות מציגות את תהליך ההסקה עצמו)";
 "The model isn't running. Send again to start it." = "המודל לא פועל. שלח שוב כדי להפעיל אותו.";
 "The model name API clients send." = "זה שם המודל שלקוחות API שולחים.";

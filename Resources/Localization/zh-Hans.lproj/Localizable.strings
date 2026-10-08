@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "模型未回答——请重试。";
 "The model didn't start: %@" = "模型未能启动：%@";
 "The model downloaded, but its folder couldn't be marked complete." = "模型已下载，但无法将其文件夹标记为完成。";
+"The model is answering another chat: yours starts as soon as it's free." = "模型正在回答另一个聊天：空闲后立即开始处理你的请求。";
+"The model is busy with another request: yours starts as soon as it's free." = "模型正在处理另一个请求：空闲后立即开始处理你的请求。";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "模型在回答前进行推理（“设置”会显示推理内容）";
 "The model isn't running. Send again to start it." = "模型未在运行。再次发送将启动模型。";
 "The model name API clients send." = "这是 API 客户端发送的模型名称。";

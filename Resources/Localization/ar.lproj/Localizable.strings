@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "النموذج لم يجب — حاول مرة أخرى.";
 "The model didn't start: %@" = "لم يبدأ النموذج: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "تم تنزيل النموذج، لكن لم يُعرَّف مجلده كمكتمل.";
+"The model is answering another chat: yours starts as soon as it's free." = "النموذج يجيب في محادثة أخرى: سيبدأ طلبك فور أن يصبح متاحًا.";
+"The model is busy with another request: yours starts as soon as it's free." = "النموذج مشغول بطلب آخر: سيبدأ طلبك فور أن يصبح متاحًا.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "النموذج يستنتج قبل أن يجيب (الإعدادات تعرض الاستنتاج نفسه)";
 "The model isn't running. Send again to start it." = "النموذج غير قيد التشغيل. أعد الإرسال لبدء تشغيله.";
 "The model name API clients send." = "اسم النموذج الذي يرسله عملاء API.";

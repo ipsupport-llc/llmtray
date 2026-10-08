@@ -93,6 +93,22 @@ public enum StallRule {
         let last = max(lastByteAt, serverProgressAt ?? lastByteAt)
         return now.timeIntervalSince(last) > threshold
     }
+
+    /// How long a request with no response yet may go without the server
+    /// showing any life.
+    public static let waitTimeout: TimeInterval = 300
+
+    /// A request with no response yet (queued behind another, or a
+    /// non-streaming one at work): stalled only when the server showed no
+    /// life -- no bytes to any request, no prefill progress
+    /// (`serverActivityAt`) -- for `timeout` since it was sent or since
+    /// that activity. A request waiting behind a long one waits as long as
+    /// that one is being answered.
+    public static func isStalledWaiting(sentAt: Date, serverActivityAt: Date?, now: Date,
+                                        timeout: TimeInterval = waitTimeout) -> Bool {
+        let last = max(sentAt, serverActivityAt ?? sentAt)
+        return now.timeIntervalSince(last) > timeout
+    }
 }
 
 /// At most `limit` automatic restarts within `window` seconds: a model that
