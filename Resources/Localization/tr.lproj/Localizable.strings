@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Görüntü oluşturma başarısız: %@";
 "Image generation finished but produced no output file." = "Görüntü oluşturma tamamlandı ancak çıktı dosyası oluşturulmadı.";
 "Image generation isn't set up -- enable it again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image generation off" = "Görüntü oluşturma kapalı";
 "Image model" = "Görüntü modeli";
 "Image, music and voice models" = "Görüntü, müzik ve ses modelleri";

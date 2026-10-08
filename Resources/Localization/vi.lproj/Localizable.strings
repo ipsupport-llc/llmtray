@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Tạo ảnh thất bại: %@";
 "Image generation finished but produced no output file." = "Tạo ảnh hoàn tất nhưng không sinh tệp đầu ra.";
 "Image generation isn't set up -- enable it again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image generation off" = "Tạo ảnh tắt";
 "Image model" = "Mô hình hình ảnh";
 "Image, music and voice models" = "Mô hình ảnh, nhạc và giọng nói";

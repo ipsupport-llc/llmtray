@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "画像生成に失敗しました: %@";
 "Image generation finished but produced no output file." = "画像生成は完了しましたが、出力ファイルが作成されませんでした。";
 "Image generation isn't set up -- enable it again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
-"Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
+"Image generation needs an update -- disable it and enable it again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image generation off" = "画像生成：オフ";
 "Image model" = "画像モデル";
 "Image, music and voice models" = "画像・音楽・音声用モデル";

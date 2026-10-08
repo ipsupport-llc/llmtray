@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "影像生成失敗：%@";
 "Image generation finished but produced no output file." = "影像生成完成但未產生輸出檔案。";
 "Image generation isn't set up -- enable it again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
-"Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
+"Image generation needs an update -- disable it and enable it again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image generation off" = "影像生成：關";
 "Image model" = "影像模型";
 "Image, music and voice models" = "影像、音樂與語音 模型";

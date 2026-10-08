@@ -441,7 +441,7 @@
 "Image generation failed: %@" = "Image generation failed: %@";
 "Image generation finished but produced no output file." = "Image generation finished but produced no output file.";
 "Image generation isn't set up -- enable it again in Settings." = "Image generation isn't set up -- enable it again in Settings.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Image generation needs an update -- disable it and enable it again in Settings.";
 "Image generation off" = "Image generation off";
 "Image model" = "Image model";
 "Image, music and voice models" = "Image, music and voice models";

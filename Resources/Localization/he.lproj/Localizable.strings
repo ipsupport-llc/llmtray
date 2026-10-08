@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "יצירת התמונה נכשלה: %@";
 "Image generation finished but produced no output file." = "יצירת התמונה הסתיימה אך לא נוצר קובץ פלט.";
 "Image generation isn't set up -- enable it again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
-"Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image generation off" = "יצירת תמונה כבויה";
 "Image model" = "מודל תמונה";
 "Image, music and voice models" = "דגמי תמונה, מוזיקה וקול";

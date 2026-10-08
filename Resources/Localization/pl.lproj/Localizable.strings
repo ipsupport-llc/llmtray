@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Generowanie obrazu nie powiodło się: %@";
 "Image generation finished but produced no output file." = "Generowanie obrazu zakończone, ale nie utworzono pliku wyjściowego.";
 "Image generation isn't set up -- enable it again in Settings." = "Generowanie obrazów nie jest skonfigurowane — włącz je ponownie w Ustawieniach.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Generowanie obrazów wymaga aktualizacji — wyłącz i włącz ponownie w Ustawieniach.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Generowanie obrazów wymaga aktualizacji — wyłącz i włącz ponownie w Ustawieniach.";
 "Image generation off" = "Generowanie obrazów wyłączone";
 "Image model" = "Model obrazów";
 "Image, music and voice models" = "Modele do obrazów, muzyki i głosu";

@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Image generation विफल: %@";
 "Image generation finished but produced no output file." = "Image generation समाप्त हुआ पर कोई आउटपुट फ़ाइल नहीं बनी।";
 "Image generation isn't set up -- enable it again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
-"Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image generation off" = "इमेज जनरेशन बंद";
 "Image model" = "इमेज मॉडल";
 "Image, music and voice models" = "चित्र, संगीत और वॉइस मॉडल";
@@ -1044,8 +1044,8 @@
 "Total time" = "कुल समय";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "चल रहे मॉडल पर decode-concurrency (1/2/4/8) और prefill-step-size (64/128/256/512) आज़माता है, हर बार सर्वर रीस्टार्ट करता है, और जो सबसे तेज़ मापा गया उसे रखता है।";
 "Try Again" = "पुन: प्रयास करें";
-"Enable Project Files…" = "Turn On Project Files…";
-"Enable…" = "Turn On…";
+"Enable Project Files…" = "Project files चालू करें…";
+"Enable…" = "चालू करें…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "परियोजना में फ़ाइलें जोड़ने और उसकी चैट्स को इन्हें खोजने देने के लिए सेटिंग्स में Project files चालू करें।";
 "Enable Project files to add files" = "फाइलें जोड़ने के लिए Project files चालू करें";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";

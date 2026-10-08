@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Pembuatan gambar gagal: %@";
 "Image generation finished but produced no output file." = "Pembuatan gambar selesai tetapi tidak menghasilkan berkas keluaran.";
 "Image generation isn't set up -- enable it again in Settings." = "Pembuatan gambar belum disiapkan — aktifkan lagi di Pengaturan.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Pembuatan gambar perlu pembaruan — matikan lalu hidupkan kembali di Pengaturan.";
 "Image generation off" = "Pembuatan gambar mati";
 "Image model" = "Model gambar";
 "Image, music and voice models" = "Model gambar, musik, dan suara";

@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "이미지 생성 실패: %@";
 "Image generation finished but produced no output file." = "이미지 생성이 완료되었지만 출력 파일이 생성되지 않았습니다.";
 "Image generation isn't set up -- enable it again in Settings." = "이미지 생성이 설정되어 있지 않습니다 — 설정에서 다시 켜세요.";
-"Image generation needs an update -- turn it off and on again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "이미지 생성에 업데이트가 필요합니다 — 설정에서 껐다가 다시 켜세요.";
 "Image generation off" = "이미지 생성 끔";
 "Image model" = "이미지 모델";
 "Image, music and voice models" = "이미지·음악·음성 모델";

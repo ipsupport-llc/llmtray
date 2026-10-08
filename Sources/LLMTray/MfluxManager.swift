@@ -288,7 +288,7 @@ final class MfluxManager: ObservableObject {
         // Installed before the pin, or by an older app: its internals may
         // not match the runner's.
         guard installedMfluxVersion() == Self.mfluxVersion else {
-            throw MfluxError.processFailed(NSLocalizedString("Image generation needs an update -- turn it off and on again in Settings.", comment: ""))
+            throw MfluxError.processFailed(NSLocalizedString("Image generation needs an update -- disable it and enable it again in Settings.", comment: ""))
         }
 
         let savedDir = savedModelDir(for: model)

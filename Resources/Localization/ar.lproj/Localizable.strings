@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "فشل توليد الصورة: %@";
 "Image generation finished but produced no output file." = "انتهى توليد الصورة لكنه لم ينتج ملفًا.";
 "Image generation isn't set up -- enable it again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
-"Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image generation off" = "توليد الصور متوقف";
 "Image model" = "نموذج الصور";
 "Image, music and voice models" = "نماذج الصور والموسيقى والصوت";

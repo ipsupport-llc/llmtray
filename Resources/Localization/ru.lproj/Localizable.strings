@@ -422,7 +422,7 @@
 "Image generation failed: %@" = "Не удалось сгенерировать изображение: %@";
 "Image generation finished but produced no output file." = "Генерация изображения завершилась, но файл не создан.";
 "Image generation isn't set up -- enable it again in Settings." = "Генерация изображений не настроена — включите её снова в Настройках.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
 "Image generation off" = "Генерация изображений отключена";
 "Image model" = "Модель картинок";
 "Image, music and voice models" = "Модели для изображений, музыки и голоса";
