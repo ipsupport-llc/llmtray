@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "अधिक भरा‑पूरा, अधिक तैयार सुनाई देने वाला मिक्स; गीत की पंक्तियाँ कम स्पष्ट होंगी। 30 s संगीत के लिए लगभग 20 s।";
 "A package: moved as one item." = "एक पैकेज: एक आइटम के रूप में स्थानांतरित।";
 "A quiet check at every launch. Only shows anything if an update exists." = "हर लॉन्च पर चुपचाप जाँच। कुछ तभी दिखाता है जब कोई अपडेट उपलब्ध हो।";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "इस Mac पर बनाया गया यादृच्छिक ID, हर बार चालू करने पर नया बनता है। यह आप या Mac से जुड़ा नहीं है।";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "इस Mac पर बनाया गया यादृच्छिक ID, हर बार चालू करने पर नया बनता है। यह आप या Mac से जुड़ा नहीं है।";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "एक रेटिंग और कुछ शब्द ipsupport.us पर भेजे जाते हैं: कोई खाता या डिवाइस आइडेंटिफ़ायर नहीं। समीक्षाएँ moderation के बाद LLMTray वेबसाइट पर प्रकाशित होती हैं।";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "जो अनुरोध इतने समय तक कुछ नहीं देता, उसे रुका हुआ माना जाता है। ऐसा तब होता है जब प्रोसेस चालू रहता है लेकिन सर्वर वर्कर बंद हो जाता है, जैसे GPU मेमोरी खत्म होने पर।";
 "A song from a description" = "वर्णन से एक गीत";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "नई चैट के पहले उत्तर के बाद, मॉडल चैट सूची के लिए एक छोटा शीर्षक देता है (एक छोटा अतिरिक्त अनुरोध)। बंद: पहले संदेश की शुरुआत। चैट का नाम बदलना हमेशा काम करता है।";
 "Air quality" = "वायु गुणवत्ता";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "उपनाम: इस मॉडल को पाने के लिए दूसरे टूल LLMTray के API को भेजा जाने वाला “model” नाम। प्रोफ़ाइल: यह मॉडल कौन-सी सेटिंग्स प्रोफ़ाइल इस्तेमाल करता है।";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "जब तक आप चालू न करें, सब बंद हैं। मॉडल Finish के बाद एक‑एक करके डाउनलोड होंगे।";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "जब तक आप चालू न करें, सब बंद हैं। मॉडल Finish के बाद एक‑एक करके डाउनलोड होंगे।";
 "Allow" = "अनुमत करें";
 "Allow Folder to Change…" = "फ़ोल्डर को बदलने की अनुमति दें…";
 "Allow Folder to Look In…" = "फ़ोल्डर को देखने की अनुमति दें…";
@@ -421,7 +421,7 @@
 "Image generation" = "इमेज जनरेशन";
 "Image generation failed: %@" = "Image generation विफल: %@";
 "Image generation finished but produced no output file." = "Image generation समाप्त हुआ पर कोई आउटपुट फ़ाइल नहीं बनी।";
-"Image generation isn't set up -- turn it on again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
+"Image generation isn't set up -- enable it again in Settings." = "Image generation सेटअप नहीं है — Settings में जाकर इसे फिर से चालू करें।";
 "Image generation needs an update -- turn it off and on again in Settings." = "Image generation को अपडेट की ज़रूरत है — Settings में बंद करके फिर चालू करें।";
 "Image generation off" = "इमेज जनरेशन बंद";
 "Image model" = "इमेज मॉडल";
@@ -535,7 +535,7 @@
 "Models folder" = "मॉडल फ़ोल्डर";
 "Models folder: %@" = "Models फ़ोल्डर: %@";
 "Models found: %lld" = "मॉडल मिले: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "मॉडल इस Mac पर चलते हैं। आपकी चैट्स यहां से बाहर नहीं जातीं; केवल वेब टूल्स, अगर आप उन्हें चालू करें, इंटरनेट तक पहुँचते हैं।";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "मॉडल इस Mac पर चलते हैं। आपकी चैट्स यहां से बाहर नहीं जातीं; केवल वेब टूल्स, अगर आप उन्हें चालू करें, इंटरनेट तक पहुँचते हैं।";
 "Models: %@ · free: %@" = "मॉडल: %@ · खाली: %@";
 "Move %1$@ to %2$@" = "%1$@ को %2$@ में स्थानांतरित करें";
 "Move %@ to the Trash" = "%@ को Trash में भेजें";
@@ -547,7 +547,7 @@
 "Music generation" = "संगीत जनरेशन";
 "Music generation failed: %@" = "संगीत जनरेशन विफल रहा: %@";
 "Music generation finished but produced no audio." = "संगीत जनरेशन पूरा हुआ पर कोई ऑडियो नहीं मिला।";
-"Music generation isn't set up -- turn it on again in Settings." = "संगीत जनरेशन सेटअप नहीं है — सेटिंग्स में इसे दोबारा चालू करें।";
+"Music generation isn't set up -- enable it again in Settings." = "संगीत जनरेशन सेटअप नहीं है — सेटिंग्स में इसे दोबारा चालू करें।";
 "Music model" = "Music model";
 "Music off" = "संगीत बंद";
 "Name" = "नाम";
@@ -618,7 +618,7 @@
 "OK" = "ठीक है";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "मॉडल के संदर्भ और उसके वेट्स द्वारा संदर्भ के लिए छोड़ी गई मेमोरी में, किसी प्रोजेक्ट की पिन की हुई फाइलें मिलकर कितना स्थान ले सकती हैं। उत्तर के अधिकतम टोकन यहाँ जितना भी सेट हों, वे अलग रहते हैं। अधिक स्थान लेने से बातचीत के लिए कम जगह बचती है, और फाइलें पढ़ते समय पहला उत्तर लंबा हो सकता है।";
 "Off" = "बंद";
-"Off · turn on in Settings" = "बंद · सेटिंग्स में चालू करें";
+"Off · enable in Settings" = "बंद · सेटिंग्स में चालू करें";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "बंद होने पर, केवल यह Mac सर्वर तक पहुँच सकता है। चालू होने पर, आपके नेटवर्क पर मौजूद अन्य डिवाइस भी पहुँच सकते हैं — नेटवर्क पर कोई भी; इसलिए केवल भरोसेमंद नेटवर्क पर ही चालू करें।";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "बंद: केवल यही Mac। चालू: आपके नेटवर्क का कोई भी, इसलिए केवल उन नेटवर्क्स पर चालू करें जिन पर आप भरोसा करते हैं।";
 "Older" = "पुराना";
@@ -656,7 +656,7 @@
 "Performance" = "प्रदर्शन";
 "Pick a rating from 1 to 5 stars." = "1 से 5 सितारों में रेटिंग चुनें।";
 "Pick one to chat with. A download starts right away and goes on in the background." = "चैट करने के लिए किसी एक को चुनें। डाउनलोड तुरंत शुरू होगा और बैकग्राउंड में चलता रहेगा।";
-"Picks a model that fits your Mac and turns on only what you choose." = "आपके Mac के अनुकूल मॉडल चुनता है और केवल वही सुविधाएँ सक्रिय करता है जिन्हें आप चुनते हैं।";
+"Picks a model that fits your Mac and enables only what you choose." = "आपके Mac के अनुकूल मॉडल चुनता है और केवल वही सुविधाएँ सक्रिय करता है जिन्हें आप चुनते हैं।";
 "Pin" = "पिन करें";
 "Pin %@" = "पिन करें %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "पिन करें: प्रोजेक्ट की हर चैट को पूरी फ़ाइल मिल जाएगी (≈%@ टोकन)। फ़ाइल पिन होने के दौरान उन चैट्स में वेब शोध और छवि या संगीत जनरेशन बंद रहेगा।";
@@ -736,7 +736,7 @@
 "Remove from Project" = "प्रोजेक्ट से हटाएँ";
 "Remove from the project" = "प्रोजेक्ट से हटाएँ";
 "Remove this file from the project?" = "क्या इस फाइल को प्रोजेक्ट से हटाया जाए?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम और इमेज जनरेशन (इसका रनटाइम और इमेज मॉडल) %@ से हटाता है। अगली बार सर्वर शुरू होने पर या जब इमेज जनरेशन चालू किया जाएगा, तब इन्हें पुनः सेट किया जाएगा। सेव किए गए चैट और प्रोफ़ाइल बरकरार रखे जाएंगे।";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "डाउनलोड किया गया mlx-lm रनटाइम और इमेज जनरेशन (इसका रनटाइम और इमेज मॉडल) %@ से हटाता है। अगली बार सर्वर शुरू होने पर या जब इमेज जनरेशन चालू किया जाएगा, तब इन्हें पुनः सेट किया जाएगा। सेव किए गए चैट और प्रोफ़ाइल बरकरार रखे जाएंगे।";
 "Rename" = "नाम बदलें";
 "Rename %1$@ to %2$@" = "%1$@ का नाम बदलकर %2$@ करें";
 "Rename Profile" = "प्रोफ़ाइल का नाम बदलें";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "वहाँ नाम पहले से मौजूद है: यह परिवर्तन ओवरराइट करने के बजाय विफल होगा।";
 "The name must be on one line." = "नाम एक ही पंक्ति में होना चाहिए।";
 "The name wasn't accepted: up to 64 characters, on one line." = "नाम स्वीकार नहीं किया गया: अधिकतम 64 अक्षर, एक ही पंक्ति में।";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "अगले चरण एक मॉडल और वह फीचर्स सेट करते हैं जो आप चाहते हैं। प्रत्येक को छोड़ सकते हैं; जब तक आप चुने नहीं करते, कुछ भी डाउनलोड या चालू नहीं होगा।";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "अगले चरण एक मॉडल और वह फीचर्स सेट करते हैं जो आप चाहते हैं। प्रत्येक को छोड़ सकते हैं; जब तक आप चुने नहीं करते, कुछ भी डाउनलोड या चालू नहीं होगा।";
 "The plan changed since you looked at it: review it again." = "जब से आपने योजना देखी है यह बदल गई है: इसे फिर से देखें।";
 "The port and network access can change only while the server is stopped." = "पोर्ट और नेटवर्क एक्सेस केवल सर्वर बंद होने पर ही बदल सकते हैं।";
 "The reply was cut at its length limit." = "उत्तर उसकी लंबाई सीमा पर काट दिया गया था।";
@@ -1044,12 +1044,12 @@
 "Total time" = "कुल समय";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "चल रहे मॉडल पर decode-concurrency (1/2/4/8) और prefill-step-size (64/128/256/512) आज़माता है, हर बार सर्वर रीस्टार्ट करता है, और जो सबसे तेज़ मापा गया उसे रखता है।";
 "Try Again" = "पुन: प्रयास करें";
-"Turn On Project Files…" = "Turn On Project Files…";
-"Turn On…" = "Turn On…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "परियोजना में फ़ाइलें जोड़ने और उसकी चैट्स को इन्हें खोजने देने के लिए सेटिंग्स में Project files चालू करें।";
-"Turn on Project files to add files" = "फाइलें जोड़ने के लिए Project files चालू करें";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
-"Turn on project files?" = "प्रोजेक्ट फ़ाइलें चालू करें?";
+"Enable Project Files…" = "Turn On Project Files…";
+"Enable…" = "Turn On…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "परियोजना में फ़ाइलें जोड़ने और उसकी चैट्स को इन्हें खोजने देने के लिए सेटिंग्स में Project files चालू करें।";
+"Enable Project files to add files" = "फाइलें जोड़ने के लिए Project files चालू करें";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
+"Enable project files?" = "प्रोजेक्ट फ़ाइलें चालू करें?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
 "Unavailable" = "उपलब्ध नहीं";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "अपडेट असफल: %@";
 "Updates" = "अपडेट";
 "Usage statistics" = "उपयोग सांख्यिकियाँ";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "उपयोग सांख्यिकी बंद हैं: कुछ भी भेजा नहीं जाता। यह रिपोर्ट ऐसी दिखेगी यदि आप उन्हें चालू करते हैं (तब ID बनाया जाता है)।";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "उपयोग सांख्यिकी बंद हैं: कुछ भी भेजा नहीं जाता। यह रिपोर्ट ऐसी दिखेगी यदि आप उन्हें चालू करते हैं (तब ID बनाया जाता है)।";
 "Usage statistics: the reports" = "उपयोग सांख्यिकी: रिपोर्टें";
 "Use" = "उपयोग करें";
 "Use %lld" = "%lld का उपयोग करें";
@@ -1100,7 +1100,7 @@
 "View model card" = "मॉडल कार्ड देखें।";
 "Voice" = "वॉइस";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab बंद है — Settings > Voice में इसे चालू करें।";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab बंद है — Settings > Voice में इसे चालू करें।";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab लगभग %1$@ GB लेता है उस %2$@ GB में जो GPU उपयोग कर सकता है — चैट मॉडल के %3$@ GB के साथ एक साथ नहीं, इसलिए चलने पर चैट मॉडल अनलोड हो जाता है।";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab लगभग %1$@ GB लेता है उस %2$@ GB में जो GPU उपयोग कर सकता है।";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab लगभग %1$@ GB लेता है, जो इस Mac पर GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB से अधिक है: मेमोरी समाप्त हो जाएगी।";

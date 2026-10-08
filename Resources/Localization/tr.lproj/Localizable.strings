@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
 "A package: moved as one item." = "Bir paket: tek öge olarak taşındı.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Her başlatmada sessizce denetler. Yalnızca güncelleme varsa bir şey gösterir.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "Bu Mac'te oluşturulan rastgele bir kimlik; her açılışta yenilenir. Sizinle veya Mac ile ilişkilendirilmez.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Bu Mac'te oluşturulan rastgele bir kimlik; her açılışta yenilenir. Sizinle veya Mac ile ilişkilendirilmez.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Bir puan ve birkaç kelime ipsupport.us adresine gönderilir: hesap veya cihaz tanımlayıcıları yok. Değerlendirmeler, LLMTray web sitesinde denetlemeden sonra yayınlanır.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Bu süre boyunca hiçbir şey üretmeyen istek takılmış sayılır. Bu, işlem çalışmaya devam ederken bir sunucu çalışanı öldüğünde (örn. GPU belleği bittiğinde) olur.";
 "A song from a description" = "Açıklamaya göre şarkı";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Yeni sohbetin ilk yanıtından sonra model, sohbetler listesi için kısa bir başlık belirler (kısa ek bir istek). Kapalı: ilk mesajın başı kullanılır. Sohbetin adını yeniden verme her zaman çalışır.";
 "Air quality" = "Hava kalitesi";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Takma ad: Diğer araçların bu modeli almak için LLMTray API’sine gönderdiği “model” adı. Profil: Bu modelin kullandığı ayarlar profili.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "Açmadığınız sürece hepsi kapalıdır. Modeller Finish sonrası, teker teker indirilir.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "Açmadığınız sürece hepsi kapalıdır. Modeller Finish sonrası, teker teker indirilir.";
 "Allow" = "İzin ver";
 "Allow Folder to Change…" = "Klasörün değişiklik yapmasına izin ver…";
 "Allow Folder to Look In…" = "Klasörün içinde bakmasına izin ver…";
@@ -421,7 +421,7 @@
 "Image generation" = "Görüntü oluşturma";
 "Image generation failed: %@" = "Görüntü oluşturma başarısız: %@";
 "Image generation finished but produced no output file." = "Görüntü oluşturma tamamlandı ancak çıktı dosyası oluşturulmadı.";
-"Image generation isn't set up -- turn it on again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
+"Image generation isn't set up -- enable it again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image generation off" = "Görüntü oluşturma kapalı";
 "Image model" = "Görüntü modeli";
@@ -535,7 +535,7 @@
 "Models folder" = "Modeller klasörü";
 "Models folder: %@" = "Models klasörü: %@";
 "Models found: %lld" = "Bulunan modeller: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "Modeller bu Mac'te çalışır. Sohbetleriniz buradan çıkmaz; yalnızca web araçları açıksa internete erişir.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Modeller bu Mac'te çalışır. Sohbetleriniz buradan çıkmaz; yalnızca web araçları açıksa internete erişir.";
 "Models: %@ · free: %@" = "Modeller: %@ · boş: %@";
 "Move %1$@ to %2$@" = "%1$@ öğesini %2$@ konumuna taşı";
 "Move %@ to the Trash" = "%@ öğesini Çöp'e taşı";
@@ -547,7 +547,7 @@
 "Music generation" = "Müzik üretimi";
 "Music generation failed: %@" = "Müzik üretimi başarısız oldu: %@";
 "Music generation finished but produced no audio." = "Müzik üretimi tamamlandı ancak ses üretilmedi.";
-"Music generation isn't set up -- turn it on again in Settings." = "Müzik üretimi ayarlı değil — Açmak için Ayarlar'a gidin.";
+"Music generation isn't set up -- enable it again in Settings." = "Müzik üretimi ayarlı değil — Açmak için Ayarlar'a gidin.";
 "Music model" = "Müzik modeli";
 "Music off" = "Müzik kapalı";
 "Name" = "Ad";
@@ -618,7 +618,7 @@
 "OK" = "Tamam";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Modelin bağlamından ve ağırlıklarının bağlam için ayırdığı bellekten, bir projenin sabitlenmiş dosyalarının birlikte kaplayabileceği alan. Cevabın maksimum token sayısı burada ne yazarsa yazsın korunur. Daha fazla dosya, sohbet için daha az alan bırakır ve dosyalar okunurken ilk yanıt uzun olabilir.";
 "Off" = "Kapalı";
-"Off · turn on in Settings" = "Kapalı · Açmak için Ayarlar’a gidin";
+"Off · enable in Settings" = "Kapalı · Açmak için Ayarlar’a gidin";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Kapalı: sunucuya yalnızca bu Mac erişebilir. Açık: ağınızdaki diğer aygıtlar da erişebilir; ağdaki herkes erişebileceği için yalnızca güvendiğiniz ağlarda kullanın.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Kapalı: yalnızca bu Mac. Açık: ağınızdaki herkes — yalnızca güvendiğiniz ağlarda kullanın.";
 "Older" = "Daha eski";
@@ -656,7 +656,7 @@
 "Performance" = "Performans";
 "Pick a rating from 1 to 5 stars." = "1 ile 5 yıldız arasında bir puan seçin.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Sohbet etmek için birini seçin. İndirme hemen başlar ve arka planda devam eder.";
-"Picks a model that fits your Mac and turns on only what you choose." = "Mac’inize uygun bir model seçer ve yalnızca tercih ettiklerinizi etkinleştirir.";
+"Picks a model that fits your Mac and enables only what you choose." = "Mac’inize uygun bir model seçer ve yalnızca tercih ettiklerinizi etkinleştirir.";
 "Pin" = "Sabitlen";
 "Pin %@" = "Sabitle %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Sabitle: projedeki her sohbet tüm dosyayı alır (≈%@ token). Dosya sabitliyken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapalıdır.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "Projeden Kaldır";
 "Remove from the project" = "Projeden kaldır";
 "Remove this file from the project?" = "Bu dosya projeden kaldırılsın mı?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanı ve görüntü oluşturma (çalışma zamanı ve görüntü modelleri) %@ konumundan kaldırılır. Sunucu bir sonraki başlatıldığında veya görüntü oluşturma açıldığında yeniden yapılandırılır. Kaydedilmiş sohbetler ve profiller saklanır.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanı ve görüntü oluşturma (çalışma zamanı ve görüntü modelleri) %@ konumundan kaldırılır. Sunucu bir sonraki başlatıldığında veya görüntü oluşturma açıldığında yeniden yapılandırılır. Kaydedilmiş sohbetler ve profiller saklanır.";
 "Rename" = "Yeniden Adlandır";
 "Rename %1$@ to %2$@" = "%1$@ öğesinin adını %2$@ olarak değiştir";
 "Rename Profile" = "Profili Yeniden Adlandır";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "Orada aynı ad zaten var: bu değişiklik üzerine yazmak yerine başarısız olacak.";
 "The name must be on one line." = "İsim tek satır olmalıdır.";
 "The name wasn't accepted: up to 64 characters, on one line." = "İsim kabul edilmedi: en fazla 64 karakter, tek satır olmalıdır.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "Sonraki adımlar model ve istediğiniz özellikleri kurar. Her biri atlanabilir; siz seçmedikçe hiçbir şey indirilmez veya açılmaz.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Sonraki adımlar model ve istediğiniz özellikleri kurar. Her biri atlanabilir; siz seçmedikçe hiçbir şey indirilmez veya açılmaz.";
 "The plan changed since you looked at it: review it again." = "Plan, baktığınızdan beri değişti: tekrar gözden geçirin.";
 "The port and network access can change only while the server is stopped." = "Port ve ağ erişimi yalnızca sunucu dururken değiştirilebilir.";
 "The reply was cut at its length limit." = "Yanıt, uzunluk sınırında kesildi.";
@@ -1044,12 +1044,12 @@
 "Total time" = "Toplam süre";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Çalışan modelde decode-concurrency (1/2/4/8) ve prefill-step-size (64/128/256/512) değerlerini dener, her biri arasında sunucuyu yeniden başlatır ve ölçülen en hızlı olanı tutar.";
 "Try Again" = "Tekrar Dene";
-"Turn On Project Files…" = "Proje Dosyalarını Aç…";
-"Turn On…" = "Aç…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "Projeye dosya eklemek ve sohbetlerin bu dosyalarda arama yapabilmesi için Ayarlar’dan Proje dosyalarını açın.";
-"Turn on Project files to add files" = "Dosya eklemek için Proje Dosyalarını açın";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenir veya indirilmez.";
-"Turn on project files?" = "Proje dosyalarını açmak istiyor musunuz?";
+"Enable Project Files…" = "Proje Dosyalarını Aç…";
+"Enable…" = "Aç…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Projeye dosya eklemek ve sohbetlerin bu dosyalarda arama yapabilmesi için Ayarlar’dan Proje dosyalarını açın.";
+"Enable Project files to add files" = "Dosya eklemek için Proje Dosyalarını açın";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenir veya indirilmez.";
+"Enable project files?" = "Proje dosyalarını açmak istiyor musunuz?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
 "Unavailable" = "Kullanılamıyor";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "Güncelleme başarısız: %@";
 "Updates" = "Güncellemeler";
 "Usage statistics" = "Kullanım istatistikleri";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Kullanım istatistikleri kapalı: hiçbir şey gönderilmez. Bunları açsaydınız bir raporun nasıl görüneceği böyle olur (ID o zaman oluşturulur).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Kullanım istatistikleri kapalı: hiçbir şey gönderilmez. Bunları açsaydınız bir raporun nasıl görüneceği böyle olur (ID o zaman oluşturulur).";
 "Usage statistics: the reports" = "Kullanım istatistikleri: raporlar";
 "Use" = "Kullan";
 "Use %lld" = "%lld kullan";
@@ -1100,7 +1100,7 @@
 "View model card" = "Model kartını görüntüle.";
 "Voice" = "Ses";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab kapalı — Ayarlar > Ses'ten açın.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab kapalı — Ayarlar > Ses'ten açın.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab, GPU'nun kullanabileceği %2$@ GB'den yaklaşık %1$@ GB alır — sohbet modelinin %3$@ GB ile aynı anda kullanılamaz, bu yüzden çalışırken sohbet modeli boşaltılır.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab, GPU'nun kullanabileceği %2$@ GB'den yaklaşık %1$@ GB alır.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab yaklaşık %1$@ GB gerektirir, bu Mac'te GPU'nun kullanabileceği %2$@ GB'den fazla: bellek tükenir.";

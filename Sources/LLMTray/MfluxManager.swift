@@ -283,7 +283,7 @@ final class MfluxManager: ObservableObject {
         // Set up by the download in Settings; never installed mid-chat (a
         // temporary chat must not cause files to be written).
         guard FileManager.default.fileExists(atPath: venvPython) else {
-            throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- turn it on again in Settings.", comment: ""))
+            throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- enable it again in Settings.", comment: ""))
         }
         // Installed before the pin, or by an older app: its internals may
         // not match the runner's.

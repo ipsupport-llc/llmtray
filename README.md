@@ -28,7 +28,7 @@ The models run on your Mac. Only the optional web tools reach the internet.
 - **OpenAI-compatible local API on Apple Silicon** at `http://localhost:8765/v1`. A client can name a model in each request, and LLMTray switches to it (without one, the loaded model answers). A setting decides whether outside clients may switch the loaded model, must ask first, or keep what's loaded.
 - **Local AI coding agents on Mac.** Point any OpenAI-compatible agent or editor at that endpoint (`OPENAI_BASE_URL=http://localhost:8765/v1`), and the model's profile fills in its sampling defaults.
 - **Anthropic Messages API** at `http://localhost:8765/v1/messages` too, for clients that speak only Anthropic's API (`ANTHROPIC_BASE_URL=http://localhost:8765`): text, thinking, tool use, streaming, with the same model switching. Name a model LLMTray serves: `claude-*` names aren't models on this Mac.
-- **Local image generation and editing on Mac.** The chat model calls Z-Image Turbo or FLUX.2 klein, using our GPTQ checkpoints on Hugging Face, and edits photos with klein. Also local music with sung lyrics (ACE-Step 1.5), and a Creator mode for reviewing a prompt before anything is made. All optional, and downloaded only when turned on in Settings.
+- **Local image generation and editing on Mac.** The chat model calls Z-Image Turbo or FLUX.2 klein, using our GPTQ checkpoints on Hugging Face, and edits photos with klein. Also local music with sung lyrics (ACE-Step 1.5), and a Creator mode for reviewing a prompt before anything is made. All optional, and downloaded only when enabled in Settings.
 - **Chat** with tabs, projects and their instructions, and tools (web search, news, Wikipedia, weather, calculator, …).
 
 - **Start/stop `mlx_lm.server`** from the menu bar, against any model in your models folder (`~/.llmtray/models` by default, configurable in Settings — point it at `~/.lmstudio/models` to share models already downloaded via LM Studio).
@@ -67,7 +67,7 @@ The image runner caps MLX's buffer cache at 256 MB (by default MLX keeps freed b
 
 Not measured yet, so estimated in the JSON from a measured sibling plus the difference in files: Z-Image GPTQ 8-bit and 4-bit, ACE-Step sft 8-bit and full precision. Image, music and voice run alone (the chat model is unloaded for them). Peaks near the GPU limit may be held down by it (MLX frees its cache under memory pressure), so on a bigger Mac they can be higher.
 
-The wizard and Settings gate image generation, image editing and music by these peaks: under the GPU limit a model fits; over it but within the RAM less 4 GiB for macOS (as far as the limit can be raised) it's offered with a warning; beyond that it can't be turned on, and says how much it needs. Voice Lab sets its peak against the GPU limit with its own check (a 1.5 GB margin, the chat model beside it) and offers no download of a model that can't run even with a raised limit.
+The wizard and Settings gate image generation, image editing and music by these peaks: under the GPU limit a model fits; over it but within the RAM less 4 GiB for macOS (as far as the limit can be raised) it's offered with a warning; beyond that it can't be enabled, and says how much it needs. Voice Lab sets its peak against the GPU limit with its own check (a 1.5 GB margin, the chat model beside it) and offers no download of a model that can't run even with a raised limit.
 
 ## Quick start
 

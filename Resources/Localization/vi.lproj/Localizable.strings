@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
 "A package: moved as one item." = "Một gói: di chuyển như một mục duy nhất.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "Một ID ngẫu nhiên tạo trên Mac này, mới mỗi khi máy khởi động. Không liên kết với bạn hay tài khoản Mac.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Một ID ngẫu nhiên tạo trên Mac này, mới mỗi khi máy khởi động. Không liên kết với bạn hay tài khoản Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Một đánh giá kèm vài lời, gửi tới ipsupport.us: không cần tài khoản, không có định danh thiết bị. Các đánh giá được đăng trên trang LLMTray sau khi kiểm duyệt.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Yêu cầu không tạo ra gì trong khoảng thời gian này sẽ được xem là bị kẹt. Điều này xảy ra khi một worker của máy chủ chết (ví dụ: hết bộ nhớ GPU) trong khi tiến trình vẫn chạy.";
 "A song from a description" = "Bài hát từ mô tả";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Sau khi cuộc trò chuyện mới nhận được câu trả lời đầu tiên, mô hình sẽ gán một tiêu đề ngắn cho danh sách trò chuyện (một truy vấn phụ ngắn). Tắt: bắt đầu của tin nhắn đầu tiên. Đổi tên trò chuyện luôn hoạt động.";
 "Air quality" = "Chất lượng không khí";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Bí danh: tên “model” mà các công cụ khác gửi đến API của LLMTray để lấy mô hình này. Hồ sơ: hồ sơ cài đặt mà mô hình này sử dụng.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "Tất cả tắt cho đến khi bạn bật. Các mô hình được tải về sau khi nhấn Finish, từng cái một.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "Tất cả tắt cho đến khi bạn bật. Các mô hình được tải về sau khi nhấn Finish, từng cái một.";
 "Allow" = "Cho phép";
 "Allow Folder to Change…" = "Cho phép Thư mục Thay đổi…";
 "Allow Folder to Look In…" = "Cho phép Thư mục Xem…";
@@ -421,7 +421,7 @@
 "Image generation" = "Tạo hình ảnh";
 "Image generation failed: %@" = "Tạo ảnh thất bại: %@";
 "Image generation finished but produced no output file." = "Tạo ảnh hoàn tất nhưng không sinh tệp đầu ra.";
-"Image generation isn't set up -- turn it on again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
+"Image generation isn't set up -- enable it again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
 "Image generation needs an update -- turn it off and on again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image generation off" = "Tạo ảnh tắt";
 "Image model" = "Mô hình hình ảnh";
@@ -535,7 +535,7 @@
 "Models folder" = "Thư mục mô hình";
 "Models folder: %@" = "Thư mục models: %@";
 "Models found: %lld" = "Tìm được mô hình: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "Mô hình chạy trên Mac này. Cuộc trò chuyện của bạn không rời máy; chỉ các công cụ web, nếu bật, mới truy cập internet.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Mô hình chạy trên Mac này. Cuộc trò chuyện của bạn không rời máy; chỉ các công cụ web, nếu bật, mới truy cập internet.";
 "Models: %@ · free: %@" = "Mô hình: %@ · còn trống: %@";
 "Move %1$@ to %2$@" = "Di chuyển %1$@ tới %2$@";
 "Move %@ to the Trash" = "Di chuyển %@ vào Trash";
@@ -547,7 +547,7 @@
 "Music generation" = "Tạo nhạc";
 "Music generation failed: %@" = "Tạo nhạc thất bại: %@";
 "Music generation finished but produced no audio." = "Tạo nhạc hoàn tất nhưng không sinh ra âm thanh.";
-"Music generation isn't set up -- turn it on again in Settings." = "Tạo nhạc chưa được thiết lập — bật lại trong Cài đặt.";
+"Music generation isn't set up -- enable it again in Settings." = "Tạo nhạc chưa được thiết lập — bật lại trong Cài đặt.";
 "Music model" = "Mô hình nhạc";
 "Music off" = "Nhạc tắt";
 "Name" = "Tên";
@@ -618,7 +618,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Trong bối cảnh của mô hình và dung lượng bộ nhớ mà trọng số của nó để lại cho bối cảnh, tổng dung lượng các tệp được ghim của một dự án có thể chiếm. Số token tối đa cho câu trả lời vẫn được giữ miễn phí bất kể thiết lập này. Giá trị lớn hơn làm giảm không gian cho cuộc hội thoại, và một câu trả lời dài ban đầu sẽ xảy ra khi các tệp đang được đọc vào.";
 "Off" = "Tắt";
-"Off · turn on in Settings" = "Tắt · bật trong Cài đặt";
+"Off · enable in Settings" = "Tắt · bật trong Cài đặt";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Tắt: chỉ máy Mac này có thể truy cập máy chủ. Bật: các thiết bị khác trên mạng của bạn cũng có thể truy cập — bất kỳ ai trên mạng đó, vì vậy chỉ bật trên mạng bạn tin cậy.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Tắt: chỉ Mac này. Bật: bất kỳ ai trên mạng của bạn, chỉ bật trên mạng bạn tin tưởng.";
 "Older" = "Cũ hơn";
@@ -656,7 +656,7 @@
 "Performance" = "Hiệu năng";
 "Pick a rating from 1 to 5 stars." = "Chọn đánh giá từ 1 đến 5 sao.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Chọn một để chat. Việc tải về bắt đầu ngay và chạy ở nền.";
-"Picks a model that fits your Mac and turns on only what you choose." = "Chọn mô hình phù hợp với Mac của bạn và chỉ bật những mục bạn chọn.";
+"Picks a model that fits your Mac and enables only what you choose." = "Chọn mô hình phù hợp với Mac của bạn và chỉ bật những mục bạn chọn.";
 "Pin" = "Ghim";
 "Pin %@" = "Ghim %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Ghim: mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ tệp (≈%@ token). Tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi tệp được ghim.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "Gỡ khỏi Dự án";
 "Remove from the project" = "Gỡ khỏi dự án";
 "Remove this file from the project?" = "Gỡ tệp này khỏi dự án?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
 "Rename" = "Đổi tên";
 "Rename %1$@ to %2$@" = "Đổi tên %1$@ thành %2$@";
 "Rename Profile" = "Đổi tên Hồ sơ";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "Tên đã tồn tại ở đó: thay đổi này sẽ thất bại thay vì ghi đè.";
 "The name must be on one line." = "Tên phải trên một dòng.";
 "The name wasn't accepted: up to 64 characters, on one line." = "Tên không được chấp nhận: tối đa 64 ký tự, trên một dòng.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "Các bước tiếp theo thiết lập mô hình và các tính năng bạn muốn. Mỗi bước có thể bỏ qua; không có gì được tải về hay bật trừ khi bạn chọn.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Các bước tiếp theo thiết lập mô hình và các tính năng bạn muốn. Mỗi bước có thể bỏ qua; không có gì được tải về hay bật trừ khi bạn chọn.";
 "The plan changed since you looked at it: review it again." = "Kế hoạch đã thay đổi kể từ khi bạn xem: xem lại lần nữa.";
 "The port and network access can change only while the server is stopped." = "Cổng và quyền truy cập mạng chỉ thay đổi được khi server đang dừng.";
 "The reply was cut at its length limit." = "Phản hồi bị cắt do vượt giới hạn độ dài.";
@@ -1044,12 +1044,12 @@
 "Total time" = "Tổng thời gian";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Thử decode-concurrency (1/2/4/8) và prefill-step-size (64/128/256/512) với mô hình đang chạy, khởi động lại máy chủ sau mỗi lần thử, rồi giữ cấu hình đo được nhanh nhất.";
 "Try Again" = "Thử lại";
-"Turn On Project Files…" = "Bật Project Files…";
-"Turn On…" = "Bật…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "Bật Tệp dự án trong Cài đặt để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng.";
-"Turn on Project files to add files" = "Bật Project Files để thêm Files";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Project Files để thêm Files vào dự án và cho phép hội thoại tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
-"Turn on project files?" = "Bật tệp dự án?";
+"Enable Project Files…" = "Bật Project Files…";
+"Enable…" = "Bật…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Bật Tệp dự án trong Cài đặt để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng.";
+"Enable Project files to add files" = "Bật Project Files để thêm Files";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Project Files để thêm Files vào dự án và cho phép hội thoại tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
+"Enable project files?" = "Bật tệp dự án?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
 "Unavailable" = "Không khả dụng";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "Cập nhật thất bại: %@";
 "Updates" = "Bản cập nhật";
 "Usage statistics" = "Thống kê sử dụng";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Thống kê sử dụng đang tắt: không có gì được gửi. Đây là ví dụ một báo cáo nếu bạn bật chúng (ID được tạo khi đó).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Thống kê sử dụng đang tắt: không có gì được gửi. Đây là ví dụ một báo cáo nếu bạn bật chúng (ID được tạo khi đó).";
 "Usage statistics: the reports" = "Thống kê sử dụng: các báo cáo";
 "Use" = "Sử dụng";
 "Use %lld" = "Sử dụng %lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "Xem thẻ mô hình.";
 "Voice" = "Giọng";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab đang tắt — bật ở Cài đặt > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab đang tắt — bật ở Cài đặt > Voice.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab chiếm khoảng %1$@ GB trong %2$@ GB GPU có thể dùng — không cùng lúc với %3$@ GB của mô hình chat, nên mô hình chat được giải nạp khi Voice Lab chạy.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab chiếm khoảng %1$@ GB trong %2$@ GB GPU có thể dùng.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab chiếm khoảng %1$@ GB, nhiều hơn %2$@ GB GPU có thể dùng trên Mac này: sẽ hết bộ nhớ.";

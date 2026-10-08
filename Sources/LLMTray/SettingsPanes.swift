@@ -160,7 +160,7 @@ struct UsageStatisticsSection: View {
                     Text("At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.")
                         .fixedSize(horizontal: false, vertical: true)
                     field("product", Text("The app's name."), value: TelemetryReport.product)
-                    field("install_id", Text("A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac."),
+                    field("install_id", Text("A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac."),
                           value: telemetry.installID?.uuidString.lowercased())
                     field("day", Text("The day the counts are for."))
                     field("app_version", Text("LLMTray's version."), value: environment?.appVersion)
@@ -660,7 +660,7 @@ struct ProjectFilesSection: View {
             return nil
         }
         let alert = NSAlert()
-        alert.messageText = NSLocalizedString("Turn on project files?", comment: "")
+        alert.messageText = NSLocalizedString("Enable project files?", comment: "")
         alert.informativeText = String(format: NSLocalizedString("Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.", comment: ""),
                                        entry.displayName, ModelCatalog.format(FeatureSetup.downloadBytes(entry)))
         alert.addButton(withTitle: NSLocalizedString("Download and Enable", comment: ""))
@@ -1590,7 +1590,7 @@ struct UpdatesPane: View {
         guard !MLXRuntimeInstaller.isSettingUp else { return runtimeBusy() }
         let alert = NSAlert()
         alert.messageText = NSLocalizedString("Uninstall runtime data?", comment: "")
-        alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
+        alert.informativeText = String(format: NSLocalizedString("Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept.", comment: ""), RuntimePaths.externalRuntimeDir)
         alert.addButton(withTitle: NSLocalizedString("Uninstall", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
         alert.alertStyle = .warning

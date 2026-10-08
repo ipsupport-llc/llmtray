@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
 "A package: moved as one item." = "パッケージ：1 件の項目として移動されます。";
 "A quiet check at every launch. Only shows anything if an update exists." = "起動するたびに静かに確認します。アップデートがある場合にのみ表示します。";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "このMac上で作られるランダムID。起動ごとに新しくなり、あなたやMacに紐づきません。";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "このMac上で作られるランダムID。起動ごとに新しくなり、あなたやMacに紐づきません。";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "評価と簡単なコメントをipsupport.usに送信します。アカウントやデバイス識別子は送信されません。レビューは審査後にLLMTrayのウェブサイトに掲載されます。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "この時間内に何も生成しないリクエストは停止と見なします。これは、プロセスは動作したままサーバワーカーが停止した場合（例: GPU メモリ不足）に発生します。";
 "A song from a description" = "説明から作る曲";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "新しいチャットの最初の応答後、モデルがチャット一覧用の短いタイトルを自動で付けます（短い追加リクエストが発生します）。オフ：最初のメッセージの先頭をタイトルに使用します。チャットの名前変更は常に可能です。";
 "Air quality" = "空気質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "エイリアス: ほかのツールがこのモデルを使うために LLMTray の API へ送る「model」名です。プロファイル: このモデルで使う設定プロファイルです。";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "有効にしない限りすべてオフです。モデルは Finish 後に一度にひとつずつダウンロードされます。";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "有効にしない限りすべてオフです。モデルは Finish 後に一度にひとつずつダウンロードされます。";
 "Allow" = "許可";
 "Allow Folder to Change…" = "フォルダの変更を許可…";
 "Allow Folder to Look In…" = "フォルダの参照を許可…";
@@ -421,7 +421,7 @@
 "Image generation" = "画像生成";
 "Image generation failed: %@" = "画像生成に失敗しました: %@";
 "Image generation finished but produced no output file." = "画像生成は完了しましたが、出力ファイルが作成されませんでした。";
-"Image generation isn't set up -- turn it on again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
+"Image generation isn't set up -- enable it again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
 "Image generation needs an update -- turn it off and on again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image generation off" = "画像生成：オフ";
 "Image model" = "画像モデル";
@@ -535,7 +535,7 @@
 "Models folder" = "モデルフォルダ";
 "Models folder: %@" = "models フォルダ: %@";
 "Models found: %lld" = "見つかったモデル: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "モデルはこの Mac 上で実行されます。チャットデータは外部に出ません。ウェブツールを有効にした場合のみインターネットに接続します。";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "モデルはこの Mac 上で実行されます。チャットデータは外部に出ません。ウェブツールを有効にした場合のみインターネットに接続します。";
 "Models: %@ · free: %@" = "モデル: %@ · 空き: %@";
 "Move %1$@ to %2$@" = "%1$@ を %2$@ に移動";
 "Move %@ to the Trash" = "%@ をゴミ箱に移動";
@@ -547,7 +547,7 @@
 "Music generation" = "音楽生成";
 "Music generation failed: %@" = "音楽生成に失敗しました：%@";
 "Music generation finished but produced no audio." = "音楽生成は完了しましたが、音声が生成されませんでした。";
-"Music generation isn't set up -- turn it on again in Settings." = "音楽生成が設定されていません。設定で再度有効にしてください。";
+"Music generation isn't set up -- enable it again in Settings." = "音楽生成が設定されていません。設定で再度有効にしてください。";
 "Music model" = "音楽モデル";
 "Music off" = "音楽：オフ";
 "Name" = "名前";
@@ -618,7 +618,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "モデルのコンテキストおよび重みがコンテキストに残すメモリのうち、プロジェクトのピン留めファイルが占める可能性のある合計です。回答の最大トークン数はこの設定にかかわらず確保されます。値を大きくすると会話に使える領域が減り、ファイル読み込み中は最初の応答が長くなることがあります。";
 "Off" = "オフ";
-"Off · turn on in Settings" = "オフ · 設定で有効にしてください";
+"Off · enable in Settings" = "オフ · 設定で有効にしてください";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "オフ: このMacだけがサーバにアクセスできます。オン: ネットワーク上のほかのデバイスからもアクセスできます（同じネットワーク上の誰でもアクセスできるため、信頼できるネットワークでのみ使用してください）。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "オフ：この Mac のみ。オン：ネットワーク上の全員が利用可能になるため、信頼できるネットワークでのみ有効にしてください。";
 "Older" = "以前";
@@ -656,7 +656,7 @@
 "Performance" = "パフォーマンス";
 "Pick a rating from 1 to 5 stars." = "1〜5の星から評価を選んでください。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "チャットするモデルを選んでください。選択するとすぐにダウンロードが開始され、バックグラウンドで進行します。";
-"Picks a model that fits your Mac and turns on only what you choose." = "あなたのMacに合ったモデルを選び、選択した機能だけを有効にします。";
+"Picks a model that fits your Mac and enables only what you choose." = "あなたのMacに合ったモデルを選び、選択した機能だけを有効にします。";
 "Pin" = "ピン留め";
 "Pin %@" = "ピン留め %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "ピン留め: プロジェクト内のすべてのチャットがファイル全体を受け取ります（約 %@ トークン）。ピン留め中はそのチャットで Web 検索や画像・音楽生成は無効になります。";
@@ -736,7 +736,7 @@
 "Remove from Project" = "プロジェクトから削除";
 "Remove from the project" = "プロジェクトから削除";
 "Remove this file from the project?" = "このファイルをプロジェクトから削除しますか？";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
 "Rename" = "名称変更";
 "Rename %1$@ to %2$@" = "%1$@ の名前を %2$@ に変更";
 "Rename Profile" = "プロファイル名を変更";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "その場所に同名が存在します：上書きせず失敗します。";
 "The name must be on one line." = "名前は1行で入力してください。";
 "The name wasn't accepted: up to 64 characters, on one line." = "名前は受け付けられませんでした：64文字以内、1行で入力してください。";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "次のステップでモデルと必要な機能を設定します。各項目はスキップ可能で、選択しない限り何もダウンロードや有効化はされません。";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "次のステップでモデルと必要な機能を設定します。各項目はスキップ可能で、選択しない限り何もダウンロードや有効化はされません。";
 "The plan changed since you looked at it: review it again." = "表示してから計画が変更されました：再度確認してください。";
 "The port and network access can change only while the server is stopped." = "ポートとネットワークアクセスはサーバー停止中にのみ変更できます。";
 "The reply was cut at its length limit." = "返信が長さの上限で切られました。";
@@ -1044,12 +1044,12 @@
 "Total time" = "合計時間";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
 "Try Again" = "再試行";
-"Turn On Project Files…" = "プロジェクトファイルを有効にする…";
-"Turn On…" = "有効にする…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "設定で Project files を有効にすると、ファイルをプロジェクトに追加してチャットで検索できるようになります。";
-"Turn on Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
-"Turn on project files?" = "プロジェクトファイルを有効にしますか？";
+"Enable Project Files…" = "プロジェクトファイルを有効にする…";
+"Enable…" = "有効にする…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "設定で Project files を有効にすると、ファイルをプロジェクトに追加してチャットで検索できるようになります。";
+"Enable Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
+"Enable project files?" = "プロジェクトファイルを有効にしますか？";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
 "Unavailable" = "利用不可";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "更新に失敗しました：%@";
 "Updates" = "アップデート";
 "Usage statistics" = "使用統計";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "使用統計はオフです：何も送信されません。これが統計を有効にしたときのレポートの例です（ID はその時に作成されます）。";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "使用統計はオフです：何も送信されません。これが統計を有効にしたときのレポートの例です（ID はその時に作成されます）。";
 "Usage statistics: the reports" = "使用統計：レポート";
 "Use" = "使用";
 "Use %lld" = "%lld を使用";
@@ -1100,7 +1100,7 @@
 "View model card" = "モデルカードを表示します。";
 "Voice" = "音声";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab はオフです — 設定 > Voice でオンにしてください。";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab はオフです — 設定 > Voice でオンにしてください。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab は GPU が使用可能な %2$@ GB のうち約 %1$@ GB を使用します — チャットモデルの %3$@ GB とは同時には使えないため、実行中はチャットモデルがアンロードされます。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab は GPU が使用可能な %2$@ GB のうち約 %1$@ GB を使用します。";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab は約 %1$@ GB を使用します。これはこの Mac の GPU が使用できる %2$@ GB を超えているため、メモリ不足になります。";

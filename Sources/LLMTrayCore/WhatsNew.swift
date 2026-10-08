@@ -42,7 +42,7 @@ public enum WhatsNew {
                      text: NSLocalizedString("A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.", comment: "what's new: text"),
                      symbol: "folder"),
                 Item(title: NSLocalizedString("First-run setup", comment: "what's new: title"),
-                     text: NSLocalizedString("Picks a model that fits your Mac and turns on only what you choose.", comment: "what's new: text"),
+                     text: NSLocalizedString("Picks a model that fits your Mac and enables only what you choose.", comment: "what's new: text"),
                      symbol: "checklist"),
                 Item(title: NSLocalizedString("Answer details", comment: "what's new: title"),
                      text: NSLocalizedString("Hover the info button under an answer to see the model, speed and how much context it used.", comment: "what's new: text"),

@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "מיקס מלא ומעובד יותר; המילים נשמעות פחות בבירור. כ‑20 שנ׳ להכנת 30 שנ׳ מוזיקה.";
 "A package: moved as one item." = "חבילה: הועברה כפריט יחיד.";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "מזהה אקראי שנוצר במק זה, חדש בכל הפעלה. אינו מקושר אליך או אל המחשב.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "מזהה אקראי שנוצר במק זה, חדש בכל הפעלה. אינו מקושר אליך או אל המחשב.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "דירוג וכמה מילים, נשלחים ל-ipsupport.us: ללא חשבון, ללא מזהי מכשיר. חוות הדעת מופיעות באתר LLMTray לאחר בדיקה.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "בקשה שלא מפיקה דבר במשך זמן כזה נחשבת תקועה. זה קורה כשעובד שרת קורס (למשל בגלל מחסור בזיכרון GPU) בזמן שהתהליך ממשיך לפעול.";
 "A song from a description" = "שיר מתיאור";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "לאחר התשובה הראשונה בצ'אט חדש, המודל נותן לו כותרת קצרה לרשימת הצ'אטים (בקשה קצרה נוספת). כבוי: תחילת ההודעה הראשונה. שינוי שם צ'אט תמיד פועל.";
 "Air quality" = "איכות אוויר";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "כינוי: שם ה־“model” שכלים אחרים שולחים ל־API של LLMTray כדי לקבל את המודל הזה. פרופיל: פרופיל ההגדרות שבו המודל הזה משתמש.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "הכול כבוי עד שתדליקו. המודלים יורדו אחרי Finish, אחד‑אחד.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "הכול כבוי עד שתדליקו. המודלים יורדו אחרי Finish, אחד‑אחד.";
 "Allow" = "אפשר";
 "Allow Folder to Change…" = "אפשר לתיקייה לשנות…";
 "Allow Folder to Look In…" = "אפשר לתיקייה להסתכל ב…";
@@ -421,7 +421,7 @@
 "Image generation" = "יצירת תמונות";
 "Image generation failed: %@" = "יצירת התמונה נכשלה: %@";
 "Image generation finished but produced no output file." = "יצירת התמונה הסתיימה אך לא נוצר קובץ פלט.";
-"Image generation isn't set up -- turn it on again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
+"Image generation isn't set up -- enable it again in Settings." = "יצירת תמונות לא מוגדרת — הפעל/י אותה שוב ב‑Settings.";
 "Image generation needs an update -- turn it off and on again in Settings." = "יצירת תמונות דורשת עדכון — כבה/י והפעל/י שוב ב‑Settings.";
 "Image generation off" = "יצירת תמונה כבויה";
 "Image model" = "מודל תמונה";
@@ -535,7 +535,7 @@
 "Models folder" = "תיקיית המודלים";
 "Models folder: %@" = "תיקיית מודלים: %@";
 "Models found: %lld" = "מודלים שנמצאו: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "מודלים רצים על Mac זה. הצ'אטים לא עוזבים אותו; רק כלי רשת, אם תדליקו אותם, ניגשים לאינטרנט.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "מודלים רצים על Mac זה. הצ'אטים לא עוזבים אותו; רק כלי רשת, אם תדליקו אותם, ניגשים לאינטרנט.";
 "Models: %@ · free: %@" = "מודלים: %@ · פנוי: %@";
 "Move %1$@ to %2$@" = "העבר %1$@ אל %2$@";
 "Move %@ to the Trash" = "העבר %@ אל ה־Trash";
@@ -547,7 +547,7 @@
 "Music generation" = "יצירת מוזיקה";
 "Music generation failed: %@" = "יצירת מוזיקה נכשלה: %@";
 "Music generation finished but produced no audio." = "יצירת המוזיקה הסתיימה אך לא נוצר פס קול.";
-"Music generation isn't set up -- turn it on again in Settings." = "יצירת מוזיקה לא מוגדרת — הפעל שוב בהגדרות.";
+"Music generation isn't set up -- enable it again in Settings." = "יצירת מוזיקה לא מוגדרת — הפעל שוב בהגדרות.";
 "Music model" = "מודל מוזיקה";
 "Music off" = "מוסיקה כבויה";
 "Name" = "שם";
@@ -618,7 +618,7 @@
 "OK" = "אישור";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "מתוך הקונטקסט של המודל, ומהזיכרון שתקנוני המשקלות שלו משאירים לקונטקסט — כמה מקום קבצי הפרויקט הקבועים עלולים לתפוס ביחד. המקסימום של הטוקנים לתשובה נשאר פנוי ללא קשר להגדרה זו. יותר קבצים תופסים פחות מקום לשיחה, ותשובה ארוכה בתחילת הטעינה תתרחש בזמן שהקבצים נטענים.";
 "Off" = "כבוי";
-"Off · turn on in Settings" = "מכובה · הפעל ב'הגדרות'";
+"Off · enable in Settings" = "מכובה · הפעל ב'הגדרות'";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "כבוי: רק ה-Mac הזה יכול לגשת לשרת. מופעל: גם מכשירים אחרים ברשת שלך יכולים לגשת אליו — כל מי שמחובר אליה, לכן יש להפעיל רק ברשתות מהימנות.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "כבוי: רק Mac זה. דלוק: כל מי ברשת שלך, לכן הפעל רק ברשתות שאתה סומך עליהן.";
 "Older" = "ישנים יותר";
@@ -656,7 +656,7 @@
 "Performance" = "ביצועים";
 "Pick a rating from 1 to 5 stars." = "בחר דירוג מ‑1 עד 5 כוכבים.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "בחר אחד לשיחה. הורדה תתחיל מיד ותמשיך ברקע.";
-"Picks a model that fits your Mac and turns on only what you choose." = "בוחר מודל שמתאים ל‑Mac שלך ומפעיל רק את מה שתבחר.";
+"Picks a model that fits your Mac and enables only what you choose." = "בוחר מודל שמתאים ל‑Mac שלך ומפעיל רק את מה שתבחר.";
 "Pin" = "נעץ";
 "Pin %@" = "סמן %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "סימון: כל צ'אט בפרויקט מקבל את הקובץ במלואו (≈%@ טוקנים). חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד הקובץ מסומן.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "הסר מהפרויקט";
 "Remove from the project" = "הסר מהפרויקט";
 "Remove this file from the project?" = "להסיר קובץ זה מהפרויקט?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "מסיר את הרוץ־זמן של mlx-lm והיכולות ליצירת תמונות (הרוץ‑זמן ודגמי התמונה) שהורדו מ־%@. הם יותקנו שוב בעת הפעלת השרת הבאה, או כאשר הפעלת יצירת תמונות תופעל. שיחות ושבצים פרופיל נשמרים.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "מסיר את הרוץ־זמן של mlx-lm והיכולות ליצירת תמונות (הרוץ‑זמן ודגמי התמונה) שהורדו מ־%@. הם יותקנו שוב בעת הפעלת השרת הבאה, או כאשר הפעלת יצירת תמונות תופעל. שיחות ושבצים פרופיל נשמרים.";
 "Rename" = "שינוי שם";
 "Rename %1$@ to %2$@" = "שנה שם %1$@ ל־%2$@";
 "Rename Profile" = "שנה שם פרופיל";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "השם תפוס שם: שינוי זה ייכשל במקום להחליף.";
 "The name must be on one line." = "השם צריך להיות בשורה אחת.";
 "The name wasn't accepted: up to 64 characters, on one line." = "השם לא התקבל: עד 64 תווים, בשורה אחת.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "השלבים הבאים מכינים מודל ואת התכונות שתרצו. כל שלב ניתן לדילוג; שום דבר לא יורד או נדלק אלא אם תבחרו.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "השלבים הבאים מכינים מודל ואת התכונות שתרצו. כל שלב ניתן לדילוג; שום דבר לא יורד או נדלק אלא אם תבחרו.";
 "The plan changed since you looked at it: review it again." = "התכנית שונתה מאז שהסתכלת עליה: בדוק אותה שוב.";
 "The port and network access can change only while the server is stopped." = "הפורט וגישת הרשת ניתנים לשינוי רק כשהשרת עצור.";
 "The reply was cut at its length limit." = "התשובה נחתכה בגלל מגבלת אורך.";
@@ -1044,12 +1044,12 @@
 "Total time" = "זמן כולל";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "בודק את decode-concurrency (1/2/4/8) ואת prefill-step-size (64/128/256/512) מול המודל הפעיל, מפעיל מחדש את השרת בין כל בדיקה, ושומר את האפשרות שנמדדה כמהירה ביותר.";
 "Try Again" = "נסה שוב";
-"Turn On Project Files…" = "הפעל קבצי פרויקט…";
-"Turn On…" = "הפעל…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
-"Turn on Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
-"Turn on project files?" = "להפעיל את קבצי הפרויקט?";
+"Enable Project Files…" = "הפעל קבצי פרויקט…";
+"Enable…" = "הפעל…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
+"Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
+"Enable project files?" = "להפעיל את קבצי הפרויקט?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
 "Unavailable" = "לא זמין";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "העדכון נכשל: %@";
 "Updates" = "עדכונים";
 "Usage statistics" = "סטטיסטיקות שימוש";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "סטטיסטיקת שימוש כבויה: לא נשלח דבר. כך ייראה דוח אם תפעילו אותן (ה‑ID יוּצר אז).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "סטטיסטיקת שימוש כבויה: לא נשלח דבר. כך ייראה דוח אם תפעילו אותן (ה‑ID יוּצר אז).";
 "Usage statistics: the reports" = "סטטיסטיקת שימוש: הדוחות";
 "Use" = "השתמש";
 "Use %lld" = "השתמש ב־%lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "הצג את כרטיס המודל.";
 "Voice" = "קול";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab כבוי — הדלק בהגדרות > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab כבוי — הדלק בהגדרות > Voice.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab תופס כ‑%1$@ GB מתוך %2$@ GB ש‑GPU עשוי להשתמש בהם — לא אפשרי יחד עם %3$@ GB של מודל הצ'אט, לכן מודל הצ'אט מנותק בזמן הריצה.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab תופס כ‑%1$@ GB מתוך %2$@ GB ש‑GPU עשוי להשתמש בהם.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab תופס כ‑%1$@ GB, יותר מ‑%2$@ GB שה‑GPU יכול להשתמש בו ב‑Mac זה: לא יהיה מספיק זיכרון.";

@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Mezcla más completa y acabada; las letras se oyen menos claras. Unos 20 s para 30 s de música.";
 "A package: moved as one item." = "Un paquete: movido como un solo elemento.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Una comprobación silenciosa en cada inicio. Solo muestra algo si hay una actualización.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "Un identificador aleatorio creado en este Mac, nuevo cada vez que se enciende. No está vinculado a usted ni al Mac.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Un identificador aleatorio creado en este Mac, nuevo cada vez que se enciende. No está vinculado a usted ni al Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Una valoración y unas palabras, enviadas a ipsupport.us: sin cuenta, sin identificadores de dispositivo. Las valoraciones aparecen en el sitio web de LLMTray tras moderación.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Una solicitud que no produce nada durante este tiempo se considera bloqueada. Ocurre cuando un worker del servidor muere (p. ej., sin memoria de GPU) mientras el proceso sigue vivo.";
 "A song from a description" = "Una canción a partir de una descripción";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "Después de la primera respuesta de un chat nuevo, el modelo le asigna un título breve para la lista de chats (una solicitud adicional corta). Desactivado: el inicio del primer mensaje. Renombrar un chat siempre funciona.";
 "Air quality" = "Calidad del aire";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: el nombre «model» que otras herramientas envían a la API de LLMTray para obtener este modelo. Perfil: qué perfil de ajustes usa el modelo.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "Todo apagado a menos que lo actives. Los modelos se descargan después de Finalizar, uno a la vez.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "Todo apagado a menos que lo actives. Los modelos se descargan después de Finalizar, uno a la vez.";
 "Allow" = "Permitir";
 "Allow Folder to Change…" = "Permitir que la carpeta cambie…";
 "Allow Folder to Look In…" = "Permitir que la carpeta sea inspeccionada…";
@@ -421,7 +421,7 @@
 "Image generation" = "Generación de imágenes";
 "Image generation failed: %@" = "La generación de imagen falló: %@";
 "Image generation finished but produced no output file." = "La generación de imagen finalizó pero no produjo ningún archivo de salida.";
-"Image generation isn't set up -- turn it on again in Settings." = "La generación de imagen no está configurada: actívala de nuevo en Ajustes.";
+"Image generation isn't set up -- enable it again in Settings." = "La generación de imagen no está configurada: actívala de nuevo en Ajustes.";
 "Image generation needs an update -- turn it off and on again in Settings." = "La generación de imagen necesita una actualización: apágala y vuélvela a activar en Ajustes.";
 "Image generation off" = "Generación de imágenes desactivada";
 "Image model" = "Modelo de imágenes";
@@ -535,7 +535,7 @@
 "Models folder" = "Carpeta de modelos";
 "Models folder: %@" = "Carpeta de modelos: %@";
 "Models found: %lld" = "Modelos encontrados: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "Los modelos se ejecutan en este Mac. Tus chats no salen de él; solo las herramientas web, si las activas, acceden a Internet.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Los modelos se ejecutan en este Mac. Tus chats no salen de él; solo las herramientas web, si las activas, acceden a Internet.";
 "Models: %@ · free: %@" = "Modelos: %@ · libre: %@";
 "Move %1$@ to %2$@" = "Mover %1$@ a %2$@";
 "Move %@ to the Trash" = "Mover %@ a la Papelera";
@@ -547,7 +547,7 @@
 "Music generation" = "Generación de música";
 "Music generation failed: %@" = "La generación de música falló: %@";
 "Music generation finished but produced no audio." = "La generación de música finalizó pero no produjo audio.";
-"Music generation isn't set up -- turn it on again in Settings." = "La generación de música no está configurada: actívala de nuevo en Ajustes.";
+"Music generation isn't set up -- enable it again in Settings." = "La generación de música no está configurada: actívala de nuevo en Ajustes.";
 "Music model" = "Modelo musical";
 "Music off" = "Música desactivada";
 "Name" = "Nombre";
@@ -618,7 +618,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Del contexto del modelo y de la memoria que sus pesos reservan para el contexto, lo que en conjunto pueden ocupar los archivos fijados de un proyecto. El máximo de tokens de la respuesta se mantiene libre haga lo que haga este ajuste. Cuanto más ocupe, menos espacio queda para la conversación, y la primera respuesta puede ser larga mientras se leen los archivos.";
 "Off" = "No";
-"Off · turn on in Settings" = "Desactivado · activar en Ajustes";
+"Off · enable in Settings" = "Desactivado · activar en Ajustes";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "No: solo este Mac puede conectarse. Sí: también cualquier dispositivo de tu red, así que solo en redes de confianza.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Apagado: solo este Mac. Encendido: cualquier dispositivo en tu red; úsalo solo en redes de confianza.";
 "Older" = "Más antiguos";
@@ -656,7 +656,7 @@
 "Performance" = "Rendimiento";
 "Pick a rating from 1 to 5 stars." = "Elige una valoración de 1 a 5 estrellas.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Elige uno para chatear. La descarga empieza de inmediato y continúa en segundo plano.";
-"Picks a model that fits your Mac and turns on only what you choose." = "Selecciona un modelo adecuado para tu Mac y activa solo lo que elijas.";
+"Picks a model that fits your Mac and enables only what you choose." = "Selecciona un modelo adecuado para tu Mac y activa solo lo que elijas.";
 "Pin" = "Fijar";
 "Pin %@" = "Anclar %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Anclar: todos los chats del proyecto reciben el archivo completo (≈%@ tokens). La búsqueda web y la generación de imágenes o música están desactivadas en esos chats mientras está anclado.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "Quitar del proyecto";
 "Remove from the project" = "Eliminar del proyecto";
 "Remove this file from the project?" = "¿Eliminar este archivo del proyecto?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Elimina el runtime mlx-lm descargado y la generación de imágenes (su runtime y modelos de imagen) de %@. Se volverán a configurar en el siguiente inicio del servidor o cuando se active la generación de imágenes. Se conservan los chats y perfiles guardados.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Elimina el runtime mlx-lm descargado y la generación de imágenes (su runtime y modelos de imagen) de %@. Se volverán a configurar en el siguiente inicio del servidor o cuando se active la generación de imágenes. Se conservan los chats y perfiles guardados.";
 "Rename" = "Renombrar";
 "Rename %1$@ to %2$@" = "Renombrar %1$@ a %2$@";
 "Rename Profile" = "Renombrar perfil";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "El nombre ya existe allí: este cambio fallará en vez de sobrescribir.";
 "The name must be on one line." = "El nombre debe estar en una sola línea.";
 "The name wasn't accepted: up to 64 characters, on one line." = "El nombre no fue aceptado: hasta 64 caracteres, en una sola línea.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "Los siguientes pasos configuran un modelo y las funciones que desees. Cada uno puede omitirse; no se descarga ni activa nada a menos que lo elijas.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Los siguientes pasos configuran un modelo y las funciones que desees. Cada uno puede omitirse; no se descarga ni activa nada a menos que lo elijas.";
 "The plan changed since you looked at it: review it again." = "El plan cambió desde que lo viste: revísalo de nuevo.";
 "The port and network access can change only while the server is stopped." = "El puerto y el acceso de red solo se pueden cambiar mientras el servidor esté detenido.";
 "The reply was cut at its length limit." = "La respuesta se truncó por el límite de longitud.";
@@ -1044,12 +1044,12 @@
 "Total time" = "Tiempo total";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Prueba decode-concurrency (1/2/4/8) y prefill-step-size (64/128/256/512) con el modelo en ejecución, reiniciando el servidor entre cada uno, y se queda con lo más rápido.";
 "Try Again" = "Intentar de nuevo";
-"Turn On Project Files…" = "Activar Archivos del proyecto…";
-"Turn On…" = "Activar…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "Activa Archivos del proyecto en Ajustes para añadir archivos al proyecto y permitir que sus chats los busquen.";
-"Turn on Project files to add files" = "Activa Archivos del proyecto para añadir archivos";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Activa Archivos del proyecto para añadir archivos a un proyecto y permitir que sus chats los busquen. Nada se indexa ni descarga hasta entonces.";
-"Turn on project files?" = "¿Activar archivos del proyecto?";
+"Enable Project Files…" = "Activar Archivos del proyecto…";
+"Enable…" = "Activar…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Activa Archivos del proyecto en Ajustes para añadir archivos al proyecto y permitir que sus chats los busquen.";
+"Enable Project files to add files" = "Activa Archivos del proyecto para añadir archivos";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Activa Archivos del proyecto para añadir archivos a un proyecto y permitir que sus chats los busquen. Nada se indexa ni descarga hasta entonces.";
+"Enable project files?" = "¿Activar archivos del proyecto?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Convierte el texto de los archivos en vectores para la búsqueda por significado, en este Mac. Al eliminarlo se conservan los índices: los archivos se buscarán por sus palabras hasta que se vuelva a descargar.";
 "Tweak…" = "Ajustar…";
 "Unavailable" = "No disponible";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "Actualización fallida: %@";
 "Updates" = "Actualizaciones";
 "Usage statistics" = "Estadísticas de uso";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Las estadísticas de uso están desactivadas: no se envía nada. Así se vería un informe si las activaras (el ID se crea entonces).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Las estadísticas de uso están desactivadas: no se envía nada. Así se vería un informe si las activaras (el ID se crea entonces).";
 "Usage statistics: the reports" = "Estadísticas de uso: los informes";
 "Use" = "Usar";
 "Use %lld" = "Usar %lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "Ver la ficha del modelo";
 "Voice" = "Voz";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab está desactivado — actívalo en Ajustes > Voz.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab está desactivado — actívalo en Ajustes > Voz.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab usa aproximadamente %1$@ GB de los %2$@ GB que puede usar la GPU — no junto con los %3$@ GB del modelo de chat, por lo que el modelo de chat se descarga mientras se ejecuta.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab usa aproximadamente %1$@ GB de los %2$@ GB que puede usar la GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab necesita aproximadamente %1$@ GB, más de los %2$@ GB que puede usar la GPU en este Mac: se quedaría sin memoria.";

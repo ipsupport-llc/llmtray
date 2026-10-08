@@ -131,7 +131,7 @@ private struct EmptyChatShowcase: View {
         .help(Text("OpenAI-compatible: point a coding agent or app at this address (copies it)"))
     }
 
-    private var offDetail: Text { Text("Off · turn on in Settings") }
+    private var offDetail: Text { Text("Off · enable in Settings") }
 
     /// Image and music generation are profile settings: the selected model's.
     private func openProfileSettings() {
@@ -205,15 +205,15 @@ struct GettingStartedCard: View {
             step(.ask, 3, Text("Ask about LLMTray"),
                  indexer.isEnabled
                     ? Text("The LLMTray guide is in this project: ask, for example, how to connect your coding agent.")
-                    : Text("Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.")) {
+                    : Text("Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.")) {
                 if indexer.isEnabled {
                     insertPrompt(NSLocalizedString("How do I connect my coding agent to LLMTray?", comment: "getting started: a prompt about the guide"))
                 } else {
                     openFilesSettings()
                 }
             }
-            step(.create, 4, Text("Turn on images, music and voice"),
-                 Text("Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings.")) {
+            step(.create, 4, Text("Enable images, music and voice"),
+                 Text("Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.")) {
                 NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: [
                     "pane": SettingsPane.profiles.rawValue, "profileID": profiles.profile(for: selectedModelID).id,
                 ])

@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "音色更豐滿、聽起來更完成；歌詞較不突出。生成約需 30 秒音樂的 20 秒。";
 "A package: moved as one item." = "封裝：以單一項目移動。";
 "A quiet check at every launch. Only shows anything if an update exists." = "每次啟動時靜默檢查。只有在有更新時才會顯示內容。";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "在此 Mac 上產生的隨機識別碼，每次開機時會重新建立。與您的帳戶或此 Mac 無關。";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "在此 Mac 上產生的隨機識別碼，每次開機時會重新建立。與您的帳戶或此 Mac 無關。";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "評分和少量文字會送到 ipsupport.us：不需帳號，不含裝置識別碼。評論經審核後會顯示在 LLMTray 網站上。";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "若要求在這段時間內沒有產生任何內容，即視為停滯。這通常是在伺服器工作程序停止（例如 GPU 記憶體不足）但程序仍在執行時發生。";
 "A song from a description" = "由描述產生的歌曲";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "當新對話收到第一次回答後，模型會為它在對話列表中自動產生一個短標題（需額外一次短請求）。關閉：使用第一則訊息開頭。重新命名對話永遠可用。";
 "Air quality" = "空氣品質";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "別名：其他工具傳送給 LLMTray API 以取得此模型的「model」名稱。設定檔：此模型使用的設定檔。";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "預設皆關閉，需你開啟。模型在按「完成」後逐一下載。";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "預設皆關閉，需你開啟。模型在按「完成」後逐一下載。";
 "Allow" = "允許";
 "Allow Folder to Change…" = "允許資料夾變更⋯";
 "Allow Folder to Look In…" = "允許資料夾檢視⋯";
@@ -421,7 +421,7 @@
 "Image generation" = "影像生成";
 "Image generation failed: %@" = "影像生成失敗：%@";
 "Image generation finished but produced no output file." = "影像生成完成但未產生輸出檔案。";
-"Image generation isn't set up -- turn it on again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
+"Image generation isn't set up -- enable it again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
 "Image generation needs an update -- turn it off and on again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image generation off" = "影像生成：關";
 "Image model" = "影像模型";
@@ -535,7 +535,7 @@
 "Models folder" = "模型檔案夾";
 "Models folder: %@" = "模型資料夾：%@";
 "Models found: %lld" = "找到的模型：%lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "模型在此 Mac 上執行。聊天不會離開此裝置；只有你啟用的網路工具會連上網際網路。";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "模型在此 Mac 上執行。聊天不會離開此裝置；只有你啟用的網路工具會連上網際網路。";
 "Models: %@ · free: %@" = "模型：%@ · 可用：%@";
 "Move %1$@ to %2$@" = "將 %1$@ 移到 %2$@";
 "Move %@ to the Trash" = "將 %@ 移到垃圾桶";
@@ -547,7 +547,7 @@
 "Music generation" = "音樂生成";
 "Music generation failed: %@" = "音樂生成失敗：%@";
 "Music generation finished but produced no audio." = "音樂生成完成但未產生音訊。";
-"Music generation isn't set up -- turn it on again in Settings." = "尚未設定音樂生成 —— 請於「設定」中重新啟用。";
+"Music generation isn't set up -- enable it again in Settings." = "尚未設定音樂生成 —— 請於「設定」中重新啟用。";
 "Music model" = "音樂模型";
 "Music off" = "音樂：關";
 "Name" = "名稱";
@@ -618,7 +618,7 @@
 "OK" = "好";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "模型的上下文，以及模型權重為上下文保留的記憶，與專案的固定檔案（pinned files）合計可佔用的空間。回應的最大 token 數不受此設定影響。設定越大，對話可用空間越少，且在載入檔案時第一則回應可能較長。";
 "Off" = "關閉";
-"Off · turn on in Settings" = "已關閉 · 在設定中開啟";
+"Off · enable in Settings" = "已關閉 · 在設定中開啟";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "關閉時，只有這部 Mac 可以連線到伺服器。開啟時，你網路上的其他裝置也可以連線（網路上的任何人都可以），因此請只在信任的網路上使用。";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "關：僅此 Mac 可存取。開：網路上的任何人皆可存取，僅在受信任網路下使用。";
 "Older" = "較舊";
@@ -656,7 +656,7 @@
 "Performance" = "效能";
 "Pick a rating from 1 to 5 stars." = "請選擇 1 至 5 星的評分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "選擇一個進行聊天。下載會立即開始並在背景進行。";
-"Picks a model that fits your Mac and turns on only what you choose." = "選擇適合你 Mac 的模型，並只啟用你選擇的功能。";
+"Picks a model that fits your Mac and enables only what you choose." = "選擇適合你 Mac 的模型，並只啟用你選擇的功能。";
 "Pin" = "釘選";
 "Pin %@" = "釘選 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "釘選：專案中的每個對話會取得整個檔案（≈%@ 代幣）。檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
@@ -736,7 +736,7 @@
 "Remove from Project" = "從專案移除";
 "Remove from the project" = "從專案中移除";
 "Remove this file from the project?" = "要從專案中移除此檔案嗎？";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "從 %@ 移除已下載的 mlx-lm 執行環境與圖像生成功能（其執行環境與圖像模型）。下次伺服器啟動或啟用圖像生成功能時會重新設定。已儲存的對話和設定檔會保留。";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "從 %@ 移除已下載的 mlx-lm 執行環境與圖像生成功能（其執行環境與圖像模型）。下次伺服器啟動或啟用圖像生成功能時會重新設定。已儲存的對話和設定檔會保留。";
 "Rename" = "重新命名";
 "Rename %1$@ to %2$@" = "將 %1$@ 重新命名為 %2$@";
 "Rename Profile" = "重新命名設定檔";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "該處已有相同名稱：此變更將失敗而非覆寫。";
 "The name must be on one line." = "名稱必須為單行。";
 "The name wasn't accepted: up to 64 characters, on one line." = "名稱不被接受：最多 64 個字元，且為單行。";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "接下來的步驟會設定模型及你想要的功能。每一步都可跳過；除非你選擇，否則不會下載或啟用任何項目。";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "接下來的步驟會設定模型及你想要的功能。每一步都可跳過；除非你選擇，否則不會下載或啟用任何項目。";
 "The plan changed since you looked at it: review it again." = "計畫自您檢視後已變更：請再次檢閱。";
 "The port and network access can change only while the server is stopped." = "連接埠與網路存取僅能於伺服器停止時變更。";
 "The reply was cut at its length limit." = "回覆已達長度上限並被截斷。";
@@ -1044,12 +1044,12 @@
 "Total time" = "總時長";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "針對執行中的模型嘗試 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之間都會重新啟動伺服器，並保留測得最快的設定。";
 "Try Again" = "重試";
-"Turn On Project Files…" = "開啟專案檔案…";
-"Turn On…" = "開啟…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "在設定中開啟「專案檔案」，以將檔案加入專案並讓對話搜尋它們。";
-"Turn on Project files to add files" = "開啟專案檔案以新增檔案";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "開啟專案檔案以新增檔案到專案並讓對話可搜尋它們。完成前不會進行索引或下載。";
-"Turn on project files?" = "要開啟專案檔案嗎？";
+"Enable Project Files…" = "開啟專案檔案…";
+"Enable…" = "開啟…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "在設定中開啟「專案檔案」，以將檔案加入專案並讓對話搜尋它們。";
+"Enable Project files to add files" = "開啟專案檔案以新增檔案";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "開啟專案檔案以新增檔案到專案並讓對話可搜尋它們。完成前不會進行索引或下載。";
+"Enable project files?" = "要開啟專案檔案嗎？";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "將檔案文字轉為用於語意搜尋的向量，並儲存在此台 Mac。移除模型不會刪除索引：在重新下載前，檔案會改以文字方式搜尋。";
 "Tweak…" = "微調…";
 "Unavailable" = "無法使用";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "更新失敗：%@";
 "Updates" = "更新";
 "Usage statistics" = "使用統計";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "使用統計已關閉：不會寄送任何資料。若啟用時，報告會長得像這樣（ID 會在啟用時產生）。";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "使用統計已關閉：不會寄送任何資料。若啟用時，報告會長得像這樣（ID 會在啟用時產生）。";
 "Usage statistics: the reports" = "使用統計：報告";
 "Use" = "使用";
 "Use %lld" = "使用 %lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "檢視模型卡。";
 "Voice" = "語音";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab 已關閉 — 請在「設定 > 語音」中開啟。";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab 已關閉 — 請在「設定 > 語音」中開啟。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab 約佔 %1$@ GB，於 GPU 可用的 %2$@ GB 中使用 — 與聊天模型的 %3$@ GB 無法同時共存，因此運行時會卸載聊天模型。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab 約佔 %1$@ GB，於 GPU 可用的 %2$@ GB 中使用。";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab 約佔 %1$@ GB，超過此 Mac GPU 可用的 %2$@ GB：會耗盡記憶體。";
