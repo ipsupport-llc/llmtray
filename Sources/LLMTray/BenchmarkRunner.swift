@@ -145,7 +145,10 @@ final class BenchmarkRunner: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(AppRequestToken.value, forHTTPHeaderField: AppRequestToken.header)
         request.httpBody = bodyData
-        request.timeoutInterval = 300
+        // The proxy's stall watchdog ends a stuck request; a fixed idle
+        // timeout here would end one waiting behind an API client's long
+        // answer.
+        request.timeoutInterval = 24 * 3600
 
         let sendDate = Date()
         var firstByteDate: Date?

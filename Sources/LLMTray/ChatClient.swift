@@ -18,7 +18,7 @@ final class ChatClient: ObservableObject {
     /// model answers one request at a time (shown as such).
     enum WaitingBehind { case anotherChat, anotherRequest }
     @Published private(set) var waitingBehind: WaitingBehind?
-    /// The current request's answer has started (or it ended), and which
+    /// The current request's response has started (or it ended), and which
     /// request is current (a tool round sends the next one).
     private var answerStarted = false
     private var streamNumber = 0
@@ -1114,7 +1114,11 @@ final class ChatClient: ObservableObject {
         answerStarted = false
         streamNumber += 1
         let number = streamNumber
-        transport.stream(request, onText: { [weak self] text in
+        transport.stream(request, onResponse: { [weak self] in
+            // The model server took it: no longer waiting behind another.
+            self?.answerStarted = true
+            self?.waitingBehind = nil
+        }, onText: { [weak self] text in
             self?.answerStarted = true
             self?.waitingBehind = nil
             self?.handle(self?.decoder.feed(text) ?? [])
@@ -1123,8 +1127,9 @@ final class ChatClient: ObservableObject {
             self?.waitingBehind = nil
             self?.streamDidComplete(completion)
         })
-        // Until the answer starts: another request in flight means this one
-        // waits for it -- said so, not just a spinner.
+        // Until the response starts (mlx_lm.server sends its headers once
+        // generation takes the request): another request in flight means
+        // this one waits for it -- said so, not just a spinner.
         let token = turnToken, epoch = conversationEpoch
         Task { [weak self] in
             while let self, number == self.streamNumber, !self.answerStarted, self.isStreaming,

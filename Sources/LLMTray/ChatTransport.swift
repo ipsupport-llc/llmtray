@@ -28,6 +28,7 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
     }
 
     private struct Handlers {
+        var onResponse: () -> Void
         var onText: (String) -> Void
         var onComplete: (Completion) -> Void
     }
@@ -43,12 +44,15 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
         session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }
 
-    func stream(_ request: URLRequest, onText: @escaping (String) -> Void, onComplete: @escaping (Completion) -> Void) {
+    /// `onResponse`: the response has started (its headers came) -- the
+    /// model server has taken the request.
+    func stream(_ request: URLRequest, onResponse: @escaping () -> Void = {},
+                onText: @escaping (String) -> Void, onComplete: @escaping (Completion) -> Void) {
         cancel()
         let newTask = session.dataTask(with: request)
         streams.begin(newTask.taskIdentifier)
         task = newTask
-        handlers = Handlers(onText: onText, onComplete: onComplete)
+        handlers = Handlers(onResponse: onResponse, onText: onText, onComplete: onComplete)
         startDate = Date()
         newTask.resume()
     }
@@ -101,8 +105,13 @@ final class ChatTransport: NSObject, URLSessionDataDelegate {
         didReceive response: URLResponse,
         completionHandler: @escaping @Sendable (URLSession.ResponseDisposition) -> Void
     ) {
-        streams.setStatus((response as? HTTPURLResponse)?.statusCode, for: dataTask.taskIdentifier)
+        let taskID = dataTask.taskIdentifier
+        streams.setStatus((response as? HTTPURLResponse)?.statusCode, for: taskID)
         completionHandler(.allow)
+        Task { @MainActor in
+            guard self.task?.taskIdentifier == taskID else { return }
+            self.handlers?.onResponse()
+        }
     }
 
     nonisolated func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
