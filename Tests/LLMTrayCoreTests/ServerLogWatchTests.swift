@@ -76,6 +76,9 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 5, now: t + 70, threshold: 60))
         // Old progress, from before this request's last byte, changes nothing.
         XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t - 100, now: t + 61, threshold: 60))
+        // Another request's progress keeps it alive only up to the ceiling.
+        XCTAssertFalse(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 3590, now: t + 3599, threshold: 60, maxWait: 3600))
+        XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 3600, now: t + 3601, threshold: 60, maxWait: 3600))
     }
 
     func testStallRuleWaiting() {

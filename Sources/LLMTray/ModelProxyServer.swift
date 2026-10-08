@@ -567,10 +567,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             // The server's prefill progress counts too (StallRule): a long
             // prompt on a busy Mac sends nothing for minutes while the log
             // shows it working.
+            let now = Date()
             guard StallRule.isStalled(lastByteAt: lastActivityAt, serverProgressAt: server?.lastPrefillProgressAt,
-                                      now: Date(), threshold: stallThreshold) else { return }
-            server?.appendLog(
-                "--- proxy: no response or prefill progress from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
+                                      now: now, threshold: stallThreshold) else { return }
+            server?.appendLog(now.timeIntervalSince(lastActivityAt) > StallRule.maxWait
+                ? "--- proxy: a response got no more bytes from mlx_lm.server in \(Int(StallRule.maxWait / 60)) min -- treating as stalled ---\n"
+                : "--- proxy: no response or prefill progress from mlx_lm.server for \(Int(stallThreshold))s -- treating as stalled and resetting ---\n"
             )
             _ = finish(stalled: true)
         }

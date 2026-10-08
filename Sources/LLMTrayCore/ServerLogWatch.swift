@@ -87,9 +87,12 @@ public struct ServerLogWatch {
 /// prefilled: the log line doesn't say whose prompt it is, and it shows the
 /// server's generation loop alive -- requests queued behind that prefill
 /// aren't stuck either. A genuine stall (a dead worker, a wedged process)
-/// logs no progress and sends no bytes, and still trips it.
+/// logs no progress and sends no bytes, and still trips it. No bytes of its
+/// own for `maxWait` trips it whatever the progress.
 public enum StallRule {
-    public static func isStalled(lastByteAt: Date, serverProgressAt: Date?, now: Date, threshold: TimeInterval) -> Bool {
+    public static func isStalled(lastByteAt: Date, serverProgressAt: Date?, now: Date, threshold: TimeInterval,
+                                 maxWait: TimeInterval = maxWait) -> Bool {
+        if now.timeIntervalSince(lastByteAt) > maxWait { return true }
         let last = max(lastByteAt, serverProgressAt ?? lastByteAt)
         return now.timeIntervalSince(last) > threshold
     }
@@ -98,9 +101,10 @@ public enum StallRule {
     /// showing any life.
     public static let waitTimeout: TimeInterval = 300
 
-    /// The longest a request may wait for its response at all, however
-    /// busy the server is with others: one the server lost while it answers
-    /// other requests must not wait forever.
+    /// The longest a request may wait for its response, or go without
+    /// bytes once it started, however busy the server is with others: one
+    /// the server lost while it answers other requests must not wait
+    /// forever.
     public static let maxWait: TimeInterval = 3600
 
     /// A request with no response yet (queued behind another, or a

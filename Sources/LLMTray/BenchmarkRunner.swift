@@ -321,6 +321,8 @@ final class BenchmarkRunner: ObservableObject {
             statusText = "Testing decode-concurrency=\(value)…"
             server.launchTrial.decodeConcurrency = value
             guard await restart() else { break }
+            // Cancelled during the restart: nothing in flight to cancel yet.
+            if cancelRequested { break }
 
             let batchStart = Date()
             let results: [BenchmarkSample?] = await withTaskGroup(of: BenchmarkSample?.self) { group in
@@ -372,6 +374,7 @@ final class BenchmarkRunner: ObservableObject {
             statusText = "Testing prefill-step-size=\(value)…"
             server.launchTrial.prefillStepSize = value
             guard await restart() else { break }
+            if cancelRequested { break }
 
             guard let sample = try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 2048, maxTokens: 8) else { continue }
             autoTuneLog.append(AutoTuneCandidateResult(parameter: "prefill-step-size", value: value, throughput: sample.prefillTokPerSec))
