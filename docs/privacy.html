@@ -196,7 +196,7 @@
     <h2>Anonymous usage statistics</h2>
     <p>Once a day LLMTray can send an anonymous report of the previous day to <code>ipsupport.us</code>. It is on by default for a new install. You can turn it off during setup or at any time in <b>Settings › General › Usage statistics</b>, which also shows exactly what is sent, with your Mac's values. The first report is sent only after your first day ends, so you can turn it off before anything is sent.</p>
     <ul>
-      <li><b>Sent:</b> a random install ID (a new one each time you turn it on or press Reset ID), the day, the LLMTray and macOS versions, the chip (for example “Apple M5”), the memory size, the interface language, how many times each feature was used (chat answers, tool calls, API requests from other apps, images made or edited, music made, model downloads), and the families of the models you used (for example “gemma” or “qwen”, anything else as “other”).</li>
+      <li><b>Sent:</b> a random install ID (a new one each time you enable it or press Reset ID), the day, the LLMTray and macOS versions, the chip (for example “Apple M5”), the memory size, the interface language, how many times each feature was used (chat answers, tool calls, API requests from other apps, images made or edited, music made, model downloads), and the families of the models you used (for example “gemma” or “qwen”, anything else as “other”).</li>
       <li><b>Never sent:</b> prompts, chat content, generated images or audio, file names or paths, exact model names or repositories, API keys, and account or contact details. Temporary chats are not counted at all.</li>
       <li><b>What we keep:</b> a keyed hash of the install ID (never the ID itself), the approximate country of the connection, and the report's fields, for 400 days. The address the report came from is used only to limit how often reports are accepted, as a keyed hash; the address itself is never stored.</li>
     </ul>
@@ -229,10 +229,10 @@
 
     <h2>Updates</h2>
     <p>The Mac App Store version is updated by the App Store and installs nothing else.</p>
-    <p>The version downloaded from our site checks for updates (Sparkle) automatically, by reading the update feed on our GitHub Pages site (<code>ipsupport-llc.github.io</code>); updates are downloaded from GitHub. Its smaller download sets up its model runtime on first launch, and image generation, music and voice when you turn them on, by downloading packages from GitHub and the Python Package Index (PyPI). It checks GitHub for updates of those runtimes when you ask it to.</p>
+    <p>The version downloaded from our site checks for updates (Sparkle) automatically, by reading the update feed on our GitHub Pages site (<code>ipsupport-llc.github.io</code>); updates are downloaded from GitHub. Its smaller download sets up its model runtime on first launch, and image generation, music and voice when you enable them, by downloading packages from GitHub and the Python Package Index (PyPI). It checks GitHub for updates of those runtimes when you ask it to.</p>
 
     <h2>The local API server</h2>
-    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you turn on access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet (it doesn't fetch images given as web links).</p>
+    <p>LLMTray's OpenAI-compatible server listens only on your Mac (127.0.0.1) by default. If you enable access from your local network, other devices on that network can use it too. It is a server for your own apps; it doesn't send anything to the internet (it doesn't fetch images given as web links).</p>
 
     <h2>Microphone</h2>
     <p>Voice Lab uses the microphone only while you use it. The audio is processed on your Mac and is not recorded or sent anywhere.</p>

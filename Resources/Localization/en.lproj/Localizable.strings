@@ -72,7 +72,7 @@
 "A package: moved as one item." = "A package: moved as one item.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up.";
 "A song from a description" = "A song from a description";
@@ -97,7 +97,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.";
 "Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "All off unless you turn them on. Models are downloaded after Finish, one at a time.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "All off unless you enable them. Models are downloaded after Finish, one at a time.";
 "Allow" = "Allow";
 "Allow Folder to Change…" = "Allow Folder to Change…";
 "Allow Folder to Look In…" = "Allow Folder to Look In…";
@@ -318,12 +318,20 @@
 "Echo gate" = "Echo gate";
 "Edit Profile…" = "Edit Profile…";
 "Embedding model" = "Embedding model";
+"Enable Project Files…" = "Enable Project Files…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Enable Project files in Settings to add files to the project and let its chats search them.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.";
+"Enable Project files to add files" = "Enable Project files to add files";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
 "Enable Without It" = "Enable Without It";
 "Enable image editing?" = "Enable image editing?";
 "Enable image generation" = "Enable image generation";
 "Enable image generation?" = "Enable image generation?";
+"Enable images, music and voice" = "Enable images, music and voice";
 "Enable music generation" = "Enable music generation";
 "Enable music generation?" = "Enable music generation?";
+"Enable project files?" = "Enable project files?";
+"Enable…" = "Enable…";
 "End" = "End";
 "End the conversation (the chat model reloads)" = "End the conversation (the chat model reloads)";
 "Enjoying LLMTray?" = "Enjoying LLMTray?";
@@ -432,8 +440,8 @@
 "Image generation" = "Image generation";
 "Image generation failed: %@" = "Image generation failed: %@";
 "Image generation finished but produced no output file." = "Image generation finished but produced no output file.";
-"Image generation isn't set up -- turn it on again in Settings." = "Image generation isn't set up -- turn it on again in Settings.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Image generation needs an update -- turn it off and on again in Settings.";
+"Image generation isn't set up -- enable it again in Settings." = "Image generation isn't set up -- enable it again in Settings.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Image generation needs an update -- disable it and enable it again in Settings.";
 "Image generation off" = "Image generation off";
 "Image model" = "Image model";
 "Image, music and voice models" = "Image, music and voice models";
@@ -526,7 +534,7 @@
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
 "Make images and edit them." = "Make images and edit them.";
-"Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: turn them on in Settings.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Makes a new random ID: later reports can't be matched to earlier ones.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it.";
@@ -550,7 +558,7 @@
 "Models folder" = "Models folder";
 "Models folder: %@" = "Models folder: %@";
 "Models found: %lld" = "Models found: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet.";
 "Models: %@ · free: %@" = "Models: %@ · free: %@";
 "Move %1$@ to %2$@" = "Move %1$@ to %2$@";
 "Move %@ to the Trash" = "Move %@ to the Trash";
@@ -562,7 +570,7 @@
 "Music generation" = "Music generation";
 "Music generation failed: %@" = "Music generation failed: %@";
 "Music generation finished but produced no audio." = "Music generation finished but produced no audio.";
-"Music generation isn't set up -- turn it on again in Settings." = "Music generation isn't set up -- turn it on again in Settings.";
+"Music generation isn't set up -- enable it again in Settings." = "Music generation isn't set up -- enable it again in Settings.";
 "Music model" = "Music model";
 "Music off" = "Music off";
 "Name" = "Name";
@@ -634,7 +642,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.";
 "Off" = "Off";
-"Off · turn on in Settings" = "Off · turn on in Settings";
+"Off · enable in Settings" = "Off · enable in Settings";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
@@ -672,7 +680,7 @@
 "Performance" = "Performance";
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
-"Picks a model that fits your Mac and turns on only what you choose." = "Picks a model that fits your Mac and turns on only what you choose.";
+"Picks a model that fits your Mac and enables only what you choose." = "Picks a model that fits your Mac and enables only what you choose.";
 "Pin" = "Pin";
 "Pin %@" = "Pin %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.";
@@ -752,7 +760,7 @@
 "Remove from Project" = "Remove from Project";
 "Remove from the project" = "Remove from the project";
 "Remove this file from the project?" = "Remove this file from the project?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept.";
 "Rename" = "Rename";
 "Rename %1$@ to %2$@" = "Rename %1$@ to %2$@";
 "Rename Profile" = "Rename Profile";
@@ -991,7 +999,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "The name is taken there: this change will fail rather than overwrite.";
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it.";
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The reply was cut at its length limit." = "The reply was cut at its length limit.";
@@ -1065,14 +1073,6 @@
 "Total time" = "Total time";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
 "Try Again" = "Try Again";
-"Turn On Project Files…" = "Turn On Project Files…";
-"Turn On…" = "Turn On…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "Turn on Project files in Settings to add files to the project and let its chats search them.";
-"Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Turn on Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.";
-"Turn on Project files to add files" = "Turn on Project files to add files";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
-"Turn on images, music and voice" = "Turn on images, music and voice";
-"Turn on project files?" = "Turn on project files?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
 "Type a message below and press Return. Try: “What can you do?”" = "Type a message below and press Return. Try: “What can you do?”";
@@ -1104,7 +1104,7 @@
 "Update failed: %@" = "Update failed: %@";
 "Updates" = "Updates";
 "Usage statistics" = "Usage statistics";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then).";
 "Usage statistics: the reports" = "Usage statistics: the reports";
 "Use" = "Use";
 "Use %lld" = "Use %lld";
@@ -1124,7 +1124,7 @@
 "View model card" = "View model card";
 "Voice" = "Voice";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab is off -- turn it on in Settings > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab is off -- enable it in Settings > Voice.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory.";
@@ -1206,6 +1206,8 @@
 "downloading %@ (%@)" = "downloading %@ (%@)";
 "downloading (%@)" = "downloading (%@)";
 "embedding" = "embedding";
+"enable in Settings" = "enable in Settings";
+"enable in Settings to add the LLMTray guide" = "enable in Settings to add the LLMTray guide";
 "failed" = "failed";
 "failed to build request" = "failed to build request";
 "failed: %@" = "failed: %@";
@@ -1254,8 +1256,6 @@
 "tight fit" = "tight fit";
 "trash %lld" = "trash %lld";
 "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make." = "turbo: a fuller, more finished-sounding mix. sft: sings the lyrics clearly, the voice upfront, about twice as long to make.";
-"turn on in Settings" = "turn on in Settings";
-"turn on in Settings to add the LLMTray guide" = "turn on in Settings to add the LLMTray guide";
 "until %@" = "until %@";
 "used %@" = "used %@";
 "used by %@" = "used by %@";

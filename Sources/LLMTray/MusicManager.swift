@@ -207,7 +207,7 @@ final class MusicManager: ObservableObject {
                   creativity: Double? = nil, adherence: Double? = nil, seed: Int? = nil,
                   bitrate: Int = 256) async throws -> Song {
         guard isReady(model) else {
-            throw MusicError.processFailed(NSLocalizedString("Music generation isn't set up -- turn it on again in Settings.", comment: ""))
+            throw MusicError.processFailed(NSLocalizedString("Music generation isn't set up -- enable it again in Settings.", comment: ""))
         }
         // Claimed before any suspension: two tabs can't both run it.
         guard !isBusy else {

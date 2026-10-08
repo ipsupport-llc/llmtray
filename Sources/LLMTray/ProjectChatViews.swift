@@ -73,8 +73,8 @@ struct ProjectChatStatusLine: View {
                 dot
                 // What a click on the line does: Settings › Files.
                 Text(GettingStarted.isProject(project)
-                     ? NSLocalizedString("turn on in Settings to add the LLMTray guide", comment: "a project chat's status line: Getting Started's guide waits for Project files")
-                     : NSLocalizedString("turn on in Settings", comment: "a project chat's status line: Project files are off"))
+                     ? NSLocalizedString("enable in Settings to add the LLMTray guide", comment: "a project chat's status line: Getting Started's guide waits for Project files")
+                     : NSLocalizedString("enable in Settings", comment: "a project chat's status line: Project files are off"))
                     .foregroundColor(.accentColor)
             }
         } else {
@@ -135,7 +135,7 @@ struct ProjectChatStatusLine: View {
     /// Why it failed (the first few files), what it's doing, or what a click does.
     private func help(_ project: UUID) -> String {
         guard indexer.isEnabled else {
-            return NSLocalizedString("Turn on Project files in Settings to add files to the project and let its chats search them.", comment: "")
+            return NSLocalizedString("Enable Project files in Settings to add files to the project and let its chats search them.", comment: "")
         }
         let failures = ProjectChatStatus.failureLines(indexer.documents[project] ?? [])
         var lines = [indexer.statusText(for: project)].compactMap { $0 }
@@ -177,7 +177,7 @@ struct ProjectChatDropZone: View {
                 VStack(spacing: 6) {
                     Image(systemName: "folder.badge.questionmark").font(.title3)
                     Text("Project files are off").font(.callout)
-                    Text("Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
+                    Text("Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
                         .font(.caption).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     Button("Settings…") { openFilesSettings() }.controlSize(.small)
                 }

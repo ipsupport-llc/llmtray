@@ -26,7 +26,7 @@ shots = [
  ("03-chat", "LLMTray-02-chat.png", None,
   "Less data center. More Mac.", "Open models like Gemma and Nemotron run right here. Your chats stay on your Mac."),
  ("04-getting-started", "LLMTray-03-getting-started.png", NO_MENUBAR,
-  "Up and running in minutes", "A guided start: chat, add your files, turn on images, music and voice."),
+  "Up and running in minutes", "A guided start: chat, add your files, enable images, music and voice."),
  ("05-models", "LLMTray-04-models.png", SETTINGS,
   "All your models in one place", "Chat, image, music and voice models, downloaded once and kept on your disk."),
  ("06-profiles", "LLMTray-05-profiles.png", SETTINGS,

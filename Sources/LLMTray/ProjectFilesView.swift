@@ -188,11 +188,11 @@ private struct ProjectFilesView: View {
     private var offNote: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Project files are turned off", systemImage: "folder.badge.questionmark").font(.headline)
-            Text("Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
+            Text("Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack {
-                Button("Turn On…") { Task { actionError = await ProjectFilesSection.turnOn() } }
+                Button("Enable…") { Task { actionError = await ProjectFilesSection.turnOn() } }
                     .keyboardShortcut(.defaultAction)
                 Button("Settings…") { openFilesSettings() }
             }

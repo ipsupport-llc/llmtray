@@ -9,8 +9,8 @@ locally; nothing you type, attach or generate is sent to a cloud.
 1. Pick a chat model. The setup assistant suggests the ones that fit your
    Mac's memory; you can download others from Hugging Face later.
 2. Start chatting. The model loads the first time you send a message.
-3. Turn on the extras you want in Settings: image generation, music, voice,
-   project files. Each one downloads what it needs only when you turn it on.
+3. Enable the extras you want in Settings: image generation, music, voice,
+   project files. Each one downloads what it needs only when you enable it.
 
 LLMTray lives in the menu bar. Click its icon for the chat; Open Chat (or
 New Chat) opens it in its own window.
@@ -71,7 +71,7 @@ A project groups chats with their own instructions and files.
 - **Files:** add documents (PDF, text, Markdown, Office files…) in the
   project's Files window. The model searches them and cites the pages it
   used; click a citation to open the page.
-- **Searching files needs Project files turned on:** Settings › Files ›
+- **Searching files needs Project files enabled:** Settings › Files ›
   Project files. Without an embedding model the search matches words; with
   one (downloaded there, about 1 GB) it also finds passages by meaning.
 - **Pinned files** go into every request of the project's chats as a whole
@@ -83,7 +83,7 @@ Models that call tools can use LLMTray's built-in tools when you ask for
 something they can't know:
 
 - On your Mac: date and time, calculator.
-- On the web (off until you turn them on in the profile): web search, news,
+- On the web (off until you enable them in the profile): web search, news,
   Hacker News, Wikipedia, country facts, public holidays, currency rates,
   weather, hourly forecast, air quality, sunrise and sunset, the time in a
   city.
@@ -105,7 +105,7 @@ to the Trash.
 
 ## Images
 
-Turn on image generation in Settings › Profiles › Image generation and pick a
+Enable image generation in Settings › Profiles › Image generation and pick a
 model (Z-Image Turbo, or FLUX.2 klein, which can also edit an image). Then
 ask in the chat: "draw a fox in the snow". To change an image, attach it and
 say what to change.
@@ -115,7 +115,7 @@ prompt, size and model before the image is made.
 
 ## Music
 
-Turn on music generation in Settings › Profiles › Music generation. Ask for a
+Enable music generation in Settings › Profiles › Music generation. Ask for a
 song with a style and lyrics: "a calm piano song about the sea". Songs play
 in the chat and can be saved or shared.
 
@@ -135,7 +135,7 @@ LLMTray serves an OpenAI-compatible API on your Mac.
 - **API key:** any value; the server runs on your Mac only.
 - Point any app or coding agent that speaks the OpenAI API at that address:
   set the base URL to `http://127.0.0.1:8765/v1` and the model to an alias.
-- **Other devices** on your network can use it after you turn on network
+- **Other devices** on your network can use it after you enable network
   access in Settings › Server › Network.
 - **Switching models:** a request for another model can load it; Settings ›
   Server › Model switching decides whether apps may switch it.
