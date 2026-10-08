@@ -38,7 +38,7 @@ private struct TelemetryReportView: View {
             VStack(alignment: .leading, spacing: 14) {
                 Text(telemetry.isEnabled
                      ? "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac."
-                     : "Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then).")
+                     : "Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then).")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

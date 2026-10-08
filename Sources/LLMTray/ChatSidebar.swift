@@ -381,7 +381,7 @@ struct ChatSidebar: View {
                         Button("Stop Indexing") { Task { await indexer.stop(project.id) } }
                     }
                 } else {
-                    Button("Turn On Project Files…") { turnOnProjectFiles() }
+                    Button("Enable Project Files…") { turnOnProjectFiles() }
                 }
                 Button("Instructions…") { ProjectInstructionsWindow.show(project.id) }
                 Button("Rename…") {
@@ -402,7 +402,7 @@ struct ChatSidebar: View {
     private func projectFileNotes(_ project: UUID) -> some View {
         if filesOffHint == project, !indexer.isEnabled {
             Button { turnOnProjectFiles() } label: {
-                Label("Turn on Project files to add files", systemImage: "info.circle")
+                Label("Enable Project files to add files", systemImage: "info.circle")
                     .font(.caption)
                     .fixedSize(horizontal: false, vertical: true)
             }

@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "مكس أكثر امتلاءً ومظهرًا مكتملًا؛ كلمات الأغنية تبدو أقل وضوحًا. حوالي 20 s لمقطع موسيقي مدته 30 s.";
 "A package: moved as one item." = "حزمة: نُقلت كعنصر واحد.";
 "A quiet check at every launch. Only shows anything if an update exists." = "فحص صامت عند كل تشغيل. لا يُظهر شيئًا إلا إذا كان هناك تحديث.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "معرّف عشوائي يُنشأ على هذا الـ Mac عند كل تشغيل. غير مرتبط بك أو بالـ Mac.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "معرّف عشوائي يُنشأ على هذا الـ Mac عند كل تشغيل. غير مرتبط بك أو بالـ Mac.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "تقييم وبعض الكلمات يُرسَل إلى ipsupport.us: لا حساب، ولا معرفات جهاز. تظهر المراجعات على موقع LLMTray بعد المراجعة.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "يُعدّ الطلب الذي لا ينتج شيئًا طوال هذه المدة متعثرًا. يحدث ذلك عندما يتوقف عامل الخادم (مثلًا بسبب نفاد ذاكرة GPU) مع بقاء العملية قيد التشغيل.";
 "A song from a description" = "أغنية من وصف";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "بعد إجابة الدردشة الأولى، يقدّم النموذج عنوانًا قصيرًا لقائمة الدردشات (طلب قصير إضافي). إيقاف: بداية الرسالة الأولى. إعادة تسمية الدردشة تعمل دائمًا.";
 "Air quality" = "جودة الهواء";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "الاسم المستعار: اسم «model» الذي ترسله أدوات أخرى إلى API الخاص بـ LLMTray للحصول على هذا النموذج. ملف التعريف: ملف إعدادات هذا النموذج.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "كلها مغلقة ما لم تقم بتشغيلها. يتم تنزيل النماذج بعد Finish، واحدًا تلو الآخر.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "كلها مغلقة ما لم تقم بتشغيلها. يتم تنزيل النماذج بعد Finish، واحدًا تلو الآخر.";
 "Allow" = "السماح";
 "Allow Folder to Change…" = "السماح للمجلد بالتغيير…";
 "Allow Folder to Look In…" = "السماح للمجلد بالنظر داخل…";
@@ -421,8 +421,8 @@
 "Image generation" = "إنشاء الصور";
 "Image generation failed: %@" = "فشل توليد الصورة: %@";
 "Image generation finished but produced no output file." = "انتهى توليد الصورة لكنه لم ينتج ملفًا.";
-"Image generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
-"Image generation needs an update -- turn it off and on again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
+"Image generation isn't set up -- enable it again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image generation off" = "توليد الصور متوقف";
 "Image model" = "نموذج الصور";
 "Image, music and voice models" = "نماذج الصور والموسيقى والصوت";
@@ -535,7 +535,7 @@
 "Models folder" = "مجلد النماذج";
 "Models folder: %@" = "مجلد النماذج: %@";
 "Models found: %lld" = "النماذج الموجودة: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "تعمل النماذج على هذا الـ Mac. دردشاتك لا تغادره؛ فقط أدوات الويب، إذا شغّلتها، تتصل بالإنترنت.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "تعمل النماذج على هذا الـ Mac. دردشاتك لا تغادره؛ فقط أدوات الويب، إذا شغّلتها، تتصل بالإنترنت.";
 "Models: %@ · free: %@" = "نماذج: %@ · مساحة حرة: %@";
 "Move %1$@ to %2$@" = "نقل %1$@ إلى %2$@";
 "Move %@ to the Trash" = "نقل %@ إلى Trash";
@@ -547,7 +547,7 @@
 "Music generation" = "إنتاج الموسيقى";
 "Music generation failed: %@" = "فشل إنتاج الموسيقى: %@";
 "Music generation finished but produced no audio." = "اكتمل توليد الموسيقى لكن لم يتم إنتاج صوت.";
-"Music generation isn't set up -- turn it on again in Settings." = "لم يتم إعداد إنتاج الموسيقى — فعّله مرة أخرى في الإعدادات.";
+"Music generation isn't set up -- enable it again in Settings." = "لم يتم إعداد إنتاج الموسيقى — فعّله مرة أخرى في الإعدادات.";
 "Music model" = "نموذج الموسيقى";
 "Music off" = "الموسيقى متوقفة";
 "Name" = "الاسم";
@@ -618,7 +618,7 @@
 "OK" = "موافق";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "من سياق النموذج، ومن الذاكرة التي تتركها أوزانُه في السياق، ما قد تشغله الملفات المثبتة لمشروع ما معًا. يبقى حدّ أقصى لرموز الإجابة متاحًا مهما كان هذا الإعداد. المزيد يقلل المساحة المتاحة للمحادثة، وقد تطيُل الإجابة الأولى أثناء قراءة الملفات.";
 "Off" = "إيقاف";
-"Off · turn on in Settings" = "إيقاف · فعّله في الإعدادات";
+"Off · enable in Settings" = "إيقاف · فعّله في الإعدادات";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "إيقاف: لا يمكن إلا لهذا الـ Mac الوصول إلى الخادم. تشغيل: يمكن للأجهزة الأخرى على شبكتك الوصول إليه أيضًا — أي شخص عليها، لذا لا تستخدمه إلا على الشبكات التي تثق بها.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "متوقف: هذا الـ Mac فقط. مفعل: أي شخص على شبكتك، لذا فعّله فقط على الشبكات التي تثق بها.";
 "Older" = "أقدم";
@@ -656,7 +656,7 @@
 "Performance" = "الأداء";
 "Pick a rating from 1 to 5 stars." = "اختر تقييماً من 1 إلى 5 نجوم.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "اختر واحدًا للدردشة معه. يبدأ التنزيل فورًا ويستمر في الخلفية.";
-"Picks a model that fits your Mac and turns on only what you choose." = "يختار نموذجًا مناسبًا لجهاز Mac ويشغّل فقط الميزات التي تختارها.";
+"Picks a model that fits your Mac and enables only what you choose." = "يختار نموذجًا مناسبًا لجهاز Mac ويشغّل فقط الميزات التي تختارها.";
 "Pin" = "تثبيت";
 "Pin %@" = "تثبيت %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "تثبيت: تحصل كل محادثة في المشروع على الملف كاملًا (≈%@ رمزًا). البحث على الويب وتوليد الصور أو الموسيقى متوقّفان في تلك المحادثات طالما هو مثبت.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "إزالة من المشروع";
 "Remove from the project" = "أزل من المشروع";
 "Remove this file from the project?" = "هل تريد إزالة هذا الملف من المشروع؟";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "يزيل وقت التشغيل mlx-lm المحمّل وتوليد الصور (وقت التشغيل ونماذج الصور) من %@. سيتم إعدادها مرة أخرى عند إعادة تشغيل الخادم أو عند تفعيل توليد الصور. المحادثات والحسابات المحفوظة تبقى محفوظة.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "يزيل وقت التشغيل mlx-lm المحمّل وتوليد الصور (وقت التشغيل ونماذج الصور) من %@. سيتم إعدادها مرة أخرى عند إعادة تشغيل الخادم أو عند تفعيل توليد الصور. المحادثات والحسابات المحفوظة تبقى محفوظة.";
 "Rename" = "إعادة تسمية";
 "Rename %1$@ to %2$@" = "إعادة تسمية %1$@ إلى %2$@";
 "Rename Profile" = "إعادة تسمية الملف الشخصي";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "الاسم مستخدم هناك: سيفشل هذا التغيير بدلاً من أن يستبدل.";
 "The name must be on one line." = "يجب أن يكون الاسم في سطر واحد.";
 "The name wasn't accepted: up to 64 characters, on one line." = "لم يُقبل الاسم: حتى 64 حرفًا، في سطر واحد.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "الخطوات التالية تُعد نموذجًا والميزات التي تريدها. يمكن تخطي كل منها؛ لا يُنزل أو يُفعّل شيء ما لم تختره.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "الخطوات التالية تُعد نموذجًا والميزات التي تريدها. يمكن تخطي كل منها؛ لا يُنزل أو يُفعّل شيء ما لم تختره.";
 "The plan changed since you looked at it: review it again." = "تغيرت الخطة منذ نظرت إليها: راجعها مرة أخرى.";
 "The port and network access can change only while the server is stopped." = "لا يمكن تغيير المنفذ والوصول إلى الشبكة إلا بينما يكون الخادم متوقفًا.";
 "The reply was cut at its length limit." = "تم قطع الرد عند الحد الأقصى للطول.";
@@ -1044,12 +1044,12 @@
 "Total time" = "الزمن الإجمالي";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "يجرب decode-concurrency (1/2/4/8) و prefill-step-size (64/128/256/512) على النموذج قيد التشغيل، مع إعادة تشغيل الخادم بين كل تجربة، ويحتفظ بالإعداد الأسرع قياسًا.";
 "Try Again" = "حاول مرة أخرى";
-"Turn On Project Files…" = "تشغيل Project Files…";
-"Turn On…" = "تشغيل…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "فعّل ملفات المشروع في الإعدادات لإضافة ملفات إلى المشروع والسماح لمحادثاته بالبحث فيها.";
-"Turn on Project files to add files" = "شغّل Project files لإضافة ملفات";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل Project files لإضافة ملفات إلى المشروع وتمكين الدردشات من البحث فيها. لا يُفهرس أو يُنزل شيء حتى ذلك الحين.";
-"Turn on project files?" = "تشغيل ملفات المشروع؟";
+"Enable Project Files…" = "تشغيل Project Files…";
+"Enable…" = "تشغيل…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "فعّل ملفات المشروع في الإعدادات لإضافة ملفات إلى المشروع والسماح لمحادثاته بالبحث فيها.";
+"Enable Project files to add files" = "شغّل Project files لإضافة ملفات";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل Project files لإضافة ملفات إلى المشروع وتمكين الدردشات من البحث فيها. لا يُفهرس أو يُنزل شيء حتى ذلك الحين.";
+"Enable project files?" = "تشغيل ملفات المشروع؟";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "يحوِّل نص الملفات إلى متجهات للبحث بحسب المعنى على هذا الـMac. إزالته تحتفظ بالفهارس: عندها تُبحث الملفات بكلماتها حتى يعاد تنزيله.";
 "Tweak…" = "تعديل…";
 "Unavailable" = "غير متاح";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "فشل التحديث: %@";
 "Updates" = "التحديثات";
 "Usage statistics" = "إحصاءات الاستخدام";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "إحصاءات الاستخدام معطلة: لا يُرسل شيء. هذا شكل التقرير إذا قمت بتشغيلها (يُنشأ المعرّف عندها).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "إحصاءات الاستخدام معطلة: لا يُرسل شيء. هذا شكل التقرير إذا قمت بتشغيلها (يُنشأ المعرّف عندها).";
 "Usage statistics: the reports" = "إحصاءات الاستخدام: التقارير";
 "Use" = "استخدام";
 "Use %lld" = "استخدم %lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "اعرض بطاقة النموذج.";
 "Voice" = "الصوت";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab متوقّف — فعّله في الإعدادات > الصوت.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab متوقّف — فعّله في الإعدادات > الصوت.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "يستهلك Voice Lab نحو %1$@ غيغابايت من أصل %2$@ غيغابايت قد يستخدمها الـGPU — لا يمكن تشغيله مع %3$@ غيغابايت الخاصة بنموذج الدردشة، لذا يُفرغ نموذج الدردشة أثناء تشغيله.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "يستهلك Voice Lab نحو %1$@ غيغابايت من أصل %2$@ غيغابايت قد يستخدمها الـGPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "يستهلك Voice Lab نحو %1$@ غيغابايت، وهو أكثر من %2$@ غيغابايت التي قد يستخدمها الـGPU على هذا الـMac: سيفقد الذاكرة.";

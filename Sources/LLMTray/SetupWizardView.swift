@@ -220,14 +220,14 @@ private struct WelcomeStep: View {
                 capability("network", Text("An OpenAI-compatible API on localhost for other apps."))
             }
             Label {
-                Text("Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet.")
+                Text("Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet.")
                     .fixedSize(horizontal: false, vertical: true)
             } icon: {
                 Image(systemName: "lock")
             }
             .foregroundStyle(.secondary)
             ModelDisclaimer.Card()
-            Text("The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it.")
+            Text("The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it.")
                 .font(.callout).foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             // Before the server first starts: a port another app holds
@@ -566,7 +566,7 @@ private struct ExtrasStep: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            StepHeader(Text("What else"), Text("All off unless you turn them on. Models are downloaded after Finish, one at a time."))
+            StepHeader(Text("What else"), Text("All off unless you enable them. Models are downloaded after Finish, one at a time."))
             feature(isOn: Binding(get: { model.progress.choices.imageModel != nil },
                                   set: { model.progress.choices.imageModel = $0 ? model.imagePick.rawValue : nil }),
                     title: Text("Image generation"),

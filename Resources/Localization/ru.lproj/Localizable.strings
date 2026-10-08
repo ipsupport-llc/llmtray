@@ -69,7 +69,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Более плотный, готовый звук; слова слышны менее отчётливо. Примерно 20 с на 30 с музыки.";
 "A package: moved as one item." = "Пакет: перемещается как один элемент.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Тихая проверка при каждом запуске. Что-то показывает, только если есть обновление.";
-"A random ID made on this Mac, new each time this is turned on. Not tied to you or the Mac." = "Случайный ID, созданный на этом Mac; новый при каждой загрузке. Не привязан к вам или к компьютеру.";
+"A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Случайный ID, созданный на этом Mac; новый при каждой загрузке. Не привязан к вам или к компьютеру.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Оценка и несколько слов отправляются на ipsupport.us: без учёта аккаунта и идентификаторов устройства. Отзывы публикуются на сайте LLMTray после модерации.";
 "A request that produces nothing for this long counts as stalled. That happens when a server worker dies (e.g. out of GPU memory) while the process stays up." = "Запрос, который столько времени ничего не выдаёт, считается зависшим. Так бывает, когда рабочий поток сервера умирает (например, кончилась память GPU), а сам процесс продолжает жить.";
 "A song from a description" = "Песня по описанию";
@@ -94,7 +94,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "После первого ответа в новом чате модель присваивает ему короткое название для списка чатов (ещё один короткий запрос). Выключено: начало первого сообщения. Переименование чата всегда работает.";
 "Air quality" = "Качество воздуха";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Алиас — имя в поле «model», которое другие программы отправляют в API LLMTray, чтобы получить эту модель. Профиль — какой профиль настроек использует модель.";
-"All off unless you turn them on. Models are downloaded after Finish, one at a time." = "Все отключено, пока вы не включите. Модели загружаются после «Finish», по одной.";
+"All off unless you enable them. Models are downloaded after Finish, one at a time." = "Все отключено, пока вы не включите. Модели загружаются после «Finish», по одной.";
 "Allow" = "Разрешить";
 "Allow Folder to Change…" = "Разрешить папке изменять…";
 "Allow Folder to Look In…" = "Разрешить папке просматривать…";
@@ -421,8 +421,8 @@
 "Image generation" = "Генерация картинок";
 "Image generation failed: %@" = "Не удалось сгенерировать изображение: %@";
 "Image generation finished but produced no output file." = "Генерация изображения завершилась, но файл не создан.";
-"Image generation isn't set up -- turn it on again in Settings." = "Генерация изображений не настроена — включите её снова в Настройках.";
-"Image generation needs an update -- turn it off and on again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
+"Image generation isn't set up -- enable it again in Settings." = "Генерация изображений не настроена — включите её снова в Настройках.";
+"Image generation needs an update -- disable it and enable it again in Settings." = "Генерации изображений требуется обновление — выключите и включите её снова в Настройках.";
 "Image generation off" = "Генерация изображений отключена";
 "Image model" = "Модель картинок";
 "Image, music and voice models" = "Модели для изображений, музыки и голоса";
@@ -535,7 +535,7 @@
 "Models folder" = "Папка моделей";
 "Models folder: %@" = "Папка моделей: %@";
 "Models found: %lld" = "Найдено моделей: %lld";
-"Models run on this Mac. Your chats don't leave it; only the web tools, if you turn them on, reach the internet." = "Модели работают на этом Mac. Чаты не покидают его; в интернет выходят только веб‑инструменты, если вы их включите.";
+"Models run on this Mac. Your chats don't leave it; only the web tools, if you enable them, reach the internet." = "Модели работают на этом Mac. Чаты не покидают его; в интернет выходят только веб‑инструменты, если вы их включите.";
 "Models: %@ · free: %@" = "Модели: %@ · свободно: %@";
 "Move %1$@ to %2$@" = "Переместить %1$@ в %2$@";
 "Move %@ to the Trash" = "Переместить %@ в Корзину";
@@ -547,7 +547,7 @@
 "Music generation" = "Генерация музыки";
 "Music generation failed: %@" = "Генерация музыки не удалась: %@";
 "Music generation finished but produced no audio." = "Генерация музыки завершилась, но аудио не создано.";
-"Music generation isn't set up -- turn it on again in Settings." = "Генерация музыки не настроена — включите её в Настройках.";
+"Music generation isn't set up -- enable it again in Settings." = "Генерация музыки не настроена — включите её в Настройках.";
 "Music model" = "Музыкальная модель";
 "Music off" = "Музыка отключена";
 "Name" = "Имя";
@@ -618,7 +618,7 @@
 "OK" = "OK";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Сколько контекста модели и памяти, которую её веса оставляют для контекста, могут занимать закреплённые файлы проекта вместе. Максимальное число токенов для ответа остаётся свободным независимо от этого параметра. Чем больше значение, тем меньше места остаётся для беседы, и при чтении файлов первый ответ может быть долгим.";
 "Off" = "Выкл.";
-"Off · turn on in Settings" = "Выкл · включите в Настройках";
+"Off · enable in Settings" = "Выкл · включите в Настройках";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Выкл. — к серверу подключается только этот Mac. Вкл. — любые устройства в вашей сети, поэтому включайте только в доверенных сетях.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Выкл: только этот Mac. Вкл: любой в вашей сети — включайте только в доверенных сетях.";
 "Older" = "Раньше";
@@ -656,7 +656,7 @@
 "Performance" = "Производительность";
 "Pick a rating from 1 to 5 stars." = "Выберите оценку от 1 до 5 звёзд.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Выберите модель для общения. Загрузка начнётся сразу и продолжится в фоне.";
-"Picks a model that fits your Mac and turns on only what you choose." = "Выбирает модель, подходящую для вашего Mac, и включает только выбранные вами опции.";
+"Picks a model that fits your Mac and enables only what you choose." = "Выбирает модель, подходящую для вашего Mac, и включает только выбранные вами опции.";
 "Pin" = "Закрепить";
 "Pin %@" = "Закрепить %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закрепить: каждый чат проекта получит весь файл (≈%@ токенов). В этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
@@ -736,7 +736,7 @@
 "Remove from Project" = "Убрать из проекта";
 "Remove from the project" = "Удалить из проекта";
 "Remove this file from the project?" = "Удалить этот файл из проекта?";
-"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is turned on. Saved chats and profiles are kept." = "Удаляет загруженный runtime mlx-lm и компоненты генерации изображений (runtime и модели изображений) из %@. Они будут установлены снова при следующем запуске сервера или при включении генерации изображений. Сохранённые чаты и профили остаются.";
+"Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Удаляет загруженный runtime mlx-lm и компоненты генерации изображений (runtime и модели изображений) из %@. Они будут установлены снова при следующем запуске сервера или при включении генерации изображений. Сохранённые чаты и профили остаются.";
 "Rename" = "Переименовать";
 "Rename %1$@ to %2$@" = "Переименовать %1$@ в %2$@";
 "Rename Profile" = "Переименовать профиль";
@@ -970,7 +970,7 @@
 "The name is taken there: this change will fail rather than overwrite." = "Имя уже занято: это изменение завершится ошибкой, не перезаписывая.";
 "The name must be on one line." = "Имя должно быть в одной строке.";
 "The name wasn't accepted: up to 64 characters, on one line." = "Имя не принято: до 64 символов, в одной строке.";
-"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or turned on unless you choose it." = "Следующие шаги настраивают модель и нужные функции. Каждый шаг можно пропустить; ничего не загружается и не включается без вашего выбора.";
+"The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Следующие шаги настраивают модель и нужные функции. Каждый шаг можно пропустить; ничего не загружается и не включается без вашего выбора.";
 "The plan changed since you looked at it: review it again." = "План изменился с момента просмотра: просмотрите его снова.";
 "The port and network access can change only while the server is stopped." = "Порт и сетевой доступ можно изменить только при остановленном сервере.";
 "The reply was cut at its length limit." = "Ответ был обрезан по ограничению длины.";
@@ -1044,12 +1044,12 @@
 "Total time" = "Общее время";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирает decode-concurrency (1/2/4/8) и prefill-step-size (64/128/256/512) на запущенной модели, перезапуская сервер между попытками, и оставляет самое быстрое.";
 "Try Again" = "Повторить";
-"Turn On Project Files…" = "Включить Project Files…";
-"Turn On…" = "Включить…";
-"Turn on Project files in Settings to add files to the project and let its chats search them." = "Включите файлы проекта в Настройках, чтобы добавлять файлы в проект и позволить чатам их искать.";
-"Turn on Project files to add files" = "Включите Project files, чтобы добавлять файлы";
-"Turn on Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите Project files, чтобы добавлять файлы в проект и позволить его чатам искать по ним. До этого ничего не индексируется и не скачивается.";
-"Turn on project files?" = "Включить файлы проекта?";
+"Enable Project Files…" = "Включить Project Files…";
+"Enable…" = "Включить…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Включите файлы проекта в Настройках, чтобы добавлять файлы в проект и позволить чатам их искать.";
+"Enable Project files to add files" = "Включите Project files, чтобы добавлять файлы";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите Project files, чтобы добавлять файлы в проект и позволить его чатам искать по ним. До этого ничего не индексируется и не скачивается.";
+"Enable project files?" = "Включить файлы проекта?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Преобразует текст файлов в векторы для поиска по смыслу на этом Mac. При удалении модель индексы сохранятся — файлы будут искаться по словам до повторной загрузки модели.";
 "Tweak…" = "Настроить…";
 "Unavailable" = "Недоступно";
@@ -1080,7 +1080,7 @@
 "Update failed: %@" = "Обновление не удалось: %@";
 "Updates" = "Обновления";
 "Usage statistics" = "Статистика использования";
-"Usage statistics are off: nothing is sent. This is what a report would look like if you turned them on (the ID is made then)." = "Статистика использования отключена: ничего не отправляется. Так выглядел бы отчёт при включении (ID формируется тогда).";
+"Usage statistics are off: nothing is sent. This is what a report would look like if you enabled them (the ID is made then)." = "Статистика использования отключена: ничего не отправляется. Так выглядел бы отчёт при включении (ID формируется тогда).";
 "Usage statistics: the reports" = "Статистика использования: отчёты";
 "Use" = "Использовать";
 "Use %lld" = "Использовать %lld";
@@ -1100,7 +1100,7 @@
 "View model card" = "Карточка модели";
 "Voice" = "Голос";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- turn it on in Settings > Voice." = "Voice Lab отключён — включите в Настройки > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab отключён — включите в Настройки > Voice.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab занимает примерно %1$@ ГБ из %2$@ ГБ, доступных GPU — не вместе с %3$@ ГБ чат‑модели, поэтому чат‑модель выгружается во время работы.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab занимает примерно %1$@ ГБ из %2$@ ГБ, доступных GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab занимает примерно %1$@ ГБ, что больше, чем %2$@ ГБ, доступных GPU на этом Mac: памяти не хватит.";
