@@ -161,7 +161,10 @@ enum ChatRequestBuilder {
         // The app's own chat: switches models whatever the switching policy.
         request.setValue(AppRequestToken.value, forHTTPHeaderField: AppRequestToken.header)
         request.httpBody = data
-        request.timeoutInterval = 300
+        // The proxy's stall watchdog ends a stuck request (a 504, or the
+        // stream cut); a fixed idle timeout here would end one waiting
+        // behind another chat's long answer.
+        request.timeoutInterval = 24 * 3600
         return request
     }
 }

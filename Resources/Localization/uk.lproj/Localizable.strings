@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "Модель не відповіла — спробуйте ще раз.";
 "The model didn't start: %@" = "Модель не запустилася: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "Модель завантажено, але папку не вдалося позначити як завершену.";
+"The model is answering another chat: yours starts as soon as it's free." = "Модель відповідає в іншому чаті: ваш запит почнеться, щойно вона звільниться.";
+"The model is busy with another request: yours starts as soon as it's free." = "Модель зайнята іншим запитом: ваш почнеться, щойно вона звільниться.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "Модель розмірковує перед відповіддю (в Налаштуваннях відображено саме розмірковування)";
 "The model isn't running. Send again to start it." = "Модель не запущена. Надішліть ще раз, щоб запустити її.";
 "The model name API clients send." = "Ім'я моделі, яке надсилають API-клієнти.";

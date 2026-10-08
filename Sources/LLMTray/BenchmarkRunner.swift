@@ -118,6 +118,9 @@ final class BenchmarkRunner: ObservableObject {
 
     func cancel() {
         cancelRequested = true
+        // A measurement in flight ends too: one waiting behind a long API
+        // answer would otherwise hold the benchmark until that ends.
+        session.getAllTasks { $0.forEach { $0.cancel() } }
     }
 
     // MARK: - Single-request measurement
@@ -145,7 +148,10 @@ final class BenchmarkRunner: ObservableObject {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(AppRequestToken.value, forHTTPHeaderField: AppRequestToken.header)
         request.httpBody = bodyData
-        request.timeoutInterval = 300
+        // The proxy's stall watchdog ends a stuck request; a fixed idle
+        // timeout here would end one waiting behind an API client's long
+        // answer.
+        request.timeoutInterval = 24 * 3600
 
         let sendDate = Date()
         var firstByteDate: Date?
@@ -229,7 +235,7 @@ final class BenchmarkRunner: ObservableObject {
         do {
             _ = try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens)
         } catch {
-            quickBenchmarkError = error.localizedDescription
+            if !cancelRequested { quickBenchmarkError = error.localizedDescription }
             return
         }
 
@@ -240,7 +246,7 @@ final class BenchmarkRunner: ObservableObject {
             do {
                 samples.append(try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens))
             } catch {
-                quickBenchmarkError = error.localizedDescription
+                if !cancelRequested { quickBenchmarkError = error.localizedDescription }
                 return
             }
         }
@@ -315,6 +321,8 @@ final class BenchmarkRunner: ObservableObject {
             statusText = "Testing decode-concurrency=\(value)…"
             server.launchTrial.decodeConcurrency = value
             guard await restart() else { break }
+            // Cancelled during the restart: nothing in flight to cancel yet.
+            if cancelRequested { break }
 
             let batchStart = Date()
             let results: [BenchmarkSample?] = await withTaskGroup(of: BenchmarkSample?.self) { group in
@@ -327,6 +335,8 @@ final class BenchmarkRunner: ObservableObject {
                 for await sample in group { collected.append(sample) }
                 return collected
             }
+            // Cancelled mid-batch: its requests failed for that, not memory.
+            if cancelRequested { break }
             let elapsed = Date().timeIntervalSince(batchStart)
             let failures = results.filter { $0 == nil }.count
             let totalTokens = results.compactMap { $0?.completionTokens }.reduce(0, +)
@@ -364,6 +374,7 @@ final class BenchmarkRunner: ObservableObject {
             statusText = "Testing prefill-step-size=\(value)…"
             server.launchTrial.prefillStepSize = value
             guard await restart() else { break }
+            if cancelRequested { break }
 
             guard let sample = try? await measureOnce(port: port, modelAlias: modelAlias, promptTokens: 2048, maxTokens: 8) else { continue }
             autoTuneLog.append(AutoTuneCandidateResult(parameter: "prefill-step-size", value: value, throughput: sample.prefillTokPerSec))
@@ -387,14 +398,15 @@ final class BenchmarkRunner: ObservableObject {
         if !cancelRequested {
             statusText = "Restoring original settings…"
             _ = await restart()
-            pendingProposal = AutoTuneProposal(
+            // Cancelled while restoring: no proposal either.
+            if !cancelRequested { pendingProposal = AutoTuneProposal(
                 modelPath: modelPath,
                 profileID: profileID,
                 currentConcurrency: originalConcurrency,
                 proposedConcurrency: bestConcurrency,
                 currentPrefillStep: originalPrefillStep,
                 proposedPrefillStep: bestPrefillStep
-            )
+            ) }
         } else {
             statusText = "Cancelled -- restoring original settings…"
             _ = await restart()

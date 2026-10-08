@@ -76,6 +76,28 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 5, now: t + 70, threshold: 60))
         // Old progress, from before this request's last byte, changes nothing.
         XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t - 100, now: t + 61, threshold: 60))
+        // Another request's progress keeps it alive only up to the ceiling.
+        XCTAssertFalse(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 3590, now: t + 3599, threshold: 60, maxWait: 3600))
+        XCTAssertTrue(StallRule.isStalled(lastByteAt: t, serverProgressAt: t + 3600, now: t + 3601, threshold: 60, maxWait: 3600))
+    }
+
+    func testStallRuleWaiting() {
+        let t = Date(timeIntervalSince1970: 1000)
+        // Queued behind another chat's long answer: its bytes 5 s ago keep
+        // this one waiting, 20 minutes after it was sent.
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 1195, now: t + 1200, timeout: 300))
+        // Nothing from the server at all since it was sent: stalled.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: nil, now: t + 301, timeout: 300))
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: nil, now: t + 299, timeout: 300))
+        // Activity from before it was sent doesn't extend it.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t - 50, now: t + 301, timeout: 300))
+        // Activity that stopped: stalled once the timeout passes after it.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 600, now: t + 901, timeout: 300))
+        // Past the ceiling, stalled even with the server busy for others.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 3600, now: t + 3601, timeout: 300, maxWait: 3600))
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 3590, now: t + 3599, timeout: 300, maxWait: 3600))
+        XCTAssertEqual(StallRule.waitTimeout, 300)
+        XCTAssertEqual(StallRule.maxWait, 3600)
     }
 
     func testUTF8SplitAcrossChunks() {

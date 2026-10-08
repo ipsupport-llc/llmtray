@@ -14,6 +14,14 @@ final class ChatClient: ObservableObject {
     @Published private(set) var isWaitingForModelLoad = false
     /// The message waits for the chat model's download (first run).
     @Published private(set) var isWaitingForModelDownload = false
+    /// What the sent request waits behind, before its answer starts: the
+    /// model answers one request at a time (shown as such).
+    enum WaitingBehind { case anotherChat, anotherRequest }
+    @Published private(set) var waitingBehind: WaitingBehind?
+    /// The current request's response has started (or it ended), and which
+    /// request is current (a tool round sends the next one).
+    private var answerStarted = false
+    private var streamNumber = 0
     @Published var isStreaming: Bool = false
     @Published var lastTokensPerSecond: Double?
     @Published var errorText: String?
@@ -102,6 +110,8 @@ final class ChatClient: ObservableObject {
     /// Another tab is unloading the model for an image, or has it unloaded
     /// (ChatTabs): an answer waits for it to come back.
     var isAnotherChatUnloadingModel: () -> Bool = { false }
+    /// Another chat's answer is on its way (ChatTabs).
+    var isAnotherChatStreaming: () -> Bool = { false }
     /// This chat unloads the model for an image and reloads it after:
     /// announced before the unload, so other tabs wait from the start.
     @Published private(set) var isUnloadingModelForMedia = false
@@ -1088,7 +1098,7 @@ final class ChatClient: ObservableObject {
     /// will start it -- ends the turn with why: a request to a port nobody
     /// listens on only said "Could not connect to the server".
     private func startStreamIfModelUp(_ request: URLRequest, server: ServerManager) {
-        if server.canAnswer { return startStream(request) }
+        if server.canAnswer { return startStream(request, server: server) }
         isStreaming = false
         if case .failed(let reason) = server.state {
             errorText = String(format: NSLocalizedString("The model didn't start: %@", comment: "chat: the auto-start failed"), reason)
@@ -1100,17 +1110,46 @@ final class ChatClient: ObservableObject {
         persistCurrentSession()
     }
 
-    private func startStream(_ request: URLRequest) {
-        transport.stream(request, onText: { [weak self] text in
+    private func startStream(_ request: URLRequest, server: ServerManager) {
+        answerStarted = false
+        streamNumber += 1
+        let number = streamNumber
+        transport.stream(request, onResponse: { [weak self] in
+            // The model server took it: no longer waiting behind another.
+            self?.answerStarted = true
+            self?.waitingBehind = nil
+        }, onText: { [weak self] text in
+            self?.answerStarted = true
+            self?.waitingBehind = nil
             self?.handle(self?.decoder.feed(text) ?? [])
         }, onComplete: { [weak self] completion in
+            self?.answerStarted = true
+            self?.waitingBehind = nil
             self?.streamDidComplete(completion)
         })
+        // Until the response starts (mlx_lm.server sends its headers once
+        // generation takes the request): another request in flight means
+        // this one waits for it -- said so, not just a spinner.
+        let token = turnToken, epoch = conversationEpoch
+        Task { [weak self] in
+            // A moment first: with decode concurrency above one the server
+            // takes a second request at once, and its headers come then.
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            while let self, number == self.streamNumber, !self.answerStarted, self.isStreaming,
+                  token == self.turnToken, epoch == self.conversationEpoch {
+                let behind: WaitingBehind? = server.activeRequestCount > 1
+                    ? (self.isAnotherChatStreaming() ? .anotherChat : .anotherRequest) : nil
+                if behind != self.waitingBehind { self.waitingBehind = behind }
+                try? await Task.sleep(nanoseconds: 500_000_000)
+            }
+            if let self, number == self.streamNumber { self.waitingBehind = nil }
+        }
     }
 
     func cancel() {
         isWaitingForModelLoad = false
         isWaitingForModelDownload = false
+        waitingBehind = nil
         draft?.resolve(nil)
         draft = nil
         // A call waiting on a folder prompt stops; one the user opened stays.

@@ -953,6 +953,8 @@
 "The model didn't answer -- try again." = "Model tidak merespons — coba lagi.";
 "The model didn't start: %@" = "Model gagal dimulai: %@";
 "The model downloaded, but its folder couldn't be marked complete." = "Model terunduh, tetapi foldernya tidak bisa ditandai selesai.";
+"The model is answering another chat: yours starts as soon as it's free." = "Model sedang menjawab di obrolan lain: permintaan Anda dimulai begitu model kosong.";
+"The model is busy with another request: yours starts as soon as it's free." = "Model sedang sibuk dengan permintaan lain: permintaan Anda dimulai begitu model kosong.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "Model sedang berpikir sebelum menjawab (Pengaturan menampilkan proses berpikir itu sendiri)";
 "The model isn't running. Send again to start it." = "Model tidak berjalan. Kirim lagi untuk memulainya.";
 "The model name API clients send." = "Nama model yang dikirim klien API.";
