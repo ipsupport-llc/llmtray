@@ -90,7 +90,11 @@ final class ServerLogWatchTests: XCTestCase {
         XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t - 50, now: t + 301, timeout: 300))
         // Activity that stopped: stalled once the timeout passes after it.
         XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 600, now: t + 901, timeout: 300))
+        // Past the ceiling, stalled even with the server busy for others.
+        XCTAssertTrue(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 3600, now: t + 3601, timeout: 300, maxWait: 3600))
+        XCTAssertFalse(StallRule.isStalledWaiting(sentAt: t, serverActivityAt: t + 3590, now: t + 3599, timeout: 300, maxWait: 3600))
         XCTAssertEqual(StallRule.waitTimeout, 300)
+        XCTAssertEqual(StallRule.maxWait, 3600)
     }
 
     func testUTF8SplitAcrossChunks() {

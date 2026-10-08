@@ -98,14 +98,21 @@ public enum StallRule {
     /// showing any life.
     public static let waitTimeout: TimeInterval = 300
 
+    /// The longest a request may wait for its response at all, however
+    /// busy the server is with others: one the server lost while it answers
+    /// other requests must not wait forever.
+    public static let maxWait: TimeInterval = 3600
+
     /// A request with no response yet (queued behind another, or a
     /// non-streaming one at work): stalled only when the server showed no
     /// life -- no bytes to any request, no prefill progress
     /// (`serverActivityAt`) -- for `timeout` since it was sent or since
     /// that activity. A request waiting behind a long one waits as long as
     /// that one is being answered.
+    /// Past `maxWait` it's stalled whatever the activity.
     public static func isStalledWaiting(sentAt: Date, serverActivityAt: Date?, now: Date,
-                                        timeout: TimeInterval = waitTimeout) -> Bool {
+                                        timeout: TimeInterval = waitTimeout, maxWait: TimeInterval = maxWait) -> Bool {
+        if now.timeIntervalSince(sentAt) > maxWait { return true }
         let last = max(sentAt, serverActivityAt ?? sentAt)
         return now.timeIntervalSince(last) > timeout
     }

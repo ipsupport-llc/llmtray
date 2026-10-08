@@ -118,6 +118,9 @@ final class BenchmarkRunner: ObservableObject {
 
     func cancel() {
         cancelRequested = true
+        // A measurement in flight ends too: one waiting behind a long API
+        // answer would otherwise hold the benchmark until that ends.
+        session.getAllTasks { $0.forEach { $0.cancel() } }
     }
 
     // MARK: - Single-request measurement
@@ -232,7 +235,7 @@ final class BenchmarkRunner: ObservableObject {
         do {
             _ = try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens)
         } catch {
-            quickBenchmarkError = error.localizedDescription
+            if !cancelRequested { quickBenchmarkError = error.localizedDescription }
             return
         }
 
@@ -243,7 +246,7 @@ final class BenchmarkRunner: ObservableObject {
             do {
                 samples.append(try await measureOnce(port: port, modelAlias: modelAlias, promptTokens: promptTokens, maxTokens: maxTokens))
             } catch {
-                quickBenchmarkError = error.localizedDescription
+                if !cancelRequested { quickBenchmarkError = error.localizedDescription }
                 return
             }
         }
@@ -330,6 +333,8 @@ final class BenchmarkRunner: ObservableObject {
                 for await sample in group { collected.append(sample) }
                 return collected
             }
+            // Cancelled mid-batch: its requests failed for that, not memory.
+            if cancelRequested { break }
             let elapsed = Date().timeIntervalSince(batchStart)
             let failures = results.filter { $0 == nil }.count
             let totalTokens = results.compactMap { $0?.completionTokens }.reduce(0, +)

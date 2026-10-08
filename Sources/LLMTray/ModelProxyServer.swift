@@ -554,10 +554,12 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
                 // behind another (always, with an MTP drafter) waits for it.
                 // Stalled only once the server shows no life at all for
                 // anyone (bytes to any request, prefill progress).
+                let now = Date()
                 guard StallRule.isStalledWaiting(sentAt: sentAt, serverActivityAt: server?.lastServerActivityAt,
-                                                 now: Date()) else { return }
-                server?.appendLog(
-                    "--- proxy: no response and no activity from mlx_lm.server for \(Int(StallRule.waitTimeout))s -- treating as stalled and resetting ---\n"
+                                                 now: now) else { return }
+                server?.appendLog(now.timeIntervalSince(sentAt) > StallRule.maxWait
+                    ? "--- proxy: a request got no response from mlx_lm.server in \(Int(StallRule.maxWait / 60)) min -- treating as stalled ---\n"
+                    : "--- proxy: no response and no activity from mlx_lm.server for \(Int(StallRule.waitTimeout))s -- treating as stalled and resetting ---\n"
                 )
                 _ = finish(stalled: true)
                 return
