@@ -20,7 +20,9 @@ final class ComposerModel: ObservableObject {
     /// Only a vision-capable model can take images; switching to one that
     /// can't drops what's attached.
     @Published var acceptsImages = false {
-        didSet { if !acceptsImages { attachments.removeAll() } }
+        didSet {
+            if !acceptsImages { attachments.removeAll() } else { notice = nil }
+        }
     }
 
     var isEmpty: Bool { draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty }
@@ -56,7 +58,8 @@ final class ComposerModel: ObservableObject {
             .urlReadingContentsConformToTypes: [UTType.image.identifier],
         ]) as? [URL]) ?? []
         let images: [NSImage]
-        switch ClipboardImages.source(imageFiles: files.count, hasText: pasteboard.availableType(from: [.string]) != nil,
+        let text = pasteboard.string(forType: .string)
+        switch ClipboardImages.source(imageFiles: files.count, text: text,
                                       hasImageData: pasteboard.canReadObject(forClasses: [NSImage.self], options: nil)) {
         case .files:
             images = files.compactMap { NSImage(contentsOf: $0) }
@@ -110,6 +113,15 @@ final class ComposerModel: ObservableObject {
         guard acceptsImages else {
             if providers.contains(where: { $0.canLoadObject(ofClass: NSImage.self) || $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) }) {
                 modelCantSeeImages()
+            } else {
+                // A file from Finder: an image only by its type, known once
+                // its URL is loaded.
+                for provider in providers where provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                    _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                        guard let url, UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) == true else { return }
+                        DispatchQueue.main.async { if !self.acceptsImages { self.modelCantSeeImages() } }
+                    }
+                }
             }
             return false
         }
@@ -341,7 +353,8 @@ private struct PasteImageWatcher: NSViewRepresentable {
             guard window != nil else { return }
             monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
                 guard let self, self.isFocused, event.window === self.window,
-                      event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                      // Caps Lock and the like aside, as every ⌘ shortcut.
+                      event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
                       ClipboardImages.isPasteKey(characters: event.charactersIgnoringModifiers, keyCode: event.keyCode),
                       let paste = self.paste else { return event }
                 return MainActor.assumeIsolated { paste() } ? nil : event

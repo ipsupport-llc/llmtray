@@ -4,13 +4,18 @@ import XCTest
 final class ClipboardImagesTests: XCTestCase {
     func testSource() {
         // Finder copy of an image file: the file, though its name is text too.
-        XCTAssertEqual(ClipboardImages.source(imageFiles: 1, hasText: true, hasImageData: true), .files)
-        // A screenshot to the clipboard, Copy Image in a browser.
-        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, hasText: false, hasImageData: true), .imageData)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 1, text: "photo.png", hasImageData: false), .files)
+        // A screenshot to the clipboard, Copy Image in Chrome.
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: nil, hasImageData: true), .imageData)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "  \n", hasImageData: true), .imageData)
+        // Copy Image in Safari: the image and its address.
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "https://example.com/a/fox.jpg", hasImageData: true), .imageData)
         // Text with a picture (a rich copy): its text.
-        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, hasText: true, hasImageData: true), .text)
-        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, hasText: true, hasImageData: false), .text)
-        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, hasText: false, hasImageData: false), .text)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "A fox in the snow", hasImageData: true), .text)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "see https://example.com/fox", hasImageData: true), .text)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "hello", hasImageData: false), .text)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: "https://example.com", hasImageData: false), .text)
+        XCTAssertEqual(ClipboardImages.source(imageFiles: 0, text: nil, hasImageData: false), .text)
     }
 
     func testPasteKey() {
