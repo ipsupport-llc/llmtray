@@ -17,9 +17,9 @@ struct ChatSidebar: View {
     var closesOnOpen = false
 
     @State private var query = ""
-    /// The search's results for `query`, worked out off the main thread
-    /// (nil: not yet).
-    @State private var found: [ChatSummary]?
+    /// The search's results and the query they're for, worked out off
+    /// the main thread (nil: not yet).
+    @State private var found: (query: String, chats: [ChatSummary])?
     @State private var lastSearch: SearchKey?
     @State private var showsAllRecents = false
     /// The chat being renamed, and the list it's being renamed in (a
@@ -152,11 +152,16 @@ struct ChatSidebar: View {
             // Only chats still there: one deleted since the search isn't
             // offered until it's redone.
             let existing = Set(store.chats.map(\.id))
-            let rows = found.filter { existing.contains($0.id) }
-            if rows.isEmpty {
+            let rows = found.chats.filter { existing.contains($0.id) }
+            // Another query's results while the new one is worked out:
+            // dimmed, not to be opened.
+            let stale = found.query != query
+            if rows.isEmpty && !stale {
                 Text("No chats found").foregroundColor(.secondary).padding(8)
             }
             ForEach(rows) { row($0, in: "search") }
+                .opacity(stale ? 0.4 : 1)
+                .allowsHitTesting(!stale)
         }
     }
 
@@ -181,7 +186,7 @@ struct ChatSidebar: View {
         }
         let chats = store.chats, query = self.query
         guard let result = await Self.search(chats, query: query), !Task.isCancelled else { return }
-        found = result
+        found = (query, result)
     }
 
     /// Off the main actor (nonisolated async), and cancelled with the
