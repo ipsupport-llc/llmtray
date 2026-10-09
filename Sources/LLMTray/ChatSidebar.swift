@@ -17,6 +17,9 @@ struct ChatSidebar: View {
     var closesOnOpen = false
 
     @State private var query = ""
+    /// The search's results for `query`, worked out off the main thread
+    /// (nil: not yet).
+    @State private var found: [ChatSummary]?
     @State private var showsAllRecents = false
     /// The chat being renamed, and the list it's being renamed in (a
     /// pinned chat in a project shows twice).
@@ -72,6 +75,7 @@ struct ChatSidebar: View {
                 .padding(.bottom, 12)
             }
         }
+        .task(id: SearchKey(query: query, revision: store.revision)) { await runSearch() }
         .background(.regularMaterial)
         .onReceive(Self.clock) { now = $0 }
         // The popover's overlay: typing searches, and Esc closes it.
@@ -139,11 +143,35 @@ struct ChatSidebar: View {
 
     @ViewBuilder
     private var searchResults: some View {
-        let found = store.chats.filter { $0.matches(query) }
-        if found.isEmpty {
-            Text("No chats found").foregroundColor(.secondary).padding(8)
+        if let found {
+            if found.isEmpty {
+                Text("No chats found").foregroundColor(.secondary).padding(8)
+            }
+            ForEach(found) { row($0, in: "search") }
         }
-        ForEach(found) { row($0, in: "search") }
+    }
+
+    /// What the search depends on: a new query or a saved chat redoes it.
+    private struct SearchKey: Equatable {
+        var query: String
+        var revision: Int
+    }
+
+    /// Off the main thread, once typing pauses: a large library doesn't
+    /// hold up the keys.
+    private func runSearch() async {
+        guard !query.isEmpty else {
+            found = nil
+            return
+        }
+        if found != nil {
+            try? await Task.sleep(nanoseconds: 120_000_000)
+            guard !Task.isCancelled else { return }
+        }
+        let chats = store.chats, query = self.query
+        let result = await Task.detached(priority: .userInitiated) { ChatSummary.search(chats, query: query) }.value
+        guard !Task.isCancelled else { return }
+        found = result
     }
 
     @ViewBuilder

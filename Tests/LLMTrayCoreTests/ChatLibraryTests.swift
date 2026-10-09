@@ -45,6 +45,24 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertTrue(chat.matches(""))
     }
 
+    func testSearchBytes() {
+        // Decomposed letters (e + combining accent, й as и + breve) match
+        // their composed spelling either way round.
+        let chat = ChatSummary(id: UUID(), title: "t", updatedAt: Date(),
+                               searchText: ChatSearchText.make(title: "t", messages: ["Cafe\u{301} и Краи\u{306}"]))
+        XCTAssertTrue(chat.matches("café"))
+        XCTAssertTrue(chat.matches("КРАЙ"))
+        let composed = ChatSummary(id: UUID(), title: "t", updatedAt: Date(), searchText: "café")
+        XCTAssertTrue(composed.matches("Cafe\u{301}"))
+        // Every word, any order; none found.
+        let a = ChatSummary(id: UUID(), title: "a", updatedAt: Date(), searchText: "кластер на тандерболте")
+        let b = ChatSummary(id: UUID(), title: "b", updatedAt: Date(), searchText: "rdma кластер")
+        XCTAssertEqual(ChatSummary.search([a, b], query: "кластер").map(\.title), ["a", "b"])
+        XCTAssertEqual(ChatSummary.search([a, b], query: "тандер Кластер").map(\.title), ["a"])
+        XCTAssertEqual(ChatSummary.search([a, b], query: "infiniband").count, 0)
+        XCTAssertEqual(ChatSummary.search([a, b], query: "  ").count, 2)
+    }
+
     func testSearchTextCoversALongChat() {
         // A long chat in Russian (the 40 KB cap for everything lost its
         // second half): 20 answers of 6 KB, then the word.
