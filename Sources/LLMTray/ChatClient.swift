@@ -23,13 +23,11 @@ final class ChatClient: ObservableObject {
     @Published var revealRequest: RevealRequest?
 
     /// Brings the first message with `query`'s words into view, among the
-    /// ones the chat shows (a tool's output points at the answer before it).
+    /// ones the chat shows (and saves: what the search looked through).
     func reveal(matching query: String) {
         let shown = messages.filter { $0.role != "tool" && !$0.isToolContext }
-        guard let i = ChatSearchText.firstMessage(matching: query, in: messages.map(\.content)) else { return }
-        let target = messages[...i].last { $0.role != "tool" && !$0.isToolContext } ?? shown.first
-        guard let target else { return }
-        revealRequest = RevealRequest(messageID: target.id)
+        guard let i = ChatSearchText.firstMessage(matching: query, in: shown.map(\.content)) else { return }
+        revealRequest = RevealRequest(messageID: shown[i].id)
     }
     /// What the sent request waits behind, before its answer starts: the
     /// model answers one request at a time (shown as such).

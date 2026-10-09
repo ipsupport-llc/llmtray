@@ -281,6 +281,28 @@ struct ContentView: View {
         return "\(m.id)|\(m.reasoning.count)|\(m.content.count)|\(m.toolCalls.count)|\(m.images.count)|\(m.audios.count)|\(chat.isBusy)"
     }
 
+    /// A chat opened from a search: at the message the words are in,
+    /// marked for a moment, no longer following the end.
+    private func reveal(_ request: ChatClient.RevealRequest, _ proxy: ScrollViewProxy) {
+        chat.revealRequest = nil
+        followChatBottom = false
+        isRevealing = true
+        // After the layout the loaded chat causes.
+        DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                followChatBottom = false
+                proxy.scrollTo(request.messageID, anchor: .top)
+                withAnimation(.easeOut(duration: 0.2)) { revealedMessageID = request.messageID }
+                // Once the scroll's own layout is in.
+                DispatchQueue.main.async { isRevealing = false }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    guard revealedMessageID == request.messageID else { return }
+                    withAnimation(.easeOut(duration: 0.6)) { revealedMessageID = nil }
+                }
+            }
+        }
+    }
+
     /// Brings the end into view while following: after the layout the
     /// change causes (one main-queue turn isn't enough -- the scroll landed
     /// against the old content height, a line short each time).
@@ -480,6 +502,13 @@ struct ContentView: View {
             // the reader's place, as it always has.
             .onAppear {
                 userScroll.start()
+                // A tab opened (or switched to) from a search: its view is
+                // new, the request came before it.
+                if let request = chat.revealRequest {
+                    didScrollOnAppear = true
+                    reveal(request, proxy)
+                    return
+                }
                 guard !didScrollOnAppear else { return }
                 didScrollOnAppear = true
                 // After the first layout, or there's nothing to scroll yet.
@@ -502,6 +531,9 @@ struct ContentView: View {
                 let scrolledUp = (geometry.bottom - lastChatGeometry.bottom) - grew > 0.5
                 lastChatGeometry = geometry
                 let atEnd = geometry.bottom <= chatViewportHeight + 40
+                // A search result being brought into view: the loaded chat's
+                // interim layouts don't decide following.
+                if isRevealing { return }
                 // Told by the user's input, not guessed from the geometry:
                 // re-rendered Markdown, a folding reasoning block or an
                 // image's preview change the height and the offset in ways
@@ -559,22 +591,7 @@ struct ContentView: View {
             // A chat opened from a search: at the message the words are in,
             // and no longer following the end.
             .onChange(of: chat.revealRequest) { _, request in
-                guard let request else { return }
-                chat.revealRequest = nil
-                followChatBottom = false
-                isRevealing = true
-                // After the layout the loaded chat causes.
-                DispatchQueue.main.async {
-                    DispatchQueue.main.async {
-                        isRevealing = false
-                        proxy.scrollTo(request.messageID, anchor: .top)
-                        withAnimation(.easeOut(duration: 0.2)) { revealedMessageID = request.messageID }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                            guard revealedMessageID == request.messageID else { return }
-                            withAnimation(.easeOut(duration: 0.6)) { revealedMessageID = nil }
-                        }
-                    }
-                }
+                if let request { reveal(request, proxy) }
             }
             // A folder prompt or plan wants the user's eyes too.
             .onChange(of: chat.folderPrompt?.id) { _, id in
