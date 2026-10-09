@@ -133,7 +133,9 @@ final class ChatTabs: ObservableObject {
 
     /// A saved chat: its tab if it's open already, else in a new tab or in
     /// the one on screen.
-    func open(_ sessionID: UUID, inNewTab: Bool) {
+    /// `reveal`: a search's query -- the chat opens at the message it found.
+    func open(_ sessionID: UUID, inNewTab: Bool, reveal query: String? = nil) {
+        defer { if let query, selected.currentSessionID == sessionID { selected.reveal(matching: query) } }
         if let index = index(of: sessionID) {
             select(index)
             return

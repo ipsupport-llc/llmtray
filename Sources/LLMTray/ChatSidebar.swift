@@ -322,11 +322,13 @@ struct ChatSidebar: View {
             .onTapGesture {
                 // ⌘-click: in a new tab, as in a browser.
                 let newTab = NSEvent.modifierFlags.contains(.command)
-                open { tabs.open(summary.id, inNewTab: newTab) }
+                // From the search: at the message the words are in.
+                let reveal = section == "search" ? query : nil
+                open { tabs.open(summary.id, inNewTab: newTab, reveal: reveal) }
             }
             .accessibilityAddTraits(.isButton)
             // VoiceOver's "press", as the Button had.
-            .accessibilityAction { open { tabs.open(summary.id, inNewTab: false) } }
+            .accessibilityAction { open { tabs.open(summary.id, inNewTab: false, reveal: section == "search" ? query : nil) } }
             .help(summary.title)
             .contextMenu { chatMenu(summary, in: section) }
             // Onto a project, Pinned, or the recents.

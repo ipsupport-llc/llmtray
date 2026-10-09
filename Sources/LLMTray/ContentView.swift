@@ -50,6 +50,11 @@ struct ContentView: View {
     /// Following the end before a Tweak draft paused it: restored after.
     @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
+    /// The message a search result opened at, marked for a moment.
+    @State private var revealedMessageID: UUID?
+    /// Bringing that message into view: the loaded chat's new last message
+    /// doesn't send it to the end meanwhile.
+    @State private var isRevealing = false
     @State private var lastChatGeometry = ChatGeometry(bottom: 0, height: 0)
     /// The user's own scrolling (wheel, trackpad, scroller): only it turns
     /// following off -- the chat's own layout changes never do.
@@ -378,6 +383,9 @@ struct ContentView: View {
                           draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil,
                           isAnswering: chat.isBusy && msg.id == chat.messages.last?.id)
                 .environment(\.visibleChatHeight, chatViewportHeight)
+                .background(RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.accentColor.opacity(revealedMessageID == msg.id ? 0.18 : 0))
+                    .padding(-4))
                 .id(msg.id)
         }
         if let draft = chat.draft, draft.anchor == nil {
@@ -548,6 +556,26 @@ struct ContentView: View {
                 // the view (followToEnd).
                 DispatchQueue.main.async { DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } } }
             }
+            // A chat opened from a search: at the message the words are in,
+            // and no longer following the end.
+            .onChange(of: chat.revealRequest) { _, request in
+                guard let request else { return }
+                chat.revealRequest = nil
+                followChatBottom = false
+                isRevealing = true
+                // After the layout the loaded chat causes.
+                DispatchQueue.main.async {
+                    DispatchQueue.main.async {
+                        isRevealing = false
+                        proxy.scrollTo(request.messageID, anchor: .top)
+                        withAnimation(.easeOut(duration: 0.2)) { revealedMessageID = request.messageID }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                            guard revealedMessageID == request.messageID else { return }
+                            withAnimation(.easeOut(duration: 0.6)) { revealedMessageID = nil }
+                        }
+                    }
+                }
+            }
             // A folder prompt or plan wants the user's eyes too.
             .onChange(of: chat.folderPrompt?.id) { _, id in
                 guard let id else { return }
@@ -558,6 +586,8 @@ struct ContentView: View {
                 DispatchQueue.main.async { withAnimation { proxy.scrollTo(id, anchor: .bottom) } }
             }
             .onChange(of: lastUserMessageID) {
+                // A chat opened from a search stays at its result.
+                guard chat.revealRequest == nil, !isRevealing else { return }
                 // The user's own new message always brings the end into view
                 // (send() appends the reply placeholder right after it).
                 followChatBottom = true

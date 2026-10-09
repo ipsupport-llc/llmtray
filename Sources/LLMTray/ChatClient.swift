@@ -14,6 +14,23 @@ final class ChatClient: ObservableObject {
     @Published private(set) var isWaitingForModelLoad = false
     /// The message waits for the chat model's download (first run).
     @Published private(set) var isWaitingForModelDownload = false
+    /// A message to bring into view and mark for a moment: a chat opened
+    /// from a search result, at the message the words are in.
+    struct RevealRequest: Equatable {
+        let messageID: UUID
+        let id = UUID()
+    }
+    @Published var revealRequest: RevealRequest?
+
+    /// Brings the first message with `query`'s words into view, among the
+    /// ones the chat shows (a tool's output points at the answer before it).
+    func reveal(matching query: String) {
+        let shown = messages.filter { $0.role != "tool" && !$0.isToolContext }
+        guard let i = ChatSearchText.firstMessage(matching: query, in: messages.map(\.content)) else { return }
+        let target = messages[...i].last { $0.role != "tool" && !$0.isToolContext } ?? shown.first
+        guard let target else { return }
+        revealRequest = RevealRequest(messageID: target.id)
+    }
     /// What the sent request waits behind, before its answer starts: the
     /// model answers one request at a time (shown as such).
     enum WaitingBehind { case anotherChat, anotherRequest }

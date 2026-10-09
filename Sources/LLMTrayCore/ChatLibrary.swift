@@ -220,6 +220,23 @@ public enum ChatSearchText {
     }
 }
 
+extension ChatSearchText {
+    /// The message a search result opens at: the first with every word of
+    /// `query`, else the first with any of them (the words may be spread
+    /// over several), nil when none has one (the title matched).
+    /// `messages` are the candidates' text, in order.
+    public static func firstMessage(matching query: String, in messages: [String]) -> Int? {
+        let words = ChatSummary.searchWords(query)
+        guard !words.isEmpty else { return nil }
+        let texts = messages.map { Array($0.lowercased().precomposedStringWithCanonicalMapping.utf8) }
+        func has(_ text: [UInt8], _ word: [UInt8]) -> Bool {
+            text.withUnsafeBytes { hay in word.withUnsafeBytes { memmem(hay.baseAddress, hay.count, $0.baseAddress, $0.count) != nil } }
+        }
+        return texts.firstIndex { text in words.allSatisfy { has(text, $0) } }
+            ?? texts.firstIndex { text in words.contains { has(text, $0) } }
+    }
+}
+
 /// One saved chat as the sidebar lists it.
 public struct ChatSummary: Equatable, Identifiable, Sendable {
     public var id: UUID
