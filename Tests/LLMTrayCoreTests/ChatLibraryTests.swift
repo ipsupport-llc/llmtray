@@ -45,6 +45,37 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertTrue(chat.matches(""))
     }
 
+    func testSearchTextCoversALongChat() {
+        // A long chat in Russian (the 40 KB cap for everything lost its
+        // second half): 20 answers of 6 KB, then the word.
+        let answer = String(repeating: "ответ модели про кластеры ", count: 130)   // ~6 KB
+        let messages = Array(repeating: answer, count: 20) + ["Так ты погугли про кластера на тандерболте"]
+        let chat = ChatSummary(id: UUID(), title: "AI", updatedAt: Date(),
+                               searchText: ChatSearchText.make(title: "AI", messages: messages))
+        XCTAssertTrue(chat.matches("тандер"))
+
+        // One pasted document is cut at the message cap, so what comes
+        // after it is still searched.
+        let document = String(repeating: "я", count: 30_000)   // 60 KB
+        let text = ChatSearchText.make(title: "t", messages: [document, "Thunderbolt"], messageCap: 20_000, chatCap: 50_000)
+        XCTAssertTrue(text.contains("thunderbolt"))
+        XCTAssertLessThan(text.utf8.count, 20_100)
+        // A letter cut in two at the cap doesn't break anything.
+        XCTAssertFalse(ChatSearchText.make(title: "", messages: [document], messageCap: 20_001).isEmpty)
+
+        // The whole chat stays capped.
+        let capped = ChatSearchText.make(title: "t", messages: Array(repeating: "abc", count: 100) + ["needle"], chatCap: 40)
+        XCTAssertFalse(capped.contains("needle"))
+        // Never past it: the last message is cut to what's left.
+        let tight = ChatSearchText.make(title: "t", messages: [String(repeating: "a", count: 100)], messageCap: 80, chatCap: 50)
+        XCTAssertEqual(tight.utf8.count, 50)
+        // Measured after lowercasing ("İ" grows from 2 bytes to 3), and a
+        // letter cut in two doesn't push it over.
+        let dotted = String(repeating: "İ", count: 1_000)
+        XCTAssertLessThanOrEqual(ChatSearchText.make(title: "", messages: [dotted, dotted], messageCap: 1_000, chatCap: 1_500).utf8.count, 1_500)
+        XCTAssertLessThanOrEqual(ChatSearchText.make(title: "", messages: ["яяя"], messageCap: 5).utf8.count, 6)
+    }
+
     func testPinsAndProjects() {
         var library = ChatLibrary()
         let a = UUID(), b = UUID()

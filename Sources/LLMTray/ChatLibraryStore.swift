@@ -81,15 +81,8 @@ final class ChatLibraryStore: ObservableObject {
     }
 
     nonisolated private static func summary(_ file: ChatSessionFile) -> ChatSummary {
-        // Title and text, capped: a search needn't scan a book per chat.
-        var text = file.title
-        var length = text.utf8.count
-        for message in file.messages {
-            guard length < 40_000 else { break }
-            text += "\n" + message.content
-            length += message.content.utf8.count + 1
-        }
-        return ChatSummary(id: file.id, title: file.title, updatedAt: file.updatedAt, searchText: text.lowercased())
+        ChatSummary(id: file.id, title: file.title, updatedAt: file.updatedAt,
+                    searchText: ChatSearchText.make(title: file.title, messages: file.messages.map(\.content)))
     }
 
     /// A pinned chat shows under Pinned only.

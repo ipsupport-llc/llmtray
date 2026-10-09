@@ -188,6 +188,38 @@ public func chatSystemPrompt(profile: String, project: ProjectContext?, toolUseP
         .joined(separator: "\n\n")
 }
 
+/// What a chat's search looks through: its title and messages, lowercased.
+/// Capped so a search needn't scan a book per chat, per message too: a
+/// pasted document doesn't crowd out the rest. A long chat is searched
+/// whole (the cap was 40 KB for everything: in a long chat in Russian, two
+/// bytes a letter, the later half was never found).
+public enum ChatSearchText {
+    public static let messageCap = 20_000
+    public static let chatCap = 400_000
+
+    public static func make(title: String, messages: [String],
+                            messageCap: Int = messageCap, chatCap: Int = chatCap) -> String {
+        // Measured lowercased: a lowercase letter can take more bytes.
+        var text = title.lowercased()
+        var length = text.utf8.count
+        for message in messages where !message.isEmpty {
+            let room = min(messageCap, chatCap - length - 1)
+            guard room > 0 else { break }
+            let lowered = message.lowercased()
+            var part = lowered
+            if lowered.utf8.count > room {
+                // A letter cut in two decodes as U+FFFD, which may be longer
+                // than its cut bytes: dropped then.
+                part = String(decoding: lowered.utf8.prefix(room), as: UTF8.self)
+                if part.utf8.count > room { part.removeLast() }
+            }
+            text += "\n" + part
+            length += part.utf8.count + 1
+        }
+        return text
+    }
+}
+
 /// One saved chat as the sidebar lists it.
 public struct ChatSummary: Equatable, Identifiable {
     public var id: UUID
