@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "Esta carpeta se comparte con LM Studio: el modelo también ha sido eliminado allí.";
 "This folder's access has ended or was revoked." = "El acceso a esta carpeta terminó o fue revocado.";
 "This many of the most recent messages are kept word for word when compacting." = "Estos mensajes más recientes se conservan tal cual al compactar.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "Este modelo no puede ver imágenes: elige uno que pueda (un modelo de visión) para adjuntarlas.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Este modelo usa %1$@ de los %2$@ GB que puede usar la GPU; en entradas largas puede quedarse sin memoria. Use un modelo más pequeño o aumente el límite de memoria GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Este modelo usa %1$@ de los %2$@ GB que puede usar la GPU; en entradas largas puede quedarse sin memoria. Use un modelo más pequeño.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "El archivo de este perfil no se puede leer, así que no se puede editar aquí. Corrige o elimina el archivo y vuelve a abrir Ajustes.";

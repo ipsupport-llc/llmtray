@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "此文件夹与 LM Studio 共享：该模型在那里也已删除。";
 "This folder's access has ended or was revoked." = "此文件夹的访问已结束或被撤销。";
 "This many of the most recent messages are kept word for word when compacting." = "压缩时会逐字保留这么多条最近消息。";
+"This model can't see images: pick one that can (a vision model) to attach them." = "此模型无法查看图片：要附加图片，请选择支持视觉的模型。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型，或提高 GPU 内存限制。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";

@@ -20,10 +20,62 @@ final class ComposerModel: ObservableObject {
     /// Only a vision-capable model can take images; switching to one that
     /// can't drops what's attached.
     @Published var acceptsImages = false {
-        didSet { if !acceptsImages { attachments.removeAll() } }
+        didSet {
+            if !acceptsImages { attachments.removeAll() } else { notice = nil }
+        }
     }
 
     var isEmpty: Bool { draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty }
+
+    /// A short note under the field (an image the model can't take), gone
+    /// after a few seconds.
+    @Published private(set) var notice: String?
+    private var noticeToken = 0
+
+    func showNotice(_ text: String) {
+        notice = text
+        noticeToken += 1
+        let token = noticeToken
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            if let self, self.noticeToken == token { self.notice = nil }
+        }
+    }
+
+    private func modelCantSeeImages() {
+        showNotice(NSLocalizedString("This model can't see images: pick one that can (a vision model) to attach them.",
+                                     comment: "chat: an image pasted or dropped for a model without vision"))
+    }
+
+    /// ⌘V in the field with an image on the clipboard: attached, like a
+    /// dropped one (the text field itself pastes only text). Image files
+    /// copied in Finder, or image data (a screenshot, Copy Image) when
+    /// there's no text with it. Returns whether the paste was handled
+    /// here; otherwise the field pastes as usual.
+    func pasteImages(from pasteboard: NSPasteboard = .general) -> Bool {
+        let files = (pasteboard.readObjects(forClasses: [NSURL.self], options: [
+            .urlReadingFileURLsOnly: true,
+            .urlReadingContentsConformToTypes: [UTType.image.identifier],
+        ]) as? [URL]) ?? []
+        let images: [NSImage]
+        let text = pasteboard.string(forType: .string)
+        switch ClipboardImages.source(imageFiles: files.count, text: text,
+                                      hasImageData: pasteboard.canReadObject(forClasses: [NSImage.self], options: nil)) {
+        case .files:
+            images = files.compactMap { NSImage(contentsOf: $0) }
+        case .imageData:
+            images = (pasteboard.readObjects(forClasses: [NSImage.self]) as? [NSImage]) ?? []
+        case .text:
+            return false
+        }
+        guard !images.isEmpty else { return false }
+        guard acceptsImages else {
+            modelCantSeeImages()
+            return true
+        }
+        for image in images { attach(image) }
+        return true
+    }
 
     /// Takes the draft and attachments for sending and clears them.
     func take() -> (text: String, images: [Data]) {
@@ -58,7 +110,21 @@ final class ComposerModel: ObservableObject {
     /// floating screenshot thumbnail, which hands over a file URL) or raw
     /// image data.
     func handleDrop(_ providers: [NSItemProvider]) -> Bool {
-        guard acceptsImages else { return false }
+        guard acceptsImages else {
+            if providers.contains(where: { $0.canLoadObject(ofClass: NSImage.self) || $0.hasItemConformingToTypeIdentifier(UTType.image.identifier) }) {
+                modelCantSeeImages()
+            } else {
+                // A file from Finder: an image only by its type, known once
+                // its URL is loaded.
+                for provider in providers where provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+                    _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                        guard let url, UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) == true else { return }
+                        DispatchQueue.main.async { if !self.acceptsImages { self.modelCantSeeImages() } }
+                    }
+                }
+            }
+            return false
+        }
         var handled = false
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
@@ -157,6 +223,7 @@ struct ChatComposer: View {
                     .onSubmit(send)
                     .onChange(of: composer.draft) { composer.convertDroppedImagePaths() }
                     .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+                    .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
                     .focused(isFocused)
                     .disabled(!canChat)
 
@@ -172,6 +239,13 @@ struct ChatComposer: View {
                 }
             }
             .padding(.horizontal, 12)
+            if let notice = composer.notice {
+                Text(notice)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .transition(.opacity)
+            }
             ModelDisclaimer.Line()
                 .padding(.horizontal, 12)
                 .padding(.bottom, 6)
@@ -245,5 +319,50 @@ struct ChatComposer: View {
             }
         }
         .padding(.horizontal, 12)
+    }
+}
+
+/// ⌘V for the composer's field while it has focus in its window: `paste`
+/// decides whether it's an image (handled, the key consumed) or text for
+/// the field as usual. A text field's own paste takes only text.
+private struct PasteImageWatcher: NSViewRepresentable {
+    let isFocused: Bool
+    let paste: () -> Bool
+
+    func makeNSView(context: Context) -> WatcherView {
+        let view = WatcherView()
+        view.isFocused = isFocused
+        view.paste = paste
+        return view
+    }
+
+    func updateNSView(_ view: WatcherView, context: Context) {
+        view.isFocused = isFocused
+        view.paste = paste
+    }
+
+    final class WatcherView: NSView {
+        var isFocused = false
+        var paste: (() -> Bool)?
+        private var monitor: Any?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let monitor { NSEvent.removeMonitor(monitor) }
+            monitor = nil
+            guard window != nil else { return }
+            monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+                guard let self, self.isFocused, event.window === self.window,
+                      // Caps Lock and the like aside, as every ⌘ shortcut.
+                      event.modifierFlags.intersection([.command, .shift, .option, .control]) == .command,
+                      ClipboardImages.isPasteKey(characters: event.charactersIgnoringModifiers, keyCode: event.keyCode),
+                      let paste = self.paste else { return event }
+                return MainActor.assumeIsolated { paste() } ? nil : event
+            }
+        }
+
+        deinit {
+            if let monitor { NSEvent.removeMonitor(monitor) }
+        }
     }
 }

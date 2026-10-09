@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "Folder ini dibagikan dengan LM Studio: model juga hilang di sana.";
 "This folder's access has ended or was revoked." = "Akses folder ini telah berakhir atau dicabut.";
 "This many of the most recent messages are kept word for word when compacting." = "Jumlah pesan terbaru yang dipertahankan kata demi kata saat memadatkan.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "Model ini tidak bisa melihat gambar: pilih model yang bisa (model visi) untuk melampirkannya.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil, atau tingkatkan batas memori GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";

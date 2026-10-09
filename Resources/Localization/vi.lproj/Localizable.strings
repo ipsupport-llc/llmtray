@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "Thư mục này được chia sẻ với LM Studio: mô hình cũng đã bị xoá ở đó.";
 "This folder's access has ended or was revoked." = "Quyền truy cập thư mục này đã hết hạn hoặc bị thu hồi.";
 "This many of the most recent messages are kept word for word when compacting." = "Khi nén, số tin nhắn gần đây nhất này được giữ nguyên từng chữ.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "Mô hình này không xem được hình ảnh: hãy chọn mô hình có thị giác để đính kèm ảnh.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn hoặc tăng giới hạn bộ nhớ GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";

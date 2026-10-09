@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "תיקייה זו משותפת עם LM Studio: הדגם הוסר גם שם.";
 "This folder's access has ended or was revoked." = "הגישה לתיקיה זו הסתיימה או בוטלה.";
 "This many of the most recent messages are kept word for word when compacting." = "מספר זה של ההודעות האחרונות יישמר מילה במילה בעת דחיסה.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "המודל הזה לא רואה תמונות: כדי לצרף אותן, בחרו מודל עם ראייה.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר, או הגבּל את זיכרון ה‑GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "לא ניתן לקרוא את קובץ הפרופיל הזה, לכן אי אפשר לערוך אותו כאן. יש לתקן או למחוק את הקובץ, ואז לפתוח מחדש את ההגדרות.";
