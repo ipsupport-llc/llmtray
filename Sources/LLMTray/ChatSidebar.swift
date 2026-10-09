@@ -20,6 +20,7 @@ struct ChatSidebar: View {
     /// The search's results for `query`, worked out off the main thread
     /// (nil: not yet).
     @State private var found: [ChatSummary]?
+    @State private var lastSearch: SearchKey?
     @State private var showsAllRecents = false
     /// The chat being renamed, and the list it's being renamed in (a
     /// pinned chat in a project shows twice).
@@ -75,7 +76,11 @@ struct ChatSidebar: View {
                 .padding(.bottom, 12)
             }
         }
-        .task(id: SearchKey(query: query, revision: store.revision)) { await runSearch() }
+        .task(id: SearchKey(query: query, revision: store.revision)) {
+            let previous = lastSearch
+            lastSearch = SearchKey(query: query, revision: store.revision)
+            await runSearch(after: previous)
+        }
         .background(.regularMaterial)
         .onReceive(Self.clock) { now = $0 }
         // The popover's overlay: typing searches, and Esc closes it.
@@ -144,10 +149,14 @@ struct ChatSidebar: View {
     @ViewBuilder
     private var searchResults: some View {
         if let found {
-            if found.isEmpty {
+            // Only chats still there: one deleted since the search isn't
+            // offered until it's redone.
+            let existing = Set(store.chats.map(\.id))
+            let rows = found.filter { existing.contains($0.id) }
+            if rows.isEmpty {
                 Text("No chats found").foregroundColor(.secondary).padding(8)
             }
-            ForEach(found) { row($0, in: "search") }
+            ForEach(rows) { row($0, in: "search") }
         }
     }
 
@@ -158,20 +167,33 @@ struct ChatSidebar: View {
     }
 
     /// Off the main thread, once typing pauses: a large library doesn't
-    /// hold up the keys.
-    private func runSearch() async {
+    /// hold up the keys. A new key or a closed sidebar cancels it.
+    @MainActor
+    private func runSearch(after key: SearchKey?) async {
         guard !query.isEmpty else {
             found = nil
             return
         }
-        if found != nil {
+        // A saved chat redoes the search at once; typing waits for a pause.
+        if key?.query != query {
             try? await Task.sleep(nanoseconds: 120_000_000)
             guard !Task.isCancelled else { return }
         }
         let chats = store.chats, query = self.query
-        let result = await Task.detached(priority: .userInitiated) { ChatSummary.search(chats, query: query) }.value
-        guard !Task.isCancelled else { return }
+        guard let result = await Self.search(chats, query: query), !Task.isCancelled else { return }
         found = result
+    }
+
+    /// Off the main actor (nonisolated async), and cancelled with the
+    /// task that awaits it.
+    nonisolated private static func search(_ chats: [ChatSummary], query: String) async -> [ChatSummary]? {
+        let words = ChatSummary.searchWords(query)
+        var result: [ChatSummary] = []
+        for (i, chat) in chats.enumerated() {
+            if i % 64 == 0, Task.isCancelled { return nil }
+            if chat.matches(words: words) { result.append(chat) }
+        }
+        return result
     }
 
     @ViewBuilder
