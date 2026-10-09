@@ -199,18 +199,24 @@ public enum ChatSearchText {
 
     public static func make(title: String, messages: [String],
                             messageCap: Int = messageCap, chatCap: Int = chatCap) -> String {
-        var text = title
+        // Measured lowercased: a lowercase letter can take more bytes.
+        var text = title.lowercased()
         var length = text.utf8.count
         for message in messages where !message.isEmpty {
             let room = min(messageCap, chatCap - length - 1)
             guard room > 0 else { break }
-            // A letter cut in two at the cap decodes as U+FFFD: harmless here.
-            let part = message.utf8.count > room
-                ? String(decoding: message.utf8.prefix(room), as: UTF8.self) : message
+            let lowered = message.lowercased()
+            var part = lowered
+            if lowered.utf8.count > room {
+                // A letter cut in two decodes as U+FFFD, which may be longer
+                // than its cut bytes: dropped then.
+                part = String(decoding: lowered.utf8.prefix(room), as: UTF8.self)
+                if part.utf8.count > room { part.removeLast() }
+            }
             text += "\n" + part
             length += part.utf8.count + 1
         }
-        return text.lowercased()
+        return text
     }
 }
 

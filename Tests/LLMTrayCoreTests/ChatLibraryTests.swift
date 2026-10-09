@@ -69,6 +69,11 @@ final class ChatLibraryTests: XCTestCase {
         // Never past it: the last message is cut to what's left.
         let tight = ChatSearchText.make(title: "t", messages: [String(repeating: "a", count: 100)], messageCap: 80, chatCap: 50)
         XCTAssertEqual(tight.utf8.count, 50)
+        // Measured after lowercasing ("İ" grows from 2 bytes to 3), and a
+        // letter cut in two doesn't push it over.
+        let dotted = String(repeating: "İ", count: 1_000)
+        XCTAssertLessThanOrEqual(ChatSearchText.make(title: "", messages: [dotted, dotted], messageCap: 1_000, chatCap: 1_500).utf8.count, 1_500)
+        XCTAssertLessThanOrEqual(ChatSearchText.make(title: "", messages: ["яяя"], messageCap: 5).utf8.count, 6)
     }
 
     func testPinsAndProjects() {
