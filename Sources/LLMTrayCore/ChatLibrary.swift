@@ -202,10 +202,11 @@ public enum ChatSearchText {
         var text = title
         var length = text.utf8.count
         for message in messages where !message.isEmpty {
-            guard length < chatCap else { break }
+            let room = min(messageCap, chatCap - length - 1)
+            guard room > 0 else { break }
             // A letter cut in two at the cap decodes as U+FFFD: harmless here.
-            let part = message.utf8.count > messageCap
-                ? String(decoding: message.utf8.prefix(messageCap), as: UTF8.self) : message
+            let part = message.utf8.count > room
+                ? String(decoding: message.utf8.prefix(room), as: UTF8.self) : message
             text += "\n" + part
             length += part.utf8.count + 1
         }

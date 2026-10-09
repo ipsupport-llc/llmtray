@@ -66,6 +66,9 @@ final class ChatLibraryTests: XCTestCase {
         // The whole chat stays capped.
         let capped = ChatSearchText.make(title: "t", messages: Array(repeating: "abc", count: 100) + ["needle"], chatCap: 40)
         XCTAssertFalse(capped.contains("needle"))
+        // Never past it: the last message is cut to what's left.
+        let tight = ChatSearchText.make(title: "t", messages: [String(repeating: "a", count: 100)], messageCap: 80, chatCap: 50)
+        XCTAssertEqual(tight.utf8.count, 50)
     }
 
     func testPinsAndProjects() {
