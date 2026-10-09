@@ -162,6 +162,8 @@ struct ChatSidebar: View {
             ForEach(rows) { row($0, in: "search") }
                 .opacity(stale ? 0.4 : 1)
                 .allowsHitTesting(!stale)
+                // VoiceOver's own press action too.
+                .accessibilityHidden(stale)
         }
     }
 
