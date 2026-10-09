@@ -1042,6 +1042,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "This folder is shared with LM Studio: the model is gone there too.";
 "This folder's access has ended or was revoked." = "This folder's access has ended or was revoked.";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "This model can't see images: pick one that can (a vision model) to attach them.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";

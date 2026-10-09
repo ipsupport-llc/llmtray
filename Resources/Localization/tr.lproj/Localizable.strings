@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "Bu klasör LM Studio ile paylaşılıyor: model orada da kaldırıldı.";
 "This folder's access has ended or was revoked." = "Bu klasörün erişimi sona erdi veya iptal edildi.";
 "This many of the most recent messages are kept word for word when compacting." = "Sıkıştırma sırasında en son iletilerden bu kadarı kelimesi kelimesine korunur.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "Bu model görselleri göremez: eklemek için görebilen bir model (görü modeli) seçin.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın veya GPU bellek sınırını yükseltin.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";

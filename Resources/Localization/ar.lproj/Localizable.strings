@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "هذا المجلد مشترك مع LM Studio: النموذج مفقود هناك أيضًا.";
 "This folder's access has ended or was revoked." = "انتهى وصول هذا المجلد أو تم سحبه.";
 "This many of the most recent messages are kept word for word when compacting." = "يُحتفَظ بهذا العدد من أحدث الرسائل حرفيًا عند التكثيف.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "هذا النموذج لا يرى الصور: لإرفاقها اختر نموذجًا يدعم الرؤية.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر، أو زد حد ذاكرة الـ GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "لا يمكن قراءة ملف ملف التعريف هذا، لذلك لا يمكن تحريره هنا. أصلح الملف أو احذفه، ثم أعد فتح الإعدادات.";

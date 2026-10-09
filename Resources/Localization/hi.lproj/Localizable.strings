@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "यह फ़ोल्डर LM Studio के साथ साझा किया गया है: वहां से भी मॉडल हट चुका है।";
 "This folder's access has ended or was revoked." = "इस फ़ोल्डर की पहुँच समाप्त हो गई है या रद्द कर दी गई है।";
 "This many of the most recent messages are kept word for word when compacting." = "कॉम्पैक्ट करते समय इतने हालिया संदेश शब्दशः रखे जाते हैं।";
+"This model can't see images: pick one that can (a vision model) to attach them." = "यह मॉडल छवियाँ नहीं देख सकता: उन्हें जोड़ने के लिए विज़न वाला मॉडल चुनें।";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें, या GPU मेमोरी सीमा बढ़ाएँ।";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "यह मॉडल GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB में से %1$@ लेता है; लंबे प्रॉम्प्ट मेमोरी ख़त्म कर सकते हैं। छोटा मॉडल प्रयोग करें।";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "इस प्रोफ़ाइल की फ़ाइल पढ़ी नहीं जा सकती, इसलिए इसे यहां संपादित नहीं किया जा सकता। फ़ाइल ठीक करें या हटाएं, फिर सेटिंग्स फिर से खोलें।";

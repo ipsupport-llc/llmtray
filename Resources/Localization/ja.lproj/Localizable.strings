@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "このフォルダは LM Studio と共有されています：そのモデルはそちらでも削除されています。";
 "This folder's access has ended or was revoked." = "このフォルダへのアクセスは終了したか取り消されました。";
 "This many of the most recent messages are kept word for word when compacting." = "コンパクト化するときに、直近のメッセージをこの件数だけ原文のまま保持します。";
+"This model can't see images: pick one that can (a vision model) to attach them." = "このモデルは画像を認識できません。画像を添付するには、画像に対応したモデルを選んでください。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使うか、GPU メモリ上限を引き上げてください。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使用してください。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "このプロファイルのファイルを読み込めないため、ここでは編集できません。ファイルを修正または削除してから、設定を開き直してください。";

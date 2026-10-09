@@ -1015,6 +1015,7 @@
 "This folder is shared with LM Studio: the model is gone there too." = "Эта папка общая с LM Studio: модель исчезнет и там.";
 "This folder's access has ended or was revoked." = "Доступ к этой папке закончился или был отозван.";
 "This many of the most recent messages are kept word for word when compacting." = "Столько последних сообщений при сжатии сохраняются дословно.";
+"This model can't see images: pick one that can (a vision model) to attach them." = "Эта модель не видит изображения: чтобы прикрепить их, выберите модель со зрением.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель или увеличьте лимит памяти GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл этого профиля не читается, поэтому редактировать его здесь нельзя. Исправьте или удалите файл, затем снова откройте Настройки.";
