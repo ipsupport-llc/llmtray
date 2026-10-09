@@ -63,6 +63,20 @@ final class ChatLibraryTests: XCTestCase {
         XCTAssertEqual(ChatSummary.search([a, b], query: "  ").count, 2)
     }
 
+    func testFirstMessageMatching() {
+        let messages = ["Привет", "RDMA и InfiniBand", "Так ты погугли про кластера на тандерболте", "Тандерболт: кластер из Mac"]
+        // The first with the word, any case.
+        XCTAssertEqual(ChatSearchText.firstMessage(matching: "тандер", in: messages), 2)
+        // Every word in one message wins over an earlier one with only some.
+        XCTAssertEqual(ChatSearchText.firstMessage(matching: "кластер mac", in: messages), 3)
+        // Spread over several: the first with any of them.
+        XCTAssertEqual(ChatSearchText.firstMessage(matching: "infiniband mac", in: messages), 1)
+        // Nowhere in the messages (the title matched), or no words.
+        XCTAssertNil(ChatSearchText.firstMessage(matching: "ethernet", in: messages))
+        XCTAssertNil(ChatSearchText.firstMessage(matching: " ", in: messages))
+        XCTAssertNil(ChatSearchText.firstMessage(matching: "x", in: []))
+    }
+
     func testSearchTextCoversALongChat() {
         // A long chat in Russian (the 40 KB cap for everything lost its
         // second half): 20 answers of 6 KB, then the word.
