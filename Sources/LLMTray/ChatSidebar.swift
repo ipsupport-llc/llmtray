@@ -17,6 +17,10 @@ struct ChatSidebar: View {
     var closesOnOpen = false
 
     @State private var query = ""
+    /// The search's results and the query they're for, worked out off
+    /// the main thread (nil: not yet).
+    @State private var found: (query: String, chats: [ChatSummary])?
+    @State private var lastSearch: SearchKey?
     @State private var showsAllRecents = false
     /// The chat being renamed, and the list it's being renamed in (a
     /// pinned chat in a project shows twice).
@@ -71,6 +75,11 @@ struct ChatSidebar: View {
                 .padding(.horizontal, 8)
                 .padding(.bottom, 12)
             }
+        }
+        .task(id: SearchKey(query: query, revision: store.revision)) {
+            let previous = lastSearch
+            lastSearch = SearchKey(query: query, revision: store.revision)
+            await runSearch(after: previous)
         }
         .background(.regularMaterial)
         .onReceive(Self.clock) { now = $0 }
@@ -139,11 +148,59 @@ struct ChatSidebar: View {
 
     @ViewBuilder
     private var searchResults: some View {
-        let found = store.chats.filter { $0.matches(query) }
-        if found.isEmpty {
-            Text("No chats found").foregroundColor(.secondary).padding(8)
+        if let found {
+            // Only chats still there: one deleted since the search isn't
+            // offered until it's redone.
+            let existing = Set(store.chats.map(\.id))
+            let rows = found.chats.filter { existing.contains($0.id) }
+            // Another query's results while the new one is worked out:
+            // dimmed, not to be opened.
+            let stale = found.query != query
+            if rows.isEmpty && !stale {
+                Text("No chats found").foregroundColor(.secondary).padding(8)
+            }
+            ForEach(rows) { row($0, in: "search") }
+                .opacity(stale ? 0.4 : 1)
+                .allowsHitTesting(!stale)
+                // VoiceOver's own press action too.
+                .accessibilityHidden(stale)
         }
-        ForEach(found) { row($0, in: "search") }
+    }
+
+    /// What the search depends on: a new query or a saved chat redoes it.
+    private struct SearchKey: Equatable {
+        var query: String
+        var revision: Int
+    }
+
+    /// Off the main thread, once typing pauses: a large library doesn't
+    /// hold up the keys. A new key or a closed sidebar cancels it.
+    @MainActor
+    private func runSearch(after key: SearchKey?) async {
+        guard !query.isEmpty else {
+            found = nil
+            return
+        }
+        // A saved chat redoes the search at once; typing waits for a pause.
+        if key?.query != query {
+            try? await Task.sleep(nanoseconds: 120_000_000)
+            guard !Task.isCancelled else { return }
+        }
+        let chats = store.chats, query = self.query
+        guard let result = await Self.search(chats, query: query), !Task.isCancelled else { return }
+        found = (query, result)
+    }
+
+    /// Off the main actor (nonisolated async), and cancelled with the
+    /// task that awaits it.
+    nonisolated private static func search(_ chats: [ChatSummary], query: String) async -> [ChatSummary]? {
+        let words = ChatSummary.searchWords(query)
+        var result: [ChatSummary] = []
+        for (i, chat) in chats.enumerated() {
+            if i % 64 == 0, Task.isCancelled { return nil }
+            if chat.matches(words: words) { result.append(chat) }
+        }
+        return result
     }
 
     @ViewBuilder

@@ -12,7 +12,11 @@ import LLMTrayCore
 final class ChatLibraryStore: ObservableObject {
     static let shared = ChatLibraryStore()
 
-    @Published private(set) var chats: [ChatSummary] = []
+    @Published private(set) var chats: [ChatSummary] = [] {
+        didSet { revision &+= 1 }
+    }
+    /// Bumped on every change of `chats`: what a search redoes on.
+    private(set) var revision = 0
     @Published private(set) var library = ChatLibrary()
     @Published private(set) var isLoaded = false
 
