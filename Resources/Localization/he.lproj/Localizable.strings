@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "״%@״ כבר לא חלק מהפרויקט.";
 "%.0f%% from drafts" = "%.0f%% מטיוטות";
 "%.1f s" = "%.1f שנ'";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ ועוד %2$lld";
 "%1$@ asks for %2$@" = "%1$@ מבקש את %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ מבקש את %2$@. החלפה תסיר את המודל הטעון כעת.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld נקטעו: הסתכל ב־Finder";
 "%lld items put back under their names." = "%lld פריטים הוחזרו לשמותיהם.";
 "%lld more" = "%lld נוספים";
+"%lld more…" = "%lld נוספים…";
 "%lld need a look: see the list." = "יש לבדוק %lld: ראה את הרשימה.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld חדשים מאז פתיחת הרשימה: מסומנים כלא מסומנים עד שתסמן אותם.";
 "%lld of 5 stars" = "%lld מתוך 5 כוכבים";
@@ -80,6 +82,7 @@
 "A song from a description" = "שיר מתיאור";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "שיר עם מילים מושרות, או אינסטרומנטל, מתיאור (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "קישור סמלי: הקישור עצמו, לא מה שהוא מצביע אליו.";
+"A temporary chat can't hold files" = "צ'אט זמני לא יכול להכיל קבצים";
 "AAC %lld kbit/s" = "AAC %lld קבט/ש";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — ווקל בהיר, 8‑bit (מומלץ)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — ווקל בהיר, GPTQ 4‑bit (דורש פחות זיכרון)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — צליל עשיר יותר";
 "About LLMTray" = "על LLMTray";
 "Add" = "הוסף";
+"Add Files to “%@”…" = "הוסף קבצים אל “%@”…";
 "Add Files…" = "הוסף קבצים…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "הוסף קבצי PDF, Word וטקסט לפרויקט. השיחות שלו מחפשות בהם וציטטות את הדף; צמיד קובץ כדי לשמור את כל תוכנו בשיחה.";
+"Add files" = "הוסף קבצים";
+"Add files or images" = "הוסף קבצים או תמונות";
+"Add files to a project" = "הוסף קבצים לפרויקט";
+"Add files to a project, or images for the model to see" = "הוסף קבצים לפרויקט, או תמונות שהמודל יראה";
 "Add more files: every chat of the project can search them." = "הוסף קבצים נוספים: כל שיחה בפרויקט תוכל לחפש בהם.";
+"Add the files to a project?" = "להוסיף את הקבצים לפרויקט?";
+"Add “%1$@” to “%2$@”?" = "להוסיף את “%1$@” אל “%2$@”?";
 "Added %@" = "נוסף %@";
 "Added here" = "נוסף כאן";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "מתווסף להנחיית המערכת בכל פעם שמוצעים כלים. תבנית הכלים של המודל עצמו אומרת רק איך לקרוא לכלי, ולעולם לא מתי לא. שדה ריק משבית זאת.";
@@ -143,7 +153,9 @@
 "Ask first" = "שאל קודם";
 "Assistant" = "העוזר";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "דוח אחד לכל היותר ביום, עבור יום עבר אחד, נשלח ל-ipsupport.us. יום שלא נשלח יישלח בהשקה הבאה, עד 7 ימים אחורה. כיבוי האפשרות מוחק מה שלא נשלח.";
-"Attach image(s) for the model to see" = "צרף תמונה או תמונות כדי שהמודל יראה אותן.";
+"Attach Images…" = "צרף תמונות…";
+"Attach images" = "צרף תמונות";
+"Attach images for the model to see" = "צרף תמונות שהמודל יוכל לראות";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ב‑8‑bit, feed‑forward ב‑4‑bit — האיזון הטוב ביותר בין גודל ליציבות, מאומת מול 4‑bit אחיד.";
 "Audio quality" = "איכות שמע";
 "Auto-compact" = "דחיסה אוטומטית";
@@ -223,6 +235,7 @@
 "Clear" = "נקה";
 "Clear search" = "נקה חיפוש";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "נקה תור: מה שאונדקס נשאר לחיפוש, השאר מסומן כ'לא מאונדקס'";
+"Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת Project files: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Close" = "סגור";
 "Close Tab" = "סגור כרטיסייה";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "מיסגר את החלון הזה. Settings › General › Set Up LLMTray… פותח אותו שוב.";
@@ -283,7 +296,11 @@
 "Diagnostics" = "אבחון";
 "Disk usage" = "שימוש בדיסק";
 "Dismiss" = "התעלם";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "המסמכים מועתקים לפרויקט ומאונדקסים במחשבי זה; תמונות נכנסות להודעה שלך.";
+"Documents go into a project with this chat." = "המסמכים נכנסים לפרויקט יחד עם הצ'אט הזה.";
+"Documents go into a project with this chat; images go into your message." = "המסמכים נכנסים לפרויקט עם הצ'אט הזה; תמונות נכנסות להודעה שלך.";
 "Doesn't open at login" = "לא נפתח בכניסה";
+"Don't Add" = "אל תוסיף";
 "Don't Ask Again" = "אל תשאל שוב";
 "Don't show again" = "אל תציג שוב";
 "Done" = "בוצע";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "שחרר שיחות או קבצים כאן כדי להוסיף לפרויקט";
 "Drop files here" = "שחרר קבצים כאן";
 "Drop files here to add them to the project" = "שחרר קבצים כאן כדי להוסיף לפרויקט";
+"Drop to add files" = "שחרר להוספת קבצים";
+"Drop to add to “%@”" = "שחרר להוספה אל “%@”";
+"Drop to attach images" = "שחרר לצירוף תמונות";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
 "Echo cancellation" = "הדחקת הד";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "לא ניתן להפעיל הדחקת הד: %@ — כבה אותה ב‑Settings > Voice.";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "עריכת פרופיל…";
 "Embedding model" = "דגם הטמעה";
 "Enable Project Files…" = "הפעל קבצי פרויקט…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "הפעילו קודם קבצי פרויקט בהגדרות › קבצים: אז מדריך LLMTray יתווסף לכאן והתשובות יצטטו אותו.";
 "Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
+"Enable Project files to add files to the project" = "הפעל Project files כדי להוסיף קבצים לפרויקט";
 "Enable Without It" = "הפעל בלעדיו";
 "Enable image editing?" = "להפעיל עריכת תמונות?";
 "Enable image generation" = "הפעלת יצירת תמונות";
@@ -356,8 +376,12 @@
 "Files Settings…" = "הגדרות קבצים…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "קבצים שמוספים לכאן מועתקים לפרויקט ונאונדקסים במחשב זה; כל שיחה בפרויקט יכולה לחפש בהם.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "קבצים שנוספו לפרויקט מאונדקסים במחשב זה, כך שהשיחות יוכלו לחפש בהם. חיפוש לפי משמעות משתמש בדגם הטמעה; בלעדיו מחפשים בקבצים לפי מילים.";
+"Files are copied into the project and indexed on this Mac." = "הקבצים מועתקים לפרויקט ומאונדקסים במחשב זה.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "קבצים נכנסים לפרויקט, וצ'אט זמני אף פעם אינו חלק ממנו. התחל צ'אט שמור חדש (⌘N) כדי להוסיף אותם.";
 "Files in %@" = "קבצים ב־%@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "קבצים שייכים לפרויקטים: כל צ'אט בפרויקט יכול לחפש בהם. צ'אט זה יעבור להיות חלק מהפרויקט יחד איתם.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "קבצים שתוסיפו לפרויקט מאונדקסים על Mac זה, כדי שהצ'אטים יוכלו לחפש בהם.";
+"Files · off" = "קבצים · כבוי";
 "Files…" = "קבצים…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish מיישם את מה שבחרתם. אפשר לשנות הכל מאוחר יותר ב‑Settings.";
@@ -448,6 +472,8 @@
 "Image model" = "מודל תמונה";
 "Image, music and voice models" = "דגמי תמונה, מוזיקה וקול";
 "Images" = "תמונות";
+"Images go into your message; for documents, Project files are turned on first." = "תמונות נכנסות להודעה שלך; עבור מסמכים, Project files יופעלו תחילה.";
+"Images only: a temporary chat can't hold files." = "רק תמונות: צ'אט זמני לא יכול להכיל קבצים.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import מ‑LLMTray (הורדה ישירה)";
 "Imported" = "Imported";
@@ -597,6 +623,7 @@
 "New profile" = "פרופיל חדש";
 "New profile (inherits everything from Default)" = "פרופיל חדש (יורש הכול מ-Default)";
 "New project" = "פרויקט חדש";
+"New project “%@”" = "פרויקט חדש “%@”";
 "New temporary chat" = "צ'אט זמני חדש";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "שיחה זמנית חדשה (⌘⇧N) — כלום לא נשמר";
 "News" = "חדשות";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "קבצי הפרויקט מושבתים בהגדרות.";
 "Project files off" = "קבצי פרויקט כבויים";
 "Project files on" = "קבצי פרויקט דלוקים";
+"Project files will be turned on first." = "Project files יופעלו תחילה.";
 "Project name" = "שם פרויקט";
 "Projects" = "פרויקטים";
 "Projects' files on disk" = "קבצי הפרויקטים בדיסק";
@@ -842,6 +870,7 @@
 "Shape" = "צורה";
 "Share anonymous usage statistics" = "שתף סטטיסטיקות שימוש אנונימיות";
 "Share…" = "שיתוף…";
+"Show All Files…" = "הצג את כל הקבצים…";
 "Show Chat Window" = "הצג חלון שיחה";
 "Show Files" = "הצג קבצים";
 "Show Next Tab" = "הצג כרטיסייה הבאה";
@@ -880,6 +909,7 @@
 "Start" = "התחל";
 "Start LLMTray automatically when you log in to this Mac." = "הפעלת LLMTray אוטומטית בעת ההתחברות ל-Mac זה.";
 "Start Server" = "הפעל שרת";
+"Start a new saved chat (⌘N) to add files to a project." = "התחל צ'אט שמור חדש (⌘N) כדי להוסיף קבצים לפרויקט.";
 "Start server" = "מפעיל את השרת.";
 "Start talking" = "התחל לדבר";
 "Start the server first." = "יש להפעיל את השרת תחילה.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "שפת האפליקציה (רק השפה, לא האזור).";
 "The app's name." = "שם האפליקציה.";
 "The base profile: every other profile inherits from it." = "פרופיל הבסיס: כל פרופיל אחר יורש ממנו.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "הצ׳אט מבקש להעתיק את %1$@ (%2$@) אל הפרויקט. כל צ׳אט בפרויקט יוכל לאחר מכן לחפש בו.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "מודל השיחה יכול להסתכל בתיקיות שתאפשר (שמות, גדלים, תאריכים, ציטוטים קצרים) ולהציע שם שינויים — תיקיות חדשות, העברות, שינויי שם, העברה ל־Trash. כל שינוי הוא תכנית שדורשת את אישורך וניתן לביטול.";
 "The chat model couldn't be unloaded for Voice Lab." = "לא ניתן לנתק את מודל הצ'אט עבור Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "מודל הצ׳אט יורד לתיקיה זו. שנה זאת ב־Settings לאחר ההתקנה, או בחר קודם דגם צ׳אט אחר.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "המודל נטען מחדש כש‑Voice Lab נעצר";
 "The model reloads when the image or song is done" = "המודל נטען מחדש כשהתמונה או השיר הושלמו";
 "The model runtime isn't installed yet -- start a model once, then try again." = "ה-runtime של המודל עדיין לא מותקן — הפעל מודל פעם אחת ואז נסה שוב.";
+"The model sees them with your next message." = "המודל יראה אותם עם ההודעה הבאה שלך.";
 "The model server no longer goes online when it starts." = "שרת המודל כבר לא מתחבר לאינטרנט כשהוא מתחיל לפעול.";
 "The model's license, from its card." = "רישיון המודל, כפי שמופיע בכרטיס.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "תיקיית ה‑models אינה זמינה — האם הדיסק שלה מחובר? בחרי/ה בחר/י אותה שוב ב‑Settings → Models.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "השלבים הבאים מכינים מודל ואת התכונות שתרצו. כל שלב ניתן לדילוג; שום דבר לא יורד או נדלק אלא אם תבחרו.";
 "The plan changed since you looked at it: review it again." = "התכנית שונתה מאז שהסתכלת עליה: בדוק אותה שוב.";
 "The port and network access can change only while the server is stopped." = "הפורט וגישת הרשת ניתנים לשינוי רק כשהשרת עצור.";
+"The project's files, and Add Files…" = "קבצי הפרויקט, ו‑Add Files…";
 "The reply was cut at its length limit." = "התשובה נחתכה בגלל מגבלת אורך.";
 "The report" = "הדוח";
 "The reports" = "הדוחות";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "ה‑voice runner הפסיק לפתע (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "אחר כך הדלק את שרת המודל מחדש. המגבלה תחזור לברירת המחדל כאשר ה‑Mac יאתחל. LLMTray לעולם לא משנה זאת בעצמו.";
 "There's no plan waiting any more." = "אין תכנית ממתינה יותר.";
+"These can't be added to a project" = "לא ניתן להוסיף אלו לפרויקט";
 "These models go back to Default: %@." = "המודלים האלה יוחזרו ל‑Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "הם רצים אחד בכל פעם, מוצגים בחלון בשורת התפריט. ניתן לסגור חלון זה בינתיים.";
 "Thinking…" = "חושב…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר, או הגבּל את זיכרון ה‑GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "המודל משתמש ב‑%1$@ מתוך %2$@ GB שה‑GPU רשאי להשתמש בהם; בקשות ארוכות עלולות לגמרי את הזיכרון. השתמש במודל קטן יותר.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "לא ניתן לקרוא את קובץ הפרופיל הזה, לכן אי אפשר לערוך אותו כאן. יש לתקן או למחוק את הקובץ, ואז לפתוח מחדש את ההגדרות.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "גרסה זו מאונדקסת טקסט, Markdown, קוד, PDF, Word (docx, doc), ODT, RTF, HTML וקבצי גיליון (xlsx, ods); לא ניתן להוסיף תיקיות או קבצים מוסתרים.";
 "This version of LLMTray can't send reviews. Please update the app." = "גרסה זו של LLMTray לא יכולה לשלוח חוות דעת. עדכן את האפליקציה.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "גירסה זו של LLMTray מבקשת להתקין את סביבת ההרצה עם Python. התקן Python מ‑python.org או Homebrew ואז נסה שוב. או השתמש ב‑LLMTray‑Full, שכולל את כל הנדרש.";
 "Thought process" = "תהליך החשיבה";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "יכול לצפות ולהציע שינויים";
 "cancelled" = "בוטל";
 "checking %@" = "בודק %@";
+"click to enable" = "לחץ כדי להפעיל";
 "copy" = "העתק";
 "copying" = "מעתיק";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "מוריד %@ (%@)";
 "downloading (%@)" = "מוריד (%@)";
 "embedding" = "מטמיע";
-"enable in Settings" = "אפשר ב‑Settings";
-"enable in Settings to add the LLMTray guide" = "אפשר ב‑Settings כדי להוסיף את המדריך של LLMTray";
+"enable them to add the LLMTray guide" = "הפעל אותם כדי להוסיף את מדריך LLMTray";
 "failed" = "נכשל";
 "failed to build request" = "בניית הבקשה נכשלה";
 "failed: %@" = "נכשל: %@";

@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" không còn trong dự án nữa.";
 "%.0f%% from drafts" = "%.0f%% từ bản nháp";
 "%.1f s" = "%.1f s";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ và %2$lld mục khác";
 "%1$@ asks for %2$@" = "%1$@ yêu cầu %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ yêu cầu %2$@. Chuyển sẽ tháo mô hình đang tải.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld bị gián đoạn: xem chúng trong Finder";
 "%lld items put back under their names." = "%lld mục được đặt lại theo tên của chúng.";
 "%lld more" = "còn %lld";
+"%lld more…" = "%lld nữa…";
 "%lld need a look: see the list." = "%lld cần xem: xem danh sách.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld mới kể từ khi bạn mở danh sách: chưa chọn cho tới khi bạn đánh dấu.";
 "%lld of 5 stars" = "%lld trên 5 sao";
@@ -80,6 +82,7 @@
 "A song from a description" = "Bài hát từ mô tả";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Bài hát có lời hoặc bản nhạc không lời, tạo từ mô tả (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Một liên kết tượng trưng: chính liên kết, không phải mục nó trỏ tới.";
+"A temporary chat can't hold files" = "Cuộc trò chuyện tạm thời không thể chứa tệp";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — giọng rõ, 8-bit (khuyến nghị)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — giọng rõ, GPTQ 4-bit (tiết kiệm bộ nhớ)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — âm thanh dày hơn";
 "About LLMTray" = "Giới thiệu về LLMTray";
 "Add" = "Thêm";
+"Add Files to “%@”…" = "Thêm Tệp vào “%@”…";
 "Add Files…" = "Thêm tệp…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Thêm PDF, Word và tệp văn bản vào dự án. Các cuộc trò chuyện có thể tìm kiếm trong đó và trích dẫn trang; ghim tệp để giữ toàn bộ nội dung trong cuộc hội thoại.";
+"Add files" = "Thêm tệp";
+"Add files or images" = "Thêm tệp hoặc ảnh";
+"Add files to a project" = "Thêm tệp vào dự án";
+"Add files to a project, or images for the model to see" = "Thêm tệp vào dự án, hoặc ảnh để mô hình xem";
 "Add more files: every chat of the project can search them." = "Thêm tệp: mọi cuộc trò chuyện trong dự án đều có thể tìm kiếm chúng.";
+"Add the files to a project?" = "Thêm các tệp vào dự án?";
+"Add “%1$@” to “%2$@”?" = "Thêm “%1$@” vào “%2$@”?";
 "Added %@" = "Đã thêm %@";
 "Added here" = "Đã thêm ở đây";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
@@ -143,7 +153,9 @@
 "Ask first" = "Hỏi trước";
 "Assistant" = "Trợ lý";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Tối đa một báo cáo mỗi ngày, mỗi báo cáo bao gồm một ngày trước gửi tới ipsupport.us. Ngày chưa gửi sẽ được gửi vào lần khởi chạy tiếp theo, tối đa 7 ngày trước. Tắt tính năng này sẽ xóa các báo chưa gửi.";
-"Attach image(s) for the model to see" = "Đính kèm hình ảnh để mô hình xem.";
+"Attach Images…" = "Đính kèm Ảnh…";
+"Attach images" = "Đính kèm ảnh";
+"Attach images for the model to see" = "Đính kèm ảnh để mô hình xem";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ở 8-bit, feed‑forward ở 4-bit — cân bằng dung lượng/ổn định tốt nhất, đã xác thực so với 4-bit đồng nhất.";
 "Audio quality" = "Chất lượng âm thanh";
 "Auto-compact" = "Tự động nén gọn";
@@ -223,6 +235,7 @@
 "Clear" = "Xóa";
 "Clear search" = "Xóa tìm kiếm";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Xóa hàng chờ: những gì đã được lập chỉ mục vẫn có thể tìm, phần còn lại được đánh dấu không lập chỉ mục";
+"Click to enable Project files: add files to the project and let its chats search them." = "Nhấp để bật Tệp dự án: thêm tệp vào dự án và cho phép các cuộc trò chuyện của nó tìm kiếm chúng.";
 "Close" = "Đóng";
 "Close Tab" = "Đóng tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Settings › General › Set Up LLMTray… sẽ mở lại.";
@@ -283,7 +296,11 @@
 "Diagnostics" = "Chẩn đoán";
 "Disk usage" = "Sử dụng ổ đĩa";
 "Dismiss" = "Bỏ qua";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "Tài liệu được sao chép vào dự án và được lập chỉ mục trên Mac này; ảnh sẽ vào tin nhắn của bạn.";
+"Documents go into a project with this chat." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này.";
+"Documents go into a project with this chat; images go into your message." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này; ảnh sẽ vào tin nhắn của bạn.";
 "Doesn't open at login" = "Không mở khi đăng nhập";
+"Don't Add" = "Không thêm";
 "Don't Ask Again" = "Không hỏi nữa";
 "Don't show again" = "Không hiện lại";
 "Done" = "Xong";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "Thả cuộc trò chuyện hoặc tệp vào đây để thêm vào dự án";
 "Drop files here" = "Thả tệp vào đây";
 "Drop files here to add them to the project" = "Thả tệp vào đây để thêm vào dự án";
+"Drop to add files" = "Kéo thả để thêm tệp";
+"Drop to add to “%@”" = "Kéo thả để thêm vào “%@”";
+"Drop to attach images" = "Kéo thả để đính kèm ảnh";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
 "Echo cancellation" = "Hủy tiếng vọng";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động hủy tiếng vọng: %@ — tắt trong Cài đặt > Âm thanh.";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
 "Embedding model" = "Mô hình embedding";
 "Enable Project Files…" = "Bật Tệp dự án…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Bật Tệp dự án trong Cài đặt để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Bật Tệp dự án trong Cài đặt › Tệp trước: hướng dẫn LLMTray sẽ được thêm ở đây và câu trả lời sẽ trích dẫn nó.";
 "Enable Project files to add files" = "Bật Tệp dự án để thêm tệp";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Tệp dự án để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
+"Enable Project files to add files to the project" = "Bật Tệp dự án để thêm tệp vào dự án";
 "Enable Without It" = "Bật mà không cần nó";
 "Enable image editing?" = "Bật chỉnh sửa ảnh?";
 "Enable image generation" = "Bật tạo ảnh";
@@ -356,8 +376,12 @@
 "Files Settings…" = "Cài đặt Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Các tệp thêm vào đây được sao chép vào dự án và lập chỉ mục trên Mac này; mọi cuộc trò chuyện trong dự án đều có thể tìm chúng.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Các tệp thêm vào dự án được lập chỉ mục trên Mac này để các trò chuyện có thể tìm kiếm chúng. Tìm kiếm theo ý nghĩa dùng mô hình embedding; nếu không có, tệp sẽ được tìm kiếm theo từ ngữ.";
+"Files are copied into the project and indexed on this Mac." = "Tệp được sao chép vào dự án và lập chỉ mục trên Mac này.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Tệp được đưa vào dự án, và cuộc trò chuyện tạm thời không thuộc dự án. Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm chúng.";
 "Files in %@" = "Tệp trong %@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Tệp nằm trong dự án: mọi cuộc trò chuyện của dự án đều có thể tìm kiếm chúng. Cuộc trò chuyện này sẽ di chuyển vào dự án cùng chúng.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Các tệp bạn thêm vào dự án được lập chỉ mục trên Mac này, để các chat có thể tìm kiếm chúng.";
+"Files · off" = "Tệp · tắt";
 "Files…" = "Tệp…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish áp dụng những gì bạn chọn. Bạn có thể thay đổi sau trong Settings.";
@@ -448,6 +472,8 @@
 "Image model" = "Mô hình hình ảnh";
 "Image, music and voice models" = "Mô hình ảnh, nhạc và giọng nói";
 "Images" = "Ảnh";
+"Images go into your message; for documents, Project files are turned on first." = "Ảnh sẽ vào tin nhắn của bạn; đối với tài liệu, Tệp dự án sẽ được bật trước.";
+"Images only: a temporary chat can't hold files." = "Chỉ ảnh: cuộc trò chuyện tạm thời không thể chứa tệp.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import từ LLMTray (tải trực tiếp)";
 "Imported" = "Imported";
@@ -597,6 +623,7 @@
 "New profile" = "Hồ sơ mới";
 "New profile (inherits everything from Default)" = "Hồ sơ mới (kế thừa mọi thứ từ Default)";
 "New project" = "Dự án mới";
+"New project “%@”" = "Dự án mới “%@”";
 "New temporary chat" = "Cuộc trò chuyện tạm mới";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "Trò chuyện tạm thời mới (⌘⇧N) — không có gì được lưu lại";
 "News" = "Tin tức";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "Tệp dự án đang tắt trong Cài đặt.";
 "Project files off" = "Tệp dự án tắt";
 "Project files on" = "Tệp dự án bật";
+"Project files will be turned on first." = "Tệp dự án sẽ được bật trước.";
 "Project name" = "Tên dự án";
 "Projects" = "Dự án";
 "Projects' files on disk" = "Tệp của dự án trên đĩa";
@@ -842,6 +870,7 @@
 "Shape" = "Shape";
 "Share anonymous usage statistics" = "Chia sẻ thống kê sử dụng ẩn danh";
 "Share…" = "Chia sẻ…";
+"Show All Files…" = "Hiển thị Tất cả Tệp…";
 "Show Chat Window" = "Hiển thị cửa sổ trò chuyện";
 "Show Files" = "Hiện tệp";
 "Show Next Tab" = "Hiện tab tiếp";
@@ -880,6 +909,7 @@
 "Start" = "Bắt đầu";
 "Start LLMTray automatically when you log in to this Mac." = "Tự động mở LLMTray khi bạn đăng nhập vào máy Mac này.";
 "Start Server" = "Khởi động máy chủ";
+"Start a new saved chat (⌘N) to add files to a project." = "Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm tệp vào dự án.";
 "Start server" = "Khởi động máy chủ.";
 "Start talking" = "Bắt đầu nói";
 "Start the server first." = "Hãy khởi động máy chủ trước.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "Ngôn ngữ của ứng dụng (chỉ ngôn ngữ, không bao gồm vùng).";
 "The app's name." = "Tên ứng dụng.";
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó đều có thể tìm kiếm nội dung này.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Mô hình trò chuyện có thể xem trong các thư mục bạn cho phép (tên, kích thước, ngày, đoạn trích ngắn) và đề xuất thay đổi ở đó — thư mục mới, di chuyển, đổi tên, chuyển vào Trash. Mỗi thay đổi là một kế hoạch bạn phải phê duyệt trước và có thể hoàn tác.";
 "The chat model couldn't be unloaded for Voice Lab." = "Không thể giải nạp mô hình chat cho Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Mô hình chat đang được tải về thư mục này. Thay đổi trong Cài đặt sau khi hoàn tất, hoặc chọn mô hình chat khác trước.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Mô hình nạp lại khi Voice Lab dừng";
 "The model reloads when the image or song is done" = "Mô hình sẽ nạp lại khi ảnh hoặc bài hát hoàn tất";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Chưa cài runtime mô hình — khởi chạy một mô hình rồi thử lại.";
+"The model sees them with your next message." = "Mô hình sẽ thấy chúng cùng với tin nhắn tiếp theo của bạn.";
 "The model server no longer goes online when it starts." = "Máy chủ mô hình không còn tự động lên mạng khi khởi động.";
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Thư mục models không khả dụng — đĩa của nó đã được kết nối chưa? Chọn lại trong Cài đặt → Models.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Các bước tiếp theo thiết lập mô hình và các tính năng bạn muốn. Mỗi bước có thể bỏ qua; không có gì được tải về hay bật trừ khi bạn chọn.";
 "The plan changed since you looked at it: review it again." = "Kế hoạch đã thay đổi kể từ khi bạn xem: xem lại lần nữa.";
 "The port and network access can change only while the server is stopped." = "Cổng và quyền truy cập mạng chỉ thay đổi được khi server đang dừng.";
+"The project's files, and Add Files…" = "Tệp của dự án, và Thêm Tệp…";
 "The reply was cut at its length limit." = "Phản hồi bị cắt do vượt giới hạn độ dài.";
 "The report" = "Báo cáo";
 "The reports" = "Các báo cáo";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "Voice runner dừng bất ngờ (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Khởi động lại máy chủ mô hình. Giới hạn sẽ trở về mặc định khi Mac khởi động lại. LLMTray không tự thay đổi giá trị này.";
 "There's no plan waiting any more." = "Không còn kế hoạch nào đang chờ.";
+"These can't be added to a project" = "Những mục này không thể thêm vào dự án";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Chúng chạy lần lượt, hiển thị trong cửa sổ thanh menu. Bạn có thể đóng cửa sổ này tạm thời.";
 "Thinking…" = "Đang suy nghĩ…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn hoặc tăng giới hạn bộ nhớ GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods); không thể thêm thư mục và tệp ẩn.";
 "This version of LLMTray can't send reviews. Please update the app." = "Phiên bản LLMTray này không gửi được đánh giá. Vui lòng cập nhật ứng dụng.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Phiên bản LLMTray này thiết lập môi trường bằng Python. Cài Python từ python.org hoặc Homebrew rồi kiểm tra lại. Hoặc dùng LLMTray-Full, đã bao gồm mọi thứ cần thiết.";
 "Thought process" = "Quá trình suy nghĩ";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "có thể xem và đề xuất thay đổi";
 "cancelled" = "đã hủy";
 "checking %@" = "đang kiểm tra %@";
+"click to enable" = "nhấp để bật";
 "copy" = "sao chép";
 "copying" = "đang sao chép";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "đang tải xuống %@ (%@)";
 "downloading (%@)" = "đang tải xuống (%@)";
 "embedding" = "đang embedding";
-"enable in Settings" = "bật trong Cài đặt";
-"enable in Settings to add the LLMTray guide" = "bật trong Cài đặt để thêm hướng dẫn LLMTray";
+"enable them to add the LLMTray guide" = "bật chúng để thêm hướng dẫn LLMTray";
 "failed" = "thất bại";
 "failed to build request" = "không thể tạo yêu cầu";
 "failed: %@" = "thất bại: %@";

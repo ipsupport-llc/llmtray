@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "«%@» больше не в проекте.";
 "%.0f%% from drafts" = "%.0f%% из черновиков";
 "%.1f s" = "%.1f с";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ и ещё %2$lld";
 "%1$@ asks for %2$@" = "%1$@ запрашивает %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ запрашивает %2$@. Переключение выгружает текущую модель.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld прервано: просмотрите их в Finder";
 "%lld items put back under their names." = "%lld элементов возвращено в их имена.";
 "%lld more" = "ещё %lld";
+"%lld more…" = "%lld ещё…";
 "%lld need a look: see the list." = "%lld требуют просмотра: см. список.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld новых с момента открытия списка: сняты, пока вы не отметите их.";
 "%lld of 5 stars" = "%lld из 5 звёзд";
@@ -80,6 +82,7 @@
 "A song from a description" = "Песня по описанию";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Песня с вокалом или инструментальная композиция по описанию (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Символическая ссылка: ссылка сама по себе, а не объект, на который она указывает.";
+"A temporary chat can't hold files" = "Временный чат не может хранить файлы";
 "AAC %lld kbit/s" = "AAC %lld кбит/с";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — чистые вокалы, 8‑бит (рекомендуется)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чистые вокалы, GPTQ 4‑бит (меньше памяти)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — более полный звук";
 "About LLMTray" = "О LLMTray";
 "Add" = "Добавить";
+"Add Files to “%@”…" = "Добавить файлы в «%@»…";
 "Add Files…" = "Добавить файлы…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Добавляйте PDF, Word и текстовые файлы в проект. Чаты ищут в них и ссылаются на страницу; прикрепите файл, чтобы сохранить его содержимое в разговоре.";
+"Add files" = "Добавить файлы";
+"Add files or images" = "Добавить файлы или изображения";
+"Add files to a project" = "Добавить файлы в проект";
+"Add files to a project, or images for the model to see" = "Добавить файлы в проект или изображения для просмотра моделью";
 "Add more files: every chat of the project can search them." = "Добавьте файлы: каждый чат проекта сможет их искать.";
+"Add the files to a project?" = "Добавить файлы в проект?";
+"Add “%1$@” to “%2$@”?" = "Добавить «%1$@» в «%2$@»?";
 "Added %@" = "Добавлена %@";
 "Added here" = "Добавлено здесь";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Добавляется к системному промпту, когда модели доступны инструменты. Шаблон инструментов самой модели говорит только, как их вызывать, но не когда этого делать не нужно. Пусто — выключено.";
@@ -143,7 +153,9 @@
 "Ask first" = "Спрашивать сначала";
 "Assistant" = "Ассистент";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не более одного отчёта в день, охватывающего предыдущие сутки, отправляется на ipsupport.us. Неприведённый в тот день отчёт отправляется при следующем запуске — не позднее чем за 7 дней. Отключение удаляет несохранённые отчёты.";
-"Attach image(s) for the model to see" = "Прикрепить изображения, чтобы модель их увидела";
+"Attach Images…" = "Прикрепить изображения…";
+"Attach images" = "Прикрепить изображения";
+"Attach images for the model to see" = "Прикрепить изображения для просмотра моделью";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention в 8‑бит, feed‑forward в 4‑бит — лучший баланс размера и устойчивости, проверено против единообразного 4‑бит.";
 "Audio quality" = "Качество аудио";
 "Auto-compact" = "Автосжатие";
@@ -223,6 +235,7 @@
 "Clear" = "Очистить";
 "Clear search" = "Стереть поиск";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Очистить очередь: то, что проиндексировано, останется доступным для поиска, остальное будет помечено как не индексированное";
+"Click to enable Project files: add files to the project and let its chats search them." = "Нажмите, чтобы включить файлы проекта: добавляйте файлы в проект и разрешите чатам проекта их искать.";
 "Close" = "Закрыть";
 "Close Tab" = "Закрыть вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закрывает это окно. Снова открыть: Настройки › Основные › Настроить LLMTray…";
@@ -283,7 +296,11 @@
 "Diagnostics" = "Диагностика";
 "Disk usage" = "Использование диска";
 "Dismiss" = "Закрыть";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "Документы копируются в проект и индексируются на этом Mac; изображения добавляются в ваше сообщение.";
+"Documents go into a project with this chat." = "Документы попадут в проект вместе с этим чатом.";
+"Documents go into a project with this chat; images go into your message." = "Документы попадут в проект вместе с этим чатом; изображения добавятся в ваше сообщение.";
 "Doesn't open at login" = "Не открывать при входе";
+"Don't Add" = "Не добавлять";
 "Don't Ask Again" = "Больше не спрашивать";
 "Don't show again" = "Больше не показывать";
 "Done" = "Готово";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "Перетащите чаты или файлы сюда, чтобы добавить их в проект";
 "Drop files here" = "Перетащите файлы сюда";
 "Drop files here to add them to the project" = "Перетащите файлы сюда, чтобы добавить их в проект";
+"Drop to add files" = "Перетащите, чтобы добавить файлы";
+"Drop to add to “%@”" = "Перетащите, чтобы добавить в «%@»";
+"Drop to attach images" = "Перетащите, чтобы прикрепить изображения";
 "Duplicate this profile" = "Дублировать профиль";
 "Echo cancellation" = "Ш подавление эха";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не удалось запустить подавление эха: %@ — отключите в «Настройки» > «Голос».";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "Редактировать профиль…";
 "Embedding model" = "Модель эмбеддингов";
 "Enable Project Files…" = "Включить файлы проекта…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Включите файлы проекта в Настройках, чтобы добавлять файлы в проект и позволить чатам их искать.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Сначала включите файлы проекта в разделе «Настройки › Файлы»: тогда сюда добавится руководство LLMTray, и ответы будут на него ссылаться.";
 "Enable Project files to add files" = "Включите файлы проекта, чтобы добавлять файлы";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите файлы проекта, чтобы добавлять файлы в проект и искать по ним в его чатах. До этого ничего не индексируется и не скачивается.";
+"Enable Project files to add files to the project" = "Включите файлы проекта, чтобы добавлять файлы в проект";
 "Enable Without It" = "Включить без неё";
 "Enable image editing?" = "Включить редактирование изображений?";
 "Enable image generation" = "Генерация картинок";
@@ -356,8 +376,12 @@
 "Files Settings…" = "Настройки файлов…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Файлы, добавленные сюда, копируются в проект и индексируются на этом Mac; любой чат проекта может их искать.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файлы, добавленные в проект, индексируются на этом Mac, чтобы их можно было искать в чатах. Поиск по смыслу использует модель эмбеддингов; без неё файлы ищутся по словам.";
+"Files are copied into the project and indexed on this Mac." = "Файлы копируются в проект и индексируются на этом Mac.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Файлы помещаются в проект, а временный чат никогда не принадлежит проекту. Начните новый сохранённый чат (⌘N), чтобы добавить их.";
 "Files in %@" = "Файлы в %@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Файлы хранятся в проектах: любой чат проекта может их искать. Этот чат переместится в проект вместе с ними.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Файлы, добавленные в проект, индексируются на этом Mac, чтобы чаты могли их искать.";
+"Files · off" = "Файлы · выкл.";
 "Files…" = "Файлы…";
 "Finish" = "Готово";
 "Finish applies what you chose. You can change all of it later in Settings." = "«Готово» применяет выбранное. Всё это можно изменить позже в Настройках.";
@@ -448,6 +472,8 @@
 "Image model" = "Модель картинок";
 "Image, music and voice models" = "Модели для изображений, музыки и голоса";
 "Images" = "Изображения";
+"Images go into your message; for documents, Project files are turned on first." = "Изображения добавляются в сообщение; для документов сначала включаются файлы проекта.";
+"Images only: a temporary chat can't hold files." = "Только изображения: временный чат не может хранить файлы.";
 "Import" = "Импортировать";
 "Import from LLMTray (direct download)" = "Import из LLMTray (прямое скачивание)";
 "Imported" = "Импортировано";
@@ -597,6 +623,7 @@
 "New profile" = "Новый профиль";
 "New profile (inherits everything from Default)" = "Новый профиль (всё наследует от Default)";
 "New project" = "Новый проект";
+"New project “%@”" = "Новый проект «%@»";
 "New temporary chat" = "Новый временный чат";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "Новый временный чат (⌘⇧N) — ничего из него не сохраняется";
 "News" = "Новости";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "Файлы проекта отключены в Настройках.";
 "Project files off" = "Файлы проекта отключены";
 "Project files on" = "Файлы проекта включены";
+"Project files will be turned on first." = "Сначала будут включены файлы проекта.";
 "Project name" = "Название проекта";
 "Projects" = "Проекты";
 "Projects' files on disk" = "Файлы проектов на диске";
@@ -842,6 +870,7 @@
 "Shape" = "Форма";
 "Share anonymous usage statistics" = "Делиться анонимной статистикой использования";
 "Share…" = "Поделиться…";
+"Show All Files…" = "Показать все файлы…";
 "Show Chat Window" = "Показать окно чата";
 "Show Files" = "Показать файлы";
 "Show Next Tab" = "Показать следующую вкладку";
@@ -880,6 +909,7 @@
 "Start" = "Пуск";
 "Start LLMTray automatically when you log in to this Mac." = "Запускать LLMTray автоматически при входе в систему.";
 "Start Server" = "Запустить сервер";
+"Start a new saved chat (⌘N) to add files to a project." = "Начните новый сохранённый чат (⌘N), чтобы добавить файлы в проект.";
 "Start server" = "Запустить сервер";
 "Start talking" = "Начать говорить";
 "Start the server first." = "Сначала запустите сервер.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "Язык приложения (только язык, без региона).";
 "The app's name." = "Название приложения.";
 "The base profile: every other profile inherits from it." = "Базовый профиль: все остальные наследуются от него.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Чат просит скопировать %1$@ (%2$@) в проект. После этого каждый чат проекта сможет искать по нему.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Модель чата может просматривать разрешённые папки (имена, размеры, даты, короткие фрагменты) и предлагать там изменения — новые папки, перемещения, переименования, отправку в Корзину. Каждое изменение — это план, который вы сначала одобряете, и его можно отменить.";
 "The chat model couldn't be unloaded for Voice Lab." = "Не удалось выгрузить чат‑модель для Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Чат‑модель загружается в эту папку. Измените её в Настройках после установки или сначала выберите другую чат‑модель.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Модель перезагружается при остановке Voice Lab";
 "The model reloads when the image or song is done" = "Модель перезагружается после завершения создания изображения или песни";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Среда выполнения модели ещё не установлена — запустите модель один раз, затем попробуйте снова.";
+"The model sees them with your next message." = "Модель увидит их с вашим следующим сообщением.";
 "The model server no longer goes online when it starts." = "Сервер модели больше не выходит в сеть при запуске.";
 "The model's license, from its card." = "Лицензия модели с её карточки.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка моделей недоступна — подключён ли её диск? Выберите её заново в Настройках → Models.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Следующие шаги настраивают модель и нужные функции. Каждый шаг можно пропустить; ничего не загружается и не включается без вашего выбора.";
 "The plan changed since you looked at it: review it again." = "План изменился с момента просмотра: просмотрите его снова.";
 "The port and network access can change only while the server is stopped." = "Порт и сетевой доступ можно изменить только при остановленном сервере.";
+"The project's files, and Add Files…" = "Файлы проекта и «Добавить файлы…»";
 "The reply was cut at its length limit." = "Ответ был обрезан по ограничению длины.";
 "The report" = "Отчёт";
 "The reports" = "Отчёты";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "Voice runner остановился неожиданно (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Затем перезапустите сервер модели. При перезагрузке Mac лимит возвращается к значению по умолчанию. LLMTray сам этого не меняет.";
 "There's no plan waiting any more." = "Планов в ожидании больше нет.";
+"These can't be added to a project" = "Эти элементы нельзя добавить в проект";
 "These models go back to Default: %@." = "Эти модели вернутся на Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Они запускаются по очереди и показываются во всплывающем окне строки меню. Вы можете закрыть это окно.";
 "Thinking…" = "Думаю…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель или увеличьте лимит памяти GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл этого профиля не читается, поэтому редактировать его здесь нельзя. Исправьте или удалите файл, затем снова откройте Настройки.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Эта версия индексирует файлы текстовых форматов, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods); папки и скрытые файлы нельзя добавить.";
 "This version of LLMTray can't send reviews. Please update the app." = "Эта версия LLMTray не может отправлять отзывы. Обновите приложение.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Эта версия LLMTray настраивает окружение через Python. Установите Python с python.org или через Homebrew, затем проверьте снова. Или используйте LLMTray‑Full — она содержит всё необходимое.";
 "Thought process" = "Ход размышлений";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "может просматривать и предлагать изменения";
 "cancelled" = "отменено";
 "checking %@" = "проверка %@";
+"click to enable" = "нажмите, чтобы включить";
 "copy" = "копия";
 "copying" = "копирование";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "загрузка %@ (%@)";
 "downloading (%@)" = "загрузка (%@)";
 "embedding" = "embedding";
-"enable in Settings" = "включить в Настройках";
-"enable in Settings to add the LLMTray guide" = "включите в Настройках, чтобы добавить руководство LLMTray";
+"enable them to add the LLMTray guide" = "включите их, чтобы добавить руководство LLMTray";
 "failed" = "ошибка";
 "failed to build request" = "не удалось составить запрос";
 "failed: %@" = "сбой: %@";

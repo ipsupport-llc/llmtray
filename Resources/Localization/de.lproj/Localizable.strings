@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" ist nicht mehr im Projekt.";
 "%.0f%% from drafts" = "%.0f%% aus Entwürfen";
 "%.1f s" = "%.1f s";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ und %2$lld weitere";
 "%1$@ asks for %2$@" = "%1$@ fordert %2$@ an";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ fordert %2$@ an. Ein Wechsel entlädt das aktuell geladene Modell.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld unterbrochen: sie im Finder ansehen";
 "%lld items put back under their names." = "%lld Elemente unter ihren Namen zurückgelegt.";
 "%lld more" = "%lld weitere";
+"%lld more…" = "%lld weitere…";
 "%lld need a look: see the list." = "%lld brauchen eine Überprüfung: Liste ansehen.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld neu, seit Sie die Liste geöffnet haben: bis zum Ankreuzen deaktiviert.";
 "%lld of 5 stars" = "%lld von 5 Sternen";
@@ -80,6 +82,7 @@
 "A song from a description" = "Ein Lied aus einer Beschreibung";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Ein Lied mit gesungenem Text oder ein Instrumental, aus einer Beschreibung (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Ein symbolischer Link: der Link selbst, nicht sein Ziel.";
+"A temporary chat can't hold files" = "Ein temporärer Chat kann keine Dateien aufnehmen";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — deutliche Vocals, 8-bit (empfohlen)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — deutliche Vocals, GPTQ 4-bit (weniger RAM)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — vollerer Sound";
 "About LLMTray" = "Über LLMTray";
 "Add" = "Hinzufügen";
+"Add Files to “%@”…" = "Dateien zu „%@“ hinzufügen…";
 "Add Files…" = "Dateien hinzufügen…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Fügen Sie PDFs, Word‑ und Textdateien zu einem Projekt hinzu. Die Chats durchsuchen sie und zitieren die Seite; heften Sie eine Datei an, um ihren gesamten Inhalt in der Unterhaltung zu behalten.";
+"Add files" = "Dateien hinzufügen";
+"Add files or images" = "Dateien oder Bilder hinzufügen";
+"Add files to a project" = "Dateien zu einem Projekt hinzufügen";
+"Add files to a project, or images for the model to see" = "Dateien zu einem Projekt hinzufügen oder Bilder, die das Modell sehen soll";
 "Add more files: every chat of the project can search them." = "Weitere Dateien hinzufügen: Jeder Chat des Projekts kann darin suchen.";
+"Add the files to a project?" = "Dateien in ein Projekt aufnehmen?";
+"Add “%1$@” to “%2$@”?" = "„%1$@“ zu „%2$@“ hinzufügen?";
 "Added %@" = "Hinzugefügt %@";
 "Added here" = "Hier hinzugefügt";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Wird dem System-Prompt hinzugefügt, sobald Tools angeboten werden. Die eigene Tool-Vorlage des Modells beschreibt nur, wie ein Tool aufgerufen wird, nie, wann nicht. Leer lassen deaktiviert dies.";
@@ -143,7 +153,9 @@
 "Ask first" = "Zuerst fragen";
 "Assistant" = "Assistent";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Höchstens ein Bericht pro Tag, der einen vergangenen Tag abdeckt, an ipsupport.us. Ein noch nicht gesendeter Tag wird beim nächsten Start gesendet, bis zu 7 Tage rückwirkend. Wenn Sie dies ausschalten, werden nicht gesendete Daten gelöscht.";
-"Attach image(s) for the model to see" = "Fügt Bild(er) hinzu, die das Modell sehen kann.";
+"Attach Images…" = "Bilder anhängen…";
+"Attach images" = "Bilder anhängen";
+"Attach images for the model to see" = "Bilder anhängen, die das Modell sehen soll";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention in 8‑Bit, Feed‑Forward in 4‑Bit – bestes Größen-/Stabilitätsverhältnis, validiert gegenüber einheitlichem 4‑Bit.";
 "Audio quality" = "Audioqualität";
 "Auto-compact" = "Automatisch verdichten";
@@ -223,6 +235,7 @@
 "Clear" = "Löschen";
 "Clear search" = "Suche löschen";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Warteschlange löschen: Indexiertes bleibt durchsuchbar, der Rest wird als nicht indexiert markiert";
+"Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats durchsuchbar machen.";
 "Close" = "Schließen";
 "Close Tab" = "Tab schließen";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. Einstellungen › Allgemein › Set Up LLMTray… öffnet es erneut.";
@@ -283,7 +296,11 @@
 "Diagnostics" = "Diagnose";
 "Disk usage" = "Speicherplatz";
 "Dismiss" = "Schließen";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "Dokumente werden ins Projekt kopiert und auf diesem Mac indexiert; Bilder werden in Ihre Nachricht eingefügt.";
+"Documents go into a project with this chat." = "Dokumente werden zusammen mit diesem Chat ins Projekt aufgenommen.";
+"Documents go into a project with this chat; images go into your message." = "Dokumente werden zusammen mit diesem Chat ins Projekt aufgenommen; Bilder werden in Ihre Nachricht eingefügt.";
 "Doesn't open at login" = "Öffnet nicht beim Anmelden";
+"Don't Add" = "Nicht hinzufügen";
 "Don't Ask Again" = "Nicht erneut fragen";
 "Don't show again" = "Nicht wieder anzeigen";
 "Done" = "Fertig";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "Ziehen Sie Chats oder Dateien hierher, um sie dem Projekt hinzuzufügen";
 "Drop files here" = "Dateien hier ablegen";
 "Drop files here to add them to the project" = "Dateien hier ablegen, um sie dem Projekt hinzuzufügen";
+"Drop to add files" = "Zum Hinzufügen ablegen";
+"Drop to add to “%@”" = "Zum Hinzufügen zu „%@“ ablegen";
+"Drop to attach images" = "Zum Anhängen von Bildern ablegen";
 "Duplicate this profile" = "Dieses Profil duplizieren";
 "Echo cancellation" = "Echo-Unterdrückung";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ – schalten Sie sie unter „Einstellungen > Stimme“ aus.";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "Profil bearbeiten …";
 "Embedding model" = "Embedding‑Modell";
 "Enable Project Files…" = "Projektdateien aktivieren…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Projektdateien in „Einstellungen“ aktivieren, um Dateien zum Projekt hinzuzufügen und Chats darin suchen zu lassen.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Projektdateien in „Einstellungen › Dateien“ zuerst aktivieren: Dann wird der LLMTray‑Leitfaden hier hinzugefügt und Antworten verweisen darauf.";
 "Enable Project files to add files" = "Projektdateien aktivieren, um Dateien hinzuzufügen";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Projektdateien aktivieren, um Dateien zu einem Projekt hinzuzufügen und dessen Chats die Dateien durchsuchen zu lassen. Bis dahin wird nichts indexiert oder heruntergeladen.";
+"Enable Project files to add files to the project" = "Projektdateien aktivieren, um Dateien zum Projekt hinzuzufügen";
 "Enable Without It" = "Ohne Aktivieren zulassen";
 "Enable image editing?" = "Bildbearbeitung aktivieren?";
 "Enable image generation" = "Bildgenerierung aktivieren";
@@ -356,8 +376,12 @@
 "Files Settings…" = "„Dateien“-Einstellungen…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Hier hinzugefügte Dateien werden ins Projekt kopiert und auf diesem Mac indexiert; jeder Chat des Projekts kann darin suchen.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Dateien, die einem Projekt hinzugefügt werden, werden auf diesem Mac indexiert, damit dessen Chats sie durchsuchen können. Die semantische Suche verwendet ein Embedding‑Modell; ohne dieses werden Dateien nur nach ihren Wörtern durchsucht.";
+"Files are copied into the project and indexed on this Mac." = "Dateien werden ins Projekt kopiert und auf diesem Mac indexiert.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Dateien gehören zu einem Projekt — ein temporärer Chat ist nie Teil davon. Starten Sie einen neuen gespeicherten Chat (⌘N), um Dateien hinzuzufügen.";
 "Files in %@" = "Dateien in %@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Dateien leben in Projekten: Jeder Chat eines Projekts kann sie durchsuchen. Dieser Chat wird zusammen mit den Dateien ins Projekt verschoben.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Dateien, die Sie einem Projekt hinzufügen, werden auf diesem Mac indexiert, damit Chats sie durchsuchen können.";
+"Files · off" = "Dateien · aus";
 "Files…" = "Dateien…";
 "Finish" = "Fertig";
 "Finish applies what you chose. You can change all of it later in Settings." = "„Fertig“ wendet Ihre Auswahl an. Sie können alles später in Einstellungen ändern.";
@@ -448,6 +472,8 @@
 "Image model" = "Bildmodell";
 "Image, music and voice models" = "Modelle für Bild, Musik und Stimme";
 "Images" = "Bilder";
+"Images go into your message; for documents, Project files are turned on first." = "Bilder werden in Ihre Nachricht eingefügt; für Dokumente werden zuerst Projektdateien aktiviert.";
+"Images only: a temporary chat can't hold files." = "Nur Bilder: Ein temporärer Chat kann keine Dateien aufnehmen.";
 "Import" = "Importieren";
 "Import from LLMTray (direct download)" = "Importieren aus LLMTray (direkter Download)";
 "Imported" = "Importiert";
@@ -597,6 +623,7 @@
 "New profile" = "Neues Profil";
 "New profile (inherits everything from Default)" = "Neues Profil (übernimmt alles von Default)";
 "New project" = "Neues Projekt";
+"New project “%@”" = "Neues Projekt „%@“";
 "New temporary chat" = "Neuer temporärer Chat";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "Neuer temporärer Chat (⌘⇧N) — nichts davon wird jemals gespeichert";
 "News" = "Nachrichten";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "Projektdateien sind in den Einstellungen deaktiviert.";
 "Project files off" = "Projektdateien aus";
 "Project files on" = "Projektdateien an";
+"Project files will be turned on first." = "Projektdateien werden zuerst aktiviert.";
 "Project name" = "Projektname";
 "Projects" = "Projekte";
 "Projects' files on disk" = "Projektdaten auf der Festplatte";
@@ -842,6 +870,7 @@
 "Shape" = "Shape";
 "Share anonymous usage statistics" = "Anonyme Nutzungsstatistiken teilen";
 "Share…" = "Teilen…";
+"Show All Files…" = "Alle Dateien anzeigen…";
 "Show Chat Window" = "Chatfenster zeigen";
 "Show Files" = "Dateien zeigen";
 "Show Next Tab" = "Nächsten Tab zeigen";
@@ -880,6 +909,7 @@
 "Start" = "Start";
 "Start LLMTray automatically when you log in to this Mac." = "LLMTray beim Anmelden an diesem Mac automatisch starten.";
 "Start Server" = "Server starten";
+"Start a new saved chat (⌘N) to add files to a project." = "Starten Sie einen neuen gespeicherten Chat (⌘N), um Dateien zu einem Projekt hinzuzufügen.";
 "Start server" = "Startet den Server.";
 "Start talking" = "Sprechen beginnen";
 "Start the server first." = "Zuerst den Server starten.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "Die Sprache der App (nur Sprache, nicht Region).";
 "The app's name." = "Der Name der App.";
 "The base profile: every other profile inherits from it." = "Das Basisprofil: Alle anderen Profile erben davon.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Der Chat fordert auf, %1$@ (%2$@) in das Projekt zu kopieren. Jeder Chat des Projekts kann es dann durchsuchen.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Das Chat‑Modell kann in Ordner schauen, die Sie erlauben (Namen, Größen, Daten, kurze Auszüge) und dort Änderungen vorschlagen – neue Ordner, Verschiebe‑, Umbenennungs‑ und Papierkorb‑Aktionen. Jede Änderung ist ein Plan, den Sie zuerst bestätigen und rückgängig machen können.";
 "The chat model couldn't be unloaded for Voice Lab." = "Das Chat‑Modell konnte für Voice Lab nicht entladen werden.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Das Chat‑Modell wird in diesen Ordner heruntergeladen. Ändern Sie dies nach der Einrichtung in den Einstellungen oder wählen Sie vorher ein anderes Chat‑Modell aus.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Das Modell wird neu geladen, wenn Voice Lab stoppt";
 "The model reloads when the image or song is done" = "Das Modell wird neu geladen, sobald das Bild oder Lied fertig ist";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Die Model Runtime ist noch nicht installiert — starten Sie einmal ein Modell und versuchen Sie es dann erneut.";
+"The model sees them with your next message." = "Das Modell sieht sie mit Ihrer nächsten Nachricht.";
 "The model server no longer goes online when it starts." = "Der Modell‑Server verbindet sich beim Start nicht mehr automatisch mit dem Internet.";
 "The model's license, from its card." = "Die Lizenz des Modells, von dessen Modell‑Card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Der Models-Ordner ist nicht verfügbar — ist die Festplatte verbunden? Wähle ihn erneut in Einstellungen → Models.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Die nächsten Schritte richten ein Modell und gewünschte Funktionen ein. Jeder Schritt kann übersprungen werden; nichts wird heruntergeladen oder aktiviert, sofern Sie es nicht wählen.";
 "The plan changed since you looked at it: review it again." = "Der Plan hat sich seit Ihrer Ansicht geändert: Bitte erneut prüfen.";
 "The port and network access can change only while the server is stopped." = "Port und Netzwerkzugriff können nur geändert werden, während der Server gestoppt ist.";
+"The project's files, and Add Files…" = "Die Dateien des Projekts und „Dateien hinzufügen…“";
 "The reply was cut at its length limit." = "Die Antwort wurde aufgrund der Längenbegrenzung abgeschnitten.";
 "The report" = "Der Bericht";
 "The reports" = "Die Berichte";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "Der Voice Runner wurde unerwartet gestoppt (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Starte dann den Modell‑Server neu. Das Limit wird beim Neustart des Mac auf den Standard zurückgesetzt. LLMTray ändert es nie automatisch.";
 "There's no plan waiting any more." = "Es wartet kein Plan mehr.";
+"These can't be added to a project" = "Diese können nicht zu einem Projekt hinzugefügt werden";
 "These models go back to Default: %@." = "Diese Modelle werden auf Default zurückgesetzt: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Sie laufen nacheinander und werden im Fenster der Menüleiste angezeigt. Sie können dieses Fenster inzwischen schließen.";
 "Thinking…" = "Denkt nach …";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Dieses Modell benötigt %1$@ von den %2$@ GB, die die GPU verwenden kann; bei langen Prompts kann der Speicher knapp werden. Verwende ein kleineres Modell oder erhöhe das GPU‑Speicherlimit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Dieses Modell benötigt %1$@ von den %2$@ GB, die die GPU verwenden kann; bei langen Prompts kann der Speicher knapp werden. Verwende ein kleineres Modell.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Dieses Profil kann hier nicht bearbeitet werden, weil seine Datei nicht gelesen werden kann. Repariere oder lösche die Datei und öffne dann die Einstellungen erneut.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Diese Version indexiert Text, Markdown, Code, PDF, Word (docx, doc), ODT, RTF, HTML und Tabellen (xlsx, ods); Ordner und versteckte Dateien können nicht hinzugefügt werden.";
 "This version of LLMTray can't send reviews. Please update the app." = "Diese Version von LLMTray kann keine Bewertungen senden. Bitte aktualisieren Sie die App.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Diese Version von LLMTray richtet die Laufzeit mit Python ein. Installieren Sie Python von python.org oder über Homebrew und versuchen Sie es erneut. Oder verwenden Sie LLMTray‑Full, das alles Notwendige bereits enthält.";
 "Thought process" = "Gedankengang";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "darf ansehen und Änderungen vorschlagen";
 "cancelled" = "abgebrochen";
 "checking %@" = "prüfe %@";
+"click to enable" = "klicken, um zu aktivieren";
 "copy" = "Kopieren";
 "copying" = "kopiere";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "Lade %@ herunter (%@)";
 "downloading (%@)" = "lade herunter (%@)";
 "embedding" = "erzeuge Embeddings";
-"enable in Settings" = "In „Einstellungen“ aktivieren";
-"enable in Settings to add the LLMTray guide" = "In „Einstellungen“ aktivieren, um den LLMTray‑Leitfaden hinzuzufügen";
+"enable them to add the LLMTray guide" = "aktivieren, um die LLMTray‑Anleitung hinzuzufügen";
 "failed" = "fehlgeschlagen";
 "failed to build request" = "Anfrage konnte nicht erstellt werden";
 "failed: %@" = "fehlgeschlagen: %@";
