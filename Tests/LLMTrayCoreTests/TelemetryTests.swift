@@ -38,6 +38,7 @@ final class TelemetryFamilyTests: XCTestCase {
             ("roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit", .nemotron),
             ("roman220220/FrogNano-4B-2609-gptq-mlx-jang", .qwen),
             ("roman220220/Ornith-1.5-35B-A3B-gptq-mlx-jang-small", .qwen),
+            ("acme/Ornithology-Llama-8B", .llama),
             ("", .other),
         ]
         for (model, family) in cases {
