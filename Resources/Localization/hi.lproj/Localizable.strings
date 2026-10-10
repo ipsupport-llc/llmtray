@@ -235,7 +235,7 @@
 "Clear" = "साफ़ करें";
 "Clear search" = "खोज साफ़ करें";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "क्यू साफ करें: जो अनुक्रमित है वह खोजने योग्य रहेगा, बाकी को 'अनुक्रमित नहीं' चिह्नित किया जाएगा";
-"Click to enable Project files: add files to the project and let its chats search them." = "Project files सक्षम करने के लिए क्लिक करें: फ़ाइलें प्रोजेक्ट में जोड़ें और इसकी चैट उन्हें खोज सकें।";
+"Click to enable Project files: add files to the project and let its chats search them." = "प्रोजेक्ट फ़ाइलें सक्षम करने के लिए क्लिक करें: फ़ाइलें प्रोजेक्ट में जोड़ें और इसकी चैट उन्हें खोज सकें।";
 "Close" = "बंद करें";
 "Close Tab" = "टैब बंद करें";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "यह विंडो बंद करता है। Settings › General › Set Up LLMTray… इसे फिर खोलता है।";
@@ -344,7 +344,7 @@
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "पहले सेटिंग्स › फ़ाइलें में प्रोजेक्ट फ़ाइलें चालू करें: फिर LLMTray मार्गदर्शिका यहाँ जोड़ी जाएगी और उत्तर इसका हवाला देंगे।";
 "Enable Project files to add files" = "फ़ाइलें जोड़ने के लिए प्रोजेक्ट फ़ाइलें चालू करें";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फ़ाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए प्रोजेक्ट फ़ाइलें चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
-"Enable Project files to add files to the project" = "प्रोजेक्ट में फ़ाइलें जोड़ने के लिए Project files सक्षम करें";
+"Enable Project files to add files to the project" = "प्रोजेक्ट में फ़ाइलें जोड़ने के लिए प्रोजेक्ट फ़ाइलें सक्षम करें";
 "Enable Without It" = "बिना इसके सक्षम करें";
 "Enable image editing?" = "छवि संपादन सक्षम करें?";
 "Enable image generation" = "इमेज जनरेशन सक्षम करें";
@@ -472,7 +472,7 @@
 "Image model" = "इमेज मॉडल";
 "Image, music and voice models" = "चित्र, संगीत और वॉइस मॉडल";
 "Images" = "छवियाँ";
-"Images go into your message; for documents, Project files are turned on first." = "छवियाँ आपके संदेश में जाती हैं; दस्तावेज़ों के लिए पहले Project files चालू होंगी।";
+"Images go into your message; for documents, Project files are turned on first." = "छवियाँ आपके संदेश में जाती हैं; दस्तावेज़ों के लिए पहले प्रोजेक्ट फ़ाइलें चालू होंगी।";
 "Images only: a temporary chat can't hold files." = "केवल छवियाँ: अस्थायी चैट फ़ाइलें नहीं रख सकती।";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray से Import (direct download)";
@@ -741,7 +741,7 @@
 "Project files are turned off in Settings." = "प्रोजेक्ट फ़ाइलें सेटिंग्स में बंद हैं।";
 "Project files off" = "प्रोजेक्ट फाइलें बंद";
 "Project files on" = "प्रोजेक्ट फाइलें चालू";
-"Project files will be turned on first." = "पहले Project files चालू की जाएँगी।";
+"Project files will be turned on first." = "पहले प्रोजेक्ट फ़ाइलें चालू की जाएँगी।";
 "Project name" = "प्रोजेक्ट का नाम";
 "Projects" = "प्रोजेक्ट";
 "Projects' files on disk" = "डिस्क पर प्रोजेक्ट की फाइलें";
@@ -1036,7 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "अगले चरण एक मॉडल और वह फीचर्स सेट करते हैं जो आप चाहते हैं। प्रत्येक को छोड़ सकते हैं; जब तक आप चुने नहीं करते, कुछ भी डाउनलोड या चालू नहीं होगा।";
 "The plan changed since you looked at it: review it again." = "जब से आपने योजना देखी है यह बदल गई है: इसे फिर से देखें।";
 "The port and network access can change only while the server is stopped." = "पोर्ट और नेटवर्क एक्सेस केवल सर्वर बंद होने पर ही बदल सकते हैं।";
-"The project's files, and Add Files…" = "प्रोजेक्ट की फ़ाइलें, और Add Files…";
+"The project's files, and Add Files…" = "प्रोजेक्ट की फ़ाइलें, और “फाइलें जोड़ें…”";
 "The reply was cut at its length limit." = "उत्तर उसकी लंबाई सीमा पर काट दिया गया था।";
 "The report" = "रिपोर्ट";
 "The reports" = "रिपोर्टें";

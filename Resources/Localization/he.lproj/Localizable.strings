@@ -235,7 +235,7 @@
 "Clear" = "נקה";
 "Clear search" = "נקה חיפוש";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "נקה תור: מה שאונדקס נשאר לחיפוש, השאר מסומן כ'לא מאונדקס'";
-"Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת Project files: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
+"Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת קבצי פרויקט: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Close" = "סגור";
 "Close Tab" = "סגור כרטיסייה";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "מיסגר את החלון הזה. Settings › General › Set Up LLMTray… פותח אותו שוב.";
@@ -296,7 +296,7 @@
 "Diagnostics" = "אבחון";
 "Disk usage" = "שימוש בדיסק";
 "Dismiss" = "התעלם";
-"Documents are copied into the project and indexed on this Mac; images go into your message." = "המסמכים מועתקים לפרויקט ומאונדקסים במחשבי זה; תמונות נכנסות להודעה שלך.";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "המסמכים מועתקים לפרויקט ומאונדקסים ב-Mac זה; תמונות נכנסות להודעה שלך.";
 "Documents go into a project with this chat." = "המסמכים נכנסים לפרויקט יחד עם הצ'אט הזה.";
 "Documents go into a project with this chat; images go into your message." = "המסמכים נכנסים לפרויקט עם הצ'אט הזה; תמונות נכנסות להודעה שלך.";
 "Doesn't open at login" = "לא נפתח בכניסה";
@@ -344,7 +344,7 @@
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "הפעילו קודם קבצי פרויקט בהגדרות › קבצים: אז מדריך LLMTray יתווסף לכאן והתשובות יצטטו אותו.";
 "Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
-"Enable Project files to add files to the project" = "הפעל Project files כדי להוסיף קבצים לפרויקט";
+"Enable Project files to add files to the project" = "הפעל קבצי פרויקט כדי להוסיף קבצים לפרויקט";
 "Enable Without It" = "הפעל בלעדיו";
 "Enable image editing?" = "להפעיל עריכת תמונות?";
 "Enable image generation" = "הפעלת יצירת תמונות";
@@ -472,7 +472,7 @@
 "Image model" = "מודל תמונה";
 "Image, music and voice models" = "דגמי תמונה, מוזיקה וקול";
 "Images" = "תמונות";
-"Images go into your message; for documents, Project files are turned on first." = "תמונות נכנסות להודעה שלך; עבור מסמכים, Project files יופעלו תחילה.";
+"Images go into your message; for documents, Project files are turned on first." = "תמונות נכנסות להודעה שלך; עבור מסמכים, קבצי פרויקט יופעלו תחילה.";
 "Images only: a temporary chat can't hold files." = "רק תמונות: צ'אט זמני לא יכול להכיל קבצים.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import מ‑LLMTray (הורדה ישירה)";
@@ -741,7 +741,7 @@
 "Project files are turned off in Settings." = "קבצי הפרויקט מושבתים בהגדרות.";
 "Project files off" = "קבצי פרויקט כבויים";
 "Project files on" = "קבצי פרויקט דלוקים";
-"Project files will be turned on first." = "Project files יופעלו תחילה.";
+"Project files will be turned on first." = "קבצי פרויקט יופעלו תחילה.";
 "Project name" = "שם פרויקט";
 "Projects" = "פרויקטים";
 "Projects' files on disk" = "קבצי הפרויקטים בדיסק";
@@ -1036,7 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "השלבים הבאים מכינים מודל ואת התכונות שתרצו. כל שלב ניתן לדילוג; שום דבר לא יורד או נדלק אלא אם תבחרו.";
 "The plan changed since you looked at it: review it again." = "התכנית שונתה מאז שהסתכלת עליה: בדוק אותה שוב.";
 "The port and network access can change only while the server is stopped." = "הפורט וגישת הרשת ניתנים לשינוי רק כשהשרת עצור.";
-"The project's files, and Add Files…" = "קבצי הפרויקט, ו‑Add Files…";
+"The project's files, and Add Files…" = "קבצי הפרויקט, ו“הוסף קבצים…”";
 "The reply was cut at its length limit." = "התשובה נחתכה בגלל מגבלת אורך.";
 "The report" = "הדוח";
 "The reports" = "הדוחות";

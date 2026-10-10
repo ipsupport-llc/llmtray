@@ -978,7 +978,7 @@
 "The app's language (the language only, not the region)." = "لغة التطبيق (اللغة فقط، لا المنطقة).";
 "The app's name." = "اسم التطبيق.";
 "The base profile: every other profile inherits from it." = "ملف التعريف الأساسي: ترث منه كل ملفات التعريف الأخرى.";
-"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "يطالب المحادثة بنسخ %1$@ (%2$@) إلى المشروع. ستتمكن كل محادثة في المشروع بعد ذلك من البحث فيه.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "تطلب المحادثة نسخ %1$@ (%2$@) إلى المشروع. ستتمكن كل محادثة في المشروع بعد ذلك من البحث فيه.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "نموذج الدردشة يمكنه النظر في المجلدات التي تسمح بها (الأسماء، الأحجام، التواريخ، مقتطفات قصيرة) واقتراح تغييرات هناك — مجلدات جديدة، نقل، إعادة تسمية، الإرسال إلى Trash. كل تغيير هو خطة توافق عليها أولاً، ويمكن التراجع عنها.";
 "The chat model couldn't be unloaded for Voice Lab." = "تعذّر إفراغ نموذج الدردشة لـVoice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "نموذج الدردشة يُحمَّل في هذا المجلد. غيّره في الإعدادات بعد الإعداد، أو اختر نموذج دردشة آخر أولاً.";

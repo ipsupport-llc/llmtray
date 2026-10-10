@@ -235,7 +235,7 @@
 "Clear" = "消去";
 "Clear search" = "検索をクリア";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "キューを消去：インデックス済みは検索可能のまま、残りは未インデックスに設定されます";
-"Click to enable Project files: add files to the project and let its chats search them." = "クリックして「Project files」を有効にします：ファイルをプロジェクトに追加し、そのチャットで検索できるようにします。";
+"Click to enable Project files: add files to the project and let its chats search them." = "クリックして「プロジェクトファイル」を有効にします：ファイルをプロジェクトに追加し、そのチャットで検索できるようにします。";
 "Close" = "閉じる";
 "Close Tab" = "タブを閉じる";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "このウインドウを閉じます。設定 › 一般 › Set Up LLMTray… で再度開けます。";
@@ -344,7 +344,7 @@
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "まず「設定」›「ファイル」でプロジェクトファイルを有効にすると、ここに LLMTray ガイドが追加され、回答で参照されます。";
 "Enable Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
-"Enable Project files to add files to the project" = "プロジェクトにファイルを追加するには「Project files」を有効にしてください";
+"Enable Project files to add files to the project" = "プロジェクトにファイルを追加するには「プロジェクトファイル」を有効にしてください";
 "Enable Without It" = "それなしで有効化";
 "Enable image editing?" = "画像編集を有効にしますか？";
 "Enable image generation" = "画像生成を有効にする";
@@ -472,7 +472,7 @@
 "Image model" = "画像モデル";
 "Image, music and voice models" = "画像・音楽・音声用モデル";
 "Images" = "画像";
-"Images go into your message; for documents, Project files are turned on first." = "画像はメッセージに添付されます。ドキュメントは先に「Project files」を有効にしてください。";
+"Images go into your message; for documents, Project files are turned on first." = "画像はメッセージに添付されます。ドキュメントの場合は、先に「プロジェクトファイル」が有効になります。";
 "Images only: a temporary chat can't hold files." = "画像のみ：一時チャットにはファイルを保持できません。";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray からインポート（直接ダウンロード）";
@@ -741,7 +741,7 @@
 "Project files are turned off in Settings." = "プロジェクトファイルは「設定」でオフになっています。";
 "Project files off" = "プロジェクトファイル：オフ";
 "Project files on" = "プロジェクトファイル：オン";
-"Project files will be turned on first." = "先に「Project files」が有効になります。";
+"Project files will be turned on first." = "先に「プロジェクトファイル」が有効になります。";
 "Project name" = "プロジェクト名";
 "Projects" = "プロジェクト";
 "Projects' files on disk" = "プロジェクトのディスク上のファイル";
@@ -1036,7 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "次のステップでモデルと必要な機能を設定します。各項目はスキップ可能で、選択しない限り何もダウンロードや有効化はされません。";
 "The plan changed since you looked at it: review it again." = "表示してから計画が変更されました：再度確認してください。";
 "The port and network access can change only while the server is stopped." = "ポートとネットワークアクセスはサーバー停止中にのみ変更できます。";
-"The project's files, and Add Files…" = "プロジェクトのファイル、及び「Add Files…」";
+"The project's files, and Add Files…" = "プロジェクトのファイル、及び「ファイルを追加…」";
 "The reply was cut at its length limit." = "返信が長さの上限で切られました。";
 "The report" = "レポート";
 "The reports" = "レポート";
