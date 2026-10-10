@@ -6,6 +6,12 @@ locally; nothing you type, attach or generate is sent to a cloud.
 
 ## Getting started
 
+The version from our website installs from a DMG on the releases page
+(drag it to Applications) or with Homebrew:
+`brew install --cask ipsupport-llc/tap/llmtray-full` (Python and the
+runtime inside) or `brew install --cask ipsupport-llc/tap/llmtray` (small;
+installs the runtime on first launch). It updates itself either way.
+
 1. Pick a chat model. The setup assistant suggests the ones that fit your
    Mac's memory; you can download others from Hugging Face later.
 2. Start chatting. The model loads the first time you send a message.

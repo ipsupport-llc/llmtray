@@ -76,7 +76,15 @@ Two DMGs are attached to every [release](https://github.com/ipsupport-llc/llmtra
 - **[LLMTray.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray.dmg)** (~8MB) — sets up the `mlx-lm` venv on first launch (needs a Python 3.10+ already on the machine; see [Requirements](#requirements)).
 - **[LLMTray-Full.dmg](https://github.com/ipsupport-llc/llmtray/releases/latest/download/LLMTray-Full.dmg)** (~270MB) — ships its own Python + `mlx-lm` already installed, so first launch needs nothing else on the machine and starts serving immediately.
 
-1. Download one of the two above and drag it to Applications.
+Or install with [Homebrew](https://github.com/ipsupport-llc/homebrew-tap):
+
+```sh
+brew install --cask ipsupport-llc/tap/llmtray-full   # or ipsupport-llc/tap/llmtray
+```
+
+The app updates itself (Sparkle), so `brew upgrade` leaves it alone.
+
+1. Download one of the two above and drag it to Applications (or install with Homebrew).
 2. Open it. LLMTray is signed with IPSupport LLC's Developer ID and notarized by Apple, so it opens like any other app.
 3. Click the brain icon in the menu bar and pick a model (or download one via the built-in Hugging Face browser if you don't have one yet) — the server starts on its own from here, both right now and on every future launch.
 
