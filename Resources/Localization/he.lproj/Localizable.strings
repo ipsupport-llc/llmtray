@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "״%@״ השתנה מאז שהתשובה הזאת ציינה אותו: ייתכן שעמוד %lld ייראה שונה עכשיו.";
 "\"%@\" is no longer in the project." = "״%@״ כבר לא חלק מהפרויקט.";
+"%.0f%% from drafts" = "%.0f%% מטיוטות";
 "%.1f s" = "%.1f שנ'";
 "%1$@ and %2$lld more" = "%1$@ ועוד %2$lld";
 "%1$@ asks for %2$@" = "%1$@ מבקש את %2$@";
@@ -32,6 +33,7 @@
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · הורד; mlx-audio מותקן בהרצה הראשונה";
 "%@ · not downloaded" = "%@ · לא הורד";
 "%@ · partly downloaded" = "%@ · הורד חלקית";
+"%@ — in project %@" = "%@ — בפרויקט %@";
 "%@ — page %lld" = "%@ — עמוד %lld";
 "%@ → %@ available" = "זמין: %@ → %@";
 "%@ ★ from %lld reviews" = "%@ ★ מתוך %lld חוות דעת";
@@ -53,6 +55,7 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld חדשים מאז פתיחת הרשימה: מסומנים כלא מסומנים עד שתסמן אותם.";
 "%lld of 5 stars" = "%lld מתוך 5 כוכבים";
 "%lld pages" = "%lld עמודים";
+"%lld requests" = "%lld בקשות";
 "%lld s" = "%lld שנ׳";
 "%lld-bit" = "%lld סיביות";
 "(Please attach the report file shown in Finder.)" = "(אנא צרפו את קובץ הדוח שמוצג ב‑Finder.)";
@@ -67,7 +70,9 @@
 "A chat model" = "מודל צ'אט";
 "A client" = "לקוח";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "מיקס מלא ומעובד יותר; המילים נשמעות פחות בבירור. כ‑20 שנ׳ להכנת 30 שנ׳ מוזיקה.";
+"A model is a tool, not an authority" = "מודל הוא כלי, לא סמכות";
 "A package: moved as one item." = "חבילה: הועברה כפריט יחיד.";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "טבלת אמבדינג לכל שכבה (Gemma 4 E2B, E4B) נקראת מהדיסק לפי הצורך, וחלקי תמונה ואודיו (Gemma 4, Qwen 3.5) נטענים בפעם הראשונה שמשתמשים בהם. חיסכון של עד כ־2 GB זיכרון במכונות עם 8 GB; עם הטבלה על הדיסק, ההילוּל (generation) כ־10% איטי יותר. התוצאות זהות.";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "מזהה אקראי שנוצר במק זה, חדש בכל הפעלה. אינו מקושר אליך או אל המחשב.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "דירוג וכמה מילים, נשלחים ל-ipsupport.us: ללא חשבון, ללא מזהי מכשיר. חוות הדעת מופיעות באתר LLMTray לאחר בדיקה.";
@@ -132,6 +137,7 @@
 "Apps & agents" = "אפליקציות וסוכנים";
 "Apps and agents" = "אפליקציות וסוכנים";
 "Ask Later" = "שאל מאוחר יותר";
+"Ask about LLMTray" = "שאל על LLMTray";
 "Ask again in two weeks" = "שאל שוב בעוד שבועיים";
 "Ask anything, or try one of these:" = "שאל כל דבר, או נסה אחד מהבאים:";
 "Ask first" = "שאל קודם";
@@ -302,6 +308,7 @@
 "Downloads waiting: %lld" = "הורדות בהמתנה: %lld";
 "Drag chats here, or use a chat's menu" = "גרור שיחות לכאן, או השתמש בתפריט של שיחה";
 "Drag chats or files here, or use a chat's menu" = "גרור שיחות או קבצים לכאן, או השתמש בתפריט השיחה";
+"Drag documents onto this chat: they join the project, and the model answers from them." = "גרור מסמכים לצ׳אט זה: הם יתווספו לפרויקט והמודל יענה בהתבסס עליהם.";
 "Drop chats here to move them to the project" = "שחרר שיחות כאן כדי להעבירן לפרויקט";
 "Drop chats or files here to add them to the project" = "שחרר שיחות או קבצים כאן כדי להוסיף לפרויקט";
 "Drop files here" = "שחרר קבצים כאן";
@@ -313,18 +320,27 @@
 "Echo gate" = "שער הדהוד";
 "Edit Profile…" = "עריכת פרופיל…";
 "Embedding model" = "דגם הטמעה";
+"Enable Project Files…" = "הפעל קבצי פרויקט…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "אפשר קבצי Project ב‑Settings › Files תחילה: המדריך של LLMTray יתווסף לכאן והתשובות יצטטו אותו.";
+"Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
 "Enable Without It" = "הפעל בלעדיו";
 "Enable image editing?" = "להפעיל עריכת תמונות?";
 "Enable image generation" = "הפעלת יצירת תמונות";
 "Enable image generation?" = "להפעיל יצירת תמונות?";
+"Enable images, music and voice" = "אפשר תמונות, מוזיקה וקול";
 "Enable music generation" = "הפעל יצירת מוזיקה";
 "Enable music generation?" = "להפעיל יצירת מוזיקה?";
+"Enable project files?" = "להפעיל את קבצי הפרויקט?";
+"Enable…" = "הפעל…";
 "End" = "סיום";
 "End the conversation (the chat model reloads)" = "סיים שיחה (המודל נטען מחדש)";
 "Enjoying LLMTray?" = "נהנים מ‑LLMTray?";
 "Errors" = "שגיאות";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "לכל צ'אט בפרויקט זה יתווספו הוראות אלו, אחרי ה־system prompt של פרופיל המודל. שינוי יכנס לתוקף מההודעה הבאה.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "כל צ'אט בפרויקט מקבל את כל הטקסט; חיפוש באינטרנט ויצירת תמונות או מוזיקה כבויים בצ'אטים אלה כל עוד קובץ מסומן.";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
 "Everything in that folder is here already." = "הכל בתיקיה הזו כבר כאן.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "בדיוק מה ש‑LLMTray שולח אל ipsupport.us, שדה אחר שדה. שום דבר אחר לא יוצא מהמחשב.";
 "Experimental — English only" = "ניסיוני — אנגלית בלבד";
@@ -386,6 +402,8 @@
 "Get Started" = "התחל";
 "Get a Model…" = "השג מודל…";
 "Get one" = "קבל אחד";
+"Getting Started" = "התחלה";
+"Getting started" = "התחלה";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "מעניק למודל כלי generate_image (נדרש מודל שקורא לכלים). בפעם הראשונה, מודל התמונה יורד.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "מספק למודל כלי generate_music: שיר עם מילים מושרות או יצירה אינסטרומנטלית מתוך תיאור (ACE-Step 1.5, רישיון MIT; כ‑20 שנ׳ ל‑30 שנ׳ של מוזיקה). בפעם הראשונה המודל יורד.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "נותן למודל כלי edit_image: משנה תמונה מהשיחה — אחת שצירפת או שנוצרה כאן. דורש שיהיה מופעל יצור תמונות. המודל נמצא משלו, יורד כשאתה בוחר בו.";
@@ -394,13 +412,16 @@
 "Has other names (a hard link): they keep the file." = "יש לו שמות אחרים (hard link): הם שומרים את הקובץ.";
 "Help" = "עזרה";
 "Help improve LLMTray?" = "לעזור לשפר את LLMTray?";
+"Hide" = "הסתר";
 "Hide chats" = "הסתר צ'אטים";
 "Hide the reasoning" = "הסתר את נימוקי ההחלטה";
+"Hide these steps for good" = "הסתר צעדים אלה לצמיתות";
 "High quality (larger canvas)" = "איכות גבוהה (קנבס גדול יותר)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "דיוק מקסימלי, הורדה גדולה — קו בסיס נכונות שניתן לסמוך עליו.";
 "Hourly forecast" = "תחזית לפי שעה";
 "Hover the info button under an answer to see the model, speed and how much context it used." = "העבר את הסמן מעל כפתור המידע מתחת לתשובה כדי לראות את המודל, המהירות וכמה הקשר הוא השתמש.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "כמה הרמוני ובלתי צפוי יהיה המוזיקה. זמין רק ב‑turbo: ל‑sft אין מתכנן שירים לשונות.";
+"How do I connect my coding agent to LLMTray?" = "איך אני מחבר את סוכן הקוד שלי ל-LLMTray?";
 "How do you like LLMTray?" = "מה דעתך על LLMTray?";
 "How it was made" = "איך זה נוצר";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "כמה טוקנים של ההנחיה מעובדים בכל צעד. ערך גדול יותר מהיר יותר בהנחיות ארוכות, אך משתמש ביותר זיכרון. הכוונון האוטומטי של המדד יכול לבחור אותו.";
@@ -433,6 +454,7 @@
 "Import…" = "Import…";
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "ב־iCloud Drive או בענן אחר: העברתו ל־Trash תסירו גם מהמכשירים האחרים שלך.";
 "In project %@" = "בפרויקט %@";
+"In real use" = "בשימוש אמיתי";
 "In the queue: %lld ahead…" = "בתור: %lld לפני…";
 "Include LLMTray crash reports from the last two weeks" = "כלול דוחות קריסה של LLMTray משבועיים אחרונים";
 "Include the server log" = "כלול את לוג השרת";
@@ -452,6 +474,7 @@
 "Installs the llmtray command in ~/.local/bin: start and stop the server, list and download models, chat, and generate images from a terminal or a script. Run llmtray help for the commands." = "מתקין את הפקודה llmtray בתיקייה ~/.local/bin: הפעלה/עצירת השרת, רשימת והורדת מודלים, שיחה ויצירת תמונות מטווח הטרמינל או מתוך סקריפט. הרץ llmtray help לקבלת הפקודות.";
 "Instructions for %@" = "הוראות עבור %@";
 "Instructions…" = "הוראות…";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "הוא עלול לטעות ולהמציא: בדקו כל דבר חשוב. הוא לא רופא, לא עורך דין, לא פסיכולוג ולא חבר. השימוש בתשובות שלו הוא באחריותכם בלבד.";
 "It goes on in the background: you can continue." = "זה רץ ברקע: אפשר להמשיך.";
 "It had no settings of its own to bring; the ones here were kept." = "לא היו לה הגדרות לייבוא; ההגדרות כאן נשמרו.";
 "It is being set up or updated. Try again once that's done." = "מוגדר או מתעדכן כעת. נסו שוב כשזה יסתיים.";
@@ -474,6 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "משמר את פורט זה. אם אפליקציה אחרת כבר משתמשת בו, השרת לא יתחל עד שתשנה את הפורט ב־Settings.";
 "Kept free: %lld MB" = "שמורים פנויים: %lld MB";
 "LLMTray" = "LLMTray";
+"LLMTray Guide" = "מדריך LLMTray";
 "LLMTray isn't allowed to use the microphone." = "אין ל‑LLMTray הרשאה להשתמש במיקרופון.";
 "LLMTray restarts now to load them." = "LLMTray יאתחל עכשיו כדי לטעון אותם.";
 "LLMTray status, indexing project files" = "סטטוס LLMTray — אינדוקס קבצי פרויקט";
@@ -496,7 +520,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "קל מהמומלץ: מהיר יותר ומשאיר זיכרון לאפליקציות אחרות, אך התשובות פשטניות יותר.";
 "Like LLMTray?" = "אוהבים את LLMTray?";
 "Likes" = "לייקים";
-"Link (optional, https://…)" = "קישור (אופציונלי, https://…)";
 "List my name" = "פרסם את שמי";
 "List my name in Supporters" = "פרסם את שמי ברשימת התומכים";
 "Listening…" = "מקשיב…";
@@ -513,6 +536,7 @@
 "Maintenance" = "תחזוקה";
 "Make a 30-second calm lo-fi instrumental for studying" = "הכן קטע אינסטרומנטלי שקט ל‑lo‑fi למשך 30 שניות ללמידה";
 "Make images and edit them." = "יצירת תמונות ועריכתן.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "צור תמונות, שירים ודבר עם מודל קולי — הכל במכונה זו: אפשר אותם ב‑Settings.";
 "Make songs and instrumentals." = "יצירת שירים ואינסטרומנטלים.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "יוצר מזהה אקראי חדש — דוחות עתידיים לא יימשכו לדוחות קודמים.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "יצירת תיקיות, העברה, שינוי שם והעברה ל־Trash — כל תכנית מוצגת קודם לך, ושום דבר לא משתנה עד שתאשר אותה.";
@@ -532,6 +556,7 @@
 "Model switching" = "החלפת מודלים";
 "Model:" = "מודל:";
 "Models" = "מודלים";
+"Models can make mistakes. Check important information." = "מודלים עלולים לטעות. בדקו מידע חשוב.";
 "Models folder" = "תיקיית המודלים";
 "Models folder: %@" = "תיקיית מודלים: %@";
 "Models found: %lld" = "מודלים שנמצאו: %lld";
@@ -595,6 +620,7 @@
 "No model uses it." = "אף מודל לא משתמש בו.";
 "No models found in this folder." = "לא נמצאו מודלים בתיקייה זו.";
 "No models in this folder yet. The next step offers some to download." = "אין מודלים בתיקייה זו עדיין. השלב הבא מציע כמה להורדה.";
+"No requests yet." = "אין עדיין בקשות.";
 "No runs yet." = "עדיין אין הרצות.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "ללא מנויים. ללא חסימות תכונות. תמכו בפיתוח אם LLMTray שימושי לכם.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "אין הצעות לזיכרון של Mac זה. דפדפו ב‑Hugging Face אחרי מודל.";
@@ -775,6 +801,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "דוגם רק ממספר כזה של הטוקנים הסבירים ביותר. 0 מכבה זאת. ב-Gemma 4 מומלץ 64.";
 "Sampling" = "דגימה";
 "Save" = "שמור";
+"Save memory" = "חסוך זיכרון";
 "Saved chats will show up here." = "צ'אטים שנשמרו יופיעו כאן.";
 "Saved in your Keychain" = "שמור ב‑Keychain שלך";
 "Save…" = "שמור…";
@@ -914,6 +941,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "גרסת ה‑App Store של LLMTray פתוחה. סגור אותה קודם (באייקון בשורת התפריטים › Quit), ואז פתח את זו שוב: שתיהן ישתמשו באותו פורט ויטענו מודלים פעמיים.";
 "The Keychain refused to remove the token." = "Keychain סרב להסיר את האסימון.";
 "The Keychain refused to save the token." = "Keychain סרב לשמור את האסימון.";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "מדריך LLMTray נמצא בפרויקט זה: שאל, למשל, איך לחבר את סוכן הקוד שלך.";
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter הורד — יש להפעיל מחדש את השרת כדי להשתמש בו.";
 "The Mac's chip." = "השבב של המק.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "ה‑API שתואם ל‑OpenAI מאזין כאן (http://localhost:<port>/v1). אפשר לשנות אותו כשהשרת עצור.";
@@ -956,6 +984,7 @@
 "The model is answering another chat: yours starts as soon as it's free." = "המודל עונה בצ'אט אחר: הבקשה שלך תתחיל ברגע שיתפנה.";
 "The model is busy with another request: yours starts as soon as it's free." = "המודל עסוק בבקשה אחרת: הבקשה שלך תתחיל ברגע שיתפנה.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "המודל חושב לפני שהוא עונה (הגדרות מציגות את תהליך ההסקה עצמו)";
+"The model is still downloading: your message goes out as soon as it's ready." = "המודל עדיין מורד: ההודעה שלך תישלח מיד כשהוא יהיה מוכן.";
 "The model isn't running. Send again to start it." = "המודל לא פועל. שלח שוב כדי להפעיל אותו.";
 "The model name API clients send." = "זה שם המודל שלקוחות API שולחים.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "בורר המודל, Start/Stop, פרופיל, כלי וטמפרטורה מעל הצ'אט בחלון נפרד. כבוי: החלון מציג רק את השיחות והשיחה — הבקרות האלה נשארות בסרגל התפריט.";
@@ -1047,14 +1076,9 @@
 "Total time" = "זמן כולל";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "בודק את decode-concurrency (1/2/4/8) ואת prefill-step-size (64/128/256/512) מול המודל הפעיל, מפעיל מחדש את השרת בין כל בדיקה, ושומר את האפשרות שנמדדה כמהירה ביותר.";
 "Try Again" = "נסה שוב";
-"Enable Project Files…" = "הפעל קבצי פרויקט…";
-"Enable…" = "הפעל…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
-"Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
-"Enable project files?" = "להפעיל את קבצי הפרויקט?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
+"Type a message below and press Return. Try: “What can you do?”" = "הקלד הודעה למטה ולחץ Return. נסה: “What can you do?”";
 "Unavailable" = "לא זמין";
 "Uncompressed (WAV)" = "ללא דחיסה (WAV)";
 "Undo" = "בטל";
@@ -1113,6 +1137,7 @@
 "Voice Lab…" = "Voice Lab…";
 "Voice model" = "מודל קול";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "יש להמתין לסיום הבקשה הנוכחית או בדיקת הביצועים -- הפעלה מחדש תקטע אותה.";
+"Waiting for a model download to finish…" = "ממתין להשלמת הורדת המודל…";
 "Waiting for an image or song to finish…" = "ממתין לסיום יצירת תמונה או שיר…";
 "Waiting for another chat's image or music to finish…" = "מחכה לסיום יצירת תמונה או מוזיקה משיחה אחרת…";
 "Waiting for the chat or a generator to finish" = "ממתין לשיחה או לגנרטור שיסיים";
@@ -1126,6 +1151,7 @@
 "Web tools on" = "כלי אינטרנט דולקים";
 "Welcome" = "ברוכים הבאים";
 "Welcome to LLMTray" = "ברוכים הבאים ל‑LLMTray";
+"What can you do?" = "מה אתה יכול לעשות?";
 "What decides which models run well here." = "מה קובע אילו מודלים ירוצו כאן היטב.";
 "What else" = "מה עוד";
 "What happened?" = "מה קרה?";
@@ -1148,6 +1174,7 @@
 "Words only" = "מילים בלבד";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "זיכרון עבודה לקריאת פקודה בחלקים; פחות זיכרון יקרא פקודות ארוכות בחלקים קטנים ואטיים יותר. אם מטמון הפקודות והקריאה יחד לא עולים על 90%: היתרה מחזיקה את הפקודה הנקראת.";
 "Works offline" = "עובד ללא חיבור";
+"Write here" = "כתוב כאן";
 "Writing the song…" = "כותב את השיר…";
 "Yesterday" = "אתמול";
 "You" = "את/ה";
@@ -1157,6 +1184,7 @@
 "Your files" = "הקבצים שלך";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "אפליקציית המייל לא יכלה לטפל בקובץ המצורף: הדוח מוצג ב‑Finder — צרף אותו ידנית למייל.";
 "Your name (optional)" = "שמך (אופציונלי)";
+"Your site or profile (optional, https://…)" = "האתר או הפרופיל שלך (אופציונלי, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed (מומלץ)";
@@ -1164,10 +1192,12 @@
 "and %lld more" = "ועוד %lld";
 "at least %1$@ items, %2$@" = "לפחות %1$@ פריטים, %2$@";
 "at least %@" = "לפחות %@";
+"building %@" = "בונה %@";
 "calls tools" = "קורא לכלים";
 "can look" = "יכול לצפות";
 "can look and propose changes" = "יכול לצפות ולהציע שינויים";
 "cancelled" = "בוטל";
+"checking %@" = "בודק %@";
 "copy" = "העתק";
 "copying" = "מעתיק";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1175,14 +1205,23 @@
 "done" = "בוצע";
 "downloaded" = "הורד";
 "downloading" = "מוריד";
+"downloading %@" = "מוריד %@";
+"downloading %@ (%@)" = "מוריד %@ (%@)";
+"downloading (%@)" = "מוריד (%@)";
 "embedding" = "מטמיע";
+"enable in Settings" = "אפשר ב‑Settings";
+"enable in Settings to add the LLMTray guide" = "אפשר ב‑Settings כדי להוסיף את המדריך של LLMTray";
 "failed" = "נכשל";
 "failed to build request" = "בניית הבקשה נכשלה";
 "failed: %@" = "נכשל: %@";
+"finishing" = "מסיים";
+"first token %.1f s" = "טוקן ראשון %.1f ש׳";
 "for this chat" = "לשיחה זו";
+"generation %.1f tok/s" = "יצירה %.1f טוקנים/ש׳";
 "hears audio" = "שומע אודיו";
 "in LLMTray's own folder" = "בתיקייה של LLMTray";
 "in an earlier models folder" = "בתיקיית models קודמת";
+"installing %d packages" = "מתקין %d חבילות";
 "it isn't a model folder in the models folder" = "זו אינה תיקיית דגם בתוך תיקיית models";
 "it's being downloaded" = "מוריד/ה כעת";
 "it's in use or downloading" = "נעשה בו שימוש או מוריד/ת אותו";
@@ -1202,6 +1241,7 @@
 "not supported" = "לא נתמך";
 "not used by any model" = "לא בשימוש של אף מודל";
 "off" = "מכובה";
+"prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";
 "queued" = "בתור";
 "reading" = "קורא";
 "reads images" = "קורא תמונות";
@@ -1236,16 +1276,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "“%@” (%@) מועבר/ת לפח, שם ניתן לשחזר אותו/אותה. הכינוי ובחירת הפרופיל נשכחים.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "“%@” והאינדקס שלה נמחקו מהפרויקט. הקובץ שממנו הוספת אותה לא נגע בו.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "“%@” לא הוסר: השרת עסוק או משתמש בו. נסה/י שוב כשיופסק העומס.";
-"%.0f%% from drafts" = "%.0f%% מטיוטות";
-"%lld requests" = "%lld בקשות";
-"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "כל בקשה שהשרת עונה עליה, מהצ׳אט ומאפליקציות וסוכנים אחרים דרך ה-API, נשמרת ב-Mac הזה. חציונים לכל מודל והגדרות.";
-"In real use" = "בשימוש אמיתי";
-"No requests yet." = "אין עדיין בקשות.";
-"first token %.1f s" = "טוקן ראשון %.1f ש׳";
-"generation %.1f tok/s" = "יצירה %.1f טוקנים/ש׳";
-"prompt %.0f tok/s" = "פרומפט %.0f טוקנים/ש׳";
-
-/* The model disclaimer (welcome page, About, under the chat field) */
-"A model is a tool, not an authority" = "מודל הוא כלי, לא סמכות";
-"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "הוא עלול לטעות ולהמציא: בדקו כל דבר חשוב. הוא לא רופא, לא עורך דין, לא פסיכולוג ולא חבר. השימוש בתשובות שלו הוא באחריותכם בלבד.";
-"Models can make mistakes. Check important information." = "מודלים עלולים לטעות. בדקו מידע חשוב.";

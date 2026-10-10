@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "\"%@\" uległ zmianie od czasu, gdy ta odpowiedź go cytowała: strona %lld może teraz wyglądać inaczej.";
 "\"%@\" is no longer in the project." = "\"%@\" już nie znajduje się w projekcie.";
+"%.0f%% from drafts" = "%.0f%% z wersji roboczych";
 "%.1f s" = "%.1f s";
 "%1$@ and %2$lld more" = "%1$@ i %2$lld więcej";
 "%1$@ asks for %2$@" = "%1$@ prosi o %2$@";
@@ -32,6 +33,7 @@
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · pobrane; mlx-audio zainstalowany przy pierwszym uruchomieniu";
 "%@ · not downloaded" = "%@ · niepobrane";
 "%@ · partly downloaded" = "%@ · częściowo pobrane";
+"%@ — in project %@" = "%@ — w projekcie %@";
 "%@ — page %lld" = "%@ — strona %lld";
 "%@ → %@ available" = "Dostępne: %@ → %@";
 "%@ ★ from %lld reviews" = "%@ ★ z %lld recenzji";
@@ -53,6 +55,7 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld nowych od otwarcia listy: będą odznaczone, dopóki ich nie zaznaczysz.";
 "%lld of 5 stars" = "%lld z 5 gwiazdek";
 "%lld pages" = "%lld stron";
+"%lld requests" = "%lld żądań";
 "%lld s" = "%lld s";
 "%lld-bit" = "%lld-bitowy";
 "(Please attach the report file shown in Finder.)" = "(Proszę dołączyć plik raportu pokazany w Finderze.)";
@@ -67,7 +70,9 @@
 "A chat model" = "Model rozmów";
 "A client" = "Klient";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Pełniejsze, bardziej dopracowane brzmienie; tekst jest mniej wyraźny. Około 20 s na 30 s muzyki.";
+"A model is a tool, not an authority" = "Model to narzędzie, a nie autorytet";
 "A package: moved as one item." = "Pakiet: przenoszony jako pojedynczy element.";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Tabela osadzeń per-warstwa (Gemma 4 E2B, E4B) jest wczytywana z dysku w razie potrzeby, a części obrazów i dźwięku (Gemma 4, Qwen 3.5) ładują się przy pierwszym użyciu. Do około 2 GB mniej pamięci na Macach z 8 GB; przy tabeli na dysku generowanie jest około 10% wolniejsze. Odpowiedzi takie same.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Ciche sprawdzenie przy każdym uruchomieniu. Pokazuje coś tylko wtedy, gdy jest dostępna aktualizacja.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Losowy identyfikator utworzony na tym Macu, nowy przy każdym uruchomieniu. Nie jest przypisany do Ciebie ani do Maca.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Ocena i kilka słów wysyłane na ipsupport.us: bez konta, bez identyfikatorów urządzenia. Recenzje pojawiają się na stronie LLMTray po moderacji.";
@@ -132,6 +137,7 @@
 "Apps & agents" = "Aplikacje i agenty";
 "Apps and agents" = "Aplikacje i agenty";
 "Ask Later" = "Zapytaj później";
+"Ask about LLMTray" = "Zapytaj o LLMTray";
 "Ask again in two weeks" = "Zapytaj ponownie za dwa tygodnie";
 "Ask anything, or try one of these:" = "Zapytaj o cokolwiek lub wypróbuj jedno z poniższych:";
 "Ask first" = "Najpierw zapytaj";
@@ -302,6 +308,7 @@
 "Downloads waiting: %lld" = "Oczekujące pobrania: %lld";
 "Drag chats here, or use a chat's menu" = "Przeciągnij czaty tutaj lub użyj menu czatu";
 "Drag chats or files here, or use a chat's menu" = "Przeciągnij rozmowy lub pliki tutaj albo użyj menu rozmowy";
+"Drag documents onto this chat: they join the project, and the model answers from them." = "Przeciągnij dokumenty na tę rozmowę — zostaną dodane do projektu, a model odpowie na ich podstawie.";
 "Drop chats here to move them to the project" = "Upuść rozmowy tutaj, aby przenieść je do projektu";
 "Drop chats or files here to add them to the project" = "Upuść rozmowy lub pliki tutaj, aby dodać je do projektu";
 "Drop files here" = "Upuść pliki tutaj";
@@ -313,18 +320,27 @@
 "Echo gate" = "Bramka echa";
 "Edit Profile…" = "Edytuj profil…";
 "Embedding model" = "Model osadzania";
+"Enable Project Files…" = "Włącz Project Files…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Włącz Pliki projektu w Ustawieniach, aby dodawać pliki do projektu i umożliwić ich przeszukiwanie przez czaty.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Włącz Pliki projektów w Ustawieniach › Pliki najpierw: wtedy przewodnik LLMTray zostanie tu dodany, a odpowiedzi będą się do niego odwoływać.";
+"Enable Project files to add files" = "Włącz Project Files, aby dodać pliki";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Włącz Project Files, aby dodać pliki do projektu i pozwolić jego czatom ich przeszukiwać. Nic nie jest indeksowane ani pobierane przed włączeniem.";
 "Enable Without It" = "Włącz bez niego";
 "Enable image editing?" = "Włączyć edycję obrazów?";
 "Enable image generation" = "Włącz generowanie obrazów";
 "Enable image generation?" = "Włączyć generowanie obrazów?";
+"Enable images, music and voice" = "Włącz obrazy, muzykę i głos";
 "Enable music generation" = "Włącz generowanie muzyki";
 "Enable music generation?" = "Włączyć generowanie muzyki?";
+"Enable project files?" = "Włączyć pliki projektu?";
+"Enable…" = "Włącz…";
 "End" = "Zakończ";
 "End the conversation (the chat model reloads)" = "Zakończ rozmowę (model czatu przeładuje się)";
 "Enjoying LLMTray?" = "Podoba Ci się LLMTray?";
 "Errors" = "Błędy";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "Każdy czat w tym projekcie otrzymuje te instrukcje po systemowym komunikacie profilu modelu. Zmiana zaczyna obowiązywać od następnej wiadomości.";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "Każda rozmowa w projekcie otrzymuje cały tekst; wyszukiwanie w sieci oraz generowanie obrazów i muzyki są w tych rozmowach wyłączone, gdy plik jest przypięty.";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Każde żądanie, na które odpowiada serwer — z czatu oraz z innych aplikacji i agentów przez API — zapisane na tym Macu. Mediany dla modelu i ustawień.";
 "Everything in that folder is here already." = "Wszystko z tego folderu jest już tutaj.";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Dokładnie to, co LLMTray wysyła do ipsupport.us, pole po polu. Nic więcej nie opuszcza Twojego Maca.";
 "Experimental — English only" = "Eksperymentalne — tylko po angielsku";
@@ -386,6 +402,8 @@
 "Get Started" = "Rozpocznij";
 "Get a Model…" = "Pobierz model…";
 "Get one" = "Pobierz";
+"Getting Started" = "Rozpocznij";
+"Getting started" = "Rozpocznij";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "Udostępnia modelowi narzędzie generate_image (wymaga modelu obsługującego wywoływanie narzędzi). Przy pierwszym użyciu model obrazów zostanie pobrany.";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "Daje modelowi narzędzie generate_music: piosenkę ze śpiewanymi tekstami albo podkład instrumentalny na podstawie opisu (ACE-Step 1.5, licencja MIT; około 20 sekund pracy na 30 sekund muzyki). Przy pierwszym użyciu model jest pobierany.";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "Dodaje modelowi narzędzie edit_image: zmienia obraz z czatu — dołączony albo wygenerowany tutaj. Wymaga włączonej generacji obrazów. Używa własnego modelu, pobieranego po wybraniu.";
@@ -394,13 +412,16 @@
 "Has other names (a hard link): they keep the file." = "Ma inne nazwy (twarde dowiązanie): one zachowują plik.";
 "Help" = "Pomoc";
 "Help improve LLMTray?" = "Pomóc ulepszyć LLMTray?";
+"Hide" = "Ukryj";
 "Hide chats" = "Ukryj czaty";
 "Hide the reasoning" = "Ukryj rozumowanie";
+"Hide these steps for good" = "Trwale ukryj te kroki";
 "High quality (larger canvas)" = "Wysoka jakość (większe pole)";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "Najwyższa wierność, największe pobranie — punkt odniesienia poprawności, któremu możesz zaufać.";
 "Hourly forecast" = "Prognoza godzinowa";
 "Hover the info button under an answer to see the model, speed and how much context it used." = "Najedź na przycisk informacji pod odpowiedzią, aby zobaczyć model, szybkość i ilość użytego kontekstu.";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "Jak śmiała i nieoczekiwana jest muzyka. tylko turbo: sft nie ma planera utworów do wariacji.";
+"How do I connect my coding agent to LLMTray?" = "Jak podłączyć agenta programistycznego do LLMTray?";
 "How do you like LLMTray?" = "Jak podoba Ci się LLMTray?";
 "How it was made" = "Jak to powstało";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Ile tokenów promptu jest przetwarzanych w jednym kroku. Większa wartość przyspiesza długie prompty, ale zużywa więcej pamięci. Autostrojenie w teście wydajności może ją dobrać.";
@@ -433,6 +454,7 @@
 "Import…" = "Importuj…";
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "W iCloud Drive lub innej chmurze: przeniesienie do Kosza usuwa go też z innych urządzeń.";
 "In project %@" = "W projekcie %@";
+"In real use" = "W rzeczywistym użyciu";
 "In the queue: %lld ahead…" = "W kolejce: %lld przed tobą…";
 "Include LLMTray crash reports from the last two weeks" = "Dołącz raporty awarii LLMTray z ostatnich dwóch tygodni";
 "Include the server log" = "Dołącz log serwera";
@@ -452,6 +474,7 @@
 "Installs the llmtray command in ~/.local/bin: start and stop the server, list and download models, chat, and generate images from a terminal or a script. Run llmtray help for the commands." = "Instaluje polecenie llmtray w ~/.local/bin: uruchamianie i zatrzymywanie serwera, listowanie i pobieranie modeli, chat oraz generowanie obrazów z terminala lub skryptu. Uruchom llmtray help, aby zobaczyć polecenia.";
 "Instructions for %@" = "Instrukcje dla %@";
 "Instructions…" = "Instrukcje…";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "Może się mylić i zmyślać: sprawdzaj wszystko, co ważne. Nie jest lekarzem, prawnikiem, psychologiem ani przyjacielem. Korzystasz z jego odpowiedzi na własne ryzyko.";
 "It goes on in the background: you can continue." = "Dzieje się to w tle: możesz kontynuować.";
 "It had no settings of its own to bring; the ones here were kept." = "Nie miała własnych ustawień do przeniesienia; zachowano ustawienia tutaj.";
 "It is being set up or updated. Try again once that's done." = "Trwa konfiguracja lub aktualizacja. Spróbuj ponownie po zakończeniu.";
@@ -474,6 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Zachowuje ten port. Jeśli inna aplikacja go rzeczywiście używa, serwer nie uruchomi się, dopóki nie zmienisz portu w Ustawieniach.";
 "Kept free: %lld MB" = "Zachowane wolne: %lld MB";
 "LLMTray" = "LLMTray";
+"LLMTray Guide" = "Poradnik LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray nie ma uprawnień do używania mikrofonu.";
 "LLMTray restarts now to load them." = "LLMTray zostanie teraz ponownie uruchomiony, aby je załadować.";
 "LLMTray status, indexing project files" = "Stan LLMTray — indeksowanie plików projektu";
@@ -496,7 +520,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "Lżejszy niż zalecany: szybszy i zostawia pamięć dla innych aplikacji, ale odpowiedzi są prostsze.";
 "Like LLMTray?" = "Podoba Ci się LLMTray?";
 "Likes" = "Polubienia";
-"Link (optional, https://…)" = "Link (opcjonalnie, https://…)";
 "List my name" = "Umieść moje imię";
 "List my name in Supporters" = "Umieść moje imię w Sponsorach";
 "Listening…" = "Słucham…";
@@ -513,6 +536,7 @@
 "Maintenance" = "Konserwacja";
 "Make a 30-second calm lo-fi instrumental for studying" = "Stwórz 30‑sekundowy spokojny lo‑fi instrumental do nauki";
 "Make images and edit them." = "Twórz obrazy i je edytuj.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Twórz obrazy, utwory i mów za pomocą modelu głosowego, wszystko na tym Macu: włącz to w Ustawieniach.";
 "Make songs and instrumentals." = "Twórz utwory i instrumentale.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Generuje nowy losowy identyfikator: późniejsze raporty nie będą powiązywane z wcześniejszymi.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Tworzenie folderów, przenoszenia, zmiany nazw i przenoszenie do Kosza — każdy plan jest najpierw pokazywany, a nic nie zmienia się bez Twojego zatwierdzenia.";
@@ -532,6 +556,7 @@
 "Model switching" = "Przełączanie modeli";
 "Model:" = "Model:";
 "Models" = "Modele";
+"Models can make mistakes. Check important information." = "Modele mogą się mylić. Sprawdzaj ważne informacje.";
 "Models folder" = "Folder modeli";
 "Models folder: %@" = "Folder modeli: %@";
 "Models found: %lld" = "Znalezione modele: %lld";
@@ -595,6 +620,7 @@
 "No model uses it." = "Żaden model tego nie używa.";
 "No models found in this folder." = "Nie znaleziono modeli w tym folderze.";
 "No models in this folder yet. The next step offers some to download." = "Brak modeli w tym folderze. W następnym kroku możesz pobrać niektóre.";
+"No requests yet." = "Brak żądań.";
 "No runs yet." = "Nie ma jeszcze uruchomień.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "Brak subskrypcji. Brak blokad funkcji. Wspieraj rozwój, jeśli LLMTray ci się przydaje.";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "Brak sugestii dla pamięci tego Maca. Przeglądaj Hugging Face w poszukiwaniu modelu.";
@@ -775,6 +801,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Losuje tylko spośród tylu najbardziej prawdopodobnych tokenów. 0 wyłącza tę opcję. Gemma 4 zaleca 64.";
 "Sampling" = "Próbkowanie";
 "Save" = "Zapisz";
+"Save memory" = "Oszczędzaj pamięć";
 "Saved chats will show up here." = "Zapisane czaty pojawią się tutaj.";
 "Saved in your Keychain" = "Zapisano w Keychain";
 "Save…" = "Zachowaj…";
@@ -914,6 +941,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Wersja LLMTray z App Store jest uruchomiona. Najpierw ją zamknij (ikona na pasku menu › Quit), potem otwórz tę aplikację ponownie: obie używałyby tego samego portu i ładowałyby modele dwukrotnie.";
 "The Keychain refused to remove the token." = "Keychain odmówił usunięcia tokenu.";
 "The Keychain refused to save the token." = "Keychain odmówił zapisania tokenu.";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Przewodnik LLMTray znajduje się w tym projekcie: na przykład zapytaj, jak podłączyć agenta programistycznego.";
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter został pobrany — uruchom ponownie serwer, aby z niego korzystać.";
 "The Mac's chip." = "Chip Maca.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API zgodne z OpenAI nasłuchuje tutaj (http://localhost:<port>/v1). Zmień ten adres, gdy serwer jest zatrzymany.";
@@ -956,6 +984,7 @@
 "The model is answering another chat: yours starts as soon as it's free." = "Model odpowiada w innym czacie: Twoje zapytanie zacznie się, gdy tylko będzie wolny.";
 "The model is busy with another request: yours starts as soon as it's free." = "Model obsługuje inne zapytanie: Twoje zacznie się, gdy tylko będzie wolny.";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "Model rozważa odpowiedź przed jej wygenerowaniem (W ustawieniach widać sam tok rozumowania)";
+"The model is still downloading: your message goes out as soon as it's ready." = "Model nadal się pobiera — Twoja wiadomość zostanie wysłana, gdy będzie gotowy.";
 "The model isn't running. Send again to start it." = "Model nie działa. Wyślij ponownie, aby go uruchomić.";
 "The model name API clients send." = "To nazwa modelu wysyłana przez klientów API.";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "Wybór modelu, Start/Stop, profil, narzędzia i temperatura nad czatem we własnym oknie. Wyłączone: okno zawiera tylko czaty i rozmowę — te sterowniki pozostają w pasku menu.";
@@ -1047,14 +1076,9 @@
 "Total time" = "Łączny czas";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Próbuje decode-concurrency (1/2/4/8) i prefill-step-size (64/128/256/512) na uruchomionym modelu, za każdym razem ponownie uruchamia serwer i zachowuje najszybszy zmierzony wariant.";
 "Try Again" = "Spróbuj ponownie";
-"Enable Project Files…" = "Włącz Project Files…";
-"Enable…" = "Włącz…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Włącz Pliki projektu w Ustawieniach, aby dodawać pliki do projektu i umożliwić ich przeszukiwanie przez czaty.";
-"Enable Project files to add files" = "Włącz Project Files, aby dodać pliki";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Włącz Project Files, aby dodać pliki do projektu i pozwolić jego czatom ich przeszukiwać. Nic nie jest indeksowane ani pobierane przed włączeniem.";
-"Enable project files?" = "Włączyć pliki projektu?";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Zmienia tekst plików na wektory do wyszukiwania znaczeniowego na tym Macu. Usunięcie pozostawia indeksy — pliki będą wtedy przeszukiwane po słowach, dopóki model nie zostanie ponownie pobrany.";
 "Tweak…" = "Dostrój…";
+"Type a message below and press Return. Try: “What can you do?”" = "Wpisz wiadomość poniżej i naciśnij Return. Spróbuj: „Co potrafisz?”";
 "Unavailable" = "Niedostępne";
 "Uncompressed (WAV)" = "Nieskompresowany (WAV)";
 "Undo" = "Cofnij";
@@ -1113,6 +1137,7 @@
 "Voice Lab…" = "Voice Lab…";
 "Voice model" = "Model głosowy";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "Poczekaj, aż bieżące żądanie lub test wydajności się zakończy — ponowne uruchomienie by je przerwało.";
+"Waiting for a model download to finish…" = "Oczekiwanie na zakończenie pobierania modelu…";
 "Waiting for an image or song to finish…" = "Oczekiwanie na zakończenie obrazu lub utworu…";
 "Waiting for another chat's image or music to finish…" = "Oczekiwanie na zakończenie tworzenia obrazu lub muzyki w innym czacie…";
 "Waiting for the chat or a generator to finish" = "Oczekiwanie na zakończenie rozmowy lub generatora";
@@ -1126,6 +1151,7 @@
 "Web tools on" = "Narzędzia sieciowe włączone";
 "Welcome" = "Witaj";
 "Welcome to LLMTray" = "Witamy w LLMTray";
+"What can you do?" = "Co potrafisz?";
 "What decides which models run well here." = "Co decyduje o tym, które modele działają tutaj dobrze.";
 "What else" = "Co jeszcze";
 "What happened?" = "Co się stało?";
@@ -1148,6 +1174,7 @@
 "Words only" = "Tylko słowa";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "Pamięć robocza do odczytu promptu w częściach; mniej powoduje czytanie długich promptów mniejszymi, wolniejszymi krokami. Gdy pamięć podręczna promptów zajmuje maksymalnie 90% łącznie — reszta mieści odczytywany prompt.";
 "Works offline" = "Działa w trybie offline";
+"Write here" = "Napisz tutaj";
 "Writing the song…" = "Pisanie utworu…";
 "Yesterday" = "Wczoraj";
 "You" = "Ty";
@@ -1157,6 +1184,7 @@
 "Your files" = "Twoje pliki";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "Twoja aplikacja pocztowa nie może załączyć pliku: raport jest pokazany w Finderze — dołącz go do e‑maila.";
 "Your name (optional)" = "Twoje imię (opcjonalnie)";
+"Your site or profile (optional, https://…)" = "Twój serwis lub profil (opcjonalnie, https://…)";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image Turbo — GPTQ mixed (zalecane)";
@@ -1164,10 +1192,12 @@
 "and %lld more" = "i jeszcze %lld";
 "at least %1$@ items, %2$@" = "co najmniej %1$@ elementów, %2$@";
 "at least %@" = "co najmniej %@";
+"building %@" = "kompilowanie %@";
 "calls tools" = "wywołuje narzędzia";
 "can look" = "może przeglądać";
 "can look and propose changes" = "może przeglądać i proponować zmiany";
 "cancelled" = "anulowano";
+"checking %@" = "sprawdzanie %@";
 "copy" = "kopiuj";
 "copying" = "kopiowanie";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1175,14 +1205,23 @@
 "done" = "zrobione";
 "downloaded" = "pobrano";
 "downloading" = "pobieranie";
+"downloading %@" = "pobieranie %@";
+"downloading %@ (%@)" = "pobieranie %@ (%@)";
+"downloading (%@)" = "pobieranie (%@)";
 "embedding" = "tworzenie embeddingu";
+"enable in Settings" = "włącz w Ustawieniach";
+"enable in Settings to add the LLMTray guide" = "włącz w Ustawieniach, aby dodać przewodnik LLMTray";
 "failed" = "nie powiodło się";
 "failed to build request" = "nie udało się zbudować żądania";
 "failed: %@" = "niepowodzenie: %@";
+"finishing" = "kończenie";
+"first token %.1f s" = "pierwszy token %.1f s";
 "for this chat" = "dla tego czatu";
+"generation %.1f tok/s" = "generowanie %.1f tok/s";
 "hears audio" = "słyszy dźwięk";
 "in LLMTray's own folder" = "w folderze LLMTray";
 "in an earlier models folder" = "w poprzednim folderze modeli";
+"installing %d packages" = "instalowanie %d pakietów";
 "it isn't a model folder in the models folder" = "to nie jest folder modelu w folderze models";
 "it's being downloaded" = "jest pobierany";
 "it's in use or downloading" = "jest używany lub pobierany";
@@ -1202,6 +1241,7 @@
 "not supported" = "nieobsługiwane";
 "not used by any model" = "nieużywane przez żaden model";
 "off" = "wyłączone";
+"prompt %.0f tok/s" = "prompt %.0f tok/s";
 "queued" = "w kolejce";
 "reading" = "czytanie";
 "reads images" = "odczytuje obrazy";
@@ -1236,16 +1276,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "„%@” (%@) trafi do kosza, gdzie nadal możesz go przywrócić. Jego alias i wybór profilu zostaną zapomniane.";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "„%@” i jego indeks zostały usunięte z projektu. Plik, z którego to dodałeś, nie został zmieniony.";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "„%@” nie został usunięty: serwer jest zajęty lub go używa. Spróbuj ponownie, gdy będzie bezczynny.";
-"%.0f%% from drafts" = "%.0f%% z wersji roboczych";
-"%lld requests" = "%lld żądań";
-"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "Każde żądanie, na które odpowiada serwer — z czatu oraz z innych aplikacji i agentów przez API — zapisane na tym Macu. Mediany dla modelu i ustawień.";
-"In real use" = "W rzeczywistym użyciu";
-"No requests yet." = "Brak żądań.";
-"first token %.1f s" = "pierwszy token %.1f s";
-"generation %.1f tok/s" = "generowanie %.1f tok/s";
-"prompt %.0f tok/s" = "prompt %.0f tok/s";
-
-/* The model disclaimer (welcome page, About, under the chat field) */
-"A model is a tool, not an authority" = "Model to narzędzie, a nie autorytet";
-"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "Może się mylić i zmyślać: sprawdzaj wszystko, co ważne. Nie jest lekarzem, prawnikiem, psychologiem ani przyjacielem. Korzystasz z jego odpowiedzi na własne ryzyko.";
-"Models can make mistakes. Check important information." = "Modele mogą się mylić. Sprawdzaj ważne informacje.";
