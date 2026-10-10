@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "「%@」已不再包含於專案中。";
 "%.0f%% from drafts" = "%.0f%% 來自草稿";
 "%.1f s" = "%.1f 秒";
+"%1$@ (%2$lld)" = "%1$@（%2$lld）";
 "%1$@ and %2$lld more" = "%1$@ 與其他 %2$lld 筆";
 "%1$@ asks for %2$@" = "%1$@ 請求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 請求 %2$@。切換會卸載目前載入的模型。";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld 項遭中斷：請在 Finder 檢視";
 "%lld items put back under their names." = "%lld 項已依原名復原。";
 "%lld more" = "還有 %lld";
+"%lld more…" = "還有 %lld…";
 "%lld need a look: see the list." = "%lld 項需查看：請參閱清單。";
 "%lld new since you opened the list: unticked until you tick them." = "自您開啟清單以來有 %lld 項新增：未勾選，直到您勾選為止。";
 "%lld of 5 stars" = "%lld／5 星";
@@ -80,6 +82,7 @@
 "A song from a description" = "由描述產生的歌曲";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "依描述產生有人演唱的歌曲或純伴奏（ACE-Step 1.5）。";
 "A symbolic link: the link itself, not what it points to." = "符號連結：只有連結本身，指向的對象不會移動。";
+"A temporary chat can't hold files" = "暫存對話無法儲存檔案";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — 人聲清晰，8-bit（建議）";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 人聲清晰，GPTQ 4-bit（較省記憶體）";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — 音色更豐滿";
 "About LLMTray" = "關於 LLMTray";
 "Add" = "新增";
+"Add Files to “%@”…" = "將檔案加入「%@」…";
 "Add Files…" = "加入檔案…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "將 PDF、Word 與文字檔加入專案。對話會搜尋並引用頁面；將檔案釘選可將整個檔案保留在對話中。";
+"Add files" = "加入檔案";
+"Add files or images" = "加入檔案或影像";
+"Add files to a project" = "將檔案加入專案";
+"Add files to a project, or images for the model to see" = "將檔案加入專案，或加入模型可見的影像";
 "Add more files: every chat of the project can search them." = "新增更多檔案：專案中的每個對話都能搜尋這些檔案。";
+"Add the files to a project?" = "要將這些檔案加入專案嗎？";
+"Add “%1$@” to “%2$@”?" = "將「%1$@」加入「%2$@」？";
 "Added %@" = "已新增 %@";
 "Added here" = "已新增於此處";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具時，一律加入系統提示。模型本身的工具範本只說明如何呼叫工具，從不說明何時不要呼叫。留空則停用。";
@@ -143,7 +153,9 @@
 "Ask first" = "先詢問";
 "Assistant" = "助理";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "每天最多傳送一份報告，涵蓋過去一天，送至 ipsupport.us。未傳送的日資料會在下次啟動時一併送出，最多回溯 7 天。關閉此功能會刪除尚未傳送的資料。";
-"Attach image(s) for the model to see" = "附加影像，讓模型查看。";
+"Attach Images…" = "附加影像…";
+"Attach images" = "附加影像";
+"Attach images for the model to see" = "附加影像讓模型查看";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "注意層為 8-bit、前向層為 4-bit — 在大小與穩定性間最平衡，已對比統一 4-bit 驗證。";
 "Audio quality" = "音訊品質";
 "Auto-compact" = "自動壓縮";
@@ -223,6 +235,7 @@
 "Clear" = "清除";
 "Clear search" = "清除搜尋";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "清除佇列：已建立索引的仍可搜尋，其餘會標記為未建立索引";
+"Click to enable Project files: add files to the project and let its chats search them." = "按一下以啟用「專案檔案」：將檔案加入專案，並讓該專案的對話搜尋它們。";
 "Close" = "關閉";
 "Close Tab" = "關閉分頁";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "關閉此視窗。設定 › 一般 › 設定 LLMTray… 可再次開啟。";
@@ -283,7 +296,11 @@
 "Diagnostics" = "診斷";
 "Disk usage" = "磁碟使用量";
 "Dismiss" = "關閉";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "文件會複製到專案並在此 Mac 上建立索引；影像會放入您的訊息中。";
+"Documents go into a project with this chat." = "文件會隨本對話加入專案。";
+"Documents go into a project with this chat; images go into your message." = "文件會隨本對話加入專案；影像會放入您的訊息中。";
 "Doesn't open at login" = "登入時不開啟";
+"Don't Add" = "不要加入";
 "Don't Ask Again" = "不要再詢問";
 "Don't show again" = "不再顯示";
 "Done" = "完成";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "將聊天或檔案放到此處以加入專案";
 "Drop files here" = "將檔案放到此處";
 "Drop files here to add them to the project" = "將檔案放到此處以加入專案";
+"Drop to add files" = "拖放以加入檔案";
+"Drop to add to “%@”" = "拖放以加入「%@」";
+"Drop to attach images" = "拖放以附加影像";
 "Duplicate this profile" = "複製此描述檔。";
 "Echo cancellation" = "迴聲消除";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "無法啟動迴聲消除：%@ — 請到「設定」>「語音」關閉。";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "編輯描述檔…";
 "Embedding model" = "嵌入模型";
 "Enable Project Files…" = "開啟專案檔案…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "在設定中開啟「專案檔案」，以將檔案加入專案並讓對話搜尋它們。";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "請先在「設定 › 檔案」啟用專案檔案：之後 LLMTray 指南會加入此處，回覆將引用它。";
 "Enable Project files to add files" = "開啟專案檔案以新增檔案";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "開啟專案檔案以新增檔案到專案並讓對話可搜尋它們。完成前不會進行索引或下載。";
+"Enable Project files to add files to the project" = "啟用「專案檔案」以將檔案加入專案";
 "Enable Without It" = "無此仍可啟用";
 "Enable image editing?" = "啟用圖片編輯？";
 "Enable image generation" = "啟用影像生成";
@@ -356,8 +376,12 @@
 "Files Settings…" = "檔案設定…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "此處加入的檔案會複製到專案並在此 Mac 上建立索引；專案中的所有聊天都可以搜尋這些檔案。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "新增至專案的檔案會在此台 Mac 建立索引，讓該專案的對話可搜尋它們。以語意搜尋需要嵌入模型；若無則以檔案文字搜尋。";
+"Files are copied into the project and indexed on this Mac." = "檔案會複製到專案並在此 Mac 上建立索引。";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "檔案會放入專案，但暫存對話不屬於任何專案。請建立新的已儲存對話（⌘N）以加入檔案。";
 "Files in %@" = "%@ 中的檔案";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "檔案儲存在專案中：專案內的所有對話都能搜尋這些檔案。本對話會隨檔案移入該專案。\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "你新增到專案的檔案會在此 Mac 建立索引，讓該專案的聊天可以搜尋。";
+"Files · off" = "檔案 · 關閉";
 "Files…" = "檔案…";
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "按「完成」會套用你的選擇。之後可在設定中變更。";
@@ -448,6 +472,8 @@
 "Image model" = "影像模型";
 "Image, music and voice models" = "影像、音樂與語音 模型";
 "Images" = "影像";
+"Images go into your message; for documents, Project files are turned on first." = "影像會放入您的訊息；文件需先啟用「專案檔案」。";
+"Images only: a temporary chat can't hold files." = "僅限影像：暫存對話無法儲存檔案。";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "從 LLMTray 匯入（直接下載）";
 "Imported" = "已匯入";
@@ -597,6 +623,7 @@
 "New profile" = "新增設定檔";
 "New profile (inherits everything from Default)" = "新增設定檔，並從 Default 繼承所有設定。";
 "New project" = "新專案";
+"New project “%@”" = "新專案「%@」";
 "New temporary chat" = "新的暫時對話";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "新暫存對話（⌘⇧N） — 不會儲存任何內容";
 "News" = "新聞";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "已於「設定」關閉專案檔案。";
 "Project files off" = "專案檔案：關";
 "Project files on" = "專案檔案：開";
+"Project files will be turned on first." = "將先啟用「專案檔案」。";
 "Project name" = "專案名稱";
 "Projects" = "專案";
 "Projects' files on disk" = "專案檔案（磁碟上）";
@@ -842,6 +870,7 @@
 "Shape" = "形態";
 "Share anonymous usage statistics" = "分享匿名使用統計";
 "Share…" = "分享…";
+"Show All Files…" = "顯示所有檔案…";
 "Show Chat Window" = "顯示對話視窗";
 "Show Files" = "顯示檔案";
 "Show Next Tab" = "顯示下一個分頁";
@@ -880,6 +909,7 @@
 "Start" = "開始";
 "Start LLMTray automatically when you log in to this Mac." = "登入此 Mac 時自動啟動 LLMTray。";
 "Start Server" = "啟動伺服器";
+"Start a new saved chat (⌘N) to add files to a project." = "建立新的已儲存對話（⌘N）以將檔案加入專案。";
 "Start server" = "啟動伺服器。";
 "Start talking" = "開始說話";
 "Start the server first." = "請先啟動伺服器。";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "應用程式語言（僅語言，不包含地區）。";
 "The app's name." = "應用程式名稱。";
 "The base profile: every other profile inherits from it." = "基礎設定檔：所有其他設定檔都會繼承其設定。";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天要求將 %1$@（%2$@）複製到專案中。專案中的所有聊天之後都能搜尋它。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可檢視您允許的資料夾（名稱、大小、日期、短節錄）並提出變更——建立新資料夾、移動、重新命名、移至垃圾桶。每項變更皆為需您先核可的計畫，且可復原。";
 "The chat model couldn't be unloaded for Voice Lab." = "無法為 Voice Lab 卸載聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下載到此資料夾。設定完成後可在「設定」更改，或先選擇其他聊天模型。";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Voice Lab 停止時模型會重新載入";
 "The model reloads when the image or song is done" = "影像或歌曲完成後模型會重新載入";
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型執行環境尚未安裝——請先啟動一個模型，然後再試一次。";
+"The model sees them with your next message." = "模型會在您下一則訊息時看到它們。";
 "The model server no longer goes online when it starts." = "模型伺服器啟動時不再自動上線。";
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 資料夾目前無法使用 — 磁碟是否已連接？請於「設定 → Models」中重新選擇。";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "接下來的步驟會設定模型及你想要的功能。每一步都可跳過；除非你選擇，否則不會下載或啟用任何項目。";
 "The plan changed since you looked at it: review it again." = "計畫自您檢視後已變更：請再次檢閱。";
 "The port and network access can change only while the server is stopped." = "連接埠與網路存取僅能於伺服器停止時變更。";
+"The project's files, and Add Files…" = "專案的檔案，以及「加入檔案…」";
 "The reply was cut at its length limit." = "回覆已達長度上限並被截斷。";
 "The report" = "報告檔案";
 "The reports" = "報告";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "語音執行程式意外停止（%@）。";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "接著重新啟動模型伺服器。Mac 重開機後上限會還原為預設值。LLMTray 不會自行變更該設定。";
 "There's no plan waiting any more." = "已無待處理計畫。";
+"These can't be added to a project" = "這些無法加入專案";
 "These models go back to Default: %@." = "這些模型會回復為 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它們會逐一執行，顯示在選單列的視窗中。您可以在此期間關閉該視窗。";
 "Thinking…" = "思考中…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "此模型使用 GPU 可用 %2$@ GB 中的 %1$@；長輸入提示可能會耗盡記憶體。請使用較小的模型，或提高 GPU 記憶體上限。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "此模型使用 GPU 可用 %2$@ GB 中的 %1$@；長輸入提示可能會耗盡記憶體。請使用較小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "無法讀取此設定檔的檔案，因此無法在此編輯。請修正或刪除檔案，然後重新開啟「設定」。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "此版本會建立文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 與試算表（xlsx、ods）檔案的索引；資料夾與隱藏檔案無法加入。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 無法送出評論。請更新應用程式。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 設定執行環境。請從 python.org 或 Homebrew 安裝 Python，然後再試。或改用包含所有需求的 LLMTray-Full。";
 "Thought process" = "思考過程";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "可查看並建議變更";
 "cancelled" = "已取消";
 "checking %@" = "正在檢查 %@";
+"click to enable" = "按一下以啟用";
 "copy" = "拷貝";
 "copying" = "複製中";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld，prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "正在下載 %@（%@）";
 "downloading (%@)" = "正在下載（%@）";
 "embedding" = "建立嵌入中";
-"enable in Settings" = "在「設定」中啟用";
-"enable in Settings to add the LLMTray guide" = "在「設定」中啟用以加入 LLMTray 指南";
+"enable them to add the LLMTray guide" = "啟用它們以加入 LLMTray 指南";
 "failed" = "失敗";
 "failed to build request" = "建立請求失敗";
 "failed: %@" = "失敗：%@";

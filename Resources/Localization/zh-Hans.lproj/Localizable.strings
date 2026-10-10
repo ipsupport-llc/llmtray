@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" 不再在项目中。";
 "%.0f%% from drafts" = "%.0f%% 来自草稿";
 "%.1f s" = "%.1f 秒";
+"%1$@ (%2$lld)" = "%1$@（%2$lld）";
 "%1$@ and %2$lld more" = "%1$@，另有 %2$lld 项";
 "%1$@ asks for %2$@" = "%1$@ 请求 %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ 请求 %2$@。切换会卸载当前加载的模型。";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld 项已中断：在 Finder 中查看";
 "%lld items put back under their names." = "%lld 项按原名已恢复。";
 "%lld more" = "还剩 %lld";
+"%lld more…" = "还有 %lld…";
 "%lld need a look: see the list." = "%lld 项需要查看：请查看列表。";
 "%lld new since you opened the list: unticked until you tick them." = "自打开列表后有 %lld 项新项：未选中，直到你勾选它们。";
 "%lld of 5 stars" = "%lld / 5 星";
@@ -80,6 +82,7 @@
 "A song from a description" = "根据描述生成歌曲";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "从描述生成带人声歌词或纯乐器的歌曲（ACE-Step 1.5）。";
 "A symbolic link: the link itself, not what it points to." = "符号链接：是链接本身，而非其指向的内容。";
+"A temporary chat can't hold files" = "临时聊天无法保存文件";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — 清晰人声，8-bit（推荐）";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 清晰人声，GPTQ 4-bit（更省内存）";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — 更饱满的音色";
 "About LLMTray" = "关于 LLMTray";
 "Add" = "添加";
+"Add Files to “%@”…" = "将文件添加到“%@”…";
 "Add Files…" = "添加文件…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "向项目添加 PDF、Word 和文本文件。聊天会搜索它们并引用页码；将文件固定可将其全部保留在对话中。";
+"Add files" = "添加文件";
+"Add files or images" = "添加文件或图像";
+"Add files to a project" = "将文件添加到项目";
+"Add files to a project, or images for the model to see" = "将文件添加到项目，或添加模型可见的图像";
 "Add more files: every chat of the project can search them." = "添加更多文件：项目中的每个聊天都可以搜索这些文件。";
+"Add the files to a project?" = "要将这些文件添加到项目吗？";
+"Add “%1$@” to “%2$@”?" = "要将“%1$@”添加到“%2$@”吗？";
 "Added %@" = "已添加 %@";
 "Added here" = "已添加到此处";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具时会添加到系统提示词中。模型自带的工具模板只说明如何调用工具，从不说明何时不应调用。留空则停用。";
@@ -143,7 +153,9 @@
 "Ask first" = "先询问";
 "Assistant" = "助理";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "每天最多发送一份报告（涵盖前一天），发送至 ipsupport.us。未发送的当天数据将在下次启动时发送，最多回溯 7 天。关闭此项将删除未发送的数据。";
-"Attach image(s) for the model to see" = "附加图片供模型查看。";
+"Attach Images…" = "附加图像…";
+"Attach images" = "附加图像";
+"Attach images for the model to see" = "附加模型可见的图像";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 使用 8-bit，前馈使用 4-bit —— 在大小与稳定性间的最佳平衡，已相对于统一 4-bit 验证。";
 "Audio quality" = "音频质量";
 "Auto-compact" = "自动压缩";
@@ -223,6 +235,7 @@
 "Clear" = "清除";
 "Clear search" = "清除搜索";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "清除队列：已建立索引的保持可搜索，其余标记为未建立索引";
+"Click to enable Project files: add files to the project and let its chats search them." = "点击以启用项目文件：将文件添加到项目并允许该项目的聊天搜索它们。";
 "Close" = "关闭";
 "Close Tab" = "关闭标签页";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "关闭此窗口。前往“设置 › 通用 › 设置 LLMTray…” 可重新打开。";
@@ -283,7 +296,11 @@
 "Diagnostics" = "诊断";
 "Disk usage" = "磁盘使用情况";
 "Dismiss" = "关闭";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "文档会复制到项目并在此 Mac 上建立索引；图像会插入到你的消息中。";
+"Documents go into a project with this chat." = "文档会随本聊天一起放入项目。";
+"Documents go into a project with this chat; images go into your message." = "文档会随本聊天一起放入项目；图像会插入到你的消息中。";
 "Doesn't open at login" = "登录时不打开";
+"Don't Add" = "不添加";
 "Don't Ask Again" = "不再询问";
 "Don't show again" = "不再显示";
 "Done" = "完成";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "将聊天或文件拖到此处以添加到项目";
 "Drop files here" = "将文件拖到此处";
 "Drop files here to add them to the project" = "将文件拖到此处以添加到项目";
+"Drop to add files" = "拖放以添加文件";
+"Drop to add to “%@”" = "拖放以添加到“%@”";
+"Drop to attach images" = "拖放以附加图像";
 "Duplicate this profile" = "复制此配置";
 "Echo cancellation" = "回声消除";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "回声消除无法启动：%@ —— 请在「设置」>「语音」中将其关闭。";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "编辑配置…";
 "Embedding model" = "嵌入模型";
 "Enable Project Files…" = "启用项目文件…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "在“设置”中打开“项目文件”，以将文件添加到项目并允许其聊天搜索这些文件。";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "先在“设置 › 文件”中启用项目文件：随后 LLMTray 指南会添加到此处，回答会引用它。";
 "Enable Project files to add files" = "启用项目文件以添加文件";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "启用项目文件以将文件添加到项目并允许其聊天搜索这些文件。在启用之前不会有任何索引或下载。";
+"Enable Project files to add files to the project" = "启用项目文件以将文件添加到项目";
 "Enable Without It" = "在没有它的情况下启用";
 "Enable image editing?" = "启用图像编辑？";
 "Enable image generation" = "启用图像生成";
@@ -356,8 +376,12 @@
 "Files Settings…" = "文件设置…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "在此添加的文件会复制到项目并在此 Mac 上建立索引；项目的每个聊天都可搜索这些文件。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "添加到项目的文件会在此 Mac 上建立索引，使其聊天能够搜索这些文件。按语义搜索使用嵌入模型；没有嵌入模型时，文件仅按词语进行搜索。";
+"Files are copied into the project and indexed on this Mac." = "文件会复制到项目并在此 Mac 上建立索引。";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "文件会放入项目，而临时聊天不会属于任何项目。要添加文件，请开始新的已保存聊天（⌘N）。";
 "Files in %@" = "%@ 中的文件";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "文件存放在项目中：项目的所有对话都可以搜索这些文件。本对话会随文件一并移入该项目。\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "你添加到项目的文件会在此 Mac 上建立索引，项目聊天可以搜索这些文件。";
+"Files · off" = "文件 · 关";
 "Files…" = "文件…";
 "Finish" = "完成";
 "Finish applies what you chose. You can change all of it later in Settings." = "“完成”将应用你的选择。你可在设置中随时更改。";
@@ -448,6 +472,8 @@
 "Image model" = "图像模型";
 "Image, music and voice models" = "图像、音乐与语音模型";
 "Images" = "图像";
+"Images go into your message; for documents, Project files are turned on first." = "图像会插入到你的消息；要添加文档，需先开启项目文件。";
+"Images only: a temporary chat can't hold files." = "仅图像：临时聊天无法保存文件。";
 "Import" = "导入";
 "Import from LLMTray (direct download)" = "从 LLMTray 导入（直接下载）";
 "Imported" = "已导入";
@@ -597,6 +623,7 @@
 "New profile" = "新建配置";
 "New profile (inherits everything from Default)" = "新建配置（继承 Default 的所有设置）。";
 "New project" = "新项目";
+"New project “%@”" = "新项目“%@”";
 "New temporary chat" = "新的临时对话";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "新建临时对话（⌘⇧N）——不会保存任何内容";
 "News" = "新闻";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "“设置”中已关闭项目文件。";
 "Project files off" = "项目文件：关闭";
 "Project files on" = "项目文件：开启";
+"Project files will be turned on first." = "将先开启项目文件。";
 "Project name" = "项目名称";
 "Projects" = "项目";
 "Projects' files on disk" = "项目的磁盘文件";
@@ -842,6 +870,7 @@
 "Shape" = "形状";
 "Share anonymous usage statistics" = "共享匿名使用统计";
 "Share…" = "共享…";
+"Show All Files…" = "显示所有文件…";
 "Show Chat Window" = "显示对话窗口";
 "Show Files" = "显示文件";
 "Show Next Tab" = "显示下一个标签页";
@@ -880,6 +909,7 @@
 "Start" = "开始";
 "Start LLMTray automatically when you log in to this Mac." = "登录这台 Mac 时自动打开 LLMTray。";
 "Start Server" = "启动服务器";
+"Start a new saved chat (⌘N) to add files to a project." = "开始新的已保存聊天（⌘N）以将文件添加到项目。";
 "Start server" = "启动服务器。";
 "Start talking" = "开始说话";
 "Start the server first." = "请先启动服务器。";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "应用的语言（仅语言，不含地区）。";
 "The app's name." = "应用名称。";
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天请求将 %1$@（%2$@）复制到项目中。项目中的所有聊天都可以搜索该内容。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可在你允许的文件夹中查看（名称、大小、日期、简短摘录）并提出更改——新建文件夹、移动、重命名、移至“废纸篓”。每项更改都是需你先批准的计划，并可撤销。";
 "The chat model couldn't be unloaded for Voice Lab." = "无法为 Voice Lab 卸载聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下载到此文件夹。设置完成后可在“设置”中更改，或先选择其他聊天模型。";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Voice Lab 停止后模型会重新加载";
 "The model reloads when the image or song is done" = "图像或歌曲生成完成后模型将重新加载";
 "The model runtime isn't installed yet -- start a model once, then try again." = "模型运行时尚未安装——先启动一次模型，然后重试。";
+"The model sees them with your next message." = "模型会在你下一条消息中看到它们。";
 "The model server no longer goes online when it starts." = "模型服务器启动时不再自动联网。";
 "The model's license, from its card." = "来自模型卡的许可。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 文件夹不可用——其磁盘已连接吗？请在 设置 → Models 中重新选择。";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "接下来的步骤将设置模型及所需功能。每项均可跳过；未选择的项不会下载或开启。";
 "The plan changed since you looked at it: review it again." = "计划自你查看后已更改：请再次审查。";
 "The port and network access can change only while the server is stopped." = "端口和网络访问仅可在服务器停止时更改。";
+"The project's files, and Add Files…" = "项目的文件，以及“添加文件…”";
 "The reply was cut at its length limit." = "回复因长度限制被截断。";
 "The report" = "报告";
 "The reports" = "报告";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "语音运行器意外停止（%@）。";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "然后重启模型服务器。Mac 重新启动后限制会恢复为默认值。LLMTray 不会自行更改该设置。";
 "There's no plan waiting any more." = "不再有等待的计划。";
+"These can't be added to a project" = "这些无法添加到项目";
 "These models go back to Default: %@." = "这些模型会恢复为 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它们一次运行一个，在菜单栏的窗口中显示。你可以在此期间关闭该窗口。";
 "Thinking…" = "正在思考…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型，或提高 GPU 内存限制。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "此版本对文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods）文件建立索引；文件夹和隐藏文件无法添加。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 无法发送评论。请更新应用。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 设置运行时。请从 python.org 或 Homebrew 安装 Python，然后重试。或使用包含所需全部内容的 LLMTray-Full。";
 "Thought process" = "思考过程";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "可查看并建议更改";
 "cancelled" = "已取消";
 "checking %@" = "正在检查 %@";
+"click to enable" = "点击以启用";
 "copy" = "复制";
 "copying" = "正在复制";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld，prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "正在下载 %@（%@）";
 "downloading (%@)" = "正在下载（%@）";
 "embedding" = "正在 embedding";
-"enable in Settings" = "在“设置”中启用";
-"enable in Settings to add the LLMTray guide" = "在“设置”中启用以添加 LLMTray 指南";
+"enable them to add the LLMTray guide" = "启用它们以添加 LLMTray 指南";
 "failed" = "失败";
 "failed to build request" = "构建请求失败";
 "failed: %@" = "失败：%@";
