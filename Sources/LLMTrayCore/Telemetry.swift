@@ -141,6 +141,9 @@ public struct TelemetryUsage: Codable, Equatable, Sendable {
 /// (the server takes no older ones). Today's is only sent once it's over.
 public struct TelemetryCounters: Codable, Equatable, Sendable {
     public static let maxDaysBack = 7
+    /// The longest wait `notBefore` holds sending back (a Retry-After, a
+    /// backoff); a longer one was written by a clock ahead of time.
+    public static let maxWait: TimeInterval = 2 * 86400
 
     public var days: [String: TelemetryUsage]
     /// 429's Retry-After, or a backoff after a failure: no send before it.
@@ -163,12 +166,15 @@ public struct TelemetryCounters: Codable, Equatable, Sendable {
         days[day] = usage
     }
 
-    /// Drops days more than maxDaysBack before today, and days after it
-    /// (a clock set back): neither would be accepted.
+    /// Drops days more than maxDaysBack before today (the server takes no
+    /// older ones), and days more than one after it (a clock set back).
+    /// Tomorrow stays: a Mac moved west of where it counted ("Oct 11" in
+    /// Tokyo is still Oct 10 in Hawaii) sends it once it's over here.
     /// `now`: also by the server's UTC day (TelemetryDay.oldestAccepted).
     public mutating func prune(today: String, now: Date? = nil, calendar: Calendar = TelemetryDay.calendar) {
-        guard let oldest = TelemetryDay.oldestAccepted(today: today, now: now, calendar: calendar) else { return }
-        days = days.filter { $0.key >= oldest && $0.key <= today && TelemetryDay.date($0.key, calendar: calendar) != nil }
+        guard let oldest = TelemetryDay.oldestAccepted(today: today, now: now, calendar: calendar),
+              let newest = TelemetryDay.adding(1, to: today, calendar: calendar) else { return }
+        days = days.filter { $0.key >= oldest && $0.key <= newest && TelemetryDay.date($0.key, calendar: calendar) != nil }
     }
 
     /// The finished days to send, oldest first: every kept day before today.
@@ -490,7 +496,9 @@ public struct TelemetryUploader {
         let started = now()
         let today = TelemetryDay.string(for: started, calendar: calendar)
         store.update { $0.prune(today: today, now: started, calendar: calendar) }
-        if let notBefore = store.counters.notBefore, started < notBefore { return done }
+        // A wait set by a clock that was ahead then is no wait.
+        if let notBefore = store.counters.notBefore, started < notBefore,
+           notBefore.timeIntervalSince(started) <= TelemetryCounters.maxWait { return done }
         for day in store.counters.pending(today: today) {
             guard !Task.isCancelled, let id = installID(), let usage = store.counters.days[day] else { break }
             let outcome: TelemetryOutcome
