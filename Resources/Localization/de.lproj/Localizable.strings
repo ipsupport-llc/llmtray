@@ -235,7 +235,7 @@
 "Clear" = "Löschen";
 "Clear search" = "Suche löschen";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Warteschlange löschen: Indexiertes bleibt durchsuchbar, der Rest wird als nicht indexiert markiert";
-"Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats durchsuchbar machen.";
+"Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats die Dateien durchsuchen lassen.";
 "Close" = "Schließen";
 "Close Tab" = "Tab schließen";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. Einstellungen › Allgemein › Set Up LLMTray… öffnet es erneut.";

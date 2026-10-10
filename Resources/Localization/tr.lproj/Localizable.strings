@@ -99,7 +99,7 @@
 "Add files to a project, or images for the model to see" = "Dosyaları bir projeye veya modelin görmesi için resimleri ekle";
 "Add more files: every chat of the project can search them." = "Daha fazla dosya ekleyin: projenin her sohbeti bunlarda arama yapabilir.";
 "Add the files to a project?" = "Dosyalar bir projeye eklensin mi?";
-"Add “%1$@” to “%2$@”?" = "“%1$@” öğesini “%2$@” listesine eklemek istiyor musunuz?";
+"Add “%1$@” to “%2$@”?" = "“%1$@” öğesini “%2$@” projesine eklemek istiyor musunuz?";
 "Added %@" = "Eklendi: %@";
 "Added here" = "Buraya eklendi";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
@@ -1245,7 +1245,7 @@
 "downloading %@ (%@)" = "indiriliyor: %@ (%@)";
 "downloading (%@)" = "indiriliyor (%@)";
 "embedding" = "gömülüyor";
-"enable them to add the LLMTray guide" = "LLMTray kılavuzunu eklemeleri için etkinleştir";
+"enable them to add the LLMTray guide" = "LLMTray kılavuzunu eklemek için etkinleştir";
 "failed" = "başarısız";
 "failed to build request" = "istek oluşturulamadı";
 "failed: %@" = "başarısız: %@";
