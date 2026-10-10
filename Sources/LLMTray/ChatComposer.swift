@@ -42,7 +42,7 @@ final class ComposerModel: ObservableObject {
         }
     }
 
-    private func modelCantSeeImages() {
+    func modelCantSeeImages() {
         showNotice(NSLocalizedString("This model can't see images: pick one that can (a vision model) to attach them.",
                                      comment: "chat: an image pasted or dropped for a model without vision"))
     }
@@ -177,6 +177,7 @@ struct ChatComposer: View {
     @EnvironmentObject var chat: ChatClient
     @ObservedObject var composer: ComposerModel
     @ObservedObject private var folders = FolderAccessManager.shared
+    @ObservedObject private var library = ChatLibraryStore.shared
     let canChat: Bool
     let canRegenerate: Bool
     let canCompact: Bool
@@ -184,6 +185,8 @@ struct ChatComposer: View {
     let send: () -> Void
     let regenerate: () -> Void
     let compact: () -> Void
+    /// A drop on the field: the chat's handler (files into the project).
+    let dropFiles: ([NSItemProvider]) -> Bool
 
     var body: some View {
         VStack(spacing: 4) {
@@ -205,10 +208,8 @@ struct ChatComposer: View {
                 .padding(.horizontal, 12)
             }
             HStack(spacing: 8) {
-                if composer.acceptsImages {
-                    Button { composer.pickImages() } label: { Image(systemName: "paperclip") }
-                        .buttonStyle(.plain)
-                        .help("Attach image(s) for the model to see")
+                if chat.currentSessionID != nil || composer.acceptsImages {
+                    addMenu
                 }
                 if folders.isEnabled {
                     ChatFolderMenu()
@@ -222,7 +223,7 @@ struct ChatComposer: View {
                     .lineLimit(1...4)
                     .onSubmit(send)
                     .onChange(of: composer.draft) { composer.convertDroppedImagePaths() }
-                    .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+                    .onDrop(of: [.fileURL, .image], isTargeted: nil) { dropFiles($0) }
                     .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
                     .focused(isFocused)
                     .disabled(!canChat)
@@ -250,6 +251,43 @@ struct ChatComposer: View {
                 .padding(.horizontal, 12)
                 .padding(.bottom, 6)
         }
+    }
+
+    /// "+": files into the chat's project (in a chat outside one, into a
+    /// project it moves into with them), and images for a model that sees
+    /// them. A paperclip for images only was all there was, and people
+    /// looked there for files first.
+    private var addMenu: some View {
+        let id = chat.currentSessionID
+        let project = id.flatMap { library.library.projectContext(forChat: $0) }
+        return Menu {
+            if let project {
+                Button(String(format: NSLocalizedString("Add Files to \u{201C}%@\u{201D}…", comment: "the composer's + menu: files into the chat's project"), project.name)) {
+                    let projectID = project.id
+                    Task { @MainActor in
+                        guard await enableProjectFiles() else { return }
+                        ProjectFilesWindow.pickFiles(for: projectID)
+                    }
+                }
+            } else if id != nil {
+                Button("Add Files…") {
+                    guard let urls = ProjectFilesWindow.chooseFiles() else { return }
+                    Task { await ProjectFileOffer.offer(urls, chat: id) }
+                }
+            }
+            if composer.acceptsImages {
+                Button("Attach Images…") { composer.pickImages() }
+            }
+        } label: {
+            Image(systemName: "plus.circle")
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .help(id == nil ? Text("Attach images for the model to see")
+              : composer.acceptsImages ? Text("Add files to a project, or images for the model to see")
+              : Text("Add files to a project"))
+        .accessibilityLabel(id == nil ? Text("Attach images") : composer.acceptsImages ? Text("Add files or images") : Text("Add files"))
     }
 
     private var turnActions: some View {

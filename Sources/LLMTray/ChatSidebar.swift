@@ -242,6 +242,7 @@ struct ChatSidebar: View {
                     .foregroundColor(.secondary)
                     .padding(.leading, 18)
                     .help("New chat in this project")
+                    projectFilesRow(project.id)
                     ForEach(chats) { row($0, in: "project").padding(.leading, 18) }
                 }
             }
@@ -487,6 +488,28 @@ struct ChatSidebar: View {
         }
     }
 
+    /// "Files  5" under an open project, above its chats: the files were
+    /// only in its context menu. With Project files off, a click turns them
+    /// on.
+    private func projectFilesRow(_ project: UUID) -> some View {
+        let count = ProjectFileTotals(indexer.documents[project] ?? []).files
+        return Button {
+            if indexer.isEnabled { ProjectFilesWindow.show(project) } else { turnOnProjectFiles() }
+        } label: {
+            HStack(spacing: 4) {
+                Label(indexer.isEnabled ? "Files" : "Files · off", systemImage: "doc.on.doc").font(.caption)
+                Spacer(minLength: 0)
+                if indexer.isEnabled, count > 0 {
+                    Text(verbatim: "\(count)").font(.caption2).monospacedDigit()
+                }
+            }
+        }
+        .buttonStyle(SidebarRowStyle(isSelected: false))
+        .foregroundColor(.secondary)
+        .padding(.leading, 18)
+        .help(indexer.isEnabled ? Text("Show the project's files") : Text("Enable Project files to add files to the project"))
+    }
+
     private func showFilesOffHint(_ project: UUID) {
         filesOffHint = project
         Task { @MainActor in
@@ -725,19 +748,5 @@ private extension View {
             return perform(providers)
         }
         .background(RoundedRectangle(cornerRadius: 6).fill(Color.accentColor.opacity(target.wrappedValue == id ? 0.22 : 0)))
-    }
-}
-
-/// Turns Project files on from the sidebar; a failed embedder download (the
-/// feature is on by then, searching by words) is shown,
-/// there being no Settings row on screen to show it in.
-@MainActor
-private func turnOnProjectFiles() {
-    Task {
-        guard let failure = await ProjectFilesSection.turnOn() else { return }
-        let alert = NSAlert()
-        alert.messageText = NSLocalizedString("The embedding model couldn't be downloaded", comment: "")
-        alert.informativeText = failure
-        alert.runModal()
     }
 }
