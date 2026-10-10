@@ -1,7 +1,8 @@
 import Darwin
 import Foundation
 
-// Opt-in usage telemetry (adr/0015): one anonymous report per day covering
+// Usage telemetry (adr/0015; on for a new install, never turned on by an
+// update, off with one switch): one anonymous report per day covering
 // one local day, POST https://ipsupport.us/api/telemetry. The rules mirror
 // the server's (ipsupport-api internal/telemetry/report.go), so what passes
 // here passes there. Never prompts, content, file names, paths or model
@@ -23,7 +24,7 @@ public enum TelemetryFeature: String, CaseIterable, Codable, Sendable {
 public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
     case gemma, qwen, llama, mistral, phi, deepseek
     case gptOSS = "gpt-oss"
-    case glm, flux
+    case glm, nemotron, flux
     case zImage = "z-image"
     case aceStep = "ace-step"
     case other
@@ -41,11 +42,16 @@ public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
         // Qwen"), and is the distiller's.
         if has("gpt-oss", "gpt_oss", "gptoss") { return .gptOSS }
         if has("deepseek") { return .deepseek }
+        // Nemotron-based ("Llama-3.1-Nemotron", our NemotronLabs VoiceChat).
+        if has("nemotron") { return .nemotron }
         if has("z-image", "z_image", "zimage") { return .zImage }
         if has("ace-step", "ace_step", "acestep") { return .aceStep }
         if has("flux") { return .flux }
         if has("gemma") { return .gemma }
-        if has("qwen", "qwq") { return .qwen }
+        // FrogNano and Ornith: Qwen3.5 fine-tunes whose names don't say so
+        // ("Ornith" as a word: not "ornithology").
+        if has("qwen", "qwq", "frognano")
+            || name.range(of: #"(?<![a-z])ornith(?![a-z])"#, options: .regularExpression) != nil { return .qwen }
         if has("llama") { return .llama }
         if has("mistral", "mixtral", "ministral", "devstral", "magistral", "codestral", "pixtral") { return .mistral }
         if has("glm") { return .glm }

@@ -2,8 +2,9 @@ import AppKit
 import Foundation
 import LLMTrayCore
 
-/// Opt-in usage statistics (adr/0015): off until the user turns it on in
-/// Settings → General. Counts uses per local day and sends each finished
+/// Usage statistics (adr/0015): on for a new install, never turned on by an
+/// update (TelemetryDefault), off in the setup wizard or Settings → General
+/// at any time. Counts uses per local day and sends each finished
 /// day once, at launch and every few hours; today's goes after it ends.
 /// Off stops sending at once and erases what wasn't sent; on again makes
 /// a new install ID. A temporary chat counts nothing: its callers don't

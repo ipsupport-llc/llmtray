@@ -31,7 +31,7 @@ The listing, in the user's words (memory: llmtray-positioning):
 | **Runtime exceptions** | vendored Python: `disable-library-validation` | none: every module in the bundle is signed by this team. Tested 2026-09-29: the vendored Python ran MLX on the GPU, mlx_lm generation, ctypes callbacks, tokenizers and numpy with **no** runtime exceptions |
 | **Signing** | Developer ID Application, notarized | Apple Distribution plus a Mac App Store provisioning profile; the installer package signed with Mac Installer Distribution |
 | **Payments** | none (tips via GitHub Sponsors, [0017](0017-supporters.md)) | StoreKit IAP tips only, and no external payment links |
-| **Privacy label** | opt-in telemetry ([0015](0015-telemetry.md)), reviews | declared as-is: usage data, opt-in, not linked to the user; reviews (user content, moderated) |
+| **Privacy label** | telemetry ([0015](0015-telemetry.md): on for a new install, off with one switch), reviews | declared as-is: usage data, not linked to the user; reviews (user content, moderated) |
 | **Licences** | Full build: notices generated for the vendored runtime | the same, for every vendored runtime. **No GPL** in the bundle: mflux's `opencv-python` carries GPL codecs, so mflux ships without it (§4) |
 
 ## Decision
@@ -191,7 +191,7 @@ Homebrew Python.
     a choice made after it isn't touched. That includes the models
     folder path (still to be granted in Settings › Models, as the alert
     says), the server, chat, voice and project settings, profiles' inputs,
-    the telemetry opt-in itself and the setup wizard's "done".
+    the telemetry setting itself and the setup wizard's "done".
   - **What doesn't** (`StandaloneImport.leftOutSettings`): state of the
     moment (the pane to reopen after a relaunch, a wizard mid-way, the
     download queue with the other build's destinations, the open chat tabs,
