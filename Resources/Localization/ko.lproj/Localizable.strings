@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\"는 더 이상 프로젝트에 없습니다.";
 "%.0f%% from drafts" = "초안에서 %.0f%%";
 "%.1f s" = "%.1f초";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ 및 %2$lld개 더";
 "%1$@ asks for %2$@" = "%1$@이(가) %2$@을(를) 요청합니다";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@이(가) %2$@을(를) 요청합니다. 전환하면 현재 로드된 모델이 언로드됩니다.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld개가 중단됨: Finder에서 확인하세요";
 "%lld items put back under their names." = "%lld개 항목이 원래 이름으로 복원되었습니다.";
 "%lld more" = "%lld개 더";
+"%lld more…" = "%lld개 더…";
 "%lld need a look: see the list." = "%lld개 항목을 확인하세요: 목록을 보십시오.";
 "%lld new since you opened the list: unticked until you tick them." = "목록을 연 이후 새로 생긴 항목 %lld개: 선택할 때까지 선택 해제된 상태입니다.";
 "%lld of 5 stars" = "5점 만점에 %lld점";
@@ -80,6 +82,7 @@
 "A song from a description" = "설명에서 만든 노래";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "설명으로부터 보컬이 있는 노래 또는 기악곡 생성(ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "심볼릭 링크: 가리키는 대상이 아니라 링크 자체입니다.";
+"A temporary chat can't hold files" = "임시 채팅에는 파일을 저장할 수 없습니다";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — 가사 선명, 8-bit (권장)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — 가사 선명, GPTQ 4-bit (메모리 절약)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — 더 풍성한 사운드";
 "About LLMTray" = "LLMTray에 관하여";
 "Add" = "추가";
+"Add Files to “%@”…" = "“%@”에 파일 추가…";
 "Add Files…" = "파일 추가…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF, Word 및 텍스트 파일을 프로젝트에 추가하세요. 대화는 파일을 검색하고 페이지를 인용합니다; 파일을 고정하면 전체 내용을 대화에 보관합니다.";
+"Add files" = "파일 추가";
+"Add files or images" = "파일 또는 이미지 추가";
+"Add files to a project" = "프로젝트에 파일 추가";
+"Add files to a project, or images for the model to see" = "프로젝트에 파일을 추가하거나 모델이 볼 이미지 추가";
 "Add more files: every chat of the project can search them." = "파일을 더 추가하세요: 프로젝트의 모든 채팅에서 검색할 수 있습니다.";
+"Add the files to a project?" = "파일을 프로젝트에 추가하시겠습니까?";
+"Add “%1$@” to “%2$@”?" = "“%1$@”을(를) “%2$@”에 추가하시겠습니까?";
 "Added %@" = "추가됨 %@";
 "Added here" = "여기에 추가됨";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "도구가 제공될 때마다 시스템 프롬프트에 추가됩니다. 모델 자체 도구 템플릿은 도구 호출 방법만 설명하며, 호출하지 말아야 할 때는 설명하지 않습니다. 비워 두면 비활성화됩니다.";
@@ -143,7 +153,9 @@
 "Ask first" = "먼저 묻기";
 "Assistant" = "어시스턴트";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.us로 하루에 최대 한 번, 지난 하루를 대상으로 보고합니다. 전송되지 않은 하루는 다음 실행 시 전송되며 최대 7일 전까지 포함됩니다. 이를 끄면 전송되지 않은 데이터는 삭제됩니다.";
-"Attach image(s) for the model to see" = "모델이 볼 이미지를 첨부합니다.";
+"Attach Images…" = "이미지 첨부…";
+"Attach images" = "이미지 첨부";
+"Attach images for the model to see" = "모델이 볼 이미지를 첨부";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "어텐션은 8비트, 피드포워드는 4비트 — 균일 4비트와 비교 검증된 최적의 크기/안정성 균형입니다.";
 "Audio quality" = "오디오 품질";
 "Auto-compact" = "자동 압축";
@@ -223,6 +235,7 @@
 "Clear" = "지우기";
 "Clear search" = "검색 지우기";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "대기열 지우기: 인덱스된 항목은 검색 가능 상태로 유지되며, 나머지는 인덱스되지 않음으로 표시됩니다";
+"Click to enable Project files: add files to the project and let its chats search them." = "클릭하여 프로젝트 파일 활성화: 파일을 프로젝트에 추가하고 해당 채팅들이 검색하도록 허용합니다.";
 "Close" = "닫기";
 "Close Tab" = "탭 닫기";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "이 창을 닫습니다. 설정 › 일반 › Set Up LLMTray…에서 다시 엽니다.";
@@ -283,7 +296,11 @@
 "Diagnostics" = "진단";
 "Disk usage" = "디스크 사용량";
 "Dismiss" = "닫기";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "문서는 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다. 이미지는 메시지에 포함됩니다.";
+"Documents go into a project with this chat." = "문서는 이 채팅과 함께 프로젝트로 이동됩니다.";
+"Documents go into a project with this chat; images go into your message." = "문서는 이 채팅과 함께 프로젝트로 이동되고, 이미지는 메시지에 포함됩니다.";
 "Doesn't open at login" = "로그인 시 열리지 않음";
+"Don't Add" = "추가 안 함";
 "Don't Ask Again" = "다시는 묻지 않기";
 "Don't show again" = "다시 보지 않기";
 "Done" = "완료";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "여기에 채팅 또는 파일을 놓아 프로젝트에 추가";
 "Drop files here" = "여기에 파일 놓기";
 "Drop files here to add them to the project" = "여기에 파일을 놓아 프로젝트에 추가";
+"Drop to add files" = "여기에 놓아 파일 추가";
+"Drop to add to “%@”" = "여기에 놓아 “%@”에 추가";
+"Drop to attach images" = "여기에 놓아 이미지 첨부";
 "Duplicate this profile" = "이 프로파일을 복제합니다.";
 "Echo cancellation" = "에코 제거";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "에코 제거를 시작할 수 없습니다: %@ — 설정 > 음성에서 끄세요.";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "프로파일 편집…";
 "Embedding model" = "임베딩 모델";
 "Enable Project Files…" = "프로젝트 파일 켜기…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "설정에서 프로젝트 파일을 켜면 파일을 추가하고 채팅에서 검색할 수 있습니다.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "먼저 설정 › 파일에서 프로젝트 파일을 켜면 여기에 LLMTray 안내서가 추가되고 답변에 인용됩니다.";
 "Enable Project files to add files" = "파일을 추가하려면 프로젝트 파일을 켜세요";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "프로젝트에 파일을 추가하고 해당 채팅이 검색하도록 하려면 프로젝트 파일을 켜세요. 그 전까지는 아무것도 색인되거나 다운로드되지 않습니다.";
+"Enable Project files to add files to the project" = "프로젝트에 파일을 추가하려면 프로젝트 파일을 활성화하세요";
 "Enable Without It" = "없어도 활성화";
 "Enable image editing?" = "이미지 편집을 사용하시겠습니까?";
 "Enable image generation" = "이미지 생성 활성화";
@@ -356,8 +376,12 @@
 "Files Settings…" = "파일 설정…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "여기에 추가한 파일은 프로젝트로 복사되어 이 Mac에서 인덱스화됩니다. 프로젝트의 모든 채팅에서 검색할 수 있습니다.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "프로젝트에 추가된 파일은 이 Mac에서 인덱싱되어 채팅에서 검색할 수 있습니다. 의미 기반 검색은 임베딩 모델을 사용합니다. 임베딩 모델이 없으면 파일은 단어 단위로만 검색됩니다.";
+"Files are copied into the project and indexed on this Mac." = "파일은 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "파일은 프로젝트로 이동하며, 임시 채팅은 프로젝트에 속하지 않습니다. 추가하려면 새로 저장된 채팅(⌘N)을 시작하세요.";
 "Files in %@" = "%@의 파일";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "파일은 프로젝트에 저장됩니다: 프로젝트의 모든 채팅이 검색할 수 있습니다. 이 채팅은 파일들과 함께 해당 프로젝트로 이동됩니다.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "프로젝트에 추가한 파일은 이 Mac에서 인덱싱되어 채팅에서 검색할 수 있습니다.";
+"Files · off" = "파일 · 꺼짐";
 "Files…" = "파일…";
 "Finish" = "완료";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish가 선택한 내용을 적용합니다. 이후 설정에서 언제든 변경할 수 있습니다.";
@@ -448,6 +472,8 @@
 "Image model" = "이미지 모델";
 "Image, music and voice models" = "이미지·음악·음성 모델";
 "Images" = "이미지";
+"Images go into your message; for documents, Project files are turned on first." = "이미지는 메시지에 포함됩니다. 문서는 먼저 프로젝트 파일을 켜야 합니다.";
+"Images only: a temporary chat can't hold files." = "이미지만 가능: 임시 채팅에는 파일을 저장할 수 없습니다.";
 "Import" = "가져오기";
 "Import from LLMTray (direct download)" = "LLMTray에서 가져오기(직접 다운로드)";
 "Imported" = "가져옴";
@@ -597,6 +623,7 @@
 "New profile" = "새 프로파일";
 "New profile (inherits everything from Default)" = "새 프로파일(Default의 모든 항목을 상속)";
 "New project" = "새 프로젝트";
+"New project “%@”" = "새 프로젝트 “%@”";
 "New temporary chat" = "새 임시 채팅";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "새 임시 채팅(⌘⇧N) — 이 채팅은 절대 저장되지 않습니다";
 "News" = "뉴스";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "설정에서 프로젝트 파일이 꺼져 있습니다.";
 "Project files off" = "프로젝트 파일 끔";
 "Project files on" = "프로젝트 파일 켬";
+"Project files will be turned on first." = "먼저 프로젝트 파일이 켜집니다.";
 "Project name" = "프로젝트 이름";
 "Projects" = "프로젝트";
 "Projects' files on disk" = "디스크의 프로젝트 파일";
@@ -842,6 +870,7 @@
 "Shape" = "형태";
 "Share anonymous usage statistics" = "익명 사용 통계 공유";
 "Share…" = "공유…";
+"Show All Files…" = "모든 파일 보기…";
 "Show Chat Window" = "채팅 창 표시";
 "Show Files" = "파일 보기";
 "Show Next Tab" = "다음 탭 보기";
@@ -880,6 +909,7 @@
 "Start" = "시작";
 "Start LLMTray automatically when you log in to this Mac." = "이 Mac에 로그인할 때 LLMTray를 자동으로 시작합니다.";
 "Start Server" = "서버 시작";
+"Start a new saved chat (⌘N) to add files to a project." = "프로젝트에 파일을 추가하려면 새 저장된 채팅(⌘N)을 시작하세요.";
 "Start server" = "서버를 시작합니다.";
 "Start talking" = "말하기 시작";
 "Start the server first." = "먼저 서버를 시작하십시오.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "앱의 언어(지역 정보 제외).";
 "The app's name." = "앱 이름.";
 "The base profile: every other profile inherits from it." = "기본 프로필: 다른 모든 프로필이 이 프로필을 상속합니다.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "이 채팅이 %1$@(%2$@)을(를) 프로젝트로 복사하도록 요청합니다. 그러면 해당 프로젝트의 모든 채팅에서 이를 검색할 수 있습니다.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "채팅 모델은 사용자가 허용한 폴더를 열람(이름, 크기, 날짜, 짧은 내용 일부)하고 변경을 제안할 수 있습니다 — 새 폴더, 이동, 이름 변경, 휴지통으로 이동 등. 모든 변경은 먼저 사용자가 승인하는 계획이며 되돌릴 수 있습니다.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab을 위해 채팅 모델을 언로드할 수 없습니다.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "채팅 모델이 이 폴더로 다운로드되고 있습니다. 설정에서 설치 후 변경하거나 먼저 다른 채팅 모델을 선택하세요.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Voice Lab 종료 시 모델이 다시 로드됩니다";
 "The model reloads when the image or song is done" = "이미지 또는 노래가 완료되면 모델이 다시 로드됩니다";
 "The model runtime isn't installed yet -- start a model once, then try again." = "모델 런타임이 아직 설치되지 않았습니다 — 모델을 한 번 실행한 뒤 다시 시도하세요.";
+"The model sees them with your next message." = "모델은 다음 메시지와 함께 이를 확인합니다.";
 "The model server no longer goes online when it starts." = "모델 서버가 시작될 때 더 이상 온라인으로 전환되지 않습니다.";
 "The model's license, from its card." = "모델 카드에 기재된 사용권입니다.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 폴더를 사용할 수 없습니다 — 해당 디스크가 연결되어 있나요? 설정 → Models에서 다시 선택하세요.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "다음 단계에서 모델과 원하는 기능을 설정합니다. 각 항목은 건너뛸 수 있으며, 선택하지 않으면 아무것도 다운로드되거나 켜지지 않습니다.";
 "The plan changed since you looked at it: review it again." = "계획이 확인한 이후 변경되었습니다: 다시 검토하세요.";
 "The port and network access can change only while the server is stopped." = "포트와 네트워크 접근은 서버가 중지된 상태에서만 변경할 수 있습니다.";
+"The project's files, and Add Files…" = "프로젝트의 파일 및 파일 추가…";
 "The reply was cut at its length limit." = "응답이 길이 제한으로 잘렸습니다.";
 "The report" = "보고서";
 "The reports" = "보고서";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "음성 실행기가 예기치 않게 중지됨(%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "그런 다음 모델 서버를 재시작하세요. Mac을 재시작하면 한도는 기본값으로 돌아갑니다. LLMTray는 이 값을 직접 변경하지 않습니다.";
 "There's no plan waiting any more." = "더 이상 대기 중인 계획이 없습니다.";
+"These can't be added to a project" = "이 항목들은 프로젝트에 추가할 수 없습니다";
 "These models go back to Default: %@." = "다음 모델이 Default로 돌아갑니다: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "한 번에 하나씩 실행되며 메뉴 막대에 창으로 표시됩니다. 이 동안 창을 닫을 수 있습니다.";
 "Thinking…" = "생각 중…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하거나 GPU 메모리 한도를 올리세요.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하세요.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods)를 인덱싱합니다. 폴더와 숨김 파일은 추가할 수 없습니다.";
 "This version of LLMTray can't send reviews. Please update the app." = "이 LLMTray 버전에서는 리뷰를 보낼 수 없습니다. 앱을 업데이트해 주세요.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "이 LLMTray 버전은 런타임을 Python으로 설정합니다. python.org 또는 Homebrew에서 Python을 설치한 뒤 다시 확인하세요. 또는 필요한 구성 요소가 모두 포함된 LLMTray-Full을 사용하세요.";
 "Thought process" = "사고 과정";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "볼 수 있고 변경 제안 가능";
 "cancelled" = "취소됨";
 "checking %@" = "확인 중: %@";
+"click to enable" = "클릭하여 활성화";
 "copy" = "복사";
 "copying" = "복사 중";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "다운로드 중: %@ (%@)";
 "downloading (%@)" = "다운로드 중 (%@)";
 "embedding" = "임베딩 중";
-"enable in Settings" = "설정에서 활성화";
-"enable in Settings to add the LLMTray guide" = "LLMTray 안내서를 추가하려면 설정에서 활성화";
+"enable them to add the LLMTray guide" = "LLMTray 안내서를 추가하려면 활성화하세요";
 "failed" = "실패";
 "failed to build request" = "요청 구성 실패";
 "failed: %@" = "실패: %@";

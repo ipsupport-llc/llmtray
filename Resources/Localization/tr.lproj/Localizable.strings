@@ -6,6 +6,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" artık projede değil.";
 "%.0f%% from drafts" = "%%%.0f taslaklardan";
 "%.1f s" = "%.1f s";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ ve %2$lld tane daha";
 "%1$@ asks for %2$@" = "%1$@, %2$@ istiyor";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@, %2$@ istiyor. Değiştirirseniz şu anda yüklü olan model boşaltılır.";
@@ -51,6 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld işlem kesildi: bunlara Finder'da bakın";
 "%lld items put back under their names." = "%lld öğe adlarıyla birlikte geri kondu.";
 "%lld more" = "%lld daha";
+"%lld more…" = "%lld daha…";
 "%lld need a look: see the list." = "%lld öğe incelenmeli: listeye bakın.";
 "%lld new since you opened the list: unticked until you tick them." = "Listeyi açtığınızdan beri %lld yeni öğe: işaretlenene kadar seçilmedi.";
 "%lld of 5 stars" = "5 üzerinden %lld yıldız";
@@ -80,6 +82,7 @@
 "A song from a description" = "Açıklamaya göre şarkı";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Açıklamadan şarkı (sözlü) veya enstrümantal oluşturur (ACE‑Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Bir sembolik bağ: bağın kendisi taşınır, işaret ettiği dosya değil.";
+"A temporary chat can't hold files" = "Geçici sohbet dosya tutamaz";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — net vokaller, 8-bit (önerilen)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — net vokaller, GPTQ 4-bit (daha az bellek)";
@@ -87,9 +90,16 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — daha dolu ses";
 "About LLMTray" = "LLMTray Hakkında";
 "Add" = "Ekle";
+"Add Files to “%@”…" = "Dosyaları “%@”'ye Ekle…";
 "Add Files…" = "Dosyalar Ekle…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Bir projeye PDF, Word ve metin dosyaları ekleyin. Sohbetler bunlarda arama yapar ve sayfayı referans verir; bir dosyayı sabitleyerek tüm içeriğini sohbette tutabilirsiniz.";
+"Add files" = "Dosyalar ekle";
+"Add files or images" = "Dosya veya resim ekle";
+"Add files to a project" = "Dosyaları bir projeye ekle";
+"Add files to a project, or images for the model to see" = "Dosyaları bir projeye veya modelin görmesi için resimleri ekle";
 "Add more files: every chat of the project can search them." = "Daha fazla dosya ekleyin: projenin her sohbeti bunlarda arama yapabilir.";
+"Add the files to a project?" = "Dosyalar bir projeye eklensin mi?";
+"Add “%1$@” to “%2$@”?" = "“%1$@” öğesini “%2$@” listesine eklemek istiyor musunuz?";
 "Added %@" = "Eklendi: %@";
 "Added here" = "Buraya eklendi";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
@@ -143,7 +153,9 @@
 "Ask first" = "Önce sor";
 "Assistant" = "Asistan";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.us adresine en fazla günde bir rapor gönderilir; her rapor bir önceki günü kapsar. Gönderilmeyen bir gün, sonraki açılışta gönderilir; en fazla 7 güne kadar geriye gider. Bunu kapatmak gönderilmeyen verileri siler.";
-"Attach image(s) for the model to see" = "Modelin görmesi için görsel ekleyin.";
+"Attach Images…" = "Resim Ekle…";
+"Attach images" = "Resim ekle";
+"Attach images for the model to see" = "Modelin görmesi için resim ekle";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Dikkat 8-bit, feed‑forward 4-bit — boyut/kararlılık için en iyi denge, tekdüzey 4-bit’e karşı doğrulandı.";
 "Audio quality" = "Ses kalitesi";
 "Auto-compact" = "Otomatik sıkıştırma";
@@ -223,6 +235,7 @@
 "Clear" = "Temizle";
 "Clear search" = "Aramayı temizle";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Kuyruğu temizle: dizine eklenen aranabilir kalır, kalanlar dizine eklenmemiş olarak işaretlenir";
+"Click to enable Project files: add files to the project and let its chats search them." = "Proje dosyalarını etkinleştirmek için tıklayın: dosyaları projeye ekleyin ve sohbetlerin bunlarda arama yapmasına izin verin.";
 "Close" = "Kapat";
 "Close Tab" = "Sekmeyi Kapat";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Settings › General › Set Up LLMTray… yeniden açar.";
@@ -283,7 +296,11 @@
 "Diagnostics" = "Tanılar";
 "Disk usage" = "Disk kullanımı";
 "Dismiss" = "Kapat";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "Belgeler projeye kopyalanır ve bu Mac'te indekslenir; resimler mesajınıza eklenir.";
+"Documents go into a project with this chat." = "Belgeler bu sohbetle birlikte bir projeye eklenir.";
+"Documents go into a project with this chat; images go into your message." = "Belgeler bu sohbetle birlikte bir projeye eklenir; resimler mesajınıza eklenir.";
 "Doesn't open at login" = "Girişte açılmaz";
+"Don't Add" = "Ekleme";
 "Don't Ask Again" = "Tekrar sorma";
 "Don't show again" = "Bir daha gösterme";
 "Done" = "Bitti";
@@ -313,6 +330,9 @@
 "Drop chats or files here to add them to the project" = "Sohbetleri veya dosyaları projeye eklemek için buraya bırakın";
 "Drop files here" = "Dosyaları buraya bırakın";
 "Drop files here to add them to the project" = "Dosyaları projeye eklemek için buraya bırakın";
+"Drop to add files" = "Dosya eklemek için bırakın";
+"Drop to add to “%@”" = "“%@”'ye eklemek için bırakın";
+"Drop to attach images" = "Resim eklemek için bırakın";
 "Duplicate this profile" = "Bu profili çoğalt";
 "Echo cancellation" = "Gecikme giderme";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Gecikme giderme başlatılamadı: %@ — Kapatmak için Ayarlar > Ses’e gidin.";
@@ -321,10 +341,10 @@
 "Edit Profile…" = "Profili Düzenle…";
 "Embedding model" = "Gömü modeli";
 "Enable Project Files…" = "Proje Dosyalarını Aç…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Projeye dosya eklemek ve sohbetlerin bu dosyalarda arama yapabilmesi için Ayarlar’dan Proje dosyalarını açın.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Önce Ayarlar › Dosyalar’da Proje dosyalarını etkinleştirin: ardından LLMTray kılavuzu buraya eklenir ve yanıtlar bunu referans gösterir.";
 "Enable Project files to add files" = "Dosya eklemek için Proje Dosyalarını açın";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenmez veya indirilmez.";
+"Enable Project files to add files to the project" = "Dosyaları projeye eklemek için Proje dosyalarını etkinleştir";
 "Enable Without It" = "Etkinleştir (Olmadan)";
 "Enable image editing?" = "Resim düzenlemeyi etkinleştirilsin mi?";
 "Enable image generation" = "Görüntü oluşturmayı etkinleştir";
@@ -356,8 +376,12 @@
 "Files Settings…" = "Files Ayarları…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Buraya eklenen dosyalar projeye kopyalanır ve bu Mac'te dizine alınır; projenin her sohbeti bunlarda arama yapabilir.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Bir projeye eklenen dosyalar bu Mac’te indekslenir, böylece sohbetler bunlarda arama yapabilir. Anlamsal arama bir gömü modeli kullanır; olmadan dosyalar yalnızca kelimelerine göre aranır.";
+"Files are copied into the project and indexed on this Mac." = "Dosyalar projeye kopyalanır ve bu Mac'te indekslenir.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Dosyalar bir projeye eklenir; geçici sohbetler projede olmaz. Eklemek için yeni bir kaydedilmiş sohbet başlatın (⌘N).";
 "Files in %@" = "%@ içindeki dosyalar";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Dosyalar projelerde saklanır: bir projenin her sohbeti bunlarda arama yapabilir. Bu sohbet de onlar ile birlikte projeye taşınır.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Projeye eklediğiniz dosyalar bu Mac'te dizinlenir; böylece sohbetler bunlarda arama yapabilir.";
+"Files · off" = "Dosyalar · kapalı";
 "Files…" = "Dosyalar…";
 "Finish" = "Bitir";
 "Finish applies what you chose. You can change all of it later in Settings." = "Bitir seçiminizi uygular. Sonra Settings'ten her şeyi değiştirebilirsiniz.";
@@ -448,6 +472,8 @@
 "Image model" = "Görüntü modeli";
 "Image, music and voice models" = "Görüntü, müzik ve ses modelleri";
 "Images" = "Görseller";
+"Images go into your message; for documents, Project files are turned on first." = "Resimler mesajınıza eklenir; belgeler için önce Proje dosyaları açılır.";
+"Images only: a temporary chat can't hold files." = "Sadece resimler: geçici sohbet dosya tutamaz.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "LLMTray'den içe aktar (doğrudan indirme)";
 "Imported" = "İçe aktarıldı";
@@ -597,6 +623,7 @@
 "New profile" = "Yeni profil";
 "New profile (inherits everything from Default)" = "Yeni profil (her şeyi Default’tan devralır)";
 "New project" = "Yeni proje";
+"New project “%@”" = "Yeni proje “%@”";
 "New temporary chat" = "Yeni geçici sohbet";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "Yeni geçici sohbet (⌘⇧N) — hiçbir şey kaydedilmez";
 "News" = "Haberler";
@@ -714,6 +741,7 @@
 "Project files are turned off in Settings." = "Proje dosyaları Ayarlar’da kapalı.";
 "Project files off" = "Proje dosyaları kapalı";
 "Project files on" = "Proje dosyaları açık";
+"Project files will be turned on first." = "Önce Proje dosyaları açılacaktır.";
 "Project name" = "Proje adı";
 "Projects" = "Projeler";
 "Projects' files on disk" = "Projelerin diskteki dosyaları";
@@ -842,6 +870,7 @@
 "Shape" = "Şekil";
 "Share anonymous usage statistics" = "Anonim kullanım istatistiklerini paylaş";
 "Share…" = "Paylaş…";
+"Show All Files…" = "Tüm Dosyaları Göster…";
 "Show Chat Window" = "Sohbet Penceresini Göster";
 "Show Files" = "Dosyaları Göster";
 "Show Next Tab" = "Sonraki Sekmeyi Göster";
@@ -880,6 +909,7 @@
 "Start" = "Başlat";
 "Start LLMTray automatically when you log in to this Mac." = "Bu Mac’e giriş yaptığınızda LLMTray’i otomatik olarak başlatır.";
 "Start Server" = "Sunucuyu başlat";
+"Start a new saved chat (⌘N) to add files to a project." = "Dosyaları bir projeye eklemek için yeni bir kaydedilmiş sohbet başlatın (⌘N).";
 "Start server" = "Sunucuyu başlat.";
 "Start talking" = "Konuşmaya başla";
 "Start the server first." = "Önce sunucuyu başlatın.";
@@ -948,6 +978,7 @@
 "The app's language (the language only, not the region)." = "Uygulamanın dili (sadece dil, bölge değil).";
 "The app's name." = "Uygulama adı.";
 "The base profile: every other profile inherits from it." = "Temel profil: diğer tüm profiller ondan devralır.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Sohbet, %1$@ (%2$@) öğesini projeye kopyalamanızı istiyor. Projedeki tüm sohbetler bunu arayabilir.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Sohbet modeli, izin verdiğiniz klasörlere bakabilir (adlar, boyutlar, tarihler, kısa alıntılar) ve orada değişiklik önerebilir — yeni klasörler, taşıma, yeniden adlandırma, Çöp'e taşıma. Her değişiklik önce sizin onayınıza sunulan bir plandır ve geri alınabilir.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab için sohbet modeli boşaltılamadı.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Sohbet modeli bu klasöre indiriliyor. Kurulumdan sonra Ayarlar’dan değiştirin veya önce başka bir sohbet modeli seçin.";
@@ -991,6 +1022,7 @@
 "The model reloads when Voice Lab stops" = "Voice Lab durduğunda model yeniden yüklenir";
 "The model reloads when the image or song is done" = "Görüntü veya şarkı tamamlandığında model yeniden yüklenir";
 "The model runtime isn't installed yet -- start a model once, then try again." = "Model çalışma zamanı henüz yüklü değil — bir model başlatıp sonra tekrar deneyin.";
+"The model sees them with your next message." = "Model bunları bir sonraki mesajınızla görür.";
 "The model server no longer goes online when it starts." = "Model sunucusu artık başlarken çevrimiçi olmuyor.";
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Models klasörü kullanılamıyor — diski bağlı mı? Ayarlar → Models'den tekrar seçin.";
@@ -1004,6 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Sonraki adımlar model ve istediğiniz özellikleri kurar. Her biri atlanabilir; siz seçmedikçe hiçbir şey indirilmez veya açılmaz.";
 "The plan changed since you looked at it: review it again." = "Plan, baktığınızdan beri değişti: tekrar gözden geçirin.";
 "The port and network access can change only while the server is stopped." = "Port ve ağ erişimi yalnızca sunucu dururken değiştirilebilir.";
+"The project's files, and Add Files…" = "Projenin dosyaları ve Dosya Ekle…";
 "The reply was cut at its length limit." = "Yanıt, uzunluk sınırında kesildi.";
 "The report" = "Rapor";
 "The reports" = "Raporlar";
@@ -1033,6 +1066,7 @@
 "The voice runner stopped unexpectedly (%@)." = "Ses çalıştırıcısı beklenmedik şekilde durdu (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Sonra model sunucusunu yeniden başlatın. Mac yeniden başlatıldığında sınır varsayılan değere döner. LLMTray bunu kendiliğinden değiştirmez.";
 "There's no plan waiting any more." = "Artık bekleyen bir plan yok.";
+"These can't be added to a project" = "Bunlar bir projeye eklenemez";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Menü çubuğundaki pencerede aynı anda birer birer çalışırlar. Bu arada bu pencereyi kapatabilirsiniz.";
 "Thinking…" = "Düşünüyor…";
@@ -1048,6 +1082,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın veya GPU bellek sınırını yükseltin.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını indeksler; klasörler ve gizli dosyalar eklenemez.";
 "This version of LLMTray can't send reviews. Please update the app." = "Bu LLMTray sürümü değerlendirme gönderemez. Lütfen uygulamayı güncelleyin.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Bu LLMTray sürümü çalışma zamanı için Python kullanır. Python'u python.org veya Homebrew üzerinden yükleyin, sonra tekrar kontrol edin. Veya gerekli her şeyi içeren LLMTray-Full'u kullanın.";
 "Thought process" = "Düşünme süreci";
@@ -1198,6 +1233,7 @@
 "can look and propose changes" = "görebilir ve değişiklik önerebilir";
 "cancelled" = "iptal edildi";
 "checking %@" = "denetleniyor: %@";
+"click to enable" = "etkinleştirmek için tıklayın";
 "copy" = "kopyala";
 "copying" = "kopyalanıyor";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1209,8 +1245,7 @@
 "downloading %@ (%@)" = "indiriliyor: %@ (%@)";
 "downloading (%@)" = "indiriliyor (%@)";
 "embedding" = "gömülüyor";
-"enable in Settings" = "Ayarlar’da etkinleştir";
-"enable in Settings to add the LLMTray guide" = "LLMTray kılavuzunu eklemek için Ayarlar’da etkinleştir";
+"enable them to add the LLMTray guide" = "LLMTray kılavuzunu eklemeleri için etkinleştir";
 "failed" = "başarısız";
 "failed to build request" = "istek oluşturulamadı";
 "failed: %@" = "başarısız: %@";
