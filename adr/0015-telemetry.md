@@ -3,8 +3,9 @@
 ## Decision
 
 LLMTray can send an anonymous daily usage report to
-`POST https://ipsupport.us/api/telemetry`, and only when the user has
-turned it on. The server side, and what it may and may not receive, is
+`POST https://ipsupport.us/api/telemetry` while the setting is on: on
+for a new install, never turned on by an update, off with one switch
+(below). The server side, and what it may and may not receive, is
 ipsupport-api's `docs/telemetry.md`, its `api/openapi.yaml`
 (`TelemetryReport`) and its ADRs 9 (opt-in telemetry) and 10 (the
 country of a report); the app follows them.
@@ -74,4 +75,5 @@ country of a report); the app follows them.
 
 We want to know how many people run the app, on which Macs and builds,
 and which features they use, without undermining its promise of local,
-private AI: opt-in, pseudonymous, coarse, and easy to turn off for good.
+private AI: shown before anything is sent, pseudonymous, coarse, and easy
+to turn off for good.

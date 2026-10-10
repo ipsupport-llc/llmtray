@@ -1,7 +1,8 @@
 import Darwin
 import Foundation
 
-// Opt-in usage telemetry (adr/0015): one anonymous report per day covering
+// Usage telemetry (adr/0015; on for a new install, never turned on by an
+// update, off with one switch): one anonymous report per day covering
 // one local day, POST https://ipsupport.us/api/telemetry. The rules mirror
 // the server's (ipsupport-api internal/telemetry/report.go), so what passes
 // here passes there. Never prompts, content, file names, paths or model
