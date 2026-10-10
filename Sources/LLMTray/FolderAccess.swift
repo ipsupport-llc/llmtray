@@ -632,10 +632,14 @@ final class FilesTool: ChatTool {
         }
         guard case .fileForProject(let url, _) = copied else { return copied.toolResult }
         defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
-        indexer.dismissAddNote(project.id)
-        await indexer.addFiles([url], to: project.id)
-        if let note = indexer.addNotes[project.id] {
-            return .text("\(path) wasn't added: \(note)")
+        // This call's own outcome (Project files turned off meanwhile is a
+        // failure there), not the project's shared note.
+        switch await indexer.add([url], to: project.id).first {
+        case .added: break
+        case .duplicate: return .text("\(path) is already in the project \u{201C}\(project.name)\u{201D}.")
+        case .notSupported: return .text("\(path) wasn't added: not a format project files take.")
+        case .failed(let why): return .text("\(path) wasn't added: \(why)")
+        case nil: return .text("\(path) wasn't added.")
         }
         return .text("\(path) was added to the project \u{201C}\(project.name)\u{201D} and queued for indexing. "
             + "Once indexed, project_files can search it in a later message; until then it isn't searchable.")
