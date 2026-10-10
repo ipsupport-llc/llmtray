@@ -59,7 +59,8 @@ public enum FolderToolAnswer: Equatable, Sendable {
     /// `files(add_to_project)`: the file may be added (checked, nothing of
     /// it read): the app asks the user, then `copyForProject`. `raw` is the
     /// path as the model wrote it.
-    case projectCandidate(raw: String, path: String, bytes: Int64)
+    /// `identity`: the file checked, the one the copy must be.
+    case projectCandidate(raw: String, path: String, bytes: Int64, identity: FileIdentity)
     /// `copyForProject`: a copy of the file in a folder of its own (the app
     /// adds it, then removes that folder).
     case fileForProject(URL, path: String)
@@ -67,7 +68,7 @@ public enum FolderToolAnswer: Equatable, Sendable {
     public var text: String {
         switch self {
         case .text(let t), .refused(let t): return t
-        case .image(_, let path), .fileForProject(_, let path), .projectCandidate(_, let path, _): return path
+        case .image(_, let path), .fileForProject(_, let path), .projectCandidate(_, let path, _, _): return path
         }
     }
 }
@@ -537,17 +538,18 @@ public final class FolderToolService: @unchecked Sendable {
                 + "Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).")
         }
         do {
-            let bytes = try FolderFileTake.check(walker, location.components, maxBytes: FolderFileTake.maxProjectBytes)
-            return .projectCandidate(raw: raw, path: shown, bytes: bytes)
+            let checked = try FolderFileTake.check(walker, location.components, maxBytes: FolderFileTake.maxProjectBytes)
+            return .projectCandidate(raw: raw, path: shown, bytes: checked.bytes, identity: checked.identity)
         } catch {
             return .text("\(FolderTools.filesName): \(errorText(error)).")
         }
     }
 
     /// `add_to_project` once the user said yes: the file copied by
-    /// descriptor (the guards again) into a folder of its own. Only under
-    /// a read grant the chat still has -- nothing is asked here.
-    public func copyForProject(raw: String, chat: FolderChat, callKey: String,
+    /// descriptor (the guards again) into a folder of its own -- only the
+    /// file they said yes to (`identity`), only under a read grant the chat
+    /// still has; nothing is asked here.
+    public func copyForProject(raw: String, identity: FileIdentity, chat: FolderChat, callKey: String,
                                isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.filesName
         guard let path = try? absolute(raw, usable: usableGrants(chat, callKey: callKey)),
@@ -562,7 +564,7 @@ public final class FolderToolService: @unchecked Sendable {
         let shown = display(location.displayPath)
         do {
             let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
-                                              maxBytes: FolderFileTake.maxProjectBytes,
+                                              maxBytes: FolderFileTake.maxProjectBytes, expected: identity,
                                               isCancelled: { isCancelled() || !stillGranted() })
             guard stillGranted() else {
                 try? FileManager.default.removeItem(at: url.deletingLastPathComponent())

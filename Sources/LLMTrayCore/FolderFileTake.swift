@@ -40,14 +40,14 @@ public enum FolderFileTake {
 
     /// What a file is before anything of it is read: its size, when the
     /// guards let it be read at all.
-    public static func check(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int64) throws -> Int64 {
+    public static func check(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int64) throws -> (bytes: Int64, identity: FileIdentity) {
         let item = try walker.resolve(components)
         let shown = walker.display(components)
         guard let entry = item.entry else { throw FolderAccessError.notFound(shown) }
         guard entry.kind == .file else { throw FolderAccessError.notARegularFile(shown) }
         try guards(entry.stat, item: item, walker: walker, shown: shown)
         guard entry.stat.size <= maxBytes else { throw TakeError.tooLarge(shown, limit: maxBytes) }
-        return entry.stat.size
+        return (entry.stat.size, entry.identity)
     }
 
     private static func guards(_ stat: EntryStat, item: ResolvedItem, walker: SafeFolderWalker, shown: String) throws {
@@ -77,14 +77,19 @@ public enum FolderFileTake {
 
     /// A copy under the file's own name in a new folder of `directory`
     /// (the caller removes that folder once done with it).
+    /// `expected`: the file the user said yes to; another one there now
+    /// (replaced, or a path that leads elsewhere) isn't copied.
     public static func copy(_ walker: SafeFolderWalker, _ components: [String], into directory: URL, maxBytes: Int64,
-                            isCancelled: () -> Bool = { false }) throws -> URL {
-        try Materialization.off { try copying(walker, components, into: directory, maxBytes: maxBytes, isCancelled: isCancelled) }
+                            expected: FileIdentity? = nil, isCancelled: () -> Bool = { false }) throws -> URL {
+        try Materialization.off {
+            try copying(walker, components, into: directory, maxBytes: maxBytes, expected: expected, isCancelled: isCancelled)
+        }
     }
 
     private static func copying(_ walker: SafeFolderWalker, _ components: [String], into directory: URL, maxBytes: Int64,
-                                isCancelled: () -> Bool) throws -> URL {
+                                expected: FileIdentity?, isCancelled: () -> Bool) throws -> URL {
         let file = try open(walker, components, maxBytes: maxBytes)
+        if let expected, file.identity != expected { throw FolderAccessError.changed(walker.display(components)) }
         guard let name = components.last else { throw FolderAccessError.invalidPath("the grant root itself") }
         let folder = directory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)

@@ -32,17 +32,27 @@ final class FolderFileTakeTests: FolderTestCase {
 
     func testAddToProjectIsCheckedFirstAndCopiedOnlyAfter() async throws {
         write("notes.md", "# AI programming")
-        guard case .projectCandidate(let raw, let path, let bytes) = await take("~/grant/notes.md", add: true) else {
+        guard case .projectCandidate(let raw, let path, let bytes, let identity) = await take("~/grant/notes.md", add: true) else {
             return XCTFail("a candidate")
         }
         XCTAssertEqual(path, "~/grant/notes.md")
         XCTAssertEqual(bytes, 16)
-        guard case .fileForProject(let url, _) = await service.copyForProject(raw: raw, chat: chat, callKey: "k") else {
+        // Replaced while the user was asked: not the file they said yes to.
+        write("other.md", "replaced")
+        try fm.removeItem(atPath: grant + "/notes.md")
+        try fm.moveItem(atPath: grant + "/other.md", toPath: grant + "/notes.md")
+        if case .fileForProject = await service.copyForProject(raw: raw, identity: identity, chat: chat, callKey: "k") {
+            XCTFail("copied a file the user didn't say yes to")
+        }
+        guard case .projectCandidate(_, _, _, let current) = await take("~/grant/notes.md", add: true) else {
+            return XCTFail("a candidate")
+        }
+        guard case .fileForProject(let url, _) = await service.copyForProject(raw: raw, identity: current, chat: chat, callKey: "k") else {
             return XCTFail("a copy")
         }
         defer { try? fm.removeItem(at: url.deletingLastPathComponent()) }
         XCTAssertEqual(url.lastPathComponent, "notes.md")
-        XCTAssertEqual(try String(contentsOf: url, encoding: .utf8), "# AI programming")
+        XCTAssertEqual(try String(contentsOf: url, encoding: .utf8), "replaced")
         XCTAssertTrue(url.path.hasPrefix(FolderToolService.takeDirectory.path), url.path)
         XCTAssertTrue(fm.fileExists(atPath: grant + "/notes.md"), "the original stays")
         // A format the project doesn't take: refused before anyone is asked.
@@ -50,7 +60,7 @@ final class FolderFileTakeTests: FolderTestCase {
         if case .projectCandidate = await take("~/grant/movie.mov", add: true) { XCTFail("not a project format") }
         // Outside the chat's grants: no copy, nothing asked.
         write("secret.txt", "outside", in: outside)
-        if case .fileForProject = await service.copyForProject(raw: outside + "/secret.txt", chat: chat, callKey: "k") {
+        if case .fileForProject = await service.copyForProject(raw: outside + "/secret.txt", identity: identity, chat: chat, callKey: "k") {
             XCTFail("copied from outside the grant")
         }
     }
