@@ -4,6 +4,7 @@
 
 "\"%@\" has changed since this answer cited it: page %lld may read differently now." = "この回答で引用した「%@」は変更されています：ページ %lld の内容が現在とは異なる可能性があります。";
 "\"%@\" is no longer in the project." = "「%@」はプロジェクトに含まれていません。";
+"%.0f%% from drafts" = "ドラフト由来 %.0f%%";
 "%.1f s" = "%.1f 秒";
 "%1$@ and %2$lld more" = "%1$@ 他 %2$lld 件";
 "%1$@ asks for %2$@" = "%1$@ が %2$@ を要求しています";
@@ -32,6 +33,7 @@
 "%@ · downloaded; mlx-audio is installed at the first start" = "%@ · ダウンロード済み；mlx-audio は初回起動時にインストールされます";
 "%@ · not downloaded" = "%@ · 未ダウンロード";
 "%@ · partly downloaded" = "%@ · 部分的にダウンロード済み";
+"%@ — in project %@" = "%@ — プロジェクト %@ 内";
 "%@ — page %lld" = "%@ — ページ %lld";
 "%@ → %@ available" = "%@ → %@ が利用可能";
 "%@ ★ from %lld reviews" = "%@ ★（%lld件のレビューより）";
@@ -53,6 +55,7 @@
 "%lld new since you opened the list: unticked until you tick them." = "リストを開いてから %lld 件が新規追加されました：チェックするまで未選択のままです。";
 "%lld of 5 stars" = "5点中%lld点";
 "%lld pages" = "%lld ページ";
+"%lld requests" = "%lld 件のリクエスト";
 "%lld s" = "%lld 秒";
 "%lld-bit" = "%lldビット";
 "(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
@@ -67,7 +70,9 @@
 "A chat model" = "チャット用モデル";
 "A client" = "クライアント";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "より豊かで完成度の高いミックス。歌詞はやや聞き取りにくくなります。30秒の音楽に約20秒かかります。";
+"A model is a tool, not an authority" = "モデルはツールであり、権威ではありません";
 "A package: moved as one item." = "パッケージ：1 件の項目として移動されます。";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "各レイヤーの埋め込みテーブル（Gemma 4 E2B、E4B）は必要に応じてディスクから読み込まれ、画像・音声部分（Gemma 4、Qwen 3.5）は初回使用時に読み込まれます。8 GB の Mac では最大で約 2 GB のメモリ節約になります。テーブルをディスク上に置くと生成は約 10% 遅くなります。出力の内容は変わりません。";
 "A quiet check at every launch. Only shows anything if an update exists." = "起動するたびに静かに確認します。アップデートがある場合にのみ表示します。";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "このMac上で作られるランダムID。起動ごとに新しくなり、あなたやMacに紐づきません。";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "評価と簡単なコメントをipsupport.usに送信します。アカウントやデバイス識別子は送信されません。レビューは審査後にLLMTrayのウェブサイトに掲載されます。";
@@ -132,6 +137,7 @@
 "Apps & agents" = "アプリとエージェント";
 "Apps and agents" = "アプリとエージェント";
 "Ask Later" = "後で尋ねる";
+"Ask about LLMTray" = "LLMTray に関して質問する";
 "Ask again in two weeks" = "2週間後に再度確認します";
 "Ask anything, or try one of these:" = "何でも質問するか、こちらを試してみてください：";
 "Ask first" = "事前に確認";
@@ -302,6 +308,7 @@
 "Downloads waiting: %lld" = "待機中のダウンロード: %lld";
 "Drag chats here, or use a chat's menu" = "ここにチャットをドラッグするか、チャットのメニューを使ってください";
 "Drag chats or files here, or use a chat's menu" = "チャットかファイルをここにドラッグするか、チャットのメニューを使ってください";
+"Drag documents onto this chat: they join the project, and the model answers from them." = "このチャットに書類をドラッグするとプロジェクトに追加され、モデルはそれらを参照して回答します。";
 "Drop chats here to move them to the project" = "ここにチャットをドロップしてプロジェクトに移動";
 "Drop chats or files here to add them to the project" = "ここにチャットかファイルをドロップしてプロジェクトに追加";
 "Drop files here" = "ここにファイルをドロップ";
@@ -313,18 +320,27 @@
 "Echo gate" = "エコーゲート";
 "Edit Profile…" = "プロファイルを編集…";
 "Embedding model" = "埋め込みモデル";
+"Enable Project Files…" = "プロジェクトファイルを有効にする…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "設定でプロジェクトファイルを有効にすると、ファイルをプロジェクトに追加してチャットで検索できるようになります。";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "まず「設定」›「ファイル」でプロジェクトファイルを有効にすると、ここに LLMTray ガイドが追加され、回答で参照されます。";
+"Enable Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
 "Enable Without It" = "それなしで有効化";
 "Enable image editing?" = "画像編集を有効にしますか？";
 "Enable image generation" = "画像生成を有効にする";
 "Enable image generation?" = "画像生成を有効にしますか？";
+"Enable images, music and voice" = "画像、音楽、音声を有効にする";
 "Enable music generation" = "音楽生成を有効にする";
 "Enable music generation?" = "音楽生成を有効にしますか？";
+"Enable project files?" = "プロジェクトファイルを有効にしますか？";
+"Enable…" = "有効にする…";
 "End" = "終了";
 "End the conversation (the chat model reloads)" = "会話を終了します（チャットモデルは再読み込みされます）";
 "Enjoying LLMTray?" = "LLMTrayをお楽しみですか？";
 "Errors" = "エラー";
 "Every chat in this project gets these instructions, after the model profile's system prompt. A change applies from the next message." = "このプロジェクト内の全チャットは、モデルプロファイルのシステムプロンプトの後にこの指示を受け取ります。変更は次のメッセージから適用されます。";
 "Every chat of the project gets their whole text; web search and image or music generation are off in those chats while a file is pinned." = "プロジェクト内のすべてのチャットがファイル全体のテキストを取得します。ファイルがピン留めされている間、そのチャットでは Web 検索や画像・音楽生成は無効になります。";
+"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
 "Everything in that folder is here already." = "そのフォルダ内のものはすでにここにあります。";
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "LLMTray が ipsupport.us に送信する項目をフィールド単位で正確に表示します。他のデータは Mac を離れません。";
 "Experimental — English only" = "実験的 — 英語のみ";
@@ -336,7 +352,7 @@
 "Fast (smaller canvas)" = "高速（キャンバス小）";
 "Faster long chats" = "長いチャットを高速化";
 "Fetching file list…" = "ファイル一覧を取得しています…";
-"Files" = "Files";
+"Files" = "ファイル";
 "Files Settings…" = "Files 設定…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "ここに追加したファイルはプロジェクトにコピーされ、このMacでインデックス化されます。プロジェクト内のすべてのチャットが検索できます。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "プロジェクトに追加されたファイルはこのMac上で索引化され、チャットから検索できます。意味による検索には埋め込みモデルを使用します。モデルがない場合は、ファイルは単語ベースで検索されます。";
@@ -386,6 +402,8 @@
 "Get Started" = "はじめる";
 "Get a Model…" = "モデルを入手…";
 "Get one" = "入手";
+"Getting Started" = "はじめに";
+"Getting started" = "はじめに";
 "Gives the model a generate_image tool (needs a tool-calling model). The first time, the image model is downloaded." = "モデルに generate_image ツールを提供します（ツール呼び出し対応モデルが必要です）。初回は画像モデルがダウンロードされます。";
 "Gives the model a generate_music tool: a song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5, MIT license; about 20 seconds for 30 seconds of music). The first time, the model is downloaded." = "モデルに generate_music ツールを追加します：歌詞付きの曲またはインストゥルメンタルを説明から生成します（ACE-Step 1.5, MIT license；30秒の音楽で約20秒）。初回はモデルがダウンロードされます。";
 "Gives the model an edit_image tool: it changes an image from the chat -- one you attached or one generated here. Needs image generation on. Its own model, downloaded when you choose it." = "モデルにedit_imageツールを追加します：チャット内の画像（添付したものまたはここで生成したもの）を変更します。画像生成を有効にする必要があります。専用モデルで、選択時にダウンロードされます。";
@@ -394,13 +412,16 @@
 "Has other names (a hard link): they keep the file." = "別名が存在します（ハードリンク）：それらがファイルを保持します。";
 "Help" = "ヘルプ";
 "Help improve LLMTray?" = "LLMTrayの改善に協力しますか？";
+"Hide" = "非表示";
 "Hide chats" = "チャットを非表示";
 "Hide the reasoning" = "推論を非表示";
+"Hide these steps for good" = "この手順を今後表示しない";
 "High quality (larger canvas)" = "高品質（キャンバス大）";
 "Highest fidelity, largest download -- a correctness baseline you can trust." = "最高の忠実度、ダウンロードは最大 — 信頼できる正確性のベースラインです。";
 "Hourly forecast" = "時間ごとの予報";
 "Hover the info button under an answer to see the model, speed and how much context it used." = "回答の下にある情報ボタンにカーソルを合わせると、モデル、速度、使用したコンテキスト量が表示されます。";
 "How adventurous and unexpected the music is. turbo only: sft has no song planner to vary." = "音楽の冒険性・予測不能さ。turboのみ適用：sftには曲のプランナーがありません。";
+"How do I connect my coding agent to LLMTray?" = "コーディングエージェントを LLMTray にどう接続しますか？";
 "How do you like LLMTray?" = "LLMTrayのご感想をお聞かせください";
 "How it was made" = "作成方法の詳細です。";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
@@ -433,6 +454,7 @@
 "Import…" = "Import…";
 "In iCloud Drive or another cloud: moving it to the Trash removes it from your other devices too." = "iCloud Drive や他のクラウド上にある場合：ゴミ箱に移動すると他のデバイスからも削除されます。";
 "In project %@" = "プロジェクト %@ にて";
+"In real use" = "実際の使用";
 "In the queue: %lld ahead…" = "キュー内: %lld 件前…";
 "Include LLMTray crash reports from the last two weeks" = "過去2週間の LLMTray クラッシュレポートを含める";
 "Include the server log" = "サーバーログを含める";
@@ -452,6 +474,7 @@
 "Installs the llmtray command in ~/.local/bin: start and stop the server, list and download models, chat, and generate images from a terminal or a script. Run llmtray help for the commands." = "llmtray コマンドを ~/.local/bin にインストールします：サーバーの起動・停止、モデルの一覧とダウンロード、チャット、画像生成をターミナルやスクリプトから実行できます。コマンドは llmtray help を実行してください。";
 "Instructions for %@" = "%@ の指示";
 "Instructions…" = "指示…";
+"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "間違えたり、事実でないことを作り出したりすることがあります。重要なことは必ず確認してください。医師、弁護士、心理士、友人の代わりにはなりません。回答の利用はご自身の責任で行ってください。";
 "It goes on in the background: you can continue." = "バックグラウンドで進行します。続けて操作できます。";
 "It had no settings of its own to bring; the ones here were kept." = "取り込む独自の設定はありませんでした；こちらの設定は保持されました。";
 "It is being set up or updated. Try again once that's done." = "セットアップ中または更新中です。完了後に再試行してください。";
@@ -474,6 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "このポートを維持します。他のアプリが実際に使用している場合、サーバは起動しません。設定でポートを変更してください。";
 "Kept free: %lld MB" = "確保済み: %lld MB";
 "LLMTray" = "LLMTray";
+"LLMTray Guide" = "LLMTray ガイド";
 "LLMTray isn't allowed to use the microphone." = "LLMTray にマイク使用の許可がありません。";
 "LLMTray restarts now to load them." = "LLMTray を再起動して読み込みます。";
 "LLMTray status, indexing project files" = "LLMTray の状態 — プロジェクトファイルをインデックス化中";
@@ -496,7 +520,6 @@
 "Lighter than the recommended one: faster and leaves memory to other apps, but its answers are simpler." = "推奨より軽い：高速で他のアプリにメモリを残しますが、応答はより簡素になります。";
 "Like LLMTray?" = "LLMTrayはいかがですか？";
 "Likes" = "いいね";
-"Link (optional, https://…)" = "リンク（任意、https://…）";
 "List my name" = "名前を掲載";
 "List my name in Supporters" = "Supportersに名前を掲載";
 "Listening…" = "聴いています…";
@@ -513,6 +536,7 @@
 "Maintenance" = "メンテナンス";
 "Make a 30-second calm lo-fi instrumental for studying" = "勉強用の落ち着いた30秒のローファイ・インストゥルメンタルを作る";
 "Make images and edit them." = "画像を生成・編集します。";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "この Mac 上で画像や曲を作り、音声モデルと会話できます。「設定」で有効にしてください。";
 "Make songs and instrumentals." = "楽曲やインストゥルメンタルを作成します。";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "新しいランダムIDを作成します。以降のレポートは以前のものと照合できなくなります。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "フォルダ作成、移動、名前変更、ゴミ箱への移動—各操作は事前に計画として表示され、あなたが承認するまで何も変更されません。";
@@ -532,6 +556,7 @@
 "Model switching" = "モデル切り替え";
 "Model:" = "モデル：";
 "Models" = "モデル";
+"Models can make mistakes. Check important information." = "モデルは間違えることがあります。重要な情報は確認してください。";
 "Models folder" = "モデルフォルダ";
 "Models folder: %@" = "models フォルダ: %@";
 "Models found: %lld" = "見つかったモデル: %lld";
@@ -595,6 +620,7 @@
 "No model uses it." = "使用しているモデルはありません。";
 "No models found in this folder." = "このフォルダにモデルが見つかりません。";
 "No models in this folder yet. The next step offers some to download." = "このフォルダにまだモデルはありません。次のステップでダウンロード候補を提示します。";
+"No requests yet." = "まだリクエストはありません。";
 "No runs yet." = "実行履歴はまだありません。";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "購読なし。機能ロックなし。LLMTrayが役立つと思ったら開発を支援してください。";
 "No suggestions for this Mac's memory. Browse Hugging Face for a model." = "この Mac のメモリに対する提案はありません。Hugging Face でモデルを探してください。";
@@ -775,6 +801,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "可能性の高い順にこの数のトークンからのみサンプリングします。0 でオフになります。Gemma 4 では 64 が推奨されます。";
 "Sampling" = "サンプリング";
 "Save" = "保存";
+"Save memory" = "メモリを節約";
 "Saved chats will show up here." = "保存したチャットはここに表示されます。";
 "Saved in your Keychain" = "Keychain に保存されました";
 "Save…" = "保存…";
@@ -914,6 +941,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "App Store 版の LLMTray が開かれています。先にそちらを終了してください（メニューバーアイコン › Quit）、その後こちらを再度開いてください：両方が同じポートを使用し、モデルを二重に読み込みます。";
 "The Keychain refused to remove the token." = "Keychain がトークンの削除を拒否しました。";
 "The Keychain refused to save the token." = "Keychain がトークンの保存を拒否しました。";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "LLMTray ガイドはこのプロジェクト内にあります。たとえばコーディングエージェントの接続方法を尋ねてください。";
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter のダウンロードが完了しました — 使用するにはサーバを再起動してください。";
 "The Mac's chip." = "Macのチップ。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI互換APIはここで待ち受けます（http://localhost:<port>/v1）。サーバが停止している間に変更してください。";
@@ -956,6 +984,7 @@
 "The model is answering another chat: yours starts as soon as it's free." = "モデルは別のチャットに回答中です。空き次第、このチャットの回答を始めます。";
 "The model is busy with another request: yours starts as soon as it's free." = "モデルは別のリクエストを処理中です。空き次第、このリクエストを始めます。";
 "The model is reasoning before it answers (Settings shows the reasoning itself)" = "モデルは回答の前に推論しています（設定で推論内容を表示します）";
+"The model is still downloading: your message goes out as soon as it's ready." = "モデルをダウンロード中です：準備ができ次第、メッセージが送信されます。";
 "The model isn't running. Send again to start it." = "モデルは実行されていません。再送信すると起動します。";
 "The model name API clients send." = "APIクライアントが送信するモデル名です。";
 "The model picker, Start/Stop, profile, tools and temperature above the chat in its own window. Off: the window is just the chats and the conversation -- those controls stay in the menu bar." = "チャット上部にモデルピッカー、Start/Stop、プロファイル、ツール、温度を独立ウインドウで表示します。オフの場合はウインドウにチャットと会話のみが表示され、これらのコントロールはメニューバーに残ります。";
@@ -1047,14 +1076,9 @@
 "Total time" = "合計時間";
 "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
 "Try Again" = "再試行";
-"Enable Project Files…" = "プロジェクトファイルを有効にする…";
-"Enable…" = "有効にする…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "設定で Project files を有効にすると、ファイルをプロジェクトに追加してチャットで検索できるようになります。";
-"Enable Project files to add files" = "ファイルを追加するにはプロジェクトファイルを有効にしてください";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "プロジェクトにファイルを追加してチャットで検索できるようにするには、プロジェクトファイルを有効にしてください。その時点までは何もインデックス化やダウンロードされません。";
-"Enable project files?" = "プロジェクトファイルを有効にしますか？";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
+"Type a message below and press Return. Try: “What can you do?”" = "下にメッセージを入力して Return を押してください。例：「何ができますか？」";
 "Unavailable" = "利用不可";
 "Uncompressed (WAV)" = "非圧縮（WAV）";
 "Undo" = "元に戻す";
@@ -1113,6 +1137,7 @@
 "Voice Lab…" = "Voice Lab…";
 "Voice model" = "音声モデル";
 "Wait for the current request or benchmark to finish -- a restart would cut it off." = "現在のリクエストまたはベンチマークが完了するまでお待ちください。再起動すると中断されます。";
+"Waiting for a model download to finish…" = "モデルのダウンロード完了を待機しています…";
 "Waiting for an image or song to finish…" = "画像または曲の生成完了を待っています…";
 "Waiting for another chat's image or music to finish…" = "別のチャットの画像または音楽の処理が終わるのを待っています…";
 "Waiting for the chat or a generator to finish" = "チャットまたはジェネレータの完了を待機中";
@@ -1126,6 +1151,7 @@
 "Web tools on" = "ウェブツール：オン";
 "Welcome" = "ようこそ";
 "Welcome to LLMTray" = "LLMTray へようこそ";
+"What can you do?" = "何ができますか？";
 "What decides which models run well here." = "どのモデルがここでうまく動くかを決める要素です。";
 "What else" = "その他";
 "What happened?" = "何が起きましたか？";
@@ -1148,6 +1174,7 @@
 "Words only" = "単語のみ";
 "Working memory for reading a prompt in chunks; less reads long prompts in smaller, slower steps. With the prompt cache at most 90% together: the rest holds the prompt being read." = "プロンプトを分割して読み取るための作業メモリ。小さいほど長いプロンプトはより小さく遅いステップで読み取られます。プロンプトキャッシュと合わせて最大で90%の場合: 残りが現在読み取られるプロンプトを保持します。";
 "Works offline" = "オフラインで動作";
+"Write here" = "ここに入力";
 "Writing the song…" = "楽曲を作成中…";
 "Yesterday" = "昨日";
 "You" = "あなた";
@@ -1157,6 +1184,7 @@
 "Your files" = "あなたのファイル";
 "Your mail app couldn't take the attachment: the report is shown in Finder, attach it to the email." = "メールアプリが添付ファイルを受け取れませんでした。レポートは Finder に表示されていますので、メールに添付してください。";
 "Your name (optional)" = "お名前（任意）";
+"Your site or profile (optional, https://…)" = "サイトまたはプロフィール（任意、https://…）";
 "Z-Image Turbo — GPTQ 4-bit" = "Z-Image-Turbo — GPTQ 4-bit";
 "Z-Image Turbo — GPTQ 8-bit" = "Z-Image-Turbo — GPTQ 8-bit";
 "Z-Image Turbo — GPTQ mixed (recommended)" = "Z-Image-Turbo — GPTQ mixed（推奨）";
@@ -1164,10 +1192,12 @@
 "and %lld more" = "ほか %lld 件";
 "at least %1$@ items, %2$@" = "少なくとも %1$@ 個、%2$@";
 "at least %@" = "少なくとも %@";
+"building %@" = "ビルド中: %@";
 "calls tools" = "ツールを呼び出す";
 "can look" = "参照できます";
 "can look and propose changes" = "参照および変更を提案できます";
 "cancelled" = "キャンセル済み";
+"checking %@" = "確認中: %@";
 "copy" = "コピー";
 "copying" = "コピー中";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld、prefill-step-size %lld";
@@ -1175,14 +1205,23 @@
 "done" = "完了";
 "downloaded" = "ダウンロード済み";
 "downloading" = "ダウンロード中";
+"downloading %@" = "ダウンロード中: %@";
+"downloading %@ (%@)" = "ダウンロード中: %@（%@）";
+"downloading (%@)" = "ダウンロード中（%@）";
 "embedding" = "埋め込み中";
+"enable in Settings" = "設定で有効にする";
+"enable in Settings to add the LLMTray guide" = "「設定」で有効にして LLMTray ガイドを追加する";
 "failed" = "失敗";
 "failed to build request" = "リクエストの作成に失敗しました";
 "failed: %@" = "失敗：%@";
+"finishing" = "完了処理中";
+"first token %.1f s" = "最初のトークン %.1f 秒";
 "for this chat" = "このチャット用";
+"generation %.1f tok/s" = "生成 %.1f tok/s";
 "hears audio" = "音声を検出します";
 "in LLMTray's own folder" = "LLMTray のフォルダ内";
 "in an earlier models folder" = "以前のモデルフォルダ内";
+"installing %d packages" = "%d 個のパッケージをインストール中";
 "it isn't a model folder in the models folder" = "models フォルダ内のモデルフォルダではありません";
 "it's being downloaded" = "ダウンロード中です";
 "it's in use or downloading" = "使用中またはダウンロード中です";
@@ -1202,6 +1241,7 @@
 "not supported" = "未対応";
 "not used by any model" = "どのモデルにも使用されていません";
 "off" = "オフ";
+"prompt %.0f tok/s" = "プロンプト %.0f tok/s";
 "queued" = "キュー待ち";
 "reading" = "読み取り中";
 "reads images" = "画像を読み取る";
@@ -1236,16 +1276,3 @@
 "“%@” (%@) goes to the Trash, where you can still restore it. Its alias and profile choice are forgotten." = "「%@」（%@）はゴミ箱に移動されます。そこから復元できますが、エイリアスとプロファイルの選択は失われます。";
 "“%@” and its index are deleted from the project. The file you added it from isn't touched." = "「%@」とそのインデックスはプロジェクトから削除されます。元の追加元ファイルは変更されません。";
 "“%@” wasn't removed: the server is busy or using it. Try again when it's idle." = "「%@」は削除されませんでした：サーバーがビジー状態か使用中です。アイドル時に再試行してください。";
-"%.0f%% from drafts" = "ドラフト由来 %.0f%%";
-"%lld requests" = "%lld 件のリクエスト";
-"Every request the server answers, the chat's and other apps' and agents' through the API, kept on this Mac. Medians per model and settings." = "サーバーが応答したすべてのリクエスト（チャット、API 経由の他のアプリやエージェント）をこの Mac に記録します。モデルと設定ごとの中央値。";
-"In real use" = "実際の使用";
-"No requests yet." = "まだリクエストはありません。";
-"first token %.1f s" = "最初のトークン %.1f 秒";
-"generation %.1f tok/s" = "生成 %.1f tok/s";
-"prompt %.0f tok/s" = "プロンプト %.0f tok/s";
-
-/* The model disclaimer (welcome page, About, under the chat field) */
-"A model is a tool, not an authority" = "モデルはツールであり、権威ではありません";
-"It can be wrong and make things up: check anything that matters. It is not a doctor, lawyer, psychologist or friend. You use its answers at your own risk." = "間違えたり、事実でないことを作り出したりすることがあります。重要なことは必ず確認してください。医師、弁護士、心理士、友人の代わりにはなりません。回答の利用はご自身の責任で行ってください。";
-"Models can make mistakes. Check important information." = "モデルは間違えることがあります。重要な情報は確認してください。";
