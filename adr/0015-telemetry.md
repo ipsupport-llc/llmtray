@@ -17,7 +17,11 @@ country of a report); the app follows them.
     Show Reports…; unticking it there, or in Settings, turns it off.
     Skipping or closing the wizard leaves it on.
   - An install from before this that never chose is written **off** at
-    its first launch of this version: an update never turns it on.
+    its first launch of this version: an update never turns it on by
+    itself. When the setup wizard opens by itself on such an install (no
+    model was ever selected), it offers the box ticked as on a first run,
+    and Finish turns it on: a choice the user sees and can clear (the
+    user's call, 2026-10-10).
     `TelemetryDefault.settle` decides once, at launch: no data folder
     means a first run.
   - The first report still goes only after the first local day ends, so
@@ -34,9 +38,14 @@ country of a report); the app follows them.
   ID makes another (and cancels a send in flight under the old one).
 - **One report per day, covering one local day.** Counters are kept per
   local day (`Application Support/LLMTray/telemetry.json`), at most 7
-  days back. At launch (a minute in) and every 3 hours while running, the
-  finished days are sent oldest first; today's only after it ends. Older
-  days, and days after today (a clock set back), are dropped unsent. "7
+  days back. At launch (10 seconds in, so a quick look at the app still
+  sends) and every 3 hours while running, the finished days are sent
+  oldest first; today's only after it ends. Nothing is sent while the app
+  isn't running: the days wait for its next launch. Older days, and days
+  more than one after today (a clock set back), are dropped unsent;
+  tomorrow is kept (a Mac moved west of where it counted sends it once
+  it's over there). A Retry-After is taken up to two days; a stored wait
+  longer than that was set by a clock that was ahead, and is dropped. "7
   days back" is also counted from the UTC day, as the server does: a Mac
   behind UTC would otherwise send a day it refuses. Days are Gregorian
   (`yyyy-MM-dd`) whatever calendar the user picked. A day the app ran on

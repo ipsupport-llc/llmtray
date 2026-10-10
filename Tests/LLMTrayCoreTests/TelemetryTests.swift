@@ -163,11 +163,12 @@ final class TelemetryCountersTests: XCTestCase {
 
     func testRolloverKeepsSevenDaysBack() {
         var c = TelemetryCounters()
-        for day in ["2026-09-18", "2026-09-19", "2026-09-20", "2026-09-26", "2026-09-27", "2026-09-28"] { c.touch(day) }
+        for day in ["2026-09-18", "2026-09-19", "2026-09-20", "2026-09-26", "2026-09-27", "2026-09-28", "2026-09-29"] { c.touch(day) }
         c.days["garbage"] = TelemetryUsage()
         c.prune(today: "2026-09-27", calendar: utc)
-        // 8 and 9 days back dropped, 7 back kept; tomorrow (a clock set back) dropped.
-        XCTAssertEqual(c.days.keys.sorted(), ["2026-09-20", "2026-09-26", "2026-09-27"])
+        // 8 and 9 days back dropped, 7 back kept; tomorrow kept (a Mac moved
+        // west), the day after (a clock set back) dropped.
+        XCTAssertEqual(c.days.keys.sorted(), ["2026-09-20", "2026-09-26", "2026-09-27", "2026-09-28"])
         // Today's isn't sent until the day is over.
         XCTAssertEqual(c.pending(today: "2026-09-27"), ["2026-09-20", "2026-09-26"])
     }
@@ -354,6 +355,27 @@ extension TelemetryUploaderTests {
         Stub.statuses = [0]
         await uploader.run(store: store, now: { self.now.addingTimeInterval(4000) }, installID: { installID }, environment: { env })
         XCTAssertEqual(store.counters.pending(today: "2026-09-27"), ["2026-09-26"])
+    }
+
+    func testAWaitFromAClockAheadIsIgnored() async {
+        Stub.statuses = [204]
+        let store = store(["2026-09-26"])
+        // Written while the clock was a month ahead, then corrected.
+        store.update { $0.notBefore = self.now.addingTimeInterval(30 * 86400) }
+        await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
+        XCTAssertEqual(Stub.requests.count, 1)
+        XCTAssertTrue(store.counters.pending(today: "2026-09-27").isEmpty)
+        XCTAssertNil(store.counters.notBefore)
+        // Nothing to send: the bogus wait still goes.
+        store.update { $0.notBefore = self.now.addingTimeInterval(30 * 86400) }
+        await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
+        XCTAssertNil(store.counters.notBefore)
+    }
+
+    func testALongRetryAfterIsCutToTheLongestWait() {
+        XCTAssertEqual(TelemetryOutcome.classify(status: 429, body: nil, retryAfter: "300000"),
+                       .retryLater(seconds: Int(TelemetryCounters.maxWait)))
+        XCTAssertEqual(TelemetryOutcome.classify(status: 429, body: nil, retryAfter: "3600"), .retryLater(seconds: 3600))
     }
 
     func testTurnedOffSendsNothing() async {

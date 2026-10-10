@@ -15,8 +15,9 @@ final class UsageTelemetry: ObservableObject {
 
     /// How often, while running, finished days are looked for.
     static let interval: TimeInterval = 3 * 3600
-    /// After launch: not in the way of the app starting.
-    static let launchDelay: TimeInterval = 60
+    /// After launch: not in the way of the app starting, and short enough
+    /// that a quick look at the app still sends the finished days.
+    static let launchDelay: TimeInterval = 10
 
     @Published private(set) var isEnabled: Bool
     @Published private(set) var installID: UUID?
@@ -173,7 +174,7 @@ final class UsageTelemetry: ObservableObject {
         // Target/selector, not a closure (adr/0008: CI's toolchain).
         let first = Timer(fireAt: Date().addingTimeInterval(Self.launchDelay), interval: Self.interval, target: self,
                           selector: #selector(tick), userInfo: nil, repeats: true)
-        first.tolerance = 60
+        first.tolerance = 5   // the first send stays about launchDelay in
         RunLoop.main.add(first, forMode: .common)
         timer = first
     }
