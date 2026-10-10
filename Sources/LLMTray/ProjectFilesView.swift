@@ -61,6 +61,12 @@ enum ProjectFilesWindow {
     /// with the reason (a file without an extension -- a Makefile -- is
     /// text, so the panel can't filter by type).
     static func pickFiles(for projectID: UUID) {
+        guard let urls = chooseFiles() else { return }
+        Task { await ProjectIndexer.shared.addFiles(urls, to: projectID) }
+    }
+
+    /// The panel itself; nil when cancelled.
+    static func chooseFiles() -> [URL]? {
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
@@ -68,9 +74,8 @@ enum ProjectFilesWindow {
         panel.prompt = NSLocalizedString("Add", comment: "the Add Files panel's button")
         panel.message = NSLocalizedString("Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed.", comment: "the Add Files panel")
         NSApp.activate(ignoringOtherApps: true)
-        guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
-        let urls = panel.urls
-        Task { await ProjectIndexer.shared.addFiles(urls, to: projectID) }
+        guard panel.runModal() == .OK, !panel.urls.isEmpty else { return nil }
+        return panel.urls
     }
 }
 

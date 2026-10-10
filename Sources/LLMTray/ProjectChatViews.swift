@@ -1,11 +1,14 @@
+import AppKit
 import LLMTrayCore
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// The status line above a project chat (adr/0012): "Name · N files ·
 /// ● Indexed · RAG on", always there in a project's chat -- what its files
 /// are doing was only in the Files window before. Indexing shows the ring
-/// and its progress, a failure why on hover; clicking opens the files (or,
-/// with Project files off, Settings).
+/// and its progress, a failure why on hover. A pill with a chevron, read
+/// as plain text before: clicking lists the files with Add Files… (or,
+/// with Project files off, turns them on).
 struct ProjectChatFilesRow: View {
     let sessionID: UUID
     @ObservedObject private var store = ChatLibraryStore.shared
@@ -28,24 +31,33 @@ struct ProjectChatStatusLine: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Button {
-                if indexer.isEnabled { ProjectFilesWindow.show(project) } else { openFilesSettings() }
-            } label: {
-                HStack(spacing: 6) {
-                    ProjectRingIcon(ring: indexer.ring(for: project))
-                    Text(name).lineLimit(1).truncationMode(.tail)
-                    // The name truncates first, not the status.
-                    status(project).lineLimit(1).layoutPriority(1)
-                    Spacer(minLength: 0)
+            HStack(spacing: 0) {
+                Button {
+                    if indexer.isEnabled { ProjectFilesMenu.show(for: project) } else { turnOnProjectFiles() }
+                } label: {
+                    HStack(spacing: 6) {
+                        ProjectRingIcon(ring: indexer.ring(for: project))
+                        Text(name).lineLimit(1).truncationMode(.tail)
+                        // The name truncates first, not the status.
+                        status(project).lineLimit(1).layoutPriority(1)
+                        if indexer.isEnabled {
+                            Image(systemName: "chevron.down").font(.caption2.weight(.semibold)).layoutPriority(1)
+                        }
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(Color.accentColor.opacity(0.08)))
+                    .overlay(Capsule().strokeBorder(Color.accentColor.opacity(0.25)))
+                    .contentShape(Capsule())
                 }
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .help(help(project))
+                Spacer(minLength: 0)
             }
-            .buttonStyle(.plain)
-            .help(help(project))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 5)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
             // A drop on the chat says here what it didn't take.
             if indexer.isEnabled, let note = indexer.addNotes[project] {
                 HStack(alignment: .top, spacing: 6) {
@@ -71,10 +83,10 @@ struct ProjectChatStatusLine: View {
                 dot
                 Text("Project files are off")
                 dot
-                // What a click on the line does: Settings › Files.
+                // What a click on the line does: turns them on.
                 Text(GettingStarted.isProject(project)
-                     ? NSLocalizedString("enable in Settings to add the LLMTray guide", comment: "a project chat's status line: Getting Started's guide waits for Project files")
-                     : NSLocalizedString("enable in Settings", comment: "a project chat's status line: Project files are off"))
+                     ? NSLocalizedString("enable them to add the LLMTray guide", comment: "a project chat's status line: Getting Started's guide waits for Project files; a click turns them on")
+                     : NSLocalizedString("click to enable", comment: "a project chat's status line: Project files are off; a click turns them on"))
                     .foregroundColor(.accentColor)
             }
         } else {
@@ -135,7 +147,7 @@ struct ProjectChatStatusLine: View {
     /// Why it failed (the first few files), what it's doing, or what a click does.
     private func help(_ project: UUID) -> String {
         guard indexer.isEnabled else {
-            return NSLocalizedString("Enable Project files in Settings to add files to the project and let its chats search them.", comment: "")
+            return NSLocalizedString("Click to enable Project files: add files to the project and let its chats search them.", comment: "")
         }
         let failures = ProjectChatStatus.failureLines(indexer.documents[project] ?? [])
         var lines = [indexer.statusText(for: project)].compactMap { $0 }
@@ -143,7 +155,7 @@ struct ProjectChatStatusLine: View {
         if lines.isEmpty, ProjectFileTotals(indexer.documents[project] ?? []).searchable > 0, !indexer.isEmbedderReady {
             lines.append(NSLocalizedString("No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning.", comment: ""))
         }
-        lines.append(NSLocalizedString("Show the project's files", comment: ""))
+        lines.append(NSLocalizedString("The project's files, and Add Files…", comment: "a project chat's status line: what a click shows"))
         return lines.joined(separator: "\n")
     }
 }
@@ -160,8 +172,9 @@ private struct DotLabelStyle: LabelStyle {
 
 /// An empty project chat's invitation to add files (adr/0012): dropped
 /// here, or picked with Choose Files…, they go into the project -- as in
-/// its Files window. With Project files off, the way to Settings instead
-/// (nothing is turned on or downloaded from here).
+/// its Files window. With Project files off, the button turns them on
+/// (asking first whether to download the embedding model, as Settings
+/// does).
 struct ProjectChatDropZone: View {
     let sessionID: UUID
     let dropTargeted: Bool
@@ -179,7 +192,7 @@ struct ProjectChatDropZone: View {
                     Text("Project files are off").font(.callout)
                     Text("Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.")
                         .font(.caption).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                    Button("Settings…") { openFilesSettings() }.controlSize(.small)
+                    Button("Enable Project Files…") { turnOnProjectFiles() }.controlSize(.small)
                 }
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity)
@@ -215,5 +228,206 @@ struct ProjectDropZoneCard: View {
             .foregroundColor(targeted ? .accentColor : .secondary.opacity(0.5)))
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Drop files here to add them to the project")
+    }
+}
+
+/// The status line's menu: the project's files (a click shows them in the
+/// Files window, where they're pinned and removed), Add Files… and Show
+/// All Files…. An AppKit menu at the pointer, as the ring's: a SwiftUI
+/// Menu's label can't draw the ring.
+@MainActor
+enum ProjectFilesMenu {
+    /// Files listed by name; the rest are one "N more…" line.
+    static let listed = 12
+
+    static func show(for project: UUID) {
+        let indexer = ProjectIndexer.shared
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        if let text = indexer.statusText(for: project) {
+            let info = NSMenuItem(title: text, action: nil, keyEquivalent: "")
+            info.isEnabled = false
+            menu.addItem(info)
+            menu.addItem(.separator())
+        }
+        let docs = (indexer.documents[project] ?? []).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        let pinned = Set(indexer.pins[project] ?? [])
+        for doc in docs.prefix(listed) {
+            let item = ClosureMenuItem(doc.name) { ProjectFilesWindow.show(project) }
+            item.image = NSImage(systemSymbolName: pinned.contains(doc.doc) ? "pin.fill" : "doc", accessibilityDescription: nil)
+            menu.addItem(item)
+        }
+        if docs.count > listed {
+            menu.addItem(ClosureMenuItem(String(format: NSLocalizedString("%lld more…", comment: "a project's files menu: the files not listed"),
+                                                Int64(docs.count - listed))) { ProjectFilesWindow.show(project) })
+        }
+        if !docs.isEmpty { menu.addItem(.separator()) }
+        menu.addItem(ClosureMenuItem(NSLocalizedString("Add Files…", comment: "a project's files menu")) { ProjectFilesWindow.pickFiles(for: project) })
+        menu.addItem(ClosureMenuItem(NSLocalizedString("Show All Files…", comment: "a project's files menu")) { ProjectFilesWindow.show(project) })
+        menu.popUp(positioning: nil, at: NSEvent.mouseLocation, in: nil)
+    }
+}
+
+/// A menu item that runs a closure.
+final class ClosureMenuItem: NSMenuItem {
+    private let run: () -> Void
+
+    init(_ title: String, _ run: @escaping () -> Void) {
+        self.run = run
+        super.init(title: title, action: #selector(fire), keyEquivalent: "")
+        target = self
+    }
+
+    @available(*, unavailable)
+    required init(coder: NSCoder) { fatalError() }
+
+    @objc private func fire() { run() }
+}
+
+/// Files dropped on, or added from, a chat that isn't in a project: files
+/// live in projects, so this asks which one -- a new one named after the
+/// chat, or one there is -- and moves the chat into it with them (they
+/// were dropped and silently ignored before). Project files off: turned
+/// on first, asking about the embedding model as Settings does.
+@MainActor
+enum ProjectFileOffer {
+    static func offer(_ urls: [URL], chat: UUID?) {
+        guard !urls.isEmpty else { return }
+        let alert = NSAlert()
+        guard let chat else {
+            alert.messageText = NSLocalizedString("A temporary chat can't hold files", comment: "")
+            alert.informativeText = NSLocalizedString("Files go into a project, and a temporary chat is never in one. Start a new chat to add them.", comment: "")
+            alert.runModal()
+            return
+        }
+        let store = ChatLibraryStore.shared
+        let shown = urls.prefix(5).map(\.lastPathComponent).joined(separator: ", ") + (urls.count > 5 ? "…" : "")
+        alert.messageText = NSLocalizedString("Add the files to a project?", comment: "a file dropped on a chat that isn't in a project")
+        var info = String(format: NSLocalizedString("Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@",
+                                                    comment: "a file dropped on a chat that isn't in a project: the file names"), shown)
+        if !ProjectIndexer.shared.isEnabled {
+            info += "\n\n" + NSLocalizedString("Project files will be turned on first.", comment: "")
+        }
+        alert.informativeText = info
+        let newName = projectName(for: chat, urls: urls)
+        let popup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 300, height: 26), pullsDown: false)
+        // Items added to the menu, not by title: same-named projects would
+        // replace each other.
+        popup.menu?.addItem(NSMenuItem(title: String(format: NSLocalizedString("New project \u{201C}%@\u{201D}", comment: "where dropped files go: a new project, its name"), newName),
+                                       action: nil, keyEquivalent: ""))
+        let projects = store.library.projects
+        if !projects.isEmpty { popup.menu?.addItem(.separator()) }
+        for project in projects {
+            let item = NSMenuItem(title: project.name, action: nil, keyEquivalent: "")
+            item.representedObject = project.id
+            popup.menu?.addItem(item)
+        }
+        popup.selectItem(at: 0)
+        alert.accessoryView = popup
+        alert.addButton(withTitle: NSLocalizedString("Add", comment: "add dropped files to the chosen project"))
+        alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        let chosen = popup.selectedItem?.representedObject as? UUID
+        Task { @MainActor in
+            guard await enableProjectFiles() else { return }
+            let target: UUID
+            if let chosen, store.library.project(chosen) != nil {
+                target = chosen
+            } else if let made = store.addProject(named: uniqueName(newName, taken: Set(store.library.projects.map(\.name)))) {
+                target = made.id
+            } else {
+                return
+            }
+            // Unpinned too, as a chat dragged onto a project: a pinned chat
+            // shows under Pinned only.
+            store.move(chat, to: target)
+            store.setPinned(chat, false)
+            await ProjectIndexer.shared.addFiles(urls, to: target)
+        }
+    }
+
+    /// The chat's title; an unsaved chat has none: the first file's name.
+    static func projectName(for chat: UUID, urls: [URL]) -> String {
+        if let title = ChatLibraryStore.shared.chats.first(where: { $0.id == chat })?.title
+            .trimmingCharacters(in: .whitespacesAndNewlines), !title.isEmpty {
+            return title
+        }
+        return urls.first?.deletingPathExtension().lastPathComponent ?? NSLocalizedString("New project", comment: "")
+    }
+
+    /// "Name", or "Name 2", "Name 3"… when taken.
+    static func uniqueName(_ base: String, taken: Set<String>) -> String {
+        guard taken.contains(base) else { return base }
+        return (2...).lazy.map { "\(base) \($0)" }.first { !taken.contains($0) }!
+    }
+}
+
+/// Turns Project files on when they're off (asking first whether to
+/// download the embedding model, as the Settings switch does); a failed
+/// download -- the feature is on by then, searching by words -- is shown.
+/// Whether they're on now.
+@MainActor
+func enableProjectFiles() async -> Bool {
+    let indexer = ProjectIndexer.shared
+    if indexer.isEnabled { return true }
+    if let failure = await ProjectFilesSection.turnOn() {
+        let alert = NSAlert()
+        alert.messageText = NSLocalizedString("The embedding model couldn't be downloaded", comment: "")
+        alert.informativeText = failure
+        alert.runModal()
+    }
+    return indexer.isEnabled
+}
+
+/// The same, from a button.
+@MainActor
+func turnOnProjectFiles() {
+    Task { _ = await enableProjectFiles() }
+}
+
+/// What a drag over the chat would do, over the whole chat while it's
+/// there: only the empty project chat's drop zone said it before.
+struct ChatDropOverlay: View {
+    let title: String
+    let detail: String
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "tray.and.arrow.down").font(.system(size: 30))
+            Text(title).font(.title3.weight(.semibold)).multilineTextAlignment(.center)
+            Text(detail).font(.callout).foregroundColor(.secondary).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundColor(.accentColor)
+        .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(RoundedRectangle(cornerRadius: 12).fill(.regularMaterial))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 2, dash: [7, 5])))
+        .padding(8)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// The chat's drop target: as `onDrop(of:isTargeted:)`, and whether the
+/// drag carries files (an image dragged from a browser carries none), for
+/// the overlay's words.
+struct ChatAreaDrop: DropDelegate {
+    @Binding var targeted: Bool
+    @Binding var carriesFiles: Bool
+    let perform: ([NSItemProvider]) -> Bool
+
+    func validateDrop(info: DropInfo) -> Bool { info.hasItemsConforming(to: [.fileURL, .image]) }
+
+    func dropEntered(info: DropInfo) {
+        carriesFiles = info.hasItemsConforming(to: [.fileURL])
+        targeted = true
+    }
+
+    func dropExited(info: DropInfo) { targeted = false }
+
+    func performDrop(info: DropInfo) -> Bool {
+        targeted = false
+        return perform(info.itemProviders(for: [.fileURL, .image]))
     }
 }

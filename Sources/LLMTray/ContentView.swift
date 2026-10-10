@@ -47,6 +47,8 @@ struct ContentView: View {
     @State private var followChatBottom = true
     /// Files dragged over the chat: an empty project chat's drop zone lights up.
     @State private var chatDropTargeted = false
+    /// The drag over the chat carries files (not only an image's data).
+    @State private var chatDropCarriesFiles = false
     /// Following the end before a Tweak draft paused it: restored after.
     @State private var followBeforeDraft: Bool?
     @State private var didScrollOnAppear = false
@@ -222,14 +224,21 @@ struct ContentView: View {
     private var conversation: some View {
         VStack(spacing: 0) {
             chatArea
-                .onDrop(of: [.fileURL, .image], isTargeted: $chatDropTargeted) { handleChatDrop($0) }
+                .overlay {
+                    if chatDropTargeted, let text = chatDropText {
+                        ChatDropOverlay(title: text.title, detail: text.detail)
+                    }
+                }
+                .onDrop(of: [.fileURL, .image], delegate: ChatAreaDrop(
+                    targeted: $chatDropTargeted, carriesFiles: $chatDropCarriesFiles, perform: handleChatDrop))
             Divider()
             ChatComposer(
                 composer: composer, canChat: canChat, canRegenerate: canRegenerate, canCompact: canCompact,
                 isFocused: $isInputFocused,
-                send: send, regenerate: regenerate, compact: { Task { await presentation.compact(chat) } }
+                send: send, regenerate: regenerate, compact: { Task { await presentation.compact(chat) } },
+                dropFiles: handleChatDrop
             )
-            .onDrop(of: [.fileURL, .image], isTargeted: nil) { composer.handleDrop($0) }
+            .onDrop(of: [.fileURL, .image], isTargeted: nil) { handleChatDrop($0) }
         }
     }
 
@@ -638,26 +647,73 @@ struct ContentView: View {
         isInputFocused = true
     }
 
+    /// What a drag over the chat would do, for the overlay; nil: nothing
+    /// to say (an image for a model that can't see it says so on drop).
+    private var chatDropText: (title: String, detail: String)? {
+        let id = chat.currentSessionID
+        let project = id.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
+        let attachImages = (NSLocalizedString("Drop to attach images", comment: "a drag over the chat"),
+                            NSLocalizedString("The model sees them with your next message.", comment: "a drag over the chat"))
+        guard chatDropCarriesFiles else { return composer.acceptsImages ? attachImages : nil }
+        if let project {
+            let detail = !ProjectIndexer.shared.isEnabled
+                ? NSLocalizedString("Project files will be turned on first.", comment: "")
+                : composer.acceptsImages
+                ? NSLocalizedString("Documents are copied into the project and indexed on this Mac; images go into your message.", comment: "a drag over a project chat")
+                : NSLocalizedString("Files are copied into the project and indexed on this Mac.", comment: "a drag over a project chat")
+            return (String(format: NSLocalizedString("Drop to add to \u{201C}%@\u{201D}", comment: "a drag over a project chat: the project's name"), project.name), detail)
+        }
+        guard id != nil else { return composer.acceptsImages ? attachImages : nil }
+        return (NSLocalizedString("Drop to add files", comment: "a drag over a chat outside a project"),
+                composer.acceptsImages
+                    ? NSLocalizedString("Documents go into a project with this chat; images go into your message.", comment: "a drag over a chat outside a project")
+                    : NSLocalizedString("Documents go into a project with this chat.", comment: "a drag over a chat outside a project"))
+    }
+
     /// Files dropped on a project's chat go into the project (adr/0012),
     /// as on its Files window -- but images still go to a vision model's
-    /// message, as they always have. Elsewhere, the composer's images only.
+    /// message, as they always have. Project files off: turned on first.
+    /// A chat outside a project asks which project they go into (with the
+    /// chat); they were silently ignored before.
     private func handleChatDrop(_ providers: [NSItemProvider]) -> Bool {
-        guard ProjectIndexer.shared.isEnabled, let id = chat.currentSessionID,
-              let project = ChatLibraryStore.shared.library.projectContext(forChat: id)?.id,
-              ProjectFileDropLoader.carriesFiles(providers) else { return composer.handleDrop(providers) }
+        guard ProjectFileDropLoader.carriesFiles(providers) else { return composer.handleDrop(providers) }
         // Image data without a file (dragged from a browser): the composer's.
         let others = providers.filter { !$0.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) }
         if !others.isEmpty { _ = composer.handleDrop(others) }
+        let id = chat.currentSessionID
+        let project = id.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id }
         let acceptsImages = composer.acceptsImages
         ProjectFileDropLoader.load(providers) { urls in
-            let isImage = { (url: URL) in acceptsImages && (UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false) }
-            // An image NSImage can't open goes to the project, which says
-            // what it made of it.
+            let isImage = { (url: URL) in UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false }
             var files: [URL] = []
+            var unseen = false
             for url in urls {
-                if isImage(url), let image = NSImage(contentsOf: url) { composer.attach(image) } else { files.append(url) }
+                if isImage(url) {
+                    if acceptsImages, let image = NSImage(contentsOf: url) {
+                        composer.attach(image)
+                        continue
+                    }
+                    // Outside a project an image is the message's only.
+                    if project == nil {
+                        if !acceptsImages { unseen = true }
+                        continue
+                    }
+                }
+                // In a project, an image the model can't see (or NSImage
+                // can't open) goes in as a file, which says what it made
+                // of it.
+                files.append(url)
             }
-            if !files.isEmpty { Task { await ProjectIndexer.shared.addFiles(files, to: project) } }
+            if unseen { composer.modelCantSeeImages() }
+            guard !files.isEmpty else { return }
+            if let project {
+                Task {
+                    guard await enableProjectFiles() else { return }
+                    await ProjectIndexer.shared.addFiles(files, to: project)
+                }
+            } else {
+                ProjectFileOffer.offer(files, chat: id)
+            }
         }
         return true
     }

@@ -49,6 +49,7 @@
 "%lld interrupted: look at them in Finder" = "%lld interrupted: look at them in Finder";
 "%lld items put back under their names." = "%lld items put back under their names.";
 "%lld more" = "%lld more";
+"%lld more…" = "%lld more…";
 "%lld need a look: see the list." = "%lld need a look: see the list.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld new since you opened the list: unticked until you tick them.";
 "%lld of 5 stars" = "%lld of 5 stars";
@@ -78,6 +79,7 @@
 "A song from a description" = "A song from a description";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "A symbolic link: the link itself, not what it points to.";
+"A temporary chat can't hold files" = "A temporary chat can't hold files";
 "AAC %lld kbit/s" = "AAC %lld kbit/s";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — clear vocals, 8-bit (recommended)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
@@ -85,9 +87,13 @@
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
 "About LLMTray" = "About LLMTray";
 "Add" = "Add";
+"Add Files to “%@”…" = "Add Files to “%@”…";
 "Add Files…" = "Add Files…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
+"Add files or images" = "Add files or images";
+"Add files to the project, or images for the model to see" = "Add files to the project, or images for the model to see";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
+"Add the files to a project?" = "Add the files to a project?";
 "Added %@" = "Added %@";
 "Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
@@ -141,7 +147,7 @@
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
-"Attach image(s) for the model to see" = "Attach image(s) for the model to see";
+"Attach Images…" = "Attach Images…";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
 "Audio quality" = "Audio quality";
 "Auto-compact" = "Auto-compact";
@@ -221,6 +227,7 @@
 "Clear" = "Clear";
 "Clear search" = "Clear search";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Clear the queue: what's indexed stays searchable, the rest is marked not indexed";
+"Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -281,6 +288,9 @@
 "Diagnostics" = "Diagnostics";
 "Disk usage" = "Disk usage";
 "Dismiss" = "Dismiss";
+"Documents are copied into the project and indexed on this Mac; images go into your message." = "Documents are copied into the project and indexed on this Mac; images go into your message.";
+"Documents go into a project with this chat." = "Documents go into a project with this chat.";
+"Documents go into a project with this chat; images go into your message." = "Documents go into a project with this chat; images go into your message.";
 "Doesn't open at login" = "Doesn't open at login";
 "Don't Ask Again" = "Don't Ask Again";
 "Don't show again" = "Don't show again";
@@ -311,6 +321,9 @@
 "Drop chats or files here to add them to the project" = "Drop chats or files here to add them to the project";
 "Drop files here" = "Drop files here";
 "Drop files here to add them to the project" = "Drop files here to add them to the project";
+"Drop to add files" = "Drop to add files";
+"Drop to add to “%@”" = "Drop to add to “%@”";
+"Drop to attach images" = "Drop to attach images";
 "Duplicate this profile" = "Duplicate this profile";
 "Echo cancellation" = "Echo cancellation";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
@@ -319,10 +332,10 @@
 "Edit Profile…" = "Edit Profile…";
 "Embedding model" = "Embedding model";
 "Enable Project Files…" = "Enable Project Files…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Enable Project files in Settings to add files to the project and let its chats search them.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.";
 "Enable Project files to add files" = "Enable Project files to add files";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then.";
+"Enable Project files to add files to the project" = "Enable Project files to add files to the project";
 "Enable Without It" = "Enable Without It";
 "Enable image editing?" = "Enable image editing?";
 "Enable image generation" = "Enable image generation";
@@ -354,8 +367,12 @@
 "Files Settings…" = "Files Settings…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
+"Files are copied into the project and indexed on this Mac." = "Files are copied into the project and indexed on this Mac.";
+"Files go into a project, and a temporary chat is never in one. Start a new chat to add them." = "Files go into a project, and a temporary chat is never in one. Start a new chat to add them.";
 "Files in %@" = "Files in %@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Files you add to a project are indexed on this Mac, so its chats can search them.";
+"Files · off" = "Files · off";
 "Files…" = "Files…";
 "Finish" = "Finish";
 "Finish applies what you chose. You can change all of it later in Settings." = "Finish applies what you chose. You can change all of it later in Settings.";
@@ -595,6 +612,7 @@
 "New profile" = "New profile";
 "New profile (inherits everything from Default)" = "New profile (inherits everything from Default)";
 "New project" = "New project";
+"New project “%@”" = "New project “%@”";
 "New temporary chat" = "New temporary chat";
 "New temporary chat (⌘⇧N) -- nothing about it is ever saved" = "New temporary chat (⌘⇧N) -- nothing about it is ever saved";
 "News" = "News";
@@ -712,6 +730,7 @@
 "Project files are turned off in Settings." = "Project files are turned off in Settings.";
 "Project files off" = "Project files off";
 "Project files on" = "Project files on";
+"Project files will be turned on first." = "Project files will be turned on first.";
 "Project name" = "Project name";
 "Projects" = "Projects";
 "Projects' files on disk" = "Projects' files on disk";
@@ -840,6 +859,7 @@
 "Shape" = "Shape";
 "Share anonymous usage statistics" = "Share anonymous usage statistics";
 "Share…" = "Share…";
+"Show All Files…" = "Show All Files…";
 "Show Chat Window" = "Show Chat Window";
 "Show Files" = "Show Files";
 "Show Next Tab" = "Show Next Tab";
@@ -989,6 +1009,7 @@
 "The model reloads when Voice Lab stops" = "The model reloads when Voice Lab stops";
 "The model reloads when the image or song is done" = "The model reloads when the image or song is done";
 "The model runtime isn't installed yet -- start a model once, then try again." = "The model runtime isn't installed yet -- start a model once, then try again.";
+"The model sees them with your next message." = "The model sees them with your next message.";
 "The model server no longer goes online when it starts." = "The model server no longer goes online when it starts.";
 "The model's license, from its card." = "The model's license, from its card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
@@ -1002,6 +1023,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it.";
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
+"The project's files, and Add Files…" = "The project's files, and Add Files…";
 "The reply was cut at its length limit." = "The reply was cut at its length limit.";
 "The report" = "The report";
 "The reports" = "The reports";
@@ -1196,6 +1218,7 @@
 "can look and propose changes" = "can look and propose changes";
 "cancelled" = "cancelled";
 "checking %@" = "checking %@";
+"click to enable" = "click to enable";
 "copy" = "copy";
 "copying" = "copying";
 "decode-concurrency %lld, prefill-step-size %lld" = "decode-concurrency %lld, prefill-step-size %lld";
@@ -1207,8 +1230,7 @@
 "downloading %@ (%@)" = "downloading %@ (%@)";
 "downloading (%@)" = "downloading (%@)";
 "embedding" = "embedding";
-"enable in Settings" = "enable in Settings";
-"enable in Settings to add the LLMTray guide" = "enable in Settings to add the LLMTray guide";
+"enable them to add the LLMTray guide" = "enable them to add the LLMTray guide";
 "failed" = "failed";
 "failed to build request" = "failed to build request";
 "failed: %@" = "failed: %@";
