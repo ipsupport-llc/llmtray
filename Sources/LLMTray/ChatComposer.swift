@@ -272,7 +272,7 @@ struct ChatComposer: View {
             } else if id != nil {
                 Button("Add Files…") {
                     guard let urls = ProjectFilesWindow.chooseFiles() else { return }
-                    ProjectFileOffer.offer(urls, chat: id)
+                    Task { await ProjectFileOffer.offer(urls, chat: id) }
                 }
             }
             if composer.acceptsImages {
@@ -284,8 +284,10 @@ struct ChatComposer: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .help("Add files to the project, or images for the model to see")
-        .accessibilityLabel(Text("Add files or images"))
+        .help(id == nil ? Text("Attach images for the model to see")
+              : composer.acceptsImages ? Text("Add files to a project, or images for the model to see")
+              : Text("Add files to a project"))
+        .accessibilityLabel(id == nil ? Text("Attach images") : composer.acceptsImages ? Text("Add files or images") : Text("Add files"))
     }
 
     private var turnActions: some View {

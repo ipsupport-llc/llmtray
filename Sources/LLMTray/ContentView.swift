@@ -655,15 +655,23 @@ struct ContentView: View {
         let attachImages = (NSLocalizedString("Drop to attach images", comment: "a drag over the chat"),
                             NSLocalizedString("The model sees them with your next message.", comment: "a drag over the chat"))
         guard chatDropCarriesFiles else { return composer.acceptsImages ? attachImages : nil }
+        // A temporary chat takes images only: say so before the drop.
+        if id == nil {
+            return composer.acceptsImages
+                ? (attachImages.0, NSLocalizedString("Images only: a temporary chat can't hold files.", comment: "a drag over a temporary chat"))
+                : (NSLocalizedString("A temporary chat can't hold files", comment: ""),
+                   NSLocalizedString("Start a new saved chat (⌘N) to add files to a project.", comment: "a drag over a temporary chat"))
+        }
         if let project {
             let detail = !ProjectIndexer.shared.isEnabled
-                ? NSLocalizedString("Project files will be turned on first.", comment: "")
+                ? (composer.acceptsImages
+                    ? NSLocalizedString("Images go into your message; for documents, Project files are turned on first.", comment: "a drag over a project chat, Project files off")
+                    : NSLocalizedString("Project files will be turned on first.", comment: ""))
                 : composer.acceptsImages
                 ? NSLocalizedString("Documents are copied into the project and indexed on this Mac; images go into your message.", comment: "a drag over a project chat")
                 : NSLocalizedString("Files are copied into the project and indexed on this Mac.", comment: "a drag over a project chat")
             return (String(format: NSLocalizedString("Drop to add to \u{201C}%@\u{201D}", comment: "a drag over a project chat: the project's name"), project.name), detail)
         }
-        guard id != nil else { return composer.acceptsImages ? attachImages : nil }
         return (NSLocalizedString("Drop to add files", comment: "a drag over a chat outside a project"),
                 composer.acceptsImages
                     ? NSLocalizedString("Documents go into a project with this chat; images go into your message.", comment: "a drag over a chat outside a project")
@@ -684,7 +692,12 @@ struct ContentView: View {
         let project = id.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id }
         let acceptsImages = composer.acceptsImages
         ProjectFileDropLoader.load(providers) { urls in
-            let isImage = { (url: URL) in UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false }
+            // By its extension; one without (a screenshot saved bare) by
+            // whether it opens as one.
+            let isImage = { (url: URL) in
+                url.pathExtension.isEmpty ? NSImage(contentsOf: url) != nil
+                    : UTType(filenameExtension: url.pathExtension)?.conforms(to: .image) ?? false
+            }
             var files: [URL] = []
             var unseen = false
             for url in urls {
@@ -712,7 +725,7 @@ struct ContentView: View {
                     await ProjectIndexer.shared.addFiles(files, to: project)
                 }
             } else {
-                ProjectFileOffer.offer(files, chat: id)
+                Task { await ProjectFileOffer.offer(files, chat: id) }
             }
         }
         return true

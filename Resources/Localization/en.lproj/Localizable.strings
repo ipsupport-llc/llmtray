@@ -4,6 +4,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" is no longer in the project.";
 "%.0f%% from drafts" = "%.0f%% from drafts";
 "%.1f s" = "%.1f s";
+"%1$@ (%2$lld chats)" = "%1$@ (%2$lld chats)";
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";
@@ -90,8 +91,10 @@
 "Add Files to “%@”…" = "Add Files to “%@”…";
 "Add Files…" = "Add Files…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
+"Add files" = "Add files";
 "Add files or images" = "Add files or images";
-"Add files to the project, or images for the model to see" = "Add files to the project, or images for the model to see";
+"Add files to a project" = "Add files to a project";
+"Add files to a project, or images for the model to see" = "Add files to a project, or images for the model to see";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
 "Add the files to a project?" = "Add the files to a project?";
 "Added %@" = "Added %@";
@@ -148,6 +151,8 @@
 "Assistant" = "Assistant";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
 "Attach Images…" = "Attach Images…";
+"Attach images" = "Attach images";
+"Attach images for the model to see" = "Attach images for the model to see";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
 "Audio quality" = "Audio quality";
 "Auto-compact" = "Auto-compact";
@@ -368,7 +373,7 @@
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Files are copied into the project and indexed on this Mac." = "Files are copied into the project and indexed on this Mac.";
-"Files go into a project, and a temporary chat is never in one. Start a new chat to add them." = "Files go into a project, and a temporary chat is never in one. Start a new chat to add them.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them.";
 "Files in %@" = "Files in %@";
 "Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Files you add to a project are indexed on this Mac, so its chats can search them.";
@@ -463,6 +468,8 @@
 "Image model" = "Image model";
 "Image, music and voice models" = "Image, music and voice models";
 "Images" = "Images";
+"Images go into your message; for documents, Project files are turned on first." = "Images go into your message; for documents, Project files are turned on first.";
+"Images only: a temporary chat can't hold files." = "Images only: a temporary chat can't hold files.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Import from LLMTray (direct download)";
 "Imported" = "Imported";
@@ -898,6 +905,7 @@
 "Start" = "Start";
 "Start LLMTray automatically when you log in to this Mac." = "Start LLMTray automatically when you log in to this Mac.";
 "Start Server" = "Start Server";
+"Start a new saved chat (⌘N) to add files to a project." = "Start a new saved chat (⌘N) to add files to a project.";
 "Start server" = "Start server";
 "Start talking" = "Start talking";
 "Start the server first." = "Start the server first.";
@@ -1053,6 +1061,7 @@
 "The voice runner stopped unexpectedly (%@)." = "The voice runner stopped unexpectedly (%@).";
 "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself." = "Then restart the model server. The limit goes back to the default when the Mac restarts. LLMTray never changes it itself.";
 "There's no plan waiting any more." = "There's no plan waiting any more.";
+"These can't be added to a project" = "These can't be added to a project";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
 "Thinking…" = "Thinking…";
@@ -1068,6 +1077,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added.";
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs.";
 "Thought process" = "Thought process";

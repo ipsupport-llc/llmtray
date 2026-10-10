@@ -291,12 +291,20 @@ final class ClosureMenuItem: NSMenuItem {
 /// on first, asking about the embedding model as Settings does.
 @MainActor
 enum ProjectFileOffer {
-    static func offer(_ urls: [URL], chat: UUID?) {
+    static func offer(_ urls: [URL], chat: UUID?) async {
         guard !urls.isEmpty else { return }
         let alert = NSAlert()
         guard let chat else {
             alert.messageText = NSLocalizedString("A temporary chat can't hold files", comment: "")
-            alert.informativeText = NSLocalizedString("Files go into a project, and a temporary chat is never in one. Start a new chat to add them.", comment: "")
+            alert.informativeText = NSLocalizedString("Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them.", comment: "")
+            alert.runModal()
+            return
+        }
+        // Nothing a project takes (folders, hidden files, formats not
+        // indexed): said here, and no chat moved or project made for it.
+        guard !(await ProjectFileDrop.sort(urls)).accepted.isEmpty else {
+            alert.messageText = NSLocalizedString("These can't be added to a project", comment: "")
+            alert.informativeText = NSLocalizedString("This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added.", comment: "")
             alert.runModal()
             return
         }
@@ -309,7 +317,8 @@ enum ProjectFileOffer {
             info += "\n\n" + NSLocalizedString("Project files will be turned on first.", comment: "")
         }
         alert.informativeText = info
-        let newName = projectName(for: chat, urls: urls)
+        // Numbered here if taken, so the choice names what it makes.
+        let newName = uniqueName(projectName(for: chat, urls: urls), taken: Set(store.library.projects.map(\.name)))
         let popup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 300, height: 26), pullsDown: false)
         // Items added to the menu, not by title: same-named projects would
         // replace each other.
@@ -317,8 +326,14 @@ enum ProjectFileOffer {
                                        action: nil, keyEquivalent: ""))
         let projects = store.library.projects
         if !projects.isEmpty { popup.menu?.addItem(.separator()) }
+        let names = projects.map(\.name)
         for project in projects {
-            let item = NSMenuItem(title: project.name, action: nil, keyEquivalent: "")
+            // Two projects of one name told apart by their chats.
+            let title = names.filter { $0 == project.name }.count > 1
+                ? String(format: NSLocalizedString("%1$@ (%2$lld chats)", comment: "a project in a list: its name, how many chats it has"),
+                         project.name, Int64(store.chats(inProject: project.id).count))
+                : project.name
+            let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             item.representedObject = project.id
             popup.menu?.addItem(item)
         }
@@ -331,7 +346,9 @@ enum ProjectFileOffer {
         Task { @MainActor in
             guard await enableProjectFiles() else { return }
             let target: UUID
-            if let chosen, store.library.project(chosen) != nil {
+            if let chosen {
+                // Deleted while Project files were turned on: nothing.
+                guard store.library.project(chosen) != nil else { return }
                 target = chosen
             } else if let made = store.addProject(named: uniqueName(newName, taken: Set(store.library.projects.map(\.name)))) {
                 target = made.id
