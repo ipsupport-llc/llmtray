@@ -82,7 +82,7 @@
 "A song from a description" = "Пісня за описом";
 "A song with sung lyrics, or an instrumental, from a description (ACE-Step 1.5)." = "Пісня зі словами або інструментальна — за описом (ACE-Step 1.5).";
 "A symbolic link: the link itself, not what it points to." = "Символьне посилання: сам посилальний файл, а не те, на що він вказує.";
-"A temporary chat can't hold files" = "Тимчасова розмова не може зберігати файли";
+"A temporary chat can't hold files" = "Тимчасовий чат не може зберігати файли";
 "AAC %lld kbit/s" = "AAC %lld кбіт/с";
 "ACE-Step sft — clear vocals, 8-bit (recommended)" = "ACE-Step sft — чіткі вокали, 8‑bit (рекомендовано)";
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — чіткі вокали, GPTQ 4‑bit (менше пам’яті)";
@@ -96,7 +96,7 @@
 "Add files" = "Додати файли";
 "Add files or images" = "Додати файли або зображення";
 "Add files to a project" = "Додати файли до проєкту";
-"Add files to a project, or images for the model to see" = "Додати файли до проєкту або зображення для перегляду моделлю";
+"Add files to a project, or images for the model to see" = "Додати файли до проєкту або зображення, щоб модель їх побачила";
 "Add more files: every chat of the project can search them." = "Додайте більше файлів: кожен чат проєкту зможе їх шукати.";
 "Add the files to a project?" = "Додати файли до проєкту?";
 "Add “%1$@” to “%2$@”?" = "Додати «%1$@» до «%2$@»?";
@@ -155,7 +155,7 @@
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не більше одного звіту на день, що охоплює один попередній день, надсилається на ipsupport.us. Незапланований день буде надіслано при наступному запуску, до 7 днів назад. Вимкнення видаляє те, що не було надіслано.";
 "Attach Images…" = "Приєднати зображення…";
 "Attach images" = "Приєднати зображення";
-"Attach images for the model to see" = "Приєднати зображення для перегляду моделлю";
+"Attach images for the model to see" = "Приєднати зображення, щоб модель їх побачила";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention у 8-бітах, feed‑forward у 4-бітах — найкращий баланс розміру й стабільності, перевірено на однорідному 4‑бітному режимі.";
 "Audio quality" = "Якість аудіо";
 "Auto-compact" = "Автостиснення";
@@ -297,8 +297,8 @@
 "Disk usage" = "Використання диска";
 "Dismiss" = "Закрити";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Документи копіюються в проєкт і індексуються на цьому Mac; зображення додаються у ваше повідомлення.";
-"Documents go into a project with this chat." = "Документи додаються в проєкт разом із цією розмовою.";
-"Documents go into a project with this chat; images go into your message." = "Документи додаються в проєкт разом із цією розмовою; зображення — у ваше повідомлення.";
+"Documents go into a project with this chat." = "Документи додаються в проєкт разом із цим чатом.";
+"Documents go into a project with this chat; images go into your message." = "Документи додаються в проєкт разом із цим чатом; зображення — у ваше повідомлення.";
 "Doesn't open at login" = "Не відкривати при вході";
 "Don't Add" = "Не додавати";
 "Don't Ask Again" = "Не питати більше";
@@ -377,9 +377,9 @@
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Файли, додані сюди, копіюються в проєкт і індексуються на цьому Mac; будь-який чат проєкту може їх шукати.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файли, додані до проєкту, індексуються на цьому Mac, щоб чати могли їх шукати. Пошук за значенням використовує модель вбудовування; без неї файли шукаються за словами.";
 "Files are copied into the project and indexed on this Mac." = "Файли копіюються в проєкт і індексуються на цьому Mac.";
-"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Файли зберігаються в проєкті; тимчасова розмова ніколи не належить до проєкту. Почніть нову збережену розмову (⌘N), щоб додати їх.";
+"Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Файли зберігаються в проєкті; тимчасовий чат ніколи не належить до проєкту. Почніть новий збережений чат (⌘N), щоб додати їх.";
 "Files in %@" = "Файли в %@";
-"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Файли зберігаються в проєктах: кожна розмова в проєкті може їх шукати. Ця розмова буде переміщена до проєкту разом із ними.\n\n%@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Файли зберігаються в проєктах: кожен чат проєкту може їх шукати. Цей чат буде переміщено до проєкту разом із ними.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Файли, які ви додаєте до проєкту, індексуються на цьому Mac, тож чати можуть їх шукати.";
 "Files · off" = "Файли · вимк.";
 "Files…" = "Файли…";
@@ -473,7 +473,7 @@
 "Image, music and voice models" = "Моделі зображень, музики та голосу";
 "Images" = "Зображення";
 "Images go into your message; for documents, Project files are turned on first." = "Зображення додаються у ваше повідомлення; для документів спочатку потрібно увімкнути файли проєкту.";
-"Images only: a temporary chat can't hold files." = "Тільки зображення: тимчасова розмова не може зберігати файли.";
+"Images only: a temporary chat can't hold files." = "Тільки зображення: тимчасовий чат не може зберігати файли.";
 "Import" = "Import";
 "Import from LLMTray (direct download)" = "Імпортувати з LLMTray (пряме завантаження)";
 "Imported" = "Imported";
@@ -909,7 +909,7 @@
 "Start" = "Почати";
 "Start LLMTray automatically when you log in to this Mac." = "Запускати LLMTray автоматично під час входу в систему.";
 "Start Server" = "Запустити сервер";
-"Start a new saved chat (⌘N) to add files to a project." = "Почніть нову збережену розмову (⌘N), щоб додати файли до проєкту.";
+"Start a new saved chat (⌘N) to add files to a project." = "Почніть новий збережений чат (⌘N), щоб додати файли до проєкту.";
 "Start server" = "Запустити сервер";
 "Start talking" = "Почніть говорити";
 "Start the server first." = "Спершу запустіть сервер.";

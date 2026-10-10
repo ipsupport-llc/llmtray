@@ -297,8 +297,8 @@
 "Disk usage" = "Utilisation du disque";
 "Dismiss" = "Fermer";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Les documents sont copiés dans le projet et indexés sur ce Mac ; les images sont insérées dans votre message.";
-"Documents go into a project with this chat." = "Les documents sont ajoutés au projet associé à cette conversation.";
-"Documents go into a project with this chat; images go into your message." = "Les documents sont ajoutés au projet de cette conversation ; les images sont insérées dans votre message.";
+"Documents go into a project with this chat." = "Les documents seront placés dans un projet avec cette conversation.";
+"Documents go into a project with this chat; images go into your message." = "Les documents seront placés dans un projet avec cette conversation ; les images sont insérées dans votre message.";
 "Doesn't open at login" = "Ne s’ouvre pas à la connexion";
 "Don't Add" = "Ne pas ajouter";
 "Don't Ask Again" = "Ne plus demander";
@@ -741,7 +741,7 @@
 "Project files are turned off in Settings." = "Les fichiers du projet sont désactivés dans Réglages.";
 "Project files off" = "Fichiers de projet désactivés";
 "Project files on" = "Fichiers de projet activés";
-"Project files will be turned on first." = "Fichiers du projet seront d’abord activés.";
+"Project files will be turned on first." = "Les fichiers du projet seront d'abord activés.";
 "Project name" = "Nom du projet";
 "Projects" = "Projets";
 "Projects' files on disk" = "Fichiers des projets sur le disque";
@@ -978,7 +978,7 @@
 "The app's language (the language only, not the region)." = "La langue de l’app (la langue seulement, pas la région).";
 "The app's name." = "Le nom de l’app.";
 "The base profile: every other profile inherits from it." = "Le profil de base : tous les autres profils en héritent.";
-"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "La discussion demande de copier %1$@ (%2$@) dans le projet. Toutes les discussions du projet pourront alors le rechercher.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "La conversation demande de copier %1$@ (%2$@) dans le projet. Toutes les conversations du projet pourront alors le rechercher.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Le modèle de chat peut consulter les dossiers que vous autorisez (noms, tailles, dates, courts extraits) et y proposer des modifications : nouveaux dossiers, déplacements, renommages, envoi à la Corbeille. Chaque changement est un plan que vous approuvez d’abord et qui peut être annulé.";
 "The chat model couldn't be unloaded for Voice Lab." = "Le modèle de chat n’a pas pu être déchargé pour Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Le modèle de chat est en cours de téléchargement dans ce dossier. Changez-le dans Réglages après l’installation, ou choisissez d’abord un autre modèle de chat.";

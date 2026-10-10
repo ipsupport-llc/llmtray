@@ -379,7 +379,7 @@
 "Files are copied into the project and indexed on this Mac." = "Dateien werden ins Projekt kopiert und auf diesem Mac indexiert.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Dateien gehören zu einem Projekt — ein temporärer Chat ist nie Teil davon. Starten Sie einen neuen gespeicherten Chat (⌘N), um Dateien hinzuzufügen.";
 "Files in %@" = "Dateien in %@";
-"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Dateien leben in Projekten: Jeder Chat eines Projekts kann sie durchsuchen. Dieser Chat wird zusammen mit den Dateien ins Projekt verschoben.\n\n%@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Dateien werden in Projekten gespeichert: Jeder Chat eines Projekts kann sie durchsuchen. Dieser Chat wird zusammen mit den Dateien ins Projekt verschoben.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Dateien, die Sie einem Projekt hinzufügen, werden auf diesem Mac indexiert, damit Chats sie durchsuchen können.";
 "Files · off" = "Dateien · aus";
 "Files…" = "Dateien…";

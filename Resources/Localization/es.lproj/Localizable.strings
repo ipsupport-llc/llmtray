@@ -379,7 +379,7 @@
 "Files are copied into the project and indexed on this Mac." = "Los archivos se copian en el proyecto y se indexan en este Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Los archivos van a un proyecto, y un chat temporal nunca forma parte de uno. Inicie un nuevo chat guardado (⌘N) para agregarlos.";
 "Files in %@" = "Archivos en %@";
-"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Los archivos viven en proyectos: cada chat del proyecto puede buscarlos. Este chat se moverá al proyecto con ellos.\n\n%@";
+"Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@" = "Los archivos se guardan en proyectos: cada chat del proyecto puede buscarlos. Este chat se moverá al proyecto con ellos.\n\n%@";
 "Files you add to a project are indexed on this Mac, so its chats can search them." = "Los archivos que añades a un proyecto se indexan en este Mac, para que sus chats puedan buscarlos.";
 "Files · off" = "Archivos · desactivados";
 "Files…" = "Archivos…";
@@ -1022,7 +1022,7 @@
 "The model reloads when Voice Lab stops" = "El modelo se recarga cuando Voice Lab se detiene";
 "The model reloads when the image or song is done" = "El modelo se recarga cuando la imagen o canción termina";
 "The model runtime isn't installed yet -- start a model once, then try again." = "El runtime del modelo no está instalado; inicia un modelo una vez y vuelve a intentarlo.";
-"The model sees them with your next message." = "El modelo los verá con su próximo mensaje.";
+"The model sees them with your next message." = "El modelo las verá con su próximo mensaje.";
 "The model server no longer goes online when it starts." = "El servidor de modelos ya no se conecta a Internet al iniciarse.";
 "The model's license, from its card." = "La licencia del modelo, según su card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "La carpeta Models no está disponible: ¿está conectado su disco? Selecciónela de nuevo en Ajustes → Models.";
