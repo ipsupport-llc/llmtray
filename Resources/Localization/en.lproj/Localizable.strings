@@ -4,7 +4,7 @@
 "\"%@\" is no longer in the project." = "\"%@\" is no longer in the project.";
 "%.0f%% from drafts" = "%.0f%% from drafts";
 "%.1f s" = "%.1f s";
-"%1$@ (%2$lld chats)" = "%1$@ (%2$lld chats)";
+"%1$@ (%2$lld)" = "%1$@ (%2$lld)";
 "%1$@ and %2$lld more" = "%1$@ and %2$lld more";
 "%1$@ asks for %2$@" = "%1$@ asks for %2$@";
 "%1$@ asks for %2$@. Switching unloads the model loaded now." = "%1$@ asks for %2$@. Switching unloads the model loaded now.";

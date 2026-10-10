@@ -302,14 +302,16 @@ enum ProjectFileOffer {
         }
         // Nothing a project takes (folders, hidden files, formats not
         // indexed): said here, and no chat moved or project made for it.
-        guard !(await ProjectFileDrop.sort(urls)).accepted.isEmpty else {
+        let accepted = await ProjectFileDrop.sort(urls).accepted
+        guard !accepted.isEmpty else {
             alert.messageText = NSLocalizedString("These can't be added to a project", comment: "")
             alert.informativeText = NSLocalizedString("This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added.", comment: "")
             alert.runModal()
             return
         }
         let store = ChatLibraryStore.shared
-        let shown = urls.prefix(5).map(\.lastPathComponent).joined(separator: ", ") + (urls.count > 5 ? "…" : "")
+        // What the project will take: a folder dropped along isn't named.
+        let shown = accepted.prefix(5).map(\.lastPathComponent).joined(separator: ", ") + (accepted.count > 5 ? "…" : "")
         alert.messageText = NSLocalizedString("Add the files to a project?", comment: "a file dropped on a chat that isn't in a project")
         var info = String(format: NSLocalizedString("Files live in projects: every chat of a project can search them. This chat moves into the project with them.\n\n%@",
                                                     comment: "a file dropped on a chat that isn't in a project: the file names"), shown)
@@ -318,7 +320,7 @@ enum ProjectFileOffer {
         }
         alert.informativeText = info
         // Numbered here if taken, so the choice names what it makes.
-        let newName = uniqueName(projectName(for: chat, urls: urls), taken: Set(store.library.projects.map(\.name)))
+        let newName = uniqueName(projectName(for: chat, urls: accepted), taken: Set(store.library.projects.map(\.name)))
         let popup = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 300, height: 26), pullsDown: false)
         // Items added to the menu, not by title: same-named projects would
         // replace each other.
@@ -327,11 +329,11 @@ enum ProjectFileOffer {
         let projects = store.library.projects
         if !projects.isEmpty { popup.menu?.addItem(.separator()) }
         let names = projects.map(\.name)
-        for project in projects {
-            // Two projects of one name told apart by their chats.
+        for (index, project) in projects.enumerated() {
+            // Two projects of one name numbered in the sidebar's order.
             let title = names.filter { $0 == project.name }.count > 1
-                ? String(format: NSLocalizedString("%1$@ (%2$lld chats)", comment: "a project in a list: its name, how many chats it has"),
-                         project.name, Int64(store.chats(inProject: project.id).count))
+                ? String(format: NSLocalizedString("%1$@ (%2$lld)", comment: "a project in a list: its name, then which of the same-named ones (1, 2…) in the sidebar's order"),
+                         project.name, Int64(names[...index].filter { $0 == project.name }.count))
                 : project.name
             let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
             item.representedObject = project.id
