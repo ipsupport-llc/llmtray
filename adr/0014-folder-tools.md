@@ -363,3 +363,29 @@ took `change_files` for a text editor and wrote a shell script.
 3. Change tools + plan review + Trash + journal + Undo.
 4. Evals: "sort my Downloads" on a fixture folder, prompt-injection file
    names, a model trying paths outside the grant.
+
+## Looking at an image, adding to the project (2026-10-10)
+
+The user's ask: "there's a PDF about AI programming in my Downloads, add
+it to this project", and "look at the picture in that folder". Two more
+switches on `files`, not new tools (fewer tools):
+
+- `files(path, view: true)` — the whole image, for the model to see.
+  Declared only for a model that sees images. Read by descriptor from
+  the grant root like every read (`FolderFileTake`), at most 40 MB, never
+  through a link; the app decodes it (anything ImageIO can't open is
+  refused), caps its long side like an attachment's and puts it in front
+  of the model as `view_image` does (a hidden message, not saved). It is
+  a folder read: the trust barrier holds as for any `files` result, and
+  the result says what's in it is data, not instructions.
+- `files(path, add_to_project: true)` — a copy of the file into the
+  chat's project. Declared only in a saved chat that is in a project.
+  The file is copied by descriptor into a folder of the app's own temp
+  directory (at most 1 GB; a name swapped for a link meanwhile is never
+  followed), and only then, **after the user says yes** in a dialog
+  naming the file and the project, handed to the project's ingest; the
+  temp copy is removed either way. Nothing in the user's folder changes,
+  so it is not a `change_files` op and needs a read grant only; the
+  confirmation is what keeps a file name or a file's text from adding
+  anything by itself. Formats the project doesn't take are refused
+  before the user is asked.

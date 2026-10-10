@@ -53,10 +53,17 @@ public enum GrantChoice: String, CaseIterable, Sendable {
 public enum FolderToolAnswer: Equatable, Sendable {
     case text(String)
     case refused(String)
+    /// `files(view)`: the image file's bytes, for the app to put in front
+    /// of the model; `path` as the model sees it.
+    case image(Data, path: String)
+    /// `files(add_to_project)`: a copy of the file in a folder of its own
+    /// (the app asks the user, adds it, then removes that folder).
+    case fileForProject(URL, path: String)
 
     public var text: String {
         switch self {
         case .text(let t), .refused(let t): return t
+        case .image(_, let path), .fileForProject(_, let path): return path
         }
     }
 }
@@ -432,6 +439,16 @@ public final class FolderToolService: @unchecked Sendable {
         }
         let note = changeNextMessage && !chat.temporary
             && covered(path, level: .change, chat: chat, callKey: callKey) != nil ? FolderToolText.nextMessageNote : nil
+        // A whole file out of the folder: read or copied by descriptor.
+        if request.view || request.addToProject {
+            let answer = take(request, at: location, isCancelled: { isCancelled() || !stillGranted() })
+            guard !revoked.isSet, stillGranted() else {
+                if case .fileForProject(let url, _) = answer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+                return .refused("Access to that folder was withdrawn while it was being read: nothing from it can be used. "
+                    + "Answer without it.")
+            }
+            return answer
+        }
         let room = byteBudget - (note.map { $0.utf8.count + 1 } ?? 0)
         let answer = run(request, at: location, byteBudget: room, isCancelled: { isCancelled() || !stillGranted() })
         guard !revoked.isSet, stillGranted() else {
@@ -479,6 +496,32 @@ public final class FolderToolService: @unchecked Sendable {
             return .text("\(FolderTools.filesName): \(errorText(error)).")
         } catch {
             return .text("\(FolderTools.filesName): \(error).")
+        }
+    }
+
+    /// Where `add_to_project` copies go before the project takes them.
+    public static var takeDirectory: URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("folder-take", isDirectory: true)
+    }
+
+    /// `view`: the file's bytes; `add_to_project`: a copy of it.
+    func take(_ request: FolderTools.FilesRequest, at location: FolderLocation,
+              isCancelled: @escaping () -> Bool) -> FolderToolAnswer {
+        let walker = SafeFolderWalker(root: location.root, denylist: denylist)
+        let shown = display(location.displayPath)
+        do {
+            if request.view {
+                let data = try FolderFileTake.read(walker, location.components, maxBytes: FolderFileTake.maxViewBytes,
+                                                   isCancelled: isCancelled)
+                return .image(data, path: shown)
+            }
+            let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
+                                              maxBytes: FolderFileTake.maxProjectBytes, isCancelled: isCancelled)
+            return .fileForProject(url, path: shown)
+        } catch let error as FolderAccessError {
+            return .text("\(FolderTools.filesName): \(errorText(error)).")
+        } catch {
+            return .text("\(FolderTools.filesName): \(errorText(error)).")
         }
     }
 

@@ -250,7 +250,10 @@ final class ChatToolbox {
             guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
             // project_files by its mode (none once there's no room for file text).
             if let files = tool as? ProjectFilesTool { return files.definition(for: settings, fileTextAllowed: !fileTextRoomSpent) }
-            if tool.folderAccess != .none { return folderTools.contains(tool.name) ? tool.definition : nil }
+            if tool.folderAccess != .none {
+                guard folderTools.contains(tool.name) else { return nil }
+                return (tool as? FilesTool)?.definition(for: settings) ?? tool.definition
+            }
             guard !(fileTextRoomSpent && tool.projectAccess == .fileText) else { return nil }
             // A tool of several switches: its modes that may run now (the
             // local time stays after file text, the city lookup doesn't).
