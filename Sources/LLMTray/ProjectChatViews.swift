@@ -347,6 +347,9 @@ enum ProjectFileOffer {
         let chosen = popup.selectedItem?.representedObject as? UUID
         Task { @MainActor in
             guard await enableProjectFiles() else { return }
+            // The chat deleted, or its empty tab closed, while Project files
+            // were turned on (a download can take a while): nothing.
+            guard ChatTabs.shared.index(of: chat) != nil || ChatSessionStore.exists(chat) else { return }
             let target: UUID
             if let chosen {
                 // Deleted while Project files were turned on: nothing.
