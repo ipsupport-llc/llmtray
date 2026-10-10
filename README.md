@@ -82,7 +82,7 @@ Or install with [Homebrew](https://github.com/ipsupport-llc/homebrew-tap):
 brew install --cask ipsupport-llc/tap/llmtray-full   # or ipsupport-llc/tap/llmtray
 ```
 
-The app updates itself (Sparkle), so `brew upgrade` leaves it alone.
+The app updates itself (Sparkle), so a plain `brew upgrade` skips it; `brew upgrade --greedy` updates it too.
 
 1. Download one of the two above and drag it to Applications (or install with Homebrew).
 2. Open it. LLMTray is signed with IPSupport LLC's Developer ID and notarized by Apple, so it opens like any other app.
