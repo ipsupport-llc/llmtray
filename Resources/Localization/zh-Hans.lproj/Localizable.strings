@@ -322,7 +322,7 @@
 "Embedding model" = "嵌入模型";
 "Enable Project Files…" = "启用项目文件…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "在“设置”中打开“项目文件”，以将文件添加到项目并允许其聊天搜索这些文件。";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "先在“设置 › 文件”中启用 Project 文件：随后 LLMTray 指南会添加到此处，答案会引用它。";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "先在“设置 › 文件”中启用项目文件：随后 LLMTray 指南会添加到此处，回答会引用它。";
 "Enable Project files to add files" = "启用项目文件以添加文件";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "启用项目文件以将文件添加到项目并允许其聊天搜索这些文件。在启用之前不会有任何索引或下载。";
 "Enable Without It" = "在没有它的情况下启用";
@@ -536,7 +536,7 @@
 "Maintenance" = "维护";
 "Make a 30-second calm lo-fi instrumental for studying" = "制作一段用于学习的 30 秒平静 lo-fi 背景乐";
 "Make images and edit them." = "生成并编辑图像。";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成图片、歌曲并用语音模型讲话：在“设置”中启用它们。";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成图片和歌曲，并与语音模型对话：在“设置”中启用它们。";
 "Make songs and instrumentals." = "生成歌曲与纯音乐。";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "生成新的随机 ID：之后的报告无法与之前的报告匹配。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "创建文件夹、移动、重命名及移至“废纸篓”——每项操作均先以计划显示，未经你批准不会生效。";
@@ -1078,7 +1078,7 @@
 "Try Again" = "重试";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
-"Type a message below and press Return. Try: “What can you do?”" = "在下方输入消息并按回车。试试：“What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "在下方输入消息并按回车。试试：“你能做什么？”";
 "Unavailable" = "不可用";
 "Uncompressed (WAV)" = "未压缩（WAV）";
 "Undo" = "撤销";

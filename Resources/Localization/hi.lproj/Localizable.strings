@@ -320,11 +320,11 @@
 "Echo gate" = "इको गेट";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
 "Embedding model" = "एम्बेडिंग मॉडल";
-"Enable Project Files…" = "Project files चालू करें…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "परियोजना में फ़ाइलें जोड़ने और उसकी चैट्स को इन्हें खोजने देने के लिए सेटिंग्स में Project files चालू करें।";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "पहले Settings › Files में Project फ़ाइलें सक्षम करें: फिर LLMTray मार्गदर्शिका यहाँ जोड़ी जाएगी और उत्तर इसका हवाला देंगे।";
-"Enable Project files to add files" = "फाइलें जोड़ने के लिए Project files चालू करें";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए Project files चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
+"Enable Project Files…" = "प्रोजेक्ट फ़ाइलें चालू करें…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "प्रोजेक्ट में फ़ाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए सेटिंग्स में प्रोजेक्ट फ़ाइलें चालू करें।";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "पहले सेटिंग्स › फ़ाइलें में प्रोजेक्ट फ़ाइलें चालू करें: फिर LLMTray मार्गदर्शिका यहाँ जोड़ी जाएगी और उत्तर इसका हवाला देंगे।";
+"Enable Project files to add files" = "फ़ाइलें जोड़ने के लिए प्रोजेक्ट फ़ाइलें चालू करें";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "किसी प्रोजेक्ट में फ़ाइलें जोड़ने और उसकी चैट्स को उन्हें खोजने देने के लिए प्रोजेक्ट फ़ाइलें चालू करें। तब तक कुछ भी इंडेक्स या डाउनलोड नहीं होगा।";
 "Enable Without It" = "बिना इसके सक्षम करें";
 "Enable image editing?" = "छवि संपादन सक्षम करें?";
 "Enable image generation" = "इमेज जनरेशन सक्षम करें";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Fast (छोटा कैनवास)";
 "Faster long chats" = "लंबी चैट तेज़ करें";
 "Fetching file list…" = "फ़ाइल सूची ले जा रही है…";
-"Files" = "Files";
+"Files" = "फ़ाइलें";
 "Files Settings…" = "Files Settings…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "यहाँ जोड़ी गई फाइलें प्रोजेक्ट में कॉपी की जाती हैं और इस Mac पर अनुक्रमित होती हैं; प्रोजेक्ट की हर चैट उन्हें खोज सकती है।";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "प्रोजेक्ट में जो फ़ाइलें जोड़ी जाती हैं वे इस Mac पर इंडेक्स की जाती हैं, ताकि इसकी चैट उन्हें खोज सकें। अर्थ के आधार पर खोज के लिए एम्बेडिंग मॉडल का उपयोग होता है; बिना इसके फ़ाइलें उनके शब्दों के आधार पर ही खोजी जाती हैं।";
@@ -536,7 +536,7 @@
 "Maintenance" = "रखरखाव";
 "Make a 30-second calm lo-fi instrumental for studying" = "पढ़ाई के लिए 30-सेकंड का शांत लो-फाइ इन्स्ट्रुमेंटल बनाएं";
 "Make images and edit them." = "इमेज बनाएं और संपादित करें।";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "इस Mac पर तस्वीरें बनाएं, गाने और वॉयस मॉडल से बात करें: Settings में उन्हें सक्षम करें।";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "इस Mac पर तस्वीरें और गाने बनाएँ और वॉयस मॉडल से बात करें: इन्हें सेटिंग्स में चालू करें।";
 "Make songs and instrumentals." = "गीत और वाद्य बनाएं।";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "नया यादृच्छिक ID बनाता है: बाद की रिपोर्टें पहले वाली से मिलाई नहीं जा सकेंगी।";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "फ़ोल्डर बनाना, स्थानांतरित करना, नाम बदलना और Trash में भेजना — हर योजना पहले आपको दिखाई जाती है, और आप मंज़ूर करने तक कुछ भी बदलता नहीं है।";
@@ -941,7 +941,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "LLMTray का App Store संस्करण खुला है। पहले उसे बंद करें (इसका मेनू बार आइकन › Quit), फिर इसको फिर खोलें: दोनों एक ही पोर्ट उपयोग करेंगे और मॉडल दो बार लोड होंगे।";
 "The Keychain refused to remove the token." = "Keychain ने token हटाने से मना कर दिया।";
 "The Keychain refused to save the token." = "Keychain ने token सहेजने से मना कर दिया।";
-"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "LLMTray गाइड इस प्रोजेक्ट में है: उदाहरण के लिए पूछें कि अपना कोडिंग एजेंट कैसे जोड़ें।";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "LLMTray मार्गदर्शिका इस प्रोजेक्ट में है: उदाहरण के लिए पूछें कि अपना कोडिंग एजेंट कैसे जोड़ें।";
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter डाउनलोड हो गया है — उपयोग करने के लिए सर्वर को पुनरारंभ करें।";
 "The Mac's chip." = "Mac की चिप।";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI-संगत API यहां चलता है (http://localhost:<port>/v1)। सर्वर रुका होने पर इसे बदलें।";
@@ -1078,7 +1078,7 @@
 "Try Again" = "पुन: प्रयास करें";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
-"Type a message below and press Return. Try: “What can you do?”" = "नीचे संदेश टाइप करें और Return दबाएँ। आजमाएँ: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "नीचे संदेश टाइप करें और Return दबाएँ। आजमाएँ: “आप क्या कर सकते हैं?”";
 "Unavailable" = "उपलब्ध नहीं";
 "Uncompressed (WAV)" = "अनकंप्रेस्ड (WAV)";
 "Undo" = "पूर्ववत करें";

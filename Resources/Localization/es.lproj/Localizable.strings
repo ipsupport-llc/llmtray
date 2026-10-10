@@ -322,7 +322,7 @@
 "Embedding model" = "Modelo de embeddings";
 "Enable Project Files…" = "Activar Archivos del proyecto…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Activa Archivos del proyecto en Ajustes para añadir archivos al proyecto y permitir que sus chats los busquen.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Activa Project files en Ajustes › Archivos primero: así se añade la guía de LLMTray aquí y las respuestas la citan.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Activa primero Archivos del proyecto en Ajustes › Archivos: así se añade aquí la guía de LLMTray y las respuestas la citan.";
 "Enable Project files to add files" = "Activa Archivos del proyecto para añadir archivos";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Activa Archivos del proyecto para añadir archivos a un proyecto y permitir que sus chats los busquen. Nada se indexa ni descarga hasta entonces.";
 "Enable Without It" = "Activar sin él";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Rápido (lienzo más pequeño)";
 "Faster long chats" = "Chats largos más rápidos";
 "Fetching file list…" = "Obteniendo lista de archivos…";
-"Files" = "Files";
+"Files" = "Archivos";
 "Files Settings…" = "Ajustes de Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Los archivos añadidos aquí se copian en el proyecto y se indexan en este Mac; todas las conversaciones del proyecto pueden buscarlos.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Los archivos añadidos a un proyecto se indexan en este Mac para que sus conversaciones puedan buscarlos. La búsqueda por significado usa un modelo de embeddings; sin él, los archivos se buscan por sus palabras.";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Intentar de nuevo";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Convierte el texto de los archivos en vectores para la búsqueda por significado, en este Mac. Al eliminarlo se conservan los índices: los archivos se buscarán por sus palabras hasta que se vuelva a descargar.";
 "Tweak…" = "Ajustar…";
-"Type a message below and press Return. Try: “What can you do?”" = "Escribe un mensaje abajo y pulsa Retorno. Prueba: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Escribe un mensaje abajo y pulsa Retorno. Prueba: “¿Qué puedes hacer?”";
 "Unavailable" = "No disponible";
 "Uncompressed (WAV)" = "Sin comprimir (WAV)";
 "Undo" = "Deshacer";

@@ -320,11 +320,11 @@
 "Echo gate" = "Gerbang gema";
 "Edit Profile…" = "Edit profil…";
 "Embedding model" = "Model embedding";
-"Enable Project Files…" = "Nyalakan Project Files…";
-"Enable Project files in Settings to add files to the project and let its chats search them." = "Nyalakan File Proyek di Pengaturan untuk menambahkan file ke proyek dan memungkinkan obrolannya mencarinya.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Aktifkan file Proyek di Pengaturan › File terlebih dahulu: panduan LLMTray akan ditambahkan di sini, dan jawaban akan mengutipnya.";
-"Enable Project files to add files" = "Nyalakan Project Files untuk menambahkan file";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Nyalakan Project Files untuk menambahkan file ke proyek dan memungkinkan obrolan mencarinya. Tidak ada yang diindeks atau diunduh sampai saat itu.";
+"Enable Project Files…" = "Nyalakan Berkas proyek…";
+"Enable Project files in Settings to add files to the project and let its chats search them." = "Nyalakan Berkas proyek di Pengaturan untuk menambahkan file ke proyek dan memungkinkan obrolannya mencarinya.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Aktifkan Berkas proyek di Pengaturan › File terlebih dahulu: panduan LLMTray akan ditambahkan di sini, dan jawaban akan mengutipnya.";
+"Enable Project files to add files" = "Nyalakan Berkas proyek untuk menambahkan file";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Nyalakan Berkas proyek untuk menambahkan file ke proyek dan memungkinkan obrolannya mencarinya. Tidak ada yang diindeks atau diunduh sampai saat itu.";
 "Enable Without It" = "Aktifkan Tanpa Model";
 "Enable image editing?" = "Aktifkan pengeditan gambar?";
 "Enable image generation" = "Aktifkan pembuatan gambar";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Cepat (kanvas lebih kecil)";
 "Faster long chats" = "Percakapan panjang lebih cepat";
 "Fetching file list…" = "Mengambil daftar berkas…";
-"Files" = "Files";
+"Files" = "File";
 "Files Settings…" = "Pengaturan Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Berkas yang ditambahkan di sini disalin ke proyek dan diindeks di Mac ini; setiap obrolan dalam proyek dapat mencarinya.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Berkas yang ditambahkan ke proyek diindeks di Mac ini sehingga obrolannya bisa mencari. Pencarian berdasarkan makna menggunakan model embedding; tanpa itu, berkas dicari berdasarkan kata-katanya.";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Coba Lagi";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
-"Type a message below and press Return. Try: “What can you do?”" = "Ketik pesan di bawah dan tekan Return. Coba: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Ketik pesan di bawah dan tekan Return. Coba: “Apa yang bisa Anda lakukan?”";
 "Unavailable" = "Tidak tersedia";
 "Uncompressed (WAV)" = "Tak terkompresi (WAV)";
 "Undo" = "Urungkan";

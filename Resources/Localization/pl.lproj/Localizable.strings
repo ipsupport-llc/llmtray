@@ -72,7 +72,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Pełniejsze, bardziej dopracowane brzmienie; tekst jest mniej wyraźny. Około 20 s na 30 s muzyki.";
 "A model is a tool, not an authority" = "Model to narzędzie, a nie autorytet";
 "A package: moved as one item." = "Pakiet: przenoszony jako pojedynczy element.";
-"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Tabela osadzeń per-warstwa (Gemma 4 E2B, E4B) jest wczytywana z dysku w razie potrzeby, a części obrazów i dźwięku (Gemma 4, Qwen 3.5) ładują się przy pierwszym użyciu. Do około 2 GB mniej pamięci na Macach z 8 GB; przy tabeli na dysku generowanie jest około 10% wolniejsze. Odpowiedzi takie same.";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Tabela osadzeń dla każdej warstwy (Gemma 4 E2B, E4B) jest wczytywana z dysku w razie potrzeby, a części obrazów i dźwięku (Gemma 4, Qwen 3.5) ładują się przy pierwszym użyciu. Do około 2 GB mniej pamięci na Macach z 8 GB; przy tabeli na dysku generowanie jest około 10% wolniejsze. Odpowiedzi takie same.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Ciche sprawdzenie przy każdym uruchomieniu. Pokazuje coś tylko wtedy, gdy jest dostępna aktualizacja.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Losowy identyfikator utworzony na tym Macu, nowy przy każdym uruchomieniu. Nie jest przypisany do Ciebie ani do Maca.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Ocena i kilka słów wysyłane na ipsupport.us: bez konta, bez identyfikatorów urządzenia. Recenzje pojawiają się na stronie LLMTray po moderacji.";
@@ -320,11 +320,11 @@
 "Echo gate" = "Bramka echa";
 "Edit Profile…" = "Edytuj profil…";
 "Embedding model" = "Model osadzania";
-"Enable Project Files…" = "Włącz Project Files…";
+"Enable Project Files…" = "Włącz Pliki projektu…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Włącz Pliki projektu w Ustawieniach, aby dodawać pliki do projektu i umożliwić ich przeszukiwanie przez czaty.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Włącz Pliki projektów w Ustawieniach › Pliki najpierw: wtedy przewodnik LLMTray zostanie tu dodany, a odpowiedzi będą się do niego odwoływać.";
-"Enable Project files to add files" = "Włącz Project Files, aby dodać pliki";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Włącz Project Files, aby dodać pliki do projektu i pozwolić jego czatom ich przeszukiwać. Nic nie jest indeksowane ani pobierane przed włączeniem.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Najpierw włącz Pliki projektu w Ustawieniach › Pliki: wtedy przewodnik LLMTray zostanie tu dodany, a odpowiedzi będą się do niego odwoływać.";
+"Enable Project files to add files" = "Włącz Pliki projektu, aby dodać pliki";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Włącz Pliki projektu, aby dodawać pliki do projektu i pozwolić jego czatom je przeszukiwać. Do tego czasu nic nie jest indeksowane ani pobierane.";
 "Enable Without It" = "Włącz bez niego";
 "Enable image editing?" = "Włączyć edycję obrazów?";
 "Enable image generation" = "Włącz generowanie obrazów";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Szybko (mniejsze pole)";
 "Faster long chats" = "Szybsze długie rozmowy";
 "Fetching file list…" = "Pobieranie listy plików…";
-"Files" = "Files";
+"Files" = "Pliki";
 "Files Settings…" = "Ustawienia Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Pliki dodane tutaj są kopiowane do projektu i indeksowane na tym Macu; każda rozmowa w projekcie może ich szukać.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Pliki dodane do projektu są indeksowane na tym Macu, dzięki czemu czaty mogą ich szukać. Wyszukiwanie znaczeniowe korzysta z modelu osadzania; bez niego pliki są przeszukiwane po słowach.";
@@ -497,7 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Zachowuje ten port. Jeśli inna aplikacja go rzeczywiście używa, serwer nie uruchomi się, dopóki nie zmienisz portu w Ustawieniach.";
 "Kept free: %lld MB" = "Zachowane wolne: %lld MB";
 "LLMTray" = "LLMTray";
-"LLMTray Guide" = "Poradnik LLMTray";
+"LLMTray Guide" = "Przewodnik LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray nie ma uprawnień do używania mikrofonu.";
 "LLMTray restarts now to load them." = "LLMTray zostanie teraz ponownie uruchomiony, aby je załadować.";
 "LLMTray status, indexing project files" = "Stan LLMTray — indeksowanie plików projektu";
@@ -536,7 +536,7 @@
 "Maintenance" = "Konserwacja";
 "Make a 30-second calm lo-fi instrumental for studying" = "Stwórz 30‑sekundowy spokojny lo‑fi instrumental do nauki";
 "Make images and edit them." = "Twórz obrazy i je edytuj.";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Twórz obrazy, utwory i mów za pomocą modelu głosowego, wszystko na tym Macu: włącz to w Ustawieniach.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Twórz obrazy i utwory oraz rozmawiaj z modelem głosowym — wszystko na tym Macu: włącz to w Ustawieniach.";
 "Make songs and instrumentals." = "Twórz utwory i instrumentale.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Generuje nowy losowy identyfikator: późniejsze raporty nie będą powiązywane z wcześniejszymi.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Tworzenie folderów, przenoszenia, zmiany nazw i przenoszenie do Kosza — każdy plan jest najpierw pokazywany, a nic nie zmienia się bez Twojego zatwierdzenia.";

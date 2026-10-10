@@ -70,7 +70,7 @@
 "A chat model" = "Mô hình trò chuyện";
 "A client" = "Một client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
-"A model is a tool, not an authority" = "Mô hình là công cụ, không phải chuyên gia";
+"A model is a tool, not an authority" = "Mô hình là công cụ, không phải thẩm quyền";
 "A package: moved as one item." = "Một gói: di chuyển như một mục duy nhất.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Một bảng nhúng theo lớp (Gemma 4 E2B, E4B) được đọc từ đĩa khi cần, và phần ảnh cùng âm thanh (Gemma 4, Qwen 3.5) được tải lần đầu tiên khi sử dụng. Tiết kiệm tới khoảng 2 GB bộ nhớ trên Mac có 8 GB; khi bảng ở trên đĩa, việc sinh trả lời chậm hơn khoảng 10%. Kết quả đầu ra không thay đổi.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
@@ -320,11 +320,11 @@
 "Echo gate" = "Ngưỡng phản hồi";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
 "Embedding model" = "Mô hình embedding";
-"Enable Project Files…" = "Bật Project Files…";
+"Enable Project Files…" = "Bật Tệp dự án…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Bật Tệp dự án trong Cài đặt để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Bật Project files trong Cài đặt › Files trước: hướng dẫn LLMTray sẽ được thêm ở đây và câu trả lời sẽ trích dẫn nó.";
-"Enable Project files to add files" = "Bật Project Files để thêm Files";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Project Files để thêm Files vào dự án và cho phép hội thoại tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Bật Tệp dự án trong Cài đặt › Tệp trước: hướng dẫn LLMTray sẽ được thêm ở đây và câu trả lời sẽ trích dẫn nó.";
+"Enable Project files to add files" = "Bật Tệp dự án để thêm tệp";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bật Tệp dự án để thêm tệp vào dự án và cho phép các cuộc trò chuyện tìm kiếm chúng. Chưa có gì được lập chỉ mục hay tải xuống cho tới khi bật.";
 "Enable Without It" = "Bật mà không cần nó";
 "Enable image editing?" = "Bật chỉnh sửa ảnh?";
 "Enable image generation" = "Bật tạo ảnh";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Nhanh (khung nhỏ hơn)";
 "Faster long chats" = "Tăng tốc trò chuyện dài";
 "Fetching file list…" = "Đang lấy danh sách tệp…";
-"Files" = "Files";
+"Files" = "Tệp";
 "Files Settings…" = "Cài đặt Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Các tệp thêm vào đây được sao chép vào dự án và lập chỉ mục trên Mac này; mọi cuộc trò chuyện trong dự án đều có thể tìm chúng.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Các tệp thêm vào dự án được lập chỉ mục trên Mac này để các trò chuyện có thể tìm kiếm chúng. Tìm kiếm theo ý nghĩa dùng mô hình embedding; nếu không có, tệp sẽ được tìm kiếm theo từ ngữ.";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Thử lại";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
-"Type a message below and press Return. Try: “What can you do?”" = "Gõ tin nhắn bên dưới và nhấn Return. Thử: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Gõ tin nhắn bên dưới và nhấn Return. Thử: “Bạn có thể làm gì?”";
 "Unavailable" = "Không khả dụng";
 "Uncompressed (WAV)" = "Không nén (WAV)";
 "Undo" = "Hoàn tác";

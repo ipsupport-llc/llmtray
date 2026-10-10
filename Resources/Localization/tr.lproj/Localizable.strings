@@ -72,7 +72,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Daha dolu, daha tamamlanmış bir miks; sözler daha az net duyulur. 30 sn’lik müzik için yaklaşık 20 sn sürer.";
 "A model is a tool, not an authority" = "Model bir araçtır, otorite değil";
 "A package: moved as one item." = "Bir paket: tek öge olarak taşındı.";
-"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Katman başına gömme tablosu (Gemma 4 E2B, E4B) gerektiğinde diskte okunur; görüntü ve ses parçaları (Gemma 4, Qwen 3.5) ilk kullanımda yüklenir. 8 GB’lı Mac’lerde yaklaşık 2 GB’a kadar daha az bellek kullanımı sağlar; tablo diskteyken üretim yaklaşık %10 daha yavaştır. Yanıtlar aynı kalır.";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Katman başına gömme tablosu (Gemma 4 E2B, E4B) gerektiğinde diskten okunur; görüntü ve ses parçaları (Gemma 4, Qwen 3.5) ilk kullanımda yüklenir. 8 GB’lı Mac’lerde yaklaşık 2 GB’a kadar daha az bellek kullanımı sağlar; tablo diskteyken üretim yaklaşık %10 daha yavaştır. Yanıtlar aynı kalır.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Her başlatmada sessizce denetler. Yalnızca güncelleme varsa bir şey gösterir.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "Bu Mac'te oluşturulan rastgele bir kimlik; her açılışta yenilenir. Sizinle veya Mac ile ilişkilendirilmez.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "Bir puan ve birkaç kelime ipsupport.us adresine gönderilir: hesap veya cihaz tanımlayıcıları yok. Değerlendirmeler, LLMTray web sitesinde denetlemeden sonra yayınlanır.";
@@ -324,7 +324,7 @@
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Projeye dosya eklemek ve sohbetlerin bu dosyalarda arama yapabilmesi için Ayarlar’dan Proje dosyalarını açın.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Önce Ayarlar › Dosyalar’da Proje dosyalarını etkinleştirin: ardından LLMTray kılavuzu buraya eklenir ve yanıtlar bunu referans gösterir.";
 "Enable Project files to add files" = "Dosya eklemek için Proje Dosyalarını açın";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenir veya indirilmez.";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Bir projeye dosya eklemek ve sohbetlerin bunları aramasına izin vermek için Proje Dosyalarını açın. O zamana kadar hiçbir şey dizinlenmez veya indirilmez.";
 "Enable Without It" = "Etkinleştir (Olmadan)";
 "Enable image editing?" = "Resim düzenlemeyi etkinleştirilsin mi?";
 "Enable image generation" = "Görüntü oluşturmayı etkinleştir";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Hızlı (küçük tuval)";
 "Faster long chats" = "Uzun sohbetler için daha hızlı";
 "Fetching file list…" = "Dosya listesi alınıyor…";
-"Files" = "Files";
+"Files" = "Dosyalar";
 "Files Settings…" = "Files Ayarları…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Buraya eklenen dosyalar projeye kopyalanır ve bu Mac'te dizine alınır; projenin her sohbeti bunlarda arama yapabilir.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Bir projeye eklenen dosyalar bu Mac’te indekslenir, böylece sohbetler bunlarda arama yapabilir. Anlamsal arama bir gömü modeli kullanır; olmadan dosyalar yalnızca kelimelerine göre aranır.";
@@ -536,7 +536,7 @@
 "Maintenance" = "Bakım";
 "Make a 30-second calm lo-fi instrumental for studying" = "Çalışma için 30 saniyelik sakin bir lo‑fi enstrümantal yapın";
 "Make images and edit them." = "Görüntü oluşturun ve düzenleyin.";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Bu Mac’te görüntü, şarkı ve sesli konuşma (ses modeli) oluşturun: Ayarlar’dan etkinleştirin.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Bu Mac’te görseller ve şarkılar oluşturun, bir ses modeliyle konuşun: Ayarlar’dan etkinleştirin.";
 "Make songs and instrumentals." = "Şarkı ve enstrümantal oluşturun.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Yeni bir rastgele kimlik oluşturur: sonraki raporlar önceki raporlarla eşleştirilemez.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Klasör oluşturma, taşıma, yeniden adlandırma ve Çöp'e taşıma — her plan önce size gösterilir ve siz onaylayana kadar hiçbir şey değişmez.";
@@ -801,7 +801,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Yalnızca bu sayıdaki en olası token’dan örnekler. 0 devre dışı bırakır. Gemma 4, 64 önerir.";
 "Sampling" = "Örnekleme";
 "Save" = "Kaydet";
-"Save memory" = "Belleği koru";
+"Save memory" = "Bellek tasarrufu";
 "Saved chats will show up here." = "Kaydedilmiş sohbetler burada görünür.";
 "Saved in your Keychain" = "Keychain'inize kaydedildi";
 "Save…" = "Kaydet…";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Tekrar Dene";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
-"Type a message below and press Return. Try: “What can you do?”" = "Aşağıya bir mesaj yazıp Return tuşuna basın. Deneyin: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Aşağıya bir mesaj yazıp Return tuşuna basın. Deneyin: “Ne yapabilirsin?”";
 "Unavailable" = "Kullanılamıyor";
 "Uncompressed (WAV)" = "Sıkıştırılmamış (WAV)";
 "Undo" = "Geri Al";

@@ -941,7 +941,7 @@
 "The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Die App‑Store‑Version von LLMTray ist geöffnet. Beenden Sie diese zuerst (Symbol in der Menüleiste › Beenden), und öffnen Sie dann diese App erneut: Beide würden denselben Port verwenden und Modelle doppelt laden.";
 "The Keychain refused to remove the token." = "Der Schlüsselbund verweigerte das Entfernen des Tokens.";
 "The Keychain refused to save the token." = "Der Schlüsselbund verweigerte das Speichern des Tokens.";
-"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Der LLMTray‑Leitfaden liegt in diesem Projekt: fragen Sie zum Beispiel, wie Sie Ihren Coding‑Agenten verbinden.";
+"The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Die LLMTray‑Anleitung liegt in diesem Projekt: Fragen Sie zum Beispiel, wie Sie Ihren Coding‑Agenten verbinden.";
 "The MTP drafter has downloaded -- restart the server to use it." = "Der MTP‑Drafter wurde heruntergeladen – starte den Server neu, um ihn zu verwenden.";
 "The Mac's chip." = "Der Chip des Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "Die OpenAI-kompatible API ist hier erreichbar (http://localhost:<port>/v1). Sie kann geändert werden, solange der Server gestoppt ist.";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Erneut versuchen";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Wandelt Dateitext auf diesem Mac in Vektoren für die semantische Suche um. Beim Entfernen bleiben die Indexe erhalten: Dateien werden dann nach ihren Wörtern durchsucht, bis es wieder heruntergeladen wird.";
 "Tweak…" = "Feinabstimmung…";
-"Type a message below and press Return. Try: “What can you do?”" = "Geben Sie unten eine Nachricht ein und drücken Sie Return. Versuchen Sie: „What can you do?“";
+"Type a message below and press Return. Try: “What can you do?”" = "Geben Sie unten eine Nachricht ein und drücken Sie Return. Versuchen Sie: „Was kannst du?“";
 "Unavailable" = "Nicht verfügbar";
 "Uncompressed (WAV)" = "Unkomprimiert (WAV)";
 "Undo" = "Widerrufen";

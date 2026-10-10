@@ -72,7 +72,7 @@
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "מיקס מלא ומעובד יותר; המילים נשמעות פחות בבירור. כ‑20 שנ׳ להכנת 30 שנ׳ מוזיקה.";
 "A model is a tool, not an authority" = "מודל הוא כלי, לא סמכות";
 "A package: moved as one item." = "חבילה: הועברה כפריט יחיד.";
-"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "טבלת אמבדינג לכל שכבה (Gemma 4 E2B, E4B) נקראת מהדיסק לפי הצורך, וחלקי תמונה ואודיו (Gemma 4, Qwen 3.5) נטענים בפעם הראשונה שמשתמשים בהם. חיסכון של עד כ־2 GB זיכרון במכונות עם 8 GB; עם הטבלה על הדיסק, ההילוּל (generation) כ־10% איטי יותר. התוצאות זהות.";
+"A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "טבלת אמבדינג לכל שכבה (Gemma 4 E2B, E4B) נקראת מהדיסק לפי הצורך, וחלקי תמונה ואודיו (Gemma 4, Qwen 3.5) נטענים בפעם הראשונה שמשתמשים בהם. חיסכון של עד כ־2 GB זיכרון במכונות עם 8 GB; עם הטבלה על הדיסק, יצירת התשובות איטית בכ־10%. התוצאות זהות.";
 "A quiet check at every launch. Only shows anything if an update exists." = "בדיקה שקטה בכל הפעלה. תוצג הודעה רק אם קיים עדכון.";
 "A random ID made on this Mac, new each time this is enabled. Not tied to you or the Mac." = "מזהה אקראי שנוצר במק זה, חדש בכל הפעלה. אינו מקושר אליך או אל המחשב.";
 "A rating and a few words, sent to ipsupport.us: no account, no device identifiers. Reviews appear on the LLMTray website after moderation." = "דירוג וכמה מילים, נשלחים ל-ipsupport.us: ללא חשבון, ללא מזהי מכשיר. חוות הדעת מופיעות באתר LLMTray לאחר בדיקה.";
@@ -322,7 +322,7 @@
 "Embedding model" = "דגם הטמעה";
 "Enable Project Files…" = "הפעל קבצי פרויקט…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "הפעל קבצי פרויקט ב'הגדרות' כדי להוסיף קבצים לפרויקט ולאפשר לשיחות לחפש בהם.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "אפשר קבצי Project ב‑Settings › Files תחילה: המדריך של LLMTray יתווסף לכאן והתשובות יצטטו אותו.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "הפעילו קודם קבצי פרויקט בהגדרות › קבצים: אז מדריך LLMTray יתווסף לכאן והתשובות יצטטו אותו.";
 "Enable Project files to add files" = "הפעילו קבצי פרויקט כדי להוסיף קבצים";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "הפעילו קבצי פרויקט כדי להוסיף קבצים לפרויקט ולהרשות לצ'אטים שלו לחפש בהם. שום דבר לא מאונדקס או מורד עד אז.";
 "Enable Without It" = "הפעל בלעדיו";
@@ -536,7 +536,7 @@
 "Maintenance" = "תחזוקה";
 "Make a 30-second calm lo-fi instrumental for studying" = "הכן קטע אינסטרומנטלי שקט ל‑lo‑fi למשך 30 שניות ללמידה";
 "Make images and edit them." = "יצירת תמונות ועריכתן.";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "צור תמונות, שירים ודבר עם מודל קולי — הכל במכונה זו: אפשר אותם ב‑Settings.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "צור תמונות ושירים ודבר עם מודל קולי — הכל ב‑Mac הזה: הפעל אותם בהגדרות.";
 "Make songs and instrumentals." = "יצירת שירים ואינסטרומנטלים.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "יוצר מזהה אקראי חדש — דוחות עתידיים לא יימשכו לדוחות קודמים.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "יצירת תיקיות, העברה, שינוי שם והעברה ל־Trash — כל תכנית מוצגת קודם לך, ושום דבר לא משתנה עד שתאשר אותה.";
@@ -1078,7 +1078,7 @@
 "Try Again" = "נסה שוב";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
-"Type a message below and press Return. Try: “What can you do?”" = "הקלד הודעה למטה ולחץ Return. נסה: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "הקלד הודעה למטה ולחץ Return. נסה: “מה אתה יכול לעשות?”";
 "Unavailable" = "לא זמין";
 "Uncompressed (WAV)" = "ללא דחיסה (WAV)";
 "Undo" = "בטל";

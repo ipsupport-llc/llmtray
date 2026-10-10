@@ -70,7 +70,7 @@
 "A chat model" = "نموذج دردشة";
 "A client" = "عميل";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "مكس أكثر امتلاءً ومظهرًا مكتملًا؛ كلمات الأغنية تبدو أقل وضوحًا. حوالي 20 s لمقطع موسيقي مدته 30 s.";
-"A model is a tool, not an authority" = "النموذج أداة، وليس مرجعًا";
+"A model is a tool, not an authority" = "النموذج أداة، وليس سلطةً";
 "A package: moved as one item." = "حزمة: نُقلت كعنصر واحد.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "يُحمَّل جدول التضمين لكل طبقة (Gemma 4 E2B, E4B) من القرص عند الحاجة، وأجزاء الصور والصوت (Gemma 4, Qwen 3.5) تُحمَّل عند استخدامها للمرة الأولى. قد توفر حتى نحو 2 GB من الذاكرة على أجهزة Mac بسعة 8 GB؛ مع إبقاء الجدول على القرص، يصبح التوليد أبطأ بحوالي 10%. نفس النتائج.";
 "A quiet check at every launch. Only shows anything if an update exists." = "فحص صامت عند كل تشغيل. لا يُظهر شيئًا إلا إذا كان هناك تحديث.";
@@ -320,11 +320,11 @@
 "Echo gate" = "بوابة الصدى";
 "Edit Profile…" = "تحرير ملف التعريف…";
 "Embedding model" = "نموذج التضمين";
-"Enable Project Files…" = "تشغيل Project Files…";
+"Enable Project Files…" = "تشغيل ملفات المشروع…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "فعّل ملفات المشروع في الإعدادات لإضافة ملفات إلى المشروع والسماح لمحادثاته بالبحث فيها.";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "فعّل ملفات المشروع في الإعدادات › الملفات أولاً: عندها يُضاف دليل LLMTray هنا وتستشهد الإجابات به.";
-"Enable Project files to add files" = "شغّل Project files لإضافة ملفات";
-"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل Project files لإضافة ملفات إلى المشروع وتمكين الدردشات من البحث فيها. لا يُفهرس أو يُنزل شيء حتى ذلك الحين.";
+"Enable Project files to add files" = "شغّل ملفات المشروع لإضافة ملفات";
+"Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "شغّل ملفات المشروع لإضافة ملفات إلى المشروع وتمكين محادثاته من البحث فيها. لا تتم فهرسة أو تنزيل أي شيء حتى ذلك الحين.";
 "Enable Without It" = "تفعيل بدون ذلك";
 "Enable image editing?" = "تفعيل تحرير الصور؟";
 "Enable image generation" = "تمكين إنشاء الصور";
@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "سريع (لوحة أصغر)";
 "Faster long chats" = "تسريع المحادثات الطويلة";
 "Fetching file list…" = "جارٍ جلب قائمة الملفات…";
-"Files" = "Files";
+"Files" = "الملفات";
 "Files Settings…" = "إعدادات Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "الملفات التي تُضاف هنا تُنسَخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "الملفات المضافة إلى مشروع تُفهرَس على هذا الـMac، حتى تتمكن المحادثات من البحث فيها. البحث بحسب المعنى يستخدم نموذج تضمين؛ بدونه تُبحث الملفات حسب كلماتها.";
@@ -536,7 +536,7 @@
 "Maintenance" = "الصيانة";
 "Make a 30-second calm lo-fi instrumental for studying" = "أنشئ مقطعًا هادئًا lo-fi مدته 30 ثانية للمذاكرة";
 "Make images and edit them." = "إنشاء صور وتحريرها.";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "أنشئ صوراً وأغنيات وتحدّث بصوت نموذج صوتي، كل ذلك على هذا الـ Mac: فعّلها في الإعدادات.";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "أنشئ صوراً وأغانيَ وتحدّث مع نموذج صوتي، كل ذلك على هذا الـ Mac: فعّلها في الإعدادات.";
 "Make songs and instrumentals." = "إنشاء أغاني ومقاطع موسيقية.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "ينشئ معرّفًا عشوائيًا جديدًا: لا يمكن مطابقة التقارير اللاحقة بالسابقة.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "إنشاء مجلدات، النقل، إعادة التسمية والإرسال إلى Trash — تُعرض كل خطة عليك أولاً، ولا يتغير شيء حتى توافق.";

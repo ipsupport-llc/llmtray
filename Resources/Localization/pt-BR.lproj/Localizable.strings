@@ -322,7 +322,7 @@
 "Embedding model" = "Modelo de embedding";
 "Enable Project Files…" = "Ativar Arquivos do Projeto…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Ative Arquivos do projeto em Ajustes para adicionar arquivos ao projeto e permitir que suas conversas os pesquisem.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Ative Arquivos de Projeto em Ajustes › Arquivos primeiro: então o guia do LLMTray será adicionado aqui e as respostas o citarão.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Ative Arquivos do projeto em Ajustes › Arquivos primeiro: então o guia do LLMTray será adicionado aqui e as respostas o citarão.";
 "Enable Project files to add files" = "Ative Arquivos do Projeto para adicionar arquivos";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Ative Arquivos do Projeto para adicionar arquivos a um projeto e permitir que seus chats os pesquisem. Nada é indexado ou baixado até então.";
 "Enable Without It" = "Ativar sem ele";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Tentar novamente";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte o texto dos arquivos em vetores para pesquisa por significado, neste Mac. Remover mantém os índices: os arquivos serão pesquisados pelas palavras até que seja baixado novamente.";
 "Tweak…" = "Ajustar…";
-"Type a message below and press Return. Try: “What can you do?”" = "Digite uma mensagem abaixo e pressione Return. Experimente: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Digite uma mensagem abaixo e pressione Return. Experimente: “O que você pode fazer?”";
 "Unavailable" = "Indisponível";
 "Uncompressed (WAV)" = "Sem compactação (WAV)";
 "Undo" = "Desfazer";

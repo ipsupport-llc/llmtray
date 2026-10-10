@@ -352,7 +352,7 @@
 "Fast (smaller canvas)" = "Veloce (tela più piccola)";
 "Faster long chats" = "Chat lunghe più veloci";
 "Fetching file list…" = "Recupero elenco file…";
-"Files" = "Files";
+"Files" = "File";
 "Files Settings…" = "Impostazioni Files…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "I file aggiunti qui vengono copiati nel progetto e indicizzati su questo Mac; tutte le chat del progetto possono cercarli.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "I file aggiunti a un progetto vengono indicizzati su questo Mac, così le sue chat possono cercarli. La ricerca per significato usa un modello di embedding; senza di esso i file vengono cercati per parole.";
@@ -497,7 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Mantiene questa porta. Se un’altra app la sta usando, il server non si avvierà finché non cambi la porta in Impostazioni.";
 "Kept free: %lld MB" = "Mantenuto libero: %lld MB";
 "LLMTray" = "LLMTray";
-"LLMTray Guide" = "Guida a LLMTray";
+"LLMTray Guide" = "Guida di LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray non è autorizzato a usare il microfono.";
 "LLMTray restarts now to load them." = "LLMTray si riavvia ora per caricarli.";
 "LLMTray status, indexing project files" = "Stato di LLMTray, indicizzazione file del progetto";
@@ -1078,7 +1078,7 @@
 "Try Again" = "Riprova";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte il testo dei file in vettori per la ricerca per significato, su questo Mac. Rimuovendolo gli indici restano: i file verranno quindi cercati per parole fino a un nuovo download.";
 "Tweak…" = "Regola…";
-"Type a message below and press Return. Try: “What can you do?”" = "Digita un messaggio qui sotto e premi Invio. Prova: “What can you do?”";
+"Type a message below and press Return. Try: “What can you do?”" = "Digita un messaggio qui sotto e premi Invio. Prova: “Cosa puoi fare?”";
 "Unavailable" = "Non disponibile";
 "Uncompressed (WAV)" = "Non compresso (WAV)";
 "Undo" = "Annulla";

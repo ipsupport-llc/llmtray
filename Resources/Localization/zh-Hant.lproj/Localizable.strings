@@ -322,7 +322,7 @@
 "Embedding model" = "嵌入模型";
 "Enable Project Files…" = "開啟專案檔案…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "在設定中開啟「專案檔案」，以將檔案加入專案並讓對話搜尋它們。";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "請先在「設定 › 檔案」啟用 Project 檔案：啟用後會將 LLMTray 指南加入此處，回覆將引用該指南。";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "請先在「設定 › 檔案」啟用專案檔案：之後 LLMTray 指南會加入此處，回覆將引用它。";
 "Enable Project files to add files" = "開啟專案檔案以新增檔案";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "開啟專案檔案以新增檔案到專案並讓對話可搜尋它們。完成前不會進行索引或下載。";
 "Enable Without It" = "無此仍可啟用";
@@ -497,7 +497,7 @@
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "保留此連接埠。如果其他應用程式已佔用，伺服器將無法啟動，請到「設定」變更連接埠。";
 "Kept free: %lld MB" = "保留空閒：%lld MB";
 "LLMTray" = "LLMTray";
-"LLMTray Guide" = "LLMTray 使用說明";
+"LLMTray Guide" = "LLMTray 指南";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允許使用麥克風。";
 "LLMTray restarts now to load them." = "LLMTray 現在會重新啟動以載入這些項目。";
 "LLMTray status, indexing project files" = "LLMTray 狀態：正在為專案檔案建立索引";
@@ -536,7 +536,7 @@
 "Maintenance" = "維護";
 "Make a 30-second calm lo-fi instrumental for studying" = "製作 30 秒用於學習的寧靜 lo-fi 器樂曲";
 "Make images and edit them." = "產生並編輯影像。";
-"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上即可使用語音模型生成圖片、音樂與語音：請在「設定」中啟用。";
+"Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成圖片和歌曲，並與語音模型對話：請在「設定」中啟用。";
 "Make songs and instrumentals." = "產生歌曲與純伴奏。";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "產生新的隨機識別碼：之後的報告無法與先前報告比對。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "建立資料夾、移動、重新命名與移至垃圾桶——每項計畫會先顯示給您，未經核可不會進行變更。";
@@ -1078,7 +1078,7 @@
 "Try Again" = "重試";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "將檔案文字轉為用於語意搜尋的向量，並儲存在此台 Mac。移除模型不會刪除索引：在重新下載前，檔案會改以文字方式搜尋。";
 "Tweak…" = "微調…";
-"Type a message below and press Return. Try: “What can you do?”" = "在下方輸入訊息並按 Return。試試：「What can you do?」";
+"Type a message below and press Return. Try: “What can you do?”" = "在下方輸入訊息並按 Return。試試：「你能做什麼？」";
 "Unavailable" = "無法使用";
 "Uncompressed (WAV)" = "未壓縮（WAV）";
 "Undo" = "復原";
