@@ -23,7 +23,7 @@ public enum TelemetryFeature: String, CaseIterable, Codable, Sendable {
 public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
     case gemma, qwen, llama, mistral, phi, deepseek
     case gptOSS = "gpt-oss"
-    case glm, flux
+    case glm, nemotron, flux
     case zImage = "z-image"
     case aceStep = "ace-step"
     case other
@@ -41,11 +41,14 @@ public enum TelemetryModelFamily: String, CaseIterable, Codable, Sendable {
         // Qwen"), and is the distiller's.
         if has("gpt-oss", "gpt_oss", "gptoss") { return .gptOSS }
         if has("deepseek") { return .deepseek }
+        // NVIDIA's, on whatever base ("Llama-3.1-Nemotron", our VoiceChat).
+        if has("nemotron") { return .nemotron }
         if has("z-image", "z_image", "zimage") { return .zImage }
         if has("ace-step", "ace_step", "acestep") { return .aceStep }
         if has("flux") { return .flux }
         if has("gemma") { return .gemma }
-        if has("qwen", "qwq") { return .qwen }
+        // FrogNano and Ornith: Qwen3.5 fine-tunes whose names don't say so.
+        if has("qwen", "qwq", "frognano", "ornith") { return .qwen }
         if has("llama") { return .llama }
         if has("mistral", "mixtral", "ministral", "devstral", "magistral", "codestral", "pixtral") { return .mistral }
         if has("glm") { return .glm }

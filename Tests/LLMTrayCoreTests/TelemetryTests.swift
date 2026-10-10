@@ -33,7 +33,11 @@ final class TelemetryFamilyTests: XCTestCase {
             ("roman220220/z-image-turbo-gptq-mlx-8bit", .zImage),
             ("mlx-community/ACE-Step1.5-MLX-4bit", .aceStep),
             ("roman220220/ACE-Step1.5-sft-MLX-bf16", .aceStep),
-            ("nvidia/Nemotron-Nano-9B-v2", .other),
+            ("nvidia/Nemotron-Nano-9B-v2", .nemotron),
+            ("nvidia/Llama-3.1-Nemotron-Nano-8B-v1", .nemotron),
+            ("roman220220/NemotronLabs-VoiceChat-11B-gptq-mlx-3bit", .nemotron),
+            ("roman220220/FrogNano-4B-2609-gptq-mlx-jang", .qwen),
+            ("roman220220/Ornith-1.5-35B-A3B-gptq-mlx-jang-small", .qwen),
             ("", .other),
         ]
         for (model, family) in cases {
@@ -48,7 +52,7 @@ final class TelemetryFamilyTests: XCTestCase {
 
     func testFamiliesMatchTheServersEnum() {
         XCTAssertEqual(TelemetryModelFamily.allCases.map(\.rawValue),
-                       ["gemma", "qwen", "llama", "mistral", "phi", "deepseek", "gpt-oss", "glm", "flux", "z-image", "ace-step", "other"])
+                       ["gemma", "qwen", "llama", "mistral", "phi", "deepseek", "gpt-oss", "glm", "nemotron", "flux", "z-image", "ace-step", "other"])
         XCTAssertEqual(TelemetryFeature.allCases.map(\.rawValue),
                        ["chat", "tool_calls", "api_server", "image_generate", "image_edit", "music", "lora", "model_download"])
     }
