@@ -380,7 +380,10 @@ public enum TelemetryOutcome: Equatable, Sendable {
         case 204:
             return .sent
         case 429:
+            // At most maxWait: a longer wait than that is taken for a clock
+            // that was ahead (TelemetryUploader.run).
             let seconds = retryAfter.flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }.flatMap { $0 >= 0 ? $0 : nil }
+                .map { min($0, Int(TelemetryCounters.maxWait)) }
             return .retryLater(seconds: seconds)
         case 408, 500...599:
             return .retryLater(seconds: nil)
@@ -496,9 +499,12 @@ public struct TelemetryUploader {
         let started = now()
         let today = TelemetryDay.string(for: started, calendar: calendar)
         store.update { $0.prune(today: today, now: started, calendar: calendar) }
-        // A wait set by a clock that was ahead then is no wait.
-        if let notBefore = store.counters.notBefore, started < notBefore,
-           notBefore.timeIntervalSince(started) <= TelemetryCounters.maxWait { return done }
+        if let notBefore = store.counters.notBefore, started < notBefore {
+            // A wait longer than any it takes was set by a clock that was
+            // ahead then: no wait, and not kept.
+            guard notBefore.timeIntervalSince(started) > TelemetryCounters.maxWait else { return done }
+            store.update { $0.notBefore = nil }
+        }
         for day in store.counters.pending(today: today) {
             guard !Task.isCancelled, let id = installID(), let usage = store.counters.days[day] else { break }
             let outcome: TelemetryOutcome

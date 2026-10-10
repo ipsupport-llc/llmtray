@@ -44,8 +44,8 @@ country of a report); the app follows them.
   isn't running: the days wait for its next launch. Older days, and days
   more than one after today (a clock set back), are dropped unsent;
   tomorrow is kept (a Mac moved west of where it counted sends it once
-  it's over there). A wait (Retry-After, backoff) longer than two days
-  was set by a clock that was ahead, and is ignored. "7
+  it's over there). A Retry-After is taken up to two days; a stored wait
+  longer than that was set by a clock that was ahead, and is dropped. "7
   days back" is also counted from the UTC day, as the server does: a Mac
   behind UTC would otherwise send a day it refuses. Days are Gregorian
   (`yyyy-MM-dd`) whatever calendar the user picked. A day the app ran on

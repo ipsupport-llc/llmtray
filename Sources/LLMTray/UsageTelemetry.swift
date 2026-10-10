@@ -174,7 +174,7 @@ final class UsageTelemetry: ObservableObject {
         // Target/selector, not a closure (adr/0008: CI's toolchain).
         let first = Timer(fireAt: Date().addingTimeInterval(Self.launchDelay), interval: Self.interval, target: self,
                           selector: #selector(tick), userInfo: nil, repeats: true)
-        first.tolerance = 60
+        first.tolerance = 5   // the first send stays about launchDelay in
         RunLoop.main.add(first, forMode: .common)
         timer = first
     }

@@ -365,6 +365,17 @@ extension TelemetryUploaderTests {
         await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
         XCTAssertEqual(Stub.requests.count, 1)
         XCTAssertTrue(store.counters.pending(today: "2026-09-27").isEmpty)
+        XCTAssertNil(store.counters.notBefore)
+        // Nothing to send: the bogus wait still goes.
+        store.update { $0.notBefore = self.now.addingTimeInterval(30 * 86400) }
+        await uploader.run(store: store, now: { self.now }, installID: { installID }, environment: { env })
+        XCTAssertNil(store.counters.notBefore)
+    }
+
+    func testALongRetryAfterIsCutToTheLongestWait() {
+        XCTAssertEqual(TelemetryOutcome.classify(status: 429, body: nil, retryAfter: "300000"),
+                       .retryLater(seconds: Int(TelemetryCounters.maxWait)))
+        XCTAssertEqual(TelemetryOutcome.classify(status: 429, body: nil, retryAfter: "3600"), .retryLater(seconds: 3600))
     }
 
     func testTurnedOffSendsNothing() async {
