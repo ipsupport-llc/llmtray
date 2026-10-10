@@ -167,7 +167,7 @@
 "Beta: pre-release builds with features still being tested, and runtime updates from mlx-lm's beta branch. Switching back to Stable doesn't downgrade an installed beta; the next stable release replaces it." = "Бета — предварительные сборки с функциями, которые ещё тестируются, и обновления рантайма из бета-ветки mlx-lm. Возврат на Stable не откатывает установленную бету: её заменит следующий стабильный релиз.";
 "Beta: pre-release builds with features still being tested." = "Beta: предрелизные сборки с тестируемыми функциями.";
 "Bigger than the recommended one: better answers, but slower, with less memory left for other apps." = "Больше рекомендованного: даёт лучшие ответы, но медленнее и оставляет меньше памяти для других приложений.";
-"Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Импортирует чаты, проекты, профили, модели для изображений, музыки, голоса и embedding, а также настройки версии с ipsupport.us (сначала завершите её). Чаты и модели здесь сохраняются; её настройки заменят текущие. Модели не займут дополнительного места. Модели чатов остаются в вашей папке моделей: выберите её в Настройки › Модели.";
+"Brings over the chats, projects, profiles, the image, music, voice and embedding models and the settings of the version from ipsupport.us (quit it first). Chats and models here stay; its settings replace these. The models take no extra disk space. Chat models stay in your models folder: choose it in Settings › Models." = "Импортирует чаты, проекты, профили, модели для изображений, музыки, голоса и embedding, а также настройки версии с ipsupport.us (сначала завершите её). Чаты и модели здесь сохраняются; её настройки заменят текущие. Модели не займут дополнительного места. Модели чатов остаются в вашей папке моделей: выберите её в разделе «Настройки › Модели».";
 "Browse Hugging Face…" = "Открыть Hugging Face…";
 "Cached" = "В кэше";
 "Calculator" = "Калькулятор";
@@ -322,7 +322,7 @@
 "Embedding model" = "Модель эмбеддингов";
 "Enable Project Files…" = "Включить файлы проекта…";
 "Enable Project files in Settings to add files to the project and let its chats search them." = "Включите файлы проекта в Настройках, чтобы добавлять файлы в проект и позволить чатам их искать.";
-"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Сначала включите файлы проекта в Настройки › Файлы: тогда сюда добавится руководство LLMTray, и ответы будут на него ссылаться.";
+"Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Сначала включите файлы проекта в разделе «Настройки › Файлы»: тогда сюда добавится руководство LLMTray, и ответы будут на него ссылаться.";
 "Enable Project files to add files" = "Включите файлы проекта, чтобы добавлять файлы";
 "Enable Project files to add files to a project and let its chats search them. Nothing is indexed or downloaded until then." = "Включите файлы проекта, чтобы добавлять файлы в проект и искать по ним в его чатах. До этого ничего не индексируется и не скачивается.";
 "Enable Without It" = "Включить без неё";
@@ -389,7 +389,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑bit + 8‑bit speech: самый быстрый сборник IPSupport — 3‑битная языковая модель с 8‑битным распознаванием речи и голосом, все тесты проходят корректно. GPTQ 3‑bit: то же, но модули речи в полной точности. 4‑bit: сборка mlx‑community. Каждая версия загружается только по запросу.";
 "GPU memory limit" = "Лимит памяти GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Объём памяти GPU, который сервер модели оставляет свободным помимо весов, для активаций и macOS. Ниже указаны доли от того, что остаётся после этого.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Доступ по запросу: сначала примите лицензию на Hugging Face и сохраните токен в Настройки › Модели.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Доступ по запросу: сначала примите лицензию на Hugging Face и сохраните токен в разделе «Настройки › Модели».";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Закрыт: примите лицензию на странице модели на Hugging Face и добавьте токен в Настройки → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Закрыт: запросите доступ на странице модели на Hugging Face (авторы рассматривают запрос), затем добавьте токен в Настройки → Models.";
 "General" = "Основные";
@@ -479,10 +479,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "У неё не было собственных настроек для импорта; текущие настройки сохранены.";
 "It is being set up or updated. Try again once that's done." = "Происходит настройка или обновление. Попробуйте снова после завершения.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "Элементы отправляются в Корзину, а не удаляются. Чтобы вернуть их, используйте Undo здесь или в Настройках: Put Back в Finder не знает их папку.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Его профиль Default находится в Настройки › Профили под именем «Default (ipsupport.us)»: ваш профиль здесь был изменён, поэтому он сохранён.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Его профиль Default находится в разделе «Настройки › Профили» под именем «Default (ipsupport.us)»: ваш профиль здесь был изменён, поэтому он сохранён.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Чаты остаются и возвращаются в «Недавние»; инструкции и файлы проекта удаляются.";
 "Its memory, in GB." = "Её объём памяти, в ГБ.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Её настройки тоже перенесены; токен Hugging Face нужно ввести заново в Настройки › Модели.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Её настройки тоже перенесены; токен Hugging Face нужно ввести заново в разделе «Настройки › Модели».";
 "Its settings were the same as these already." = "Её настройки совпадали с текущими.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Её настройки не были импортированы: %@ не находится в ~/Library/Preferences.";
 "KV cache" = "KV-кэш";

@@ -70,7 +70,7 @@
 "A chat model" = "Mô hình trò chuyện";
 "A client" = "Một client";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "Giai điệu phong phú hơn, nghe như bản hoàn chỉnh; lời hát ít rõ hơn. Khoảng 20 giây cho 30 giây nhạc.";
-"A model is a tool, not an authority" = "Mô hình là công cụ, không phải thẩm quyền";
+"A model is a tool, not an authority" = "Mô hình là công cụ, không phải nguồn có thẩm quyền";
 "A package: moved as one item." = "Một gói: di chuyển như một mục duy nhất.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "Một bảng nhúng theo lớp (Gemma 4 E2B, E4B) được đọc từ đĩa khi cần, và phần ảnh cùng âm thanh (Gemma 4, Qwen 3.5) được tải lần đầu tiên khi sử dụng. Tiết kiệm tới khoảng 2 GB bộ nhớ trên Mac có 8 GB; khi bảng ở trên đĩa, việc sinh trả lời chậm hơn khoảng 10%. Kết quả đầu ra không thay đổi.";
 "A quiet check at every launch. Only shows anything if an update exists." = "Kiểm tra âm thầm mỗi khi khởi chạy. Chỉ hiển thị khi có bản cập nhật.";
