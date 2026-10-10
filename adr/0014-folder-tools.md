@@ -363,3 +363,34 @@ took `change_files` for a text editor and wrote a shell script.
 3. Change tools + plan review + Trash + journal + Undo.
 4. Evals: "sort my Downloads" on a fixture folder, prompt-injection file
    names, a model trying paths outside the grant.
+
+## Looking at an image, adding to the project (2026-10-10)
+
+The user's ask: "there's a PDF about AI programming in my Downloads, add
+it to this project", and "look at the picture in that folder". Two more
+switches on `files`, not new tools (fewer tools):
+
+- `files(path, view: true)` — the whole image, for the model to see.
+  Declared only for a model that sees images. Read by descriptor from
+  the grant root like every read (`FolderFileTake`), at most 40 MB, never
+  through a link; the app decodes it (anything ImageIO can't open is
+  refused), caps its long side like an attachment's and puts it in front
+  of the model as `view_image` does (a hidden message, not saved). It is
+  a folder read: the trust barrier holds as for any `files` result, and
+  the result says what's in it is data, not instructions.
+- `files(path, add_to_project: true)` — a copy of the file into the
+  chat's project. Declared only in a saved chat that is in a project.
+  First the file is only checked (a format the project takes, at most
+  1 GB, and the same content guards as `files` info: nothing named like
+  a secret, Hardening 17; nothing with another name, Hardening 5;
+  nothing only in iCloud, Hardening 15) -- nothing of it is read. Then
+  **the user is asked** in a dialog naming the file, its size and the
+  project; a "Don't Add" holds for that file in that chat (the dialog
+  doesn't come back). Only after a yes is the file copied by descriptor
+  (the guards again, reads set not to download) into a folder of the
+  app's temp directory, handed to the project's ingest, and the copy
+  removed; copies a crash left behind are removed at launch. Nothing in
+  the user's folder changes, so it is not a `change_files` op and needs
+  a read grant only; the confirmation is what keeps a file name or a
+  file's text from adding anything by itself.
+- `view` holds to the same guards.

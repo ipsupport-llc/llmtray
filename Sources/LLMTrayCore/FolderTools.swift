@@ -12,6 +12,9 @@ public enum FolderTools {
 
     static let filesDescription = "Look in the user's folders: a folder's listing, a file's info, or duplicate files. "
         + "No path: the folders you may access."
+    /// The two ways a file leaves its folder, each said only when declared.
+    static let viewDescription = " view: see an image file."
+    static let addDescription = " add_to_project: copy a file into this chat's project (the user confirms)."
 
     /// What `files` reads (the declared fields plus `hidden`, taken but
     /// never declared: a listing says when it matters).
@@ -26,11 +29,24 @@ public enum FolderTools {
         .init("hash", .boolean, "A file's SHA-256", aliases: ["sha256", "checksum", "sha"]),
         .init("cursor", .string, aliases: ["next", "page", "next_cursor", "continue", "page_token"]),
         .init("hidden", .boolean, aliases: ["include_hidden", "show_hidden", "all"]),
+        .init("view", .boolean, "Look at this image file",
+              aliases: ["look", "see", "show", "view_image", "look_at", "display"]),
+        .init("add_to_project", .boolean, "Copy this file into the chat's project",
+              aliases: ["add", "to_project", "add_to_the_project", "import", "project"]),
     ])
 
-    public static var filesDefinition: [String: Any] {
-        ToolSchema(filesName, filesDescription, filesSchema.params.filter { $0.name != "hidden" }).definition
+    /// `view` only for a model that sees images, `add_to_project` only in
+    /// a chat that's in a project (adr/0014, "Looking at an image, adding
+    /// to the project"); `hidden` never.
+    public static func filesDefinition(view: Bool, addToProject: Bool) -> [String: Any] {
+        let params = filesSchema.params.filter {
+            $0.name != "hidden" && ($0.name != "view" || view) && ($0.name != "add_to_project" || addToProject)
+        }
+        let description = filesDescription + (view ? viewDescription : "") + (addToProject ? addDescription : "")
+        return ToolSchema(filesName, description, params).definition
     }
+
+    public static var filesDefinition: [String: Any] { filesDefinition(view: false, addToProject: false) }
 
     public struct FilesRequest: Equatable, Sendable {
         /// nil: the folders the chat may access.
@@ -41,9 +57,13 @@ public enum FolderTools {
         public var hash = false
         public var cursor: String?
         public var hidden = false
+        /// The whole image, for the model to see.
+        public var view = false
+        /// A copy into the chat's project, once the user confirms.
+        public var addToProject = false
 
         public init(path: String? = nil, recursive: Bool = false, pattern: String? = nil, onlyDuplicates: Bool = false,
-                    hash: Bool = false, cursor: String? = nil, hidden: Bool = false) {
+                    hash: Bool = false, cursor: String? = nil, hidden: Bool = false, view: Bool = false, addToProject: Bool = false) {
             self.path = path
             self.recursive = recursive
             self.pattern = pattern
@@ -51,6 +71,8 @@ public enum FolderTools {
             self.hash = hash
             self.cursor = cursor
             self.hidden = hidden
+            self.view = view
+            self.addToProject = addToProject
         }
     }
 
@@ -62,7 +84,8 @@ public enum FolderTools {
         }
         var r = FilesRequest(path: text("path"), recursive: values["recursive"] as? Bool ?? false, pattern: text("pattern"),
                              onlyDuplicates: values["only_duplicates"] as? Bool ?? false, hash: values["hash"] as? Bool ?? false,
-                             cursor: text("cursor"), hidden: values["hidden"] as? Bool ?? false)
+                             cursor: text("cursor"), hidden: values["hidden"] as? Bool ?? false,
+                             view: values["view"] as? Bool ?? false, addToProject: values["add_to_project"] as? Bool ?? false)
         // "pdf" or ".pdf" for "*.pdf": a pattern without a wildcard is a
         // name's end, as "only the PDFs" is usually written.
         if let p = r.pattern, !p.contains("*"), !p.contains("?"), !p.contains("[") {

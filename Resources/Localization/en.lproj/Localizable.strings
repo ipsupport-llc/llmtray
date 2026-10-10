@@ -97,6 +97,7 @@
 "Add files to a project, or images for the model to see" = "Add files to a project, or images for the model to see";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
 "Add the files to a project?" = "Add the files to a project?";
+"Add “%1$@” to “%2$@”?" = "Add “%1$@” to “%2$@”?";
 "Added %@" = "Added %@";
 "Added here" = "Added here";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
@@ -297,6 +298,7 @@
 "Documents go into a project with this chat." = "Documents go into a project with this chat.";
 "Documents go into a project with this chat; images go into your message." = "Documents go into a project with this chat; images go into your message.";
 "Doesn't open at login" = "Doesn't open at login";
+"Don't Add" = "Don't Add";
 "Don't Ask Again" = "Don't Ask Again";
 "Don't show again" = "Don't show again";
 "Done" = "Done";
@@ -974,6 +976,7 @@
 "The app's language (the language only, not the region)." = "The app's language (the language only, not the region).";
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
 "The chat model couldn't be unloaded for Voice Lab." = "The chat model couldn't be unloaded for Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.";
