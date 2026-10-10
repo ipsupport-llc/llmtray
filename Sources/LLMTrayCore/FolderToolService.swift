@@ -56,14 +56,18 @@ public enum FolderToolAnswer: Equatable, Sendable {
     /// `files(view)`: the image file's bytes, for the app to put in front
     /// of the model; `path` as the model sees it.
     case image(Data, path: String)
-    /// `files(add_to_project)`: a copy of the file in a folder of its own
-    /// (the app asks the user, adds it, then removes that folder).
+    /// `files(add_to_project)`: the file may be added (checked, nothing of
+    /// it read): the app asks the user, then `copyForProject`. `raw` is the
+    /// path as the model wrote it.
+    case projectCandidate(raw: String, path: String, bytes: Int64)
+    /// `copyForProject`: a copy of the file in a folder of its own (the app
+    /// adds it, then removes that folder).
     case fileForProject(URL, path: String)
 
     public var text: String {
         switch self {
         case .text(let t), .refused(let t): return t
-        case .image(_, let path), .fileForProject(_, let path): return path
+        case .image(_, let path), .fileForProject(_, let path), .projectCandidate(_, let path, _): return path
         }
     }
 }
@@ -439,11 +443,11 @@ public final class FolderToolService: @unchecked Sendable {
         }
         let note = changeNextMessage && !chat.temporary
             && covered(path, level: .change, chat: chat, callKey: callKey) != nil ? FolderToolText.nextMessageNote : nil
-        // A whole file out of the folder: read or copied by descriptor.
+        // A whole file out of the folder: read, or checked for a copy.
         if request.view || request.addToProject {
-            let answer = take(request, at: location, isCancelled: { isCancelled() || !stillGranted() })
+            let answer = request.view ? take(request, at: location, isCancelled: { isCancelled() || !stillGranted() })
+                : candidate(raw: raw, at: location)
             guard !revoked.isSet, stillGranted() else {
-                if case .fileForProject(let url, _) = answer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
                 return .refused("Access to that folder was withdrawn while it was being read: nothing from it can be used. "
                     + "Answer without it.")
             }
@@ -504,24 +508,69 @@ public final class FolderToolService: @unchecked Sendable {
         FileManager.default.temporaryDirectory.appendingPathComponent("folder-take", isDirectory: true)
     }
 
-    /// `view`: the file's bytes; `add_to_project`: a copy of it.
+    /// Copies left by a run that ended mid-add: removed at launch.
+    public static func clearTakeDirectory() {
+        try? FileManager.default.removeItem(at: takeDirectory)
+    }
+
+    /// `view`: the file's bytes.
     func take(_ request: FolderTools.FilesRequest, at location: FolderLocation,
               isCancelled: @escaping () -> Bool) -> FolderToolAnswer {
         let walker = SafeFolderWalker(root: location.root, denylist: denylist)
         let shown = display(location.displayPath)
         do {
-            if request.view {
-                let data = try FolderFileTake.read(walker, location.components, maxBytes: FolderFileTake.maxViewBytes,
-                                                   isCancelled: isCancelled)
-                return .image(data, path: shown)
-            }
-            let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
-                                              maxBytes: FolderFileTake.maxProjectBytes, isCancelled: isCancelled)
-            return .fileForProject(url, path: shown)
-        } catch let error as FolderAccessError {
-            return .text("\(FolderTools.filesName): \(errorText(error)).")
+            let data = try FolderFileTake.read(walker, location.components, maxBytes: FolderFileTake.maxViewBytes,
+                                               isCancelled: isCancelled)
+            return .image(data, path: shown)
         } catch {
             return .text("\(FolderTools.filesName): \(errorText(error)).")
+        }
+    }
+
+    /// `add_to_project`, before the user is asked: a format the project
+    /// takes, and a file the guards let be read -- nothing of it read yet.
+    func candidate(raw: String, at location: FolderLocation) -> FolderToolAnswer {
+        let walker = SafeFolderWalker(root: location.root, denylist: denylist)
+        let shown = display(location.displayPath)
+        guard let name = location.components.last, ProjectFileFormats.isOffered(URL(fileURLWithPath: name)) else {
+            return .text("\(FolderTools.filesName): \(shown) can't be added: project files are text, Markdown, code, PDF, "
+                + "Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).")
+        }
+        do {
+            let bytes = try FolderFileTake.check(walker, location.components, maxBytes: FolderFileTake.maxProjectBytes)
+            return .projectCandidate(raw: raw, path: shown, bytes: bytes)
+        } catch {
+            return .text("\(FolderTools.filesName): \(errorText(error)).")
+        }
+    }
+
+    /// `add_to_project` once the user said yes: the file copied by
+    /// descriptor (the guards again) into a folder of its own. Only under
+    /// a read grant the chat still has -- nothing is asked here.
+    public func copyForProject(raw: String, chat: FolderChat, callKey: String,
+                               isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
+        let name = FolderTools.filesName
+        guard let path = try? absolute(raw, usable: usableGrants(chat, callKey: callKey)),
+              let location = authorized(path, level: .read, chat: chat, callKey: callKey) else {
+            return .text("\(name): \(raw) is no longer in a folder shared with this chat: nothing was added.")
+        }
+        let stillGranted = { [self] () -> Bool in
+            !hasEnded(chat.id) && grants.coversRead(path: location.displayPath, chatID: chat.id, callKey: callKey,
+                                                     temporaryChat: chat.temporary)
+        }
+        let walker = SafeFolderWalker(root: location.root, denylist: denylist)
+        let shown = display(location.displayPath)
+        do {
+            let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
+                                              maxBytes: FolderFileTake.maxProjectBytes,
+                                              isCancelled: { isCancelled() || !stillGranted() })
+            guard stillGranted() else {
+                try? FileManager.default.removeItem(at: url.deletingLastPathComponent())
+                return .refused("Access to that folder was withdrawn: nothing was added.")
+            }
+            return .fileForProject(url, path: shown)
+        } catch {
+            return .text("\(name): \(errorText(error)).")
         }
     }
 

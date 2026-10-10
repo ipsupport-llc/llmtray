@@ -30,15 +30,44 @@ final class FolderFileTakeTests: FolderTestCase {
         XCTAssertEqual(path, "~/grant/photo.png")
     }
 
-    func testAddToProjectCopiesUnderItsName() async throws {
+    func testAddToProjectIsCheckedFirstAndCopiedOnlyAfter() async throws {
         write("notes.md", "# AI programming")
-        guard case .fileForProject(let url, _) = await take("~/grant/notes.md", add: true) else { return XCTFail("a copy") }
+        guard case .projectCandidate(let raw, let path, let bytes) = await take("~/grant/notes.md", add: true) else {
+            return XCTFail("a candidate")
+        }
+        XCTAssertEqual(path, "~/grant/notes.md")
+        XCTAssertEqual(bytes, 16)
+        guard case .fileForProject(let url, _) = await service.copyForProject(raw: raw, chat: chat, callKey: "k") else {
+            return XCTFail("a copy")
+        }
         defer { try? fm.removeItem(at: url.deletingLastPathComponent()) }
         XCTAssertEqual(url.lastPathComponent, "notes.md")
         XCTAssertEqual(try String(contentsOf: url, encoding: .utf8), "# AI programming")
         XCTAssertTrue(url.path.hasPrefix(FolderToolService.takeDirectory.path), url.path)
-        // The original stays where it was.
-        XCTAssertTrue(fm.fileExists(atPath: grant + "/notes.md"))
+        XCTAssertTrue(fm.fileExists(atPath: grant + "/notes.md"), "the original stays")
+        // A format the project doesn't take: refused before anyone is asked.
+        writeData("movie.mov", Data(count: 10))
+        if case .projectCandidate = await take("~/grant/movie.mov", add: true) { XCTFail("not a project format") }
+        // Outside the chat's grants: no copy, nothing asked.
+        write("secret.txt", "outside", in: outside)
+        if case .fileForProject = await service.copyForProject(raw: outside + "/secret.txt", chat: chat, callKey: "k") {
+            XCTFail("copied from outside the grant")
+        }
+    }
+
+    func testSecretsHardLinksArentTaken() async throws {
+        write("id_ed25519", "-----BEGIN OPENSSH PRIVATE KEY-----")
+        write(".env", "TOKEN=x")
+        let photo = writeData("photo.png", Data(count: 64))
+        try fm.linkItem(atPath: photo, toPath: outside + "/same.png")
+        for answer in [await take("~/grant/id_ed25519", add: true), await take("~/grant/.env", add: true),
+                       await take("~/grant/photo.png", view: true), await take("~/grant/photo.png", add: true)] {
+            switch answer {
+            case .image, .projectCandidate, .fileForProject: XCTFail("taken: \(answer)")
+            default: break
+            }
+        }
+        XCTAssertThrowsError(try FolderFileTake.copy(walker, ["id_ed25519"], into: FolderToolService.takeDirectory, maxBytes: 1 << 20))
     }
 
     func testNeverThroughALinkOrPastTheGrant() async throws {

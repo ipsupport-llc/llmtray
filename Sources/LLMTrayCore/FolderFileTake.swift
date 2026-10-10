@@ -4,8 +4,12 @@ import Foundation
 /// A whole file out of a granted folder (adr/0014, "Looking at an image,
 /// adding to the project"): an image the model asked to look at
 /// (`files(view)`), or a copy for the chat's project
-/// (`files(add_to_project)`). Read through a descriptor opened from the
-/// grant root, like every other read -- never by path -- and bounded.
+/// (`files(add_to_project)`, made only once the user said yes). Read
+/// through a descriptor opened from the grant root, like every other read
+/// -- never by path -- bounded, and held to the same content guards as
+/// `files` info: nothing named like a secret (Hardening 17), nothing with
+/// another name (a hard link, Hardening 5), nothing only in iCloud
+/// (Hardening 15, reads set not to download).
 public enum FolderFileTake {
     /// The most `view` reads: an image bigger than this isn't a photo.
     public static let maxViewBytes = 40 * 1024 * 1024
@@ -14,6 +18,9 @@ public enum FolderFileTake {
 
     public enum TakeError: Error, Equatable, CustomStringConvertible {
         case tooLarge(String, limit: Int64)
+        case looksSecret(String)
+        case hardLinked(String)
+        case notDownloaded(String)
         case cancelled
         case write(String, Int32)
 
@@ -21,15 +28,44 @@ public enum FolderFileTake {
             switch self {
             case .tooLarge(let shown, let limit):
                 return "\(shown) is larger than \(ByteCountFormatter.string(fromByteCount: limit, countStyle: .file))"
+            case .looksSecret(let shown): return "\(shown) is \(FileClassifier.secretNote)"
+            case .hardLinked(let shown):
+                return "\(shown) has more than one name (a hard link, maybe to a file outside this folder): contents not read"
+            case .notDownloaded(let shown): return "\(shown) is \(FileClassifier.notDownloadedNote)"
             case .cancelled: return "cancelled"
             case .write(let what, let code): return "\(what) failed: \(String(cString: strerror(code)))"
             }
         }
     }
 
+    /// What a file is before anything of it is read: its size, when the
+    /// guards let it be read at all.
+    public static func check(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int64) throws -> Int64 {
+        let item = try walker.resolve(components)
+        let shown = walker.display(components)
+        guard let entry = item.entry else { throw FolderAccessError.notFound(shown) }
+        guard entry.kind == .file else { throw FolderAccessError.notARegularFile(shown) }
+        try guards(entry.stat, item: item, walker: walker, shown: shown)
+        guard entry.stat.size <= maxBytes else { throw TakeError.tooLarge(shown, limit: maxBytes) }
+        return entry.stat.size
+    }
+
+    private static func guards(_ stat: EntryStat, item: ResolvedItem, walker: SafeFolderWalker, shown: String) throws {
+        if FolderDenylist.looksSecret(name: item.name, parentName: FileClassifier.parentName(item, walker: walker)) {
+            throw TakeError.looksSecret(shown)
+        }
+        if stat.isDataless { throw TakeError.notDownloaded(shown) }
+        if stat.isHardLinked { throw TakeError.hardLinked(shown) }
+    }
+
     /// The whole file, at most `maxBytes`.
     public static func read(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int,
                             isCancelled: () -> Bool = { false }) throws -> Data {
+        try Materialization.off { try reading(walker, components, maxBytes: maxBytes, isCancelled: isCancelled) }
+    }
+
+    private static func reading(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int,
+                                isCancelled: () -> Bool) throws -> Data {
         let file = try open(walker, components, maxBytes: Int64(maxBytes))
         var data = Data()
         data.reserveCapacity(Int(file.stat.size))
@@ -43,6 +79,11 @@ public enum FolderFileTake {
     /// (the caller removes that folder once done with it).
     public static func copy(_ walker: SafeFolderWalker, _ components: [String], into directory: URL, maxBytes: Int64,
                             isCancelled: () -> Bool = { false }) throws -> URL {
+        try Materialization.off { try copying(walker, components, into: directory, maxBytes: maxBytes, isCancelled: isCancelled) }
+    }
+
+    private static func copying(_ walker: SafeFolderWalker, _ components: [String], into directory: URL, maxBytes: Int64,
+                                isCancelled: () -> Bool) throws -> URL {
         let file = try open(walker, components, maxBytes: maxBytes)
         guard let name = components.last else { throw FolderAccessError.invalidPath("the grant root itself") }
         let folder = directory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -78,8 +119,12 @@ public enum FolderFileTake {
 
     private static func open(_ walker: SafeFolderWalker, _ components: [String], maxBytes: Int64) throws -> Descriptor {
         let item = try walker.resolve(components)
+        let shown = walker.display(components)
+        if let entry = item.entry { try guards(entry.stat, item: item, walker: walker, shown: shown) }
         let file = try walker.openFile(item)
-        guard file.stat.size <= maxBytes else { throw TakeError.tooLarge(walker.display(components), limit: maxBytes) }
+        // Evicted or linked since lstat: the open file's own flags decide.
+        try guards(file.stat, item: item, walker: walker, shown: shown)
+        guard file.stat.size <= maxBytes else { throw TakeError.tooLarge(shown, limit: maxBytes) }
         return file
     }
 

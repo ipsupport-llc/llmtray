@@ -380,12 +380,17 @@ switches on `files`, not new tools (fewer tools):
   the result says what's in it is data, not instructions.
 - `files(path, add_to_project: true)` — a copy of the file into the
   chat's project. Declared only in a saved chat that is in a project.
-  The file is copied by descriptor into a folder of the app's own temp
-  directory (at most 1 GB; a name swapped for a link meanwhile is never
-  followed), and only then, **after the user says yes** in a dialog
-  naming the file and the project, handed to the project's ingest; the
-  temp copy is removed either way. Nothing in the user's folder changes,
-  so it is not a `change_files` op and needs a read grant only; the
-  confirmation is what keeps a file name or a file's text from adding
-  anything by itself. Formats the project doesn't take are refused
-  before the user is asked.
+  First the file is only checked (a format the project takes, at most
+  1 GB, and the same content guards as `files` info: nothing named like
+  a secret, Hardening 17; nothing with another name, Hardening 5;
+  nothing only in iCloud, Hardening 15) -- nothing of it is read. Then
+  **the user is asked** in a dialog naming the file, its size and the
+  project; a "Don't Add" holds for that file in that chat (the dialog
+  doesn't come back). Only after a yes is the file copied by descriptor
+  (the guards again, reads set not to download) into a folder of the
+  app's temp directory, handed to the project's ingest, and the copy
+  removed; copies a crash left behind are removed at launch. Nothing in
+  the user's folder changes, so it is not a `change_files` op and needs
+  a read grant only; the confirmation is what keeps a file name or a
+  file's text from adding anything by itself.
+- `view` holds to the same guards.
