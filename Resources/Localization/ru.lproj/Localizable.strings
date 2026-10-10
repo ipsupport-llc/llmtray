@@ -52,7 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld прервано: просмотрите их в Finder";
 "%lld items put back under their names." = "%lld элементов возвращено в их имена.";
 "%lld more" = "ещё %lld";
-"%lld more…" = "%lld ещё…";
+"%lld more…" = "Ещё %lld…";
 "%lld need a look: see the list." = "%lld требуют просмотра: см. список.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld новых с момента открытия списка: сняты, пока вы не отметите их.";
 "%lld of 5 stars" = "%lld из 5 звёзд";
@@ -330,9 +330,9 @@
 "Drop chats or files here to add them to the project" = "Перетащите чаты или файлы сюда, чтобы добавить их в проект";
 "Drop files here" = "Перетащите файлы сюда";
 "Drop files here to add them to the project" = "Перетащите файлы сюда, чтобы добавить их в проект";
-"Drop to add files" = "Перетащите, чтобы добавить файлы";
-"Drop to add to “%@”" = "Перетащите, чтобы добавить в «%@»";
-"Drop to attach images" = "Перетащите, чтобы прикрепить изображения";
+"Drop to add files" = "Отпустите, чтобы добавить файлы";
+"Drop to add to “%@”" = "Отпустите, чтобы добавить в «%@»";
+"Drop to attach images" = "Отпустите, чтобы прикрепить изображения";
 "Duplicate this profile" = "Дублировать профиль";
 "Echo cancellation" = "Ш подавление эха";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не удалось запустить подавление эха: %@ — отключите в «Настройки» > «Голос».";

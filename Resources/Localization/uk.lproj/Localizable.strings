@@ -52,7 +52,7 @@
 "%lld interrupted: look at them in Finder" = "%lld перервано: перегляньте їх у Finder";
 "%lld items put back under their names." = "%lld елементів повернуто під їхні імена.";
 "%lld more" = "ще %lld";
-"%lld more…" = "%lld ще…";
+"%lld more…" = "Ще %lld…";
 "%lld need a look: see the list." = "%lld потребують перегляду: див. список.";
 "%lld new since you opened the list: unticked until you tick them." = "%lld нових від моменту відкриття списку: не відмічені, поки ви не позначите їх.";
 "%lld of 5 stars" = "%lld із 5 зірок";
@@ -330,9 +330,9 @@
 "Drop chats or files here to add them to the project" = "Перетягніть чати або файли сюди, щоб додати їх до проєкту";
 "Drop files here" = "Перетягніть файли сюди";
 "Drop files here to add them to the project" = "Перетягніть файли сюди, щоб додати їх до проєкту";
-"Drop to add files" = "Перетягніть, щоб додати файли";
-"Drop to add to “%@”" = "Перетягніть, щоб додати до «%@»";
-"Drop to attach images" = "Перетягніть, щоб приєднати зображення";
+"Drop to add files" = "Відпустіть, щоб додати файли";
+"Drop to add to “%@”" = "Відпустіть, щоб додати до «%@»";
+"Drop to attach images" = "Відпустіть, щоб приєднати зображення";
 "Duplicate this profile" = "Дублювати профіль";
 "Echo cancellation" = "Поглинання ехо";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Не вдалося ввімкнути поглинання ехо: %@ — вимкніть у Налаштування > Голос.";
@@ -1036,7 +1036,7 @@
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "Наступні кроки налаштують модель і потрібні функції. Кожен крок можна пропустити; нічого не завантажується й не вмикається, поки ви не оберете.";
 "The plan changed since you looked at it: review it again." = "План змінився з моменту вашого перегляду: перевірте його ще раз.";
 "The port and network access can change only while the server is stopped." = "Порт і доступ до мережі можна змінювати лише коли сервер зупинено.";
-"The project's files, and Add Files…" = "Файли проєкту та Додати файли…";
+"The project's files, and Add Files…" = "Файли проєкту та «Додати файли…»";
 "The reply was cut at its length limit." = "Відповідь була обрізана через обмеження довжини.";
 "The report" = "Звіт";
 "The reports" = "Звіти";

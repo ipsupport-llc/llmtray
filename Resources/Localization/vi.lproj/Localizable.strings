@@ -330,9 +330,9 @@
 "Drop chats or files here to add them to the project" = "Thả cuộc trò chuyện hoặc tệp vào đây để thêm vào dự án";
 "Drop files here" = "Thả tệp vào đây";
 "Drop files here to add them to the project" = "Thả tệp vào đây để thêm vào dự án";
-"Drop to add files" = "Kéo thả để thêm tệp";
-"Drop to add to “%@”" = "Kéo thả để thêm vào “%@”";
-"Drop to attach images" = "Kéo thả để đính kèm ảnh";
+"Drop to add files" = "Thả để thêm tệp";
+"Drop to add to “%@”" = "Thả để thêm vào “%@”";
+"Drop to attach images" = "Thả để đính kèm ảnh";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
 "Echo cancellation" = "Hủy tiếng vọng";
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động hủy tiếng vọng: %@ — tắt trong Cài đặt > Âm thanh.";
