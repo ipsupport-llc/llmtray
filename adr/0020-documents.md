@@ -55,9 +55,22 @@ a 4B model looks as good as one from a 35B model.
      and pictures re-encoded as above, served to the page by our scheme
      (`llmtray-doc://chart/<id>`, `llmtray-doc://image/<k>`), not as
      `data:` URLs, so the page may load nothing else (Hardening 1).
-  3. *Pages*: the HTML, with the style's CSS (fonts, margins, `@page`
-     size, page breaks before chapter headings, a table of contents for
-     a long report), printed by WebKit to a paginated PDF:
+  3. *Pages*: the HTML, with the style's CSS (system fonts only, so
+     nothing is loaded for them; headings kept with what follows; a table
+     of contents after the title of a report with four chapters or more;
+     Letter or A4 by the Mac's region), printed by WebKit to a paginated
+     PDF in a child process (`LLMTray --render-document <job folder>`,
+     `DocumentRenderCLI`), supervised as extraction is: its own process
+     group killed whole at 60 s, a 1.5 GB footprint limit (jetsam and
+     polling), 4 KB of stdout, and a file-size limit it sets on itself
+     (`RLIMIT_FSIZE`, 100 MB) so a runaway print dies before the
+     parent's 50 MB check. The app writes the job (the page already
+     built, the charts' numbers) into a fresh 0700 temp folder and deletes
+     it after; the child draws the charts, prints, stamps and makes the
+     thumbnail there. Before printing it waits for the page's images to
+     decode, with the app's own script (`callAsyncJavaScript` in the
+     default client world; the page's scripts stay off): printed earlier,
+     a chart came out blank.
      `WKWebView.printOperation(with:)` with a save-to-file `NSPrintInfo`,
      the view in a borderless offscreen window, run with
      `runModal(for:delegate:didRun:contextInfo:)` (proven on macOS 14.8,
@@ -222,13 +235,12 @@ from a project file, a folder file or a web page with instructions in it.
    first. The
    `WKNavigationDelegate` refuses every frame navigation but the initial
    load. `llmtray-doc:` (a `WKURLSchemeHandler`) serves only the style's
-   bundled CSS and fonts (with `Access-Control-Allow-Origin: *`, which
-   fonts from another origin need) and this document's chart PNGs and
+   CSS (built into the app) and this document's chart PNGs and
    re-encoded pictures, by a fixed table built before the page loads,
-   never a path. Tested with a remote image, `file:`,
+   never a path; with `Access-Control-Allow-Origin: *`, which a font
+   from it would need (the styles use system fonts). Tested with a remote image, `file:`,
    `data:text/html`, `data:` SVG, a CSS `url()`, a `<script>`, an
-   `onerror`, a `<meta http-equiv=refresh>`, a redirect; and that the
-   fonts load.
+   `onerror`, a `<meta http-equiv=refresh>`, a redirect.
 2. **The converter can't emit markup from the content.** Raw HTML in
    the Markdown is text (a `<script>` comes out as those characters);
    every text and attribute value is escaped. It emits only these tags:
