@@ -39,12 +39,12 @@ final class MakeDocumentTool: ChatTool {
             changed = notes
             from = base
         case .failure(let problem):
-            return .text(problem.text)
+            return .text(problem.text + DocumentError.notMade)
         }
         var spec: DocumentSpec
         switch DocumentSpec.read(arguments, earlier: from?.content) {
         case .success(let s): spec = s
-        case .failure(let e): return .text(e.text)
+        case .failure(let e): return .text(e.text + DocumentError.notMade)
         }
         spec.adjusted = changed + spec.adjusted
         // The whole call, changes applied: what Make again and a later
@@ -67,7 +67,8 @@ final class MakeDocumentTool: ChatTool {
             }
             return .generatedDocument(made, text: text)
         case .failure(let error):
-            return .text("\(name): \(error.text)")
+            // The renderer's own failure: telling the user is the fix.
+            return .text("\(name): \(error.text) Nothing was made -- don't tell the user it was made.")
         }
     }
 

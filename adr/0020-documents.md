@@ -177,7 +177,12 @@ a 4B model looks as good as one from a 35B model.
   matches there make nothing and answer both ("give the heading exactly
   as written"), never the first; headings in fenced code aren't
   sections. A name that matches none makes nothing and answers the
-  document's headings, so the model can try again in the turn. At most
+  document's headings, so the model can try again in the turn -- except
+  `after` a section that isn't there: the new part goes at the end, said
+  in the answer (nothing is lost or doubled). Every answer that made
+  nothing ends "Nothing was made -- don't tell the user it was made":
+  a small model read a list of headings as done and told the user the PDF
+  was ready. At most
   50 changes in a call. Changes that leave less than half of a document's
   lines (of six or more) are said in the answer, never silent. An `x` on anything but a scatter is ignored. A call
   with both `content` and `changes` is its content (the answer says the

@@ -45,8 +45,9 @@ public enum DocumentEdit {
     /// The whole call to make: `base` (the earlier call's values, as the
     /// parser read them) with `call`'s changes, title, style and charts.
     /// The result has no `changes`: it is what Make again and a later
-    /// change start from. A section that isn't there is a problem, the
-    /// headings listed, and nothing is made.
+    /// change start from. A section to replace that isn't there is a
+    /// problem, the headings listed, and nothing is made; one to add after
+    /// that isn't there puts the new part at the end, said.
     public static func apply(_ call: [String: Any], to base: [String: Any]) -> Result<(values: [String: Any], adjusted: [String]), Problem> {
         var values = base
         values.removeValue(forKey: "changes")
@@ -101,7 +102,13 @@ public enum DocumentEdit {
                 let s: Section
                 switch find(name, in: sections) {
                 case .one(let found): s = found
-                case .none: return .failure(missing(name, baseTitle, sections))
+                case .none:
+                    // After a section that isn't there: at the end, said --
+                    // nothing is lost or doubled, unlike a replace's guess.
+                    guard !new.isEmpty else { continue }
+                    lines += [""] + new
+                    adjusted.append("There's no section \"\(name)\", so the new part was added at the end.")
+                    continue
                 case .several(let all): return .failure(ambiguous(name, all))
                 }
                 guard !new.isEmpty else { continue }

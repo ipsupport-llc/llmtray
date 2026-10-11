@@ -390,6 +390,10 @@ public enum DocumentError: Error, Equatable, Sendable {
     /// The content places charts "charts" doesn't give.
     case missingCharts([String])
 
+    /// After every answer that made nothing: a small model read "use one of
+    /// them" as done and told the user the PDF was ready.
+    public static let notMade = " Nothing was made -- don't tell the user it was made; call make_document again with this fixed."
+
     /// How a chart is given, for the answers that ask for one.
     static func chartExample(_ id: String) -> String {
         #"{"id": "\#(id)", "type": "bar", "labels": ["A", "B"], "series": [{"name": "Sales", "values": [3, 5]}]}"#
@@ -402,13 +406,13 @@ public enum DocumentError: Error, Equatable, Sendable {
         case .tooLong(let n):
             return "make_document: the content is \(n) characters, over the \(DocumentSpec.Limits.contentCharacters) a document can have. Shorten it."
         case .imageData:
-            return "make_document: nothing was made -- the content has an image as data (](data:...). The app draws charts itself: "
+            return "make_document: the content has an image as data (](data:...). The app draws charts itself: "
                 + "give each chart's numbers, or a formula of x, in \"charts\" and place it with ![caption](chart:<id>), e.g. "
-                + DocumentError.chartExample("c1") + ". Call again without the image data."
+                + DocumentError.chartExample("c1") + ", without the image data."
         case .missingCharts(let ids):
             let list = ids.prefix(8).map { "chart:\($0)" }.joined(separator: ", ")
-            return "make_document: nothing was made -- the content places \(list) but \"charts\" has no chart with that id. "
-                + "Give it in \"charts\", e.g. " + DocumentError.chartExample(ids.first ?? "c1") + ". Call again."
+            return "make_document: the content places \(list) but \"charts\" has no chart with that id. "
+                + "Give it in \"charts\", e.g. " + DocumentError.chartExample(ids.first ?? "c1") + "."
         }
     }
 }
