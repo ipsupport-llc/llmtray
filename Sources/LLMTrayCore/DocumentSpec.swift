@@ -67,7 +67,7 @@ public struct DocumentSpec: Equatable, Sendable {
                 .init("series", .objects([
                     .init("name", .string),
                     .init("values", .list(.number), aliases: ["data", "y"]),
-                    .init("formula", .string, "In x, e.g. sin(x): the app computes the line, instead of values.",
+                    .init("formula", .string, "A math function of x for a line, e.g. sin(x) or x^2: the app computes it. Not for data -- give values.",
                           aliases: ["function", "expression"]),
                 ]), required: true, aliases: ["data"]),
                 .init("range", .list(.string), "x from and to for a formula, e.g. [\"0\", \"2*pi\"].",
@@ -159,6 +159,14 @@ public struct DocumentSpec: Equatable, Sendable {
                 return .failure(ChartProblem(text: "a value isn't a finite number"))
             }
             series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values))
+        }
+        if kind == .pie, series.count > 1, series.allSatisfy({ $0.values.count == 1 }) {
+            // A slice per series ("Part 1": [40], "Part 2": [30]): one
+            // series, the slices named by the labels or else the series.
+            if labels.count != series.count {
+                labels = series.enumerated().map { $1.name.isEmpty ? String($0 + 1) : $1.name }
+            }
+            series = [Chart.Series(name: "", values: series.map { $0.values[0] })]
         }
         let count = series[0].values.count
         guard series.allSatisfy({ $0.values.count == count }) else {

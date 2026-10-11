@@ -43,7 +43,12 @@ final class MakeDocumentTool: ChatTool {
             var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s")). "
                 + "The user sees it in the chat and can open, save or share it. Don't repeat its content unless asked."
             let notes = spec.notes + made.notes
-            if !notes.isEmpty { text += " Left out: " + notes.joined(separator: " ") }
+            // The tool is spent for the turn once a PDF is made: the model
+            // can't fix it now, so the user must hear what's missing.
+            if !notes.isEmpty {
+                text += " Not in the PDF: " + notes.joined(separator: " ")
+                    + " Tell the user what is missing and why; don't say everything worked."
+            }
             return .generatedDocument(made, text: text)
         case .failure(let error):
             return .text("\(name): \(error.text)")
