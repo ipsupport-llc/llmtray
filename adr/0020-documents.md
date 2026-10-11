@@ -22,14 +22,21 @@ a 4B model looks as good as one from a 35B model.
     content,                    // Markdown
     style?: report|letter|notes|invoice,   // default report
     charts?: [ { id, type: bar|line|pie, title?,
-                 labels: [..], series: [ {name, values: [..]} ],
-                 unit? } ],
+                 labels: [..], series: [ {name, values: [..] | formula} ],
+                 range?: [from, to], unit? } ],
     format?: pdf                // the only one for now
   )
   ```
 
   A chart goes where the content says `![chart](chart:<id>)`; a chart the
-  content never names goes at the end. **Pictures come only from the
+  content never names goes at the end. A function plot gives each series a
+  `formula` in `x` (`sin(x)`) and the chart a `range` (numbers or
+  expressions like `2*pi`, default -10...10) instead of values: the app
+  computes 101 points with the `calculate` tool's evaluator and draws a
+  line over a number axis. A small model asked for "a sine chart" otherwise
+  writes out a hundred made-up numbers -- slowly, and wrong. Labels that
+  don't match the number of values give way to point numbers with a note;
+  the numbers are what the chart is for. **Pictures come only from the
   project** (the user's rule): `![caption](project:<id>)`, the id
   `project_files` lists for a picture of the chat's project (see "Project
   pictures"). Not the chat's attached or generated images, not a folder's,
@@ -266,7 +273,8 @@ from a project file, a folder file or a web page with instructions in it.
    the address is printed after it in small type (as print stylesheets
    do), so the PDF never hides where a link goes.
 3. **Limits on what goes in and what comes out.** In: at most 8 charts,
-   12 series, 500 points per chart; values finite; labels and titles
+   12 series, 500 points per chart (101 for a formula, at most 200
+   characters); values finite; labels and titles
    capped; content at most 200,000 characters; at most 30 pictures. A
    bad chart or picture is left out with a note in the
    tool's answer, the rest is made; pictures past the 30th are left out

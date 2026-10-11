@@ -10,6 +10,9 @@ public struct DocumentSpec: Equatable, Sendable {
         public struct Series: Equatable, Sendable {
             public var name: String
             public var values: [Double]
+            /// Each value's x, for a series drawn from a formula; empty for
+            /// values placed at the labels.
+            public var xs: [Double] = []
         }
         public var id: String
         public var kind: Kind
@@ -31,6 +34,9 @@ public struct DocumentSpec: Equatable, Sendable {
         public static let charts = 8
         public static let series = 12
         public static let points = 500
+        /// Points a formula is computed at across its range.
+        public static let formulaPoints = 101
+        public static let formulaCharacters = 200
         public static let titleCharacters = 200
         public static let labelCharacters = 80
         public static let idCharacters = 40
@@ -54,8 +60,12 @@ public struct DocumentSpec: Equatable, Sendable {
                 .init("labels", .list(.string), aliases: ["categories", "x"]),
                 .init("series", .objects([
                     .init("name", .string),
-                    .init("values", .list(.number), required: true, aliases: ["data", "y"]),
+                    .init("values", .list(.number), aliases: ["data", "y"]),
+                    .init("formula", .string, "In x, e.g. sin(x): the app computes the line, instead of values.",
+                          aliases: ["function", "expression"]),
                 ]), required: true, aliases: ["data"]),
+                .init("range", .list(.string), "x from and to for a formula, e.g. [\"0\", \"2*pi\"].",
+                      aliases: ["x_range", "domain"]),
                 .init("unit", .string),
             ])),
         ])
@@ -77,7 +87,8 @@ public struct DocumentSpec: Equatable, Sendable {
         if raw.count > Limits.charts { notes.append("Only the first \(Limits.charts) charts were used.") }
         for (n, item) in raw.prefix(Limits.charts).enumerated() {
             switch chart(item) {
-            case .success(let c):
+            case .success(let (c, note)):
+                if let note { notes.append("Chart \(n + 1): \(note).") }
                 if seen.contains(c.id) {
                     notes.append("Chart \(n + 1) left out: the id \"\(c.id)\" is used twice.")
                 } else {
@@ -95,21 +106,44 @@ public struct DocumentSpec: Equatable, Sendable {
 
     struct ChartProblem: Error { let text: String }
 
-    static func chart(_ item: [String: Any]) -> Result<Chart, ChartProblem> {
+    /// A chart, with a note when something was set aside to draw it.
+    static func chart(_ item: [String: Any]) -> Result<(Chart, String?), ChartProblem> {
         let id = ((item["id"] as? String) ?? "").trimmingCharacters(in: .whitespaces)
         guard !id.isEmpty, id.count <= Limits.idCharacters,
               id.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else {
             // ASCII: the id is part of an llmtray-doc: address, matched as written.
             return .failure(ChartProblem(text: "its id must be ASCII letters, digits, - or _"))
         }
-        guard let kind = (item["type"] as? String).flatMap(Chart.Kind.init(rawValue:)) else {
+        let rawSeries = (item["series"] as? [[String: Any]]) ?? []
+        let formulas = rawSeries.contains { $0["formula"] is String }
+        // A formula is a line; a model may well call it a plot of any type.
+        guard let kind = formulas ? .line : (item["type"] as? String).flatMap(Chart.Kind.init(rawValue:)) else {
             return .failure(ChartProblem(text: "its type must be bar, line or pie"))
         }
-        let labels = ((item["labels"] as? [Any]) ?? []).map { clip(String(describing: $0), Limits.labelCharacters) }
-        let rawSeries = (item["series"] as? [[String: Any]]) ?? []
+        var labels = ((item["labels"] as? [Any]) ?? []).map { clip(String(describing: $0), Limits.labelCharacters) }
         guard !rawSeries.isEmpty else { return .failure(ChartProblem(text: "it has no series")) }
         guard rawSeries.count <= Limits.series else { return .failure(ChartProblem(text: "more than \(Limits.series) series")) }
         var series: [Chart.Series] = []
+        if formulas {
+            guard rawSeries.allSatisfy({ $0["formula"] is String }) else {
+                return .failure(ChartProblem(text: "every series needs a formula once one has"))
+            }
+            let range: (Double, Double)
+            switch formulaRange(item["range"]) {
+            case .success(let r): range = r
+            case .failure(let problem): return .failure(problem)
+            }
+            for s in rawSeries {
+                switch formulaSeries((s["formula"] as? String) ?? "", range) {
+                case .success(let (xs, values)):
+                    series.append(Chart.Series(name: clip((s["name"] as? String) ?? (s["formula"] as? String) ?? "", Limits.labelCharacters),
+                                               values: values, xs: xs))
+                case .failure(let problem): return .failure(problem)
+                }
+            }
+            return .success((Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
+                                   labels: [], series: series, unit: clip((item["unit"] as? String) ?? "", 20)), nil))
+        }
         for s in rawSeries {
             let values = ((s["values"] as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
             guard !values.isEmpty else { return .failure(ChartProblem(text: "a series has no values")) }
@@ -123,8 +157,12 @@ public struct DocumentSpec: Equatable, Sendable {
         guard series.allSatisfy({ $0.values.count == count }) else {
             return .failure(ChartProblem(text: "its series have different lengths"))
         }
-        guard labels.isEmpty || labels.count == count else {
-            return .failure(ChartProblem(text: "it has \(labels.count) labels for \(count) values"))
+        // The numbers are what the chart is for: labels that don't match
+        // them give way to point numbers rather than losing the chart.
+        var note: String?
+        if !labels.isEmpty, labels.count != count {
+            note = "its \(labels.count) labels didn't match \(count) values, so the points are numbered"
+            labels = []
         }
         if kind == .pie {
             guard series.count == 1 else { return .failure(ChartProblem(text: "a pie has one series")) }
@@ -132,9 +170,49 @@ public struct DocumentSpec: Equatable, Sendable {
                 return .failure(ChartProblem(text: "a pie needs values of zero or more, not all zero"))
             }
         }
-        return .success(Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
-                              labels: labels.isEmpty ? (1...count).map(String.init) : labels,
-                              series: series, unit: clip((item["unit"] as? String) ?? "", 20)))
+        return .success((Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
+                               labels: labels.isEmpty ? (1...count).map(String.init) : labels,
+                               series: series, unit: clip((item["unit"] as? String) ?? "", 20)), note))
+    }
+
+    /// A formula's x range: two numbers or expressions ("2*pi"), -10...10
+    /// when not given.
+    static func formulaRange(_ raw: Any?) -> Result<(Double, Double), ChartProblem> {
+        guard let list = raw as? [Any], !list.isEmpty else { return .success((-10, 10)) }
+        let ends = list.prefix(3).map { v -> Double? in
+            if let d = v as? Double { return d }
+            if let i = v as? Int { return Double(i) }
+            guard let text = v as? String, text.count <= Limits.formulaCharacters else { return nil }
+            return try? Calculator.evaluate(text)
+        }
+        guard ends.count == 2, let from = ends[0], let to = ends[1], from.isFinite, to.isFinite, from < to,
+              to - from < 1e12 else {
+            return .failure(ChartProblem(text: "its range must be two numbers, from less than to"))
+        }
+        return .success((from, to))
+    }
+
+    /// The formula at evenly spaced x across the range; the points where it
+    /// has no value (a log below zero, tan at its pole) are left out.
+    static func formulaSeries(_ formula: String, _ range: (Double, Double)) -> Result<([Double], [Double]), ChartProblem> {
+        guard !formula.trimmingCharacters(in: .whitespaces).isEmpty, formula.count <= Limits.formulaCharacters else {
+            return .failure(ChartProblem(text: "a formula is empty or too long"))
+        }
+        // The formula's own mistakes (a typo, an unknown name) show at any x.
+        do { _ = try Calculator.evaluate(formula, variables: ["x": (range.0 + range.1) / 2]) }
+        catch let failure as Calculator.Failure {
+            if case .domain = failure {} else { return .failure(ChartProblem(text: "its formula: \(failure.localizedDescription)")) }
+        } catch { return .failure(ChartProblem(text: "its formula can't be read")) }
+        var xs: [Double] = [], values: [Double] = []
+        let n = Limits.formulaPoints
+        for i in 0..<n {
+            let x = range.0 + (range.1 - range.0) * Double(i) / Double(n - 1)
+            guard let y = try? Calculator.evaluate(formula, variables: ["x": x]), abs(y) < 1e15 else { continue }
+            xs.append(x)
+            values.append(y)
+        }
+        guard values.count >= 2 else { return .failure(ChartProblem(text: "its formula has no values in the range")) }
+        return .success((xs, values))
     }
 
     /// At most `n` Unicode scalars (not characters: see `read`).

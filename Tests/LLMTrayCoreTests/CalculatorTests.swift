@@ -71,4 +71,10 @@ final class CalculatorTests: XCTestCase {
         XCTAssertEqual(Calculator.format(0.1 + 0.2), "0.3")
         XCTAssertEqual(Calculator.format(-4), "-4")
     }
+
+    func testVariables() throws {
+        XCTAssertEqual(try Calculator.evaluate("2*x + 1", variables: ["x": 3]), 7)
+        XCTAssertEqual(try Calculator.evaluate("sin(X)", variables: ["x": 0]), 0)
+        XCTAssertThrowsError(try Calculator.evaluate("x + 1"))
+    }
 }

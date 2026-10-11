@@ -276,6 +276,8 @@ struct DocumentChartView: View {
     private struct Point: Identifiable {
         let id: Int
         let label: String
+        /// A formula's x; nil at a label.
+        let x: Double?
         let series: String
         let value: Double
     }
@@ -285,7 +287,8 @@ struct DocumentChartView: View {
         for (s, series) in chart.series.enumerated() {
             for (i, value) in series.values.enumerated() {
                 let label = i < chart.labels.count ? chart.labels[i] : String(i + 1)
-                out.append(Point(id: s * 10_000 + i, label: label, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value))
+                let x = series.xs.flatMap { i < $0.count ? $0[i] : nil }
+                out.append(Point(id: s * 10_000 + i, label: label, x: x, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value))
             }
         }
         return out
@@ -307,6 +310,20 @@ struct DocumentChartView: View {
         let unit = chart.unit.isEmpty ? "Value" : chart.unit
         let several = chart.series.count > 1
         switch chart.kind {
+        case "line" where chart.series.contains { $0.xs != nil }:
+            // A formula: a smooth line over a number axis, no dots.
+            let line = points.filter { $0.x != nil }
+            let xs = line.compactMap(\.x)
+            Chart(line) { p in
+                LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value))
+                    .foregroundStyle(by: .value("Series", p.series))
+            }
+            // The range the formula was asked for, not rounded out past it;
+            // values on the left, where long negative numbers have room.
+            .chartXScale(domain: (xs.min() ?? 0)...max(xs.max() ?? 1, (xs.min() ?? 0) + 1e-9))
+            .chartYAxis { AxisMarks(position: .leading) }
+            .chartLegend(several ? .visible : .hidden)
+            .chartYAxisLabel(chart.unit)
         case "line":
             Chart(points) { p in
                 LineMark(x: .value("Label", p.label), y: .value(unit, p.value))
