@@ -553,7 +553,11 @@ final class FilesTool: ChatTool {
                 + "The user can move the chat into a project first.")
         }
         let budget = context.projectTextBytes ?? ProjectTextBudget.bytes(forTokens: ProjectTextBudget.hardCapTokens)
-        guard budget >= ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens) else {
+        // The turn found no room for file text already: none for the rest
+        // of it, even if room came back (a profile read again mid-turn),
+        // whether or not the tool is still declared (adr/0007, "One list
+        // per turn").
+        guard context.fileTextAllowed, budget >= ProjectTextBudget.bytes(forTokens: ProjectTextBudget.minimumTokens) else {
             return .text(ProjectTextBudget.noRoomText)
         }
         let service = FolderAccessManager.shared.service
