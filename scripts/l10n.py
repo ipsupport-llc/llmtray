@@ -313,6 +313,8 @@ def check() -> int:
 
 # ---------------------------------------------------------------- translate
 
+DEFAULT_MODEL = "gpt-5.5"
+
 GLOSSARY = ["LLMTray", "MLX", "mlx-lm", "mlx_lm.server", "KV", "MTP", "Top-k", "Top-p", "GPU",
             "API", "Hugging Face", "LM Studio", "Z-Image-Turbo", "Gemma", "Default", "Stable",
             "Beta", "JSON", "Finder", "Play", "DEBUG", "generate_image", "OpenAI"]
@@ -335,7 +337,9 @@ def _openai(messages: list[dict], model: str, key: str) -> str:
     # strings needs next to none: minimal effort (the first full run on
     # gpt-5.5 at default effort cost dollars for ~9k characters of text).
     if model.startswith("gpt-5"):
-        req_body["reasoning_effort"] = "minimal"
+        # Low, not minimal: minimal mistranslated meaning ("kept for
+        # documents" as "stored as documents", a negation turned round).
+        req_body["reasoning_effort"] = os.environ.get("OPENAI_REASONING_EFFORT", "low")
     elif model.startswith(("o1", "o3", "o4")):
         req_body["reasoning_effort"] = "low"
     else:
@@ -386,7 +390,81 @@ def write_lang(code: str, table: dict[str, str], base_keys: list[str]) -> Path:
     return path
 
 
-def translate(codes: list[str], model: str, batch: int = 100) -> int:
+# Terms a sentence uses in lower case whose translation the file already
+# fixed as a label: the same word for the same thing everywhere.
+TERMS = {"chat": "Chat", "chats": "Chat", "project": "Projects", "projects": "Projects",
+         "temporary chat": "Temporary chat", "temporary chats": "Temporary chat",
+         "settings": "Settings", "documents": "Documents"}
+
+
+def _is_label(key: str) -> bool:
+    """A short UI name (a setting, tab, button, menu item), not a sentence."""
+    words = key.split()
+    return (len(key) <= 40 and len(words) <= 4 and any(c.isalpha() for c in key)
+            and not key.rstrip().endswith((".", ":", "?", "!")) and "%" not in key
+            # One word only as a name (capitalised): "downloaded" is a status
+            # word, not a label a sentence refers to.
+            and (len(words) > 1 or key[:1].isupper()))
+
+
+def labels_in(key: str, table: dict[str, str], base_keys: list[str]) -> dict[str, str]:
+    """The app's own translations of the UI labels and terms `key` contains
+    (the longest matches, at most 12): what keeps "Settings > Files", a
+    setting's name or "chat" the same in every string of a language."""
+    import re
+    found: dict[str, str] = {}
+    spans: list[tuple[int, int]] = []
+    for label in sorted((k for k in base_keys if k != key and _is_label(k) and k in table), key=len, reverse=True):
+        # Whole words; a one-word label only as written (a capitalised
+        # name), so a verb at a sentence's start doesn't count.
+        flags = 0 if " " not in label else re.IGNORECASE
+        for m in re.finditer(r"(?<![\w])" + re.escape(label) + r"(?![\w])", key, flags):
+            if any(a < m.end() and m.start() < b for a, b in spans):
+                continue
+            spans.append((m.start(), m.end()))
+            found[label] = table[label]
+            break
+        if len(found) >= 12:
+            break
+    lower = key.lower()
+    for term, label in TERMS.items():
+        if label in table and label not in found and re.search(r"(?<![\w])" + re.escape(term) + r"(?![\w])", lower):
+            found[label] = table[label]
+    return found
+
+
+def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
+    """Labels `key` names explicitly as UI -- the parts of a settings path
+    (Settings > Files or Settings › General: the longest label ending right
+    before each separator and
+    starting right after it) or a quoted name -- whose translation the
+    value must contain."""
+    import re
+    labels = [k for k in table if _is_label(k)]
+    names: list[str] = []
+    for m in re.finditer(r"\s[>\u203A]\s", key):  # "Settings > Files", "Settings › General"
+        before, after = key[:m.start()], key[m.end():]
+        left = [l for l in labels if before.endswith(l) and (len(before) == len(l) or not before[-len(l) - 1].isalnum())]
+        right = [l for l in labels if after.startswith(l) and (len(after) == len(l) or not after[len(l)].isalnum())]
+        names += [max(left, key=len)] if left else []
+        names += [max(right, key=len)] if right else []
+    names += re.findall(r"[\u201C\"«]([^\u201D\"»]{2,40})[\u201D\"»]", key)
+    return [n for n in dict.fromkeys(names) if n in table and _is_label(n) and table[n] != n]
+
+
+def contains_label(value: str, translation: str) -> bool:
+    """Whether `value` uses `translation`, allowing for inflection: each of
+    its words found by its stem (all but the last two letters of a longer
+    word -- "Настройки" in "в Настройках")."""
+    low = value.lower()
+    for word in translation.lower().split():
+        stem = word if len(word) <= 4 else word[:-2]
+        if stem not in low:
+            return False
+    return True
+
+
+def translate(codes: list[str], model: str, batch: int = 100, only: dict[str, list[str]] | None = None) -> int:
     """Fills in each language's missing keys; drops keys no longer in the
     English base (a changed English string is a new key). Never touches an
     existing translation. Batches run in parallel (L10N_JOBS, default 8):
@@ -405,7 +483,7 @@ def translate(codes: list[str], model: str, batch: int = 100) -> int:
         path = LOC / f"{code}.lproj" / "Localizable.strings"
         table = load(path) if path.exists() else {}
         tables[code] = {k: v for k, v in table.items() if k in base_keys}  # prune obsolete
-        todo = [k for k in base_keys if k not in tables[code]]
+        todo = only.get(code, []) if only is not None else [k for k in base_keys if k not in tables[code]]
         print(f"{code}: {len(todo)} to translate", flush=True)
         jobs += [(code, todo[i:i + batch]) for i in range(0, len(todo), batch)]
         write_lang(code, tables[code], base_keys)  # creates new languages, prunes
@@ -414,20 +492,35 @@ def translate(codes: list[str], model: str, batch: int = 100) -> int:
 
     def system_prompt(lang: str) -> str:
         return (
-            f"You translate the UI of LLMTray, a macOS menu-bar app for running local LLMs, from English "
-            f"into {lang}. Write natural, concise {lang} as used in macOS system UI (System Settings wording). "
+            f"You translate the UI of LLMTray, a macOS menu-bar app for running local LLMs (chat, coding "
+            f"agents, image and music generation, project files, documents), from English into {lang}. "
+            f"Write natural, concise {lang} as used in macOS system UI (System Settings wording).\n"
+            f"Meaning first: translate what the English says, not word by word. Keep every negation and "
+            f"restriction ('not in temporary chats' = unavailable there), and the exact relation of "
+            f"prepositions ('kept for documents' = kept for use in documents, not stored as documents; "
+            f"'up to' = at most). Don't add or drop information.\n"
+            f"Each item has 'text', 'where' (its place in the code) and, when it names parts of the app, "
+            f"'labels': the app's existing {lang} translations of UI labels and terms the text contains. "
+            f"When the text names that setting, tab, button or menu item (e.g. 'Settings > Files', a quoted "
+            f"name), use exactly the given translation; use the given word for terms such as chat or project "
+            f"everywhere, never a synonym.\n"
             f"Rules: keep every format specifier (%@, %lld, %d, %1$@...) exactly, in a grammatical position; "
-            f"keep these terms untranslated: {', '.join(GLOSSARY)}; keep technical flags, file paths, URLs and "
-            f"<placeholders> as they are; use the same typographic quotes style natural for {lang}; tooltips "
-            f"are full sentences, labels and buttons short. Reply with a JSON object mapping each English "
-            f"string (exactly as given) to its translation."
+            f"keep these terms untranslated: {', '.join(GLOSSARY)}; keep technical flags, file paths, URLs, "
+            f"code identifiers (snake_case names like make_document) and <placeholders> as they are; use the "
+            f"typographic quotes natural for {lang}; tooltips are full sentences, labels and buttons short.\n"
+            f"Reply with a JSON object mapping each English string (exactly as given) to its translation."
         )
 
     def run(job: tuple[str, list[str]]) -> None:
         nonlocal failed
         code, chunk = job
         system = system_prompt(_lang_name(code))
-        items = [{"text": k, "where": ctx.get(k, "UI text")} for k in chunk]
+        items = []
+        for k in chunk:
+            item = {"text": k, "where": ctx.get(k, "UI text")}
+            if labels := labels_in(k, tables[code], base_keys):
+                item["labels"] = labels
+            items.append(item)
         pending, done = chunk, {}
         for attempt in range(2):
             try:
@@ -478,10 +571,34 @@ def main() -> int:
         import argparse, os
         ap = argparse.ArgumentParser(prog="l10n.py translate")
         ap.add_argument("languages", nargs="*", help="language codes (default: every existing one)")
-        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or "gpt-5-mini")
+        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL)
         a = ap.parse_args(sys.argv[2:])
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         return translate(codes, a.model)
+    if cmd == "recheck":
+        # Existing translations of strings that name a UI label (a settings
+        # path, a quoted name) without that label's own translation: listed,
+        # and with --fix translated again with the labels (overwriting).
+        import argparse, os
+        ap = argparse.ArgumentParser(prog="l10n.py recheck")
+        ap.add_argument("languages", nargs="*")
+        ap.add_argument("--fix", action="store_true")
+        ap.add_argument("--model", default=os.environ.get("OPENAI_MODEL") or DEFAULT_MODEL)
+        a = ap.parse_args(sys.argv[2:])
+        codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
+        stale: dict[str, list[str]] = {}
+        for code in codes:
+            path = LOC / f"{code}.lproj" / "Localizable.strings"
+            if not path.exists():
+                continue  # a new language: translate creates it
+            table = load(path)
+            for k, v in table.items():
+                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n])]
+                if missing:
+                    stale.setdefault(code, []).append(k)
+                    print(f"{code}: {k[:60]!r} lacks {', '.join(repr(table[n]) for n in missing)}")
+        print(f"{sum(len(v) for v in stale.values())} strings in {len(stale)} languages")
+        return translate(list(stale), a.model, only=stale) if a.fix and stale else 0
     if cmd == "import-missing":
         # Keys an open proposal (<dir>/<lang>.lproj) translated that this
         # tree still lacks -- never overwriting what's here.

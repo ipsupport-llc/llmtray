@@ -4,13 +4,18 @@ name: Translate
 # UI text: whenever main changes the Swift sources (new / changed strings)
 # or the localization files, missing keys are machine-translated with
 # OpenAI (secret OPENAI_API_KEY; model from repo variable OPENAI_MODEL,
-# default gpt-5-mini, minimal reasoning) and the result is proposed as a pull request. Keys are
+# default gpt-5.5, low reasoning) and the result is proposed as a pull request. Each string
+# goes with the language's own translations of the UI labels and terms it
+# contains (l10n.py labels_in), so "Settings > Files" or "chat" read the
+# same everywhere. Keys are
 # the English text, so an edited English string is a new key and gets
 # translated too; keys no longer in the code are dropped. Existing
 # translations are never overwritten -- a native speaker's fix sticks.
 #
 # Manual run: Actions > Translate > Run workflow, optionally with
-# "languages" (e.g. "de fr ja") to add new languages or redo only those.
+# "languages" (e.g. "de fr ja") to add new languages or redo only those,
+# and "recheck" to translate again the existing strings that name a UI
+# label (a settings path, a quoted name) without its translation.
 on:
   push:
     branches: [main]
@@ -24,6 +29,11 @@ on:
         description: "Language codes to translate (space-separated). Empty = every existing language. New codes are created."
         required: false
         default: ""
+      recheck:
+        description: "Also translate again existing strings that name a UI label without its translation"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -61,6 +71,7 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
           # Data, not shell source: the secret is in this step's environment.
           LANGS: ${{ github.event.inputs.languages }}
+          RECHECK: ${{ github.event.inputs.recheck }}
         run: |
           if [ -z "$OPENAI_API_KEY" ]; then
             echo "::warning::OPENAI_API_KEY secret is not set -- skipping machine translation"
@@ -71,6 +82,10 @@ jobs:
             exit 1
           fi
           # shellcheck disable=SC2086  # word splitting of the validated codes is intended
+          if [ "$RECHECK" = "true" ]; then
+            python3 scripts/l10n.py recheck --fix $LANGS
+          fi
+          # shellcheck disable=SC2086
           python3 scripts/l10n.py translate $LANGS
       - name: Check
         run: python3 scripts/l10n.py check
@@ -96,6 +111,6 @@ jobs:
           fi
           gh pr create --base main --head "$branch" \
             --title "Update translations" \
-            --body "Machine-translated the UI strings missing from one or more languages (\`scripts/l10n.py translate\`, OpenAI). Existing translations are untouched. Placeholders were checked automatically; review the wording if you speak the language.
+            --body "Machine-translated the UI strings missing from one or more languages (\`scripts/l10n.py translate\`, OpenAI, with each language's own label translations as a glossary). Existing translations are untouched, except on a manual run with recheck (strings that named a UI label without its translation). Placeholders were checked automatically; review the wording if you speak the language.
 
           $(python3 scripts/l10n.py check)"
