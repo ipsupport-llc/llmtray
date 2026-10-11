@@ -1,6 +1,6 @@
 # 0020 — Documents: the chat makes a PDF, with charts; tools loaded when needed
 
-**Status: proposed** (2026-10-10). Nothing is built before the user accepts it.
+**Status: accepted** (2026-10-10, by the user). The spike and the measurement it asked for are done: see "Spike and measurement".
 
 ## Decision
 
@@ -43,14 +43,15 @@ a 4B model looks as good as one from a 35B model.
      as `data:` URLs, so the page may load nothing else (Hardening 1).
   3. *Pages*: the HTML, with the style's CSS (fonts, margins, `@page`
      size, page breaks before chapter headings, a table of contents for
-     a long report), printed by WebKit to a paginated PDF
-     (`WKWebView.printOperation(with:)` with a save-to-file
-     `NSPrintInfo`, in an offscreen window if it needs one — **a spike on
-     macOS 14 proves it before the build**, and this ADR is updated with
-     what works; `createPDF` is no fallback, it makes one endless page). The
-     header (title) and footer (page N of M) are drawn onto the finished
-     pages with PDFKit, not by CSS, which WebKit's printing honours only
-     in part.
+     a long report), printed by WebKit to a paginated PDF:
+     `WKWebView.printOperation(with:)` with a save-to-file `NSPrintInfo`,
+     the view in a borderless offscreen window, run with
+     `runModal(for:delegate:didRun:contextInfo:)` (proven on macOS 14.8,
+     15.7 and 27.2, below). Never `NSPrintOperation.run()` on a view
+     outside a window: it ran away. The header (title) and footer (page N
+     of M) are drawn by a `PDFPage` subclass (`PDFDocumentDelegate.
+     classForPage`) and the document written by PDFKit, which keeps the
+     link annotations; redrawing pages into a new `CGContext` drops them.
   Styles are a few fixed CSS files in the app, picked by name.
 - **The result is a card in the chat**, like a generated image: the first
   page as a thumbnail, the title and page count, and Open (Preview),
@@ -103,10 +104,12 @@ from a project file, a folder file or a web page with instructions in it.
    view: JavaScript off (`defaultWebpagePreferences.allowsContentJavaScript
    = false`, `javaScriptCanOpenWindowsAutomatically` off), a
    non-persistent data store, HTML loaded from a string with no base URL.
-   A `WKContentRuleList` blocks `http`, `https`, `file` and `ws(s)` loads
-   of every resource type (document, image, style-sheet, script, font,
-   media, svg-document, raw, popup); content rules don't see `data:` or
-   `blob:`, which is why the converter guarantee comes first. The
+   A `WKContentRuleList` blocks every load (`url-filter` `.*`, every
+   resource type) and then lets `^llmtray-doc:` and `^about:` through
+   (`ignore-previous-rules`); WebKit's rule regexes have no `|`, so a
+   deny-all with exceptions is also the simpler rule. Content rules don't
+   see `data:` or `blob:`, which is why the converter guarantee comes
+   first. The
    `WKNavigationDelegate` refuses every frame navigation but the initial
    load. `llmtray-doc:` (a `WKURLSchemeHandler`) serves only the style's
    bundled CSS and fonts (with `Access-Control-Allow-Origin: *`, which
@@ -178,9 +181,9 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   a different list is a different prefix and the prompt cache misses.
   The list already changes within a chat today (a spent generator, the
   trust barrier, the project's and folder's modes, a profile change), so
-  loading adds one more such change, not a new kind. **Measured before
-  the build**: prefill time of a 30K-token chat with and without a tool
-  added (an M5 laptop, Gemma 4 26B). A loaded group is **never removed**
+  loading adds one more such change, not a new kind. Measured: about a
+  minute for a 30K-token chat on Gemma 4 26B (see "Spike and
+  measurement"). A loaded group is **never removed**
   for the rest of the chat, and `load_tools` stays declared (40 tokens)
   so loading doesn't cost a second change.
 - **Three settings per group** in the profile ([0005](0005-profiles.md)):
@@ -225,12 +228,43 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   setting; out of this ADR's first step. Groups are data, so adding one
   is a line.
 
+## Spike and measurement (2026-10-10)
+
+**Printing.** A throwaway Swift script, run on this Mac (macOS 27.2) and
+on GitHub's macos-14 (14.8.9) and macos-15 (15.7.9) runners: a 30-chapter
+document with a chart, a table, a bundled font and the hostile fixtures
+of Hardening 1, in a web view configured as above.
+- Offscreen window + `runModal`: 61 Letter pages, a page break before
+  every chapter (30 of 30), the bundled font (served with
+  `Access-Control-Allow-Origin: *`) and the chart loaded through
+  `llmtray-doc:`, 130 KB. The same on all three systems.
+- Nothing ran or loaded: no `<script>`, no `onerror`; zero requests to a
+  local HTTP server for the remote `<img>`, the CSS `url()`, the
+  `<iframe>` and the meta refresh (the navigation delegate saw and
+  refused the last two); `file:` and `data:` SVG images didn't render.
+- `NSPrintOperation.run()` with the view in no window wrote a 979 MB
+  file in 90 s and didn't finish: never used, and the output limits of
+  Hardening 3 (size checked while printing, the 60 s stop) are needed
+  in any case.
+- `createPDF`: 2 pages of 612×14400 pt, as expected. Not used.
+- Header/footer: the PDFKit page subclass keeps the link annotation
+  (`https://example.com/`); a `CGContext` redraw lost it.
+
+**Cache cost of a changed tool list.** The chat templates of Gemma 4
+26B, Ornith 1.5 35B and FrogNano 4B (Qwen 3.5) and the Nemotron 3.5
+LoRA, rendered by their tokenizers for a 20-exchange chat (about 7,300
+tokens) with and without one more tool: the token sequences part after
+90–138 tokens, so 98% of the prompt is prefilled again. At the prefill
+speeds in this Mac's speed journal (medians: Gemma 4 26B 520 tokens/s,
+FrogNano 4B 870–920), a 30K-token chat costs about 58 s (Gemma) or
+33 s (FrogNano) once. Hence: a group is loaded once and never removed,
+and `load_tools` stays declared. The same cost already follows every
+mid-chat change of the tool list today (the trust barrier dropping
+guarded tools after a project read, a spent generator): worth a
+separate look, not part of this ADR.
+
 ## Verification
 
-- A spike first (macOS 14 and 27): headless paginated PDF from a
-  `WKWebView` with the hardening above, page breaks and a 30-page
-  document; PDFKit header/footer stamping. Its result goes into this ADR
-  before the build. Then the prefill measurement above.
 - Unit tests (LLMTrayCore): the converter (every block, raw HTML
   escaped, no attribute but the allowed ones, link schemes, link
   addresses shown, chart references, unknown images to alt text); chart
