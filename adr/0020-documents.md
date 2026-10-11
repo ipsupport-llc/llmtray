@@ -19,10 +19,11 @@ a 4B model looks as good as one from a 35B model.
   ```
   make_document(
     title,                      // also the file name
-    content,                    // Markdown
+    content,                    // Markdown, math as LaTeX in $..$ / $$..$$
+    changes?: [ {section? | after?, content} ],  // instead of content
     style?: report|letter|notes|invoice,   // default report
-    charts?: [ { id, type: bar|line|pie, title?,
-                 labels: [..], series: [ {name, values: [..] | formula} ],
+    charts?: [ { id, type: bar|stacked|line|pie|scatter, title?,
+                 labels: [..], series: [ {name, values: [..] | formula, x?: [..]} ],
                  range?: [from, to], unit? } ],
     format?: pdf                // the only one for now
   )
@@ -36,7 +37,14 @@ a 4B model looks as good as one from a 35B model.
   line over a number axis. A small model asked for "a sine chart" otherwise
   writes out a hundred made-up numbers -- slowly, and wrong. Labels that
   don't match the number of values give way to point numbers with a note;
-  the numbers are what the chart is for. **Pictures come only from the
+  the numbers are what the chart is for. `stacked` draws a bar
+  chart's series on top of each other; `scatter` draws each series'
+  points at its own `x` (numbers; labels that are numbers serve too,
+  else the points are numbered with a note), each series as long as it
+  is, the axes spanning the points rather than from zero. Bars, stacked
+  parts, a single short line's dots and pie slices carry their values
+  (a slice its share) when there are at most 24 marks and the part is big
+  enough to hold the text, short (12.5K, 1.25M). **Pictures come only from the
   project** (the user's rule): `![caption](project:<id>)`, the id
   `project_files` lists for a picture of the chat's project (see "Project
   pictures"). Not the chat's attached or generated images, not a folder's,
@@ -86,6 +94,21 @@ a 4B model looks as good as one from a 35B model.
      of M) are drawn by a `PDFPage` subclass (`PDFDocumentDelegate.
      classForPage`) and the document written by PDFKit, which keeps the
      link annotations; redrawing pages into a new `CGContext` drops them.
+  A table that runs over a page goes on from the next page with its
+  header again: WebKit's print doesn't repeat a `thead`. Before
+  printing, the app's own script (as the wait for images) lays the
+  body out as columns of a page's size (the page as wide as the view,
+  printed scaled to the paper less the margins, so a page is that much
+  taller in the layout) -- the same fragmentation and break rules --
+  and cuts each table before the first row that reaches the next
+  column, the rest a new table with the header again that starts a page
+  (`break-before`, a column break while measuring), the columns as wide
+  as the whole table had them; one cut at a time, the layout measured
+  again after each. Print breaks a little earlier than columns (margins
+  at a break), so a page is taken as 6% shorter, 1.5% for a page that
+  starts with a cut of ours; a row on the edge goes to the next page. A
+  header alone at a page's foot moves the table to the next page. If
+  the script fails the page prints as it is.
   Styles are a few fixed CSS files in the app, picked by name.
 - **The result is a card in the chat**, like a generated image: the first
   page as a thumbnail, the title and page count, and Open (Preview),
@@ -124,6 +147,46 @@ a 4B model looks as good as one from a 35B model.
   by its own small path (`regenerateDocument`): no generator queue, no
   model unload, no draft — it doesn't ask the model again. Pictures
   are read from the project again (one removed since: left out).
+- **Changing a document**: "fix the second section", "add a
+  conclusion" -- a small model asked that writes the whole document
+  again, slowly, and drops or changes parts it wasn't asked to. A call
+  may give `changes` instead of `content`: each `{section, content}`
+  replaces a section (its heading up to the next heading of its level or
+  above; content without a heading of its own keeps the section's
+  heading), `content: ""` removes it, `{after, content}` adds one after
+  a section, `{content}` alone at the end. The app takes the rest from
+  an earlier document of the chat (`DocumentEdit`, LLMTrayCore): the
+  latest one whose title is the call's, else the latest; its saved call
+  (`DocumentSource`), with the call's title and style if it gives them
+  and its charts replacing those of the same id or added. A chart whose
+  place went with a removed or rewritten section goes too, rather than
+  turning up at the end. A section is found by its heading as written,
+  then without its number ("2. Costs" for "Costs"), then as a heading
+  that contains the name -- the first step with a match decides, and two
+  matches there make nothing and answer both ("give the heading exactly
+  as written"), never the first; headings in fenced code aren't
+  sections. A name that matches none makes nothing and answers the
+  document's headings, so the model can try again in the turn. At most
+  50 changes in a call. An `x` on anything but a scatter is ignored. A call
+  with both `content` and `changes` is its content (the answer says the
+  changes were set aside); `changes` in a chat with no document answers
+  "write the whole content". The result is a new document and card, the
+  earlier one untouched; its `DocumentSource` is the whole call the
+  changes made, so Make again and a later change start from it.
+- **Math**: LaTeX between `$…$`, `$$…$$`, `\(…\)` or `\[…\]` (display
+  math on lines of its own is a block) becomes MathML, which WebKit lays
+  out and prints with the system's math font. Our own reader of the
+  common part of LaTeX (`DocumentMath`, LLMTrayCore): numbers, letters,
+  operators, scripts, `\frac`, `\sqrt[n]`, `\binom`, Greek, `\sum`/`\prod`
+  with limits under and over, integrals with scripts, function names
+  (`\sin`, `\lim`…) upright, `\left…\right` stretched to what they hold
+  while other brackets keep their size, accents, `\text`, `\mathbb`,
+  `matrix`/`pmatrix`/`bmatrix`/`vmatrix`/`cases`/`aligned`/`array`. An
+  unknown command shows as written; a formula that can't be read
+  (unbalanced braces, over 4,000 characters, nested over 24 deep) stays
+  text. A `$` opens only before a non-space and closes only after one,
+  not before a digit, and a span with another dollar in it isn't math:
+  "$5 and $10" stays money; `\$` is a dollar.
 - **The model is told it's done**: the tool answers the title, the page
   count and that the user sees it in the chat; no path. It doesn't read
   the PDF back.
@@ -257,11 +320,15 @@ from a project file, a folder file or a web page with instructions in it.
    `html head meta title body` (its own frame: `meta` only as `charset`), `p h1–h6 ul ol li table thead tbody
    tr th td pre code blockquote a strong em del hr br sup span img nav section
    link` (`link` only as the one stylesheet reference it places itself),
+   and for math `math mrow mi mn mo mtext msup msub msubsup mfrac msqrt
+   mroot mover munder munderover mtable mtr mtd`,
    and only these attributes: `class` (its own names), `href` on `a`,
    `src` and `alt` on `img` (a chart's or picture's `llmtray-doc:` address
    only),
    `rel="stylesheet"` and `href` on its own `link` (the style's
-   `llmtray-doc:` address only),
+   `llmtray-doc:` address only), and math's fixed values: `display="block"`
+   on `math`, `mathvariant="normal"` on `mi`, `stretchy="false"` on `mo`,
+   `accent="true"` on `mover`, `linethickness="0"` on `mfrac`,
    (a table cell's alignment is a class); the stylesheet is one `<link>` to the style
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
@@ -413,7 +480,13 @@ separate look, not part of this ADR.
   escaped, no attribute but the allowed ones, link schemes, link
   addresses shown, chart and picture references, a picture's metadata
   stripped, unknown images to alt text); chart
-  validation (caps, non-finite values, unknown types); the file-name
+  validation (caps, non-finite values, unknown types; stacked and
+  scatter, a scatter's x from labels or numbered); value labels; math
+  (each form, brackets, what can't be read, money, hostile and deep
+  input bounded); changes (replace with and without a heading, remove,
+  after, at the end, charts replaced and dropped, finding sections, a
+  missing one listing the headings, which document, content wins); the
+  file-name
   sanitizer (NFC, separators, leading dot, collisions); `ToolSchema`
   list kinds; `load_tools` (sticky, saved with the chat, pending after
   file text until the next user message, with pinned files too); the

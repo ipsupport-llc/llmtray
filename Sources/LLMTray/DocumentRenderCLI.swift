@@ -140,8 +140,28 @@ enum DocumentRenderCLI {
             webView.callAsyncJavaScript(
                 "await Promise.all(Array.from(document.images).map(i => i.decode().catch(() => null))); return document.images.length;",
                 arguments: [:], in: nil, in: .defaultClient) { _ in
-                    MainActor.assumeIsolated { self.print() }
+                    MainActor.assumeIsolated { self.repeatTableHeaders() }
                 }
+        }
+
+        /// WebKit's print doesn't repeat a table's header on the next page:
+        /// a table that runs over is cut where the page ends and goes on as
+        /// a table of its own, the header again, from a new page. Where the
+        /// pages end is measured with the page laid out as columns a page
+        /// high -- the same fragmentation, break rules and all. The app's
+        /// own script, as above; if it fails, the page prints as it is.
+        func repeatTableHeaders() {
+            guard let web else { return }
+            // The page is laid out as wide as the view and printed scaled
+            // to the paper's width less the margins: a page is that much
+            // taller in the layout.
+            let size = DocumentRenderCLI.printable
+            let width = Double(web.bounds.width)
+            web.callAsyncJavaScript(DocumentRenderCLI.tableHeaderScript,
+                                    arguments: ["width": width, "height": width * Double(size.height / size.width)],
+                                    in: nil, in: .defaultClient) { _ in
+                MainActor.assumeIsolated { self.print() }
+            }
         }
 
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -163,10 +183,10 @@ enum DocumentRenderCLI {
             let raw = dir.appendingPathComponent("raw.pdf")
             let info = NSPrintInfo()
             info.paperSize = DocumentRenderCLI.paper
-            info.topMargin = 54
-            info.bottomMargin = 54
-            info.leftMargin = 54
-            info.rightMargin = 54
+            info.topMargin = DocumentRenderCLI.margin
+            info.bottomMargin = DocumentRenderCLI.margin
+            info.leftMargin = DocumentRenderCLI.margin
+            info.rightMargin = DocumentRenderCLI.margin
             info.horizontalPagination = .fit
             info.verticalPagination = .automatic
             info.jobDisposition = .save
@@ -197,6 +217,76 @@ enum DocumentRenderCLI {
             DocumentRenderCLI.finish(pages: pages)
         }
     }
+
+    /// The page's margins (the header and footer are stamped into them).
+    static let margin: CGFloat = 54
+
+    /// What WebKit lays a page out in: the paper less the margins.
+    static var printable: NSSize {
+        NSSize(width: paper.width - 2 * margin, height: paper.height - 2 * margin)
+    }
+
+    /// Cuts each table where a page ends (`repeatTableHeaders`): the body
+    /// as columns of the page's size, each row's column its page; a table
+    /// whose rows reach the next page is cut before the first such row, the
+    /// rest a new table with the header again that starts a page. One cut
+    /// at a time (the layout moves after it), at most a page's worth.
+    static let tableHeaderScript = """
+    const body = document.body, style = body.getAttribute("style");
+    // Columns break at a column, where print breaks at a page.
+    const columns = document.createElement("style");
+    columns.textContent = "table.cont, table.newpage { break-before: column !important; }";
+    document.head.appendChild(columns);
+    Object.assign(body.style, { width: width + "px", height: height + "px", columnWidth: width + "px",
+                                columnGap: "0px", columnFill: "auto" });
+    const origin = body.getBoundingClientRect();
+    const page = el => Math.floor((el.getBoundingClientRect().left - origin.left + 1) / width);
+    const bottom = el => el.getBoundingClientRect().bottom - origin.top;
+    // A cut moves only what follows it: the next look starts at its rest.
+    let cuts = 0, from = 0;
+    for (; cuts < 400; cuts++) {
+        let cut = false;
+        const tables = Array.from(document.querySelectorAll("table"));
+        for (let t = from; t < tables.length; t++) {
+            const table = tables[t];
+            const head = table.tHead, rows = table.tBodies.length ? Array.from(table.tBodies[0].rows) : [];
+            if (!head || !head.rows.length || !rows.length) continue;
+            // Print lays pages out a little unlike columns (margins at a
+            // break): a page is taken as shorter, more so where the page
+            // didn't start with a cut of ours.
+            const room = height * (table.classList.contains("cont") ? 0.985 : 0.94);
+            const first = page(head.rows[0]);
+            const k = rows.findIndex(r => page(r) !== first || bottom(r) > room);
+            if (k < 0) continue;
+            if (k === 0) {
+                // The header alone at a page's foot: the table starts the next page.
+                if (table.classList.contains("cont") || table.classList.contains("newpage")) continue;
+                table.classList.add("newpage");
+                from = t;
+                cut = true;
+                break;
+            }
+            // The columns as wide as the whole table had them, in both parts.
+            const widths = Array.from(head.rows[0].cells).map(c => c.getBoundingClientRect().width);
+            Array.from(head.rows[0].cells).forEach((c, i) => { c.style.boxSizing = "border-box"; c.style.width = widths[i] + "px"; });
+            const rest = table.cloneNode(false), tbody = document.createElement("tbody");
+            rest.appendChild(head.cloneNode(true));
+            rest.appendChild(tbody);
+            for (const r of rows.slice(k)) tbody.appendChild(r);
+            table.classList.add("cut");
+            rest.classList.remove("cut", "newpage");
+            rest.classList.add("cont");
+            table.after(rest);
+            from = t + 1;
+            cut = true;
+            break;
+        }
+        if (!cut) break;
+    }
+    columns.remove();
+    if (style === null) body.removeAttribute("style"); else body.setAttribute("style", style);
+    return cuts;
+    """
 
     /// US Letter or A4 by the Mac's region.
     static var paper: NSSize {
@@ -311,13 +401,22 @@ struct DocumentChartView: View {
         .background(Color.white)
     }
 
+    /// Values printed on the marks when there are few enough to read.
+    private static let labelledMarks = 24
+
+    private func label(_ value: Double) -> Text {
+        Text(DocumentJob.valueLabel(value)).font(.system(size: 9))
+    }
+
     @ViewBuilder private var content: some View {
         let unit = chart.unit.isEmpty ? "Value" : chart.unit
         let several = chart.series.count > 1
+        let all = points
+        let labelled = all.count <= Self.labelledMarks
         switch chart.kind {
         case "line" where chart.series.contains { $0.xs != nil }:
             // A formula: a smooth line over a number axis, no dots.
-            let line = points.filter { $0.x != nil }
+            let line = all.filter { $0.x != nil }
             let range = chart.range ?? []
             Chart(line) { p in
                 LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value),
@@ -330,25 +429,68 @@ struct DocumentChartView: View {
             .chartYAxis { AxisMarks(position: .leading) }
             .chartLegend(several ? .visible : .hidden)
             .chartYAxisLabel(chart.unit)
+        case "scatter":
+            Chart(all.filter { $0.x != nil }) { p in
+                PointMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value))
+                    .foregroundStyle(by: .value("Series", p.series))
+                    .symbolSize(28)
+            }
+            // Measurements far from zero: the axes span the points.
+            .chartXScale(domain: .automatic(includesZero: false))
+            .chartYScale(domain: .automatic(includesZero: false))
+            .chartYAxis { AxisMarks(position: .leading) }
+            .chartLegend(several ? .visible : .hidden)
+            .chartYAxisLabel(chart.unit)
         case "line":
-            Chart(points) { p in
+            // Values over the dots of one short line; more would overlap.
+            let dots = labelled && !several
+            Chart(all) { p in
                 LineMark(x: .value("Label", p.label), y: .value(unit, p.value))
                     .foregroundStyle(by: .value("Series", p.series))
                 PointMark(x: .value("Label", p.label), y: .value(unit, p.value))
                     .foregroundStyle(by: .value("Series", p.series))
+                    .annotation(position: .top, spacing: 3) { if dots { label(p.value).foregroundStyle(.secondary) } }
             }
             .chartLegend(several ? .visible : .hidden)
             .chartYAxisLabel(chart.unit)
         case "pie":
-            Chart(points) { p in
+            // Each slice's share on it, when it's wide enough to hold it.
+            let total = all.reduce(0) { $0 + $1.value }
+            Chart(all) { p in
                 SectorMark(angle: .value(unit, p.value), innerRadius: .ratio(0.45), angularInset: 1)
                     .foregroundStyle(by: .value("Label", p.label))
+                    .annotation(position: .overlay) {
+                        if total > 0, p.value / total >= 0.05 {
+                            Text("\(Int((p.value / total * 100).rounded()))%")
+                                .font(.system(size: 9, weight: .semibold)).foregroundStyle(.white)
+                        }
+                    }
             }
+        case "stacked":
+            // Each part's value inside it, when it's tall enough to hold it.
+            // A stack's height either way from zero (negative parts stack down).
+            let tallest = Dictionary(grouping: all, by: \.label).values.map { stack in
+                max(stack.reduce(0) { $0 + max($1.value, 0) }, stack.reduce(0) { $0 - min($1.value, 0) })
+            }.max() ?? 0
+            Chart(all) { p in
+                BarMark(x: .value("Label", p.label), y: .value(unit, p.value))
+                    .foregroundStyle(by: .value("Series", p.series))
+                    .annotation(position: .overlay) {
+                        if labelled, tallest > 0, abs(p.value) / tallest >= 0.08 {
+                            label(p.value).foregroundStyle(.white)
+                        }
+                    }
+            }
+            .chartLegend(several ? .visible : .hidden)
+            .chartYAxisLabel(chart.unit)
         default:
-            Chart(points) { p in
+            Chart(all) { p in
                 BarMark(x: .value("Label", p.label), y: .value(unit, p.value))
                     .foregroundStyle(by: .value("Series", p.series))
                     .position(by: .value("Series", p.series))
+                    .annotation(position: p.value < 0 ? .bottom : .top, spacing: 2) {
+                        if labelled { label(p.value).foregroundStyle(.secondary) }
+                    }
             }
             .chartLegend(several ? .visible : .hidden)
             .chartYAxisLabel(chart.unit)
