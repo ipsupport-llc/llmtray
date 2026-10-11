@@ -53,9 +53,10 @@ chat of the project, reached by the chat model through tools.
   binary .xls / .ppt (v1b; supported — the user's call): every sheet as
   rows with its header, every slide's text and notes, one "page" per
   sheet or slide; embedded objects not in scope; (2) Vision OCR for
-  scans and photos; (3) a document VLM for hard pages. Images get OCR
-  and a short description, both indexed, so a photo is found by what it
-  shows. For images OCR text and description are separate outputs, both
+  scans and photos; (3) a document VLM for hard pages. Images are to get
+  OCR and a short description, both indexed, so a photo is found by what
+  it shows (planned, not built; until then a project keeps pictures
+  unsearched, [0020](0020-documents.md)). For images OCR text and description are separate outputs, both
   produced (the first-tier-that-passes rule is for pages). The
   description comes from a small built-in VLM beside the chat model, not
   the chat model itself (the user's call), run as a bounded, cancellable
@@ -230,6 +231,8 @@ file (citations), so the user can see where a claim came from.
   `ToolCatalog.Entry.usesNetwork` and the generators are not declared for
   the rest of the turn, and refused (`.refused`) if called anyway —
   exfiltration or actions prompted by a file need a new user message.
+  In a turn with a long prompt they stay declared (the refusal alone
+  enforces this; [0007](0007-chat-tools.md), "One list per turn").
   The barrier is per call: in a batch holding a project read and a
   generator, the generator is refused before any draft, queue ticket or
   model unload (the round decides those up front today), and checked
@@ -676,10 +679,14 @@ search. The user's explicit choice.
   embedding)*; `embedded` as *ready*; a hit found lexically only is
   marked so in the tool result. A project chat asked about a file that
   isn't ready gets that status from the tools and says so.
-- **Formats offered**: the add flow accepts only what the installed
-  version indexes (v1a, exactly: plain text, Markdown, code, PDF text
+- **Formats offered**: the add flow accepts, as documents, only what
+  the installed version indexes (v1a, exactly: plain text, Markdown, code, PDF text
   layer, docx/doc/odt/rtf, HTML); anything else is refused at add with "not yet supported",
   never shown as searchable.
+  Except pictures: taken into a store of their own beside the index,
+  listed but not searched (the image OCR and descriptions planned here
+  aren't built yet), for documents to use: [0020](0020-documents.md),
+  "Project pictures".
 - **Disk limits**: per project and app-wide (Settings); add, re-index and
   compaction check free space first (a file: its size + index growth;
   compaction and migration: 1.2× the index); a failed swap is cleaned up
