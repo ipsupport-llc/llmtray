@@ -273,6 +273,28 @@ idempotent, so a crash, a regenerated or edited answer, a compaction or
 a deleted chat is simply caught by the next sweep. Deleting a project
 deletes all of it. Tombstones count towards the disk caps.
 
+### New files are said
+
+A file dropped on a chat made a project and indexed it, and the model
+knew nothing of it. The chat keeps its project's document names as of
+its last message (`projectFilesSeen`, saved with the chat); the user's
+next message carries the ones added since -- by a drop, the + menu, the
+Files window or another chat -- and the model gets, before the
+message's text, how many and of which kinds, never their names: `[App
+note, not the user's words: 1 new file (pdf) added to this chat's project
+since the last message. If the message is about them: project_files with
+no arguments lists the files with their ids, then project_files(doc:
+<id>) reads one and project_files(query: "...") searches them.]` (`ProjectFilesNote`). A name is file text: the
+turn's trust barrier counts it once project_files has put it in front of
+the model, so a hostile name can't steer a guarded call by arriving with
+the user's message. The names are saved on the message
+(`projectFilesAdded`), so later requests send the same history, and shown
+under its bubble, cleaned (one line, no control or format characters, 80
+each), as "Told the model about new project files: …". Project files
+off: nothing is said. A chat's first message, or one from
+before this, only records the names; a chat that wasn't in a project
+counts everything a project brings as new; removals say nothing.
+
 ## The index
 
 ```

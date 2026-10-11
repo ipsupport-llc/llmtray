@@ -103,6 +103,8 @@ final class ChatClient: ObservableObject {
     /// The tool groups this chat has loaded (adr/0020): declared from the
     /// request after the load on, for the rest of the chat.
     @Published private(set) var loadedToolGroups: Set<String> = []
+    /// The project's file names as of the last message (ProjectFilesNote).
+    private var projectFilesSeen: [String]?
     /// Loaded by a call made after outside text in its turn: loaded at the
     /// start of the user's next message.
     private var pendingToolGroups: Set<String> = []
@@ -297,6 +299,7 @@ final class ChatClient: ObservableObject {
         countedRequest = nil
         loadedToolGroups = []
         pendingToolGroups = []
+        projectFilesSeen = nil
     }
 
     /// The user loads a tool group from the + menu (adr/0020): declared
@@ -324,6 +327,7 @@ final class ChatClient: ObservableObject {
             message.imageFilenames = images.count == pm.imageFilenames.count ? pm.imageFilenames : []
             message.citations = pm.citations ?? []
             message.answerStats = pm.answerStats
+            message.projectFilesAdded = pm.projectFilesAdded ?? []
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -338,6 +342,7 @@ final class ChatClient: ObservableObject {
         }
         currentSessionID = file.id
         loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
+        projectFilesSeen = file.projectFilesSeen
         pendingToolGroups = Set((file.pendingToolGroups ?? []).filter { ToolGroups.named($0) != nil }).subtracting(loadedToolGroups)
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
@@ -440,6 +445,7 @@ final class ChatClient: ObservableObject {
             persisted.citations = citations[msg.id]
             persisted.answerStats = msg.answerStats
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
+            persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
             for document in msg.documents {
                 documentFiles.insert(document.filename)
                 if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
@@ -477,7 +483,8 @@ final class ChatClient: ObservableObject {
             updatedAt: Date(),
             messages: persisted,
             loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
-            pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted()
+            pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted(),
+            projectFilesSeen: projectFilesSeen
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -589,9 +596,35 @@ final class ChatClient: ObservableObject {
         toolRoundsThisTurn = 0
         turnCallResults = [:]
         turnStats = nil
-        messages.append(ChatMessage(role: "user", content: prompt, images: images))
+        var message = ChatMessage(role: "user", content: prompt, images: images)
+        message.projectFilesAdded = projectFilesSinceLastMessage()
+        messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
+    }
+
+    /// The project's documents added since this chat's last message (a file
+    /// dropped on it, the + menu, the Files window, another chat), and the
+    /// names recorded for the next one. A temporary chat has no project;
+    /// a project whose documents aren't loaded yet changes nothing.
+    private func projectFilesSinceLastMessage() -> [String] {
+        guard let session = currentSessionID else { return [] }
+        guard let project = ChatLibraryStore.shared.library.projectContext(forChat: session) else {
+            // Not in one: whatever a project brings later is new.
+            if projectFilesSeen != [] { projectFilesSeen = []; hasUnsavedChanges = true }
+            return []
+        }
+        // Project files off: no project_files to point at.
+        guard ProjectIndexer.shared.isEnabled else { return [] }
+        // No index yet is no files (a project made empty); an index not
+        // opened yet is unknown: nothing recorded.
+        let hasIndex = FileManager.default.fileExists(
+            atPath: ChatLibraryStore.projectStorage.directory(for: project.id) + "/" + ProjectIndex.databaseName)
+        guard let documents = ProjectIndexer.shared.documents[project.id] ?? (hasIndex ? nil : []) else { return [] }
+        let names = documents.map(\.name)
+        let added = projectFilesSeen.map { ProjectFilesNote.added(current: names, seen: $0) } ?? []
+        if projectFilesSeen != names { projectFilesSeen = names; hasUnsavedChanges = true }
+        return added
     }
 
     /// The chat's project as the library has it now (adr/0012): read as a

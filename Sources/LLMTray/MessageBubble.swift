@@ -154,6 +154,17 @@ struct MessageBubble: View {
                 }
             }
 
+            if isUser, !message.projectFilesAdded.isEmpty {
+                // What the model was told came with this message.
+                Label(String(format: NSLocalizedString("Told the model about new project files: %@", comment: "under a user's message: the files added to the project since the last one (the model is told how many, not their names)"),
+                             ListFormatter.localizedString(byJoining: message.projectFilesAdded.prefix(ProjectFilesNote.shownNames).map(ProjectFilesNote.clean))
+                                + (message.projectFilesAdded.count > ProjectFilesNote.shownNames ? "…" : "")),
+                      systemImage: "doc.badge.plus")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+
             ForEach(Array(message.images.enumerated()), id: \.offset) { i, data in
                 image(data, index: i)
                 tweakDraft(.image, i)
