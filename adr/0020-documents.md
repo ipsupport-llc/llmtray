@@ -37,7 +37,16 @@ a 4B model looks as good as one from a 35B model.
   line over a number axis. A small model asked for "a sine chart" otherwise
   writes out a hundred made-up numbers -- slowly, and wrong. Labels that
   don't match the number of values give way to point numbers with a note;
-  the numbers are what the chart is for. `stacked` draws a bar
+  the numbers are what the chart is for. Two calls are answered rather
+  than made, so the model can call again in the turn (a made document
+  spends the tool): content with an image as data (`](data:`; a model
+  can't write a picture, and the page loads no `data:`), and content
+  placing `chart:<id>` that `charts` never gives (a chart given but left
+  out keeps its note, one past the cap too); both answers show how a
+  chart is given, by numbers or by a formula. Only rendered images
+  count (not a link to data or a mention in code), and only new ones: a
+  change or Make again isn't refused for what the earlier document
+  already had. `stacked` draws a bar
   chart's series on top of each other; `scatter` draws each series'
   points at its own `x` (numbers; labels that are numbers serve too,
   else the points are numbered with a note), each series as long as it

@@ -76,11 +76,12 @@ enum ToolRunnerCLI {
                 let base = args.firstIndex(of: "--base").flatMap { j in j + 1 < args.count ? try? String(contentsOfFile: args[j + 1], encoding: .utf8) : nil }
                 let values: [String: Any]
                 var changed: [String] = []
+                var earlier: String?
                 switch DocumentEdit.resolve(parsed.values, documents: base.map { [(title: "", arguments: $0)] } ?? []) {
-                case .success(let (v, notes, _)): values = v; changed = notes
+                case .success(let (v, notes, base)): values = v; changed = notes; earlier = base?.content
                 case .failure(let problem): print(problem.text); exit(1)
                 }
-                switch DocumentSpec.read(values) {
+                switch DocumentSpec.read(values, earlier: earlier) {
                 case .failure(let e): print(e.text); exit(1)
                 case .success(var spec):
                     spec.adjusted = changed + spec.adjusted
