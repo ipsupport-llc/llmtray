@@ -241,6 +241,14 @@ struct ChatComposer: View {
                 }
             }
             .padding(.horizontal, 12)
+            if let draft = chat.draft {
+                // A Creator draft holds the chat (it waits for Generate or
+                // Skip, or for its countdown): say so, not a silent Stop.
+                Label(Self.draftHint(draft.kind), systemImage: "hand.raised")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+            }
             if let notice = composer.notice {
                 Text(notice)
                     .font(.caption)
@@ -251,6 +259,14 @@ struct ChatComposer: View {
             ModelDisclaimer.Line()
                 .padding(.horizontal, 12)
                 .padding(.bottom, 6)
+        }
+    }
+
+    static func draftHint(_ kind: GenerationDraft.Kind) -> String {
+        switch kind {
+        case .music: return NSLocalizedString("The music draft above is open: Generate or Skip it to keep chatting.", comment: "")
+        case .image: return NSLocalizedString("The image draft above is open: Generate or Skip it to keep chatting.", comment: "")
+        case .edit: return NSLocalizedString("The image edit draft above is open: Generate or Skip it to keep chatting.", comment: "")
         }
     }
 
