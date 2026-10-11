@@ -231,6 +231,8 @@ file (citations), so the user can see where a claim came from.
   `ToolCatalog.Entry.usesNetwork` and the generators are not declared for
   the rest of the turn, and refused (`.refused`) if called anyway —
   exfiltration or actions prompted by a file need a new user message.
+  In a turn with a long prompt they stay declared (the refusal alone
+  enforces this; [0007](0007-chat-tools.md), "One list per turn").
   The barrier is per call: in a batch holding a project read and a
   generator, the generator is refused before any draft, queue ticket or
   model unload (the round decides those up front today), and checked

@@ -88,6 +88,23 @@ refused and the turn ends — an error only if the turn produced nothing.
 With tools declared, the profile's `toolUsePolicy` joins the system
 prompt (`ChatRequestBuilder`).
 
+**One list per turn, once the prompt is long** (`TurnDeclarations`,
+2026-10-10). The chat templates put the tools at the start of the prompt:
+a list changed between a turn's requests -- a spent generator, guarded
+tools dropped after file text, a folder or project mode gone, the last
+round without tools -- changed the prefix, and the server prefilled the
+whole chat again (98% of the prompt, about a minute for 30K tokens on
+Gemma 4 26B: [0020](0020-documents.md), "Spike and measurement"). From a
+request of 3,000 prompt tokens on (the server's count), the rest of the
+turn repeats that request's list, the last round included (its calls are
+refused as before), less only tools no longer offered at all (a profile
+switched one off). Nothing is allowed by being declared: every tool kept
+in the list that may not run now is refused when called, by the checks
+that always ran (`ToolTrust` before and at the call, a spent generator's
+own refusal, `fileTextAllowed`, a selectable tool's mode). Below 3,000
+tokens a re-prefill costs seconds and the list narrows as before, which
+keeps a small model from calling what it can't use.
+
 ## Lessons
 
 - **Small models loop on tool results.** A 4B model treated a successful
