@@ -33,7 +33,8 @@ final class FeatureSetup {
         profiles.value(\.tools.enableImageGeneration, profileID: profileID)
     }
 
-    /// Set up to generate: mflux at its pin and the checkpoint in place.
+    /// Set up to generate: mflux installed (brought to its pin before a run)
+    /// and the checkpoint in place.
     func isImageModelReady(_ model: ImageGenModel) -> Bool {
         ChatTabs.shared.mflux.isReady(model)
     }

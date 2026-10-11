@@ -204,10 +204,16 @@ final class MfluxManager: ObservableObject {
         #endif
     }
 
-    /// Set up for this model: the venv at the pinned mflux, the checkpoint
-    /// in place -- what generate() will otherwise refuse.
+    /// Set up for this model: the venv and the checkpoint in place -- what
+    /// generate() will otherwise refuse. An mflux older than the pin is
+    /// still set up: generate() brings it to the pin first.
     func isReady(_ model: ImageGenModel) -> Bool {
-        FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded && installedMfluxVersion() == Self.mfluxVersion
+        FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded
+    }
+
+    /// Set up, but mflux isn't at the pin: generate() updates it first.
+    var needsUpdate: Bool {
+        FileManager.default.fileExists(atPath: venvPython) && installedMfluxVersion() != Self.mfluxVersion
     }
 
     /// The mflux version in the venv, from its dist-info folder's name
@@ -277,37 +283,31 @@ final class MfluxManager: ObservableObject {
     /// runtime/llmtray_mflux_runner.py drives mflux's Python API and streams
     /// progress, step previews and the result over stdout, so nothing (not
     /// even a temporary file) touches the disk. Matters for temporary chats,
-    /// which must leave no trace.
+    /// which must leave no trace. (An mflux older than the pin is updated in
+    /// the app's venv first: the runtime, nothing of the chat or its image.)
     /// `images`: the image(s) to edit (a model that supportsEditing).
     func generate(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data] = []) async throws -> Data {
-        // Set up by the download in Settings; never installed mid-chat (a
-        // temporary chat must not cause files to be written).
+        // Set up by the download in Settings; never set up mid-chat (a
+        // temporary chat must not cause files to be written -- bringing an
+        // existing venv's mflux to the pin, below, writes only the app's
+        // own runtime, nothing of the chat).
         guard FileManager.default.fileExists(atPath: venvPython) else {
             throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- enable it again in Settings.", comment: ""))
         }
-        // Installed before the pin, or by an older app: its internals may
-        // not match the runner's.
-        guard installedMfluxVersion() == Self.mfluxVersion else {
-            throw MfluxError.processFailed(NSLocalizedString("Image generation needs an update -- disable it and enable it again in Settings.", comment: ""))
-        }
-
-        let savedDir = savedModelDir(for: model)
         guard model.isDownloaded else {
             // The Settings toggle only turns on after downloadModel() has
             // succeeded; fail clearly rather than silently do something else.
             throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))
         }
+        let savedDir = savedModelDir(for: model)
 
         // Claimed before any suspension: two chat tabs (or a download) can't
-        // both run it -- each run can take most of this Mac's memory.
+        // both run it -- each run can take most of this Mac's memory -- nor
+        // both install into the venv.
         guard !isBusy else {
             throw MfluxError.processFailed(NSLocalizedString("The image generator is busy with another chat -- try again once it's done.", comment: ""))
         }
         isBusy = true
-        isGenerating = true
-        statusText = NSLocalizedString("Generating image…", comment: "")
-        stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
-        previewImage = nil
         defer {
             isBusy = false
             isGenerating = false
@@ -315,6 +315,33 @@ final class MfluxManager: ObservableObject {
             stepProgress = nil
             previewImage = nil
         }
+        // Installed before the pin, or by an older app (a new app moved the
+        // pin): brought to the pin now, as the audio runtime is before a run
+        // -- its internals may not match the runner's otherwise. Only the
+        // package, into the app's own venv; nothing about the chat is
+        // written. One that can't be updated (offline) says so.
+        if installedMfluxVersion() != Self.mfluxVersion {
+            do {
+                // In a task of its own: Stop (or another chat) cancels the
+                // run, but pip is never cut off halfway through replacing
+                // packages -- it finishes, then the run ends.
+                try await Task { try await self.ensurePackageInstalled() }.value
+                try Task.checkCancellation()
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
+                                                      Self.mfluxVersion, error.localizedDescription))
+            }
+            guard installedMfluxVersion() == Self.mfluxVersion else {
+                throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
+                                                      Self.mfluxVersion, NSLocalizedString("the installed version didn't change", comment: "")))
+            }
+        }
+        isGenerating = true
+        statusText = NSLocalizedString("Generating image…", comment: "")
+        stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
+        previewImage = nil
 
         // width/height must be multiples of 16 for the model's patch size;
         // round rather than reject an odd model-supplied value.
