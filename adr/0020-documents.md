@@ -226,15 +226,15 @@ from a project file, a folder file or a web page with instructions in it.
 2. **The converter can't emit markup from the content.** Raw HTML in
    the Markdown is text (a `<script>` comes out as those characters);
    every text and attribute value is escaped. It emits only these tags:
-   `html head body` (its own frame), `p h1–h6 ul ol li table thead tbody
-   tr th td pre code blockquote a strong em del hr br sup img nav section
+   `html head meta title body` (its own frame: `meta` only as `charset`), `p h1–h6 ul ol li table thead tbody
+   tr th td pre code blockquote a strong em del hr br sup span img nav section
    link` (`link` only as the one stylesheet reference it places itself),
    and only these attributes: `class` (its own names), `href` on `a`,
    `src` and `alt` on `img` (a chart's or picture's `llmtray-doc:` address
    only),
    `rel="stylesheet"` and `href` on its own `link` (the style's
    `llmtray-doc:` address only),
-   `align` on table cells; the stylesheet is one `<link>` to the style
+   (a table cell's alignment is a class); the stylesheet is one `<link>` to the style
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
    `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart and
