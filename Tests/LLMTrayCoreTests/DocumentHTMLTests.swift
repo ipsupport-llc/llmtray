@@ -142,6 +142,12 @@ final class DocumentHTMLTests: XCTestCase {
         let header = "|" + String(repeating: "h|", count: 50) + "\n|" + String(repeating: "---|", count: 50) + "\n"
         let tall = body(header + String(repeating: "|a|\n", count: 1_000)).html
         XCTAssertLessThanOrEqual(tall.components(separatedBy: "<td").count - 1, 20_000)
+        // The budget is the document's, not each table's.
+        let one = "|" + String(repeating: "|", count: 50) + "\n|" + String(repeating: ":--:|", count: 50) + "\n" + String(repeating: "|\n", count: 399) + "\n"
+        let many = body(String(repeating: one, count: 181))
+        let cells = try! NSRegularExpression(pattern: "<t[dh][ >]").numberOfMatches(in: many.html, range: NSRange(many.html.startIndex..., in: many.html))
+        XCTAssertLessThanOrEqual(cells, 20_000)
+        XCTAssertLessThan(many.html.utf8.count, DocumentHTML.maxBodyBytes)
     }
 
     func testEscapesControlCharacters() {

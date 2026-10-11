@@ -27,14 +27,21 @@ public enum DocumentHTML {
         public var placed: [ImageRef]
         /// The headings, for a table of contents: level and plain text.
         public var headings: [(level: Int, text: String)]
+        /// The page grew past `maxBodyBytes` and was cut there: the
+        /// document isn't made (adr/0020, Hardening 3).
+        public var tooLarge: Bool
     }
+
+    /// The body's size at most: 200,000 scalars of Markdown are at most a
+    /// few megabytes of HTML, whatever their shape.
+    public static let maxBodyBytes = 8 * 1024 * 1024
 
     /// `resolve` gives the `llmtray-doc:` address of a chart or picture the
     /// document has, nil for one it doesn't (it then reads as its alt text).
     public static func body(markdown: String, resolve: @escaping (ImageRef) -> String?) -> Body {
         var converter = Converter(resolve: resolve)
         let html = converter.blocks(lines(markdown))
-        return Body(html: html, placed: converter.placed, headings: converter.headings)
+        return Body(html: html, placed: converter.placed, headings: converter.headings, tooLarge: converter.tooLarge)
     }
 
     /// The whole page: our stylesheet, then the body, a table of contents
@@ -106,6 +113,11 @@ public enum DocumentHTML {
         /// Nesting of quotes and lists: a hostile input can't recurse deep.
         var depth = 0
         var inlineDepth = 0
+        /// Table cells left for the whole document: one table's padding
+        /// can't be repeated a hundred times either.
+        var cellsLeft = maxCells
+        /// The body passed `maxBodyBytes`: the rest is dropped.
+        var tooLarge = false
 
         init(resolve: @escaping (ImageRef) -> String?) { self.resolve = resolve }
 
@@ -122,6 +134,7 @@ public enum DocumentHTML {
                 paragraph = []
             }
             while i < lines.count {
+                if depth == 1, out.utf8.count > DocumentHTML.maxBodyBytes { tooLarge = true; break }
                 let line = lines[i]
                 let trimmed = line.trimmingCharacters(in: .whitespaces)
                 if trimmed.isEmpty { flush(&out, &self); i += 1; continue }
@@ -175,7 +188,8 @@ public enum DocumentHTML {
                 // at most `maxColumns` of them, and `maxCells` in the table.
                 if trimmed.hasPrefix("|"), i + 1 < lines.count,
                    let aligns = Self.tableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces)),
-                   aligns.count == Self.cells(trimmed).count, aligns.count <= Self.maxColumns {
+                   aligns.count == Self.cells(trimmed).count, aligns.count <= Self.maxColumns,
+                   aligns.count * 2 <= cellsLeft {
                     flush(&out, &self)
                     let header = Self.cells(trimmed)
                     var rows: [[String]] = []
@@ -183,11 +197,12 @@ public enum DocumentHTML {
                     while i < lines.count {
                         let t = lines[i].trimmingCharacters(in: .whitespaces)
                         guard t.hasPrefix("|") else { break }
-                        // Past the table's cells, the rows are text.
-                        guard (rows.count + 2) * header.count <= Self.maxCells else { break }
+                        // Past the document's cells, the rows are text.
+                        guard (rows.count + 2) * header.count <= cellsLeft else { break }
                         rows.append(Self.cells(t))
                         i += 1
                     }
+                    cellsLeft -= (rows.count + 1) * header.count
                     out += table(header: header, aligns: aligns, rows: rows)
                     continue
                 }
@@ -366,8 +381,8 @@ public enum DocumentHTML {
         /// How far a closing marker, bracket or backtick is looked for: a
         /// 200,000-character line of asterisks stays linear.
         static let scanLimit = 1_000
-        /// A table's columns and cells: padding short rows to the header
-        /// can't multiply a 200,000-character input into billions of cells.
+        /// A table's columns, and the document's cells: padding short rows
+        /// to the header can't multiply a 200,000-scalar input.
         static let maxColumns = 50
         static let maxCells = 20_000
 
