@@ -1,3 +1,4 @@
+import LLMTrayCore
 import SwiftUI
 
 struct ModelCardView: View {
@@ -40,8 +41,9 @@ struct ModelCardView: View {
     /// Headings, lists, quotes, code blocks and inline formatting via the
     /// same renderer the chat bubbles use (ChatMarkdown) -- the previous
     /// inline-only AttributedString parse left "## Usage" and list markers
-    /// as raw text. Tables and HTML still come through as plain text.
+    /// as raw text. HTML (logos, link bars) is turned into Markdown first
+    /// (ModelCardText); tables still come through as plain text.
     private func renderedMarkdown(_ text: String) -> AttributedString {
-        ChatMarkdown.render(text, baseSize: 12)
+        ChatMarkdown.render(ModelCardText.clean(text), baseSize: 12)
     }
 }
