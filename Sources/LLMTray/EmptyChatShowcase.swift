@@ -14,6 +14,9 @@ struct EmptyChatIntro: View {
     /// chat takes the drop -- a vision model's images to the message,
     /// other files to the project).
     let dropTargeted: Bool
+    /// The tray popover: no room for the tiles -- just the line inviting
+    /// a question (the chat window shows them).
+    var compact = false
     @ObservedObject private var store = ChatLibraryStore.shared
     // What the Getting Started card's visibility depends on (Hide, its
     // steps): watched here, where it's shown or not.
@@ -34,6 +37,12 @@ struct EmptyChatIntro: View {
             } else {
                 ProjectChatDropZone(sessionID: sessionID, dropTargeted: dropTargeted)
             }
+        } else if compact {
+            HStack(spacing: 6) {
+                BrainMark(size: 16)
+                Text("Ask anything.").font(.callout).foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else {
             EmptyChatShowcase(selectedModelID: selectedModelID, port: port, insertPrompt: insertPrompt)
         }
