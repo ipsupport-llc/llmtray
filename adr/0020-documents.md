@@ -412,5 +412,5 @@ separate look, not part of this ADR.
   ("hi", "explain this": not called).
 - Manual: a report with a table and two charts from a project file, a
   letter, an invoice; Open, Save As…, Add to Project with files off;
-  Make again; a temporary chat (nothing on disk until Save); a chat
+  Make again; a temporary chat (`make_document` not declared, a direct call refused, nothing written); a chat
   reopened after a restart keeps its documents and its loaded group.
