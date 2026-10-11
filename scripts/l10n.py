@@ -452,10 +452,17 @@ def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
     return [n for n in dict.fromkeys(names) if n in table and _is_label(n) and table[n] != n]
 
 
-def contains_label(value: str, translation: str) -> bool:
+def contains_label(value: str, translation: str, english: str = "", key: str = "") -> bool:
     """Whether `value` uses `translation`, allowing for inflection: each of
     its words found by its stem (all but the last two letters of a longer
-    word -- "Настройки" in "в Настройках")."""
+    word -- "Настройки" in "в Настройках"). The English label left in place
+    doesn't count, though a stem may match it ("Modele" in "Models"): the
+    value may keep only the key's other uses of the word ("Voice Lab")."""
+    import re
+    if english and english not in translation:
+        word = re.compile(r"(?<!\w)" + re.escape(english) + r"(?!\w)")
+        if len(word.findall(value)) > max(len(word.findall(key)) - 1, 0):
+            return False
     low = value.lower()
     for word in translation.lower().split():
         stem = word if len(word) <= 4 else word[:-2]
@@ -503,7 +510,9 @@ def translate(codes: list[str], model: str, batch: int = 100, only: dict[str, li
             f"'labels': the app's existing {lang} translations of UI labels and terms the text contains. "
             f"When the text names that setting, tab, button or menu item (e.g. 'Settings > Files', a quoted "
             f"name), use exactly the given translation; use the given word for terms such as chat or project "
-            f"everywhere, never a synonym.\n"
+            f"everywhere, never a synonym. Fit a settings path into the sentence the way {lang} refers to a "
+            f"place in settings, without breaking the label's own form (Russian: 'в разделе «Настройки › "
+            f"Файлы»', not 'в Настройки › Файлы').\n"
             f"Rules: keep every format specifier (%@, %lld, %d, %1$@...) exactly, in a grammatical position; "
             f"keep these terms untranslated: {', '.join(GLOSSARY)}; keep technical flags, file paths, URLs, "
             f"code identifiers (snake_case names like make_document) and <placeholders> as they are; use the "
@@ -593,7 +602,7 @@ def main() -> int:
                 continue  # a new language: translate creates it
             table = load(path)
             for k, v in table.items():
-                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n])]
+                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n], n, k)]
                 if missing:
                     stale.setdefault(code, []).append(k)
                     print(f"{code}: {k[:60]!r} lacks {', '.join(repr(table[n]) for n in missing)}")
