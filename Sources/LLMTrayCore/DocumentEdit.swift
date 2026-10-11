@@ -45,8 +45,9 @@ public enum DocumentEdit {
     /// The whole call to make: `base` (the earlier call's values, as the
     /// parser read them) with `call`'s changes, title, style and charts.
     /// The result has no `changes`: it is what Make again and a later
-    /// change start from. A section that isn't there is a problem, the
-    /// headings listed, and nothing is made.
+    /// change start from. A section to replace that isn't there is a
+    /// problem, the headings listed, and nothing is made; one to add after
+    /// that isn't there puts the new part at the end, said.
     public static func apply(_ call: [String: Any], to base: [String: Any]) -> Result<(values: [String: Any], adjusted: [String]), Problem> {
         var values = base
         values.removeValue(forKey: "changes")

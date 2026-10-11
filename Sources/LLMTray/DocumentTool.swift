@@ -67,7 +67,8 @@ final class MakeDocumentTool: ChatTool {
             }
             return .generatedDocument(made, text: text)
         case .failure(let error):
-            return .text("\(name): \(error.text)")
+            // The renderer's own failure: telling the user is the fix.
+            return .text("\(name): \(error.text) Nothing was made -- don't tell the user it was made.")
         }
     }
 
