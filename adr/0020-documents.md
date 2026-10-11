@@ -29,7 +29,21 @@ a 4B model looks as good as one from a 35B model.
   ```
 
   A chart goes where the content says `![chart](chart:<id>)`; a chart the
-  content never names goes at the end. The model sends numbers, never
+  content never names goes at the end. **Pictures** go in the same way,
+  `![caption](image:<n>)` or `![caption](folder:<path>)`:
+  - `image:<n>`: an image of this chat (attached by the user, generated
+    or edited), numbered as edit_image numbers them;
+  - `folder:<path>`: an image in a folder the chat already has a read
+    grant for ([0014](0014-folder-tools.md)); no grant is asked for from
+    here — without one the picture is left out and the answer says to
+    look at the folder first (`files`), which asks;
+  - project pictures come with the project library (not yet: project
+    files take no images today, [0012](0012-project-files-rag.md)).
+  The app reads and decodes the picture itself (ImageIO, images only),
+  scales it to at most 2400 px, re-encodes it (PNG, or JPEG for photos)
+  without its metadata (no GPS or camera data goes into a document), and
+  serves it as `llmtray-doc://image/<k>`. The model never gets the
+  picture's bytes back. The model sends numbers, never
   drawings, CSS or HTML. Tables are Markdown tables in `content`, not
   charts. `ToolSchema` gains list kinds (`list(.string)`,
   `list(.number)`) with their JSON schema, lenient reading (a single value
@@ -39,8 +53,9 @@ a 4B model looks as good as one from a 35B model.
      rules of `ChatMarkdown`: headings, lists, tables, code, quotes,
      links), no new package. It emits only an allowlist (Hardening 2).
   2. *Charts* drawn by Swift Charts (`ImageRenderer`, capped size) to PNG,
-     served to the page by our scheme (`llmtray-doc://chart/<id>`), not
-     as `data:` URLs, so the page may load nothing else (Hardening 1).
+     and pictures re-encoded as above, served to the page by our scheme
+     (`llmtray-doc://chart/<id>`, `llmtray-doc://image/<k>`), not as
+     `data:` URLs, so the page may load nothing else (Hardening 1).
   3. *Pages*: the HTML, with the style's CSS (fonts, margins, `@page`
      size, page breaks before chapter headings, a table of contents for
      a long report), printed by WebKit to a paginated PDF:
@@ -113,8 +128,9 @@ from a project file, a folder file or a web page with instructions in it.
    `WKNavigationDelegate` refuses every frame navigation but the initial
    load. `llmtray-doc:` (a `WKURLSchemeHandler`) serves only the style's
    bundled CSS and fonts (with `Access-Control-Allow-Origin: *`, which
-   fonts from another origin need) and this document's chart PNGs, by a
-   fixed table, never a path. Tested with a remote image, `file:`,
+   fonts from another origin need) and this document's chart PNGs and
+   re-encoded pictures, by a fixed table built before the page loads,
+   never a path. Tested with a remote image, `file:`,
    `data:text/html`, `data:` SVG, a CSS `url()`, a `<script>`, an
    `onerror`, a `<meta http-equiv=refresh>`, a redirect; and that the
    fonts load.
@@ -125,22 +141,28 @@ from a project file, a folder file or a web page with instructions in it.
    tr th td pre code blockquote a strong em del hr br sup img nav section
    link` (`link` only as the one stylesheet reference it places itself),
    and only these attributes: `class` (its own names), `href` on `a`,
-   `src` and `alt` on `img` (a chart's `llmtray-doc:` address only),
+   `src` and `alt` on `img` (a chart's or picture's `llmtray-doc:` address
+   only),
    `rel="stylesheet"` and `href` on its own `link` (the style's
    `llmtray-doc:` address only),
    `align` on table cells; the stylesheet is one `<link>` to the style
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
-   `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart
-   references become their alt text. Links: only `http`, `https` and
+   `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart and
+   picture references (`chart:`, `image:`, `folder:`) become their alt
+   text. Links: only `http`, `https` and
    `mailto` stay links; any other scheme (`javascript:`, `file:`,
    `data:`) becomes plain text. Where a link's text isn't its address,
    the address is printed after it in small type (as print stylesheets
    do), so the PDF never hides where a link goes.
 3. **Limits on what goes in and what comes out.** In: at most 8 charts,
    12 series, 500 points per chart; values finite; labels and titles
-   capped; content at most 200,000 characters. A bad chart is left out
-   with a note in the tool's answer, the rest is made. Out: chart PNGs at
+   capped; content at most 200,000 characters; at most 30 pictures, a
+   folder picture at most 40 MB as `files` view reads it
+   (`FolderFileTake`, with its guards: no secret-looking name, no hard
+   link, no iCloud placeholder, never downloaded, by descriptor inside
+   the grant). A bad chart or picture is left out with a note in the
+   tool's answer, the rest is made. Out: chart PNGs at
    most 2400×1600 px; at most 200 pages and 50 MB; rendering stops after
    60 s. Over a limit: no document, and the tool says which limit.
 4. **It only writes its own new file.** No path comes from the model.
@@ -157,7 +179,10 @@ from a project file, a folder file or a web page with instructions in it.
    text a file brought in. `make_document` does neither: it can't send
    anything anywhere (Hardening 1), changes no existing file
    (Hardening 4), is bounded (Hardening 3), and its output only goes
-   further by the user's click. Making a document from project, folder
+   further by the user's click. Pictures from a granted folder don't
+   change that: their bytes go only into the document, never back to
+   the model, and only from folders already granted for reading. Making
+   a document from project, folder
    or pinned text is the point of the tool ("summarise these files into
    a report"), so it stays allowed after file text and with pinned
    files. If a later format ever fetches anything, that call becomes
@@ -267,7 +292,8 @@ separate look, not part of this ADR.
 
 - Unit tests (LLMTrayCore): the converter (every block, raw HTML
   escaped, no attribute but the allowed ones, link schemes, link
-  addresses shown, chart references, unknown images to alt text); chart
+  addresses shown, chart and picture references, a picture's metadata
+  stripped, unknown images to alt text); chart
   validation (caps, non-finite values, unknown types); the file-name
   sanitizer (NFC, separators, leading dot, collisions); `ToolSchema`
   list kinds; `load_tools` (sticky, saved with the chat, pending after
