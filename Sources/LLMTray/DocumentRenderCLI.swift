@@ -468,7 +468,10 @@ struct DocumentChartView: View {
             }
         case "stacked":
             // Each part's value inside it, when it's tall enough to hold it.
-            let tallest = Dictionary(grouping: all, by: \.label).values.map { $0.reduce(0) { $0 + max($1.value, 0) } }.max() ?? 0
+            // A stack's height either way from zero (negative parts stack down).
+            let tallest = Dictionary(grouping: all, by: \.label).values.map { stack in
+                max(stack.reduce(0) { $0 + max($1.value, 0) }, stack.reduce(0) { $0 - min($1.value, 0) })
+            }.max() ?? 0
             Chart(all) { p in
                 BarMark(x: .value("Label", p.label), y: .value(unit, p.value))
                     .foregroundStyle(by: .value("Series", p.series))

@@ -213,7 +213,7 @@ public enum DocumentMath {
             switch c {
             case "-": return ("<mo>−</mo>", false)
             case "~": return ("<mtext>\u{00A0}</mtext>", false)
-            case "&": return ("", false)   // outside a table: nothing
+            case "&": return ("<mo>&amp;</mo>", false)   // outside a table: as written
             case "*": return ("<mo>∗</mo>", false)
             case "(", ")", "[", "]", "|":
                 // As written, not stretched: \left and \right stretch.

@@ -274,6 +274,9 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(spec.charts[1].series.map(\.xs), [[170, 180], [160, 165, 170]], "each series its own points")
         XCTAssertEqual(spec.charts[2].series[0].xs, [1.5, 2.5], "numbers for labels are the x")
         XCTAssertEqual(spec.charts[3].series[0].xs, [1, 2, 3])
+        let extra = try read(#"{"title": "x", "content": "y", "charts": [{"id": "c", "type": "scatter", "series": [{"values": [1, 2], "x": [10, 20, 30]}]}]}"#).get()
+        XCTAssertEqual(extra.charts.first?.series.first?.xs, [10, 20], "one x for each value")
+        XCTAssertTrue(extra.adjusted.isEmpty, "\(extra.adjusted)")
         // An x on a line or bars is ignored: they're at their labels.
         let line = try read(#"{"title": "x", "content": "y", "charts": [{"id": "c", "type": "line", "series": [{"values": [1, 2], "x": [10, 20]}]}]}"#).get()
         XCTAssertEqual(line.charts.first?.series.first?.xs, [])
@@ -287,7 +290,7 @@ final class DocumentSpecTests: XCTestCase {
     func testValueLabels() {
         let cases: [(Double, String)] = [(0, "0"), (12, "12"), (12.5, "12.5"), (340.26, "340.3"), (1234, "1234"),
                                          (12_500, "12500"), (125_000, "125K"), (1_500_000, "1.5M"), (2.5e9, "2.5B"),
-                                         (0.0042, "0.0042"), (0.5, "0.5"), (-50, "-50"), (1.0, "1")]
+                                         (0.0042, "0.0042"), (0.5, "0.5"), (-50, "-50"), (1.0, "1"), (1e-9, "1e-09")]
         for (v, text) in cases { XCTAssertEqual(DocumentJob.valueLabel(v), text, "\(v)") }
     }
 

@@ -223,6 +223,11 @@ public struct DocumentSpec: Equatable, Sendable {
         var numbered = false
         let labelXs = labels.compactMap { Double($0.trimmingCharacters(in: .whitespaces)) }
         for k in series.indices where series[k].xs.count != series[k].values.count {
+            if series[k].xs.count > series[k].values.count {
+                // More x than values: the first ones, one for each value.
+                series[k].xs = Array(series[k].xs.prefix(series[k].values.count))
+                continue
+            }
             if labelXs.count == labels.count, labelXs.count == series[k].values.count {
                 series[k].xs = labelXs
             } else {

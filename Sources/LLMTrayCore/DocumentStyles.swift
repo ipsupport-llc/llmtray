@@ -176,6 +176,8 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         if a == 0 { return "0" }
         if a >= 100 { return number(v, decimals: a >= 1000 ? 0 : 1) }
         if a >= 1 { return number(v, decimals: 2) }
+        // Too small for decimals: never shown as a zero.
+        if a < 1e-6 { return String(format: "%.2g", v) }
         return number(v, decimals: min(8, max(2, Int(-log10(a).rounded(.down)) + 2)))
     }
 
