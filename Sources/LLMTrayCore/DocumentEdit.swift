@@ -84,7 +84,8 @@ public enum DocumentEdit {
                 let filled = new.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
                 if new.isEmpty {
                     lines.replaceSubrange(s.start..<s.end, with: [])
-                } else if filled.count == 1, DocumentHTML.Converter.heading(filled[0].trimmingCharacters(in: .whitespaces)) != nil {
+                } else if filled.count == 1, let (_, text) = DocumentHTML.Converter.heading(filled[0].trimmingCharacters(in: .whitespaces)),
+                          !text.isEmpty {
                     // A heading alone is a new name: the heading line only,
                     // its text and subsections kept (a title's section is
                     // the whole document).
@@ -113,7 +114,7 @@ public enum DocumentEdit {
         // Most of the document gone in one call: said, never silent.
         let before = DocumentHTML.lines((base["content"] as? String) ?? "").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
         let after = lines.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
-        if before >= 6, after * 2 < before {
+        if before >= 6, after > 0, after * 2 < before {
             adjusted.append("The changes removed most of the document (\(after) of \(before) lines are left). Tell the user, "
                 + "and if that wasn't meant, change it again with the sections that should stay.")
         }
