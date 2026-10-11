@@ -87,13 +87,15 @@ a 4B model looks as good as one from a 35B model.
   messages, `turnProducedSomething` (a document-only turn at the tool
   limit isn't "the model kept calling tools"), compaction's media check
   and the history entry's "has content" all count documents (one `hasContent` helper); the files go
-  with the chat. **Temporary chats write nothing** (0006): the PDF and
-  thumbnail bytes sit in a session-scoped in-memory store keyed by the
-  document's id (never in `Codable`), freed when the chat closes, and go
-  to disk only when the user opens, saves or shares (the temp export of
-  `MediaSharing`); Show in Finder isn't offered there. Rendering itself
-  leaves no file behind (the spike checks: printing to data, not to a
-  temp file, where the API allows).
+  with the chat. **Not in temporary chats, for now.** They write nothing
+  (0006), and the printing that works (save-to-file `NSPrintInfo`) writes
+  a file; until a paginated in-memory path is proven, `make_document`
+  isn't declared in a temporary chat (and refuses there, saying a saved
+  chat can make documents). When one is: the PDF and thumbnail bytes sit
+  in a session-scoped in-memory store keyed by the document's id (never
+  in `Codable`), freed when the chat closes, written only when the user
+  opens, saves or shares (the temp export of `MediaSharing`), Show in
+  Finder not offered.
 - **Regenerate**: Regenerate on the answer re-runs the turn as for any
   answer. "Make again" on the card re-renders from the saved call (a
   `DocumentSource`: the arguments, as `MediaSource` keeps a generator's)
@@ -202,9 +204,11 @@ A document is built from text the model wrote, and that text may come
 from a project file, a folder file or a web page with instructions in it.
 
 1. **Nothing executes, nothing loads.** The first line of defence is the
-   converter: the page it makes references nothing but `llmtray-doc:`
+   converter: the page it makes loads nothing but `llmtray-doc:`
    (Hardening 2), and a test over hostile fixtures proves it emits no
-   other URL, no `data:` and no `blob:`. Behind it, the printing web
+   other resource URL (an `img` or the stylesheet), no `data:` and no
+   `blob:`; links (`a href`, http/https/mailto, Hardening 2) are never
+   loaded and are checked separately. Behind it, the printing web
    view: JavaScript off (`defaultWebpagePreferences.allowsContentJavaScript
    = false`, `javaScriptCanOpenWindowsAutomatically` off), a
    non-persistent data store, HTML loaded from a string with no base URL.
@@ -328,8 +332,11 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   group isn't loaded (a model that saw it in another chat) is answered
   "call load_tools first", which it can, not "isn't available".
 - **After file text, loading waits for the user.** `load_tools` is
-  ordinary: declared while a switched-on group isn't loaded, and it runs
-  anytime. A group loaded by a call made after outside text in the turn
+  ordinary: declared, with the same enum, in every request of a chat
+  that has an on-demand group switched on — also after its groups are
+  loaded, so loading never changes the list a second time; a call for a
+  group already loaded answers "already loaded" and changes nothing. It
+  runs anytime. A group loaded by a call made after outside text in the turn
   (`hasUntrustedText` or `networkText`, pinned files included) goes to
   `pendingToolGroups`, and pending groups become loaded at the start of
   the user's next message, unconditionally — else a chat with pinned
