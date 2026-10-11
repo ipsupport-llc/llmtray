@@ -90,8 +90,10 @@ a 4B model looks as good as one from a 35B model.
   with the chat. **Not in temporary chats, for now.** They write nothing
   (0006), and the printing that works (save-to-file `NSPrintInfo`) writes
   a file; until a paginated in-memory path is proven, `make_document`
-  isn't declared in a temporary chat (and refuses there, saying a saved
-  chat can make documents). When one is: the PDF and thumbnail bytes sit
+  isn't declared in a temporary chat by any path (not `always`, not
+  `load_tools` — whose enum leaves `documents` out there — not the + menu's
+  item, which isn't shown), and a call there is refused first, before
+  any "call load_tools first", saying a saved chat can make documents. When one is: the PDF and thumbnail bytes sit
   in a session-scoped in-memory store keyed by the document's id (never
   in `Codable`), freed when the chat closes, written only when the user
   opens, saves or shares (the temp export of `MediaSharing`), Show in
