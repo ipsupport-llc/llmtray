@@ -1067,7 +1067,12 @@ final class ChatClient: ObservableObject {
         isRemakingDocument = true
         defer { isRemakingDocument = false }
         let folder = URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true)
-        let result = await DocumentRenderer.render(spec, source: source)
+        // Pictures only from the project the document was made in, and only
+        // while the chat is still there (never another project's p1).
+        let current = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
+        let pictures = current != nil && current == source.project
+            ? await DocumentPictures.load(for: spec.content, project: current, chat: session) : [:]
+        let result = await DocumentRenderer.render(spec, source: source, pictures: pictures)
         // Another chat now, or the card gone: nothing was written.
         guard currentSessionID == session, let k = messages.firstIndex(where: { $0.id == messageID }),
               messages[k].documents.indices.contains(index) else { return }

@@ -533,12 +533,15 @@ public final class FolderToolService: @unchecked Sendable {
     func candidate(raw: String, at location: FolderLocation) -> FolderToolAnswer {
         let walker = SafeFolderWalker(root: location.root, denylist: denylist)
         let shown = display(location.displayPath)
-        guard let name = location.components.last, ProjectFileFormats.isOffered(URL(fileURLWithPath: name)) else {
+        guard let name = location.components.last,
+              ProjectFileFormats.isOffered(URL(fileURLWithPath: name)) || ProjectPictures.isPicture(URL(fileURLWithPath: name)) else {
             return .text("\(FolderTools.filesName): \(shown) can't be added: project files are text, Markdown, code, PDF, "
-                + "Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).")
+                + "Word (docx, doc), ODT, RTF, HTML, spreadsheets (xlsx, ods) and pictures (png, jpg, heic, webp, tiff, gif).")
         }
+        // A picture: the pictures' cap (adr/0020), before anything is read.
+        let cap = ProjectPictures.isPicture(URL(fileURLWithPath: name)) ? Int64(ProjectPictures.maxBytes) : FolderFileTake.maxProjectBytes
         do {
-            let checked = try FolderFileTake.check(walker, location.components, maxBytes: FolderFileTake.maxProjectBytes)
+            let checked = try FolderFileTake.check(walker, location.components, maxBytes: cap)
             return .projectCandidate(raw: raw, path: shown, bytes: checked.bytes, identity: checked.identity)
         } catch {
             return .text("\(FolderTools.filesName): \(errorText(error)).")
@@ -550,6 +553,7 @@ public final class FolderToolService: @unchecked Sendable {
     /// file they said yes to (`identity`), only under a read grant the chat
     /// still has; nothing is asked here.
     public func copyForProject(raw: String, identity: FileIdentity, chat: FolderChat, callKey: String,
+                               maxBytes: Int64 = FolderFileTake.maxProjectBytes,
                                isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.filesName
         guard let path = try? absolute(raw, usable: usableGrants(chat, callKey: callKey)),
@@ -564,7 +568,7 @@ public final class FolderToolService: @unchecked Sendable {
         let shown = display(location.displayPath)
         do {
             let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
-                                              maxBytes: FolderFileTake.maxProjectBytes, expected: identity,
+                                              maxBytes: maxBytes, expected: identity,
                                               isCancelled: { isCancelled() || !stillGranted() })
             guard stillGranted() else {
                 try? FileManager.default.removeItem(at: url.deletingLastPathComponent())

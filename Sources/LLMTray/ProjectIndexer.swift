@@ -36,6 +36,10 @@ final class ProjectIndexer: ObservableObject {
     /// (not supported, duplicates, failures), until it's dismissed or
     /// replaced by the next add's.
     @Published private(set) var addNotes: [UUID: String] = [:]
+    /// Bumped when a project's pictures change: the Files window reads them again.
+    @Published private(set) var picturesChanged: [UUID: Int] = [:]
+    /// Each project's picture count, as last read (the chat's status line).
+    @Published private(set) var pictureCounts: [UUID: Int] = [:]
     /// Each opened project's pinned documents, in pin order (adr/0012,
     /// "Pinned files"), and each searchable document's pinned size in
     /// bytes (measured once per revision, off the main thread; tokens at
@@ -287,12 +291,19 @@ final class ProjectIndexer: ObservableObject {
         addNotes[project] = nil
         var notes: [String] = []
         if !sorted.notSupported.isEmpty {
-            notes.append(String(format: NSLocalizedString("Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).",
+            notes.append(String(format: NSLocalizedString("Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).",
                                                           comment: "files refused at add: their names"), Self.nameList(sorted.notSupported)))
         }
         if !sorted.folders.isEmpty {
             notes.append(String(format: NSLocalizedString("Folders can't be added yet: %@. Add the files in them instead.",
                                                           comment: "folders refused at add: their names"), Self.nameList(sorted.folders)))
+        }
+        if !sorted.tooLarge.isEmpty {
+            notes.append(String(format: NSLocalizedString("Pictures over 50 MB can't be added: %@.", comment: "pictures refused at add: their names"),
+                                Self.nameList(sorted.tooLarge)))
+        }
+        if !sorted.pictures.isEmpty {
+            notes += await addPictures(sorted.pictures, to: project)
         }
         if !sorted.accepted.isEmpty {
             let results = await add(sorted.accepted, to: project)
@@ -319,6 +330,100 @@ final class ProjectIndexer: ObservableObject {
     }
 
     func dismissAddNote(_ project: UUID) { addNotes[project] = nil }
+
+    /// Pictures into the project's store (adr/0020, "Project pictures"):
+    /// each copied privately first, that copy checked and measured by the
+    /// decoder child (what's stored is what was checked), then added on the
+    /// project's writer queue. The add notes they make.
+    func addPictures(_ urls: [URL], to project: UUID) async -> [String] {
+        var added = 0
+        var duplicates: [URL] = []
+        var refused: [String] = []
+        for url in urls {
+            guard isEnabled else { break }
+            switch await addPicture(url, to: project) {
+            case .success(.added): added += 1
+            case .success(.duplicate): duplicates.append(url)
+            case .failure(.reason(let why)): refused.append(url.lastPathComponent + ": " + why)
+            }
+        }
+        if added > 0 { await picturesDidChange(project) }
+        var notes: [String] = []
+        if added > 0 {
+            notes.append(String(format: NSLocalizedString("%lld pictures added: kept for documents, not searched.", comment: "pictures added to a project"), Int64(added)))
+        }
+        if !duplicates.isEmpty {
+            notes.append(String(format: NSLocalizedString("Already in the project: %@.", comment: "duplicate files at add: their names"), Self.nameList(duplicates)))
+        }
+        if !refused.isEmpty {
+            notes.append(String(format: NSLocalizedString("Couldn't be added: %@", comment: "add failures"), refused.prefix(3).joined(separator: "; ")))
+        }
+        return notes
+    }
+
+    enum PictureAddFailure: Error { case reason(String) }
+
+    func addPicture(_ url: URL, to project: UUID) async -> Result<ProjectPictures.Added, PictureAddFailure> {
+        let scratch = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-add-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: scratch) }
+        // Copied off the main actor, capped, as bytes (a link's target's).
+        let copy: URL
+        do {
+            copy = try await ProcessRunner.offMain {
+                try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+                return try ProjectPictures.privateCopy(of: url, into: scratch)
+            }
+        } catch ProjectPictureError.tooLarge {
+            return .failure(.reason(NSLocalizedString("over 50 MB", comment: "")))
+        } catch {
+            return .failure(.reason(error.localizedDescription))
+        }
+        switch await PictureDecoding.decode(copy, side: ProjectPictures.thumbnailSide) {
+        case .failure(.notAPicture): return .failure(.reason(NSLocalizedString("not a picture", comment: "")))
+        case .failure(.failed(let why)): return .failure(.reason(why))
+        case .success(let decoded):
+            let checked = ProjectPictures.Checked(copy: copy, name: url.lastPathComponent, width: decoded.width, height: decoded.height,
+                                                  thumbnail: decoded.data)
+            // Turned off while it was checked: nothing is added.
+            guard isEnabled else { return .failure(.reason(NSLocalizedString("Project files were turned off", comment: ""))) }
+            do {
+                let handle = try await registry.open(project)
+                // And again after the open's wait.
+                guard isEnabled else { return .failure(.reason(NSLocalizedString("Project files were turned off", comment: ""))) }
+                return .success(try await handle.write { index in try ProjectPictures.add(checked, to: index.directory) })
+            } catch {
+                return .failure(.reason(error.localizedDescription))
+            }
+        }
+    }
+
+    /// The pictures of a project (its manifest, read without the lock) and
+    /// the folder their copies and thumbnails are in.
+    func pictures(of project: UUID) async -> (folder: URL, pictures: [ProjectPicture])? {
+        // The manifest needs no lock: read without opening the project.
+        let dir = registry.directoryURL(project)
+        let pictures = (try? await ProcessRunner.offMain { ProjectPictures.manifest(in: dir).pictures }) ?? []
+        if pictureCounts[project] != pictures.count { pictureCounts[project] = pictures.count }
+        return (dir.appendingPathComponent("pictures", isDirectory: true), pictures)
+    }
+
+    /// A picture's copy, if the project's manifest lists the id.
+    func pictureFile(_ id: String, in project: UUID) async -> URL? {
+        ProjectPictures.file(of: id, in: registry.directoryURL(project))?.url
+    }
+
+    /// A project's pictures changed: the Files window and the status line
+    /// read them again.
+    func picturesDidChange(_ project: UUID) async {
+        picturesChanged[project, default: 0] += 1
+        _ = await pictures(of: project)
+    }
+
+    func removePicture(_ id: String, from project: UUID) async {
+        guard let handle = try? await registry.open(project) else { return }
+        _ = try? await handle.write { index in try ProjectPictures.remove(id, from: index.directory) }
+        await picturesDidChange(project)
+    }
 
     private static func nameList(_ urls: [URL]) -> String {
         let (shown, more) = ProjectFileDrop.names(urls)
@@ -370,7 +475,8 @@ final class ProjectIndexer: ObservableObject {
     static func diskUsage(for project: UUID) async -> (files: Int64, index: Int64) {
         let dir = ChatLibraryStore.projectStorage.directory(for: project)
         return await Task.detached(priority: .utility) {
-            let files = DiskUsage.directorySize(dir + "/files") + DiskUsage.directorySize(dir + "/staging")
+            // Pictures count with the copies (adr/0020).
+            let files = DiskUsage.directorySize(dir + "/files") + DiskUsage.directorySize(dir + "/staging") + DiskUsage.directorySize(dir + "/pictures")
             let index = ["", "-wal", "-shm"].reduce(Int64(0)) { sum, suffix in
                 let path = dir + "/" + ProjectIndex.databaseName + suffix
                 return sum + (((try? FileManager.default.attributesOfItem(atPath: path))?[.size] as? NSNumber)?.int64Value ?? 0)

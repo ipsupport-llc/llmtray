@@ -310,13 +310,19 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
     /// The project's counts: from its open handle, else read-only from its
     /// file without opening it (`.empty` when it has no index).
     public func summary(for project: UUID) async throws -> ProjectIndexSummary {
-        if let open = openHandle(project) { return try await open.summary() }
         let dir = directory(project)
-        return try await ProcessRunner.offMain { try ProjectIndexSummary.read(directory: dir) }
+        var summary: ProjectIndexSummary
+        if let open = openHandle(project) {
+            summary = try await open.summary()
+        } else {
+            summary = try await ProcessRunner.offMain { try ProjectIndexSummary.read(directory: dir) }
+        }
+        summary.pictures = ProjectPictures.manifest(in: dir).pictures.count
+        return summary
     }
 
     /// Where the project's index lives.
-    func directoryURL(_ project: UUID) -> URL { directory(project) }
+    public func directoryURL(_ project: UUID) -> URL { directory(project) }
 
     private func openHandle(_ project: UUID) -> ProjectIndexHandle? {
         lock.lock()

@@ -616,11 +616,15 @@ final class FilesTool: ChatTool {
         guard indexer.isEnabled else {
             return .text("Project files are turned off in Settings, so \(path) wasn't added. The user can turn them on in Settings > Files.")
         }
+        let isPicture = ProjectPictures.isPicture(URL(fileURLWithPath: path))
         let alert = NSAlert()
         alert.messageText = String(format: NSLocalizedString("Add \u{201C}%1$@\u{201D} to \u{201C}%2$@\u{201D}?", comment: "the chat asks to add a file to its project: the file's name, the project's"),
                                    (path as NSString).lastPathComponent, project.name)
-        alert.informativeText = String(format: NSLocalizedString("The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.", comment: "the file's path, its size"),
-                                       path, ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file))
+        alert.informativeText = isPicture
+            ? String(format: NSLocalizedString("The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents.", comment: "a picture's path, its size"),
+                     path, ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file))
+            : String(format: NSLocalizedString("The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.", comment: "the file's path, its size"),
+                     path, ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file))
         alert.addButton(withTitle: NSLocalizedString("Add", comment: "add a file the chat asked for to the project"))
         alert.addButton(withTitle: NSLocalizedString("Don't Add", comment: ""))
         NSApp.activate(ignoringOtherApps: true)
@@ -634,10 +638,27 @@ final class FilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let key = context.callKey
         let copied = await offMain { isCancelled in
-            await service.copyForProject(raw: raw, identity: identity, chat: chat, callKey: key, isCancelled: isCancelled)
+            // A picture: its own cap after consent too (the file may have grown).
+            await service.copyForProject(raw: raw, identity: identity, chat: chat, callKey: key,
+                                         maxBytes: isPicture ? Int64(ProjectPictures.maxBytes) : FolderFileTake.maxProjectBytes,
+                                         isCancelled: isCancelled)
         }
         guard case .fileForProject(let url, _) = copied else { return copied.toolResult }
         defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        if isPicture {
+            // Into the project's pictures (adr/0020): checked by the decoder child first.
+            let added = await indexer.addPicture(url, to: project.id)
+            await indexer.picturesDidChange(project.id)
+            switch added {
+            case .success(.added(let picture)):
+                return .text("\(path) was added to the project \u{201C}\(project.name)\u{201D} as picture \(picture.id). "
+                    + "It isn't searched; a document can use it as ![caption](project:\(picture.id)).")
+            case .success(.duplicate(let picture)):
+                return .text("\(path) is already in the project \u{201C}\(project.name)\u{201D} as picture \(picture.id).")
+            case .failure(.reason(let why)):
+                return .text("\(path) wasn't added: \(why)")
+            }
+        }
         // This call's own outcome (Project files turned off meanwhile is a
         // failure there), not the project's shared note.
         switch await indexer.add([url], to: project.id).first {

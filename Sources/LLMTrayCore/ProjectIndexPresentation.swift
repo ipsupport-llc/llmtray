@@ -154,19 +154,31 @@ public enum ProjectFileDrop {
         public var notSupported: [URL] = []
         /// Folders: linked folders come later (v1b).
         public var folders: [URL] = []
+        /// Pictures (adr/0020, "Project pictures"): kept for documents.
+        public var pictures: [URL] = []
+        /// Pictures over `ProjectPictures.maxBytes`, refused before any copy.
+        public var tooLarge: [URL] = []
 
-        public var isEmpty: Bool { accepted.isEmpty && notSupported.isEmpty && folders.isEmpty }
+        public var isEmpty: Bool { accepted.isEmpty && notSupported.isEmpty && folders.isEmpty && pictures.isEmpty && tooLarge.isEmpty }
     }
 
     /// Hidden files (.DS_Store and the like) are left out without a word.
     public static func sort(_ items: [(url: URL, isDirectory: Bool)]) -> Sorted {
+        sort(items.map { (url: $0.url, isDirectory: $0.isDirectory, bytes: nil) })
+    }
+
+    /// The same with each file's size when known: a picture over the cap is
+    /// refused before anything is copied.
+    public static func sort(_ items: [(url: URL, isDirectory: Bool, bytes: Int?)]) -> Sorted {
         var sorted = Sorted()
         var seen: Set<String> = []
-        for (url, isDirectory) in items {
+        for (url, isDirectory, bytes) in items {
             let path = url.standardizedFileURL.path
             guard url.isFileURL, seen.insert(path).inserted, !url.lastPathComponent.hasPrefix(".") else { continue }
             if isDirectory {
                 sorted.folders.append(url)
+            } else if ProjectPictures.isPicture(url) {
+                if let bytes, bytes > ProjectPictures.maxBytes { sorted.tooLarge.append(url) } else { sorted.pictures.append(url) }
             } else if ProjectFileFormats.isOffered(url) {
                 sorted.accepted.append(url)
             } else {
@@ -183,8 +195,8 @@ public enum ProjectFileDrop {
     public static func sort(_ urls: [URL]) async -> Sorted {
         let work: @Sendable () -> Sorted = {
             sort(urls.map { url in
-                let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey])
-                return (url: url, isDirectory: values?.isDirectory == true && values?.isPackage != true)
+                let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isPackageKey, .fileSizeKey])
+                return (url: url, isDirectory: values?.isDirectory == true && values?.isPackage != true, bytes: values?.fileSize)
             })
         }
         return (try? await ProcessRunner.offMain(work)) ?? Sorted()

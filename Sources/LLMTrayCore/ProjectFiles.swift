@@ -9,7 +9,8 @@ public enum ProjectFilesMode: Equatable, Sendable {
     case none, listing, all
 
     public init(featureOn: Bool, project: ProjectContext?) {
-        guard featureOn, let files = project?.files, files.documents > 0 else {
+        // Pictures only: the listing, so their ids can be learned (adr/0020).
+        guard featureOn, let files = project?.files, files.documents > 0 || files.pictures > 0 else {
             self = .none
             return
         }
@@ -69,7 +70,12 @@ public enum ProjectFiles {
         case read(ReadCursor)
         /// Pin `doc` (its whole text in the project's requests) or unpin it.
         case pin(doc: Int64, on: Bool)
+        /// The project's pictures from the `from`-th (adr/0020), when the
+        /// listing had no room for all of them.
+        case pictures(from: Int)
     }
+
+    static let picturesCursorPrefix = "pictures:"
 
     /// Where a read continues: `doc` at revision `rev`, from `offset` (code
     /// points) of `page`, through `last`. As text `3:1:12:450:20` -- what a
@@ -131,6 +137,9 @@ public enum ProjectFiles {
             if cursor.lowercased().hasPrefix(listCursorPrefix), let from = Int(cursor.dropFirst(listCursorPrefix.count)), from >= 0 {
                 return .success(.list(from: from))
             }
+            if cursor.lowercased().hasPrefix(picturesCursorPrefix), let from = Int(cursor.dropFirst(picturesCursorPrefix.count)), from >= 0 {
+                return .success(.pictures(from: from))
+            }
             guard let read = ReadCursor(cursor) else {
                 return .failure(ArgumentError("\"cursor\" must be one a result gave, not \"\(cursor.prefix(40))\"",
                                               retry: #"{"doc":<integer>,"pages":"3-5"}"#))
@@ -160,7 +169,7 @@ public enum ProjectFiles {
     /// content comes back, so a pin after it is still the user's.
     public static func returnsNamesOnly(_ values: [String: Any]) -> Bool {
         switch request(values) {
-        case .success(.list), .success(.pin), .failure: return true
+        case .success(.list), .success(.pin), .success(.pictures), .failure: return true
         case .success(.search), .success(.read): return false
         }
     }
@@ -320,7 +329,7 @@ public final class ProjectFilesService {
     /// what the files are sized at for that model (PinTokenRatios).
     public func run(_ request: ProjectFiles.Request, project: UUID, byteBudget: Int, fileTextAllowed: Bool = true,
                     pinLimitTokens: Int? = nil, pinBytesPerToken: Double = PromptTokenEstimator.defaultBytesPerToken,
-                    stillOwned: () -> Bool) async -> ProjectFilesAnswer {
+                    picturesUsable: Bool = false, stillOwned: () -> Bool) async -> ProjectFilesAnswer {
         guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
         let handle: ProjectIndexHandle
         do {
@@ -334,17 +343,23 @@ public final class ProjectFilesService {
         do {
             let (docs, pins) = try await handle.read { (try $0.documents(), try $0.pins()) }
             let budget = max(0, byteBudget - Self.slackBytes)
+            let pictures = ProjectPictures.manifest(in: handle.directory)
             switch request {
             case .list(let from):
-                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins))
+                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins,
+                                         pictures: pictures, picturesUsable: picturesUsable))
+            case .pictures(let from):
+                answer = .output(picturePage(pictures, from: from, project: project, budget: budget, usable: picturesUsable, head: nil))
             case .pin(let doc, let on):
                 answer = try await pin(doc, on: on, docs: docs, pins: pins, handle: handle, project: project,
                                        limitTokens: pinLimitTokens, bytesPerToken: pinBytesPerToken, stillOwned: stillOwned)
             case .search, .read:
                 if !fileTextAllowed { return .refused(ProjectTextBudget.noRoomText) }
                 if !docs.contains(where: { $0.status.isSearchable }) {
-                    let note = "No file can be searched or read yet -- they're still being indexed, or couldn't be read. The files:"
-                    answer = .output(listing(docs, from: 0, project: project, budget: budget, note: note, pins: pins))
+                    let note = docs.isEmpty ? "This project has no documents to search or read, only pictures." :
+                        "No file can be searched or read yet -- they're still being indexed, or couldn't be read. The files:"
+                    answer = .output(listing(docs, from: 0, project: project, budget: budget, note: note, pins: pins,
+                                             pictures: pictures, picturesUsable: picturesUsable))
                 } else if case .search(let query, let doc, let limit) = request {
                     answer = try await search(query, doc: doc, limit: limit, docs: docs, handle: handle, project: project)
                 } else if case .read(let cursor) = request {
@@ -366,8 +381,75 @@ public final class ProjectFilesService {
 
     // MARK: - listing
 
-    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64] = []) -> ProjectToolOutput {
-        guard !docs.isEmpty else { return ProjectToolOutput(project: project, preamble: "This project has no files now.") }
+    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64] = [],
+                 pictures: PictureManifest = PictureManifest(), picturesUsable: Bool = false) -> ProjectToolOutput {
+        // Its pictures after the files' last page (adr/0020, "Project
+        // pictures"); a picture is never a document here. When they don't
+        // fit there, a cursor lists them on their own.
+        guard !docs.isEmpty else {
+            guard !pictures.pictures.isEmpty else {
+                return ProjectToolOutput(project: project, preamble: (note.map { $0 + "\n" } ?? "") + "This project has no files now.")
+            }
+            return picturePage(pictures, from: 0, project: project, budget: budget, usable: picturesUsable,
+                               head: note ?? "No documents in this project, only pictures.")
+        }
+        // Room kept for the pictures' cursor: it always fits after the files.
+        let reserve = pictures.pictures.isEmpty ? 0 : 120
+        let output = documentListing(docs, from: from, project: project, budget: max(0, budget - reserve), note: note, pins: pins)
+        guard !pictures.pictures.isEmpty, output.epilogue.isEmpty else { return output }
+        var withPictures = output
+        withPictures.preamble += "\n\n" + ProjectPictures.listing(pictures, picturesUsable: picturesUsable)
+        if withPictures.fitsWhole(byteBudget: budget) { return withPictures }
+        var pointer = output
+        pointer.epilogue = "\(pictures.pictures.count) picture(s): \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.picturesCursorPrefix)0\"})"
+        return pointer.fitsWhole(byteBudget: budget) ? pointer : output
+    }
+
+    /// The pictures from the `from`-th, as many as fit, and a cursor to the rest.
+    func picturePage(_ m: PictureManifest, from: Int, project: UUID, budget: Int, usable: Bool, head: String?) -> ProjectToolOutput {
+        let all = m.pictures
+        guard from < all.count else { return ProjectToolOutput(project: project, preamble: "No more pictures.") }
+        var top = (head.map { $0 + "\n" } ?? "") + "Pictures (id. name -- size):"
+        if usable { top += " use one in a document as ![caption](project:<id>)" }
+        var lines: [String] = []
+        var output = ProjectToolOutput(project: project, preamble: top + "\n(no room to list them in this chat's context)")
+        func page(_ rows: [String]) -> ProjectToolOutput {
+            var out = ProjectToolOutput(project: project, preamble: ([top] + rows).joined(separator: "\n"))
+            let next = from + rows.count
+            if next < all.count {
+                out.epilogue = "\(all.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.picturesCursorPrefix)\(next)\"})"
+            }
+            return out
+        }
+        for p in all[from...] {
+            let row = "\(p.id). \(p.name) -- \(p.width)×\(p.height)"
+            let trial = page(lines + [row])
+            if trial.fitsWhole(byteBudget: budget) {
+                lines.append(row)
+                output = trial
+                continue
+            }
+            // Its name longer than the room: shown cut, so the listing
+            // still goes on past it.
+            if lines.isEmpty {
+                // The longest cut that fits (down to the id alone).
+                let scalars = Array(p.name.unicodeScalars)
+                func short(_ n: Int) -> String {
+                    "\(p.id). \(String(String.UnicodeScalarView(scalars[0..<n])))… -- \(p.width)×\(p.height)"
+                }
+                var lo = -1, hi = scalars.count - 1
+                while lo < hi {
+                    let mid = (lo + hi + 1) / 2
+                    if page([short(mid)]).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
+                }
+                if lo >= 0 { output = page([short(lo)]) }
+            }
+            break
+        }
+        return output
+    }
+
+    func documentListing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64]) -> ProjectToolOutput {
         let searchable = docs.contains { $0.status.isSearchable }
         var head = note.map { $0 + "\n" } ?? ""
         head += "\(docs.count) file(s) in this project (id. name -- pages -- status):"

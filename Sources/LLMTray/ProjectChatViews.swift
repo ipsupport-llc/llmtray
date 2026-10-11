@@ -54,6 +54,8 @@ struct ProjectChatStatusLine: View {
                 }
                 .buttonStyle(.plain)
                 .help(help(project))
+                // Its pictures counted once shown (adr/0020).
+                .task(id: project) { if indexer.isEnabled { _ = await indexer.pictures(of: project) } }
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 8)
@@ -96,7 +98,12 @@ struct ProjectChatStatusLine: View {
                 dot
                 switch ProjectChatStatus(totals: totals, ring: indexer.ring(for: project)) {
                 case .noFiles:
-                    Text("No files yet")
+                    // Pictures only (adr/0020): kept for documents.
+                    if let pictures = indexer.pictureCounts[project], pictures > 0 {
+                        Text(String(format: NSLocalizedString("%lld pictures", comment: "a project chat's status line: a project with pictures and no documents"), Int64(pictures)))
+                    } else {
+                        Text("No files yet")
+                    }
                 case .indexing:
                     filesCount(totals)
                     dot
@@ -216,7 +223,7 @@ struct ProjectDropZoneCard: View {
             Image(systemName: "tray.and.arrow.down").font(.title2)
             Text("Drop files here").font(.callout)
             Text(hasFiles ? NSLocalizedString("Add more files: every chat of the project can search them.", comment: "an empty project chat's drop zone")
-                          : NSLocalizedString("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.", comment: ""))
+                          : NSLocalizedString("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents.", comment: ""))
                 .font(.caption).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             Button("Choose Files…") { ProjectFilesWindow.pickFiles(for: project) }.controlSize(.small)
         }
@@ -302,10 +309,11 @@ enum ProjectFileOffer {
         }
         // Nothing a project takes (folders, hidden files, formats not
         // indexed): said here, and no chat moved or project made for it.
-        let accepted = await ProjectFileDrop.sort(urls).accepted
+        let sorted = await ProjectFileDrop.sort(urls)
+        let accepted = sorted.accepted + sorted.pictures
         guard !accepted.isEmpty else {
             alert.messageText = NSLocalizedString("These can't be added to a project", comment: "")
-            alert.informativeText = NSLocalizedString("This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added.", comment: "")
+            alert.informativeText = NSLocalizedString("This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added.", comment: "")
             alert.runModal()
             return
         }

@@ -72,7 +72,7 @@ enum ProjectFilesWindow {
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = true
         panel.prompt = NSLocalizedString("Add", comment: "the Add Files panel's button")
-        panel.message = NSLocalizedString("Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed.", comment: "the Add Files panel")
+        panel.message = NSLocalizedString("Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents.", comment: "the Add Files panel")
         NSApp.activate(ignoringOtherApps: true)
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return nil }
         return panel.urls
@@ -126,6 +126,8 @@ private struct ProjectFilesView: View {
     @State private var toRemove: IndexedDocument?
     @State private var disk: (files: Int64, index: Int64)?
     @State private var actionError: String?
+    /// The project's pictures (adr/0020): kept for documents, never searched.
+    @State private var pictures: (folder: URL, pictures: [ProjectPicture])?
     /// The chat window's model: the pin limit shown is for it.
     @AppStorage(Pref.selectedModelID) private var selectedModelID: String?
     /// Read by the limit; here so a change in Settings redraws it.
@@ -151,7 +153,11 @@ private struct ProjectFilesView: View {
                 }
                 dropZone
                 list(limit: limit)
+                if let pictures, !pictures.pictures.isEmpty { picturesSection(pictures) }
             }
+        }
+        .task(id: indexer.picturesChanged[projectID] ?? 0) {
+            pictures = await indexer.pictures(of: projectID)
         }
         .padding(16)
         .frame(minWidth: 420, minHeight: 320)
@@ -183,9 +189,45 @@ private struct ProjectFilesView: View {
         }
     }
 
+    /// Pictures: a row of thumbnails, each with its id, size and Remove.
+    private func picturesSection(_ p: (folder: URL, pictures: [ProjectPicture])) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(format: NSLocalizedString("Pictures · %lld — for documents, not searched", comment: "project files window: the pictures' heading, their count"),
+                        Int64(p.pictures.count)))
+                .font(.caption.weight(.semibold)).foregroundColor(.secondary)
+            ScrollView(.horizontal) {
+                HStack(spacing: 10) {
+                    ForEach(p.pictures, id: \.id) { picture in
+                        VStack(spacing: 3) {
+                            Group {
+                                if let t = picture.thumbnail, let image = NSImage(contentsOf: p.folder.appendingPathComponent(t)) {
+                                    Image(nsImage: image).resizable().aspectRatio(contentMode: .fill)
+                                } else {
+                                    Image(systemName: "photo").font(.title).foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(width: 84, height: 64)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            Text(verbatim: "\(picture.id) · \(picture.width)×\(picture.height)").font(.caption2).foregroundStyle(.secondary)
+                            Text(verbatim: picture.name).font(.caption2).lineLimit(1).frame(width: 84)
+                        }
+                        .help(picture.name)
+                        .contextMenu {
+                            Button("Remove from Project", role: .destructive) {
+                                Task { await indexer.removePicture(picture.id, from: projectID) }
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+        }
+    }
+
     /// Re-read when the documents change (an add, a removal, a step done).
     private var diskKey: String {
         documents.map { "\($0.doc):\($0.rev):\($0.status.rawValue)" }.joined(separator: ",")
+            + "|\(indexer.picturesChanged[projectID] ?? 0)"
     }
 
     // MARK: - parts
@@ -335,7 +377,7 @@ private struct ProjectFilesView: View {
     @ViewBuilder
     private func list(limit: Int) -> some View {
         if documents.isEmpty {
-            Text("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.")
+            Text("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents.")
                 .font(.caption).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         } else {

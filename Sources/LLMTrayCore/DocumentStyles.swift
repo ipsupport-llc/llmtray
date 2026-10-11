@@ -27,6 +27,7 @@ public enum DocumentStyles {
     a { color: #0a58ca; text-decoration: none; }
     .addr { color: #6e6e73; font-size: 8pt; }
     img { max-width: 100%; height: auto; }
+    p.figure img { max-height: 8in; width: auto; }
     p.figure { text-align: center; margin: 0.6em 0 0.2em; page-break-inside: avoid; break-inside: avoid; }
     p.caption { text-align: center; color: #6e6e73; font-size: 9pt; margin-bottom: 1em; }
     nav.toc { margin: 0 0 1.5em; padding: 0.6em 0 0.6em; border-top: 1px solid #d2d2d7; border-bottom: 1px solid #d2d2d7; }
@@ -138,8 +139,7 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         for chart in spec.charts where !placed.contains(chart.id) {
             html += DocumentHTML.figure(src: "llmtray-doc://chart/\(chart.id)", caption: chart.title)
         }
-        let named = DocumentHTML.lines(spec.content).joined(separator: "\n")
-        for ref in Self.pictureRefs(named) where pictureKeys[ref] == nil {
+        for ref in Self.pictureRefs(spec.content) where pictureKeys[ref] == nil {
             notes.append("Picture \(ref) couldn't be used.")
         }
         let chapters = body.headings.filter { $0.level == 2 }
@@ -150,20 +150,18 @@ public struct DocumentJob: Codable, Equatable, Sendable {
             ChartJob(id: c.id, kind: c.kind.rawValue, title: c.title, labels: c.labels,
                      series: c.series.map { SeriesJob(name: $0.name, values: $0.values) }, unit: c.unit)
         }
-        return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: [:]), notes, body.tooLarge)
+        let files = Dictionary(uniqueKeysWithValues: pictureKeys.map { ($0.value, $0.value) })
+        return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: files), notes, body.tooLarge)
     }
 
-    /// The project picture ids the content names (`project:<id>`), once each.
-    static func pictureRefs(_ content: String) -> [String] {
-        var seen = Set<String>()
+    /// The project picture ids the content places as images
+    /// (`![…](project:<id>)`), once each, in order -- not a mention in code
+    /// or a plain link, which placement never resolves.
+    public static func pictureRefs(_ content: String) -> [String] {
         var out: [String] = []
-        var rest = Substring(content)
-        while let r = rest.range(of: "](project:") {
-            let after = rest[r.upperBound...]
-            let id = String(after.prefix { $0 != ")" && !$0.isWhitespace }.prefix(40))
-            if !id.isEmpty, seen.insert(id).inserted { out.append(id) }
-            rest = after
-            if out.count >= DocumentSpec.Limits.pictures * 2 { break }
+        _ = DocumentHTML.body(markdown: content) { ref in
+            if case .picture(let id) = ref, !out.contains(id), out.count < DocumentSpec.Limits.pictures * 2 { out.append(id) }
+            return nil
         }
         return out
     }

@@ -36,7 +36,8 @@ final class MakeDocumentTool: ChatTool {
         case .failure(let e): return .text(e.text)
         }
         let source = DocumentSource(arguments: Self.argumentsJSON(arguments), project: context.settings.project?.id)
-        switch await DocumentRenderer.render(spec, source: source) {
+        let pictures = await DocumentPictures.load(for: spec.content, project: context.settings.project?.id, chat: context.chat)
+        switch await DocumentRenderer.render(spec, source: source, pictures: pictures) {
         case .success(let made):
             madeThisTurn = true
             var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s")). "
@@ -113,8 +114,12 @@ enum DocumentRenderer {
         }
     }
 
-    static func render(_ spec: DocumentSpec, source: DocumentSource) async -> Result<Made, Failure> {
-        let (job, notes, tooLarge) = DocumentJob.make(spec)
+    /// `pictures`: the project pictures the content names, decoded already
+    /// (DocumentPictures), by id.
+    static func render(_ spec: DocumentSpec, source: DocumentSource, pictures: [String: PictureDecoding.Result] = [:]) async -> Result<Made, Failure> {
+        // A picture's file in the job folder is its key: "<id>.jpg|png".
+        let keys = Dictionary(uniqueKeysWithValues: pictures.map { ($0.key, $0.key + ($0.value.isJPEG ? ".jpg" : ".png")) })
+        let (job, notes, tooLarge) = DocumentJob.make(spec, pictureKeys: keys)
         guard !tooLarge else { return .failure(.tooLarge) }
         guard let executable = Bundle.main.executablePath else { return .failure(.render("no executable")) }
         let jobDir = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-document-\(UUID().uuidString)", isDirectory: true)
@@ -122,6 +127,7 @@ enum DocumentRenderer {
         do {
             try FileManager.default.createDirectory(at: jobDir, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
             try JSONEncoder().encode(job).write(to: jobDir.appendingPathComponent(DocumentJob.fileName))
+            for (id, picture) in pictures { try picture.data.write(to: jobDir.appendingPathComponent(keys[id]!)) }
         } catch {
             return .failure(.render(error.localizedDescription))
         }
@@ -199,5 +205,37 @@ final class LoadToolsTool: ChatTool {
         }
         return .loadedTools(group.name, pending: false, text: "load_tools: \(group.name) is loaded; \(group.tools.joined(separator: ", ")) "
             + "can be called from the next step. Call it now if the user's request needs it.")
+    }
+}
+
+/// The project pictures a document names (adr/0020, "Project pictures"):
+/// only the chat's project's, only while the chat is still in it (checked
+/// before and after), each decoded in the child to 2400 px without
+/// metadata, all of a document's together at most 60 MB.
+@MainActor
+enum DocumentPictures {
+    static let maxTotalBytes = 60 * 1024 * 1024
+
+    static func load(for content: String, project: UUID?, chat: UUID?) async -> [String: PictureDecoding.Result] {
+        let refs = Array(DocumentJob.pictureRefs(content).prefix(DocumentSpec.Limits.pictures))
+        guard !refs.isEmpty, let project, let chat, stillIn(project, chat) else { return [:] }
+        var out: [String: PictureDecoding.Result] = [:]
+        var total = 0
+        for id in refs {
+            guard let url = await ProjectIndexer.shared.pictureFile(id, in: project) else { continue }
+            guard case .success(let decoded) = await PictureDecoding.decode(url, side: 2400) else { continue }
+            guard total + decoded.data.count <= maxTotalBytes else { break }
+            total += decoded.data.count
+            out[id] = decoded
+        }
+        // Moved out meanwhile: none of them; removed meanwhile: not that one.
+        guard stillIn(project, chat) else { return [:] }
+        var listed: [String: PictureDecoding.Result] = [:]
+        for (id, picture) in out where await ProjectIndexer.shared.pictureFile(id, in: project) != nil { listed[id] = picture }
+        return listed
+    }
+
+    static func stillIn(_ project: UUID, _ chat: UUID) -> Bool {
+        ChatLibraryStore.shared.library.projectContext(forChat: chat)?.id == project
     }
 }
