@@ -1022,6 +1022,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "The families of the models used that day (such as qwen or flux), never their names.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "The full chat window, with projects and every chat (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "The image draft above is open: Generate or Skip it to keep chatting.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "The image edit draft above is open: Generate or Skip it to keep chatting.";
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
@@ -1051,6 +1053,7 @@
 "The model's license, from its card." = "The model's license, from its card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "The music draft above is open: Generate or Skip it to keep chatting.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
 "The name can be at most %lld characters." = "The name can be at most %lld characters.";
