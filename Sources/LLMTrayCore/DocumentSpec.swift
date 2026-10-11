@@ -1,0 +1,187 @@
+import Foundation
+
+/// What a `make_document` call asks for, read and bounded (adr/0020,
+/// Hardening 3): the model's numbers are hostile, so every list is capped
+/// and every value checked before anything is drawn. A bad chart is left
+/// out with a note; the rest of the document is made.
+public struct DocumentSpec: Equatable, Sendable {
+    public struct Chart: Equatable, Sendable {
+        public enum Kind: String, Sendable, CaseIterable { case bar, line, pie }
+        public struct Series: Equatable, Sendable {
+            public var name: String
+            public var values: [Double]
+        }
+        public var id: String
+        public var kind: Kind
+        public var title: String
+        public var labels: [String]
+        public var series: [Series]
+        public var unit: String
+    }
+
+    public var title: String
+    public var content: String
+    public var style: String
+    public var charts: [Chart]
+    /// What was left out and why, for the tool's answer.
+    public var notes: [String]
+
+    public enum Limits {
+        public static let contentCharacters = 200_000
+        public static let charts = 8
+        public static let series = 12
+        public static let points = 500
+        public static let titleCharacters = 200
+        public static let labelCharacters = 80
+        public static let idCharacters = 40
+        public static let pictures = 30
+    }
+
+    /// The tool's declaration (adr/0020, "One tool").
+    public static let schema = ToolSchema(
+        "make_document",
+        "Make a PDF document from Markdown the user asked for (a report, letter, notes, invoice). The app lays it out; the user sees it in the chat.",
+        [
+            .init("title", .string, required: true, aliases: ["name"]),
+            .init("content", .string, "Markdown. Place a chart with ![caption](chart:<id>).", required: true,
+                  aliases: ["markdown", "text", "body"]),
+            .init("style", .oneOf(DocumentHTML.styles), valueAliases: ["memo": "notes", "bill": "invoice", "cover letter": "letter"]),
+            .init("charts", .objects([
+                .init("id", .string, required: true),
+                .init("type", .oneOf(Chart.Kind.allCases.map(\.rawValue)), required: true,
+                      aliases: ["kind"], valueAliases: ["column": "bar", "bars": "bar", "lines": "line", "donut": "pie"]),
+                .init("title", .string),
+                .init("labels", .list(.string), aliases: ["categories", "x"]),
+                .init("series", .objects([
+                    .init("name", .string),
+                    .init("values", .list(.number), required: true, aliases: ["data", "y"]),
+                ]), required: true, aliases: ["data"]),
+                .init("unit", .string),
+            ])),
+        ])
+
+    /// From a call's arguments as `ToolArgumentParser` read them; nil with
+    /// the reason when there's nothing to make.
+    public static func read(_ values: [String: Any]) -> Result<DocumentSpec, DocumentError> {
+        let title = clip(((values["title"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines), Limits.titleCharacters)
+        let content = (values["content"] as? String) ?? ""
+        guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .failure(.noContent) }
+        guard content.count <= Limits.contentCharacters else { return .failure(.tooLong(content.count)) }
+        var notes: [String] = []
+        var charts: [Chart] = []
+        var seen = Set<String>()
+        let raw = (values["charts"] as? [[String: Any]]) ?? []
+        if raw.count > Limits.charts { notes.append("Only the first \(Limits.charts) charts were used.") }
+        for (n, item) in raw.prefix(Limits.charts).enumerated() {
+            switch chart(item) {
+            case .success(let c):
+                if seen.contains(c.id) {
+                    notes.append("Chart \(n + 1) left out: the id \"\(c.id)\" is used twice.")
+                } else {
+                    seen.insert(c.id)
+                    charts.append(c)
+                }
+            case .failure(let reason):
+                notes.append("Chart \(n + 1) left out: \(reason.text).")
+            }
+        }
+        return .success(DocumentSpec(title: title.isEmpty ? "Document" : title, content: content,
+                                     style: (values["style"] as? String).map(DocumentHTML.styleName) ?? "report",
+                                     charts: charts, notes: notes))
+    }
+
+    struct ChartProblem: Error { let text: String }
+
+    static func chart(_ item: [String: Any]) -> Result<Chart, ChartProblem> {
+        let id = ((item["id"] as? String) ?? "").trimmingCharacters(in: .whitespaces)
+        guard !id.isEmpty, id.count <= Limits.idCharacters,
+              id.allSatisfy({ $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }) else {
+            return .failure(ChartProblem(text: "its id must be letters, digits, - or _"))
+        }
+        guard let kind = (item["type"] as? String).flatMap(Chart.Kind.init(rawValue:)) else {
+            return .failure(ChartProblem(text: "its type must be bar, line or pie"))
+        }
+        let labels = ((item["labels"] as? [Any]) ?? []).map { clip(String(describing: $0), Limits.labelCharacters) }
+        let rawSeries = (item["series"] as? [[String: Any]]) ?? []
+        guard !rawSeries.isEmpty else { return .failure(ChartProblem(text: "it has no series")) }
+        guard rawSeries.count <= Limits.series else { return .failure(ChartProblem(text: "more than \(Limits.series) series")) }
+        var series: [Chart.Series] = []
+        for s in rawSeries {
+            let values = ((s["values"] as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
+            guard !values.isEmpty else { return .failure(ChartProblem(text: "a series has no values")) }
+            guard values.count <= Limits.points else { return .failure(ChartProblem(text: "more than \(Limits.points) points")) }
+            guard values.allSatisfy({ $0.isFinite && abs($0) < 1e15 }) else {
+                return .failure(ChartProblem(text: "a value isn't a finite number"))
+            }
+            series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values))
+        }
+        let count = series[0].values.count
+        guard series.allSatisfy({ $0.values.count == count }) else {
+            return .failure(ChartProblem(text: "its series have different lengths"))
+        }
+        guard labels.isEmpty || labels.count == count else {
+            return .failure(ChartProblem(text: "it has \(labels.count) labels for \(count) values"))
+        }
+        if kind == .pie {
+            guard series.count == 1 else { return .failure(ChartProblem(text: "a pie has one series")) }
+            guard series[0].values.allSatisfy({ $0 >= 0 }), series[0].values.contains(where: { $0 > 0 }) else {
+                return .failure(ChartProblem(text: "a pie needs values of zero or more, not all zero"))
+            }
+        }
+        return .success(Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
+                              labels: labels.isEmpty ? (1...count).map(String.init) : labels,
+                              series: series, unit: clip((item["unit"] as? String) ?? "", 20)))
+    }
+
+    static func clip(_ s: String, _ n: Int) -> String { s.count <= n ? s : String(s.prefix(n)) }
+}
+
+public enum DocumentError: Error, Equatable, Sendable {
+    case noContent
+    case tooLong(Int)
+
+    public var text: String {
+        switch self {
+        case .noContent: return "make_document: \"content\" is empty. Write the document in Markdown and call again."
+        case .tooLong(let n):
+            return "make_document: the content is \(n) characters, over the \(DocumentSpec.Limits.contentCharacters) a document can have. Shorten it."
+        }
+    }
+}
+
+/// The PDF's file name from the document's title (adr/0020, Hardening 4):
+/// one sanitizer, never a path.
+public enum DocumentFileName {
+    public static func base(_ title: String) -> String {
+        var s = title.precomposedStringWithCanonicalMapping
+        s = String(s.unicodeScalars.filter { scalar in
+            !(scalar.value < 0x20 || scalar.value == 0x7F || "/:\\".unicodeScalars.contains(scalar))
+                && !CharacterSet.newlines.contains(scalar)
+        }.map(Character.init))
+        s = s.trimmingCharacters(in: .whitespaces)
+        while s.hasPrefix(".") { s.removeFirst() }
+        s = s.trimmingCharacters(in: .whitespaces)
+        if s.count > 80 { s = String(s.prefix(80)).trimmingCharacters(in: .whitespaces) }
+        return s.isEmpty ? "Document" : s
+    }
+
+    /// The n-th name to try: "Title.pdf", "Title 2.pdf", "Title 3.pdf"…
+    public static func candidate(_ base: String, attempt: Int) -> String {
+        attempt <= 1 ? "\(base).pdf" : "\(base) \(attempt).pdf"
+    }
+
+    /// Creates the file in `directory` under the first free name, never over
+    /// anything (`O_CREAT | O_EXCL | O_NOFOLLOW`), mode 0600; the open
+    /// descriptor and the name.
+    public static func create(in directory: URL, title: String) throws -> (fd: Int32, name: String) {
+        let base = base(title)
+        for attempt in 1...200 {
+            let name = candidate(base, attempt: attempt)
+            let path = directory.appendingPathComponent(name).path
+            let fd = open(path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
+            if fd >= 0 { return (fd, name) }
+            if errno != EEXIST { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        }
+        throw POSIXError(.EEXIST)
+    }
+}

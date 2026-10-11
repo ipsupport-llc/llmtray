@@ -6,7 +6,7 @@ import Foundation
 /// retry -- declared once, next to each other.
 public struct ToolSchema: Sendable {
     public struct Param: Sendable, Equatable {
-        public enum Kind: Sendable, Equatable {
+        public indirect enum Kind: Sendable, Equatable {
             case string, integer, number, boolean
             /// One of these strings.
             case oneOf([String])
@@ -14,6 +14,10 @@ public struct ToolSchema: Sendable {
             /// arguments (aliases, types, allowed values); a single object
             /// sent instead is taken as a list of one.
             case objects([Param])
+            /// A list of values of one kind (strings, numbers), each read
+            /// like a field of that kind; a single value sent instead is
+            /// taken as a list of one.
+            case list(Kind)
         }
 
         public var name: String
@@ -44,6 +48,7 @@ public struct ToolSchema: Sendable {
             case .boolean: return "boolean"
             case .oneOf(let values): return values.joined(separator: "|")
             case .objects: return "list of objects"
+            case .list(let element): return "list of \(Param("", element).typeName)s"
             }
         }
 
@@ -62,6 +67,8 @@ public struct ToolSchema: Sendable {
                 let required = fields.filter(\.required).map(\.name)
                 if !required.isEmpty { item["required"] = required }
                 out = ["type": "array", "items": item]
+            case .list(let element):
+                out = ["type": "array", "items": Param("", element).jsonSchema]
             }
             if let description { out["description"] = description }
             return out
@@ -80,6 +87,8 @@ public struct ToolSchema: Sendable {
                 for f in fields where f.required { item[f.name] = f.placeholder }
                 if item.isEmpty, let first = fields.first { item[first.name] = first.placeholder }
                 return [item]
+            case .list(let element):
+                return [Param(name, element).placeholder]
             }
         }
     }
@@ -406,7 +415,55 @@ public enum ToolArgumentParser {
             return .notAllowed(shortText(value))
         case .objects(let fields):
             return coerceObjects(value, fields: fields, name: param.name)
+        case .list(let element):
+            return coerceList(value, element: element, name: param.name)
         }
+    }
+
+    /// A list of values, each read as `element`: a JSON string holding the
+    /// list, or one value for a list of one, are taken too.
+    static func coerceList(_ value: Any, element: ToolSchema.Param.Kind, name: String) -> Coerced {
+        var fixes: [ToolRepair] = []
+        var value = value
+        if let text = value as? String {
+            let body = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if body.hasPrefix("["), case .success(let parsed) = LenientJSON.parse(body) {
+                value = parsed.value
+                fixes += parsed.repairs + [.doubleEncoded]
+            }
+        }
+        let items: [Any]
+        if let array = value as? [Any] {
+            items = array
+        } else if value is [String: Any] {
+            return .wrongType(shortText(value))
+        } else {
+            items = [value]
+            fixes.append(.listWrapped)
+        }
+        var out: [Any] = []
+        var problems: [ParsedToolArguments.Problem] = []
+        let itemParam = ToolSchema.Param(name, element)
+        for (i, item) in items.enumerated() {
+            switch coerce(item, to: itemParam) {
+            case .ok(let v, let f):
+                out.append(v)
+                fixes += f
+            case .wrongType(let sent):
+                problems.append(.wrongType("\(name)[\(i)]", sent))
+                out.append(itemParam.placeholder)
+            case .notAllowed(let sent):
+                problems.append(.notAllowed("\(name)[\(i)]", sent))
+                out.append(itemParam.placeholder)
+            case .nested(let p, let partial, let f):
+                problems += p
+                out.append(partial)
+                fixes += f
+            }
+        }
+        var seen = Set<ToolRepair>()
+        fixes = fixes.filter { seen.insert($0).inserted }
+        return problems.isEmpty ? .ok(out, fixes) : .nested(problems, partial: out, fixes)
     }
 
     /// A list of objects, each normalized against `fields`: a JSON string
@@ -469,6 +526,11 @@ extension ParsedToolArguments {
         // "ops[2].op": the field of a list's item.
         func param(_ field: String) -> ToolSchema.Param? {
             if let p = schema.param(field) { return p }
+            // "values[2]": an item of a list of values.
+            if let open = field.firstIndex(of: "["), !field.contains("."),
+               let list = schema.param(String(field[..<open])), case .list(let element) = list.kind {
+                return ToolSchema.Param(field, element)
+            }
             guard let open = field.firstIndex(of: "["), let dot = field.lastIndex(of: "."),
                   let list = schema.param(String(field[..<open])), case .objects(let fields) = list.kind else { return nil }
             let name = String(field[field.index(after: dot)...])
