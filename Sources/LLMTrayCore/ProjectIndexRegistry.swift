@@ -322,7 +322,7 @@ public final class ProjectIndexRegistry: @unchecked Sendable {
     }
 
     /// Where the project's index lives.
-    func directoryURL(_ project: UUID) -> URL { directory(project) }
+    public func directoryURL(_ project: UUID) -> URL { directory(project) }
 
     private func openHandle(_ project: UUID) -> ProjectIndexHandle? {
         lock.lock()

@@ -139,8 +139,7 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         for chart in spec.charts where !placed.contains(chart.id) {
             html += DocumentHTML.figure(src: "llmtray-doc://chart/\(chart.id)", caption: chart.title)
         }
-        let named = DocumentHTML.lines(spec.content).joined(separator: "\n")
-        for ref in Self.pictureRefs(named) where pictureKeys[ref] == nil {
+        for ref in Self.pictureRefs(spec.content) where pictureKeys[ref] == nil {
             notes.append("Picture \(ref) couldn't be used.")
         }
         let chapters = body.headings.filter { $0.level == 2 }
@@ -155,17 +154,14 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: files), notes, body.tooLarge)
     }
 
-    /// The project picture ids the content names (`project:<id>`), once each.
+    /// The project picture ids the content places as images
+    /// (`![…](project:<id>)`), once each, in order -- not a mention in code
+    /// or a plain link, which placement never resolves.
     public static func pictureRefs(_ content: String) -> [String] {
-        var seen = Set<String>()
         var out: [String] = []
-        var rest = Substring(content)
-        while let r = rest.range(of: "](project:") {
-            let after = rest[r.upperBound...]
-            let id = String(after.prefix { $0 != ")" && !$0.isWhitespace }.prefix(40))
-            if !id.isEmpty, seen.insert(id).inserted { out.append(id) }
-            rest = after
-            if out.count >= DocumentSpec.Limits.pictures * 2 { break }
+        _ = DocumentHTML.body(markdown: content) { ref in
+            if case .picture(let id) = ref, !out.contains(id), out.count < DocumentSpec.Limits.pictures * 2 { out.append(id) }
+            return nil
         }
         return out
     }

@@ -76,7 +76,7 @@ enum ExtractorCLI {
     /// RLIMIT_CPU (SIGXCPU past it; the parent reports it) and no core
     /// dumps. RLIMIT_AS/DATA/RSS are rejected on macOS (EINVAL): memory is
     /// the parent's to watch.
-    private static func limitSelf(cpuSeconds: Int) {
+    static func limitSelf(cpuSeconds: Int) {
         var cpu = rlimit(rlim_cur: rlim_t(max(1, cpuSeconds)), rlim_max: rlim_t(max(1, cpuSeconds)))
         setrlimit(RLIMIT_CPU, &cpu)
         var core = rlimit(rlim_cur: 0, rlim_max: 0)
@@ -100,7 +100,7 @@ enum ExtractorCLI {
     /// `sandbox_init` with the built-in "no-network" profile: deprecated,
     /// and not in Swift's Darwin module, so resolved at run time. True when
     /// it took.
-    private static func denyNetwork() -> Bool {
+    static func denyNetwork() -> Bool {
         typealias SandboxInit = @convention(c) (UnsafePointer<CChar>, UInt64, UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>) -> Int32
         guard let symbol = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "sandbox_init") else { return false }   // RTLD_DEFAULT
         var error: UnsafeMutablePointer<CChar>?

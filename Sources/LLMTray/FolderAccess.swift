@@ -638,13 +638,18 @@ final class FilesTool: ChatTool {
         let service = FolderAccessManager.shared.service
         let key = context.callKey
         let copied = await offMain { isCancelled in
-            await service.copyForProject(raw: raw, identity: identity, chat: chat, callKey: key, isCancelled: isCancelled)
+            // A picture: its own cap after consent too (the file may have grown).
+            await service.copyForProject(raw: raw, identity: identity, chat: chat, callKey: key,
+                                         maxBytes: isPicture ? Int64(ProjectPictures.maxBytes) : FolderFileTake.maxProjectBytes,
+                                         isCancelled: isCancelled)
         }
         guard case .fileForProject(let url, _) = copied else { return copied.toolResult }
         defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
         if isPicture {
             // Into the project's pictures (adr/0020): checked by the decoder child first.
-            switch await indexer.addPicture(url, to: project.id) {
+            let added = await indexer.addPicture(url, to: project.id)
+            await indexer.picturesDidChange(project.id)
+            switch added {
             case .success(.added(let picture)):
                 return .text("\(path) was added to the project \u{201C}\(project.name)\u{201D} as picture \(picture.id). "
                     + "It isn't searched; a document can use it as ![caption](project:\(picture.id)).")

@@ -172,8 +172,11 @@ never searched.
   count documents only, as now; a project with pictures only says "N
   pictures" in that line.
 - **What the model sees.** `project_files`' listing ends with a
-  `Pictures:` part, `p1. name -- 1600×1200` per picture (names are file
-  text, as documents' names are). The project's context counts pictures
+  `Pictures:` part after the documents' last page, `p1. name -- 1600×1200`
+  per picture (names are file text, as documents' names are); when they
+  don't fit there, a `pictures:N` cursor lists them on their own, page by
+  page. A search or read in a project with no searchable document answers
+  with the same listing, pictures included. The project's context counts pictures
   (`ProjectContext.pictures`): a project with pictures and no documents
   declares `project_files` in its listing-only mode, so the ids can be
   learned. Pictures aren't documents to `project_files`: its `doc`

@@ -227,6 +227,7 @@ private struct ProjectFilesView: View {
     /// Re-read when the documents change (an add, a removal, a step done).
     private var diskKey: String {
         documents.map { "\($0.doc):\($0.rev):\($0.status.rawValue)" }.joined(separator: ",")
+            + "|\(indexer.picturesChanged[projectID] ?? 0)"
     }
 
     // MARK: - parts
@@ -376,7 +377,7 @@ private struct ProjectFilesView: View {
     @ViewBuilder
     private func list(limit: Int) -> some View {
         if documents.isEmpty {
-            Text("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.")
+            Text("Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents.")
                 .font(.caption).foregroundColor(.secondary).fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         } else {

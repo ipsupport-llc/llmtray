@@ -17,7 +17,11 @@ enum PictureDecodeCLI {
             FileHandle.standardError.write(Data("usage: LLMTray --decode-picture <in> --out <dir> --side <px> [--thumb <px>]\n".utf8))
             exit(64)
         }
+        // As the extractor (adr/0012, "A child process"): CPU and core
+        // limits on itself, gone with the app, and no network.
+        ExtractorCLI.limitSelf(cpuSeconds: 10)
         ExtractorCLI.exitWithParent(expected: value("--parent").flatMap { pid_t($0) })
+        guard ExtractorCLI.denyNetwork() else { say(["error": "no sandbox"]); exit(1) }
         let dir = URL(fileURLWithPath: out, isDirectory: true)
         switch PictureDecoder.decode(URL(fileURLWithPath: input), side: side, thumbnailSide: value("--thumb").flatMap(Int.init)) {
         case .success(let d):

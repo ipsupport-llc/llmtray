@@ -228,8 +228,11 @@ enum DocumentPictures {
             total += decoded.data.count
             out[id] = decoded
         }
-        // Moved out meanwhile: none of them.
-        return stillIn(project, chat) ? out : [:]
+        // Moved out meanwhile: none of them; removed meanwhile: not that one.
+        guard stillIn(project, chat) else { return [:] }
+        var listed: [String: PictureDecoding.Result] = [:]
+        for (id, picture) in out where await ProjectIndexer.shared.pictureFile(id, in: project) != nil { listed[id] = picture }
+        return listed
     }
 
     static func stillIn(_ project: UUID, _ chat: UUID) -> Bool {

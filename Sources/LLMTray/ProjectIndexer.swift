@@ -340,16 +340,14 @@ final class ProjectIndexer: ObservableObject {
         var duplicates: [URL] = []
         var refused: [String] = []
         for url in urls {
+            guard isEnabled else { break }
             switch await addPicture(url, to: project) {
             case .success(.added): added += 1
             case .success(.duplicate): duplicates.append(url)
             case .failure(.reason(let why)): refused.append(url.lastPathComponent + ": " + why)
             }
         }
-        if added > 0 {
-            picturesChanged[project, default: 0] += 1
-            _ = await pictures(of: project)
-        }
+        if added > 0 { await picturesDidChange(project) }
         var notes: [String] = []
         if added > 0 {
             notes.append(String(format: NSLocalizedString("%lld pictures added: kept for documents, not searched.", comment: "pictures added to a project"), Int64(added)))
@@ -368,21 +366,26 @@ final class ProjectIndexer: ObservableObject {
     func addPicture(_ url: URL, to project: UUID) async -> Result<ProjectPictures.Added, PictureAddFailure> {
         let scratch = FileManager.default.temporaryDirectory.appendingPathComponent("llmtray-add-\(UUID().uuidString)", isDirectory: true)
         defer { try? FileManager.default.removeItem(at: scratch) }
-        let copy = scratch.appendingPathComponent(url.lastPathComponent)
+        // Copied off the main actor, capped, as bytes (a link's target's).
+        let copy: URL
         do {
-            try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
-            try FileManager.default.copyItem(at: url, to: copy)
+            copy = try await ProcessRunner.offMain {
+                try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
+                return try ProjectPictures.privateCopy(of: url, into: scratch)
+            }
+        } catch ProjectPictureError.tooLarge {
+            return .failure(.reason(NSLocalizedString("over 50 MB", comment: "")))
         } catch {
             return .failure(.reason(error.localizedDescription))
         }
-        let size = (try? FileManager.default.attributesOfItem(atPath: copy.path)[.size] as? Int) ?? 0
-        guard size <= ProjectPictures.maxBytes else { return .failure(.reason(NSLocalizedString("over 50 MB", comment: ""))) }
         switch await PictureDecoding.decode(copy, side: ProjectPictures.thumbnailSide) {
         case .failure(.notAPicture): return .failure(.reason(NSLocalizedString("not a picture", comment: "")))
         case .failure(.failed(let why)): return .failure(.reason(why))
         case .success(let decoded):
             let checked = ProjectPictures.Checked(copy: copy, name: url.lastPathComponent, width: decoded.width, height: decoded.height,
                                                   thumbnail: decoded.data)
+            // Turned off while it was checked: nothing is added.
+            guard isEnabled else { return .failure(.reason(NSLocalizedString("Project files were turned off", comment: ""))) }
             do {
                 let handle = try await registry.open(project)
                 return .success(try await handle.write { index in try ProjectPictures.add(checked, to: index.directory) })
@@ -395,24 +398,29 @@ final class ProjectIndexer: ObservableObject {
     /// The pictures of a project (its manifest, read without the lock) and
     /// the folder their copies and thumbnails are in.
     func pictures(of project: UUID) async -> (folder: URL, pictures: [ProjectPicture])? {
-        guard let handle = try? await registry.open(project) else { return nil }
-        let dir = handle.directory
-        let pictures = ProjectPictures.manifest(in: dir).pictures
+        // The manifest needs no lock: read without opening the project.
+        let dir = registry.directoryURL(project)
+        let pictures = (try? await ProcessRunner.offMain { ProjectPictures.manifest(in: dir).pictures }) ?? []
         if pictureCounts[project] != pictures.count { pictureCounts[project] = pictures.count }
         return (dir.appendingPathComponent("pictures", isDirectory: true), pictures)
     }
 
     /// A picture's copy, if the project's manifest lists the id.
     func pictureFile(_ id: String, in project: UUID) async -> URL? {
-        guard let handle = try? await registry.open(project) else { return nil }
-        return ProjectPictures.file(of: id, in: handle.directory)?.url
+        ProjectPictures.file(of: id, in: registry.directoryURL(project))?.url
+    }
+
+    /// A project's pictures changed: the Files window and the status line
+    /// read them again.
+    func picturesDidChange(_ project: UUID) async {
+        picturesChanged[project, default: 0] += 1
+        _ = await pictures(of: project)
     }
 
     func removePicture(_ id: String, from project: UUID) async {
         guard let handle = try? await registry.open(project) else { return }
         _ = try? await handle.write { index in try ProjectPictures.remove(id, from: index.directory) }
-        picturesChanged[project, default: 0] += 1
-        _ = await pictures(of: project)
+        await picturesDidChange(project)
     }
 
     private static func nameList(_ urls: [URL]) -> String {

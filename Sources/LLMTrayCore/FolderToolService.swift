@@ -553,6 +553,7 @@ public final class FolderToolService: @unchecked Sendable {
     /// file they said yes to (`identity`), only under a read grant the chat
     /// still has; nothing is asked here.
     public func copyForProject(raw: String, identity: FileIdentity, chat: FolderChat, callKey: String,
+                               maxBytes: Int64 = FolderFileTake.maxProjectBytes,
                                isCancelled: @escaping @Sendable () -> Bool = { false }) async -> FolderToolAnswer {
         let name = FolderTools.filesName
         guard let path = try? absolute(raw, usable: usableGrants(chat, callKey: callKey)),
@@ -567,7 +568,7 @@ public final class FolderToolService: @unchecked Sendable {
         let shown = display(location.displayPath)
         do {
             let url = try FolderFileTake.copy(walker, location.components, into: Self.takeDirectory,
-                                              maxBytes: FolderFileTake.maxProjectBytes, expected: identity,
+                                              maxBytes: maxBytes, expected: identity,
                                               isCancelled: { isCancelled() || !stillGranted() })
             guard stillGranted() else {
                 try? FileManager.default.removeItem(at: url.deletingLastPathComponent())

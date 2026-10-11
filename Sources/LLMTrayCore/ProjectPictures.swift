@@ -48,11 +48,23 @@ public enum ProjectPictures {
     static func staging(_ project: URL) -> URL { directory(project).appendingPathComponent("staging", isDirectory: true) }
     static func manifestURL(_ project: URL) -> URL { directory(project).appendingPathComponent("pictures.json") }
 
-    /// The manifest as on disk; none yet: empty.
+    /// The manifest as on disk, for reading: none yet or unreadable, empty.
+    /// Nothing that changes the store uses this (see `load`).
     public static func manifest(in project: URL) -> PictureManifest {
-        guard let data = try? Data(contentsOf: manifestURL(project)),
-              let m = try? JSONDecoder().decode(PictureManifest.self, from: data) else { return PictureManifest() }
-        return m
+        (try? load(project)) ?? PictureManifest()
+    }
+
+    /// The manifest for a change: none yet is empty; one that can't be read
+    /// or decoded stops the change -- never taken for empty (reconcile
+    /// would delete every picture, and ids would start over).
+    static func load(_ project: URL) throws -> PictureManifest {
+        let url = manifestURL(project)
+        guard FileManager.default.fileExists(atPath: url.path) else { return PictureManifest() }
+        do {
+            return try JSONDecoder().decode(PictureManifest.self, from: Data(contentsOf: url))
+        } catch {
+            throw ProjectPictureError.unreadableManifest
+        }
     }
 
     /// A picture's copy, only if the manifest lists it (by id).
@@ -70,6 +82,29 @@ public enum ProjectPictures {
             try? FileManager.default.removeItem(at: temp)
             throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
         }
+    }
+
+    /// A private copy of `source` in `folder` -- its bytes (a link's
+    /// target's), read with a cap: never a link, never past `maxBytes`.
+    public static func privateCopy(of source: URL, into folder: URL) throws -> URL {
+        let input = try FileHandle(forReadingFrom: source)
+        defer { try? input.close() }
+        let copy = folder.appendingPathComponent(source.lastPathComponent)
+        let fd = open(copy.path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0o600)
+        guard fd >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
+        let output = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        var total = 0
+        while let chunk = try input.read(upToCount: 1 << 20), !chunk.isEmpty {
+            total += chunk.count
+            guard total <= maxBytes else {
+                try? output.close()
+                try? FileManager.default.removeItem(at: copy)
+                throw ProjectPictureError.tooLarge
+            }
+            try output.write(contentsOf: chunk)
+        }
+        try output.close()
+        return copy
     }
 
     /// SHA-256 of a file, streamed.
@@ -111,8 +146,10 @@ public enum ProjectPictures {
         let attrs = try FileManager.default.attributesOfItem(atPath: checked.copy.path)
         let bytes = (attrs[.size] as? Int) ?? 0
         guard bytes > 0, bytes <= maxBytes else { throw ProjectPictureError.tooLarge }
+        // A regular file only: a link would keep pointing at its original.
+        guard (attrs[.type] as? FileAttributeType) == .typeRegular else { throw ProjectPictureError.notAPicture }
         let hash = try sha256(of: checked.copy)
-        var m = manifest(in: project)
+        var m = try load(project)
         if let same = m.pictures.first(where: { $0.sha256 == hash }) { return .duplicate(same) }
         let stage = staging(project)
         try FileManager.default.createDirectory(at: stage, withIntermediateDirectories: true)
@@ -147,7 +184,7 @@ public enum ProjectPictures {
 
     /// On the writer queue: out of the manifest first, then its files.
     public static func remove(_ id: String, from project: URL) throws {
-        var m = manifest(in: project)
+        var m = try load(project)
         guard let i = m.pictures.firstIndex(where: { $0.id == id }) else { return }
         let picture = m.pictures.remove(at: i)
         try save(m, in: project)
@@ -162,7 +199,7 @@ public enum ProjectPictures {
         let dir = directory(project)
         guard FileManager.default.fileExists(atPath: dir.path) else { return (0, 0) }
         try? FileManager.default.removeItem(at: staging(project))
-        var m = manifest(in: project)
+        var m = try load(project)
         // Entries whose copy is gone first: their thumbnails are then
         // unlisted files like any other.
         let before = m.pictures.count
@@ -195,4 +232,5 @@ public enum ProjectPictures {
 public enum ProjectPictureError: Error, Equatable {
     case tooLarge
     case notAPicture
+    case unreadableManifest
 }
