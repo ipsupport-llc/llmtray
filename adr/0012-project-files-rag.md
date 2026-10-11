@@ -676,13 +676,13 @@ search. The user's explicit choice.
   embedding)*; `embedded` as *ready*; a hit found lexically only is
   marked so in the tool result. A project chat asked about a file that
   isn't ready gets that status from the tools and says so.
-- **Formats offered**: the add flow accepts only what the installed
-  version indexes (v1a, exactly: plain text, Markdown, code, PDF text
+- **Formats offered**: the add flow accepts, as documents, only what
+  the installed version indexes (v1a, exactly: plain text, Markdown, code, PDF text
   layer, docx/doc/odt/rtf, HTML); anything else is refused at add with "not yet supported",
   never shown as searchable.
-  Pictures (png, jpg, heic, webp, tiff, gif) are taken too, stored and
-  listed but never searched, for documents to use:
-  [0020](0020-documents.md), "Project pictures".
+  Pictures are taken too, in their own state, stored and listed but not
+  searched until the image OCR and descriptions below exist, for
+  documents to use: [0020](0020-documents.md), "Project pictures".
 - **Disk limits**: per project and app-wide (Settings); add, re-index and
   compaction check free space first (a file: its size + index growth;
   compaction and migration: 1.2× the index); a failed swap is cleaned up

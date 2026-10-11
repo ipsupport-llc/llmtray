@@ -36,8 +36,8 @@ a 4B model looks as good as one from a 35B model.
   nothing by path or URL; a chat outside a project has no pictures. The
   app reads the picture from the project's own storage and decodes it
   never at full size: the header's pixel count first (at most 100
-  megapixels, new in this code), then
-  `CGImageSourceCreateThumbnailAtIndex` straight to at most 2400 px; it
+  megapixels), then `CGImageSourceCreateThumbnailAtIndex` straight to
+  at most 2400 px, in the bounded path of "Project pictures"; it
   re-encodes it (PNG, or JPEG for photos) without its metadata (no GPS
   or camera data goes into a document) and serves it as
   `llmtray-doc://image/<k>`. The model never gets the picture's bytes.
@@ -110,29 +110,58 @@ a 4B model looks as good as one from a 35B model.
 ## Project pictures
 
 Projects take pictures beside documents, so a document can use them
-(an addition to [0012](0012-project-files-rag.md), "Formats offered").
+(an addition to [0012](0012-project-files-rag.md), whose planned OCR and
+descriptions of images would later make the same pictures searchable;
+until then they are stored and listed, never searched).
 
-- **Formats**: png, jpg/jpeg, heic, webp, tiff, gif (its first frame);
-  `ProjectFileFormats.pictures`. Added by the same flows as documents:
-  the project's Add Files…, the + menu's Add Files to the project, the
-  project files window's drop, and `files(add_to_project)` from a
-  granted folder (its own consent dialog, [0014](0014-folder-tools.md)).
-  Dropping an image on a project chat still attaches it to the message
-  for a vision model, as today; adding it to the project is the explicit
-  path.
-- **Stored, not searched.** A picture is copied into the project's
-  storage like a document (the same size cap and duplicate check), gets
-  an id, and its state is "picture" (`DocumentDisplayStatus.picture`),
-  not "not supported". No text is extracted, no OCR, no embedding: it is
-  never a search hit and never pinned. Removing it removes the copy.
-- **Listed.** `project_files`' listing shows pictures with their id,
-  name and pixel size, marked as pictures, so the model can name one in
-  a document; search and read skip them (a read of a picture's id says
-  it's a picture, for documents only). The project files window shows
-  them with a thumbnail.
+- **Formats**, exactly: png, jpg, jpeg, jfif, heic, heif, webp, tif,
+  tiff, gif (`ProjectFileFormats.pictures`), at most 50 MB each (refused
+  above at add, and checked again at render). The extension gate is
+  followed by a content check in the ingest worker: ImageIO must read it
+  as an image (its type conforming to `public.image`); a renamed
+  non-image ends "not a picture", never stored as one.
+- **Added** by the flows that add documents: the project's Add Files…,
+  the + menu's Add Files to the project, the project files window's
+  drop, and `files(add_to_project)` from a granted folder
+  ([0014](0014-folder-tools.md), its own consent dialog). Dropping an
+  image on a project chat still attaches it to the message for a vision
+  model, as today; adding it to the project is the explicit path. The
+  texts that promise search say what's true for a picture: the consent
+  dialog ("Every chat of the project can then use it in documents"),
+  `add_to_project`'s answer, ProjectIndexer's add notes and the Add
+  Files panel's message.
+- **Its own state, `DocumentStatus.picture`**: terminal like `ready`,
+  but not searchable and not pending. `add` enqueues no extraction for
+  it; the worker only checks it (above) and measures it (width and
+  height, new fields on `IndexedDocument`, measured once at add, never
+  on the tool path); open and reconcile never queue it. Every switch
+  over the status gains the case; an older build reading it maps the
+  unknown value to `failed` (shown so, nothing lost). Presentation:
+  pictures aren't counted in "Searches N files" or the ring's progress;
+  a project with only pictures shows "N pictures"; Re-index, Index Now
+  and the pin button aren't offered for one.
+- **What the model sees.** The listing shows a picture as
+  `id. name -- picture 1600×1200`. Search and read skip pictures; a read
+  or scoped search of a picture's id answers "is a picture: it can go
+  into a document as ![caption](project:<id>), it has no text"; a pin
+  answers "is a picture: only documents are pinned" (no "yet"). With
+  documents on (the tool declared or its group on demand), the listing
+  ends with that same one-line hint; without, it doesn't mention it.
+- **Decoding untrusted images** — at add (check, measure, the window's
+  thumbnail) and at render — happens off the main actor in one bounded
+  path: `CGImageSourceCreateWithURL` without caching, properties of
+  index 0 only (a GIF's other frames never decoded), the pixel count
+  from the header refused above 100 megapixels before any decode, then
+  `CGImageSourceCreateThumbnailAtIndex` at 2400 px (400 for the
+  window), each picture under a 10 s timeout; a picture that fails or
+  times out is left out (render) or ends `failed` (add).
+- **At render, ownership is checked again**: the chat must still be in
+  the project, and the picture still its, before its copy is read — at
+  the start and before the page is built, as `project_files` checks
+  before returning text. Make again checks the same.
 - **Trust**: a picture's name is file text like a document's name (the
   listing is project text, as now); its pixels reach no model through
-  this — only `make_document`'s output. Looking at a project picture
+  this, only `make_document`'s output. Looking at a project picture
   with a vision model is not part of this ADR.
 
 ## Hardening
