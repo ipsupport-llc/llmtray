@@ -57,7 +57,7 @@ public struct DocumentSpec: Equatable, Sendable {
     /// The tool's declaration (adr/0020, "One tool").
     public static let schema = ToolSchema(
         "make_document",
-        "Make a PDF document from Markdown the user asked for (a report, letter, notes, invoice). The app lays it out; the user sees it in the chat.",
+        "Make a PDF document from Markdown the user asked for (a report, letter, notes, invoice). The app lays it out and draws charts from their numbers or formula in charts (never image data); the user sees it in the chat.",
         [
             .init("title", .string, required: true, aliases: ["name"]),
             .init("content", .string, "Markdown; math as LaTeX in $...$ or $$...$$. Place a chart with ![caption](chart:<id>).",
@@ -102,6 +102,11 @@ public struct DocumentSpec: Equatable, Sendable {
         // marks is one character.
         let scalars = content.unicodeScalars.count
         guard scalars <= Limits.contentCharacters else { return .failure(.tooLong(scalars)) }
+        // An image as data the model wrote (`![…](data:image/png;base64…`):
+        // never a picture (a model can't write one, and the page loads no
+        // data:), so the call is answered how a chart is given -- not made
+        // into a page with that text on it.
+        guard !content.lowercased().contains("](data:") else { return .failure(.imageData) }
         var notes: [String] = []
         var adjusted: [String] = []
         var charts: [Chart] = []
@@ -122,6 +127,11 @@ public struct DocumentSpec: Equatable, Sendable {
                 notes.append("Chart \(n + 1) left out: \(reason.text).")
             }
         }
+        // A chart placed by id that "charts" never gave (one given but left
+        // out has its note): nothing to draw there, so the call is answered.
+        let given = Set(raw.prefix(Limits.charts).compactMap { ($0["id"] as? String)?.trimmingCharacters(in: .whitespaces) })
+        let missing = DocumentEdit.placedCharts(content).subtracting(given).sorted()
+        guard missing.isEmpty else { return .failure(.missingCharts(missing)) }
         return .success(DocumentSpec(title: title.isEmpty ? "Document" : title, content: content,
                                      style: (values["style"] as? String).map(DocumentHTML.styleName) ?? "report",
                                      charts: charts, notes: notes, adjusted: adjusted))
@@ -316,12 +326,30 @@ public struct DocumentSpec: Equatable, Sendable {
 public enum DocumentError: Error, Equatable, Sendable {
     case noContent
     case tooLong(Int)
+    /// The content has an image as data (`](data:`).
+    case imageData
+    /// The content places charts "charts" doesn't give.
+    case missingCharts([String])
+
+    /// How a chart is given, for the answers that ask for one.
+    static func chartExample(_ id: String) -> String {
+        #"{"id": "\#(id)", "type": "bar", "labels": ["A", "B"], "series": [{"name": "Sales", "values": [3, 5]}]}"#
+            + #", or for a function of x {"id": "\#(id)", "series": [{"formula": "sin(x)"}], "range": ["0", "2*pi"]}"#
+    }
 
     public var text: String {
         switch self {
         case .noContent: return "make_document: \"content\" is empty. Write the document in Markdown and call again."
         case .tooLong(let n):
             return "make_document: the content is \(n) characters, over the \(DocumentSpec.Limits.contentCharacters) a document can have. Shorten it."
+        case .imageData:
+            return "make_document: nothing was made -- the content has an image as data (](data:...). The app draws charts itself: "
+                + "give each chart's numbers, or a formula of x, in \"charts\" and place it with ![caption](chart:<id>), e.g. "
+                + DocumentError.chartExample("c1") + ". Call again without the image data."
+        case .missingCharts(let ids):
+            let list = ids.prefix(8).map { "chart:\($0)" }.joined(separator: ", ")
+            return "make_document: nothing was made -- the content places \(list) but \"charts\" has no chart with that id. "
+                + "Give it in \"charts\", e.g. " + DocumentError.chartExample(ids.first ?? "c1") + ". Call again."
         }
     }
 }

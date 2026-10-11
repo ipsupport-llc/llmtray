@@ -294,6 +294,26 @@ final class DocumentSpecTests: XCTestCase {
         for (v, text) in cases { XCTAssertEqual(DocumentJob.valueLabel(v), text, "\(v)") }
     }
 
+    /// A chart given as image data, or placed but never given: nothing is
+    /// made, and the answer says how a chart is given.
+    func testBrokenChartsAreAnsweredNotMade() {
+        guard case .failure(let data) = read(#"{"title": "Sine", "content": "'![Sine Wave](data:image/png;base64", "label": "chart", "unit": ""}"#) else {
+            return XCTFail("made")
+        }
+        XCTAssertEqual(data, .imageData)
+        XCTAssertTrue(data.text.contains("\"formula\": \"sin(x)\""), data.text)
+        guard case .failure(let missing) = read(#"{"title": "x", "content": "![s](chart:sine)\n![t](chart:ok)", "charts": [{"id": "ok", "type": "bar", "series": [{"values": [1]}]}]}"#) else {
+            return XCTFail("made")
+        }
+        XCTAssertEqual(missing, .missingCharts(["sine"]))
+        XCTAssertTrue(missing.text.contains("chart:sine") && missing.text.contains("\"id\": \"sine\""), missing.text)
+        // Given but left out (bad numbers): made, with its note.
+        let bad = try? read(#"{"title": "x", "content": "![s](chart:s)", "charts": [{"id": "s", "type": "pie", "series": [{"values": [0, 0]}]}]}"#).get()
+        XCTAssertEqual(bad?.notes.count, 1)
+        // A data: address in prose or code isn't an image.
+        XCTAssertNotNil(try? read(#"{"title": "x", "content": "Data URLs look like `data:image/png;base64,...`."}"#).get())
+    }
+
     func testLimits() {
         XCTAssertEqual(try? read(#"{"title": "x", "content": "  "}"#).get(), nil)
         let long = String(repeating: "a", count: DocumentSpec.Limits.contentCharacters + 1)
