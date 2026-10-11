@@ -272,7 +272,7 @@ struct ChatHeaderView: View {
                         .labelStyle(.titleAndIcon)
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
-                        .help(String(format: NSLocalizedString("%lld requests answered at once", comment: "the model card: concurrent requests now"),
+                        .help(String(format: NSLocalizedString("%lld requests in flight (answered together up to Concurrent requests)", comment: "the model card: requests in flight now"),
                                      Int64(server.activeRequestCount)))
                 }
                 Button { server.stop() } label: { Image(systemName: "eject.fill") }

@@ -58,7 +58,7 @@
 "%lld pictures" = "%lld pictures";
 "%lld pictures added: kept for documents, not searched." = "%lld pictures added: kept for documents, not searched.";
 "%lld requests" = "%lld requests";
-"%lld requests answered at once" = "%lld requests answered at once";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld requests in flight (answered together up to Concurrent requests)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
@@ -409,7 +409,7 @@
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";

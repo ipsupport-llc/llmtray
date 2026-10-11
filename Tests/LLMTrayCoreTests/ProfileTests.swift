@@ -126,6 +126,30 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 40, gpuHeadroomBytes: nil), 16)
         let own = ServerLaunch.arguments(resolved { $0.launch.extraServerArgs = "--decode-concurrency 2" }, ctx)
         XCTAssertEqual(own.filter { $0 == "--decode-concurrency" }.count, 1, "the user's own wins")
+        XCTAssertEqual(value(own, "--prompt-concurrency"), "2", "with a matching prompt batch, not the runtime's 8")
+        let ownBoth = ServerLaunch.arguments(resolved { $0.launch.extraServerArgs = "--decode-concurrency=3 --prompt-concurrency 1" }, ctx)
+        XCTAssertEqual(ownBoth.filter { $0 == "--prompt-concurrency" }.count, 1)
+        // The restart key follows the real launch: the profile's value is
+        // moot while the extra arguments set it.
+        let a = resolved { $0.launch.extraServerArgs = "--decode-concurrency 2"; $0.launch.decodeConcurrency = 4 }
+        let b = resolved { $0.launch.extraServerArgs = "--decode-concurrency 2"; $0.launch.decodeConcurrency = 8 }
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: b, context: ctx))
+        XCTAssertTrue(ServerLaunch.needsRestart(from: resolved { $0.launch.decodeConcurrency = 4 },
+                                                to: resolved { $0.launch.decodeConcurrency = 8 }, context: ctx))
+    }
+
+    func testAFreshDefaultNeedsNoConcurrencyMigration() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("conc2-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let d = UserDefaults(suiteName: "llmtray.tests.concurrency2")!
+        d.removePersistentDomain(forName: "llmtray.tests.concurrency2")
+        d.set(1, forKey: "llmtray.decodeConcurrency")
+        let store = ProfileStore(directory: dir)
+        var p = try store.ensureDefault(migratingFrom: d)
+        XCTAssertEqual(p.launch.decodeConcurrency, 4, "the old built-in 1 from the legacy settings")
+        p.launch.decodeConcurrency = 1
+        try store.save(p)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: d).launch.decodeConcurrency, 1, "set after creation: stays")
     }
 
     func testAutoTunePicksTheFewestNearTheBest() {

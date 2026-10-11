@@ -133,6 +133,33 @@ public enum ServerLaunch {
         return n
     }
 
+    /// The concurrency flags a launch gets (adr/0021): always said, 1
+    /// included -- left out, the runtime's default (32) applied -- and the
+    /// prompt batch at most as large, since the runtime takes the larger of
+    /// the two as the batch. The user's own in the extra arguments win; a
+    /// decode-concurrency of theirs still gets a matching prompt batch.
+    static func concurrencyArguments(_ p: ResolvedProfile, _ c: Context) -> [String] {
+        let ownPrompt = extraArgsSet("--prompt-concurrency", p)
+        let n: Int
+        if extraArgsSet("--decode-concurrency", p) {
+            guard !ownPrompt, let own = extraArgValue("--decode-concurrency", p).flatMap(Int.init), own > 0 else { return [] }
+            return ["--prompt-concurrency", String(min(own, 8))]
+        } else {
+            n = concurrentRequests(profile: p.decodeConcurrency, gpuHeadroomBytes: c.gpuHeadroomBytes, shares: c.memoryShares)
+        }
+        return ["--decode-concurrency", String(n)] + (ownPrompt ? [] : ["--prompt-concurrency", String(min(n, 8))])
+    }
+
+    /// A flag's value in the profile's extra arguments (`--x v` or `--x=v`).
+    static func extraArgValue(_ flag: String, _ p: ResolvedProfile) -> String? {
+        let parts = p.extraServerArgs.split(separator: " ").map(String.init)
+        for (i, part) in parts.enumerated() {
+            if part == flag, i + 1 < parts.count { return parts[i + 1] }
+            if part.hasPrefix(flag + "=") { return String(part.dropFirst(flag.count + 1)) }
+        }
+        return nil
+    }
+
     /// The prompt cache a launch gets when the GPU memory cuts it below the
     /// profile's (for the launch log); nil when it doesn't, or when the
     /// profile's extra arguments set `--prompt-cache-bytes` themselves.
@@ -192,13 +219,7 @@ public enum ServerLaunch {
             args += ["--kv-bits", String(kvBits), "--kv-group-size", String(p.kvGroupSize),
                      "--quantized-kv-start", String(p.quantizedKVStart)]
         }
-        // Always said, 1 included: left out, the runtime's default (32)
-        // applied. The prompt batch is at most as large: the runtime takes
-        // the larger of the two as the batch (adr/0021).
-        if !extraArgsSet("--decode-concurrency", p) {
-            let n = concurrentRequests(profile: p.decodeConcurrency, gpuHeadroomBytes: c.gpuHeadroomBytes, shares: c.memoryShares)
-            args += ["--decode-concurrency", String(n), "--prompt-concurrency", String(min(n, 8))]
-        }
+        args += concurrencyArguments(p, c)
         if !c.alias.isEmpty {
             args += ["--model-alias", c.alias]
         }
@@ -306,8 +327,22 @@ public enum ServerLaunch {
         var c = c
         let head = c.mtpHead
         if extraArgsSet("--num-draft-tokens", p) || extraArgsSetDrafter(p) { c.mtpHead = false }
-        return withoutSampling(arguments(generated, c)) + p.extraServerArgs.split(separator: " ").map(String.init)
+        // The concurrency flags as the real launch has them (the user's own
+        // extra arguments decide them, which `generated` no longer has).
+        return withoutConcurrency(withoutSampling(arguments(generated, c))) + concurrencyArguments(p, c)
+            + p.extraServerArgs.split(separator: " ").map(String.init)
             + (head ? ["#mtp-head"] : [])
+    }
+
+    static func withoutConcurrency(_ args: [String]) -> [String] {
+        var out: [String] = []
+        var skip = false
+        for a in args {
+            if skip { skip = false; continue }
+            if a == "--decode-concurrency" || a == "--prompt-concurrency" { skip = true; continue }
+            out.append(a)
+        }
+        return out
     }
 
     /// The sampling flags `arguments` sets; each takes one value.

@@ -113,6 +113,8 @@ public final class ProfileStore {
         }
         let p = Self.migratedDefault(from: defaults)
         try save(p)
+        // Made with the new default already: nothing to migrate later.
+        defaults.set(true, forKey: Self.concurrencyMigrationKey)
         return p
     }
 
@@ -142,7 +144,10 @@ public final class ProfileStore {
         if let v = int("llmtray.kvGroupSize") { p.launch.kvGroupSize = KVSettings.validGroupSize(v) }
         if let v = int("llmtray.quantizedKVStart") { p.launch.quantizedKVStart = v }
         if let v = int("llmtray.prefillStepSize") { p.launch.prefillStepSize = v }
-        if let v = int("llmtray.decodeConcurrency") { p.launch.decodeConcurrency = v }
+        // The old built-in 1 (it limited nothing) becomes the new default.
+        if let v = int("llmtray.decodeConcurrency") {
+            p.launch.decodeConcurrency = v == Profile.formerDefaultConcurrentRequests ? Profile.defaultConcurrentRequests : v
+        }
         if let v = int("llmtray.promptCacheMB") { p.launch.promptCacheMB = v }
         if let v = bool("llmtray.mtpDrafter") { p.launch.mtpDrafter = v }
         if let v = str("llmtray.extraServerArgs") { p.launch.extraServerArgs = v }

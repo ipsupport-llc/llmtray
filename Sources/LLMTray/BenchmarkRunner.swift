@@ -316,13 +316,20 @@ final class BenchmarkRunner: ObservableObject {
         // instead of a single request per candidate.
         var bestConcurrency = originalConcurrency
         var bestConcurrencyThroughput = -1.0
-        for value in decodeConcurrencyCandidates {
+        var measuredConcurrency = Set<Int>()
+        for candidate in decodeConcurrencyCandidates {
             if cancelRequested { break }
-            statusText = "Testing decode-concurrency=\(value)…"
-            server.launchTrial.decodeConcurrency = value
+            statusText = "Testing decode-concurrency=\(candidate)…"
+            server.launchTrial.decodeConcurrency = candidate
             guard await restart() else { break }
             // Cancelled during the restart: nothing in flight to cancel yet.
             if cancelRequested { break }
+            // What the launch really took: the free memory may cut a
+            // candidate (adr/0021). One already measured isn't again, and
+            // the load fired is the real concurrency.
+            let launched = server.launchedArguments
+            let value = launched.firstIndex(of: "--decode-concurrency").flatMap { $0 + 1 < launched.count ? Int(launched[$0 + 1]) : nil } ?? candidate
+            guard measuredConcurrency.insert(value).inserted else { continue }
 
             let batchStart = Date()
             let results: [BenchmarkSample?] = await withTaskGroup(of: BenchmarkSample?.self) { group in
