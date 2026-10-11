@@ -496,9 +496,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(visible ? .regular : .accessory)
     }
 
-    /// Clicking the Dock icon (it only exists while detached) raises the chat.
+    /// Clicking the Dock icon, or its Open: the chat in its own window --
+    /// raised while detached, opened from the popover otherwise (an icon
+    /// kept in the Dock, or launching the app again from Finder, did
+    /// nothing while the chat lived in the popover).
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if chatPresentation.isDetached { showChatWindow() }
+        // Setting up: the wizard to the front, not a chat over it.
+        if setupWizard.isOpen {
+            setupWizard.show(automatic: false, queue: downloadQueue, server: server) { [weak self] in self?.startSelectedModel() }
+            return true
+        }
+        detachChat()
         return true
     }
 
