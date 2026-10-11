@@ -120,6 +120,22 @@ enum ModelDiscovery {
         return false
     }
 
+    /// What the model's chat template offers for thinking (adr/0022): its
+    /// chat_template.jinja, else tokenizer_config.json's chat_template (a
+    /// string, or named templates).
+    static func thinkingStyle(forModelPath path: String) -> ThinkingStyle {
+        if let jinja = try? String(contentsOfFile: path + "/chat_template.jinja", encoding: .utf8) {
+            return Thinking.style(chatTemplate: jinja)
+        }
+        guard let data = FileManager.default.contents(atPath: path + "/tokenizer_config.json"),
+              let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return .none }
+        if let template = obj["chat_template"] as? String { return Thinking.style(chatTemplate: template) }
+        if let named = obj["chat_template"] as? [[String: Any]] {
+            return Thinking.style(chatTemplate: named.compactMap { $0["template"] as? String }.joined(separator: "\n"))
+        }
+        return .none
+    }
+
     /// The model hears audio: its config describes an audio part
     /// (an audio_config object) and the checkpoint has the weights it runs
     /// on -- a text-only conversion can keep audio_config without them. A

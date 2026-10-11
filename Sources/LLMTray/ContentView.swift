@@ -256,6 +256,7 @@ struct ContentView: View {
     private func modelDidChange(_ modelID: String?) {
         modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
+        composer.thinkingStyle = modelID.map(ModelDiscovery.thinkingStyle(forModelPath:)) ?? .none
     }
 
     /// The `model` name requests use -- read from the catalog at send time,
@@ -266,7 +267,8 @@ struct ContentView: View {
     }
 
     private var chatSettings: ChatSettings {
-        ChatSettings.forModel(selectedModelID, supportsVision: composer.acceptsImages, maxContext: modelMaxContext)
+        ChatSettings.forModel(selectedModelID, supportsVision: composer.acceptsImages, maxContext: modelMaxContext,
+                              thinkingStyle: composer.thinkingStyle)
     }
 
     // MARK: - Chat

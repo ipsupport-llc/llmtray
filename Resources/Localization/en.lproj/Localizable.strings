@@ -1096,6 +1096,8 @@
 "These can't be added to a project" = "These can't be added to a project";
 "These models go back to Default: %@." = "These models go back to Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "They run one at a time, shown in the menu bar's window. You can close this window meanwhile.";
+"Thinking effort: %@" = "Thinking effort: %@";
+"Thinking effort: how long the model may think before it answers" = "Thinking effort: how long the model may think before it answers";
 "Thinking…" = "Thinking…";
 "Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";

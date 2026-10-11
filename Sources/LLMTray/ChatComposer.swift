@@ -19,6 +19,9 @@ final class ComposerModel: ObservableObject {
     @Published var attachments: [Data] = []
     /// Only a vision-capable model can take images; switching to one that
     /// can't drops what's attached.
+    /// What the model's template offers for thinking: the effort picker
+    /// shows for one that thinks.
+    @Published var thinkingStyle: ThinkingStyle = .none
     @Published var acceptsImages = false {
         didSet {
             if !acceptsImages { attachments.removeAll() } else { notice = nil }
@@ -229,6 +232,9 @@ struct ChatComposer: View {
                     .focused(isFocused)
                     .disabled(!canChat)
 
+                if composer.thinkingStyle != .none {
+                    ThinkingEffortPicker()
+                }
                 if chat.isBusy {
                     Button { chat.cancel() } label: { Image(systemName: "stop.fill") }
                         .help("Stop generating")
@@ -434,5 +440,32 @@ private struct PasteImageWatcher: NSViewRepresentable {
         deinit {
             if let monitor { NSEvent.removeMonitor(monitor) }
         }
+    }
+}
+
+/// The composer's thinking effort (adr/0022): Off, Low, Medium, High, for
+/// a model that thinks -- one setting for every chat, as ChatGPT's.
+struct ThinkingEffortPicker: View {
+    @AppStorage(Pref.thinkingEffort.name) private var raw = Pref.thinkingEffort.defaultValue
+
+    private var effort: ThinkingEffort { ThinkingEffort(rawValue: raw) ?? .high }
+
+    var body: some View {
+        Menu {
+            ForEach(ThinkingEffort.allCases, id: \.self) { e in
+                Button {
+                    raw = e.rawValue
+                } label: {
+                    if e == effort { Label(e.title, systemImage: "checkmark") } else { Text(e.title) }
+                }
+            }
+        } label: {
+            Label(effort.title, systemImage: "brain")
+                .labelStyle(.titleAndIcon)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("Thinking effort: how long the model may think before it answers")
+        .accessibilityLabel(Text(String(format: NSLocalizedString("Thinking effort: %@", comment: ""), effort.title)))
     }
 }
