@@ -33,6 +33,8 @@ public struct DocumentSpec: Equatable, Sendable {
     public var charts: [Chart]
     /// What was left out and why, for the tool's answer.
     public var notes: [String]
+    /// What was drawn other than asked (labels set aside), for the answer.
+    public var adjusted: [String] = []
 
     public enum Limits {
         public static let contentCharacters = 200_000
@@ -87,6 +89,7 @@ public struct DocumentSpec: Equatable, Sendable {
         let scalars = content.unicodeScalars.count
         guard scalars <= Limits.contentCharacters else { return .failure(.tooLong(scalars)) }
         var notes: [String] = []
+        var adjusted: [String] = []
         var charts: [Chart] = []
         var seen = Set<String>()
         let raw = (values["charts"] as? [[String: Any]]) ?? []
@@ -94,7 +97,7 @@ public struct DocumentSpec: Equatable, Sendable {
         for (n, item) in raw.prefix(Limits.charts).enumerated() {
             switch chart(item) {
             case .success(let (c, note)):
-                if let note { notes.append("Chart \(n + 1): \(note).") }
+                if let note { adjusted.append("Chart \(n + 1): \(note).") }
                 if seen.contains(c.id) {
                     notes.append("Chart \(n + 1) left out: the id \"\(c.id)\" is used twice.")
                 } else {
@@ -107,7 +110,7 @@ public struct DocumentSpec: Equatable, Sendable {
         }
         return .success(DocumentSpec(title: title.isEmpty ? "Document" : title, content: content,
                                      style: (values["style"] as? String).map(DocumentHTML.styleName) ?? "report",
-                                     charts: charts, notes: notes))
+                                     charts: charts, notes: notes, adjusted: adjusted))
     }
 
     struct ChartProblem: Error { let text: String }
@@ -166,7 +169,7 @@ public struct DocumentSpec: Equatable, Sendable {
             // series, the slices named by the labels or else the series.
             if labels.count != series.count {
                 if !labels.isEmpty {
-                    note = "its \(labels.count) labels didn't match \(series.count) slices, so the slices are named by their series"
+                    note = "its \(labels.count) labels didn't match \(series.count) slices, so the slices are named by their series or numbered"
                 }
                 labels = series.enumerated().map { $1.name.isEmpty ? String($0 + 1) : $1.name }
             }

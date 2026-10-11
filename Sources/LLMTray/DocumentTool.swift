@@ -45,6 +45,7 @@ final class MakeDocumentTool: ChatTool {
             let notes = spec.notes + made.notes
             // The tool is spent for the turn once a PDF is made: the model
             // can't fix it now, so the user must hear what's missing.
+            if !spec.adjusted.isEmpty { text += " Drawn with changes: " + spec.adjusted.joined(separator: " ") }
             if !notes.isEmpty {
                 text += " Not in the PDF: " + notes.joined(separator: " ")
                     + " Tell the user what is missing and why; don't say everything worked."

@@ -176,8 +176,9 @@ final class DocumentSpecTests: XCTestCase {
         // "a": its labels don't match its values -- drawn, points numbered.
         XCTAssertEqual(spec.charts.map(\.id), ["a", "ok"])
         XCTAssertEqual(spec.charts.map(\.labels), [["1", "2"], ["1", "2", "3"]])
-        XCTAssertEqual(spec.notes.count, 5, "\(spec.notes)")
-        XCTAssertTrue(spec.notes[0].contains("numbered"), spec.notes[0])
+        XCTAssertEqual(spec.notes.count, 4, "\(spec.notes)")
+        XCTAssertEqual(spec.adjusted.count, 1, "drawn, with a note of its own")
+        XCTAssertTrue(spec.adjusted[0].contains("numbered"), spec.adjusted[0])
     }
 
     /// A pie given as one series per slice is one series.
@@ -189,7 +190,8 @@ final class DocumentSpecTests: XCTestCase {
         // Labels that don't fit the slices are set aside -- and said.
         let odd = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "type": "pie", "labels": ["Alpha"], "series": [{"values": [40]}, {"values": [60]}]}]}"#).get()
         XCTAssertEqual(odd.charts.first?.labels, ["1", "2"])
-        XCTAssertEqual(odd.notes.count, 1, "\(odd.notes)")
+        XCTAssertEqual(odd.adjusted.count, 1, "\(odd.adjusted)")
+        XCTAssertTrue(odd.notes.isEmpty)
     }
 
     /// A function plot is computed by the app, not written out by the model.
