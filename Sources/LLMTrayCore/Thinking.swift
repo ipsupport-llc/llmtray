@@ -31,6 +31,19 @@ public enum Thinking {
     /// Reasoning tokens at most for Low and Medium.
     public static let budgets: [ThinkingEffort: Int] = [.low: 512, .medium: 2048]
 
+    /// The budget a user message is sent with, told to the model too (the
+    /// server's cut-off mid-thought is the backstop, not the plan): Low and
+    /// Medium of a budget model; nil otherwise.
+    public static func budgetToTell(style: ThinkingStyle, effort: ThinkingEffort) -> Int? {
+        style == .budget ? budgets[effort] : nil
+    }
+
+    /// The line put before the user's message for that budget.
+    public static func note(budget: Int) -> String {
+        "[App note, not the user's words: the user chose a short reasoning effort -- think at most about \(budget) tokens, "
+            + "then answer. Your thinking is cut off there.]"
+    }
+
     /// From the model's chat template (its text): levels where it reads
     /// reasoning_effort, a budget where it thinks in a block.
     public static func style(chatTemplate: String?) -> ThinkingStyle {

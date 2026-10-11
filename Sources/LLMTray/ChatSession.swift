@@ -49,11 +49,13 @@ struct PersistedMessage: Codable {
     var documents: [DocumentRef]?
     // See ChatMessage.projectFilesAdded; nil, and not written, when none.
     var projectFilesAdded: [String]?
+    // See ChatMessage.thinkingBudget.
+    var thinkingBudget: Int?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats, documents, projectFilesAdded
+        case answerStats, documents, projectFilesAdded, thinkingBudget
     }
 
     init(
@@ -93,6 +95,7 @@ struct PersistedMessage: Codable {
         answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
         documents = try c.decodeIfPresent([DocumentRef].self, forKey: .documents)
         projectFilesAdded = try c.decodeIfPresent([String].self, forKey: .projectFilesAdded)
+        thinkingBudget = try c.decodeIfPresent(Int.self, forKey: .thinkingBudget)
     }
 }
 

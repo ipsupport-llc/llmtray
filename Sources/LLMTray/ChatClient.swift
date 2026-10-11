@@ -328,6 +328,7 @@ final class ChatClient: ObservableObject {
             message.citations = pm.citations ?? []
             message.answerStats = pm.answerStats
             message.projectFilesAdded = pm.projectFilesAdded ?? []
+            message.thinkingBudget = pm.thinkingBudget
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -446,6 +447,7 @@ final class ChatClient: ObservableObject {
             persisted.answerStats = msg.answerStats
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
+            persisted.thinkingBudget = msg.thinkingBudget
             for document in msg.documents {
                 documentFiles.insert(document.filename)
                 if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
@@ -598,6 +600,7 @@ final class ChatClient: ObservableObject {
         turnStats = nil
         var message = ChatMessage(role: "user", content: prompt, images: images)
         message.projectFilesAdded = projectFilesSinceLastMessage()
+        message.thinkingBudget = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.thinkingEffort)
         messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)

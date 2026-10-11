@@ -32,6 +32,7 @@ enum ChatRequestBuilder {
                                            content: message.content.isEmpty && !settings.modelSupportsVision ? "(image)" : message.content,
                                            toolCalls: message.toolCalls, toolCallID: message.toolCallID)
                     text.projectFilesAdded = message.projectFilesAdded
+                    text.thinkingBudget = message.thinkingBudget
                     return text
                 }())
                 : serialize(message: message)
@@ -141,9 +142,12 @@ enum ChatRequestBuilder {
             }
             return dict
         }
-        // Files added to the project since the last message: said first.
-        let text = message.role == "user" ? ProjectFilesNote.text(message.projectFilesAdded).map { $0 + "\n\n" + message.content } ?? message.content
-            : message.content
+        // The app's notes first: files added to the project since the last
+        // message, the thinking budget the message was sent with.
+        let notes = message.role == "user"
+            ? [ProjectFilesNote.text(message.projectFilesAdded), message.thinkingBudget.map(Thinking.note(budget:))].compactMap { $0 }
+            : []
+        let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
         if message.role == "user", !message.images.isEmpty {
             // Attachments are always normalized to PNG before landing in
             // ChatMessage.images (see ContentView's attach-file handling),

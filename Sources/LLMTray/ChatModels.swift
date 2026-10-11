@@ -116,6 +116,9 @@ struct ChatMessage: Identifiable, Equatable {
     // message before it (ProjectFilesNote) -- told to the model with it,
     // shown under the bubble, saved with it.
     var projectFilesAdded: [String] = []
+    // A user message: the thinking budget it was sent with (Low, Medium),
+    // told to the model with it (Thinking.note), saved with it.
+    var thinkingBudget: Int?
     // A "tool" result refusing a call (see ToolResult.refused): left out of
     // the history of later turns. Not saved (tool messages never are).
     var isRefusal: Bool = false
