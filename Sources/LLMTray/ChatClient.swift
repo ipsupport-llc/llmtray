@@ -615,7 +615,12 @@ final class ChatClient: ObservableObject {
             return []
         }
         // Project files off: no project_files to point at.
-        guard ProjectIndexer.shared.isEnabled, let documents = ProjectIndexer.shared.documents[project.id] else { return [] }
+        guard ProjectIndexer.shared.isEnabled else { return [] }
+        // No index yet is no files (a project made empty); an index not
+        // opened yet is unknown: nothing recorded.
+        let hasIndex = FileManager.default.fileExists(
+            atPath: ChatLibraryStore.projectStorage.directory(for: project.id) + "/" + ProjectIndex.databaseName)
+        guard let documents = ProjectIndexer.shared.documents[project.id] ?? (hasIndex ? nil : []) else { return [] }
         let names = documents.map(\.name)
         let added = projectFilesSeen.map { ProjectFilesNote.added(current: names, seen: $0) } ?? []
         if projectFilesSeen != names { projectFilesSeen = names; hasUnsavedChanges = true }
