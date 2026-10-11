@@ -76,7 +76,9 @@ aspect ratio (`LLMTrayCore.EditCanvas`).
   pin (a venv from before the app moved it) isn't refused: `generate`
   claims the generator, installs the pinned package (as the audio runtime
   updates before a run), then generates; an update that fails (offline)
-  is the error. The control API's generate doesn't update -- it refuses
+  is the error -- after the chat model's unload, a cost only while the
+  pin has just moved and the Mac is offline. The install runs in a task of
+  its own: Stop cancels the run, never pip halfway through. The control API's generate doesn't update -- it refuses
   until a chat's next image has.
 
 ## The queue and the proxy

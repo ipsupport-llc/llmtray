@@ -283,11 +283,14 @@ final class MfluxManager: ObservableObject {
     /// runtime/llmtray_mflux_runner.py drives mflux's Python API and streams
     /// progress, step previews and the result over stdout, so nothing (not
     /// even a temporary file) touches the disk. Matters for temporary chats,
-    /// which must leave no trace.
+    /// which must leave no trace. (An mflux older than the pin is updated in
+    /// the app's venv first: the runtime, nothing of the chat or its image.)
     /// `images`: the image(s) to edit (a model that supportsEditing).
     func generate(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data] = []) async throws -> Data {
         // Set up by the download in Settings; never set up mid-chat (a
-        // temporary chat must not cause files to be written).
+        // temporary chat must not cause files to be written -- bringing an
+        // existing venv's mflux to the pin, below, writes only the app's
+        // own runtime, nothing of the chat).
         guard FileManager.default.fileExists(atPath: venvPython) else {
             throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- enable it again in Settings.", comment: ""))
         }
@@ -319,7 +322,13 @@ final class MfluxManager: ObservableObject {
         // written. One that can't be updated (offline) says so.
         if installedMfluxVersion() != Self.mfluxVersion {
             do {
-                try await ensurePackageInstalled()
+                // In a task of its own: Stop (or another chat) cancels the
+                // run, but pip is never cut off halfway through replacing
+                // packages -- it finishes, then the run ends.
+                try await Task { try await self.ensurePackageInstalled() }.value
+                try Task.checkCancellation()
+            } catch is CancellationError {
+                throw CancellationError()
             } catch {
                 throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
                                                       Self.mfluxVersion, error.localizedDescription))
