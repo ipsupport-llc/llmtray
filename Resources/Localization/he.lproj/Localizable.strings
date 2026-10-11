@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "עורך, סוכן או סקריפט מבקשים מודל שונה מהטעון. החלפה תסיר את המודל הטעון — גם הצ'אט. שאל קודם: הודעה עם 'Switch' / 'Keep'; ללא תשובה בדקה נחשבת 'Keep'. 'Keep': הלקוח מקבל שגיאה שמציינת את המודל הטעון. הצ'אט של האפליקציה תמיד מחליף.";
 "An item needs the new folder it goes into: tick that folder too." = "פריט צריך את התיקייה החדשה שאליה מועבר: סמן גם אותה.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "טיפ אופציונלי: ללא מנויים, ללא חסימות תכונות. תומכים יכולים לבחור להופיע בשם שהם מזינים.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "פריט לא ודאי עשוי להשתנות או לא להשתנות: יש לבדוק אותו ב־Finder. היומן נשמר ב־הגדרות > קבצים.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "ייתכן שפריט שמצבו לא ודאי השתנה ואולי לא: יש לבדוק אותו ב־Finder. היומן נשמר ב־הגדרות > קבצים.";
 "Another LLMTray is running" = "עוד LLMTray פועל";
 "Another folder change is running: try again when it's done." = "שינוי תיקייה אחר בפועל: נסה שוב כשייגמר.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";

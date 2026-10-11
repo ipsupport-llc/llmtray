@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: ще не підтримується";
 "%d overridden, rest from Default · %@" = "Перевизначено: %d, решта з Default · %@";
 "%lld MB" = "%lld МБ";
-"%lld can still be undone from Settings > Files." = "%lld ще можна скасувати в Налаштування > Файли.";
+"%lld can still be undone from Settings > Files." = "%lld ще можна скасувати в розділі «Налаштування › Файли».";
 "%lld downloads" = "%lld завантажень";
 "%lld failed" = "%lld не вдалося";
 "%lld files" = "%lld файлів";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Редактор, агент або скрипт, що запитує іншу модель, відмінну від завантаженої. Переключення розвантажує поточну модель — і чат теж. Спочатку запитати: повідомлення з опціями Switch / Keep; якщо не відповісти протягом хвилини, вважається Keep. Keep: клієнт отримає помилку з назвою завантаженої моделі. Вбудований чат програми завжди переключається.";
 "An item needs the new folder it goes into: tick that folder too." = "Елемент потребує нової папки, куди він переміщується: також позначте цю папку.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Необов’язковий внесок: без підписок і блокування функцій. Спонсори можуть вказати ім’я для публікації.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Непевний елемент міг змінитися або ні: перегляньте його у Finder. Налаштування > Файли зберігає журнал.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Непевний елемент міг змінитися або ні: перегляньте його у Finder. Журнал зберігається в розділі «Налаштування › Файли».";
 "Another LLMTray is running" = "Інший LLMTray уже запущено";
 "Another folder change is running: try again when it's done." = "Інша зміна папки виконується: повторіть спробу після завершення.";
 "Another model already uses this alias." = "Цей аліас уже зайнятий іншою моделлю.";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-біт + 8-біт мовлення: найшвидша збірка IPSupport — 3‑бітна мовна модель з 8‑бітним розпізнаванням мовлення та голосом, усі тести пройдені правильно. GPTQ 3-біт: те саме, але частини, пов’язані з мовленням, у повній точності. 4‑біт: збірка mlx-community. Кожна завантажується лише за вашим запитом.";
 "GPU memory limit" = "Обмеження пам'яті GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Пам’ять GPU, яку сервер моделі залишає вільною окрім ваг, для активацій і macOS. Нижче наведені частки, що ділять залишок.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Обмежений доступ: спочатку прийміть ліцензію на Hugging Face і збережіть токен у Налаштування › Моделі.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Обмежений доступ: спочатку прийміть ліцензію на Hugging Face і збережіть токен у розділі «Налаштування › Моделі».";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Обмежено: прийміть ліцензію на сторінці Hugging Face моделі й додайте токен у Налаштування → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Обмежено: запросіть доступ на сторінці моделі на Hugging Face (автори переглядають запити) і додайте токен у Налаштування → Models.";
 "General" = "Основні";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "У неї не було власних налаштувань для імпорту; наявні налаштування збережено.";
 "It is being set up or updated. Try again once that's done." = "Налаштовується або оновлюється. Спробуйте знову після завершення.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "Елементи йдуть у Кошик, а не видаляються. Щоб повернути їх, використовуйте Undo тут або в Settings: Put Back у Finder не знає їхню папку.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Його Default профіль у Налаштування › Profiles позначено як «Default (ipsupport.us)»: ваш місцевий профіль було змінено, тому його збережено.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Її профіль Default є в розділі «Налаштування › Профілі» як «Default (ipsupport.us)»: ваш тут було змінено, тому його збережено.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Чати зберігаються та повертаються в останні; інструкції та файли проєкту видаляються.";
 "Its memory, in GB." = "Його пам’ять у ГБ.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Його налаштування також перенесено; Токен Hugging Face потрібно знову ввести в Налаштування › Моделі.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Її налаштування також перенесено; токен Hugging Face потрібно знову ввести в розділі «Налаштування › Моделі».";
 "Its settings were the same as these already." = "Її налаштування вже збігалися з поточними.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Її налаштування не імпортовано: це не %@ у ~/Library/Preferences.";
 "KV cache" = "KV-кеш";
@@ -654,7 +654,7 @@
 "No chat model yet." = "Чату ще немає.";
 "No chats found" = "Чатів не знайдено";
 "No details for this answer." = "Немає деталей для цієї відповіді.";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Відсутня модель embedding: файли шукаються за словами. Завантажте її в Налаштування > Files для пошуку за значенням.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Немає моделі embedding: файли шукаються за словами. Завантажте її в розділі «Налаштування › Файли», щоб шукати за змістом.";
 "No files yet" = "Файлів ще немає";
 "No folder changes yet." = "Поки що немає змін у папках.";
 "No messages yet" = "Повідомлень поки немає";
@@ -1180,13 +1180,13 @@
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Використовуються для генерації зображень, музики та Voice Lab, які їх завантажують. Також зберігаються в папці models під їхніми іменами на Hugging Face.";
 "Uses the internet" = "Використовує інтернет";
 "Verbose server logging" = "Докладний лог сервера";
-"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Увімкнено детальний серверний лог, тому в журналі містяться ваші чати й він не додається. Щоб додати його, вимкніть детальне логування в Налаштування › Server, перезапустіть сервер і відтворіть проблему.";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Було ввімкнено детальне логування сервера, тому журнал містить ваші чати: його не додано. Щоб додати його, вимкніть детальне логування в розділі «Налаштування › Сервер», перезапустіть сервер і відтворіть проблему.";
 "Version" = "Версія";
 "Version %@" = "Версія %@";
 "View model card" = "Картка моделі";
 "Voice" = "Голос";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab вимкнено — увімкніть його в Налаштування > Голос.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab вимкнено — увімкніть його в розділі «Налаштування › Голос».";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab використовує приблизно %1$@ ГБ із %2$@ ГБ, які може використовувати GPU — не разом з %3$@ ГБ чат‑моделі, тому чат‑модель розвантажується під час його роботи.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab використовує приблизно %1$@ ГБ із %2$@ ГБ, які може використовувати GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab потребує приблизно %1$@ ГБ, більше ніж %2$@ ГБ, які може використовувати GPU на цьому Mac — пам’ять закінчиться.";

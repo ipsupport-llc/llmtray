@@ -516,7 +516,7 @@
 "It had no settings of its own to bring; the ones here were kept." = "取り込む独自の設定はありませんでした；こちらの設定は保持されました。";
 "It is being set up or updated. Try again once that's done." = "セットアップ中または更新中です。完了後に再試行してください。";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "項目は削除されずゴミ箱に移動されます。元に戻すにはここまたは設定の Undo を使用してください：Finder の Put Back は元のフォルダを認識しません。";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "そのDefaultプロファイルは「設定」›「プロファイル」に“Default (ipsupport.us)”としてあります。ここでは変更されていたため、保持されました。";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "そのDefaultプロファイルは「設定」›「プロファイル」に“Default (ipsupport.us)”としてあります。こちらのプロファイルは変更されていたため、保持されました。";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "チャットは「最近」に残ります。プロジェクトの指示とファイルは削除されます。";
 "Its memory, in GB." = "搭載メモリ（GB）。";
 "Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "設定も引き継がれました。ただし、Hugging Face トークンは「設定」›「モデル」で再入力する必要があります。";

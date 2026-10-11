@@ -519,7 +519,7 @@
 "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Son profil Default se trouve dans Réglages › Profiles sous « Default (ipsupport.us) » : le vôtre ici avait été modifié, il a donc été conservé.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Ses conversations restent, de retour parmi les récents ; les instructions et fichiers du projet sont supprimés.";
 "Its memory, in GB." = "Mémoire disponible, en Go.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ses réglages ont aussi été importés ; un Token Hugging Face doit être saisi à nouveau dans Réglages › Modèles.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ses réglages ont aussi été importés ; un token Hugging Face doit être saisi à nouveau dans Réglages › Modèles.";
 "Its settings were the same as these already." = "Ses réglages étaient déjà identiques à ceux-ci.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Ses réglages n’ont pas été importés : ce n’est pas %@ dans ~/Library/Preferences.";
 "KV cache" = "Cache KV";

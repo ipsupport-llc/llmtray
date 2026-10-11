@@ -519,7 +519,7 @@
 "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Hồ sơ Default của nó nằm trong Cài đặt › Profiles dưới tên “Default (ipsupport.us)”: hồ sơ của bạn ở đây đã bị thay đổi, nên đã được giữ lại.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Các cuộc trò chuyện được giữ, trở lại mục Gần đây; hướng dẫn và tệp của dự án bị xóa.";
 "Its memory, in GB." = "Bộ nhớ của nó, tính theo GB.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Cài đặt của nó cũng được chuyển sang; bạn cần nhập lại Token Hugging Face trong Cài đặt › Mô hình.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Cài đặt của nó cũng được chuyển sang; bạn cần nhập lại token Hugging Face trong Cài đặt › Mô hình.";
 "Its settings were the same as these already." = "Cài đặt của nó đã giống với cài đặt ở đây.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Không nhập được cài đặt của nó: %@ không phải là một mục trong ~/Library/Preferences.";
 "KV cache" = "Bộ nhớ đệm KV";

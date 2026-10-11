@@ -654,7 +654,7 @@
 "No chat model yet." = "Пока нет модели чата.";
 "No chats found" = "Чаты не найдены";
 "No details for this answer." = "Сведений об этом ответе нет.";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Нет модели embedding: файлы ищутся по словам. Скачайте её в Настройки > Files для поиска по смыслу.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Нет модели embedding: файлы ищутся по словам. Скачайте её в разделе «Настройки › Файлы», чтобы искать по смыслу.";
 "No files yet" = "Файлов пока нет";
 "No folder changes yet." = "Пока нет изменений папок.";
 "No messages yet" = "Сообщений пока нет";
@@ -1084,7 +1084,7 @@
 "The tips aren't available right now." = "Пожертвования сейчас недоступны.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Открыта версия LLMTray с ipsupport.us. Сначала выйдите из неё (значок в строке меню › «Выйти»), затем снова откройте эту версию: иначе обе будут использовать один и тот же порт и загружать модели дважды.";
 "The voice model is being downloaded -- try again once it's done." = "Голосовая модель загружается — попробуйте снова после завершения.";
-"The voice model isn't downloaded -- download it in Settings > Voice." = "Голосовая модель не загружена — загрузите её в Настройки > Voice.";
+"The voice model isn't downloaded -- download it in Settings > Voice." = "Голосовая модель не загружена — загрузите её в разделе «Настройки › Голос».";
 "The voice model's audio format isn't supported." = "Аудиоформат голосовой модели не поддерживается.";
 "The voice runner sent an unreadable ready message." = "Voice runner отправил нечитаемое сообщение о готовности.";
 "The voice runner stopped unexpectedly (%@)." = "Voice runner остановился неожиданно (%@).";
@@ -1180,7 +1180,7 @@
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Используются генерацией изображений, музыкой и Voice Lab, которые их загружают. Они также хранятся в папке models под своими именами Hugging Face.";
 "Uses the internet" = "Использует интернет";
 "Verbose server logging" = "Подробный лог сервера";
-"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Подробное логирование сервера включено, поэтому в журнале содержатся ваши чаты: он не прикреплён. Чтобы включить его, отключите подробное логирование в Настройках › Server, перезапустите сервер и воспроизведите проблему.";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Было включено подробное логирование сервера, поэтому в журнале есть ваши чаты: он не прикреплён. Чтобы приложить его, отключите подробное логирование в разделе «Настройки › Сервер», перезапустите сервер и воспроизведите проблему.";
 "Version" = "Версия";
 "Version %@" = "Версия %@";
 "View model card" = "Карточка модели";
