@@ -26,6 +26,11 @@ struct LLMTrayApp: App {
         if CommandLine.arguments.contains("--extract") {
             ExtractorCLI.run(arguments: CommandLine.arguments)
         }
+        // `LLMTray --render-document <dir>`: the document render child
+        // (DocumentRenderCLI, adr/0020), as early.
+        if CommandLine.arguments.contains("--render-document") {
+            MainActor.assumeIsolated { DocumentRenderCLI.run(arguments: CommandLine.arguments) }
+        }
         // Developer entry point: `LLMTray --run-tool <name> '<json args>'`
         // runs one chat tool, prints its result and exits -- for checking
         // the tools against the live services without a model.

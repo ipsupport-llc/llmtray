@@ -293,6 +293,7 @@ struct ChatFolderMenu: View {
 /// with Undo, what recovery found.
 struct FoldersPane: View {
     @ObservedObject private var manager = FolderAccessManager.shared
+    @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
     @State private var error: String?
     @State private var undoNote: String?
     /// An hour's grant leaves the list when it ends.
@@ -302,6 +303,11 @@ struct FoldersPane: View {
     var body: some View {
         Form {
             ProjectFilesSection()
+            Section("Documents") {
+                Toggle(isOn: $documentsEnabled) {
+                    SettingLabel(title: "Let chats make documents", help: "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats.")
+                }
+            }
             Section("Folder access") {
                 Toggle(isOn: Binding(get: { manager.isEnabled }, set: { manager.setEnabled($0) })) {
                     SettingLabel(title: "Let chats work in folders", help: "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.")

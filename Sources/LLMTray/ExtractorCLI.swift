@@ -86,7 +86,7 @@ enum ExtractorCLI {
     /// A crashed or force-quit app leaves no extractor behind. `expected`:
     /// the app's pid (`--parent`), so a parent already gone before this
     /// looked (the child adopted by launchd) is caught too.
-    private static func exitWithParent(expected: pid_t?) {
+    static func exitWithParent(expected: pid_t?) {
         let parent = expected ?? getppid()
         if getppid() != parent { _exit(0) }
         Thread.detachNewThread {

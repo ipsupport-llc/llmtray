@@ -36,7 +36,31 @@ struct MediaSource: Codable, Equatable {
     }
 }
 
+/// The call a document came from (adr/0020): what Make again renders
+/// again, and the project its pictures belong to.
+struct DocumentSource: Codable, Equatable {
+    var arguments: String
+    var project: UUID?
+}
+
+/// A document a message made: metadata only -- the PDF (it can be 50 MB) and
+/// its thumbnail are files in the chat's folder, read only to show, open,
+/// save or share them.
+struct DocumentRef: Codable, Equatable, Identifiable {
+    var id: UUID
+    /// The PDF's name in the chat's folder.
+    var filename: String
+    var thumbnail: String?
+    var title: String
+    var pages: Int
+    var source: DocumentSource?
+}
+
 struct ChatMessage: Identifiable, Equatable {
+    /// An image, a song or a document: what a save keeps a content-less
+    /// message for, compaction stops before, and a turn counts as made.
+    var hasMedia: Bool { !images.isEmpty || !audios.isEmpty || !documents.isEmpty }
+
     let id = UUID()
     var role: String   // "user" | "assistant" | "tool"
     var content: String = ""
@@ -69,6 +93,9 @@ struct ChatMessage: Identifiable, Equatable {
     // Regenerate existed (or a user's attachment).
     var imageSources: [MediaSource] = []
     var audioSources: [MediaSource] = []
+    // Documents it made (make_document): metadata, the files beside the
+    // images (adr/0020).
+    var documents: [DocumentRef] = []
     // Present on an assistant message that called one or more tools --
     // resent verbatim in the next request's message history, per the
     // OpenAI tool-calling protocol.
@@ -167,7 +194,7 @@ extension ChatMessage {
     var historyEntry: HistoryEntry {
         HistoryEntry(role: role, isToolContext: isToolContext,
                      toolCalls: toolCalls.map { HistoryCall(id: $0.id, name: $0.name) }, toolCallID: toolCallID,
-                     isRefusal: isRefusal, hasContent: !content.isEmpty || !images.isEmpty || !audios.isEmpty)
+                     isRefusal: isRefusal, hasContent: hasMedia || !content.isEmpty)
     }
 }
 
@@ -217,6 +244,9 @@ struct ChatSettings {
     /// The chat as the folder tools know it (adr/0014), set when the turn
     /// starts while the feature is on; nil: no folder tool is declared.
     var folders: FolderChat?
+    /// The saved chat documents go into (its folder), while making
+    /// documents is on; nil in a temporary chat or with it off (adr/0020).
+    var documentsSession: UUID?
     /// The profile's name, for an answer's details.
     var profileName: String?
 

@@ -64,6 +64,28 @@ enum ToolRunnerCLI {
 
     static func run(name: String, json: String) -> Never {
         Task { @MainActor in
+            // A document goes into the current folder (no chat to keep it).
+            if name == MakeDocumentTool.toolName {
+                let parsed = ToolArgumentParser.parse(json, schema: DocumentSpec.schema)
+                if let schema = parsed.isValid ? nil : Optional(DocumentSpec.schema), let error = parsed.errorMessage(tool: schema) {
+                    print(error)
+                    exit(1)
+                }
+                switch DocumentSpec.read(parsed.values) {
+                case .failure(let e): print(e.text); exit(1)
+                case .success(let spec):
+                    let here = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
+                    switch await DocumentRenderer.render(spec, source: DocumentSource(arguments: json, project: nil)) {
+                    case .success(var made):
+                        made.thumbnail = nil
+                        guard let document = try? DocumentRenderer.install(made, in: here) else { print("couldn't write the PDF here"); exit(1) }
+                        print(here.appendingPathComponent(document.filename).path + " (\(document.pages) pages)")
+                        for note in spec.notes + made.notes { print("note: " + note) }
+                        exit(0)
+                    case .failure(let e): print(e.text); exit(1)
+                    }
+                }
+            }
             let toolbox = ChatToolbox()
             toolbox.stats = .inMemory()
             var settings = ChatSettings()
@@ -73,6 +95,7 @@ enum ToolRunnerCLI {
             case .text(let text), .refused(let text): print(text)
             case .generatedImage(_, _, _, let text), .generatedAudio(_, _, _, let text), .imageForModel(_, let text): print(text)
             case .projectText(let output): print(output.rendered(byteBudget: 1 << 30).text)
+            case .generatedDocument(_, let text): print(text)
             }
             exit(0)
         }

@@ -45,16 +45,19 @@ public enum DocumentHTML {
     }
 
     /// The whole page: our stylesheet, then the body, a table of contents
-    /// first when `toc` has entries.
+    /// when `toc` has entries -- after the title when the body opens with
+    /// one, else first.
     public static func page(title: String, style: String, body: String, toc: [(level: Int, text: String)] = []) -> String {
         var out = "<!doctype html><html><head><meta charset=\"utf-8\"><title>\(escape(title))</title>"
         out += "<link rel=\"stylesheet\" href=\"llmtray-doc://style/\(styleName(style)).css\"></head><body>"
-        if !toc.isEmpty {
-            out += "<nav class=\"toc\"><ul>"
-            for entry in toc { out += "<li class=\"toc\(entry.level)\">\(escape(entry.text))</li>" }
-            out += "</ul></nav>"
+        guard !toc.isEmpty else { return out + body + "</body></html>" }
+        var nav = "<nav class=\"toc\"><ul>"
+        for entry in toc { nav += "<li class=\"toc\(entry.level)\">\(escape(entry.text))</li>" }
+        nav += "</ul></nav>"
+        if body.hasPrefix("<h1>"), let end = body.range(of: "</h1>") {
+            return out + body[..<end.upperBound] + nav + body[end.upperBound...] + "</body></html>"
         }
-        return out + body + "</body></html>"
+        return out + nav + body + "</body></html>"
     }
 
     /// A chart or picture the content never placed, at the end.
@@ -66,7 +69,7 @@ public enum DocumentHTML {
     /// The styles there are; anything else is the report.
     public static let styles = ["report", "letter", "notes", "invoice"]
 
-    static func styleName(_ style: String) -> String { styles.contains(style) ? style : "report" }
+    public static func styleName(_ style: String) -> String { styles.contains(style) ? style : "report" }
 
     public static func escape(_ text: String) -> String {
         var out = ""

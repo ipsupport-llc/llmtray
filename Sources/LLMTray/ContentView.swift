@@ -412,7 +412,10 @@ struct ContentView: View {
                           citations: citations[msg.id] ?? [], openCitation: { openCitation($0) },
                           regenerateMedia: canChat && !chat.isBusy ? { kind, index, action in mediaAction(msg.id, kind, index, action) } : nil,
                           draft: chat.draft?.anchor?.message == msg.id ? chat.draft : nil,
-                          isAnswering: chat.isBusy && msg.id == chat.messages.last?.id)
+                          isAnswering: chat.isBusy && msg.id == chat.messages.last?.id,
+                          documentFolder: chat.currentSessionID.map { URL(fileURLWithPath: ChatSessionStore.imagesDir(for: $0), isDirectory: true) },
+                          documentProject: chat.currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id },
+                          remakeDocument: canChat && !chat.isBusy ? { index in Task { await chat.remakeDocument(messageID: msg.id, index: index) } } : nil)
                 .environment(\.visibleChatHeight, chatViewportHeight)
                 .background(RoundedRectangle(cornerRadius: 10)
                     .fill(Color.accentColor.opacity(revealedMessageID == msg.id ? 0.18 : 0))

@@ -28,6 +28,12 @@ struct MessageBubble: View {
     var draft: GenerationDraft?
     /// The answer still under way (the chat's last message while it's busy).
     var isAnswering = false
+    /// The chat's folder, where its documents are; nil: none shown.
+    var documentFolder: URL?
+    /// The chat's project, for a document's Add to Project.
+    var documentProject: UUID?
+    /// Makes one of this message's documents again; nil while the chat is busy.
+    var remakeDocument: ((Int) -> Void)?
     /// The reasoning shown or folded away: nil = automatic (open while the
     /// model thinks, folded once the answer starts).
     @State private var reasoningExpanded: Bool?
@@ -69,7 +75,7 @@ struct MessageBubble: View {
             if showReasoning && !message.reasoning.isEmpty {
                 // Folded once anything follows it: the answer, a tool call, media.
                 let nothingFollows = message.content.isEmpty && message.toolCalls.isEmpty
-                    && message.images.isEmpty && message.audios.isEmpty
+                    && !message.hasMedia
                 let expanded = reasoningExpanded ?? nothingFollows
                 VStack(alignment: .leading, spacing: 3) {
                     Button {
@@ -162,6 +168,13 @@ struct MessageBubble: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
                 tweakDraft(.music, i)
+            }
+
+            if let documentFolder {
+                ForEach(Array(message.documents.enumerated()), id: \.element.id) { i, document in
+                    DocumentCard(document: document, folder: documentFolder, project: documentProject,
+                                 remake: remakeDocument.map { remake in { remake(i) } })
+                }
             }
 
             ForEach(sources, id: \.self) { source in
