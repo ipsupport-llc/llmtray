@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld baru sejak Anda membuka daftar: tidak dicentang sampai Anda mencentangnya.";
 "%lld of 5 stars" = "%lld dari 5 bintang";
 "%lld pages" = "%lld halaman";
+"%lld pictures" = "%lld gambar";
+"%lld pictures added: kept for documents, not searched." = "%lld gambar ditambahkan: disimpan untuk dokumen, tidak dicari.";
 "%lld requests" = "%lld permintaan";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld permintaan sedang berjalan (dijawab bersama hingga Concurrent requests)";
 "%lld s" = "%lld dtk";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Harap lampirkan file laporan yang ditampilkan di Finder.)";
 "(estimate; exact after the first answer)" = "(perkiraan; tepat setelah jawaban pertama)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "Tambahkan berkas ke proyek, atau gambar agar model bisa melihatnya";
 "Add more files: every chat of the project can search them." = "Tambahkan lebih banyak file: setiap obrolan proyek bisa mencarinya.";
 "Add the files to a project?" = "Tambahkan berkas ke proyek?";
+"Add to Project" = "Tambahkan ke Proyek";
 "Add “%1$@” to “%2$@”?" = "Tambahkan “%1$@” ke “%2$@”?";
 "Added %@" = "Ditambahkan %@";
 "Added here" = "Ditambahkan di sini";
+"Added to the project." = "Telah ditambahkan ke proyek.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Ditambahkan ke prompt sistem setiap kali alat ditawarkan. Templat alat bawaan model hanya menjelaskan cara memanggil alat, bukan kapan tidak memanggilnya. Kosongkan untuk menonaktifkannya.";
 "Adding files" = "Menambahkan berkas";
 "Advanced" = "Lanjutan";
@@ -296,9 +302,14 @@
 "Diagnostics" = "Diagnostik";
 "Disk usage" = "Penggunaan disk";
 "Dismiss" = "Tutup";
+"Document: %@" = "Dokumen: %@";
+"Documents" = "Dokumen";
+"Documents On in This Chat" = "Dokumen Aktif di Obrolan Ini";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Dokumen disalin ke proyek dan diindeks pada Mac ini; gambar dimasukkan ke pesan Anda.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Dokumen aktif di obrolan ini: minta satu (mis. laporan, surat…).";
 "Documents go into a project with this chat." = "Dokumen dimasukkan ke proyek bersama obrolan ini.";
 "Documents go into a project with this chat; images go into your message." = "Dokumen dimasukkan ke proyek bersama obrolan ini; gambar dimasukkan ke pesan Anda.";
+"Documents tools" = "Alat Dokumen";
 "Doesn't open at login" = "Tidak dibuka saat masuk";
 "Don't Add" = "Jangan Tambahkan";
 "Don't Ask Again" = "Jangan Tanyakan Lagi";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "Mengambil daftar berkas…";
 "Files" = "File";
 "Files Settings…" = "Pengaturan Files…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Berkas yang ditambahkan di sini disalin ke proyek dan diindeks di Mac ini; setiap obrolan dalam proyek dapat mencarinya.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "File yang ditambahkan di sini disalin ke proyek dan diindeks di Mac ini; setiap obrolan dalam proyek dapat mencarinya. Gambar disimpan untuk dokumen.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Berkas yang ditambahkan ke proyek diindeks di Mac ini sehingga obrolannya bisa mencari. Pencarian berdasarkan makna menggunakan model embedding; tanpa itu, berkas dicari berdasarkan kata-katanya.";
 "Files are copied into the project and indexed on this Mac." = "Berkas disalin ke proyek dan diindeks pada Mac ini.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Berkas masuk ke proyek, dan obrolan sementara tidak pernah berada di dalamnya. Mulai obrolan tersimpan baru (⌘N) untuk menambahkannya.";
@@ -400,7 +411,7 @@
 "For This Chat" = "Untuk Chat Ini";
 "For an Hour" = "Untuk Satu Jam";
 "For faster answers (speculative decoding)" = "Untuk jawaban lebih cepat (spekulatif decoding)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Untuk model dengan drafter yang dipublikasikan (Gemma 4 26B) atau kepala MTP sendiri (model Qwen 3.5 kami, diunduh bersamanya): menebak token di depan dan model utama memeriksanya dalam satu langkah. Hasil sama, lebih cepat. Permintaan lalu dilayani satu per satu.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Untuk model dengan drafter terbitan (Gemma 4 26B) atau kepala MTP sendiri (mis. Qwen 3.5 kami, diunduh bersamaan): komponen tersebut menebak token ke depan dan model utama memeriksanya dalam satu kali proses. Keluaran sama, lebih cepat. Satu permintaan mendapatkannya sendiri; jika beberapa sekaligus mereka berbagi batch tanpa drafter.";
 "Found after an interruption" = "Ditemukan setelah terhenti";
 "Founding Supporters" = "Penyokong Pendiri";
 "Free disk space" = "Ruang disk tersedia";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "Bagaimana menurut Anda tentang LLMTray?";
 "How it was made" = "Bagaimana ini dibuat";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Jumlah token prompt yang diproses per langkah. Nilai lebih besar lebih cepat untuk prompt panjang, tetapi memakai lebih banyak memori. Penyetelan otomatis benchmark dapat memilihnya.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Jumlah permintaan yang digabungkan dalam satu langkah GPU. Hanya membantu saat beberapa klien memakai server sekaligus; memakai lebih banyak memori.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Berapa banyak permintaan yang dijawab server sekaligus — mis. chat Anda dan agen pengkodean. Satu permintaan berjalan sendiri pada kecepatan penuh (dengan drafter atau kepala MTP); dengan lebih banyak permintaan mereka berbagi tiap langkah GPU: masing‑masing sedikit lebih lambat, namun secara keseluruhan lebih cepat. Setiap permintaan yang berjalan menyimpan konteksnya sendiri di memori, jadi Mac dengan memori sedikit akan menjawab lebih sedikit sekaligus. 1: satu per satu.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Berapa kali Anda menggunakan masing‑masing: obrolan, pemanggilan alat, server API (aplikasi lain), pembuatan gambar, pengeditan gambar, musik, unduhan model.";
 "How many tokens it generates per trial." = "Jumlah token yang dibuat per percobaan.";
 "How much memory the GPU may use. A model's files must fit under it." = "Berapa banyak memori yang dapat digunakan GPU. File model harus muat di bawah batas ini.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "Buka saat masuk: %@";
 "Leave a Review" = "Tinggalkan Ulasan";
 "Length" = "Panjang";
+"Let chats make documents" = "Izinkan obrolan membuat dokumen";
 "Let chats work in folders" = "Izinkan chat bekerja di folder";
 "Let coding agents and scripts use your models." = "Biarkan agen pengkodean dan skrip menggunakan model Anda.";
 "Let the chat look in %@?" = "Izinkan chat melihat %@?";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Dibuat untuk pemrograman dan agen: alat pengkodean dan OpenAI API.";
 "Maintenance" = "Pemeliharaan";
 "Make a 30-second calm lo-fi instrumental for studying" = "Buat instrumental lo-fi tenang 30 detik untuk belajar";
+"Make a Document…" = "Buat Dokumen…";
+"Make again" = "Buat ulang";
 "Make images and edit them." = "Buat gambar dan edit mereka.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Buat gambar, lagu, dan bicara dengan model suara, semuanya di Mac ini: aktifkan di Pengaturan.";
 "Make songs and instrumentals." = "Buat lagu dan instrumental.";
+"Make the document again from the same content" = "Buat dokumen lagi dari isi yang sama";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Membuat ID acak baru: laporan berikutnya tidak bisa dipasangkan dengan yang sebelumnya.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Membuat folder, memindah, mengganti nama, dan memindahkan ke Trash — setiap rencana ditampilkan dulu, dan tidak ada yang berubah sampai Anda menyetujuinya.";
 "Manage Models…" = "Kelola Model…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Ruang disk tidak cukup: %@ memerlukan sekitar %@, tersedia %@.";
 "Not identical to %@: not a duplicate." = "Tidak identik dengan %@: bukan duplikat.";
 "Not indexed" = "Belum diindeks";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML, dan spreadsheet (xlsx, ods).";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Belum didukung: %@. Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods), serta menyimpan gambar (png, jpg, heic, webp, tiff, gif).";
 "Nothing new to import" = "Tidak ada yang baru untuk diimport";
 "Nothing sent yet." = "Belum ada yang dikirim.";
 "Nothing to change." = "Tidak ada yang perlu diubah.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "Hanya Mac ini yang dapat menggunakan server";
 "Only turbo has this knob: sft has no song planner to vary." = "Hanya turbo yang memiliki pengaturan ini: sft tidak punya perencana lagu untuk variasi.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Hanya apa yang Anda ketik di sini yang dipublikasikan, setelah diperiksa. Tidak pernah Apple ID atau email Anda.";
+"Open" = "Buka";
 "Open %@, page %lld" = "Buka %@, halaman %lld";
 "Open Chat" = "Buka Obrolan";
 "Open LLMTray when you log in" = "Buka LLMTray saat Anda masuk";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Aplikasi lain mengakses model Anda melalui API kompatibel OpenAI di Mac ini.";
 "Other devices on your network can use the server" = "Perangkat lain di jaringan Anda dapat menggunakan server";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Mengganti bahasa macOS hanya untuk LLMTray. Berlaku setelah LLMTray dimulai ulang. Teks yang belum diterjemahkan ditampilkan dalam bahasa Inggris.";
+"PDF · %lld pages" = "PDF · %lld halaman";
 "Past %lld messages" = "%lld pesan terakhir";
 "Pause" = "Jeda";
 "Pause Indexing" = "Jeda Pengindeksan";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "Pilih penilaian dari 1 sampai 5 bintang.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pilih salah satu untuk diajak obrolan. Unduhan dimulai segera dan berlangsung di latar belakang.";
 "Picks a model that fits your Mac and enables only what you choose." = "Memilih model yang sesuai dengan Mac Anda dan hanya mengaktifkan apa yang Anda pilih.";
+"Pictures over 50 MB can't be added: %@." = "Gambar lebih dari 50 MB tidak dapat ditambahkan: %@.";
+"Pictures · %lld — for documents, not searched" = "Gambar · %lld — untuk dokumen, tidak dicari";
 "Pin" = "Sematkan";
 "Pin %@" = "Pin %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: setiap obrolan proyek mendapatkan seluruh berkas (≈%@ token). Pencarian web serta pembuatan gambar atau musik dimatikan di obrolan tersebut selagi dipin.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "Berkas proyek dimatikan di Pengaturan.";
 "Project files off" = "File proyek mati";
 "Project files on" = "File proyek aktif";
+"Project files were turned off" = "File proyek dimatikan";
 "Project files will be turned on first." = "Berkas Proyek akan diaktifkan terlebih dahulu.";
 "Project name" = "Nama proyek";
 "Projects" = "Proyek";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Mengambil sampel hanya dari sejumlah token yang paling mungkin. 0 menonaktifkannya. Gemma 4 merekomendasikan 64.";
 "Sampling" = "Pengambilan Sampel";
 "Save" = "Simpan";
+"Save As…" = "Simpan Sebagai…";
 "Save memory" = "Hemat memori";
 "Saved chats will show up here." = "Chat tersimpan akan tampil di sini.";
 "Saved in your Keychain" = "Tersimpan di Keychain Anda";
@@ -959,7 +980,7 @@
 "Temporary chat" = "Chat sementara";
 "Temporary chats can only look in folders, for that chat only." = "Chat sementara hanya bisa melihat folder, hanya untuk chat itu.";
 "Temporary — not saved" = "Sementara — tidak disimpan";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Berkas Teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML, dan spreadsheet (xlsx, ods) diindeks.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "File teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods) diindeks; gambar disimpan untuk dokumen.";
 "Thank you!" = "Terima kasih!";
 "Thank you! List your name in Supporters?" = "Terima kasih! Cantumkan nama Anda di Penyokong?";
 "Thanks! Your name will appear once it's been checked." = "Terima kasih! Nama Anda akan muncul setelah diperiksa.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "Perancang MTP telah diunduh — mulai ulang server untuk menggunakannya.";
 "The Mac's chip." = "Chip Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API yang kompatibel dengan OpenAI mendengarkan di sini (http://localhost:<port>/v1). Ubah saat server dihentikan.";
+"The PDF couldn't be opened." = "PDF tidak dapat dibuka.";
 "The app's language (the language only, not the region)." = "Bahasa aplikasi (hanya bahasa, bukan wilayah).";
 "The app's name." = "Nama aplikasi.";
 "The base profile: every other profile inherits from it." = "Profil dasar: setiap profil lain mewarisinya.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Obrolan meminta menyalin %1$@ (%2$@) ke dalam proyek. Setiap obrolan di proyek tersebut lalu dapat mencarinya.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Obrolan meminta untuk menyalin %1$@ (%2$@) ke proyek. Setiap obrolan dalam proyek kemudian dapat menggunakannya dalam dokumen.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Model obrolan dapat menata hasil tulisannya sebagai PDF — laporan, surat, catatan, faktur — lengkap dengan tabel dan grafik. PDF tetap berada di obrolan sampai Anda membukanya, menyimpannya, atau menambahkannya ke proyek. Tidak ada yang diunduh untuk itu; termasuk pada obrolan sementara.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Model chat dapat melihat folder yang Anda izinkan (nama, ukuran, tanggal, kutipan singkat) dan mengusulkan perubahan di sana — folder baru, pemindahan, penggantian nama, pemindahan ke Trash. Setiap perubahan adalah rencana yang Anda setujui dulu, dan dapat dibatalkan.";
 "The chat model couldn't be unloaded for Voice Lab." = "Model chat tidak bisa dibongkar untuk Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Model chat sedang diunduh ke folder ini. Ubah di Pengaturan setelah pemasangan, atau pilih model chat lain terlebih dahulu.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil, atau tingkatkan batas memori GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Model ini menggunakan %1$@ dari %2$@ GB yang bisa dipakai GPU; prompt panjang mungkin kehabisan memori. Gunakan model yang lebih kecil.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "File profil ini tidak dapat dibaca, jadi tidak dapat diedit di sini. Perbaiki atau hapus file, lalu buka ulang Pengaturan.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Versi ini mengindeks teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods); folder dan berkas tersembunyi tidak bisa ditambahkan.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Versi ini mengindeks file teks, Markdown, kode, PDF, Word (docx, doc), ODT, RTF, HTML dan spreadsheet (xlsx, ods) serta menyimpan gambar untuk dokumen; folder dan file tersembunyi tidak dapat ditambahkan.";
 "This version of LLMTray can't send reviews. Please update the app." = "Versi LLMTray ini tidak dapat mengirim ulasan. Silakan perbarui aplikasi.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Versi LLMTray ini menyiapkan runtime menggunakan Python. Instal Python dari python.org atau Homebrew, lalu periksa lagi. Atau gunakan LLMTray-Full yang sudah menyertakan semua yang diperlukan.";
 "Thought process" = "Proses berpikir";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Total waktu";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Mencoba decode-concurrency (1/2/4/8) dan prefill-step-size (64/128/256/512) pada model yang berjalan, memulai ulang server di antara tiap percobaan, lalu menyimpan yang terukur paling cepat.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Concurrent requests: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
 "Try Again" = "Coba Lagi";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "Saat klien meminta model lain";
 "When an app asks for another model" = "Saat sebuah app meminta model lain";
 "When an app asks for another model: %@" = "Saat sebuah app meminta model lain: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Saat make_document dinyatakan, setelah Dokumen aktif (Pengaturan > Files). Saat diperlukan: model memuatnya dengan load_tools, atau Anda dari menu +, sekali per obrolan — lebih sedikit token di setiap permintaan. Selalu: ada di setiap obrolan yang disimpan.";
+"When needed" = "Saat diperlukan";
 "Where LLMTray keeps its models, one folder per model." = "Tempat LLMTray menyimpan modelnya, satu folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Lokasi LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Pilih folder mana saja, termasuk yang dibagi dengan aplikasi lain.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Tempat LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Arahkan ke ~/.lmstudio/models untuk berbagi model dengan LM Studio.";
@@ -1271,11 +1297,13 @@
 "never used" = "belum pernah digunakan";
 "no changes" = "tidak ada perubahan";
 "no text" = "tidak ada teks";
+"not a picture" = "bukan gambar";
 "not downloaded" = "belum diunduh";
 "not indexed" = "tidak terindeks";
 "not supported" = "tidak didukung";
 "not used by any model" = "tidak digunakan oleh model mana pun";
 "off" = "mati";
+"over 50 MB" = "lebih dari 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/d";
 "queued" = "diantrikan";
 "reading" = "membaca";

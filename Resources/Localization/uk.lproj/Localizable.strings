@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld нових від моменту відкриття списку: не відмічені, поки ви не позначите їх.";
 "%lld of 5 stars" = "%lld із 5 зірок";
 "%lld pages" = "%lld сторінок";
+"%lld pictures" = "%lld зображень";
+"%lld pictures added: kept for documents, not searched." = "Додано %lld зображень: зберігаються для документів, не індексуються.";
 "%lld requests" = "запитів: %lld";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld запитів у виконанні (відповідають спільно до Concurrent requests)";
 "%lld s" = "%lld с";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld біт";
 "(Please attach the report file shown in Finder.)" = "(Будь ласка, додайте файл звіту, показаний у Finder.)";
 "(estimate; exact after the first answer)" = "(оцінка; точно після першої відповіді)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "Додати файли до проєкту або зображення, щоб модель їх побачила";
 "Add more files: every chat of the project can search them." = "Додайте більше файлів: кожен чат проєкту зможе їх шукати.";
 "Add the files to a project?" = "Додати файли до проєкту?";
+"Add to Project" = "Додати до проекту";
 "Add “%1$@” to “%2$@”?" = "Додати «%1$@» до «%2$@»?";
 "Added %@" = "Додано %@";
 "Added here" = "Додано сюди";
+"Added to the project." = "Додано до проекту.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Додається до системного промпту, коли моделі доступні інструменти. Шаблон інструментів самої моделі каже лише, як їх викликати, але не коли цього робити не треба. Порожньо — вимкнено.";
 "Adding files" = "Додавання файлів";
 "Advanced" = "Додатково";
@@ -296,9 +302,14 @@
 "Diagnostics" = "Діагностика";
 "Disk usage" = "Використання диска";
 "Dismiss" = "Закрити";
+"Document: %@" = "Документ: %@";
+"Documents" = "Документи";
+"Documents On in This Chat" = "Документи ввімкнено в цій бесіді";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Документи копіюються в проєкт і індексуються на цьому Mac; зображення додаються у ваше повідомлення.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "У цій бесіді ввімкнено документи: попросіть один (звіт, лист тощо).";
 "Documents go into a project with this chat." = "Документи додаються в проєкт разом із цим чатом.";
 "Documents go into a project with this chat; images go into your message." = "Документи додаються в проєкт разом із цим чатом; зображення — у ваше повідомлення.";
+"Documents tools" = "Знаряддя для документів";
 "Doesn't open at login" = "Не відкривати при вході";
 "Don't Add" = "Не додавати";
 "Don't Ask Again" = "Не питати більше";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "Отримання списку файлів…";
 "Files" = "Файли";
 "Files Settings…" = "Налаштування Files…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Файли, додані сюди, копіюються в проєкт і індексуються на цьому Mac; будь-який чат проєкту може їх шукати.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Файли, додані сюди, копіюються в проєкт і індексуються на цьому Mac; кожен чат проєкту може їх шукати. Зображення зберігаються як документи.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файли, додані до проєкту, індексуються на цьому Mac, щоб чати могли їх шукати. Пошук за значенням використовує модель вбудовування; без неї файли шукаються за словами.";
 "Files are copied into the project and indexed on this Mac." = "Файли копіюються в проєкт і індексуються на цьому Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Файли зберігаються в проєкті; тимчасовий чат ніколи не належить до проєкту. Почніть новий збережений чат (⌘N), щоб додати їх.";
@@ -400,7 +411,7 @@
 "For This Chat" = "Для цього чату";
 "For an Hour" = "На годину";
 "For faster answers (speculative decoding)" = "Для швидших відповідей (спекулятивне декодування)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Для моделей з опублікованою чернеткою (Gemma 4 26B) або власною головою MTP (наші моделі Qwen 3.5, завантажується разом із ними): вона вгадує токени наперед, а основна модель перевіряє їх за один прохід. Та сама відповідь, швидше. Запити тоді обслуговуються по одному.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Для моделей із опублікованим drafter (Gemma 4 26B) або власною MTP-головою (наші Qwen 3.5, завантажені разом): він передбачає токени наперед, а основна модель перевіряє їх за один прохід. Та сама відповідь, швидше. Запит отримує це, коли він один; при кількох одночасно вони ділять пакет без нього.";
 "Found after an interruption" = "Знайдено після перерви";
 "Founding Supporters" = "Засновники-спонсори";
 "Free disk space" = "Вільне місце на диску";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "Як вам LLMTray?";
 "How it was made" = "Як це створено";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Скільки токенів промпту обробляється за крок. Більше — швидше на довгих промптах, але потрібно більше пам'яті. Може підібрати автопідбір у бенчмарку.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Скільки запитів об'єднується в один крок GPU. Допомагає, лише коли до сервера звертаються кілька клієнтів одночасно; витрачає більше пам'яті.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Скільки запитів сервер обробляє одночасно — наприклад, ваш чат і агент для кодування. Один запит працює на повній швидкості (з drafter або MTP-головою); при більшій кількості вони ділять кожен крок GPU: кожен трохи повільніший, але разом швидше. Кожен активний запит зберігає свій контекст у пам’яті, тому Mac із малою доступною пам’яттю обробляє менше одночасно. 1: по черзі.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Скільки разів ви використали кожну з функцій: чат, виклики інструментів, API‑сервер (інші додатки), генерація зображень, редагування зображень, музика, завантаження моделей.";
 "How many tokens it generates per trial." = "Скільки токенів генерується за прогін.";
 "How much memory the GPU may use. A model's files must fit under it." = "Скільки пам’яті може використовувати GPU. Файли моделі мають вміститися в цей ліміт.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "Відкривати при вході: %@";
 "Leave a Review" = "Залишити відгук";
 "Length" = "Довжина";
+"Let chats make documents" = "Дозволити чатам створювати документи";
 "Let chats work in folders" = "Дозволити чатам працювати в папках";
 "Let coding agents and scripts use your models." = "Дозволити кодувальним агентам і скриптам використовувати ваші моделі.";
 "Let the chat look in %@?" = "Дозволити чату переглянути %@?";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Створено для програмування й агентів: інструменти для кодування та OpenAI API.";
 "Maintenance" = "Обслуговування";
 "Make a 30-second calm lo-fi instrumental for studying" = "Створити 30‑секундний спокійний lo‑fi інструментал для навчання";
+"Make a Document…" = "Створити документ…";
+"Make again" = "Створити знову";
 "Make images and edit them." = "Створювати зображення й редагувати їх.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Створюйте зображення, пісні та розмовляйте за допомогою голосової моделі — усе на цьому Mac: увімкніть у Налаштуваннях.";
 "Make songs and instrumentals." = "Створювати пісні та інструментали.";
+"Make the document again from the same content" = "Створити документ заново з того самого вмісту";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Створює новий випадковий ідентифікатор: пізніші звіти не можна буде співставити з попередніми.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Створення папок, переміщення, перейменування і переміщення в Кошик — кожен план спочатку показується вам, і нічого не змінюється, поки ви його не затвердите.";
 "Manage Models…" = "Керувати моделями…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Недостатньо вільного місця на диску: %@ потребує приблизно %@, вільно %@.";
 "Not identical to %@: not a duplicate." = "Не ідентично %@: не дублюється.";
 "Not indexed" = "Не проіндексовано";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Ще не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods).";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Поки не підтримується: %@. Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods) і зберігає зображення (png, jpg, heic, webp, tiff, gif).";
 "Nothing new to import" = "Немає нічого нового для імпорту";
 "Nothing sent yet." = "Ще нічого не надіслано.";
 "Nothing to change." = "Нічого не потрібно змінювати.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "Тільки цей Mac може використовувати сервер";
 "Only turbo has this knob: sft has no song planner to vary." = "Цей регулятор є лише в turbo: у sft немає планувальника пісень для варіацій.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Публікується лише те, що ви тут введете, після ручної перевірки. Ваш Apple ID або електронну пошту ніколи не публікуємо.";
+"Open" = "Відкрити";
 "Open %@, page %lld" = "Відкрити %@, сторінка %lld";
 "Open Chat" = "Відкрити чат";
 "Open LLMTray when you log in" = "Відкривати LLMTray під час входу";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Інші додатки отримують доступ до ваших моделей через сумісний з OpenAI API на цьому Mac.";
 "Other devices on your network can use the server" = "Інші пристрої в мережі можуть використовувати сервер";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Змінює мову лише для LLMTray, поверх мови macOS. Діє після перезапуску LLMTray. Неперекладений текст показується англійською.";
+"PDF · %lld pages" = "PDF · %lld сторінок";
 "Past %lld messages" = "Понад %lld повідомлень";
 "Pause" = "Призупинити";
 "Pause Indexing" = "Пауза індексації";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "Виберіть оцінку від 1 до 5 зірок.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Оберіть модель для чату. Завантаження почнеться одразу й триватиме у фоновому режимі.";
 "Picks a model that fits your Mac and enables only what you choose." = "Підбирає модель, що підходить для вашого Mac, і вмикає лише обране вами.";
+"Pictures over 50 MB can't be added: %@." = "Зображення понад 50 МБ не можна додати: %@.";
+"Pictures · %lld — for documents, not searched" = "Зображення · %lld — для документів, не індексуються";
 "Pin" = "Закріпити";
 "Pin %@" = "Закріпити %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закріпити: усі чати проєкту отримають увесь файл (≈%@ токенів). У цих чатах під час закріплення вимкнено web‑пошук та генерацію зображень або музики.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "Файли проєкту вимкнено в Параметрах.";
 "Project files off" = "Файли проєкту вимкнено";
 "Project files on" = "Файли проєкту увімкнено";
+"Project files were turned off" = "Файли проєкту вимкнено";
 "Project files will be turned on first." = "Спочатку буде увімкнено файли проєкту.";
 "Project name" = "Назва проєкту";
 "Projects" = "Проєкти";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Вибирає лише зі стількох найімовірніших токенів. 0 — вимкнено. Для Gemma 4 рекомендують 64.";
 "Sampling" = "Семплінг";
 "Save" = "Зберегти";
+"Save As…" = "Зберегти як…";
 "Save memory" = "Заощадити пам’ять";
 "Saved chats will show up here." = "Збережені чати з’являться тут.";
 "Saved in your Keychain" = "Збережено в Keychain";
@@ -959,7 +980,7 @@
 "Temporary chat" = "Тимчасовий чат";
 "Temporary chats can only look in folders, for that chat only." = "Тимчасові чати можуть лише переглядати папки, тільки для цього чату.";
 "Temporary — not saved" = "Тимчасовий — не зберігається";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Індексуються файли: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML і таблиці (xlsx, ods).";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Індексуються файли тексту, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods); зображення зберігаються як документи.";
 "Thank you!" = "Дякуємо!";
 "Thank you! List your name in Supporters?" = "Дякуємо! Додати ваше ім’я до Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Дякуємо! Ваше ім’я з’явиться після перевірки.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP‑складання завантажено — перезапустіть сервер, щоб використовувати його.";
 "The Mac's chip." = "Чип Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "Тут слухає OpenAI-сумісний API (http://localhost:<порт>/v1). Змінюється, коли сервер зупинено.";
+"The PDF couldn't be opened." = "Не вдалося відкрити PDF.";
 "The app's language (the language only, not the region)." = "Мова додатка (лише мова, без регіону).";
 "The app's name." = "Назва додатка.";
 "The base profile: every other profile inherits from it." = "Базовий профіль: усі інші успадковуються від нього.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Чат просить скопіювати %1$@ (%2$@) у проєкт. Тоді кожен чат цього проєкту зможе його шукати.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Чат просить скопіювати %1$@ (%2$@) у проєкт. Після цього кожен чат проєкту зможе використовувати його в документах.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Модель чату може оформити свій вміст у PDF — звіт, лист, нотатки, рахунок із таблицями та діаграмами. PDF залишається в чаті, поки ви його не відкриєте, не збережете або не додасте до проекту. Нічого не завантажується; у тимчасових чатах теж.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Модель чату може переглядати дозволені папки (імена, розміри, дати, короткі витяги) і пропонувати там зміни — нові папки, переміщення, перейменування, переміщення в Кошик. Кожна зміна — це план, який ви спочатку затверджуєте, і його можна скасувати.";
 "The chat model couldn't be unloaded for Voice Lab." = "Не вдалося розвантажити чат‑модель для Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Чат‑модель завантажується в цю папку. Змініть її в Налаштуваннях після налаштування або спочатку виберіть іншу чат‑модель.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель або збільшіть ліміт пам’яті GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Ця модель використовує %1$@ із %2$@ ГБ, доступних GPU; при довгих запитах може закінчитися пам’ять. Використайте меншу модель.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл цього профілю не читається, тож редагувати його тут не можна. Виправте або видаліть файл, потім знову відкрийте Налаштування.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Ця версія індексує текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods); папки та приховані файли додати не можна.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Ця версія індексує файли тексту, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML та таблиці (xlsx, ods) і зберігає зображення як документи; папки та приховані файли не можна додати.";
 "This version of LLMTray can't send reviews. Please update the app." = "Ця версія LLMTray не може надсилати відгуки. Оновіть програму.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Ця версія LLMTray налаштовує середовище виконання через Python. Встановіть Python із python.org або через Homebrew, потім повторіть перевірку. Або використайте LLMTray‑Full, яка містить усе потрібне.";
 "Thought process" = "Хід міркувань";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Загальний час";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Перебирає decode-concurrency (1/2/4/8) і prefill-step-size (64/128/256/512) на запущеній моделі, перезапускаючи сервер між спробами, і залишає найшвидше.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Перевіряє 1, 2, 4 і 8 одночасних запитів та prefill-step-size (256–4096) на працюючій моделі, перезапускаючи сервер між тестами. Concurrent requests: найменша кількість, що досягає 90% від найкращої сумарної швидкості (більше витрачає пам’ять даремно); prefill: найшвидший.";
 "Try Again" = "Спробувати ще";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Перетворює текст файлів у вектори для пошуку за значенням на цьому Mac. Видалення самої моделі не торкається індексів: файли потім шукатимуться за словами, доки модель не буде знову завантажена.";
 "Tweak…" = "Налаштувати…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "Коли клієнт запитує іншу модель";
 "When an app asks for another model" = "Коли додаток запитує іншу модель";
 "When an app asks for another model: %@" = "Коли додаток запитує іншу модель: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Коли оголошено make_document і документи ввімкнено (Settings > Files). За потреби: модель завантажує його за допомогою load_tools або ви — із меню «+», один раз на бесіду — менше токенів у кожному запиті. Завжди: у кожній збереженій бесіді.";
+"When needed" = "За потреби";
 "Where LLMTray keeps its models, one folder per model." = "Де LLMTray зберігає моделі — по одній папці на модель.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Де LLMTray шукає моделі MLX (по одній папці на модель, наприклад <org>/<name>). Можна обрати будь‑яку папку, також ту, що спільно використовується з іншою програмою.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Де LLMTray шукає MLX-моделі (по теці на модель, наприклад <org>/<name>). Вкажіть ~/.lmstudio/models, щоб ділити моделі з LM Studio.";
@@ -1271,11 +1297,13 @@
 "never used" = "ніколи не використовувався";
 "no changes" = "без змін";
 "no text" = "немає тексту";
+"not a picture" = "не зображення";
 "not downloaded" = "не завантажено";
 "not indexed" = "не індексовано";
 "not supported" = "не підтримується";
 "not used by any model" = "не використовується жодною моделлю";
 "off" = "вимк.";
+"over 50 MB" = "понад 50 МБ";
 "prompt %.0f tok/s" = "промпт %.0f ток/с";
 "queued" = "в черзі";
 "reading" = "читання";

@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "自您開啟清單以來有 %lld 項新增：未勾選，直到您勾選為止。";
 "%lld of 5 stars" = "%lld／5 星";
 "%lld pages" = "%lld 頁";
+"%lld pictures" = "%lld 張圖片";
+"%lld pictures added: kept for documents, not searched." = "已新增 %lld 張圖片：保留作文件用，不會被搜尋。";
 "%lld requests" = "%lld 個請求";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 個進行中的請求（會合併至同時處理上限）";
 "%lld s" = "%lld 秒";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位元";
 "(Please attach the report file shown in Finder.)" = "（請在 Finder 中附上報告檔案。）";
 "(estimate; exact after the first answer)" = "(估計值；第一次回應後為準)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "將檔案加入專案，或加入模型可見的影像";
 "Add more files: every chat of the project can search them." = "新增更多檔案：專案中的每個對話都能搜尋這些檔案。";
 "Add the files to a project?" = "要將這些檔案加入專案嗎？";
+"Add to Project" = "加入專案";
 "Add “%1$@” to “%2$@”?" = "將「%1$@」加入「%2$@」？";
 "Added %@" = "已新增 %@";
 "Added here" = "已新增於此處";
+"Added to the project." = "已加入專案。";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具時，一律加入系統提示。模型本身的工具範本只說明如何呼叫工具，從不說明何時不要呼叫。留空則停用。";
 "Adding files" = "加入檔案中";
 "Advanced" = "進階";
@@ -296,9 +302,14 @@
 "Diagnostics" = "診斷";
 "Disk usage" = "磁碟使用量";
 "Dismiss" = "關閉";
+"Document: %@" = "文件：%@";
+"Documents" = "文件";
+"Documents On in This Chat" = "此聊天已開啟文件";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "文件會複製到專案並在此 Mac 上建立索引；影像會放入您的訊息中。";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "此聊天已啟用文件：可請求一份（報告、信件…）。";
 "Documents go into a project with this chat." = "文件會隨本對話加入專案。";
 "Documents go into a project with this chat; images go into your message." = "文件會隨本對話加入專案；影像會放入您的訊息中。";
+"Documents tools" = "文件工具";
 "Doesn't open at login" = "登入時不開啟";
 "Don't Add" = "不要加入";
 "Don't Ask Again" = "不要再詢問";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "正在擷取檔案清單…";
 "Files" = "檔案";
 "Files Settings…" = "檔案設定…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "此處加入的檔案會複製到專案並在此 Mac 上建立索引；專案中的所有聊天都可以搜尋這些檔案。";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "加入此處的檔案會複製到專案並於此 Mac 建立索引；專案中的每個對話都能搜尋它們。圖片會保留作文件用。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "新增至專案的檔案會在此台 Mac 建立索引，讓該專案的對話可搜尋它們。以語意搜尋需要嵌入模型；若無則以檔案文字搜尋。";
 "Files are copied into the project and indexed on this Mac." = "檔案會複製到專案並在此 Mac 上建立索引。";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "檔案會放入專案，但暫存對話不屬於任何專案。請建立新的已儲存對話（⌘N）以加入檔案。";
@@ -400,7 +411,7 @@
 "For This Chat" = "用於此聊天室";
 "For an Hour" = "一小時內";
 "For faster answers (speculative decoding)" = "可加速回應（推測解碼）";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "適用於有已發佈草稿模型的模型（Gemma 4 26B）或自帶 MTP 頭的模型（我們的 Qwen 3.5 模型，隨模型一起下載）：它會預先猜測詞元，主模型一次檢查。輸出相同，速度更快。此時請求會逐一處理。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "對於有公開 drafter（Gemma 4 26B）或自帶 MTP head（例如我們隨模型下載的 Qwen 3.5 系列）的模型：drafter 會預測前方 token，主模型在一次通過中驗證它們。輸出相同，但更快。單一請求時會使用；多個請求同時存在時則共享批次，不會各自使用。";
 "Found after an interruption" = "中斷後找到的項目";
 "Founding Supporters" = "創始贊助者";
 "Free disk space" = "剩餘磁碟空間";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "您覺得 LLMTray 如何？";
 "How it was made" = "此作品的製作方式";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每個步驟處理的提示詞 token 數量。數值越大，長提示詞處理越快，但會使用更多記憶體。效能測試的自動調校可選定此值。";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "每個 GPU 步驟合併批次處理的要求數量。只有多個用戶端同時使用伺服器時才有幫助；會使用更多記憶體。";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "伺服器同時回應多少個請求 — 例如你的聊天與程式碼助理。單一請求可以全速執行（若有 drafter 或 MTP head）；多個請求則在每個 GPU 步驟共享運算：單個稍慢，但整體更快。每個執行中的請求會在記憶體保留其上下文，因此記憶體較少的 Mac 同時回應的數量會較少。1：依序執行。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "您使用下列功能的次數：聊天、工具呼叫、API 伺服器（其他應用程式）、圖像產生、圖像編輯、音樂、模型下載。";
 "How many tokens it generates per trial." = "每次試驗產生的 token 數量。";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU 可使用的記憶體量。模型檔案總和必須低於此限額。";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "登入時開啟：%@";
 "Leave a Review" = "撰寫評論";
 "Length" = "長度";
+"Let chats make documents" = "允許對話建立文件";
 "Let chats work in folders" = "允許聊天室在資料夾中作業";
 "Let coding agents and scripts use your models." = "允許編碼代理與腳本使用你的模型。";
 "Let the chat look in %@?" = "是否允許聊天室檢視 %@？";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "為程式開發與代理設計：含程式工具與 OpenAI API。";
 "Maintenance" = "維護";
 "Make a 30-second calm lo-fi instrumental for studying" = "製作 30 秒用於學習的寧靜 lo-fi 器樂曲";
+"Make a Document…" = "建立文件…";
+"Make again" = "再次建立";
 "Make images and edit them." = "產生並編輯影像。";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成圖片和歌曲，並與語音模型對話：請在「設定」中啟用。";
 "Make songs and instrumentals." = "產生歌曲與純伴奏。";
+"Make the document again from the same content" = "以相同內容再次建立該文件";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "產生新的隨機識別碼：之後的報告無法與先前報告比對。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "建立資料夾、移動、重新命名與移至垃圾桶——每項計畫會先顯示給您，未經核可不會進行變更。";
 "Manage Models…" = "管理模型…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁碟空間不足：%@ 大約需要 %@，目前可用 %@。";
 "Not identical to %@: not a duplicate." = "與 %@ 不相同：非重複項。";
 "Not indexed" = "未建立索引";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "尚未支援：%@。此版本會建立文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods） 的索引。";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "尚不支援：%@。此版本會為文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods）建立索引，並保留圖片（png、jpg、heic、webp、tiff、gif）。";
 "Nothing new to import" = "沒有新項目可匯入";
 "Nothing sent yet." = "尚未寄出任何資料。";
 "Nothing to change." = "無需變更。";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "僅此 Mac 可使用伺服器";
 "Only turbo has this knob: sft has no song planner to vary." = "僅 turbo 有此旋鈕：sft 無歌曲規劃器可變化。";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "僅會公開你在此處輸入的內容，且需經人工審核。絕不會公開你的 Apple ID 或電子郵件。";
+"Open" = "開啟";
 "Open %@, page %lld" = "開啟 %@，第 %lld 頁";
 "Open Chat" = "開啟聊天室";
 "Open LLMTray when you log in" = "登入時開啟 LLMTray";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "其他應用程式可透過此 Mac 上的與 OpenAI 相容 API 存取你的模型。";
 "Other devices on your network can use the server" = "網路上的其他裝置可使用伺服器";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "僅覆寫 LLMTray 的 macOS 語言。重新啟動 LLMTray 後生效。未翻譯的文字會以英文顯示。";
+"PDF · %lld pages" = "PDF · %lld 頁";
 "Past %lld messages" = "過去 %lld 則訊息";
 "Pause" = "暫停";
 "Pause Indexing" = "暫停建立索引";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "請選擇 1 至 5 星的評分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "選擇一個進行聊天。下載會立即開始並在背景進行。";
 "Picks a model that fits your Mac and enables only what you choose." = "選擇適合你 Mac 的模型，並只啟用你選擇的功能。";
+"Pictures over 50 MB can't be added: %@." = "超過 50 MB 的圖片無法加入：%@。";
+"Pictures · %lld — for documents, not searched" = "圖片 · %lld — 保留作文件用，不會被搜尋";
 "Pin" = "釘選";
 "Pin %@" = "釘選 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "釘選：專案中的每個對話會取得整個檔案（≈%@ 代幣）。檔案釘選期間，這些對話的網路搜尋與影像或音樂生成功能會被關閉。";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "已於「設定」關閉專案檔案。";
 "Project files off" = "專案檔案：關";
 "Project files on" = "專案檔案：開";
+"Project files were turned off" = "專案檔案已關閉";
 "Project files will be turned on first." = "將先啟用「專案檔案」。";
 "Project name" = "專案名稱";
 "Projects" = "專案";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "只從此數量的最高機率詞元中取樣。0 會將其關閉。Gemma 4 建議設為 64。";
 "Sampling" = "取樣";
 "Save" = "儲存";
+"Save As…" = "另存為…";
 "Save memory" = "節省記憶體";
 "Saved chats will show up here." = "已儲存的對話會顯示在此處。";
 "Saved in your Keychain" = "已儲存在您的 Keychain";
@@ -959,7 +980,7 @@
 "Temporary chat" = "臨時對話";
 "Temporary chats can only look in folders, for that chat only." = "臨時聊天室僅能檢視資料夾，且僅限該聊天室。";
 "Temporary — not saved" = "暫時 — 不會儲存";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "會建立文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods） 檔案的索引。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "會為文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods）檔案建立索引；圖片則保留作文件用。";
 "Thank you!" = "謝謝你！";
 "Thank you! List your name in Supporters?" = "謝謝你！要在贊助者中列出你的名字嗎？";
 "Thanks! Your name will appear once it's been checked." = "感謝！你的名字將在審核通過後顯示。";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter 已下載完成 — 重新啟動伺服器以使用。";
 "The Mac's chip." = "此 Mac 的晶片。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI 相容 API 會在此監聽（http://localhost:<port>/v1）。請在伺服器停止時變更。";
+"The PDF couldn't be opened." = "無法開啟該 PDF。";
 "The app's language (the language only, not the region)." = "應用程式語言（僅語言，不包含地區）。";
 "The app's name." = "應用程式名稱。";
 "The base profile: every other profile inherits from it." = "基礎設定檔：所有其他設定檔都會繼承其設定。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天要求將 %1$@（%2$@）複製到專案中。專案中的所有聊天之後都能搜尋它。";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "對話要求將 %1$@（%2$@）複製到專案中。專案中的每個對話之後都可以在文件中使用它。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以把產出的內容排版成 PDF — 例如報告、信件、筆記或發票，並包含表格與圖表。PDF 會保留在聊天中，直到您開啟、儲存或加入專案。系統不會為其下載檔案；臨時聊天亦然。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可檢視您允許的資料夾（名稱、大小、日期、短節錄）並提出變更——建立新資料夾、移動、重新命名、移至垃圾桶。每項變更皆為需您先核可的計畫，且可復原。";
 "The chat model couldn't be unloaded for Voice Lab." = "無法為 Voice Lab 卸載聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下載到此資料夾。設定完成後可在「設定」更改，或先選擇其他聊天模型。";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "此模型使用 GPU 可用 %2$@ GB 中的 %1$@；長輸入提示可能會耗盡記憶體。請使用較小的模型，或提高 GPU 記憶體上限。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "此模型使用 GPU 可用 %2$@ GB 中的 %1$@；長輸入提示可能會耗盡記憶體。請使用較小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "無法讀取此設定檔的檔案，因此無法在此編輯。請修正或刪除檔案，然後重新開啟「設定」。";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "此版本會建立文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 與試算表（xlsx、ods）檔案的索引；資料夾與隱藏檔案無法加入。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "此版本會為文字、Markdown、程式碼、PDF、Word（docx、doc）、ODT、RTF、HTML 及試算表（xlsx、ods）檔案建立索引，並保留圖片作文件用；資料夾與隱藏檔案無法加入。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 無法送出評論。請更新應用程式。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 設定執行環境。請從 python.org 或 Homebrew 安裝 Python，然後再試。或改用包含所有需求的 LLMTray-Full。";
 "Thought process" = "思考過程";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "總時長";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "針對執行中的模型嘗試 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之間都會重新啟動伺服器，並保留測得最快的設定。";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "對執行中模型測試同時 1、2、4、8 個請求與 prefill-step-size（256–4096），每次測試間重啟伺服器。Concurrent requests：達到最佳總速率 90% 的最小數量（更多只會增加記憶體負擔）；prefill：速度最快的設定。";
 "Try Again" = "重試";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "將檔案文字轉為用於語意搜尋的向量，並儲存在此台 Mac。移除模型不會刪除索引：在重新下載前，檔案會改以文字方式搜尋。";
 "Tweak…" = "微調…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "當用戶端請求不同模型時";
 "When an app asks for another model" = "當應用程式要求其他模型時";
 "When an app asks for another model: %@" = "當應用程式要求其他模型：%@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "當宣告 make_document 且已啟用文件（設定 > Files）時生效。需要時：模型會以 load_tools 載入，或由你從 + 選單操作，每個聊天限一次 — 每次請求使用較少代幣。儲存的聊天會始終包含該文件。";
+"When needed" = "在需要時";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray 儲存模型的所在位置，每個模型一個資料夾。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray 在何處尋找 MLX 模型（每個模型為一個資料夾，例如 <org>/<name>）。可選任一資料夾，也可以與其他應用程式共用同一資料夾。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 尋找 MLX 模型的位置（每個模型一個檔案夾，例如 <org>/<name>）。將其指向 ~/.lmstudio/models 即可與 LM Studio 共用模型。";
@@ -1271,11 +1297,13 @@
 "never used" = "從未使用";
 "no changes" = "無變更";
 "no text" = "無文字";
+"not a picture" = "不是圖片";
 "not downloaded" = "尚未下載";
 "not indexed" = "未建立索引";
 "not supported" = "不支援";
 "not used by any model" = "未被任何模型使用";
 "off" = "關閉";
+"over 50 MB" = "超過 50 MB";
 "prompt %.0f tok/s" = "提示 %.0f tok/s";
 "queued" = "已排隊";
 "reading" = "讀取中";

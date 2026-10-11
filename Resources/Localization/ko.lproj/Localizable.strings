@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "목록을 연 이후 새로 생긴 항목 %lld개: 선택할 때까지 선택 해제된 상태입니다.";
 "%lld of 5 stars" = "5점 만점에 %lld점";
 "%lld pages" = "%lld페이지";
+"%lld pictures" = "%lld장 사진";
+"%lld pictures added: kept for documents, not searched." = "%lld장 사진 추가됨: 문서 용도로 보관되며 검색되지 않습니다.";
 "%lld requests" = "요청 %lld건";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld개의 진행 중인 요청(최대 Concurrent requests까지 함께 응답)";
 "%lld s" = "%lld초";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld비트";
 "(Please attach the report file shown in Finder.)" = "(Finder에 표시된 보고서 파일을 첨부해 주세요.)";
 "(estimate; exact after the first answer)" = "(추정치; 첫 응답 후 정확 값)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "프로젝트에 파일을 추가하거나 모델이 볼 이미지 추가";
 "Add more files: every chat of the project can search them." = "파일을 더 추가하세요: 프로젝트의 모든 채팅에서 검색할 수 있습니다.";
 "Add the files to a project?" = "파일을 프로젝트에 추가하시겠습니까?";
+"Add to Project" = "프로젝트에 추가";
 "Add “%1$@” to “%2$@”?" = "“%1$@”을(를) “%2$@”에 추가하시겠습니까?";
 "Added %@" = "추가됨 %@";
 "Added here" = "여기에 추가됨";
+"Added to the project." = "프로젝트에 추가됨.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "도구가 제공될 때마다 시스템 프롬프트에 추가됩니다. 모델 자체 도구 템플릿은 도구 호출 방법만 설명하며, 호출하지 말아야 할 때는 설명하지 않습니다. 비워 두면 비활성화됩니다.";
 "Adding files" = "파일 추가 중";
 "Advanced" = "고급";
@@ -296,9 +302,14 @@
 "Diagnostics" = "진단";
 "Disk usage" = "디스크 사용량";
 "Dismiss" = "닫기";
+"Document: %@" = "문서: %@";
+"Documents" = "문서";
+"Documents On in This Chat" = "이 채팅에서 문서 사용";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "문서는 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다. 이미지는 메시지에 포함됩니다.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "이 채팅에서 문서가 활성화되어 있습니다: 문서(보고서, 편지 등)를 요청하세요.";
 "Documents go into a project with this chat." = "문서는 이 채팅과 함께 프로젝트로 이동됩니다.";
 "Documents go into a project with this chat; images go into your message." = "문서는 이 채팅과 함께 프로젝트로 이동되고, 이미지는 메시지에 포함됩니다.";
+"Documents tools" = "문서 도구";
 "Doesn't open at login" = "로그인 시 열리지 않음";
 "Don't Add" = "추가 안 함";
 "Don't Ask Again" = "다시는 묻지 않기";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "파일 목록 가져오는 중…";
 "Files" = "파일";
 "Files Settings…" = "파일 설정…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "여기에 추가한 파일은 프로젝트로 복사되어 이 Mac에서 인덱스화됩니다. 프로젝트의 모든 채팅에서 검색할 수 있습니다.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "여기에 추가한 파일은 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다. 프로젝트의 모든 채팅에서 검색할 수 있습니다. 사진은 문서용으로 보관됩니다.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "프로젝트에 추가된 파일은 이 Mac에서 인덱싱되어 채팅에서 검색할 수 있습니다. 의미 기반 검색은 임베딩 모델을 사용합니다. 임베딩 모델이 없으면 파일은 단어 단위로만 검색됩니다.";
 "Files are copied into the project and indexed on this Mac." = "파일은 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "파일은 프로젝트로 이동하며, 임시 채팅은 프로젝트에 속하지 않습니다. 추가하려면 새로 저장된 채팅(⌘N)을 시작하세요.";
@@ -400,7 +411,7 @@
 "For This Chat" = "이 채팅용";
 "For an Hour" = "1시간 동안";
 "For faster answers (speculative decoding)" = "더 빠른 응답(추측적 디코딩)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "공개된 드래프터가 있는 모델(Gemma 4 26B)이나 자체 MTP 헤드가 있는 모델(당사 Qwen 3.5 모델, 함께 다운로드됨)용: 앞의 토큰을 추측하고 메인 모델이 한 번에 검사합니다. 출력은 같고 더 빠릅니다. 요청은 한 번에 하나씩 처리됩니다.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "공개된 drafter(Gemma 4 26B)나 자체 MTP 헤드(예: 함께 다운로드한 Qwen 3.5 모델)가 있는 모델의 경우: 미리 토큰을 예측하고 메인 모델이 한 번에 확인합니다. 출력은 같고 속도는 빠릅니다. 단독 요청일 때 활성화되며, 여러 요청이 동시에 있으면 drafter 없이 배치를 공유합니다.";
 "Found after an interruption" = "중단 후 발견됨";
 "Founding Supporters" = "창립 후원자";
 "Free disk space" = "여유 디스크 공간";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "LLMTray는 어떠신가요?";
 "How it was made" = "어떻게 만들어졌는지";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "한 단계에서 처리할 프롬프트 토큰 수입니다. 값이 클수록 긴 프롬프트에서 더 빠르지만 메모리를 더 사용합니다. 벤치마크의 자동 튜닝으로 선택할 수 있습니다.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "하나의 GPU 단계로 묶을 요청 수입니다. 여러 클라이언트가 동시에 서버를 사용할 때만 도움이 되며 메모리를 더 사용합니다.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "서버가 동시에 처리하는 요청 수 — 예: 채팅과 코딩 에이전트. 단독 요청은 최대 속도로 실행됩니다(해당 시 drafter 또는 MTP 헤드 사용). 요청이 많아지면 GPU 단계별로 자원을 나누어 사용하므로 개별 속도는 약간 느려지지만 전체 처리량은 증가합니다. 각 실행 요청은 자체 컨텍스트를 메모리에 유지하므로 여유 메모리가 적은 Mac은 동시에 더 적게 처리합니다. 1: 순차 처리.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "다음 항목을 각각 몇 번 사용했는지: 채팅, 도구 호출, API 서버(다른 앱), 이미지 생성, 이미지 편집, 음악, 모델 다운로드.";
 "How many tokens it generates per trial." = "시도당 생성 토큰 수";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU가 사용할 수 있는 메모리 양입니다. 모델 파일이 이 제한보다 작아야 합니다.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "로그인 시 실행: %@";
 "Leave a Review" = "리뷰 남기기";
 "Length" = "길이";
+"Let chats make documents" = "채팅으로 문서 생성 허용";
 "Let chats work in folders" = "채팅에 폴더 작업 허용";
 "Let coding agents and scripts use your models." = "코딩 에이전트와 스크립트가 모델을 사용하도록 허용합니다.";
 "Let the chat look in %@?" = "%@을(를) 채팅이 열람하도록 허용할까요?";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "프로그래밍 및 에이전트를 위해 제작됨: 코딩 도구와 OpenAI API용입니다.";
 "Maintenance" = "유지 관리";
 "Make a 30-second calm lo-fi instrumental for studying" = "공부용 30초 차분한 로파이 연주 만들기";
+"Make a Document…" = "문서 만들기…";
+"Make again" = "다시 만들기";
 "Make images and edit them." = "이미지 생성 및 편집";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "이 Mac에서 이미지와 음악을 만들고 음성 모델과 대화하세요. 설정에서 켤 수 있습니다.";
 "Make songs and instrumentals." = "노래 및 기악곡 생성";
+"Make the document again from the same content" = "같은 내용으로 문서를 다시 만듭니다.";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "새로운 임의 ID를 만듭니다: 이후 보고서는 이전 보고서와 연결할 수 없습니다.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "폴더 생성, 이동, 이름 변경, 휴지통 이동 등 모든 작업은 먼저 계획으로 보여지며 사용자가 승인할 때까지 변경되지 않습니다.";
 "Manage Models…" = "모델 관리…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "디스크 여유 공간이 부족합니다: %@에 약 %@가 필요하지만 %@만 남아 있습니다.";
 "Not identical to %@: not a duplicate." = "%@와(과) 동일하지 않음: 중복 아님.";
 "Not indexed" = "인덱스되지 않음";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "아직 지원되지 않음: %@. 이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods)을 인덱스합니다.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "아직 지원되지 않음: %@. 이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods)를 인덱싱하며, 사진(png, jpg, heic, webp, tiff, gif)은 보관합니다.";
 "Nothing new to import" = "가져올 새 항목이 없습니다";
 "Nothing sent yet." = "아직 전송된 항목이 없습니다.";
 "Nothing to change." = "변경할 항목 없음.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "서버를 사용할 수 있는 것은 이 Mac뿐";
 "Only turbo has this knob: sft has no song planner to vary." = "이 설정은 turbo만 해당합니다: sft에는 변화를 주는 곡 계획자가 없습니다.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "여기에 입력한 내용만 심사 후 공개됩니다. Apple ID나 이메일은 절대 공개되지 않습니다.";
+"Open" = "열기";
 "Open %@, page %lld" = "%@ 열기, %lld페이지";
 "Open Chat" = "채팅 열기";
 "Open LLMTray when you log in" = "로그인 시 LLMTray 열기";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "다른 앱은 이 Mac의 OpenAI 호환 API를 통해 모델에 접근합니다.";
 "Other devices on your network can use the server" = "네트워크의 다른 기기가 서버를 사용할 수 있음";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray에만 macOS 언어 설정을 덮어씁니다. LLMTray를 다시 시작한 후 적용됩니다. 번역되지 않은 텍스트는 영어로 표시됩니다.";
+"PDF · %lld pages" = "PDF · %lld쪽";
 "Past %lld messages" = "지난 %lld개 메시지";
 "Pause" = "일시 정지";
 "Pause Indexing" = "인덱스 일시정지";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "1~5점 사이에서 평점을 선택하세요.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "대화할 모델을 선택하세요. 선택 즉시 다운로드가 시작되어 백그라운드에서 진행됩니다.";
 "Picks a model that fits your Mac and enables only what you choose." = "Mac에 맞는 모델을 선택하고 사용자가 선택한 기능만 켭니다.";
+"Pictures over 50 MB can't be added: %@." = "50MB가 넘는 사진은 추가할 수 없음: %@.";
+"Pictures · %lld — for documents, not searched" = "사진 · %lld — 문서 용도(검색되지 않음)";
 "Pin" = "고정";
 "Pin %@" = "고정 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "고정: 프로젝트의 모든 채팅이 전체 파일(≈%@ 토큰)을 받습니다. 파일이 고정되어 있는 동안 해당 채팅에서는 웹 검색과 이미지·음악 생성이 비활성화됩니다.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "설정에서 프로젝트 파일이 꺼져 있습니다.";
 "Project files off" = "프로젝트 파일 끔";
 "Project files on" = "프로젝트 파일 켬";
+"Project files were turned off" = "프로젝트 파일이 꺼져 있음";
 "Project files will be turned on first." = "먼저 프로젝트 파일이 켜집니다.";
 "Project name" = "프로젝트 이름";
 "Projects" = "프로젝트";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "가장 가능성 높은 토큰을 이 개수만큼만 샘플링합니다. 0이면 끕니다. Gemma 4는 64를 권장합니다.";
 "Sampling" = "샘플링";
 "Save" = "저장";
+"Save As…" = "다른 이름으로 저장…";
 "Save memory" = "메모리 절약";
 "Saved chats will show up here." = "저장한 채팅이 여기 표시됩니다.";
 "Saved in your Keychain" = "키체인에 저장됨";
@@ -959,7 +980,7 @@
 "Temporary chat" = "임시 채팅";
 "Temporary chats can only look in folders, for that chat only." = "임시 채팅은 해당 채팅에서만 폴더를 열람할 수 있습니다.";
 "Temporary — not saved" = "임시 — 저장되지 않음";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods) 파일이 인덱스됩니다.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods) 파일이 인덱싱됩니다. 사진은 문서용으로 보관됩니다.";
 "Thank you!" = "감사합니다!";
 "Thank you! List your name in Supporters?" = "감사합니다! 후원자 명단에 이름을 등록하시겠습니까?";
 "Thanks! Your name will appear once it's been checked." = "감사합니다! 이름은 확인 후 공개됩니다.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter가 다운로드되었습니다 — 서버를 재시작해야 사용할 수 있습니다.";
 "The Mac's chip." = "Mac의 칩.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI 호환 API가 여기서 수신 대기합니다(http://localhost:<port>/v1). 서버가 중지된 상태에서 변경하십시오.";
+"The PDF couldn't be opened." = "PDF를 열 수 없습니다.";
 "The app's language (the language only, not the region)." = "앱의 언어(지역 정보 제외).";
 "The app's name." = "앱 이름.";
 "The base profile: every other profile inherits from it." = "기본 프로필: 다른 모든 프로필이 이 프로필을 상속합니다.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "이 채팅이 %1$@(%2$@)을(를) 프로젝트로 복사하도록 요청합니다. 그러면 해당 프로젝트의 모든 채팅에서 이를 검색할 수 있습니다.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "채팅에서 %1$@(%2$@)를 프로젝트로 복사하라고 요청합니다. 그러면 프로젝트의 모든 채팅에서 문서에 사용할 수 있습니다.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "채팅 모델은 작성한 내용을 표와 차트를 포함한 PDF(보고서, 편지, 메모, 청구서 등)로 배치할 수 있습니다. PDF는 열기·저장·프로젝트에 추가할 때까지 채팅에 그대로 남아 있습니다. 임시 채팅을 포함해 별도로 다운로드되지는 않습니다.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "채팅 모델은 사용자가 허용한 폴더를 열람(이름, 크기, 날짜, 짧은 내용 일부)하고 변경을 제안할 수 있습니다 — 새 폴더, 이동, 이름 변경, 휴지통으로 이동 등. 모든 변경은 먼저 사용자가 승인하는 계획이며 되돌릴 수 있습니다.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab을 위해 채팅 모델을 언로드할 수 없습니다.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "채팅 모델이 이 폴더로 다운로드되고 있습니다. 설정에서 설치 후 변경하거나 먼저 다른 채팅 모델을 선택하세요.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하거나 GPU 메모리 한도를 올리세요.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "이 모델은 GPU가 사용할 수 있는 %2$@ GB 중 %1$@을(를) 사용합니다. 긴 프롬프트는 메모리가 부족할 수 있습니다. 더 작은 모델을 사용하세요.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "이 프로필의 파일을 읽을 수 없어 여기에서 편집할 수 없습니다. 파일을 수정하거나 삭제한 다음 설정을 다시 여십시오.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods)를 인덱싱합니다. 폴더와 숨김 파일은 추가할 수 없습니다.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "이 버전은 텍스트, Markdown, 코드, PDF, Word(docx, doc), ODT, RTF, HTML 및 스프레드시트(xlsx, ods) 파일을 인덱싱하고, 사진은 문서용으로 보관합니다. 폴더와 숨김 파일은 추가할 수 없습니다.";
 "This version of LLMTray can't send reviews. Please update the app." = "이 LLMTray 버전에서는 리뷰를 보낼 수 없습니다. 앱을 업데이트해 주세요.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "이 LLMTray 버전은 런타임을 Python으로 설정합니다. python.org 또는 Homebrew에서 Python을 설치한 뒤 다시 확인하세요. 또는 필요한 구성 요소가 모두 포함된 LLMTray-Full을 사용하세요.";
 "Thought process" = "사고 과정";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "총 시간";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "실행 중인 모델에 대해 서버를 매번 재시작하며 decode-concurrency(1/2/4/8)와 prefill-step-size(64/128/256/512)를 시도하고, 측정 결과가 가장 빠른 값을 유지합니다.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "실행 중인 모델에 대해 1, 2, 4, 8개의 동시 요청과 prefill-step-size(256–4096)를 각각 시도하며 시도 간 서버를 재시작합니다. Concurrent requests: 최고 총합 속도의 90%에 도달하는 최소값(더 높이면 메모리만 많이 소모); prefill: 가장 빠른 값.";
 "Try Again" = "다시 시도";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "파일 텍스트를 이 Mac에서 의미 기반 검색용 벡터로 변환합니다. 제거해도 인덱스는 유지됩니다. 다시 다운로드될 때까지 파일은 단어 단위로 검색됩니다.";
 "Tweak…" = "조정…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "클라이언트가 다른 모델을 요청할 때";
 "When an app asks for another model" = "앱이 다른 모델을 요청할 때";
 "When an app asks for another model: %@" = "앱이 다른 모델을 요청할 때: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "make_document가 선언되면, 문서가 활성화된 후(Settings > Files) 동작합니다. 필요할 때: 모델이 load_tools로 불러오거나, + 메뉴에서 사용자가 채팅당 한 번 불러옵니다 — 각 요청의 토큰 사용량 감소. 저장된 모든 채팅에서는 항상 포함됩니다.";
+"When needed" = "필요 시";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray가 모델을 보관하는 위치로, 모델별로 하나의 폴더가 생성됩니다.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray가 MLX 모델을 찾는 위치입니다(모델당 한 폴더, 예: <org>/<name>). 다른 앱과 공유된 폴더도 포함하여 원하는 폴더를 선택하세요.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray가 MLX 모델을 찾을 위치입니다(모델당 폴더 하나, 예: <org>/<name>). LM Studio와 모델을 공유하려면 ~/.lmstudio/models로 지정하십시오.";
@@ -1271,11 +1297,13 @@
 "never used" = "사용된 적 없음";
 "no changes" = "변경 없음";
 "no text" = "텍스트 없음";
+"not a picture" = "사진 아님";
 "not downloaded" = "다운로드되지 않음";
 "not indexed" = "인덱스되지 않음";
 "not supported" = "지원되지 않음";
 "not used by any model" = "어떤 모델에서도 사용되지 않음";
 "off" = "끔";
+"over 50 MB" = "50MB 초과";
 "prompt %.0f tok/s" = "프롬프트 %.0f tok/s";
 "queued" = "대기 중";
 "reading" = "읽는 중";

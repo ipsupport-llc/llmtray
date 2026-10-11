@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "Listeyi açtığınızdan beri %lld yeni öğe: işaretlenene kadar seçilmedi.";
 "%lld of 5 stars" = "5 üzerinden %lld yıldız";
 "%lld pages" = "%lld sayfa";
+"%lld pictures" = "%lld resim";
+"%lld pictures added: kept for documents, not searched." = "%lld resim eklendi: belgeler için saklandı, aranmaz.";
 "%lld requests" = "%lld istek";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld işlemdeki istek (aynı anda en çok Concurrent requests kadar birlikte yanıtlanır)";
 "%lld s" = "%lld sn";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Lütfen Finder’da gösterilen rapor dosyasını ekleyin.)";
 "(estimate; exact after the first answer)" = "(tahmini; ilk yanıttan sonra kesinleşir)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "Dosyaları bir projeye veya modelin görmesi için resimleri ekle";
 "Add more files: every chat of the project can search them." = "Daha fazla dosya ekleyin: projenin her sohbeti bunlarda arama yapabilir.";
 "Add the files to a project?" = "Dosyalar bir projeye eklensin mi?";
+"Add to Project" = "Projeye Ekle";
 "Add “%1$@” to “%2$@”?" = "“%1$@” öğesini “%2$@” projesine eklemek istiyor musunuz?";
 "Added %@" = "Eklendi: %@";
 "Added here" = "Buraya eklendi";
+"Added to the project." = "Projeye eklendi.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Araçlar sunulduğunda sistem istemine eklenir. Modelin kendi araç şablonu yalnızca bir aracın nasıl çağrılacağını söyler; ne zaman çağrılmaması gerektiğini söylemez. Boş bırakılırsa devre dışı kalır.";
 "Adding files" = "Dosyalar ekleniyor";
 "Advanced" = "İleri Düzey";
@@ -296,9 +302,14 @@
 "Diagnostics" = "Tanılar";
 "Disk usage" = "Disk kullanımı";
 "Dismiss" = "Kapat";
+"Document: %@" = "Belge: %@";
+"Documents" = "Belgeler";
+"Documents On in This Chat" = "Bu Sohbette Belgeler Açık";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Belgeler projeye kopyalanır ve bu Mac'te indekslenir; resimler mesajınıza eklenir.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Bu sohbette belgeler açık: bir belge isteyin (rapor, mektup…).";
 "Documents go into a project with this chat." = "Belgeler bu sohbetle birlikte bir projeye eklenir.";
 "Documents go into a project with this chat; images go into your message." = "Belgeler bu sohbetle birlikte bir projeye eklenir; resimler mesajınıza eklenir.";
+"Documents tools" = "Belgeler araçları";
 "Doesn't open at login" = "Girişte açılmaz";
 "Don't Add" = "Ekleme";
 "Don't Ask Again" = "Tekrar sorma";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "Dosya listesi alınıyor…";
 "Files" = "Dosyalar";
 "Files Settings…" = "Files Ayarları…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Buraya eklenen dosyalar projeye kopyalanır ve bu Mac'te dizine alınır; projenin her sohbeti bunlarda arama yapabilir.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Buraya eklenen dosyalar projeye kopyalanır ve bu Mac'te dizinlenir; projenin her sohbeti bunlarda arama yapabilir. Resimler belgeler için saklanır.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Bir projeye eklenen dosyalar bu Mac’te indekslenir, böylece sohbetler bunlarda arama yapabilir. Anlamsal arama bir gömü modeli kullanır; olmadan dosyalar yalnızca kelimelerine göre aranır.";
 "Files are copied into the project and indexed on this Mac." = "Dosyalar projeye kopyalanır ve bu Mac'te indekslenir.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Dosyalar bir projeye eklenir; geçici sohbetler projede olmaz. Eklemek için yeni bir kaydedilmiş sohbet başlatın (⌘N).";
@@ -400,7 +411,7 @@
 "For This Chat" = "Bu Sohbet İçin";
 "For an Hour" = "Bir Saat İçin";
 "For faster answers (speculative decoding)" = "Daha hızlı yanıtlar için (spekülatif çözümleme)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Yayımlanmış bir taslakçısı olan (Gemma 4 26B) ya da kendi MTP başlığı olan modeller için (bizim Qwen 3.5 modellerimiz, onlarla birlikte indirilir): ileriki token’ları tahmin eder, ana model bunları tek geçişte doğrular. Aynı çıktı, daha hızlı. İstekler o zaman tek tek işlenir.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Yayımlanmış bir drafter'ı olan modeller (Gemma 4 26B) veya kendi MTP başlığına sahip modellerde (Qwen 3.5 modellerimiz, bunlarla birlikte indirilir): önden token tahmini yapar ve ana model bunları tek geçişte denetler. Aynı çıktı, daha hızlı. Bir istek yalnızken bunu kullanır; birden çok istek aynı anda olursa paketleri paylaşırlar ve kullanmazlar.";
 "Found after an interruption" = "Kesintiden sonra bulunanlar";
 "Founding Supporters" = "Kurucu Destekçiler";
 "Free disk space" = "Boş disk alanı";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "LLMTray’i nasıl buluyorsunuz?";
 "How it was made" = "Nasıl yapıldı";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Her adımda kaç istem token’ının işlendiği. Daha büyük değer uzun istemlerde daha hızlıdır, ancak daha fazla bellek kullanır. Performans testinin otomatik ayarı bunu seçebilir.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Tek bir GPU adımında kaç isteğin toplu işleneceği. Yalnızca birkaç istemci sunucuyu aynı anda kullandığında işe yarar; daha fazla bellek kullanır.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Sunucunun aynı anda kaç isteğe yanıt verdiği — örneğin sohbetiniz ve bir kodlama aracı. Tek bir istek yalnız çalışırken tam hızda çalışır (drafter veya MTP başlığı ile); daha fazla istekte her GPU adımını paylaşırlar: her biri biraz daha yavaş, birlikte daha hızlı. Her çalışan istek kendi bağlamını bellekte tutar, bu yüzden az belleği olan bir Mac aynı anda daha az istek yanıtlar. 1: ardışık olarak.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Aşağıdakileri kaç kez kullandığınız: sohbet, araç çağrıları, API sunucusu (diğer uygulamalar), görüntü oluşturma, görüntü düzenleme, müzik, model indirmeleri.";
 "How many tokens it generates per trial." = "Her denemede kaç token üreteceği.";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU'nun kullanabileceği bellek miktarı. Bir modelin dosyaları bunun altına sığmalıdır.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "Girişte aç: %@";
 "Leave a Review" = "Değerlendirme bırak";
 "Length" = "Uzunluk";
+"Let chats make documents" = "Sohbetlerin belge oluşturmasına izin ver";
 "Let chats work in folders" = "Sohbetlerin klasörlerde çalışmasına izin ver";
 "Let coding agents and scripts use your models." = "Kodlama ajanlarının ve scriptlerin modellerinizi kullanmasına izin verin.";
 "Let the chat look in %@?" = "Sohbetin %@ içinde bakmasına izin verilsin mi?";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Programlama ve ajanlar için hazırlanmıştır: kodlama araçları ve OpenAI API.";
 "Maintenance" = "Bakım";
 "Make a 30-second calm lo-fi instrumental for studying" = "Çalışma için 30 saniyelik sakin bir lo‑fi enstrümantal yapın";
+"Make a Document…" = "Belge Oluştur…";
+"Make again" = "Yeniden oluştur";
 "Make images and edit them." = "Görüntü oluşturun ve düzenleyin.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Bu Mac’te görseller ve şarkılar oluşturun, bir ses modeliyle konuşun: Ayarlar’dan etkinleştirin.";
 "Make songs and instrumentals." = "Şarkı ve enstrümantal oluşturun.";
+"Make the document again from the same content" = "Aynı içerikten belgeyi yeniden oluştur";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Yeni bir rastgele kimlik oluşturur: sonraki raporlar önceki raporlarla eşleştirilemez.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Klasör oluşturma, taşıma, yeniden adlandırma ve Çöp'e taşıma — her plan önce size gösterilir ve siz onaylayana kadar hiçbir şey değişmez.";
 "Manage Models…" = "Modelleri Yönet…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Yeterli boş disk alanı yok: %@ yaklaşık %@ gerektiriyor, %@ boş.";
 "Not identical to %@: not a duplicate." = "%@ ile aynı değil: yinelenen değil.";
 "Not indexed" = "Dizine eklenmedi";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını dizine alır.";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Henüz desteklenmiyor: %@. Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tabloları (xlsx, ods) dizinler ve resimleri (png, jpg, heic, webp, tiff, gif) saklar.";
 "Nothing new to import" = "İçe aktarılacak yeni bir şey yok";
 "Nothing sent yet." = "Henüz gönderilen yok.";
 "Nothing to change." = "Değiştirilecek bir şey yok.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "Sunucuyu yalnızca bu Mac kullanır";
 "Only turbo has this knob: sft has no song planner to vary." = "Sadece turbo’da bu ayar var: sft’de şarkı planlayıcısı yok.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Yalnızca buraya yazdığınız içerik, bir kişi tarafından kontrol edildikten sonra yayımlanır. Apple Kimliğiniz veya e-posta adresiniz asla yayımlanmaz.";
+"Open" = "Aç";
 "Open %@, page %lld" = "%@ dosyasını aç, sayfa %lld";
 "Open Chat" = "Sohbeti Aç";
 "Open LLMTray when you log in" = "Girişte LLMTray'ı aç";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Diğer uygulamalar modellere bu Mac'te OpenAI uyumlu bir API aracılığıyla erişir.";
 "Other devices on your network can use the server" = "Ağınızdaki diğer cihazlar sunucuyu kullanabilir";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Yalnızca LLMTray için macOS dilini geçersiz kılar. LLMTray yeniden başlatıldıktan sonra etkili olur. Çevrilmemiş metin İngilizce gösterilir.";
+"PDF · %lld pages" = "PDF · %lld sayfa";
 "Past %lld messages" = "Son %lld mesaj";
 "Pause" = "Duraklat";
 "Pause Indexing" = "Dizine Almayı Duraklat";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "1 ile 5 yıldız arasında bir puan seçin.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Sohbet etmek için birini seçin. İndirme hemen başlar ve arka planda devam eder.";
 "Picks a model that fits your Mac and enables only what you choose." = "Mac’inize uygun bir model seçer ve yalnızca tercih ettiklerinizi etkinleştirir.";
+"Pictures over 50 MB can't be added: %@." = "50 MB'tan büyük resimler eklenemez: %@.";
+"Pictures · %lld — for documents, not searched" = "Resimler · %lld — belgeler için, aranmaz";
 "Pin" = "Sabitlen";
 "Pin %@" = "Sabitle %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Sabitle: projedeki her sohbet tüm dosyayı alır (≈%@ token). Dosya sabitliyken bu sohbetlerde web araması ve görüntü veya müzik üretimi kapalıdır.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "Proje dosyaları Ayarlar’da kapalı.";
 "Project files off" = "Proje dosyaları kapalı";
 "Project files on" = "Proje dosyaları açık";
+"Project files were turned off" = "Proje dosyaları kapatıldı";
 "Project files will be turned on first." = "Önce Proje dosyaları açılacaktır.";
 "Project name" = "Proje adı";
 "Projects" = "Projeler";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Yalnızca bu sayıdaki en olası token’dan örnekler. 0 devre dışı bırakır. Gemma 4, 64 önerir.";
 "Sampling" = "Örnekleme";
 "Save" = "Kaydet";
+"Save As…" = "Farklı Kaydet…";
 "Save memory" = "Bellek tasarrufu";
 "Saved chats will show up here." = "Kaydedilmiş sohbetler burada görünür.";
 "Saved in your Keychain" = "Keychain'inize kaydedildi";
@@ -959,7 +980,7 @@
 "Temporary chat" = "Geçici sohbet";
 "Temporary chats can only look in folders, for that chat only." = "Geçici sohbetler yalnızca klasörlere bakabilir, sadece o sohbet için.";
 "Temporary — not saved" = "Geçici — kaydedilmez";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyaları dizine alınır.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyaları dizinlenir; resimler belgeler için saklanır.";
 "Thank you!" = "Teşekkürler!";
 "Thank you! List your name in Supporters?" = "Teşekkürler! Adınızı Destekçilerde listelemek ister misiniz?";
 "Thanks! Your name will appear once it's been checked." = "Teşekkürler! İsminiz kontrol edildikten sonra görünecek.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP taslağı indirildi — kullanmak için sunucuyu yeniden başlatın.";
 "The Mac's chip." = "Mac'in çipi.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI uyumlu API burada dinler (http://localhost:<port>/v1). Sunucu durdurulmuşken değiştirin.";
+"The PDF couldn't be opened." = "PDF açılamadı.";
 "The app's language (the language only, not the region)." = "Uygulamanın dili (sadece dil, bölge değil).";
 "The app's name." = "Uygulama adı.";
 "The base profile: every other profile inherits from it." = "Temel profil: diğer tüm profiller ondan devralır.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Sohbet, %1$@ (%2$@) öğesini projeye kopyalamanızı istiyor. Projedeki tüm sohbetler bunu arayabilir.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Sohbet, %1$@ (%2$@) öğesini projeye kopyalamayı istiyor. Projedeki her sohbet daha sonra bunu belgelerde kullanabilir.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Sohbet modeli yazdıklarını PDF olarak düzenleyebilir — rapor, mektup, not, fatura — tablolar ve grafiklerle. PDF, açana, kaydedene veya projeye ekleyene kadar sohbette kalır. Bunun için bir şey indirilmez; geçici sohbetlerde de değil.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Sohbet modeli, izin verdiğiniz klasörlere bakabilir (adlar, boyutlar, tarihler, kısa alıntılar) ve orada değişiklik önerebilir — yeni klasörler, taşıma, yeniden adlandırma, Çöp'e taşıma. Her değişiklik önce sizin onayınıza sunulan bir plandır ve geri alınabilir.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab için sohbet modeli boşaltılamadı.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Sohbet modeli bu klasöre indiriliyor. Kurulumdan sonra Ayarlar’dan değiştirin veya önce başka bir sohbet modeli seçin.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın veya GPU bellek sınırını yükseltin.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Bu model, GPU'nun kullanabileceği %2$@ GB'nin %1$@'sini kullanıyor; uzun girdilerde bellek tükenebilir. Daha küçük bir model kullanın.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Bu profilin dosyası okunamıyor, bu yüzden burada düzenlenemez. Dosyayı düzeltin veya silin, sonra Ayarlar’ı yeniden açın.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını indeksler; klasörler ve gizli dosyalar eklenemez.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Bu sürüm metin, Markdown, kod, PDF, Word (docx, doc), ODT, RTF, HTML ve elektronik tablo (xlsx, ods) dosyalarını dizinler ve resimleri belgeler için saklar; klasörler ve gizli dosyalar eklenemez.";
 "This version of LLMTray can't send reviews. Please update the app." = "Bu LLMTray sürümü değerlendirme gönderemez. Lütfen uygulamayı güncelleyin.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Bu LLMTray sürümü çalışma zamanı için Python kullanır. Python'u python.org veya Homebrew üzerinden yükleyin, sonra tekrar kontrol edin. Veya gerekli her şeyi içeren LLMTray-Full'u kullanın.";
 "Thought process" = "Düşünme süreci";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Toplam süre";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Çalışan modelde decode-concurrency (1/2/4/8) ve prefill-step-size (64/128/256/512) değerlerini dener, her biri arasında sunucuyu yeniden başlatır ve ölçülen en hızlı olanı tutar.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Çalışan modele karşı 1, 2, 4 ve 8 isteği aynı anda ve prefill-step-size'ı (256–4096) dener, her deneme arasında sunucuyu yeniden başlatır. Concurrent requests: en iyi toplam hızın %90'ına ulaşan en az sayı (daha fazlası az fayda için daha fazla bellek tüketir); prefill: en hızlı olan.";
 "Try Again" = "Tekrar Dene";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "Bir istemci başka bir model istediğinde";
 "When an app asks for another model" = "Bir uygulama başka bir model istediğinde";
 "When an app asks for another model: %@" = "Bir uygulama başka bir model istediğinde: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "make_document bildirildiğinde ve Belgeler açıldığında (Ayarlar > Dosyalar) geçerlidir. Gerektiğinde: model load_tools ile yükler veya siz + menüsünden, sohbet başına bir kez — her istekte daha az token kullanımı. Her zaman: kaydedilen her sohbette.";
+"When needed" = "Gerektiğinde";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray'in modelleri sakladığı yer, her model için bir klasör.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray'in MLX modellerini aradığı yer (her model için bir klasör, örn. <org>/<name>). İstediğiniz bir klasörü seçin; başka bir uygulama ile paylaşılan bir klasör de olabilir.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray’in MLX modellerini aradığı konum (model başına bir klasör; örn. <org>/<name>). Modelleri LM Studio ile paylaşmak için ~/.lmstudio/models konumuna ayarlayın.";
@@ -1271,11 +1297,13 @@
 "never used" = "hiç kullanılmadı";
 "no changes" = "değişiklik yok";
 "no text" = "metin yok";
+"not a picture" = "resim değil";
 "not downloaded" = "indirilmedi";
 "not indexed" = "dizine alınmamış";
 "not supported" = "desteklenmiyor";
 "not used by any model" = "hiçbir model tarafından kullanılmıyor";
 "off" = "kapalı";
+"over 50 MB" = "50 MB'tan büyük";
 "prompt %.0f tok/s" = "istem %.0f tok/sn";
 "queued" = "kuyruğa alındı";
 "reading" = "okunuyor";

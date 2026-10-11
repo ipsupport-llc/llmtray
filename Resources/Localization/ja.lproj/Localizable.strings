@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "リストを開いてから %lld 件が新規追加されました：チェックするまで未選択のままです。";
 "%lld of 5 stars" = "5点中%lld点";
 "%lld pages" = "%lld ページ";
+"%lld pictures" = "%lld 枚の画像";
+"%lld pictures added: kept for documents, not searched." = "%lld 枚の画像を追加しました：文書用に保存され、検索はされません。";
 "%lld requests" = "%lld 件のリクエスト";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 件の進行中リクエスト（Concurrent requests まで同時に処理）";
 "%lld s" = "%lld 秒";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lldビット";
 "(Please attach the report file shown in Finder.)" = "（Finder に表示されているレポートファイルを添付してください。）";
 "(estimate; exact after the first answer)" = "(概算。最初の応答後に正確値が表示されます)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "モデルに見せるために、プロジェクトにファイルを追加するか画像を添付";
 "Add more files: every chat of the project can search them." = "ファイルを追加すると、プロジェクト内のすべてのチャットで検索できます。";
 "Add the files to a project?" = "ファイルをプロジェクトに追加しますか？";
+"Add to Project" = "プロジェクトに追加";
 "Add “%1$@” to “%2$@”?" = "「%1$@」を「%2$@」に追加しますか？";
 "Added %@" = "追加しました：%@";
 "Added here" = "ここに追加済み";
+"Added to the project." = "プロジェクトに追加されました。";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "ツールが提供されるたびにシステムプロンプトへ追加されます。モデル自身のツールテンプレートはツールの呼び出し方法だけを示し、呼び出さない条件は示しません。空にすると無効になります。";
 "Adding files" = "ファイルを追加中";
 "Advanced" = "詳細";
@@ -296,9 +302,14 @@
 "Diagnostics" = "診断";
 "Disk usage" = "ディスク使用量";
 "Dismiss" = "閉じる";
+"Document: %@" = "ドキュメント：%@";
+"Documents" = "ドキュメント";
+"Documents On in This Chat" = "このチャットでドキュメントを有効にする";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "ドキュメントはプロジェクトにコピーされ、このMac上でインデックス化されます。画像はメッセージに添付されます。";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "このチャットではドキュメントが有効です：レポートや手紙などを依頼してください。";
 "Documents go into a project with this chat." = "ドキュメントはこのチャットとともにプロジェクトに入ります。";
 "Documents go into a project with this chat; images go into your message." = "ドキュメントはこのチャットとともにプロジェクトに入ります。画像はメッセージに添付されます。";
+"Documents tools" = "ドキュメントツール";
 "Doesn't open at login" = "ログイン時に開かない";
 "Don't Add" = "追加しない";
 "Don't Ask Again" = "今後尋ねない";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "ファイル一覧を取得しています…";
 "Files" = "ファイル";
 "Files Settings…" = "Files 設定…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "ここに追加したファイルはプロジェクトにコピーされ、このMacでインデックス化されます。プロジェクト内のすべてのチャットが検索できます。";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "ここに追加されたファイルはプロジェクトにコピーされ、このMacでインデックス化されます。プロジェクト内のすべてのチャットが検索できます。画像は文書用に保存されます。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "プロジェクトに追加されたファイルはこのMac上で索引化され、チャットから検索できます。意味による検索には埋め込みモデルを使用します。モデルがない場合は、ファイルは単語ベースで検索されます。";
 "Files are copied into the project and indexed on this Mac." = "ファイルはプロジェクトにコピーされ、このMac上でインデックス化されます。";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "ファイルはプロジェクトに入ります。なお一時チャットはプロジェクト内になりません。追加するには新しい保存済みチャット（⌘N）を作成してください。";
@@ -400,7 +411,7 @@
 "For This Chat" = "このチャット用";
 "For an Hour" = "1 時間だけ";
 "For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "ドラフターが公開されているモデル（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデル、モデルと一緒にダウンロード）向け：先のトークンを推測し、メインモデルが 1 回のパスで確認します。出力は同じで、より高速です。リクエストは 1 件ずつ処理されます。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "公開された drafter（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデルを含む）では、先読みでトークンを予測し、メインモデルが一度のパスで検証します。出力は同じで高速です。単独のリクエストはこれを利用し、複数同時時はバッチを共有して使用されます。";
 "Found after an interruption" = "中断後に見つかった項目";
 "Founding Supporters" = "創設支援者";
 "Free disk space" = "空きディスク容量";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "LLMTrayのご感想をお聞かせください";
 "How it was made" = "作成方法の詳細です。";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "1ステップで処理するプロンプトトークン数です。値を大きくすると長いプロンプトで高速になりますが、メモリ使用量が増えます。ベンチマークの自動調整で選択できます。";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "1回の GPU ステップにまとめるリクエスト数です。複数のクライアントが同時にサーバを使用する場合にのみ有効で、メモリ使用量が増えます。";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "サーバーが同時に処理するリクエスト数 — たとえばチャットとコーディングエージェント。単一リクエストは（drafter や MTP ヘッドを使って）最大速度で動作します。複数では GPU のステップを共有するため、個々はやや遅くなりますが合計は高速化します。各実行中リクエストは独自のコンテキストをメモリに保持するため、空きメモリの少ない Mac は同時処理数が少なくなります。1：順次処理。 ";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "使用回数を集計します：チャット、ツール呼び出し、APIサーバー（他のアプリ）、画像生成、画像編集、音楽、モデルのダウンロード。";
 "How many tokens it generates per trial." = "1回の試行で生成するトークン数です。";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU が使用できるメモリ量です。モデルのファイルはこの範囲に収まる必要があります。";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "ログイン時に起動: %@";
 "Leave a Review" = "レビューを書く";
 "Length" = "長さ";
+"Let chats make documents" = "チャットでドキュメントを作成できるようにする";
 "Let chats work in folders" = "チャットにフォルダ操作を許可";
 "Let coding agents and scripts use your models." = "コーディングエージェントやスクリプトにモデルの利用を許可します。";
 "Let the chat look in %@?" = "チャットに %@ を参照させますか？";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "プログラミングとエージェント向け：コーディングツールと the OpenAI API。";
 "Maintenance" = "メンテナンス";
 "Make a 30-second calm lo-fi instrumental for studying" = "勉強用の落ち着いた30秒のローファイ・インストゥルメンタルを作る";
+"Make a Document…" = "ドキュメントを作成…";
+"Make again" = "再作成";
 "Make images and edit them." = "画像を生成・編集します。";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "この Mac 上で画像や曲を作り、音声モデルと会話できます。「設定」で有効にしてください。";
 "Make songs and instrumentals." = "楽曲やインストゥルメンタルを作成します。";
+"Make the document again from the same content" = "同じ内容からドキュメントを再作成します";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "新しいランダムIDを作成します。以降のレポートは以前のものと照合できなくなります。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "フォルダ作成、移動、名前変更、ゴミ箱への移動—各操作は事前に計画として表示され、あなたが承認するまで何も変更されません。";
 "Manage Models…" = "モデルを管理…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "空きディスク容量が不足しています：%@ は約 %@ が必要で、%@ の空きがあります。";
 "Not identical to %@: not a duplicate." = "%@ と同一ではないため、重複ではありません。";
 "Not indexed" = "未インデックス";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "未対応です: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化します。";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "未対応: %@。このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化し、画像 (png, jpg, heic, webp, tiff, gif) は保存します。";
 "Nothing new to import" = "新しい項目はありません";
 "Nothing sent yet." = "まだ送信されていません。";
 "Nothing to change." = "変更点はありません。";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "サーバーを使用できるのはこの Mac のみ";
 "Only turbo has this knob: sft has no song planner to vary." = "このノブはturboのみ：sftには曲のプランナーがありません。";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "ここに入力した内容だけが、人が確認した後に公開されます。Apple IDやメールは決して公開されません。";
+"Open" = "開く";
 "Open %@, page %lld" = "%@ を開く（%lld ページ）";
 "Open Chat" = "チャットを開く";
 "Open LLMTray when you log in" = "ログイン時に LLMTray を開く";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "他のアプリはこの Mac 上の OpenAI 互換 API を通じてモデルにアクセスします。";
 "Other devices on your network can use the server" = "ネットワーク上の他のデバイスがサーバーを利用可能";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "LLMTray のみに使用する macOS の言語設定を上書きします。LLMTray の再起動後に有効になります。未翻訳のテキストは英語で表示されます。";
+"PDF · %lld pages" = "PDF · %lldページ";
 "Past %lld messages" = "過去 %lld 件のメッセージ";
 "Pause" = "一時停止";
 "Pause Indexing" = "インデックスを一時停止";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "1〜5の星から評価を選んでください。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "チャットするモデルを選んでください。選択するとすぐにダウンロードが開始され、バックグラウンドで進行します。";
 "Picks a model that fits your Mac and enables only what you choose." = "あなたのMacに合ったモデルを選び、選択した機能だけを有効にします。";
+"Pictures over 50 MB can't be added: %@." = "50 MB を超える画像は追加できません: %@。";
+"Pictures · %lld — for documents, not searched" = "画像 · %lld — 文書用（検索されません）";
 "Pin" = "ピン留め";
 "Pin %@" = "ピン留め %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "ピン留め: プロジェクト内のすべてのチャットがファイル全体を受け取ります（約 %@ トークン）。ピン留め中はそのチャットで Web 検索や画像・音楽生成は無効になります。";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "プロジェクトファイルは「設定」でオフになっています。";
 "Project files off" = "プロジェクトファイル：オフ";
 "Project files on" = "プロジェクトファイル：オン";
+"Project files were turned off" = "プロジェクトファイルはオフになっています";
 "Project files will be turned on first." = "先に「プロジェクトファイル」が有効になります。";
 "Project name" = "プロジェクト名";
 "Projects" = "プロジェクト";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "可能性の高い順にこの数のトークンからのみサンプリングします。0 でオフになります。Gemma 4 では 64 が推奨されます。";
 "Sampling" = "サンプリング";
 "Save" = "保存";
+"Save As…" = "別名で保存…";
 "Save memory" = "メモリを節約";
 "Saved chats will show up here." = "保存したチャットはここに表示されます。";
 "Saved in your Keychain" = "Keychain に保存されました";
@@ -959,7 +980,7 @@
 "Temporary chat" = "一時チャット";
 "Temporary chats can only look in folders, for that chat only." = "一時的なチャットは、そのチャットのみでフォルダを参照できます。";
 "Temporary — not saved" = "一時的 — 保存されません";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "テキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化します。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "テキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) はインデックス化され、画像は文書用に保存されます。";
 "Thank you!" = "ありがとうございます！";
 "Thank you! List your name in Supporters?" = "ありがとうございます！Supportersに名前を掲載しますか？";
 "Thanks! Your name will appear once it's been checked." = "ありがとうございます！名前は確認後に表示されます。";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter のダウンロードが完了しました — 使用するにはサーバを再起動してください。";
 "The Mac's chip." = "Macのチップ。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "OpenAI互換APIはここで待ち受けます（http://localhost:<port>/v1）。サーバが停止している間に変更してください。";
+"The PDF couldn't be opened." = "PDFを開けませんでした。";
 "The app's language (the language only, not the region)." = "アプリの言語（地域は含みません）。";
 "The app's name." = "アプリ名。";
 "The base profile: every other profile inherits from it." = "基本プロファイルです。ほかのすべてのプロファイルはこれを継承します。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "チャットが %1$@（%2$@）をプロジェクトにコピーするよう要求しています。プロジェクト内のすべてのチャットから検索できるようになります。";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "このチャットは %1$@（%2$@）をプロジェクトにコピーすることを要求しています。するとプロジェクト内のすべてのチャットが文書で利用できます。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "チャットモデルは作成した内容をPDFとしてレイアウトできます — レポート、手紙、メモ、請求書など。表やグラフも含められます。PDFは開く、保存、プロジェクトに追加するまでチャット内に残ります。一時的なチャットでもPDFがダウンロードされることはありません。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "チャットモデルはあなたが許可したフォルダを参照できます（名前、サイズ、日付、短い抜粋）およびそこに対する変更を提案できます—新規フォルダ、移動、名前変更、ゴミ箱への移動。各変更は事前にあなたが承認する計画として表示され、元に戻せます。";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab のためにチャットモデルをアンロードできませんでした。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "チャットモデルをこのフォルダにダウンロードしています。セットアップ後に「Settings」で変更するか、先に別のチャットモデルを選んでください。";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使うか、GPU メモリ上限を引き上げてください。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "このモデルは GPU が使用できる %2$@ GB のうち %1$@ を使用します。長いプロンプトではメモリ不足になる可能性があります。より小さいモデルを使用してください。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "このプロファイルのファイルを読み込めないため、ここでは編集できません。ファイルを修正または削除してから、設定を開き直してください。";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "このバージョンはテキスト、Markdown、コード、PDF、Word（docx、doc）、ODT、RTF、HTML、スプレッドシート（xlsx、ods）をインデックス化します。フォルダおよび隠しファイルは追加できません。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "このバージョンはテキスト、Markdown、コード、PDF、Word (docx, doc)、ODT、RTF、HTML、スプレッドシート (xlsx, ods) をインデックス化し、画像は文書用に保存します。フォルダと隠しファイルは追加できません。";
 "This version of LLMTray can't send reviews. Please update the app." = "このバージョンのLLMTrayではレビューを送信できません。アプリをアップデートしてください。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "この LLMTray は Python でランタイムを設定します。python.org または Homebrew から Python をインストールしてから再確認してください。必要なものをすべて含む LLMTray‑Full を使うこともできます。";
 "Thought process" = "思考プロセス";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "合計時間";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "実行中のモデルに対して decode-concurrency（1/2/4/8）と prefill-step-size（64/128/256/512）を試します。各試行の間にサーバを再起動し、測定が最も速かったものを保持します。";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。Concurrent requests：最良の合計速度の 90% に達する最小数（それ以上はメモリ負荷に見合わないことが多い）。prefill：最速となる値。";
 "Try Again" = "再試行";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "クライアントが別のモデルを要求したとき";
 "When an app asks for another model" = "アプリが別のモデルを要求したとき";
 "When an app asks for another model: %@" = "アプリが別のモデルを要求したとき：%@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "make_document が宣言されている場合、ドキュメントは一度有効にすると（設定 > Files）利用できます。必要なときは、モデルが load_tools で読み込むか、チャットごとに一度 + メニューから読み込めます — 各リクエストで使用するトークンが少なくなります。保存されたすべてのチャットでは常に利用可能です。";
+"When needed" = "必要時";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray がモデルを保存する場所。モデルごとに1フォルダです。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray が MLX モデルを探す場所（モデルごとに 1 フォルダ、例: <org>/<name>）。任意のフォルダを選択できます。他のアプリと共有するフォルダでも構いません。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray が MLX モデルを検索する場所です（モデルごとに1つのフォルダ、例: <org>/<name>）。LM Studio とモデルを共有するには、~/.lmstudio/models を指定します。";
@@ -1271,11 +1297,13 @@
 "never used" = "未使用";
 "no changes" = "変更なし";
 "no text" = "テキストなし";
+"not a picture" = "画像ではありません";
 "not downloaded" = "未ダウンロード";
 "not indexed" = "未インデックス";
 "not supported" = "未対応";
 "not used by any model" = "どのモデルにも使用されていません";
 "off" = "オフ";
+"over 50 MB" = "50 MB 超";
 "prompt %.0f tok/s" = "プロンプト %.0f tok/s";
 "queued" = "キュー待ち";
 "reading" = "読み取り中";
