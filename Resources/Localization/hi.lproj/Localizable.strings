@@ -849,7 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "केवल इतने सबसे संभावित टोकन से सैंपल करता है। 0 इसे बंद करता है। Gemma 4 में 64 अनुशंसित है।";
 "Sampling" = "सैंपलिंग";
 "Save" = "सहेजें";
-"Save As…" = "के रूप में सहेजें…";
+"Save As…" = "इस नाम से सहेजें…";
 "Save memory" = "मेमोरी बचाएँ";
 "Saved chats will show up here." = "यहाँ सेव की गई चैट्स दिखेंगी।";
 "Saved in your Keychain" = "आपके Keychain में सहेजा गया";

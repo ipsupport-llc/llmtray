@@ -385,7 +385,7 @@
 "Fetching file list…" = "جارٍ جلب قائمة الملفات…";
 "Files" = "الملفات";
 "Files Settings…" = "إعدادات Files…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "الملفات المضافة هنا تُنسخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها. تُحتفظ الصور للمستندات.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "الملفات المضافة هنا تُنسخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها. يُحتفظ بالصور لاستخدامها في المستندات.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "الملفات المضافة إلى مشروع تُفهرَس على هذا الـMac، حتى تتمكن المحادثات من البحث فيها. البحث بحسب المعنى يستخدم نموذج تضمين؛ بدونه تُبحث الملفات حسب كلماتها.";
 "Files are copied into the project and indexed on this Mac." = "تُنسخ الملفات إلى المشروع وتُفهرَس على هذا الـ Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "الملفات تُضاف إلى مشروع، والمحادثة المؤقتة لا تكون جزءًا من مشروع. ابدأ محادثة محفوظة جديدة (⌘N) لإضافتها.";
@@ -980,7 +980,7 @@
 "Temporary chat" = "دردشة مؤقتة";
 "Temporary chats can only look in folders, for that chat only." = "الدردشات المؤقتة يمكنها فقط النظر داخل المجلدات، لتلك الدردشة فقط.";
 "Temporary — not saved" = "مؤقت — غير محفوظ";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "يتم فهرسة ملفات النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)؛ وتُحتفظ الصور للمستندات.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "يتم فهرسة ملفات النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)؛ ويُحتفظ بالصور لاستخدامها في المستندات.";
 "Thank you!" = "شكراً لك!";
 "Thank you! List your name in Supporters?" = "شكراً لك! هل تريد إدراج اسمك بين الرعاة؟";
 "Thanks! Your name will appear once it's been checked." = "تمّ، سيظهر اسمك بعد مراجعته.";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "ملف التعريف الأساسي: ترث منه كل ملفات التعريف الأخرى.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "تطلب المحادثة نسخ %1$@ (%2$@) إلى المشروع. ستتمكن كل محادثة في المشروع بعد ذلك من البحث فيه.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "تطلب المحادثة نسخ %1$@ (%2$@) إلى المشروع. بعدها يمكن لكل محادثة في المشروع استخدامه في المستندات.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "يمكن لنموذج المحادثة صياغة ما كتبه كملف PDF — تقرير، رسالة، ملاحظات، فاتورة — مع جداول ومخططات. يبقى ملف PDF في المحادثة حتى تقوم بفتحه أو حفظه أو إضافته إلى مشروع. لا يتم تنزيل أي شيء له؛ ولا في المحادثات المؤقتة.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "يمكن لنموذج الدردشة تنسيق ما كتبه كملف PDF — تقرير، رسالة، ملاحظات، فاتورة — مع جداول ومخططات. يبقى ملف PDF في الدردشة حتى تقوم بفتحه أو حفظه أو إضافته إلى مشروع. لا يتم تنزيل أي شيء لهذه الميزة؛ وهي غير متاحة في الدردشات المؤقتة.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "نموذج الدردشة يمكنه النظر في المجلدات التي تسمح بها (الأسماء، الأحجام، التواريخ، مقتطفات قصيرة) واقتراح تغييرات هناك — مجلدات جديدة، نقل، إعادة تسمية، الإرسال إلى Trash. كل تغيير هو خطة توافق عليها أولاً، ويمكن التراجع عنها.";
 "The chat model couldn't be unloaded for Voice Lab." = "تعذّر إفراغ نموذج الدردشة لـVoice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "نموذج الدردشة يُحمَّل في هذا المجلد. غيّره في الإعدادات بعد الإعداد، أو اختر نموذج دردشة آخر أولاً.";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "عندما يطلب عميل نموذجًا آخر";
 "When an app asks for another model" = "عندما يطلب تطبيق نموذجاً آخراً";
 "When an app asks for another model: %@" = "عندما يطلب تطبيق نموذجاً آخراً: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "عند إعلان make_document وبعد تفعيل الوثائق (الإعدادات > Files). عند الحاجة: يقوم النموذج بتحميله باستخدام load_tools، أو يمكنك ذلك من قائمة +، مرة واحدة لكل محادثة — عدد رموز أقل في كل طلب. دائماً: في كل محادثة محفوظة.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "عند إعلان make_document وبعد تفعيل المستندات (الإعدادات > الملفات). عند الحاجة: يقوم النموذج بتحميله باستخدام load_tools، أو يمكنك ذلك من قائمة +، مرة واحدة لكل دردشة — عدد رموز أقل في كل طلب. دائماً: في كل دردشة محفوظة.";
 "When needed" = "عند الحاجة";
 "Where LLMTray keeps its models, one folder per model." = "المكان الذي يحتفظ فيه LLMTray بالنماذج، مجلد لكل نموذج.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). اختر أي مجلد — يمكن أن يكون مشتركًا مع تطبيق آخر.";

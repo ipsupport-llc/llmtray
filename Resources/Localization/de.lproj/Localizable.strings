@@ -58,9 +58,9 @@
 "%lld of 5 stars" = "%lld von 5 Sternen";
 "%lld pages" = "%lld Seiten";
 "%lld pictures" = "%lld Bilder";
-"%lld pictures added: kept for documents, not searched." = "%lld Bilder hinzugefügt: werden als Dokumente behalten, nicht durchsuchbar.";
+"%lld pictures added: kept for documents, not searched." = "%lld Bilder hinzugefügt: zur Verwendung in Dokumenten gespeichert, nicht durchsuchbar.";
 "%lld requests" = "%lld Anfragen";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld Anfragen in Bearbeitung (gleichzeitig beantwortet bis zu Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld Anfragen in Bearbeitung (gleichzeitig beantwortet bis zum unter „Gleichzeitige Anfragen“ eingestellten Limit)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-Bit";
@@ -385,7 +385,7 @@
 "Fetching file list…" = "Dateiliste wird abgerufen…";
 "Files" = "Dateien";
 "Files Settings…" = "„Dateien“-Einstellungen…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Hier hinzugefügte Dateien werden in das Projekt kopiert und auf diesem Mac indexiert; jeder Chat des Projekts kann sie durchsuchen. Bilder werden als Dokumente behalten.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Hier hinzugefügte Dateien werden in das Projekt kopiert und auf diesem Mac indexiert; jeder Chat des Projekts kann sie durchsuchen. Bilder werden zur Verwendung in Dokumenten gespeichert.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Dateien, die einem Projekt hinzugefügt werden, werden auf diesem Mac indexiert, damit dessen Chats sie durchsuchen können. Die semantische Suche verwendet ein Embedding‑Modell; ohne dieses werden Dateien nur nach ihren Wörtern durchsucht.";
 "Files are copied into the project and indexed on this Mac." = "Dateien werden ins Projekt kopiert und auf diesem Mac indexiert.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Dateien gehören zu einem Projekt — ein temporärer Chat ist nie Teil davon. Starten Sie einen neuen gespeicherten Chat (⌘N), um Dateien hinzuzufügen.";
@@ -728,7 +728,7 @@
 "Pick one to chat with. A download starts right away and goes on in the background." = "Wählen Sie eines zum Chatten. Ein Download startet sofort und läuft im Hintergrund.";
 "Picks a model that fits your Mac and enables only what you choose." = "Wählt ein Modell, das zu Ihrem Mac passt, und aktiviert nur das, was Sie auswählen.";
 "Pictures over 50 MB can't be added: %@." = "Bilder über 50 MB können nicht hinzugefügt werden: %@.";
-"Pictures · %lld — for documents, not searched" = "Bilder · %lld — als Dokumente, nicht durchsuchbar";
+"Pictures · %lld — for documents, not searched" = "Bilder · %lld — zur Verwendung in Dokumenten, nicht durchsuchbar";
 "Pin" = "Anheften";
 "Pin %@" = "Anheften %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Anheften: Jeder Chat des Projekts erhält die gesamte Datei (≈%@ Tokens). Websuche sowie Bild‑ oder Musikgenerierung sind in diesen Chats deaktiviert, solange sie angeheftet ist.";
@@ -980,7 +980,7 @@
 "Temporary chat" = "Temporärer Chat";
 "Temporary chats can only look in folders, for that chat only." = "Temporäre Chats dürfen nur in Ordner schauen, und nur für diesen Chat.";
 "Temporary — not saved" = "Temporär – nicht gespeichert";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Text, Markdown, Code, PDF, Word (docx, doc), ODT, RTF, HTML und Tabellen (xlsx, ods) werden indexiert; Bilder werden als Dokumente behalten.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Text, Markdown, Code, PDF, Word (docx, doc), ODT, RTF, HTML und Tabellen (xlsx, ods) werden indexiert; Bilder werden zur Verwendung in Dokumenten gespeichert.";
 "Thank you!" = "Danke!";
 "Thank you! List your name in Supporters?" = "Danke! Deinen Namen unter Unterstützer eintragen?";
 "Thanks! Your name will appear once it's been checked." = "Danke! Dein Name erscheint, sobald er geprüft wurde.";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "Das Basisprofil: Alle anderen Profile erben davon.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Der Chat fordert auf, %1$@ (%2$@) in das Projekt zu kopieren. Jeder Chat des Projekts kann es dann durchsuchen.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Der Chat fragt, ob %1$@ (%2$@) in das Projekt kopiert werden soll. Jeder Chat des Projekts kann es dann in Dokumenten verwenden.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Das Chatmodell kann seine Antworten als PDF formatieren — beispielsweise als Bericht, Brief, Notizen oder Rechnung — inklusive Tabellen und Diagrammen. Das PDF bleibt im Chat, bis Sie es öffnen, sichern oder einem Projekt hinzufügen. Es wird nichts heruntergeladen; auch nicht in temporären Chats.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Das Chatmodell kann seine Antworten als PDF formatieren — beispielsweise als Bericht, Brief, Notizen oder Rechnung — inklusive Tabellen und Diagrammen. Das PDF bleibt im Chat, bis Sie es öffnen, sichern oder einem Projekt hinzufügen. Für diese Funktion wird nichts heruntergeladen; sie ist in temporären Chats nicht verfügbar.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Das Chat‑Modell kann in Ordner schauen, die Sie erlauben (Namen, Größen, Daten, kurze Auszüge) und dort Änderungen vorschlagen – neue Ordner, Verschiebe‑, Umbenennungs‑ und Papierkorb‑Aktionen. Jede Änderung ist ein Plan, den Sie zuerst bestätigen und rückgängig machen können.";
 "The chat model couldn't be unloaded for Voice Lab." = "Das Chat‑Modell konnte für Voice Lab nicht entladen werden.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Das Chat‑Modell wird in diesen Ordner heruntergeladen. Ändern Sie dies nach der Einrichtung in den Einstellungen oder wählen Sie vorher ein anderes Chat‑Modell aus.";
@@ -1106,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Dieses Modell benötigt %1$@ von den %2$@ GB, die die GPU verwenden kann; bei langen Prompts kann der Speicher knapp werden. Verwende ein kleineres Modell oder erhöhe das GPU‑Speicherlimit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Dieses Modell benötigt %1$@ von den %2$@ GB, die die GPU verwenden kann; bei langen Prompts kann der Speicher knapp werden. Verwende ein kleineres Modell.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Dieses Profil kann hier nicht bearbeitet werden, weil seine Datei nicht gelesen werden kann. Repariere oder lösche die Datei und öffne dann die Einstellungen erneut.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Diese Version indexiert Text, Markdown, Code, PDF, Word (docx, doc), ODT, RTF, HTML und Tabellen (xlsx, ods) und behält Bilder als Dokumente; Ordner und versteckte Dateien können nicht hinzugefügt werden.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Diese Version indexiert Text, Markdown, Code, PDF, Word (docx, doc), ODT, RTF, HTML und Tabellen (xlsx, ods) und speichert Bilder zur Verwendung in Dokumenten; Ordner und versteckte Dateien können nicht hinzugefügt werden.";
 "This version of LLMTray can't send reviews. Please update the app." = "Diese Version von LLMTray kann keine Bewertungen senden. Bitte aktualisieren Sie die App.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Diese Version von LLMTray richtet die Laufzeit mit Python ein. Installieren Sie Python von python.org oder über Homebrew und versuchen Sie es erneut. Oder verwenden Sie LLMTray‑Full, das alles Notwendige bereits enthält.";
 "Thought process" = "Gedankengang";
