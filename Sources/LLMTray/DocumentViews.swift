@@ -89,14 +89,18 @@ struct DocumentCard: View {
         // Its own file chosen: nothing to do (removing it first would lose it).
         guard target.standardizedFileURL.resolvingSymlinksInPath() != url.standardizedFileURL.resolvingSymlinksInPath() else { return }
         do {
-            // A copy beside the target first, then swapped in: an existing
-            // file is replaced only once the copy is whole.
-            let staging = target.deletingLastPathComponent().appendingPathComponent(".\(UUID().uuidString).pdf")
-            try FileManager.default.copyItem(at: url, to: staging)
             if FileManager.default.fileExists(atPath: target.path) {
-                _ = try FileManager.default.replaceItemAt(target, withItemAt: staging)
+                // A whole copy in the system's replacement folder for that
+                // volume (the save panel grants the file, not its folder, in
+                // the App Store build), then swapped in.
+                let scratch = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask,
+                                                          appropriateFor: target, create: true)
+                defer { try? FileManager.default.removeItem(at: scratch) }
+                let staged = scratch.appendingPathComponent(document.filename)
+                try FileManager.default.copyItem(at: url, to: staged)
+                _ = try FileManager.default.replaceItemAt(target, withItemAt: staged)
             } else {
-                try FileManager.default.moveItem(at: staging, to: target)
+                try FileManager.default.copyItem(at: url, to: target)
             }
         } catch {
             note = error.localizedDescription
