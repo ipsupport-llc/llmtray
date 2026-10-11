@@ -11,37 +11,45 @@ final class ModelCardTextTests: XCTestCase {
             style="width: 100%; max-width: 100%; height: auto;"
           />
           <div style="display: flex; gap: 0.5em;">
-            <a href="https://playground.liquid.ai/"><strong>Try LFM</strong></a> •
-            <a href="https://docs.liquid.ai/"><strong>Docs</strong></a>
+            <a data-href="bad" title="a > b" href="https://playground.liquid.ai/"><strong>Try LFM</strong></a> •
+            <a href='https://docs.liquid.ai/'><strong>Docs</strong></a>
           </div>
         </div>
 
         # Model
-
-        Text with a <https://example.com> autolink, a < b, &amp; more.<br>Next line.
         """
-        let out = ModelCardText.clean(card)
-        XCTAssertFalse(out.contains("<div"), out)
-        XCTAssertFalse(out.contains("<img"), out)
-        XCTAssertFalse(out.contains("style="), out)
-        XCTAssertTrue(out.contains("[Try LFM](https://playground.liquid.ai/)"), out)
-        XCTAssertTrue(out.contains("[Docs](https://docs.liquid.ai/)"), out)
-        XCTAssertTrue(out.contains("<https://example.com>"), out)
-        XCTAssertTrue(out.contains("a < b, & more.\nNext line."), out)
-        XCTAssertTrue(out.contains("# Model"), out)
-        // No line keeps a code-block indent.
-        XCTAssertFalse(out.components(separatedBy: "\n").contains { $0.hasPrefix("    ") }, out)
+        XCTAssertEqual(ModelCardText.clean(card), """
+        [Try LFM](https://playground.liquid.ai/) •
+        [Docs](https://docs.liquid.ai/)
+
+        # Model
+        """)
     }
 
-    func testFencedCodeIsLeftAsWritten() {
-        let card = "Run:\n\n```html\n<div class=\"x\">\n    <b>keep</b>\n</div>\n```\n\n<p>after</p>"
-        let out = ModelCardText.clean(card)
-        XCTAssertTrue(out.contains("```html\n<div class=\"x\">\n    <b>keep</b>\n</div>\n```"), out)
-        XCTAssertTrue(out.hasSuffix("after"), out)
+    /// Only HTML blocks change: prose, inline code and inline HTML, lists,
+    /// indented and fenced code, entities and blank lines stay as written.
+    func testEverythingElseIsLeftAsWritten() {
+        let cards = [
+            "# Title\n\n- one\n  - <strong>child</strong>\n\n    <b>indented code</b>\n\n| a | b |\n|---|---|",
+            "Use `<T>` and `&amp;`, [download](<model>), a <https://example.com> link.<br>  \nnext",
+            "a\n\n\n\nb\n\nbefore\n\n```\nx\n```\n\nafter",
+            "````html\n```\n<b>keep</b>\n````\n\n```html\n```not-a-close\n<div>keep</div>\n```",
+            "&lt;div&gt;not a tag&lt;/div&gt;\nfoo\n|\nbar",
+        ]
+        for card in cards { XCTAssertEqual(ModelCardText.clean(card), card) }
     }
 
-    func testPlainMarkdownUnchanged() {
-        let card = "# Title\n\n- one\n- two\n\n    indented code\n\n| a | b |\n|---|---|"
-        XCTAssertEqual(ModelCardText.clean(card), card)
+    func testBlockEndsAtABlankLine() {
+        XCTAssertEqual(ModelCardText.clean("<p align=\"center\">\n    hello <a href=\"u\">x</a>\n</p>\n\n    code"),
+                       "hello [x](u)\n\n    code")
+        XCTAssertEqual(ModelCardText.clean("<!-- note -->\ntext"), "text")
+        XCTAssertEqual(ModelCardText.clean("<a href=\"has space\">x</a>"), "x", "an address Markdown can't carry")
+    }
+
+    func testHostileBlockStaysFast() {
+        let card = "<div " + String(repeating: "a=\"", count: 5000) + "\n" + String(repeating: "<a href=x>", count: 3000)
+        let start = Date()
+        _ = ModelCardText.clean(card)
+        XCTAssertLessThan(Date().timeIntervalSince(start), 1)
     }
 }

@@ -1,74 +1,138 @@
 import Foundation
 
-/// A Hugging Face README as the model card shows it: Markdown, with the
-/// HTML many cards open with (centered logos, link bars in `<div>`s) turned
-/// into what it says -- a link stays a link, a picture and the markup go --
-/// since the card renders Markdown only and showed that HTML as text.
-/// Fenced code is left as written: an HTML example there is the point.
+/// A Hugging Face README as the model card shows it: the HTML blocks many
+/// cards open with (a centered logo, a `<div>` bar of links) turned into
+/// what they say -- a link stays a link, pictures and markup go -- since
+/// the card renders Markdown only and showed that HTML as text. Only HTML
+/// blocks in the CommonMark sense change (a line starting with a tag, up to
+/// the next blank line); prose, lists, code and inline HTML stay as written.
 public enum ModelCardText {
+    /// A block longer than this is left alone (no card needs it).
+    static let blockLimit = 20_000
+
     public static func clean(_ markdown: String) -> String {
         var out: [String] = []
-        var prose: [String] = []
-        var fence: String?
+        var block: [String] = []
+        var fence: (char: Character, count: Int)?
         func flush() {
-            guard !prose.isEmpty else { return }
-            out.append(strip(prose.joined(separator: "\n")))
-            prose.removeAll()
+            guard !block.isEmpty else { return }
+            let text = block.joined(separator: "\n")
+            if text.utf16.count <= blockLimit {
+                out.append(contentsOf: convert(text))
+            } else {
+                out.append(contentsOf: block)
+            }
+            block.removeAll()
         }
         for line in markdown.components(separatedBy: "\n") {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if !block.isEmpty {
+                if line.trimmingCharacters(in: .whitespaces).isEmpty {
+                    flush()
+                    out.append(line)
+                } else {
+                    block.append(line)
+                }
+                continue
+            }
             if let open = fence {
                 out.append(line)
-                if trimmed.hasPrefix(open) { fence = nil }
-            } else if trimmed.hasPrefix("```") || trimmed.hasPrefix("~~~") {
-                flush()
-                fence = String(trimmed.prefix(3))
+                if closes(line, open) { fence = nil }
+                continue
+            }
+            if let open = opens(line) {
+                fence = open
                 out.append(line)
+            } else if startsHTMLBlock(line) {
+                block.append(line)
             } else {
-                prose.append(line)
+                out.append(line)
             }
         }
         flush()
         return out.joined(separator: "\n")
     }
 
-    /// Prose with its HTML turned into Markdown or dropped.
-    static func strip(_ text: String) -> String {
-        var s = text
-        func replace(_ pattern: String, _ template: String) {
-            s = s.replacingOccurrences(of: pattern, with: template, options: [.regularExpression, .caseInsensitive])
-        }
-        replace(#"<!--[\s\S]*?-->"#, "")
-        // A link's text (its own tags dropped below) and address.
-        replace(#"<a\s[^>]*?href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)</a\s*>"#, "[$2]($1)")
-        replace(#"<br\s*/?>"#, "\n")
-        // Lines that held markup lose their indent: four spaces of a nested
-        // <div> would make the rest a code block.
-        var lines: [String] = []
-        let tag = try! NSRegularExpression(pattern: #"</?[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>"#)
-        for line in s.components(separatedBy: "\n") {
-            let range = NSRange(line.startIndex..., in: line)
-            guard tag.firstMatch(in: line, range: range) != nil || line.contains("<img") else {
-                lines.append(line)
-                continue
+    /// Up to three spaces, then three or more ` or ~.
+    static func opens(_ line: String) -> (char: Character, count: Int)? {
+        let indent = line.prefix { $0 == " " }.count
+        guard indent <= 3 else { return nil }
+        let rest = line.dropFirst(indent)
+        guard let c = rest.first, c == "`" || c == "~" else { return nil }
+        let count = rest.prefix { $0 == c }.count
+        // A backtick fence's info string has no backtick.
+        guard count >= 3, c == "~" || !rest.dropFirst(count).contains("`") else { return nil }
+        return (c, count)
+    }
+
+    /// The same character, at least as many, nothing after but spaces.
+    static func closes(_ line: String, _ open: (char: Character, count: Int)) -> Bool {
+        let indent = line.prefix { $0 == " " }.count
+        guard indent <= 3 else { return false }
+        let rest = line.dropFirst(indent)
+        let count = rest.prefix { $0 == open.char }.count
+        return count >= open.count && rest.dropFirst(count).allSatisfy { $0 == " " || $0 == "\t" }
+    }
+
+    /// Up to three spaces, then a tag (open or close) or a comment.
+    static func startsHTMLBlock(_ line: String) -> Bool {
+        let indent = line.prefix { $0 == " " }.count
+        guard indent <= 3 else { return false }
+        let rest = line.dropFirst(indent)
+        if rest.hasPrefix("<!--") { return true }
+        return rest.range(of: #"^</?[A-Za-z][A-Za-z0-9-]*(?=[\s/>]|$)"#, options: .regularExpression) != nil
+    }
+
+    // Attributes may quote '>' -- a tag ends at the first '>' outside quotes.
+    static let attributes = #"(?:[^>"']|"[^"]*"|'[^']*')*"#
+    static let tag = try! NSRegularExpression(pattern: #"<!--[\s\S]*?-->|</?([A-Za-z][A-Za-z0-9-]*)"# + attributes + ">")
+    static let href = try! NSRegularExpression(pattern: #"(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))"#, options: .caseInsensitive)
+    static let blockTags: Set<String> = ["div", "p", "center", "h1", "h2", "h3", "h4", "h5", "h6", "table", "tr",
+                                         "ul", "ol", "li", "section", "details", "summary", "picture", "figure", "br", "hr"]
+
+    /// One HTML block as Markdown lines: a link's text and address, line
+    /// breaks at block tags, every other tag (pictures too) dropped.
+    static func convert(_ text: String) -> [String] {
+        let ns = text as NSString
+        var out = ""
+        var link: String?  // the open <a>'s address
+        var position = 0
+        for match in tag.matches(in: text, range: NSRange(location: 0, length: ns.length)) {
+            out += ns.substring(with: NSRange(location: position, length: match.range.location - position))
+            position = match.range.location + match.range.length
+            let whole = ns.substring(with: match.range)
+            guard match.range(at: 1).location != NSNotFound else { continue }  // a comment
+            let name = ns.substring(with: match.range(at: 1)).lowercased()
+            let closing = whole.hasPrefix("</")
+            if name == "a" {
+                if !closing, let address = address(whole) {
+                    link = address
+                    out += "["
+                } else if closing, let address = link {
+                    out += "](\(address))"
+                    link = nil
+                }
+            } else if blockTags.contains(name) {
+                out += "\n"
             }
-            lines.append(line.trimmingCharacters(in: .whitespaces))
         }
-        s = lines.joined(separator: "\n")
-        // Block tags end a paragraph; the rest, and pictures, just go. A tag
-        // may span lines (an <img> with one attribute per line). An autolink
-        // (<https://...>) isn't a tag: it has no space-free name then '>'.
-        replace(#"</?(?:div|p|center|h[1-6]|table|tr|ul|ol|li|section|details|summary|picture|figure)(?:\s[^<>]*)?/?>"#, "\n")
-        replace(#"</?(?!https?:)[A-Za-z][A-Za-z0-9-]*(?:\s[^<>]*)?/?>"#, "")
-        for (entity, char) in ["&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": "\"", "&#39;": "'"] {
-            s = s.replacingOccurrences(of: entity, with: char)
+        out += ns.substring(from: position)
+        if link != nil, let open = out.lastIndex(of: "[") { out.remove(at: open) }  // never closed
+        out = out.replacingOccurrences(of: "&nbsp;", with: " ").replacingOccurrences(of: "&amp;", with: "&")
+        // No indent left over (four spaces would make a code block), no
+        // lines empty or with only the dots that separated the links.
+        return out.components(separatedBy: "\n")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty && !["•", "|", "·"].contains($0) }
+    }
+
+    static func address(_ tag: String) -> String? {
+        let ns = tag as NSString
+        guard let m = href.firstMatch(in: tag, range: NSRange(location: 0, length: ns.length)) else { return nil }
+        for i in 1...3 where m.range(at: i).location != NSNotFound {
+            let value = ns.substring(with: m.range(at: i)).trimmingCharacters(in: .whitespaces)
+            // Markdown's own link syntax can't carry these.
+            return value.isEmpty || value.contains(where: { " ()<>".contains($0) }) ? nil : value
         }
-        // Lines left empty or with only the dots that separated links.
-        s = s.components(separatedBy: "\n").map {
-            let t = $0.trimmingCharacters(in: .whitespaces)
-            return t == "•" || t == "|" || t == "·" ? "" : $0
-        }.joined(separator: "\n")
-        replace(#"\n{3,}"#, "\n\n")
-        return s.trimmingCharacters(in: .newlines)
+        return nil
     }
 }
