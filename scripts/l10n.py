@@ -435,14 +435,14 @@ def labels_in(key: str, table: dict[str, str], base_keys: list[str]) -> dict[str
 
 def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
     """Labels `key` names explicitly as UI -- the parts of a settings path
-    (Settings > Files or Settings › General: the longest label ending right
+    (Settings > Files, Settings › General or Settings → Models: the longest label ending right
     before each separator and
     starting right after it) or a quoted name -- whose translation the
     value must contain."""
     import re
     labels = [k for k in table if _is_label(k)]
     names: list[str] = []
-    for m in re.finditer(r"\s[>\u203A]\s", key):  # "Settings > Files", "Settings › General"
+    for m in re.finditer(r"\s[>\u203A\u2192]\s", key):  # "Settings > Files", "Settings › General", "Settings → Models"
         before, after = key[:m.start()], key[m.end():]
         left = [l for l in labels if before.endswith(l) and (len(before) == len(l) or not before[-len(l) - 1].isalnum())]
         right = [l for l in labels if after.startswith(l) and (len(after) == len(l) or not after[len(l)].isalnum())]
@@ -452,13 +452,31 @@ def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
     return [n for n in dict.fromkeys(names) if n in table and _is_label(n) and table[n] != n]
 
 
-def contains_label(value: str, translation: str) -> bool:
+def contains_label(value: str, translation: str, english: str = "", key: str = "",
+                   longer: tuple[str, ...] = ()) -> bool:
     """Whether `value` uses `translation`, allowing for inflection: each of
     its words found by its stem (all but the last two letters of a longer
-    word -- "Настройки" in "в Настройках")."""
+    word -- "Настройки" in "в Настройках"). The English label left in place
+    doesn't count, though a stem may match it ("Modele" in "Models"): not
+    where the label goes (next to > › →, or quoted), and not more often
+    than the key uses the word otherwise ("Voice Lab"). `longer`: labels
+    that start with this one ("Voice Lab" for "Voice"), never taken for it."""
+    import re
+    if english:
+        e = re.escape(english) + r"(?!\w)" + "".join("(?!" + re.escape(l[len(english):]) + ")" for l in longer)
+        sep = r"[>\u203A\u2192]"
+        word = re.compile(r"(?<!\w)" + e)  # in the key: the label's own case
+        left = re.compile(word.pattern, re.IGNORECASE)  # in a value: any case
+        place = re.compile(sep + r"\s*" + e + r"|(?<!\w)" + e + r"\s*" + sep + r"|[\u201C\u201E\"«]" + e + r"[\u201C\u201D\"»]")
+        if not left.search(translation):
+            if re.search(place.pattern, value, re.IGNORECASE):
+                return False
+            # Uses of the word in the key that aren't the label itself may stay.
+            if len(left.findall(value)) > max(len(word.findall(key)) - len(place.findall(key)), 0):
+                return False
     low = value.lower()
-    for word in translation.lower().split():
-        stem = word if len(word) <= 4 else word[:-2]
+    for part in translation.lower().split():
+        stem = part if len(part) <= 4 else part[:-2]
         if stem not in low:
             return False
     return True
@@ -503,7 +521,9 @@ def translate(codes: list[str], model: str, batch: int = 100, only: dict[str, li
             f"'labels': the app's existing {lang} translations of UI labels and terms the text contains. "
             f"When the text names that setting, tab, button or menu item (e.g. 'Settings > Files', a quoted "
             f"name), use exactly the given translation; use the given word for terms such as chat or project "
-            f"everywhere, never a synonym.\n"
+            f"everywhere, never a synonym. Fit a settings path into the sentence the way {lang} refers to a "
+            f"place in settings, without breaking the label's own form (Russian: 'в разделе «Настройки › "
+            f"Файлы»', not 'в Настройки › Файлы').\n"
             f"Rules: keep every format specifier (%@, %lld, %d, %1$@...) exactly, in a grammatical position; "
             f"keep these terms untranslated: {', '.join(GLOSSARY)}; keep technical flags, file paths, URLs, "
             f"code identifiers (snake_case names like make_document) and <placeholders> as they are; use the "
@@ -592,8 +612,10 @@ def main() -> int:
             if not path.exists():
                 continue  # a new language: translate creates it
             table = load(path)
+            labels = [l for l in table if _is_label(l)]
             for k, v in table.items():
-                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n])]
+                missing = [n for n in referenced_labels(k, table)
+                           if not contains_label(v, table[n], n, k, tuple(l for l in labels if len(l) > len(n) and l.startswith(n) and not l[len(n)].isalnum()))]
                 if missing:
                     stale.setdefault(code, []).append(k)
                     print(f"{code}: {k[:60]!r} lacks {', '.join(repr(table[n]) for n in missing)}")
