@@ -34,7 +34,8 @@ public enum ProjectFilesNote {
         }
         let count = names.count == 1 ? "1 new file" : "\(names.count) new files"
         return "[App note, not the user's words: \(count) (\(kinds.prefix(6).joined(separator: ", "))) added to this chat's project "
-            + "since the last message. Call project_files to see and read them if the message is about them.]"
+            + "since the last message. If the message is about them: project_files with no arguments lists the files with their ids, "
+            + "then project_files(doc: <id>) reads one and project_files(query: \"...\") searches them.]"
     }
 
     /// A name for the bubble's caption: one line, no control, format or

@@ -282,8 +282,9 @@ next message carries the ones added since -- by a drop, the + menu, the
 Files window or another chat -- and the model gets, before the
 message's text, how many and of which kinds, never their names: `[App
 note, not the user's words: 1 new file (pdf) added to this chat's project
-since the last message. Call project_files to see and read them if the
-message is about them.]` (`ProjectFilesNote`). A name is file text: the
+since the last message. If the message is about them: project_files with
+no arguments lists the files with their ids, then project_files(doc:
+<id>) reads one and project_files(query: "...") searches them.]` (`ProjectFilesNote`). A name is file text: the
 turn's trust barrier counts it once project_files has put it in front of
 the model, so a hostile name can't steer a guarded call by arriving with
 the user's message. The names are saved on the message
