@@ -432,9 +432,17 @@ public final class ProjectFilesService {
             // Its name longer than the room: shown cut, so the listing
             // still goes on past it.
             if lines.isEmpty {
-                let short = "\(p.id). \(String(p.name.unicodeScalars.prefix(24)))… -- \(p.width)×\(p.height)"
-                let cut = page([short])
-                if cut.fitsWhole(byteBudget: budget) { output = cut }
+                // The longest cut that fits (down to the id alone).
+                let scalars = Array(p.name.unicodeScalars)
+                func short(_ n: Int) -> String {
+                    "\(p.id). \(String(String.UnicodeScalarView(scalars[0..<n])))… -- \(p.width)×\(p.height)"
+                }
+                var lo = -1, hi = scalars.count - 1
+                while lo < hi {
+                    let mid = (lo + hi + 1) / 2
+                    if page([short(mid)]).fitsWhole(byteBudget: budget) { lo = mid } else { hi = mid - 1 }
+                }
+                if lo >= 0 { output = page([short(lo)]) }
             }
             break
         }
