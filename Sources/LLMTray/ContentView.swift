@@ -257,6 +257,7 @@ struct ContentView: View {
         modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
         composer.thinkingStyle = modelID.map(ModelDiscovery.thinkingStyle(forModelPath:)) ?? .none
+        composer.acceptsAudio = modelID.map(ModelDiscovery.supportsAudio(forModelPath:)) ?? false
     }
 
     /// The `model` name requests use -- read from the catalog at send time,
@@ -268,7 +269,7 @@ struct ContentView: View {
 
     private var chatSettings: ChatSettings {
         ChatSettings.forModel(selectedModelID, supportsVision: composer.acceptsImages, maxContext: modelMaxContext,
-                              thinkingStyle: composer.thinkingStyle)
+                              thinkingStyle: composer.thinkingStyle, supportsAudio: composer.acceptsAudio)
     }
 
     // MARK: - Chat
@@ -772,8 +773,9 @@ struct ContentView: View {
         // Return in an empty field mustn't start loading a model.
         guard canChat, !chat.isBusy, !composer.isEmpty else { return }
         startModelIfStopped()
-        let (text, images) = composer.take()
-        chat.send(prompt: text, images: images, port: port, modelAlias: requestModelName, settings: chatSettings, server: server)
+        let (text, images, audios) = composer.take()
+        chat.send(prompt: text, images: images, audios: audios, port: port, modelAlias: requestModelName,
+                  settings: chatSettings, server: server)
         isInputFocused = true
     }
 

@@ -239,6 +239,8 @@ struct ChatSettings {
     var maxTokensCap: Int = 32768
     /// The chat model accepts images (view_image is offered only then).
     var modelSupportsVision: Bool = false
+    /// The model hears audio: a user message's recordings go as input_audio.
+    var modelSupportsAudio: Bool = false
     /// What the model's template offers for thinking, and the effort asked
     /// (the composer's picker): the request's fields (Thinking.requestFields).
     var thinkingStyle: ThinkingStyle = .none
@@ -297,11 +299,12 @@ extension ChatSettings {
     /// the chat view and compaction, which also runs with no view on screen.
     @MainActor
     static func forModel(_ modelID: String?, supportsVision: Bool, maxContext: Int? = nil,
-                         thinkingStyle: ThinkingStyle = .none) -> ChatSettings {
+                         thinkingStyle: ThinkingStyle = .none, supportsAudio: Bool = false) -> ChatSettings {
         let cap = maxContext ?? Self.maxContext(forModel: modelID)
         var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
         settings.modelSupportsVision = supportsVision
         settings.thinkingStyle = thinkingStyle
+        settings.modelSupportsAudio = supportsAudio
         settings.thinkingEffort = ThinkingEffort(rawValue: UserDefaults.standard[Pref.thinkingEffort]) ?? .high
         settings.modelPath = modelID
         return settings

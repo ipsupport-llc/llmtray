@@ -581,10 +581,10 @@ final class ChatClient: ObservableObject {
     }
 
     func send(
-        prompt: String, images: [Data] = [], port: Int, modelAlias: String, settings: ChatSettings,
+        prompt: String, images: [Data] = [], audios: [Data] = [], port: Int, modelAlias: String, settings: ChatSettings,
         server: ServerManager
     ) {
-        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
+        guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty else { return }
         // Groups loaded after outside text in an earlier turn: from this
         // message on (adr/0020).
         if !pendingToolGroups.isEmpty {
@@ -597,6 +597,9 @@ final class ChatClient: ObservableObject {
         turnCallResults = [:]
         turnStats = nil
         var message = ChatMessage(role: "user", content: prompt, images: images)
+        // Recordings (adr/0023): played back in the bubble, sent as audio.
+        message.audios = audios
+        message.audioPrompts = audios.map { _ in NSLocalizedString("Recording", comment: "a spoken message's caption") }
         message.projectFilesAdded = projectFilesSinceLastMessage()
         messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
@@ -1329,6 +1332,7 @@ final class ChatClient: ObservableObject {
         var now = ChatSettings(profile: ProfileManager.shared.resolved(for: modelPath), maxTokensCap: start.maxTokensCap)
         now.modelPath = modelPath
         now.modelSupportsVision = start.modelSupportsVision
+        now.modelSupportsAudio = start.modelSupportsAudio
         now.thinkingStyle = start.thinkingStyle
         now.thinkingEffort = start.thinkingEffort
         now.project = start.project

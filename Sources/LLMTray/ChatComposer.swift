@@ -1,3 +1,4 @@
+import Combine
 import AppKit
 import LLMTrayCore
 import SwiftUI
@@ -22,13 +23,28 @@ final class ComposerModel: ObservableObject {
     /// What the model's template offers for thinking: the effort picker
     /// shows for one that thinks.
     @Published var thinkingStyle: ThinkingStyle = .none
+    /// Recordings for a model that hears (WAV, ChatRecorder); switching to
+    /// one that doesn't drops them.
+    @Published var recordings: [Data] = []
+    @Published var acceptsAudio = false {
+        didSet { if !acceptsAudio { recordings.removeAll(); recorder.cancel() } }
+    }
+    let recorder = ChatRecorder()
+    private var recorderWatch: AnyCancellable?
+
+    init() {
+        // Send's state follows the recording (isEmpty reads it).
+        recorderWatch = recorder.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+    }
     @Published var acceptsImages = false {
         didSet {
             if !acceptsImages { attachments.removeAll() } else { notice = nil }
         }
     }
 
-    var isEmpty: Bool { draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty }
+    var isEmpty: Bool {
+        draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty && recordings.isEmpty && !recorder.isRecording
+    }
 
     /// A short note under the field (an image the model can't take), gone
     /// after a few seconds.
@@ -81,9 +97,11 @@ final class ComposerModel: ObservableObject {
     }
 
     /// Takes the draft and attachments for sending and clears them.
-    func take() -> (text: String, images: [Data]) {
-        defer { draft = ""; attachments = [] }
-        return (draft, attachments)
+    /// What's sent: a recording still going is stopped and goes too.
+    func take() -> (text: String, images: [Data], audios: [Data]) {
+        if let wav = recorder.stop() { recordings.append(wav) }
+        defer { draft = ""; attachments = []; recordings = [] }
+        return (draft, attachments, recordings)
     }
 
     func pickImages() {
@@ -197,7 +215,7 @@ struct ChatComposer: View {
             if canRegenerate || chat.lastTokensPerSecond != nil || canCompact || chat.currentSessionID == nil {
                 turnActions
             }
-            if !composer.attachments.isEmpty {
+            if !composer.attachments.isEmpty || !composer.recordings.isEmpty {
                 attachmentStrip
             }
             if !canChat {
@@ -232,6 +250,9 @@ struct ChatComposer: View {
                     .focused(isFocused)
                     .disabled(!canChat)
 
+                if composer.acceptsAudio {
+                    RecordButton(recorder: composer.recorder) { composer.recordings.append($0) }
+                }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
                 }
@@ -363,6 +384,25 @@ struct ChatComposer: View {
     private var attachmentStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
+                ForEach(Array(composer.recordings.enumerated()), id: \.offset) { i, wav in
+                    HStack(spacing: 4) {
+                        Image(systemName: "waveform")
+                        Text(RecordButton.time(Double(max(0, wav.count - 44)) / Double(2 * ChatRecorder.sampleRate)))
+                            .monospacedDigit()
+                        Button {
+                            composer.recordings.remove(at: i)
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                        }
+                        .buttonStyle(.plain)
+                        .help("Remove recording")
+                        .accessibilityLabel("Remove recording")
+                    }
+                    .font(.callout)
+                    .padding(.horizontal, 8)
+                    .frame(height: 44)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.gray.opacity(0.15)))
+                }
                 ForEach(Array(composer.attachments.enumerated()), id: \.offset) { i, data in
                     if let nsImage = NSImage(data: data) {
                         ZStack(alignment: .topTrailing) {
@@ -467,5 +507,45 @@ struct ThinkingEffortPicker: View {
         .fixedSize()
         .help("Thinking effort: how long the model may think before it answers")
         .accessibilityLabel(Text(String(format: NSLocalizedString("Thinking effort: %@", comment: ""), effort.title)))
+    }
+}
+
+/// The composer's microphone for a model that hears (adr/0023): click to
+/// record, click again to stop; the recording waits by the field until
+/// it's sent (Send stops one still going and sends it too).
+struct RecordButton: View {
+    @ObservedObject var recorder: ChatRecorder
+    let done: (Data) -> Void
+
+    static func time(_ seconds: Double) -> String {
+        let s = Int(seconds.rounded(.down))
+        return String(format: "%d:%02d", s / 60, s % 60)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if recorder.isRecording {
+                Text(Self.time(recorder.seconds))
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.red)
+            }
+            Button {
+                if recorder.isRecording {
+                    if let wav = recorder.stop() { done(wav) }
+                } else {
+                    Task { await recorder.start() }
+                }
+            } label: {
+                Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic")
+                    .foregroundStyle(recorder.isRecording ? Color.red : Color.primary)
+            }
+            .buttonStyle(.borderless)
+            .help(recorder.isRecording ? "Stop recording" : "Record a spoken message (the model hears it)")
+            .accessibilityLabel(recorder.isRecording ? "Stop recording" : "Record")
+        }
+        .onAppear { recorder.onLimit = done }
+        .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
+            Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
+        }
     }
 }

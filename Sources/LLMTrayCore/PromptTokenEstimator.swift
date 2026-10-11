@@ -26,10 +26,19 @@ public struct PromptTokenEstimator: Equatable {
     public struct Measure: Equatable {
         public var bytes: Int
         public var images: Int
+        /// The recordings' soft tokens (their data isn't in `bytes`).
+        public var audioTokens: Int
 
-        public init(bytes: Int, images: Int = 0) {
+        public init(bytes: Int, images: Int = 0, audioTokens: Int = 0) {
             self.bytes = bytes
             self.images = images
+            self.audioTokens = audioTokens
+        }
+
+        /// A WAV recording's tokens at 16 kHz 16-bit mono, as Gemma 4 counts
+        /// audio: one soft token per 40 ms.
+        public static func audioTokens(wavBytes: Int) -> Int {
+            Int((Double(max(0, wavBytes - 44)) / 32_000 * 25).rounded(.up)) + 2
         }
     }
 
@@ -58,6 +67,7 @@ public struct PromptTokenEstimator: Equatable {
 
     private static func tokens(_ m: Measure) -> Int {
         Int((Double(max(0, m.bytes)) / defaultBytesPerToken).rounded(.up)) + max(0, m.images) * tokensPerImage
+            + max(0, m.audioTokens)
     }
 
     /// The server counted `promptTokens` for a request of this size. A
@@ -65,7 +75,7 @@ public struct PromptTokenEstimator: Equatable {
     /// then nothing is counted, not an older request. True when it's used.
     @discardableResult
     public mutating func calibrate(_ m: Measure, promptTokens: Int) -> Bool {
-        guard m.images == 0, promptTokens > 0, m.bytes > 0 else {
+        guard m.images == 0, m.audioTokens == 0, promptTokens > 0, m.bytes > 0 else {
             calibration = nil
             return false
         }
