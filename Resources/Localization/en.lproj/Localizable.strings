@@ -298,9 +298,12 @@
 "Dismiss" = "Dismiss";
 "Document: %@" = "Document: %@";
 "Documents" = "Documents";
+"Documents On in This Chat" = "Documents On in This Chat";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Documents are copied into the project and indexed on this Mac; images go into your message.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Documents are on in this chat: ask for one (a report, a letter…).";
 "Documents go into a project with this chat." = "Documents go into a project with this chat.";
 "Documents go into a project with this chat; images go into your message." = "Documents go into a project with this chat; images go into your message.";
+"Documents tools" = "Documents tools";
 "Doesn't open at login" = "Doesn't open at login";
 "Don't Add" = "Don't Add";
 "Don't Ask Again" = "Don't Ask Again";
@@ -564,6 +567,7 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
+"Make a Document…" = "Make a Document…";
 "Make again" = "Make again";
 "Make images and edit them." = "Make images and edit them.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.";
@@ -1210,6 +1214,8 @@
 "When a client asks for another model" = "When a client asks for another model";
 "When an app asks for another model" = "When an app asks for another model";
 "When an app asks for another model: %@" = "When an app asks for another model: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat.";
+"When needed" = "When needed";
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
