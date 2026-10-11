@@ -1117,6 +1117,10 @@ final class ChatClient: ObservableObject {
 
     /// `offerTools: false` for the answer after the last allowed tool round.
     private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager, offerTools: Bool = true) {
+        // The groups as loaded now: one loaded from the + menu while the
+        // turn's start awaited the project's files counts in (adr/0020).
+        var settings = settings
+        settings.loadedToolGroups = loadedToolGroups
         errorText = nil
         pendingRequestContext = RequestContext(port: port, modelAlias: modelAlias, settings: settings, server: server)
         messages.append(ChatMessage(role: "assistant"))
