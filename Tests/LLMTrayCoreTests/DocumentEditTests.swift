@@ -125,7 +125,7 @@ final class DocumentEditTests: XCTestCase {
         // Its title picks it; else the latest.
         let byTitle = try DocumentEdit.resolve(call(#"{"title": "plan", "changes": [{"section": "Costs", "content": "X"}]}"#), documents: docs).get()
         XCTAssertTrue(content(byTitle.0).contains("Intro."))
-        XCTAssertEqual(byTitle.2, "Plan")
+        XCTAssertEqual(byTitle.2?.title, "Plan")
         let latest = try DocumentEdit.resolve(call(#"{"title": "New", "changes": [{"section": "Costs", "content": "X"}]}"#), documents: docs).get()
         XCTAssertTrue(content(latest.0).contains("# Other"))
         // The whole content wins over changes; no changes, as it came.
@@ -135,7 +135,7 @@ final class DocumentEditTests: XCTestCase {
         XCTAssertNil(whole.0["changes"])
         let plain = try DocumentEdit.resolve(call(#"{"title": "N", "content": "Hi"}"#), documents: []).get()
         XCTAssertEqual(content(plain.0), "Hi")
-        XCTAssertNil(plain.2)
+        XCTAssertNil(plain.2?.title)
         // Nothing to change.
         XCTAssertNil(try? DocumentEdit.resolve(call(#"{"title": "N", "changes": [{"content": "X"}]}"#), documents: []).get())
         // The result reads as a document.

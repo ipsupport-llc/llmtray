@@ -94,7 +94,10 @@ public struct DocumentSpec: Equatable, Sendable {
 
     /// From a call's arguments as `ToolArgumentParser` read them; nil with
     /// the reason when there's nothing to make.
-    public static func read(_ values: [String: Any]) -> Result<DocumentSpec, DocumentError> {
+    /// `earlier`: the content of the document a change starts from (or
+    /// Make again's own): what it already had -- an image as data, a chart
+    /// placed but never given -- isn't refused now; it's new ones that are.
+    public static func read(_ values: [String: Any], earlier: String? = nil) -> Result<DocumentSpec, DocumentError> {
         let title = clip(((values["title"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines), Limits.titleCharacters)
         let content = (values["content"] as? String) ?? ""
         guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .failure(.noContent) }
@@ -106,7 +109,7 @@ public struct DocumentSpec: Equatable, Sendable {
         // never a picture (a model can't write one, and the page loads no
         // data:), so the call is answered how a chart is given -- not made
         // into a page with that text on it.
-        guard !content.lowercased().contains("](data:") else { return .failure(.imageData) }
+        guard imagesAsData(content) <= earlier.map(imagesAsData) ?? 0 else { return .failure(.imageData) }
         var notes: [String] = []
         var adjusted: [String] = []
         var charts: [Chart] = []
@@ -129,8 +132,10 @@ public struct DocumentSpec: Equatable, Sendable {
         }
         // A chart placed by id that "charts" never gave (one given but left
         // out has its note): nothing to draw there, so the call is answered.
-        let given = Set(raw.prefix(Limits.charts).compactMap { ($0["id"] as? String)?.trimmingCharacters(in: .whitespaces) })
-        let missing = DocumentEdit.placedCharts(content).subtracting(given).sorted()
+        // Every id given counts, past the cap too (that one has its note).
+        let given = Set(raw.compactMap { ($0["id"] as? String)?.trimmingCharacters(in: .whitespaces) })
+        let missing = DocumentEdit.placedCharts(content).subtracting(given)
+            .subtracting(earlier.map(DocumentEdit.placedCharts) ?? []).sorted()
         guard missing.isEmpty else { return .failure(.missingCharts(missing)) }
         return .success(DocumentSpec(title: title.isEmpty ? "Document" : title, content: content,
                                      style: (values["style"] as? String).map(DocumentHTML.styleName) ?? "report",
@@ -256,6 +261,29 @@ public struct DocumentSpec: Equatable, Sendable {
     /// A list of numbers as the parser read it (nil or empty: none).
     static func numbers(_ raw: Any?) -> [Double] {
         ((raw as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
+    }
+
+    /// Images written as data (`![…](data:…`, closed or not) outside code:
+    /// a link to data or a mention in code isn't one.
+    static func imagesAsData(_ content: String) -> Int {
+        var count = 0
+        var fence: String?
+        for line in DocumentHTML.lines(content) {
+            let t = line.trimmingCharacters(in: .whitespaces)
+            if let open = fence {
+                if t.hasPrefix(open) { fence = nil }
+                continue
+            }
+            if t.hasPrefix("```") || t.hasPrefix("~~~") { fence = String(t.prefix(3)); continue }
+            // Code spans out: every other run between backticks.
+            let prose = t.components(separatedBy: "`").enumerated().filter { $0.offset % 2 == 0 }.map(\.element).joined(separator: " ")
+            count += prose.lowercased().components(separatedBy: "](data:").dropLast().filter { before in
+                // The bracket it closes opened as "![".
+                guard let open = before.range(of: "[", options: .backwards) else { return false }
+                return before[..<open.lowerBound].hasSuffix("!")
+            }.count
+        }
+        return count
     }
 
     /// A formula's x range: two numbers or expressions ("2*pi"), -10...10

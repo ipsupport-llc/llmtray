@@ -310,8 +310,27 @@ final class DocumentSpecTests: XCTestCase {
         // Given but left out (bad numbers): made, with its note.
         let bad = try? read(#"{"title": "x", "content": "![s](chart:s)", "charts": [{"id": "s", "type": "pie", "series": [{"values": [0, 0]}]}]}"#).get()
         XCTAssertEqual(bad?.notes.count, 1)
-        // A data: address in prose or code isn't an image.
-        XCTAssertNotNil(try? read(#"{"title": "x", "content": "Data URLs look like `data:image/png;base64,...`."}"#).get())
+        // A data: address in prose or code, or a link to data, isn't an image.
+        for ok in [#"Data URLs look like `data:image/png;base64,...`."#, #"See `![x](data:image/png;base64,AA)`."#,
+                   "```\n![x](data:image/png;base64,AA)\n```", #"[download](data:text/plain,hello)"#,
+                   #"`![s](chart:nope)` places a chart."#] {
+            let json = String(decoding: try! JSONSerialization.data(withJSONObject: ["title": "x", "content": ok]), as: UTF8.self)
+            XCTAssertNotNil(try? read(json).get(), ok)
+        }
+        // A ninth chart is given (past the cap: its note), not missing.
+        let nine = (1...9).map { #"{"id": "c\#($0)", "type": "bar", "series": [{"values": [1]}]}"# }.joined(separator: ",")
+        let capped = try? read(#"{"title": "x", "content": "![n](chart:c9)", "charts": [\#(nine)]}"#).get()
+        XCTAssertEqual(capped?.notes.first?.contains("first 8"), true)
+    }
+
+    /// What the earlier document already had (a change, Make again) isn't
+    /// held against the call; a new one is.
+    func testEarlierProblemsArentRefused() throws {
+        let old = "## Costs\n![c](chart:c)\n![p](data:image/png;base64\n## Risks\nOld."
+        let values: [String: Any] = ["title": "x", "content": old + "\nNew line."]
+        XCTAssertNoThrow(try DocumentSpec.read(values, earlier: old).get())
+        XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![d](chart:d)"], earlier: old).failure, .missingCharts(["d"]))
+        XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![q](data:image/png"], earlier: old).failure, .imageData)
     }
 
     func testLimits() {
@@ -345,4 +364,8 @@ final class DocumentSpecTests: XCTestCase {
         let attrs = try FileManager.default.attributesOfItem(atPath: dir.appendingPathComponent(a.name).path)
         XCTAssertEqual((attrs[.posixPermissions] as? NSNumber)?.intValue, 0o600)
     }
+}
+
+private extension Result {
+    var failure: Failure? { if case .failure(let e) = self { return e } else { return nil } }
 }

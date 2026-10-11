@@ -1063,7 +1063,9 @@ final class ChatClient: ObservableObject {
               let j = messages.firstIndex(where: { $0.id == messageID }), messages[j].documents.indices.contains(index),
               let source = messages[j].documents[index].source else { return }
         let parsed = ToolArgumentParser.parse(source.arguments, schema: DocumentSpec.schema)
-        guard case .success(let spec) = DocumentSpec.read(parsed.values) else { return }
+        // Its own content as the earlier one: a document made before a
+        // check came in is made again as it was.
+        guard case .success(let spec) = DocumentSpec.read(parsed.values, earlier: parsed.values["content"] as? String) else { return }
         isRemakingDocument = true
         defer { isRemakingDocument = false }
         let folder = URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true)

@@ -32,7 +32,7 @@ final class MakeDocumentTool: ChatTool {
         }
         var arguments = arguments
         var changed: [String] = []
-        var from: String?
+        var from: (title: String, content: String)?
         switch DocumentEdit.resolve(arguments, documents: context.chatDocuments) {
         case .success(let (values, notes, base)):
             arguments = values
@@ -42,7 +42,7 @@ final class MakeDocumentTool: ChatTool {
             return .text(problem.text)
         }
         var spec: DocumentSpec
-        switch DocumentSpec.read(arguments) {
+        switch DocumentSpec.read(arguments, earlier: from?.content) {
         case .success(let s): spec = s
         case .failure(let e): return .text(e.text)
         }
@@ -55,7 +55,7 @@ final class MakeDocumentTool: ChatTool {
         case .success(let made):
             madeThisTurn = true
             var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s"))"
-                + (from.map { " from \"\($0)\" with the changes" } ?? "") + ". "
+                + (from.map { " from \"\($0.title)\" with the changes" } ?? "") + ". "
                 + "The user sees it in the chat and can open, save or share it. Don't repeat its content unless asked."
             let notes = spec.notes + made.notes
             // The tool is spent for the turn once a PDF is made: the model

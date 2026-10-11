@@ -14,9 +14,10 @@ public enum DocumentEdit {
     /// document it changes (the one of its title, else the latest; `documents`
     /// oldest first, each its title and call as JSON) with those sections.
     /// A call with content too is that content; one without changes is as
-    /// it came. Also notes for the answer, and the earlier document's title.
+    /// it came. Also notes for the answer, and the earlier document's title
+    /// and content (what it already had isn't held against the change).
     public static func resolve(_ arguments: [String: Any], documents: [(title: String, arguments: String)])
-        -> Result<([String: Any], [String], String?), Problem> {
+        -> Result<([String: Any], [String], (title: String, content: String)?), Problem> {
         var values = arguments
         let changes = (values.removeValue(forKey: "changes") as? [[String: Any]]) ?? []
         guard !changes.isEmpty else { return .success((values, [], nil)) }
@@ -27,7 +28,7 @@ public enum DocumentEdit {
             return .failure(Problem(text: "make_document: there's no earlier document in this chat to change. Write the whole content."))
         }
         let base = ToolArgumentParser.parse(documents[k].arguments, schema: DocumentSpec.schema).values
-        return apply(arguments, to: base).map { ($0.values, $0.adjusted, documents[k].title) }
+        return apply(arguments, to: base).map { ($0.values, $0.adjusted, (documents[k].title, (base["content"] as? String) ?? "")) }
     }
 
     /// The earlier document a call changes: the latest one whose title is
