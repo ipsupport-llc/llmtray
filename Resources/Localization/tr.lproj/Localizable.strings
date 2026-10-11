@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: henüz desteklenmiyor";
 "%d overridden, rest from Default · %@" = "%d geçersiz kılındı, kalanı Default’tan · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld işlemi hâlâ Ayarlar > Files bölümünden geri alınabilir.";
+"%lld can still be undone from Settings > Files." = "%lld, Ayarlar > Dosyalar’dan hâlâ geri alınabilir.";
 "%lld downloads" = "%lld indirme";
 "%lld failed" = "%lld başarısız";
 "%lld files" = "%lld dosya";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Yüklü olandan farklı bir modeli isteyen bir düzenleyici, agent veya betik. Değiştirdiğinizde yüklü olan boşaltılır — sohbet de dahil. Önce sor: Switch / Keep içeren bir bildirim; bir dakika içinde yanıtlanmazsa Keep sayılır. Keep: istemciye, yüklü modeli belirten bir hata döner. Uygulamanın kendi sohbeti her zaman değişir.";
 "An item needs the new folder it goes into: tick that folder too." = "Bir öğe gideceği yeni klasöre ihtiyaç duyuyor: o klasörü de işaretleyin.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "İsteğe bağlı bir bahşiş: abonelik yok, özellik kilidi yok. Destekçiler, yazdıkları bir isimle listelenmeyi seçebilir.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Değişmiş olup olmadığı belirsiz öğe için Finder’da kontrol edin. Ayarlar > Files günlük tutar.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Emin olunmayan bir öğe değişmiş de olabilir, değişmemiş de: Finder’da ona bakın. Günlük Ayarlar > Dosyalar’da tutulur.";
 "Another LLMTray is running" = "Başka bir LLMTray çalışıyor";
 "Another folder change is running: try again when it's done." = "Başka bir klasör değişikliği sürüyor: bitince yeniden deneyin.";
 "Another model already uses this alias." = "Bu takma adı zaten başka bir model kullanıyor.";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Proje dosyalarını etkinleştirmek için tıklayın: dosyaları projeye ekleyin ve sohbetlerin bunlarda arama yapmasına izin verin.";
 "Close" = "Kapat";
 "Close Tab" = "Sekmeyi Kapat";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Settings › General › Set Up LLMTray… yeniden açar.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Ayarlar › Genel › LLMTray'ı Kur… öğesi yeniden açar.";
 "Coding agents" = "Kodlama ajanları";
 "Coffee" = "Kahve";
 "Command-line tool" = "Komut satırı aracı";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit speech: IPSupport’ın en hızlı yapısı — 3-bit dil modeli, 8-bit konuşma tanıma ve ses ile; her testte doğru yanıtlar. GPTQ 3-bit: konuşma bileşenleri tam hassasiyette olan aynı model. 4-bit: mlx-community yapısı. Her biri yalnızca siz indirmeyi seçtiğinizde indirilecektir.";
 "GPU memory limit" = "GPU bellek limiti";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Model sunucusunun ağırlıklar dışında aktivasyonlar ve macOS için ayırdığı GPU belleği. Aşağıdaki paylar geride kalan belleği böler.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Kısıtlı: Hugging Face'te lisansını kabul edin ve önce Settings › Models altında bir token kaydedin.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Kısıtlı erişim: Önce Hugging Face’te lisansını kabul edip Ayarlar › Modeller’de bir token kaydedin.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasındaki lisansını kabul edin ve Ayarlar → Models bölümüne bir token ekleyin.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Kısıtlı: Hugging Face sayfasından erişim isteyin (yazarlar inceler) ve Ayarlar → Models bölümüne bir token ekleyin.";
 "General" = "Genel";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "Kendi taşıyabileceği bir ayarı yoktu; buradaki ayarlar korundu.";
 "It is being set up or updated. Try again once that's done." = "Kuruluyor veya güncelleniyor. İşlem bitince tekrar deneyin.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "Öğeler Çöp'e gider, silinmez. Geri koymak için burada veya Ayarlar'da Geri Al'ı kullanın: Finder'ın Put Back işlemi klasörünü bilmez.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Varsayılan profili Settings › Profiles içinde “Default (ipsupport.us)” olarak duruyor: buradaki sizin profiliniz değiştirilmişti, bu yüzden korundu.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Bunun Default profili Ayarlar › Profiller’de “Default (ipsupport.us)” olarak bulunur: buradaki sizinki değiştirilmiş olduğu için korundu.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Sohbetleri saklanır, Son'dakiler arasında geri görünür; projenin talimatları ve dosyaları silinir.";
 "Its memory, in GB." = "Bellek miktarı, GB cinsinden.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ayarları da getirildi; Settings › Models içinde Hugging Face token yeniden girilmelidir.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ayarları da geldi; Ayarlar › Modeller’de bir Hugging Face tokenı yeniden girilmeli.";
 "Its settings were the same as these already." = "Ayarları zaten bunlarla aynıydı.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Ayarları içe aktarılmadı: ~/Library/Preferences içinde %@ değil.";
 "KV cache" = "KV önbelleği";

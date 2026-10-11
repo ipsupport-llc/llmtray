@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Fai clic per abilitare File progetto: aggiungi file al progetto e consenti alle sue chat di cercarli.";
 "Close" = "Chiudi";
 "Close Tab" = "Chiudi scheda";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Chiude questa finestra. Impostazioni › Generali › Set Up LLMTray… la riapre.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Chiude questa finestra. Impostazioni › Generali › Configura LLMTray… la riapre.";
 "Coding agents" = "Agent di coding";
 "Coffee" = "Caffè";
 "Command-line tool" = "Strumento da riga di comando";
@@ -1084,7 +1084,7 @@
 "The tips aren't available right now." = "Le offerte non sono disponibili in questo momento.";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versione di LLMTray da ipsupport.us è aperta. Chiudila prima (icona nella barra dei menu › Quit), poi riapri questa: entrambi userebbero la stessa porta e caricherebbero i modelli due volte.";
 "The voice model is being downloaded -- try again once it's done." = "Il modello vocale è in download — riprova quando è completato.";
-"The voice model isn't downloaded -- download it in Settings > Voice." = "Il modello vocale non è scaricato — scaricalo in Impostazioni > Voice.";
+"The voice model isn't downloaded -- download it in Settings > Voice." = "Il modello vocale non è stato scaricato: scaricalo in Impostazioni > Voce.";
 "The voice model's audio format isn't supported." = "Il formato audio del modello vocale non è supportato.";
 "The voice runner sent an unreadable ready message." = "Il voice runner ha inviato un messaggio di pronto illeggibile.";
 "The voice runner stopped unexpectedly (%@)." = "Il voice runner si è fermato inaspettatamente (%@).";
@@ -1186,7 +1186,7 @@
 "View model card" = "Visualizza la scheda del modello.";
 "Voice" = "Voce";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab è disattivato — attivalo in Impostazioni > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab è disattivato: attivalo in Impostazioni > Voce.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab occupa circa %1$@ GB dei %2$@ GB utilizzabili dalla GPU — non può coesistere con i %3$@ GB del modello di chat, quindi il modello di chat viene scaricato mentre è attivo.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab occupa circa %1$@ GB dei %2$@ GB utilizzabili dalla GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab occupa circa %1$@ GB, più dei %2$@ GB che la GPU può usare su questo Mac: finirebbe la memoria.";

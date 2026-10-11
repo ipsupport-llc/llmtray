@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: todavía no es compatible";
 "%d overridden, rest from Default · %@" = "%d modificados, el resto de Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld aún se puede deshacer desde Ajustes > Files.";
+"%lld can still be undone from Settings > Files." = "%lld aún se puede deshacer desde Ajustes > Archivos.";
 "%lld downloads" = "%lld descargas";
 "%lld failed" = "%lld fallaron";
 "%lld files" = "%lld archivos";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Un editor, un agente o un script que solicite un modelo distinto del cargado. Cambiar descarga el modelo cargado — también el chat. Preguntar primero: una notificación con Cambiar / Mantener; si no se responde en un minuto cuenta como Mantener. Mantener: el cliente recibe un error que indica el modelo cargado. El chat de la app siempre cambia.";
 "An item needs the new folder it goes into: tick that folder too." = "Un elemento necesita la nueva carpeta a la que va: marca también esa carpeta.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Una propina opcional: sin suscripciones ni funciones bloqueadas. Los patrocinadores pueden elegir aparecer con el nombre que escriban.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Un elemento dudoso puede haber cambiado o no: compruébalo en Finder. Ajustes > Files mantiene el registro.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Un ítem incierto puede haber cambiado o no: revísalo en Finder. Ajustes > Archivos conserva el registro.";
 "Another LLMTray is running" = "Otra instancia de LLMTray está en ejecución";
 "Another folder change is running: try again when it's done." = "Otro cambio de carpeta está en curso: intenta de nuevo cuando termine.";
 "Another model already uses this alias." = "Otro modelo ya usa este alias.";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Haga clic para activar Archivos del proyecto: agregue archivos al proyecto y permita que sus chats los busquen.";
 "Close" = "Cerrar";
 "Close Tab" = "Cerrar pestaña";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Cierra esta ventana. Ajustes › General › Set Up LLMTray… la vuelve a abrir.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Cierra esta ventana. Ajustes › General › Configurar LLMTray… vuelve a abrirla.";
 "Coding agents" = "Agentes de código";
 "Coffee" = "Café";
 "Command-line tool" = "Herramienta de línea de comandos";
@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "Esa no es la carpeta de LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "Los %lld movimientos a la Papelera están desmarcados: marque los que desee.";
 "The App Store couldn't confirm the purchase." = "App Store no pudo confirmar la compra.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versión de LLMTray de App Store está abierta. Ciérrala primero (icono en la barra de menús › Quit), y luego abre esta: ambas usarían el mismo puerto y cargarían modelos dos veces.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versión de LLMTray del App Store está abierta. Sal de ella primero (su icono de la barra de menús › Salir) y, a continuación, vuelve a abrir esta: las dos usarían el mismo puerto y cargarían los modelos dos veces.";
 "The Keychain refused to remove the token." = "El Keychain rechazó eliminar el token.";
 "The Keychain refused to save the token." = "El Keychain rechazó guardar el token.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "La guía de LLMTray está en este proyecto: pregunta, por ejemplo, cómo conectar tu agente de programación.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "Se mantuvo la configuración actual.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Las sugerencias para este Mac ya están aquí. Busca otro modelo en Hugging Face.";
 "The tips aren't available right now." = "Las propinas no están disponibles ahora mismo.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versión de LLMTray desde ipsupport.us está abierta. Ciérrala primero (icono en la barra de menús › Quit), y luego abre esta: ambas usarían el mismo puerto y cargarían modelos dos veces.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "La versión de LLMTray de ipsupport.us está abierta. Sal de ella primero (su icono de la barra de menús › Salir) y, a continuación, vuelve a abrir esta: las dos usarían el mismo puerto y cargarían los modelos dos veces.";
 "The voice model is being downloaded -- try again once it's done." = "El modelo de voz se está descargando — inténtalo de nuevo cuando termine.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "El modelo de voz no está descargado — descárgalo en Ajustes > Voz.";
 "The voice model's audio format isn't supported." = "El formato de audio del modelo de voz no es compatible.";

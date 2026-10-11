@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: 未対応です";
 "%d overridden, rest from Default · %@" = "%d件を上書き、残りは Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld は Settings > Files で元に戻せます。";
+"%lld can still be undone from Settings > Files." = "%lldはまだ「設定」>「ファイル」から取り消せます。";
 "%lld downloads" = "%lld回のダウンロード";
 "%lld failed" = "%lld 件失敗";
 "%lld files" = "%lld 個のファイル";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "編集中のエディタ、エージェント、またはスクリプトが現在読み込まれているものと異なるモデルを要求する場合。切り替えると読み込まれているモデル（チャットも含む）はアンロードされます。先に確認する: 「切り替え / 維持」の通知を表示。1分間未回答なら「維持」とみなします。「維持」の場合、クライアントには読み込まれているモデル名を伝えるエラーが返ります。アプリ内のチャットは常に切り替えます。";
 "An item needs the new folder it goes into: tick that folder too." = "項目には移動先の新しいフォルダが必要です：そのフォルダにもチェックを入れてください。";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "任意のチップ：購読や機能ロックはありません。支援者は自分で入力した名前で掲載できます。";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "変更されたか不確かな項目は Finder で確認してください。Settings > Files がジャーナルを保持します。";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "不確かな項目は変更された可能性も、されていない可能性もあります。Finderで確認してください。「設定」>「ファイル」にジャーナルが保存されています。";
 "Another LLMTray is running" = "別の LLMTray が実行中です";
 "Another folder change is running: try again when it's done." = "別のフォルダ変更が実行中です：完了後にもう一度お試しください。";
 "Another model already uses this alias." = "別のモデルがこのエイリアスをすでに使用しています。";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit speech: IPSupport の最速ビルド — 3-bit 言語モデルに 8-bit 音声認識と音声対応。すべてのテストで正しい回答。GPTQ 3-bit: 音声部分がフル精度の同等ビルド。4-bit: mlx-community のビルド。各モデルは要求時にのみダウンロードされます。";
 "GPU memory limit" = "GPU メモリ制限";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "モデルサーバーが重みのほかに活性化やmacOSのために確保しておくGPUメモリ。以下の比率は、そこから残った部分を分割します。";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated：Hugging Face でライセンスを承認し、Settings › Models でトークンを保存してください。";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: 先にHugging Faceでライセンスに同意し、「設定」›「モデル」でトークンを保存してください。";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "制限付き: その Hugging Face ページでライセンスを承諾し、設定 → Models にトークンを追加してください。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "制限付き: その Hugging Face ページでアクセスを申請してください（著者による審査があります）。設定 → Models にトークンを追加してください。";
 "General" = "一般";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "取り込む独自の設定はありませんでした；こちらの設定は保持されました。";
 "It is being set up or updated. Try again once that's done." = "セットアップ中または更新中です。完了後に再試行してください。";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "項目は削除されずゴミ箱に移動されます。元に戻すにはここまたは設定の Undo を使用してください：Finder の Put Back は元のフォルダを認識しません。";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "その Default プロファイルは Settings › Profiles に “Default (ipsupport.us)” としてあります：こちらのあなたのプロファイルは変更されていたため、そのまま保持されました。";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "そのDefaultプロファイルは「設定」›「プロファイル」に“Default (ipsupport.us)”としてあります。ここでは変更されていたため、保持されました。";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "チャットは「最近」に残ります。プロジェクトの指示とファイルは削除されます。";
 "Its memory, in GB." = "搭載メモリ（GB）。";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "その設定も取り込まれました；Hugging Face トークンは再度 設定 › Models で入力する必要があります。";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "設定も引き継がれました。ただし、Hugging Face トークンは「設定」›「モデル」で再入力する必要があります。";
 "Its settings were the same as these already." = "その設定はすでにこちらと同じでした。";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "その設定は取り込まれませんでした：~/Library/Preferences の %@ ではありません。";
 "KV cache" = "KVキャッシュ";
@@ -654,7 +654,7 @@
 "No chat model yet." = "チャット用モデルがまだありません。";
 "No chats found" = "チャットが見つかりません";
 "No details for this answer." = "この回答の詳細はありません。";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "埋め込みモデルがありません：ファイルは語句で検索されます。意味で検索するには Settings > Files からダウンロードしてください。";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "埋め込みモデルがありません。ファイルは単語で検索されます。意味で検索するには、「設定」>「ファイル」でダウンロードしてください。";
 "No files yet" = "ファイルがありません";
 "No folder changes yet." = "まだフォルダの変更はありません。";
 "No messages yet" = "メッセージはまだありません";
@@ -1186,7 +1186,7 @@
 "View model card" = "モデルカードを表示します。";
 "Voice" = "音声";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab はオフです — 設定 > Voice でオンにしてください。";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Labはオフです。「設定」>「音声」で有効にしてください。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab は GPU が使用可能な %2$@ GB のうち約 %1$@ GB を使用します — チャットモデルの %3$@ GB とは同時には使えないため、実行中はチャットモデルがアンロードされます。";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab は GPU が使用可能な %2$@ GB のうち約 %1$@ GB を使用します。";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab は約 %1$@ GB を使用します。これはこの Mac の GPU が使用できる %2$@ GB を超えているため、メモリ不足になります。";

@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "Itu bukan folder LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "Ada %lld pemindahan ke Sampah yang belum dicentang: beri centang pada yang Anda inginkan.";
 "The App Store couldn't confirm the purchase." = "App Store tidak dapat mengonfirmasi pembelian.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari App Store sedang terbuka. Tutup terlebih dahulu (ikon di menu bar › Quit), lalu buka yang ini lagi: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari App Store sedang terbuka. Keluar dulu (ikon bar menunya › Keluar), lalu buka lagi yang ini: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
 "The Keychain refused to remove the token." = "Keychain menolak menghapus token.";
 "The Keychain refused to save the token." = "Keychain menolak menyimpan token.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Panduan LLMTray ada di proyek ini: tanyakan, misalnya, cara menghubungkan agen pengkodean Anda.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "Pengaturan di sini dipertahankan.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Saran untuk Mac ini sudah tersedia. Jelajahi Hugging Face untuk model lain.";
 "The tips aren't available right now." = "Sumbangan tidak tersedia saat ini.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari ipsupport.us sedang terbuka. Tutup terlebih dahulu (ikon di menu bar › Quit), lalu buka yang ini lagi: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Versi LLMTray dari ipsupport.us sedang terbuka. Keluar dulu (ikon bar menunya › Keluar), lalu buka lagi yang ini: keduanya akan menggunakan port yang sama dan memuat model dua kali.";
 "The voice model is being downloaded -- try again once it's done." = "Model suara sedang diunduh — coba lagi setelah selesai.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Model suara belum diunduh — unduh di Pengaturan > Voice.";
 "The voice model's audio format isn't supported." = "Format audio model suara tidak didukung.";
@@ -1186,7 +1186,7 @@
 "View model card" = "Lihat kartu model.";
 "Voice" = "Suara";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab mati — aktifkan di Pengaturan > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab nonaktif -- aktifkan di Pengaturan > Suara.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab menggunakan sekitar %1$@ GB dari %2$@ GB yang dapat dipakai GPU — tidak bersama dengan %3$@ GB model chat, jadi model chat dibongkar saat berjalan.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab menggunakan sekitar %1$@ GB dari %2$@ GB yang dapat dipakai GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab menggunakan sekitar %1$@ GB, lebih dari %2$@ GB yang dapat dipakai GPU di Mac ini: akan kehabisan memori.";

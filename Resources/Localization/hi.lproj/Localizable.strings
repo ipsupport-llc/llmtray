@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: अभी समर्थित नहीं है";
 "%d overridden, rest from Default · %@" = "%d बदले गए, बाकी Default से · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld को अभी भी Settings > Files से पूर्ववत किया जा सकता है।";
+"%lld can still be undone from Settings > Files." = "%lld को अब भी सेटिंग्स > फ़ाइलें से पूर्ववत किया जा सकता है।";
 "%lld downloads" = "%lld डाउनलोड";
 "%lld failed" = "%lld असफल";
 "%lld files" = "%lld फ़ाइलें";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "एक एडिटर, एजेंट या स्क्रिप्ट जो लोड किए गए मॉडल के अलावा किसी अन्य मॉडल की मांग करता है। स्विच करने से लोड किया गया मॉडल—and चैट भी—अनलोड हो जाएगा। पहले पूछें: एक सूचना जिसमें Switch / Keep दिखेगा; एक मिनट में अनुत्तरित रहने पर Keep माना जाएगा। Keep चुनने पर क्लाइंट को लोड किए गए मॉडल का नाम बताते हुए त्रुटि मिलती है। ऐप की अपनी चैट हमेशा स्विच होती है।";
 "An item needs the new folder it goes into: tick that folder too." = "किसी आइटम को जिस नए फ़ोल्डर में जाना है वह चाहिए: उस फ़ोल्डर को भी टिक करें।";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "वैकल्पिक टिप: कोई सब्सक्रिप्शन नहीं, कोई फीचर लॉक नहीं। समर्थक अपना नाम स्वयं टाइप करके सूचीबद्ध होने का विकल्प चुन सकते हैं।";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "एक अनिश्चित आइटम बदला भी हो सकता है और नहीं भी — इसे Finder में देखें। Settings > Files जर्नल रखता है।";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "अनिश्चित आइटम बदला भी हो सकता है और नहीं भी: उसे Finder में देखें। सेटिंग्स > फ़ाइलें जर्नल रखता है।";
 "Another LLMTray is running" = "दूसरा LLMTray चल रहा है";
 "Another folder change is running: try again when it's done." = "एक और फ़ोल्डर परिवर्तन चल रहा है: समाप्त होने पर पुनः प्रयास करें।";
 "Another model already uses this alias." = "कोई दूसरा मॉडल पहले से यह उपनाम इस्तेमाल कर रहा है।";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "प्रोजेक्ट फ़ाइलें सक्षम करने के लिए क्लिक करें: फ़ाइलें प्रोजेक्ट में जोड़ें और इसकी चैट उन्हें खोज सकें।";
 "Close" = "बंद करें";
 "Close Tab" = "टैब बंद करें";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "यह विंडो बंद करता है। Settings › General › Set Up LLMTray… इसे फिर खोलता है।";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "यह विंडो बंद करता है। सेटिंग्स › सामान्य › LLMTray सेट अप करें… इसे फिर से खोलता है।";
 "Coding agents" = "कोडिंग एजेंट";
 "Coffee" = "कॉफ़ी";
 "Command-line tool" = "कमांड‑लाइन टूल";
@@ -346,7 +346,7 @@
 "Drop to attach images" = "छवियाँ संलग्न करने के लिए यहाँ छोड़ें";
 "Duplicate this profile" = "इस प्रोफ़ाइल की कॉपी बनाता है।";
 "Echo cancellation" = "इको रद्दीकरण";
-"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "इको रद्दीकरण शुरू नहीं हो सका: %@ — इसे बंद करने के लिए Settings > Voice पर जाएँ।";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "इको रद्दीकरण शुरू नहीं हो सका: %@ -- इसे सेटिंग्स > वॉइस में बंद करें।";
 "Echo cancellation isn't available on this Mac." = "यह Mac इको रद्दीकरण के लिए उपलब्ध नहीं है।";
 "Echo gate" = "इको गेट";
 "Edit Profile…" = "प्रोफ़ाइल संपादित करें…";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑bit + 8‑bit speech: IPSupport का सबसे तेज़ बिल्ड — 3‑bit भाषा मॉडल के साथ 8‑bit स्पीच रिकग्निशन और वॉइस; हर टेस्ट का उत्तर सही। GPTQ 3‑bit: वही है, पर स्पीच हिस्से पूर्ण सटीकता (full precision) में हैं। 4‑bit: mlx-community का बिल्ड। ये सभी केवल तभी डाउनलोड होते हैं जब आप अनुरोध करें।";
 "GPU memory limit" = "GPU मेमोरी सीमा";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "मॉडल सर्वर वेट्स के अलावा सक्रियताओं और macOS के लिए जो GPU मेमोरी अलग रखता है। नीचे दिए शेयर उस बची हुई मेमोरी को विभाजित करते हैं।";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: पहले Hugging Face पर उसकी लाइसेंस स्वीकार करें और Settings › Models में टोकन सुरक्षित करें।";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: पहले Hugging Face पर इसका लाइसेंस स्वीकार करें और सेटिंग्स › मॉडल में token सहेजें।";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
 "General" = "सामान्य";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "इसके पास आयात करने के लिए अपनी कोई सेटिंग नहीं थी; यहाँ की सेटिंग्स रखी गईं।";
 "It is being set up or updated. Try again once that's done." = "यह सेटअप या अपडेट हो रहा है। यह पूरा होने के बाद पुनः प्रयास करें।";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "आइटम Trash में जाते हैं, हटाए नहीं जाते। उन्हें वापस रखने के लिए, यहाँ या Settings में Undo का उपयोग करें: Finder का Put Back उनका फ़ोल्डर नहीं जानता।";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "उसका Default प्रोफ़ाइल Settings › Profiles में “Default (ipsupport.us)” के नाम से है: आपका यहाँ बदला हुआ था, इसलिए उसे सुरक्षित रखा गया।";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "इसकी Default प्रोफ़ाइल सेटिंग्स › प्रोफ़ाइलें में “Default (ipsupport.us)” के रूप में है: यहाँ आपकी प्रोफ़ाइल बदली गई थी, इसलिए उसे रखा गया।";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "इसके चैट बरकरार रहते हैं, हाल के में वापस आ जाते हैं; प्रोजेक्ट के निर्देश और फ़ाइलें हटा दी जाएँगी।";
 "Its memory, in GB." = "इसकी मेमोरी, GB में।";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "इसकी सेटिंग्स भी आईं; Settings › Models में Hugging Face टोकन फिर से दर्ज करना होगा।";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "इसकी सेटिंग्स भी आ गईं; Hugging Face token को सेटिंग्स › मॉडल में फिर से दर्ज करना होगा।";
 "Its settings were the same as these already." = "इसके सेटिंग्स पहले से यहीं जैसी थीं।";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "इसके सेटिंग्स आयात नहीं हुए: ~/Library/Preferences में %@ नहीं है।";
 "KV cache" = "KV कैश";
@@ -654,7 +654,7 @@
 "No chat model yet." = "अभी तक कोई चैट मॉडल नहीं।";
 "No chats found" = "कोई चैट नहीं मिली";
 "No details for this answer." = "इस उत्तर के लिए कोई विवरण नहीं है।";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "कोई embedding मॉडल नहीं: फाइलें उनके शब्दों से खोजी जाती हैं। अर्थ के आधार पर खोज के लिए इसे Settings > Files से डाउनलोड करें।";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "कोई एम्बेडिंग मॉडल नहीं: फ़ाइलों में उनके शब्दों से खोज की जाती है। अर्थ के आधार पर खोज के लिए इसे सेटिंग्स > फ़ाइलें में डाउनलोड करें।";
 "No files yet" = "अभी तक फाइलें नहीं";
 "No folder changes yet." = "अभी तक कोई फ़ोल्डर परिवर्तन नहीं।";
 "No messages yet" = "अभी तक कोई संदेश नहीं";
@@ -909,7 +909,7 @@
 "Show tool calls" = "टूल कॉल दिखाएँ";
 "Shows Pause, Stop and the project's files" = "Pause, Stop और प्रोजेक्ट की फाइलें दिखाता है";
 "Shows the chat window" = "चैट विंडो दिखाएँ";
-"Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल की सोच (खुलने/बंद होने वाला “सोचने की प्रक्रिया” ब्लॉक) उसके उत्तर के ऊपर दिखाता है।";
+"Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "मॉडल के उत्तर के ऊपर उसकी सोच (सिमटने वाला “विचार प्रक्रिया” ब्लॉक) दिखाता है।";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "गीत की पंक्तियाँ स्पष्ट गाता है, आवाज़ आगे रहती है। 30 s संगीत के लिए लगभग 40 s।";
 "Size" = "आकार";
 "Skip" = "Skip";
@@ -1084,7 +1084,7 @@
 "The tips aren't available right now." = "टिप्स अभी उपलब्ध नहीं हैं।";
 "The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "ipsupport.us से आया LLMTray वर्शन खुला है। पहले उसे बंद करें (इसका मेनू बार आइकन › Quit), फिर इसको फिर खोलें: दोनों एक ही पोर्ट उपयोग करेंगे और मॉडल दो बार लोड होंगे।";
 "The voice model is being downloaded -- try again once it's done." = "वॉइस मॉडल डाउनलोड हो रहा है — पूरा होने पर फिर से कोशिश करें।";
-"The voice model isn't downloaded -- download it in Settings > Voice." = "वॉइस मॉडल डाउनलोड नहीं हुआ — इसे Settings > Voice में डाउनलोड करें।";
+"The voice model isn't downloaded -- download it in Settings > Voice." = "वॉइस मॉडल डाउनलोड नहीं है -- इसे सेटिंग्स > वॉइस में डाउनलोड करें।";
 "The voice model's audio format isn't supported." = "वॉइस मॉडल का ऑडियो फ़ॉर्मेट समर्थित नहीं है।";
 "The voice runner sent an unreadable ready message." = "वॉइस रनर ने एक अभिलेखनीय तैयार संदेश भेजा।";
 "The voice runner stopped unexpectedly (%@)." = "वॉइस रनर अचानक बंद हो गया (%@)।";
@@ -1180,13 +1180,13 @@
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "इन्हें इमेज जेनरेशन, म्यूजिक और Voice Lab उपयोग करते हैं, जो इन्हें डाउनलोड करते हैं। इन्हें उनके Hugging Face नामों के साथ models फ़ोल्डर में भी रखा जाता है।";
 "Uses the internet" = "इंटरनेट का उपयोग करता है";
 "Verbose server logging" = "विस्तृत सर्वर लॉगिंग";
-"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "वर्बोज़ सर्वर लॉगिंग चालू थी, इसलिए लॉग में आपकी चैटें हैं: इसे संलग्न नहीं किया गया है। इसे शामिल करने के लिए Settings › Server में वर्बोज़ लॉगिंग बंद करें, सर्वर पुनरारंभ करें और समस्या दोहराएँ।";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "विस्तृत सर्वर लॉगिंग चालू थी, इसलिए लॉग में आपकी चैट हैं: इसे संलग्न नहीं किया गया है। इसे शामिल करने के लिए, सेटिंग्स › सर्वर में विस्तृत लॉगिंग बंद करें, सर्वर फिर से शुरू करें और समस्या दोहराएँ।";
 "Version" = "संस्करण";
 "Version %@" = "संस्करण %@";
 "View model card" = "मॉडल कार्ड देखें।";
 "Voice" = "वॉइस";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab बंद है — Settings > Voice में इसे चालू करें।";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab बंद है -- इसे सेटिंग्स > वॉइस में सक्षम करें।";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab लगभग %1$@ GB लेता है उस %2$@ GB में जो GPU उपयोग कर सकता है — चैट मॉडल के %3$@ GB के साथ एक साथ नहीं, इसलिए चलने पर चैट मॉडल अनलोड हो जाता है।";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab लगभग %1$@ GB लेता है उस %2$@ GB में जो GPU उपयोग कर सकता है।";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab लगभग %1$@ GB लेता है, जो इस Mac पर GPU द्वारा उपयोग किए जा सकने वाले %2$@ GB से अधिक है: मेमोरी समाप्त हो जाएगी।";

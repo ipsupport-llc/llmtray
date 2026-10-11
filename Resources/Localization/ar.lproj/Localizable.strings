@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: غير مدعوم بعد";
 "%d overridden, rest from Default · %@" = "%d متجاوز، والباقي من Default · %@";
 "%lld MB" = "%lld م.ب";
-"%lld can still be undone from Settings > Files." = "%lld لا يزال من الممكن التراجع عنه من الإعدادات > Files.";
+"%lld can still be undone from Settings > Files." = "لا يزال يمكن التراجع عن %lld من الإعدادات > الملفات.";
 "%lld downloads" = "%lld تنزيلات";
 "%lld failed" = "%lld فشل";
 "%lld files" = "%lld ملفًا";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "محرر أو وكيل أو سكربت يطلب نموذجاً مختلفاً عن المحمّل. التبديل يفرغ النموذج المحمّل — وكذلك الدردشة. اسأل أولاً: إشعار مع خيارات Switch / Keep؛ عدم الرد خلال دقيقة يعتبر Keep. عند اختيار Keep: يحصل العميل على خطأ يذكر النموذج المحمّل. دردشة التطبيق نفسها تتحوّل دائماً.";
 "An item needs the new folder it goes into: tick that folder too." = "العنصر يحتاج المجلد الجديد الذي سينتقل إليه: حدّد ذلك المجلد أيضاً.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "بقشيش اختياري: لا اشتراكات، لا قفل ميزات. يمكن للمتبرعين اختيار الاسم الذي يظهر بكتابته.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "قد يكون العنصر غير المؤكد قد تغيّر أو لم يتغيّر: انظُر إليه في Finder. الإعدادات > Files يحتفظ بالسجل.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "قد يكون عنصر غير مؤكد قد تغيّر أو لم يتغيّر: افحصه في Finder. تحتفظ الإعدادات > الملفات بالسجل.";
 "Another LLMTray is running" = "هناك نسخة أخرى من LLMTray تعمل";
 "Another folder change is running: try again when it's done." = "هناك تغيير مجلد آخر قيد التشغيل: حاول مرة أخرى بعد الانتهاء.";
 "Another model already uses this alias." = "يستخدم نموذج آخر هذا الاسم المستعار بالفعل.";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "انقر لتمكين ملفات المشروع: أضِف ملفات إلى المشروع ودع محادثاته تبحث فيها.";
 "Close" = "إغلاق";
 "Close Tab" = "إغلاق التبويب";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. Settings › General › Set Up LLMTray… يعيد فتحها.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. الإعدادات › عام › إعداد LLMTray… يفتحها من جديد.";
 "Coding agents" = "وكلاء الترميز";
 "Coffee" = "قهوة";
 "Command-line tool" = "أداة سطر الأوامر";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ بثلاثة بت + كلام بثمانية بت: أسرع إصدار من IPSupport — نموذج لغوي 3‑بت مع تعرف صوتي وصوت بثمانية بت، كل الاختبارات صحيحة. GPTQ 3‑بت: نفسه مع أجزاء الكلام بدقة كاملة. 4‑بت: إصدار mlx-community. يتم تنزيل كل واحد فقط عند طلبك.";
 "GPU memory limit" = "حد ذاكرة GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "ذاكرة GPU التي يتركها خادم النموذج دون مساس بجانب الأوزان، للاشتغالات ونظام macOS. الحصص أدناه تقسم ما تبقى بعد ذلك.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "مقيّد: اقبل ترخيصه على Hugging Face واحفظ رمزًا في Settings › Models أولًا.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "مقيّد: اقبل ترخيصه على Hugging Face واحفظ رمزًا في الإعدادات › النماذج أولًا.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "مقيَّد: اقبل ترخيصه في صفحته على Hugging Face، ثم أضف رمزًا في الإعدادات → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "مقيَّد: اطلب الوصول من صفحته على Hugging Face (يقوم المؤلفون بمراجعته)، ثم أضف رمزًا في الإعدادات → Models.";
 "General" = "عام";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "لم يكن لديها إعدادات خاصة بها لنقلها؛ تم الاحتفاظ بالإعدادات هنا.";
 "It is being set up or updated. Try again once that's done." = "جاري إعداده أو تحديثه. حاول مرة أخرى بعد الانتهاء.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "تنتقل العناصر إلى Trash ولا تُحذف. لإعادتها، استخدم Undo هنا أو في الإعدادات: أمر Put Back في Finder لا يعرف مجلدها.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "الملف الشخصي Default الخاص به موجود في الإعدادات › الملفات الشخصية باسم «Default (ipsupport.us)»: ملفك هنا تغيّر، لذلك تم الاحتفاظ به.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "ملف التعريف Default الخاص به موجود في الإعدادات › ملفات التعريف باسم «Default (ipsupport.us)»: ملفك هنا تم تغييره، لذلك تم الاحتفاظ به.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "تظل محادثاته ضمن الأخيرة؛ تُحذف تعليمات المشروع وملفاته.";
 "Its memory, in GB." = "سعته من الذاكرة، بالـ GB.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "تمت أيضًا جلب إعداداته؛ يجب إعادة إدخال رمز Hugging Face في الإعدادات › Models.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "وجاءت إعداداته أيضًا؛ يجب إدخال رمز Hugging Face من جديد في الإعدادات › النماذج.";
 "Its settings were the same as these already." = "كانت إعداداته مطابقة لهذه بالفعل.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "لم تُستَورد إعداداته: هذا ليس %@ في ~/Library/Preferences.";
 "KV cache" = "ذاكرة KV المؤقتة";
@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "هذا ليس مجلد LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "تم إلغاء تحديد %lld عناصر مُدرجة إلى سلة المهملات: حدّد العناصر التي تريدها.";
 "The App Store couldn't confirm the purchase." = "تعذر على App Store تأكيد الشراء.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "نسخة LLMTray من App Store مفتوحة. أغلقها أولاً (أيقونتها في شريط القائمة › Quit)، ثم أعد فتح هذه؛ كلا النسختين سيستخدمان نفس المنفذ وسيحمِّلان النماذج مرتين.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "إصدار App Store من LLMTray مفتوح. أنهِه أولًا (أيقونته في شريط القائمة › إنهاء)، ثم افتح هذا الإصدار من جديد: سيستخدم الاثنان المنفذ نفسه ويحمّلان النماذج مرتين.";
 "The Keychain refused to remove the token." = "رفض Keychain إزالة الرمز.";
 "The Keychain refused to save the token." = "رفض Keychain حفظ الرمز.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "دليل LLMTray موجود في هذا المشروع: اسأل، مثلاً، كيف توصل وكيل البرمجة.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "تم الاحتفاظ بالإعدادات هنا.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "الاقتراحات لهذا الـ Mac متاحة بالفعل هنا. تصفّح Hugging Face لنموذج آخر.";
 "The tips aren't available right now." = "خيارات التبرع غير متاحة حالياً.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "نسخة LLMTray من ipsupport.us مفتوحة. أغلقها أولاً (أيقونتها في شريط القائمة › Quit)، ثم أعد فتح هذه؛ النسختان ستستخدمان نفس المنفذ وسيتكرر تحميل النماذج.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "إصدار LLMTray من ipsupport.us مفتوح. أنهِه أولًا (أيقونته في شريط القائمة › إنهاء)، ثم افتح هذا الإصدار من جديد: سيستخدم الاثنان المنفذ نفسه ويحمّلان النماذج مرتين.";
 "The voice model is being downloaded -- try again once it's done." = "جاري تنزيل نموذج الصوت — حاول مرة أخرى عند الانتهاء.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "نموذج الصوت غير محمّل — حمّله من الإعدادات > الصوت.";
 "The voice model's audio format isn't supported." = "تنسيق صوت نموذج الصوت غير مدعوم.";

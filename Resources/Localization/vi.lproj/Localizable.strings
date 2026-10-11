@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: chưa được hỗ trợ";
 "%d overridden, rest from Default · %@" = "%d mục ghi đè, còn lại từ Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld vẫn có thể hoàn tác từ Cài đặt > Files.";
+"%lld can still be undone from Settings > Files." = "Vẫn có thể hoàn tác %lld từ Cài đặt > Tệp.";
 "%lld downloads" = "%lld lượt tải xuống";
 "%lld failed" = "%lld thất bại";
 "%lld files" = "%lld tệp";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Một trình soạn thảo, tác nhân hoặc script yêu cầu mô hình khác với mô hình đang tải. Chuyển sẽ tháo mô hình đã tải — cả cuộc trò chuyện cũng vậy. Hỏi trước: hiện thông báo với Switch / Keep; không trả lời trong một phút tính là Keep. Keep: client sẽ nhận lỗi kèm tên mô hình đang tải. Chat của app luôn chuyển.";
 "An item needs the new folder it goes into: tick that folder too." = "Một mục cần thư mục mới nó sẽ vào: hãy đánh dấu cả thư mục đó.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Mẹo tùy chọn: không đăng ký, không khoá tính năng. Người ủng hộ có thể chọn hiển thị tên họ nhập.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Một mục không chắc có thể đã thay đổi hoặc không: xem nó trong Finder. Cài đặt > Files lưu giữ nhật ký.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Một mục không chắc chắn có thể đã thay đổi hoặc không: hãy xem mục đó trong Finder. Cài đặt > Tệp lưu nhật ký.";
 "Another LLMTray is running" = "Đã có LLMTray khác đang chạy";
 "Another folder change is running: try again when it's done." = "Một thay đổi thư mục khác đang chạy: thử lại khi nó xong.";
 "Another model already uses this alias." = "Một mô hình khác đã dùng bí danh này.";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Nhấp để bật Tệp dự án: thêm tệp vào dự án và cho phép các cuộc trò chuyện của nó tìm kiếm chúng.";
 "Close" = "Đóng";
 "Close Tab" = "Đóng tab";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Settings › General › Set Up LLMTray… sẽ mở lại.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Cài đặt › Chung › Set Up LLMTray… sẽ mở lại cửa sổ này.";
 "Coding agents" = "Tác nhân lập trình";
 "Coffee" = "Cà phê";
 "Command-line tool" = "Công cụ dòng lệnh";
@@ -346,7 +346,7 @@
 "Drop to attach images" = "Thả để đính kèm ảnh";
 "Duplicate this profile" = "Tạo bản sao hồ sơ này";
 "Echo cancellation" = "Hủy tiếng vọng";
-"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động hủy tiếng vọng: %@ — tắt trong Cài đặt > Âm thanh.";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Không thể khởi động Hủy tiếng vọng: %@ -- hãy tắt tính năng này trong Cài đặt > Giọng.";
 "Echo cancellation isn't available on this Mac." = "Hủy tiếng vọng không khả dụng trên Mac này.";
 "Echo gate" = "Ngưỡng phản hồi";
 "Edit Profile…" = "Chỉnh sửa hồ sơ…";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit speech: bản dựng nhanh nhất của IPSupport — mô hình ngôn ngữ 3-bit với nhận dạng giọng nói và giọng nói 8-bit, mọi câu kiểm tra đều đúng. GPTQ 3-bit: tương tự nhưng phần giọng nói ở độ chính xác đầy đủ. 4-bit: bản dựng của mlx-community. Mỗi bản chỉ được tải xuống khi bạn yêu cầu.";
 "GPU memory limit" = "Giới hạn bộ nhớ GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Bộ nhớ GPU mà model server để trống ngoài phần trọng số, dành cho activations và macOS. Các tỷ lệ bên dưới chia phần còn lại sau đó.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: chấp nhận giấy phép trên Hugging Face và lưu token trong Settings › Models trước.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Bị giới hạn quyền truy cập: trước tiên hãy chấp nhận giấy phép trên Hugging Face và lưu token trong Cài đặt › Mô hình.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Bị hạn chế: chấp nhận giấy phép trên trang Hugging Face của mô hình, rồi thêm token trong Cài đặt → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Bị hạn chế: yêu cầu quyền truy cập trên trang Hugging Face của mô hình (tác giả sẽ xem xét), rồi thêm token trong Cài đặt → Models.";
 "General" = "Chung";
@@ -519,7 +519,7 @@
 "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Hồ sơ Default của nó nằm trong Cài đặt › Profiles dưới tên “Default (ipsupport.us)”: hồ sơ của bạn ở đây đã bị thay đổi, nên đã được giữ lại.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Các cuộc trò chuyện được giữ, trở lại mục Gần đây; hướng dẫn và tệp của dự án bị xóa.";
 "Its memory, in GB." = "Bộ nhớ của nó, tính theo GB.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Cài đặt của nó cũng được nhập; cần nhập lại token Hugging Face trong Settings › Models.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Cài đặt của nó cũng được chuyển sang; bạn cần nhập lại Token Hugging Face trong Cài đặt › Mô hình.";
 "Its settings were the same as these already." = "Cài đặt của nó đã giống với cài đặt ở đây.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Không nhập được cài đặt của nó: %@ không phải là một mục trong ~/Library/Preferences.";
 "KV cache" = "Bộ nhớ đệm KV";
@@ -654,7 +654,7 @@
 "No chat model yet." = "Chưa có mô hình chat.";
 "No chats found" = "Không tìm thấy trò chuyện";
 "No details for this answer." = "Không có chi tiết cho câu trả lời này.";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Không có mô hình embedding: Files được tìm kiếm theo từ. Tải xuống trong Cài đặt > Files để tìm theo nghĩa.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "Không có Mô hình embedding: các tệp được tìm kiếm theo từ ngữ. Tải về mô hình này trong Cài đặt > Tệp để tìm kiếm theo ý nghĩa.";
 "No files yet" = "Chưa có tệp";
 "No folder changes yet." = "Chưa có thay đổi thư mục.";
 "No messages yet" = "Chưa có tin nhắn";
@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "Đó không phải là thư mục của LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "%lld mục chuyển vào Thùng rác chưa được chọn: đánh dấu những mục bạn muốn.";
 "The App Store couldn't confirm the purchase." = "App Store không thể xác nhận giao dịch mua.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray trên App Store đang mở. Đóng nó trước (biểu tượng trên thanh menu › Quit), rồi mở lại cái này: hai bản sẽ dùng cùng một cổng và tải mô hình hai lần.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray từ App Store đang mở. Hãy thoát phiên bản đó trước (biểu tượng trên thanh menu › Thoát), rồi mở lại phiên bản này: cả hai sẽ dùng cùng một cổng và tải mô hình hai lần.";
 "The Keychain refused to remove the token." = "Keychain từ chối xóa token.";
 "The Keychain refused to save the token." = "Keychain từ chối lưu token.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Hướng dẫn LLMTray nằm trong dự án này: ví dụ, hỏi cách kết nối agent lập trình của bạn.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "Các cài đặt ở đây đã được giữ.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Các gợi ý cho Mac này đã có sẵn. Duyệt Hugging Face để chọn mô hình khác.";
 "The tips aren't available right now." = "Tùy chọn góp tiền hiện không khả dụng.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray từ ipsupport.us đang mở. Đóng nó trước (biểu tượng trên thanh menu › Quit), rồi mở lại cái này: hai bản sẽ dùng cùng một cổng và tải mô hình hai lần.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Phiên bản LLMTray từ ipsupport.us đang mở. Hãy thoát phiên bản đó trước (biểu tượng trên thanh menu › Thoát), rồi mở lại phiên bản này: cả hai sẽ dùng cùng một cổng và tải mô hình hai lần.";
 "The voice model is being downloaded -- try again once it's done." = "Mô hình giọng nói đang tải — thử lại khi hoàn tất.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Mô hình giọng nói chưa tải — tải trong Cài đặt > Voice.";
 "The voice model's audio format isn't supported." = "Định dạng âm thanh của mô hình giọng nói không được hỗ trợ.";
@@ -1180,13 +1180,13 @@
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "Được sử dụng cho tạo ảnh, nhạc và Voice Lab, nơi tải chúng về. Chúng cũng được lưu trong thư mục models, theo tên trên Hugging Face.";
 "Uses the internet" = "Sử dụng internet";
 "Verbose server logging" = "Ghi nhật ký máy chủ chi tiết";
-"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ghi nhật ký chi tiết máy chủ đang bật, nên nhật ký chứa các cuộc trò chuyện của bạn: nó không được đính kèm. Để đính kèm, tắt ghi nhật ký chi tiết trong Settings › Server, khởi động lại máy chủ và tái tạo sự cố.";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "Ghi nhật ký máy chủ chi tiết đang bật, nên nhật ký chứa các trò chuyện của bạn: nhật ký không được đính kèm. Để kèm theo nhật ký, hãy tắt ghi nhật ký chi tiết trong Cài đặt › Máy chủ, khởi động lại máy chủ và tái hiện sự cố.";
 "Version" = "Phiên bản";
 "Version %@" = "Phiên bản %@";
 "View model card" = "Xem thẻ mô hình.";
 "Voice" = "Giọng";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab đang tắt — bật ở Cài đặt > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab đang tắt -- hãy bật trong Cài đặt > Giọng.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab chiếm khoảng %1$@ GB trong %2$@ GB GPU có thể dùng — không cùng lúc với %3$@ GB của mô hình chat, nên mô hình chat được giải nạp khi Voice Lab chạy.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab chiếm khoảng %1$@ GB trong %2$@ GB GPU có thể dùng.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab chiếm khoảng %1$@ GB, nhiều hơn %2$@ GB GPU có thể dùng trên Mac này: sẽ hết bộ nhớ.";

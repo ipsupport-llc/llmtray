@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats die Dateien durchsuchen lassen.";
 "Close" = "Schließen";
 "Close Tab" = "Tab schließen";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. Einstellungen › Allgemein › Set Up LLMTray… öffnet es erneut.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. „Einstellungen“ › „Allgemein“ › „LLMTray einrichten…“ öffnet es erneut.";
 "Coding agents" = "Code‑Agenten";
 "Coffee" = "Coffee";
 "Command-line tool" = "Kommandozeilen‑Tool";
@@ -346,7 +346,7 @@
 "Drop to attach images" = "Zum Anhängen von Bildern ablegen";
 "Duplicate this profile" = "Dieses Profil duplizieren";
 "Echo cancellation" = "Echo-Unterdrückung";
-"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ – schalten Sie sie unter „Einstellungen > Stimme“ aus.";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ -- deaktivieren Sie sie unter „Einstellungen“ > „Sprache“.";
 "Echo cancellation isn't available on this Mac." = "Echo-Unterdrückung ist auf diesem Mac nicht verfügbar.";
 "Echo gate" = "Echo-Gate";
 "Edit Profile…" = "Profil bearbeiten …";
@@ -1186,7 +1186,7 @@
 "View model card" = "Modellkarte anzeigen.";
 "Voice" = "Sprache";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab ist ausgeschaltet – in Einstellungen > Voice einschalten.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab ist deaktiviert -- aktivieren Sie es unter „Einstellungen“ > „Sprache“.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab benötigt etwa %1$@ GB der %2$@ GB, die die GPU nutzen darf – nicht zusammen mit den %3$@ GB des Chat‑Modells, daher wird das Chat‑Modell während des Betriebs entladen.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab benötigt etwa %1$@ GB der %2$@ GB, die die GPU nutzen darf.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab benötigt etwa %1$@ GB, mehr als die %2$@ GB, die die GPU auf diesem Mac nutzen darf: Es würde nicht genug Speicher geben.";

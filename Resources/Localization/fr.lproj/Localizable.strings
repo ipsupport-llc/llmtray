@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3 bits + parole 8 bits : la version la plus rapide d'IPSupport — un modèle de langage 3 bits avec reconnaissance et synthèse vocale en 8 bits, toutes les réponses de test exactes. GPTQ 3 bits : identique mais les composants vocaux sont en pleine précision. 4 bits : la version de la communauté mlx. Chacune n'est téléchargée que sur demande.";
 "GPU memory limit" = "Limite de mémoire GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Mémoire GPU que le serveur de modèle laisse libre en dehors des poids, pour les activations et macOS. Les parts ci‑dessous partagent ce qui reste.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Restreint : acceptez sa licence sur Hugging Face et enregistrez d’abord un jeton dans Réglages › Models.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Accès restreint : acceptez d’abord sa licence sur Hugging Face et enregistrez un token dans Réglages › Modèles.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Restreint : acceptez sa licence sur sa page Hugging Face, puis ajoutez un token dans Réglages → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Restreint : demandez l’accès sur sa page Hugging Face (les auteurs l’examinent), puis ajoutez un token dans Réglages → Models.";
 "General" = "Général";
@@ -519,7 +519,7 @@
 "Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Son profil Default se trouve dans Réglages › Profiles sous « Default (ipsupport.us) » : le vôtre ici avait été modifié, il a donc été conservé.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "Ses conversations restent, de retour parmi les récents ; les instructions et fichiers du projet sont supprimés.";
 "Its memory, in GB." = "Mémoire disponible, en Go.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ses réglages ont aussi été importés ; un token Hugging Face doit être saisi à nouveau dans Réglages › Models.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "Ses réglages ont aussi été importés ; un Token Hugging Face doit être saisi à nouveau dans Réglages › Modèles.";
 "Its settings were the same as these already." = "Ses réglages étaient déjà identiques à ceux-ci.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "Ses réglages n’ont pas été importés : ce n’est pas %@ dans ~/Library/Preferences.";
 "KV cache" = "Cache KV";

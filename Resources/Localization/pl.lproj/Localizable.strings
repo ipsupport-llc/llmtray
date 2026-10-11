@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: jeszcze nieobsługiwane";
 "%d overridden, rest from Default · %@" = "Nadpisane: %d, reszta z Default · %@";
 "%lld MB" = "%lld MB";
-"%lld can still be undone from Settings > Files." = "%lld można nadal cofnąć w Ustawienia > Files.";
+"%lld can still be undone from Settings > Files." = "%lld nadal można cofnąć w Ustawienia > Pliki.";
 "%lld downloads" = "%lld pobrań";
 "%lld failed" = "%lld nie powiodło się";
 "%lld files" = "%lld plików";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "Edytor, agent lub skrypt żądający modelu innego niż załadowany. Przełączenie wypina także obecny model — również czat. Najpierw zapytaj: powiadomienie z opcjami Przełącz / Zachowaj; brak odpowiedzi w minutę traktowany jest jako Zachowaj. Zachowaj: klient otrzyma błąd z nazwą załadowanego modelu. Własny czat aplikacji zawsze się przełącza.";
 "An item needs the new folder it goes into: tick that folder too." = "Element potrzebuje nowego folderu, do którego zostanie przeniesiony: zaznacz też ten folder.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "Dobrowolna darowizna: bez subskrypcji, bez blokowania funkcji. Sponsorzy mogą wybrać nazwę, którą sami wpiszą.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Pozycja może, lecz nie musi być zmieniona — sprawdź ją w Finder. Dziennik znajduje się w Ustawienia > Files.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "Niepewny element mógł się zmienić albo nie: sprawdź go w Finder. Ustawienia > Pliki przechowują dziennik.";
 "Another LLMTray is running" = "Inna instancja LLMTray już działa";
 "Another folder change is running: try again when it's done." = "Inna operacja na folderze jest w toku: spróbuj ponownie po jej zakończeniu.";
 "Another model already uses this alias." = "Inny model używa już tego aliasu.";
@@ -909,7 +909,7 @@
 "Show tool calls" = "Pokaż wywołania narzędzi";
 "Shows Pause, Stop and the project's files" = "Wyświetla Wstrzymaj, Zatrzymaj i pliki projektu";
 "Shows the chat window" = "Pokazuje okno czatu";
-"Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Pokazuje tok myślenia modelu (zwijany blok „Tok myślenia”) nad jego odpowiedzią.";
+"Shows the model's thinking (the collapsible “Thought process” block) above its answer." = "Pokazuje rozumowanie modelu (zwijany blok „Tok rozumowania”) nad jego odpowiedzią.";
 "Sings the lyrics clearly, the voice upfront. About 40 s for 30 s of music." = "Wyraźne śpiewanie tekstu, głos na pierwszym planie. Około 40 s na 30 s muzyki.";
 "Size" = "Rozmiar";
 "Skip" = "Pomiń";
@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "To nie jest folder LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "Te %lld przeniesień do Kosza są odznaczone: zaznacz te, które chcesz.";
 "The App Store couldn't confirm the purchase." = "App Store nie mógł potwierdzić zakupu.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Wersja LLMTray z App Store jest uruchomiona. Najpierw ją zamknij (ikona na pasku menu › Quit), potem otwórz tę aplikację ponownie: obie używałyby tego samego portu i ładowałyby modele dwukrotnie.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Wersja LLMTray z App Store jest otwarta. Najpierw ją zakończ (ikona na pasku menu › Zakończ), a następnie otwórz tę wersję ponownie: obie używałyby tego samego portu i ładowały modele dwukrotnie.";
 "The Keychain refused to remove the token." = "Keychain odmówił usunięcia tokenu.";
 "The Keychain refused to save the token." = "Keychain odmówił zapisania tokenu.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "Przewodnik LLMTray znajduje się w tym projekcie: na przykład zapytaj, jak podłączyć agenta programistycznego.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "Ustawienia tutaj zostały zachowane.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "Sugestie dla tego Maca są już dostępne. Przeglądaj Hugging Face w poszukiwaniu innego modelu.";
 "The tips aren't available right now." = "Darowizny są teraz niedostępne.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Wersja LLMTray z ipsupport.us jest uruchomiona. Najpierw ją zamknij (ikona na pasku menu › Quit), potem otwórz tę aplikację ponownie: obie używałyby tego samego portu i ładowałyby modele dwukrotnie.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "Wersja LLMTray z ipsupport.us jest otwarta. Najpierw ją zakończ (ikona na pasku menu › Zakończ), a następnie otwórz tę wersję ponownie: obie używałyby tego samego portu i ładowały modele dwukrotnie.";
 "The voice model is being downloaded -- try again once it's done." = "Model głosowy jest pobierany — spróbuj ponownie po zakończeniu.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "Model głosowy nie jest pobrany — pobierz go w Ustawienia > Voice.";
 "The voice model's audio format isn't supported." = "Format audio modelu głosowego nie jest obsługiwany.";
@@ -1186,7 +1186,7 @@
 "View model card" = "Wyświetl kartę modelu.";
 "Voice" = "Głos";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab jest wyłączony — włącz go w Ustawienia > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab jest wyłączone — włącz je w Ustawienia > Głos.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab zajmuje około %1$@ GB z %2$@ GB, które może użyć GPU — nie razem z %3$@ GB modelu czatu, dlatego model czatu jest wyładowany podczas działania.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab zajmuje około %1$@ GB z %2$@ GB, które może użyć GPU.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab zajmuje około %1$@ GB, więcej niż %2$@ GB, które GPU może użyć na tym Macu: zabrakłoby pamięci.";
