@@ -267,9 +267,14 @@ public enum DocumentMath {
                 return ("<munder>\(try argument())<mo>_</mo></munder>", false)
             case "text", "textrm", "textit", "textbf", "mbox", "textnormal":
                 return ("<mtext>\(DocumentHTML.escape(DocumentMath.textEscapes(try rawArgument())))</mtext>", false)
-            case "mathrm", "operatorname", "mathsf", "mathtt":
+            case "operatorname":
+                // A name as written (foo-bar too), applied like \sin.
+                let name = try rawArgument().filter { !$0.isWhitespace }
+                function = true
+                return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(DocumentMath.textEscapes(name)))</mi>", false)
+            case "mathrm", "mathsf", "mathtt":
                 // Read as math (m^2 is m squared), its letters upright; a
-                // plain word stays one name (\operatorname{rank}).
+                // plain word stays one name (\mathrm{kg}).
                 let start = i
                 let text = try rawArgument()
                 if text.allSatisfy({ $0.isLetter || $0.isNumber || $0 == " " }) {
