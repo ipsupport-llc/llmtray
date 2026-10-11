@@ -242,10 +242,13 @@ enum DocumentRenderCLI {
     const origin = body.getBoundingClientRect();
     const page = el => Math.floor((el.getBoundingClientRect().left - origin.left + 1) / width);
     const bottom = el => el.getBoundingClientRect().bottom - origin.top;
-    let cuts = 0;
+    // A cut moves only what follows it: the next look starts at its rest.
+    let cuts = 0, from = 0;
     for (; cuts < 400; cuts++) {
         let cut = false;
-        for (const table of document.querySelectorAll("table")) {
+        const tables = Array.from(document.querySelectorAll("table"));
+        for (let t = from; t < tables.length; t++) {
+            const table = tables[t];
             const head = table.tHead, rows = table.tBodies.length ? Array.from(table.tBodies[0].rows) : [];
             if (!head || !head.rows.length || !rows.length) continue;
             // Print lays pages out a little unlike columns (margins at a
@@ -259,6 +262,7 @@ enum DocumentRenderCLI {
                 // The header alone at a page's foot: the table starts the next page.
                 if (table.classList.contains("cont") || table.classList.contains("newpage")) continue;
                 table.classList.add("newpage");
+                from = t;
                 cut = true;
                 break;
             }
@@ -273,6 +277,7 @@ enum DocumentRenderCLI {
             rest.classList.remove("cut", "newpage");
             rest.classList.add("cont");
             table.after(rest);
+            from = t + 1;
             cut = true;
             break;
         }
