@@ -54,6 +54,9 @@ final class ModelCardTextTests: XCTestCase {
         XCTAssertEqual(ModelCardText.clean("<div><a href=\"https://e.com\">A [B</a></div>"), "[A \\[B](https://e.com)")
         XCTAssertEqual(ModelCardText.clean("\n<img src=\"logo.png\" />\n\ntext"), "\n\ntext", "a lone tag after a blank line")
         XCTAssertEqual(ModelCardText.clean("# Model\n<a href=\"https://chat.qwen.ai/\">\nChat\n</a>"), "# Model\n[Chat](https://chat.qwen.ai/)", "after a heading")
+        XCTAssertEqual(ModelCardText.clean("<pre><code>if ready:\n    print(\"&lt;model>\")\n</code></pre>\n\nafter"),
+                       "```\nif ready:\n    print(\"<model>\")\n```\n\nafter", "a <pre> is code, as written")
+        XCTAssertEqual(ModelCardText.clean("<pre>one line</pre>\ntext"), "```\none line\n```\ntext")
         XCTAssertEqual(ModelCardText.clean("<table>\n<tr><td>Accuracy</td><td>90%</td></tr>\n</table>\n\ntext"), "Accuracy 90%\n\ntext")
     }
 

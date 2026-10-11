@@ -16,22 +16,28 @@ public enum ModelCardText {
         var fence: (char: Character, count: Int)?
         // A lone tag can't interrupt a paragraph; after a heading it can.
         var inParagraph = false
+        // A comment ends at -->, a <pre> at </pre>, the rest at a blank line.
+        var end: String?
+        var pre = false
         func flush() {
             guard !block.isEmpty else { return }
             let text = block.joined(separator: "\n")
-            if text.utf16.count <= blockLimit {
+            if pre {
+                out.append(contentsOf: code(text))
+            } else if text.utf16.count <= blockLimit {
                 out.append(contentsOf: convert(text))
             } else {
                 out.append(contentsOf: block)
             }
             block.removeAll()
+            end = nil
+            pre = false
         }
-        var comment = false  // the block is a comment: it ends at -->
         for line in markdown.components(separatedBy: "\n") {
             if !block.isEmpty {
-                if comment {
+                if let marker = end {
                     block.append(line)
-                    if line.contains("-->") { flush(); comment = false }
+                    if line.range(of: marker, options: .caseInsensitive) != nil { flush() }
                 } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
                     flush()
                     out.append(line)
@@ -52,9 +58,14 @@ public enum ModelCardText {
                 inParagraph = false
             } else if let start = htmlBlockStart(line, inParagraph: inParagraph) {
                 block.append(line)
-                if start == .comment {
-                    if line.contains("-->") { flush() } else { comment = true }
+                switch start {
+                case .comment: end = "-->"
+                case .pre: end = "</pre>"; pre = true
+                default: break
                 }
+                // The end on the opening line itself (after its start).
+                if let marker = end, let open = line.range(of: start == .pre ? "<pre" : "<!--", options: .caseInsensitive),
+                   line[open.upperBound...].range(of: marker, options: .caseInsensitive) != nil { flush() }
             } else {
                 out.append(line)
                 let t = line.trimmingCharacters(in: .whitespaces)
@@ -86,7 +97,7 @@ public enum ModelCardText {
         return count >= open.count && rest.dropFirst(count).allSatisfy { $0 == " " || $0 == "\t" }
     }
 
-    enum BlockStart { case comment, block, tag }
+    enum BlockStart { case comment, pre, block, tag }
 
     /// CommonMark's HTML block starts, up to three spaces in: a comment; a
     /// block-level tag; any other complete tag alone on its line, only
@@ -96,6 +107,7 @@ public enum ModelCardText {
         guard indent <= 3 else { return nil }
         let rest = String(line.dropFirst(indent))
         if rest.hasPrefix("<!--") { return .comment }
+        if rest.range(of: #"^<pre(?=[\s>]|$)"#, options: [.regularExpression, .caseInsensitive]) != nil { return .pre }
         if let r = rest.range(of: #"^</?([A-Za-z][A-Za-z0-9-]*)(?=[\s/>]|$)"#, options: .regularExpression) {
             let name = rest[r].trimmingCharacters(in: CharacterSet(charactersIn: "</")).lowercased()
             if blockStartTags.contains(name) { return .block }
@@ -121,6 +133,22 @@ public enum ModelCardText {
     static let attribute = try! NSRegularExpression(pattern: #"([^\s"'=<>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?"#)
     static let blockTags: Set<String> = ["div", "p", "center", "h1", "h2", "h3", "h4", "h5", "h6", "table", "tr",
                                          "ul", "ol", "li", "section", "details", "summary", "picture", "figure", "br", "hr"]
+
+    /// A <pre> block as a fenced code block: its text as written (the
+    /// <pre>/<code> tags around it gone, entities decoded), indent and all.
+    static func code(_ text: String) -> [String] {
+        var body = text.replacingOccurrences(of: #"^\s*<pre[^>]*>\s*(<code[^>]*>)?\n?"#, with: "",
+                                             options: [.regularExpression, .caseInsensitive])
+        body = body.replacingOccurrences(of: #"\n?(</code\s*>)?\s*</pre\s*>[\s\S]*$"#, with: "",
+                                         options: [.regularExpression, .caseInsensitive])
+        for (entity, char) in [("&lt;", "<"), ("&gt;", ">"), ("&quot;", "\""), ("&#39;", "'"), ("&amp;", "&")] {
+            body = body.replacingOccurrences(of: entity, with: char)
+        }
+        // A fence longer than any run of backticks inside.
+        let longest = body.components(separatedBy: CharacterSet(charactersIn: "`").inverted).map(\.count).max() ?? 0
+        let fence = String(repeating: "`", count: max(3, longest + 1))
+        return [fence] + body.components(separatedBy: "\n") + [fence]
+    }
 
     /// One HTML block as Markdown lines: a link's text and address, line
     /// breaks at block tags, every other tag (pictures too) dropped.
