@@ -1829,7 +1829,7 @@ final class ChatClient: ObservableObject {
         guard let counted = countedRequest, counted.historyCount <= messages.count else { return nil }
         let framing = framing(modelAlias: context.modelAlias, settings: settings, tools: toolbox.definitions(for: settings))
         guard framing.isCovered(by: unpinned ? counted.unpinnedFraming : counted.framing) else { return nil }
-        let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map(ChatRequestBuilder.serialize)])
+        let added = ChatRequestBuilder.measure(["messages": messages[counted.historyCount...].map { ChatRequestBuilder.serialize(message: $0) }])
         return tokenEstimator.estimate(countedPlus: added)
     }
 

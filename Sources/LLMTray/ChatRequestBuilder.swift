@@ -22,6 +22,11 @@ enum ChatRequestBuilder {
         // An image a tool put in front of the model goes with the request
         // right after it only -- not again with every later one.
         let lastIndex = history.indices.last
+        // The thinking budget is told with the latest user message only, as
+        // the picker is now (Thinking.note): never a stale one from an
+        // earlier choice or another model in the history.
+        let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.thinkingEffort).map(Thinking.note(budget:))
+        let latestUser = history.lastIndex { $0.role == "user" && !$0.isToolContext }
         var payload = history.enumerated().map { i, message in
             // A model without vision refuses any request carrying an image
             // (mlx_lm.server): a chat that had one, continued with a text
@@ -33,8 +38,8 @@ enum ChatRequestBuilder {
                                            toolCalls: message.toolCalls, toolCallID: message.toolCallID)
                     text.projectFilesAdded = message.projectFilesAdded
                     return text
-                }())
-                : serialize(message: message)
+                }(), note: i == latestUser ? budgetNote : nil)
+                : serialize(message: message, note: i == latestUser ? budgetNote : nil)
         }
         // The project's instructions between the profile's prompt and the
         // tool-use rule: the rules about tools come last whatever they say.
@@ -127,7 +132,9 @@ enum ChatRequestBuilder {
     /// assistant turn that called tool(s) (tool_calls attached, content
     /// omitted if the model produced none), or a "tool" result keyed by
     /// tool_call_id.
-    static func serialize(message: ChatMessage) -> [String: Any] {
+    /// `note`: an app note for a user message (the thinking budget), put
+    /// before the files note and the text.
+    static func serialize(message: ChatMessage, note: String? = nil) -> [String: Any] {
         if message.role == "tool" {
             return ["role": "tool", "tool_call_id": message.toolCallID ?? "", "content": message.content]
         }
@@ -142,8 +149,8 @@ enum ChatRequestBuilder {
             return dict
         }
         // Files added to the project since the last message: said first.
-        let text = message.role == "user" ? ProjectFilesNote.text(message.projectFilesAdded).map { $0 + "\n\n" + message.content } ?? message.content
-            : message.content
+        let notes = message.role == "user" ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 } : []
+        let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
         if message.role == "user", !message.images.isEmpty {
             // Attachments are always normalized to PNG before landing in
             // ChatMessage.images (see ContentView's attach-file handling),

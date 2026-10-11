@@ -10,6 +10,18 @@ final class ThinkingTests: XCTestCase {
         XCTAssertEqual(Thinking.style(chatTemplate: "Reasoning: {{ reasoning_effort }} <think>"), .levels, "gpt-oss: its own levels first")
     }
 
+    /// Low and Medium are told to the model as well as cut off by the server.
+    func testTheBudgetIsTold() {
+        XCTAssertEqual(Thinking.budgetToTell(style: .budget, effort: .low), 512)
+        XCTAssertEqual(Thinking.budgetToTell(style: .budget, effort: .medium), 2048)
+        XCTAssertNil(Thinking.budgetToTell(style: .budget, effort: .high))
+        XCTAssertNil(Thinking.budgetToTell(style: .budget, effort: .off), "the template turns it off")
+        XCTAssertNil(Thinking.budgetToTell(style: .levels, effort: .low), "gpt-oss has its own levels")
+        XCTAssertNil(Thinking.budgetToTell(style: .none, effort: .low))
+        let note = Thinking.note(budget: 512)
+        XCTAssertTrue(note.hasPrefix("[App note, not the user's words:") && note.contains("about 512 tokens"), note)
+    }
+
     func testRequestFields() {
         XCTAssertTrue(Thinking.requestFields(style: .none, effort: .low).isEmpty)
         XCTAssertTrue(Thinking.requestFields(style: .budget, effort: .high).isEmpty, "High: as before, no limit")
