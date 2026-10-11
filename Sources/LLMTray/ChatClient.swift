@@ -100,6 +100,12 @@ final class ChatClient: ObservableObject {
     @Published private(set) var currentSessionID: UUID?
     /// A document is being made again (Make again): the chat is busy.
     @Published private(set) var isRemakingDocument = false
+    /// The tool groups this chat has loaded (adr/0020): declared from the
+    /// request after the load on, for the rest of the chat.
+    @Published private(set) var loadedToolGroups: Set<String> = []
+    /// Loaded by a call made after outside text in its turn: loaded at the
+    /// start of the user's next message.
+    private var pendingToolGroups: Set<String> = []
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
     /// The title is the user's or the model's already: no auto-title.
@@ -288,6 +294,18 @@ final class ChatClient: ObservableObject {
         tokenEstimator = PromptTokenEstimator()
         lastRequest = nil
         countedRequest = nil
+        loadedToolGroups = []
+        pendingToolGroups = []
+    }
+
+    /// The user loads a tool group from the + menu (adr/0020): declared
+    /// from this message on, saved with the chat.
+    func loadToolGroup(_ name: String) {
+        guard ToolGroups.named(name) != nil, !loadedToolGroups.contains(name) else { return }
+        loadedToolGroups.insert(name)
+        toolbox.toolGroupsChanged()
+        hasUnsavedChanges = true
+        if !messages.isEmpty { persistCurrentSession() }
     }
 
     func loadSession(_ file: ChatSessionFile) {
@@ -317,6 +335,7 @@ final class ChatClient: ObservableObject {
             return message
         }
         currentSessionID = file.id
+        loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
@@ -453,7 +472,8 @@ final class ChatClient: ObservableObject {
             title: title,
             createdAt: sessionCreatedAt ?? Date(),
             updatedAt: Date(),
-            messages: persisted
+            messages: persisted,
+            loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted()
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -554,6 +574,13 @@ final class ChatClient: ObservableObject {
         server: ServerManager
     ) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
+        // Groups loaded after outside text in an earlier turn: from this
+        // message on (adr/0020).
+        if !pendingToolGroups.isEmpty {
+            loadedToolGroups.formUnion(pendingToolGroups)
+            pendingToolGroups = []
+            hasUnsavedChanges = true
+        }
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         turnCallResults = [:]
@@ -571,6 +598,7 @@ final class ChatClient: ObservableObject {
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
         settings.folders = folderChat
         settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
+        settings.loadedToolGroups = loadedToolGroups
         return settings
     }
 
@@ -1250,6 +1278,9 @@ final class ChatClient: ObservableObject {
         now.project = start.project
         // Turned off mid-turn: stops at once.
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
+        now.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? start.documentsSession : nil
+        // As loaded now: a group load_tools just loaded applies.
+        now.loadedToolGroups = loadedToolGroups
         return now
     }
 
@@ -1634,6 +1665,15 @@ final class ChatClient: ObservableObject {
                     if messages[sourceIndex].imageSources.count == messages[sourceIndex].images.count - 1 {
                         messages[sourceIndex].imageSources.append(source)
                     }
+                }
+                messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .loadedTools(let group, let pending, let text):
+                if pending {
+                    pendingToolGroups.insert(group)
+                } else if !loadedToolGroups.contains(group) {
+                    loadedToolGroups.insert(group)
+                    toolbox.toolGroupsChanged()
+                    hasUnsavedChanges = true
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .generatedDocument(let document, let text):

@@ -144,3 +144,40 @@ enum DocumentRenderer {
         var value: String { lock.lock(); defer { lock.unlock() }; return line }
     }
 }
+
+/// `load_tools` (adr/0020): loads an on-demand tool group into this chat.
+/// Declared, with the same enum, in every request of a chat with an
+/// on-demand group switched on -- also after loading, so the list changes
+/// once. Ordinary trust; after outside text in the turn the group waits for
+/// the user's next message (a file can't hand the model a new tool).
+@MainActor
+final class LoadToolsTool: ChatTool {
+    let name = "load_tools"
+    weak var toolbox: ChatToolbox?
+    var definition: [String: Any] { ToolGroups.loaderSchema(groups: ToolGroups.all).definition }
+    var schema: ToolSchema? { ToolGroups.loaderSchema(groups: ToolGroups.all) }
+
+    func isOffered(_ settings: ChatSettings) -> Bool { !(toolbox?.onDemandGroups(settings).isEmpty ?? true) }
+
+    func definition(for settings: ChatSettings) -> [String: Any]? {
+        let groups = toolbox?.onDemandGroups(settings) ?? []
+        return groups.isEmpty ? nil : ToolGroups.loaderSchema(groups: groups).definition
+    }
+
+    func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
+        let offered = toolbox?.onDemandGroups(context.settings) ?? []
+        guard let name = arguments["group"] as? String, let group = offered.first(where: { $0.name == name }) else {
+            let names = offered.map(\.name).joined(separator: ", ")
+            return .text(names.isEmpty ? "load_tools: no tools can be loaded in this chat." : "load_tools: \"group\" must be one of \(names).")
+        }
+        if context.settings.loadedToolGroups.contains(group.name) {
+            return .text("load_tools: \(group.name) is already loaded; its tools (\(group.tools.joined(separator: ", "))) are available.")
+        }
+        if context.untrustedTextThisTurn {
+            return .loadedTools(group.name, pending: true, text: "load_tools: \(group.name) will be available from the user's next message "
+                + "(it can't be loaded after file or web text in the same turn). Tell the user to ask again.")
+        }
+        return .loadedTools(group.name, pending: false, text: "load_tools: \(group.name) is loaded; \(group.tools.joined(separator: ", ")) "
+            + "can be called from the next step. Call it now if the user's request needs it.")
+    }
+}

@@ -247,6 +247,10 @@ struct ChatSettings {
     /// The saved chat documents go into (its folder), while making
     /// documents is on; nil in a temporary chat or with it off (adr/0020).
     var documentsSession: UUID?
+    /// Per tool group: declared always, or on demand (adr/0020).
+    var toolLoading: [String: ToolLoading] = ToolGroups.builtIn
+    /// The on-demand groups this chat has loaded (load_tools, the + menu).
+    var loadedToolGroups: Set<String> = []
     /// The profile's name, for an answer's details.
     var profileName: String?
 
@@ -273,6 +277,7 @@ struct ChatSettings {
         unloadModelDuringImageGen = p.unloadModelDuringImageGen
         imageQuality = ImageQuality(rawValue: p.imageQuality) ?? .balanced
         toolUsePolicy = p.toolUsePolicy
+        toolLoading = p.toolLoading
     }
 
     init() {}

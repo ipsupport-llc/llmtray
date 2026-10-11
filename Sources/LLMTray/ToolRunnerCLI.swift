@@ -94,7 +94,7 @@ enum ToolRunnerCLI {
             case .text(let text), .refused(let text): print(text)
             case .generatedImage(_, _, _, let text), .generatedAudio(_, _, _, let text), .imageForModel(_, let text): print(text)
             case .projectText(let output): print(output.rendered(byteBudget: 1 << 30).text)
-            case .generatedDocument(_, let text): print(text)
+            case .generatedDocument(_, let text), .loadedTools(_, _, let text): print(text)
             }
             exit(0)
         }

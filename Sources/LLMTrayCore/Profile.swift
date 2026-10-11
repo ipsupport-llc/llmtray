@@ -89,6 +89,9 @@ public struct Profile: Codable, Identifiable, Equatable, Sendable {
         /// Added to the system prompt whenever tools are offered. Empty
         /// string disables it.
         public var toolUsePolicy: String?
+        /// Per tool group (ToolGroups): declared always, or loaded on demand
+        /// (adr/0020). Merged per group across layers.
+        public var toolLoading: ToolLoadingMap?
         public init() {}
     }
 
@@ -208,6 +211,7 @@ extension Profile {
         p.tools.imageQuality = "balanced"
         p.tools.unloadModelDuringImageGen = true
         p.tools.toolUsePolicy = defaultToolUsePolicy
+        p.tools.toolLoading = ToolLoadingMap(ToolGroups.builtIn)
         p.launch.kvBits = KVSettings.defaultBits
         p.launch.kvGroupSize = KVSettings.defaultGroupSize
         p.launch.quantizedKVStart = 0
@@ -222,7 +226,8 @@ extension Profile {
 
     /// Number of fields this profile sets (for "overrides N settings").
     public var overrideCount: Int {
-        Profile.allFields.filter { $0.isSet(self) }.count
+        // toolLoading counts as the groups it sets, not as one field.
+        Profile.allFields.filter { $0.name != "toolLoading" && $0.isSet(self) }.count + (tools.toolLoading?.groups.count ?? 0)
     }
 }
 
@@ -249,7 +254,7 @@ public enum ProfileResolver {
 
     public static func resolve(overlay: Profile?, base: Profile) -> ResolvedProfile {
         func v<T>(_ kp: KeyPath<Profile, T?>) -> T { value(kp, overlay: overlay, base: base) }
-        return ResolvedProfile(
+        var resolved = ResolvedProfile(
             profileID: overlay?.id ?? base.id,
             profileName: overlay?.name ?? base.name,
             // Clamped like the launch values below: a hand-edited or
@@ -283,6 +288,8 @@ public enum ProfileResolver {
             lowMemoryWeights: v(\.launch.lowMemoryWeights),
             extraServerArgs: v(\.launch.extraServerArgs)
         )
+        resolved.toolLoading = ToolGroups.merged(overlay: overlay?.tools.toolLoading, base: base.tools.toolLoading)
+        return resolved
     }
 }
 
@@ -320,6 +327,8 @@ public struct ResolvedProfile: Equatable, Sendable {
     public var mtpDrafter: Bool
     public var lowMemoryWeights: Bool
     public var extraServerArgs: String
+    /// Per tool group, merged per group (ToolGroups.merged).
+    public var toolLoading: [String: ToolLoading] = ToolGroups.builtIn
 }
 
 /// Type-erased handle on one optional field, for counting and resetting
@@ -363,6 +372,7 @@ extension Profile {
         ProfileField("imageQuality", \.tools.imageQuality),
         ProfileField("unloadModelDuringImageGen", \.tools.unloadModelDuringImageGen),
         ProfileField("toolUsePolicy", \.tools.toolUsePolicy),
+        ProfileField("toolLoading", \.tools.toolLoading),
         ProfileField("kvBits", \.launch.kvBits),
         ProfileField("kvGroupSize", \.launch.kvGroupSize),
         ProfileField("quantizedKVStart", \.launch.quantizedKVStart),
