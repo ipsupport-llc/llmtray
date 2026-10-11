@@ -279,15 +279,18 @@ A file dropped on a chat made a project and indexed it, and the model
 knew nothing of it. The chat keeps its project's document names as of
 its last message (`projectFilesSeen`, saved with the chat); the user's
 next message carries the ones added since -- by a drop, the + menu, the
-Files window or another chat -- and the model gets them before the
-message's text as `[App note, not the user's words: added to this
-chat's project since the last message: "a.pdf", … project_files lists,
-searches and reads them.]` (`ProjectFilesNote`). Names only, as the
-listing has them: file text, so marked as the app's, one line, no
-brackets or quotes, 80 characters each, ten shown and the rest counted.
-The names are saved on the message (`projectFilesAdded`), so later
-requests send the same history, and shown under its bubble ("Told the
-model about new project files: …"). A chat's first message, or one from
+Files window or another chat -- and the model gets, before the
+message's text, how many and of which kinds, never their names: `[App
+note, not the user's words: 1 new file (pdf) added to this chat's project
+since the last message. Call project_files to see and read them if the
+message is about them.]` (`ProjectFilesNote`). A name is file text: the
+turn's trust barrier counts it once project_files has put it in front of
+the model, so a hostile name can't steer a guarded call by arriving with
+the user's message. The names are saved on the message
+(`projectFilesAdded`), so later requests send the same history, and shown
+under its bubble, cleaned (one line, no control or format characters, 80
+each), as "Told the model about new project files: …". Project files
+off: nothing is said. A chat's first message, or one from
 before this, only records the names; a chat that wasn't in a project
 counts everything a project brings as new; removals say nothing.
 

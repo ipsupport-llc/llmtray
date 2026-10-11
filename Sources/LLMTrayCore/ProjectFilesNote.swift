@@ -3,8 +3,8 @@ import Foundation
 /// The files added to a chat's project since its last message, told to the
 /// model with the user's next one (adr/0012, "New files are said"): a file
 /// dropped on the chat made a project and indexed it, and the model knew
-/// nothing of it. Names only, as the listing has them -- file text, not the
-/// user's words, so marked as the app's and kept short.
+/// nothing of it. The model is told how many and of which kinds; the names
+/// are for the user's caption.
 public enum ProjectFilesNote {
     /// Names shown at most; the rest are counted.
     public static let shownNames = 10
@@ -21,19 +21,31 @@ public enum ProjectFilesNote {
     }
 
     /// The line put before the user's message for the model; nil for none.
+    /// How many and of which kinds, never their names: a name is file text,
+    /// and the turn's trust barrier counts it only once project_files has
+    /// put it in front of the model -- so the model calls project_files.
     public static func text(_ names: [String]) -> String? {
         guard !names.isEmpty else { return nil }
-        let shown = names.prefix(shownNames).map { "\"\(clean($0))\"" }.joined(separator: ", ")
-        let more = names.count > shownNames ? " and \(names.count - shownNames) more" : ""
-        return "[App note, not the user's words: added to this chat's project since the last message: \(shown)\(more). "
-            + "project_files lists, searches and reads them.]"
+        var kinds: [String] = []
+        for name in names {
+            let ext = (name as NSString).pathExtension.lowercased()
+            let kind = !ext.isEmpty && ext.count <= 5 && ext.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber) }) ? ext : "file"
+            if !kinds.contains(kind) { kinds.append(kind) }
+        }
+        let count = names.count == 1 ? "1 new file" : "\(names.count) new files"
+        return "[App note, not the user's words: \(count) (\(kinds.prefix(6).joined(separator: ", "))) added to this chat's project "
+            + "since the last message. Call project_files to see and read them if the message is about them.]"
     }
 
-    /// A name on one line, without brackets or quotes that could close the
-    /// note, at most 80 characters.
-    static func clean(_ name: String) -> String {
-        var s = String(name.unicodeScalars.filter { $0.value >= 0x20 && $0 != "\u{7F}" && !"[]\"".unicodeScalars.contains($0) }
-            .map(Character.init))
+    /// A name for the bubble's caption: one line, no control, format or
+    /// separator characters (bidi overrides, U+2028), at most 80.
+    public static func clean(_ name: String) -> String {
+        var s = String(name.unicodeScalars.filter { scalar in
+            switch scalar.properties.generalCategory {
+            case .control, .format, .lineSeparator, .paragraphSeparator, .surrogate, .unassigned, .privateUse: return false
+            default: return true
+            }
+        }.map(Character.init))
         if s.unicodeScalars.count > nameScalars {
             s = String(String.UnicodeScalarView(s.unicodeScalars.prefix(nameScalars - 1))) + "…"
         }

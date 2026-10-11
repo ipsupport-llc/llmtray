@@ -614,7 +614,8 @@ final class ChatClient: ObservableObject {
             if projectFilesSeen != [] { projectFilesSeen = []; hasUnsavedChanges = true }
             return []
         }
-        guard let documents = ProjectIndexer.shared.documents[project.id] else { return [] }
+        // Project files off: no project_files to point at.
+        guard ProjectIndexer.shared.isEnabled, let documents = ProjectIndexer.shared.documents[project.id] else { return [] }
         let names = documents.map(\.name)
         let added = projectFilesSeen.map { ProjectFilesNote.added(current: names, seen: $0) } ?? []
         if projectFilesSeen != names { projectFilesSeen = names; hasUnsavedChanges = true }
