@@ -702,6 +702,7 @@ struct ProfilesPane: View {
     @EnvironmentObject var benchmark: BenchmarkRunner
     @EnvironmentObject var navigation: SettingsNavigation
     @ObservedObject private var profiles = ProfileManager.shared
+    @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
     @State private var renaming: String?
     @State private var nameDraft = ""
     @State private var onlyOverrides = false
@@ -906,19 +907,31 @@ struct ProfilesPane: View {
                     }
                 }
                 row(\.tools.toolLoading, "Documents tools", "When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat.") {
-                    Picker("", selection: Binding(
-                        get: { profiles.resolved(profileID: selectedID).toolLoading[ToolGroups.documents] ?? .onDemand },
-                        set: { value in
-                            var groups = profiles.profile(id: selectedID)?.tools.toolLoading?.groups ?? [:]
-                            groups[ToolGroups.documents] = value
-                            profiles.set(\.tools.toolLoading, ToolLoadingMap(groups), profileID: selectedID)
+                    VStack(alignment: .trailing, spacing: 4) {
+                        Picker("", selection: Binding(
+                            get: { profiles.resolved(profileID: selectedID).toolLoading[ToolGroups.documents] ?? .onDemand },
+                            set: { value in
+                                var groups = profiles.profile(id: selectedID)?.tools.toolLoading?.groups ?? [:]
+                                groups[ToolGroups.documents] = value
+                                profiles.set(\.tools.toolLoading, ToolLoadingMap(groups), profileID: selectedID)
+                            }
+                        )) {
+                            Text("When needed").tag(ToolLoading.onDemand)
+                            Text("Always").tag(ToolLoading.always)
                         }
-                    )) {
-                        Text("When needed").tag(ToolLoading.onDemand)
-                        Text("Always").tag(ToolLoading.always)
+                        .labelsHidden()
+                        .fixedSize()
+                        // This only says when the tool is declared: without
+                        // the opt-in in Settings > Files no chat gets it.
+                        if !documentsEnabled {
+                            HStack(spacing: 6) {
+                                Text("Documents are off (Settings › Files).")
+                                    .font(.caption).foregroundStyle(.secondary)
+                                Button("Turn On") { documentsEnabled = true }
+                                    .controlSize(.small)
+                            }
+                        }
                     }
-                    .labelsHidden()
-                    .fixedSize()
                 }
                 row(\.tools.toolUsePolicy, "Tool-use rule", "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.") {
                     TextEditor(text: b(\.tools.toolUsePolicy)).frame(minHeight: 50)
