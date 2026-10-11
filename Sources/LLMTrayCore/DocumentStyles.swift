@@ -20,9 +20,12 @@ public enum DocumentStyles {
     p code, li code, td code { background: #f5f5f7; border-radius: 3px; padding: 0 0.25em; }
     table { border-collapse: collapse; width: 100%; margin: 0 0 0.9em; font-size: 9.5pt; page-break-inside: auto; }
     tr { page-break-inside: avoid; break-inside: avoid; }
+    table.cont, table.newpage { page-break-before: always; break-before: page; }
     th, td { border-bottom: 1px solid #d2d2d7; padding: 0.3em 0.5em; text-align: left; vertical-align: top; }
     th { border-bottom: 1.5px solid #86868b; font-weight: 600; }
     th.c, td.c { text-align: center; } th.r, td.r { text-align: right; }
+    math { font-family: "STIX Two Math", math; font-size: 1.08em; }
+    math[display="block"] { display: block; margin: 0.4em 0 0.8em; page-break-inside: avoid; break-inside: avoid; }
     hr { border: 0; border-top: 1px solid #d2d2d7; margin: 1.2em 0; }
     a { color: #0a58ca; text-decoration: none; }
     .addr { color: #6e6e73; font-size: 8pt; }
@@ -56,7 +59,7 @@ public enum DocumentStyles {
     table { font-size: 10pt; }
     th { background: #f5f5f7; }
     td.r, th.r { font-variant-numeric: tabular-nums; }
-    tbody tr:last-child td { font-weight: 600; border-bottom: 1.5px solid #86868b; }
+    table:not(.cut) tbody tr:last-child td { font-weight: 600; border-bottom: 1.5px solid #86868b; }
     """
 
     /// The stylesheet for a style name (the report for any other).
@@ -160,6 +163,29 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         }
         let files = Dictionary(uniqueKeysWithValues: pictureKeys.map { ($0.value, $0.value) })
         return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: files), notes, body.tooLarge)
+    }
+
+    /// A value as a chart prints it on its bar, point or slice: short
+    /// (12.5K, 1.25M), no trailing zeros, two significant digits below 1.
+    public static func valueLabel(_ v: Double) -> String {
+        let a = abs(v)
+        if a >= 1e5 {
+            let (scale, suffix) = a >= 1e9 ? (1e9, "B") : a >= 1e6 ? (1e6, "M") : (1e3, "K")
+            return number(v / scale, decimals: a / scale >= 100 ? 0 : 1) + suffix
+        }
+        if a == 0 { return "0" }
+        if a >= 100 { return number(v, decimals: a >= 1000 ? 0 : 1) }
+        if a >= 1 { return number(v, decimals: 2) }
+        return number(v, decimals: min(8, max(2, Int(-log10(a).rounded(.down)) + 2)))
+    }
+
+    static func number(_ v: Double, decimals: Int) -> String {
+        var s = String(format: "%.\(decimals)f", v)
+        if s.contains(".") {
+            while s.hasSuffix("0") { s.removeLast() }
+            if s.hasSuffix(".") { s.removeLast() }
+        }
+        return s == "-0" ? "0" : s
     }
 
     /// The project picture ids the content places as images

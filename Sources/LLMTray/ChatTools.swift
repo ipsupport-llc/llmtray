@@ -48,6 +48,9 @@ struct ToolContext {
     /// Every image in this conversation, attached or generated, oldest
     /// first (edit_image).
     var chatImages: [(data: Data, prompt: String)] = []
+    /// The documents made in this conversation, oldest first: their titles
+    /// and calls (make_document's changes start from one).
+    var chatDocuments: [(title: String, arguments: String)] = []
     /// The chat the call is for (nil: a temporary chat): a project tool
     /// checks it's still in the turn's project.
     var chat: UUID? = nil

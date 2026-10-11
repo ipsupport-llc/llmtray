@@ -30,17 +30,32 @@ final class MakeDocumentTool: ChatTool {
         guard !madeThisTurn else {
             return .refused("\(name): a document was already made in this turn. Do not call it again; say if it should change.")
         }
-        let spec: DocumentSpec
+        var arguments = arguments
+        var changed: [String] = []
+        var from: String?
+        switch DocumentEdit.resolve(arguments, documents: context.chatDocuments) {
+        case .success(let (values, notes, base)):
+            arguments = values
+            changed = notes
+            from = base
+        case .failure(let problem):
+            return .text(problem.text)
+        }
+        var spec: DocumentSpec
         switch DocumentSpec.read(arguments) {
         case .success(let s): spec = s
         case .failure(let e): return .text(e.text)
         }
+        spec.adjusted = changed + spec.adjusted
+        // The whole call, changes applied: what Make again and a later
+        // change start from.
         let source = DocumentSource(arguments: Self.argumentsJSON(arguments), project: context.settings.project?.id)
         let pictures = await DocumentPictures.load(for: spec.content, project: context.settings.project?.id, chat: context.chat)
         switch await DocumentRenderer.render(spec, source: source, pictures: pictures) {
         case .success(let made):
             madeThisTurn = true
-            var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s")). "
+            var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s"))"
+                + (from.map { " from \"\($0)\" with the changes" } ?? "") + ". "
                 + "The user sees it in the chat and can open, save or share it. Don't repeat its content unless asked."
             let notes = spec.notes + made.notes
             // The tool is spent for the turn once a PDF is made: the model

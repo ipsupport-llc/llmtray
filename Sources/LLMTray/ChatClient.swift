@@ -1445,6 +1445,12 @@ final class ChatClient: ObservableObject {
         }
     }
 
+    /// The documents made in this conversation with their calls, oldest
+    /// first (make_document's changes).
+    private var chatDocuments: [(title: String, arguments: String)] {
+        messages.flatMap { msg in msg.documents.compactMap { d in d.source.map { (title: d.title, arguments: $0.arguments) } } }
+    }
+
     /// A call's name and arguments, the keys sorted (the same request
     /// written in another order is the same call).
     static func repeatKey(_ call: ToolCall) -> String {
@@ -1639,6 +1645,7 @@ final class ChatClient: ObservableObject {
             let source = MediaSource(tool: call.name, arguments: Self.pinnedArguments(call, chatImageCount: chatImages.count),
                                      model: drafts[call.id]?.modelID, madeWith: MediaSource.generatorModel(call.name, settings))
             var toolContext = ToolContext(settings: settings, generatedImages: generatedImages, chatImages: chatImages, chat: currentSessionID)
+            toolContext.chatDocuments = chatDocuments
             let chatID = folderChatID
             toolContext.askFolderAccess = { [weak self] request in await self?.askFolderAccess(request, chatID: chatID, token: token) }
             if toolbox.budgetedToolNames.contains(call.name) {

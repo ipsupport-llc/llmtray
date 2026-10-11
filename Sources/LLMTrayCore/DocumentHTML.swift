@@ -8,12 +8,12 @@ import Foundation
 /// a chart's or picture's `img` (an `llmtray-doc:` address we resolved).
 public enum DocumentHTML {
     /// What the converter can emit, and nothing else (a test checks).
-    public static let allowedTags: Set<String> = [
+    public static let allowedTags: Set<String> = Set([
         "html", "head", "meta", "title", "link", "body",
         "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
         "table", "thead", "tbody", "tr", "th", "td", "pre", "code", "blockquote",
         "a", "strong", "em", "del", "hr", "br", "sup", "span", "img", "nav", "section",
-    ]
+    ]).union(DocumentMath.tags)
 
     /// A picture or chart named in the content, and where it went.
     public enum ImageRef: Equatable, Sendable {
@@ -153,6 +153,13 @@ public enum DocumentHTML {
                     }
                     i += 1
                     out += "<pre><code>\(escape(code.joined(separator: "\n")))</code></pre>"
+                    continue
+                }
+                // Display math on lines of its own: $$ … $$ or \[ … \].
+                if let (math, next) = Self.displayMath(lines, from: i) {
+                    flush(&out, &self)
+                    out += math
+                    i = next
                     continue
                 }
                 // Heading.
@@ -336,6 +343,19 @@ public enum DocumentHTML {
                     i = close + 1
                     continue
                 }
+                // An escaped dollar is a dollar, never math.
+                if c == "\\", i + 1 < chars.count, chars[i + 1] == "$" {
+                    plain.append("$")
+                    i += 2
+                    continue
+                }
+                // Math: $…$, $$…$$, \(…\), \[…\].
+                if c == "$" || c == "\\", let (math, next) = Self.inlineMath(chars, at: i) {
+                    flushPlain()
+                    out += math
+                    i = next
+                    continue
+                }
                 // Image inline: a chart or picture, else its alt text.
                 if c == "!", i + 1 < chars.count, chars[i + 1] == "[",
                    let (alt, src, end) = Self.bracketed(chars, from: i + 1) {
@@ -398,6 +418,74 @@ public enum DocumentHTML {
                 guard i + m.count < chars.count, !chars[i + m.count].isWhitespace,
                       let close = findMarker(m, in: chars, from: i + m.count), close > i + m.count else { continue }
                 return (tag, String(chars[(i + m.count)..<close]), close + m.count)
+            }
+            return nil
+        }
+
+        /// How many lines display math may span.
+        static let mathLines = 60
+
+        /// `$$ … $$` or `\[ … \]` from line `i`, the delimiters starting
+        /// and ending lines (one line or several): the MathML and the line
+        /// after. Nil when it isn't that or can't be read (then it's text).
+        static func displayMath(_ lines: [String], from i: Int) -> (String, Int)? {
+            let first = lines[i].trimmingCharacters(in: .whitespaces)
+            let pairs = [("$$", "$$"), ("\\[", "\\]")]
+            guard let (open, close) = pairs.first(where: { first.hasPrefix($0.0) }) else { return nil }
+            var text = String(first.dropFirst(open.count))
+            var j = i
+            while true {
+                let t = text.trimmingCharacters(in: .whitespaces)
+                if t.hasSuffix(close), j > i || t.count >= close.count {
+                    let inner = String(t.dropLast(close.count))
+                    // Something after the closing delimiter: not a block.
+                    guard !inner.contains(close) else { return nil }
+                    guard let math = DocumentMath.mathML(inner, display: true) else { return nil }
+                    return (math, j + 1)
+                }
+                j += 1
+                guard j < lines.count, j - i < mathLines else { return nil }
+                text += "\n" + lines[j]
+            }
+        }
+
+        /// Math inside a line at `i`: the MathML and the index after it.
+        /// A `$` opens only before a non-space and closes only after one,
+        /// not before a digit: "$5 and $10" stays money.
+        static func inlineMath(_ chars: [Character], at i: Int) -> (String, Int)? {
+            func close(_ m: [Character], from: Int) -> Int? {
+                var j = from
+                let end = min(chars.count, from + scanLimit)
+                while j + m.count <= end {
+                    if starts(chars, at: j, with: m) { return j }
+                    j += 1
+                }
+                return nil
+            }
+            if chars[i] == "\\" {
+                guard i + 1 < chars.count, chars[i + 1] == "(" || chars[i + 1] == "[" else { return nil }
+                let display = chars[i + 1] == "["
+                guard let j = close(display ? ["\\", "]"] : ["\\", ")"], from: i + 2),
+                      let math = DocumentMath.mathML(String(chars[(i + 2)..<j]), display: display) else { return nil }
+                return (math, j + 2)
+            }
+            if i + 1 < chars.count, chars[i + 1] == "$" {
+                guard let j = close(["$", "$"], from: i + 2), j > i + 2,
+                      let math = DocumentMath.mathML(String(chars[(i + 2)..<j]), display: true) else { return nil }
+                return (math, j + 2)
+            }
+            guard i + 1 < chars.count, !chars[i + 1].isWhitespace else { return nil }
+            var j = i + 1
+            let end = min(chars.count, i + 1 + scanLimit)
+            while j < end {
+                if chars[j] == "$", chars[j - 1] != "\\" {
+                    // Another dollar that can't close it: money ("$5 and
+                    // $10, … 0$"), not math.
+                    guard !chars[j - 1].isWhitespace, j + 1 == chars.count || !chars[j + 1].isNumber else { return nil }
+                    guard j > i + 1, let math = DocumentMath.mathML(String(chars[(i + 1)..<j]), display: false) else { return nil }
+                    return (math, j + 1)
+                }
+                j += 1
             }
             return nil
         }

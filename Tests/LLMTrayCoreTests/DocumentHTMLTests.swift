@@ -29,6 +29,12 @@ final class DocumentHTMLTests: XCTestCase {
                     XCTAssertTrue(value.hasPrefix("http://") || value.hasPrefix("https://") || value.hasPrefix("mailto:"), value, file: file, line: line)
                 case ("img", "src"), ("link", "href"):
                     XCTAssertTrue(value.hasPrefix("llmtray-doc://"), value, file: file, line: line)
+                // Math's own, fixed values only.
+                case ("math", "display"): XCTAssertEqual(value, "block", file: file, line: line)
+                case ("mi", "mathvariant"): XCTAssertEqual(value, "normal", file: file, line: line)
+                case ("mo", "stretchy"): XCTAssertEqual(value, "false", file: file, line: line)
+                case ("mover", "accent"): XCTAssertEqual(value, "true", file: file, line: line)
+                case ("mfrac", "linethickness"): XCTAssertEqual(value, "0", file: file, line: line)
                 default: XCTFail("attribute \(key) on <\(name)>", file: file, line: line)
                 }
             }
@@ -153,6 +159,40 @@ final class DocumentHTMLTests: XCTestCase {
     func testEscapesControlCharacters() {
         XCTAssertEqual(DocumentHTML.escape("a\u{0}b\u{7F}c<&>\"'"), "abc&lt;&amp;&gt;&quot;&#39;")
     }
+
+    func testMathInText() {
+        let html = body(#"""
+        Area $\pi r^2$ and \(x_1\), money $5 and $10, a price \$3, cost $5.
+
+        $$\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$$
+
+        \[
+        \begin{pmatrix} 1 & 2 \\ 3 & 4 \end{pmatrix}
+        \]
+
+        $<script>alert(1)</script>$ and $\frac{1}{$ and `$x$`
+        """#).html
+        assertOnlyAllowedMarkup(html)
+        XCTAssertEqual(html.components(separatedBy: "<math display=\"block\">").count - 1, 2, html)
+        XCTAssertEqual(html.components(separatedBy: "<math>").count - 1, 3, html)
+        XCTAssertTrue(html.contains("money $5 and $10, a price $3, cost $5."), html)
+        XCTAssertTrue(html.contains("<mtable>"), html)
+        // Markup inside math is text; what can't be read stays as written.
+        XCTAssertTrue(html.contains("<mo>&lt;</mo><mi>s</mi>"), html)
+        XCTAssertFalse(html.contains("<script"), html)
+        XCTAssertTrue(html.contains("$\\frac{1}{$"), html)
+        XCTAssertTrue(html.contains("<code>$x$</code>"), html)
+    }
+
+    func testMathStaysBounded() {
+        for hostile in [String(repeating: "\\sqrt", count: 5000) + "x", String(repeating: "{", count: 5000),
+                        String(repeating: "x^", count: 3000) + "y", String(repeating: "\\left(", count: 2000)] {
+            let started = Date()
+            _ = body("$$" + hostile + "$$")
+            _ = DocumentMath.mathML(hostile, display: false)
+            XCTAssertLessThan(Date().timeIntervalSince(started), 2)
+        }
+    }
 }
 
 final class DocumentSpecTests: XCTestCase {
@@ -226,6 +266,26 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(bad.charts.count, 0)
         XCTAssertEqual(bad.notes.count, 4, "\(bad.notes)")
         XCTAssertTrue(bad.notes[0].contains("unknown name"), bad.notes[0])
+    }
+
+    func testStackedAndScatterCharts() throws {
+        let spec = try read(#"{"title": "x", "content": "y", "charts": [{"id": "s", "type": "stacked bar", "labels": ["A", "B"], "series": [{"values": [1, 2]}, {"values": [3, 4]}]}, {"id": "p", "type": "scatter", "series": [{"name": "m", "x": [170, 180], "values": [70, 80]}, {"name": "f", "x": [160, 165, 170], "values": [55, 58, 61]}]}, {"id": "l", "type": "points", "labels": ["1.5", "2.5"], "series": [{"values": [3, 4]}]}, {"id": "n", "type": "scatter", "series": [{"values": [3, 4, 5]}]}]}"#).get()
+        XCTAssertEqual(spec.charts.map(\.kind), [.stacked, .scatter, .scatter, .scatter])
+        XCTAssertEqual(spec.charts[1].series.map(\.xs), [[170, 180], [160, 165, 170]], "each series its own points")
+        XCTAssertEqual(spec.charts[2].series[0].xs, [1.5, 2.5], "numbers for labels are the x")
+        XCTAssertEqual(spec.charts[3].series[0].xs, [1, 2, 3])
+        XCTAssertEqual(spec.adjusted.count, 1, "\(spec.adjusted)")
+        XCTAssertTrue(spec.notes.isEmpty, "\(spec.notes)")
+        let job = DocumentJob.make(spec).job
+        XCTAssertEqual(job.charts.map(\.kind), ["stacked", "scatter", "scatter", "scatter"])
+        XCTAssertEqual(job.charts[1].series[1].xs, [160, 165, 170])
+    }
+
+    func testValueLabels() {
+        let cases: [(Double, String)] = [(0, "0"), (12, "12"), (12.5, "12.5"), (340.26, "340.3"), (1234, "1234"),
+                                         (12_500, "12500"), (125_000, "125K"), (1_500_000, "1.5M"), (2.5e9, "2.5B"),
+                                         (0.0042, "0.0042"), (0.5, "0.5"), (-50, "-50"), (1.0, "1")]
+        for (v, text) in cases { XCTAssertEqual(DocumentJob.valueLabel(v), text, "\(v)") }
     }
 
     func testLimits() {

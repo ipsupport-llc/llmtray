@@ -6,12 +6,14 @@ import Foundation
 /// out with a note; the rest of the document is made.
 public struct DocumentSpec: Equatable, Sendable {
     public struct Chart: Equatable, Sendable {
-        public enum Kind: String, Sendable, CaseIterable { case bar, line, pie }
+        /// `stacked`: bars of the series on top of each other; `scatter`:
+        /// points at their own x.
+        public enum Kind: String, Sendable, CaseIterable { case bar, stacked, line, pie, scatter }
         public struct Series: Equatable, Sendable {
             public var name: String
             public var values: [Double]
-            /// Each value's x, for a series drawn from a formula; empty for
-            /// values placed at the labels.
+            /// Each value's x, for a series drawn from a formula or a
+            /// scatter; empty for values placed at the labels.
             public var xs: [Double] = []
             /// Each formula point's piece: the line isn't drawn between
             /// pieces (a pole, a stretch without values).
@@ -56,19 +58,29 @@ public struct DocumentSpec: Equatable, Sendable {
         "Make a PDF document from Markdown the user asked for (a report, letter, notes, invoice). The app lays it out; the user sees it in the chat.",
         [
             .init("title", .string, required: true, aliases: ["name"]),
-            .init("content", .string, "Markdown. Place a chart with ![caption](chart:<id>).", required: true,
+            .init("content", .string, "Markdown; math as LaTeX in $...$ or $$...$$. Place a chart with ![caption](chart:<id>).",
                   aliases: ["markdown", "text", "body"]),
+            .init("changes", .objects([
+                .init("section", .string, "The heading of the section to replace.", aliases: ["heading"]),
+                .init("after", .string, "Or: the heading to add a new section after (neither: at the end)."),
+                .init("content", .string, "The section's new Markdown; empty removes it.", required: true,
+                      aliases: ["markdown", "text", "body"]),
+            ]), "To change the last document made in this chat: only the sections that change, instead of content. The rest stays as it was.",
+                  aliases: ["edits", "sections"]),
             .init("style", .oneOf(DocumentHTML.styles), valueAliases: ["memo": "notes", "bill": "invoice", "cover letter": "letter"]),
             .init("charts", .objects([
                 .init("id", .string, required: true),
                 // Not required: a formula is a line whatever it's called.
                 .init("type", .oneOf(Chart.Kind.allCases.map(\.rawValue)),
-                      aliases: ["kind"], valueAliases: ["column": "bar", "bars": "bar", "lines": "line", "donut": "pie"]),
+                      aliases: ["kind"], valueAliases: ["column": "bar", "bars": "bar", "lines": "line", "donut": "pie",
+                                                        "stacked bar": "stacked", "stacked_bar": "stacked", "stacked column": "stacked",
+                                                        "points": "scatter", "dots": "scatter", "xy": "scatter", "scatter plot": "scatter"]),
                 .init("title", .string),
                 .init("labels", .list(.string), aliases: ["categories", "x"]),
                 .init("series", .objects([
                     .init("name", .string),
                     .init("values", .list(.number), aliases: ["data", "y"]),
+                    .init("x", .list(.number), "A scatter's x of each value.", aliases: ["xs", "x_values"]),
                     .init("formula", .string, "A math function of x for a line, e.g. sin(x) or x^2: the app computes it. Not for data -- give values.",
                           aliases: ["function", "expression"]),
                 ]), required: true, aliases: ["data"]),
@@ -127,7 +139,7 @@ public struct DocumentSpec: Equatable, Sendable {
         let formulas = rawSeries.contains { $0["formula"] is String }
         // A formula is a line; a model may well call it a plot of any type.
         guard let kind = formulas ? .line : (item["type"] as? String).flatMap(Chart.Kind.init(rawValue:)) else {
-            return .failure(ChartProblem(text: "its type must be bar, line or pie"))
+            return .failure(ChartProblem(text: "its type must be bar, stacked, line, pie or scatter"))
         }
         var labels = ((item["labels"] as? [Any]) ?? []).map { clip(String(describing: $0), Limits.labelCharacters) }
         guard !rawSeries.isEmpty else { return .failure(ChartProblem(text: "it has no series")) }
@@ -161,9 +173,13 @@ public struct DocumentSpec: Equatable, Sendable {
             guard values.allSatisfy({ $0.isFinite && abs($0) < 1e15 }) else {
                 return .failure(ChartProblem(text: "a value isn't a finite number"))
             }
-            series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values))
+            series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values,
+                                       xs: numbers(s["x"])))
         }
         var note: String?
+        if kind == .scatter {
+            return scatter(id: id, item: item, labels: labels, series: series)
+        }
         if kind == .pie, series.count > 1, series.allSatisfy({ $0.values.count == 1 }) {
             // A slice per series ("Part 1": [40], "Part 2": [30]): one
             // series, the slices named by the labels or else the series.
@@ -194,6 +210,33 @@ public struct DocumentSpec: Equatable, Sendable {
         return .success((Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
                                labels: labels.isEmpty ? (1...count).map(String.init) : labels,
                                series: series, unit: clip((item["unit"] as? String) ?? "", 20)), note))
+    }
+
+    /// A scatter: each series its own points, at its own x -- or at the
+    /// labels when they're numbers, else numbered (with a note).
+    static func scatter(id: String, item: [String: Any], labels: [String], series raw: [Chart.Series]) -> Result<(Chart, String?), ChartProblem> {
+        var series = raw
+        var numbered = false
+        let labelXs = labels.compactMap { Double($0.trimmingCharacters(in: .whitespaces)) }
+        for k in series.indices where series[k].xs.count != series[k].values.count {
+            if labelXs.count == labels.count, labelXs.count == series[k].values.count {
+                series[k].xs = labelXs
+            } else {
+                numbered = true
+                series[k].xs = series[k].values.indices.map { Double($0 + 1) }
+            }
+        }
+        guard series.allSatisfy({ $0.xs.allSatisfy { $0.isFinite && abs($0) < 1e15 } }) else {
+            return .failure(ChartProblem(text: "an x isn't a finite number"))
+        }
+        let note = numbered ? "a scatter series had no x for each value, so its points are numbered" : nil
+        return .success((Chart(id: id, kind: .scatter, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
+                               labels: [], series: series, unit: clip((item["unit"] as? String) ?? "", 20)), note))
+    }
+
+    /// A list of numbers as the parser read it (nil or empty: none).
+    static func numbers(_ raw: Any?) -> [Double] {
+        ((raw as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
     }
 
     /// A formula's x range: two numbers or expressions ("2*pi"), -10...10
