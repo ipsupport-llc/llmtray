@@ -91,6 +91,9 @@ public struct ProjectIndexSummary: Equatable, Sendable {
     /// Still to be indexed (staged, extracting).
     public var pending: Int
     public var failed: Int
+    /// Pictures in the project's store (adr/0020): not documents, never
+    /// searched; enough for project_files' listing.
+    public var pictures: Int = 0
 
     public static let empty = ProjectIndexSummary(documents: 0, searchable: 0, embedded: 0, pending: 0, failed: 0)
 

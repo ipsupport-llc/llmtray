@@ -754,6 +754,8 @@ public final class ProjectIndex {
     public func reconcile() throws -> ReconcileReport {
         var r = ReconcileReport()
         let fm = FileManager.default
+        // The pictures' store too (adr/0020): under the same lock.
+        try? ProjectPictures.reconcile(directory)
 
         for d in try documents(where: "status = 'removing'", []) {
             // One copy that can't be deleted now doesn't stop the rest.

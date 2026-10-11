@@ -52,6 +52,9 @@ final class ProjectFilesTool: ChatTool {
             // A pin is for the project's chats, with this chat's model's room.
             pinLimitTokens: ProjectIndexer.pinLimit(for: context.settings).tokens,
             pinBytesPerToken: ProjectIndexer.pinBytesPerToken(model: context.settings.modelPath),
+            // make_document declared: the listing says how to use a picture.
+            picturesUsable: context.settings.documentsSession != nil
+                && (context.settings.toolLoading[ToolGroups.documents] == .always || context.settings.loadedToolGroups.contains(ToolGroups.documents)),
             stillOwned: { ChatLibraryStore.shared.library.chat(chat, isIn: project.id) })
         switch answer {
         case .output(let output): return .projectText(output)

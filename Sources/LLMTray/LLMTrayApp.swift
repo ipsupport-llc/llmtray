@@ -28,6 +28,11 @@ struct LLMTrayApp: App {
         }
         // `LLMTray --render-document <dir>`: the document render child
         // (DocumentRenderCLI, adr/0020), as early.
+        // `LLMTray --decode-picture <in> ...`: the picture decoder child
+        // (PictureDecodeCLI, adr/0020).
+        if CommandLine.arguments.contains("--decode-picture") {
+            PictureDecodeCLI.run(arguments: CommandLine.arguments)
+        }
         if CommandLine.arguments.contains("--render-document") {
             MainActor.assumeIsolated { DocumentRenderCLI.run(arguments: CommandLine.arguments) }
         }

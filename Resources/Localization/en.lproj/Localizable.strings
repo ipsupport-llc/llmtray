@@ -55,8 +55,11 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld new since you opened the list: unticked until you tick them.";
 "%lld of 5 stars" = "%lld of 5 stars";
 "%lld pages" = "%lld pages";
+"%lld pictures" = "%lld pictures";
+"%lld pictures added: kept for documents, not searched." = "%lld pictures added: kept for documents, not searched.";
 "%lld requests" = "%lld requests";
 "%lld s" = "%lld s";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
 "(Please attach the report file shown in Finder.)" = "(Please attach the report file shown in Finder.)";
 "(estimate; exact after the first answer)" = "(estimate; exact after the first answer)";
@@ -380,6 +383,7 @@
 "Files" = "Files";
 "Files Settings…" = "Files Settings…";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Files are copied into the project and indexed on this Mac." = "Files are copied into the project and indexed on this Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them.";
@@ -671,7 +675,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not indexed" = "Not indexed";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
@@ -721,6 +725,8 @@
 "Pick a rating from 1 to 5 stars." = "Pick a rating from 1 to 5 stars.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Pick one to chat with. A download starts right away and goes on in the background.";
 "Picks a model that fits your Mac and enables only what you choose." = "Picks a model that fits your Mac and enables only what you choose.";
+"Pictures over 50 MB can't be added: %@." = "Pictures over 50 MB can't be added: %@.";
+"Pictures · %lld — for documents, not searched" = "Pictures · %lld — for documents, not searched";
 "Pin" = "Pin";
 "Pin %@" = "Pin %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.";
@@ -971,7 +977,7 @@
 "Temporary chat" = "Temporary chat";
 "Temporary chats can only look in folders, for that chat only." = "Temporary chats can only look in folders, for that chat only.";
 "Temporary — not saved" = "Temporary — not saved";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents.";
 "Thank you!" = "Thank you!";
 "Thank you! List your name in Supporters?" = "Thank you! List your name in Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Thanks! Your name will appear once it's been checked.";
@@ -992,6 +998,7 @@
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
 "The chat model couldn't be unloaded for Voice Lab." = "The chat model couldn't be unloaded for Voice Lab.";
@@ -1096,7 +1103,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added.";
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs.";
 "Thought process" = "Thought process";
@@ -1287,11 +1294,13 @@
 "never used" = "never used";
 "no changes" = "no changes";
 "no text" = "no text";
+"not a picture" = "not a picture";
 "not downloaded" = "not downloaded";
 "not indexed" = "not indexed";
 "not supported" = "not supported";
 "not used by any model" = "not used by any model";
 "off" = "off";
+"over 50 MB" = "over 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/s";
 "queued" = "queued";
 "reading" = "reading";

@@ -27,6 +27,7 @@ public enum DocumentStyles {
     a { color: #0a58ca; text-decoration: none; }
     .addr { color: #6e6e73; font-size: 8pt; }
     img { max-width: 100%; height: auto; }
+    p.figure img { max-height: 8in; width: auto; }
     p.figure { text-align: center; margin: 0.6em 0 0.2em; page-break-inside: avoid; break-inside: avoid; }
     p.caption { text-align: center; color: #6e6e73; font-size: 9pt; margin-bottom: 1em; }
     nav.toc { margin: 0 0 1.5em; padding: 0.6em 0 0.6em; border-top: 1px solid #d2d2d7; border-bottom: 1px solid #d2d2d7; }
@@ -150,11 +151,12 @@ public struct DocumentJob: Codable, Equatable, Sendable {
             ChartJob(id: c.id, kind: c.kind.rawValue, title: c.title, labels: c.labels,
                      series: c.series.map { SeriesJob(name: $0.name, values: $0.values) }, unit: c.unit)
         }
-        return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: [:]), notes, body.tooLarge)
+        let files = Dictionary(uniqueKeysWithValues: pictureKeys.map { ($0.value, $0.value) })
+        return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: files), notes, body.tooLarge)
     }
 
     /// The project picture ids the content names (`project:<id>`), once each.
-    static func pictureRefs(_ content: String) -> [String] {
+    public static func pictureRefs(_ content: String) -> [String] {
         var seen = Set<String>()
         var out: [String] = []
         var rest = Substring(content)

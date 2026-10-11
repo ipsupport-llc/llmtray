@@ -9,7 +9,8 @@ public enum ProjectFilesMode: Equatable, Sendable {
     case none, listing, all
 
     public init(featureOn: Bool, project: ProjectContext?) {
-        guard featureOn, let files = project?.files, files.documents > 0 else {
+        // Pictures only: the listing, so their ids can be learned (adr/0020).
+        guard featureOn, let files = project?.files, files.documents > 0 || files.pictures > 0 else {
             self = .none
             return
         }
@@ -320,7 +321,7 @@ public final class ProjectFilesService {
     /// what the files are sized at for that model (PinTokenRatios).
     public func run(_ request: ProjectFiles.Request, project: UUID, byteBudget: Int, fileTextAllowed: Bool = true,
                     pinLimitTokens: Int? = nil, pinBytesPerToken: Double = PromptTokenEstimator.defaultBytesPerToken,
-                    stillOwned: () -> Bool) async -> ProjectFilesAnswer {
+                    picturesUsable: Bool = false, stillOwned: () -> Bool) async -> ProjectFilesAnswer {
         guard stillOwned() else { return .refused(ProjectFiles.notInProjectText) }
         let handle: ProjectIndexHandle
         do {
@@ -334,9 +335,11 @@ public final class ProjectFilesService {
         do {
             let (docs, pins) = try await handle.read { (try $0.documents(), try $0.pins()) }
             let budget = max(0, byteBudget - Self.slackBytes)
+            let pictures = ProjectPictures.manifest(in: handle.directory)
             switch request {
             case .list(let from):
-                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins))
+                answer = .output(listing(docs, from: from, project: project, budget: budget, note: nil, pins: pins,
+                                         pictures: pictures, picturesUsable: picturesUsable))
             case .pin(let doc, let on):
                 answer = try await pin(doc, on: on, docs: docs, pins: pins, handle: handle, project: project,
                                        limitTokens: pinLimitTokens, bytesPerToken: pinBytesPerToken, stillOwned: stillOwned)
@@ -366,8 +369,25 @@ public final class ProjectFilesService {
 
     // MARK: - listing
 
-    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64] = []) -> ProjectToolOutput {
-        guard !docs.isEmpty else { return ProjectToolOutput(project: project, preamble: "This project has no files now.") }
+    func listing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64] = [],
+                 pictures: PictureManifest = PictureManifest(), picturesUsable: Bool = false) -> ProjectToolOutput {
+        // Its pictures after the files, on the first page, when they fit
+        // (adr/0020, "Project pictures"); a picture is never a document here.
+        let picturePart = from == 0 ? ProjectPictures.listing(pictures, picturesUsable: picturesUsable) : ""
+        guard !docs.isEmpty else {
+            guard !picturePart.isEmpty else { return ProjectToolOutput(project: project, preamble: "This project has no files now.") }
+            let out = ProjectToolOutput(project: project, preamble: "No documents in this project, only pictures.\n" + picturePart)
+            return out.fitsWhole(byteBudget: budget) ? out
+                : ProjectToolOutput(project: project, preamble: "\(pictures.pictures.count) picture(s), no room to list them in this chat's context.")
+        }
+        let output = documentListing(docs, from: from, project: project, budget: budget, note: note, pins: pins)
+        guard !picturePart.isEmpty else { return output }
+        var withPictures = output
+        withPictures.preamble += "\n\n" + picturePart
+        return withPictures.fitsWhole(byteBudget: budget) ? withPictures : output
+    }
+
+    func documentListing(_ docs: [IndexedDocument], from: Int, project: UUID, budget: Int, note: String?, pins: [Int64]) -> ProjectToolOutput {
         let searchable = docs.contains { $0.status.isSearchable }
         var head = note.map { $0 + "\n" } ?? ""
         head += "\(docs.count) file(s) in this project (id. name -- pages -- status):"

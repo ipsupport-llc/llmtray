@@ -533,12 +533,15 @@ public final class FolderToolService: @unchecked Sendable {
     func candidate(raw: String, at location: FolderLocation) -> FolderToolAnswer {
         let walker = SafeFolderWalker(root: location.root, denylist: denylist)
         let shown = display(location.displayPath)
-        guard let name = location.components.last, ProjectFileFormats.isOffered(URL(fileURLWithPath: name)) else {
+        guard let name = location.components.last,
+              ProjectFileFormats.isOffered(URL(fileURLWithPath: name)) || ProjectPictures.isPicture(URL(fileURLWithPath: name)) else {
             return .text("\(FolderTools.filesName): \(shown) can't be added: project files are text, Markdown, code, PDF, "
-                + "Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods).")
+                + "Word (docx, doc), ODT, RTF, HTML, spreadsheets (xlsx, ods) and pictures (png, jpg, heic, webp, tiff, gif).")
         }
+        // A picture: the pictures' cap (adr/0020), before anything is read.
+        let cap = ProjectPictures.isPicture(URL(fileURLWithPath: name)) ? Int64(ProjectPictures.maxBytes) : FolderFileTake.maxProjectBytes
         do {
-            let checked = try FolderFileTake.check(walker, location.components, maxBytes: FolderFileTake.maxProjectBytes)
+            let checked = try FolderFileTake.check(walker, location.components, maxBytes: cap)
             return .projectCandidate(raw: raw, path: shown, bytes: checked.bytes, identity: checked.identity)
         } catch {
             return .text("\(FolderTools.filesName): \(errorText(error)).")
