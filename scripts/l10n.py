@@ -452,22 +452,28 @@ def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
     return [n for n in dict.fromkeys(names) if n in table and _is_label(n) and table[n] != n]
 
 
-def contains_label(value: str, translation: str, english: str = "", key: str = "") -> bool:
+def contains_label(value: str, translation: str, english: str = "", key: str = "",
+                   longer: tuple[str, ...] = ()) -> bool:
     """Whether `value` uses `translation`, allowing for inflection: each of
     its words found by its stem (all but the last two letters of a longer
     word -- "Настройки" in "в Настройках"). The English label left in place
-    doesn't count, though a stem may match it ("Modele" in "Models"): the
-    value may keep only the key's other uses of the word ("Voice Lab")."""
+    doesn't count, though a stem may match it ("Modele" in "Models"): not
+    where the label goes (next to > › →, or quoted), and not more often
+    than the key uses the word otherwise ("Voice Lab"). `longer`: labels
+    that start with this one ("Voice Lab" for "Voice"), never taken for it."""
     import re
-    e = re.escape(english)
-    word = re.compile(r"(?<!\w)" + e + r"(?!\w)")  # in the key: the label's own case
-    left = re.compile(word.pattern, re.IGNORECASE)  # in a value: any case
-    if english and not left.search(translation):
-        # Uses of the word in the key that aren't the label itself -- a path
-        # part next to > or ›, or a quoted name -- may stay ("Voice Lab").
-        refs = re.compile(r"[>\u203A\u2192]\s*" + e + r"(?!\w)|(?<!\w)" + e + r"\s*[>\u203A\u2192]|[\u201C\"«]" + e + r"[\u201D\"»]")
-        if len(left.findall(value)) > max(len(word.findall(key)) - len(refs.findall(key)), 0):
-            return False
+    if english:
+        e = re.escape(english) + r"(?!\w)" + "".join("(?!" + re.escape(l[len(english):]) + ")" for l in longer)
+        sep = r"[>\u203A\u2192]"
+        word = re.compile(r"(?<!\w)" + e)  # in the key: the label's own case
+        left = re.compile(word.pattern, re.IGNORECASE)  # in a value: any case
+        place = re.compile(sep + r"\s*" + e + r"|(?<!\w)" + e + r"\s*" + sep + r"|[\u201C\u201E\"«]" + e + r"[\u201C\u201D\"»]")
+        if not left.search(translation):
+            if re.search(place.pattern, value, re.IGNORECASE):
+                return False
+            # Uses of the word in the key that aren't the label itself may stay.
+            if len(left.findall(value)) > max(len(word.findall(key)) - len(place.findall(key)), 0):
+                return False
     low = value.lower()
     for part in translation.lower().split():
         stem = part if len(part) <= 4 else part[:-2]
@@ -606,8 +612,10 @@ def main() -> int:
             if not path.exists():
                 continue  # a new language: translate creates it
             table = load(path)
+            labels = [l for l in table if _is_label(l)]
             for k, v in table.items():
-                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n], n, k)]
+                missing = [n for n in referenced_labels(k, table)
+                           if not contains_label(v, table[n], n, k, tuple(l for l in labels if len(l) > len(n) and l.startswith(n) and not l[len(n)].isalnum()))]
                 if missing:
                     stale.setdefault(code, []).append(k)
                     print(f"{code}: {k[:60]!r} lacks {', '.join(repr(table[n]) for n in missing)}")
