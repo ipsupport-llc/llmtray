@@ -204,10 +204,11 @@ final class MfluxManager: ObservableObject {
         #endif
     }
 
-    /// Set up for this model: the venv at the pinned mflux, the checkpoint
-    /// in place -- what generate() will otherwise refuse.
+    /// Set up for this model: the venv and the checkpoint in place -- what
+    /// generate() will otherwise refuse. An mflux older than the pin is
+    /// still set up: generate() brings it to the pin first.
     func isReady(_ model: ImageGenModel) -> Bool {
-        FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded && installedMfluxVersion() == Self.mfluxVersion
+        FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded
     }
 
     /// The mflux version in the venv, from its dist-info folder's name
@@ -285,10 +286,22 @@ final class MfluxManager: ObservableObject {
         guard FileManager.default.fileExists(atPath: venvPython) else {
             throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- enable it again in Settings.", comment: ""))
         }
-        // Installed before the pin, or by an older app: its internals may
-        // not match the runner's.
-        guard installedMfluxVersion() == Self.mfluxVersion else {
-            throw MfluxError.processFailed(NSLocalizedString("Image generation needs an update -- disable it and enable it again in Settings.", comment: ""))
+        // Installed before the pin, or by an older app (a new app moved the
+        // pin): brought to the pin now, as the audio runtime is before a run
+        // -- its internals may not match the runner's otherwise. Only the
+        // package, into the app's own venv; nothing about the chat is
+        // written. One that can't be updated (offline) says so.
+        if installedMfluxVersion() != Self.mfluxVersion {
+            do {
+                try await ensurePackageInstalled()
+            } catch {
+                throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
+                                                      Self.mfluxVersion, error.localizedDescription))
+            }
+            guard installedMfluxVersion() == Self.mfluxVersion else {
+                throw MfluxError.processFailed(String(format: NSLocalizedString("Image generation couldn't be updated to mflux %@: %@", comment: ""),
+                                                      Self.mfluxVersion, NSLocalizedString("the installed version didn't change", comment: "")))
+            }
         }
 
         let savedDir = savedModelDir(for: model)
