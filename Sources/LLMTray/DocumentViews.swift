@@ -86,9 +86,18 @@ struct DocumentCard: View {
         panel.allowedContentTypes = [.pdf]
         panel.canCreateDirectories = true
         guard panel.runModal() == .OK, let target = panel.url else { return }
+        // Its own file chosen: nothing to do (removing it first would lose it).
+        guard target.standardizedFileURL.resolvingSymlinksInPath() != url.standardizedFileURL.resolvingSymlinksInPath() else { return }
         do {
-            if FileManager.default.fileExists(atPath: target.path) { try FileManager.default.removeItem(at: target) }
-            try FileManager.default.copyItem(at: url, to: target)
+            // A copy beside the target first, then swapped in: an existing
+            // file is replaced only once the copy is whole.
+            let staging = target.deletingLastPathComponent().appendingPathComponent(".\(UUID().uuidString).pdf")
+            try FileManager.default.copyItem(at: url, to: staging)
+            if FileManager.default.fileExists(atPath: target.path) {
+                _ = try FileManager.default.replaceItemAt(target, withItemAt: staging)
+            } else {
+                try FileManager.default.moveItem(at: staging, to: target)
+            }
         } catch {
             note = error.localizedDescription
         }

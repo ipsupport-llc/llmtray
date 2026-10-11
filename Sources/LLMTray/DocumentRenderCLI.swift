@@ -152,6 +152,12 @@ enum DocumentRenderCLI {
             DocumentRenderCLI.finish(error: "load: \(error.localizedDescription)")
         }
 
+        /// WebKit's content process crashed (on this page): no other
+        /// callback comes, so say so now rather than at the time limit.
+        func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            DocumentRenderCLI.finish(error: "the page crashed the renderer")
+        }
+
         func print() {
             guard let web else { return }
             let raw = dir.appendingPathComponent("raw.pdf")

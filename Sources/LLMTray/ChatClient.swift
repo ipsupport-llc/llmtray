@@ -1035,14 +1035,19 @@ final class ChatClient: ObservableObject {
         isRemakingDocument = true
         defer { isRemakingDocument = false }
         let folder = URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true)
-        let result = await DocumentRenderer.render(spec, into: folder, source: source)
+        let result = await DocumentRenderer.render(spec, source: source)
+        // Another chat now, or the card gone: nothing was written.
         guard currentSessionID == session, let k = messages.firstIndex(where: { $0.id == messageID }),
               messages[k].documents.indices.contains(index) else { return }
         switch result {
         case .success(let made):
-            messages[k].documents[index] = made.document
-            hasUnsavedChanges = true
-            persistCurrentSession()
+            do {
+                messages[k].documents[index] = try DocumentRenderer.install(made, in: folder)
+                hasUnsavedChanges = true
+                persistCurrentSession()
+            } catch {
+                errorText = DocumentRenderer.Failure.write(error.localizedDescription).text
+            }
         case .failure(let error):
             errorText = error.text
         }
@@ -1250,6 +1255,8 @@ final class ChatClient: ObservableObject {
         now.project = start.project
         // Turned off mid-turn: stops at once.
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
+        // Turned off mid-turn: stops at once; a temporary chat never has one.
+        now.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? start.documentsSession : nil
         return now
     }
 
@@ -1636,9 +1643,19 @@ final class ChatClient: ObservableObject {
                     }
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
-            case .generatedDocument(let document, let text):
-                if sourceIndex < messages.count { messages[sourceIndex].documents.append(document) }
-                messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .generatedDocument(let made, let text):
+                // Written into the chat's folder in the same step as the card
+                // goes in: no save can sweep it in between.
+                var answer = text
+                if sourceIndex < messages.count, let session = currentSessionID {
+                    do {
+                        let folder = URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true)
+                        messages[sourceIndex].documents.append(try DocumentRenderer.install(made, in: folder))
+                    } catch {
+                        answer = "\(MakeDocumentTool.toolName): the PDF couldn't be saved (\(error.localizedDescription)). Tell the user."
+                    }
+                }
+                messages.append(ChatMessage(role: "tool", content: answer, toolCallID: call.id))
             case .generatedAudio(let data, let seconds, let prompt, let text):
                 if sourceIndex < messages.count {
                     messages[sourceIndex].audios.append(data)

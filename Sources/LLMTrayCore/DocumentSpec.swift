@@ -98,8 +98,9 @@ public struct DocumentSpec: Equatable, Sendable {
     static func chart(_ item: [String: Any]) -> Result<Chart, ChartProblem> {
         let id = ((item["id"] as? String) ?? "").trimmingCharacters(in: .whitespaces)
         guard !id.isEmpty, id.count <= Limits.idCharacters,
-              id.allSatisfy({ $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }) else {
-            return .failure(ChartProblem(text: "its id must be letters, digits, - or _"))
+              id.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else {
+            // ASCII: the id is part of an llmtray-doc: address, matched as written.
+            return .failure(ChartProblem(text: "its id must be ASCII letters, digits, - or _"))
         }
         guard let kind = (item["type"] as? String).flatMap(Chart.Kind.init(rawValue:)) else {
             return .failure(ChartProblem(text: "its type must be bar, line or pie"))

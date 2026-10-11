@@ -75,11 +75,12 @@ enum ToolRunnerCLI {
                 case .failure(let e): print(e.text); exit(1)
                 case .success(let spec):
                     let here = URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
-                    switch await DocumentRenderer.render(spec, into: here, source: DocumentSource(arguments: json, project: nil)) {
-                    case .success(let made):
-                        print(here.appendingPathComponent(made.document.filename).path + " (\(made.document.pages) pages)")
+                    switch await DocumentRenderer.render(spec, source: DocumentSource(arguments: json, project: nil)) {
+                    case .success(var made):
+                        made.thumbnail = nil
+                        guard let document = try? DocumentRenderer.install(made, in: here) else { print("couldn't write the PDF here"); exit(1) }
+                        print(here.appendingPathComponent(document.filename).path + " (\(document.pages) pages)")
                         for note in spec.notes + made.notes { print("note: " + note) }
-                        if let thumb = made.document.thumbnail { try? FileManager.default.removeItem(at: here.appendingPathComponent(thumb)) }
                         exit(0)
                     case .failure(let e): print(e.text); exit(1)
                     }

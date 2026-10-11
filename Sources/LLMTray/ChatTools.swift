@@ -16,7 +16,7 @@ enum ToolResult {
     case generatedAudio(Data, seconds: Double, prompt: String, text: String)
     /// A document (make_document): its PDF already in the chat's folder,
     /// shown as a card, plus the tool result.
-    case generatedDocument(DocumentRef, text: String)
+    case generatedDocument(DocumentRenderer.Made, text: String)
     /// An image put in front of the model (view_image): sent with the next
     /// request, in memory only -- neither shown as a chat bubble nor saved.
     case imageForModel(Data, text: String)
