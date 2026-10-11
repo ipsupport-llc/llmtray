@@ -21,7 +21,7 @@ a 4B model looks as good as one from a 35B model.
     title,                      // also the file name
     content,                    // Markdown
     style?: report|letter|notes|invoice,   // default report
-    charts?: [ { id, type: bar|line|pie|table, title?,
+    charts?: [ { id, type: bar|line|pie, title?,
                  labels: [..], series: [ {name, values: [..]} ],
                  unit? } ],
     format?: pdf                // the only one for now
@@ -30,14 +30,14 @@ a 4B model looks as good as one from a 35B model.
 
   A chart goes where the content says `![chart](chart:<id>)`; a chart the
   content never names goes at the end. The model sends numbers, never
-  drawings, CSS or HTML.
+  drawings, CSS or HTML. Tables are Markdown tables in `content`, not
+  charts. `ToolSchema` gains list kinds (`list(.string)`,
+  `list(.number)`) with their JSON schema, lenient reading (a single value
+  for a one-item list, `"5"` for 5) and errors, tested as the other kinds.
 - **The app renders, locally**, in three steps:
   1. *Markdown to HTML* by our own converter in LLMTrayCore (the block
      rules of `ChatMarkdown`: headings, lists, tables, code, quotes,
-     links), no new package. It emits a fixed set of tags with no
-     attributes but `href` (filtered, Hardening 2), our own `class`
-     names and the chart images' `src`; never `style`, event handlers,
-     `<link>`, `<script>`, `<iframe>`, `<object>`, `<svg>`.
+     links), no new package. It emits only an allowlist (Hardening 2).
   2. *Charts* drawn by Swift Charts (`ImageRenderer`, capped size) to PNG,
      served to the page by our scheme (`llmtray-doc://chart/<id>`), not
      as `data:` URLs, so the page may load nothing else (Hardening 1).
@@ -45,9 +45,9 @@ a 4B model looks as good as one from a 35B model.
      size, page breaks before chapter headings, a table of contents for
      a long report), printed by WebKit to a paginated PDF
      (`WKWebView.printOperation(with:)` with a save-to-file
-     `NSPrintInfo`, or `createPDF` cut into pages if printing headless
-     proves unreliable — **a spike on macOS 14 decides before the
-     build**, and this ADR is updated with the API that works). The
+     `NSPrintInfo`, in an offscreen window if it needs one — **a spike on
+     macOS 14 proves it before the build**, and this ADR is updated with
+     what works; `createPDF` is no fallback, it makes one endless page). The
      header (title) and footer (page N of M) are drawn onto the finished
      pages with PDFKit, not by CSS, which WebKit's printing honours only
      in part.
@@ -60,19 +60,24 @@ a 4B model looks as good as one from a 35B model.
   Project files are turned on first if they're off
   (`enableProjectFiles`), and its notes (added, already in the project)
   show as they do for a drop.
-- **Stored like the chat's images.** A message gets `documents` beside
-  `images` and `audios` (`ChatMessage`, `PersistedMessage`), the files
-  go in the chat's `<uuid>-images/` folder ([0006](0006-chat-sessions-and-library.md)),
-  are kept by the sweep of unreferenced files, removed with the chat,
-  and compaction keeps the messages that hold one as it keeps media.
-  **Temporary chats write nothing** (0006): the PDF stays in memory and
-  goes to disk only when the user opens, saves or shares it (the temp
-  export of `MediaSharing`).
+- **Stored beside the chat's images, but not in memory.** Images and
+  songs are `[Data]` loaded with the chat; a PDF can be 50 MB, so a
+  message gets `documents` as metadata only (`DocumentRef`: file name,
+  title, pages, a small thumbnail, the `DocumentSource`), in
+  `ChatMessage` and `PersistedMessage`. The file is in the chat's
+  `<uuid>-images/` folder ([0006](0006-chat-sessions-and-library.md)),
+  read only to open, save or share it. `PersistedMessage.withoutFiles`,
+  the sweep's referenced set, compaction's media check and the history
+  entry's "has content" all count documents; the file goes with the
+  chat. **Temporary chats write nothing** (0006): the PDF stays in
+  memory while the chat is open and goes to disk only when the user
+  opens, saves or shares it (the temp export of `MediaSharing`); Show in
+  Finder isn't offered there.
 - **Regenerate**: Regenerate on the answer re-runs the turn as for any
   answer. "Make again" on the card re-renders from the saved call (a
-  `DocumentSource`: the arguments, as `MediaSource` keeps a generator's),
-  through the `canRegenerateMedia` / `regenerateMedia` path; it doesn't
-  ask the model again.
+  `DocumentSource`: the arguments, as `MediaSource` keeps a generator's)
+  by its own small path (`regenerateDocument`): no generator queue, no
+  model unload, no draft — it doesn't ask the model again.
 - **The model is told it's done**: the tool answers the title, the page
   count and that the user sees it in the chat; no path. It doesn't read
   the PDF back.
@@ -85,21 +90,36 @@ a 4B model looks as good as one from a 35B model.
 A document is built from text the model wrote, and that text may come
 from a project file, a folder file or a web page with instructions in it.
 
-1. **Nothing executes, nothing loads.** The printing web view: JavaScript
-   off (`defaultWebpagePreferences.allowsContentJavaScript = false`, and
-   `javaScriptCanOpenWindowsAutomatically` off), a non-persistent data
-   store, HTML loaded from a string with no base URL. Loads are refused
-   at two layers: a `WKContentRuleList` blocks every resource load but
-   our scheme (subresources: images, CSS, fonts — `http`, `https`,
-   `file`, `data`, `blob`, anything); the `WKNavigationDelegate` refuses
-   every navigation but the initial load. `llmtray-doc:` (a
-   `WKURLSchemeHandler`) serves only the style's bundled CSS and fonts
-   and this document's chart PNGs, by a fixed table, never a path.
-   Tested with a remote image, `file:`, `data:text/html`, `data:` SVG, a
-   CSS `url()`, a `<script>`, an `onerror`, a redirect.
+1. **Nothing executes, nothing loads.** The first line of defence is the
+   converter: the page it makes references nothing but `llmtray-doc:`
+   (Hardening 2), and a test over hostile fixtures proves it emits no
+   other URL, no `data:` and no `blob:`. Behind it, the printing web
+   view: JavaScript off (`defaultWebpagePreferences.allowsContentJavaScript
+   = false`, `javaScriptCanOpenWindowsAutomatically` off), a
+   non-persistent data store, HTML loaded from a string with no base URL.
+   A `WKContentRuleList` blocks `http`, `https`, `file` and `ws(s)` loads
+   of every resource type (document, image, style-sheet, script, font,
+   media, svg-document, raw, popup); content rules don't see `data:` or
+   `blob:`, which is why the converter guarantee comes first. The
+   `WKNavigationDelegate` refuses every frame navigation but the initial
+   load. `llmtray-doc:` (a `WKURLSchemeHandler`) serves only the style's
+   bundled CSS and fonts (with `Access-Control-Allow-Origin: *`, which
+   fonts from another origin need) and this document's chart PNGs, by a
+   fixed table, never a path. Tested with a remote image, `file:`,
+   `data:text/html`, `data:` SVG, a CSS `url()`, a `<script>`, an
+   `onerror`, a `<meta http-equiv=refresh>`, a redirect; and that the
+   fonts load.
 2. **The converter can't emit markup from the content.** Raw HTML in
    the Markdown is text (a `<script>` comes out as those characters);
-   every text and attribute value is escaped. Images other than chart
+   every text and attribute value is escaped. It emits only these tags:
+   `html head body` (its own frame), `p h1–h6 ul ol li table thead tbody
+   tr th td pre code blockquote a strong em del hr br sup img nav section`,
+   and only these attributes: `class` (its own names), `href` on `a`,
+   `src` and `alt` on `img` (a chart's `llmtray-doc:` address only),
+   `align` on table cells; the stylesheet is one `<link>` to the style
+   it put there itself. Everything else (`style`, event handlers,
+   `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
+   `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart
    references become their alt text. Links: only `http`, `https` and
    `mailto` stay links; any other scheme (`javascript:`, `file:`,
    `data:`) becomes plain text. Where a link's text isn't its address,
@@ -156,16 +176,19 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   so loading doesn't cost a second change.
 - **Three settings per group** in the profile ([0005](0005-profiles.md)):
   a new optional field `tools.toolLoading: [group: always | onDemand]`
-  beside `enabledTools`, resolved per field like every overlay field
-  (profile → Default → built-in). A group missing from it: on demand. A
-  group off is simply not in `enabledTools`, as today. Old profiles
-  without the field read as before; hand edits with an unknown value
-  are ignored with a log line.
+  beside `enabledTools`, merged **per group**, not as a whole field: for
+  each group, the overlay's value, else Default's, else on demand (so an
+  overlay that sets one group doesn't wipe Default's others; the
+  overlay's override count counts its groups). A group off is simply
+  not in `enabledTools`, as today. Old profiles without the field read
+  as before. The field decodes leniently: values case-insensitive, an
+  unknown group or value skipped with a log line, never failing the
+  whole profile (synthesized `Codable` would throw on one bad value).
 - **How a group gets declared:**
   1. *By the model.* With any on-demand group switched on, a small tool
      `load_tools(group)` is declared, its enum the groups with a phrase
      each (`documents: PDF documents with charts`). The model calls it
-     on "оформи документ"; the answer says the tools are ready; the
+     on "make this into a document"; the answer says the tools are ready; the
      group is declared from the next request on.
   2. *By the user.* The composer's + menu gets "Make a Document…": the
      group is loaded from this message on. No text is added to the
@@ -178,12 +201,15 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   on that are `always` or in `loadedToolGroups`. A call of a tool whose
   group isn't loaded (a model that saw it in another chat) is answered
   "call load_tools first", which it can, not "isn't available".
-- **After file text, loading waits for the user.** `load_tools` runs
-  anytime, but a group loaded by a call made after file, folder or web
-  text in the turn (`ToolTrust.TurnState.hasUntrustedText` or
-  `networkText`) goes to `pendingToolGroups` and is declared only from
-  the user's next message: a file can't hand the model a new tool in its
-  own turn. The answer says so.
+- **After file text, loading waits for the user.** `load_tools` is
+  ordinary: declared while a switched-on group isn't loaded, and it runs
+  anytime. A group loaded by a call made after outside text in the turn
+  (`hasUntrustedText` or `networkText`, pinned files included) goes to
+  `pendingToolGroups`, and pending groups become loaded at the start of
+  the user's next message, unconditionally — else a chat with pinned
+  files, untrusted every turn, could never load one. A file can't hand
+  the model a new tool in its own turn; the answer says so. What a
+  loaded tool may then do is still the trust barrier's to decide.
 - **The other tools later** (web, weather, country) take the same
   setting; out of this ADR's first step. Groups are data, so adding one
   is a line.
@@ -198,16 +224,18 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   escaped, no attribute but the allowed ones, link schemes, link
   addresses shown, chart references, unknown images to alt text); chart
   validation (caps, non-finite values, unknown types); the file-name
-  sanitizer (NFC, separators, leading dot, collisions); `load_tools`
-  (sticky, saved with the chat, pending after file text until the next
-  user message); the profile field's resolution and an old profile.
+  sanitizer (NFC, separators, leading dot, collisions); `ToolSchema`
+  list kinds; `load_tools` (sticky, saved with the chat, pending after
+  file text until the next user message, with pinned files too); the
+  profile field's per-group merge, an old profile, a bad hand edit.
 - Rendering tests: a fixed document in each style to PDF, page count and
   extracted text (PDFKit) checked; the hostile fixtures of Hardening 1
   load nothing; the output limits fail cleanly.
-- `--run-tool make_document '<json>'` writes the PDF (as the other
-  tools); `scripts/eval_tool_choice.py` gets prompts that need a document
+- `--run-tool make_document '<json>'` writes the PDF into the current
+  folder and prints its path (the other tools print text only); the CLI
+  declares every group as loaded; `scripts/eval_tool_choice.py` gets prompts that need a document
   (called, through `load_tools` when on demand) and ones that don't
-  ("привет", "explain this": not called).
+  ("hi", "explain this": not called).
 - Manual: a report with a table and two charts from a project file, a
   letter, an invoice; Open, Save As…, Add to Project with files off;
   Make again; a temporary chat (nothing on disk until Save); a chat
