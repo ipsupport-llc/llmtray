@@ -34,13 +34,26 @@ a 4B model looks as good as one from a 35B model.
   - `image:<n>`: an image of this chat (attached by the user, generated
     or edited), numbered as edit_image numbers them;
   - `folder:<path>`: an image in a folder the chat already has a read
-    grant for ([0014](0014-folder-tools.md)); no grant is asked for from
-    here — without one the picture is left out and the answer says to
-    look at the folder first (`files`), which asks;
+    grant for ([0014](0014-folder-tools.md)), read through
+    `FolderToolService` exactly as `files` view reads one: `coversRead`
+    without prompting, a standing grant only (an hour, this chat,
+    always: a once-grant is bound to its own call), none of the standing
+    ones in a temporary chat (Hardening 19), the grant checked before
+    and after the read (a revoke mid-read stops it), then
+    `FolderFileTake` with its guards. No grant is asked for from here.
+    A call with any `folder:` reference counts as a folder read for the
+    trust barrier (`turnTrust.record(.folderRead)`), whatever came of
+    it, as `files` does; and the model learns only "picture N couldn't
+    be used" — one text for no grant, missing, refused by a guard, too
+    large or not an image — so it can't probe a folder through
+    documents; the card shows the user the real reason;
   - project pictures come with the project library (not yet: project
     files take no images today, [0012](0012-project-files-rag.md)).
   The app reads and decodes the picture itself (ImageIO, images only),
-  scales it to at most 2400 px, re-encodes it (PNG, or JPEG for photos)
+  never at full size: the header's pixel count is checked first (at most
+  100 megapixels), then `CGImageSourceCreateThumbnailAtIndex` decodes it
+  straight to at most 2400 px (the bounded path of
+  `FolderAccess.modelImage`); it re-encodes it (PNG, or JPEG for photos)
   without its metadata (no GPS or camera data goes into a document), and
   serves it as `llmtray-doc://image/<k>`. The model never gets the
   picture's bytes back. The model sends numbers, never
@@ -99,7 +112,9 @@ a 4B model looks as good as one from a 35B model.
   answer. "Make again" on the card re-renders from the saved call (a
   `DocumentSource`: the arguments, as `MediaSource` keeps a generator's)
   by its own small path (`regenerateDocument`): no generator queue, no
-  model unload, no draft — it doesn't ask the model again.
+  model unload, no draft — it doesn't ask the model again. Folder
+  pictures are read again with every check above (a grant gone since:
+  left out).
 - **The model is told it's done**: the tool answers the title, the page
   count and that the user sees it in the chat; no path. It doesn't read
   the PDF back.
@@ -162,7 +177,9 @@ from a project file, a folder file or a web page with instructions in it.
    (`FolderFileTake`, with its guards: no secret-looking name, no hard
    link, no iCloud placeholder, never downloaded, by descriptor inside
    the grant). A bad chart or picture is left out with a note in the
-   tool's answer, the rest is made. Out: chart PNGs at
+   tool's answer, the rest is made; pictures past the 30th are left out
+   the same way. "Over a limit: no document" is for the output limits
+   below. Out: chart PNGs at
    most 2400×1600 px; at most 200 pages and 50 MB; rendering stops after
    60 s. Over a limit: no document, and the tool says which limit.
 4. **It only writes its own new file.** No path comes from the model.
