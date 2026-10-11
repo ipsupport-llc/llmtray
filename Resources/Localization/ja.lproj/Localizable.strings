@@ -306,6 +306,7 @@
 "Documents" = "ドキュメント";
 "Documents On in This Chat" = "このチャットではドキュメントが有効です";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "ドキュメントはプロジェクトにコピーされ、このMac上でインデックス化されます。画像はメッセージに添付されます。";
+"Documents are off (Settings › Files)." = "ドキュメントはオフです（設定 › ファイル）。";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "このチャットではドキュメントが有効です：レポートや手紙などを依頼してください。";
 "Documents go into a project with this chat." = "ドキュメントはこのチャットとともにプロジェクトに入ります。";
 "Documents go into a project with this chat; images go into your message." = "ドキュメントはこのチャットとともにプロジェクトに入ります。画像はメッセージに添付されます。";
@@ -1135,6 +1136,7 @@
 "Total time" = "合計時間";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。同時リクエスト数：最良の合計速度の 90% に達する最小数（それ以上はメモリ使用量が増える割に効果が小さい）。prefill：最速となる値。";
 "Try Again" = "再試行";
+"Turn On" = "オンにする";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
 "Type a message below and press Return. Try: “What can you do?”" = "下にメッセージを入力して Return を押してください。例：「何ができますか？」";

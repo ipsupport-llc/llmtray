@@ -306,6 +306,7 @@
 "Documents" = "दस्तावेज़";
 "Documents On in This Chat" = "इस चैट में दस्तावेज़ चालू हैं";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "दस्तावेज़ प्रोजेक्ट में कॉपी किए जाते हैं और इस Mac पर इंडेक्स किए जाते हैं; छवियाँ आपके संदेश में जाती हैं।";
+"Documents are off (Settings › Files)." = "दस्तावेज़ बंद हैं (सेटिंग्स › फ़ाइलें)।";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "इस चैट में दस्तावेज़ चालू हैं: किसी एक के लिए कहें (रिपोर्ट, पत्र …)।";
 "Documents go into a project with this chat." = "दस्तावेज़ इस चैट के साथ प्रोजेक्ट में जाते हैं।";
 "Documents go into a project with this chat; images go into your message." = "दस्तावेज़ इस चैट के साथ प्रोजेक्ट में जाते हैं; छवियाँ आपके संदेश में जाती हैं।";
@@ -1135,6 +1136,7 @@
 "Total time" = "कुल समय";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "चलते मॉडल पर एक साथ 1, 2, 4 और 8 अनुरोधों और prefill-step-size (256–4096) को आज़माता है, हर परीक्षण के बीच सर्वर को रीस्टार्ट करता है। समवर्ती अनुरोध: वह न्यूनतम संख्या जो सर्वश्रेष्ठ कुल गति के 90% तक पहुँचती है (अधिक संख्या से मेमोरी खर्च बढ़ता है, लाभ कम मिलता है); prefill: सबसे तेज़।";
 "Try Again" = "पुन: प्रयास करें";
+"Turn On" = "चालू करें";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
 "Type a message below and press Return. Try: “What can you do?”" = "नीचे संदेश टाइप करें और Return दबाएँ। आजमाएँ: “आप क्या कर सकते हैं?”";

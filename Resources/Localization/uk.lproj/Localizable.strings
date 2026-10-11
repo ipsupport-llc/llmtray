@@ -306,6 +306,7 @@
 "Documents" = "Документи";
 "Documents On in This Chat" = "Документи в цьому чаті ввімкнено";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Документи копіюються в проєкт і індексуються на цьому Mac; зображення додаються у ваше повідомлення.";
+"Documents are off (Settings › Files)." = "Документи вимкнено (Налаштування › Файли).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Документи в цьому чаті ввімкнено: попросіть зробити документ (звіт, лист…).";
 "Documents go into a project with this chat." = "Документи додаються в проєкт разом із цим чатом.";
 "Documents go into a project with this chat; images go into your message." = "Документи додаються в проєкт разом із цим чатом; зображення — у ваше повідомлення.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Загальний час";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Пробує 1, 2, 4 і 8 одночасних запитів і prefill-step-size (256–4096) на запущеній моделі, перезапускаючи сервер між спробами. Паралельні запити: найменша кількість, що дає 90% найкращої сумарної швидкості (більше — зайва пам’ять майже без виграшу); prefill: найшвидший.";
 "Try Again" = "Спробувати ще";
+"Turn On" = "Увімкнути";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Перетворює текст файлів у вектори для пошуку за значенням на цьому Mac. Видалення самої моделі не торкається індексів: файли потім шукатимуться за словами, доки модель не буде знову завантажена.";
 "Tweak…" = "Налаштувати…";
 "Type a message below and press Return. Try: “What can you do?”" = "Введіть повідомлення нижче й натисніть Return. Спробуйте: «Що ти вмієш?»";

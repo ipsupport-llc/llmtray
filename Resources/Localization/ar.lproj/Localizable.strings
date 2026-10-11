@@ -306,6 +306,7 @@
 "Documents" = "المستندات";
 "Documents On in This Chat" = "الوثائق مفعّلة في هذه المحادثة";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "تُنسخ المستندات إلى المشروع وتُفهرَس على هذا الـ Mac؛ الصور تُدرَج في رسالتك.";
+"Documents are off (Settings › Files)." = "المستندات متوقفة (الإعدادات › الملفات).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "الوثائق مفعّلة في هذه المحادثة: اطلب واحدة (تقرير، رسالة ...) ";
 "Documents go into a project with this chat." = "تُضاف المستندات إلى مشروع مرتبط بهذه المحادثة.";
 "Documents go into a project with this chat; images go into your message." = "تُضاف المستندات إلى مشروع مرتبط بهذه المحادثة؛ الصور تُدرَج في رسالتك.";
@@ -1135,6 +1136,7 @@
 "Total time" = "الزمن الإجمالي";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "يجرب 1 و2 و4 و8 طلبات في آن واحد وحجم خطوة التعبئة المسبقة (256–4096) مقابل النموذج الجاري، مع إعادة تشغيل الخادم بين كل تجربة. الطلبات المتزامنة: أقل عدد يصل إلى 90% من أفضل سرعة إجمالية (زيادة العدد تكلف ذاكرة دون فائدة كبيرة)؛ التعبئة المسبقة: الأسرع.";
 "Try Again" = "حاول مرة أخرى";
+"Turn On" = "تشغيل";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "يحوِّل نص الملفات إلى متجهات للبحث بحسب المعنى على هذا الـMac. إزالته تحتفظ بالفهارس: عندها تُبحث الملفات بكلماتها حتى يعاد تنزيله.";
 "Tweak…" = "تعديل…";
 "Type a message below and press Return. Try: “What can you do?”" = "اكتب رسالة أدناه واضغط Return. جرّب: «ماذا تستطيع أن تفعل؟»";

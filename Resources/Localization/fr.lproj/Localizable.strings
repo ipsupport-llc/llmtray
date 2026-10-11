@@ -306,6 +306,7 @@
 "Documents" = "Documents";
 "Documents On in This Chat" = "Documents activés dans cette conversation";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Les documents sont copiés dans le projet et indexés sur ce Mac ; les images sont insérées dans votre message.";
+"Documents are off (Settings › Files)." = "Les Documents sont désactivés (Réglages › Fichiers).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Les documents sont activés dans cette conversation : demandez-en un (un rapport, une lettre…).";
 "Documents go into a project with this chat." = "Les documents seront placés dans un projet avec cette conversation.";
 "Documents go into a project with this chat; images go into your message." = "Les documents seront placés dans un projet avec cette conversation ; les images sont insérées dans votre message.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Temps total";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Teste 1, 2, 4 et 8 requêtes en parallèle et prefill-step-size (256–4096) contre le modèle en cours, en redémarrant le serveur entre chaque essai. Requêtes simultanées : le nombre minimal atteignant 90 % de la meilleure vitesse totale (plus augmente l’usage mémoire pour peu de gain) ; prefill : la valeur la plus rapide.";
 "Try Again" = "Réessayer";
+"Turn On" = "Activer";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Transforme le texte des fichiers en vecteurs pour la recherche par sens, sur ce Mac. Le supprimer conserve les index : les fichiers seront alors recherchés par leurs mots jusqu’à un nouveau téléchargement.";
 "Tweak…" = "Ajuster…";
 "Type a message below and press Return. Try: “What can you do?”" = "Tapez un message ci‑dessous et appuyez sur Retour. Essayez : « Que pouvez‑vous faire ? »";
