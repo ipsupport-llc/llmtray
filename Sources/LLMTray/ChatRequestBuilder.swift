@@ -27,9 +27,13 @@ enum ChatRequestBuilder {
             // (mlx_lm.server): a chat that had one, continued with a text
             // model, sends just the text.
             message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
-                ? serialize(message: ChatMessage(role: message.role,
-                                                 content: message.content.isEmpty && !settings.modelSupportsVision ? "(image)" : message.content,
-                                                 toolCalls: message.toolCalls, toolCallID: message.toolCallID))
+                ? serialize(message: {
+                    var text = ChatMessage(role: message.role,
+                                           content: message.content.isEmpty && !settings.modelSupportsVision ? "(image)" : message.content,
+                                           toolCalls: message.toolCalls, toolCallID: message.toolCallID)
+                    text.projectFilesAdded = message.projectFilesAdded
+                    return text
+                }())
                 : serialize(message: message)
         }
         // The project's instructions between the profile's prompt and the
@@ -135,13 +139,16 @@ enum ChatRequestBuilder {
             }
             return dict
         }
+        // Files added to the project since the last message: said first.
+        let text = message.role == "user" ? ProjectFilesNote.text(message.projectFilesAdded).map { $0 + "\n\n" + message.content } ?? message.content
+            : message.content
         if message.role == "user", !message.images.isEmpty {
             // Attachments are always normalized to PNG before landing in
             // ChatMessage.images (see ContentView's attach-file handling),
             // so the MIME half of this data URI is never a guess.
             var parts: [[String: Any]] = []
-            if !message.content.isEmpty {
-                parts.append(["type": "text", "text": message.content])
+            if !text.isEmpty {
+                parts.append(["type": "text", "text": text])
             }
             for data in message.images {
                 let url = "data:image/png;base64,\(data.base64EncodedString())"
@@ -149,7 +156,7 @@ enum ChatRequestBuilder {
             }
             return ["role": "user", "content": parts]
         }
-        return ["role": message.role, "content": message.content]
+        return ["role": message.role, "content": text]
     }
 
     private static func request(port: Int, body: [String: Any]) -> URLRequest? {

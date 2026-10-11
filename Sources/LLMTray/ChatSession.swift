@@ -47,11 +47,13 @@ struct PersistedMessage: Codable {
     var answerStats: AnswerStats?
     // See ChatMessage.documents; nil, and not written, when it has none.
     var documents: [DocumentRef]?
+    // See ChatMessage.projectFilesAdded; nil, and not written, when none.
+    var projectFilesAdded: [String]?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats, documents
+        case answerStats, documents, projectFilesAdded
     }
 
     init(
@@ -90,6 +92,7 @@ struct PersistedMessage: Codable {
         citations = try c.decodeIfPresent([Citation].self, forKey: .citations)
         answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
         documents = try c.decodeIfPresent([DocumentRef].self, forKey: .documents)
+        projectFilesAdded = try c.decodeIfPresent([String].self, forKey: .projectFilesAdded)
     }
 }
 
@@ -125,6 +128,10 @@ struct ChatSessionFile: Codable, Identifiable {
     /// Loaded after outside text: they load at the user's next message,
     /// also after the chat is opened again.
     var pendingToolGroups: [String]? = nil
+    /// The project's file names as of the chat's last message: the next
+    /// one tells the model what was added since (ProjectFilesNote). Nil in
+    /// chats from before: the next message only records them.
+    var projectFilesSeen: [String]? = nil
 }
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --

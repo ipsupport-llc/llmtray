@@ -1122,6 +1122,7 @@
 "Today so far: %@ (sent once the day is over)" = "Today so far: %@ (sent once the day is over)";
 "Together over 90%: reading a prompt gets %lld%." = "Together over 90%: reading a prompt gets %lld%.";
 "Tokens" = "Tokens";
+"Told the model about new project files: %@" = "Told the model about new project files: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "Too long for the selected model's room now, read by search instead: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left";
 "Too many reviews from this network. Try again in %lld min." = "Too many reviews from this network. Try again in %lld min.";
