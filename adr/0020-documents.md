@@ -162,7 +162,9 @@ a 4B model looks as good as one from a 35B model.
   may give `changes` instead of `content`: each `{section, content}`
   replaces a section (its heading up to the next heading of its level or
   above; content without a heading of its own keeps the section's
-  heading), `content: ""` removes it, `{after, content}` adds one after
+  heading; a heading alone renames the section, its text and
+  subsections kept -- a title's section is the whole document),
+  `content: ""` removes it, `{after, content}` adds one after
   a section, `{content}` alone at the end. The app takes the rest from
   an earlier document of the chat (`DocumentEdit`, LLMTrayCore): the
   latest one whose title is the call's, else the latest; its saved call
@@ -176,7 +178,8 @@ a 4B model looks as good as one from a 35B model.
   as written"), never the first; headings in fenced code aren't
   sections. A name that matches none makes nothing and answers the
   document's headings, so the model can try again in the turn. At most
-  50 changes in a call. An `x` on anything but a scatter is ignored. A call
+  50 changes in a call. Changes that leave less than half of a document's
+  lines (of six or more) are said in the answer, never silent. An `x` on anything but a scatter is ignored. A call
   with both `content` and `changes` is its content (the answer says the
   changes were set aside); `changes` in a chat with no document answers
   "write the whole content". The result is a new document and card, the

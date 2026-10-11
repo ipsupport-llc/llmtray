@@ -106,6 +106,24 @@ final class DocumentEditTests: XCTestCase {
         XCTAssertTrue(problem.text.contains("\"1. Costs\", \"2. Costs\""), problem.text)
     }
 
+    /// A heading alone renames the section; the document stays.
+    func testAHeadingAloneRenames() throws {
+        let out = try DocumentEdit.apply(call(##"{"title": "Plan", "changes": [{"section": "Plan", "content": "# New plan"}]}"##), to: baseValues).get()
+        let text = content(out.values)
+        XCTAssertTrue(text.hasPrefix("# New plan\n"), text)
+        XCTAssertTrue(text.contains("Old costs.") && text.contains("Old risks."), text)
+        XCTAssertTrue(out.adjusted.isEmpty, "\(out.adjusted)")
+        let sub = try DocumentEdit.apply(call(#"{"title": "Plan", "changes": [{"section": "Costs", "content": "\n## 1. Budget\n"}]}"#), to: baseValues).get()
+        XCTAssertTrue(content(sub.values).contains("## 1. Budget\n\nOld costs."), content(sub.values))
+    }
+
+    /// Most of the document removed: the answer says so.
+    func testRemovingMostIsSaid() throws {
+        let out = try DocumentEdit.apply(call(##"{"title": "Plan", "changes": [{"section": "Plan", "content": "# Plan\n\nShort."}]}"##), to: baseValues).get()
+        XCTAssertEqual(out.adjusted.count, 1)
+        XCTAssertTrue(out.adjusted[0].contains("removed most of the document"), out.adjusted[0])
+    }
+
     func testChangesAreBounded() {
         let many = (0..<(DocumentSpec.Limits.changes + 1)).map { _ in #"{"content": "x"}"# }.joined(separator: ",")
         XCTAssertNil(try? DocumentEdit.apply(call(#"{"title": "x", "changes": [\#(many)]}"#), to: baseValues).get())
