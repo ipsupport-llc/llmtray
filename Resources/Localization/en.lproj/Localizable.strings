@@ -304,6 +304,7 @@
 "Documents" = "Documents";
 "Documents On in This Chat" = "Documents On in This Chat";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Documents are copied into the project and indexed on this Mac; images go into your message.";
+"Documents are off (Settings › Files)." = "Documents are off (Settings › Files).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Documents are on in this chat: ask for one (a report, a letter…).";
 "Documents go into a project with this chat." = "Documents go into a project with this chat.";
 "Documents go into a project with this chat; images go into your message." = "Documents go into a project with this chat; images go into your message.";
@@ -1133,6 +1134,7 @@
 "Total time" = "Total time";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.";
 "Try Again" = "Try Again";
+"Turn On" = "Turn On";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
 "Type a message below and press Return. Try: “What can you do?”" = "Type a message below and press Return. Try: “What can you do?”";
