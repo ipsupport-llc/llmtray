@@ -186,6 +186,10 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(spec.charts.map(\.labels), [["A", "B", "3"], ["x", "y"]])
         XCTAssertEqual(spec.charts.map { $0.series.map(\.values) }, [[[40, 30, 30]], [[1, 2]]])
         XCTAssertTrue(spec.notes.isEmpty, "\(spec.notes)")
+        // Labels that don't fit the slices are set aside -- and said.
+        let odd = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "type": "pie", "labels": ["Alpha"], "series": [{"values": [40]}, {"values": [60]}]}]}"#).get()
+        XCTAssertEqual(odd.charts.first?.labels, ["1", "2"])
+        XCTAssertEqual(odd.notes.count, 1, "\(odd.notes)")
     }
 
     /// A function plot is computed by the app, not written out by the model.

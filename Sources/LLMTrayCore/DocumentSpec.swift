@@ -160,10 +160,14 @@ public struct DocumentSpec: Equatable, Sendable {
             }
             series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values))
         }
+        var note: String?
         if kind == .pie, series.count > 1, series.allSatisfy({ $0.values.count == 1 }) {
             // A slice per series ("Part 1": [40], "Part 2": [30]): one
             // series, the slices named by the labels or else the series.
             if labels.count != series.count {
+                if !labels.isEmpty {
+                    note = "its \(labels.count) labels didn't match \(series.count) slices, so the slices are named by their series"
+                }
                 labels = series.enumerated().map { $1.name.isEmpty ? String($0 + 1) : $1.name }
             }
             series = [Chart.Series(name: "", values: series.map { $0.values[0] })]
@@ -174,7 +178,6 @@ public struct DocumentSpec: Equatable, Sendable {
         }
         // The numbers are what the chart is for: labels that don't match
         // them give way to point numbers rather than losing the chart.
-        var note: String?
         if !labels.isEmpty, labels.count != count {
             note = "its \(labels.count) labels didn't match \(count) values, so the points are numbered"
             labels = []
