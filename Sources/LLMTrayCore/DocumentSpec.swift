@@ -109,7 +109,7 @@ public struct DocumentSpec: Equatable, Sendable {
         // never a picture (a model can't write one, and the page loads no
         // data:), so the call is answered how a chart is given -- not made
         // into a page with that text on it.
-        guard Set(imagesAsData(content)).isSubset(of: Set(earlier.map(imagesAsData) ?? [])) else { return .failure(.imageData) }
+        guard !newImages(imagesAsData(content), earlier: earlier.map(imagesAsData) ?? []) else { return .failure(.imageData) }
         var notes: [String] = []
         var adjusted: [String] = []
         var charts: [Chart] = []
@@ -263,9 +263,9 @@ public struct DocumentSpec: Equatable, Sendable {
         ((raw as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
     }
 
-    /// The lines with images written as data (`![…](data:…`, closed or
-    /// not) outside code -- a link to data or a mention in code isn't one;
-    /// a line the earlier document had as it is isn't new.
+    /// The images written as data (`![…](data:…)`, closed or not) outside
+    /// code, each as written -- a link to data or a mention in code isn't
+    /// one. One the earlier document had is new only past its count there.
     static func imagesAsData(_ content: String) -> [String] {
         var found: [String] = []
         var fence: String?
@@ -277,15 +277,31 @@ public struct DocumentSpec: Equatable, Sendable {
             }
             if t.hasPrefix("```") || t.hasPrefix("~~~") { fence = String(t.prefix(3)); continue }
             // Code spans out: every other run between backticks.
-            let prose = t.components(separatedBy: "`").enumerated().filter { $0.offset % 2 == 0 }.map(\.element).joined(separator: " ")
-            let images = prose.lowercased().components(separatedBy: "](data:").dropLast().filter { before in
-                // The bracket it closes opened as "![".
-                guard let open = before.range(of: "[", options: .backwards) else { return false }
-                return before[..<open.lowerBound].hasSuffix("!")
+            for prose in t.components(separatedBy: "`").enumerated().filter({ $0.offset % 2 == 0 }).map(\.element) {
+                var rest = prose[...]
+                while let mark = rest.range(of: "](data:", options: .caseInsensitive) {
+                    let before = rest[..<mark.lowerBound]
+                    let after = rest[mark.upperBound...]
+                    let end = after.firstIndex(of: ")").map { after.index(after: $0) } ?? after.endIndex
+                    // The bracket it closes opened as "![".
+                    if let open = before.range(of: "[", options: .backwards), before[..<open.lowerBound].hasSuffix("!") {
+                        found.append(String(rest[open.lowerBound..<end]))
+                    }
+                    rest = rest[end...]
+                }
             }
-            if !images.isEmpty { found.append(t) }
         }
         return found
+    }
+
+    /// Any of `images` past its count in `earlier`.
+    static func newImages(_ images: [String], earlier: [String]) -> Bool {
+        var left = Dictionary(earlier.map { ($0, 1) }, uniquingKeysWith: +)
+        for image in images {
+            guard let n = left[image], n > 0 else { return true }
+            left[image] = n - 1
+        }
+        return false
     }
 
     /// A formula's x range: two numbers or expressions ("2*pi"), -10...10

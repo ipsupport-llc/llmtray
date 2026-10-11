@@ -334,6 +334,10 @@ final class DocumentSpecTests: XCTestCase {
         // A new one in place of an old one is new.
         let swapped = old.replacingOccurrences(of: "![p](data:image/png;base64", with: "![p](data:image/png;base64,BB")
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": swapped], earlier: old).failure, .imageData)
+        // The same image twice is one more; the text around it may change.
+        XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![p](data:image/png;base64"], earlier: old).failure, .imageData)
+        let reworded = old.replacingOccurrences(of: "![p](data:image/png;base64", with: "See ![p](data:image/png;base64")
+        XCTAssertNoThrow(try DocumentSpec.read(["title": "x", "content": reworded], earlier: old).get())
     }
 
     func testLimits() {
