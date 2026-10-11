@@ -327,8 +327,7 @@ final class BenchmarkRunner: ObservableObject {
             // What the launch really took: the free memory may cut a
             // candidate (adr/0021). One already measured isn't again, and
             // the load fired is the real concurrency.
-            let launched = server.launchedArguments
-            let value = launched.firstIndex(of: "--decode-concurrency").flatMap { $0 + 1 < launched.count ? Int(launched[$0 + 1]) : nil } ?? candidate
+            let value = ServerLaunch.argValue("--decode-concurrency", in: server.launchedArguments).flatMap(Int.init) ?? candidate
             guard measuredConcurrency.insert(value).inserted else { continue }
 
             let batchStart = Date()

@@ -152,12 +152,18 @@ public enum ServerLaunch {
 
     /// A flag's value in the profile's extra arguments (`--x v` or `--x=v`).
     static func extraArgValue(_ flag: String, _ p: ResolvedProfile) -> String? {
-        let parts = p.extraServerArgs.split(separator: " ").map(String.init)
-        for (i, part) in parts.enumerated() {
-            if part == flag, i + 1 < parts.count { return parts[i + 1] }
-            if part.hasPrefix(flag + "=") { return String(part.dropFirst(flag.count + 1)) }
+        argValue(flag, in: p.extraServerArgs.split(separator: " ").map(String.init))
+    }
+
+    /// A flag's value in launch arguments, `--x v` or `--x=v` (the last one
+    /// given, as the runtime's parser takes it).
+    public static func argValue(_ flag: String, in args: [String]) -> String? {
+        var found: String?
+        for (i, part) in args.enumerated() {
+            if part == flag, i + 1 < args.count { found = args[i + 1] }
+            if part.hasPrefix(flag + "=") { found = String(part.dropFirst(flag.count + 1)) }
         }
-        return nil
+        return found
     }
 
     /// The prompt cache a launch gets when the GPU memory cuts it below the

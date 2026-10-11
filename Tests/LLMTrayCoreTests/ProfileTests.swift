@@ -138,6 +138,12 @@ final class ServerLaunchTests: XCTestCase {
                                                 to: resolved { $0.launch.decodeConcurrency = 8 }, context: ctx))
     }
 
+    func testArgValueTakesBothFormsAndTheLast() {
+        XCTAssertEqual(ServerLaunch.argValue("--decode-concurrency", in: ["--decode-concurrency", "4", "--decode-concurrency=2"]), "2")
+        XCTAssertEqual(ServerLaunch.argValue("--decode-concurrency", in: ["--decode-concurrency=3"]), "3")
+        XCTAssertNil(ServerLaunch.argValue("--decode-concurrency", in: ["--prompt-concurrency", "4"]))
+    }
+
     func testAFreshDefaultNeedsNoConcurrencyMigration() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("conc2-\(UUID().uuidString)")
         defer { try? FileManager.default.removeItem(at: dir) }
