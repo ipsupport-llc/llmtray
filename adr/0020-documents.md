@@ -29,34 +29,20 @@ a 4B model looks as good as one from a 35B model.
   ```
 
   A chart goes where the content says `![chart](chart:<id>)`; a chart the
-  content never names goes at the end. **Pictures** go in the same way,
-  `![caption](image:<n>)` or `![caption](folder:<path>)`:
-  - `image:<n>`: an image of this chat (attached by the user, generated
-    or edited), numbered as edit_image numbers them;
-  - `folder:<path>`: an image in a folder the chat already has a read
-    grant for ([0014](0014-folder-tools.md)), read through
-    `FolderToolService` exactly as `files` view reads one: `coversRead`
-    without prompting, a standing grant only (an hour, this chat,
-    always: a once-grant is bound to its own call), none of the standing
-    ones in a temporary chat (Hardening 19), the grant checked before
-    and after the read (a revoke mid-read stops it), then
-    `FolderFileTake` with its guards. No grant is asked for from here.
-    A call with any `folder:` reference counts as a folder read for the
-    trust barrier (`turnTrust.record(.folderRead)`), whatever came of
-    it, as `files` does; and the model learns only "picture N couldn't
-    be used" — one text for no grant, missing, refused by a guard, too
-    large or not an image — so it can't probe a folder through
-    documents; the card shows the user the real reason;
-  - project pictures come with the project library (not yet: project
-    files take no images today, [0012](0012-project-files-rag.md)).
-  The app reads and decodes the picture itself (ImageIO, images only),
-  never at full size: the header's pixel count is checked first (at most
-  100 megapixels), then `CGImageSourceCreateThumbnailAtIndex` decodes it
-  straight to at most 2400 px (the bounded path of
-  `FolderAccess.modelImage`); it re-encodes it (PNG, or JPEG for photos)
-  without its metadata (no GPS or camera data goes into a document), and
-  serves it as `llmtray-doc://image/<k>`. The model never gets the
-  picture's bytes back. The model sends numbers, never
+  content never names goes at the end. **Pictures come only from the
+  project** (the user's rule): `![caption](project:<id>)`, the id
+  `project_files` lists for a picture of the chat's project (see "Project
+  pictures"). Not the chat's attached or generated images, not a folder's,
+  nothing by path or URL; a chat outside a project has no pictures. The
+  app reads the picture from the project's own storage and decodes it
+  never at full size: the header's pixel count first (at most 100
+  megapixels, new in this code), then
+  `CGImageSourceCreateThumbnailAtIndex` straight to at most 2400 px; it
+  re-encodes it (PNG, or JPEG for photos) without its metadata (no GPS
+  or camera data goes into a document) and serves it as
+  `llmtray-doc://image/<k>`. The model never gets the picture's bytes.
+  An id that isn't a picture of this project, or one that fails to
+  decode, is left out with a note. The model sends numbers, never
   drawings, CSS or HTML. Tables are Markdown tables in `content`, not
   charts. `ToolSchema` gains list kinds (`list(.string)`,
   `list(.number)`) with their JSON schema, lenient reading (a single value
@@ -112,15 +98,42 @@ a 4B model looks as good as one from a 35B model.
   answer. "Make again" on the card re-renders from the saved call (a
   `DocumentSource`: the arguments, as `MediaSource` keeps a generator's)
   by its own small path (`regenerateDocument`): no generator queue, no
-  model unload, no draft — it doesn't ask the model again. Folder
-  pictures are read again with every check above (a grant gone since:
-  left out).
+  model unload, no draft — it doesn't ask the model again. Pictures
+  are read from the project again (one removed since: left out).
 - **The model is told it's done**: the tool answers the title, the page
   count and that the user sees it in the chat; no path. It doesn't read
   the PDF back.
 - Later, through the same tool: `format: docx` (Word, for editing) and
   `format: xlsx` for tables; `style` gains the user's own templates. Not
   in the first version.
+
+## Project pictures
+
+Projects take pictures beside documents, so a document can use them
+(an addition to [0012](0012-project-files-rag.md), "Formats offered").
+
+- **Formats**: png, jpg/jpeg, heic, webp, tiff, gif (its first frame);
+  `ProjectFileFormats.pictures`. Added by the same flows as documents:
+  the project's Add Files…, the + menu's Add Files to the project, the
+  project files window's drop, and `files(add_to_project)` from a
+  granted folder (its own consent dialog, [0014](0014-folder-tools.md)).
+  Dropping an image on a project chat still attaches it to the message
+  for a vision model, as today; adding it to the project is the explicit
+  path.
+- **Stored, not searched.** A picture is copied into the project's
+  storage like a document (the same size cap and duplicate check), gets
+  an id, and its state is "picture" (`DocumentDisplayStatus.picture`),
+  not "not supported". No text is extracted, no OCR, no embedding: it is
+  never a search hit and never pinned. Removing it removes the copy.
+- **Listed.** `project_files`' listing shows pictures with their id,
+  name and pixel size, marked as pictures, so the model can name one in
+  a document; search and read skip them (a read of a picture's id says
+  it's a picture, for documents only). The project files window shows
+  them with a thumbnail.
+- **Trust**: a picture's name is file text like a document's name (the
+  listing is project text, as now); its pixels reach no model through
+  this — only `make_document`'s output. Looking at a project picture
+  with a vision model is not part of this ADR.
 
 ## Hardening
 
@@ -164,7 +177,7 @@ from a project file, a folder file or a web page with instructions in it.
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
    `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart and
-   picture references (`chart:`, `image:`, `folder:`) become their alt
+   picture references (`chart:`, `project:`) become their alt
    text. Links: only `http`, `https` and
    `mailto` stay links; any other scheme (`javascript:`, `file:`,
    `data:`) becomes plain text. Where a link's text isn't its address,
@@ -172,11 +185,8 @@ from a project file, a folder file or a web page with instructions in it.
    do), so the PDF never hides where a link goes.
 3. **Limits on what goes in and what comes out.** In: at most 8 charts,
    12 series, 500 points per chart; values finite; labels and titles
-   capped; content at most 200,000 characters; at most 30 pictures, a
-   folder picture at most 40 MB as `files` view reads it
-   (`FolderFileTake`, with its guards: no secret-looking name, no hard
-   link, no iCloud placeholder, never downloaded, by descriptor inside
-   the grant). A bad chart or picture is left out with a note in the
+   capped; content at most 200,000 characters; at most 30 pictures. A
+   bad chart or picture is left out with a note in the
    tool's answer, the rest is made; pictures past the 30th are left out
    the same way. "Over a limit: no document" is for the output limits
    below. Out: chart PNGs at
@@ -196,10 +206,9 @@ from a project file, a folder file or a web page with instructions in it.
    text a file brought in. `make_document` does neither: it can't send
    anything anywhere (Hardening 1), changes no existing file
    (Hardening 4), is bounded (Hardening 3), and its output only goes
-   further by the user's click. Pictures from a granted folder don't
-   change that: their bytes go only into the document, never back to
-   the model, and only from folders already granted for reading. Making
-   a document from project, folder
+   further by the user's click. Project pictures don't change that:
+   their bytes go only into the document, never back to the model.
+   Making a document from project, folder
    or pinned text is the point of the tool ("summarise these files into
    a report"), so it stays allowed after file text and with pinned
    files. If a later format ever fetches anything, that call becomes
@@ -316,6 +325,12 @@ separate look, not part of this ADR.
   list kinds; `load_tools` (sticky, saved with the chat, pending after
   file text until the next user message, with pinned files too); the
   profile field's per-group merge, an old profile, a bad hand edit.
+- Project pictures: each format added (and a renamed non-image
+  refused), listed with id and size, never a search hit, never pinned, a
+  read of one answered as a picture, removed with its copy; a document
+  with a picture of another project or a removed one leaves it out; a
+  100-megapixel-plus header refused before decoding; metadata gone from
+  the embedded copy.
 - Rendering tests: a fixed document in each style to PDF, page count and
   extracted text (PDFKit) checked; the hostile fixtures of Hardening 1
   load nothing; the output limits fail cleanly.

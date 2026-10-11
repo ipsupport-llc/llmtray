@@ -680,6 +680,9 @@ search. The user's explicit choice.
   version indexes (v1a, exactly: plain text, Markdown, code, PDF text
   layer, docx/doc/odt/rtf, HTML); anything else is refused at add with "not yet supported",
   never shown as searchable.
+  Pictures (png, jpg, heic, webp, tiff, gif) are taken too, stored and
+  listed but never searched, for documents to use:
+  [0020](0020-documents.md), "Project pictures".
 - **Disk limits**: per project and app-wide (Settings); add, re-index and
   compaction check free space first (a file: its size + index growth;
   compaction and migration: 1.2× the index); a failed swap is cleaned up
