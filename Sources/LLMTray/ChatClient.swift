@@ -98,6 +98,8 @@ final class ChatClient: ObservableObject {
     // persistCurrentSession() writes a session file after every completed
     // turn, keyed by this id.
     @Published private(set) var currentSessionID: UUID?
+    /// A document is being made again (Make again): the chat is busy.
+    @Published private(set) var isRemakingDocument = false
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
     /// The title is the user's or the model's already: no auto-title.
@@ -119,7 +121,7 @@ final class ChatClient: ObservableObject {
     var isTurnInProgress: Bool { isStreaming || isGeneratingMedia || isRunningTools }
     /// Anything that changes `messages` is running: compaction too, so a
     /// second Compact (or a send) can't work on a stale message range.
-    var isBusy: Bool { isTurnInProgress || isCompacting }
+    var isBusy: Bool { isTurnInProgress || isCompacting || isRemakingDocument }
 
     private let toolbox: ChatToolbox
     /// Another tab is unloading the model for an image, or has it unloaded
@@ -308,6 +310,7 @@ final class ChatClient: ObservableObject {
                 message.audioDurations = pm.audioDurations
                 if pm.audioSources.count == audios.count { message.audioSources = pm.audioSources }
             }
+            message.documents = (pm.documents ?? []).filter { FileManager.default.fileExists(atPath: imagesDir + "/" + $0.filename) }
             return message
         }
         currentSessionID = file.id
@@ -374,13 +377,15 @@ final class ChatClient: ObservableObject {
         guard let sessionID = currentSessionID, hasUnsavedChanges else { return }
         let imagesDir = ChatSessionStore.imagesDir(for: sessionID)
         var pendingImageWrites: [(path: String, data: Data)] = []
+        // Documents' files are written when they're made: only kept.
+        var documentFiles = Set<String>()
 
         // Before the tool messages they come from are dropped.
         let sources = ChatMessage.sourcesByAnswer(messages)
         let citations = ChatMessage.citationsByAnswer(messages)
         var persisted = messages.compactMap { msg -> PersistedMessage? in
             guard msg.role != "tool", !msg.isToolContext else { return nil }
-            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, msg.images.isEmpty, msg.audios.isEmpty { return nil }
+            if msg.role == "assistant", msg.content.isEmpty, msg.reasoning.isEmpty, !msg.hasMedia { return nil }
             // Keyed by this message's own (stable for its lifetime) id, so
             // re-persisting the same session after a later turn doesn't
             // re-derive different filenames for images already on disk.
@@ -409,6 +414,11 @@ final class ChatClient: ObservableObject {
             persisted.audioSources = msg.audioSources.count == msg.audios.count ? msg.audioSources : []
             persisted.citations = citations[msg.id]
             persisted.answerStats = msg.answerStats
+            persisted.documents = msg.documents.isEmpty ? nil : msg.documents
+            for document in msg.documents {
+                documentFiles.insert(document.filename)
+                if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
+            }
             return persisted
         }
         guard !persisted.isEmpty else { return }
@@ -429,7 +439,7 @@ final class ChatClient: ObservableObject {
                 mediaMissing = true
             }
         }
-        let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent })
+        let referenced = Set(pendingImageWrites.map { ($0.path as NSString).lastPathComponent }).union(documentFiles)
 
         if currentSessionTitle.isEmpty, let firstUser = messages.first(where: { $0.role == "user" }) {
             currentSessionTitle = String(firstUser.content.prefix(48))
@@ -494,7 +504,7 @@ final class ChatClient: ObservableObject {
         // compaction would leave its summary behind for good).
         guard let start = (keepStart..<messages.count).first(where: { isTurnStart($0) || messages[$0].isSummary }) else { return nil }
         var end = messages.count - keepEnd
-        if let media = messages.indices.first(where: { $0 >= start && (!messages[$0].images.isEmpty || !messages[$0].audios.isEmpty) }) {
+        if let media = messages.indices.first(where: { $0 >= start && messages[$0].hasMedia }) {
             end = min(end, media)
         }
         while end > start, end < messages.count, !isTurnStart(end) { end -= 1 }
@@ -557,6 +567,7 @@ final class ChatClient: ObservableObject {
         var settings = settings
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
         settings.folders = folderChat
+        settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
         return settings
     }
 
@@ -820,7 +831,7 @@ final class ChatClient: ObservableObject {
     private var turnProducedSomething: Bool {
         guard let start = messages.lastIndex(where: { $0.role == "user" && !$0.isToolContext }) else { return false }
         return messages[(start + 1)...].contains {
-            $0.role == "assistant" && (!$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !$0.images.isEmpty || !$0.audios.isEmpty)
+            $0.role == "assistant" && (!$0.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || $0.hasMedia)
         }
     }
 
@@ -1006,6 +1017,31 @@ final class ChatClient: ObservableObject {
             }
             hasUnsavedChanges = true
             persistCurrentSession()
+        }
+    }
+
+    /// Makes a message's document again from its saved call (adr/0020,
+    /// Make again): the same content laid out anew, no model asked. The
+    /// new PDF replaces the card; the old file goes with the next save.
+    func remakeDocument(messageID: UUID, index: Int) async {
+        guard !isBusy, let session = currentSessionID, UserDefaults.standard[Pref.documentsEnabled],
+              let j = messages.firstIndex(where: { $0.id == messageID }), messages[j].documents.indices.contains(index),
+              let source = messages[j].documents[index].source else { return }
+        let parsed = ToolArgumentParser.parse(source.arguments, schema: DocumentSpec.schema)
+        guard case .success(let spec) = DocumentSpec.read(parsed.values) else { return }
+        isRemakingDocument = true
+        defer { isRemakingDocument = false }
+        let folder = URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true)
+        let result = await DocumentRenderer.render(spec, into: folder, source: source)
+        guard currentSessionID == session, let k = messages.firstIndex(where: { $0.id == messageID }),
+              messages[k].documents.indices.contains(index) else { return }
+        switch result {
+        case .success(let made):
+            messages[k].documents[index] = made.document
+            hasUnsavedChanges = true
+            persistCurrentSession()
+        case .failure(let error):
+            errorText = error.text
         }
     }
 
@@ -1595,6 +1631,9 @@ final class ChatClient: ObservableObject {
                         messages[sourceIndex].imageSources.append(source)
                     }
                 }
+                messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .generatedDocument(let document, let text):
+                if sourceIndex < messages.count { messages[sourceIndex].documents.append(document) }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .generatedAudio(let data, let seconds, let prompt, let text):
                 if sourceIndex < messages.count {

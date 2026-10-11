@@ -45,11 +45,13 @@ struct PersistedMessage: Codable {
     var citations: [Citation]?
     // See ChatMessage.answerStats; nil, and not written, when unknown.
     var answerStats: AnswerStats?
+    // See ChatMessage.documents; nil, and not written, when it has none.
+    var documents: [DocumentRef]?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats
+        case answerStats, documents
     }
 
     init(
@@ -87,6 +89,7 @@ struct PersistedMessage: Codable {
         audioSources = try c.decodeIfPresent([MediaSource].self, forKey: .audioSources) ?? []
         citations = try c.decodeIfPresent([Citation].self, forKey: .citations)
         answerStats = try c.decodeIfPresent(AnswerStats.self, forKey: .answerStats)
+        documents = try c.decodeIfPresent([DocumentRef].self, forKey: .documents)
     }
 }
 
@@ -105,6 +108,7 @@ extension PersistedMessage {
         copy.audioDurations = keptAudio.compactMap { audioDurations[safe: $0] }
         copy.audioPrompts = keptAudio.compactMap { audioPrompts[safe: $0] }
         copy.audioSources = audioSources.count == audioFilenames.count ? keptAudio.map { audioSources[$0] } : []
+        copy.documents = documents.map { $0.filter { !names.contains($0.filename) } }.flatMap { $0.isEmpty ? nil : $0 }
         return copy
     }
 }

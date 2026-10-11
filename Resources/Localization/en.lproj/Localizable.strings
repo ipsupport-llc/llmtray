@@ -97,9 +97,11 @@
 "Add files to a project, or images for the model to see" = "Add files to a project, or images for the model to see";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
 "Add the files to a project?" = "Add the files to a project?";
+"Add to Project" = "Add to Project";
 "Add “%1$@” to “%2$@”?" = "Add “%1$@” to “%2$@”?";
 "Added %@" = "Added %@";
 "Added here" = "Added here";
+"Added to the project." = "Added to the project.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
 "Advanced" = "Advanced";
@@ -294,6 +296,8 @@
 "Diagnostics" = "Diagnostics";
 "Disk usage" = "Disk usage";
 "Dismiss" = "Dismiss";
+"Document: %@" = "Document: %@";
+"Documents" = "Documents";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Documents are copied into the project and indexed on this Mac; images go into your message.";
 "Documents go into a project with this chat." = "Documents go into a project with this chat.";
 "Documents go into a project with this chat; images go into your message." = "Documents go into a project with this chat; images go into your message.";
@@ -535,6 +539,7 @@
 "Launch at login: %@" = "Launch at login: %@";
 "Leave a Review" = "Leave a Review";
 "Length" = "Length";
+"Let chats make documents" = "Let chats make documents";
 "Let chats work in folders" = "Let chats work in folders";
 "Let coding agents and scripts use your models." = "Let coding agents and scripts use your models.";
 "Let the chat look in %@?" = "Let the chat look in %@?";
@@ -559,9 +564,11 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Made for programming and agents: coding tools and the OpenAI API.";
 "Maintenance" = "Maintenance";
 "Make a 30-second calm lo-fi instrumental for studying" = "Make a 30-second calm lo-fi instrumental for studying";
+"Make again" = "Make again";
 "Make images and edit them." = "Make images and edit them.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings.";
 "Make songs and instrumentals." = "Make songs and instrumentals.";
+"Make the document again from the same content" = "Make the document again from the same content";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Makes a new random ID: later reports can't be matched to earlier ones.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it.";
 "Manage Models…" = "Manage Models…";
@@ -679,6 +686,7 @@
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Only what you type here is published, after a person has checked it. Never your Apple ID or email.";
+"Open" = "Open";
 "Open %@, page %lld" = "Open %@, page %lld";
 "Open Chat" = "Open Chat";
 "Open LLMTray when you log in" = "Open LLMTray when you log in";
@@ -695,6 +703,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Other apps reach your models through an OpenAI-compatible API on this Mac.";
 "Other devices on your network can use the server" = "Other devices on your network can use the server";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
+"PDF · %lld pages" = "PDF · %lld pages";
 "Past %lld messages" = "Past %lld messages";
 "Pause" = "Pause";
 "Pause Indexing" = "Pause Indexing";
@@ -827,6 +836,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64.";
 "Sampling" = "Sampling";
 "Save" = "Save";
+"Save As…" = "Save As…";
 "Save memory" = "Save memory";
 "Saved chats will show up here." = "Saved chats will show up here.";
 "Saved in your Keychain" = "Saved in your Keychain";
@@ -973,10 +983,12 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "The MTP drafter has downloaded -- restart the server to use it.";
 "The Mac's chip." = "The Mac's chip.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped.";
+"The PDF couldn't be opened." = "The PDF couldn't be opened.";
 "The app's language (the language only, not the region)." = "The app's language (the language only, not the region).";
 "The app's name." = "The app's name.";
 "The base profile: every other profile inherits from it." = "The base profile: every other profile inherits from it.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone.";
 "The chat model couldn't be unloaded for Voice Lab." = "The chat model couldn't be unloaded for Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.";

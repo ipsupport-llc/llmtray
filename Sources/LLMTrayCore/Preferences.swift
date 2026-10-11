@@ -128,6 +128,8 @@ public enum Pref {
     // Folder access (adr/0014)
     /// Off until turned on in Settings: no folder tool is declared before.
     public static let folderToolsEnabled = PrefKey("llmtray.folderTools.enabled", default: false)
+    /// Chats may make PDF documents (make_document, adr/0020): off until turned on.
+    public static let documentsEnabled = PrefKey("llmtray.documents.enabled", default: false)
 
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)

@@ -14,6 +14,9 @@ enum ToolResult {
     case generatedImage(Data, seconds: Double, prompt: String, text: String)
     /// Generated music (.m4a), shown to the user as a player, plus the tool result.
     case generatedAudio(Data, seconds: Double, prompt: String, text: String)
+    /// A document (make_document): its PDF already in the chat's folder,
+    /// shown as a card, plus the tool result.
+    case generatedDocument(DocumentRef, text: String)
     /// An image put in front of the model (view_image): sent with the next
     /// request, in memory only -- neither shown as a chat bubble nor saved.
     case imageForModel(Data, text: String)
@@ -111,6 +114,7 @@ extension ChatTool {
 final class ChatToolbox {
     let imageGeneration: ImageToolRunner
     let musicGeneration: MusicToolRunner
+    let documents = MakeDocumentTool()
     private(set) var tools: [ChatTool] = []
     /// What file text this turn has had back (project files, folder
     /// listings, change proposals): network tools and the generators are off
@@ -171,7 +175,7 @@ final class ChatToolbox {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         musicGeneration = MusicToolRunner(music: music ?? MusicManager())
         tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
-            + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool()]
+            + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool(), documents]
     }
 
     func register(_ tool: ChatTool) {
@@ -239,6 +243,7 @@ final class ChatToolbox {
             spent.formUnion([ImageToolRunner.toolName, EditImageTool.toolName])
         }
         if musicGeneration.songsThisTurn >= musicGeneration.maxSongsPerTurn { spent.insert(MusicToolRunner.toolName) }
+        if documents.madeThisTurn { spent.insert(MakeDocumentTool.toolName) }
         // After file text: nothing that reaches out (adr/0012), no folder
         // change after a read (adr/0014), and no more file text once there's
         // no room for it.
@@ -266,6 +271,7 @@ final class ChatToolbox {
     func startTurn() {
         imageGeneration.startTurn()
         musicGeneration.startTurn()
+        documents.startTurn()
         turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
         changeRefusedThisTurn = false
@@ -439,7 +445,7 @@ final class ChatToolbox {
             // The generators' and view_image's plain-text failures.
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success
-        case .generatedImage, .generatedAudio, .imageForModel, .projectText: return .success
+        case .generatedImage, .generatedAudio, .generatedDocument, .imageForModel, .projectText: return .success
         }
     }
 
