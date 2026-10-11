@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit speech: IPSupport の最速ビルド — 3-bit 言語モデルに 8-bit 音声認識と音声対応。すべてのテストで正しい回答。GPTQ 3-bit: 音声部分がフル精度の同等ビルド。4-bit: mlx-community のビルド。各モデルは要求時にのみダウンロードされます。";
 "GPU memory limit" = "GPU メモリ制限";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "モデルサーバーが重みのほかに活性化やmacOSのために確保しておくGPUメモリ。以下の比率は、そこから残った部分を分割します。";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: 先にHugging Faceでライセンスに同意し、「設定」›「モデル」でトークンを保存してください。";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "制限付き: 先にHugging Faceでライセンスに同意し、「設定」›「モデル」でトークンを保存してください。";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "制限付き: その Hugging Face ページでライセンスを承諾し、設定 → Models にトークンを追加してください。";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "制限付き: その Hugging Face ページでアクセスを申請してください（著者による審査があります）。設定 → Models にトークンを追加してください。";
 "General" = "一般";

@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑bit + 8‑bit speech: IPSupport का सबसे तेज़ बिल्ड — 3‑bit भाषा मॉडल के साथ 8‑bit स्पीच रिकग्निशन और वॉइस; हर टेस्ट का उत्तर सही। GPTQ 3‑bit: वही है, पर स्पीच हिस्से पूर्ण सटीकता (full precision) में हैं। 4‑bit: mlx-community का बिल्ड। ये सभी केवल तभी डाउनलोड होते हैं जब आप अनुरोध करें।";
 "GPU memory limit" = "GPU मेमोरी सीमा";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "मॉडल सर्वर वेट्स के अलावा सक्रियताओं और macOS के लिए जो GPU मेमोरी अलग रखता है। नीचे दिए शेयर उस बची हुई मेमोरी को विभाजित करते हैं।";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: पहले Hugging Face पर इसका लाइसेंस स्वीकार करें और सेटिंग्स › मॉडल में token सहेजें।";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "सीमित: पहले Hugging Face पर इसका लाइसेंस स्वीकार करें और सेटिंग्स › मॉडल में token सहेजें।";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर लाइसेंस स्वीकार करें और Settings → Models में token जोड़ें।";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "सीमित: इसकी Hugging Face पेज पर एक्सेस का अनुरोध करें (लेखक समीक्षा करते हैं), और Settings → Models में token जोड़ें।";
 "General" = "सामान्य";

@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit speech: la versión más rápida de IPSupport: un modelo de lenguaje en 3 bits con reconocimiento y voz en 8 bits; todas las pruebas responden correctamente. GPTQ 3-bit: lo mismo, con las partes de voz en precisión completa. 4-bit: compilación de mlx-community. Cada uno se descarga solo cuando lo solicitas.";
 "GPU memory limit" = "Límite de memoria GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "Memoria GPU que el servidor de modelos deja libre además de los pesos, para activaciones y macOS. Las proporciones siguientes dividen lo que queda.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: acepta su licencia en Hugging Face y guarda un token en Ajustes › Models primero.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Restringido: primero acepta su licencia en Hugging Face y guarda un token en Ajustes › Modelos.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Restringido: acepta su licencia en su página de Hugging Face y añade un token en Ajustes → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Restringido: solicita acceso en su página de Hugging Face (los autores lo revisan) y añade un token en Ajustes → Models.";
 "General" = "General";
