@@ -53,6 +53,8 @@ final class ModelCardTextTests: XCTestCase {
         XCTAssertEqual(ModelCardText.clean("<div><a title=\"hint href='wrong'\" href=\"https://e.com\">Docs</a></div>"), "[Docs](https://e.com)")
         XCTAssertEqual(ModelCardText.clean("<div><a href=\"https://e.com\">A [B</a></div>"), "[A \\[B](https://e.com)")
         XCTAssertEqual(ModelCardText.clean("\n<img src=\"logo.png\" />\n\ntext"), "\n\ntext", "a lone tag after a blank line")
+        XCTAssertEqual(ModelCardText.clean("# Model\n<a href=\"https://chat.qwen.ai/\">\nChat\n</a>"), "# Model\n[Chat](https://chat.qwen.ai/)", "after a heading")
+        XCTAssertEqual(ModelCardText.clean("<table>\n<tr><td>Accuracy</td><td>90%</td></tr>\n</table>\n\ntext"), "Accuracy 90%\n\ntext")
     }
 
     func testHostileBlockStaysFast() {

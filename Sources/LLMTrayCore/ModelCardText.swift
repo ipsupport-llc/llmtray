@@ -14,7 +14,8 @@ public enum ModelCardText {
         var out: [String] = []
         var block: [String] = []
         var fence: (char: Character, count: Int)?
-        var previousBlank = true
+        // A lone tag can't interrupt a paragraph; after a heading it can.
+        var inParagraph = false
         func flush() {
             guard !block.isEmpty else { return }
             let text = block.joined(separator: "\n")
@@ -27,7 +28,6 @@ public enum ModelCardText {
         }
         var comment = false  // the block is a comment: it ends at -->
         for line in markdown.components(separatedBy: "\n") {
-            defer { previousBlank = line.trimmingCharacters(in: .whitespaces).isEmpty }
             if !block.isEmpty {
                 if comment {
                     block.append(line)
@@ -35,6 +35,7 @@ public enum ModelCardText {
                 } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
                     flush()
                     out.append(line)
+                    inParagraph = false
                 } else {
                     block.append(line)
                 }
@@ -48,13 +49,17 @@ public enum ModelCardText {
             if let open = opens(line) {
                 fence = open
                 out.append(line)
-            } else if let start = htmlBlockStart(line, afterBlank: previousBlank) {
+                inParagraph = false
+            } else if let start = htmlBlockStart(line, inParagraph: inParagraph) {
                 block.append(line)
                 if start == .comment {
                     if line.contains("-->") { flush() } else { comment = true }
                 }
             } else {
                 out.append(line)
+                let t = line.trimmingCharacters(in: .whitespaces)
+                inParagraph = !t.isEmpty && !t.hasPrefix("#")
+                    && t.range(of: #"^([-*_])(\s*\1){2,}\s*$"#, options: .regularExpression) == nil
             }
         }
         flush()
@@ -85,8 +90,8 @@ public enum ModelCardText {
 
     /// CommonMark's HTML block starts, up to three spaces in: a comment; a
     /// block-level tag; any other complete tag alone on its line, only
-    /// after a blank line (it can't interrupt a paragraph).
-    static func htmlBlockStart(_ line: String, afterBlank: Bool) -> BlockStart? {
+    /// outside a paragraph (it can't interrupt one).
+    static func htmlBlockStart(_ line: String, inParagraph: Bool) -> BlockStart? {
         let indent = line.prefix { $0 == " " }.count
         guard indent <= 3 else { return nil }
         let rest = String(line.dropFirst(indent))
@@ -96,7 +101,7 @@ public enum ModelCardText {
             if blockStartTags.contains(name) { return .block }
         }
         let alone = "^</?[A-Za-z][A-Za-z0-9-]*" + attributes + #">\s*$"#
-        if afterBlank, rest.range(of: alone, options: .regularExpression) != nil { return .tag }
+        if !inParagraph, rest.range(of: alone, options: .regularExpression) != nil { return .tag }
         return nil
     }
 
@@ -139,8 +144,11 @@ public enum ModelCardText {
                     labelStart = out.utf16.count
                 } else if closing, let address = link, let offset = labelStart {
                     let start = String.Index(utf16Offset: offset, in: out)
-                    // Brackets in the text would end the link early.
-                    let label = String(out[start...]).replacingOccurrences(of: "[", with: "\\[")
+                    // On one line, with its brackets escaped: the card's renderer
+                    // reads a link within a line, and a bracket would end it early.
+                    let label = String(out[start...]).components(separatedBy: .whitespacesAndNewlines)
+                        .filter { !$0.isEmpty }.joined(separator: " ")
+                        .replacingOccurrences(of: "[", with: "\\[")
                         .replacingOccurrences(of: "]", with: "\\]")
                     out = String(out[..<start]) + label + "](\(address))"
                     link = nil
@@ -148,6 +156,8 @@ public enum ModelCardText {
                 }
             } else if blockTags.contains(name) {
                 out += "\n"
+            } else if (name == "td" || name == "th"), !closing {
+                out += " "  // cells of a row apart
             }
         }
         out += ns.substring(from: position)
