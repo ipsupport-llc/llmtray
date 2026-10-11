@@ -22,7 +22,7 @@ final class MakeDocumentTool: ChatTool {
     func startTurn() { madeThisTurn = false }
 
     func run(_ arguments: [String: Any], context: ToolContext) async -> ToolResult {
-        guard let session = context.settings.documentsSession else {
+        guard context.settings.documentsSession != nil else {
             return .text(UserDefaults.standard[Pref.documentsEnabled]
                 ? "\(name) isn't available in a temporary chat: it writes nothing. The user can make documents in a saved chat."
                 : "\(name) isn't available: making documents is turned off in Settings. Answer without it.")
@@ -36,14 +36,14 @@ final class MakeDocumentTool: ChatTool {
         case .failure(let e): return .text(e.text)
         }
         let source = DocumentSource(arguments: Self.argumentsJSON(arguments), project: context.settings.project?.id)
-        switch await DocumentRenderer.render(spec, into: URL(fileURLWithPath: ChatSessionStore.imagesDir(for: session), isDirectory: true), source: source) {
+        switch await DocumentRenderer.render(spec, source: source) {
         case .success(let made):
             madeThisTurn = true
-            var text = "Made the PDF \"\(made.document.title)\" (\(made.document.pages) page\(made.document.pages == 1 ? "" : "s")). "
+            var text = "Made the PDF \"\(made.title)\" (\(made.pages) page\(made.pages == 1 ? "" : "s")). "
                 + "The user sees it in the chat and can open, save or share it. Don't repeat its content unless asked."
             let notes = spec.notes + made.notes
             if !notes.isEmpty { text += " Left out: " + notes.joined(separator: " ") }
-            return .generatedDocument(made.document, text: text)
+            return .generatedDocument(made, text: text)
         case .failure(let error):
             return .text("\(name): \(error.text)")
         }
@@ -57,12 +57,46 @@ final class MakeDocumentTool: ChatTool {
 }
 
 /// The parent side of `LLMTray --render-document`: a fresh job folder, the
-/// child under supervision (60 s, a memory limit, a small stdout), then the
-/// PDF and its thumbnail moved into the chat's folder under a new name.
+/// child under supervision (60 s, a memory limit, a small stdout), the PDF
+/// and its thumbnail read back. Nothing goes into the chat's folder here:
+/// `install` writes them there on the main actor, in the same step that
+/// puts the card in the message -- a save in between could otherwise sweep
+/// files no message lists yet, and a result dropped (another chat, Stop)
+/// leaves nothing behind.
 enum DocumentRenderer {
     struct Made {
-        var document: DocumentRef
+        var pdf: Data
+        var thumbnail: Data?
+        var title: String
+        var pages: Int
+        var source: DocumentSource
         var notes: [String]
+    }
+
+    /// The thumbnail's size at most (the child makes it 400 px).
+    static let maxThumbnailBytes = 512 * 1024
+
+    /// Writes a made document into `folder` under the first free name
+    /// (`O_EXCL`), its thumbnail beside it; the card's metadata.
+    static func install(_ made: Made, in folder: URL) throws -> DocumentRef {
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let (fd, name) = try DocumentFileName.create(in: folder, title: made.title)
+        let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
+        do {
+            try handle.write(contentsOf: made.pdf)
+            try handle.close()
+        } catch {
+            try? FileManager.default.removeItem(at: folder.appendingPathComponent(name))
+            throw error
+        }
+        var thumbnail: String?
+        if let thumb = made.thumbnail, thumb.count <= maxThumbnailBytes {
+            let thumbName = "\(UUID().uuidString).thumb.png"
+            if (try? thumb.write(to: folder.appendingPathComponent(thumbName), options: .withoutOverwriting)) != nil {
+                thumbnail = thumbName
+            }
+        }
+        return DocumentRef(id: UUID(), filename: name, thumbnail: thumbnail, title: made.title, pages: made.pages, source: made.source)
     }
 
     enum Failure: Error {
@@ -79,7 +113,7 @@ enum DocumentRenderer {
         }
     }
 
-    static func render(_ spec: DocumentSpec, into chatFolder: URL, source: DocumentSource) async -> Result<Made, Failure> {
+    static func render(_ spec: DocumentSpec, source: DocumentSource) async -> Result<Made, Failure> {
         let (job, notes, tooLarge) = DocumentJob.make(spec)
         guard !tooLarge else { return .failure(.tooLarge) }
         guard let executable = Bundle.main.executablePath else { return .failure(.render("no executable")) }
@@ -116,24 +150,10 @@ enum DocumentRenderer {
         guard let bytes = try? Data(contentsOf: pdf), bytes.count <= DocumentJob.Limits.pdfBytes else {
             return .failure(.render("no PDF"))
         }
-        do {
-            try FileManager.default.createDirectory(at: chatFolder, withIntermediateDirectories: true)
-            let (fd, name) = try DocumentFileName.create(in: chatFolder, title: spec.title)
-            let handle = FileHandle(fileDescriptor: fd, closeOnDealloc: true)
-            try handle.write(contentsOf: bytes)
-            try handle.close()
-            var thumbnail: String?
-            if let thumb = try? Data(contentsOf: jobDir.appendingPathComponent(DocumentJob.thumbnail)) {
-                let thumbName = "\(UUID().uuidString).thumb.png"
-                if (try? thumb.write(to: chatFolder.appendingPathComponent(thumbName), options: .withoutOverwriting)) != nil {
-                    thumbnail = thumbName
-                }
-            }
-            let document = DocumentRef(id: UUID(), filename: name, thumbnail: thumbnail, title: spec.title, pages: pages, source: source)
-            return .success(Made(document: document, notes: notes))
-        } catch {
-            return .failure(.write(error.localizedDescription))
-        }
+        let thumbURL = jobDir.appendingPathComponent(DocumentJob.thumbnail)
+        let thumbSize = (try? FileManager.default.attributesOfItem(atPath: thumbURL.path)[.size] as? Int) ?? Int.max
+        let thumb = thumbSize <= maxThumbnailBytes ? try? Data(contentsOf: thumbURL) : nil
+        return .success(Made(pdf: bytes, thumbnail: thumb, title: spec.title, pages: pages, source: source, notes: notes))
     }
 
     /// The child's one line (the supervising thread writes, the caller reads after).
