@@ -276,6 +276,11 @@ struct DocumentChartView: View {
     private struct Point: Identifiable {
         let id: Int
         let label: String
+        /// A formula's x; nil at a label.
+        let x: Double?
+        /// A formula's line: its series and piece (not joined across a pole);
+        /// by index, so two series of one name stay two lines.
+        var line = ""
         let series: String
         let value: Double
     }
@@ -285,7 +290,10 @@ struct DocumentChartView: View {
         for (s, series) in chart.series.enumerated() {
             for (i, value) in series.values.enumerated() {
                 let label = i < chart.labels.count ? chart.labels[i] : String(i + 1)
-                out.append(Point(id: s * 10_000 + i, label: label, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value))
+                let x = series.xs.flatMap { i < $0.count ? $0[i] : nil }
+                var point = Point(id: s * 10_000 + i, label: label, x: x, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value)
+                point.line = "\(s)/\(series.pieces.flatMap { i < $0.count ? $0[i] : nil } ?? 0)"
+                out.append(point)
             }
         }
         return out
@@ -307,6 +315,21 @@ struct DocumentChartView: View {
         let unit = chart.unit.isEmpty ? "Value" : chart.unit
         let several = chart.series.count > 1
         switch chart.kind {
+        case "line" where chart.series.contains { $0.xs != nil }:
+            // A formula: a smooth line over a number axis, no dots.
+            let line = points.filter { $0.x != nil }
+            let range = chart.range ?? []
+            Chart(line) { p in
+                LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value),
+                         series: .value("Line", p.line))
+                    .foregroundStyle(by: .value("Series", p.series))
+            }
+            // The range the formula was asked for, not rounded out past it;
+            // values on the left, where long negative numbers have room.
+            .chartXScale(domain: range.count == 2 && range[0] < range[1] ? range[0]...range[1] : 0...1)
+            .chartYAxis { AxisMarks(position: .leading) }
+            .chartLegend(several ? .visible : .hidden)
+            .chartYAxisLabel(chart.unit)
         case "line":
             Chart(points) { p in
                 LineMark(x: .value("Label", p.label), y: .value(unit, p.value))

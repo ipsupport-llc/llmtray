@@ -158,6 +158,8 @@ final class DocumentHTMLTests: XCTestCase {
 final class DocumentSpecTests: XCTestCase {
     private func read(_ json: String) -> Result<DocumentSpec, DocumentError> {
         let parsed = ToolArgumentParser.parse(json, schema: DocumentSpec.schema)
+        // As the app runs it: a call the schema rejects never gets here.
+        XCTAssertTrue(parsed.problems.isEmpty, "\(parsed.problems)")
         return DocumentSpec.read(parsed.values)
     }
 
@@ -171,9 +173,45 @@ final class DocumentSpecTests: XCTestCase {
 
     func testBadChartsAreLeftOutWithANote() throws {
         let spec = try read(#"{"title": "x", "content": "y", "charts": [{"id": "a", "type": "bar", "labels": ["A"], "series": [{"values": [1, 2]}]}, {"id": "b", "type": "pie", "series": [{"values": [1]}, {"values": [2]}]}, {"id": "c", "type": "pie", "series": [{"values": [0, 0]}]}, {"id": "bad id!", "type": "bar", "series": [{"values": [1]}]}, {"id": "ok", "type": "line", "series": [{"values": [1, 2, 3]}]}, {"id": "ok", "type": "line", "series": [{"values": [1]}]}]}"#).get()
-        XCTAssertEqual(spec.charts.map(\.id), ["ok"])
-        XCTAssertEqual(spec.charts.first?.labels, ["1", "2", "3"])
+        // "a": its labels don't match its values -- drawn, points numbered.
+        XCTAssertEqual(spec.charts.map(\.id), ["a", "ok"])
+        XCTAssertEqual(spec.charts.map(\.labels), [["1", "2"], ["1", "2", "3"]])
         XCTAssertEqual(spec.notes.count, 5, "\(spec.notes)")
+        XCTAssertTrue(spec.notes[0].contains("numbered"), spec.notes[0])
+    }
+
+    /// A function plot is computed by the app, not written out by the model.
+    func testFormulaCharts() throws {
+        let spec = try read(#"{"title": "x", "content": "![s](chart:s)", "charts": [{"id": "s", "type": "bar", "range": ["0", "2*pi"], "series": [{"formula": "sin(x)"}, {"name": "cos", "function": "cos(x)"}]}]}"#).get()
+        let chart = try XCTUnwrap(spec.charts.first)
+        XCTAssertEqual(chart.kind, .line)
+        XCTAssertEqual(chart.series.map(\.name), ["sin(x)", "cos"])
+        let sine = chart.series[0]
+        XCTAssertEqual(sine.values.count, DocumentSpec.Limits.formulaPoints)
+        XCTAssertEqual(sine.xs.first, 0)
+        XCTAssertEqual(sine.xs.last ?? 0, 2 * .pi, accuracy: 1e-9)
+        XCTAssertEqual(sine.values[25], 1, accuracy: 1e-9)  // sin(pi/2)
+        XCTAssertTrue(spec.notes.isEmpty, "\(spec.notes)")
+        // Points without a value are left out; no range is -10...10.
+        let log = try read(#"{"title": "x", "content": "y", "charts": [{"id": "l", "series": [{"formula": "log(x)"}]}]}"#).get()
+        XCTAssertEqual(log.charts.first?.series.first?.xs.allSatisfy { $0 > 0 }, true)
+        XCTAssertEqual(log.charts.first?.series.first?.xs.last, 10)
+        XCTAssertEqual(log.charts.first?.range, [-10, 10], "the axis is the asked range, gaps and all")
+        // A pole between two points, or at one: no line across it.
+        let pole = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "range": [-1, 2], "series": [{"formula": "1/x"}, {"name": "sin", "formula": "sin(x)"}]}]}"#).get()
+        let inverse = try XCTUnwrap(pole.charts.first?.series.first)
+        XCTAssertEqual(Set(inverse.pieces), [0, 1])
+        XCTAssertTrue(zip(inverse.xs, inverse.pieces).allSatisfy { ($0 < 0) == ($1 == 0) })
+        XCTAssertEqual(Set(pole.charts.first?.series.last?.pieces ?? []), [0], "a smooth line is one piece")
+        // Limits count scalars: one letter with a thousand marks is too long.
+        let marks = "x" + String(repeating: "\u{301}", count: 1000)
+        let long = try read(#"{"title": "x", "content": "y", "charts": [{"id": "m", "series": [{"formula": "\#(marks)"}]}]}"#).get()
+        XCTAssertEqual(long.charts.count, 0)
+        // A typo, a mix with plain values, a bad range: left out with a note.
+        let bad = try read(#"{"title": "x", "content": "y", "charts": [{"id": "a", "series": [{"formula": "sinn(x)"}]}, {"id": "b", "series": [{"formula": "x"}, {"values": [1]}]}, {"id": "c", "range": [5, 1], "series": [{"formula": "x"}]}, {"id": "d", "range": ["-1", "1"], "series": [{"formula": "sqrt(x - 5)"}]}]}"#).get()
+        XCTAssertEqual(bad.charts.count, 0)
+        XCTAssertEqual(bad.notes.count, 4, "\(bad.notes)")
+        XCTAssertTrue(bad.notes[0].contains("unknown name"), bad.notes[0])
     }
 
     func testLimits() {

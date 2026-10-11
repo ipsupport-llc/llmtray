@@ -86,10 +86,16 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         public var labels: [String]
         public var series: [SeriesJob]
         public var unit: String
+        /// A formula's x range [from, to]: the axis.
+        public var range: [Double]?
     }
     public struct SeriesJob: Codable, Equatable, Sendable {
         public var name: String
         public var values: [Double]
+        /// The values' x for a formula's line; nil: at the labels.
+        public var xs: [Double]?
+        /// Each point's piece of that line (not joined across).
+        public var pieces: [Int]?
     }
 
     public var title: String
@@ -148,7 +154,9 @@ public struct DocumentJob: Codable, Equatable, Sendable {
         let page = DocumentHTML.page(title: spec.title, style: spec.style, body: html, toc: toc)
         let charts = spec.charts.map { c in
             ChartJob(id: c.id, kind: c.kind.rawValue, title: c.title, labels: c.labels,
-                     series: c.series.map { SeriesJob(name: $0.name, values: $0.values) }, unit: c.unit)
+                     series: c.series.map { SeriesJob(name: $0.name, values: $0.values, xs: $0.xs.isEmpty ? nil : $0.xs,
+                                                       pieces: $0.pieces.isEmpty ? nil : $0.pieces) }, unit: c.unit,
+                     range: c.range.count == 2 ? c.range : nil)
         }
         let files = Dictionary(uniqueKeysWithValues: pictureKeys.map { ($0.value, $0.value) })
         return (DocumentJob(title: spec.title, style: spec.style, html: page, charts: charts, pictures: files), notes, body.tooLarge)

@@ -25,8 +25,10 @@ public enum Calculator {
         }
     }
 
-    public static func evaluate(_ expression: String) throws -> Double {
-        var parser = Parser(tokens: try tokenize(percentOf(expression)))
+    /// `variables` (lowercase names, like `x` in a document chart's
+    /// formula) are read like the constants and win over them.
+    public static func evaluate(_ expression: String, variables: [String: Double] = [:]) throws -> Double {
+        var parser = Parser(tokens: try tokenize(percentOf(expression)), variables: variables)
         let value = try parser.expression()
         guard parser.atEnd else { throw Failure.syntax("unexpected '\(parser.peekText)'") }
         guard value.isFinite else { throw Failure.domain("result is not finite") }
@@ -110,6 +112,7 @@ public enum Calculator {
 
     struct Parser {
         var tokens: [Token]
+        var variables: [String: Double] = [:]
         var position = 0
         var depth = 0
 
@@ -213,7 +216,7 @@ public enum Calculator {
                     }
                     return try Calculator.call(name, args)
                 }
-                if let constant = Calculator.constants[name] { return constant }
+                if let value = variables[name] ?? Calculator.constants[name] { return value }
                 throw Failure.unknown(name)
             case nil:
                 throw Failure.syntax("unexpected end")
