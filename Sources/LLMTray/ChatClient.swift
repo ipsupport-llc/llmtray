@@ -197,6 +197,7 @@ final class ChatClient: ObservableObject {
     /// The tools the last request declared: what the turn keeps once a
     /// request of it was long (ChatToolbox.keepDeclarations).
     private var lastSentTools: [[String: Any]] = []
+    private var lastSentToolsEpoch = 0
     private var assistantMessageIndex: Int?
 
     private struct RequestContext {
@@ -304,6 +305,7 @@ final class ChatClient: ObservableObject {
         guard ToolGroups.named(name) != nil, !loadedToolGroups.contains(name) else { return }
         loadedToolGroups.insert(name)
         toolbox.toolGroupsChanged()
+        turnCallResults.removeAll()
         hasUnsavedChanges = true
         if !messages.isEmpty { persistCurrentSession() }
     }
@@ -336,6 +338,7 @@ final class ChatClient: ObservableObject {
         }
         currentSessionID = file.id
         loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
+        pendingToolGroups = Set((file.pendingToolGroups ?? []).filter { ToolGroups.named($0) != nil }).subtracting(loadedToolGroups)
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
@@ -473,7 +476,8 @@ final class ChatClient: ObservableObject {
             createdAt: sessionCreatedAt ?? Date(),
             updatedAt: Date(),
             messages: persisted,
-            loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted()
+            loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
+            pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted()
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -1134,6 +1138,7 @@ final class ChatClient: ObservableObject {
         countedRequest = nil
         let sentTools = offerTools || toolbox.keepsDeclarations ? toolbox.definitions(for: settings) : []
         lastSentTools = sentTools
+        lastSentToolsEpoch = toolbox.declarationsEpoch
         lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
                                   framing: framing(modelAlias: modelAlias, settings: settings, tools: sentTools),
                                   modelPath: settings.modelPath, pinnedBytes: Self.pinnedBlockBytes(settings),
@@ -1675,11 +1680,15 @@ final class ChatClient: ObservableObject {
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .loadedTools(let group, let pending, let text):
                 if pending {
-                    pendingToolGroups.insert(group)
+                    // Kept with the chat: reopened later, it still loads at
+                    // the user's next message.
+                    if !loadedToolGroups.contains(group), pendingToolGroups.insert(group).inserted { hasUnsavedChanges = true }
                 } else if !loadedToolGroups.contains(group) {
                     loadedToolGroups.insert(group)
                     toolbox.toolGroupsChanged()
                     hasUnsavedChanges = true
+                    // "Call load_tools first" answers are stale now.
+                    turnCallResults.removeAll()
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .generatedDocument(let made, let text):
@@ -1835,7 +1844,7 @@ final class ChatClient: ObservableObject {
                 requestStats.promptTokens = promptTokens
                 requestStats.cachedTokens = cachedTokens
                 requestStats.reasoningTokens = reasoningTokens
-                if let promptTokens { toolbox.keepDeclarations(lastSentTools, promptTokens: promptTokens) }
+                if let promptTokens { toolbox.keepDeclarations(lastSentTools, promptTokens: promptTokens, epoch: lastSentToolsEpoch) }
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
                     ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens,

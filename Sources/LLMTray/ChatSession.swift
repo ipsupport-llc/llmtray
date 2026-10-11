@@ -122,6 +122,9 @@ struct ChatSessionFile: Codable, Identifiable {
     /// The tool groups the chat loaded (adr/0020): they stay declared when
     /// it's opened again. Nil, and not written, when none.
     var loadedToolGroups: [String]? = nil
+    /// Loaded after outside text: they load at the user's next message,
+    /// also after the chat is opened again.
+    var pendingToolGroups: [String]? = nil
 }
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --

@@ -260,8 +260,8 @@ final class ChatToolbox {
 
     /// After a request's usage: keep the list it was sent with for the rest
     /// of the turn if its prompt was long.
-    func keepDeclarations(_ sent: [[String: Any]], promptTokens: Int) {
-        guard TurnDeclarations.shouldKeep(alreadyKept: keptDeclarations != nil, declared: sent.count, promptTokens: promptTokens) else { return }
+    func keepDeclarations(_ sent: [[String: Any]], promptTokens: Int, epoch: Int) {
+        guard epoch == declarationsEpoch, TurnDeclarations.shouldKeep(alreadyKept: keptDeclarations != nil, declared: sent.count, promptTokens: promptTokens) else { return }
         keptDeclarations = sent
     }
 
@@ -319,7 +319,12 @@ final class ChatToolbox {
     /// built anew with it -- the one change of the list loading costs.
     func toolGroupsChanged() {
         keptDeclarations = nil
+        declarationsEpoch += 1
     }
+
+    /// Bumped by a load: a request sent before it can't keep its older list
+    /// when its usage comes in.
+    private(set) var declarationsEpoch = 0
 
     /// A real new user turn (per-turn limits reset).
     func startTurn() {
