@@ -32,6 +32,17 @@ final class ChatPresentation: ObservableObject {
         tabs.$tabs
             .sink { [weak self] in self?.syncTabs($0) }
             .store(in: &cancellables)
+        // One microphone, on the tab on screen: another tab shown stops a
+        // recording going on in the one left (its clip kept by its field).
+        tabs.$selectedIndex
+            .sink { [weak self] index in self?.stopRecordings(except: index) }
+            .store(in: &cancellables)
+        NotificationCenter.default.publisher(for: .chatTabReset)
+            .sink { [weak self] note in
+                guard let chat = note.object as? ChatClient else { return }
+                MainActor.assumeIsolated { self?.chatReset(chat) }
+            }
+            .store(in: &cancellables)
         NotificationCenter.default.publisher(for: .modelsDidChange)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in self?.modelsDidChange($0) }
@@ -45,6 +56,27 @@ final class ChatPresentation: ObservableObject {
         let composer = ComposerModel()
         composers[key] = composer
         return composer
+    }
+
+    private func stopRecordings(except index: Int) {
+        let shown = tabs.tabs.indices.contains(index) ? tabs.tabs[index].tabID : nil
+        for (key, composer) in composers where key != shown {
+            if let wav = composer.recorder.stop() { composer.recordings.append(wav) }
+        }
+    }
+
+    /// The model picked now hears or doesn't: every tab's composer, not
+    /// only the one on screen (a tab left with recordings by its field).
+    func modelHearsAudio(_ hears: Bool) {
+        for composer in composers.values { composer.acceptsAudio = hears }
+    }
+
+    /// The last tab closed becomes a new chat with the same tab: its
+    /// microphone and recordings go with the old one.
+    func chatReset(_ chat: ChatClient) {
+        guard let composer = composers[chat.tabID] else { return }
+        composer.recorder.cancel()
+        composer.recordings.removeAll()
     }
 
     private func syncTabs(_ open: [ChatClient]) {

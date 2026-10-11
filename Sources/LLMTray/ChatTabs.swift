@@ -110,6 +110,8 @@ final class ChatTabs: ObservableObject {
         guard tabs.indices.contains(index) else { return }
         guard tabs.count > 1 else {
             tabs[index].cancel()
+            // The same tab, a new chat: its microphone and recordings go.
+            NotificationCenter.default.post(name: .chatTabReset, object: tabs[index])
             tabs[index].newSession()
             tabsChanged()
             intoDefaultProject()
@@ -329,4 +331,9 @@ struct ChatTabStrip: View {
             return chat.currentSessionTitle.isEmpty ? NSLocalizedString("New chat", comment: "") : chat.currentSessionTitle
         }
     }
+}
+
+extension Notification.Name {
+    /// The last tab closed became a new chat (ChatTabs.close): object, its ChatClient.
+    static let chatTabReset = Notification.Name("LLMTray.chatTabReset")
 }

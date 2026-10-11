@@ -257,7 +257,9 @@ struct ContentView: View {
         modelMaxContext = ChatSettings.maxContext(forModel: modelID)
         composer.acceptsImages = modelID.map(ModelDiscovery.supportsVision(forModelPath:)) ?? false
         composer.thinkingStyle = modelID.map(ModelDiscovery.thinkingStyle(forModelPath:)) ?? .none
-        composer.acceptsAudio = modelID.map(ModelDiscovery.supportsAudio(forModelPath:)) ?? false
+        let hears = modelID.map(ModelDiscovery.supportsAudio(forModelPath:)) ?? false
+        composer.acceptsAudio = hears
+        presentation.modelHearsAudio(hears)
     }
 
     /// The `model` name requests use -- read from the catalog at send time,
