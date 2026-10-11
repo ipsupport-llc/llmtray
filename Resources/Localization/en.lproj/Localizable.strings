@@ -382,7 +382,6 @@
 "Fetching file list…" = "Fetching file list…";
 "Files" = "Files";
 "Files Settings…" = "Files Settings…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them.";
 "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words.";
 "Files are copied into the project and indexed on this Mac." = "Files are copied into the project and indexed on this Mac.";
@@ -758,6 +757,7 @@
 "Project files are turned off in Settings." = "Project files are turned off in Settings.";
 "Project files off" = "Project files off";
 "Project files on" = "Project files on";
+"Project files were turned off" = "Project files were turned off";
 "Project files will be turned on first." = "Project files will be turned on first.";
 "Project name" = "Project name";
 "Projects" = "Projects";
