@@ -25,5 +25,6 @@ here; this is where the history lives.
 | [0017](0017-supporters.md) | Support LLMTray: optional tips (StoreKit IAP in the App Store build, GitHub Sponsors otherwise), opt-in supporters list moderated and signed by ipsupport-api; nothing locked |
 | [0018](0018-app-store-build.md) | A Mac App Store build beside the Developer ID one: every runtime bundled and signed, sandboxed, no Sparkle, StoreKit tips |
 | [0019](0019-command-line.md) | The `llmtray` command-line tool: an owner-only control socket, the tray's own actions, a symlink in ~/.local/bin; not in the App Store build |
+| [0020](0020-documents.md) | Documents: `make_document` turns the model's Markdown and chart data into a PDF laid out by the app; tools declared on demand (`load_tools`, + menu) and kept for the chat |
 
 New ADR: next number, one topic, the decision first, then why.
