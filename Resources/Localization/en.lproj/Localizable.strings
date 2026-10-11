@@ -69,6 +69,7 @@
 "(no server output yet)" = "(no server output yet)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
+"30 s reached · release to send, Esc to drop" = "30 s reached · release to send, Esc to drop";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";

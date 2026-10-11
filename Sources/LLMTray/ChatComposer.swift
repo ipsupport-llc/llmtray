@@ -253,7 +253,9 @@ struct ChatComposer: View {
                     .focused(isFocused)
                     .disabled(!canChat)
                     // Recording: the time and level over the field.
-                    .overlay { if composer.recorder.isRecording { RecordingBar(recorder: composer.recorder) } }
+                    .overlay {
+                        if composer.recorder.isRecording || composer.recorder.heldPending { RecordingBar(recorder: composer.recorder) }
+                    }
 
                 if composer.acceptsAudio {
                     RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
@@ -621,7 +623,7 @@ struct RecordButton: View {
                 Group {
                     Button("") { recorder.cancel() }
                         .keyboardShortcut(.cancelAction)
-                        .disabled(!recorder.isRecording)
+                        .disabled(!recorder.isRecording && !recorder.heldPending)
                     Button("") {
                         if recorder.isRecording {
                             if let wav = recorder.stop() { done(wav) }
@@ -632,6 +634,7 @@ struct RecordButton: View {
                     .keyboardShortcut("r", modifiers: [.command, .option])
                 }
                 .opacity(0)
+                .allowsHitTesting(false)
                 .accessibilityHidden(true)
             }
     }
@@ -642,6 +645,9 @@ struct RecordingBar: View {
     @ObservedObject var recorder: ChatRecorder
 
     private var hint: String {
+        if recorder.heldPending {
+            return NSLocalizedString("30 s reached · release to send, Esc to drop", comment: "hold-to-talk at the limit")
+        }
         if recorder.holdToSend {
             return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
                 : NSLocalizedString("Release to send · move away to cancel", comment: "hold-to-talk")

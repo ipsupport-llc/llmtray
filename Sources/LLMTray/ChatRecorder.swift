@@ -27,7 +27,9 @@ final class ChatRecorder: ObservableObject {
     @Published var holdAway = false
     /// A held recording that hit the limit: kept until the hold ends
     /// (released over the button: sent; away: dropped).
-    private var heldClip: Data?
+    private var heldClip: Data? { didSet { heldPending = heldClip != nil } }
+    /// A held clip waits for the release (the bar stays up for it).
+    @Published private(set) var heldPending = false
 
     func takeHeldClip() -> Data? {
         defer { heldClip = nil }
@@ -107,6 +109,7 @@ final class ChatRecorder: ObservableObject {
 
     func cancel() {
         _ = stop()
+        heldClip = nil
     }
 
     private func tick(seconds: Double, level: Float) {
