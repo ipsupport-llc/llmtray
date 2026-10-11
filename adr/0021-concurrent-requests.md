@@ -63,6 +63,10 @@ runtime takes the larger of it and the prompt batch (8) anyway.
 | 2 | 63.4 | 33 | 0.27 s |
 | 4 | 106.8 | 28 | 0.33 s |
 
+Gemma 4 26B (GPTQ) with its assistant drafter, KV 8-bit: alone 42.9
+tok/s (drafter); 2 at once 50.8 total; 4 at once 73.8 total (19.5 each),
+worst first token 0.46 s.
+
 A request arriving while another answered with the MTP head started in
 0.87 s (the handoff and its catch-up included) instead of waiting for the
 other's 300 tokens; both answers ran on together at 31-33 tok/s.
