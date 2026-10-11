@@ -335,8 +335,11 @@ final class DocumentSpecTests: XCTestCase {
         let swapped = old.replacingOccurrences(of: "![p](data:image/png;base64", with: "![p](data:image/png;base64,BB")
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": swapped], earlier: old).failure, .imageData)
         // An open link or image before one doesn't hide it.
-        XCTAssertEqual(DocumentSpec.imagesAsData("[download](data:text/plain,hello ![x](data:image/png;base64,AA)"), ["[x](data:image/png;base64,AA)"])
-        XCTAssertEqual(DocumentSpec.imagesAsData("![a](data:AAA ![b](data:BBB"), ["[a](data:AAA ", "[b](data:BBB"])
+        XCTAssertEqual(DocumentSpec.imagesAsData("[download](data:text/plain,hello ![x](data:image/png;base64,AA)"), ["![x](data:image/png;base64,AA)"])
+        XCTAssertEqual(DocumentSpec.imagesAsData("![a](data:AAA ![b](data:BBB"), ["![a](data:AAA ", "![b](data:BBB"])
+        XCTAssertEqual(DocumentSpec.imagesAsData("`open ![x](data:A)"), ["![x](data:A)"], "an open backtick is text")
+        XCTAssertEqual(DocumentSpec.imagesAsData("![a[b](data:A)"), ["![a[b](data:A)"])
+        XCTAssertEqual(DocumentSpec.imagesAsData("![y](p.png) [x](data:A)"), [], "a link after an image")
         // The same image twice is one more; the text around it may change.
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![p](data:image/png;base64"], earlier: old).failure, .imageData)
         let reworded = old.replacingOccurrences(of: "![p](data:image/png;base64", with: "See ![p](data:image/png;base64")
