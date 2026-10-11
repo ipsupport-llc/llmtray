@@ -392,7 +392,7 @@ def write_lang(code: str, table: dict[str, str], base_keys: list[str]) -> Path:
 
 # Terms a sentence uses in lower case whose translation the file already
 # fixed as a label: the same word for the same thing everywhere.
-TERMS = {"chat": "Chat", "chats": "Chat", "project": "Project", "projects": "Project",
+TERMS = {"chat": "Chat", "chats": "Chat", "project": "Projects", "projects": "Projects",
          "temporary chat": "Temporary chat", "temporary chats": "Temporary chat",
          "settings": "Settings", "documents": "Documents", "pictures": "Pictures"}
 
@@ -434,14 +434,33 @@ def labels_in(key: str, table: dict[str, str], base_keys: list[str]) -> dict[str
 
 
 def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
-    """Labels `key` names explicitly as UI -- a settings path (Settings >
-    Files) or a quoted name -- whose translation the value must contain."""
+    """Labels `key` names explicitly as UI -- the parts of a settings path
+    (Settings > Files: the longest label ending right before each ">" and
+    starting right after it) or a quoted name -- whose translation the
+    value must contain."""
     import re
+    labels = [k for k in table if _is_label(k)]
     names: list[str] = []
-    for path in re.findall(r"[A-Z][\w]*(?: [\w]+)*(?: > [A-Z][\w]*(?: [\w]+)*)+", key):
-        names += [part.strip() for part in path.split(">")]
+    for m in re.finditer(r"\s>\s", key):
+        before, after = key[:m.start()], key[m.end():]
+        left = [l for l in labels if before.endswith(l) and (len(before) == len(l) or not before[-len(l) - 1].isalnum())]
+        right = [l for l in labels if after.startswith(l) and (len(after) == len(l) or not after[len(l)].isalnum())]
+        names += [max(left, key=len)] if left else []
+        names += [max(right, key=len)] if right else []
     names += re.findall(r"[\u201C\"«]([^\u201D\"»]{2,40})[\u201D\"»]", key)
     return [n for n in dict.fromkeys(names) if n in table and _is_label(n) and table[n] != n]
+
+
+def contains_label(value: str, translation: str) -> bool:
+    """Whether `value` uses `translation`, allowing for inflection: each of
+    its words found by its stem (all but the last two letters of a longer
+    word -- "Настройки" in "в Настройках")."""
+    low = value.lower()
+    for word in translation.lower().split():
+        stem = word if len(word) <= 4 else word[:-2]
+        if stem not in low:
+            return False
+    return True
 
 
 def translate(codes: list[str], model: str, batch: int = 100, only: dict[str, list[str]] | None = None) -> int:
@@ -568,9 +587,12 @@ def main() -> int:
         codes = a.languages or [p.name.removesuffix(".lproj") for p in languages()]
         stale: dict[str, list[str]] = {}
         for code in codes:
-            table = load(LOC / f"{code}.lproj" / "Localizable.strings")
+            path = LOC / f"{code}.lproj" / "Localizable.strings"
+            if not path.exists():
+                continue  # a new language: translate creates it
+            table = load(path)
             for k, v in table.items():
-                missing = [n for n in referenced_labels(k, table) if table[n].lower() not in v.lower()]
+                missing = [n for n in referenced_labels(k, table) if not contains_label(v, table[n])]
                 if missing:
                     stale.setdefault(code, []).append(k)
                     print(f"{code}: {k[:60]!r} lacks {', '.join(repr(table[n]) for n in missing)}")
