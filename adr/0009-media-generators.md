@@ -70,9 +70,14 @@ aspect ratio (`LLMTrayCore.EditCanvas`).
   whose app crashed (6027ac4) — it holds its model's memory.
 - **No unload for a call that won't run** (refused, turned off, an empty
   edit instruction, a model not set up): `willGenerate` is checked first
-  (498097c, ff5b656, 5f06a89, 23d5342). For images it checks the venv, the
-  pinned mflux and the checkpoint (`MfluxManager.isReady`): before, a
-  missing image model was refused only after the chat model's unload.
+  (498097c, ff5b656, 5f06a89, 23d5342). For images it checks the venv and
+  the checkpoint (`MfluxManager.isReady`): before, a missing image model
+  was refused only after the chat model's unload. An mflux older than the
+  pin (a venv from before the app moved it) isn't refused: `generate`
+  claims the generator, installs the pinned package (as the audio runtime
+  updates before a run), then generates; an update that fails (offline)
+  is the error. The control API's generate doesn't update -- it refuses
+  until a chat's next image has.
 
 ## The queue and the proxy
 

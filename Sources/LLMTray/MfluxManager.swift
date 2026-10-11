@@ -211,6 +211,11 @@ final class MfluxManager: ObservableObject {
         FileManager.default.fileExists(atPath: venvPython) && model.isDownloaded
     }
 
+    /// Set up, but mflux isn't at the pin: generate() updates it first.
+    var needsUpdate: Bool {
+        FileManager.default.fileExists(atPath: venvPython) && installedMfluxVersion() != Self.mfluxVersion
+    }
+
     /// The mflux version in the venv, from its dist-info folder's name
     /// (mflux-0.21.0.dist-info) -- no Python started for it.
     private func installedMfluxVersion() -> String? {
@@ -281,10 +286,31 @@ final class MfluxManager: ObservableObject {
     /// which must leave no trace.
     /// `images`: the image(s) to edit (a model that supportsEditing).
     func generate(prompt: String, width: Int, height: Int, model: ImageGenModel, images: [Data] = []) async throws -> Data {
-        // Set up by the download in Settings; never installed mid-chat (a
+        // Set up by the download in Settings; never set up mid-chat (a
         // temporary chat must not cause files to be written).
         guard FileManager.default.fileExists(atPath: venvPython) else {
             throw MfluxError.processFailed(NSLocalizedString("Image generation isn't set up -- enable it again in Settings.", comment: ""))
+        }
+        guard model.isDownloaded else {
+            // The Settings toggle only turns on after downloadModel() has
+            // succeeded; fail clearly rather than silently do something else.
+            throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))
+        }
+        let savedDir = savedModelDir(for: model)
+
+        // Claimed before any suspension: two chat tabs (or a download) can't
+        // both run it -- each run can take most of this Mac's memory -- nor
+        // both install into the venv.
+        guard !isBusy else {
+            throw MfluxError.processFailed(NSLocalizedString("The image generator is busy with another chat -- try again once it's done.", comment: ""))
+        }
+        isBusy = true
+        defer {
+            isBusy = false
+            isGenerating = false
+            statusText = ""
+            stepProgress = nil
+            previewImage = nil
         }
         // Installed before the pin, or by an older app (a new app moved the
         // pin): brought to the pin now, as the audio runtime is before a run
@@ -303,31 +329,10 @@ final class MfluxManager: ObservableObject {
                                                       Self.mfluxVersion, NSLocalizedString("the installed version didn't change", comment: "")))
             }
         }
-
-        let savedDir = savedModelDir(for: model)
-        guard model.isDownloaded else {
-            // The Settings toggle only turns on after downloadModel() has
-            // succeeded; fail clearly rather than silently do something else.
-            throw MfluxError.processFailed(String(format: NSLocalizedString("%@ isn't downloaded yet -- re-enable image generation in Settings.", comment: ""), model.displayName))
-        }
-
-        // Claimed before any suspension: two chat tabs (or a download) can't
-        // both run it -- each run can take most of this Mac's memory.
-        guard !isBusy else {
-            throw MfluxError.processFailed(NSLocalizedString("The image generator is busy with another chat -- try again once it's done.", comment: ""))
-        }
-        isBusy = true
         isGenerating = true
         statusText = NSLocalizedString("Generating image…", comment: "")
         stepProgress = (step: 0, total: Int(model.stepCount) ?? 9)
         previewImage = nil
-        defer {
-            isBusy = false
-            isGenerating = false
-            statusText = ""
-            stepProgress = nil
-            previewImage = nil
-        }
 
         // width/height must be multiples of 16 for the model's patch size;
         // round rather than reject an odd model-supplied value.
