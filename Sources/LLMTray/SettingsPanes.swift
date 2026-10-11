@@ -1039,7 +1039,7 @@ struct ProfilesPane: View {
                     }
                     .labelsHidden().frame(width: 90)
                 }
-                row(\.launch.decodeConcurrency, "Concurrent requests", "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.") {
+                row(\.launch.decodeConcurrency, "Concurrent requests", "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.") {
                     Stepper(value: b(\.launch.decodeConcurrency), in: 1...16) {
                         Text("\(profiles.value(\.launch.decodeConcurrency, profileID: selectedID))")
                     }
@@ -1049,7 +1049,7 @@ struct ProfilesPane: View {
                         Text("\(profiles.value(\.launch.promptCacheMB, profileID: selectedID)) MB")
                     }
                 }
-                row(\.launch.mtpDrafter, "Speculative decoding (MTP)", "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.") {
+                row(\.launch.mtpDrafter, "Speculative decoding (MTP)", "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.") {
                     Toggle("", isOn: b(\.launch.mtpDrafter)).labelsHidden()
                 }
                 row(\.launch.lowMemoryWeights, "Save memory", "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers.") {

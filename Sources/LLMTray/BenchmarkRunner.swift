@@ -316,13 +316,19 @@ final class BenchmarkRunner: ObservableObject {
         // instead of a single request per candidate.
         var bestConcurrency = originalConcurrency
         var bestConcurrencyThroughput = -1.0
-        for value in decodeConcurrencyCandidates {
+        var measuredConcurrency = Set<Int>()
+        for candidate in decodeConcurrencyCandidates {
             if cancelRequested { break }
-            statusText = "Testing decode-concurrency=\(value)…"
-            server.launchTrial.decodeConcurrency = value
+            statusText = "Testing decode-concurrency=\(candidate)…"
+            server.launchTrial.decodeConcurrency = candidate
             guard await restart() else { break }
             // Cancelled during the restart: nothing in flight to cancel yet.
             if cancelRequested { break }
+            // What the launch really took: the free memory may cut a
+            // candidate (adr/0021). One already measured isn't again, and
+            // the load fired is the real concurrency.
+            let value = ServerLaunch.argValue("--decode-concurrency", in: server.launchedArguments).flatMap(Int.init) ?? candidate
+            guard measuredConcurrency.insert(value).inserted else { continue }
 
             let batchStart = Date()
             let results: [BenchmarkSample?] = await withTaskGroup(of: BenchmarkSample?.self) { group in
@@ -360,6 +366,10 @@ final class BenchmarkRunner: ObservableObject {
                 bestConcurrency = value
             }
         }
+        // The fewest at once that reach 90% of the best total: more only
+        // add memory for a few percent (adr/0021).
+        bestConcurrency = AutoTune.concurrencyChoice(autoTuneLog.filter { $0.parameter == "decode-concurrency" }
+            .map { ($0.value, $0.throughput) }) ?? originalConcurrency
         server.launchTrial.decodeConcurrency = bestConcurrency
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "decode-concurrency" && $0.value == bestConcurrency }) {
             autoTuneLog[idx].isWinner = true

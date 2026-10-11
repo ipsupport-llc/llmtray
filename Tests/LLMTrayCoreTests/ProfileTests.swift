@@ -106,7 +106,80 @@ final class ServerLaunchTests: XCTestCase {
         XCTAssertEqual(value(args, "--kv-bits"), "8")
         XCTAssertEqual(value(args, "--model-alias"), "a")
         XCTAssertNil(value(args, "--draft-model"))
-        XCTAssertNil(value(args, "--decode-concurrency"))
+        // Always said (adr/0021): left out, the runtime's 32 applied.
+        XCTAssertEqual(value(args, "--decode-concurrency"), "4")
+        XCTAssertEqual(value(args, "--prompt-concurrency"), "4")
+    }
+
+    func testConcurrentRequestsHonestAndMemoryAware() {
+        let one = ServerLaunch.arguments(resolved { $0.launch.decodeConcurrency = 1 }, ctx)
+        XCTAssertEqual(value(one, "--decode-concurrency"), "1", "1 is said, not left to the runtime's 32")
+        XCTAssertEqual(value(one, "--prompt-concurrency"), "1", "nor widened by the prompt batch's 8")
+        let many = ServerLaunch.arguments(resolved { $0.launch.decodeConcurrency = 12 }, ctx)
+        XCTAssertEqual(value(many, "--prompt-concurrency"), "8")
+        let gb: Int64 = 1_073_741_824
+        let margin = ServerLaunch.MemoryShares.default.marginBytes
+        XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 4, gpuHeadroomBytes: nil), 4)
+        XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 4, gpuHeadroomBytes: margin + gb), 1)
+        XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 4, gpuHeadroomBytes: margin + 3 * gb), 2)
+        XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 4, gpuHeadroomBytes: margin + 8 * gb), 4)
+        XCTAssertEqual(ServerLaunch.concurrentRequests(profile: 40, gpuHeadroomBytes: nil), 16)
+        let own = ServerLaunch.arguments(resolved { $0.launch.extraServerArgs = "--decode-concurrency 2" }, ctx)
+        XCTAssertEqual(own.filter { $0 == "--decode-concurrency" }.count, 1, "the user's own wins")
+        XCTAssertEqual(value(own, "--prompt-concurrency"), "2", "with a matching prompt batch, not the runtime's 8")
+        let ownBoth = ServerLaunch.arguments(resolved { $0.launch.extraServerArgs = "--decode-concurrency=3 --prompt-concurrency 1" }, ctx)
+        XCTAssertEqual(ownBoth.filter { $0 == "--prompt-concurrency" }.count, 1)
+        // The restart key follows the real launch: the profile's value is
+        // moot while the extra arguments set it.
+        let a = resolved { $0.launch.extraServerArgs = "--decode-concurrency 2"; $0.launch.decodeConcurrency = 4 }
+        let b = resolved { $0.launch.extraServerArgs = "--decode-concurrency 2"; $0.launch.decodeConcurrency = 8 }
+        XCTAssertFalse(ServerLaunch.needsRestart(from: a, to: b, context: ctx))
+        XCTAssertTrue(ServerLaunch.needsRestart(from: resolved { $0.launch.decodeConcurrency = 4 },
+                                                to: resolved { $0.launch.decodeConcurrency = 8 }, context: ctx))
+    }
+
+    func testArgValueTakesBothFormsAndTheLast() {
+        XCTAssertEqual(ServerLaunch.argValue("--decode-concurrency", in: ["--decode-concurrency", "4", "--decode-concurrency=2"]), "2")
+        XCTAssertEqual(ServerLaunch.argValue("--decode-concurrency", in: ["--decode-concurrency=3"]), "3")
+        XCTAssertNil(ServerLaunch.argValue("--decode-concurrency", in: ["--prompt-concurrency", "4"]))
+    }
+
+    func testAFreshDefaultNeedsNoConcurrencyMigration() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("conc2-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let d = UserDefaults(suiteName: "llmtray.tests.concurrency2")!
+        d.removePersistentDomain(forName: "llmtray.tests.concurrency2")
+        d.set(1, forKey: "llmtray.decodeConcurrency")
+        let store = ProfileStore(directory: dir)
+        var p = try store.ensureDefault(migratingFrom: d)
+        XCTAssertEqual(p.launch.decodeConcurrency, 4, "the old built-in 1 from the legacy settings")
+        p.launch.decodeConcurrency = 1
+        try store.save(p)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: d).launch.decodeConcurrency, 1, "set after creation: stays")
+    }
+
+    func testAutoTunePicksTheFewestNearTheBest() {
+        XCTAssertEqual(AutoTune.concurrencyChoice([(1, 55), (2, 63), (4, 107), (8, 112)]), 4, "4 reaches 90% of 8's")
+        XCTAssertEqual(AutoTune.concurrencyChoice([(1, 50), (2, 48)]), 1)
+        XCTAssertNil(AutoTune.concurrencyChoice([]))
+    }
+
+    func testDefaultsOldConcurrencyFollowsTheNewBuiltInOnce() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("conc-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let d = UserDefaults(suiteName: "llmtray.tests.concurrency")!
+        d.removePersistentDomain(forName: "llmtray.tests.concurrency")
+        let store = ProfileStore(directory: dir)
+        var old = Profile.builtIn
+        old.id = Profile.defaultID
+        old.name = "Default"
+        old.launch.decodeConcurrency = 1
+        try store.save(old)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: d).launch.decodeConcurrency, 4)
+        var set = try store.ensureDefault(migratingFrom: d)
+        set.launch.decodeConcurrency = 1
+        try store.save(set)
+        XCTAssertEqual(try store.ensureDefault(migratingFrom: d).launch.decodeConcurrency, 1, "a 1 set later stays")
     }
 
     func testNeedsRestart() {

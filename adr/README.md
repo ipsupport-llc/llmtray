@@ -26,5 +26,6 @@ here; this is where the history lives.
 | [0018](0018-app-store-build.md) | A Mac App Store build beside the Developer ID one: every runtime bundled and signed, sandboxed, no Sparkle, StoreKit tips |
 | [0019](0019-command-line.md) | The `llmtray` command-line tool: an owner-only control socket, the tray's own actions, a symlink in ~/.local/bin; not in the App Store build |
 | [0020](0020-documents.md) | Documents: `make_document` turns the model's Markdown and chart data into a PDF laid out by the app; tools declared on demand (`load_tools`, + menu) and kept for the chat |
+| [0021](0021-concurrent-requests.md) | Concurrent requests: batching with a quantized KV cache, speculation (MTP, drafter) by load with handoff into the batch; Concurrent requests said honestly, memory-aware, auto-tuned |
 
 New ADR: next number, one topic, the decision first, then why.

@@ -58,6 +58,7 @@
 "%lld pictures" = "%lld pictures";
 "%lld pictures added: kept for documents, not searched." = "%lld pictures added: kept for documents, not searched.";
 "%lld requests" = "%lld requests";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld requests in flight (answered together up to Concurrent requests)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
@@ -408,7 +409,7 @@
 "For This Chat" = "For This Chat";
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";
@@ -457,7 +458,7 @@
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How it was made" = "How it was made";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
 "How many tokens it generates per trial." = "How many tokens it generates per trial.";
 "How much memory the GPU may use. A model's files must fit under it." = "How much memory the GPU may use. A model's files must fit under it.";
@@ -1130,7 +1131,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Total time";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.";
 "Try Again" = "Try Again";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again.";
 "Tweak…" = "Tweak…";
