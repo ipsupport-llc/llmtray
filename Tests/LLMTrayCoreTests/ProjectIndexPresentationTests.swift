@@ -96,7 +96,8 @@ final class ProjectIndexPresentationTests: XCTestCase {
             (URL(string: "https://example.com/x.pdf")!, false),
         ])
         XCTAssertEqual(sorted.accepted.map(\.lastPathComponent), ["a.pdf", "c.md", "Makefile", "main.swift"], "each once, in order")
-        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["b.PPTX", "photo.png"])
+        XCTAssertEqual(sorted.notSupported.map(\.lastPathComponent), ["b.PPTX"])
+        XCTAssertEqual(sorted.pictures.map(\.lastPathComponent), ["photo.png"], "a picture: kept for documents (adr/0020)")
         XCTAssertEqual(sorted.folders.map(\.lastPathComponent), ["Folder"])
         XCTAssertTrue(ProjectFileDrop.sort([(u(".hidden"), false)]).isEmpty)
     }
