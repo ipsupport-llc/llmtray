@@ -14,6 +14,7 @@ public enum ModelCardText {
         var out: [String] = []
         var block: [String] = []
         var fence: (char: Character, count: Int)?
+        var previousBlank = true
         func flush() {
             guard !block.isEmpty else { return }
             let text = block.joined(separator: "\n")
@@ -24,9 +25,14 @@ public enum ModelCardText {
             }
             block.removeAll()
         }
+        var comment = false  // the block is a comment: it ends at -->
         for line in markdown.components(separatedBy: "\n") {
+            defer { previousBlank = line.trimmingCharacters(in: .whitespaces).isEmpty }
             if !block.isEmpty {
-                if line.trimmingCharacters(in: .whitespaces).isEmpty {
+                if comment {
+                    block.append(line)
+                    if line.contains("-->") { flush(); comment = false }
+                } else if line.trimmingCharacters(in: .whitespaces).isEmpty {
                     flush()
                     out.append(line)
                 } else {
@@ -42,8 +48,11 @@ public enum ModelCardText {
             if let open = opens(line) {
                 fence = open
                 out.append(line)
-            } else if startsHTMLBlock(line) {
+            } else if let start = htmlBlockStart(line, afterBlank: previousBlank) {
                 block.append(line)
+                if start == .comment {
+                    if line.contains("-->") { flush() } else { comment = true }
+                }
             } else {
                 out.append(line)
             }
@@ -52,11 +61,11 @@ public enum ModelCardText {
         return out.joined(separator: "\n")
     }
 
-    /// Up to three spaces, then three or more ` or ~.
+    /// Three or more ` or ~, after any indent, list marker or quote: a
+    /// fence missed would have its code changed, one too many changes nothing.
     static func opens(_ line: String) -> (char: Character, count: Int)? {
-        let indent = line.prefix { $0 == " " }.count
-        guard indent <= 3 else { return nil }
-        let rest = line.dropFirst(indent)
+        guard let start = line.range(of: #"^(?:\s*(?:[-*+]|\d+[.)]|>)\s+)*\s*"#, options: .regularExpression) else { return nil }
+        let rest = line[start.upperBound...]
         guard let c = rest.first, c == "`" || c == "~" else { return nil }
         let count = rest.prefix { $0 == c }.count
         // A backtick fence's info string has no backtick.
@@ -66,26 +75,45 @@ public enum ModelCardText {
 
     /// The same character, at least as many, nothing after but spaces.
     static func closes(_ line: String, _ open: (char: Character, count: Int)) -> Bool {
-        let indent = line.prefix { $0 == " " }.count
-        guard indent <= 3 else { return false }
-        let rest = line.dropFirst(indent)
+        guard let start = line.range(of: #"^(?:\s*>)*\s*"#, options: .regularExpression) else { return false }
+        let rest = line[start.upperBound...]
         let count = rest.prefix { $0 == open.char }.count
         return count >= open.count && rest.dropFirst(count).allSatisfy { $0 == " " || $0 == "\t" }
     }
 
-    /// Up to three spaces, then a tag (open or close) or a comment.
-    static func startsHTMLBlock(_ line: String) -> Bool {
+    enum BlockStart { case comment, block, tag }
+
+    /// CommonMark's HTML block starts, up to three spaces in: a comment; a
+    /// block-level tag; any other complete tag alone on its line, only
+    /// after a blank line (it can't interrupt a paragraph).
+    static func htmlBlockStart(_ line: String, afterBlank: Bool) -> BlockStart? {
         let indent = line.prefix { $0 == " " }.count
-        guard indent <= 3 else { return false }
-        let rest = line.dropFirst(indent)
-        if rest.hasPrefix("<!--") { return true }
-        return rest.range(of: #"^</?[A-Za-z][A-Za-z0-9-]*(?=[\s/>]|$)"#, options: .regularExpression) != nil
+        guard indent <= 3 else { return nil }
+        let rest = String(line.dropFirst(indent))
+        if rest.hasPrefix("<!--") { return .comment }
+        if let r = rest.range(of: #"^</?([A-Za-z][A-Za-z0-9-]*)(?=[\s/>]|$)"#, options: .regularExpression) {
+            let name = rest[r].trimmingCharacters(in: CharacterSet(charactersIn: "</")).lowercased()
+            if blockStartTags.contains(name) { return .block }
+        }
+        let alone = "^</?[A-Za-z][A-Za-z0-9-]*" + attributes + #">\s*$"#
+        if afterBlank, rest.range(of: alone, options: .regularExpression) != nil { return .tag }
+        return nil
     }
+
+    /// CommonMark's block-level tag names (HTML block type 6).
+    static let blockStartTags: Set<String> = [
+        "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption", "center", "col",
+        "colgroup", "dd", "details", "dialog", "dir", "div", "dl", "dt", "fieldset", "figcaption", "figure",
+        "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hr",
+        "html", "iframe", "legend", "li", "link", "main", "menu", "menuitem", "nav", "noframes", "ol",
+        "optgroup", "option", "p", "param", "search", "section", "summary", "table", "tbody", "td", "tfoot",
+        "th", "thead", "title", "tr", "track", "ul", "picture"]
 
     // Attributes may quote '>' -- a tag ends at the first '>' outside quotes.
     static let attributes = #"(?:[^>"']|"[^"]*"|'[^']*')*"#
     static let tag = try! NSRegularExpression(pattern: #"<!--[\s\S]*?-->|</?([A-Za-z][A-Za-z0-9-]*)"# + attributes + ">")
-    static let href = try! NSRegularExpression(pattern: #"(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))"#, options: .caseInsensitive)
+    /// One attribute: name, then an optional quoted or bare value.
+    static let attribute = try! NSRegularExpression(pattern: #"([^\s"'=<>/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?"#)
     static let blockTags: Set<String> = ["div", "p", "center", "h1", "h2", "h3", "h4", "h5", "h6", "table", "tr",
                                          "ul", "ol", "li", "section", "details", "summary", "picture", "figure", "br", "hr"]
 
@@ -95,6 +123,7 @@ public enum ModelCardText {
         let ns = text as NSString
         var out = ""
         var link: String?  // the open <a>'s address
+        var labelStart: Int?  // utf16 offset: an index wouldn't survive appends
         var position = 0
         for match in tag.matches(in: text, range: NSRange(location: 0, length: ns.length)) {
             out += ns.substring(with: NSRange(location: position, length: match.range.location - position))
@@ -107,9 +136,15 @@ public enum ModelCardText {
                 if !closing, let address = address(whole) {
                     link = address
                     out += "["
-                } else if closing, let address = link {
-                    out += "](\(address))"
+                    labelStart = out.utf16.count
+                } else if closing, let address = link, let offset = labelStart {
+                    let start = String.Index(utf16Offset: offset, in: out)
+                    // Brackets in the text would end the link early.
+                    let label = String(out[start...]).replacingOccurrences(of: "[", with: "\\[")
+                        .replacingOccurrences(of: "]", with: "\\]")
+                    out = String(out[..<start]) + label + "](\(address))"
                     link = nil
+                    labelStart = nil
                 }
             } else if blockTags.contains(name) {
                 out += "\n"
@@ -125,13 +160,21 @@ public enum ModelCardText {
             .filter { !$0.isEmpty && !["•", "|", "·"].contains($0) }
     }
 
+    /// The `href` of an `<a ...>` tag, as a Markdown link destination.
     static func address(_ tag: String) -> String? {
         let ns = tag as NSString
-        guard let m = href.firstMatch(in: tag, range: NSRange(location: 0, length: ns.length)) else { return nil }
-        for i in 1...3 where m.range(at: i).location != NSNotFound {
-            let value = ns.substring(with: m.range(at: i)).trimmingCharacters(in: .whitespaces)
-            // Markdown's own link syntax can't carry these.
-            return value.isEmpty || value.contains(where: { " ()<>".contains($0) }) ? nil : value
+        // Past "<a": the attributes, each read whole so a quoted value
+        // ("hint href='x'") is never taken for one.
+        let from = min(2, ns.length)
+        for m in attribute.matches(in: tag, range: NSRange(location: from, length: ns.length - from))
+        where ns.substring(with: m.range(at: 1)).lowercased() == "href" {
+            for i in 2...4 where m.range(at: i).location != NSNotFound {
+                let value = ns.substring(with: m.range(at: i)).trimmingCharacters(in: .whitespaces)
+                if value.isEmpty || value.contains(where: { "<>\n".contains($0) }) { return nil }
+                // Parentheses or spaces need the <...> form.
+                return value.contains(where: { " ()".contains($0) }) ? "<\(value)>" : value
+            }
+            return nil
         }
         return nil
     }
