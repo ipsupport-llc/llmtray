@@ -58,9 +58,9 @@
 "%lld of 5 stars" = "%lld из 5 звёзд";
 "%lld pages" = "%lld страниц";
 "%lld pictures" = "%lld изображений";
-"%lld pictures added: kept for documents, not searched." = "%lld изображений добавлено: сохраняются как документы, не индексируются для поиска.";
+"%lld pictures added: kept for documents, not searched." = "Добавлено изображений: %lld. Они хранятся для документов, в поиске не участвуют.";
 "%lld requests" = "запросов: %lld";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld запросов в обработке (отвечаются одновременно до значения «Concurrent requests»)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "Запросов в работе: %lld (одновременно — до значения «Параллельные запросы»)";
 "%lld s" = "%lld с";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld бит";
@@ -304,9 +304,9 @@
 "Dismiss" = "Закрыть";
 "Document: %@" = "Документ: %@";
 "Documents" = "Документы";
-"Documents On in This Chat" = "Документы в этой беседе включены";
+"Documents On in This Chat" = "Документы в этом чате включены";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Документы копируются в проект и индексируются на этом Mac; изображения добавляются в ваше сообщение.";
-"Documents are on in this chat: ask for one (a report, a letter…)." = "В этой беседе включены документы: запросите один (отчёт, письмо и т. п.).";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Документы в этом чате включены: попросите сделать документ (отчёт, письмо…).";
 "Documents go into a project with this chat." = "Документы попадут в проект вместе с этим чатом.";
 "Documents go into a project with this chat; images go into your message." = "Документы попадут в проект вместе с этим чатом; изображения добавятся в ваше сообщение.";
 "Documents tools" = "Инструменты для документов";
@@ -385,7 +385,7 @@
 "Fetching file list…" = "Получение списка файлов…";
 "Files" = "Файлы";
 "Files Settings…" = "Настройки файлов…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Файлы, добавленные сюда, копируются в проект и индексируются на этом Mac; каждый чат проекта может их поискать. Изображения сохраняются как документы.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Файлы, добавленные сюда, копируются в проект и индексируются на этом Mac; любой чат проекта может по ним искать. Изображения хранятся для документов.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Файлы, добавленные в проект, индексируются на этом Mac, чтобы их можно было искать в чатах. Поиск по смыслу использует модель эмбеддингов; без неё файлы ищутся по словам.";
 "Files are copied into the project and indexed on this Mac." = "Файлы копируются в проект и индексируются на этом Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Файлы помещаются в проект, а временный чат никогда не принадлежит проекту. Начните новый сохранённый чат (⌘N), чтобы добавить их.";
@@ -460,7 +460,7 @@
 "How do you like LLMTray?" = "Как вам LLMTray?";
 "How it was made" = "Как это было создано";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Сколько токенов промпта обрабатывается за шаг. Больше — быстрее на длинных промптах, но нужно больше памяти. Может подобрать автоподбор в бенчмарке.";
-"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Сколько запросов сервер обрабатывает одновременно — например, чат и кодовый агент. Один запрос выполняется с полной скоростью (с drafter или MTP‑head); при нескольких они делят шаги GPU: каждый чуть медленнее, но вместе быстрее. Каждый запущенный запрос хранит свой контекст в памяти, поэтому на Mac с мало свободной памяти одновременно отвечается меньше запросов. 1: по очереди.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Сколько запросов сервер обрабатывает одновременно — например, ваш чат и агент для кода. Один запрос идёт на полной скорости (с drafter или MTP-головой); при нескольких они делят каждый шаг GPU: каждый чуть медленнее, вместе — быстрее. Каждый запрос держит свой контекст в памяти, поэтому на Mac с небольшим запасом памяти одновременно обрабатывается меньше. 1 — по очереди.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Сколько раз вы использовали: чат, вызовы инструментов, API‑сервер (другие приложения), генерацию изображений, редактирование изображений, музыку, загрузки моделей.";
 "How many tokens it generates per trial." = "Сколько токенов генерируется за прогон.";
 "How much memory the GPU may use. A model's files must fit under it." = "Сколько памяти может использовать GPU. Файлы модели должны помещаться в этот лимит.";
@@ -728,7 +728,7 @@
 "Pick one to chat with. A download starts right away and goes on in the background." = "Выберите модель для общения. Загрузка начнётся сразу и продолжится в фоне.";
 "Picks a model that fits your Mac and enables only what you choose." = "Выбирает модель, подходящую для вашего Mac, и включает только выбранные вами опции.";
 "Pictures over 50 MB can't be added: %@." = "Изображения больше 50 МБ нельзя добавить: %@.";
-"Pictures · %lld — for documents, not searched" = "Изображения · %lld — как документы, не индексируются";
+"Pictures · %lld — for documents, not searched" = "Изображения · %lld — для документов, в поиске не участвуют";
 "Pin" = "Закрепить";
 "Pin %@" = "Закрепить %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Закрепить: каждый чат проекта получит весь файл (≈%@ токенов). В этих чатах отключён веб‑поиск и генерация изображений или музыки, пока файл закреплён.";
@@ -980,7 +980,7 @@
 "Temporary chat" = "Временный чат";
 "Temporary chats can only look in folders, for that chat only." = "Временные чаты могут только просматривать папки и только для этого чата.";
 "Temporary — not saved" = "Временный — не сохраняется";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Файлы: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods) индексируются; изображения сохраняются как документы.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Индексируются текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods); изображения хранятся для документов.";
 "Thank you!" = "Спасибо!";
 "Thank you! List your name in Supporters?" = "Спасибо! Добавить ваше имя в список спонсоров?";
 "Thanks! Your name will appear once it's been checked." = "Спасибо! Ваше имя появится после проверки.";
@@ -1001,8 +1001,8 @@
 "The app's name." = "Название приложения.";
 "The base profile: every other profile inherits from it." = "Базовый профиль: все остальные наследуются от него.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Чат просит скопировать %1$@ (%2$@) в проект. После этого каждый чат проекта сможет искать по нему.";
-"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Чат предлагает скопировать %1$@ (%2$@) в проект. После этого любой чат проекта сможет использовать его как документ.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Модель чата может оформить написанное в PDF — отчёт, письмо, заметки, счёт — с таблицами и графиками. PDF остаётся в чате, пока вы не откроете, не сохраните или не добавите его в проект. Ничего не загружается; в временных чатах тоже.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Чат просит скопировать %1$@ (%2$@) в проект. После этого любой чат проекта сможет использовать его в документах.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Модель может оформить написанное в PDF — отчёт, письмо, заметки, счёт — с таблицами и графиками. PDF остаётся в чате, пока вы его не откроете, не сохраните или не добавите в проект. Ничего не скачивается; во временных чатах недоступно.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Модель чата может просматривать разрешённые папки (имена, размеры, даты, короткие фрагменты) и предлагать там изменения — новые папки, перемещения, переименования, отправку в Корзину. Каждое изменение — это план, который вы сначала одобряете, и его можно отменить.";
 "The chat model couldn't be unloaded for Voice Lab." = "Не удалось выгрузить чат‑модель для Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Чат‑модель загружается в эту папку. Измените её в Настройках после установки или сначала выберите другую чат‑модель.";
@@ -1106,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель или увеличьте лимит памяти GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Эта модель занимает %1$@ из %2$@ ГБ, доступных GPU; при длинных подсказках может закончиться память. Используйте меньшую модель.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Файл этого профиля не читается, поэтому редактировать его здесь нельзя. Исправьте или удалите файл, затем снова откройте Настройки.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Эта версия индексирует файлы: текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods) и сохраняет изображения как документы; папки и скрытые файлы добавить нельзя.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Эта версия индексирует текст, Markdown, код, PDF, Word (docx, doc), ODT, RTF, HTML и таблицы (xlsx, ods), а изображения хранит для документов; папки и скрытые файлы добавить нельзя.";
 "This version of LLMTray can't send reviews. Please update the app." = "Эта версия LLMTray не может отправлять отзывы. Обновите приложение.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Эта версия LLMTray настраивает окружение через Python. Установите Python с python.org или через Homebrew, затем проверьте снова. Или используйте LLMTray‑Full — она содержит всё необходимое.";
 "Thought process" = "Ход размышлений";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Общее время";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Пробует 1, 2, 4 и 8 запросов одновременно и prefill-step-size (256–4096) на работающей модели, перезапуская сервер между итерациями. Concurrent requests: минимальное число, дающее 90% от лучшей суммарной скорости (больше — тратит память впустую); prefill: максимальная скорость.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Пробует 1, 2, 4 и 8 запросов одновременно и prefill-step-size (256–4096) на работающей модели, перезапуская сервер между попытками. Параллельные запросы: наименьшее число, дающее 90% лучшей суммарной скорости (больше — лишняя память почти без выигрыша); prefill: самый быстрый.";
 "Try Again" = "Повторить";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Преобразует текст файлов в векторы для поиска по смыслу на этом Mac. При удалении модель индексы сохранятся — файлы будут искаться по словам до повторной загрузки модели.";
 "Tweak…" = "Настроить…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "Когда клиент запрашивает другую модель";
 "When an app asks for another model" = "Когда приложение запрашивает другую модель";
 "When an app asks for another model: %@" = "Когда приложение запрашивает другую модель: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Когда объявлена make_document и документы включены (Настройки > Files). При необходимости модель загружает его через load_tools, либо вы — через меню +, один раз за беседу — меньше токенов в каждом запросе. Всегда: в каждом сохранённом чате.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Когда модели доступен make_document (если документы включены в Настройки > Файлы). «При необходимости»: модель подключает его через load_tools или вы — через меню «+», один раз на чат; в каждом запросе меньше токенов. «Всегда»: в каждом сохранённом чате.";
 "When needed" = "При необходимости";
 "Where LLMTray keeps its models, one folder per model." = "Где LLMTray хранит модели — по папке на каждую модель.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Где LLMTray ищет модели MLX (по одной папке на модель, например <org>/<name>). Можно выбрать любую папку, даже общую с другим приложением.";
