@@ -20,6 +20,8 @@ public struct DocumentSpec: Equatable, Sendable {
         public var labels: [String]
         public var series: [Series]
         public var unit: String
+        /// The x range a formula was asked for: the axis, gaps and all.
+        public var range: [Double] = []
     }
 
     public var title: String
@@ -54,7 +56,8 @@ public struct DocumentSpec: Equatable, Sendable {
             .init("style", .oneOf(DocumentHTML.styles), valueAliases: ["memo": "notes", "bill": "invoice", "cover letter": "letter"]),
             .init("charts", .objects([
                 .init("id", .string, required: true),
-                .init("type", .oneOf(Chart.Kind.allCases.map(\.rawValue)), required: true,
+                // Not required: a formula is a line whatever it's called.
+                .init("type", .oneOf(Chart.Kind.allCases.map(\.rawValue)),
                       aliases: ["kind"], valueAliases: ["column": "bar", "bars": "bar", "lines": "line", "donut": "pie"]),
                 .init("title", .string),
                 .init("labels", .list(.string), aliases: ["categories", "x"]),
@@ -142,7 +145,8 @@ public struct DocumentSpec: Equatable, Sendable {
                 }
             }
             return .success((Chart(id: id, kind: kind, title: clip((item["title"] as? String) ?? "", Limits.titleCharacters),
-                                   labels: [], series: series, unit: clip((item["unit"] as? String) ?? "", 20)), nil))
+                                   labels: [], series: series, unit: clip((item["unit"] as? String) ?? "", 20),
+                                   range: [range.0, range.1]), nil))
         }
         for s in rawSeries {
             let values = ((s["values"] as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
@@ -182,7 +186,8 @@ public struct DocumentSpec: Equatable, Sendable {
         let ends = list.prefix(3).map { v -> Double? in
             if let d = v as? Double { return d }
             if let i = v as? Int { return Double(i) }
-            guard let text = v as? String, text.count <= Limits.formulaCharacters else { return nil }
+            // Scalars: a letter with a million combining marks is one character.
+            guard let text = v as? String, text.unicodeScalars.count <= Limits.formulaCharacters else { return nil }
             return try? Calculator.evaluate(text)
         }
         guard ends.count == 2, let from = ends[0], let to = ends[1], from.isFinite, to.isFinite, from < to,
@@ -195,7 +200,7 @@ public struct DocumentSpec: Equatable, Sendable {
     /// The formula at evenly spaced x across the range; the points where it
     /// has no value (a log below zero, tan at its pole) are left out.
     static func formulaSeries(_ formula: String, _ range: (Double, Double)) -> Result<([Double], [Double]), ChartProblem> {
-        guard !formula.trimmingCharacters(in: .whitespaces).isEmpty, formula.count <= Limits.formulaCharacters else {
+        guard !formula.trimmingCharacters(in: .whitespaces).isEmpty, formula.unicodeScalars.count <= Limits.formulaCharacters else {
             return .failure(ChartProblem(text: "a formula is empty or too long"))
         }
         // The formula's own mistakes (a typo, an unknown name) show at any x.

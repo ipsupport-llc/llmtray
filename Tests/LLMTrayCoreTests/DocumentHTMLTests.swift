@@ -158,6 +158,8 @@ final class DocumentHTMLTests: XCTestCase {
 final class DocumentSpecTests: XCTestCase {
     private func read(_ json: String) -> Result<DocumentSpec, DocumentError> {
         let parsed = ToolArgumentParser.parse(json, schema: DocumentSpec.schema)
+        // As the app runs it: a call the schema rejects never gets here.
+        XCTAssertTrue(parsed.problems.isEmpty, "\(parsed.problems)")
         return DocumentSpec.read(parsed.values)
     }
 
@@ -194,6 +196,11 @@ final class DocumentSpecTests: XCTestCase {
         let log = try read(#"{"title": "x", "content": "y", "charts": [{"id": "l", "series": [{"formula": "log(x)"}]}]}"#).get()
         XCTAssertEqual(log.charts.first?.series.first?.xs.allSatisfy { $0 > 0 }, true)
         XCTAssertEqual(log.charts.first?.series.first?.xs.last, 10)
+        XCTAssertEqual(log.charts.first?.range, [-10, 10], "the axis is the asked range, gaps and all")
+        // Limits count scalars: one letter with a thousand marks is too long.
+        let marks = "x" + String(repeating: "\u{301}", count: 1000)
+        let long = try read(#"{"title": "x", "content": "y", "charts": [{"id": "m", "series": [{"formula": "\#(marks)"}]}]}"#).get()
+        XCTAssertEqual(long.charts.count, 0)
         // A typo, a mix with plain values, a bad range: left out with a note.
         let bad = try read(#"{"title": "x", "content": "y", "charts": [{"id": "a", "series": [{"formula": "sinn(x)"}]}, {"id": "b", "series": [{"formula": "x"}, {"values": [1]}]}, {"id": "c", "range": [5, 1], "series": [{"formula": "x"}]}, {"id": "d", "range": ["-1", "1"], "series": [{"formula": "sqrt(x - 5)"}]}]}"#).get()
         XCTAssertEqual(bad.charts.count, 0)

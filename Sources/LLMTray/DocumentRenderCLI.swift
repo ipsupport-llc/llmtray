@@ -278,17 +278,26 @@ struct DocumentChartView: View {
         let label: String
         /// A formula's x; nil at a label.
         let x: Double?
+        /// A formula's piece between points it has no value at (1/x at 0):
+        /// pieces aren't joined across the gap.
+        var piece = 0
         let series: String
         let value: Double
     }
 
     private var points: [Point] {
         var out: [Point] = []
+        // Formula points are evenly spaced; a wider step is a skipped point.
+        let step = chart.range.map { ($0.count == 2 ? $0[1] - $0[0] : 0) / Double(DocumentSpec.Limits.formulaPoints - 1) } ?? 0
         for (s, series) in chart.series.enumerated() {
             for (i, value) in series.values.enumerated() {
                 let label = i < chart.labels.count ? chart.labels[i] : String(i + 1)
                 let x = series.xs.flatMap { i < $0.count ? $0[i] : nil }
-                out.append(Point(id: s * 10_000 + i, label: label, x: x, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value))
+                var point = Point(id: s * 10_000 + i, label: label, x: x, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value)
+                if let x, let last = out.last, last.series == point.series, let lastX = last.x {
+                    point.piece = last.piece + (x - lastX > step * 1.5 ? 1 : 0)
+                }
+                out.append(point)
             }
         }
         return out
@@ -313,14 +322,15 @@ struct DocumentChartView: View {
         case "line" where chart.series.contains { $0.xs != nil }:
             // A formula: a smooth line over a number axis, no dots.
             let line = points.filter { $0.x != nil }
-            let xs = line.compactMap(\.x)
+            let range = chart.range ?? []
             Chart(line) { p in
-                LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value))
+                LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value),
+                         series: .value("Piece", "\(p.series)\u{1F}\(p.piece)"))
                     .foregroundStyle(by: .value("Series", p.series))
             }
             // The range the formula was asked for, not rounded out past it;
             // values on the left, where long negative numbers have room.
-            .chartXScale(domain: (xs.min() ?? 0)...max(xs.max() ?? 1, (xs.min() ?? 0) + 1e-9))
+            .chartXScale(domain: range.count == 2 && range[0] < range[1] ? range[0]...range[1] : 0...1)
             .chartYAxis { AxisMarks(position: .leading) }
             .chartLegend(several ? .visible : .hidden)
             .chartYAxisLabel(chart.unit)
