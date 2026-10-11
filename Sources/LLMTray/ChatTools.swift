@@ -127,6 +127,9 @@ final class ChatToolbox {
     private(set) var changeRefusedThisTurn = false
     /// Ids of the file text pieces sent this turn: not sent again.
     private var sentProjectHits: Set<String> = []
+    /// The declarations every later request of this turn repeats, once one
+    /// of its requests was long (TurnDeclarations).
+    private var keptDeclarations: [[String: Any]]?
     /// Calls read by `prepare` and not yet run: what their arguments came
     /// to, by call id (for the stats and the error a call gets).
     private var prepared: [String: Prepared] = [:]
@@ -230,10 +233,30 @@ final class ChatToolbox {
         stats.record(tool: tool?.name, known: tool != nil, repairs: entry?.repairs ?? [], outcome: .refused)
     }
 
-    /// Declarations for the request's `tools`: not the generators this turn
-    /// has used up (a small model otherwise calls one again after its
-    /// result, in a loop, until the round limit).
+    /// Declarations for the request's `tools`: the turn's kept list once a
+    /// request of it was long (still only the tools offered now: a profile
+    /// read again mid-turn may have switched one off), else what may run
+    /// now.
     func definitions(for settings: ChatSettings) -> [[String: Any]] {
+        guard let kept = keptDeclarations else { return currentDefinitions(for: settings) }
+        return TurnDeclarations.repeated(kept, offered: Set(tools.filter { $0.isOffered(settings) }.map(\.name)))
+    }
+
+    /// Whether this turn's requests repeat one list (the last round's
+    /// answer too: its calls are refused, as without tools).
+    var keepsDeclarations: Bool { keptDeclarations != nil }
+
+    /// After a request's usage: keep the list it was sent with for the rest
+    /// of the turn if its prompt was long.
+    func keepDeclarations(_ sent: [[String: Any]], promptTokens: Int) {
+        guard TurnDeclarations.shouldKeep(alreadyKept: keptDeclarations != nil, declared: sent.count, promptTokens: promptTokens) else { return }
+        keptDeclarations = sent
+    }
+
+    /// What may run now: not the generators this turn has used up (a small
+    /// model otherwise calls one again after its result, in a loop, until
+    /// the round limit), nothing guarded after file text, and so on.
+    func currentDefinitions(for settings: ChatSettings) -> [[String: Any]] {
         var spent: Set<String> = []
         if imageGeneration.imagesThisTurn >= imageGeneration.maxImagesPerTurn {
             spent.formUnion([ImageToolRunner.toolName, EditImageTool.toolName])
@@ -269,6 +292,7 @@ final class ChatToolbox {
         turnTrust = ToolTrust.TurnState()
         fileTextRoomSpent = false
         changeRefusedThisTurn = false
+        keptDeclarations = nil
         sentProjectHits = []
         prepared = [:]
     }

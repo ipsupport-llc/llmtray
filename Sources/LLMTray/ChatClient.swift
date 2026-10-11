@@ -186,6 +186,9 @@ final class ChatClient: ObservableObject {
     /// tokenEstimator's calibration is of).
     private var lastRequest: SentRequest?
     private var countedRequest: SentRequest?
+    /// The tools the last request declared: what the turn keeps once a
+    /// request of it was long (ChatToolbox.keepDeclarations).
+    private var lastSentTools: [[String: Any]] = []
     private var assistantMessageIndex: Int?
 
     private struct RequestContext {
@@ -1049,7 +1052,7 @@ final class ChatClient: ObservableObject {
         let body = ChatRequestBuilder.streamingBody(
             modelAlias: modelAlias, settings: settings,
             history: Array(messages.dropLast(1)),
-            tools: offerTools ? toolbox.definitions(for: settings) : [],
+            tools: offerTools || toolbox.keepsDeclarations ? toolbox.definitions(for: settings) : [],
             projectTools: toolbox.projectToolNames
         )
         guard let request = ChatRequestBuilder.streaming(port: port, body: body) else {
@@ -1060,7 +1063,8 @@ final class ChatClient: ObservableObject {
         // it comes, nothing is counted (an older count may be of a history
         // compaction or a new turn has changed since).
         countedRequest = nil
-        let sentTools = offerTools ? toolbox.definitions(for: settings) : []
+        let sentTools = offerTools || toolbox.keepsDeclarations ? toolbox.definitions(for: settings) : []
+        lastSentTools = sentTools
         lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
                                   framing: framing(modelAlias: modelAlias, settings: settings, tools: sentTools),
                                   modelPath: settings.modelPath, pinnedBytes: Self.pinnedBlockBytes(settings),
@@ -1635,7 +1639,9 @@ final class ChatClient: ObservableObject {
         guard stillCurrent() else { return }
         toolRoundsThisTurn += 1
         // The last allowed round's answer is requested without tools, so the
-        // turn ends with a reply instead of an error.
+        // turn ends with a reply instead of an error -- or, in a turn that
+        // keeps its list, with it (the prefix the server has cached); calls
+        // in that answer are refused either way.
         let offerTools = toolRoundsThisTurn < maxToolRoundsPerTurn
         isRunningTools = false
         startAssistantResponse(
@@ -1734,6 +1740,7 @@ final class ChatClient: ObservableObject {
                 requestStats.promptTokens = promptTokens
                 requestStats.cachedTokens = cachedTokens
                 requestStats.reasoningTokens = reasoningTokens
+                if let promptTokens { toolbox.keepDeclarations(lastSentTools, promptTokens: promptTokens) }
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
                     ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens,
