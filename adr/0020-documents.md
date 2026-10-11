@@ -127,6 +127,17 @@ never searched.
   checked and measured (below); one that isn't an image or has no
   dimensions is refused with "not a picture" and its copy removed. The
   same file twice (by SHA-256) is "already in the project".
+- **Consistency**, as the index's ([0012](0012-project-files-rag.md),
+  "Consistency", "Concurrency"): every change to a project's pictures
+  holds the project's index writer lock (the same `flock`), so two
+  tabs or flows never write the manifest at once; an add copies into
+  `pictures/staging/`, is checked, then renamed into place before the
+  manifest records it; the manifest is replaced atomically (temp file,
+  `rename`); a removal takes the entry out of the manifest first, then
+  the file. Opening the project reconciles: files the manifest doesn't
+  name and staging leftovers are deleted, entries whose file is gone
+  dropped. Pictures count toward the project's and the app's disk
+  limits and usage.
 - **Added** by the flows that add documents, which sort each file to its
   store: the project's Add Files…, the + menu's Add Files to the
   project, the project files window's drop, and `files(add_to_project)`
@@ -145,16 +156,25 @@ never searched.
   pictures" in that line.
 - **What the model sees.** `project_files`' listing ends with a
   `Pictures:` part, `p1. name -- 1600×1200` per picture (names are file
-  text, as documents' names are). A read or search of a `p` id answers
-  "p1 is a picture: it has no text"; a pin "p1 is a picture: only
-  documents are pinned". When `make_document` is declared, the listing
-  and those answers add "it can go into a document as
-  ![caption](project:p1)" (`listing(… picturesUsable:)`); otherwise
-  nothing about documents.
+  text, as documents' names are). The project's context counts pictures
+  (`ProjectContext.pictures`): a project with pictures and no documents
+  declares `project_files` in its listing-only mode, so the ids can be
+  learned. Pictures aren't documents to `project_files`: its `doc`
+  stays an integer, a `p` id there is the usual type error, and search,
+  read and pin never see pictures. When `make_document` is declared,
+  the listing's picture part starts with "use one in a document as
+  ![caption](project:p1)" (`listing(… picturesUsable:)`); otherwise it
+  says nothing about documents.
 - **Decoding untrusted images** — check and measure at add, the
-  window's thumbnail, and render — happens in a child process, as
-  extraction does (0012, "A child process": `LLMTray --decode-picture`,
-  no network, the same memory limit, killed after 10 s): it reads the
+  window's thumbnail, and render — happens in a child process spawned
+  exactly as extraction's (0012, "A child process": `posix_spawn`
+  through `ProcessRunner`, its own process group killed whole, no
+  network, the extraction's jetsam memory limit with the 20 ms footprint
+  polling as backstop), as `LLMTray --decode-picture <in> --out <dir>`
+  with a 10 s wall clock. The parent makes `<dir>` fresh (0700); the
+  child writes the re-encoded picture there and prints one JSON line
+  (width, height, bytes, or an error); the parent reads at most 16 MB
+  of it and 4 KB of stdout, and deletes `<dir>` after. It reads the
   header incrementally without caching (as `FileClassifier` does),
   refuses above 100 megapixels before any decode, decodes frame 0 only
   (a GIF's other frames never), scales with
@@ -167,8 +187,10 @@ never searched.
   all before the page loads; the scheme handler serves only those bytes,
   nothing is read from disk while WebKit prints. The decoded pictures of
   one document total at most 60 MB; past that the rest are left out.
-  Make again runs this against the chat's project now (a picture removed
-  since, or a chat moved out: left out).
+  The `DocumentSource` records the project's id with the call; Make
+  again uses pictures only if the chat is still in that project (moved
+  out: every picture left out, never another project's `p1`), and a
+  picture removed since is left out.
 - **Trust**: the listing's picture part is project text, as the rest of
   the listing; a picture's pixels reach no model through this, only
   `make_document`'s output. Looking at a project picture with a vision
@@ -367,7 +389,9 @@ separate look, not part of this ADR.
 - Project pictures: each format added; a renamed non-image, one over
   50 MB and one over 100 megapixels refused (the last before decoding);
   a duplicate by hash; the manifest's ids never reused; listing,
-  read/search/pin answers with and without documents on; removed with
+  the listing with and without documents on, a pictures-only project's
+  listing-only mode, a `p` id refused by `project_files`; a manifest
+  reconciled after a crash mid-add; removed with
   its copy; a document with a picture of another project, a removed one
   or past 60 MB leaves it out; metadata gone from the embedded copy; the
   decoder child killed at 10 s.
