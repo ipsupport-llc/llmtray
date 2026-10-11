@@ -24,6 +24,8 @@ final class ChatPresentation: ObservableObject {
     /// its turn tracker.
     private var composers: [UUID: ComposerModel] = [:]
     private var trackers: [UUID: TurnTracker] = [:]
+    /// The model picked now hears (modelHearsAudio): a new tab's composer.
+    private var modelHears = false
     private var cancellables: Set<AnyCancellable> = []
 
     init(tabs: ChatTabs, server: ServerManager) {
@@ -54,6 +56,8 @@ final class ChatPresentation: ObservableObject {
         let key = chat.tabID
         if let composer = composers[key] { return composer }
         let composer = ComposerModel()
+        // A new tab's microphone as the model picked now.
+        composer.acceptsAudio = modelHears
         composers[key] = composer
         return composer
     }
@@ -68,6 +72,7 @@ final class ChatPresentation: ObservableObject {
     /// The model picked now hears or doesn't: every tab's composer, not
     /// only the one on screen (a tab left with recordings by its field).
     func modelHearsAudio(_ hears: Bool) {
+        modelHears = hears
         for composer in composers.values { composer.acceptsAudio = hears }
     }
 
