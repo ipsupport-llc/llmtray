@@ -34,6 +34,12 @@ struct DocumentCard: View {
                     Button("Open") { open() }
                     Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting([url]) }
                     Button("Save As…") { saveAs() }
+                    // The PDF in the chat's folder, as the share sheet's
+                    // services take a file (Mail, Messages, AirDrop…).
+                    // Only while the file is there: the sheet can't say it's gone.
+                    if FileManager.default.fileExists(atPath: url.path) {
+                        ShareLink(item: url, preview: SharePreview(document.title)) { Text("Share…") }
+                    }
                     if let project {
                         Button("Add to Project") { addToProject(project) }
                     }
