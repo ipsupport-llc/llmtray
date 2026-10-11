@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld mới kể từ khi bạn mở danh sách: chưa chọn cho tới khi bạn đánh dấu.";
 "%lld of 5 stars" = "%lld trên 5 sao";
 "%lld pages" = "%lld trang";
+"%lld pictures" = "%lld ảnh";
+"%lld pictures added: kept for documents, not searched." = "%lld ảnh đã thêm: giữ cho tài liệu, không được tìm kiếm.";
 "%lld requests" = "%lld yêu cầu";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld yêu cầu đang xử lý (được trả lời cùng nhau tối đa theo giá trị «Yêu cầu đồng thời»)";
 "%lld s" = "%lld giây";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
 "(Please attach the report file shown in Finder.)" = "(Vui lòng đính kèm tệp báo cáo hiển thị trong Finder.)";
 "(estimate; exact after the first answer)" = "(ước tính; chính xác sau câu trả lời đầu tiên)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "Thêm tệp vào dự án, hoặc ảnh để mô hình xem";
 "Add more files: every chat of the project can search them." = "Thêm tệp: mọi cuộc trò chuyện trong dự án đều có thể tìm kiếm chúng.";
 "Add the files to a project?" = "Thêm các tệp vào dự án?";
+"Add to Project" = "Thêm vào dự án";
 "Add “%1$@” to “%2$@”?" = "Thêm “%1$@” vào “%2$@”?";
 "Added %@" = "Đã thêm %@";
 "Added here" = "Đã thêm ở đây";
+"Added to the project." = "Đã thêm vào dự án.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Adding files" = "Đang thêm tệp";
 "Advanced" = "Nâng cao";
@@ -296,9 +302,14 @@
 "Diagnostics" = "Chẩn đoán";
 "Disk usage" = "Sử dụng ổ đĩa";
 "Dismiss" = "Bỏ qua";
+"Document: %@" = "Tài liệu: %@";
+"Documents" = "Tài liệu";
+"Documents On in This Chat" = "Tài liệu đang bật trong cuộc trò chuyện này";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Tài liệu được sao chép vào dự án và được lập chỉ mục trên Mac này; ảnh sẽ vào tin nhắn của bạn.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Tài liệu đang bật trong cuộc trò chuyện này: yêu cầu một tài liệu (báo cáo, thư…).";
 "Documents go into a project with this chat." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này.";
 "Documents go into a project with this chat; images go into your message." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này; ảnh sẽ vào tin nhắn của bạn.";
+"Documents tools" = "Công cụ Tài liệu";
 "Doesn't open at login" = "Không mở khi đăng nhập";
 "Don't Add" = "Không thêm";
 "Don't Ask Again" = "Không hỏi nữa";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "Đang lấy danh sách tệp…";
 "Files" = "Tệp";
 "Files Settings…" = "Cài đặt Files…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "Các tệp thêm vào đây được sao chép vào dự án và lập chỉ mục trên Mac này; mọi cuộc trò chuyện trong dự án đều có thể tìm chúng.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Các tệp thêm ở đây sẽ được sao chép vào dự án và lập chỉ mục trên máy Mac này; mọi cuộc trò chuyện của dự án đều có thể tìm kiếm chúng. Ảnh được giữ cho tài liệu.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Các tệp thêm vào dự án được lập chỉ mục trên Mac này để các trò chuyện có thể tìm kiếm chúng. Tìm kiếm theo ý nghĩa dùng mô hình embedding; nếu không có, tệp sẽ được tìm kiếm theo từ ngữ.";
 "Files are copied into the project and indexed on this Mac." = "Tệp được sao chép vào dự án và lập chỉ mục trên Mac này.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Tệp được đưa vào dự án, và cuộc trò chuyện tạm thời không thuộc dự án. Bắt đầu cuộc trò chuyện mới lưu (⌘N) để thêm chúng.";
@@ -400,7 +411,7 @@
 "For This Chat" = "Cho cuộc trò chuyện này";
 "For an Hour" = "Trong một giờ";
 "For faster answers (speculative decoding)" = "Để trả lời nhanh hơn (giải mã suy đoán)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "Cho các mô hình có drafter đã công bố (Gemma 4 26B) hoặc có đầu MTP riêng (các mô hình Qwen 3.5 của chúng tôi, được tải cùng mô hình): nó đoán trước các token và mô hình chính kiểm tra chúng trong một lượt. Cùng kết quả, nhanh hơn. Khi đó các yêu cầu được xử lý lần lượt từng cái.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "Đối với các mô hình có drafter công bố (Gemma 4 26B) hoặc đầu MTP riêng (các mô hình Qwen 3.5 của chúng tôi, tải về cùng chúng): nó dự đoán token trước và mô hình chính kiểm tra trong một lần duyệt. Kết quả như nhau, nhanh hơn. Một yêu cầu khi chạy độc lập sẽ dùng tính năng này; khi có nhiều yêu cầu cùng lúc thì chúng chia sẻ batch mà không dùng tính năng này.";
 "Found after an interruption" = "Tìm thấy sau khi gián đoạn";
 "Founding Supporters" = "Những người ủng hộ sáng lập";
 "Free disk space" = "Dung lượng đĩa trống";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "Bạn đánh giá LLMTray thế nào?";
 "How it was made" = "Cách tạo ra";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "Số token prompt được xử lý mỗi bước. Giá trị lớn hơn sẽ nhanh hơn với prompt dài nhưng dùng nhiều bộ nhớ hơn. Tính năng tự tinh chỉnh của bài đo hiệu năng có thể chọn giá trị này.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "Số yêu cầu được gộp vào một bước GPU. Chỉ hữu ích khi nhiều ứng dụng khách dùng máy chủ cùng lúc; dùng nhiều bộ nhớ hơn.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "Số yêu cầu mà máy chủ trả lời cùng lúc — ví dụ chat và tác nhân lập trình. Một yêu cầu chạy đơn lẻ đạt tốc độ tối đa (với drafter hoặc đầu MTP); khi có nhiều yêu cầu, chúng chia sẻ mỗi bước GPU: mỗi yêu cầu hơi chậm hơn, nhưng tổng nhanh hơn. Mỗi yêu cầu đang chạy giữ ngữ cảnh riêng trong bộ nhớ, nên Mac ít bộ nhớ sẽ trả lời ít yêu cầu cùng lúc hơn. 1: lần lượt từng yêu cầu.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "Số lần bạn đã dùng từng mục: chat, gọi công cụ, máy chủ API (ứng dụng khác), tạo ảnh, chỉnh sửa ảnh, âm nhạc, tải xuống mô hình.";
 "How many tokens it generates per trial." = "Số token được tạo trong mỗi lượt thử.";
 "How much memory the GPU may use. A model's files must fit under it." = "Bao nhiêu bộ nhớ GPU được phép dùng. Tệp của mô hình phải vừa dưới giới hạn này.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "Mở khi đăng nhập: %@";
 "Leave a Review" = "Gửi đánh giá";
 "Length" = "Độ dài";
+"Let chats make documents" = "Cho phép cuộc trò chuyện tạo tài liệu";
 "Let chats work in folders" = "Cho phép trò chuyện thao tác trong thư mục";
 "Let coding agents and scripts use your models." = "Cho agents và script sử dụng mô hình của bạn.";
 "Let the chat look in %@?" = "Cho phép cuộc trò chuyện xem trong %@?";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "Dành cho lập trình và agent: công cụ lập trình và OpenAI API.";
 "Maintenance" = "Bảo trì";
 "Make a 30-second calm lo-fi instrumental for studying" = "Tạo nhạc nền lo-fi 30 giây, nhẹ nhàng để học";
+"Make a Document…" = "Tạo Tài liệu…";
+"Make again" = "Tạo lại";
 "Make images and edit them." = "Tạo ảnh và chỉnh sửa chúng.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "Tạo hình ảnh, bài hát và nói bằng mô hình giọng nói, tất cả trên Mac này: bật trong Cài đặt.";
 "Make songs and instrumentals." = "Tạo bài hát và nhạc cụ.";
+"Make the document again from the same content" = "Tạo lại tài liệu từ cùng nội dung";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "Tạo ID ngẫu nhiên mới: các báo cáo sau không thể đối chiếu với báo trước.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "Tạo thư mục, di chuyển, đổi tên và chuyển vào Trash — mỗi kế hoạch đều được hiển thị trước cho bạn, và không có gì thay đổi cho tới khi bạn chấp thuận.";
 "Manage Models…" = "Quản lý mô hình…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Không đủ dung lượng đĩa trống: %@ cần khoảng %@, hiện có %@.";
 "Not identical to %@: not a duplicate." = "Không giống %@: không phải bản trùng lặp.";
 "Not indexed" = "Chưa lập chỉ mục";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods).";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Chưa hỗ trợ: %@. Phiên bản này lập chỉ mục văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods), và giữ ảnh (png, jpg, heic, webp, tiff, gif).";
 "Nothing new to import" = "Không có gì mới để import";
 "Nothing sent yet." = "Chưa gửi gì.";
 "Nothing to change." = "Không có gì để thay đổi.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "Chỉ Mac này dùng được server";
 "Only turbo has this knob: sft has no song planner to vary." = "Chỉ turbo có tuỳ chỉnh này: sft không có bộ lập kế hoạch bài hát để thay đổi.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "Chỉ những gì bạn nhập ở đây được công bố, sau khi kiểm duyệt. Không bao giờ là Apple ID hay email của bạn.";
+"Open" = "Mở";
 "Open %@, page %lld" = "Mở %@, trang %lld";
 "Open Chat" = "Mở Trò chuyện";
 "Open LLMTray when you log in" = "Mở LLMTray khi đăng nhập";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Các app khác truy cập mô hình của bạn qua API tương thích OpenAI trên Mac này.";
 "Other devices on your network can use the server" = "Thiết bị khác trên mạng của bạn có thể dùng server";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Ghi đè ngôn ngữ macOS chỉ cho LLMTray. Có hiệu lực sau khi LLMTray khởi động lại. Văn bản chưa dịch sẽ hiển thị bằng tiếng Anh.";
+"PDF · %lld pages" = "PDF · %lld trang";
 "Past %lld messages" = "%lld tin nhắn trước đó";
 "Pause" = "Tạm dừng";
 "Pause Indexing" = "Tạm dừng lập chỉ mục";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "Chọn đánh giá từ 1 đến 5 sao.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "Chọn một để chat. Việc tải về bắt đầu ngay và chạy ở nền.";
 "Picks a model that fits your Mac and enables only what you choose." = "Chọn mô hình phù hợp với Mac của bạn và chỉ bật những mục bạn chọn.";
+"Pictures over 50 MB can't be added: %@." = "Ảnh trên 50 MB không thể thêm: %@.";
+"Pictures · %lld — for documents, not searched" = "Ảnh · %lld — cho tài liệu, không được tìm kiếm";
 "Pin" = "Ghim";
 "Pin %@" = "Ghim %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Ghim: mỗi cuộc trò chuyện trong dự án sẽ nhận toàn bộ tệp (≈%@ token). Tìm kiếm web và tạo ảnh hoặc nhạc bị tắt trong các cuộc trò chuyện đó khi tệp được ghim.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "Tệp dự án đang tắt trong Cài đặt.";
 "Project files off" = "Tệp dự án tắt";
 "Project files on" = "Tệp dự án bật";
+"Project files were turned off" = "Tệp dự án đã bị tắt";
 "Project files will be turned on first." = "Tệp dự án sẽ được bật trước.";
 "Project name" = "Tên dự án";
 "Projects" = "Dự án";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "Chỉ lấy mẫu từ số token có khả năng cao nhất này. 0 sẽ tắt tính năng này. Gemma 4 khuyến nghị 64.";
 "Sampling" = "Lấy mẫu";
 "Save" = "Lưu";
+"Save As…" = "Lưu dưới tên…";
 "Save memory" = "Tiết kiệm bộ nhớ";
 "Saved chats will show up here." = "Các trò chuyện đã lưu sẽ hiển thị ở đây.";
 "Saved in your Keychain" = "Đã lưu trong Keychain";
@@ -959,7 +980,7 @@
 "Temporary chat" = "Trò chuyện tạm";
 "Temporary chats can only look in folders, for that chat only." = "Cuộc trò chuyện tạm thời chỉ có thể xem trong thư mục, và chỉ cho cuộc trò chuyện đó.";
 "Temporary — not saved" = "Tạm thời — không được lưu";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "Các tệp văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods) được lập chỉ mục.";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "Các tệp Văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods) được lập chỉ mục; ảnh được giữ cho tài liệu.";
 "Thank you!" = "Cảm ơn!";
 "Thank you! List your name in Supporters?" = "Cảm ơn! Liệt kê tên bạn trong Supporters?";
 "Thanks! Your name will appear once it's been checked." = "Cảm ơn! Tên của bạn sẽ hiển thị sau khi được kiểm duyệt.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP drafter đã tải xong — khởi động lại server để sử dụng.";
 "The Mac's chip." = "Chip của Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "API tương thích với OpenAI lắng nghe tại đây (http://localhost:<port>/v1). Thay đổi mục này khi máy chủ đang dừng.";
+"The PDF couldn't be opened." = "Không thể mở PDF.";
 "The app's language (the language only, not the region)." = "Ngôn ngữ của ứng dụng (chỉ ngôn ngữ, không bao gồm vùng).";
 "The app's name." = "Tên ứng dụng.";
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó đều có thể tìm kiếm nội dung này.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó có thể sử dụng nó trong tài liệu.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Mô hình trò chuyện có thể tạo bố cục nội dung thành PDF — báo cáo, thư, ghi chú, hoá đơn — kèm bảng và biểu đồ. PDF được giữ trong cuộc trò chuyện cho đến khi bạn mở, lưu hoặc thêm vào dự án. Không cần tải xuống gì để dùng tính năng này; tính năng không khả dụng trong cuộc trò chuyện tạm.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Mô hình trò chuyện có thể xem trong các thư mục bạn cho phép (tên, kích thước, ngày, đoạn trích ngắn) và đề xuất thay đổi ở đó — thư mục mới, di chuyển, đổi tên, chuyển vào Trash. Mỗi thay đổi là một kế hoạch bạn phải phê duyệt trước và có thể hoàn tác.";
 "The chat model couldn't be unloaded for Voice Lab." = "Không thể giải nạp mô hình chat cho Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Mô hình chat đang được tải về thư mục này. Thay đổi trong Cài đặt sau khi hoàn tất, hoặc chọn mô hình chat khác trước.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn hoặc tăng giới hạn bộ nhớ GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "Mô hình này sử dụng %1$@ trên %2$@ GB bộ nhớ GPU; các prompt dài có thể hết bộ nhớ. Dùng mô hình nhỏ hơn.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "Không thể đọc tệp của hồ sơ này, nên bạn không thể chỉnh sửa hồ sơ tại đây. Hãy sửa hoặc xóa tệp, rồi mở lại Cài đặt.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "Phiên bản này lập chỉ mục văn bản, Markdown, mã, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods); không thể thêm thư mục và tệp ẩn.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "Phiên bản này lập chỉ mục các tệp Văn bản, Markdown, mã nguồn, PDF, Word (docx, doc), ODT, RTF, HTML và bảng tính (xlsx, ods) và giữ ảnh cho tài liệu; không thể thêm thư mục và tệp ẩn.";
 "This version of LLMTray can't send reviews. Please update the app." = "Phiên bản LLMTray này không gửi được đánh giá. Vui lòng cập nhật ứng dụng.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "Phiên bản LLMTray này thiết lập môi trường bằng Python. Cài Python từ python.org hoặc Homebrew rồi kiểm tra lại. Hoặc dùng LLMTray-Full, đã bao gồm mọi thứ cần thiết.";
 "Thought process" = "Quá trình suy nghĩ";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Tổng thời gian";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "Thử decode-concurrency (1/2/4/8) và prefill-step-size (64/128/256/512) với mô hình đang chạy, khởi động lại máy chủ sau mỗi lần thử, rồi giữ cấu hình đo được nhanh nhất.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
 "Try Again" = "Thử lại";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "Khi client yêu cầu mô hình khác";
 "When an app asks for another model" = "Khi một ứng dụng yêu cầu mô hình khác";
 "When an app asks for another model: %@" = "Khi một ứng dụng yêu cầu mô hình khác: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Khi make_document được khai báo, sau khi Tài liệu bật (Cài đặt > Tệp). Khi cần: mô hình tải nó bằng load_tools, hoặc bạn tải từ menu +, mỗi cuộc trò chuyện một lần — giảm số token cho mỗi yêu cầu. Luôn: trong mọi cuộc trò chuyện đã lưu.";
+"When needed" = "Khi cần";
 "Where LLMTray keeps its models, one folder per model." = "Nơi LLMTray lưu các mô hình, mỗi mô hình một thư mục.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Chọn bất kỳ thư mục nào, có thể dùng chung với ứng dụng khác.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Trỏ đến ~/.lmstudio/models để chia sẻ mô hình với LM Studio.";
@@ -1271,11 +1297,13 @@
 "never used" = "chưa từng sử dụng";
 "no changes" = "không có thay đổi";
 "no text" = "không có văn bản";
+"not a picture" = "không phải ảnh";
 "not downloaded" = "chưa tải về";
 "not indexed" = "chưa lập chỉ mục";
 "not supported" = "không được hỗ trợ";
 "not used by any model" = "không được mô hình nào dùng";
 "off" = "tắt";
+"over 50 MB" = "trên 50 MB";
 "prompt %.0f tok/s" = "prompt %.0f tok/giây";
 "queued" = "đang chờ";
 "reading" = "đang đọc";

@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "自打开列表后有 %lld 项新项：未选中，直到你勾选它们。";
 "%lld of 5 stars" = "%lld / 5 星";
 "%lld pages" = "%lld 页";
+"%lld pictures" = "%lld 张图片";
+"%lld pictures added: kept for documents, not searched." = "已添加 %lld 张图片：保留供文档使用，不参与搜索。";
 "%lld requests" = "%lld 个请求";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 个正在处理的请求（最多同时按“并发请求”一起回答）";
 "%lld s" = "%lld 秒";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位";
 "(Please attach the report file shown in Finder.)" = "（请在 Finder 中附加显示的报告文件。）";
 "(estimate; exact after the first answer)" = "（估计值；首次回答后为准确值）";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "将文件添加到项目，或添加模型可见的图像";
 "Add more files: every chat of the project can search them." = "添加更多文件：项目中的每个聊天都可以搜索这些文件。";
 "Add the files to a project?" = "要将这些文件添加到项目吗？";
+"Add to Project" = "添加到项目";
 "Add “%1$@” to “%2$@”?" = "要将“%1$@”添加到“%2$@”吗？";
 "Added %@" = "已添加 %@";
 "Added here" = "已添加到此处";
+"Added to the project." = "已添加到项目。";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "提供工具时会添加到系统提示词中。模型自带的工具模板只说明如何调用工具，从不说明何时不应调用。留空则停用。";
 "Adding files" = "正在添加文件";
 "Advanced" = "高级";
@@ -296,9 +302,14 @@
 "Diagnostics" = "诊断";
 "Disk usage" = "磁盘使用情况";
 "Dismiss" = "关闭";
+"Document: %@" = "文档：%@";
+"Documents" = "文档";
+"Documents On in This Chat" = "本聊天已启用文档";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "文档会复制到项目并在此 Mac 上建立索引；图像会插入到你的消息中。";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "本聊天已启用文档：可请求文档（如报告、信件等）。";
 "Documents go into a project with this chat." = "文档会随本聊天一起放入项目。";
 "Documents go into a project with this chat; images go into your message." = "文档会随本聊天一起放入项目；图像会插入到你的消息中。";
+"Documents tools" = "文档工具";
 "Doesn't open at login" = "登录时不打开";
 "Don't Add" = "不添加";
 "Don't Ask Again" = "不再询问";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "正在获取文件列表…";
 "Files" = "文件";
 "Files Settings…" = "文件设置…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "在此添加的文件会复制到项目并在此 Mac 上建立索引；项目的每个聊天都可搜索这些文件。";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "添加到这里的文件会被复制到项目并在此 Mac 上建立索引；项目中的每个聊天都可以搜索这些文件。图片保留供文档使用。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "添加到项目的文件会在此 Mac 上建立索引，使其聊天能够搜索这些文件。按语义搜索使用嵌入模型；没有嵌入模型时，文件仅按词语进行搜索。";
 "Files are copied into the project and indexed on this Mac." = "文件会复制到项目并在此 Mac 上建立索引。";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "文件会放入项目，而临时聊天不会属于任何项目。要添加文件，请开始新的已保存聊天（⌘N）。";
@@ -400,7 +411,7 @@
 "For This Chat" = "针对本聊天";
 "For an Hour" = "一小时内";
 "For faster answers (speculative decoding)" = "用于更快的回答（猜测解码）";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "适用于有已发布草稿模型的模型（Gemma 4 26B）或自带 MTP 头的模型（我们的 Qwen 3.5 模型，随模型一起下载）：它提前猜测词元，主模型一次性检查。输出相同，速度更快。此时请求会逐个处理。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "对于有公开 drafter（Gemma 4 26B）或自带 MTP head（如我们随模型下载的 Qwen 3.5 系列）的模型：它会提前预测若干 token，主模型在一次处理内校验这些 token。输出相同，但更快。单个请求时会使用它；多个并发时则共享批次，而不使用它。";
 "Found after an interruption" = "中断后发现";
 "Founding Supporters" = "创始赞助者";
 "Free disk space" = "可用磁盘空间";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "您觉得 LLMTray 如何？";
 "How it was made" = "说明创作过程";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "每步处理的提示词词元数。数值越大，长提示词越快，但会占用更多内存。基准测试的自动调优可选择该值。";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "合并到一个 GPU 步骤中的请求数。仅在多个客户端同时使用服务器时有帮助；会占用更多内存。";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "服务器同时处理多少请求——例如你的聊天和一个编码代理。单个请求可达到全速（若有 drafter 或 MTP head）；多请求时它们共享每个 GPU 步骤：每个略慢，但总体更快。每个运行中的请求在内存中保留自己的上下文，因此内存较少的 Mac 能同时处理的请求更少。1：逐个顺序处理。";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "统计您使用下列功能的次数：对话、工具调用、API 服务器（其他应用）、图像生成、图像编辑、音乐、模型下载。";
 "How many tokens it generates per trial." = "每次试验生成的词元数。";
 "How much memory the GPU may use. A model's files must fit under it." = "GPU 可使用的内存量。模型文件必须在此限制内。";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "登录时启动：%@";
 "Leave a Review" = "留下评价";
 "Length" = "长度";
+"Let chats make documents" = "允许聊天生成文档";
 "Let chats work in folders" = "允许聊天在文件夹中工作";
 "Let coding agents and scripts use your models." = "允许代码代理和脚本使用你的模型。";
 "Let the chat look in %@?" = "允许聊天查看 %@ 吗？";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "为编程与 agent 设计：包含编码工具并支持 OpenAI API。";
 "Maintenance" = "维护";
 "Make a 30-second calm lo-fi instrumental for studying" = "制作一段用于学习的 30 秒平静 lo-fi 背景乐";
+"Make a Document…" = "创建文档…";
+"Make again" = "重新生成";
 "Make images and edit them." = "生成并编辑图像。";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成图片和歌曲，并与语音模型对话：在“设置”中启用它们。";
 "Make songs and instrumentals." = "生成歌曲与纯音乐。";
+"Make the document again from the same content" = "使用相同内容重新生成此文档。";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "生成新的随机 ID：之后的报告无法与之前的报告匹配。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "创建文件夹、移动、重命名及移至“废纸篓”——每项操作均先以计划显示，未经你批准不会生效。";
 "Manage Models…" = "管理模型…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "磁盘空间不足：%@ 需要约 %@，当前可用 %@。";
 "Not identical to %@: not a duplicate." = "与 %@ 不相同：不是重复项。";
 "Not indexed" = "未索引";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "暂不支持：%@。此版本可建立文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods） 的索引。";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "暂不支持：%@。此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods），并保留图片（png、jpg、heic、webp、tiff、gif）。";
 "Nothing new to import" = "无可导入的新内容";
 "Nothing sent yet." = "尚未发送任何内容。";
 "Nothing to change." = "无需更改。";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "仅此 Mac 可使用服务器";
 "Only turbo has this knob: sft has no song planner to vary." = "仅 turbo 有此旋钮：sft 无歌曲规划器以供变化。";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "仅会发布你在此输入的内容，且需人工审核通过。绝不会发布你的 Apple ID 或电子邮件。";
+"Open" = "打开";
 "Open %@, page %lld" = "打开 %@，第 %lld 页";
 "Open Chat" = "打开聊天";
 "Open LLMTray when you log in" = "登录时打开 LLMTray";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "其他应用通过此 Mac 上与 OpenAI 兼容的 API 访问你的模型。";
 "Other devices on your network can use the server" = "网络上的其他设备可使用服务器";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "仅覆盖 LLMTray 的 macOS 语言设置。重启 LLMTray 后生效。未翻译的文本将以英文显示。";
+"PDF · %lld pages" = "PDF · %lld 页";
 "Past %lld messages" = "过去 %lld 条消息";
 "Pause" = "暂停";
 "Pause Indexing" = "暂停建立索引";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "请选择 1 到 5 星的评分。";
 "Pick one to chat with. A download starts right away and goes on in the background." = "选择一个进行聊天。下载会立即开始并在后台进行。";
 "Picks a model that fits your Mac and enables only what you choose." = "为你的 Mac 选择合适的模型，仅启用你选择的功能。";
+"Pictures over 50 MB can't be added: %@." = "超过 50 MB 的图片无法添加：%@。";
+"Pictures · %lld — for documents, not searched" = "图片 · %lld — 供文档使用，不参与搜索";
 "Pin" = "固定";
 "Pin %@" = "置顶 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "置顶：项目的每个对话都会获取整个文件（≈%@ 令牌）。文件被置顶期间，这些对话中的网页搜索和图像或音乐生成功能被禁用。";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "“设置”中已关闭项目文件。";
 "Project files off" = "项目文件：关闭";
 "Project files on" = "项目文件：开启";
+"Project files were turned off" = "已关闭项目文件";
 "Project files will be turned on first." = "将先开启项目文件。";
 "Project name" = "项目名称";
 "Projects" = "项目";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "仅从此数量的最可能词元中采样。0 表示关闭。Gemma 4 建议 64。";
 "Sampling" = "采样";
 "Save" = "保存";
+"Save As…" = "另存为…";
 "Save memory" = "节省内存";
 "Saved chats will show up here." = "已保存的对话会显示在此处。";
 "Saved in your Keychain" = "已保存在您的钥匙串中";
@@ -959,7 +980,7 @@
 "Temporary chat" = "临时对话";
 "Temporary chats can only look in folders, for that chat only." = "临时聊天只能查看文件夹，且仅限该聊天。";
 "Temporary — not saved" = "临时——未保存";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "会为文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods） 文件建立索引。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）；图片保留供文档使用。";
 "Thank you!" = "谢谢！";
 "Thank you! List your name in Supporters?" = "谢谢！要在赞助者中列出你的名字吗？";
 "Thanks! Your name will appear once it's been checked." = "谢谢！你的名字将在审核通过后显示。";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "MTP 草稿器已下载——重启服务器以使用。";
 "The Mac's chip." = "Mac 的芯片。";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "兼容 OpenAI 的 API 在此处监听（http://localhost:<port>/v1）。请在服务器停止时更改。";
+"The PDF couldn't be opened." = "无法打开该 PDF。";
 "The app's language (the language only, not the region)." = "应用的语言（仅语言，不含地区）。";
 "The app's name." = "应用名称。";
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天请求将 %1$@（%2$@）复制到项目中。项目中的所有聊天都可以搜索该内容。";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "该聊天请求将 %1$@（%2$@）复制到项目中。项目的每个聊天随后都可以在文档中使用它。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以将其输出排版为 PDF（如报告、信函、笔记、发票），并可包含表格和图表。该 PDF 会保留在聊天中，直到你打开、保存或添加到项目。无需为此下载任何内容；此功能在临时对话中不可用。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可在你允许的文件夹中查看（名称、大小、日期、简短摘录）并提出更改——新建文件夹、移动、重命名、移至“废纸篓”。每项更改都是需你先批准的计划，并可撤销。";
 "The chat model couldn't be unloaded for Voice Lab." = "无法为 Voice Lab 卸载聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下载到此文件夹。设置完成后可在“设置”中更改，或先选择其他聊天模型。";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型，或提高 GPU 内存限制。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "此版本对文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 和电子表格（xlsx、ods）文件建立索引；文件夹和隐藏文件无法添加。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）文件，并保留图片供文档使用；文件夹和隐藏文件无法添加。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 无法发送评论。请更新应用。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 设置运行时。请从 python.org 或 Homebrew 安装 Python，然后重试。或使用包含所需全部内容的 LLMTray-Full。";
 "Thought process" = "思考过程";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "总时长";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "对正在运行的模型尝试 decode-concurrency (1/2/4/8) 和 prefill-step-size (64/128/256/512)，每次之间都会重启服务器，并保留实测最快的组合。";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "对运行中的模型分别尝试 1、2、4、8 个并发请求和 prefill-step-size（256–4096），每次尝试后重启服务器。并发请求：选择达到最佳总速度 90% 的最小并发数（更高并发对内存开销大但收益小）；prefill：选择最快的值。";
 "Try Again" = "重试";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "当客户端请求其他模型时";
 "When an app asks for another model" = "当应用请求其他模型时";
 "When an app asks for another model: %@" = "当应用请求其他模型：%@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "文档已启用（设置 > 文件）且 make_document 已声明时适用。按需加载：模型会用 load_tools 加载，或你可从 + 菜单加载，每个聊天只需一次——每次请求消耗更少令牌。始终：在每个已保存的聊天中声明该工具。";
+"When needed" = "按需加载";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray 存放模型的位置，每个模型一个文件夹。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray 在此查找 MLX 模型（每个模型一个文件夹，例如 <org>/<name>）。可选择任意文件夹，也可与其他应用共享。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "LLMTray 查找 MLX 模型的位置（每个模型一个文件夹，例如 <org>/<name>）。将其指向 ~/.lmstudio/models 可与 LM Studio 共享模型。";
@@ -1271,11 +1297,13 @@
 "never used" = "从未使用";
 "no changes" = "无更改";
 "no text" = "无文本";
+"not a picture" = "不是图片";
 "not downloaded" = "未下载";
 "not indexed" = "未建立索引";
 "not supported" = "不支持";
 "not used by any model" = "未被任何模型使用";
 "off" = "关闭";
+"over 50 MB" = "超过 50 MB";
 "prompt %.0f tok/s" = "提示 %.0f tok/s";
 "queued" = "已排队";
 "reading" = "正在读取";

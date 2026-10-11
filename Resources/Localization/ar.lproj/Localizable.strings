@@ -57,8 +57,12 @@
 "%lld new since you opened the list: unticked until you tick them." = "%lld جديدة منذ فتحك للقائمة: غير محددة حتى تحددها.";
 "%lld of 5 stars" = "%lld من 5 نجوم";
 "%lld pages" = "%lld صفحة";
+"%lld pictures" = "%lld صورة";
+"%lld pictures added: kept for documents, not searched." = "تمت إضافة %lld صورة: محفوظة للمستندات، غير قابلة للبحث.";
 "%lld requests" = "%lld طلبات";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld طلبًا جارٍ تنفيذها (تُجاب معًا حتى حد الطلبات المتزامنة)";
 "%lld s" = "%lld ث";
+"%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-بت";
 "(Please attach the report file shown in Finder.)" = "الرجاء إرفاق ملف التقرير المعروض في Finder.";
 "(estimate; exact after the first answer)" = "(تقديري؛ الدقة بعد الإجابة الأولى)";
@@ -99,9 +103,11 @@
 "Add files to a project, or images for the model to see" = "إضافة ملفات إلى المشروع، أو صور ليطلع النموذج عليها";
 "Add more files: every chat of the project can search them." = "أضف مزيدًا من الملفات: يمكن لكل محادثة في المشروع البحث فيها.";
 "Add the files to a project?" = "هل تريد إضافة الملفات إلى مشروع؟";
+"Add to Project" = "إضافة إلى المشروع";
 "Add “%1$@” to “%2$@”?" = "إضافة «%1$@» إلى «%2$@»؟";
 "Added %@" = "أضيف %@";
 "Added here" = "أُضيف هنا";
+"Added to the project." = "تمت الإضافة إلى المشروع.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "تُضاف إلى موجه النظام كلما توفرت الأدوات. لا يوضح قالب الأدوات الخاص بالنموذج إلا كيفية استدعاء أداة، وليس متى يجب عدم استخدامها. اتركه فارغًا لتعطيله.";
 "Adding files" = "جارٍ إضافة الملفات";
 "Advanced" = "متقدم";
@@ -296,9 +302,14 @@
 "Diagnostics" = "التشخيصات";
 "Disk usage" = "استخدام القرص";
 "Dismiss" = "إغلاق";
+"Document: %@" = "مستند: %@";
+"Documents" = "المستندات";
+"Documents On in This Chat" = "الوثائق مفعّلة في هذه المحادثة";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "تُنسخ المستندات إلى المشروع وتُفهرَس على هذا الـ Mac؛ الصور تُدرَج في رسالتك.";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "الوثائق مفعّلة في هذه المحادثة: اطلب واحدة (تقرير، رسالة ...) ";
 "Documents go into a project with this chat." = "تُضاف المستندات إلى مشروع مرتبط بهذه المحادثة.";
 "Documents go into a project with this chat; images go into your message." = "تُضاف المستندات إلى مشروع مرتبط بهذه المحادثة؛ الصور تُدرَج في رسالتك.";
+"Documents tools" = "أدوات الوثائق";
 "Doesn't open at login" = "لا يفتح عند تسجيل الدخول";
 "Don't Add" = "لا تضف";
 "Don't Ask Again" = "لا تسأل مجددًا";
@@ -374,7 +385,7 @@
 "Fetching file list…" = "جارٍ جلب قائمة الملفات…";
 "Files" = "الملفات";
 "Files Settings…" = "إعدادات Files…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them." = "الملفات التي تُضاف هنا تُنسَخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "الملفات المضافة هنا تُنسخ إلى المشروع وتُفهرَس على هذا الـ Mac؛ يمكن لكل محادثة في المشروع البحث فيها. يُحتفظ بالصور لاستخدامها في المستندات.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "الملفات المضافة إلى مشروع تُفهرَس على هذا الـMac، حتى تتمكن المحادثات من البحث فيها. البحث بحسب المعنى يستخدم نموذج تضمين؛ بدونه تُبحث الملفات حسب كلماتها.";
 "Files are copied into the project and indexed on this Mac." = "تُنسخ الملفات إلى المشروع وتُفهرَس على هذا الـ Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "الملفات تُضاف إلى مشروع، والمحادثة المؤقتة لا تكون جزءًا من مشروع. ابدأ محادثة محفوظة جديدة (⌘N) لإضافتها.";
@@ -400,7 +411,7 @@
 "For This Chat" = "لهذه الدردشة";
 "For an Hour" = "لمدة ساعة";
 "For faster answers (speculative decoding)" = "لإجابات أسرع (توقّع فك التشفير)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. Requests are then served one at a time." = "للنماذج التي لها مسودة منشورة (Gemma 4 26B) أو رأس MTP خاص بها (نماذج Qwen 3.5 الخاصة بنا، يُنزَّل معها): يخمّن الرموز مسبقًا ويتحقق منها النموذج الرئيسي في تمريرة واحدة. النتيجة نفسها، وأسرع. تُخدَم الطلبات حينها واحدًا تلو الآخر.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "للنماذج التي لديها مُولد مسودات منشور (Gemma 4 26B) أو رأس MTP خاص بها (نماذج Qwen 3.5 الخاصة بنا التي تم تنزيلها معها): يتوقع الرموز مقدمًا ويتحقّق النموذج الرئيسي منها في مرور واحد. نفس المخرجات، أسرع. الطلب الواحد يحصل عليه عندما يكون وحيدًا؛ مع عدة طلبات في آن واحد يشاركون الدفعة دون الحاجة إليه.";
 "Found after an interruption" = "تم العثور عليها بعد انقطاع";
 "Founding Supporters" = "الراعون المؤسسون";
 "Free disk space" = "مساحة القرص الحرة";
@@ -449,7 +460,7 @@
 "How do you like LLMTray?" = "ما رأيك في LLMTray؟";
 "How it was made" = "كيف تم إنشاؤها";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "عدد رموز الموجه التي تُعالَج في كل خطوة. القيم الأكبر أسرع مع الموجهات الطويلة لكنها تستخدم ذاكرة أكثر. يمكن للضبط التلقائي في الاختبار المعياري اختيارها.";
-"How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory." = "عدد الطلبات التي تُجمع في خطوة GPU واحدة. لا يفيد إلا عند استخدام عدة عملاء للخادم في الوقت نفسه؛ ويستخدم ذاكرة أكثر.";
+"How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "كم عدد الطلبات التي يجيبها الخادم في وقت واحد — على سبيل المثال محادثتك ووكيل برمجي. الطلب الواحد يعمل بأقصى سرعة (مع مُولده أو رأس MTP الخاص به)؛ مع زيادة العدد يشاركون كل خطوة على GPU: كل واحد أبطأ قليلًا، لكنهم أسرع معًا. كل طلب جارٍ يحتفظ بسياقه في الذاكرة، لذا جهاز Mac ذو ذاكرة قليلة يجيب على عدد أقل في الوقت نفسه. 1: واحد تلو الآخر.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "عدد المرات التي استخدمت فيها كل من: المحادثة، استدعاءات الأدوات، خادم API (تطبيقات أخرى)، توليد الصور، تحرير الصور، الموسيقى، تنزيل النماذج.";
 "How many tokens it generates per trial." = "عدد الرموز التي يُنشئها في كل تجربة.";
 "How much memory the GPU may use. A model's files must fit under it." = "مقدار الذاكرة التي قد يستخدمها الـ GPU. يجب أن تتسع ملفات النموذج ضمن هذا الحد.";
@@ -537,6 +548,7 @@
 "Launch at login: %@" = "فتح عند تسجيل الدخول: %@";
 "Leave a Review" = "اترك مراجعة";
 "Length" = "الطول";
+"Let chats make documents" = "السماح للمحادثات بإنشاء مستندات";
 "Let chats work in folders" = "السماح للدردشات بالعمل في المجلدات";
 "Let coding agents and scripts use your models." = "اسمح للـ agents والنصوص البرمجية باستخدام نماذجك.";
 "Let the chat look in %@?" = "هل تسمح للدردشة بالنظر داخل %@؟";
@@ -561,9 +573,12 @@
 "Made for programming and agents: coding tools and the OpenAI API." = "مصمم للبرمجة والوكيلات: أدوات برمجية وOpenAI API.";
 "Maintenance" = "الصيانة";
 "Make a 30-second calm lo-fi instrumental for studying" = "أنشئ مقطعًا هادئًا lo-fi مدته 30 ثانية للمذاكرة";
+"Make a Document…" = "إنشاء مستند…";
+"Make again" = "إنشاء مجدداً";
 "Make images and edit them." = "إنشاء صور وتحريرها.";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "أنشئ صوراً وأغانيَ وتحدّث مع نموذج صوتي، كل ذلك على هذا الـ Mac: فعّلها في الإعدادات.";
 "Make songs and instrumentals." = "إنشاء أغاني ومقاطع موسيقية.";
+"Make the document again from the same content" = "إعادة إنشاء المستند من نفس المحتوى";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "ينشئ معرّفًا عشوائيًا جديدًا: لا يمكن مطابقة التقارير اللاحقة بالسابقة.";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "إنشاء مجلدات، النقل، إعادة التسمية والإرسال إلى Trash — تُعرض كل خطة عليك أولاً، ولا يتغير شيء حتى توافق.";
 "Manage Models…" = "إدارة النماذج…";
@@ -662,7 +677,7 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "لم يتبقَّ مساحة كافية على القرص: %@ يحتاج نحو %@، و%@ متاح.";
 "Not identical to %@: not a duplicate." = "ليس مطابقًا لـ %@: ليس مكررًا.";
 "Not indexed" = "غير مفهرَس";
-"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods)." = "غير مدعوم بعد: %@. هذه النسخة تفهرِس النصوص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML وجداول البيانات (xlsx, ods).";
+"Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "غير مدعوم بعد: %@. هذه النسخة تفهرس النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)، وتحتفظ بالصور (png, jpg, heic, webp, tiff, gif).";
 "Nothing new to import" = "لا يوجد شيء جديد للاستيراد";
 "Nothing sent yet." = "لم يُرسل شيء بعد.";
 "Nothing to change." = "لا شيء لتغييره.";
@@ -681,6 +696,7 @@
 "Only this Mac can use the server" = "هذا الـ Mac فقط يمكنه استخدام الخادم";
 "Only turbo has this knob: sft has no song planner to vary." = "هذا الضابط متاح فقط في turbo: sft لا يحتوي على مخطط أغاني للتغيير.";
 "Only what you type here is published, after a person has checked it. Never your Apple ID or email." = "ما تكتبه هنا فقط يُنشر بعد مراجعته. لن يتم نشر Apple ID أو بريدك الإلكتروني.";
+"Open" = "فتح";
 "Open %@, page %lld" = "فتح %1$@، الصفحة %2$lld";
 "Open Chat" = "فتح الدردشة";
 "Open LLMTray when you log in" = "فتح LLMTray عند تسجيل الدخول";
@@ -697,6 +713,7 @@
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "تصل التطبيقات الأخرى إلى نماذجك عبر API متوافق مع OpenAI على هذا الـ Mac.";
 "Other devices on your network can use the server" = "الأجهزة الأخرى على شبكتك يمكنها استخدام الخادم";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "يتجاوز لغة macOS في LLMTray فقط. يسري بعد إعادة تشغيل LLMTray. يظهر النص غير المترجم بالإنجليزية.";
+"PDF · %lld pages" = "PDF · %lld صفحة";
 "Past %lld messages" = "آخر %lld رسالة";
 "Pause" = "إيقاف مؤقت";
 "Pause Indexing" = "إيقاف الفهرسة مؤقتًا";
@@ -710,6 +727,8 @@
 "Pick a rating from 1 to 5 stars." = "اختر تقييماً من 1 إلى 5 نجوم.";
 "Pick one to chat with. A download starts right away and goes on in the background." = "اختر واحدًا للدردشة معه. يبدأ التنزيل فورًا ويستمر في الخلفية.";
 "Picks a model that fits your Mac and enables only what you choose." = "يختار نموذجًا مناسبًا لجهاز Mac ويشغّل فقط الميزات التي تختارها.";
+"Pictures over 50 MB can't be added: %@." = "لا يمكن إضافة صور أكبر من 50 ميجابايت: %@.";
+"Pictures · %lld — for documents, not searched" = "صور · %lld — للمستندات، غير قابلة للبحث";
 "Pin" = "تثبيت";
 "Pin %@" = "تثبيت %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "تثبيت: تحصل كل محادثة في المشروع على الملف كاملًا (≈%@ رمزًا). البحث على الويب وتوليد الصور أو الموسيقى متوقّفان في تلك المحادثات طالما هو مثبت.";
@@ -741,6 +760,7 @@
 "Project files are turned off in Settings." = "تم تعطيل ملفات المشروع في الإعدادات.";
 "Project files off" = "ملفات المشروع متوقفة";
 "Project files on" = "ملفات المشروع مفعّلة";
+"Project files were turned off" = "تم إيقاف ملفات المشروع";
 "Project files will be turned on first." = "سيتم تفعيل ملفات المشروع أولًا.";
 "Project name" = "اسم المشروع";
 "Projects" = "المشاريع";
@@ -829,6 +849,7 @@
 "Samples only from this many most likely tokens. 0 turns it off. Gemma 4 recommends 64." = "يأخذ عينات فقط من هذا العدد من الرموز الأكثر احتمالًا. يعطّله 0. يوصي Gemma 4 بالقيمة 64.";
 "Sampling" = "أخذ العينات";
 "Save" = "حفظ";
+"Save As…" = "حفظ باسم…";
 "Save memory" = "توفير الذاكرة";
 "Saved chats will show up here." = "ستظهر الدردشات المحفوظة هنا.";
 "Saved in your Keychain" = "محفوظ في Keychain";
@@ -959,7 +980,7 @@
 "Temporary chat" = "دردشة مؤقتة";
 "Temporary chats can only look in folders, for that chat only." = "الدردشات المؤقتة يمكنها فقط النظر داخل المجلدات، لتلك الدردشة فقط.";
 "Temporary — not saved" = "مؤقت — غير محفوظ";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed." = "يتم فهرسة ملفات النص وMarkdown والرمز وPDF وWord (docx, doc) وODT وRTF وHTML وجداول البيانات (xlsx, ods).";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "يتم فهرسة ملفات النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods)؛ ويُحتفظ بالصور لاستخدامها في المستندات.";
 "Thank you!" = "شكراً لك!";
 "Thank you! List your name in Supporters?" = "شكراً لك! هل تريد إدراج اسمك بين الرعاة؟";
 "Thanks! Your name will appear once it's been checked." = "تمّ، سيظهر اسمك بعد مراجعته.";
@@ -975,10 +996,13 @@
 "The MTP drafter has downloaded -- restart the server to use it." = "تم تنزيل MTP drafter — أعد تشغيل الخادم لاستخدامه.";
 "The Mac's chip." = "معالج الـ Mac.";
 "The OpenAI-compatible API listens here (http://localhost:<port>/v1). Change it while the server is stopped." = "تستمع API المتوافقة مع OpenAI هنا (http://localhost:<port>/v1). غيّرها أثناء توقف الخادم.";
+"The PDF couldn't be opened." = "تعذر فتح ملف PDF.";
 "The app's language (the language only, not the region)." = "لغة التطبيق (اللغة فقط، لا المنطقة).";
 "The app's name." = "اسم التطبيق.";
 "The base profile: every other profile inherits from it." = "ملف التعريف الأساسي: ترث منه كل ملفات التعريف الأخرى.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "تطلب المحادثة نسخ %1$@ (%2$@) إلى المشروع. ستتمكن كل محادثة في المشروع بعد ذلك من البحث فيه.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "تطلب المحادثة نسخ %1$@ (%2$@) إلى المشروع. بعدها يمكن لكل محادثة في المشروع استخدامه في المستندات.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "يمكن لنموذج الدردشة تنسيق ما كتبه كملف PDF — تقرير، رسالة، ملاحظات، فاتورة — مع جداول ومخططات. يبقى ملف PDF في الدردشة حتى تقوم بفتحه أو حفظه أو إضافته إلى مشروع. لا يتم تنزيل أي شيء لهذه الميزة؛ وهي غير متاحة في الدردشات المؤقتة.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "نموذج الدردشة يمكنه النظر في المجلدات التي تسمح بها (الأسماء، الأحجام، التواريخ، مقتطفات قصيرة) واقتراح تغييرات هناك — مجلدات جديدة، نقل، إعادة تسمية، الإرسال إلى Trash. كل تغيير هو خطة توافق عليها أولاً، ويمكن التراجع عنها.";
 "The chat model couldn't be unloaded for Voice Lab." = "تعذّر إفراغ نموذج الدردشة لـVoice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "نموذج الدردشة يُحمَّل في هذا المجلد. غيّره في الإعدادات بعد الإعداد، أو اختر نموذج دردشة آخر أولاً.";
@@ -1082,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر، أو زد حد ذاكرة الـ GPU.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "يستهلك هذا النموذج %1$@ من ‏%2$@ جيجابايت التي قد يستخدمها الـ GPU؛ قد تنفد الذاكرة مع المطالبات الطويلة. استخدم نموذجًا أصغر.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "لا يمكن قراءة ملف ملف التعريف هذا، لذلك لا يمكن تحريره هنا. أصلح الملف أو احذفه، ثم أعد فتح الإعدادات.";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files; folders and hidden files can't be added." = "تقوم هذه النسخة بفهرسة النص، Markdown، الشيفرة، PDF، Word (docx, doc)، ODT، RTF، HTML وملفات الجداول (xlsx, ods)؛ لا يمكن إضافة المجلدات أو الملفات المخفية.";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "تقوم هذه النسخة بفهرسة ملفات النص، Markdown، الكود، PDF، Word (docx, doc)، ODT، RTF، HTML والجداول (xlsx, ods) وتحتفظ بالصور للمستندات؛ لا يمكن إضافة المجلدات والملفات المخفية.";
 "This version of LLMTray can't send reviews. Please update the app." = "هذا الإصدار من LLMTray لا يمكنه إرسال المراجعات. يرجى تحديث التطبيق.";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "تقوم هذه النسخة من LLMTray بضبط بيئتها التشغيلية باستخدام Python. ثبّت Python من python.org أو عبر Homebrew ثم أعد المحاولة. أو استخدم LLMTray‑Full الذي يتضمن كل ما يحتاجه.";
 "Thought process" = "عملية التفكير";
@@ -1109,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "الزمن الإجمالي";
-"Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest." = "يجرب decode-concurrency (1/2/4/8) و prefill-step-size (64/128/256/512) على النموذج قيد التشغيل، مع إعادة تشغيل الخادم بين كل تجربة، ويحتفظ بالإعداد الأسرع قياسًا.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "يجرب 1 و2 و4 و8 طلبات في آن واحد وحجم خطوة التعبئة المسبقة (256–4096) مقابل النموذج الجاري، مع إعادة تشغيل الخادم بين كل تجربة. الطلبات المتزامنة: أقل عدد يصل إلى 90% من أفضل سرعة إجمالية (زيادة العدد تكلف ذاكرة دون فائدة كبيرة)؛ التعبئة المسبقة: الأسرع.";
 "Try Again" = "حاول مرة أخرى";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "يحوِّل نص الملفات إلى متجهات للبحث بحسب المعنى على هذا الـMac. إزالته تحتفظ بالفهارس: عندها تُبحث الملفات بكلماتها حتى يعاد تنزيله.";
 "Tweak…" = "تعديل…";
@@ -1200,6 +1224,8 @@
 "When a client asks for another model" = "عندما يطلب عميل نموذجًا آخر";
 "When an app asks for another model" = "عندما يطلب تطبيق نموذجاً آخراً";
 "When an app asks for another model: %@" = "عندما يطلب تطبيق نموذجاً آخراً: %@";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "عند إعلان make_document وبعد تفعيل المستندات (الإعدادات > الملفات). عند الحاجة: يقوم النموذج بتحميله باستخدام load_tools، أو يمكنك ذلك من قائمة +، مرة واحدة لكل دردشة — عدد رموز أقل في كل طلب. دائماً: في كل دردشة محفوظة.";
+"When needed" = "عند الحاجة";
 "Where LLMTray keeps its models, one folder per model." = "المكان الذي يحتفظ فيه LLMTray بالنماذج، مجلد لكل نموذج.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). اختر أي مجلد — يمكن أن يكون مشتركًا مع تطبيق آخر.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "المجلد الذي يبحث فيه LLMTray عن نماذج MLX (مجلد واحد لكل نموذج، مثل <org>/<name>). وجّهه إلى ~/.lmstudio/models لمشاركة النماذج مع LM Studio.";
@@ -1271,11 +1297,13 @@
 "never used" = "لم يُستخدم أبداً";
 "no changes" = "لا تغييرات";
 "no text" = "لا يوجد نص";
+"not a picture" = "ليست صورة";
 "not downloaded" = "لم يتم تنزيله";
 "not indexed" = "غير مفهرس";
 "not supported" = "غير مدعوم";
 "not used by any model" = "غير مستخدم من أي نموذج";
 "off" = "إيقاف";
+"over 50 MB" = "أكبر من 50 ميجابايت";
 "prompt %.0f tok/s" = "الموجّه %.0f رمز/ث";
 "queued" = "قيد الانتظار";
 "reading" = "جارٍ القراءة";
