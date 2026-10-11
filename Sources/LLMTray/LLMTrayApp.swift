@@ -501,6 +501,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// kept in the Dock, or launching the app again from Finder, did
     /// nothing while the chat lived in the popover).
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        // Setting up: the wizard to the front, not a chat over it.
+        if setupWizard.isOpen {
+            setupWizard.show(automatic: false, queue: downloadQueue, server: server) { [weak self] in self?.startSelectedModel() }
+            return true
+        }
         detachChat()
         return true
     }
