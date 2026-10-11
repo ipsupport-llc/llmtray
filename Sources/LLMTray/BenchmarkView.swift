@@ -184,7 +184,7 @@ struct BenchmarkView: View {
     private var autoTuneSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Auto-tune").foregroundColor(.secondary)
-            Text("Tries decode-concurrency (1/2/4/8) and prefill-step-size (64/128/256/512) against the running model, restarting the server between each, and keeps whichever measured fastest.")
+            Text("Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.")
                 .font(.caption)
                 .foregroundColor(.secondary)
 

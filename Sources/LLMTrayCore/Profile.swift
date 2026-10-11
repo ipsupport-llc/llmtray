@@ -190,6 +190,13 @@ extension Profile {
     /// and the prefill step (128 made a long prompt's prefill several times
     /// slower; mlx-lm's 2048 ran a 26B model out of GPU memory at a 30K-token
     /// offset -- a step's attention grows with step x context).
+    /// Requests the server answers at once (adr/0021): with one it runs
+    /// at full speed, drafting included; with more they share each step.
+    public static let defaultConcurrentRequests = 4
+    /// The built-in value before concurrent requests worked (adr/0021): a
+    /// Default still holding it follows the new built-in, once.
+    public static let formerDefaultConcurrentRequests = 1
+
     public static let builtIn: Profile = {
         var p = Profile(id: "builtin", name: "Built-in")
         p.request.temperature = 0.6
@@ -216,7 +223,7 @@ extension Profile {
         p.launch.kvGroupSize = KVSettings.defaultGroupSize
         p.launch.quantizedKVStart = 0
         p.launch.prefillStepSize = 512
-        p.launch.decodeConcurrency = 1
+        p.launch.decodeConcurrency = defaultConcurrentRequests
         p.launch.promptCacheMB = 1024
         p.launch.mtpDrafter = true
         p.launch.lowMemoryWeights = false

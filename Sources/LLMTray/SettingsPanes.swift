@@ -1039,7 +1039,7 @@ struct ProfilesPane: View {
                     }
                     .labelsHidden().frame(width: 90)
                 }
-                row(\.launch.decodeConcurrency, "Concurrent requests", "How many requests are batched into one GPU step. Only helps when several clients use the server at once; uses more memory.") {
+                row(\.launch.decodeConcurrency, "Concurrent requests", "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.") {
                     Stepper(value: b(\.launch.decodeConcurrency), in: 1...16) {
                         Text("\(profiles.value(\.launch.decodeConcurrency, profileID: selectedID))")
                     }

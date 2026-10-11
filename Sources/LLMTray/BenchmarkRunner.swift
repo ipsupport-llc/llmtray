@@ -360,6 +360,10 @@ final class BenchmarkRunner: ObservableObject {
                 bestConcurrency = value
             }
         }
+        // The fewest at once that reach 90% of the best total: more only
+        // add memory for a few percent (adr/0021).
+        bestConcurrency = AutoTune.concurrencyChoice(autoTuneLog.filter { $0.parameter == "decode-concurrency" }
+            .map { ($0.value, $0.throughput) }) ?? originalConcurrency
         server.launchTrial.decodeConcurrency = bestConcurrency
         if let idx = autoTuneLog.lastIndex(where: { $0.parameter == "decode-concurrency" && $0.value == bestConcurrency }) {
             autoTuneLog[idx].isWinner = true

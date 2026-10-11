@@ -266,6 +266,15 @@ struct ChatHeaderView: View {
             case .starting:
                 ProgressView().controlSize(.small).help("Starting…")
             case .running:
+                // Several clients at once (adr/0021): how many now.
+                if server.activeRequestCount > 1 {
+                    Label("\(server.activeRequestCount)", systemImage: "person.2.fill")
+                        .labelStyle(.titleAndIcon)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .help(String(format: NSLocalizedString("%lld requests answered at once", comment: "the model card: concurrent requests now"),
+                                     Int64(server.activeRequestCount)))
+                }
                 Button { server.stop() } label: { Image(systemName: "eject.fill") }
                     .help("Stop server (unload model)")
             }

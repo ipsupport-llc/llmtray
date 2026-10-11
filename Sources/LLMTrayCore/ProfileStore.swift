@@ -99,6 +99,16 @@ public final class ProfileStore {
                 p.tools.toolUsePolicy = Profile.defaultToolUsePolicy
                 try save(p)
             }
+            // Once: the old built-in 1 (it never limited anything -- the
+            // runtime batched nothing anyway) becomes the new built-in.
+            // A 1 set after this stays.
+            if !defaults.bool(forKey: Self.concurrencyMigrationKey) {
+                if p.launch.decodeConcurrency == Profile.formerDefaultConcurrentRequests {
+                    p.launch.decodeConcurrency = Profile.defaultConcurrentRequests
+                    try save(p)
+                }
+                defaults.set(true, forKey: Self.concurrencyMigrationKey)
+            }
             return p
         }
         let p = Self.migratedDefault(from: defaults)
@@ -138,4 +148,9 @@ public final class ProfileStore {
         if let v = str("llmtray.extraServerArgs") { p.launch.extraServerArgs = v }
         return p
     }
+}
+
+
+extension ProfileStore {
+    static let concurrencyMigrationKey = "llmtray.migrated.concurrentRequests"
 }

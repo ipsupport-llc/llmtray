@@ -120,6 +120,19 @@ public enum ServerLaunch {
         return min(profile, max(0, (gpuHeadroomBytes - shares.marginBytes) * Int64(shares.promptCachePercent) / 100))
     }
 
+    /// `--decode-concurrency`: the profile's (1...16), fewer when the GPU
+    /// memory beside the weights and the margin is short -- every running
+    /// request holds its own context (adr/0021): under 2 GB one, under 4 GB
+    /// at most two.
+    public static func concurrentRequests(profile: Int, gpuHeadroomBytes: Int64?, shares: MemoryShares = .default) -> Int {
+        let n = min(16, max(1, profile))
+        guard let gpuHeadroomBytes else { return n }
+        let free = gpuHeadroomBytes - shares.marginBytes
+        if free < 2 * 1_073_741_824 { return 1 }
+        if free < 4 * 1_073_741_824 { return min(n, 2) }
+        return n
+    }
+
     /// The prompt cache a launch gets when the GPU memory cuts it below the
     /// profile's (for the launch log); nil when it doesn't, or when the
     /// profile's extra arguments set `--prompt-cache-bytes` themselves.
@@ -179,8 +192,12 @@ public enum ServerLaunch {
             args += ["--kv-bits", String(kvBits), "--kv-group-size", String(p.kvGroupSize),
                      "--quantized-kv-start", String(p.quantizedKVStart)]
         }
-        if p.decodeConcurrency > 1 {
-            args += ["--decode-concurrency", String(p.decodeConcurrency)]
+        // Always said, 1 included: left out, the runtime's default (32)
+        // applied. The prompt batch is at most as large: the runtime takes
+        // the larger of the two as the batch (adr/0021).
+        if !extraArgsSet("--decode-concurrency", p) {
+            let n = concurrentRequests(profile: p.decodeConcurrency, gpuHeadroomBytes: c.gpuHeadroomBytes, shares: c.memoryShares)
+            args += ["--decode-concurrency", String(n), "--prompt-concurrency", String(min(n, 8))]
         }
         if !c.alias.isEmpty {
             args += ["--model-alias", c.alias]
@@ -337,5 +354,15 @@ public enum ServerLaunch {
     /// which then wins over the automatic one.
     public static func extraArgsSetDrafter(_ p: ResolvedProfile) -> Bool {
         p.extraServerArgs.contains("--draft-model")
+    }
+}
+
+/// Auto-tune's choices (BenchmarkRunner), testable.
+public enum AutoTune {
+    /// Of the measured (requests at once, total tokens/s), the fewest that
+    /// reach 90% of the best total: more only add memory for a few percent.
+    public static func concurrencyChoice(_ measured: [(Int, Double)]) -> Int? {
+        guard let best = measured.map(\.1).max(), best > 0 else { return nil }
+        return measured.filter { $0.1 >= best * 0.9 }.map(\.0).min()
     }
 }
