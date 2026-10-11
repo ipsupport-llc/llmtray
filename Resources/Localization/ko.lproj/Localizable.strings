@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld장 사진";
 "%lld pictures added: kept for documents, not searched." = "%lld장 사진 추가됨: 문서 용도로 보관되며 검색되지 않습니다.";
 "%lld requests" = "요청 %lld건";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld개의 진행 중인 요청(최대 Concurrent requests까지 함께 응답)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld개의 진행 중인 요청(「동시 요청 수」의 설정값까지 함께 응답)";
 "%lld s" = "%lld초";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld비트";
@@ -304,7 +304,7 @@
 "Dismiss" = "닫기";
 "Document: %@" = "문서: %@";
 "Documents" = "문서";
-"Documents On in This Chat" = "이 채팅에서 문서 사용";
+"Documents On in This Chat" = "이 채팅에서 문서가 활성화되어 있음";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "문서는 프로젝트로 복사되어 이 Mac에서 인덱싱됩니다. 이미지는 메시지에 포함됩니다.";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "이 채팅에서 문서가 활성화되어 있습니다: 문서(보고서, 편지 등)를 요청하세요.";
 "Documents go into a project with this chat." = "문서는 이 채팅과 함께 프로젝트로 이동됩니다.";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "기본 프로필: 다른 모든 프로필이 이 프로필을 상속합니다.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "이 채팅이 %1$@(%2$@)을(를) 프로젝트로 복사하도록 요청합니다. 그러면 해당 프로젝트의 모든 채팅에서 이를 검색할 수 있습니다.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "채팅에서 %1$@(%2$@)를 프로젝트로 복사하라고 요청합니다. 그러면 프로젝트의 모든 채팅에서 문서에 사용할 수 있습니다.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "채팅 모델은 작성한 내용을 표와 차트를 포함한 PDF(보고서, 편지, 메모, 청구서 등)로 배치할 수 있습니다. PDF는 열기·저장·프로젝트에 추가할 때까지 채팅에 그대로 남아 있습니다. 임시 채팅을 포함해 별도로 다운로드되지는 않습니다.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "채팅 모델은 작성한 내용을 표와 차트를 포함한 PDF(보고서, 편지, 메모, 청구서 등)로 배치할 수 있습니다. PDF는 열기·저장·프로젝트에 추가할 때까지 채팅에 그대로 남아 있습니다. 이 기능을 위해 다운로드하는 것은 없습니다. 임시 채팅에서는 사용할 수 없습니다.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "채팅 모델은 사용자가 허용한 폴더를 열람(이름, 크기, 날짜, 짧은 내용 일부)하고 변경을 제안할 수 있습니다 — 새 폴더, 이동, 이름 변경, 휴지통으로 이동 등. 모든 변경은 먼저 사용자가 승인하는 계획이며 되돌릴 수 있습니다.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab을 위해 채팅 모델을 언로드할 수 없습니다.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "채팅 모델이 이 폴더로 다운로드되고 있습니다. 설정에서 설치 후 변경하거나 먼저 다른 채팅 모델을 선택하세요.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "총 시간";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "실행 중인 모델에 대해 1, 2, 4, 8개의 동시 요청과 prefill-step-size(256–4096)를 각각 시도하며 시도 간 서버를 재시작합니다. Concurrent requests: 최고 총합 속도의 90%에 도달하는 최소값(더 높이면 메모리만 많이 소모); prefill: 가장 빠른 값.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "실행 중인 모델에 대해 1, 2, 4, 8개의 동시 요청과 prefill-step-size(256–4096)를 각각 시도하며 시도 간 서버를 재시작합니다. 동시 요청 수: 최고 총합 속도의 90%에 도달하는 최소값(더 높이면 메모리 사용량에 비해 이득이 적음); prefill: 가장 빠른 값.";
 "Try Again" = "다시 시도";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "파일 텍스트를 이 Mac에서 의미 기반 검색용 벡터로 변환합니다. 제거해도 인덱스는 유지됩니다. 다시 다운로드될 때까지 파일은 단어 단위로 검색됩니다.";
 "Tweak…" = "조정…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "클라이언트가 다른 모델을 요청할 때";
 "When an app asks for another model" = "앱이 다른 모델을 요청할 때";
 "When an app asks for another model: %@" = "앱이 다른 모델을 요청할 때: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "make_document가 선언되면, 문서가 활성화된 후(Settings > Files) 동작합니다. 필요할 때: 모델이 load_tools로 불러오거나, + 메뉴에서 사용자가 채팅당 한 번 불러옵니다 — 각 요청의 토큰 사용량 감소. 저장된 모든 채팅에서는 항상 포함됩니다.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "문서가 활성화되고(설정 > 파일) make_document가 선언될 때 적용됩니다. 필요 시: 모델이 load_tools로 불러오거나, + 메뉴에서 사용자가 채팅당 한 번 불러옵니다 — 각 요청의 토큰 사용량 감소. 항상: 저장된 모든 채팅에서 선언됩니다.";
 "When needed" = "필요 시";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray가 모델을 보관하는 위치로, 모델별로 하나의 폴더가 생성됩니다.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray가 MLX 모델을 찾는 위치입니다(모델당 한 폴더, 예: <org>/<name>). 다른 앱과 공유된 폴더도 포함하여 원하는 폴더를 선택하세요.";

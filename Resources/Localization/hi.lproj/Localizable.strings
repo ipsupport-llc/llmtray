@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld चित्र";
 "%lld pictures added: kept for documents, not searched." = "%lld चित्र जोड़ दिए गए: दस्तावेज़ों के लिए रखे गए, खोज में शामिल नहीं।";
 "%lld requests" = "%lld अनुरोध";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld अनुरोध प्रगति में (एक साथ उत्तरित, अधिकतम Concurrent requests तक)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld अनुरोध प्रगति में (एक साथ उत्तर दिए जाते हैं, अधिकतम «समवर्ती अनुरोध» के मान तक)";
 "%lld s" = "%lld स";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-बिट";
@@ -548,7 +548,7 @@
 "Launch at login: %@" = "लॉगिन पर खोलें: %@";
 "Leave a Review" = "समीक्षा छोड़ें";
 "Length" = "लंबाई";
-"Let chats make documents" = "चैट्स को दस्तावेज़ बनानें दें";
+"Let chats make documents" = "चैट को दस्तावेज़ बनाने दें";
 "Let chats work in folders" = "चैट को फ़ोल्डरों में काम करने दें";
 "Let coding agents and scripts use your models." = "कोडिंग एजेंट और स्क्रिप्ट्स को आपके मॉडल उपयोग करने दें।";
 "Let the chat look in %@?" = "क्या चैट को %@ में देखने दें?";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "मूल प्रोफ़ाइल: बाकी सभी प्रोफ़ाइल इससे इनहेरिट करती हैं।";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "चैट %1$@ (%2$@) को प्रोजेक्ट में कॉपी करने का अनुरोध कर रहा है। इसके बाद प्रोजेक्ट की हर चैट इसमें खोज कर सकती है।";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "चैट %1$@ (%2$@) को प्रोजेक्ट में कॉपी करने का अनुरोध करता है। इसके बाद प्रोजेक्ट की हर चैट इसे दस्तावेज़ों में इस्तेमाल कर सकती है।";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "चैट मॉडल जो लिखा है उसे PDF के रूप में व्यवस्थित कर सकता है — एक रिपोर्ट, पत्र, नोट्स, या चालान — तालिकाओं और चार्ट के साथ। PDF तब तक चैट में रहता है जब तक आप उसे खोलते, सहेजते या प्रोजेक्ट में जोड़ते नहीं। इसके लिए कुछ डाउनलोड नहीं होता; अस्थायी चैट्स में भी नहीं।";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "चैट मॉडल जो लिखा है उसे PDF के रूप में व्यवस्थित कर सकता है — एक रिपोर्ट, पत्र, नोट्स, या चालान — तालिकाओं और चार्ट के साथ। PDF तब तक चैट में रहता है जब तक आप उसे खोलते, सहेजते या प्रोजेक्ट में जोड़ते नहीं। इसके लिए कुछ डाउनलोड नहीं होता; यह सुविधा अस्थायी चैट में उपलब्ध नहीं है।";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "चैट मॉडल उन फ़ोल्डरों में देख सकता है जिन्हें आप अनुमति देते हैं (नाम, आकार, तिथियाँ, छोटे अंश) और वहाँ परिवर्तन प्रस्तावित कर सकता है — नए फ़ोल्डर, स्थानांतरण, नाम बदलना, Trash में भेजना। हर परिवर्तन एक योजना है जिसे आप पहले मंज़ूर करते हैं, और जिसे पूर्ववत किया जा सकता है।";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab के लिए चैट मॉडल अनलोड नहीं किया जा सका।";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "चैट मॉडल इस फ़ोल्डर में डाउनलोड हो रहा है। सेटअप के बाद Settings में बदलें, या पहले कोई और चैट मॉडल चुनें।";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "कुल समय";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "चलते मॉडल के खिलाफ 1, 2, 4 और 8 अनुरोध एक साथ और prefill-step-size (256–4096) की कोशिश करता है, प्रत्येक के बीच सर्वर को रीस्टार्ट करते हुए। Concurrent requests: वे न्यूनतम संख्या जो सर्वश्रेष्ठ कुल गति का 90% पहुँचती हैं (ज्यादा पर मेमोरी खर्च बढ़ती है, लाभ कम); prefill: सबसे तेज़।";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "चलते मॉडल पर एक साथ 1, 2, 4 और 8 अनुरोधों और prefill-step-size (256–4096) को आज़माता है, हर परीक्षण के बीच सर्वर को रीस्टार्ट करता है। समवर्ती अनुरोध: वह न्यूनतम संख्या जो सर्वश्रेष्ठ कुल गति के 90% तक पहुँचती है (अधिक संख्या से मेमोरी खर्च बढ़ता है, लाभ कम मिलता है); prefill: सबसे तेज़।";
 "Try Again" = "पुन: प्रयास करें";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "फ़ाइल टेक्स्ट को इस Mac पर अर्थ-आधारित खोज के लिए वेक्टर में बदलता है। इसे हटाने से इंडेक्स बनाए रहते हैं: तब फ़ाइलें फिर से डाउनलोड होने तक उनके शब्दों से खोजी जाएँगी।";
 "Tweak…" = "Tweak…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "जब कोई क्लाइंट किसी अन्य मॉडल की मांग करे";
 "When an app asks for another model" = "जब कोई ऐप किसी अन्य मॉडल के लिए अनुरोध करे";
 "When an app asks for another model: %@" = "जब कोई ऐप किसी अन्य मॉडल के लिए अनुरोध करे: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "जब make_document घोषित हो और दस्तावेज़ चालू हों (Settings > Files)। जरूरत होने पर: मॉडल इसे load_tools के साथ लोड करता है, या आप + मेनू से — प्रति चैट एक बार; हर अनुरोध में कम टोकन। हमेशा: हर सहेजे गए चैट में।";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "जब make_document घोषित हो और दस्तावेज़ चालू हों (सेटिंग्स > फ़ाइलें)। जब जरूरत हो: मॉडल इसे load_tools से लोड करता है, या आप + मेनू से — प्रति चैट एक बार; हर अनुरोध में कम टोकन। हमेशा: हर सहेजी गई चैट में।";
 "When needed" = "जब जरूरत हो";
 "Where LLMTray keeps its models, one folder per model." = "जहाँ LLMTray अपने मॉडल रखता है, प्रति मॉडल एक फ़ोल्डर।";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray जहाँ MLX मॉडल खोजता है (प्रति मॉडल एक फ़ोल्डर, जैसे <org>/<name>)। कोई भी फ़ोल्डर चुनें — किसी और ऐप के साथ साझा किया हुआ भी हो सकता है।";

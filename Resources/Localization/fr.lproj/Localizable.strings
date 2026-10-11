@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld images";
 "%lld pictures added: kept for documents, not searched." = "%lld images ajoutées : conservées pour les documents, non indexées.";
 "%lld requests" = "%lld requêtes";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld requêtes en cours (répondues ensemble jusqu'à Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld requêtes en cours (traitées ensemble jusqu’à la limite « Requêtes simultanées »)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bits";
@@ -385,7 +385,7 @@
 "Fetching file list…" = "Récupération de la liste de fichiers…";
 "Files" = "Fichiers";
 "Files Settings…" = "Réglages des Fichiers…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Les fichiers ajoutés ici sont copiés dans le projet et indexés sur ce Mac ; chaque discussion du projet peut les rechercher. Les images sont conservées pour les documents.";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "Les fichiers ajoutés ici sont copiés dans le projet et indexés sur ce Mac ; chaque conversation du projet peut les rechercher. Les images sont conservées pour les documents.";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "Les fichiers ajoutés à un projet sont indexés sur ce Mac afin que ses conversations puissent les rechercher. La recherche par sens utilise un modèle d’encodage ; sans lui, les fichiers sont recherchés par leurs mots.";
 "Files are copied into the project and indexed on this Mac." = "Les fichiers sont copiés dans le projet et indexés sur ce Mac.";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "Les fichiers vont dans un projet ; une conversation temporaire n’en fait jamais partie. Commencez une nouvelle conversation enregistrée (⌘N) pour les ajouter.";
@@ -1001,7 +1001,7 @@
 "The app's name." = "Le nom de l’app.";
 "The base profile: every other profile inherits from it." = "Le profil de base : tous les autres profils en héritent.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "La conversation demande de copier %1$@ (%2$@) dans le projet. Toutes les conversations du projet pourront alors le rechercher.";
-"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "La discussion demande de copier %1$@ (%2$@) dans le projet. Chaque discussion du projet pourra alors l’utiliser dans les documents.";
+"The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "La conversation demande de copier %1$@ (%2$@) dans le projet. Chaque conversation du projet pourra alors l’utiliser dans les documents.";
 "The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Le modèle de conversation peut mettre en page ce qu’il a rédigé au format PDF — rapport, lettre, notes, facture — avec tableaux et graphiques. Le PDF reste dans la conversation jusqu’à ce que vous l’ouvriez, l’enregistriez ou l’ajoutiez à un projet. Rien n’est téléchargé pour celui‑ci ; pas dans les conversations temporaires.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Le modèle de chat peut consulter les dossiers que vous autorisez (noms, tailles, dates, courts extraits) et y proposer des modifications : nouveaux dossiers, déplacements, renommages, envoi à la Corbeille. Chaque changement est un plan que vous approuvez d’abord et qui peut être annulé.";
 "The chat model couldn't be unloaded for Voice Lab." = "Le modèle de chat n’a pas pu être déchargé pour Voice Lab.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Temps total";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Teste 1, 2, 4 et 8 requêtes en parallèle et préfill-step-size (256–4096) contre le modèle en cours, en redémarrant le serveur entre chaque essai. Concurrent requests : le nombre minimal atteignant 90 % de la meilleure vitesse totale (plus augmente l'usage mémoire pour peu de gain) ; prefill : la valeur la plus rapide.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Teste 1, 2, 4 et 8 requêtes en parallèle et prefill-step-size (256–4096) contre le modèle en cours, en redémarrant le serveur entre chaque essai. Requêtes simultanées : le nombre minimal atteignant 90 % de la meilleure vitesse totale (plus augmente l’usage mémoire pour peu de gain) ; prefill : la valeur la plus rapide.";
 "Try Again" = "Réessayer";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Transforme le texte des fichiers en vecteurs pour la recherche par sens, sur ce Mac. Le supprimer conserve les index : les fichiers seront alors recherchés par leurs mots jusqu’à un nouveau téléchargement.";
 "Tweak…" = "Ajuster…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "Quand un client demande un autre modèle";
 "When an app asks for another model" = "Quand une app demande un autre modèle";
 "When an app asks for another model: %@" = "Quand une app demande un autre modèle : %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Lorsque make_document est déclaré et que Documents est activé (Réglages > Files). Selon le besoin : le modèle le charge avec load_tools, ou vous depuis le menu +, une fois par conversation — moins de tokens à chaque requête. Toujours : dans chaque conversation enregistrée.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Lorsque make_document est déclaré et que Documents est activé (Réglages > Fichiers). Selon le besoin : le modèle le charge avec load_tools, ou vous depuis le menu +, une fois par conversation — moins de tokens à chaque requête. Toujours : dans chaque conversation enregistrée.";
 "When needed" = "Selon le besoin";
 "Where LLMTray keeps its models, one folder per model." = "Où LLMTray conserve ses modèles, un dossier par modèle.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Emplacement où LLMTray cherche les modèles MLX (un dossier par modèle, p.ex. <org>/<name>). Choisissez n’importe quel dossier, y compris un dossier partagé avec une autre app.";

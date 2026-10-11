@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld resim";
 "%lld pictures added: kept for documents, not searched." = "%lld resim eklendi: belgeler için saklandı, aranmaz.";
 "%lld requests" = "%lld istek";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld işlemdeki istek (aynı anda en çok Concurrent requests kadar birlikte yanıtlanır)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld işlemdeki istek (“Eşzamanlı istekler” ayarının değerine kadar birlikte yanıtlanır)";
 "%lld s" = "%lld sn";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "Temel profil: diğer tüm profiller ondan devralır.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Sohbet, %1$@ (%2$@) öğesini projeye kopyalamanızı istiyor. Projedeki tüm sohbetler bunu arayabilir.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Sohbet, %1$@ (%2$@) öğesini projeye kopyalamayı istiyor. Projedeki her sohbet daha sonra bunu belgelerde kullanabilir.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Sohbet modeli yazdıklarını PDF olarak düzenleyebilir — rapor, mektup, not, fatura — tablolar ve grafiklerle. PDF, açana, kaydedene veya projeye ekleyene kadar sohbette kalır. Bunun için bir şey indirilmez; geçici sohbetlerde de değil.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Sohbet modeli yazdıklarını PDF olarak düzenleyebilir — rapor, mektup, not, fatura — tablolar ve grafiklerle. PDF, açana, kaydedene veya projeye ekleyene kadar sohbette kalır. Bunun için bir şey indirilmez; bu özellik geçici sohbetlerde kullanılamaz.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Sohbet modeli, izin verdiğiniz klasörlere bakabilir (adlar, boyutlar, tarihler, kısa alıntılar) ve orada değişiklik önerebilir — yeni klasörler, taşıma, yeniden adlandırma, Çöp'e taşıma. Her değişiklik önce sizin onayınıza sunulan bir plandır ve geri alınabilir.";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab için sohbet modeli boşaltılamadı.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Sohbet modeli bu klasöre indiriliyor. Kurulumdan sonra Ayarlar’dan değiştirin veya önce başka bir sohbet modeli seçin.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Toplam süre";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Çalışan modele karşı 1, 2, 4 ve 8 isteği aynı anda ve prefill-step-size'ı (256–4096) dener, her deneme arasında sunucuyu yeniden başlatır. Concurrent requests: en iyi toplam hızın %90'ına ulaşan en az sayı (daha fazlası az fayda için daha fazla bellek tüketir); prefill: en hızlı olan.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Çalışan modele karşı 1, 2, 4 ve 8 isteği aynı anda ve prefill-step-size'ı (256–4096) dener, her deneme arasında sunucuyu yeniden başlatır. Eşzamanlı istekler: en iyi toplam hızın %90'ına ulaşan en az sayı (daha fazlası az fayda için daha fazla bellek tüketir); prefill: en hızlı olan.";
 "Try Again" = "Tekrar Dene";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";

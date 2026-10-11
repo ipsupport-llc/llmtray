@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld 張圖片";
 "%lld pictures added: kept for documents, not searched." = "已新增 %lld 張圖片：保留作文件用，不會被搜尋。";
 "%lld requests" = "%lld 個請求";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 個進行中的請求（會合併至同時處理上限）";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 個進行中的請求（依「並行要求數」設定的上限同時回應）";
 "%lld s" = "%lld 秒";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld 位元";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "基礎設定檔：所有其他設定檔都會繼承其設定。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天要求將 %1$@（%2$@）複製到專案中。專案中的所有聊天之後都能搜尋它。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "對話要求將 %1$@（%2$@）複製到專案中。專案中的每個對話之後都可以在文件中使用它。";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以把產出的內容排版成 PDF — 例如報告、信件、筆記或發票，並包含表格與圖表。PDF 會保留在聊天中，直到您開啟、儲存或加入專案。系統不會為其下載檔案；臨時聊天亦然。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以把產出的內容排版成 PDF — 例如報告、信件、筆記或發票，並包含表格與圖表。PDF 會保留在聊天中，直到您開啟、儲存或加入專案。無需為此下載任何內容；此功能無法在臨時對話中使用。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可檢視您允許的資料夾（名稱、大小、日期、短節錄）並提出變更——建立新資料夾、移動、重新命名、移至垃圾桶。每項變更皆為需您先核可的計畫，且可復原。";
 "The chat model couldn't be unloaded for Voice Lab." = "無法為 Voice Lab 卸載聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下載到此資料夾。設定完成後可在「設定」更改，或先選擇其他聊天模型。";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "總時長";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "對執行中模型測試同時 1、2、4、8 個請求與 prefill-step-size（256–4096），每次測試間重啟伺服器。Concurrent requests：達到最佳總速率 90% 的最小數量（更多只會增加記憶體負擔）；prefill：速度最快的設定。";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "對執行中模型測試同時 1、2、4、8 個請求與 prefill-step-size（256–4096），每次測試間重啟伺服器。並行要求數：達到最佳總速率 90% 的最小數量（更多會增加記憶體負擔，收益卻很少）；prefill：速度最快的設定。";
 "Try Again" = "重試";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "將檔案文字轉為用於語意搜尋的向量，並儲存在此台 Mac。移除模型不會刪除索引：在重新下載前，檔案會改以文字方式搜尋。";
 "Tweak…" = "微調…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "當用戶端請求不同模型時";
 "When an app asks for another model" = "當應用程式要求其他模型時";
 "When an app asks for another model: %@" = "當應用程式要求其他模型：%@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "當宣告 make_document 且已啟用文件（設定 > Files）時生效。需要時：模型會以 load_tools 載入，或由你從 + 選單操作，每個聊天限一次 — 每次請求使用較少代幣。儲存的聊天會始終包含該文件。";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "文件已啟用（設定 > 檔案）且 make_document 已宣告時適用。在需要時：模型會以 load_tools 載入，或由您從 + 選單載入，每個聊天只需一次 — 每次請求使用較少詞元。永遠：在每個已儲存的聊天中宣告該工具。";
 "When needed" = "在需要時";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray 儲存模型的所在位置，每個模型一個資料夾。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray 在何處尋找 MLX 模型（每個模型為一個資料夾，例如 <org>/<name>）。可選任一資料夾，也可以與其他應用程式共用同一資料夾。";

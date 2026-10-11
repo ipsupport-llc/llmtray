@@ -58,7 +58,7 @@
 "%lld of 5 stars" = "%lld / 5 星";
 "%lld pages" = "%lld 页";
 "%lld pictures" = "%lld 张图片";
-"%lld pictures added: kept for documents, not searched." = "已添加 %lld 张图片：作为文档保留，不参与搜索。";
+"%lld pictures added: kept for documents, not searched." = "已添加 %lld 张图片：保留供文档使用，不参与搜索。";
 "%lld requests" = "%lld 个请求";
 "%lld requests in flight (answered together up to Concurrent requests)" = "%lld 个正在处理的请求（最多同时按“并发请求”一起回答）";
 "%lld s" = "%lld 秒";
@@ -302,8 +302,8 @@
 "Diagnostics" = "诊断";
 "Disk usage" = "磁盘使用情况";
 "Dismiss" = "关闭";
-"Document: %@" = "文稿：%@";
-"Documents" = "文稿";
+"Document: %@" = "文档：%@";
+"Documents" = "文档";
 "Documents On in This Chat" = "本聊天已启用文档";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "文档会复制到项目并在此 Mac 上建立索引；图像会插入到你的消息中。";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "本聊天已启用文档：可请求文档（如报告、信件等）。";
@@ -385,7 +385,7 @@
 "Fetching file list…" = "正在获取文件列表…";
 "Files" = "文件";
 "Files Settings…" = "文件设置…";
-"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "添加到这里的文件会被复制到项目并在此 Mac 上建立索引；项目中的每个聊天都可以搜索这些文件。图片作为文档保留。";
+"Files added here are copied into the project and indexed on this Mac; every chat of the project can search them. Pictures are kept for documents." = "添加到这里的文件会被复制到项目并在此 Mac 上建立索引；项目中的每个聊天都可以搜索这些文件。图片保留供文档使用。";
 "Files added to a project are indexed on this Mac, so its chats can search them. Search by meaning uses an embedding model; without it, files are searched by their words." = "添加到项目的文件会在此 Mac 上建立索引，使其聊天能够搜索这些文件。按语义搜索使用嵌入模型；没有嵌入模型时，文件仅按词语进行搜索。";
 "Files are copied into the project and indexed on this Mac." = "文件会复制到项目并在此 Mac 上建立索引。";
 "Files go into a project, and a temporary chat is never in one. Start a new saved chat (⌘N) to add them." = "文件会放入项目，而临时聊天不会属于任何项目。要添加文件，请开始新的已保存聊天（⌘N）。";
@@ -548,7 +548,7 @@
 "Launch at login: %@" = "登录时启动：%@";
 "Leave a Review" = "留下评价";
 "Length" = "长度";
-"Let chats make documents" = "允许对话生成文稿";
+"Let chats make documents" = "允许聊天生成文档";
 "Let chats work in folders" = "允许聊天在文件夹中工作";
 "Let coding agents and scripts use your models." = "允许代码代理和脚本使用你的模型。";
 "Let the chat look in %@?" = "允许聊天查看 %@ 吗？";
@@ -578,7 +578,7 @@
 "Make images and edit them." = "生成并编辑图像。";
 "Make pictures, songs and talk with a voice model, all on this Mac: enable them in Settings." = "在此 Mac 上生成图片和歌曲，并与语音模型对话：在“设置”中启用它们。";
 "Make songs and instrumentals." = "生成歌曲与纯音乐。";
-"Make the document again from the same content" = "使用相同内容重新生成此文稿。";
+"Make the document again from the same content" = "使用相同内容重新生成此文档。";
 "Makes a new random ID: later reports can't be matched to earlier ones." = "生成新的随机 ID：之后的报告无法与之前的报告匹配。";
 "Making folders, moving, renaming and moving to the Trash -- each plan is shown to you first, and nothing changes until you approve it." = "创建文件夹、移动、重命名及移至“废纸篓”——每项操作均先以计划显示，未经你批准不会生效。";
 "Manage Models…" = "管理模型…";
@@ -728,7 +728,7 @@
 "Pick one to chat with. A download starts right away and goes on in the background." = "选择一个进行聊天。下载会立即开始并在后台进行。";
 "Picks a model that fits your Mac and enables only what you choose." = "为你的 Mac 选择合适的模型，仅启用你选择的功能。";
 "Pictures over 50 MB can't be added: %@." = "超过 50 MB 的图片无法添加：%@。";
-"Pictures · %lld — for documents, not searched" = "图片 · %lld — 作为文档保留，不参与搜索";
+"Pictures · %lld — for documents, not searched" = "图片 · %lld — 供文档使用，不参与搜索";
 "Pin" = "固定";
 "Pin %@" = "置顶 %@";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "置顶：项目的每个对话都会获取整个文件（≈%@ 令牌）。文件被置顶期间，这些对话中的网页搜索和图像或音乐生成功能被禁用。";
@@ -980,7 +980,7 @@
 "Temporary chat" = "临时对话";
 "Temporary chats can only look in folders, for that chat only." = "临时聊天只能查看文件夹，且仅限该聊天。";
 "Temporary — not saved" = "临时——未保存";
-"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）；图片作为文档保留。";
+"Text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files are indexed; pictures are kept for documents." = "会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）；图片保留供文档使用。";
 "Thank you!" = "谢谢！";
 "Thank you! List your name in Supporters?" = "谢谢！要在赞助者中列出你的名字吗？";
 "Thanks! Your name will appear once it's been checked." = "谢谢！你的名字将在审核通过后显示。";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "基础配置文件：所有其他配置文件都继承自它。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "聊天请求将 %1$@（%2$@）复制到项目中。项目中的所有聊天都可以搜索该内容。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "该聊天请求将 %1$@（%2$@）复制到项目中。项目的每个聊天随后都可以在文档中使用它。";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "对话模型可以将其输出排版为 PDF（如报告、信函、笔记、发票），并可包含表格和图表。该 PDF 会保留在对话中，直到你打开、保存或添加到项目。不会为其下载任何内容；临时对话亦然。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "聊天模型可以将其输出排版为 PDF（如报告、信函、笔记、发票），并可包含表格和图表。该 PDF 会保留在聊天中，直到你打开、保存或添加到项目。无需为此下载任何内容；此功能在临时对话中不可用。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "聊天模型可在你允许的文件夹中查看（名称、大小、日期、简短摘录）并提出更改——新建文件夹、移动、重命名、移至“废纸篓”。每项更改都是需你先批准的计划，并可撤销。";
 "The chat model couldn't be unloaded for Voice Lab." = "无法为 Voice Lab 卸载聊天模型。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "聊天模型正在下载到此文件夹。设置完成后可在“设置”中更改，或先选择其他聊天模型。";
@@ -1106,7 +1106,7 @@
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型，或提高 GPU 内存限制。";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "该模型使用了 GPU 可用 %2$@ GB 中的 %1$@；长提示可能会导致内存不足。请使用更小的模型。";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "无法读取此配置文件的文件，因此无法在此处编辑。请修复或删除该文件，然后重新打开“设置”。";
-"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）文件，并将图片作为文档保留；文件夹和隐藏文件无法添加。";
+"This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "此版本会索引文本、Markdown、代码、PDF、Word（docx、doc）、ODT、RTF、HTML 及电子表格（xlsx、ods）文件，并保留图片供文档使用；文件夹和隐藏文件无法添加。";
 "This version of LLMTray can't send reviews. Please update the app." = "此版本的 LLMTray 无法发送评论。请更新应用。";
 "This version of LLMTray sets up its runtime with Python. Install Python from python.org or Homebrew, then check again. Or use LLMTray-Full, which includes everything it needs." = "此版本的 LLMTray 使用 Python 设置运行时。请从 python.org 或 Homebrew 安装 Python，然后重试。或使用包含所需全部内容的 LLMTray-Full。";
 "Thought process" = "思考过程";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "当客户端请求其他模型时";
 "When an app asks for another model" = "当应用请求其他模型时";
 "When an app asks for another model: %@" = "当应用请求其他模型：%@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "在声明 make_document 后且文档已启用（设置 > 文件）时可用。需要时：模型会用 load_tools 加载，或你可从 + 菜单每个聊天加载一次——每次请求消耗更少令牌。已保存的每个聊天始终包含文档。";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "文档已启用（设置 > 文件）且 make_document 已声明时适用。按需加载：模型会用 load_tools 加载，或你可从 + 菜单加载，每个聊天只需一次——每次请求消耗更少令牌。始终：在每个已保存的聊天中声明该工具。";
 "When needed" = "按需加载";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray 存放模型的位置，每个模型一个文件夹。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray 在此查找 MLX 模型（每个模型一个文件夹，例如 <org>/<name>）。可选择任意文件夹，也可与其他应用共享。";

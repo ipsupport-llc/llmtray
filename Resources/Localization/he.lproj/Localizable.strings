@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld תמונות";
 "%lld pictures added: kept for documents, not searched." = "נוספו %lld תמונות: נשמרות למסמכים, לא נבחנות בחיפוש.";
 "%lld requests" = "%lld בקשות";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld בקשות בביצוע (נענות יחד עד Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld בקשות בביצוע (נענות יחד עד לערך של „בקשות בו־זמניות”)";
 "%lld s" = "%lld שנ׳";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld סיביות";
@@ -411,7 +411,7 @@
 "For This Chat" = "לעבור שיחה זו";
 "For an Hour" = "לשעה";
 "For faster answers (speculative decoding)" = "לתשובות מהירות יותר (קידוד ספקולטיבי)";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "למודלים עם drafter שפורסם (Gemma 4 26B) או עם MTP head משלהם (מודלי Qwen 3.5 שלנו, שהורדו יחד אתם): הוא מנחש טוקנים קדימה והמודל הראשי מאשר אותם במעבר אחד. אותו פלט, מהר יותר. בקשה מקבלת זאת כשהיא לבד; כשיש כמה יחד הם חולקים את ה-batch ללאו.";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "למודלים עם drafter שפורסם (Gemma 4 26B) או עם MTP head משלהם (מודלי Qwen 3.5 שלנו, שהורדו יחד אתם): הוא מנחש טוקנים קדימה והמודל הראשי מאשר אותם במעבר אחד. אותו פלט, מהר יותר. בקשה משתמשת בו כשהיא לבד; כשיש כמה בקשות יחד הן חולקות את ה-batch בלעדיו.";
 "Found after an interruption" = "נמצאו אחרי הפרעה";
 "Founding Supporters" = "תומכי ביסוס";
 "Free disk space" = "שטח דיסק פנוי";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "פרופיל הבסיס: כל פרופיל אחר יורש ממנו.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "הצ׳אט מבקש להעתיק את %1$@ (%2$@) אל הפרויקט. כל צ׳אט בפרויקט יוכל לאחר מכן לחפש בו.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "השיחה מבקשת להעתיק את %1$@ (%2$@) לפרויקט. כל שיחה בפרויקט תוכל להשתמש בו במסמכים.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "המודל בשיחה יכול לעצב את הטקסט כ‑PDF — דוח, מכתב, הערות, חשבונית — כולל טבלאות וגרפים. ה‑PDF נשאר בשיחה עד שתפתח, תשמור או תוסיף אותו לפרוייקט. לא יורד שום קובץ לשום מקום; גם לא בשיחות זמניות.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "המודל בשיחה יכול לעצב את הטקסט כ‑PDF — דוח, מכתב, הערות, חשבונית — כולל טבלאות וגרפים. ה‑PDF נשאר בשיחה עד שתפתח, תשמור או תוסיף אותו לפרויקט. לא מורידים דבר לצורך התכונה; היא אינה זמינה בשיחות זמניות.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "מודל השיחה יכול להסתכל בתיקיות שתאפשר (שמות, גדלים, תאריכים, ציטוטים קצרים) ולהציע שם שינויים — תיקיות חדשות, העברות, שינויי שם, העברה ל־Trash. כל שינוי הוא תכנית שדורשת את אישורך וניתן לביטול.";
 "The chat model couldn't be unloaded for Voice Lab." = "לא ניתן לנתק את מודל הצ'אט עבור Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "מודל הצ׳אט יורד לתיקיה זו. שנה זאת ב־Settings לאחר ההתקנה, או בחר קודם דגם צ׳אט אחר.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "זמן כולל";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "מנסה 1, 2, 4 ו-8 בקשות בבת אחת ו-prefill-step-size (256–4096) מול המודל הרץ, כשמורה עלח את השרת בין ריצות. Concurrent requests: המספר המועט שמגיע ל-90% ממהירות הסה״כ הטובה ביותר (יותר דורש זיכרון בעד זינוק קטן); prefill: המהיר ביותר.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "בודק 1, 2, 4 ו-8 בקשות בבת אחת ו-prefill-step-size (256–4096) מול המודל הרץ, ומפעיל מחדש את השרת בין הבדיקות. בקשות בו־זמניות: המספר הקטן ביותר שמגיע ל-90% מהמהירות הכוללת הטובה ביותר (יותר בקשות צורכות זיכרון תמורת שיפור קטן); prefill: הערך המהיר ביותר.";
 "Try Again" = "נסה שוב";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "כשלקוח מבקש מודל אחר";
 "When an app asks for another model" = "כשאפליקציה מבקשת מודל אחר";
 "When an app asks for another model: %@" = "כשאפליקציה מבקשת מודל אחר: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "כאשר make_document מוגדר, לאחר שהמסמכים מופעלים (Settings > Files). בעת הצורך: המודל טוען אותו עם load_tools, או אתה דרך תפריט +, פעם אחת לכל שיחה — פחות טוקנים בכל בקשה. תמיד: בכל שיחה שנשמרת.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "כאשר make_document מוגדר, לאחר שהמסמכים מופעלים (הגדרות > קבצים). בעת הצורך: המודל טוען אותו עם load_tools, או אתה דרך תפריט +, פעם אחת לכל שיחה — פחות טוקנים בכל בקשה. תמיד: בכל שיחה שנשמרת.";
 "When needed" = "בעת הצורך";
 "Where LLMTray keeps its models, one folder per model." = "המיקום שבו LLMTray שומר את המודלים שלו, תיקייה אחת לכל מודל.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "היכן LLMTray מחפש מודלים של MLX (תיקייה אחת לכל מודל, למשל <org>/<name>). בחר/י כל תיקייה, גם משותפת עם אפליקציה אחרת.";

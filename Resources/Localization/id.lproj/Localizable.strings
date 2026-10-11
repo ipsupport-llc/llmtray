@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld gambar";
 "%lld pictures added: kept for documents, not searched." = "%lld gambar ditambahkan: disimpan untuk dokumen, tidak dicari.";
 "%lld requests" = "%lld permintaan";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld permintaan sedang berjalan (dijawab bersama hingga Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld permintaan sedang berjalan (dijawab bersama hingga batas «Permintaan bersamaan»)";
 "%lld s" = "%lld dtk";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld-bit";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "Profil dasar: setiap profil lain mewarisinya.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Obrolan meminta menyalin %1$@ (%2$@) ke dalam proyek. Setiap obrolan di proyek tersebut lalu dapat mencarinya.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Obrolan meminta untuk menyalin %1$@ (%2$@) ke proyek. Setiap obrolan dalam proyek kemudian dapat menggunakannya dalam dokumen.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Model obrolan dapat menata hasil tulisannya sebagai PDF — laporan, surat, catatan, faktur — lengkap dengan tabel dan grafik. PDF tetap berada di obrolan sampai Anda membukanya, menyimpannya, atau menambahkannya ke proyek. Tidak ada yang diunduh untuk itu; termasuk pada obrolan sementara.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Model obrolan dapat menata hasil tulisannya sebagai PDF — laporan, surat, catatan, faktur — lengkap dengan tabel dan grafik. PDF tetap berada di obrolan sampai Anda membukanya, menyimpannya, atau menambahkannya ke proyek. Tidak ada yang diunduh untuk fitur ini; fitur ini tidak tersedia dalam chat sementara.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Model chat dapat melihat folder yang Anda izinkan (nama, ukuran, tanggal, kutipan singkat) dan mengusulkan perubahan di sana — folder baru, pemindahan, penggantian nama, pemindahan ke Trash. Setiap perubahan adalah rencana yang Anda setujui dulu, dan dapat dibatalkan.";
 "The chat model couldn't be unloaded for Voice Lab." = "Model chat tidak bisa dibongkar untuk Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Model chat sedang diunduh ke folder ini. Ubah di Pengaturan setelah pemasangan, atau pilih model chat lain terlebih dahulu.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Total waktu";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Concurrent requests: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Permintaan bersamaan: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
 "Try Again" = "Coba Lagi";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "Saat klien meminta model lain";
 "When an app asks for another model" = "Saat sebuah app meminta model lain";
 "When an app asks for another model: %@" = "Saat sebuah app meminta model lain: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Saat make_document dinyatakan, setelah Dokumen aktif (Pengaturan > Files). Saat diperlukan: model memuatnya dengan load_tools, atau Anda dari menu +, sekali per obrolan — lebih sedikit token di setiap permintaan. Selalu: ada di setiap obrolan yang disimpan.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Saat make_document dinyatakan, setelah Dokumen aktif (Pengaturan > File). Saat diperlukan: model memuatnya dengan load_tools, atau Anda dari menu +, sekali per obrolan — lebih sedikit token di setiap permintaan. Selalu: ada di setiap obrolan yang disimpan.";
 "When needed" = "Saat diperlukan";
 "Where LLMTray keeps its models, one folder per model." = "Tempat LLMTray menyimpan modelnya, satu folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Lokasi LLMTray mencari model MLX (satu folder per model, mis. <org>/<name>). Pilih folder mana saja, termasuk yang dibagi dengan aplikasi lain.";

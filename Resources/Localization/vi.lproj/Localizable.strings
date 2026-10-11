@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld ảnh";
 "%lld pictures added: kept for documents, not searched." = "%lld ảnh đã thêm: giữ cho tài liệu, không được tìm kiếm.";
 "%lld requests" = "%lld yêu cầu";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld yêu cầu đang xử lý (được trả lời cùng nhau tối đa bằng Số yêu cầu đồng thời)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld yêu cầu đang xử lý (được trả lời cùng nhau tối đa theo giá trị «Yêu cầu đồng thời»)";
 "%lld s" = "%lld giây";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
@@ -103,11 +103,11 @@
 "Add files to a project, or images for the model to see" = "Thêm tệp vào dự án, hoặc ảnh để mô hình xem";
 "Add more files: every chat of the project can search them." = "Thêm tệp: mọi cuộc trò chuyện trong dự án đều có thể tìm kiếm chúng.";
 "Add the files to a project?" = "Thêm các tệp vào dự án?";
-"Add to Project" = "Thêm vào Project";
+"Add to Project" = "Thêm vào dự án";
 "Add “%1$@” to “%2$@”?" = "Thêm “%1$@” vào “%2$@”?";
 "Added %@" = "Đã thêm %@";
 "Added here" = "Đã thêm ở đây";
-"Added to the project." = "Đã thêm vào project.";
+"Added to the project." = "Đã thêm vào dự án.";
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Được thêm vào lời nhắc hệ thống mỗi khi cung cấp công cụ. Mẫu công cụ riêng của mô hình chỉ cho biết cách gọi công cụ, không bao giờ nói khi nào không nên gọi. Để trống để tắt.";
 "Adding files" = "Đang thêm tệp";
 "Advanced" = "Nâng cao";
@@ -304,9 +304,9 @@
 "Dismiss" = "Bỏ qua";
 "Document: %@" = "Tài liệu: %@";
 "Documents" = "Tài liệu";
-"Documents On in This Chat" = "Tài liệu đang bật trong cuộc chat này";
+"Documents On in This Chat" = "Tài liệu đang bật trong cuộc trò chuyện này";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Tài liệu được sao chép vào dự án và được lập chỉ mục trên Mac này; ảnh sẽ vào tin nhắn của bạn.";
-"Documents are on in this chat: ask for one (a report, a letter…)." = "Tài liệu đang bật trong cuộc chat này: yêu cầu một tài liệu (báo cáo, thư…).";
+"Documents are on in this chat: ask for one (a report, a letter…)." = "Tài liệu đang bật trong cuộc trò chuyện này: yêu cầu một tài liệu (báo cáo, thư…).";
 "Documents go into a project with this chat." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này.";
 "Documents go into a project with this chat; images go into your message." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này; ảnh sẽ vào tin nhắn của bạn.";
 "Documents tools" = "Công cụ Tài liệu";
@@ -548,7 +548,7 @@
 "Launch at login: %@" = "Mở khi đăng nhập: %@";
 "Leave a Review" = "Gửi đánh giá";
 "Length" = "Độ dài";
-"Let chats make documents" = "Cho phép hội thoại tạo tài liệu";
+"Let chats make documents" = "Cho phép cuộc trò chuyện tạo tài liệu";
 "Let chats work in folders" = "Cho phép trò chuyện thao tác trong thư mục";
 "Let coding agents and scripts use your models." = "Cho agents và script sử dụng mô hình của bạn.";
 "Let the chat look in %@?" = "Cho phép cuộc trò chuyện xem trong %@?";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "Hồ sơ cơ sở: mọi hồ sơ khác kế thừa từ hồ sơ này.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó đều có thể tìm kiếm nội dung này.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "Cuộc trò chuyện yêu cầu sao chép %1$@ (%2$@) vào dự án. Mọi cuộc trò chuyện trong dự án sau đó có thể sử dụng nó trong tài liệu.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Mô hình hội thoại có thể tạo bố cục nội dung thành PDF — báo cáo, thư, ghi chú, hoá đơn — kèm bảng và biểu đồ. PDF được giữ trong hội thoại cho đến khi bạn mở, lưu hoặc thêm vào project. Không có tệp nào được tải xuống cho PDF này; kể cả trong hội thoại tạm.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Mô hình trò chuyện có thể tạo bố cục nội dung thành PDF — báo cáo, thư, ghi chú, hoá đơn — kèm bảng và biểu đồ. PDF được giữ trong cuộc trò chuyện cho đến khi bạn mở, lưu hoặc thêm vào dự án. Không cần tải xuống gì để dùng tính năng này; tính năng không khả dụng trong cuộc trò chuyện tạm.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Mô hình trò chuyện có thể xem trong các thư mục bạn cho phép (tên, kích thước, ngày, đoạn trích ngắn) và đề xuất thay đổi ở đó — thư mục mới, di chuyển, đổi tên, chuyển vào Trash. Mỗi thay đổi là một kế hoạch bạn phải phê duyệt trước và có thể hoàn tác.";
 "The chat model couldn't be unloaded for Voice Lab." = "Không thể giải nạp mô hình chat cho Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Mô hình chat đang được tải về thư mục này. Thay đổi trong Cài đặt sau khi hoàn tất, hoặc chọn mô hình chat khác trước.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Tổng thời gian";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Số yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
 "Try Again" = "Thử lại";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "Khi client yêu cầu mô hình khác";
 "When an app asks for another model" = "Khi một ứng dụng yêu cầu mô hình khác";
 "When an app asks for another model: %@" = "Khi một ứng dụng yêu cầu mô hình khác: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Khi make_document được khai báo, sau khi Tài liệu bật (Cài đặt > Files). Khi cần: mô hình tải nó bằng load_tools, hoặc bạn từ menu +, mỗi cuộc chat một lần — giảm số token cho mỗi yêu cầu. Luôn có: trong mọi cuộc chat được lưu.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Khi make_document được khai báo, sau khi Tài liệu bật (Cài đặt > Tệp). Khi cần: mô hình tải nó bằng load_tools, hoặc bạn tải từ menu +, mỗi cuộc trò chuyện một lần — giảm số token cho mỗi yêu cầu. Luôn: trong mọi cuộc trò chuyện đã lưu.";
 "When needed" = "Khi cần";
 "Where LLMTray keeps its models, one folder per model." = "Nơi LLMTray lưu các mô hình, mỗi mô hình một thư mục.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Nơi LLMTray tìm các mô hình MLX (mỗi mô hình một thư mục, ví dụ <org>/<name>). Chọn bất kỳ thư mục nào, có thể dùng chung với ứng dụng khác.";

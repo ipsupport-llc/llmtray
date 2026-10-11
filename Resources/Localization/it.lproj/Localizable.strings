@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld immagini";
 "%lld pictures added: kept for documents, not searched." = "%lld immagini aggiunte: conservate per i documenti, non cercate.";
 "%lld requests" = "%lld richieste";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld richieste in corso (risposte insieme fino a Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld richieste in corso (gestite insieme fino al limite di «Richieste simultanee»)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bit";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "Il profilo di base: tutti gli altri profili lo ereditano.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "La chat chiede di copiare %1$@ (%2$@) nel progetto. Ogni chat del progetto potrà poi cercarlo.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "La chat richiede di copiare %1$@ (%2$@) nel progetto. Ogni chat del progetto potrà quindi utilizzarlo nei documenti.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Il modello di chat può impaginare ciò che ha scritto come PDF — un rapporto, una lettera, appunti, una fattura — con tabelle e grafici. Il PDF rimane nella chat finché non lo apri, salvi o aggiungi a un progetto. Non viene scaricato nulla; nemmeno nelle chat temporanee.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "Il modello di chat può impaginare ciò che ha scritto come PDF — un rapporto, una lettera, appunti, una fattura — con tabelle e grafici. Il PDF rimane nella chat finché non lo apri, salvi o aggiungi a un progetto. Non viene scaricato nulla per questa funzione; non è disponibile nelle chat temporanee.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "Il modello chat può esplorare le cartelle che consenti (nomi, dimensioni, date, brevi estratti) e proporvi modifiche: nuove cartelle, spostamenti, rinomini, spostamenti nel Cestino. Ogni modifica è un piano che approvi prima e può essere annullata.";
 "The chat model couldn't be unloaded for Voice Lab." = "Impossibile scaricare il modello di chat per Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "Il modello chat è in fase di download in questa cartella. Cambialo in Impostazioni dopo la configurazione o scegli prima un altro modello chat.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Tempo totale";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Effettua prove con 1, 2, 4 e 8 richieste contemporanee e con prefill-step-size (256–4096) sul modello in esecuzione, riavviando il server tra ogni test. Concurrent requests: il numero minimo che raggiunge il 90% della migliore velocità totale (di più costa memoria senza guadagno); prefill: la più veloce.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Effettua prove con 1, 2, 4 e 8 richieste contemporanee e con prefill-step-size (256–4096) sul modello in esecuzione, riavviando il server tra ogni test. Richieste simultanee: il numero minimo che raggiunge il 90% della migliore velocità totale (di più costa memoria per poco guadagno); prefill: la più veloce.";
 "Try Again" = "Riprova";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte il testo dei file in vettori per la ricerca per significato, su questo Mac. Rimuovendolo gli indici restano: i file verranno quindi cercati per parole fino a un nuovo download.";
 "Tweak…" = "Regola…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "Quando un client richiede un altro modello";
 "When an app asks for another model" = "Quando un'app richiede un altro modello";
 "When an app asks for another model: %@" = "Quando un'app richiede un altro modello: %@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Quando make_document è dichiarato e i Documenti sono attivi (Impostazioni > Files). Quando necessario: il modello lo carica con load_tools, o puoi farlo tu dal menu +, una sola volta per chat — meno token in ogni richiesta. Sempre: in ogni chat salvata.";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "Quando make_document è dichiarato e i Documenti sono attivi (Impostazioni > File). Quando necessario: il modello lo carica con load_tools, o puoi farlo tu dal menu +, una sola volta per chat — meno token in ogni richiesta. Sempre: in ogni chat salvata.";
 "When needed" = "Quando necessario";
 "Where LLMTray keeps its models, one folder per model." = "Dove LLMTray conserva i modelli, una cartella per modello.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Dove LLMTray cerca i modelli MLX (una cartella per modello, es. <org>/<name>). Seleziona qualsiasi cartella, anche una condivisa con un’altra app.";

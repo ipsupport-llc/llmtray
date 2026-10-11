@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld imagens";
 "%lld pictures added: kept for documents, not searched." = "%lld imagens adicionadas: mantidas para documentos, não pesquisadas.";
 "%lld requests" = "%lld solicitações";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld solicitações em andamento (respondidas em conjunto até Concurrent requests)";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld solicitações em andamento (respondidas em conjunto até o limite de “Solicitações simultâneas”)";
 "%lld s" = "%lld s";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lld bits";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "O perfil base: todos os outros perfis herdam dele.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "O bate‑papo solicita copiar %1$@ (%2$@) para o projeto. Todos os bate‑papos do projeto poderão então pesquisar nele.";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "O chat pede para copiar %1$@ (%2$@) para o projeto. Todo chat do projeto poderá então usá‑lo em documentos.";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "O modelo de conversa pode formatar o que escreveu como PDF — um relatório, uma carta, anotações, uma fatura — com tabelas e gráficos. O PDF permanece na conversa até que você o abra, salve ou adicione a um projeto. Nada é baixado para ele; nem em conversas temporárias.";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "O modelo de conversa pode formatar o que escreveu como PDF — um relatório, uma carta, anotações, uma fatura — com tabelas e gráficos. O PDF permanece na conversa até que você o abra, salve ou adicione a um projeto. Nada é baixado para essa função; ela não está disponível em conversas temporárias.";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "O modelo do chat pode examinar pastas que você permitir (nomes, tamanhos, datas, trechos curtos) e propor alterações — novas pastas, movimentos, renomes, mover para a Lixeira. Cada mudança é um plano que você aprova primeiro e pode ser desfeito.";
 "The chat model couldn't be unloaded for Voice Lab." = "Não foi possível descarregar o modelo de chat para o Voice Lab.";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "O modelo de chat está sendo baixado nesta pasta. Altere em Ajustes após a configuração ou escolha outro modelo de chat primeiro.";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "Tempo total";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Testa 1, 2, 4 e 8 solicitações ao mesmo tempo e prefill-step-size (256–4096) contra o modelo em execução, reiniciando o servidor entre cada teste. Concurrent requests: o menor número que alcança 90% da melhor velocidade total (mais custa memória por pouco ganho); prefill: o mais rápido.";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Testa 1, 2, 4 e 8 solicitações ao mesmo tempo e prefill-step-size (256–4096) contra o modelo em execução, reiniciando o servidor entre cada teste. Solicitações simultâneas: o menor número que alcança 90% da melhor velocidade total (mais custa memória por pouco ganho); prefill: o mais rápido.";
 "Try Again" = "Tentar novamente";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte o texto dos arquivos em vetores para pesquisa por significado, neste Mac. Remover mantém os índices: os arquivos serão pesquisados pelas palavras até que seja baixado novamente.";
 "Tweak…" = "Ajustar…";

@@ -60,7 +60,7 @@
 "%lld pictures" = "%lld 枚の画像";
 "%lld pictures added: kept for documents, not searched." = "%lld 枚の画像を追加しました：文書用に保存され、検索はされません。";
 "%lld requests" = "%lld 件のリクエスト";
-"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 件の進行中リクエスト（Concurrent requests まで同時に処理）";
+"%lld requests in flight (answered together up to Concurrent requests)" = "%lld 件の進行中リクエスト（「同時リクエスト数」の設定値まで同時に処理）";
 "%lld s" = "%lld 秒";
 "%lld · %lld×%lld" = "%lld · %lld×%lld";
 "%lld-bit" = "%lldビット";
@@ -304,7 +304,7 @@
 "Dismiss" = "閉じる";
 "Document: %@" = "ドキュメント：%@";
 "Documents" = "ドキュメント";
-"Documents On in This Chat" = "このチャットでドキュメントを有効にする";
+"Documents On in This Chat" = "このチャットではドキュメントが有効です";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "ドキュメントはプロジェクトにコピーされ、このMac上でインデックス化されます。画像はメッセージに添付されます。";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "このチャットではドキュメントが有効です：レポートや手紙などを依頼してください。";
 "Documents go into a project with this chat." = "ドキュメントはこのチャットとともにプロジェクトに入ります。";
@@ -411,7 +411,7 @@
 "For This Chat" = "このチャット用";
 "For an Hour" = "1 時間だけ";
 "For faster answers (speculative decoding)" = "応答を高速化します（推測デコード）";
-"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "公開された drafter（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデルを含む）では、先読みでトークンを予測し、メインモデルが一度のパスで検証します。出力は同じで高速です。単独のリクエストはこれを利用し、複数同時時はバッチを共有して使用されます。";
+"For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "公開された drafter（Gemma 4 26B）や独自の MTP ヘッドを持つモデル（当社の Qwen 3.5 モデルではモデルと一緒にダウンロードされます）では、先読みでトークンを予測し、メインモデルが一度のパスで検証します。出力は同じで高速です。単独のリクエストではこれを使用し、複数のリクエストが同時にある場合はこれを使わずにバッチを共有します。";
 "Found after an interruption" = "中断後に見つかった項目";
 "Founding Supporters" = "創設支援者";
 "Free disk space" = "空きディスク容量";
@@ -1002,7 +1002,7 @@
 "The base profile: every other profile inherits from it." = "基本プロファイルです。ほかのすべてのプロファイルはこれを継承します。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then search it." = "チャットが %1$@（%2$@）をプロジェクトにコピーするよう要求しています。プロジェクト内のすべてのチャットから検索できるようになります。";
 "The chat asks to copy %1$@ (%2$@) into the project. Every chat of the project can then use it in documents." = "このチャットは %1$@（%2$@）をプロジェクトにコピーすることを要求しています。するとプロジェクト内のすべてのチャットが文書で利用できます。";
-"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "チャットモデルは作成した内容をPDFとしてレイアウトできます — レポート、手紙、メモ、請求書など。表やグラフも含められます。PDFは開く、保存、プロジェクトに追加するまでチャット内に残ります。一時的なチャットでもPDFがダウンロードされることはありません。";
+"The chat model can lay out what it wrote as a PDF -- a report, a letter, notes, an invoice -- with tables and charts. The PDF stays in the chat until you open, save or add it to a project. Nothing is downloaded for it; not in temporary chats." = "チャットモデルは作成した内容をPDFとしてレイアウトできます — レポート、手紙、メモ、請求書など。表やグラフも含められます。PDFは開く、保存、プロジェクトに追加するまでチャット内に残ります。この機能のためにダウンロードするものはありません。一時チャットでは利用できません。";
 "The chat model can look in folders you allow (names, sizes, dates, short excerpts) and propose changes there -- new folders, moves, renames, moving to the Trash. Every change is a plan you approve first, and can be undone." = "チャットモデルはあなたが許可したフォルダを参照できます（名前、サイズ、日付、短い抜粋）およびそこに対する変更を提案できます—新規フォルダ、移動、名前変更、ゴミ箱への移動。各変更は事前にあなたが承認する計画として表示され、元に戻せます。";
 "The chat model couldn't be unloaded for Voice Lab." = "Voice Lab のためにチャットモデルをアンロードできませんでした。";
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "チャットモデルをこのフォルダにダウンロードしています。セットアップ後に「Settings」で変更するか、先に別のチャットモデルを選んでください。";
@@ -1133,7 +1133,7 @@
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
 "Total time" = "合計時間";
-"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。Concurrent requests：最良の合計速度の 90% に達する最小数（それ以上はメモリ負荷に見合わないことが多い）。prefill：最速となる値。";
+"Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "動作中モデルに対して 1、2、4、8 件の同時リクエストと prefill-step-size（256–4096）を試し、各試行間でサーバーを再起動します。同時リクエスト数：最良の合計速度の 90% に達する最小数（それ以上はメモリ使用量が増える割に効果が小さい）。prefill：最速となる値。";
 "Try Again" = "再試行";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ファイルのテキストをこのMac上でベクトル化して意味による検索を可能にします。これを削除しても索引は保持され、再度ダウンロードされるまでファイルは単語ベースで検索されます。";
 "Tweak…" = "調整…";
@@ -1224,7 +1224,7 @@
 "When a client asks for another model" = "クライアントが別のモデルを要求したとき";
 "When an app asks for another model" = "アプリが別のモデルを要求したとき";
 "When an app asks for another model: %@" = "アプリが別のモデルを要求したとき：%@";
-"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "make_document が宣言されている場合、ドキュメントは一度有効にすると（設定 > Files）利用できます。必要なときは、モデルが load_tools で読み込むか、チャットごとに一度 + メニューから読み込めます — 各リクエストで使用するトークンが少なくなります。保存されたすべてのチャットでは常に利用可能です。";
+"When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "ドキュメントが有効（設定 > ファイル）で、make_document が宣言されている場合に適用されます。必要時：モデルが load_tools で読み込むか、ユーザーが + メニューからチャットごとに一度読み込みます — 各リクエストで使用するトークンが少なくなります。常に：保存されたすべてのチャットで宣言されます。";
 "When needed" = "必要時";
 "Where LLMTray keeps its models, one folder per model." = "LLMTray がモデルを保存する場所。モデルごとに1フォルダです。";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "LLMTray が MLX モデルを探す場所（モデルごとに 1 フォルダ、例: <org>/<name>）。任意のフォルダを選択できます。他のアプリと共有するフォルダでも構いません。";
