@@ -172,12 +172,26 @@ final class DocumentSpecTests: XCTestCase {
     }
 
     func testBadChartsAreLeftOutWithANote() throws {
-        let spec = try read(#"{"title": "x", "content": "y", "charts": [{"id": "a", "type": "bar", "labels": ["A"], "series": [{"values": [1, 2]}]}, {"id": "b", "type": "pie", "series": [{"values": [1]}, {"values": [2]}]}, {"id": "c", "type": "pie", "series": [{"values": [0, 0]}]}, {"id": "bad id!", "type": "bar", "series": [{"values": [1]}]}, {"id": "ok", "type": "line", "series": [{"values": [1, 2, 3]}]}, {"id": "ok", "type": "line", "series": [{"values": [1]}]}]}"#).get()
+        let spec = try read(#"{"title": "x", "content": "y", "charts": [{"id": "a", "type": "bar", "labels": ["A"], "series": [{"values": [1, 2]}]}, {"id": "b", "type": "pie", "series": [{"values": [1, 2]}, {"values": [2, 3]}]}, {"id": "c", "type": "pie", "series": [{"values": [0, 0]}]}, {"id": "bad id!", "type": "bar", "series": [{"values": [1]}]}, {"id": "ok", "type": "line", "series": [{"values": [1, 2, 3]}]}, {"id": "ok", "type": "line", "series": [{"values": [1]}]}]}"#).get()
         // "a": its labels don't match its values -- drawn, points numbered.
         XCTAssertEqual(spec.charts.map(\.id), ["a", "ok"])
         XCTAssertEqual(spec.charts.map(\.labels), [["1", "2"], ["1", "2", "3"]])
-        XCTAssertEqual(spec.notes.count, 5, "\(spec.notes)")
-        XCTAssertTrue(spec.notes[0].contains("numbered"), spec.notes[0])
+        XCTAssertEqual(spec.notes.count, 4, "\(spec.notes)")
+        XCTAssertEqual(spec.adjusted.count, 1, "drawn, with a note of its own")
+        XCTAssertTrue(spec.adjusted[0].contains("numbered"), spec.adjusted[0])
+    }
+
+    /// A pie given as one series per slice is one series.
+    func testPieOfOneValueSeries() throws {
+        let spec = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "type": "pie", "series": [{"name": "A", "values": [40]}, {"name": "B", "values": [30]}, {"values": [30]}]}, {"id": "q", "type": "pie", "labels": ["x", "y"], "series": [{"name": "A", "values": [1]}, {"name": "B", "values": [2]}]}]}"#).get()
+        XCTAssertEqual(spec.charts.map(\.labels), [["A", "B", "3"], ["x", "y"]])
+        XCTAssertEqual(spec.charts.map { $0.series.map(\.values) }, [[[40, 30, 30]], [[1, 2]]])
+        XCTAssertTrue(spec.notes.isEmpty, "\(spec.notes)")
+        // Labels that don't fit the slices are set aside -- and said.
+        let odd = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "type": "pie", "labels": ["Alpha"], "series": [{"values": [40]}, {"values": [60]}]}]}"#).get()
+        XCTAssertEqual(odd.charts.first?.labels, ["1", "2"])
+        XCTAssertEqual(odd.adjusted.count, 1, "\(odd.adjusted)")
+        XCTAssertTrue(odd.notes.isEmpty)
     }
 
     /// A function plot is computed by the app, not written out by the model.

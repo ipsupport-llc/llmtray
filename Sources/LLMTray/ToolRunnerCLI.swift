@@ -80,7 +80,7 @@ enum ToolRunnerCLI {
                         made.thumbnail = nil
                         guard let document = try? DocumentRenderer.install(made, in: here) else { print("couldn't write the PDF here"); exit(1) }
                         print(here.appendingPathComponent(document.filename).path + " (\(document.pages) pages)")
-                        for note in spec.notes + made.notes { print("note: " + note) }
+                        for note in spec.adjusted + spec.notes + made.notes { print("note: " + note) }
                         exit(0)
                     case .failure(let e): print(e.text); exit(1)
                     }

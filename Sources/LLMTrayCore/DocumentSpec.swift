@@ -33,6 +33,8 @@ public struct DocumentSpec: Equatable, Sendable {
     public var charts: [Chart]
     /// What was left out and why, for the tool's answer.
     public var notes: [String]
+    /// What was drawn other than asked (labels set aside), for the answer.
+    public var adjusted: [String] = []
 
     public enum Limits {
         public static let contentCharacters = 200_000
@@ -67,7 +69,7 @@ public struct DocumentSpec: Equatable, Sendable {
                 .init("series", .objects([
                     .init("name", .string),
                     .init("values", .list(.number), aliases: ["data", "y"]),
-                    .init("formula", .string, "In x, e.g. sin(x): the app computes the line, instead of values.",
+                    .init("formula", .string, "A math function of x for a line, e.g. sin(x) or x^2: the app computes it. Not for data -- give values.",
                           aliases: ["function", "expression"]),
                 ]), required: true, aliases: ["data"]),
                 .init("range", .list(.string), "x from and to for a formula, e.g. [\"0\", \"2*pi\"].",
@@ -87,6 +89,7 @@ public struct DocumentSpec: Equatable, Sendable {
         let scalars = content.unicodeScalars.count
         guard scalars <= Limits.contentCharacters else { return .failure(.tooLong(scalars)) }
         var notes: [String] = []
+        var adjusted: [String] = []
         var charts: [Chart] = []
         var seen = Set<String>()
         let raw = (values["charts"] as? [[String: Any]]) ?? []
@@ -94,7 +97,7 @@ public struct DocumentSpec: Equatable, Sendable {
         for (n, item) in raw.prefix(Limits.charts).enumerated() {
             switch chart(item) {
             case .success(let (c, note)):
-                if let note { notes.append("Chart \(n + 1): \(note).") }
+                if let note { adjusted.append("Chart \(n + 1): \(note).") }
                 if seen.contains(c.id) {
                     notes.append("Chart \(n + 1) left out: the id \"\(c.id)\" is used twice.")
                 } else {
@@ -107,7 +110,7 @@ public struct DocumentSpec: Equatable, Sendable {
         }
         return .success(DocumentSpec(title: title.isEmpty ? "Document" : title, content: content,
                                      style: (values["style"] as? String).map(DocumentHTML.styleName) ?? "report",
-                                     charts: charts, notes: notes))
+                                     charts: charts, notes: notes, adjusted: adjusted))
     }
 
     struct ChartProblem: Error { let text: String }
@@ -160,13 +163,24 @@ public struct DocumentSpec: Equatable, Sendable {
             }
             series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values))
         }
+        var note: String?
+        if kind == .pie, series.count > 1, series.allSatisfy({ $0.values.count == 1 }) {
+            // A slice per series ("Part 1": [40], "Part 2": [30]): one
+            // series, the slices named by the labels or else the series.
+            if labels.count != series.count {
+                if !labels.isEmpty {
+                    note = "its \(labels.count) labels didn't match \(series.count) slices, so the slices are named by their series or numbered"
+                }
+                labels = series.enumerated().map { $1.name.isEmpty ? String($0 + 1) : $1.name }
+            }
+            series = [Chart.Series(name: "", values: series.map { $0.values[0] })]
+        }
         let count = series[0].values.count
         guard series.allSatisfy({ $0.values.count == count }) else {
             return .failure(ChartProblem(text: "its series have different lengths"))
         }
         // The numbers are what the chart is for: labels that don't match
         // them give way to point numbers rather than losing the chart.
-        var note: String?
         if !labels.isEmpty, labels.count != count {
             note = "its \(labels.count) labels didn't match \(count) values, so the points are numbered"
             labels = []
