@@ -266,10 +266,19 @@ public enum DocumentMath {
             case "underline":
                 return ("<munder>\(try argument())<mo>_</mo></munder>", false)
             case "text", "textrm", "textit", "textbf", "mbox", "textnormal":
-                return ("<mtext>\(DocumentHTML.escape(try rawArgument()))</mtext>", false)
+                return ("<mtext>\(DocumentHTML.escape(DocumentMath.textEscapes(try rawArgument())))</mtext>", false)
             case "mathrm", "operatorname", "mathsf", "mathtt":
-                let text = try rawArgument().filter { !$0.isWhitespace }
-                return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(text))</mi>", false)
+                // Read as math (m^2 is m squared), its letters upright; a
+                // plain word stays one name (\operatorname{rank}).
+                let start = i
+                let text = try rawArgument()
+                if text.allSatisfy({ $0.isLetter || $0.isNumber || $0 == " " }) {
+                    let name = text.filter { !$0.isWhitespace }
+                    return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(name))</mi>", false)
+                }
+                i = start
+                let row = try argument()
+                return (row.replacingOccurrences(of: "<mi>", with: "<mi mathvariant=\"normal\">"), false)
             case "mathbf", "boldsymbol", "bm", "mathit", "mathcal", "mathscr", "mathfrak":
                 return (try argument(), false)
             case "mathbb":
@@ -338,6 +347,24 @@ public enum DocumentMath {
     }
 
     static func mrow(_ parts: [String]) -> String { "<mrow>" + parts.joined() + "</mrow>" }
+
+    /// \text{…}'s escapes as the characters they stand for (5\% is 5%).
+    static func textEscapes(_ text: String) -> String {
+        var out = ""
+        var escaped = false
+        for ch in text {
+            if escaped {
+                if "%$&#_{} ".contains(ch) { out.append(ch) } else { out.append("\\"); out.append(ch) }
+                escaped = false
+            } else if ch == "\\" {
+                escaped = true
+            } else {
+                out.append(ch == "~" ? "\u{00A0}" : ch)
+            }
+        }
+        if escaped { out.append("\\") }
+        return out
+    }
 
     // MARK: - Tables
 

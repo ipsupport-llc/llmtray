@@ -15,6 +15,9 @@ final class DocumentMathTests: XCTestCase {
         XCTAssertTrue(math(#"a \& b"#).contains("<mi mathvariant=\"normal\">&amp;</mi>"))
         XCTAssertTrue(math("a & b").contains("<mi>a</mi><mo>&amp;</mo><mi>b</mi>"), "a bare & is kept")
         XCTAssertTrue(math(#"\text{if } x"#).contains("<mtext>if </mtext>"))
+        XCTAssertTrue(math(#"\text{Tax: 5\%}"#).contains("<mtext>Tax: 5%</mtext>"))
+        XCTAssertTrue(math(#"10\,\mathrm{m^2}"#).contains("<msup><mi mathvariant=\"normal\">m</mi><mn>2</mn></msup>"))
+        XCTAssertTrue(math(#"\operatorname{rank} A"#).contains("<mi mathvariant=\"normal\">rank</mi>"))
         XCTAssertTrue(math(#"\Delta \alpha"#).contains("<mi mathvariant=\"normal\">Δ</mi><mi>α</mi>"))
         XCTAssertTrue(math(#"\hat{x}"#).contains("<mover accent=\"true\"><mrow><mi>x</mi></mrow><mo>ˆ</mo></mover>"))
     }
