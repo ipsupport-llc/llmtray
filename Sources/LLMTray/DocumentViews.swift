@@ -36,7 +36,10 @@ struct DocumentCard: View {
                     Button("Save As…") { saveAs() }
                     // The PDF in the chat's folder, as the share sheet's
                     // services take a file (Mail, Messages, AirDrop…).
-                    ShareLink(item: url, preview: SharePreview(document.title)) { Text("Share…") }
+                    // Only while the file is there: the sheet can't say it's gone.
+                    if FileManager.default.fileExists(atPath: url.path) {
+                        ShareLink(item: url, preview: SharePreview(document.title)) { Text("Share…") }
+                    }
                     if let project {
                         Button("Add to Project") { addToProject(project) }
                     }
