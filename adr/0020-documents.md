@@ -161,10 +161,13 @@ a 4B model looks as good as one from a 35B model.
   and its charts replacing those of the same id or added. A chart whose
   place went with a removed or rewritten section goes too, rather than
   turning up at the end. A section is found by its heading as written,
-  then without its number ("2. Costs" for "Costs"), then as the one
-  heading that contains the name; headings in fenced code aren't
+  then without its number ("2. Costs" for "Costs"), then as a heading
+  that contains the name -- the first step with a match decides, and two
+  matches there make nothing and answer both ("give the heading exactly
+  as written"), never the first; headings in fenced code aren't
   sections. A name that matches none makes nothing and answers the
-  document's headings, so the model can try again in the turn. A call
+  document's headings, so the model can try again in the turn. At most
+  50 changes in a call. An `x` on anything but a scatter is ignored. A call
   with both `content` and `changes` is its content (the answer says the
   changes were set aside); `changes` in a chat with no document answers
   "write the whole content". The result is a new document and card, the

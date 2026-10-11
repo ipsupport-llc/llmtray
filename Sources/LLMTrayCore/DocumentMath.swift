@@ -62,6 +62,7 @@ public enum DocumentMath {
                 guard let c = peek() else { break }
                 if c == "}" { if stops.contains("}") { break } else { throw Failure() } }
                 if c == "&", stops.contains("&") { break }
+                if c == "]", stops.contains("]") { break }
                 if c == "\\", let name = commandName(), stops.contains("\\" + name) { break }
                 if c == "^" || c == "_" {
                     // A script with nothing before it: on an empty base.
@@ -172,11 +173,7 @@ public enum DocumentMath {
             skipSpace()
             guard peek() == "[" else { return nil }
             i += 1
-            var row: [String] = []
-            while peek() != nil, peek() != "]" {
-                guard let atom = try atom() else { break }
-                row.append(atom.html)
-            }
+            let row = try expression(until: ["]"])
             guard peek() == "]" else { throw Failure() }
             i += 1
             return DocumentMath.mrow(row)
@@ -223,8 +220,8 @@ public enum DocumentMath {
             let name = readCommand()
             if name.isEmpty { return ("<mo>\\</mo>", false) }
             if let space = DocumentMath.spaces[name] { return (space.isEmpty ? "" : "<mtext>\(space)</mtext>", false) }
-            if let symbol = DocumentMath.identifiers[name] { return ("<mi>\(symbol)</mi>", false) }
-            if let symbol = DocumentMath.upright[name] { return ("<mi mathvariant=\"normal\">\(symbol)</mi>", false) }
+            if let symbol = DocumentMath.identifiers[name] { return ("<mi>\(DocumentHTML.escape(symbol))</mi>", false) }
+            if let symbol = DocumentMath.upright[name] { return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(symbol))</mi>", false) }
             if let fence = DocumentMath.fences[name] { return ("<mo stretchy=\"false\">\(DocumentHTML.escape(fence))</mo>", false) }
             if let op = DocumentMath.operators[name] { return ("<mo>\(DocumentHTML.escape(op))</mo>", false) }
             if let big = DocumentMath.bigOperators[name] { return ("<mo>\(big)</mo>", !DocumentMath.integrals.contains(name)) }

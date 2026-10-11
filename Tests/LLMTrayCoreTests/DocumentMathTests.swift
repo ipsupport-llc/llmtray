@@ -11,6 +11,8 @@ final class DocumentMathTests: XCTestCase {
         XCTAssertTrue(math(#"x_{i}^{2}"#).contains("<msubsup><mi>x</mi>"))
         XCTAssertTrue(math("3.14 - x").contains("<mn>3.14</mn><mo>−</mo>"))
         XCTAssertTrue(math(#"\mathbb{R}"#).contains("<mi>ℝ</mi>"))
+        XCTAssertTrue(math(#"\sqrt[x^2]{y}"#).contains("<mroot><mrow><mi>y</mi></mrow><mrow><msup><mi>x</mi><mn>2</mn></msup></mrow></mroot>"))
+        XCTAssertTrue(math(#"a \& b"#).contains("<mi mathvariant=\"normal\">&amp;</mi>"))
         XCTAssertTrue(math(#"\text{if } x"#).contains("<mtext>if </mtext>"))
         XCTAssertTrue(math(#"\Delta \alpha"#).contains("<mi mathvariant=\"normal\">Δ</mi><mi>α</mi>"))
         XCTAssertTrue(math(#"\hat{x}"#).contains("<mover accent=\"true\"><mrow><mi>x</mi></mrow><mo>ˆ</mo></mover>"))

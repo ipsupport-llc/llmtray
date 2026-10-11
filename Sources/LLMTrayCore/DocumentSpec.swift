@@ -50,6 +50,8 @@ public struct DocumentSpec: Equatable, Sendable {
         public static let labelCharacters = 80
         public static let idCharacters = 40
         public static let pictures = 30
+        /// Sections one call may change.
+        public static let changes = 50
     }
 
     /// The tool's declaration (adr/0020, "One tool").
@@ -173,8 +175,10 @@ public struct DocumentSpec: Equatable, Sendable {
             guard values.allSatisfy({ $0.isFinite && abs($0) < 1e15 }) else {
                 return .failure(ChartProblem(text: "a value isn't a finite number"))
             }
+            // Only a scatter places values at their own x; a line or bars
+            // with an x are at their labels.
             series.append(Chart.Series(name: clip((s["name"] as? String) ?? "", Limits.labelCharacters), values: values,
-                                       xs: numbers(s["x"])))
+                                       xs: kind == .scatter ? Array(numbers(s["x"]).prefix(Limits.points + 1)) : []))
         }
         var note: String?
         if kind == .scatter {

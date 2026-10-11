@@ -65,12 +65,21 @@ public enum DocumentEdit {
             values["charts"] = charts
         }
         var lines = DocumentHTML.lines((base["content"] as? String) ?? "")
-        for change in (call["changes"] as? [[String: Any]]) ?? [] {
+        let changes = (call["changes"] as? [[String: Any]]) ?? []
+        guard changes.count <= DocumentSpec.Limits.changes else {
+            return .failure(Problem(text: "make_document: at most \(DocumentSpec.Limits.changes) changes at once; write the whole content instead."))
+        }
+        for change in changes {
             let text = ((change["content"] as? String) ?? "").trimmingCharacters(in: .newlines)
             let new = text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? [] : DocumentHTML.lines(text)
             let sections = Self.sections(lines)
             if let name = nonEmpty(change["section"]) {
-                guard let s = find(name, in: sections) else { return .failure(missing(name, baseTitle, sections)) }
+                let s: Section
+                switch find(name, in: sections) {
+                case .one(let found): s = found
+                case .none: return .failure(missing(name, baseTitle, sections))
+                case .several(let all): return .failure(ambiguous(name, all))
+                }
                 if new.isEmpty {
                     lines.replaceSubrange(s.start..<s.end, with: [])
                 } else if let first = new.first(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }),
@@ -81,7 +90,12 @@ public enum DocumentEdit {
                     lines.replaceSubrange(s.start..<s.end, with: [lines[s.start], ""] + new + [""])
                 }
             } else if let name = nonEmpty(change["after"]) {
-                guard let s = find(name, in: sections) else { return .failure(missing(name, baseTitle, sections)) }
+                let s: Section
+                switch find(name, in: sections) {
+                case .one(let found): s = found
+                case .none: return .failure(missing(name, baseTitle, sections))
+                case .several(let all): return .failure(ambiguous(name, all))
+                }
                 guard !new.isEmpty else { continue }
                 lines.insert(contentsOf: [""] + new + [""], at: s.end)
             } else if !new.isEmpty {
@@ -143,17 +157,34 @@ public enum DocumentEdit {
         }
     }
 
+    enum Match {
+        case one(Section)
+        case none
+        /// More than one heading fits: never a guess.
+        case several([Section])
+    }
+
     /// The section a name means: the same heading, then the same without
-    /// its number ("2. Costs" for "Costs"), then the one heading that
-    /// contains it.
-    static func find(_ name: String, in sections: [Section]) -> Section? {
+    /// its number ("2. Costs" for "Costs"), then the heading that contains
+    /// it -- the first step with any match decides, and two matches there
+    /// are a question back, not the first of them.
+    static func find(_ name: String, in sections: [Section]) -> Match {
         let wanted = normalized(name)
-        guard !wanted.isEmpty else { return nil }
-        if let s = sections.first(where: { normalized($0.title) == wanted }) { return s }
+        guard !wanted.isEmpty else { return .none }
         let bare = unnumbered(wanted)
-        if let s = sections.first(where: { unnumbered(normalized($0.title)) == bare }) { return s }
-        let containing = sections.filter { normalized($0.title).contains(bare) }
-        return containing.count == 1 ? containing[0] : nil
+        for step in [{ (s: Section) in normalized(s.title) == wanted },
+                     { (s: Section) in unnumbered(normalized(s.title)) == bare },
+                     { (s: Section) in normalized(s.title).contains(bare) }] {
+            let found = sections.filter(step)
+            if found.count == 1 { return .one(found[0]) }
+            if found.count > 1 { return .several(found) }
+        }
+        return .none
+    }
+
+    static func ambiguous(_ name: String, _ sections: [Section]) -> Problem {
+        let list = sections.prefix(10).map { "\"\($0.title)\"" }.joined(separator: ", ")
+        return Problem(text: "make_document: several sections fit \"\(name)\": \(list). Give the heading exactly as written.")
     }
 
     static func missing(_ name: String, _ title: String, _ sections: [Section]) -> Problem {

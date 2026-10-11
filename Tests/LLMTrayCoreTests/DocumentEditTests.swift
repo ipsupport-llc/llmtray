@@ -84,11 +84,31 @@ final class DocumentEditTests: XCTestCase {
     func testFindsSectionsByNumberCaseAndPart() {
         let sections = DocumentEdit.sections(DocumentHTML.lines(base))
         XCTAssertEqual(sections.map(\.title), ["Plan", "1. Costs", "Detail", "Risks"], "not the heading in code")
-        XCTAssertEqual(DocumentEdit.find("costs", in: sections)?.title, "1. Costs")
-        XCTAssertEqual(DocumentEdit.find("2. Costs", in: sections)?.title, "1. Costs")
-        XCTAssertEqual(DocumentEdit.find("**RISKS**", in: sections)?.title, "Risks")
-        XCTAssertEqual(DocumentEdit.find("Cost", in: sections)?.title, "1. Costs", "the one heading containing it")
-        XCTAssertNil(DocumentEdit.find("Budget", in: sections))
+        func title(_ name: String, _ list: [DocumentEdit.Section] = sections) -> String? {
+            if case .one(let s) = DocumentEdit.find(name, in: list) { return s.title }
+            return nil
+        }
+        XCTAssertEqual(title("costs"), "1. Costs")
+        XCTAssertEqual(title("2. Costs"), "1. Costs")
+        XCTAssertEqual(title("**RISKS**"), "Risks")
+        XCTAssertEqual(title("Cost"), "1. Costs", "the one heading containing it")
+        XCTAssertNil(title("Budget"))
+        // Two that fit are a question back, never the first of them.
+        let twice = DocumentEdit.sections(DocumentHTML.lines("# T\n## 1. Costs\nA\n## 2. Costs\nB\n## Summary\n## Summary"))
+        XCTAssertEqual(title("2. Costs", twice), "2. Costs")
+        for name in ["Costs", "Summary"] {
+            guard case .several(let all) = DocumentEdit.find(name, in: twice) else { return XCTFail(name) }
+            XCTAssertEqual(all.count, 2)
+        }
+        let out = DocumentEdit.apply(call(#"{"title": "x", "changes": [{"section": "Costs", "content": "y"}]}"#),
+                                     to: ["title": "T", "content": "# T\n## 1. Costs\nA\n## 2. Costs\nB"])
+        guard case .failure(let problem) = out else { return XCTFail() }
+        XCTAssertTrue(problem.text.contains("\"1. Costs\", \"2. Costs\""), problem.text)
+    }
+
+    func testChangesAreBounded() {
+        let many = (0..<(DocumentSpec.Limits.changes + 1)).map { _ in #"{"content": "x"}"# }.joined(separator: ",")
+        XCTAssertNil(try? DocumentEdit.apply(call(#"{"title": "x", "changes": [\#(many)]}"#), to: baseValues).get())
     }
 
     func testAMissingSectionListsTheHeadings() {

@@ -274,6 +274,9 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(spec.charts[1].series.map(\.xs), [[170, 180], [160, 165, 170]], "each series its own points")
         XCTAssertEqual(spec.charts[2].series[0].xs, [1.5, 2.5], "numbers for labels are the x")
         XCTAssertEqual(spec.charts[3].series[0].xs, [1, 2, 3])
+        // An x on a line or bars is ignored: they're at their labels.
+        let line = try read(#"{"title": "x", "content": "y", "charts": [{"id": "c", "type": "line", "series": [{"values": [1, 2], "x": [10, 20]}]}]}"#).get()
+        XCTAssertEqual(line.charts.first?.series.first?.xs, [])
         XCTAssertEqual(spec.adjusted.count, 1, "\(spec.adjusted)")
         XCTAssertTrue(spec.notes.isEmpty, "\(spec.notes)")
         let job = DocumentJob.make(spec).job
