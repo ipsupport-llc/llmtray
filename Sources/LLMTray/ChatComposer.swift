@@ -175,6 +175,7 @@ final class ComposerModel: ObservableObject {
 /// the text field and Send/Stop.
 struct ChatComposer: View {
     @EnvironmentObject var chat: ChatClient
+    @AppStorage(Pref.documentsEnabled.name) private var documentsEnabled = Pref.documentsEnabled.defaultValue
     @ObservedObject var composer: ComposerModel
     @ObservedObject private var folders = FolderAccessManager.shared
     @ObservedObject private var library = ChatLibraryStore.shared
@@ -277,6 +278,21 @@ struct ChatComposer: View {
             }
             if composer.acceptsImages {
                 Button("Attach Images…") { composer.pickImages() }
+            }
+            // Documents (adr/0020): loads their tools into this saved chat,
+            // for a model that wouldn't think of load_tools.
+            if id != nil, documentsEnabled {
+                Divider()
+                if chat.loadedToolGroups.contains(ToolGroups.documents) {
+                    Button { } label: { Label("Documents On in This Chat", systemImage: "checkmark") }
+                        .disabled(true)
+                } else {
+                    Button("Make a Document…") {
+                        chat.loadToolGroup(ToolGroups.documents)
+                        composer.showNotice(NSLocalizedString("Documents are on in this chat: ask for one (a report, a letter…).", comment: "after the + menu's Make a Document…"))
+                        isFocused.wrappedValue = true
+                    }
+                }
             }
         } label: {
             Image(systemName: "plus.circle")

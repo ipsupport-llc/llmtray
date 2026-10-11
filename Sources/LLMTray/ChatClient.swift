@@ -100,6 +100,12 @@ final class ChatClient: ObservableObject {
     @Published private(set) var currentSessionID: UUID?
     /// A document is being made again (Make again): the chat is busy.
     @Published private(set) var isRemakingDocument = false
+    /// The tool groups this chat has loaded (adr/0020): declared from the
+    /// request after the load on, for the rest of the chat.
+    @Published private(set) var loadedToolGroups: Set<String> = []
+    /// Loaded by a call made after outside text in its turn: loaded at the
+    /// start of the user's next message.
+    private var pendingToolGroups: Set<String> = []
     @Published private(set) var currentSessionTitle: String = ""
     private var sessionCreatedAt: Date?
     /// The title is the user's or the model's already: no auto-title.
@@ -191,6 +197,7 @@ final class ChatClient: ObservableObject {
     /// The tools the last request declared: what the turn keeps once a
     /// request of it was long (ChatToolbox.keepDeclarations).
     private var lastSentTools: [[String: Any]] = []
+    private var lastSentToolsEpoch = 0
     private var assistantMessageIndex: Int?
 
     private struct RequestContext {
@@ -288,6 +295,19 @@ final class ChatClient: ObservableObject {
         tokenEstimator = PromptTokenEstimator()
         lastRequest = nil
         countedRequest = nil
+        loadedToolGroups = []
+        pendingToolGroups = []
+    }
+
+    /// The user loads a tool group from the + menu (adr/0020): declared
+    /// from this message on, saved with the chat.
+    func loadToolGroup(_ name: String) {
+        guard ToolGroups.named(name) != nil, !loadedToolGroups.contains(name) else { return }
+        loadedToolGroups.insert(name)
+        toolbox.toolGroupsChanged()
+        turnCallResults.removeAll()
+        hasUnsavedChanges = true
+        if !messages.isEmpty { persistCurrentSession() }
     }
 
     func loadSession(_ file: ChatSessionFile) {
@@ -317,6 +337,8 @@ final class ChatClient: ObservableObject {
             return message
         }
         currentSessionID = file.id
+        loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
+        pendingToolGroups = Set((file.pendingToolGroups ?? []).filter { ToolGroups.named($0) != nil }).subtracting(loadedToolGroups)
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
         sessionCreatedAt = file.createdAt
@@ -453,7 +475,9 @@ final class ChatClient: ObservableObject {
             title: title,
             createdAt: sessionCreatedAt ?? Date(),
             updatedAt: Date(),
-            messages: persisted
+            messages: persisted,
+            loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
+            pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted()
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -554,6 +578,13 @@ final class ChatClient: ObservableObject {
         server: ServerManager
     ) {
         guard !prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty else { return }
+        // Groups loaded after outside text in an earlier turn: from this
+        // message on (adr/0020).
+        if !pendingToolGroups.isEmpty {
+            loadedToolGroups.formUnion(pendingToolGroups)
+            pendingToolGroups = []
+            hasUnsavedChanges = true
+        }
         toolbox.startTurn()
         toolRoundsThisTurn = 0
         turnCallResults = [:]
@@ -571,6 +602,7 @@ final class ChatClient: ObservableObject {
         settings.project = currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0) }
         settings.folders = folderChat
         settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
+        settings.loadedToolGroups = loadedToolGroups
         return settings
     }
 
@@ -1085,6 +1117,10 @@ final class ChatClient: ObservableObject {
 
     /// `offerTools: false` for the answer after the last allowed tool round.
     private func startAssistantResponse(port: Int, modelAlias: String, settings: ChatSettings, server: ServerManager, offerTools: Bool = true) {
+        // The groups as loaded now: one loaded from the + menu while the
+        // turn's start awaited the project's files counts in (adr/0020).
+        var settings = settings
+        settings.loadedToolGroups = loadedToolGroups
         errorText = nil
         pendingRequestContext = RequestContext(port: port, modelAlias: modelAlias, settings: settings, server: server)
         messages.append(ChatMessage(role: "assistant"))
@@ -1106,6 +1142,7 @@ final class ChatClient: ObservableObject {
         countedRequest = nil
         let sentTools = offerTools || toolbox.keepsDeclarations ? toolbox.definitions(for: settings) : []
         lastSentTools = sentTools
+        lastSentToolsEpoch = toolbox.declarationsEpoch
         lastRequest = SentRequest(measure: ChatRequestBuilder.measure(body), historyCount: messages.count - 1,
                                   framing: framing(modelAlias: modelAlias, settings: settings, tools: sentTools),
                                   modelPath: settings.modelPath, pinnedBytes: Self.pinnedBlockBytes(settings),
@@ -1257,6 +1294,8 @@ final class ChatClient: ObservableObject {
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
         // Turned off mid-turn: stops at once; a temporary chat never has one.
         now.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? start.documentsSession : nil
+        // As loaded now: a group load_tools just loaded applies.
+        now.loadedToolGroups = loadedToolGroups
         return now
     }
 
@@ -1643,6 +1682,19 @@ final class ChatClient: ObservableObject {
                     }
                 }
                 messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
+            case .loadedTools(let group, let pending, let text):
+                if pending {
+                    // Kept with the chat: reopened later, it still loads at
+                    // the user's next message.
+                    if !loadedToolGroups.contains(group), pendingToolGroups.insert(group).inserted { hasUnsavedChanges = true }
+                } else if !loadedToolGroups.contains(group) {
+                    loadedToolGroups.insert(group)
+                    toolbox.toolGroupsChanged()
+                    hasUnsavedChanges = true
+                    // "Call load_tools first" answers are stale now.
+                    turnCallResults.removeAll()
+                }
+                messages.append(ChatMessage(role: "tool", content: text, toolCallID: call.id))
             case .generatedDocument(let made, let text):
                 // Written into the chat's folder in the same step as the card
                 // goes in: no save can sweep it in between.
@@ -1796,7 +1848,7 @@ final class ChatClient: ObservableObject {
                 requestStats.promptTokens = promptTokens
                 requestStats.cachedTokens = cachedTokens
                 requestStats.reasoningTokens = reasoningTokens
-                if let promptTokens { toolbox.keepDeclarations(lastSentTools, promptTokens: promptTokens) }
+                if let promptTokens { toolbox.keepDeclarations(lastSentTools, promptTokens: promptTokens, epoch: lastSentToolsEpoch) }
                 if let promptTokens, let request = lastRequest {
                     countedRequest = tokenEstimator.calibrate(request.measure, promptTokens: promptTokens) ? request : nil
                     ProjectIndexer.shared.recordPromptTokens(model: request.modelPath, request.measure, promptTokens: promptTokens,

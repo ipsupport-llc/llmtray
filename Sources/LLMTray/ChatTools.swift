@@ -14,6 +14,9 @@ enum ToolResult {
     case generatedImage(Data, seconds: Double, prompt: String, text: String)
     /// Generated music (.m4a), shown to the user as a player, plus the tool result.
     case generatedAudio(Data, seconds: Double, prompt: String, text: String)
+    /// A tool group load_tools loaded (now, or at the user's next message
+    /// when `pending`), plus the tool result.
+    case loadedTools(String, pending: Bool, text: String)
     /// A document (make_document): its PDF already in the chat's folder,
     /// shown as a card, plus the tool result.
     case generatedDocument(DocumentRenderer.Made, text: String)
@@ -48,6 +51,9 @@ struct ToolContext {
     /// The chat the call is for (nil: a temporary chat): a project tool
     /// checks it's still in the turn's project.
     var chat: UUID? = nil
+    /// load_tools: the turn has had outside text (file, folder or web): a
+    /// group it loads waits for the user's next message (adr/0020).
+    var untrustedTextThisTurn = false
     /// Bytes of file text the next request has room for (ProjectTextBudget),
     /// measured before the call: a project tool sizes its answer to it, so
     /// a cut read's cursor points where the text stopped. nil: the hard cap.
@@ -115,6 +121,7 @@ final class ChatToolbox {
     let imageGeneration: ImageToolRunner
     let musicGeneration: MusicToolRunner
     let documents = MakeDocumentTool()
+    let loader = LoadToolsTool()
     private(set) var tools: [ChatTool] = []
     /// What file text this turn has had back (project files, folder
     /// listings, change proposals): network tools and the generators are off
@@ -178,7 +185,8 @@ final class ChatToolbox {
         imageGeneration = ImageToolRunner(mflux: mflux ?? MfluxManager())
         musicGeneration = MusicToolRunner(music: music ?? MusicManager())
         tools = [imageGeneration, EditImageTool(generator: imageGeneration), ViewImageTool(), musicGeneration]
-            + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool(), documents]
+            + ToolCatalog.makeTools() + [ProjectFilesTool(), FilesTool(), ChangeFilesTool(), documents, loader]
+        loader.toolbox = self
     }
 
     func register(_ tool: ChatTool) {
@@ -252,8 +260,8 @@ final class ChatToolbox {
 
     /// After a request's usage: keep the list it was sent with for the rest
     /// of the turn if its prompt was long.
-    func keepDeclarations(_ sent: [[String: Any]], promptTokens: Int) {
-        guard TurnDeclarations.shouldKeep(alreadyKept: keptDeclarations != nil, declared: sent.count, promptTokens: promptTokens) else { return }
+    func keepDeclarations(_ sent: [[String: Any]], promptTokens: Int, epoch: Int) {
+        guard epoch == declarationsEpoch, TurnDeclarations.shouldKeep(alreadyKept: keptDeclarations != nil, declared: sent.count, promptTokens: promptTokens) else { return }
         keptDeclarations = sent
     }
 
@@ -275,7 +283,8 @@ final class ChatToolbox {
                                                    turn: turnTrust, fileTextRoomSpent: fileTextRoomSpent,
                                                    changeRefused: changeRefusedThisTurn))
         return tools.compactMap { tool -> [String: Any]? in
-            guard tool.isOffered(settings), !spent.contains(tool.name) else { return nil }
+            guard tool.isOffered(settings), !spent.contains(tool.name), groupDeclared(tool.name, settings) else { return nil }
+            if tool === loader { return loader.definition(for: settings) }
             // project_files by its mode (none once there's no room for file text).
             if let files = tool as? ProjectFilesTool { return files.definition(for: settings, fileTextAllowed: !fileTextRoomSpent) }
             if tool.folderAccess != .none {
@@ -289,6 +298,33 @@ final class ChatToolbox {
             return trustKind(tool) != .guarded || allowGuarded ? tool.definition : nil
         }
     }
+
+    /// Whether a tool's group lets it be declared: no group, `always`, or
+    /// loaded in this chat (adr/0020).
+    func groupDeclared(_ name: String, _ settings: ChatSettings) -> Bool {
+        guard let group = ToolGroups.group(ofTool: name) else { return true }
+        return settings.toolLoading[group.name] == .always || settings.loadedToolGroups.contains(group.name)
+    }
+
+    /// The on-demand groups switched on now (a tool of theirs offered): what
+    /// load_tools offers -- also once loaded, so the list never changes again.
+    func onDemandGroups(_ settings: ChatSettings) -> [ToolGroups.Group] {
+        ToolGroups.all.filter { group in
+            settings.toolLoading[group.name] != .always
+                && tools.contains { group.tools.contains($0.name) && $0.isOffered(settings) }
+        }
+    }
+
+    /// A group was loaded: the turn's kept list (TurnDeclarations) is
+    /// built anew with it -- the one change of the list loading costs.
+    func toolGroupsChanged() {
+        keptDeclarations = nil
+        declarationsEpoch += 1
+    }
+
+    /// Bumped by a load: a request sent before it can't keep its older list
+    /// when its usage comes in.
+    private(set) var declarationsEpoch = 0
 
     /// A real new user turn (per-turn limits reset).
     func startTurn() {
@@ -402,6 +438,18 @@ final class ChatToolbox {
             return result
         }
         let arguments = entry?.arguments ?? ParsedToolArguments(values: [:], repairs: [], problems: [])
+        // A tool of an on-demand group the chat hasn't loaded (a model that
+        // saw it elsewhere): load it first. Not for one that isn't offered
+        // at all -- it answers why itself (a temporary chat, switched off).
+        if tool.isOffered(context.settings), !groupDeclared(tool.name, context.settings),
+           let group = ToolGroups.group(ofTool: tool.name) {
+            return finish(.text("\(tool.name) isn't loaded in this chat. Call load_tools({\"group\":\"\(group.name)\"}) first, then call it."))
+        }
+        if tool === loader {
+            var context = context
+            context.untrustedTextThisTurn = turnTrust.hasUntrustedText || turnTrust.networkText
+            return finish(await tool.run(arguments.values, context: context))
+        }
         // Checked again right before it runs (the round refused it up front
         // already): an earlier call of this round may have returned file text.
         let kind = trustKind(of: call, settings: context.settings)
@@ -469,7 +517,7 @@ final class ChatToolbox {
             // The generators' and view_image's plain-text failures.
             let failed = ["failed", "There's no image", "No image has been", "index must be", "Say what to change", "Describe the style"]
             return failed.contains { text.contains($0) } ? .error("failed") : .success
-        case .generatedImage, .generatedAudio, .generatedDocument, .imageForModel, .projectText: return .success
+        case .generatedImage, .generatedAudio, .generatedDocument, .loadedTools, .imageForModel, .projectText: return .success
         }
     }
 
