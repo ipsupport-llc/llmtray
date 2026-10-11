@@ -59,6 +59,8 @@ enum ChatRequestBuilder {
         if !tools.isEmpty {
             body["tools"] = tools
         }
+        // The composer's thinking effort (adr/0022).
+        body.merge(Thinking.requestFields(style: settings.thinkingStyle, effort: settings.thinkingEffort)) { $1 }
         return body
     }
 

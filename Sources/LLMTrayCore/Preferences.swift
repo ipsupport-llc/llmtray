@@ -34,6 +34,9 @@ public enum Pref {
 
     // Chat
     public static let showReasoning = PrefKey("llmtray.showReasoning", default: true)
+    /// The composer's thinking effort (ThinkingEffort's raw value), for every
+    /// model that thinks: High, as long as it takes, until changed.
+    public static let thinkingEffort = PrefKey("llmtray.thinkingEffort", default: ThinkingEffort.high.rawValue)
     /// Debug: show each tool call (name, arguments) under the answer, with
     /// its result when expanded.
     public static let showToolCalls = PrefKey("llmtray.showToolCalls", default: false)

@@ -239,6 +239,10 @@ struct ChatSettings {
     var maxTokensCap: Int = 32768
     /// The chat model accepts images (view_image is offered only then).
     var modelSupportsVision: Bool = false
+    /// What the model's template offers for thinking, and the effort asked
+    /// (the composer's picker): the request's fields (Thinking.requestFields).
+    var thinkingStyle: ThinkingStyle = .none
+    var thinkingEffort: ThinkingEffort = .high
     /// Appended to the system prompt whenever tools are offered.
     var toolUsePolicy: String = Profile.defaultToolUsePolicy
     /// The chat's project, set when the turn starts (ChatClient) and kept
@@ -292,10 +296,13 @@ extension ChatSettings {
     /// Default), max tokens capped at the model's trained context. Shared by
     /// the chat view and compaction, which also runs with no view on screen.
     @MainActor
-    static func forModel(_ modelID: String?, supportsVision: Bool, maxContext: Int? = nil) -> ChatSettings {
+    static func forModel(_ modelID: String?, supportsVision: Bool, maxContext: Int? = nil,
+                         thinkingStyle: ThinkingStyle = .none) -> ChatSettings {
         let cap = maxContext ?? Self.maxContext(forModel: modelID)
         var settings = ChatSettings(profile: ProfileManager.shared.resolved(for: modelID), maxTokensCap: cap)
         settings.modelSupportsVision = supportsVision
+        settings.thinkingStyle = thinkingStyle
+        settings.thinkingEffort = ThinkingEffort(rawValue: UserDefaults.standard[Pref.thinkingEffort]) ?? .high
         settings.modelPath = modelID
         return settings
     }

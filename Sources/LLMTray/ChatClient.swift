@@ -1329,6 +1329,8 @@ final class ChatClient: ObservableObject {
         var now = ChatSettings(profile: ProfileManager.shared.resolved(for: modelPath), maxTokensCap: start.maxTokensCap)
         now.modelPath = modelPath
         now.modelSupportsVision = start.modelSupportsVision
+        now.thinkingStyle = start.thinkingStyle
+        now.thinkingEffort = start.thinkingEffort
         now.project = start.project
         // Turned off mid-turn: stops at once.
         now.folders = FolderAccessManager.shared.isEnabled ? start.folders : nil
