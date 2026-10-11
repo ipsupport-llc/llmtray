@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "它沒有要帶入的自有設定；此處的設定已保留。";
 "It is being set up or updated. Try again once that's done." = "正在設定或更新。完成後請再試一次。";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "項目會移至垃圾桶，而非刪除。欲還原請在此或於「設定」使用「Undo」：Finder 的 Put Back 無法辨識其資料夾。";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "其 Default 個人檔案會顯示在「設定 › Profiles」為「Default (ipsupport.us)」：您在這裡的個人檔案曾被修改，因此會保留原本的檔案。";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "它的 Default 設定檔位於「設定 › 設定檔」，名稱為「Default (ipsupport.us)」；你這裡的設定檔已變更，因此已保留。";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "其對話會保留，回到近期項目；專案的指示與檔案將被刪除。";
 "Its memory, in GB." = "記憶體大小（GB）。";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "其設定也一併帶入；需在「設定 › Models」中重新輸入 Hugging Face 代幣。";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "它的設定也一併帶入；Hugging Face 代幣必須在「設定 › 模型」中重新輸入。";
 "Its settings were the same as these already." = "其設定已與此處相同。";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "未匯入其設定：~/Library/Preferences 中的 %@ 並非如此。";
 "KV cache" = "KV 快取";

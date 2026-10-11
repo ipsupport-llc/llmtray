@@ -44,7 +44,7 @@
 "%@: not supported yet" = "%@: עדיין לא נתמך";
 "%d overridden, rest from Default · %@" = "דריסות: %d, השאר מ־Default · %@";
 "%lld MB" = "%lld מ״ב";
-"%lld can still be undone from Settings > Files." = "%lld עדיין ניתן לבטל מ־Settings > Files.";
+"%lld can still be undone from Settings > Files." = "עדיין ניתן לבטל את %lld דרך הגדרות > קבצים.";
 "%lld downloads" = "%lld הורדות";
 "%lld failed" = "%lld נכשלו";
 "%lld files" = "%lld קבצים";
@@ -137,7 +137,7 @@
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "עורך, סוכן או סקריפט מבקשים מודל שונה מהטעון. החלפה תסיר את המודל הטעון — גם הצ'אט. שאל קודם: הודעה עם 'Switch' / 'Keep'; ללא תשובה בדקה נחשבת 'Keep'. 'Keep': הלקוח מקבל שגיאה שמציינת את המודל הטעון. הצ'אט של האפליקציה תמיד מחליף.";
 "An item needs the new folder it goes into: tick that folder too." = "פריט צריך את התיקייה החדשה שאליה מועבר: סמן גם אותה.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "טיפ אופציונלי: ללא מנויים, ללא חסימות תכונות. תומכים יכולים לבחור להופיע בשם שהם מזינים.";
-"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "פריט לא ודאי אולי השתנה או לא — בדקו אותו ב‑Finder. Settings > Files שומר יומן.";
+"An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "ייתכן שפריט שמצבו לא ודאי השתנה ואולי לא: יש לבדוק אותו ב־Finder. היומן נשמר ב־הגדרות > קבצים.";
 "Another LLMTray is running" = "עוד LLMTray פועל";
 "Another folder change is running: try again when it's done." = "שינוי תיקייה אחר בפועל: נסה שוב כשייגמר.";
 "Another model already uses this alias." = "מודל אחר כבר משתמש בכינוי הזה.";
@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "לחץ להפעלת קבצי פרויקט: הוסף קבצים לפרויקט ואפשר לצ'אטים שלו לחפש בהם.";
 "Close" = "סגור";
 "Close Tab" = "סגור כרטיסייה";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "מיסגר את החלון הזה. Settings › General › Set Up LLMTray… פותח אותו שוב.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "סוגר את החלון הזה. הגדרות › כללי › הגדר את LLMTray… פותח אותו שוב.";
 "Coding agents" = "סוכני קוד";
 "Coffee" = "קפה";
 "Command-line tool" = "כלי שורת פקודה";
@@ -346,7 +346,7 @@
 "Drop to attach images" = "שחרר לצירוף תמונות";
 "Duplicate this profile" = "משכפל את הפרופיל הזה.";
 "Echo cancellation" = "הדחקת הד";
-"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "לא ניתן להפעיל הדחקת הד: %@ — כבה אותה ב‑Settings > Voice.";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "הדחקת הד לא הצליחה להתחיל: %@ -- יש לכבות אותה ב־הגדרות > קול.";
 "Echo cancellation isn't available on this Mac." = "הדחקת הד אינה זמינה במחשב Mac זה.";
 "Echo gate" = "שער הדהוד";
 "Edit Profile…" = "עריכת פרופיל…";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit דיבור: הגרסה המהירה ביותר של IPSupport — מודל שפה ב־3 סיביות עם זיהוי דיבור וקול ב־8 סיביות, כל מבחן עונה נכון. GPTQ 3-bit: אותו דבר כשהמרכיבים של הדיבור בדיוק מלא. 4-bit: בניית mlx-community. כל אחד יורד רק כאשר אתה מבקש.";
 "GPU memory limit" = "מגבלת זיכרון GPU";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "זיכרון GPU שהשרת של המודל משאיר פנוי לצד המשקלים, עבור אקטיבציות ו‑macOS. החלוקות למטה מחלקות את מה שנשאר לאחר מכן.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: קבלו את הרישיון ב‑Hugging Face ושמרו אסימון ב‑Settings › Models קודם.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "מוגבל בגישה: תחילה יש לאשר את הרישיון שלו ב־Hugging Face ולשמור אסימון ב־הגדרות › מודלים.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "מוגבל: קבל את הרישיון בעמוד ה‑Hugging Face שלו, והוסף אסימון ב‑Settings → Models.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "מוגבל: בקש גישה בעמוד ה‑Hugging Face שלו (המחברים בוחנים את הבקשה), והוסף אסימון ב‑Settings → Models.";
 "General" = "כללי";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "לא היו לה הגדרות לייבוא; ההגדרות כאן נשמרו.";
 "It is being set up or updated. Try again once that's done." = "מוגדר או מתעדכן כעת. נסו שוב כשזה יסתיים.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "הפריטים נשלחים ל־Trash, לא נמחקים. כדי להשיבם השתמש ב־Undo כאן או ב־Settings: Finder's Put Back לא יודע את התיקייה שלהם.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "ה‑Default profile שלו נמצא ב‑Settings › Profiles בשם “Default (ipsupport.us)”: שלך כאן שונה, לכן נשמר.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "פרופיל Default שלו נמצא ב־הגדרות › פרופילים בתור „Default (ipsupport.us)”: הפרופיל שלך כאן השתנה, ולכן הוא נשמר.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "הצ'אטים שלו נשארים ומופיעים שוב ברשימת האחרונים; ההוראות והקבצים של הפרויקט יימחקו.";
 "Its memory, in GB." = "זיכרון במחשב, בגיגה־בייט.";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "הגדרותיה יובאו גם הן; יש להזין שוב אסימון Hugging Face ב‑Settings › Models.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "גם ההגדרות שלו הועברו; צריך להזין שוב אסימון של Hugging Face ב־הגדרות › מודלים.";
 "Its settings were the same as these already." = "ההגדרות שלה כבר תאמו את אלה.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "ההגדרות שלה לא יובאו: זה לא %@ ב‑~/Library/Preferences.";
 "KV cache" = "מטמון KV";
@@ -654,7 +654,7 @@
 "No chat model yet." = "עדיין אין מודל צ'אט.";
 "No chats found" = "לא נמצאו צ'אטים";
 "No details for this answer." = "אין פרטים עבור תשובה זו.";
-"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "אין מודל embedding: החיפוש בקבצים נעשה לפי מילים. הורידו אותו ב‑Settings > Files כדי לחפש לפי משמעות.";
+"No embedding model: files are searched by their words. Download it in Settings > Files for search by meaning." = "אין דגם הטמעה: החיפוש בקבצים נעשה לפי המילים שלהם. יש להוריד אותו ב־הגדרות > קבצים לחיפוש לפי משמעות.";
 "No files yet" = "אין קבצים עדיין";
 "No folder changes yet." = "עדיין אין שינויים בתיקיות.";
 "No messages yet" = "עדיין אין הודעות";
@@ -1180,13 +1180,13 @@
 "Used by image generation, music and Voice Lab, which download them. They're kept in the models folder too, under their Hugging Face names." = "משמש/ת להפקת תמונה, למוזיקה ול‑Voice Lab, שהורדות אותן. גם נשמרות בתיקיית ה‑models תחת שמותיהן ב‑Hugging Face.";
 "Uses the internet" = "משתמש באינטרנט";
 "Verbose server logging" = "רישום שרת מפורט";
-"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "לוג מפורט של השרת היה מופעל, ולכן הלוג מכיל את השיחות שלך — הוא לא מצורף. כדי לכלול אותו, כבה את הלוג המפורט ב‑Settings › Server, הפעל מחדש את השרת ושחזר את הבעיה.";
+"Verbose server logging was on, so the log holds your chats: it isn't attached. To include it, turn verbose logging off in Settings › Server, restart the server and reproduce the problem." = "רישום שרת מפורט היה פעיל, ולכן היומן מכיל את הצ׳אטים שלך: הוא לא מצורף. כדי לכלול אותו, יש לכבות רישום מפורט ב־הגדרות › שרת, להפעיל מחדש את השרת ולשחזר את הבעיה.";
 "Version" = "גרסה";
 "Version %@" = "גרסה %@";
 "View model card" = "הצג את כרטיס המודל.";
 "Voice" = "קול";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab כבוי — הדלק בהגדרות > Voice.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab כבוי -- יש להפעיל אותו ב־הגדרות > קול.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab תופס כ‑%1$@ GB מתוך %2$@ GB ש‑GPU עשוי להשתמש בהם — לא אפשרי יחד עם %3$@ GB של מודל הצ'אט, לכן מודל הצ'אט מנותק בזמן הריצה.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab תופס כ‑%1$@ GB מתוך %2$@ GB ש‑GPU עשוי להשתמש בהם.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab תופס כ‑%1$@ GB, יותר מ‑%2$@ GB שה‑GPU יכול להשתמש בו ב‑Mac זה: לא יהיה מספיק זיכרון.";

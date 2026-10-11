@@ -989,7 +989,7 @@
 "That isn't LLMTray's folder" = "Essa não é a pasta do LLMTray";
 "The %lld moves to the Trash are unticked: tick the ones you want." = "As %lld remoções para a Lixeira estão desmarcadas: marque as que você deseja.";
 "The App Store couldn't confirm the purchase." = "A App Store não pôde confirmar a compra.";
-"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "A versão do LLMTray da App Store está aberta. Feche-a primeiro (ícone na barra de menus › Quit), depois abra esta novamente: ambas usariam a mesma porta e carregariam modelos duas vezes.";
+"The App Store version of LLMTray is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "A versão do LLMTray da App Store está aberta. Encerre-a primeiro (ícone na barra de menus › Encerrar) e abra esta novamente: as duas usariam a mesma porta e carregariam modelos duas vezes.";
 "The Keychain refused to remove the token." = "O Keychain recusou remover o token.";
 "The Keychain refused to save the token." = "O Keychain recusou salvar o token.";
 "The LLMTray guide is in this project: ask, for example, how to connect your coding agent." = "O guia do LLMTray está neste projeto: pergunte, por exemplo, como conectar seu agente de codificação.";
@@ -1082,7 +1082,7 @@
 "The settings here were kept." = "As configurações daqui foram mantidas.";
 "The suggestions for this Mac are already here. Browse Hugging Face for another model." = "As sugestões para este Mac já estão aqui. Navegue no Hugging Face por outro modelo.";
 "The tips aren't available right now." = "As contribuições não estão disponíveis no momento.";
-"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "A versão do LLMTray de ipsupport.us está aberta. Feche-a primeiro (ícone na barra de menus › Quit), depois abra esta novamente: ambas usariam a mesma porta e carregariam modelos duas vezes.";
+"The version of LLMTray from ipsupport.us is open. Quit it first (its menu bar icon › Quit), then open this one again: the two would use the same port and load models twice." = "A versão do LLMTray de ipsupport.us está aberta. Encerre-a primeiro (ícone na barra de menus › Encerrar) e abra esta novamente: as duas usariam a mesma porta e carregariam modelos duas vezes.";
 "The voice model is being downloaded -- try again once it's done." = "O modelo de voz está sendo baixado — tente novamente quando terminar.";
 "The voice model isn't downloaded -- download it in Settings > Voice." = "O modelo de voz não está baixado — baixe em Ajustes > Voz.";
 "The voice model's audio format isn't supported." = "O formato de áudio do modelo de voz não é suportado.";

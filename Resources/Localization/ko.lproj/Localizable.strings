@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3-bit + 8-bit 음성: IPSupport의 가장 빠른 빌드 — 3비트 언어 모델에 8비트 음성 인식과 음성 합성이 포함되어 있으며, 모든 테스트에서 정확한 응답을 제공합니다. GPTQ 3-bit: 음성 관련 처리가 전체 정밀도로 된 동일한 빌드입니다. 4-bit: mlx-community 빌드입니다. 각 항목은 사용자가 요청할 때만 다운로드됩니다.";
 "GPU memory limit" = "GPU 메모리 제한";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "가중치 외에 모델 서버가 활성화와 macOS를 위해 비워두는 GPU 메모리입니다. 아래 비율은 그 남은 공간을 분할합니다.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: Hugging Face에서 라이선스에 동의하고 Settings › Models에 토큰을 먼저 저장하세요.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "제한됨: 먼저 Hugging Face에서 라이선스에 동의하고 설정 › 모델에 토큰을 저장하십시오.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 사용권에 동의한 뒤 설정 → Models에 토큰을 추가하세요.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "제한됨: 해당 모델의 Hugging Face 페이지에서 접근을 요청하세요(저자가 검토함). 그 후 설정 → Models에 토큰을 추가하세요.";
 "General" = "일반";
@@ -516,10 +516,10 @@
 "It had no settings of its own to bring; the ones here were kept." = "가져올 자체 설정이 없었습니다; 여기의 설정이 유지되었습니다.";
 "It is being set up or updated. Try again once that's done." = "설정 또는 업데이트 중입니다. 완료된 후 다시 시도하세요.";
 "Items go to the Trash, not deleted. To put them back, use Undo here or in Settings: Finder's Put Back doesn't know their folder." = "항목은 삭제되지 않고 휴지통으로 이동됩니다. 복원하려면 여기 또는 설정에서 Undo를 사용하세요. Finder의 Put Back은 원래 폴더를 알지 못합니다.";
-"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "기본(Default) 프로필은 Settings › Profiles에 “Default (ipsupport.us)”로 있습니다: 여기 계정의 프로필은 변경되어 있어 보관되었습니다.";
+"Its Default profile is in Settings › Profiles as “Default (ipsupport.us)”: yours here was changed, so it was kept." = "Default 프로필은 설정 › 프로필에 ‘Default (ipsupport.us)’로 있습니다. 여기의 프로필은 변경되어 유지되었습니다.";
 "Its chats stay, back among the recents; the project's instructions and files are deleted." = "채팅은 유지되어 최근 항목에 남아 있으며, 프로젝트의 지침과 파일은 삭제됩니다.";
 "Its memory, in GB." = "메모리 용량(GB).";
-"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "설정도 함께 가져왔습니다; Hugging Face 토큰을 다시 Settings › Models에 입력해야 합니다.";
+"Its settings came too; a Hugging Face token has to be entered again in Settings › Models." = "설정도 함께 가져왔습니다. Hugging Face 토큰은 설정 › 모델에서 다시 입력해야 합니다.";
 "Its settings were the same as these already." = "해당 설정은 이미 이 설정과 동일했습니다.";
 "Its settings weren't imported: that isn't %@ in ~/Library/Preferences." = "설정이 가져와지지 않았습니다: ~/Library/Preferences의 %@가 아닙니다.";
 "KV cache" = "KV 캐시";
@@ -1186,7 +1186,7 @@
 "View model card" = "모델 카드를 엽니다.";
 "Voice" = "음성";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab이 꺼져 있습니다 — 설정 > Voice에서 켜세요.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab이 꺼져 있습니다. 설정 > 음성에서 켜십시오.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab은 GPU가 사용할 수 있는 %2$@ GB 중 약 %1$@ GB를 차지합니다 — 채팅 모델의 %3$@ GB와 동시에 사용할 수 없어 실행 중에는 채팅 모델이 언로드됩니다.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab은 GPU가 사용할 수 있는 %2$@ GB 중 약 %1$@ GB를 차지합니다.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab은 약 %1$@ GB로, 이 Mac의 GPU가 사용할 수 있는 %2$@ GB보다 많습니다: 메모리가 부족합니다.";

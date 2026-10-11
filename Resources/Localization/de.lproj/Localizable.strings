@@ -244,7 +244,7 @@
 "Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats die Dateien durchsuchen lassen.";
 "Close" = "Schließen";
 "Close Tab" = "Tab schließen";
-"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. Einstellungen › Allgemein › Set Up LLMTray… öffnet es erneut.";
+"Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. „Einstellungen“ › „Allgemein“ › „LLMTray einrichten…“ öffnet es erneut.";
 "Coding agents" = "Code‑Agenten";
 "Coffee" = "Coffee";
 "Command-line tool" = "Kommandozeilen‑Tool";
@@ -346,7 +346,7 @@
 "Drop to attach images" = "Zum Anhängen von Bildern ablegen";
 "Duplicate this profile" = "Dieses Profil duplizieren";
 "Echo cancellation" = "Echo-Unterdrückung";
-"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ – schalten Sie sie unter „Einstellungen > Stimme“ aus.";
+"Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo-Unterdrückung konnte nicht gestartet werden: %@ -- deaktivieren Sie sie unter „Einstellungen“ > „Sprache“.";
 "Echo cancellation isn't available on this Mac." = "Echo-Unterdrückung ist auf diesem Mac nicht verfügbar.";
 "Echo gate" = "Echo-Gate";
 "Edit Profile…" = "Profil bearbeiten …";
@@ -424,7 +424,7 @@
 "GPTQ 3-bit + 8-bit speech: IPSupport's fastest build -- a 3-bit language model with 8-bit speech recognition and voice, every test answer right. GPTQ 3-bit: the same with the speech parts in full precision. 4-bit: mlx-community's build. Each is downloaded only when you ask." = "GPTQ 3‑bit + 8‑bit Speech: IPSupports schnellster Build – ein 3‑bit Sprachmodell mit 8‑bit Spracherkennung und Stimme, in Tests durchgehend korrekt. GPTQ 3‑bit: wie oben, die Sprachkomponenten in voller Präzision. 4‑bit: Build von mlx‑community. Jede Variante wird nur bei Bedarf heruntergeladen.";
 "GPU memory limit" = "GPU‑Speicherlimit";
 "GPU memory the model server leaves alone beside the weights, for activations and macOS. The shares below split what's left after it." = "GPU‑Speicher, den der Modell‑Server neben den Gewichten freilässt, für Aktivierungen und macOS. Die untenstehenden Anteile teilen, was danach übrig bleibt.";
-"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Gated: Akzeptieren Sie die Lizenz auf Hugging Face und speichern Sie zuerst ein Token in Einstellungen › Modelle.";
+"Gated: accept its license on Hugging Face and save a token in Settings › Models first." = "Eingeschränkt: Akzeptieren Sie zuerst die Lizenz auf Hugging Face und speichern Sie einen Token in Einstellungen › Modelle.";
 "Gated: accept its license on its Hugging Face page, and add a token in Settings → Models." = "Eingeschränkt: Akzeptieren Sie die Lizenz auf der Hugging Face‑Seite des Modells und fügen Sie in Einstellungen → Modelle einen Token hinzu.";
 "Gated: request access on its Hugging Face page (the authors review it), and add a token in Settings → Models." = "Eingeschränkt: Beantragen Sie Zugriff auf der Hugging Face‑Seite des Modells (Autoren prüfen Anfragen) und fügen Sie in Einstellungen → Modelle einen Token hinzu.";
 "General" = "Allgemein";
@@ -1186,7 +1186,7 @@
 "View model card" = "Modellkarte anzeigen.";
 "Voice" = "Sprache";
 "Voice Lab" = "Voice Lab";
-"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab ist ausgeschaltet – in Einstellungen > Voice einschalten.";
+"Voice Lab is off -- enable it in Settings > Voice." = "Voice Lab ist deaktiviert -- aktivieren Sie es unter „Einstellungen“ > „Sprache“.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use -- not together with the chat model's %3$@ GB, so the chat model is unloaded while it runs." = "Voice Lab benötigt etwa %1$@ GB der %2$@ GB, die die GPU nutzen darf – nicht zusammen mit den %3$@ GB des Chat‑Modells, daher wird das Chat‑Modell während des Betriebs entladen.";
 "Voice Lab takes about %1$@ GB of the %2$@ GB the GPU may use." = "Voice Lab benötigt etwa %1$@ GB der %2$@ GB, die die GPU nutzen darf.";
 "Voice Lab takes about %1$@ GB, more than the %2$@ GB the GPU may use on this Mac: it would run out of memory." = "Voice Lab benötigt etwa %1$@ GB, mehr als die %2$@ GB, die die GPU auf diesem Mac nutzen darf: Es würde nicht genug Speicher geben.";
