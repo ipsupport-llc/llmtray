@@ -435,14 +435,14 @@ def labels_in(key: str, table: dict[str, str], base_keys: list[str]) -> dict[str
 
 def referenced_labels(key: str, table: dict[str, str]) -> list[str]:
     """Labels `key` names explicitly as UI -- the parts of a settings path
-    (Settings > Files or Settings › General: the longest label ending right
+    (Settings > Files, Settings › General or Settings → Models: the longest label ending right
     before each separator and
     starting right after it) or a quoted name -- whose translation the
     value must contain."""
     import re
     labels = [k for k in table if _is_label(k)]
     names: list[str] = []
-    for m in re.finditer(r"\s[>\u203A]\s", key):  # "Settings > Files", "Settings › General"
+    for m in re.finditer(r"\s[>\u203A\u2192]\s", key):  # "Settings > Files", "Settings › General", "Settings → Models"
         before, after = key[:m.start()], key[m.end():]
         left = [l for l in labels if before.endswith(l) and (len(before) == len(l) or not before[-len(l) - 1].isalnum())]
         right = [l for l in labels if after.startswith(l) and (len(after) == len(l) or not after[len(l)].isalnum())]
@@ -465,7 +465,7 @@ def contains_label(value: str, translation: str, english: str = "", key: str = "
     if english and not left.search(translation):
         # Uses of the word in the key that aren't the label itself -- a path
         # part next to > or ›, or a quoted name -- may stay ("Voice Lab").
-        refs = re.compile(r"[>\u203A]\s*" + e + r"(?!\w)|(?<!\w)" + e + r"\s*[>\u203A]|[\u201C\"«]" + e + r"[\u201D\"»]")
+        refs = re.compile(r"[>\u203A\u2192]\s*" + e + r"(?!\w)|(?<!\w)" + e + r"\s*[>\u203A\u2192]|[\u201C\"«]" + e + r"[\u201D\"»]")
         if len(left.findall(value)) > max(len(word.findall(key)) - len(refs.findall(key)), 0):
             return False
     low = value.lower()
