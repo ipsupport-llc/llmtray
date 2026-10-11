@@ -252,11 +252,29 @@ struct ChatComposer: View {
                     .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
                     .focused(isFocused)
                     .disabled(!canChat)
+                    // Recording: the time and level over the field.
+                    .overlay { if composer.recorder.isRecording { RecordingBar(recorder: composer.recorder) } }
 
                 if composer.acceptsAudio {
-                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings) {
-                        composer.recordings.append($0)
+                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
+                                 done: { composer.recordings.append($0) },
+                                 sendNow: { composer.recordings.append($0); send() })
+                    // Esc drops a recording; ⌥⌘R starts or stops a clip.
+                    Button("") { composer.recorder.cancel() }
+                        .keyboardShortcut(.cancelAction)
+                        .disabled(!composer.recorder.isRecording)
+                        .frame(width: 0, height: 0)
+                        .hidden()
+                    Button("") {
+                        if composer.recorder.isRecording {
+                            if let wav = composer.recorder.stop() { composer.recordings.append(wav) }
+                        } else if composer.recordings.count < ComposerModel.maxRecordings {
+                            Task { await composer.recorder.start() }
+                        }
                     }
+                    .keyboardShortcut("r", modifiers: [.command, .option])
+                    .frame(width: 0, height: 0)
+                    .hidden()
                 }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
@@ -515,44 +533,123 @@ struct ThinkingEffortPicker: View {
     }
 }
 
-/// The composer's microphone for a model that hears (adr/0023): click to
-/// record, click again to stop; the recording waits by the field until
-/// it's sent (Send stops one still going and sends it too).
+/// The composer's microphone for a model that hears (adr/0023), as
+/// Telegram's: a click records a clip that waits by the field (a second
+/// click stops it); held, it's a walkie-talkie -- released, the message
+/// goes at once (with the field's text), moved off the button first, the
+/// recording is dropped.
 struct RecordButton: View {
     @ObservedObject var recorder: ChatRecorder
     /// The message has as many recordings as it can take.
     var full = false
+    /// A clip for the field.
     let done: (Data) -> Void
+    /// Held and released over the button: send with this recording.
+    let sendNow: (Data) -> Void
+    @State private var pressed = false
+    @State private var holding = false
+    @State private var holdTask: Task<Void, Never>?
+    /// How long a press is before it's a hold.
+    static let holdDelay: UInt64 = 300_000_000
 
     static func time(_ seconds: Double) -> String {
         let s = Int(seconds.rounded(.down))
         return String(format: "%d:%02d", s / 60, s % 60)
     }
 
+    private var disabled: Bool { recorder.isStarting || (full && !recorder.isRecording) }
+
+    private func inside(_ p: CGPoint) -> Bool { CGRect(x: -16, y: -16, width: 56, height: 56).contains(p) }
+
     var body: some View {
-        HStack(spacing: 4) {
-            if recorder.isRecording {
-                Text(Self.time(recorder.seconds))
-                    .font(.callout.monospacedDigit())
-                    .foregroundStyle(.red)
-            }
-            Button {
+        Image(systemName: recorder.isRecording ? (recorder.holdToSend ? "mic.fill" : "stop.circle.fill") : "mic")
+            .foregroundStyle(recorder.isRecording ? Color.red : Color.primary)
+            .frame(width: 24, height: 24)
+            .contentShape(Rectangle())
+            .opacity(disabled ? 0.4 : 1)
+            .gesture(DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    guard !disabled else { return }
+                    if !pressed {
+                        pressed = true
+                        // A press on a clip being recorded is the click
+                        // that stops it, never a hold.
+                        if !recorder.isRecording {
+                            holdTask = Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: Self.holdDelay)
+                                guard !Task.isCancelled, pressed else { return }
+                                holding = true
+                                recorder.holdToSend = true
+                                await recorder.start()
+                            }
+                        }
+                    }
+                    if holding { recorder.holdAway = !inside(value.location) }
+                }
+                .onEnded { value in
+                    defer { pressed = false; holding = false; holdTask?.cancel(); holdTask = nil }
+                    guard !disabled else { return }
+                    if holding {
+                        // Released: sent, unless moved away (or too short).
+                        let keep = inside(value.location)
+                        if let wav = recorder.stop(), keep { sendNow(wav) }
+                        return
+                    }
+                    if recorder.isRecording {
+                        if let wav = recorder.stop() { done(wav) }
+                    } else {
+                        Task { await recorder.start() }
+                    }
+                })
+            .help(recorder.isRecording
+                  ? (recorder.holdToSend ? "Release to send" : "Stop recording")
+                  : "Click to record a clip; hold to talk and release to send (the model hears it)")
+            .accessibilityElement()
+            .accessibilityLabel(recorder.isRecording ? Text("Stop recording") : Text("Record"))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
                 if recorder.isRecording {
                     if let wav = recorder.stop() { done(wav) }
-                } else {
+                } else if !disabled {
                     Task { await recorder.start() }
                 }
-            } label: {
-                Image(systemName: recorder.isRecording ? "stop.circle.fill" : "mic")
-                    .foregroundStyle(recorder.isRecording ? Color.red : Color.primary)
             }
-            .buttonStyle(.borderless)
-            .disabled(recorder.isStarting || (full && !recorder.isRecording))
-            .help(recorder.isRecording ? "Stop recording" : "Record a spoken message (the model hears it)")
-            .accessibilityLabel(recorder.isRecording ? "Stop recording" : "Record")
+            .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
+                Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
+            }
+    }
+}
+
+/// Over the field while recording: the time, the level, what ends it.
+struct RecordingBar: View {
+    @ObservedObject var recorder: ChatRecorder
+
+    private var hint: String {
+        if recorder.holdToSend {
+            return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
+                : NSLocalizedString("Release to send · move away to cancel", comment: "hold-to-talk")
         }
-        .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
-            Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
+        return NSLocalizedString("Click ■ to stop · Esc cancels", comment: "recording a clip")
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle().fill(Color.red).frame(width: 8, height: 8)
+            Text(RecordButton.time(recorder.seconds)).font(.callout.monospacedDigit())
+            HStack(alignment: .center, spacing: 2) {
+                ForEach(Array(recorder.levels.suffix(28).enumerated()), id: \.offset) { _, level in
+                    Capsule().fill(Color.red.opacity(0.7))
+                        .frame(width: 3, height: max(2, min(18, CGFloat(level) * 120)))
+                }
+            }
+            .frame(height: 20)
+            Spacer(minLength: 4)
+            Text(hint).font(.caption).foregroundStyle(.secondary).lineLimit(1)
         }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .textBackgroundColor)))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.red.opacity(0.5)))
+        .accessibilityElement(children: .combine)
     }
 }

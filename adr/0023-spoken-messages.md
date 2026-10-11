@@ -10,9 +10,14 @@ unified model with its audio embedder -- `ModelDiscovery.supportsAudio`,
 the setup's "hears audio") gets a microphone in the composer, next to
 Send.
 
-- **Recording**: click to record, click again to stop; the clip waits by
-  the field (its length, a remove button) until the message is sent, and
-  Send stops one still going and sends it too. Voice Lab's capture
+- **Recording**, as Telegram's, no setting: a **click** records a clip
+  that waits by the field (its length, a remove button) until the
+  message is sent -- a second click stops it, Send stops one still going
+  and sends it too; **held** (over 0.3 s) the button is a walkie-talkie:
+  released over it, the message goes at once with the field's text;
+  moved off it first, the recording is dropped. While recording, a bar
+  over the field shows the time, the level and what ends it; Esc drops
+  the recording; ⌥⌘R starts or stops a clip. Voice Lab's capture
   (`MicrophoneCapture`, adr/0016): 16 kHz mono PCM16 collected in memory
   and wrapped as a WAV in memory (`WAVFile`, `ChatRecorder`) -- nothing
   touches the disk, a temporary chat included. At most 30 s a clip (the

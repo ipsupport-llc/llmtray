@@ -241,6 +241,8 @@
 "Clear search" = "Clear search";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Clear the queue: what's indexed stays searchable, the rest is marked not indexed";
 "Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Click to record a clip; hold to talk and release to send (the model hears it)";
+"Click ■ to stop · Esc cancels" = "Click ■ to stop · Esc cancels";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -801,13 +803,15 @@
 "Recently updated" = "Recently updated";
 "Recommended" = "Recommended";
 "Record" = "Record";
-"Record a spoken message (the model hears it)" = "Record a spoken message (the model hears it)";
 "Recording" = "Recording";
 "Recovery" = "Recovery";
 "Refused" = "Refused";
 "Regenerate" = "Regenerate";
 "Reinstall" = "Reinstall";
 "Reinstall failed: %@" = "Reinstall failed: %@";
+"Release to cancel" = "Release to cancel";
+"Release to send" = "Release to send";
+"Release to send · move away to cancel" = "Release to send · move away to cancel";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
 "Remove attachment" = "Remove attachment";

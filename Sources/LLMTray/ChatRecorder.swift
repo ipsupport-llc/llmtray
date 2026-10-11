@@ -19,6 +19,12 @@ final class ChatRecorder: ObservableObject {
     private var startToken = 0
     @Published private(set) var seconds: Double = 0
     @Published private(set) var level: Float = 0
+    /// The last levels, for the composer's meter (newest last).
+    @Published private(set) var levels: [Float] = []
+    /// Held to talk: released, it sends (the composer's RecordButton).
+    @Published var holdToSend = false
+    /// Held, and the pointer moved off the button: released, it's dropped.
+    @Published var holdAway = false
     /// Why it couldn't start (no permission, no microphone).
     @Published var problem: String?
 
@@ -69,12 +75,15 @@ final class ChatRecorder: ObservableObject {
         self.audio = audio
         self.capture = capture
         seconds = 0
+        levels = []
         isRecording = true
     }
 
     /// The recording as a WAV; nil when there was nothing (under 0.3 s).
     func stop() -> Data? {
         startToken += 1
+        holdToSend = false
+        holdAway = false
         guard isRecording else { return nil }
         capture?.stop()
         audio?.stop()
@@ -96,6 +105,8 @@ final class ChatRecorder: ObservableObject {
         guard isRecording else { return }
         self.seconds = seconds
         self.level = level
+        levels.append(level)
+        if levels.count > 40 { levels.removeFirst(levels.count - 40) }
         if seconds >= Self.maxSeconds, let wav = stop() { onLimit?(wav) }
     }
 
