@@ -273,6 +273,12 @@ final class ControlCommands {
             return reply.send(.failure("image generation isn't set up for \(model.rawValue) (\(model.displayName)) -- "
                                        + "download it in LLMTray › Settings › Image generation"))
         }
+        // Nor updated from here (minutes of pip in a request): a chat's
+        // next image brings it to the pin.
+        guard !tabs.mflux.needsUpdate else {
+            return reply.send(.failure("image generation needs an mflux update -- it updates on the next image made in a chat, "
+                                       + "or turn image generation off and on in LLMTray › Settings"))
+        }
         let prompt = String(request.prompt.prefix(4000))
         // The chat tool's default canvas, scaled by the quality setting; an
         // explicit size as given (mflux rounds it to 16 px, 256...2048).
