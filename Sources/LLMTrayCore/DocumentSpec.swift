@@ -65,7 +65,7 @@ public struct DocumentSpec: Equatable, Sendable {
             .init("changes", .objects([
                 .init("section", .string, "The heading of the section to replace.", aliases: ["heading"]),
                 .init("after", .string, "Or: the heading to add a new section after (neither: at the end)."),
-                .init("content", .string, "The section's new Markdown; empty removes it.", required: true,
+                .init("content", .string, "The section's new Markdown; a heading alone renames it; empty removes it.", required: true,
                       aliases: ["markdown", "text", "body"]),
             ]), "To change the last document made in this chat: only the sections that change, instead of content. The rest stays as it was.",
                   aliases: ["edits", "sections"]),

@@ -81,8 +81,14 @@ public enum DocumentEdit {
                 case .none: return .failure(missing(name, baseTitle, sections))
                 case .several(let all): return .failure(ambiguous(name, all))
                 }
+                let filled = new.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
                 if new.isEmpty {
                     lines.replaceSubrange(s.start..<s.end, with: [])
+                } else if filled.count == 1, DocumentHTML.Converter.heading(filled[0].trimmingCharacters(in: .whitespaces)) != nil {
+                    // A heading alone is a new name: the heading line only,
+                    // its text and subsections kept (a title's section is
+                    // the whole document).
+                    lines[s.start] = filled[0]
                 } else if let first = new.first(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }),
                           DocumentHTML.Converter.heading(first.trimmingCharacters(in: .whitespaces)) != nil {
                     lines.replaceSubrange(s.start..<s.end, with: new + [""])
@@ -104,6 +110,13 @@ public enum DocumentEdit {
             }
         }
         values["content"] = lines.joined(separator: "\n")
+        // Most of the document gone in one call: said, never silent.
+        let before = DocumentHTML.lines((base["content"] as? String) ?? "").filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
+        let after = lines.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }.count
+        if before >= 6, after * 2 < before {
+            adjusted.append("The changes removed most of the document (\(after) of \(before) lines are left). Tell the user, "
+                + "and if that wasn't meant, change it again with the sections that should stay.")
+        }
         // A chart whose place went with a removed or rewritten section goes
         // too (else it would turn up at the end); one this call sent stays.
         let dropped = placedCharts((base["content"] as? String) ?? "").subtracting(placedCharts(values["content"] as? String ?? ""))
