@@ -459,13 +459,18 @@ def contains_label(value: str, translation: str, english: str = "", key: str = "
     doesn't count, though a stem may match it ("Modele" in "Models"): the
     value may keep only the key's other uses of the word ("Voice Lab")."""
     import re
-    if english and english not in translation:
-        word = re.compile(r"(?<!\w)" + re.escape(english) + r"(?!\w)")
-        if len(word.findall(value)) > max(len(word.findall(key)) - 1, 0):
+    e = re.escape(english)
+    word = re.compile(r"(?<!\w)" + e + r"(?!\w)")  # in the key: the label's own case
+    left = re.compile(word.pattern, re.IGNORECASE)  # in a value: any case
+    if english and not left.search(translation):
+        # Uses of the word in the key that aren't the label itself -- a path
+        # part next to > or ›, or a quoted name -- may stay ("Voice Lab").
+        refs = re.compile(r"[>\u203A]\s*" + e + r"(?!\w)|(?<!\w)" + e + r"\s*[>\u203A]|[\u201C\"«]" + e + r"[\u201D\"»]")
+        if len(left.findall(value)) > max(len(word.findall(key)) - len(refs.findall(key)), 0):
             return False
     low = value.lower()
-    for word in translation.lower().split():
-        stem = word if len(word) <= 4 else word[:-2]
+    for part in translation.lower().split():
+        stem = part if len(part) <= 4 else part[:-2]
         if stem not in low:
             return False
     return True
