@@ -276,28 +276,28 @@ public struct DocumentSpec: Equatable, Sendable {
                 continue
             }
             if t.hasPrefix("```") || t.hasPrefix("~~~") { fence = String(t.prefix(3)); continue }
-            // Code spans out: every other run between backticks -- a last
-            // backtick left open is text, as the converter reads it.
-            let runs = t.components(separatedBy: "`")
-            for prose in runs.enumerated().filter({ $0.offset % 2 == 0 || $0.offset == runs.count - 1 }).map(\.element) {
-                var rest = prose[...]
-                while let mark = rest.range(of: "](data:", options: .caseInsensitive) {
-                    let before = rest[..<mark.lowerBound]
-                    let after = rest[mark.upperBound...]
-                    // The bracket it closes opened as "![": an image; a link
-                    // isn't, and the scan goes on right after its marker.
-                    // (The last "![" with no "](" after it: alt text may hold "[".)
-                    guard let bang = before.range(of: "![", options: .backwards), !before[bang.upperBound...].contains("](") else {
-                        rest = after
-                        continue
-                    }
-                    // To its ")", or (left open) to the next image or the line's end.
-                    let close = after.firstIndex(of: ")").map { after.index(after: $0) } ?? after.endIndex
-                    let next = after.range(of: "![")?.lowerBound ?? after.endIndex
-                    let end = min(close, next)
-                    found.append(String(rest[bang.lowerBound..<end]))
-                    rest = rest[end...]
+            // Code spans (backticks in pairs; one left open is text, as the
+            // converter reads it): a marker inside one isn't an image, but an
+            // image's caption may hold code.
+            let ticks = t.indices.filter { t[$0] == "`" }
+            let spans = stride(from: 0, to: ticks.count - 1, by: 2).map { ticks[$0]...ticks[$0 + 1] }
+            var rest = t[...]
+            while let mark = rest.range(of: "](data:", options: .caseInsensitive) {
+                let before = rest[..<mark.lowerBound]
+                let after = rest[mark.upperBound...]
+                // The last "![" with no "](" after it (alt text may hold "["):
+                // an image; a link isn't, nor a marker in code.
+                guard !spans.contains(where: { $0.contains(mark.lowerBound) }),
+                      let bang = before.range(of: "![", options: .backwards), !before[bang.upperBound...].contains("](") else {
+                    rest = after
+                    continue
                 }
+                // To its ")", or (left open) to the next image or the line's end.
+                let close = after.firstIndex(of: ")").map { after.index(after: $0) } ?? after.endIndex
+                let next = after.range(of: "![")?.lowerBound ?? after.endIndex
+                let end = min(close, next)
+                found.append(String(rest[bang.lowerBound..<end]))
+                rest = rest[end...]
             }
         }
         return found
