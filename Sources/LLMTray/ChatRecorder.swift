@@ -25,6 +25,14 @@ final class ChatRecorder: ObservableObject {
     @Published var holdToSend = false
     /// Held, and the pointer moved off the button: released, it's dropped.
     @Published var holdAway = false
+    /// A held recording that hit the limit: kept until the hold ends
+    /// (released over the button: sent; away: dropped).
+    private var heldClip: Data?
+
+    func takeHeldClip() -> Data? {
+        defer { heldClip = nil }
+        return heldClip
+    }
     /// Why it couldn't start (no permission, no microphone).
     @Published var problem: String?
 
@@ -107,7 +115,12 @@ final class ChatRecorder: ObservableObject {
         self.level = level
         levels.append(level)
         if levels.count > 40 { levels.removeFirst(levels.count - 40) }
-        if seconds >= Self.maxSeconds, let wav = stop() { onLimit?(wav) }
+        if seconds >= Self.maxSeconds {
+            let held = holdToSend
+            if let wav = stop() {
+                if held { heldClip = wav } else { onLimit?(wav) }
+            }
+        }
     }
 
     /// Asked the first time it's used, not at launch.

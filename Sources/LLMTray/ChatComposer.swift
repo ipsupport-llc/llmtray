@@ -259,22 +259,6 @@ struct ChatComposer: View {
                     RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
                                  done: { composer.recordings.append($0) },
                                  sendNow: { composer.recordings.append($0); send() })
-                    // Esc drops a recording; ⌥⌘R starts or stops a clip.
-                    Button("") { composer.recorder.cancel() }
-                        .keyboardShortcut(.cancelAction)
-                        .disabled(!composer.recorder.isRecording)
-                        .frame(width: 0, height: 0)
-                        .hidden()
-                    Button("") {
-                        if composer.recorder.isRecording {
-                            if let wav = composer.recorder.stop() { composer.recordings.append(wav) }
-                        } else if composer.recordings.count < ComposerModel.maxRecordings {
-                            Task { await composer.recorder.start() }
-                        }
-                    }
-                    .keyboardShortcut("r", modifiers: [.command, .option])
-                    .frame(width: 0, height: 0)
-                    .hidden()
                 }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
@@ -549,6 +533,7 @@ struct RecordButton: View {
     @State private var pressed = false
     @State private var holding = false
     @State private var holdTask: Task<Void, Never>?
+    @State private var lastLocation: CGPoint = .zero
     /// How long a press is before it's a hold.
     static let holdDelay: UInt64 = 300_000_000
 
@@ -569,6 +554,8 @@ struct RecordButton: View {
             .opacity(disabled ? 0.4 : 1)
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { value in
+                    lastLocation = value.location
+                    if holding { recorder.holdAway = !inside(value.location) }
                     guard !disabled else { return }
                     if !pressed {
                         pressed = true
@@ -580,21 +567,23 @@ struct RecordButton: View {
                                 guard !Task.isCancelled, pressed else { return }
                                 holding = true
                                 recorder.holdToSend = true
+                                recorder.holdAway = !inside(lastLocation)
                                 await recorder.start()
                             }
                         }
                     }
-                    if holding { recorder.holdAway = !inside(value.location) }
                 }
                 .onEnded { value in
                     defer { pressed = false; holding = false; holdTask?.cancel(); holdTask = nil }
-                    guard !disabled else { return }
+                    // A hold ends however it is (still starting too: the stop
+                    // cancels that start): sent if released over the button.
                     if holding {
-                        // Released: sent, unless moved away (or too short).
                         let keep = inside(value.location)
-                        if let wav = recorder.stop(), keep { sendNow(wav) }
+                        let wav = recorder.stop() ?? recorder.takeHeldClip()
+                        if keep, let wav { sendNow(wav) }
                         return
                     }
+                    guard !disabled else { return }
                     if recorder.isRecording {
                         if let wav = recorder.stop() { done(wav) }
                     } else {
@@ -616,6 +605,34 @@ struct RecordButton: View {
             }
             .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
                 Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
+            }
+            // Gone mid-press (another tab, a model that doesn't hear): no
+            // start behind the user's back, a hold dropped.
+            .onDisappear {
+                holdTask?.cancel()
+                holdTask = nil
+                if holding { recorder.cancel(); _ = recorder.takeHeldClip() }
+                pressed = false
+                holding = false
+            }
+            // Esc drops a recording; ⌥⌘R starts or stops a clip. Behind the
+            // button: no room taken, nothing for VoiceOver.
+            .background {
+                Group {
+                    Button("") { recorder.cancel() }
+                        .keyboardShortcut(.cancelAction)
+                        .disabled(!recorder.isRecording)
+                    Button("") {
+                        if recorder.isRecording {
+                            if let wav = recorder.stop() { done(wav) }
+                        } else if !disabled {
+                            Task { await recorder.start() }
+                        }
+                    }
+                    .keyboardShortcut("r", modifiers: [.command, .option])
+                }
+                .opacity(0)
+                .accessibilityHidden(true)
             }
     }
 }
