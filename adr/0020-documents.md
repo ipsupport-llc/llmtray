@@ -121,7 +121,8 @@ a 4B model looks as good as one from a 35B model.
   Styles are a few fixed CSS files in the app, picked by name.
 - **The result is a card in the chat**, like a generated image: the first
   page as a thumbnail, the title and page count, and Open (Preview),
-  Show in Finder, Save As…, Add to Project (when the chat is in one).
+  Show in Finder, Save As…, Share… (the system's share sheet with the
+  PDF), Add to Project (when the chat is in one).
   Add to Project calls `ProjectIndexer.addFiles([pdf], to: project)` on
   the main actor, the + menu's path ([0012](0012-project-files-rag.md)):
   Project files are turned on first if they're off
