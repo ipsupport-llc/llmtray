@@ -23,6 +23,9 @@ final class DocumentMathTests: XCTestCase {
     func testOperatorsAndFunctions() {
         XCTAssertTrue(math(#"\sum_{i=1}^n i"#).contains("<munderover><mo>∑</mo>"))
         XCTAssertTrue(math(#"\int_0^1 f"#).contains("<msubsup><mo>∫</mo>"))
+        XCTAssertTrue(math(#"\sum\limits_{i=1}^{n} i"#).contains("<munderover><mo>∑</mo><mrow><mi>i</mi>"))
+        XCTAssertTrue(math(#"\int\limits_0^1 f"#).contains("<munderover><mo>∫</mo>"))
+        XCTAssertTrue(math(#"\displaystyle^2"#).contains("<msup><mrow></mrow><mn>2</mn></msup>"))
         XCTAssertTrue(math(#"\lim_{x \to 0} x"#).contains("<munder><mi>lim</mi>"))
         XCTAssertTrue(math(#"\sin x"#).contains("<mi>sin</mi><mo>\u{2061}</mo><mtext>\u{2009}</mtext><mi>x</mi>"))
         XCTAssertTrue(math(#"\sin(x)"#).contains("<mi>sin</mi><mo>\u{2061}</mo><mo stretchy=\"false\">(</mo>"))

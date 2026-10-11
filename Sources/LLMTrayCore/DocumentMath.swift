@@ -72,9 +72,17 @@ public enum DocumentMath {
                 function = false
                 guard let atom = try atom() else { continue }
                 let applied = function
+                var limits = atom.limits
                 skipSpace()
+                // \sum\limits_…: the operator's scripts, placed as asked.
+                while let name = commandName(), name == "limits" || name == "nolimits" {
+                    limits = name == "limits"
+                    _ = readCommand()
+                    skipSpace()
+                }
                 if let n = peek(), n == "^" || n == "_" || n == "'" {
-                    out.append(try scripts(on: atom.html, limits: atom.limits))
+                    // Nothing to put them on (a space, \displaystyle): an empty base.
+                    out.append(try scripts(on: atom.html.isEmpty ? "<mrow></mrow>" : atom.html, limits: limits))
                 } else {
                     out.append(atom.html)
                 }
@@ -269,7 +277,7 @@ public enum DocumentMath {
                 return ("<mi>\(DocumentHTML.escape(String(text.map { DocumentMath.doubleStruck($0) })))</mi>", false)
             case "begin":
                 return (try environment(), false)
-            case "displaystyle", "textstyle", "limits", "nolimits", "nonumber", "notag":
+            case "displaystyle", "textstyle", "scriptstyle", "limits", "nolimits", "nonumber", "notag":
                 return ("", false)
             default:
                 // Not ours: shown as written.
