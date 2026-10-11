@@ -109,7 +109,7 @@ public struct DocumentSpec: Equatable, Sendable {
         // never a picture (a model can't write one, and the page loads no
         // data:), so the call is answered how a chart is given -- not made
         // into a page with that text on it.
-        guard imagesAsData(content) <= earlier.map(imagesAsData) ?? 0 else { return .failure(.imageData) }
+        guard Set(imagesAsData(content)).isSubset(of: Set(earlier.map(imagesAsData) ?? [])) else { return .failure(.imageData) }
         var notes: [String] = []
         var adjusted: [String] = []
         var charts: [Chart] = []
@@ -263,10 +263,11 @@ public struct DocumentSpec: Equatable, Sendable {
         ((raw as? [Any]) ?? []).compactMap { ($0 as? Double) ?? ($0 as? Int).map(Double.init) }
     }
 
-    /// Images written as data (`![…](data:…`, closed or not) outside code:
-    /// a link to data or a mention in code isn't one.
-    static func imagesAsData(_ content: String) -> Int {
-        var count = 0
+    /// The lines with images written as data (`![…](data:…`, closed or
+    /// not) outside code -- a link to data or a mention in code isn't one;
+    /// a line the earlier document had as it is isn't new.
+    static func imagesAsData(_ content: String) -> [String] {
+        var found: [String] = []
         var fence: String?
         for line in DocumentHTML.lines(content) {
             let t = line.trimmingCharacters(in: .whitespaces)
@@ -277,13 +278,14 @@ public struct DocumentSpec: Equatable, Sendable {
             if t.hasPrefix("```") || t.hasPrefix("~~~") { fence = String(t.prefix(3)); continue }
             // Code spans out: every other run between backticks.
             let prose = t.components(separatedBy: "`").enumerated().filter { $0.offset % 2 == 0 }.map(\.element).joined(separator: " ")
-            count += prose.lowercased().components(separatedBy: "](data:").dropLast().filter { before in
+            let images = prose.lowercased().components(separatedBy: "](data:").dropLast().filter { before in
                 // The bracket it closes opened as "![".
                 guard let open = before.range(of: "[", options: .backwards) else { return false }
                 return before[..<open.lowerBound].hasSuffix("!")
-            }.count
+            }
+            if !images.isEmpty { found.append(t) }
         }
-        return count
+        return found
     }
 
     /// A formula's x range: two numbers or expressions ("2*pi"), -10...10

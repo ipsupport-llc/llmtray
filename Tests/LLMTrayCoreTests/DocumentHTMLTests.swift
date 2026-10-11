@@ -331,6 +331,9 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertNoThrow(try DocumentSpec.read(values, earlier: old).get())
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![d](chart:d)"], earlier: old).failure, .missingCharts(["d"]))
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![q](data:image/png"], earlier: old).failure, .imageData)
+        // A new one in place of an old one is new.
+        let swapped = old.replacingOccurrences(of: "![p](data:image/png;base64", with: "![p](data:image/png;base64,BB")
+        XCTAssertEqual(DocumentSpec.read(["title": "x", "content": swapped], earlier: old).failure, .imageData)
     }
 
     func testLimits() {
