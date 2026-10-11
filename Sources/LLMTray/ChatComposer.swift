@@ -549,8 +549,9 @@ struct RecordButton: View {
     private func inside(_ p: CGPoint) -> Bool { CGRect(x: -16, y: -16, width: 56, height: 56).contains(p) }
 
     var body: some View {
-        Image(systemName: recorder.isRecording ? (recorder.holdToSend ? "mic.fill" : "stop.circle.fill") : "mic")
-            .foregroundStyle(recorder.isRecording ? Color.red : Color.primary)
+        Image(systemName: recorder.heldPending ? "mic.fill"
+              : recorder.isRecording ? (recorder.holdToSend ? "mic.fill" : "stop.circle.fill") : "mic")
+            .foregroundStyle(recorder.isRecording || recorder.heldPending ? Color.red : Color.primary)
             .frame(width: 24, height: 24)
             .contentShape(Rectangle())
             .opacity(disabled ? 0.4 : 1)
@@ -646,7 +647,8 @@ struct RecordingBar: View {
 
     private var hint: String {
         if recorder.heldPending {
-            return NSLocalizedString("30 s reached · release to send, Esc to drop", comment: "hold-to-talk at the limit")
+            return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
+                : NSLocalizedString("30 s reached · release to send, Esc to drop", comment: "hold-to-talk at the limit")
         }
         if recorder.holdToSend {
             return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
