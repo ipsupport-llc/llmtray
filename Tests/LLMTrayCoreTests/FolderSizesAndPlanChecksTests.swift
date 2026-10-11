@@ -147,11 +147,11 @@ final class FolderSizesAndPlanChecksTests: FolderTestCase {
 
     func testChangeFilesSaysASubfolderIsOneItemAndWhatADuplicateIs() {
         let d = FolderTools.changeDescription
-        XCTAssertTrue(d.contains("done for real once the user approves it. Not for editing a file's contents."), d)
+        XCTAssertTrue(d.contains("done for real once the user approves it. Not for editing a file's contents or this chat's documents."), d)
         XCTAssertTrue(d.contains("A subfolder is one item: move it whole or leave it"), d)
         XCTAssertTrue(d.contains("only what files(only_duplicates) finds, not a (1) in a name"), d)
         // Declared for every request: kept short (it was 134 bytes).
-        XCTAssertLessThanOrEqual(d.utf8.count, 300, "\(d.utf8.count) bytes")
+        XCTAssertLessThanOrEqual(d.utf8.count, 330, "\(d.utf8.count) bytes")
     }
 
     func testChangesAfterAReadRunFlaggedUnlessFilesArePinned() {

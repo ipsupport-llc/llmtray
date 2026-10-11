@@ -39,12 +39,12 @@ final class MakeDocumentTool: ChatTool {
             changed = notes
             from = base
         case .failure(let problem):
-            return .text(problem.text)
+            return .text(problem.text + DocumentError.notMade)
         }
         var spec: DocumentSpec
         switch DocumentSpec.read(arguments, earlier: from?.content) {
         case .success(let s): spec = s
-        case .failure(let e): return .text(e.text)
+        case .failure(let e): return .text(e.text + DocumentError.notMade)
         }
         spec.adjusted = changed + spec.adjusted
         // The whole call, changes applied: what Make again and a later

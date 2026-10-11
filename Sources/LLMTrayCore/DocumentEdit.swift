@@ -101,7 +101,13 @@ public enum DocumentEdit {
                 let s: Section
                 switch find(name, in: sections) {
                 case .one(let found): s = found
-                case .none: return .failure(missing(name, baseTitle, sections))
+                case .none:
+                    // After a section that isn't there: at the end, said --
+                    // nothing is lost or doubled, unlike a replace's guess.
+                    guard !new.isEmpty else { continue }
+                    lines += [""] + new
+                    adjusted.append("There's no section \"\(name)\", so the new part was added at the end.")
+                    continue
                 case .several(let all): return .failure(ambiguous(name, all))
                 }
                 guard !new.isEmpty else { continue }

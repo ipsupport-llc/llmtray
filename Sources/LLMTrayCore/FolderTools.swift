@@ -101,7 +101,7 @@ public enum FolderTools {
     // wrote a shell script instead; one split a 22,000-file folder by
     // extension and trashed "x (1).zip", which wasn't a copy.
     static let changeDescription = "Make folders, move or rename files and folders, move them to the Trash: one list, "
-        + "done for real once the user approves it. Not for editing a file's contents. "
+        + "done for real once the user approves it. Not for editing a file's contents or this chat's documents. "
         + "A subfolder is one item: move it whole or leave it, unless asked. "
         + "Duplicates are only what files(only_duplicates) finds, not a (1) in a name."
 

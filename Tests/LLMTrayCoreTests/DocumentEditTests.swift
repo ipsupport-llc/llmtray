@@ -61,7 +61,11 @@ final class DocumentEditTests: XCTestCase {
           {"content": "## Ending\n\nBye."}
         ], "charts": [{"id": "costs", "type": "line", "series": [{"values": [3, 4]}]}]}
         """#), to: baseValues)
-        XCTAssertNil(try? out.get(), "\"Intro\" isn't a heading")
+        // After "Intro", no heading: at the end, said.
+        let appended = try out.get()
+        XCTAssertTrue(content(appended.values).hasSuffix("## Ending\n\nBye."), content(appended.values))
+        XCTAssertTrue(content(appended.values).contains("## Notes\n\nA note."))
+        XCTAssertTrue(appended.adjusted.contains { $0.contains("no section \"Intro\"") }, "\(appended.adjusted)")
         let ok = try DocumentEdit.apply(call(#"""
         {"title": "Plan v2", "changes": [
           {"section": "## Risks", "content": "## Dangers\n\nNew risks."},
