@@ -24,17 +24,20 @@ final class ComposerModel: ObservableObject {
     /// shows for one that thinks.
     @Published var thinkingStyle: ThinkingStyle = .none
     /// Recordings for a model that hears (WAV, ChatRecorder); switching to
-    /// one that doesn't drops them.
+    /// one that doesn't drops them. At most `maxRecordings` a message (the
+    /// server takes eight clips a request).
     @Published var recordings: [Data] = []
     @Published var acceptsAudio = false {
         didSet { if !acceptsAudio { recordings.removeAll(); recorder.cancel() } }
     }
     let recorder = ChatRecorder()
+    static let maxRecordings = 8
     private var recorderWatch: AnyCancellable?
 
     init() {
         // Send's state follows the recording (isEmpty reads it).
         recorderWatch = recorder.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        recorder.onLimit = { [weak self] wav in self?.recordings.append(wav) }
     }
     @Published var acceptsImages = false {
         didSet {
@@ -251,7 +254,9 @@ struct ChatComposer: View {
                     .disabled(!canChat)
 
                 if composer.acceptsAudio {
-                    RecordButton(recorder: composer.recorder) { composer.recordings.append($0) }
+                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings) {
+                        composer.recordings.append($0)
+                    }
                 }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
@@ -515,6 +520,8 @@ struct ThinkingEffortPicker: View {
 /// it's sent (Send stops one still going and sends it too).
 struct RecordButton: View {
     @ObservedObject var recorder: ChatRecorder
+    /// The message has as many recordings as it can take.
+    var full = false
     let done: (Data) -> Void
 
     static func time(_ seconds: Double) -> String {
@@ -540,10 +547,10 @@ struct RecordButton: View {
                     .foregroundStyle(recorder.isRecording ? Color.red : Color.primary)
             }
             .buttonStyle(.borderless)
+            .disabled(recorder.isStarting || (full && !recorder.isRecording))
             .help(recorder.isRecording ? "Stop recording" : "Record a spoken message (the model hears it)")
             .accessibilityLabel(recorder.isRecording ? "Stop recording" : "Record")
         }
-        .onAppear { recorder.onLimit = done }
         .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
             Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
         }

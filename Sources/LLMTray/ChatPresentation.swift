@@ -49,6 +49,8 @@ final class ChatPresentation: ObservableObject {
 
     private func syncTabs(_ open: [ChatClient]) {
         let keys = Set(open.map(\.tabID))
+        // A closed tab's microphone stops with it (its recording goes too).
+        for (key, composer) in composers where !keys.contains(key) { composer.recorder.cancel() }
         composers = composers.filter { keys.contains($0.key) }
         trackers = trackers.filter { keys.contains($0.key) }
         for chat in open where trackers[chat.tabID] == nil {

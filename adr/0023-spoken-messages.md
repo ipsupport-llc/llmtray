@@ -17,8 +17,10 @@ Send.
   and wrapped as a WAV in memory (`WAVFile`, `ChatRecorder`) -- nothing
   touches the disk, a temporary chat included. At most 30 s a clip (the
   server's limit: Gemma 4's extractor cuts longer ones); it stops itself
-  there. The microphone permission is asked the first time it's used,
-  as Voice Lab's.
+  there (the clip trimmed to exactly 30 s). The microphone permission is
+  asked the first time it's used, as Voice Lab's; a cancel while it's
+  asked (another model, a closed tab) starts nothing, and a closed tab's
+  microphone stops with it.
 - **The message**: the recordings are the user message's `audios`
   (the field generated music uses), played back in its bubble by the
   same player, saved with the chat as the music is (WAV files beside the
@@ -27,7 +29,10 @@ Send.
 - **The request**: OpenAI `input_audio` parts (base64 WAV) after the
   text and images. A model that doesn't hear gets the text, or "(audio)"
   for a message that was only a recording -- as "(image)" for a model
-  that doesn't see. The size estimate counts a clip by its length (one
+  that doesn't see. The server takes eight clips a request: the latest
+  messages' recordings go and older ones read "(audio)" (a ninth
+  recording otherwise made every later request of the chat fail); the
+  composer takes at most eight a message. The size estimate counts a clip by its length (one
   soft token per 40 ms), never its base64, and a request with audio
   isn't a calibration (as images aren't).
 - **The server** (fork ipsupport-llc/mlx-lm#40): `input_audio` parts

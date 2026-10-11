@@ -3,6 +3,9 @@ import LLMTrayCore
 
 /// Builds the chat-completion requests the in-app chat sends.
 enum ChatRequestBuilder {
+    /// Audio clips a request may carry (the server's limit, fork #40).
+    static let maxAudioClips = 8
+
     /// A streaming request with this body (streamingBody).
     static func streaming(port: Int, body: [String: Any]) -> URLRequest? {
         request(port: port, body: body)
@@ -27,6 +30,16 @@ enum ChatRequestBuilder {
         // earlier choice or another model in the history.
         let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.thinkingEffort).map(Thinking.note(budget:))
         let latestUser = history.lastIndex { $0.role == "user" && !$0.isToolContext }
+        // The server takes eight audio clips a request: the latest messages'
+        // recordings go, older ones as "(audio)" (else a ninth recording made
+        // every later request of the chat fail).
+        var audioKept = Set<Int>()
+        var clips = 0
+        for (i, m) in history.enumerated().reversed() where m.role == "user" && !m.audios.isEmpty {
+            guard clips + m.audios.count <= ChatRequestBuilder.maxAudioClips else { break }
+            clips += m.audios.count
+            audioKept.insert(i)
+        }
         var payload = history.enumerated().map { i, message in
             // A model without vision refuses any request carrying an image
             // (mlx_lm.server): a chat that had one, continued with a text
@@ -36,12 +49,15 @@ enum ChatRequestBuilder {
             // gets the text, and a word for what it can't take when there's
             // no text.
             let dropImages = message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
-            let dropAudio = message.role == "user" && !settings.modelSupportsAudio && !message.audios.isEmpty
+            let dropAudio = message.role == "user" && !message.audios.isEmpty && (!settings.modelSupportsAudio || !audioKept.contains(i))
             let note = i == latestUser ? budgetNote : nil
             guard dropImages || dropAudio else { return serialize(message: message, note: note) }
+            // What was dropped, named when there's no text.
+            let named = [dropImages && !settings.modelSupportsVision && !message.images.isEmpty ? "(image)" : nil,
+                         dropAudio ? "(audio)" : nil].compactMap { $0 }.joined(separator: " ")
             var copy = ChatMessage(role: message.role,
                                    content: !message.content.isEmpty ? message.content
-                                       : dropAudio ? "(audio)" : !settings.modelSupportsVision ? "(image)" : "",
+                                       : !named.isEmpty ? named : !settings.modelSupportsVision ? "(image)" : "",
                                    toolCalls: message.toolCalls, toolCallID: message.toolCallID)
             if !dropImages { copy.images = message.images }
             if !dropAudio { copy.audios = message.audios }

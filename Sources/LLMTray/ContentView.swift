@@ -772,8 +772,11 @@ struct ContentView: View {
         // what stops Return from sending a second message mid-stream.
         // Return in an empty field mustn't start loading a model.
         guard canChat, !chat.isBusy, !composer.isEmpty else { return }
-        startModelIfStopped()
+        // Taken first: a recording too short to keep leaves nothing to send,
+        // and nothing must start the model then.
         let (text, images, audios) = composer.take()
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty || !audios.isEmpty else { return }
+        startModelIfStopped()
         chat.send(prompt: text, images: images, audios: audios, port: port, modelAlias: requestModelName,
                   settings: chatSettings, server: server)
         isInputFocused = true

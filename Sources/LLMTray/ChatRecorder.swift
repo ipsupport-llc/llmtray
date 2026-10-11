@@ -13,6 +13,10 @@ final class ChatRecorder: ObservableObject {
     static let maxSeconds = 30.0
 
     @Published private(set) var isRecording = false
+    /// Asking for the microphone: a second click waits, a cancel (another
+    /// model, a closed tab) ends it before it starts.
+    @Published private(set) var isStarting = false
+    private var startToken = 0
     @Published private(set) var seconds: Double = 0
     @Published private(set) var level: Float = 0
     /// Why it couldn't start (no permission, no microphone).
@@ -34,9 +38,15 @@ final class ChatRecorder: ObservableObject {
     }
 
     func start() async {
-        guard !isRecording else { return }
+        guard !isRecording, !isStarting else { return }
         problem = nil
-        guard await Self.microphoneAllowed() else {
+        isStarting = true
+        let token = startToken
+        let allowed = await Self.microphoneAllowed()
+        isStarting = false
+        // Cancelled while asked: not started behind the user's back.
+        guard token == startToken else { return }
+        guard allowed else {
             problem = NSLocalizedString("LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.", comment: "")
             return
         }
@@ -64,6 +74,7 @@ final class ChatRecorder: ObservableObject {
 
     /// The recording as a WAV; nil when there was nothing (under 0.3 s).
     func stop() -> Data? {
+        startToken += 1
         guard isRecording else { return nil }
         capture?.stop()
         audio?.stop()
@@ -71,7 +82,8 @@ final class ChatRecorder: ObservableObject {
         audio = nil
         isRecording = false
         level = 0
-        let pcm = buffer.take()
+        // Never past the server's limit (a last frame can overshoot it).
+        let pcm = buffer.take().prefix(Int(Self.maxSeconds) * Self.sampleRate * 2)
         guard pcm.count >= Self.sampleRate * 2 * 3 / 10 else { return nil }
         return WAVFile.pcm16(pcm, sampleRate: Self.sampleRate)
     }
