@@ -282,11 +282,17 @@ public struct DocumentSpec: Equatable, Sendable {
                 while let mark = rest.range(of: "](data:", options: .caseInsensitive) {
                     let before = rest[..<mark.lowerBound]
                     let after = rest[mark.upperBound...]
-                    let end = after.firstIndex(of: ")").map { after.index(after: $0) } ?? after.endIndex
-                    // The bracket it closes opened as "![".
-                    if let open = before.range(of: "[", options: .backwards), before[..<open.lowerBound].hasSuffix("!") {
-                        found.append(String(rest[open.lowerBound..<end]))
+                    // The bracket it closes opened as "![": an image; a link
+                    // isn't, and the scan goes on right after its marker.
+                    guard let open = before.range(of: "[", options: .backwards), before[..<open.lowerBound].hasSuffix("!") else {
+                        rest = after
+                        continue
                     }
+                    // To its ")", or (left open) to the next image or the line's end.
+                    let close = after.firstIndex(of: ")").map { after.index(after: $0) } ?? after.endIndex
+                    let next = after.range(of: "![")?.lowerBound ?? after.endIndex
+                    let end = min(close, next)
+                    found.append(String(rest[open.lowerBound..<end]))
                     rest = rest[end...]
                 }
             }
