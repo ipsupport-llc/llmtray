@@ -69,6 +69,7 @@
 "(no server output yet)" = "(no server output yet)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 hour";
+"30 s reached · release to send, Esc to drop" = "30 s reached · release to send, Esc to drop";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";
@@ -241,6 +242,8 @@
 "Clear search" = "Clear search";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Clear the queue: what's indexed stays searchable, the rest is marked not indexed";
 "Click to enable Project files: add files to the project and let its chats search them." = "Click to enable Project files: add files to the project and let its chats search them.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Click to record a clip; hold to talk and release to send (the model hears it)";
+"Click ■ to stop · Esc cancels" = "Click ■ to stop · Esc cancels";
 "Close" = "Close";
 "Close Tab" = "Close Tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Closes this window. Settings › General › Set Up LLMTray… opens it again.";
@@ -536,6 +539,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone.";
 "LLMTray restarts now to load them." = "LLMTray restarts now to load them.";
 "LLMTray status, indexing project files" = "LLMTray status, indexing project files";
 "LLMTray — Chat" = "LLMTray — Chat";
@@ -799,16 +803,22 @@
 "Recent changes" = "Recent changes";
 "Recently updated" = "Recently updated";
 "Recommended" = "Recommended";
+"Record" = "Record";
+"Recording" = "Recording";
 "Recovery" = "Recovery";
 "Refused" = "Refused";
 "Regenerate" = "Regenerate";
 "Reinstall" = "Reinstall";
 "Reinstall failed: %@" = "Reinstall failed: %@";
+"Release to cancel" = "Release to cancel";
+"Release to send" = "Release to send";
+"Release to send · move away to cancel" = "Release to send · move away to cancel";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
 "Remove attachment" = "Remove attachment";
 "Remove from Project" = "Remove from Project";
 "Remove from the project" = "Remove from the project";
+"Remove recording" = "Remove recording";
 "Remove this file from the project?" = "Remove this file from the project?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept.";
 "Rename" = "Rename";
@@ -946,6 +956,7 @@
 "Stop Voice Lab and music generation to update it." = "Stop Voice Lab and music generation to update it.";
 "Stop Voice Lab first." = "Stop Voice Lab first.";
 "Stop generating" = "Stop generating";
+"Stop recording" = "Stop recording";
 "Stop server (unload model)" = "Stop server (unload model)";
 "Stop the server to change these." = "Stop the server to change these.";
 "Stop the server to update the runtime." = "Stop the server to update the runtime.";

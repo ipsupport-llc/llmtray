@@ -3,6 +3,9 @@ import LLMTrayCore
 
 /// Builds the chat-completion requests the in-app chat sends.
 enum ChatRequestBuilder {
+    /// Audio clips a request may carry (the server's limit, fork #40).
+    static let maxAudioClips = 8
+
     /// A streaming request with this body (streamingBody).
     static func streaming(port: Int, body: [String: Any]) -> URLRequest? {
         request(port: port, body: body)
@@ -27,19 +30,39 @@ enum ChatRequestBuilder {
         // earlier choice or another model in the history.
         let budgetNote = Thinking.budgetToTell(style: settings.thinkingStyle, effort: settings.thinkingEffort).map(Thinking.note(budget:))
         let latestUser = history.lastIndex { $0.role == "user" && !$0.isToolContext }
+        // The server takes eight audio clips a request: the latest messages'
+        // recordings go, older ones as "(audio)" (else a ninth recording made
+        // every later request of the chat fail).
+        var audioKept = Set<Int>()
+        var clips = 0
+        for (i, m) in history.enumerated().reversed() where m.role == "user" && !m.audios.isEmpty {
+            guard clips + m.audios.count <= ChatRequestBuilder.maxAudioClips else { break }
+            clips += m.audios.count
+            audioKept.insert(i)
+        }
         var payload = history.enumerated().map { i, message in
             // A model without vision refuses any request carrying an image
             // (mlx_lm.server): a chat that had one, continued with a text
             // model, sends just the text.
-            message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
-                ? serialize(message: {
-                    var text = ChatMessage(role: message.role,
-                                           content: message.content.isEmpty && !settings.modelSupportsVision ? "(image)" : message.content,
-                                           toolCalls: message.toolCalls, toolCallID: message.toolCallID)
-                    text.projectFilesAdded = message.projectFilesAdded
-                    return text
-                }(), note: i == latestUser ? budgetNote : nil)
-                : serialize(message: message, note: i == latestUser ? budgetNote : nil)
+            // An image a tool put in front of the model goes with the
+            // request right after it only; a model that can't see or hear
+            // gets the text, and a word for what it can't take when there's
+            // no text.
+            let dropImages = message.isToolContext && i != lastIndex || !settings.modelSupportsVision && !message.images.isEmpty
+            let dropAudio = message.role == "user" && !message.audios.isEmpty && (!settings.modelSupportsAudio || !audioKept.contains(i))
+            let note = i == latestUser ? budgetNote : nil
+            guard dropImages || dropAudio else { return serialize(message: message, note: note) }
+            // What was dropped, named when there's no text.
+            let named = [dropImages && !settings.modelSupportsVision && !message.images.isEmpty ? "(image)" : nil,
+                         dropAudio ? "(audio)" : nil].compactMap { $0 }.joined(separator: " ")
+            var copy = ChatMessage(role: message.role,
+                                   content: !message.content.isEmpty ? message.content
+                                       : !named.isEmpty ? named : !settings.modelSupportsVision ? "(image)" : "",
+                                   toolCalls: message.toolCalls, toolCallID: message.toolCallID)
+            if !dropImages { copy.images = message.images }
+            if !dropAudio { copy.audios = message.audios }
+            copy.projectFilesAdded = message.projectFilesAdded
+            return serialize(message: copy, note: note)
         }
         // The project's instructions between the profile's prompt and the
         // tool-use rule: the rules about tools come last whatever they say.
@@ -73,12 +96,19 @@ enum ChatRequestBuilder {
     /// the images' data URIs left out, and how many images it carries.
     static func measure(_ body: [String: Any]) -> PromptTokenEstimator.Measure {
         var images = 0
+        var audioTokens = 0
         var stripped = body
         if let messages = body["messages"] as? [[String: Any]] {
             stripped["messages"] = messages.map { message -> [String: Any] in
                 guard let parts = message["content"] as? [[String: Any]] else { return message }
                 var m = message
                 m["content"] = parts.map { part -> [String: Any] in
+                    if part["type"] as? String == "input_audio" {
+                        // Its tokens by its length, not its base64.
+                        let b64 = ((part["input_audio"] as? [String: Any])?["data"] as? String)?.utf8.count ?? 0
+                        audioTokens += PromptTokenEstimator.Measure.audioTokens(wavBytes: b64 * 3 / 4)
+                        return ["type": "input_audio"]
+                    }
                     guard part["type"] as? String == "image_url" else { return part }
                     images += 1
                     return ["type": "image_url"]
@@ -87,7 +117,7 @@ enum ChatRequestBuilder {
             }
         }
         let bytes = (try? JSONSerialization.data(withJSONObject: stripped))?.count ?? 0
-        return PromptTokenEstimator.Measure(bytes: bytes, images: images)
+        return PromptTokenEstimator.Measure(bytes: bytes, images: images, audioTokens: audioTokens)
     }
 
     /// The history without the tool calls of earlier turns that don't
@@ -151,7 +181,7 @@ enum ChatRequestBuilder {
         // Files added to the project since the last message: said first.
         let notes = message.role == "user" ? [note, ProjectFilesNote.text(message.projectFilesAdded)].compactMap { $0 } : []
         let text = notes.isEmpty ? message.content : notes.joined(separator: "\n") + "\n\n" + message.content
-        if message.role == "user", !message.images.isEmpty {
+        if message.role == "user", !message.images.isEmpty || !message.audios.isEmpty {
             // Attachments are always normalized to PNG before landing in
             // ChatMessage.images (see ContentView's attach-file handling),
             // so the MIME half of this data URI is never a guess.
@@ -162,6 +192,10 @@ enum ChatRequestBuilder {
             for data in message.images {
                 let url = "data:image/png;base64,\(data.base64EncodedString())"
                 parts.append(["type": "image_url", "image_url": ["url": url]])
+            }
+            // Recordings (adr/0023): WAV, as OpenAI's input_audio.
+            for data in message.audios {
+                parts.append(["type": "input_audio", "input_audio": ["data": data.base64EncodedString(), "format": "wav"]])
             }
             return ["role": "user", "content": parts]
         }

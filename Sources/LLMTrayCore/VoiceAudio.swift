@@ -211,3 +211,20 @@ public enum EchoSuppression {
         threshold > 0 && modelSpeaking && rms < threshold
     }
 }
+
+
+/// A WAV file of mono 16-bit PCM, built in memory: a recording sent to a
+/// model that hears (adr/0023) never touches the disk on its way.
+public enum WAVFile {
+    public static func pcm16(_ samples: Data, sampleRate: Int) -> Data {
+        func le<T: FixedWidthInteger>(_ v: T) -> Data { withUnsafeBytes(of: v.littleEndian) { Data($0) } }
+        var d = Data("RIFF".utf8)
+        d += le(UInt32(36 + samples.count))
+        d += Data("WAVEfmt ".utf8)
+        d += le(UInt32(16)) + le(UInt16(1)) + le(UInt16(1))            // PCM, mono
+        d += le(UInt32(sampleRate)) + le(UInt32(sampleRate * 2))       // byte rate
+        d += le(UInt16(2)) + le(UInt16(16))                            // block align, bits
+        d += Data("data".utf8) + le(UInt32(samples.count))
+        return d + samples
+    }
+}

@@ -103,6 +103,8 @@ struct AudioClipView: View {
     var canRegenerate: Bool = false
     /// Regenerate / Tweak / Remove; nil while the chat can't (busy, no server).
     var action: ((ChatClient.MediaAction) -> Void)?
+    /// A made song (Regenerate, Tweak, Remove); a user's recording has none.
+    var isMade = true
     @ObservedObject private var playback = AudioPlayback.shared
 
     private var isCurrent: Bool { playback.currentID == id }
@@ -197,12 +199,14 @@ struct AudioClipView: View {
                 .disabled(action == nil)
                 .help(Text("Change the style, lyrics, model or knobs, then make another version"))
             }
-            Button { action?(.remove) } label: {
-                Label("Remove", systemImage: "trash").font(.caption)
+            if isMade {
+                Button { action?(.remove) } label: {
+                    Label("Remove", systemImage: "trash").font(.caption)
+                }
+                .buttonStyle(.plain)
+                .disabled(action == nil)
+                .help(Text("Remove"))
             }
-            .buttonStyle(.plain)
-            .disabled(action == nil)
-            .help(Text("Remove"))
             // The info button shows the time too: the row must fit the card.
             if source != nil {
                 MediaInfoButton { MediaInfoButton.rows(source: source, prompt: prompt, seconds: generationSeconds, songLength: AudioCodec.duration(data)) }

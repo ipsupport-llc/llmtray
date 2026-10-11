@@ -1,3 +1,4 @@
+import Combine
 import AppKit
 import LLMTrayCore
 import SwiftUI
@@ -22,13 +23,31 @@ final class ComposerModel: ObservableObject {
     /// What the model's template offers for thinking: the effort picker
     /// shows for one that thinks.
     @Published var thinkingStyle: ThinkingStyle = .none
+    /// Recordings for a model that hears (WAV, ChatRecorder); switching to
+    /// one that doesn't drops them. At most `maxRecordings` a message (the
+    /// server takes eight clips a request).
+    @Published var recordings: [Data] = []
+    @Published var acceptsAudio = false {
+        didSet { if !acceptsAudio { recordings.removeAll(); recorder.cancel() } }
+    }
+    let recorder = ChatRecorder()
+    static let maxRecordings = 8
+    private var recorderWatch: AnyCancellable?
+
+    init() {
+        // Send's state follows the recording (isEmpty reads it).
+        recorderWatch = recorder.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        recorder.onLimit = { [weak self] wav in self?.recordings.append(wav) }
+    }
     @Published var acceptsImages = false {
         didSet {
             if !acceptsImages { attachments.removeAll() } else { notice = nil }
         }
     }
 
-    var isEmpty: Bool { draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty }
+    var isEmpty: Bool {
+        draft.trimmingCharacters(in: .whitespaces).isEmpty && attachments.isEmpty && recordings.isEmpty && !recorder.isRecording
+    }
 
     /// A short note under the field (an image the model can't take), gone
     /// after a few seconds.
@@ -81,9 +100,11 @@ final class ComposerModel: ObservableObject {
     }
 
     /// Takes the draft and attachments for sending and clears them.
-    func take() -> (text: String, images: [Data]) {
-        defer { draft = ""; attachments = [] }
-        return (draft, attachments)
+    /// What's sent: a recording still going is stopped and goes too.
+    func take() -> (text: String, images: [Data], audios: [Data]) {
+        if let wav = recorder.stop() { recordings.append(wav) }
+        defer { draft = ""; attachments = []; recordings = [] }
+        return (draft, attachments, recordings)
     }
 
     func pickImages() {
@@ -197,7 +218,7 @@ struct ChatComposer: View {
             if canRegenerate || chat.lastTokensPerSecond != nil || canCompact || chat.currentSessionID == nil {
                 turnActions
             }
-            if !composer.attachments.isEmpty {
+            if !composer.attachments.isEmpty || !composer.recordings.isEmpty {
                 attachmentStrip
             }
             if !canChat {
@@ -231,7 +252,16 @@ struct ChatComposer: View {
                     .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
                     .focused(isFocused)
                     .disabled(!canChat)
+                    // Recording: the time and level over the field.
+                    .overlay {
+                        if composer.recorder.isRecording || composer.recorder.heldPending { RecordingBar(recorder: composer.recorder) }
+                    }
 
+                if composer.acceptsAudio {
+                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
+                                 done: { composer.recordings.append($0) },
+                                 sendNow: { composer.recordings.append($0); send() })
+                }
                 if composer.thinkingStyle != .none {
                     ThinkingEffortPicker()
                 }
@@ -363,6 +393,25 @@ struct ChatComposer: View {
     private var attachmentStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) {
+                ForEach(Array(composer.recordings.enumerated()), id: \.offset) { i, wav in
+                    HStack(spacing: 4) {
+                        Image(systemName: "waveform")
+                        Text(RecordButton.time(Double(max(0, wav.count - 44)) / Double(2 * ChatRecorder.sampleRate)))
+                            .monospacedDigit()
+                        Button {
+                            composer.recordings.remove(at: i)
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                        }
+                        .buttonStyle(.plain)
+                        .help("Remove recording")
+                        .accessibilityLabel("Remove recording")
+                    }
+                    .font(.callout)
+                    .padding(.horizontal, 8)
+                    .frame(height: 44)
+                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.gray.opacity(0.15)))
+                }
                 ForEach(Array(composer.attachments.enumerated()), id: \.offset) { i, data in
                     if let nsImage = NSImage(data: data) {
                         ZStack(alignment: .topTrailing) {
@@ -467,5 +516,165 @@ struct ThinkingEffortPicker: View {
         .fixedSize()
         .help("Thinking effort: how long the model may think before it answers")
         .accessibilityLabel(Text(String(format: NSLocalizedString("Thinking effort: %@", comment: ""), effort.title)))
+    }
+}
+
+/// The composer's microphone for a model that hears (adr/0023), as
+/// Telegram's: a click records a clip that waits by the field (a second
+/// click stops it); held, it's a walkie-talkie -- released, the message
+/// goes at once (with the field's text), moved off the button first, the
+/// recording is dropped.
+struct RecordButton: View {
+    @ObservedObject var recorder: ChatRecorder
+    /// The message has as many recordings as it can take.
+    var full = false
+    /// A clip for the field.
+    let done: (Data) -> Void
+    /// Held and released over the button: send with this recording.
+    let sendNow: (Data) -> Void
+    @State private var pressed = false
+    @State private var holding = false
+    @State private var holdTask: Task<Void, Never>?
+    @State private var lastLocation: CGPoint = .zero
+    /// How long a press is before it's a hold.
+    static let holdDelay: UInt64 = 300_000_000
+
+    static func time(_ seconds: Double) -> String {
+        let s = Int(seconds.rounded(.down))
+        return String(format: "%d:%02d", s / 60, s % 60)
+    }
+
+    private var disabled: Bool { recorder.isStarting || (full && !recorder.isRecording) }
+
+    private func inside(_ p: CGPoint) -> Bool { CGRect(x: -16, y: -16, width: 56, height: 56).contains(p) }
+
+    var body: some View {
+        Image(systemName: recorder.heldPending ? "mic.fill"
+              : recorder.isRecording ? (recorder.holdToSend ? "mic.fill" : "stop.circle.fill") : "mic")
+            .foregroundStyle(recorder.isRecording || recorder.heldPending ? Color.red : Color.primary)
+            .frame(width: 24, height: 24)
+            .contentShape(Rectangle())
+            .opacity(disabled ? 0.4 : 1)
+            .gesture(DragGesture(minimumDistance: 0)
+                .onChanged { value in
+                    lastLocation = value.location
+                    if holding { recorder.holdAway = !inside(value.location) }
+                    guard !disabled else { return }
+                    if !pressed {
+                        pressed = true
+                        // A press on a clip being recorded is the click
+                        // that stops it, never a hold.
+                        if !recorder.isRecording {
+                            holdTask = Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: Self.holdDelay)
+                                guard !Task.isCancelled, pressed else { return }
+                                holding = true
+                                recorder.holdToSend = true
+                                recorder.holdAway = !inside(lastLocation)
+                                await recorder.start()
+                            }
+                        }
+                    }
+                }
+                .onEnded { value in
+                    defer { pressed = false; holding = false; holdTask?.cancel(); holdTask = nil }
+                    // A hold ends however it is (still starting too: the stop
+                    // cancels that start): sent if released over the button.
+                    if holding {
+                        let keep = inside(value.location)
+                        let wav = recorder.stop() ?? recorder.takeHeldClip()
+                        if keep, let wav { sendNow(wav) }
+                        return
+                    }
+                    guard !disabled else { return }
+                    if recorder.isRecording {
+                        if let wav = recorder.stop() { done(wav) }
+                    } else {
+                        Task { await recorder.start() }
+                    }
+                })
+            .help(recorder.isRecording
+                  ? (recorder.holdToSend ? "Release to send" : "Stop recording")
+                  : "Click to record a clip; hold to talk and release to send (the model hears it)")
+            .accessibilityElement()
+            .accessibilityLabel(recorder.isRecording ? Text("Stop recording") : Text("Record"))
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
+                if recorder.isRecording {
+                    if let wav = recorder.stop() { done(wav) }
+                } else if !disabled {
+                    Task { await recorder.start() }
+                }
+            }
+            .popover(isPresented: Binding(get: { recorder.problem != nil }, set: { if !$0 { recorder.problem = nil } })) {
+                Text(recorder.problem ?? "").padding().frame(maxWidth: 320)
+            }
+            // Gone mid-press (another tab, a model that doesn't hear): no
+            // start behind the user's back, a hold dropped.
+            .onDisappear {
+                holdTask?.cancel()
+                holdTask = nil
+                if holding { recorder.cancel(); _ = recorder.takeHeldClip() }
+                pressed = false
+                holding = false
+            }
+            // Esc drops a recording; ⌥⌘R starts or stops a clip. Behind the
+            // button: no room taken, nothing for VoiceOver.
+            .background {
+                Group {
+                    Button("") { recorder.cancel() }
+                        .keyboardShortcut(.cancelAction)
+                        .disabled(!recorder.isRecording && !recorder.heldPending)
+                    Button("") {
+                        if recorder.isRecording {
+                            if let wav = recorder.stop() { done(wav) }
+                        } else if !disabled {
+                            Task { await recorder.start() }
+                        }
+                    }
+                    .keyboardShortcut("r", modifiers: [.command, .option])
+                }
+                .opacity(0)
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
+    }
+}
+
+/// Over the field while recording: the time, the level, what ends it.
+struct RecordingBar: View {
+    @ObservedObject var recorder: ChatRecorder
+
+    private var hint: String {
+        if recorder.heldPending {
+            return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
+                : NSLocalizedString("30 s reached · release to send, Esc to drop", comment: "hold-to-talk at the limit")
+        }
+        if recorder.holdToSend {
+            return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
+                : NSLocalizedString("Release to send · move away to cancel", comment: "hold-to-talk")
+        }
+        return NSLocalizedString("Click ■ to stop · Esc cancels", comment: "recording a clip")
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Circle().fill(Color.red).frame(width: 8, height: 8)
+            Text(RecordButton.time(recorder.seconds)).font(.callout.monospacedDigit())
+            HStack(alignment: .center, spacing: 2) {
+                ForEach(Array(recorder.levels.suffix(28).enumerated()), id: \.offset) { _, level in
+                    Capsule().fill(Color.red.opacity(0.7))
+                        .frame(width: 3, height: max(2, min(18, CGFloat(level) * 120)))
+                }
+            }
+            .frame(height: 20)
+            Spacer(minLength: 4)
+            Text(hint).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+        }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .textBackgroundColor)))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.red.opacity(0.5)))
+        .accessibilityElement(children: .combine)
     }
 }

@@ -175,7 +175,9 @@ struct MessageBubble: View {
                               generationSeconds: message.audioDurations[safe: i],
                               source: message.audioSources.count == message.audios.count ? message.audioSources[safe: i] : nil,
                               canRegenerate: canRegenerate(.music, i),
-                              action: regenerateMedia.map { act in { act(.music, i, $0) } })
+                              // A spoken message is the user's: nothing to make again.
+                              action: isUser ? nil : regenerateMedia.map { act in { act(.music, i, $0) } },
+                              isMade: !isUser)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 4)
                 tweakDraft(.music, i)
