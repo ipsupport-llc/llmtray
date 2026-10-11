@@ -30,27 +30,52 @@ a 4B model looks as good as one from a 35B model.
 
   A chart goes where the content says `![chart](chart:<id>)`; a chart the
   content never names goes at the end. The model sends numbers, never
-  drawings.
-- **The app renders, locally.** Markdown (GitHub flavour: headings,
-  lists, tables, code, quotes, links, footnotes) goes to HTML through our
-  own converter in LLMTrayCore — the same block rules as `ChatMarkdown`,
-  no new package — then into a page laid out by the style's CSS (fonts,
-  margins, header and footer with the title and page numbers, a table of
-  contents for a long report), printed to PDF by WebKit (`WKWebView`
-  `createPDF`, paginated with `NSPrintOperation` for real page breaks).
-  Charts are drawn by Swift Charts (`ImageRenderer`, 2x) and embedded as
-  PNG `data:` images. Styles are a few fixed CSS files in the app, not
-  model input: the model picks one by name, it never sends CSS or HTML.
+  drawings, CSS or HTML.
+- **The app renders, locally**, in three steps:
+  1. *Markdown to HTML* by our own converter in LLMTrayCore (the block
+     rules of `ChatMarkdown`: headings, lists, tables, code, quotes,
+     links), no new package. It emits a fixed set of tags with no
+     attributes but `href` (filtered, Hardening 2), our own `class`
+     names and the chart images' `src`; never `style`, event handlers,
+     `<link>`, `<script>`, `<iframe>`, `<object>`, `<svg>`.
+  2. *Charts* drawn by Swift Charts (`ImageRenderer`, capped size) to PNG,
+     served to the page by our scheme (`llmtray-doc://chart/<id>`), not
+     as `data:` URLs, so the page may load nothing else (Hardening 1).
+  3. *Pages*: the HTML, with the style's CSS (fonts, margins, `@page`
+     size, page breaks before chapter headings, a table of contents for
+     a long report), printed by WebKit to a paginated PDF
+     (`WKWebView.printOperation(with:)` with a save-to-file
+     `NSPrintInfo`, or `createPDF` cut into pages if printing headless
+     proves unreliable — **a spike on macOS 14 decides before the
+     build**, and this ADR is updated with the API that works). The
+     header (title) and footer (page N of M) are drawn onto the finished
+     pages with PDFKit, not by CSS, which WebKit's printing honours only
+     in part.
+  Styles are a few fixed CSS files in the app, picked by name.
 - **The result is a card in the chat**, like a generated image: the first
   page as a thumbnail, the title and page count, and Open (Preview),
-  Show in Finder, Save As…, Add to Project (when the chat is in one,
-  through `ProjectIndexer.addFiles`, the same path as a drop). The file
-  lives with the chat's own data and goes with it when the chat is
-  deleted; temporary chats keep it in the temp folder until the chat
-  closes. Regenerate makes it again from the same call.
-- **The model is told it's done**: the tool answers the file name and the
-  page count, no path, and says the user sees it in the chat. It doesn't
-  read the PDF back.
+  Show in Finder, Save As…, Add to Project (when the chat is in one).
+  Add to Project calls `ProjectIndexer.addFiles([pdf], to: project)` on
+  the main actor, the + menu's path ([0012](0012-project-files-rag.md)):
+  Project files are turned on first if they're off
+  (`enableProjectFiles`), and its notes (added, already in the project)
+  show as they do for a drop.
+- **Stored like the chat's images.** A message gets `documents` beside
+  `images` and `audios` (`ChatMessage`, `PersistedMessage`), the files
+  go in the chat's `<uuid>-images/` folder ([0006](0006-chat-sessions-and-library.md)),
+  are kept by the sweep of unreferenced files, removed with the chat,
+  and compaction keeps the messages that hold one as it keeps media.
+  **Temporary chats write nothing** (0006): the PDF stays in memory and
+  goes to disk only when the user opens, saves or shares it (the temp
+  export of `MediaSharing`).
+- **Regenerate**: Regenerate on the answer re-runs the turn as for any
+  answer. "Make again" on the card re-renders from the saved call (a
+  `DocumentSource`: the arguments, as `MediaSource` keeps a generator's),
+  through the `canRegenerateMedia` / `regenerateMedia` path; it doesn't
+  ask the model again.
+- **The model is told it's done**: the tool answers the title, the page
+  count and that the user sees it in the chat; no path. It doesn't read
+  the PDF back.
 - Later, through the same tool: `format: docx` (Word, for editing) and
   `format: xlsx` for tables; `style` gains the user's own templates. Not
   in the first version.
@@ -60,36 +85,56 @@ a 4B model looks as good as one from a 35B model.
 A document is built from text the model wrote, and that text may come
 from a project file, a folder file or a web page with instructions in it.
 
-1. **Nothing executes, nothing loads.** The web view that prints has
-   JavaScript off (`allowsContentJavaScript = false`), no network (a
-   `WKURLSchemeHandler` serves only our styles and fonts; every other
-   URL is refused, including `file:`), loads HTML from a string with no
-   base URL. Images in the content are allowed only as the chart
-   references above; any other `![...](...)` becomes its alt text. Links
-   stay links in the PDF but are never fetched.
-2. **The converter escapes everything.** Raw HTML in the Markdown is
-   text, not markup (a `<script>` or `<iframe>` comes out as those
-   characters); attribute values are escaped; link targets are kept only
-   for `http`, `https` and `mailto`.
-3. **The model's numbers are hostile** ([0007](0007-chat-tools.md),
-   Lessons): at most 8 charts, 12 series, 500 points per chart; values
-   must be finite; labels and titles are capped; a bad chart is left out
-   with a note in the tool's answer, the rest of the document is made.
-   Content is capped at 200,000 characters; a title becomes a file name
-   only after the same sanitizing as a project file's name.
-4. **It only writes its own new file.** No path comes from the model;
-   the file goes into the chat's data folder under a fresh name
-   (`O_EXCL`), never over anything. Getting it anywhere else is the
+1. **Nothing executes, nothing loads.** The printing web view: JavaScript
+   off (`defaultWebpagePreferences.allowsContentJavaScript = false`, and
+   `javaScriptCanOpenWindowsAutomatically` off), a non-persistent data
+   store, HTML loaded from a string with no base URL. Loads are refused
+   at two layers: a `WKContentRuleList` blocks every resource load but
+   our scheme (subresources: images, CSS, fonts — `http`, `https`,
+   `file`, `data`, `blob`, anything); the `WKNavigationDelegate` refuses
+   every navigation but the initial load. `llmtray-doc:` (a
+   `WKURLSchemeHandler`) serves only the style's bundled CSS and fonts
+   and this document's chart PNGs, by a fixed table, never a path.
+   Tested with a remote image, `file:`, `data:text/html`, `data:` SVG, a
+   CSS `url()`, a `<script>`, an `onerror`, a redirect.
+2. **The converter can't emit markup from the content.** Raw HTML in
+   the Markdown is text (a `<script>` comes out as those characters);
+   every text and attribute value is escaped. Images other than chart
+   references become their alt text. Links: only `http`, `https` and
+   `mailto` stay links; any other scheme (`javascript:`, `file:`,
+   `data:`) becomes plain text. Where a link's text isn't its address,
+   the address is printed after it in small type (as print stylesheets
+   do), so the PDF never hides where a link goes.
+3. **Limits on what goes in and what comes out.** In: at most 8 charts,
+   12 series, 500 points per chart; values finite; labels and titles
+   capped; content at most 200,000 characters. A bad chart is left out
+   with a note in the tool's answer, the rest is made. Out: chart PNGs at
+   most 2400×1600 px; at most 200 pages and 50 MB; rendering stops after
+   60 s. Over a limit: no document, and the tool says which limit.
+4. **It only writes its own new file.** No path comes from the model.
+   The name is built from the title by one sanitizer: Unicode NFC,
+   control characters and `/ : \` removed, no leading dot, trimmed to 80
+   characters, empty → "Document"; the file is created with
+   `open(O_CREAT | O_EXCL | O_NOFOLLOW)`, a " 2", " 3"… suffix on a
+   collision, never over anything. Getting it anywhere else is the
    user's click (Save As…, Add to Project).
-5. **Trust kind: ordinary** (the barrier of
-   [0012](0012-project-files-rag.md) and [0014](0014-folder-tools.md)).
-   Making a document from project or folder text is the point of the
-   tool ("summarise these files into a report"), and it can't reach the
-   network or change a file, so it stays allowed after file text. If a
-   later format ever fetches anything (a template from the web), that
-   call becomes guarded.
-6. **Per turn: one document**, like one image; a second call in the turn
-   is refused with "already made — say if it should change".
+5. **Trust kind: ordinary**, and why not guarded
+   ([0012](0012-project-files-rag.md), [0014](0014-folder-tools.md)):
+   guarded tools are the ones that reach the network or start a
+   generator — heavy queued work that can unload the chat model — after
+   text a file brought in. `make_document` does neither: it can't send
+   anything anywhere (Hardening 1), changes no existing file
+   (Hardening 4), is bounded (Hardening 3), and its output only goes
+   further by the user's click. Making a document from project, folder
+   or pinned text is the point of the tool ("summarise these files into
+   a report"), so it stays allowed after file text and with pinned
+   files. If a later format ever fetches anything, that call becomes
+   guarded.
+6. **One document per turn**, with the generators' treatment
+   ([0007](0007-chat-tools.md), Lessons): once made, the tool isn't
+   declared again in the turn; a second call is refused with "already
+   made — say if it should change", and that refusal is dropped from
+   later turns (`ChatRequestBuilder.withoutEarlier`).
 
 ## Tools loaded when needed
 
@@ -98,53 +143,72 @@ worse among many tools (the user's rule, [0007](0007-chat-tools.md)).
 `make_document` with charts is one of the bigger declarations (an
 estimated 250–300 tokens). Declaring it only when it's needed:
 
-- **Why not just add it in the middle of a chat:** the tools sit at the
-  start of the prompt (the chat templates put them in the system turn),
-  so changing the list changes the prefix and the server's prompt cache
-  misses: a 30K-token chat is prefilled again, tens of seconds on a
-  laptop. So a tool is added **once and stays** for the rest of the chat,
-  never toggled per turn.
-- **Three ways it gets declared**, a tool's setting in the profile
-  ([0005](0005-profiles.md)) — `always`, `on demand` (the default for
-  documents), `off`:
-  1. *On demand by the model.* With any on-demand tool switched on, one
-     small tool `load_tools(group)` is declared (about 40 tokens with the
-     group names and a phrase each: `documents: PDF documents with
-     charts`). The model calls it on "оформи документ"; the answer says
-     the tool is ready; the group is declared from the next request in
-     this chat on, and saved with the chat. One cache miss, only in chats
-     that need it.
-  2. *By the user.* The composer's + menu gets "Document…": the group is
-     declared from this message on, and the message gets a short hint
-     that a document is wanted. For a model that wouldn't think of
-     `load_tools`.
+- **The cost of a change.** In-app, tools go in the request's `tools`
+  field, but the server's chat template renders them at the start of the
+  prompt (Gemma 4, Qwen 3.5 and Nemotron put them in the system turn), so
+  a different list is a different prefix and the prompt cache misses.
+  The list already changes within a chat today (a spent generator, the
+  trust barrier, the project's and folder's modes, a profile change), so
+  loading adds one more such change, not a new kind. **Measured before
+  the build**: prefill time of a 30K-token chat with and without a tool
+  added (an M5 laptop, Gemma 4 26B). A loaded group is **never removed**
+  for the rest of the chat, and `load_tools` stays declared (40 tokens)
+  so loading doesn't cost a second change.
+- **Three settings per group** in the profile ([0005](0005-profiles.md)):
+  a new optional field `tools.toolLoading: [group: always | onDemand]`
+  beside `enabledTools`, resolved per field like every overlay field
+  (profile → Default → built-in). A group missing from it: on demand. A
+  group off is simply not in `enabledTools`, as today. Old profiles
+  without the field read as before; hand edits with an unknown value
+  are ignored with a log line.
+- **How a group gets declared:**
+  1. *By the model.* With any on-demand group switched on, a small tool
+     `load_tools(group)` is declared, its enum the groups with a phrase
+     each (`documents: PDF documents with charts`). The model calls it
+     on "оформи документ"; the answer says the tools are ready; the
+     group is declared from the next request on.
+  2. *By the user.* The composer's + menu gets "Make a Document…": the
+     group is loaded from this message on. No text is added to the
+     user's message; the tool's own description says when to use it.
   3. *Always*, for a user who wants it in every chat and has the
      context.
-- **The same mechanism for the other tools later** (web, weather,
-  country): the profile says which are always on and which on demand.
-  Out of this ADR's first step; the groups are data, so adding one is a
-  line.
-- `load_tools` is ordinary (it changes only what's declared); the trust
-  barrier still decides what a loaded tool may do. A group loaded by a
-  call that came after file text works only from the user's next message
-  (a file can't hand the model a new tool in its own turn).
+- **State, saved with the chat**: `loadedToolGroups` in the session file
+  ([0006](0006-chat-sessions-and-library.md); temporary chats keep it in
+  memory). `ChatToolbox.definitions(for:)` declares the groups switched
+  on that are `always` or in `loadedToolGroups`. A call of a tool whose
+  group isn't loaded (a model that saw it in another chat) is answered
+  "call load_tools first", which it can, not "isn't available".
+- **After file text, loading waits for the user.** `load_tools` runs
+  anytime, but a group loaded by a call made after file, folder or web
+  text in the turn (`ToolTrust.TurnState.hasUntrustedText` or
+  `networkText`) goes to `pendingToolGroups` and is declared only from
+  the user's next message: a file can't hand the model a new tool in its
+  own turn. The answer says so.
+- **The other tools later** (web, weather, country) take the same
+  setting; out of this ADR's first step. Groups are data, so adding one
+  is a line.
 
 ## Verification
 
-- Unit tests (LLMTrayCore): the Markdown converter (every block, raw
-  HTML escaped, links filtered, chart references resolved, unknown
-  images to alt text); chart validation (caps, non-finite values, unknown
-  types); file naming; `load_tools` (sticky, saved with the chat, after
-  file text only from the next message).
-- A rendering test: a fixed document in each style printed to PDF, page
-  count and text extracted (PDFKit) checked; the web view's handler
-  refuses a remote image, `file:` and a script.
+- A spike first (macOS 14 and 27): headless paginated PDF from a
+  `WKWebView` with the hardening above, page breaks and a 30-page
+  document; PDFKit header/footer stamping. Its result goes into this ADR
+  before the build. Then the prefill measurement above.
+- Unit tests (LLMTrayCore): the converter (every block, raw HTML
+  escaped, no attribute but the allowed ones, link schemes, link
+  addresses shown, chart references, unknown images to alt text); chart
+  validation (caps, non-finite values, unknown types); the file-name
+  sanitizer (NFC, separators, leading dot, collisions); `load_tools`
+  (sticky, saved with the chat, pending after file text until the next
+  user message); the profile field's resolution and an old profile.
+- Rendering tests: a fixed document in each style to PDF, page count and
+  extracted text (PDFKit) checked; the hostile fixtures of Hardening 1
+  load nothing; the output limits fail cleanly.
 - `--run-tool make_document '<json>'` writes the PDF (as the other
   tools); `scripts/eval_tool_choice.py` gets prompts that need a document
   (called, through `load_tools` when on demand) and ones that don't
-  ("привет", "explain this" — not called).
-- Measure: declaration tokens (`--dump-tool-definitions`), the cache
-  miss on loading (prefill time before/after in a long chat).
+  ("привет", "explain this": not called).
 - Manual: a report with a table and two charts from a project file, a
-  letter, an invoice; Open, Save As…, Add to Project; a temporary chat;
-  Regenerate.
+  letter, an invoice; Open, Save As…, Add to Project with files off;
+  Make again; a temporary chat (nothing on disk until Save); a chat
+  reopened after a restart keeps its documents and its loaded group.
