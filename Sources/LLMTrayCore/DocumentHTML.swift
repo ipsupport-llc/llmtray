@@ -171,8 +171,11 @@ public enum DocumentHTML {
                     continue
                 }
                 // Table: a row and a separator under it.
+                // As GitHub's: the separator has as many cells as the header;
+                // at most `maxColumns` of them, and `maxCells` in the table.
                 if trimmed.hasPrefix("|"), i + 1 < lines.count,
-                   let aligns = Self.tableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces)) {
+                   let aligns = Self.tableSeparator(lines[i + 1].trimmingCharacters(in: .whitespaces)),
+                   aligns.count == Self.cells(trimmed).count, aligns.count <= Self.maxColumns {
                     flush(&out, &self)
                     let header = Self.cells(trimmed)
                     var rows: [[String]] = []
@@ -180,6 +183,8 @@ public enum DocumentHTML {
                     while i < lines.count {
                         let t = lines[i].trimmingCharacters(in: .whitespaces)
                         guard t.hasPrefix("|") else { break }
+                        // Past the table's cells, the rows are text.
+                        guard (rows.count + 2) * header.count <= Self.maxCells else { break }
                         rows.append(Self.cells(t))
                         i += 1
                     }
@@ -361,6 +366,10 @@ public enum DocumentHTML {
         /// How far a closing marker, bracket or backtick is looked for: a
         /// 200,000-character line of asterisks stays linear.
         static let scanLimit = 1_000
+        /// A table's columns and cells: padding short rows to the header
+        /// can't multiply a 200,000-character input into billions of cells.
+        static let maxColumns = 50
+        static let maxCells = 20_000
 
         static func emphasis(_ chars: [Character], at i: Int) -> (String, String, Int)? {
             for (marker, tag) in [("**", "strong"), ("__", "strong"), ("~~", "del"), ("*", "em"), ("_", "em")] {

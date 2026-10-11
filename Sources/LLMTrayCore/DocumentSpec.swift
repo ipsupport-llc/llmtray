@@ -66,7 +66,10 @@ public struct DocumentSpec: Equatable, Sendable {
         let title = clip(((values["title"] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines), Limits.titleCharacters)
         let content = (values["content"] as? String) ?? ""
         guard !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return .failure(.noContent) }
-        guard content.count <= Limits.contentCharacters else { return .failure(.tooLong(content.count)) }
+        // Unicode scalars, not characters: a letter with a million combining
+        // marks is one character.
+        let scalars = content.unicodeScalars.count
+        guard scalars <= Limits.contentCharacters else { return .failure(.tooLong(scalars)) }
         var notes: [String] = []
         var charts: [Chart] = []
         var seen = Set<String>()
@@ -133,7 +136,10 @@ public struct DocumentSpec: Equatable, Sendable {
                               series: series, unit: clip((item["unit"] as? String) ?? "", 20)))
     }
 
-    static func clip(_ s: String, _ n: Int) -> String { s.count <= n ? s : String(s.prefix(n)) }
+    /// At most `n` Unicode scalars (not characters: see `read`).
+    static func clip(_ s: String, _ n: Int) -> String {
+        s.unicodeScalars.count <= n ? s : String(String.UnicodeScalarView(s.unicodeScalars.prefix(n)))
+    }
 }
 
 public enum DocumentError: Error, Equatable, Sendable {
@@ -161,7 +167,7 @@ public enum DocumentFileName {
         s = s.trimmingCharacters(in: .whitespaces)
         while s.hasPrefix(".") { s.removeFirst() }
         s = s.trimmingCharacters(in: .whitespaces)
-        if s.count > 80 { s = String(s.prefix(80)).trimmingCharacters(in: .whitespaces) }
+        if s.unicodeScalars.count > 80 { s = DocumentSpec.clip(s, 80).trimmingCharacters(in: .whitespaces) }
         return s.isEmpty ? "Document" : s
     }
 

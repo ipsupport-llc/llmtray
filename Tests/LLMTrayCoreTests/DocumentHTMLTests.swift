@@ -135,6 +135,15 @@ final class DocumentHTMLTests: XCTestCase {
         XCTAssertLessThan(Date().timeIntervalSince(start), 10)
     }
 
+    func testTablesAreBounded() {
+        let wide = "|" + String(repeating: "x|", count: 25_000) + "\n|---|\n" + String(repeating: "|\n", count: 70_000)
+        let html = body(wide).html
+        XCTAssertFalse(html.contains("<table>"), "a separator that doesn't match the header isn't a table")
+        let header = "|" + String(repeating: "h|", count: 50) + "\n|" + String(repeating: "---|", count: 50) + "\n"
+        let tall = body(header + String(repeating: "|a|\n", count: 1_000)).html
+        XCTAssertLessThanOrEqual(tall.components(separatedBy: "<td").count - 1, 20_000)
+    }
+
     func testEscapesControlCharacters() {
         XCTAssertEqual(DocumentHTML.escape("a\u{0}b\u{7F}c<&>\"'"), "abc&lt;&amp;&gt;&quot;&#39;")
     }
@@ -168,6 +177,12 @@ final class DocumentSpecTests: XCTestCase {
         let many = (0..<501).map(String.init).joined(separator: ",")
         let spec = try? read("{\"title\": \"x\", \"content\": \"y\", \"charts\": [{\"id\": \"a\", \"type\": \"bar\", \"series\": [{\"values\": [\(many)]}]}]}").get()
         XCTAssertEqual(spec?.charts.count, 0)
+    }
+
+    func testLimitsCountScalars() {
+        let marks = "a" + String(repeating: "\u{301}", count: DocumentSpec.Limits.contentCharacters)
+        if case .failure(.tooLong) = DocumentSpec.read(["title": "x", "content": marks]) {} else { XCTFail() }
+        XCTAssertEqual(DocumentSpec.clip("e" + String(repeating: "\u{301}", count: 500), 10).unicodeScalars.count, 10)
     }
 
     func testFileNames() throws {
