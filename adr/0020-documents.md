@@ -109,60 +109,70 @@ a 4B model looks as good as one from a 35B model.
 
 ## Project pictures
 
-Projects take pictures beside documents, so a document can use them
-(an addition to [0012](0012-project-files-rag.md), whose planned OCR and
-descriptions of images would later make the same pictures searchable;
-until then they are stored and listed, never searched).
+Projects take pictures beside documents, so a document can use them.
+**Kept out of the search index**: a picture has no text, and
+[0012](0012-project-files-rag.md)'s index (its schema, states, counts
+and every query) stays exactly as it is. Pictures are a small store of
+their own, `ProjectPictures` (LLMTrayCore), per project:
+`pictures/<uuid>.<ext>` copies (mode 0600, `O_EXCL | O_NOFOLLOW`) and a
+`pictures.json` manifest (id `p1`, `p2`… never reused, name, width,
+height, bytes, SHA-256, added). When 0012's image OCR and descriptions
+come, they may move pictures into the index; until then pictures are
+never searched.
 
 - **Formats**, exactly: png, jpg, jpeg, jfif, heic, heif, webp, tif,
-  tiff, gif (`ProjectFileFormats.pictures`), at most 50 MB each (refused
-  above at add, and checked again at render). The extension gate is
-  followed by a content check in the ingest worker: ImageIO must read it
-  as an image (its type conforming to `public.image`); a renamed
-  non-image ends "not a picture", never stored as one.
-- **Added** by the flows that add documents: the project's Add Files…,
-  the + menu's Add Files to the project, the project files window's
-  drop, and `files(add_to_project)` from a granted folder
-  ([0014](0014-folder-tools.md), its own consent dialog). Dropping an
-  image on a project chat still attaches it to the message for a vision
-  model, as today; adding it to the project is the explicit path. The
-  texts that promise search say what's true for a picture: the consent
-  dialog ("Every chat of the project can then use it in documents"),
-  `add_to_project`'s answer, ProjectIndexer's add notes and the Add
-  Files panel's message.
-- **Its own state, `DocumentStatus.picture`**: terminal like `ready`,
-  but not searchable and not pending. `add` enqueues no extraction for
-  it; the worker only checks it (above) and measures it (width and
-  height, new fields on `IndexedDocument`, measured once at add, never
-  on the tool path); open and reconcile never queue it. Every switch
-  over the status gains the case; an older build reading it maps the
-  unknown value to `failed` (shown so, nothing lost). Presentation:
-  pictures aren't counted in "Searches N files" or the ring's progress;
-  a project with only pictures shows "N pictures"; Re-index, Index Now
-  and the pin button aren't offered for one.
-- **What the model sees.** The listing shows a picture as
-  `id. name -- picture 1600×1200`. Search and read skip pictures; a read
-  or scoped search of a picture's id answers "is a picture: it can go
-  into a document as ![caption](project:<id>), it has no text"; a pin
-  answers "is a picture: only documents are pinned" (no "yet"). With
-  documents on (the tool declared or its group on demand), the listing
-  ends with that same one-line hint; without, it doesn't mention it.
-- **Decoding untrusted images** — at add (check, measure, the window's
-  thumbnail) and at render — happens off the main actor in one bounded
-  path: `CGImageSourceCreateWithURL` without caching, properties of
-  index 0 only (a GIF's other frames never decoded), the pixel count
-  from the header refused above 100 megapixels before any decode, then
-  `CGImageSourceCreateThumbnailAtIndex` at 2400 px (400 for the
-  window), each picture under a 10 s timeout; a picture that fails or
-  times out is left out (render) or ends `failed` (add).
-- **At render, ownership is checked again**: the chat must still be in
-  the project, and the picture still its, before its copy is read — at
-  the start and before the page is built, as `project_files` checks
-  before returning text. Make again checks the same.
-- **Trust**: a picture's name is file text like a document's name (the
-  listing is project text, as now); its pixels reach no model through
-  this, only `make_document`'s output. Looking at a project picture
-  with a vision model is not part of this ADR.
+  tiff, gif; at most 50 MB each, checked by size when the files are
+  sorted for adding (`ProjectFileDrop.sort` and `add_to_project`'s
+  candidate check), before anything is copied. Then the picture is
+  checked and measured (below); one that isn't an image or has no
+  dimensions is refused with "not a picture" and its copy removed. The
+  same file twice (by SHA-256) is "already in the project".
+- **Added** by the flows that add documents, which sort each file to its
+  store: the project's Add Files…, the + menu's Add Files to the
+  project, the project files window's drop, and `files(add_to_project)`
+  from a granted folder ([0014](0014-folder-tools.md), its consent
+  dialog). Dropping an image on a project chat still attaches it to the
+  message for a vision model, as today; adding it to the project is the
+  explicit path. Texts say what's true per kind: the consent dialog
+  ("…can then search it" for a document, "…can then use it in
+  documents" for a picture), `add_to_project`'s answer likewise, the add
+  notes ("1 picture added"), and the format lines of the Add Files
+  panel, the drop zone and the empty Files view ("…; pictures are kept
+  for documents").
+- **Shown apart.** The Files window gets a Pictures section
+  (thumbnail, name, size, Remove); "Searches N files" and the ring
+  count documents only, as now; a project with pictures only says "N
+  pictures" in that line.
+- **What the model sees.** `project_files`' listing ends with a
+  `Pictures:` part, `p1. name -- 1600×1200` per picture (names are file
+  text, as documents' names are). A read or search of a `p` id answers
+  "p1 is a picture: it has no text"; a pin "p1 is a picture: only
+  documents are pinned". When `make_document` is declared, the listing
+  and those answers add "it can go into a document as
+  ![caption](project:p1)" (`listing(… picturesUsable:)`); otherwise
+  nothing about documents.
+- **Decoding untrusted images** — check and measure at add, the
+  window's thumbnail, and render — happens in a child process, as
+  extraction does (0012, "A child process": `LLMTray --decode-picture`,
+  no network, the same memory limit, killed after 10 s): it reads the
+  header incrementally without caching (as `FileClassifier` does),
+  refuses above 100 megapixels before any decode, decodes frame 0 only
+  (a GIF's other frames never), scales with
+  `CGImageSourceCreateThumbnailAtIndex` (2400 px for a document, 400 for
+  the window) and returns the re-encoded bytes (PNG, or JPEG for
+  photos) without metadata, or an error. A picture that fails or times
+  out is refused (add) or left out (render).
+- **At render**, for each `project:<id>`: the chat still in the
+  project, the id in its manifest, then decoded as above into memory —
+  all before the page loads; the scheme handler serves only those bytes,
+  nothing is read from disk while WebKit prints. The decoded pictures of
+  one document total at most 60 MB; past that the rest are left out.
+  Make again runs this against the chat's project now (a picture removed
+  since, or a chat moved out: left out).
+- **Trust**: the listing's picture part is project text, as the rest of
+  the listing; a picture's pixels reach no model through this, only
+  `make_document`'s output. Looking at a project picture with a vision
+  model is not part of this ADR.
 
 ## Hardening
 
@@ -354,12 +364,13 @@ separate look, not part of this ADR.
   list kinds; `load_tools` (sticky, saved with the chat, pending after
   file text until the next user message, with pinned files too); the
   profile field's per-group merge, an old profile, a bad hand edit.
-- Project pictures: each format added (and a renamed non-image
-  refused), listed with id and size, never a search hit, never pinned, a
-  read of one answered as a picture, removed with its copy; a document
-  with a picture of another project or a removed one leaves it out; a
-  100-megapixel-plus header refused before decoding; metadata gone from
-  the embedded copy.
+- Project pictures: each format added; a renamed non-image, one over
+  50 MB and one over 100 megapixels refused (the last before decoding);
+  a duplicate by hash; the manifest's ids never reused; listing,
+  read/search/pin answers with and without documents on; removed with
+  its copy; a document with a picture of another project, a removed one
+  or past 60 MB leaves it out; metadata gone from the embedded copy; the
+  decoder child killed at 10 s.
 - Rendering tests: a fixed document in each style to PDF, page count and
   extracted text (PDFKit) checked; the hostile fixtures of Hardening 1
   load nothing; the output limits fail cleanly.
