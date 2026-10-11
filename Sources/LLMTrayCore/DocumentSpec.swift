@@ -270,12 +270,16 @@ public struct DocumentSpec: Equatable, Sendable {
         var found: [String] = []
         var fence: String?
         for line in DocumentHTML.lines(content) {
-            let t = line.trimmingCharacters(in: .whitespaces)
+            // A quote's ">" markers off: a fence may be quoted too.
+            var unquoted = Substring(line.trimmingCharacters(in: .whitespaces))
+            while unquoted.hasPrefix(">") { unquoted = unquoted.dropFirst().drop(while: { $0 == " " }) }
+            let quoted = String(unquoted)
             if let open = fence {
-                if t.hasPrefix(open) { fence = nil }
+                if quoted.hasPrefix(open) { fence = nil }
                 continue
             }
-            if t.hasPrefix("```") || t.hasPrefix("~~~") { fence = String(t.prefix(3)); continue }
+            if quoted.hasPrefix("```") || quoted.hasPrefix("~~~") { fence = String(quoted.prefix(3)); continue }
+            let t = quoted
             // Code spans (backticks in pairs; one left open is text, as the
             // converter reads it): a marker inside one isn't an image, but an
             // image's caption may hold code.

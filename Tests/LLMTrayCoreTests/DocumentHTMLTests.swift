@@ -340,6 +340,7 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(DocumentSpec.imagesAsData("`open ![x](data:A)"), ["![x](data:A)"], "an open backtick is text")
         XCTAssertEqual(DocumentSpec.imagesAsData("![a[b](data:A)"), ["![a[b](data:A)"])
         XCTAssertEqual(DocumentSpec.imagesAsData("![Plot of `sin(x)`](data:A)"), ["![Plot of `sin(x)`](data:A)"], "code in a caption")
+        XCTAssertEqual(DocumentSpec.imagesAsData("> ```markdown\n> ![Logo](data:image/png;base64,...)\n> ```"), [], "a quoted fence")
         XCTAssertEqual(DocumentSpec.imagesAsData("![y](p.png) [x](data:A)"), [], "a link after an image")
         // The same image twice is one more; the text around it may change.
         XCTAssertEqual(DocumentSpec.read(["title": "x", "content": old + "\n![p](data:image/png;base64"], earlier: old).failure, .imageData)
