@@ -39,13 +39,15 @@ before. A model that doesn't think shows no picker.
   user chose a short reasoning effort -- think at most about 512 tokens,
   then answer. Your thinking is cut off there.]` before its text, so a
   model plans a short thought instead of being cut off in the middle --
-  the server's cut-off stays the backstop. Not in the system prompt: a
-  changed system prompt is a whole new prompt to prefill on every switch
-  (a minute for a long chat on Gemma 4 26B). The budget is saved on the
-  message (`thinkingBudget`), so later requests send the same history;
-  Regenerate keeps the message's note while the request's budget is the
-  picker's now. Off (the template's) and High (nothing to limit) say
-  nothing; gpt-oss's levels are its template's.
+  the server's cut-off stays the backstop. With the latest user message
+  only, as the picker is now -- never saved: a saved one went stale (Low,
+  then High and Regenerate: "cut off at 512" with no budget sent; a chat
+  continued on another model). The cost is the cache at that message:
+  the next turn sends it without the note, so the last exchange is read
+  again (seconds), not the chat. Not in the system prompt: a changed
+  system prompt is a whole new prompt to prefill on every switch (a
+  minute for a long chat on Gemma 4 26B). Off (the template's) and High
+  (nothing to limit) say nothing; gpt-oss's levels are its template's.
 - **In-app requests only** for now: the proxy forwards an external
   client's body as it is (it may send `thinking_budget` itself). A
   profile field for external clients is a later step if wanted.
