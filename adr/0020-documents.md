@@ -62,15 +62,16 @@ a 4B model looks as good as one from a 35B model.
   show as they do for a drop.
 - **Stored beside the chat's images, but not in memory.** Images and
   songs are `[Data]` loaded with the chat; a PDF can be 50 MB, so a
-  message gets `documents` as metadata only (`DocumentRef`: file name,
-  title, pages, the `DocumentSource`), in `ChatMessage` and
+  message gets `documents` as metadata only (`DocumentRef`: an `id`
+  (UUID), file name, title, pages, the `DocumentSource`), in `ChatMessage` and
   `PersistedMessage`. The PDF and its thumbnail (PNG, at most 400 px,
   under 100 KB) are files in the chat's `<uuid>-images/` folder
   ([0006](0006-chat-sessions-and-library.md)), never in the JSON, read
   only to show, open, save or share. `PersistedMessage.withoutFiles`,
   the sweep's referenced set, the save-time drop of empty assistant
-  messages, compaction's media check and the history entry's "has
-  content" all count documents (one `hasContent` helper); the files go
+  messages, `turnProducedSomething` (a document-only turn at the tool
+  limit isn't "the model kept calling tools"), compaction's media check
+  and the history entry's "has content" all count documents (one `hasContent` helper); the files go
   with the chat. **Temporary chats write nothing** (0006): the PDF and
   thumbnail bytes sit in a session-scoped in-memory store keyed by the
   document's id (never in `Codable`), freed when the chat closes, and go
@@ -122,6 +123,8 @@ from a project file, a folder file or a web page with instructions in it.
    link` (`link` only as the one stylesheet reference it places itself),
    and only these attributes: `class` (its own names), `href` on `a`,
    `src` and `alt` on `img` (a chart's `llmtray-doc:` address only),
+   `rel="stylesheet"` and `href` on its own `link` (the style's
+   `llmtray-doc:` address only),
    `align` on table cells; the stylesheet is one `<link>` to the style
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
@@ -185,8 +188,9 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   beside `enabledTools`, merged **per group**, not as a whole field: for
   each group, the overlay's value, else Default's, else on demand (so an
   overlay that sets one group doesn't wipe Default's others).
-  `toolLoading` stays out of `allFields`; an overlay's override count
-  adds its number of groups instead. A group off is simply
+  `toolLoading` is in `allFields` like every stored field (so the
+  coverage test and Reset work); the override count counts it as its
+  number of groups rather than as 1. A group off is simply
   not in `enabledTools`, as today. Old profiles without the field read
   as before. The field decodes leniently: values case-insensitive, an
   unknown group or value skipped with a log line, never failing the
