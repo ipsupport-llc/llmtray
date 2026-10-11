@@ -388,6 +388,8 @@ final class ProjectIndexer: ObservableObject {
             guard isEnabled else { return .failure(.reason(NSLocalizedString("Project files were turned off", comment: ""))) }
             do {
                 let handle = try await registry.open(project)
+                // And again after the open's wait.
+                guard isEnabled else { return .failure(.reason(NSLocalizedString("Project files were turned off", comment: ""))) }
                 return .success(try await handle.write { index in try ProjectPictures.add(checked, to: index.directory) })
             } catch {
                 return .failure(.reason(error.localizedDescription))

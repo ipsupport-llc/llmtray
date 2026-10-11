@@ -393,7 +393,9 @@ public final class ProjectFilesService {
             return picturePage(pictures, from: 0, project: project, budget: budget, usable: picturesUsable,
                                head: note ?? "No documents in this project, only pictures.")
         }
-        let output = documentListing(docs, from: from, project: project, budget: budget, note: note, pins: pins)
+        // Room kept for the pictures' cursor: it always fits after the files.
+        let reserve = pictures.pictures.isEmpty ? 0 : 120
+        let output = documentListing(docs, from: from, project: project, budget: max(0, budget - reserve), note: note, pins: pins)
         guard !pictures.pictures.isEmpty, output.epilogue.isEmpty else { return output }
         var withPictures = output
         withPictures.preamble += "\n\n" + ProjectPictures.listing(pictures, picturesUsable: picturesUsable)
@@ -411,15 +413,30 @@ public final class ProjectFilesService {
         if usable { top += " use one in a document as ![caption](project:<id>)" }
         var lines: [String] = []
         var output = ProjectToolOutput(project: project, preamble: top + "\n(no room to list them in this chat's context)")
-        for p in all[from...] {
-            var trial = ProjectToolOutput(project: project, preamble: ([top] + lines + ["\(p.id). \(p.name) -- \(p.width)×\(p.height)"]).joined(separator: "\n"))
-            let next = from + lines.count + 1
+        func page(_ rows: [String]) -> ProjectToolOutput {
+            var out = ProjectToolOutput(project: project, preamble: ([top] + rows).joined(separator: "\n"))
+            let next = from + rows.count
             if next < all.count {
-                trial.epilogue = "\(all.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.picturesCursorPrefix)\(next)\"})"
+                out.epilogue = "\(all.count - next) more: \(ProjectFiles.toolName)({\"cursor\":\"\(ProjectFiles.picturesCursorPrefix)\(next)\"})"
             }
-            guard trial.fitsWhole(byteBudget: budget) else { break }
-            lines.append("\(p.id). \(p.name) -- \(p.width)×\(p.height)")
-            output = trial
+            return out
+        }
+        for p in all[from...] {
+            let row = "\(p.id). \(p.name) -- \(p.width)×\(p.height)"
+            let trial = page(lines + [row])
+            if trial.fitsWhole(byteBudget: budget) {
+                lines.append(row)
+                output = trial
+                continue
+            }
+            // Its name longer than the room: shown cut, so the listing
+            // still goes on past it.
+            if lines.isEmpty {
+                let short = "\(p.id). \(String(p.name.unicodeScalars.prefix(24)))… -- \(p.width)×\(p.height)"
+                let cut = page([short])
+                if cut.fitsWhole(byteBudget: budget) { output = cut }
+            }
+            break
         }
         return output
     }
