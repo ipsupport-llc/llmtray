@@ -197,6 +197,12 @@ final class DocumentSpecTests: XCTestCase {
         XCTAssertEqual(log.charts.first?.series.first?.xs.allSatisfy { $0 > 0 }, true)
         XCTAssertEqual(log.charts.first?.series.first?.xs.last, 10)
         XCTAssertEqual(log.charts.first?.range, [-10, 10], "the axis is the asked range, gaps and all")
+        // A pole between two points, or at one: no line across it.
+        let pole = try read(#"{"title": "x", "content": "y", "charts": [{"id": "p", "range": [-1, 2], "series": [{"formula": "1/x"}, {"name": "sin", "formula": "sin(x)"}]}]}"#).get()
+        let inverse = try XCTUnwrap(pole.charts.first?.series.first)
+        XCTAssertEqual(Set(inverse.pieces), [0, 1])
+        XCTAssertTrue(zip(inverse.xs, inverse.pieces).allSatisfy { ($0 < 0) == ($1 == 0) })
+        XCTAssertEqual(Set(pole.charts.first?.series.last?.pieces ?? []), [0], "a smooth line is one piece")
         // Limits count scalars: one letter with a thousand marks is too long.
         let marks = "x" + String(repeating: "\u{301}", count: 1000)
         let long = try read(#"{"title": "x", "content": "y", "charts": [{"id": "m", "series": [{"formula": "\#(marks)"}]}]}"#).get()

@@ -13,6 +13,9 @@ public struct DocumentSpec: Equatable, Sendable {
             /// Each value's x, for a series drawn from a formula; empty for
             /// values placed at the labels.
             public var xs: [Double] = []
+            /// Each formula point's piece: the line isn't drawn between
+            /// pieces (a pole, a stretch without values).
+            public var pieces: [Int] = []
         }
         public var id: String
         public var kind: Kind
@@ -138,9 +141,9 @@ public struct DocumentSpec: Equatable, Sendable {
             }
             for s in rawSeries {
                 switch formulaSeries((s["formula"] as? String) ?? "", range) {
-                case .success(let (xs, values)):
+                case .success(let (xs, values, pieces)):
                     series.append(Chart.Series(name: clip((s["name"] as? String) ?? (s["formula"] as? String) ?? "", Limits.labelCharacters),
-                                               values: values, xs: xs))
+                                               values: values, xs: xs, pieces: pieces))
                 case .failure(let problem): return .failure(problem)
                 }
             }
@@ -198,8 +201,10 @@ public struct DocumentSpec: Equatable, Sendable {
     }
 
     /// The formula at evenly spaced x across the range; the points where it
-    /// has no value (a log below zero, tan at its pole) are left out.
-    static func formulaSeries(_ formula: String, _ range: (Double, Double)) -> Result<([Double], [Double]), ChartProblem> {
+    /// has no value (a log below zero, tan at its pole) are left out, and a
+    /// new piece starts after them or at a pole between two points (no value
+    /// halfway, or the sign flips with the middle beyond both: 1/x, tan).
+    static func formulaSeries(_ formula: String, _ range: (Double, Double)) -> Result<([Double], [Double], [Int]), ChartProblem> {
         guard !formula.trimmingCharacters(in: .whitespaces).isEmpty, formula.unicodeScalars.count <= Limits.formulaCharacters else {
             return .failure(ChartProblem(text: "a formula is empty or too long"))
         }
@@ -208,16 +213,32 @@ public struct DocumentSpec: Equatable, Sendable {
         catch let failure as Calculator.Failure {
             if case .domain = failure {} else { return .failure(ChartProblem(text: "its formula: \(failure.localizedDescription)")) }
         } catch { return .failure(ChartProblem(text: "its formula can't be read")) }
-        var xs: [Double] = [], values: [Double] = []
+        func value(_ x: Double) -> Double? {
+            guard let y = try? Calculator.evaluate(formula, variables: ["x": x]), abs(y) < 1e15 else { return nil }
+            return y
+        }
+        var xs: [Double] = [], values: [Double] = [], pieces: [Int] = []
+        var piece = 0, skipped = false
         let n = Limits.formulaPoints
         for i in 0..<n {
             let x = range.0 + (range.1 - range.0) * Double(i) / Double(n - 1)
-            guard let y = try? Calculator.evaluate(formula, variables: ["x": x]), abs(y) < 1e15 else { continue }
+            guard let y = value(x) else { skipped = true; continue }
+            if let lastX = xs.last, let lastY = values.last {
+                if skipped {
+                    piece += 1
+                } else if let mid = value((lastX + x) / 2) {
+                    if (lastY < 0) != (y < 0), abs(mid) > max(abs(lastY), abs(y)) { piece += 1 }
+                } else {
+                    piece += 1
+                }
+            }
+            skipped = false
             xs.append(x)
             values.append(y)
+            pieces.append(piece)
         }
         guard values.count >= 2 else { return .failure(ChartProblem(text: "its formula has no values in the range")) }
-        return .success((xs, values))
+        return .success((xs, values, pieces))
     }
 
     /// At most `n` Unicode scalars (not characters: see `read`).

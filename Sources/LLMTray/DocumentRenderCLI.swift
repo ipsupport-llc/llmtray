@@ -278,25 +278,21 @@ struct DocumentChartView: View {
         let label: String
         /// A formula's x; nil at a label.
         let x: Double?
-        /// A formula's piece between points it has no value at (1/x at 0):
-        /// pieces aren't joined across the gap.
-        var piece = 0
+        /// A formula's line: its series and piece (not joined across a pole);
+        /// by index, so two series of one name stay two lines.
+        var line = ""
         let series: String
         let value: Double
     }
 
     private var points: [Point] {
         var out: [Point] = []
-        // Formula points are evenly spaced; a wider step is a skipped point.
-        let step = chart.range.map { ($0.count == 2 ? $0[1] - $0[0] : 0) / Double(DocumentSpec.Limits.formulaPoints - 1) } ?? 0
         for (s, series) in chart.series.enumerated() {
             for (i, value) in series.values.enumerated() {
                 let label = i < chart.labels.count ? chart.labels[i] : String(i + 1)
                 let x = series.xs.flatMap { i < $0.count ? $0[i] : nil }
                 var point = Point(id: s * 10_000 + i, label: label, x: x, series: series.name.isEmpty ? "Series \(s + 1)" : series.name, value: value)
-                if let x, let last = out.last, last.series == point.series, let lastX = last.x {
-                    point.piece = last.piece + (x - lastX > step * 1.5 ? 1 : 0)
-                }
+                point.line = "\(s)/\(series.pieces.flatMap { i < $0.count ? $0[i] : nil } ?? 0)"
                 out.append(point)
             }
         }
@@ -325,7 +321,7 @@ struct DocumentChartView: View {
             let range = chart.range ?? []
             Chart(line) { p in
                 LineMark(x: .value("x", p.x ?? 0), y: .value(unit, p.value),
-                         series: .value("Piece", "\(p.series)\u{1F}\(p.piece)"))
+                         series: .value("Line", p.line))
                     .foregroundStyle(by: .value("Series", p.series))
             }
             // The range the formula was asked for, not rounded out past it;
