@@ -63,16 +63,21 @@ a 4B model looks as good as one from a 35B model.
 - **Stored beside the chat's images, but not in memory.** Images and
   songs are `[Data]` loaded with the chat; a PDF can be 50 MB, so a
   message gets `documents` as metadata only (`DocumentRef`: file name,
-  title, pages, a small thumbnail, the `DocumentSource`), in
-  `ChatMessage` and `PersistedMessage`. The file is in the chat's
-  `<uuid>-images/` folder ([0006](0006-chat-sessions-and-library.md)),
-  read only to open, save or share it. `PersistedMessage.withoutFiles`,
-  the sweep's referenced set, compaction's media check and the history
-  entry's "has content" all count documents; the file goes with the
-  chat. **Temporary chats write nothing** (0006): the PDF stays in
-  memory while the chat is open and goes to disk only when the user
-  opens, saves or shares it (the temp export of `MediaSharing`); Show in
-  Finder isn't offered there.
+  title, pages, the `DocumentSource`), in `ChatMessage` and
+  `PersistedMessage`. The PDF and its thumbnail (PNG, at most 400 px,
+  under 100 KB) are files in the chat's `<uuid>-images/` folder
+  ([0006](0006-chat-sessions-and-library.md)), never in the JSON, read
+  only to show, open, save or share. `PersistedMessage.withoutFiles`,
+  the sweep's referenced set, the save-time drop of empty assistant
+  messages, compaction's media check and the history entry's "has
+  content" all count documents (one `hasContent` helper); the files go
+  with the chat. **Temporary chats write nothing** (0006): the PDF and
+  thumbnail bytes sit in a session-scoped in-memory store keyed by the
+  document's id (never in `Codable`), freed when the chat closes, and go
+  to disk only when the user opens, saves or shares (the temp export of
+  `MediaSharing`); Show in Finder isn't offered there. Rendering itself
+  leaves no file behind (the spike checks: printing to data, not to a
+  temp file, where the API allows).
 - **Regenerate**: Regenerate on the answer re-runs the turn as for any
   answer. "Make again" on the card re-renders from the saved call (a
   `DocumentSource`: the arguments, as `MediaSource` keeps a generator's)
@@ -113,7 +118,8 @@ from a project file, a folder file or a web page with instructions in it.
    the Markdown is text (a `<script>` comes out as those characters);
    every text and attribute value is escaped. It emits only these tags:
    `html head body` (its own frame), `p h1–h6 ul ol li table thead tbody
-   tr th td pre code blockquote a strong em del hr br sup img nav section`,
+   tr th td pre code blockquote a strong em del hr br sup img nav section
+   link` (`link` only as the one stylesheet reference it places itself),
    and only these attributes: `class` (its own names), `href` on `a`,
    `src` and `alt` on `img` (a chart's `llmtray-doc:` address only),
    `align` on table cells; the stylesheet is one `<link>` to the style
@@ -178,8 +184,9 @@ estimated 250–300 tokens). Declaring it only when it's needed:
   a new optional field `tools.toolLoading: [group: always | onDemand]`
   beside `enabledTools`, merged **per group**, not as a whole field: for
   each group, the overlay's value, else Default's, else on demand (so an
-  overlay that sets one group doesn't wipe Default's others; the
-  overlay's override count counts its groups). A group off is simply
+  overlay that sets one group doesn't wipe Default's others).
+  `toolLoading` stays out of `allFields`; an overlay's override count
+  adds its number of groups instead. A group off is simply
   not in `enabledTools`, as today. Old profiles without the field read
   as before. The field decodes leniently: values case-insensitive, an
   unknown group or value skipped with a log line, never failing the
