@@ -169,6 +169,13 @@ public enum DocumentMath {
             var out = ""
             while let c = peek() {
                 i += 1
+                // An escaped brace (or anything escaped) is text, not a group.
+                if c == "\\", let next = peek() {
+                    out.unicodeScalars.append(c)
+                    out.unicodeScalars.append(next)
+                    i += 1
+                    continue
+                }
                 if c == "{" { level += 1 }
                 if c == "}" { level -= 1; if level == 0 { return out } }
                 out.unicodeScalars.append(c)
@@ -269,9 +276,9 @@ public enum DocumentMath {
                 return ("<mtext>\(DocumentHTML.escape(DocumentMath.textEscapes(try rawArgument())))</mtext>", false)
             case "operatorname":
                 // A name as written (foo-bar too), applied like \sin.
-                let name = try rawArgument().filter { !$0.isWhitespace }
+                let name = DocumentMath.textEscapes(try rawArgument(), dropSpaces: true)
                 function = true
-                return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(DocumentMath.textEscapes(name)))</mi>", false)
+                return ("<mi mathvariant=\"normal\">\(DocumentHTML.escape(name))</mi>", false)
             case "mathrm", "mathsf", "mathtt":
                 // Read as math (m^2 is m squared), its letters upright; a
                 // plain word stays one name (\mathrm{kg}).
@@ -354,15 +361,19 @@ public enum DocumentMath {
     static func mrow(_ parts: [String]) -> String { "<mrow>" + parts.joined() + "</mrow>" }
 
     /// \text{…}'s escapes as the characters they stand for (5\% is 5%).
-    static func textEscapes(_ text: String) -> String {
+    /// `dropSpaces`: plain spaces go (a name), escaped ones stay.
+    static func textEscapes(_ text: String, dropSpaces: Bool = false) -> String {
         var out = ""
         var escaped = false
         for ch in text {
             if escaped {
-                if "%$&#_{} ".contains(ch) { out.append(ch) } else { out.append("\\"); out.append(ch) }
+                // \\ is a line break in LaTeX: a space on one line.
+                if "%$&#_{} ".contains(ch) { out.append(ch) } else if ch == "\\" { out.append(" ") } else { out.append("\\"); out.append(ch) }
                 escaped = false
             } else if ch == "\\" {
                 escaped = true
+            } else if ch == " " || ch == "\t" || ch == "\n" {
+                if !dropSpaces { out.append(ch) }
             } else {
                 out.append(ch == "~" ? "\u{00A0}" : ch)
             }
