@@ -237,7 +237,7 @@ from a project file, a folder file or a web page with instructions in it.
    (a table cell's alignment is a class); the stylesheet is one `<link>` to the style
    it put there itself. Everything else (`style`, event handlers,
    `script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`,
-   `source`, `form`, `meta`, `base`, `style`) never comes out. Images other than chart and
+   `source`, `form`, any other `meta`, `base`, `style`) never comes out. Images other than chart and
    picture references (`chart:`, `project:`) become their alt
    text. Links: only `http`, `https` and
    `mailto` stay links; any other scheme (`javascript:`, `file:`,
