@@ -306,6 +306,7 @@
 "Documents" = "Belgeler";
 "Documents On in This Chat" = "Bu Sohbette Belgeler Açık";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Belgeler projeye kopyalanır ve bu Mac'te indekslenir; resimler mesajınıza eklenir.";
+"Documents are off (Settings › Files)." = "Belgeler kapalı (Ayarlar › Dosyalar).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Bu sohbette belgeler açık: bir belge isteyin (rapor, mektup…).";
 "Documents go into a project with this chat." = "Belgeler bu sohbetle birlikte bir projeye eklenir.";
 "Documents go into a project with this chat; images go into your message." = "Belgeler bu sohbetle birlikte bir projeye eklenir; resimler mesajınıza eklenir.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Toplam süre";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Çalışan modele karşı 1, 2, 4 ve 8 isteği aynı anda ve prefill-step-size'ı (256–4096) dener, her deneme arasında sunucuyu yeniden başlatır. Eşzamanlı istekler: en iyi toplam hızın %90'ına ulaşan en az sayı (daha fazlası az fayda için daha fazla bellek tüketir); prefill: en hızlı olan.";
 "Try Again" = "Tekrar Dene";
+"Turn On" = "Aç";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Dosya metinlerini bu Mac’te anlamsal arama için vektörlere dönüştürür. Bunu kaldırmak indeksleri korur: yeniden indirilene kadar dosyalar kelimelerine göre aranır.";
 "Tweak…" = "Ayarla…";
 "Type a message below and press Return. Try: “What can you do?”" = "Aşağıya bir mesaj yazıp Return tuşuna basın. Deneyin: “Ne yapabilirsin?”";

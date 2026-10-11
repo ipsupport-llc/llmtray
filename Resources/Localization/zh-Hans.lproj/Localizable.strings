@@ -306,6 +306,7 @@
 "Documents" = "文档";
 "Documents On in This Chat" = "本聊天已启用文档";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "文档会复制到项目并在此 Mac 上建立索引；图像会插入到你的消息中。";
+"Documents are off (Settings › Files)." = "文档已关闭（设置 › 文件）。";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "本聊天已启用文档：可请求文档（如报告、信件等）。";
 "Documents go into a project with this chat." = "文档会随本聊天一起放入项目。";
 "Documents go into a project with this chat; images go into your message." = "文档会随本聊天一起放入项目；图像会插入到你的消息中。";
@@ -1135,6 +1136,7 @@
 "Total time" = "总时长";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "对运行中的模型分别尝试 1、2、4、8 个并发请求和 prefill-step-size（256–4096），每次尝试后重启服务器。并发请求：选择达到最佳总速度 90% 的最小并发数（更高并发对内存开销大但收益小）；prefill：选择最快的值。";
 "Try Again" = "重试";
+"Turn On" = "开启";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "将在此 Mac 上把文件文本转换为用于按语义搜索的向量。移除后会保留索引：在重新下载之前，文件将按词语进行搜索。";
 "Tweak…" = "微调…";
 "Type a message below and press Return. Try: “What can you do?”" = "在下方输入消息并按回车。试试：“你能做什么？”";

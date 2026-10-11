@@ -306,6 +306,7 @@
 "Documents" = "Documentos";
 "Documents On in This Chat" = "Documentos activados en este chat";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Los documentos se copian en el proyecto y se indexan en este Mac; las imágenes se incluyen en su mensaje.";
+"Documents are off (Settings › Files)." = "Documentos está desactivado (Ajustes › Archivos).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Los documentos están activados en este chat: solicita uno (un informe, una carta…).";
 "Documents go into a project with this chat." = "Los documentos van al proyecto junto con este chat.";
 "Documents go into a project with this chat; images go into your message." = "Los documentos van al proyecto junto con este chat; las imágenes se incluyen en su mensaje.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Tiempo total";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Prueba 1, 2, 4 y 8 solicitudes a la vez y prefill-step-size (256–4096) con el modelo en ejecución, reiniciando el servidor entre cada prueba. Solicitudes simultáneas: el menor número que alcanza el 90% de la mejor velocidad total (más cuesta memoria por poco beneficio); prefill: el más rápido.";
 "Try Again" = "Intentar de nuevo";
+"Turn On" = "Activar";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Convierte el texto de los archivos en vectores para la búsqueda por significado, en este Mac. Al eliminarlo se conservan los índices: los archivos se buscarán por sus palabras hasta que se vuelva a descargar.";
 "Tweak…" = "Ajustar…";
 "Type a message below and press Return. Try: “What can you do?”" = "Escribe un mensaje abajo y pulsa Retorno. Prueba: “¿Qué puedes hacer?”";

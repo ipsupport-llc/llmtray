@@ -306,6 +306,7 @@
 "Documents" = "Documenti";
 "Documents On in This Chat" = "Documenti attivi in questa chat";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "I documenti vengono copiati nel progetto e indicizzati su questo Mac; le immagini vanno nel tuo messaggio.";
+"Documents are off (Settings › Files)." = "Documenti sono disattivati (Impostazioni › File).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "I documenti sono attivi in questa chat: richiedi uno (per es. un rapporto, una lettera…).";
 "Documents go into a project with this chat." = "I documenti vengono inseriti in un progetto con questa chat.";
 "Documents go into a project with this chat; images go into your message." = "I documenti vengono inseriti in un progetto con questa chat; le immagini vanno nel tuo messaggio.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Tempo totale";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Effettua prove con 1, 2, 4 e 8 richieste contemporanee e con prefill-step-size (256–4096) sul modello in esecuzione, riavviando il server tra ogni test. Richieste simultanee: il numero minimo che raggiunge il 90% della migliore velocità totale (di più costa memoria per poco guadagno); prefill: la più veloce.";
 "Try Again" = "Riprova";
+"Turn On" = "Attiva";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Converte il testo dei file in vettori per la ricerca per significato, su questo Mac. Rimuovendolo gli indici restano: i file verranno quindi cercati per parole fino a un nuovo download.";
 "Tweak…" = "Regola…";
 "Type a message below and press Return. Try: “What can you do?”" = "Digita un messaggio qui sotto e premi Invio. Prova: “Cosa puoi fare?”";

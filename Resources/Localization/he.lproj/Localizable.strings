@@ -306,6 +306,7 @@
 "Documents" = "מסמכים";
 "Documents On in This Chat" = "מסמכים פעילים בשיחה זו";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "המסמכים מועתקים לפרויקט ומאונדקסים ב-Mac זה; תמונות נכנסות להודעה שלך.";
+"Documents are off (Settings › Files)." = "מסמכים כבויים (הגדרות › קבצים).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "מסמכים פעילים בשיחה זו: בקש אחד (דוח, מכתב …).";
 "Documents go into a project with this chat." = "המסמכים נכנסים לפרויקט יחד עם הצ'אט הזה.";
 "Documents go into a project with this chat; images go into your message." = "המסמכים נכנסים לפרויקט עם הצ'אט הזה; תמונות נכנסות להודעה שלך.";
@@ -1135,6 +1136,7 @@
 "Total time" = "זמן כולל";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "בודק 1, 2, 4 ו-8 בקשות בבת אחת ו-prefill-step-size (256–4096) מול המודל הרץ, ומפעיל מחדש את השרת בין הבדיקות. בקשות בו־זמניות: המספר הקטן ביותר שמגיע ל-90% מהמהירות הכוללת הטובה ביותר (יותר בקשות צורכות זיכרון תמורת שיפור קטן); prefill: הערך המהיר ביותר.";
 "Try Again" = "נסה שוב";
+"Turn On" = "הפעל";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "ממיר את טקסט הקבצים לווקטורים לחיפוש לפי משמעות, במחשב זה. הסרתו שומרת את האינדקסים: הקבצים יחפשו לפי מילים עד להורדה מחודשת.";
 "Tweak…" = "כוונן…";
 "Type a message below and press Return. Try: “What can you do?”" = "הקלד הודעה למטה ולחץ Return. נסה: “מה אתה יכול לעשות?”";

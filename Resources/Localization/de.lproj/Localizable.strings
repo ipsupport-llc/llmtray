@@ -306,6 +306,7 @@
 "Documents" = "Dokumente";
 "Documents On in This Chat" = "Dokumente in diesem Chat aktiviert";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Dokumente werden ins Projekt kopiert und auf diesem Mac indexiert; Bilder werden in Ihre Nachricht eingefügt.";
+"Documents are off (Settings › Files)." = "Dokumente sind deaktiviert (Einstellungen › Dateien).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "In diesem Chat sind Dokumente aktiviert: Fordern Sie eines an (z. B. einen Bericht, einen Brief…).";
 "Documents go into a project with this chat." = "Dokumente werden zusammen mit diesem Chat ins Projekt aufgenommen.";
 "Documents go into a project with this chat; images go into your message." = "Dokumente werden zusammen mit diesem Chat ins Projekt aufgenommen; Bilder werden in Ihre Nachricht eingefügt.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Gesamtzeit";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Testet 1, 2, 4 und 8 gleichzeitige Anfragen und prefill‑step‑size (256–4096) gegen das laufende Modell, jeweils mit Server‑Neustart dazwischen. Gleichzeitige Anfragen: die geringste Anzahl, die 90 % der besten Gesamtgeschwindigkeit erreicht (mehr verbraucht Speicher bei geringem Gewinn); prefill: die schnellste Einstellung.";
 "Try Again" = "Erneut versuchen";
+"Turn On" = "Aktivieren";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Wandelt Dateitext auf diesem Mac in Vektoren für die semantische Suche um. Beim Entfernen bleiben die Indexe erhalten: Dateien werden dann nach ihren Wörtern durchsucht, bis es wieder heruntergeladen wird.";
 "Tweak…" = "Feinabstimmung…";
 "Type a message below and press Return. Try: “What can you do?”" = "Geben Sie unten eine Nachricht ein und drücken Sie Return. Versuchen Sie: „Was kannst du?“";

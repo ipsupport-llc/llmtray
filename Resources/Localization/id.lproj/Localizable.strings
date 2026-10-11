@@ -306,6 +306,7 @@
 "Documents" = "Dokumen";
 "Documents On in This Chat" = "Dokumen Aktif di Obrolan Ini";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Dokumen disalin ke proyek dan diindeks pada Mac ini; gambar dimasukkan ke pesan Anda.";
+"Documents are off (Settings › Files)." = "Dokumen dimatikan (Pengaturan › File).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Dokumen aktif di obrolan ini: minta satu (mis. laporan, surat…).";
 "Documents go into a project with this chat." = "Dokumen dimasukkan ke proyek bersama obrolan ini.";
 "Documents go into a project with this chat; images go into your message." = "Dokumen dimasukkan ke proyek bersama obrolan ini; gambar dimasukkan ke pesan Anda.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Total waktu";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Menguji 1, 2, 4, dan 8 permintaan sekaligus dan prefill-step-size (256–4096) terhadap model yang berjalan, me-restart server di antara tiap pengujian. Permintaan bersamaan: jumlah paling sedikit yang mencapai 90% dari kecepatan total terbaik (lebih banyak menghabiskan memori dengan keuntungan kecil); prefill: yang tercepat.";
 "Try Again" = "Coba Lagi";
+"Turn On" = "Nyalakan";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Mengubah teks berkas menjadi vektor untuk pencarian berdasarkan makna di Mac ini. Menghapusnya mempertahankan indeks: berkas akan dicari berdasarkan kata-kata sampai diunduh lagi.";
 "Tweak…" = "Atur…";
 "Type a message below and press Return. Try: “What can you do?”" = "Ketik pesan di bawah dan tekan Return. Coba: “Apa yang bisa Anda lakukan?”";

@@ -306,6 +306,7 @@
 "Documents" = "Tài liệu";
 "Documents On in This Chat" = "Tài liệu đang bật trong cuộc trò chuyện này";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Tài liệu được sao chép vào dự án và được lập chỉ mục trên Mac này; ảnh sẽ vào tin nhắn của bạn.";
+"Documents are off (Settings › Files)." = "Tài liệu đang tắt (Cài đặt › Tệp).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "Tài liệu đang bật trong cuộc trò chuyện này: yêu cầu một tài liệu (báo cáo, thư…).";
 "Documents go into a project with this chat." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này.";
 "Documents go into a project with this chat; images go into your message." = "Tài liệu được đưa vào dự án cùng với cuộc trò chuyện này; ảnh sẽ vào tin nhắn của bạn.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Tổng thời gian";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Thử 1, 2, 4 và 8 yêu cầu cùng lúc và prefill-step-size (256–4096) trên mô hình đang chạy, khởi động lại máy chủ giữa các lần. Yêu cầu đồng thời: số nhỏ nhất đạt 90% so với tốc độ tổng tốt nhất (tăng sẽ tốn bộ nhớ mà lợi ích ít); prefill: cấu hình nhanh nhất.";
 "Try Again" = "Thử lại";
+"Turn On" = "Bật";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Chuyển văn bản tệp thành véc-tơ để tìm theo ý nghĩa trên Mac này. Xóa mô hình sẽ giữ lại chỉ mục: tệp sẽ được tìm theo từ cho tới khi tải lại.";
 "Tweak…" = "Tinh chỉnh…";
 "Type a message below and press Return. Try: “What can you do?”" = "Gõ tin nhắn bên dưới và nhấn Return. Thử: “Bạn có thể làm gì?”";

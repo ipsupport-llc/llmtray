@@ -306,6 +306,7 @@
 "Documents" = "Dokumenty";
 "Documents On in This Chat" = "Dokumenty włączone w tym czacie";
 "Documents are copied into the project and indexed on this Mac; images go into your message." = "Dokumenty są kopiowane do projektu i indeksowane na tym Macu; obrazy trafiają do twojej wiadomości.";
+"Documents are off (Settings › Files)." = "Dokumenty są wyłączone (Ustawienia › Pliki).";
 "Documents are on in this chat: ask for one (a report, a letter…)." = "W tym czacie są włączone dokumenty: poproś o jeden (raport, list…).";
 "Documents go into a project with this chat." = "Dokumenty trafiają do projektu razem z tym czatem.";
 "Documents go into a project with this chat; images go into your message." = "Dokumenty trafiają do projektu z tym czatem; obrazy trafiają do twojej wiadomości.";
@@ -1135,6 +1136,7 @@
 "Total time" = "Łączny czas";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Testuje 1, 2, 4 i 8 żądań jednocześnie oraz prefill-step-size (256–4096) na działającym modelu, restartując serwer między próbami. Równoczesne żądania: najmniejsza liczba osiągająca 90% najlepszej łącznej szybkości (więcej kosztuje pamięć przy niewielkim przyroście); prefill: najszybsze.";
 "Try Again" = "Spróbuj ponownie";
+"Turn On" = "Włącz";
 "Turns file text into vectors for search by meaning, on this Mac. Removing it keeps the indexes: files are then searched by their words until it's downloaded again." = "Zmienia tekst plików na wektory do wyszukiwania znaczeniowego na tym Macu. Usunięcie pozostawia indeksy — pliki będą wtedy przeszukiwane po słowach, dopóki model nie zostanie ponownie pobrany.";
 "Tweak…" = "Dostrój…";
 "Type a message below and press Return. Try: “What can you do?”" = "Wpisz wiadomość poniżej i naciśnij Return. Spróbuj: „Co potrafisz?”";
