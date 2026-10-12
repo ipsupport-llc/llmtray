@@ -71,6 +71,7 @@
 "(no server output yet)" = "(noch keine Serverausgabe)";
 "+ MTP drafter %@" = "+ MTP‑Drafter %@";
 "1 hour" = "1 Stunde";
+"30 s reached · release to send, Esc to drop" = "30 s erreicht · zum Senden loslassen, Esc zum Verwerfen";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Ein Chat fragt, bevor er in einen Ordner schaut, und zeigt jede Änderung als zu bestätigenden Plan. Private Bereiche (Library, keys, der Home‑Ordner selbst) werden nie geteilt.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Ein Chat kann in von Ihnen erlaubten Ordnern suchen und neue Ordner, Verschiebungen sowie Umbenennungen vorschlagen. Sie genehmigen jede Änderung und können sie rückgängig machen.";
 "A chat model" = "Ein Chat‑Modell";
@@ -98,9 +99,9 @@
 "Add Files…" = "Dateien hinzufügen…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Fügen Sie PDFs, Word‑ und Textdateien zu einem Projekt hinzu. Die Chats durchsuchen sie und zitieren die Seite; heften Sie eine Datei an, um ihren gesamten Inhalt in der Unterhaltung zu behalten.";
 "Add files" = "Dateien hinzufügen";
+"Add files or folders" = "Dateien oder Ordner hinzufügen";
 "Add files or images" = "Dateien oder Bilder hinzufügen";
-"Add files to a project" = "Dateien zu einem Projekt hinzufügen";
-"Add files to a project, or images for the model to see" = "Dateien zu einem Projekt hinzufügen oder Bilder, die das Modell sehen soll";
+"Add files, images or folders" = "Dateien, Bilder oder Ordner hinzufügen";
 "Add more files: every chat of the project can search them." = "Weitere Dateien hinzufügen: Jeder Chat des Projekts kann darin suchen.";
 "Add the files to a project?" = "Dateien in ein Projekt aufnehmen?";
 "Add to Project" = "Zum Projekt hinzufügen";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "Lassen Sie LLMTray diesen Ordner für seine Modelle verwenden.";
 "Allow Once" = "Einmal erlauben";
 "Allow connections from the local network" = "Verbindungen aus dem lokalen Netzwerk erlauben";
+"Allow folders" = "Ordner erlauben";
 "Allowed folders" = "Erlaubte Ordner";
 "Allowed in a chat" = "Im Chat erlaubt";
 "Almost done" = "Fast fertig";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "Frage zu LLMTray";
 "Ask again in two weeks" = "In zwei Wochen erneut fragen";
 "Ask anything, or try one of these:" = "Frag etwas oder probiere eines dieser Beispiele:";
+"Ask anything." = "Frag alles.";
 "Ask first" = "Zuerst fragen";
 "Assistant" = "Assistent";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Höchstens ein Bericht pro Tag, der einen vergangenen Tag abdeckt, an ipsupport.us. Ein noch nicht gesendeter Tag wird beim nächsten Start gesendet, bis zu 7 Tage rückwirkend. Wenn Sie dies ausschalten, werden nicht gesendete Daten gelöscht.";
 "Attach Images…" = "Bilder anhängen…";
 "Attach images" = "Bilder anhängen";
-"Attach images for the model to see" = "Bilder anhängen, die das Modell sehen soll";
+"Attach images or allow folders" = "Bilder anhängen oder Ordner erlauben";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention in 8‑Bit, Feed‑Forward in 4‑Bit – bestes Größen-/Stabilitätsverhältnis, validiert gegenüber einheitlichem 4‑Bit.";
 "Audio quality" = "Audioqualität";
 "Auto-compact" = "Automatisch verdichten";
@@ -242,6 +245,8 @@
 "Clear search" = "Suche löschen";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Warteschlange löschen: Indexiertes bleibt durchsuchbar, der Rest wird als nicht indexiert markiert";
 "Click to enable Project files: add files to the project and let its chats search them." = "Klicken, um Projektdateien zu aktivieren: Dateien zum Projekt hinzufügen und dessen Chats die Dateien durchsuchen lassen.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Klicken, um einen Clip aufzunehmen; zum Sprechen halten und zum Senden loslassen (das Modell hört ihn).";
+"Click ■ to stop · Esc cancels" = "Zum Stoppen auf ■ klicken · Esc bricht ab";
 "Close" = "Schließen";
 "Close Tab" = "Tab schließen";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Schließt dieses Fenster. „Einstellungen“ › „Allgemein“ › „LLMTray einrichten…“ öffnet es erneut.";
@@ -407,7 +412,6 @@
 "Folders" = "Ordner";
 "Folders can't be added yet: %@. Add the files in them instead." = "Ordner können noch nicht hinzugefügt werden: %@. Fügen Sie stattdessen die darin enthaltenen Dateien hinzu.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Ordner, die Chats ohne Nachfrage verwenden dürfen. Wenn ein Chat auf einen anderen Ordner zugreifen muss, fragt er dich im Chat.";
-"Folders the chat may use" = "Ordner, die der Chat verwenden darf";
 "Follow the description" = "Beschreibung befolgen";
 "For This Chat" = "Für diesen Chat";
 "For an Hour" = "Für eine Stunde";
@@ -476,10 +480,10 @@
 "Image editing" = "Bildbearbeitung";
 "Image editing off" = "Bildbearbeitung aus";
 "Image generation" = "Bildgenerierung";
+"Image generation couldn't be updated to mflux %@: %@" = "Die Bildgenerierung konnte nicht auf mflux %@ aktualisiert werden: %@";
 "Image generation failed: %@" = "Bildgenerierung fehlgeschlagen: %@";
 "Image generation finished but produced no output file." = "Bildgenerierung beendet, aber keine Ausgabedatei erstellt.";
 "Image generation isn't set up -- enable it again in Settings." = "Bildgenerierung ist nicht eingerichtet – in „Einstellungen“ wieder aktivieren.";
-"Image generation needs an update -- disable it and enable it again in Settings." = "Bildgenerierung benötigt ein Update – in „Einstellungen“ aus- und wieder einschalten.";
 "Image generation off" = "Bildgenerierung aus";
 "Image model" = "Bildmodell";
 "Image, music and voice models" = "Modelle für Bild, Musik und Stimme";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray‑Anleitung";
 "LLMTray isn't allowed to use the microphone." = "LLMTray darf das Mikrofon nicht verwenden.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray darf das Mikrofon nicht verwenden. Erlauben Sie dies in Systemeinstellungen › Datenschutz & Sicherheit › Mikrofon.";
 "LLMTray restarts now to load them." = "LLMTray wird jetzt neu gestartet, um sie zu laden.";
 "LLMTray status, indexing project files" = "LLMTray‑Status: Projektdateien werden indexiert";
 "LLMTray — Chat" = "LLMTray — Chat";
@@ -800,16 +805,22 @@
 "Recent changes" = "Neueste Änderungen";
 "Recently updated" = "Kürzlich aktualisiert";
 "Recommended" = "Empfohlen";
+"Record" = "Aufnehmen";
+"Recording" = "Aufnahme läuft";
 "Recovery" = "Wiederherstellung";
 "Refused" = "Abgelehnt";
 "Regenerate" = "Neu generieren";
 "Reinstall" = "Neu installieren";
 "Reinstall failed: %@" = "Neuinstallation fehlgeschlagen: %@";
+"Release to cancel" = "Zum Abbrechen loslassen";
+"Release to send" = "Zum Senden loslassen";
+"Release to send · move away to cancel" = "Zum Senden loslassen · zum Abbrechen wegbewegen";
 "Remove" = "Entfernen";
 "Remove %@" = "Entfernen: %@";
 "Remove attachment" = "Entfernt den Anhang.";
 "Remove from Project" = "Aus Projekt entfernen";
 "Remove from the project" = "Aus dem Projekt entfernen";
+"Remove recording" = "Aufnahme entfernen";
 "Remove this file from the project?" = "Diese Datei aus dem Projekt entfernen?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Entfernt die heruntergeladene mlx-lm Runtime und die Bildgenerierung (deren Runtime- und Bildmodelle) aus %@. Sie werden beim nächsten Serverstart oder wenn die Bildgenerierung wieder aktiviert wird neu eingerichtet. Gespeicherte Chats und Profile bleiben erhalten.";
 "Rename" = "Umbenennen";
@@ -840,6 +851,7 @@
 "Retry" = "Erneut versuchen";
 "Review" = "Bewertung";
 "Revoke" = "Entziehen";
+"Revoke %@" = "%@ entziehen";
 "Run benchmark" = "Benchmark ausführen";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Führen Sie es im Terminal aus, um das GPU‑Speicherlimit zu erhöhen; es wird beim Neustart des Mac zurückgesetzt.";
 "Running" = "Läuft";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "Beende Voice Lab und Musikerzeugung, um es zu aktualisieren.";
 "Stop Voice Lab first." = "Stoppen Sie zuerst Voice Lab.";
 "Stop generating" = "Stoppt die Generierung.";
+"Stop recording" = "Aufnahme stoppen";
 "Stop server (unload model)" = "Stoppt den Server und entlädt das Modell.";
 "Stop the server to change these." = "Stoppen Sie den Server, um diese zu ändern.";
 "Stop the server to update the runtime." = "Zum Aktualisieren der Laufzeitumgebung den Server stoppen.";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "Die Modellfamilien, die an diesem Tag verwendet wurden (z. B. qwen oder flux), niemals die Modellnamen.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Beim ersten Mal wird %@ (%@) auf diesen Mac heruntergeladen – jetzt und nicht mitten in einem Chat.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Das vollständige Chat-Fenster mit Projekten und allen Chats (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "Der Bildentwurf oben ist geöffnet: Generieren oder überspringen Sie ihn, um weiter zu chatten.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "Der Bildbearbeitungsentwurf oben ist geöffnet: Generieren oder überspringen Sie ihn, um weiter zu chatten.";
 "The image generator is busy -- try again once it's done." = "Der Bildgenerator ist beschäftigt – bitte erneut versuchen, wenn er fertig ist.";
 "The image generator is busy with another chat -- try again once it's done." = "Der Bildgenerator ist mit einem anderen Chat beschäftigt – bitte erneut versuchen, wenn er fertig ist.";
 "The import stopped" = "Der Import wurde unterbrochen";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "Die Lizenz des Modells, von dessen Modell‑Card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Der Models-Ordner ist nicht verfügbar — ist die Festplatte verbunden? Wähle ihn erneut in Einstellungen → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Maximaler Platz, den der Cache früherer Prompts einnehmen darf (die Prompt‑Cache‑Größe des Profils ist ebenfalls eine Obergrenze). Mehr beschleunigt lange Chats und Agenten; zu viel lässt keinen Platz fürs aktuelle Einlesen des Prompts.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "Der Musikentwurf oben ist geöffnet: Generieren oder überspringen Sie ihn, um weiter zu chatten.";
 "The music generator is busy -- try again once it's done." = "Der Musikgenerator ist beschäftigt – bitte später erneut versuchen.";
 "The music generator is busy with another chat -- try again once it's done." = "Der Musikgenerator ist mit einem anderen Chat beschäftigt – bitte später erneut versuchen.";
 "The name can be at most %lld characters." = "Der Name darf höchstens %lld Zeichen lang sein.";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "Diese können nicht zu einem Projekt hinzugefügt werden";
 "These models go back to Default: %@." = "Diese Modelle werden auf Default zurückgesetzt: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Sie laufen nacheinander und werden im Fenster der Menüleiste angezeigt. Sie können dieses Fenster inzwischen schließen.";
+"Thinking effort: %@" = "Denkaufwand: %@";
+"Thinking effort: how long the model may think before it answers" = "Denkaufwand: wie lange das Modell nachdenken darf, bevor es antwortet";
 "Thinking…" = "Denkt nach …";
 "Thinking… %@ s of reply ready" = "Denke nach… %@ s Antwort bereit";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Dieser Mac führt das Modell mit etwa ~%@× Echtzeit aus: sprechen, dann zuhören.";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "Bisher heute: %@ (wird nach Ablauf des Tages gesendet)";
 "Together over 90%: reading a prompt gets %lld%." = "Zusammen über 90 %: Einlesen des Prompts erhält %lld%.";
 "Tokens" = "Tokens";
+"Told the model about new project files: %@" = "Das Modell wurde über neue Projektdateien informiert: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "Für den Speicherplatz des ausgewählten Modells jetzt zu lang, wird stattdessen per Suche gelesen: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Zum Anheften mit dem ausgewählten Modell zu lang: ≈%1$@ Tokens, ≈%2$@ von %3$@ verbleibend";
 "Too many reviews from this network. Try again in %lld min." = "Zu viele Bewertungen von diesem Netzwerk. Bitte in %lld Min. erneut versuchen.";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "%lld umbenennen";
 "search by words only" = "nur nach Wörtern suchen";
 "the download finished incomplete" = "Der Download wurde unvollständig abgeschlossen";
+"the installed version didn't change" = "die installierte Version hat sich nicht geändert";
 "the model" = "das Modell";
 "the model runtime isn't installed yet" = "Die Modell‑Runtime ist noch nicht installiert";
 "then" = "dann";

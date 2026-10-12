@@ -71,6 +71,7 @@
 "(no server output yet)" = "（サーバ出力はまだありません）";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1時間";
+"30 s reached · release to send, Esc to drop" = "30秒に達しました · 離すと送信、Escで破棄";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "チャットはフォルダを参照する前に許可を求め、各変更を承認するための計画として表示します。Library、keys、ホームフォルダなどのプライベートな場所は共有されません。";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "チャットは許可したフォルダを参照し、新しいフォルダや移動、名前変更を提案できます。すべての変更はあなたが承認し、取り消せます。";
 "A chat model" = "チャット用モデル";
@@ -98,9 +99,9 @@
 "Add Files…" = "ファイルを追加…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "PDF、Word、テキストファイルをプロジェクトに追加できます。チャットはそれらを検索してページを引用します。ファイルをピン留めすると会話内で全体を保持します。";
 "Add files" = "ファイルを追加";
+"Add files or folders" = "ファイルまたはフォルダを追加";
 "Add files or images" = "ファイルまたは画像を追加";
-"Add files to a project" = "プロジェクトにファイルを追加";
-"Add files to a project, or images for the model to see" = "モデルに見せるために、プロジェクトにファイルを追加するか画像を添付";
+"Add files, images or folders" = "ファイル、画像、またはフォルダを追加";
 "Add more files: every chat of the project can search them." = "ファイルを追加すると、プロジェクト内のすべてのチャットで検索できます。";
 "Add the files to a project?" = "ファイルをプロジェクトに追加しますか？";
 "Add to Project" = "プロジェクトに追加";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "LLMTray にこのフォルダをモデル用に使用させます。";
 "Allow Once" = "一度だけ許可";
 "Allow connections from the local network" = "ローカルネットワークからの接続を許可";
+"Allow folders" = "フォルダを許可";
 "Allowed folders" = "許可されたフォルダ";
 "Allowed in a chat" = "チャットで許可済み";
 "Almost done" = "もうすぐ完了";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "LLMTray に関して質問する";
 "Ask again in two weeks" = "2週間後に再度確認します";
 "Ask anything, or try one of these:" = "何でも質問するか、こちらを試してみてください：";
+"Ask anything." = "何でも聞いてください。";
 "Ask first" = "事前に確認";
 "Assistant" = "アシスタント";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.usへ送信するのは1日につき最大1件で、対象は直近1日分です。未送信の分は次回起動時に送信され、最大7日分まで遡ります。オフにすると未送信のデータは削除されます。";
 "Attach Images…" = "画像を添付…";
 "Attach images" = "画像を添付";
-"Attach images for the model to see" = "モデルに見せる画像を添付";
+"Attach images or allow folders" = "画像を添付、またはフォルダを許可";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention を 8-bit、feed-forward を 4-bit に — サイズと安定性の最良バランス。uniform 4-bit と比較して検証済みです。";
 "Audio quality" = "オーディオ品質";
 "Auto-compact" = "自動圧縮";
@@ -242,6 +245,8 @@
 "Clear search" = "検索をクリア";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "キューを消去：インデックス済みは検索可能のまま、残りは未インデックスに設定されます";
 "Click to enable Project files: add files to the project and let its chats search them." = "クリックして「プロジェクトファイル」を有効にします：ファイルをプロジェクトに追加し、そのチャットで検索できるようにします。";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "クリックしてクリップを録音します。押したまま話し、離すと送信します（モデルが音声を聞きます）。";
+"Click ■ to stop · Esc cancels" = "■をクリックして停止 · Escでキャンセル";
 "Close" = "閉じる";
 "Close Tab" = "タブを閉じる";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "このウインドウを閉じます。設定 › 一般 › Set Up LLMTray… で再度開けます。";
@@ -407,7 +412,6 @@
 "Folders" = "フォルダ";
 "Folders can't be added yet: %@. Add the files in them instead." = "フォルダはまだ追加できません: %@。代わりにその中のファイルを追加してください。";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "フォルダはチャットが確認なしで使用できます。チャットが別のフォルダを必要とする場合は、チャット内で確認します。";
-"Folders the chat may use" = "チャットが使用できるフォルダ";
 "Follow the description" = "説明に従う";
 "For This Chat" = "このチャット用";
 "For an Hour" = "1 時間だけ";
@@ -476,10 +480,10 @@
 "Image editing" = "画像編集";
 "Image editing off" = "画像編集：オフ";
 "Image generation" = "画像生成";
+"Image generation couldn't be updated to mflux %@: %@" = "画像生成を mflux %@ にアップデートできませんでした: %@";
 "Image generation failed: %@" = "画像生成に失敗しました: %@";
 "Image generation finished but produced no output file." = "画像生成は完了しましたが、出力ファイルが作成されませんでした。";
 "Image generation isn't set up -- enable it again in Settings." = "画像生成が設定されていません — 設定で再度有効にしてください。";
-"Image generation needs an update -- disable it and enable it again in Settings." = "画像生成は更新が必要です — 設定で一度オフにしてから再度オンにしてください。";
 "Image generation off" = "画像生成：オフ";
 "Image model" = "画像モデル";
 "Image, music and voice models" = "画像・音楽・音声用モデル";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray ガイド";
 "LLMTray isn't allowed to use the microphone." = "LLMTray にマイク使用の許可がありません。";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTrayにはマイクの使用が許可されていません。「システム設定」＞「プライバシーとセキュリティ」＞「マイク」で許可してください。";
 "LLMTray restarts now to load them." = "LLMTray を再起動して読み込みます。";
 "LLMTray status, indexing project files" = "LLMTray の状態 — プロジェクトファイルをインデックス化中";
 "LLMTray — Chat" = "LLMTray — チャット";
@@ -800,16 +805,22 @@
 "Recent changes" = "最近の変更";
 "Recently updated" = "最近更新";
 "Recommended" = "推奨";
+"Record" = "録音";
+"Recording" = "録音中";
 "Recovery" = "復旧";
 "Refused" = "拒否";
 "Regenerate" = "再生成";
 "Reinstall" = "再インストール";
 "Reinstall failed: %@" = "再インストールに失敗しました：%@";
+"Release to cancel" = "離すとキャンセル";
+"Release to send" = "離すと送信";
+"Release to send · move away to cancel" = "離すと送信 · 離れた位置へ動かすとキャンセル";
 "Remove" = "削除";
 "Remove %@" = "%@ を削除";
 "Remove attachment" = "添付ファイルを削除します。";
 "Remove from Project" = "プロジェクトから削除";
 "Remove from the project" = "プロジェクトから削除";
+"Remove recording" = "録音を削除";
 "Remove this file from the project?" = "このファイルをプロジェクトから削除しますか？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "mlx-lm ランタイムと画像生成（ランタイムおよび画像モデル）を %@ から削除します。次回サーバー起動時、または画像生成を有効にすると再度設定されます。保存されたチャットとプロファイルは保持されます。";
 "Rename" = "名称変更";
@@ -840,6 +851,7 @@
 "Retry" = "再試行";
 "Review" = "レビュー";
 "Revoke" = "取り消す";
+"Revoke %@" = "%@を取り消す";
 "Run benchmark" = "ベンチマークを実行";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU メモリ制限を上げるには Terminal で実行してください；Mac を再起動するとリセットされます。";
 "Running" = "実行中";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "更新するには Voice Lab と音楽生成を停止してください。";
 "Stop Voice Lab first." = "先に Voice Lab を停止してください。";
 "Stop generating" = "生成を停止します。";
+"Stop recording" = "録音を停止";
 "Stop server (unload model)" = "サーバを停止します（モデルをアンロードします）。";
 "Stop the server to change these." = "これらを変更するにはサーバーを停止してください。";
 "Stop the server to update the runtime." = "ランタイムをアップデートするには、サーバを停止してください。";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "その日に使われたモデルのファミリ（例：qwenやflux）。モデル名自体は含みません。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "初回は、チャットの途中ではなく今、%@（%@）をこのMacにダウンロードします。";
 "The full chat window, with projects and every chat (⌘⇧O)" = "プロジェクトとすべてのチャットを含むフルチャットウインドウ（⌘⇧O）";
+"The image draft above is open: Generate or Skip it to keep chatting." = "上の画像の下書きが開いています。チャットを続けるには「生成」または「スキップ」してください。";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "上の画像編集の下書きが開いています。チャットを続けるには「生成」または「スキップ」してください。";
 "The image generator is busy -- try again once it's done." = "画像ジェネレーターが処理中です。完了してからもう一度お試しください。";
 "The image generator is busy with another chat -- try again once it's done." = "画像ジェネレーターは別のチャットで使用中です。完了してからもう一度お試しください。";
 "The import stopped" = "インポートが停止しました";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "モデルカードに記載されたモデルのライセンス。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "モデルフォルダが利用できません — ディスクは接続されていますか？ 設定 → Models で再度選択してください。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "過去プロンプトのキャッシュが占め得る最大量（プロファイルのPrompt cacheサイズも上限になります）。多いと長い会話やエージェントが高速になりますが、過剰だと現在読み取るプロンプトの余地がなくなります。";
+"The music draft above is open: Generate or Skip it to keep chatting." = "上の音楽の下書きが開いています。チャットを続けるには「生成」または「スキップ」してください。";
 "The music generator is busy -- try again once it's done." = "音楽生成が使用中です。終了後にもう一度お試しください。";
 "The music generator is busy with another chat -- try again once it's done." = "音楽生成は別のチャットで使用中です。終了後にもう一度お試しください。";
 "The name can be at most %lld characters." = "名前は最大%lld文字までです。";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "これらはプロジェクトに追加できません";
 "These models go back to Default: %@." = "これらのモデルは Default に戻ります：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "それらは同時に1つずつ実行され、メニューバーのウインドウに表示されます。ウインドウはその間に閉じても構いません。";
+"Thinking effort: %@" = "思考量：%@";
+"Thinking effort: how long the model may think before it answers" = "思考量：モデルが回答する前に思考できる時間の長さ";
 "Thinking…" = "考え中…";
 "Thinking… %@ s of reply ready" = "考え中… %@ 秒分の返信が準備できました";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "この Mac はモデルを約 %@× 実時間で動作させます：話してから聞きます。";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "本日これまで: %@（日付が変わると送信されます）";
 "Together over 90%: reading a prompt gets %lld%." = "合計が90%を超える場合: プロンプト読み取りに %lld% が割り当てられます。";
 "Tokens" = "トークン数";
+"Told the model about new project files: %@" = "新しいプロジェクトファイルについてモデルに通知しました: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "選択されたモデルのルームには長すぎるため、代わりに検索で読み取ります: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "選択モデルではピン留め不可（長すぎます）: 約 %1$@ トークン、残り 約 %2$@ ／ %3$@";
 "Too many reviews from this network. Try again in %lld min." = "このネットワークからのレビューが多すぎます。%lld分後に再試行してください。";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "%lld 件を名前変更";
 "search by words only" = "単語のみで検索";
 "the download finished incomplete" = "ダウンロードが不完全に終了しました";
+"the installed version didn't change" = "インストールされているバージョンは変更されませんでした";
 "the model" = "モデル";
 "the model runtime isn't installed yet" = "モデル実行環境がまだインストールされていません";
 "then" = "その後";

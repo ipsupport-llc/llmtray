@@ -71,6 +71,7 @@
 "(no server output yet)" = "(henüz sunucu çıktısı yok)";
 "+ MTP drafter %@" = "+ MTP taslağı %@";
 "1 hour" = "1 saat";
+"30 s reached · release to send, Esc to drop" = "30 sn’ye ulaşıldı · göndermek için bırakın, vazgeçmek için Esc";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Sohbet bir klasöre bakmadan önce sorar ve her değişikliği onaylamanız için bir plan olarak gösterir. Özel yerler (Library, keys, ana kullanıcı klasörü) asla paylaşılmaz.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Sohbet, izin verdiğiniz klasörlerde arama yapabilir ve yeni klasörler, taşıma veya yeniden adlandırma önerilerinde bulunabilir. Her değişikliği onaylarsınız ve geri alabilirsiniz.";
 "A chat model" = "Sohbet modeli";
@@ -98,9 +99,9 @@
 "Add Files…" = "Dosyalar Ekle…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Bir projeye PDF, Word ve metin dosyaları ekleyin. Sohbetler bunlarda arama yapar ve sayfayı referans verir; bir dosyayı sabitleyerek tüm içeriğini sohbette tutabilirsiniz.";
 "Add files" = "Dosyalar ekle";
+"Add files or folders" = "Dosyalar veya klasörler ekle";
 "Add files or images" = "Dosya veya resim ekle";
-"Add files to a project" = "Dosyaları bir projeye ekle";
-"Add files to a project, or images for the model to see" = "Dosyaları bir projeye veya modelin görmesi için resimleri ekle";
+"Add files, images or folders" = "Dosyalar, resimler veya klasörler ekle";
 "Add more files: every chat of the project can search them." = "Daha fazla dosya ekleyin: projenin her sohbeti bunlarda arama yapabilir.";
 "Add the files to a project?" = "Dosyalar bir projeye eklensin mi?";
 "Add to Project" = "Projeye Ekle";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "LLMTray'in modelleri için bu klasörü kullanmasına izin ver.";
 "Allow Once" = "Bir Kez İzin Ver";
 "Allow connections from the local network" = "Yerel ağdan bağlantılara izin ver";
+"Allow folders" = "Klasörlere izin ver";
 "Allowed folders" = "İzin verilen klasörler";
 "Allowed in a chat" = "Sohbette izin verildi";
 "Almost done" = "Neredeyse hazır";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "LLMTray hakkında sor";
 "Ask again in two weeks" = "İki hafta sonra tekrar sor";
 "Ask anything, or try one of these:" = "Her şeyi sorun veya bunlardan birini deneyin:";
+"Ask anything." = "Her şeyi sorabilirsiniz.";
 "Ask first" = "Önce sor";
 "Assistant" = "Asistan";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "ipsupport.us adresine en fazla günde bir rapor gönderilir; her rapor bir önceki günü kapsar. Gönderilmeyen bir gün, sonraki açılışta gönderilir; en fazla 7 güne kadar geriye gider. Bunu kapatmak gönderilmeyen verileri siler.";
 "Attach Images…" = "Resim Ekle…";
 "Attach images" = "Resim ekle";
-"Attach images for the model to see" = "Modelin görmesi için resim ekle";
+"Attach images or allow folders" = "Resim ekle veya klasörlere izin ver";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Dikkat 8-bit, feed‑forward 4-bit — boyut/kararlılık için en iyi denge, tekdüzey 4-bit’e karşı doğrulandı.";
 "Audio quality" = "Ses kalitesi";
 "Auto-compact" = "Otomatik sıkıştırma";
@@ -242,6 +245,8 @@
 "Clear search" = "Aramayı temizle";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Kuyruğu temizle: dizine eklenen aranabilir kalır, kalanlar dizine eklenmemiş olarak işaretlenir";
 "Click to enable Project files: add files to the project and let its chats search them." = "Proje dosyalarını etkinleştirmek için tıklayın: dosyaları projeye ekleyin ve sohbetlerin bunlarda arama yapmasına izin verin.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Klip kaydetmek için tıklayın; konuşmak için basılı tutun ve göndermek için bırakın (model bunu duyar).";
+"Click ■ to stop · Esc cancels" = "Durdurmak için ■ tıklayın · Esc iptal eder";
 "Close" = "Kapat";
 "Close Tab" = "Sekmeyi Kapat";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Bu pencereyi kapatır. Ayarlar › Genel › LLMTray'ı Kur… öğesi yeniden açar.";
@@ -407,7 +412,6 @@
 "Folders" = "Klasörler";
 "Folders can't be added yet: %@. Add the files in them instead." = "Klasörler henüz eklenemiyor: %@. Bunun yerine içindeki dosyaları ekleyin.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Sohbetlerin sormadan kullanabileceği klasörler. Bir sohbet başka bir klasöre ihtiyaç duyarsa, sohbette sizden izin ister.";
-"Folders the chat may use" = "Sohbetin kullanabileceği klasörler";
 "Follow the description" = "Açıklamayı takip et";
 "For This Chat" = "Bu Sohbet İçin";
 "For an Hour" = "Bir Saat İçin";
@@ -476,10 +480,10 @@
 "Image editing" = "Resim düzenleme";
 "Image editing off" = "Görüntü düzenleme kapalı";
 "Image generation" = "Görüntü oluşturma";
+"Image generation couldn't be updated to mflux %@: %@" = "Görüntü oluşturma mflux %@ sürümüne güncellenemedi: %@";
 "Image generation failed: %@" = "Görüntü oluşturma başarısız: %@";
 "Image generation finished but produced no output file." = "Görüntü oluşturma tamamlandı ancak çıktı dosyası oluşturulmadı.";
 "Image generation isn't set up -- enable it again in Settings." = "Görüntü oluşturma ayarlı değil — Ayarlar'dan tekrar açın.";
-"Image generation needs an update -- disable it and enable it again in Settings." = "Görüntü oluşturmanın güncellenmesi gerekiyor — Ayarlar'dan kapatıp tekrar açın.";
 "Image generation off" = "Görüntü oluşturma kapalı";
 "Image model" = "Görüntü modeli";
 "Image, music and voice models" = "Görüntü, müzik ve ses modelleri";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Kılavuzu";
 "LLMTray isn't allowed to use the microphone." = "LLMTray'ın mikrofonu kullanmasına izin verilmiyor.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray’in mikrofonu kullanmasına izin verilmiyor. Sistem Ayarları › Gizlilik ve Güvenlik › Mikrofon’da izin verin.";
 "LLMTray restarts now to load them." = "LLMTray şimdi bunları yüklemek için yeniden başlıyor.";
 "LLMTray status, indexing project files" = "LLMTray durumu, proje dosyaları dizine alınıyor";
 "LLMTray — Chat" = "LLMTray — Sohbet";
@@ -800,16 +805,22 @@
 "Recent changes" = "Son değişiklikler";
 "Recently updated" = "Son güncellenenler";
 "Recommended" = "Önerilen";
+"Record" = "Kaydet";
+"Recording" = "Kaydediliyor";
 "Recovery" = "Kurtarma";
 "Refused" = "Reddedilen";
 "Regenerate" = "Yeniden oluştur";
 "Reinstall" = "Yeniden yükle";
 "Reinstall failed: %@" = "Yeniden yükleme başarısız: %@";
+"Release to cancel" = "İptal etmek için bırakın";
+"Release to send" = "Göndermek için bırakın";
+"Release to send · move away to cancel" = "Göndermek için bırakın · iptal etmek için uzaklaşın";
 "Remove" = "Kaldır";
 "Remove %@" = "%@ ögesini kaldır";
 "Remove attachment" = "Eki kaldırır.";
 "Remove from Project" = "Projeden Kaldır";
 "Remove from the project" = "Projeden kaldır";
+"Remove recording" = "Kaydı kaldır";
 "Remove this file from the project?" = "Bu dosya projeden kaldırılsın mı?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "İndirilen mlx-lm çalışma zamanı ve görüntü oluşturma (çalışma zamanı ve görüntü modelleri) %@ konumundan kaldırılır. Sunucu bir sonraki başlatıldığında veya görüntü oluşturma açıldığında yeniden yapılandırılır. Kaydedilmiş sohbetler ve profiller saklanır.";
 "Rename" = "Yeniden Adlandır";
@@ -840,6 +851,7 @@
 "Retry" = "Yeniden Dene";
 "Review" = "Değerlendirme";
 "Revoke" = "Geri Al";
+"Revoke %@" = "%@ erişimini geri al";
 "Run benchmark" = "Benchmark Çalıştır";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "GPU bellek sınırını artırmak için Terminal'de çalıştırın; Mac yeniden başladığında sıfırlanır.";
 "Running" = "Çalışıyor";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "Güncellemek için Voice Lab ve müzik üretimini durdurun.";
 "Stop Voice Lab first." = "Önce Voice Lab'i durdurun.";
 "Stop generating" = "Üretmeyi durdurur.";
+"Stop recording" = "Kaydı durdur";
 "Stop server (unload model)" = "Sunucuyu durdurur (modeli bellekten kaldırır).";
 "Stop the server to change these." = "Bunları değiştirmek için sunucuyu durdurun.";
 "Stop the server to update the runtime." = "Çalışma zamanını güncellemek için sunucuyu durdurun.";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "O gün kullanılan model aileleri (ör. qwen veya flux), model adları asla.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "İlk seferinde %@ (%@) bu Mac’e sohbet sırasında değil, şimdi indirilir.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Projeler ve tüm sohbetlerle tam sohbet penceresi (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "Yukarıdaki görsel taslağı açık: Sohbete devam etmek için Oluştur’u veya Atla’yı seçin.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "Yukarıdaki görsel düzenleme taslağı açık: Sohbete devam etmek için Oluştur’u veya Atla’yı seçin.";
 "The image generator is busy -- try again once it's done." = "Görüntü oluşturucu meşgul — işlem bitince tekrar deneyin.";
 "The image generator is busy with another chat -- try again once it's done." = "Görüntü oluşturucu başka bir sohbetle meşgul — işlem bitince tekrar deneyin.";
 "The import stopped" = "İçe aktarma durdu";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "Modelin lisansı, model kartından.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Models klasörü kullanılamıyor — diski bağlı mı? Ayarlar → Models'den tekrar seçin.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Önceki istemlerin önbelleğinin alabileceği maksimum (profilin İsteme önbelleği boyutu da bir üst sınırdır). Daha fazla uzun sohbetleri ve ajanları hızlandırır; çok fazlası okunan istem için yer bırakmaz.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "Yukarıdaki müzik taslağı açık: Sohbete devam etmek için Oluştur’u veya Atla’yı seçin.";
 "The music generator is busy -- try again once it's done." = "Müzik oluşturucu meşgul — bitmesini bekleyip tekrar deneyin.";
 "The music generator is busy with another chat -- try again once it's done." = "Müzik oluşturucu başka bir sohbetle meşgul — bitmesini bekleyip tekrar deneyin.";
 "The name can be at most %lld characters." = "İsim en fazla %lld karakter olabilir.";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "Bunlar bir projeye eklenemez";
 "These models go back to Default: %@." = "Bu modeller Default’a geri döner: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Menü çubuğundaki pencerede aynı anda birer birer çalışırlar. Bu arada bu pencereyi kapatabilirsiniz.";
+"Thinking effort: %@" = "Düşünme çabası: %@";
+"Thinking effort: how long the model may think before it answers" = "Düşünme çabası, modelin yanıtlamadan önce ne kadar süre düşünebileceğini belirtir.";
 "Thinking…" = "Düşünüyor…";
 "Thinking… %@ s of reply ready" = "Düşünüyor… %@ s yanıt hazır";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Bu Mac modeli yaklaşık %@× gerçek zaman hızında çalıştırıyor: konuşun, sonra dinleyin.";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "Bugüne kadar: %@ (gün bittikten sonra gönderilir)";
 "Together over 90%: reading a prompt gets %lld%." = "Toplam %90’dan fazla: istem okumasına %lld% düşer.";
 "Tokens" = "Tokenler";
+"Told the model about new project files: %@" = "Modele yeni proje dosyaları bildirildi: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "Seçili modelin hafızası için şimdi çok uzun, bunun yerine arama ile okunacak: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Seçili model ile sabitlemek için çok uzun: ≈%1$@ token, %3$@ tokenın ≈%2$@'u kaldı";
 "Too many reviews from this network. Try again in %lld min." = "Bu ağdan çok fazla değerlendirme yapıldı. %lld dakika sonra tekrar deneyin.";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "%lld yeniden adlandır";
 "search by words only" = "sadece kelimelere göre ara";
 "the download finished incomplete" = "indirme eksik tamamlandı";
+"the installed version didn't change" = "yüklü sürüm değişmedi";
 "the model" = "model";
 "the model runtime isn't installed yet" = "model çalışma zamanı henüz kurulmamış";
 "then" = "sonra";

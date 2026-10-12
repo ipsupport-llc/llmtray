@@ -71,6 +71,7 @@
 "(no server output yet)" = "（尚無伺服器輸出）";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 小時";
+"30 s reached · release to send, Esc to drop" = "已達 30 秒 · 放開即可傳送，按 Esc 可捨棄";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天室在檢視資料夾前會先詢問，並將每項變更顯示為需您核可的計畫。私人位置（Library、keys、使用者主目錄本身）不會被分享。";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "對話可查看你允許的資料夾，並建議新增資料夾、移動或重新命名。你須核准每項變更，且可以復原。";
 "A chat model" = "聊天模型";
@@ -98,9 +99,9 @@
 "Add Files…" = "加入檔案…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "將 PDF、Word 與文字檔加入專案。對話會搜尋並引用頁面；將檔案釘選可將整個檔案保留在對話中。";
 "Add files" = "加入檔案";
+"Add files or folders" = "加入檔案或檔案夾";
 "Add files or images" = "加入檔案或影像";
-"Add files to a project" = "將檔案加入專案";
-"Add files to a project, or images for the model to see" = "將檔案加入專案，或加入模型可見的影像";
+"Add files, images or folders" = "加入檔案、影像或檔案夾";
 "Add more files: every chat of the project can search them." = "新增更多檔案：專案中的每個對話都能搜尋這些檔案。";
 "Add the files to a project?" = "要將這些檔案加入專案嗎？";
 "Add to Project" = "加入專案";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "允許 LLMTray 使用此資料夾作為其模型資料夾。";
 "Allow Once" = "允許一次";
 "Allow connections from the local network" = "允許來自區域網路的連線";
+"Allow folders" = "允許檔案夾";
 "Allowed folders" = "已允許的資料夾";
 "Allowed in a chat" = "允許在聊天室使用";
 "Almost done" = "即將完成";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "詢問 LLMTray";
 "Ask again in two weeks" = "兩週後再問一次";
 "Ask anything, or try one of these:" = "問任何問題，或嘗試下列範例：";
+"Ask anything." = "有問題都可以問。";
 "Ask first" = "先詢問";
 "Assistant" = "助理";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "每天最多傳送一份報告，涵蓋過去一天，送至 ipsupport.us。未傳送的日資料會在下次啟動時一併送出，最多回溯 7 天。關閉此功能會刪除尚未傳送的資料。";
 "Attach Images…" = "附加影像…";
 "Attach images" = "附加影像";
-"Attach images for the model to see" = "附加影像讓模型查看";
+"Attach images or allow folders" = "附加影像或允許檔案夾";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "注意層為 8-bit、前向層為 4-bit — 在大小與穩定性間最平衡，已對比統一 4-bit 驗證。";
 "Audio quality" = "音訊品質";
 "Auto-compact" = "自動壓縮";
@@ -242,6 +245,8 @@
 "Clear search" = "清除搜尋";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "清除佇列：已建立索引的仍可搜尋，其餘會標記為未建立索引";
 "Click to enable Project files: add files to the project and let its chats search them." = "按一下以啟用「專案檔案」：將檔案加入專案，並讓該專案的對話搜尋它們。";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "按一下可錄製片段；按住說話，放開即可傳送（該模型會聽到）";
+"Click ■ to stop · Esc cancels" = "按一下 ■ 即可停止 · Esc 會取消";
 "Close" = "關閉";
 "Close Tab" = "關閉分頁";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "關閉此視窗。設定 › 一般 › 設定 LLMTray… 可再次開啟。";
@@ -407,7 +412,6 @@
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "資料夾暫時無法加入：%@。請改為加入其中的檔案。";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "資料夾可供聊天室在不經詢問的情況下使用。若聊天室需要其他資料夾，會在聊天室中向你要求。";
-"Folders the chat may use" = "聊天室可使用的資料夾";
 "Follow the description" = "遵循描述";
 "For This Chat" = "用於此聊天室";
 "For an Hour" = "一小時內";
@@ -476,10 +480,10 @@
 "Image editing" = "圖片編輯";
 "Image editing off" = "影像編輯：關";
 "Image generation" = "影像生成";
+"Image generation couldn't be updated to mflux %@: %@" = "無法將影像生成更新至 mflux %@：%@";
 "Image generation failed: %@" = "影像生成失敗：%@";
 "Image generation finished but produced no output file." = "影像生成完成但未產生輸出檔案。";
 "Image generation isn't set up -- enable it again in Settings." = "尚未設定影像生成功能 — 請在「設定」中重新啟用。";
-"Image generation needs an update -- disable it and enable it again in Settings." = "影像生成功能需更新 — 請在「設定」中先關閉再開啟。";
 "Image generation off" = "影像生成：關";
 "Image model" = "影像模型";
 "Image, music and voice models" = "影像、音樂與語音 模型";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray 指南";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允許使用麥克風。";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray 未獲允許使用麥克風。請在「系統設定」›「隱私權與安全性」›「麥克風」中允許。";
 "LLMTray restarts now to load them." = "LLMTray 現在會重新啟動以載入這些項目。";
 "LLMTray status, indexing project files" = "LLMTray 狀態：正在為專案檔案建立索引";
 "LLMTray — Chat" = "LLMTray — 聊天";
@@ -800,16 +805,22 @@
 "Recent changes" = "最近的變更";
 "Recently updated" = "最近已更新";
 "Recommended" = "建議";
+"Record" = "錄音";
+"Recording" = "錄音中";
 "Recovery" = "復原";
 "Refused" = "已拒絕";
 "Regenerate" = "重新產生";
 "Reinstall" = "重新安裝";
 "Reinstall failed: %@" = "重新安裝失敗：%@";
+"Release to cancel" = "放開以取消";
+"Release to send" = "放開以傳送";
+"Release to send · move away to cancel" = "放開即可傳送 · 移開即可取消";
 "Remove" = "移除";
 "Remove %@" = "移除 %@";
 "Remove attachment" = "移除附件。";
 "Remove from Project" = "從專案移除";
 "Remove from the project" = "從專案中移除";
+"Remove recording" = "移除錄音";
 "Remove this file from the project?" = "要從專案中移除此檔案嗎？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "從 %@ 移除已下載的 mlx-lm 執行環境與圖像生成功能（其執行環境與圖像模型）。下次伺服器啟動或啟用圖像生成功能時會重新設定。已儲存的對話和設定檔會保留。";
 "Rename" = "重新命名";
@@ -840,6 +851,7 @@
 "Retry" = "重試";
 "Review" = "評論";
 "Revoke" = "撤銷";
+"Revoke %@" = "撤銷 %@";
 "Run benchmark" = "執行基準測試";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在終端執行以提高 GPU 記憶體限制；Mac 重新啟動後會重設。";
 "Running" = "執行中";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "請停止 Voice Lab 與音樂生成功能以進行更新。";
 "Stop Voice Lab first." = "請先停止 Voice Lab。";
 "Stop generating" = "停止生成。";
+"Stop recording" = "停止錄音";
 "Stop server (unload model)" = "停止伺服器（卸載模型）。";
 "Stop the server to change these." = "請先停止伺服器以更改這些設定。";
 "Stop the server to update the runtime." = "停止伺服器以更新執行階段。";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "該日使用的模型家族（例如 qwen 或 flux），絕不包含模型名稱。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "第一次使用時，會立即將 %@（%@）下載到這部 Mac，而不是等到聊天進行中才下載。";
 "The full chat window, with projects and every chat (⌘⇧O)" = "完整對話視窗，含專案與所有對話（⌘⇧O）";
+"The image draft above is open: Generate or Skip it to keep chatting." = "上方的影像草稿已開啟：請生成或略過以繼續聊天。";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "上方的影像編輯草稿已開啟：請生成或略過以繼續聊天。";
 "The image generator is busy -- try again once it's done." = "影像產生器正在忙碌 — 完成後請再試一次。";
 "The image generator is busy with another chat -- try again once it's done." = "影像產生器正在處理其他對話 — 完成後請再試一次。";
 "The import stopped" = "匯入已中止";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "模型的授權，來自其說明卡。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 資料夾目前無法使用 — 磁碟是否已連接？請於「設定 → Models」中重新選擇。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示快取最多可佔的空間（設定檔的「Prompt cache」大小也會作為上限）。快取越大可讓長對話與 agents 更流暢；太大則會留不到空間給正在讀取的提示。";
+"The music draft above is open: Generate or Skip it to keep chatting." = "上方的音樂草稿已開啟：請生成或略過以繼續聊天。";
 "The music generator is busy -- try again once it's done." = "音樂產生器正忙碌中 —— 完成後再試。";
 "The music generator is busy with another chat -- try again once it's done." = "音樂產生器正為其他聊天處理中 —— 完成後再試。";
 "The name can be at most %lld characters." = "名稱最多 %lld 個字元。";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "這些無法加入專案";
 "These models go back to Default: %@." = "這些模型會回復為 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它們會逐一執行，顯示在選單列的視窗中。您可以在此期間關閉該視窗。";
+"Thinking effort: %@" = "思考投入：%@";
+"Thinking effort: how long the model may think before it answers" = "思考投入：該模型在回答前可思考多久。";
 "Thinking…" = "思考中…";
 "Thinking… %@ s of reply ready" = "思考中… 已準備 %@ 秒的回覆";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "此 Mac 大約以 %@× 的實時速度執行模型：先說話，然後收聽。";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "截至今日：%@（在一天結束後寄出）";
 "Together over 90%: reading a prompt gets %lld%." = "合計超過 90%：讀取提示將取得 %lld%。";
 "Tokens" = "標記數";
+"Told the model about new project files: %@" = "已告知該模型新的專案檔案：%@";
 "Too long for the selected model's room now, read by search instead: %@" = "對目前選擇的模型可用空間來說太長，改以搜尋方式讀取：%@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "以目前選擇的模型無法釘選：約 %1$@ 代幣，剩餘約 %3$@ 的 %2$@";
 "Too many reviews from this network. Try again in %lld min." = "此網路的評論次數過多。請在 %lld 分鐘後再試。";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "重新命名 %lld 項";
 "search by words only" = "僅以文字搜尋";
 "the download finished incomplete" = "下載未完整完成";
+"the installed version didn't change" = "已安裝的版本未變更";
 "the model" = "該模型";
 "the model runtime isn't installed yet" = "尚未安裝模型執行環境";
 "then" = "然後";

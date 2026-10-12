@@ -71,6 +71,7 @@
 "(no server output yet)" = "(لا توجد مخرجات من الخادم بعد)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "ساعة واحدة";
+"30 s reached · release to send, Esc to drop" = "بلغت 30 ث · اترك للإرسال، Esc للإفلات";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "يطلب الدردشة إذناً قبل النظر داخل مجلد، ويعرض كل تغيير كخطة للموافقة. الأماكن الخاصة (Library، keys، مجلد المنزل نفسه) لا تُشارك أبداً.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "يمكن للمحادثة البحث في المجلدات التي تسمح بها واقتراح مجلدات جديدة، ونقلها وإعادة تسميتها. أنت تُوافق على كل تغيير ويمكنك التراجع عنه.";
 "A chat model" = "نموذج دردشة";
@@ -98,9 +99,9 @@
 "Add Files…" = "إضافة ملفات…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "أضف ملفات PDF وWord والنص إلى مشروع. محادثاته تبحث فيها وتستشهد بالصفحة؛ ثبّت ملفًا للاحتفاظ بكل محتواه في المحادثة.";
 "Add files" = "إضافة ملفات";
+"Add files or folders" = "إضافة ملفات أو مجلدات";
 "Add files or images" = "إضافة ملفات أو صور";
-"Add files to a project" = "إضافة ملفات إلى المشروع";
-"Add files to a project, or images for the model to see" = "إضافة ملفات إلى المشروع، أو صور ليطلع النموذج عليها";
+"Add files, images or folders" = "إضافة ملفات أو صور أو مجلدات";
 "Add more files: every chat of the project can search them." = "أضف مزيدًا من الملفات: يمكن لكل محادثة في المشروع البحث فيها.";
 "Add the files to a project?" = "هل تريد إضافة الملفات إلى مشروع؟";
 "Add to Project" = "إضافة إلى المشروع";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "السماح لـ LLMTray باستخدام هذا المجلد لنماذجه.";
 "Allow Once" = "السماح مرة واحدة";
 "Allow connections from the local network" = "السماح بالاتصالات من الشبكة المحلية";
+"Allow folders" = "السماح بالمجلدات";
 "Allowed folders" = "المجلدات المسموح بها";
 "Allowed in a chat" = "مسموح في المحادثة";
 "Almost done" = "قريبًا من الانتهاء";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "اطرح سؤالاً عن LLMTray";
 "Ask again in two weeks" = "اسأل مرة أخرى بعد أسبوعين";
 "Ask anything, or try one of these:" = "اسأل عن أي شيء، أو جرّب أحد هذه:";
+"Ask anything." = "اسأل عن أي شيء.";
 "Ask first" = "اسأل أولاً";
 "Assistant" = "المساعد";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "تقرير واحد كحد أقصى يومياً إلى ipsupport.us، يغطي يومًا واحدًا مضى. يُرسل أي يوم لم يُرسل بعد عند التشغيل التالي، حتى 7 أيام إلى الخلف. إيقاف هذا الخيار يحذف ما لم يُرسل.";
 "Attach Images…" = "إرفاق صور…";
 "Attach images" = "إرفاق صور";
-"Attach images for the model to see" = "إرفاق صور ليطلع النموذج عليها";
+"Attach images or allow folders" = "إرفاق صور أو السماح بالمجلدات";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "الانتباه بعمق 8-بت، والتفاؤل الأمامي بعمق 4-بت — أفضل توازن بين الحجم والثبات، تم التحقق منه مقابل 4-بت الموحد.";
 "Audio quality" = "جودة الصوت";
 "Auto-compact" = "الضغط التلقائي";
@@ -242,6 +245,8 @@
 "Clear search" = "مسح البحث";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "مسح الطابور: ما فُهرِس يبقى قابلاً للبحث، والباقي يُعلَّم كغير مفهرس";
 "Click to enable Project files: add files to the project and let its chats search them." = "انقر لتمكين ملفات المشروع: أضِف ملفات إلى المشروع ودع محادثاته تبحث فيها.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "انقر لتسجيل مقطع؛ اضغط مطوّلًا للتحدث ثم اترك للإرسال (سيسمعه النموذج).";
+"Click ■ to stop · Esc cancels" = "انقر ■ للإيقاف · Esc للإلغاء";
 "Close" = "إغلاق";
 "Close Tab" = "إغلاق التبويب";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "يغلق هذه النافذة. الإعدادات › عام › إعداد LLMTray… يفتحها من جديد.";
@@ -407,7 +412,6 @@
 "Folders" = "المجلدات";
 "Folders can't be added yet: %@. Add the files in them instead." = "لا يمكن إضافة المجلدات بعد: %@. أضف الملفات الموجودة فيها بدلًا من ذلك.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "المجلدات التي يمكن للمحادثات استخدامها دون سؤال. عندما تحتاج محادثة إلى مجلد آخر، ستطلبه في المحادثة.";
-"Folders the chat may use" = "المجلدات التي قد تستخدمها الدردشة";
 "Follow the description" = "التقِ بالوصف";
 "For This Chat" = "لهذه الدردشة";
 "For an Hour" = "لمدة ساعة";
@@ -476,10 +480,10 @@
 "Image editing" = "تحرير الصور";
 "Image editing off" = "تحرير الصور متوقف";
 "Image generation" = "إنشاء الصور";
+"Image generation couldn't be updated to mflux %@: %@" = "تعذّر تحديث إنشاء الصور إلى mflux %@: %@";
 "Image generation failed: %@" = "فشل توليد الصورة: %@";
 "Image generation finished but produced no output file." = "انتهى توليد الصورة لكنه لم ينتج ملفًا.";
 "Image generation isn't set up -- enable it again in Settings." = "لم يتم إعداد توليد الصور — فعّله مجددًا في الإعدادات.";
-"Image generation needs an update -- disable it and enable it again in Settings." = "توليد الصور يحتاج إلى تحديث — أطفئه ثم أعد تشغيله في الإعدادات.";
 "Image generation off" = "توليد الصور متوقف";
 "Image model" = "نموذج الصور";
 "Image, music and voice models" = "نماذج الصور والموسيقى والصوت";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "دليل LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray غير مسموح له باستخدام الميكروفون.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "لا يُسمح لـ LLMTray باستخدام الميكروفون. اسمح له من إعدادات النظام › الخصوصية والأمان › الميكروفون.";
 "LLMTray restarts now to load them." = "يعيد LLMTray التشغيل الآن لتحميلها.";
 "LLMTray status, indexing project files" = "حالة LLMTray، جارٍ فهرسة ملفات المشروع";
 "LLMTray — Chat" = "LLMTray — دردشة";
@@ -800,16 +805,22 @@
 "Recent changes" = "التغييرات الأخيرة";
 "Recently updated" = "تم التحديث مؤخرًا";
 "Recommended" = "مُوصى به";
+"Record" = "تسجيل";
+"Recording" = "جارٍ التسجيل";
 "Recovery" = "الاسترداد";
 "Refused" = "مرفوضة";
 "Regenerate" = "إعادة التوليد";
 "Reinstall" = "إعادة التثبيت";
 "Reinstall failed: %@" = "فشل إعادة التثبيت: %@";
+"Release to cancel" = "اترك للإلغاء";
+"Release to send" = "اترك للإرسال";
+"Release to send · move away to cancel" = "اترك للإرسال · ابتعد للإلغاء";
 "Remove" = "إزالة";
 "Remove %@" = "أزل %@";
 "Remove attachment" = "إزالة المرفق.";
 "Remove from Project" = "إزالة من المشروع";
 "Remove from the project" = "أزل من المشروع";
+"Remove recording" = "إزالة التسجيل";
 "Remove this file from the project?" = "هل تريد إزالة هذا الملف من المشروع؟";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "يزيل وقت التشغيل mlx-lm المحمّل وتوليد الصور (وقت التشغيل ونماذج الصور) من %@. سيتم إعدادها مرة أخرى عند إعادة تشغيل الخادم أو عند تفعيل توليد الصور. المحادثات والحسابات المحفوظة تبقى محفوظة.";
 "Rename" = "إعادة تسمية";
@@ -840,6 +851,7 @@
 "Retry" = "إعادة المحاولة";
 "Review" = "مراجعة";
 "Revoke" = "إلغاء";
+"Revoke %@" = "إلغاء %@";
 "Run benchmark" = "تشغيل الاختبار المعياري";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "شغّله في Terminal لزيادة حد ذاكرة GPU؛ سيُعاد تعيينه عند إعادة تشغيل الـMac.";
 "Running" = "قيد التشغيل";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "أوقف Voice Lab وتوليد الموسيقى لتحديثه.";
 "Stop Voice Lab first." = "أوقف Voice Lab أولاً.";
 "Stop generating" = "أوقف التوليد.";
+"Stop recording" = "إيقاف التسجيل";
 "Stop server (unload model)" = "أوقف الخادم (أفرغ النموذج من الذاكرة).";
 "Stop the server to change these." = "أوقف الخادم لتغيير هذه.";
 "Stop the server to update the runtime." = "أوقف الخادم لتحديث بيئة التشغيل.";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "عائلات النماذج المستخدمة في ذلك اليوم (مثل qwen أو flux)، دون أسماء النماذج.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "في المرة الأولى، يؤدي هذا إلى تنزيل %@ (%@) إلى هذا الـ Mac الآن، بدلًا من أثناء الدردشة.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "نافذة المحادثة الكاملة، مع المشاريع وكل المحادثات (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "مسودة الصورة أعلاه مفتوحة: اضغط «إنشاء» أو «تخطى» لمتابعة الدردشة.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "مسودة تعديل الصورة أعلاه مفتوحة: اضغط «إنشاء» أو «تخطى» لمتابعة الدردشة.";
 "The image generator is busy -- try again once it's done." = "مولد الصور مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The image generator is busy with another chat -- try again once it's done." = "مولد الصور مشغول في دردشة أخرى — حاول مرة أخرى بعد الانتهاء.";
 "The import stopped" = "توقّف الاستيراد";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "ترخيص النموذج، من بطاقته.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "مجلد النماذج غير متاح — هل تم توصيل قرصه؟ حدده مجدداً في الإعدادات → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "الحد الأقصى الذي قد تشغله ذاكرة التخزين المؤقت للمطالبات السابقة (حجم ذاكرة التخزين المؤقت للمطالبة في الملف الشخصي هو أيضاً حد أعلى). المزيد يجعل المحادثات الطويلة والوكيلات أسرع؛ الكثير يترك دون مساحة للمطالبة الجاري قراءتها.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "مسودة الموسيقى أعلاه مفتوحة: اضغط «إنشاء» أو «تخطى» لمتابعة الدردشة.";
 "The music generator is busy -- try again once it's done." = "مولِّد الموسيقى مشغول — حاول مرة أخرى بعد الانتهاء.";
 "The music generator is busy with another chat -- try again once it's done." = "مولِّد الموسيقى مشغول بمحادثة أخرى — حاول مرة أخرى بعد الانتهاء.";
 "The name can be at most %lld characters." = "يمكن أن يكون الاسم بحد أقصى %lld حرفًا.";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "لا يمكن إضافة هذه إلى مشروع";
 "These models go back to Default: %@." = "ستعود هذه النماذج إلى Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "تعمل بشكل متسلسل، وتُعرض في نافذة شريط القائمة. يمكنك إغلاق هذه النافذة أثناء ذلك.";
+"Thinking effort: %@" = "جهد التفكير: %@";
+"Thinking effort: how long the model may think before it answers" = "جهد التفكير: المدة التي يمكن أن يفكر فيها النموذج قبل أن يجيب";
 "Thinking…" = "جارٍ التفكير…";
 "Thinking… %@ s of reply ready" = "جارٍ التفكير… %@ ثٌ من الرد جاهز";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "يشغّل هذا الـMac النموذج بسرعة ~%@× من الوقت الحقيقي: تكلّم، ثم استمع.";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "ما تم اليوم حتى الآن: %@ (يُرسل عند انتهاء اليوم)";
 "Together over 90%: reading a prompt gets %lld%." = "إذا كان المجموع فوق 90%: تحصل قراءة المطالبة على %lld%.";
 "Tokens" = "الرموز";
+"Told the model about new project files: %@" = "تم إبلاغ النموذج بملفات المشروع الجديدة: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "طويل جدًا بالنسبة لمساحة النموذج المحدد الآن، سيُقرأ عبر البحث بدلًا من ذلك: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "طويل جدًا للتثبيت مع النموذج المحدد: ≈%1$@ رمزًا، تبقّى ≈%2$@ من %3$@";
 "Too many reviews from this network. Try again in %lld min." = "عدد كبير جدًا من المراجعات من هذه الشبكة. حاول مرة أخرى بعد %lld دقيقة.";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "إعادة تسمية %lld";
 "search by words only" = "البحث بالكلمات فقط";
 "the download finished incomplete" = "اكتمل التنزيل جزئيًا";
+"the installed version didn't change" = "لم يتغير الإصدار المثبّت";
 "the model" = "النموذج";
 "the model runtime isn't installed yet" = "بيئة تشغيل النموذج غير مُثبتة بعد";
 "then" = "ثم";
