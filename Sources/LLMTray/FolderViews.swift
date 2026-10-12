@@ -297,7 +297,8 @@ struct ChatFolderChips: View {
                             }
                             .buttonStyle(.plain)
                             .help("Revoke")
-                            .accessibilityLabel(Text("Revoke"))
+                            .accessibilityLabel(Text(String(format: NSLocalizedString("Revoke %@", comment: "a folder chip's ×: the folder's name"),
+                                                            URL(fileURLWithPath: grant.root.path).lastPathComponent)))
                         }
                         .font(.caption)
                         .padding(.horizontal, 8)

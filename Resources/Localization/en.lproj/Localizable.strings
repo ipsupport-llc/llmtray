@@ -97,9 +97,9 @@
 "Add Files…" = "Add Files…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
 "Add files" = "Add files";
+"Add files or folders" = "Add files or folders";
 "Add files or images" = "Add files or images";
-"Add files to a project" = "Add files to a project";
-"Add files to a project, or images for the model to see" = "Add files to a project, or images for the model to see";
+"Add files, images or folders" = "Add files, images or folders";
 "Add more files: every chat of the project can search them." = "Add more files: every chat of the project can search them.";
 "Add the files to a project?" = "Add the files to a project?";
 "Add to Project" = "Add to Project";
@@ -122,6 +122,7 @@
 "Allow LLMTray to use this folder for its models." = "Allow LLMTray to use this folder for its models.";
 "Allow Once" = "Allow Once";
 "Allow connections from the local network" = "Allow connections from the local network";
+"Allow folders" = "Allow folders";
 "Allowed folders" = "Allowed folders";
 "Allowed in a chat" = "Allowed in a chat";
 "Almost done" = "Almost done";
@@ -161,7 +162,7 @@
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
 "Attach Images…" = "Attach Images…";
 "Attach images" = "Attach images";
-"Attach images for the model to see" = "Attach images for the model to see";
+"Attach images or allow folders" = "Attach images or allow folders";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit.";
 "Audio quality" = "Audio quality";
 "Auto-compact" = "Auto-compact";
@@ -848,6 +849,7 @@
 "Retry" = "Retry";
 "Review" = "Review";
 "Revoke" = "Revoke";
+"Revoke %@" = "Revoke %@";
 "Run benchmark" = "Run benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts.";
 "Running" = "Running";

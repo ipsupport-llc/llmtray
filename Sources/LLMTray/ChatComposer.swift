@@ -323,6 +323,18 @@ struct ChatComposer: View {
         .onDrop(of: [.fileURL, .image], isTargeted: nil) { dropFiles($0) }
     }
 
+    static func addHelp(files: Bool, images: Bool, folders: Bool) -> String {
+        switch (files, images, folders) {
+        case (true, true, true): return NSLocalizedString("Add files, images or folders", comment: "the composer's + menu")
+        case (true, true, false): return NSLocalizedString("Add files or images", comment: "the composer's + menu")
+        case (true, false, true): return NSLocalizedString("Add files or folders", comment: "the composer's + menu")
+        case (true, false, false): return NSLocalizedString("Add files", comment: "the composer's + menu")
+        case (false, true, true): return NSLocalizedString("Attach images or allow folders", comment: "the composer's + menu")
+        case (false, true, false): return NSLocalizedString("Attach images", comment: "the composer's + menu")
+        default: return NSLocalizedString("Allow folders", comment: "the composer's + menu")
+        }
+    }
+
     static func draftHint(_ kind: GenerationDraft.Kind) -> String {
         switch kind {
         case .music: return NSLocalizedString("The music draft above is open: Generate or Skip it to keep chatting.", comment: "")
@@ -375,6 +387,8 @@ struct ChatComposer: View {
             if folders.isEnabled {
                 Divider()
                 Menu("Folders") { FolderMenuItems() }
+                    // Read again when grants change.
+                    .id(folders.grantsRevision)
             }
         } label: {
             Image(systemName: "plus.circle").font(.title3)
@@ -382,10 +396,10 @@ struct ChatComposer: View {
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .help(id == nil ? Text("Attach images for the model to see")
-              : composer.acceptsImages ? Text("Add files to a project, or images for the model to see")
-              : Text("Add files to a project"))
-        .accessibilityLabel(id == nil ? Text("Attach images") : composer.acceptsImages ? Text("Add files or images") : Text("Add files"))
+        // What's in it: files (a saved chat), images (a model that sees),
+        // folders (folder access on).
+        .help(Text(Self.addHelp(files: id != nil, images: composer.acceptsImages, folders: folders.isEnabled)))
+        .accessibilityLabel(Text(Self.addHelp(files: id != nil, images: composer.acceptsImages, folders: folders.isEnabled)))
     }
 
     private var turnActions: some View {
