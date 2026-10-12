@@ -71,6 +71,7 @@
 "(no server output yet)" = "（暂无服务器输出）";
 "+ MTP drafter %@" = "+ MTP 草稿器 %@";
 "1 hour" = "1 小时";
+"30 s reached · release to send, Esc to drop" = "已达 30 秒 · 松开发送，按 Esc 放弃";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "聊天在查看文件夹前会询问，并将每项更改以计划形式显示供你批准。私人位置（Library、keys、主目录）不会被共享。";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "聊天可以查看你允许的文件夹，并建议新文件夹、移动和重命名。你需批准每项更改且可撤销。";
 "A chat model" = "聊天模型";
@@ -98,9 +99,9 @@
 "Add Files…" = "添加文件…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "向项目添加 PDF、Word 和文本文件。聊天会搜索它们并引用页码；将文件固定可将其全部保留在对话中。";
 "Add files" = "添加文件";
+"Add files or folders" = "添加文件或文件夹";
 "Add files or images" = "添加文件或图像";
-"Add files to a project" = "将文件添加到项目";
-"Add files to a project, or images for the model to see" = "将文件添加到项目，或添加模型可见的图像";
+"Add files, images or folders" = "添加文件、图像或文件夹";
 "Add more files: every chat of the project can search them." = "添加更多文件：项目中的每个聊天都可以搜索这些文件。";
 "Add the files to a project?" = "要将这些文件添加到项目吗？";
 "Add to Project" = "添加到项目";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "允许 LLMTray 使用此文件夹来存放其模型。";
 "Allow Once" = "允许一次";
 "Allow connections from the local network" = "允许来自本地网络的连接";
+"Allow folders" = "允许文件夹";
 "Allowed folders" = "已允许的文件夹";
 "Allowed in a chat" = "允许在对话中使用";
 "Almost done" = "即将完成";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "询问 LLMTray";
 "Ask again in two weeks" = "两周后再次询问";
 "Ask anything, or try one of these:" = "随便问点什么，或试试下面的示例：";
+"Ask anything." = "可以问任何问题。";
 "Ask first" = "先询问";
 "Assistant" = "助理";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "每天最多发送一份报告（涵盖前一天），发送至 ipsupport.us。未发送的当天数据将在下次启动时发送，最多回溯 7 天。关闭此项将删除未发送的数据。";
 "Attach Images…" = "附加图像…";
 "Attach images" = "附加图像";
-"Attach images for the model to see" = "附加模型可见的图像";
+"Attach images or allow folders" = "附加图像或允许文件夹";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention 使用 8-bit，前馈使用 4-bit —— 在大小与稳定性间的最佳平衡，已相对于统一 4-bit 验证。";
 "Audio quality" = "音频质量";
 "Auto-compact" = "自动压缩";
@@ -242,6 +245,8 @@
 "Clear search" = "清除搜索";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "清除队列：已建立索引的保持可搜索，其余标记为未建立索引";
 "Click to enable Project files: add files to the project and let its chats search them." = "点击以启用项目文件：将文件添加到项目并允许该项目的聊天搜索它们。";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "点按可录制片段；按住可说话，松开后发送（模型会听到）。";
+"Click ■ to stop · Esc cancels" = "点按 ■ 停止 · Esc 取消";
 "Close" = "关闭";
 "Close Tab" = "关闭标签页";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "关闭此窗口。前往“设置 › 通用 › 设置 LLMTray…” 可重新打开。";
@@ -407,7 +412,6 @@
 "Folders" = "文件夹";
 "Folders can't be added yet: %@. Add the files in them instead." = "暂无法添加文件夹：%@。请改为添加其中的文件。";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "对话可在无需询问的情况下使用这些文件夹。若对话需要其它文件夹，会在对话中向你请求。";
-"Folders the chat may use" = "聊天可使用的文件夹";
 "Follow the description" = "遵循描述";
 "For This Chat" = "针对本聊天";
 "For an Hour" = "一小时内";
@@ -476,10 +480,10 @@
 "Image editing" = "图像编辑";
 "Image editing off" = "图像编辑：关闭";
 "Image generation" = "图像生成";
+"Image generation couldn't be updated to mflux %@: %@" = "无法将图像生成更新到 mflux %@：%@";
 "Image generation failed: %@" = "图像生成失败：%@";
 "Image generation finished but produced no output file." = "图像生成完成但未产生输出文件。";
 "Image generation isn't set up -- enable it again in Settings." = "尚未设置图像生成功能 —— 请在“设置”中重新开启。";
-"Image generation needs an update -- disable it and enable it again in Settings." = "图像生成功能需要更新 —— 请在“设置”中先关闭再重新开启。";
 "Image generation off" = "图像生成：关闭";
 "Image model" = "图像模型";
 "Image, music and voice models" = "图像、音乐与语音模型";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray 指南";
 "LLMTray isn't allowed to use the microphone." = "LLMTray 未被允许使用麦克风。";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray 未被允许使用麦克风。请在“系统设置”›“隐私与安全性”›“麦克风”中允许。";
 "LLMTray restarts now to load them." = "LLMTray 现在将重启以加载这些内容。";
 "LLMTray status, indexing project files" = "LLMTray 状态：正在为项目文件建立索引";
 "LLMTray — Chat" = "LLMTray — 聊天";
@@ -800,16 +805,22 @@
 "Recent changes" = "最近更改";
 "Recently updated" = "最近更新";
 "Recommended" = "推荐";
+"Record" = "录音";
+"Recording" = "正在录音";
 "Recovery" = "恢复";
 "Refused" = "已拒绝";
 "Regenerate" = "重新生成";
 "Reinstall" = "重新安装";
 "Reinstall failed: %@" = "重新安装失败：%@";
+"Release to cancel" = "松开取消";
+"Release to send" = "松开即可发送。";
+"Release to send · move away to cancel" = "松开发送 · 移开取消";
 "Remove" = "移除";
 "Remove %@" = "移除 %@";
 "Remove attachment" = "移除附件";
 "Remove from Project" = "从项目中移除";
 "Remove from the project" = "从项目中移除";
+"Remove recording" = "移除录音";
 "Remove this file from the project?" = "是否从项目中移除此文件？";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "从 %@ 删除已下载的 mlx-lm 运行时和图像生成功能（包括运行时和图像模型）。下一次服务器启动或启用图像生成功能时会重新设置。已保存的聊天和配置档会保留。";
 "Rename" = "重命名";
@@ -840,6 +851,7 @@
 "Retry" = "重试";
 "Review" = "评价";
 "Revoke" = "撤销";
+"Revoke %@" = "撤销 %@";
 "Run benchmark" = "运行基准测试";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "在终端中运行以提高 GPU 内存限制；Mac 重启后会重置。";
 "Running" = "正在运行";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "请停止 Voice Lab 和音乐生成功能以更新它。";
 "Stop Voice Lab first." = "请先停止 Voice Lab。";
 "Stop generating" = "停止生成。";
+"Stop recording" = "停止录音";
 "Stop server (unload model)" = "停止服务器（卸载模型）。";
 "Stop the server to change these." = "请停止服务器以更改这些项。";
 "Stop the server to update the runtime." = "停止服务器以更新运行时。";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "当天使用的模型系列（例如 qwen 或 flux），不包含具体模型名称。";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "首次使用时，这会立即将 %@（%@）下载到这台 Mac，而不是等到聊天过程中下载。";
 "The full chat window, with projects and every chat (⌘⇧O)" = "完整聊天窗口，侧栏显示项目和所有对话（⌘⇧O）";
+"The image draft above is open: Generate or Skip it to keep chatting." = "上方的图像草稿仍处于打开状态：请生成或跳过它以继续聊天。";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "上方的图像编辑草稿仍处于打开状态：请生成或跳过它以继续聊天。";
 "The image generator is busy -- try again once it's done." = "图像生成器正在工作——完成后请重试。";
 "The image generator is busy with another chat -- try again once it's done." = "图像生成器正被另一个对话占用——完成后请重试。";
 "The import stopped" = "导入已停止";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "来自模型卡的许可。";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "models 文件夹不可用——其磁盘已连接吗？请在 设置 → Models 中重新选择。";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "先前提示缓存最多可占用的空间（配置文件中的提示缓存大小同样是上限）。更多缓存可加速长对话与代理；但过多会挤占正在读取的提示空间。";
+"The music draft above is open: Generate or Skip it to keep chatting." = "上方的音乐草稿仍处于打开状态：请生成或跳过它以继续聊天。";
 "The music generator is busy -- try again once it's done." = "音乐生成器正在忙碌——完成后请重试。";
 "The music generator is busy with another chat -- try again once it's done." = "音乐生成器正处理其他聊天——完成后请重试。";
 "The name can be at most %lld characters." = "名称最多可为 %lld 个字符。";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "这些无法添加到项目";
 "These models go back to Default: %@." = "这些模型会恢复为 Default：%@。";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "它们一次运行一个，在菜单栏的窗口中显示。你可以在此期间关闭该窗口。";
+"Thinking effort: %@" = "思考强度：%@";
+"Thinking effort: how long the model may think before it answers" = "思考强度：模型在回答前可以思考多久。";
 "Thinking…" = "正在思考…";
 "Thinking… %@ s of reply ready" = "思考中… 已准备 %@ 秒回复";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "此 Mac 以约 %@× 实时运行模型：先说话，然后聆听。";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "今日至今：%@（将在当天结束后发送）";
 "Together over 90%: reading a prompt gets %lld%." = "合计超过 90%：读取提示将获得 %lld%。";
 "Tokens" = "标记数";
+"Told the model about new project files: %@" = "已告知模型新的项目文件：%@";
 "Too long for the selected model's room now, read by search instead: %@" = "对于当前选定模型的空间过长，改为通过搜索读取：%@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "对于所选模型无法置顶：约 %1$@ 令牌，剩余约 %3$@ 的 %2$@";
 "Too many reviews from this network. Try again in %lld min." = "来自此网络的评论过多。%lld 分钟后重试。";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "重命名 %lld 项";
 "search by words only" = "仅按文字搜索";
 "the download finished incomplete" = "下载未完成";
+"the installed version didn't change" = "已安装的版本未更改";
 "the model" = "模型";
 "the model runtime isn't installed yet" = "模型运行时尚未安装";
 "then" = "然后";

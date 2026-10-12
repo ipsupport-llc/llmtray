@@ -71,6 +71,7 @@
 "(no server output yet)" = "(виводу сервера ще немає)";
 "+ MTP drafter %@" = "+ MTP‑складання %@";
 "1 hour" = "1 година";
+"30 s reached · release to send, Esc to drop" = "Досягнуто 30 с · відпустіть, щоб надіслати, Esc — щоб скасувати";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Чат запитує перед тим, як переглядати папку, і показує кожну зміну як план для затвердження. Приватні місця (Library, keys, сам домашній каталог) ніколи не передаються.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Чат може переглядати дозволені вами папки та пропонувати нові папки, переміщення й перейменування. Ви підтверджуєте кожну зміну й можете скасувати її.";
 "A chat model" = "Модель для чату";
@@ -98,9 +99,9 @@
 "Add Files…" = "Додати файли…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Додайте PDF, Word та текстові файли до проєкту. Чати шукають у них і цитують сторінки; закріпіть файл, щоб увесь його вміст був у розмові.";
 "Add files" = "Додати файли";
+"Add files or folders" = "Додати файли або папки";
 "Add files or images" = "Додати файли або зображення";
-"Add files to a project" = "Додати файли до проєкту";
-"Add files to a project, or images for the model to see" = "Додати файли до проєкту або зображення, щоб модель їх побачила";
+"Add files, images or folders" = "Додати файли, зображення або папки";
 "Add more files: every chat of the project can search them." = "Додайте більше файлів: кожен чат проєкту зможе їх шукати.";
 "Add the files to a project?" = "Додати файли до проєкту?";
 "Add to Project" = "Додати до проєкту";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "Дозволити LLMTray використовувати цю папку для своїх моделей.";
 "Allow Once" = "Дозволити один раз";
 "Allow connections from the local network" = "Дозволити підключення з локальної мережі";
+"Allow folders" = "Дозволити папки";
 "Allowed folders" = "Дозволені папки";
 "Allowed in a chat" = "Дозволено в чаті";
 "Almost done" = "Майже готово";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "Запитайте про LLMTray";
 "Ask again in two weeks" = "Запитати знову через два тижні";
 "Ask anything, or try one of these:" = "Запитайте будь-що або спробуйте одне з цього:";
+"Ask anything." = "Запитайте будь-що.";
 "Ask first" = "Спочатку запитати";
 "Assistant" = "Асистент";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Не більше одного звіту на день, що охоплює один попередній день, надсилається на ipsupport.us. Незапланований день буде надіслано при наступному запуску, до 7 днів назад. Вимкнення видаляє те, що не було надіслано.";
 "Attach Images…" = "Приєднати зображення…";
 "Attach images" = "Приєднати зображення";
-"Attach images for the model to see" = "Приєднати зображення, щоб модель їх побачила";
+"Attach images or allow folders" = "Приєднати зображення або дозволити папки";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention у 8-бітах, feed‑forward у 4-бітах — найкращий баланс розміру й стабільності, перевірено на однорідному 4‑бітному режимі.";
 "Audio quality" = "Якість аудіо";
 "Auto-compact" = "Автостиснення";
@@ -242,6 +245,8 @@
 "Clear search" = "Очистити пошук";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Очистити чергу: індексоване залишається доступним для пошуку, інше позначається як неіндексоване";
 "Click to enable Project files: add files to the project and let its chats search them." = "Натисніть, щоб увімкнути файли проєкту: додайте файли до проєкту, і його розмови зможуть їх шукати.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Клацніть, щоб записати фрагмент; утримуйте, щоб говорити, і відпустіть, щоб надіслати (модель це почує).";
+"Click ■ to stop · Esc cancels" = "Клацніть ■, щоб зупинити · Esc скасовує";
 "Close" = "Закрити";
 "Close Tab" = "Закрити вкладку";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Закриває це вікно. Налаштування › Основні › Налаштувати LLMTray… відкриває його знову.";
@@ -407,7 +412,6 @@
 "Folders" = "Папки";
 "Folders can't be added yet: %@. Add the files in them instead." = "Папки поки що не можна додати: %@. Додайте файли всередині них.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Папки, які чати можуть використовувати без запиту. Якщо чат потребує іншої папки, він попросить у чаті.";
-"Folders the chat may use" = "Папки, які чат може використовувати";
 "Follow the description" = "Дотримуватися опису";
 "For This Chat" = "Для цього чату";
 "For an Hour" = "На годину";
@@ -476,10 +480,10 @@
 "Image editing" = "Редагування зображень";
 "Image editing off" = "Редагування зображень вимкнено";
 "Image generation" = "Генерація зображень";
+"Image generation couldn't be updated to mflux %@: %@" = "Не вдалося оновити «Генерація зображень» до mflux %@: %@";
 "Image generation failed: %@" = "Не вдалося згенерувати зображення: %@";
 "Image generation finished but produced no output file." = "Генерація зображення завершилася, але файл не створено.";
 "Image generation isn't set up -- enable it again in Settings." = "Генерація зображень не налаштована — знову увімкніть її в Налаштуваннях.";
-"Image generation needs an update -- disable it and enable it again in Settings." = "Потрібне оновлення генерації зображень — вимкніть і ввімкніть її знову в Налаштуваннях.";
 "Image generation off" = "Створення зображень вимкнено";
 "Image model" = "Модель зображень";
 "Image, music and voice models" = "Моделі зображень, музики та голосу";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Посібник LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray не має дозволу на використання мікрофона.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray не має дозволу використовувати мікрофон. Дозвольте це в Системних налаштуваннях › Приватність і безпека › Мікрофон.";
 "LLMTray restarts now to load them." = "LLMTray зараз перезапуститься, щоб завантажити їх.";
 "LLMTray status, indexing project files" = "Статус LLMTray: індексація файлів проєкту";
 "LLMTray — Chat" = "LLMTray — Чат";
@@ -800,16 +805,22 @@
 "Recent changes" = "Останні зміни";
 "Recently updated" = "Нещодавно оновлено";
 "Recommended" = "Рекомендовано";
+"Record" = "Записати";
+"Recording" = "Записування";
 "Recovery" = "Відновлення";
 "Refused" = "Відхилено";
 "Regenerate" = "Згенерувати знову";
 "Reinstall" = "Перевстановити";
 "Reinstall failed: %@" = "Не вдалося перевстановити: %@";
+"Release to cancel" = "Відпустіть, щоб скасувати";
+"Release to send" = "Відпустіть, щоб надіслати";
+"Release to send · move away to cancel" = "Відпустіть, щоб надіслати · відведіть, щоб скасувати";
 "Remove" = "Вилучити";
 "Remove %@" = "Видалити %@";
 "Remove attachment" = "Прибрати вкладення";
 "Remove from Project" = "Видалити з проєкту";
 "Remove from the project" = "Видалити з проєкту";
+"Remove recording" = "Вилучити запис";
 "Remove this file from the project?" = "Видалити цей файл із проєкту?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Видаляє завантажений runtime mlx-lm та моделі генерації зображень (runtime і моделі зображень) з %@. Вони будуть знову встановлені при наступному запуску сервера або коли генерація зображень буде увімкнена. Збережені чати та профілі зберігаються.";
 "Rename" = "Перейменувати";
@@ -840,6 +851,7 @@
 "Retry" = "Повторити";
 "Review" = "Відгук";
 "Revoke" = "Скасувати доступ";
+"Revoke %@" = "Скасувати доступ до %@";
 "Run benchmark" = "Запустити бенчмарк";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Запустіть у Terminal, щоб підняти ліміт пам’яті GPU; при перезавантаженні Mac ліміт скинеться.";
 "Running" = "Запущена";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "Зупиніть Voice Lab і генерацію музики для оновлення.";
 "Stop Voice Lab first." = "Спочатку зупиніть Voice Lab.";
 "Stop generating" = "Зупинити генерацію";
+"Stop recording" = "Зупинити записування";
 "Stop server (unload model)" = "Зупинити сервер (вивантажити модель)";
 "Stop the server to change these." = "Зупиніть сервер, щоб змінити це.";
 "Stop the server to update the runtime." = "Щоб оновити рантайм, зупиніть сервер.";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "Сімейства моделей, використаних того дня (наприклад qwen або flux), ніколи їхні назви.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Першого разу на цей Mac завантажиться %@ (%@) — зараз, а не посеред розмови.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Повне вікно чату з проєктами та всіма розмовами (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "Чернетку зображення вище відкрито: натисніть «Створити» або «Пропустити», щоб продовжити чат.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "Чернетку редагування зображення вище відкрито: натисніть «Створити» або «Пропустити», щоб продовжити чат.";
 "The image generator is busy -- try again once it's done." = "Генератор зображень зайнятий — спробуйте пізніше, коли завершить роботу.";
 "The image generator is busy with another chat -- try again once it's done." = "Генератор зображень зайнятий іншим чатом — спробуйте пізніше, коли завершить роботу.";
 "The import stopped" = "Імпорт зупинено";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "Ліцензія моделі з її картки.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Папка models недоступна — чи підключено її диск? Виберіть папку заново в Налаштування → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Максимальна пам’ять, яку може займати кеш попередніх підказок (розмір Prompt cache у профілі також встановлює обмеження). Більше пришвидшує довгі розмови та агентів; занадто багато залишає замало місця для підказки, що читається.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "Чернетку музики вище відкрито: натисніть «Створити» або «Пропустити», щоб продовжити чат.";
 "The music generator is busy -- try again once it's done." = "Генератор музики зайнятий — спробуйте пізніше, коли завершиться.";
 "The music generator is busy with another chat -- try again once it's done." = "Генератор музики зайнятий іншим чатом — спробуйте пізніше, коли завершиться.";
 "The name can be at most %lld characters." = "Ім’я може містити не більше %lld символів.";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "Ці файли не можна додати до проєкту";
 "These models go back to Default: %@." = "Ці моделі повернуться на Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Вони запускаються по черзі й показуються у вікні рядка меню. Можете тимчасово закрити це вікно.";
+"Thinking effort: %@" = "Зусилля на міркування: %@";
+"Thinking effort: how long the model may think before it answers" = "Зусилля на міркування: як довго модель може міркувати перед відповіддю";
 "Thinking…" = "Думаю…";
 "Thinking… %@ s of reply ready" = "Мислю… готово %@ с відповіді";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Цей Mac запускає модель приблизно @%@× реальному часі: говоріть, потім слухайте.";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "Сьогодні до цього моменту: %@ (надішлеться після закінчення дня)";
 "Together over 90%: reading a prompt gets %lld%." = "Разом більше 90%: на читання підказки виділяється %lld%.";
 "Tokens" = "Токени";
+"Told the model about new project files: %@" = "Повідомлено модель про нові файли проєкту: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "Зараз завеликий для доступного місця моделі, буде читатися через пошук: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Занадто довгий для закріплення з обраною моделлю: ≈%1$@ токенів, ≈%2$@ із %3$@ залишилось";
 "Too many reviews from this network. Try again in %lld min." = "З цього мережевого підключення надто багато відгуків. Спробуйте знову через %lld хв.";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "перейменувати %lld";
 "search by words only" = "пошук лише за словами";
 "the download finished incomplete" = "завантаження завершилося неповністю";
+"the installed version didn't change" = "інстальована версія не змінилася";
 "the model" = "модель";
 "the model runtime isn't installed yet" = "час виконання моделі ще не встановлено";
 "then" = "тоді";

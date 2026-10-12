@@ -71,6 +71,7 @@
 "(no server output yet)" = "(chưa có đầu ra từ máy chủ)";
 "+ MTP drafter %@" = "+ MTP drafter %@";
 "1 hour" = "1 giờ";
+"30 s reached · release to send, Esc to drop" = "Đã đạt 30 giây · thả để gửi, Esc để bỏ";
 "A chat asks before it looks in a folder, and shows every change as a plan to approve. Private places (Library, keys, the home folder itself) are never shared." = "Một cuộc trò chuyện sẽ hỏi trước khi xem trong thư mục, và hiển thị từng thay đổi dưới dạng một kế hoạch để bạn chấp thuận. Các nơi riêng tư (Library, keys, chính thư mục người dùng) không bao giờ được chia sẻ.";
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "Cuộc trò chuyện có thể truy cập các thư mục bạn cho phép và đề xuất thư mục mới, di chuyển hoặc đổi tên. Bạn duyệt mọi thay đổi và có thể hoàn tác.";
 "A chat model" = "Mô hình trò chuyện";
@@ -98,9 +99,9 @@
 "Add Files…" = "Thêm tệp…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Thêm PDF, Word và tệp văn bản vào dự án. Các cuộc trò chuyện có thể tìm kiếm trong đó và trích dẫn trang; ghim tệp để giữ toàn bộ nội dung trong cuộc hội thoại.";
 "Add files" = "Thêm tệp";
+"Add files or folders" = "Thêm tệp hoặc thư mục";
 "Add files or images" = "Thêm tệp hoặc ảnh";
-"Add files to a project" = "Thêm tệp vào dự án";
-"Add files to a project, or images for the model to see" = "Thêm tệp vào dự án, hoặc ảnh để mô hình xem";
+"Add files, images or folders" = "Thêm tệp, ảnh hoặc thư mục";
 "Add more files: every chat of the project can search them." = "Thêm tệp: mọi cuộc trò chuyện trong dự án đều có thể tìm kiếm chúng.";
 "Add the files to a project?" = "Thêm các tệp vào dự án?";
 "Add to Project" = "Thêm vào dự án";
@@ -123,6 +124,7 @@
 "Allow LLMTray to use this folder for its models." = "Cho phép LLMTray sử dụng thư mục này cho các mô hình của nó.";
 "Allow Once" = "Cho phép một lần";
 "Allow connections from the local network" = "Cho phép kết nối từ mạng cục bộ";
+"Allow folders" = "Cho phép thư mục";
 "Allowed folders" = "Thư mục được cho phép";
 "Allowed in a chat" = "Được phép trong cuộc trò chuyện";
 "Almost done" = "Gần xong";
@@ -156,12 +158,13 @@
 "Ask about LLMTray" = "Hỏi về LLMTray";
 "Ask again in two weeks" = "Hỏi lại sau hai tuần";
 "Ask anything, or try one of these:" = "Hỏi bất cứ điều gì, hoặc thử một trong những gợi ý sau:";
+"Ask anything." = "Hỏi bất cứ điều gì.";
 "Ask first" = "Hỏi trước";
 "Assistant" = "Trợ lý";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "Tối đa một báo cáo mỗi ngày, mỗi báo cáo bao gồm một ngày trước gửi tới ipsupport.us. Ngày chưa gửi sẽ được gửi vào lần khởi chạy tiếp theo, tối đa 7 ngày trước. Tắt tính năng này sẽ xóa các báo chưa gửi.";
 "Attach Images…" = "Đính kèm Ảnh…";
 "Attach images" = "Đính kèm ảnh";
-"Attach images for the model to see" = "Đính kèm ảnh để mô hình xem";
+"Attach images or allow folders" = "Đính kèm ảnh hoặc cho phép thư mục";
 "Attention at 8-bit, feed-forward at 4-bit -- best size/stability balance, validated against uniform 4-bit." = "Attention ở 8-bit, feed‑forward ở 4-bit — cân bằng dung lượng/ổn định tốt nhất, đã xác thực so với 4-bit đồng nhất.";
 "Audio quality" = "Chất lượng âm thanh";
 "Auto-compact" = "Tự động nén gọn";
@@ -242,6 +245,8 @@
 "Clear search" = "Xóa tìm kiếm";
 "Clear the queue: what's indexed stays searchable, the rest is marked not indexed" = "Xóa hàng chờ: những gì đã được lập chỉ mục vẫn có thể tìm, phần còn lại được đánh dấu không lập chỉ mục";
 "Click to enable Project files: add files to the project and let its chats search them." = "Nhấp để bật Tệp dự án: thêm tệp vào dự án và cho phép các cuộc trò chuyện của nó tìm kiếm chúng.";
+"Click to record a clip; hold to talk and release to send (the model hears it)" = "Bấm để ghi một đoạn; giữ để nói và thả để gửi (mô hình sẽ nghe)";
+"Click ■ to stop · Esc cancels" = "Bấm ■ để dừng · Esc để hủy";
 "Close" = "Đóng";
 "Close Tab" = "Đóng tab";
 "Closes this window. Settings › General › Set Up LLMTray… opens it again." = "Đóng cửa sổ này. Cài đặt › Chung › Set Up LLMTray… sẽ mở lại cửa sổ này.";
@@ -407,7 +412,6 @@
 "Folders" = "Folders";
 "Folders can't be added yet: %@. Add the files in them instead." = "Thư mục chưa thể thêm: %@. Hãy thêm các tệp bên trong thay thế.";
 "Folders chats can use without asking. When a chat needs another folder, it asks you in the chat." = "Các thư mục mà cuộc trò chuyện có thể dùng mà không hỏi. Khi cuộc trò chuyện cần thư mục khác, nó sẽ hỏi bạn trong cuộc trò chuyện.";
-"Folders the chat may use" = "Các thư mục cuộc trò chuyện có thể dùng";
 "Follow the description" = "Theo sát mô tả";
 "For This Chat" = "Cho cuộc trò chuyện này";
 "For an Hour" = "Trong một giờ";
@@ -476,10 +480,10 @@
 "Image editing" = "Chỉnh sửa ảnh";
 "Image editing off" = "Chỉnh sửa ảnh tắt";
 "Image generation" = "Tạo hình ảnh";
+"Image generation couldn't be updated to mflux %@: %@" = "Không thể cập nhật Tạo hình ảnh lên mflux %@: %@";
 "Image generation failed: %@" = "Tạo ảnh thất bại: %@";
 "Image generation finished but produced no output file." = "Tạo ảnh hoàn tất nhưng không sinh tệp đầu ra.";
 "Image generation isn't set up -- enable it again in Settings." = "Tạo ảnh chưa được thiết lập — bật lại trong Cài đặt.";
-"Image generation needs an update -- disable it and enable it again in Settings." = "Tạo ảnh cần cập nhật — tắt rồi bật lại trong Cài đặt.";
 "Image generation off" = "Tạo ảnh tắt";
 "Image model" = "Mô hình hình ảnh";
 "Image, music and voice models" = "Mô hình ảnh, nhạc và giọng nói";
@@ -537,6 +541,7 @@
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "Hướng dẫn LLMTray";
 "LLMTray isn't allowed to use the microphone." = "LLMTray không được phép dùng micro.";
+"LLMTray isn't allowed to use the microphone. Allow it in System Settings › Privacy & Security › Microphone." = "LLMTray không được phép sử dụng micrô. Cho phép trong Cài đặt Hệ thống › Quyền riêng tư & Bảo mật › Micrô.";
 "LLMTray restarts now to load them." = "LLMTray sẽ khởi động lại ngay để nạp chúng.";
 "LLMTray status, indexing project files" = "Trạng thái LLMTray, đang lập chỉ mục tệp dự án";
 "LLMTray — Chat" = "LLMTray — Trò chuyện";
@@ -800,16 +805,22 @@
 "Recent changes" = "Thay đổi gần đây";
 "Recently updated" = "Mới cập nhật";
 "Recommended" = "Được khuyến nghị";
+"Record" = "Ghi âm";
+"Recording" = "Đang ghi âm";
 "Recovery" = "Khôi phục";
 "Refused" = "Bị từ chối";
 "Regenerate" = "Tạo lại";
 "Reinstall" = "Cài lại";
 "Reinstall failed: %@" = "Cài lại thất bại: %@";
+"Release to cancel" = "Thả để hủy";
+"Release to send" = "Thả để gửi";
+"Release to send · move away to cancel" = "Thả để gửi · di chuyển ra xa để hủy";
 "Remove" = "Xóa";
 "Remove %@" = "Gỡ bỏ %@";
 "Remove attachment" = "Xóa tệp đính kèm.";
 "Remove from Project" = "Gỡ khỏi Dự án";
 "Remove from the project" = "Gỡ khỏi dự án";
+"Remove recording" = "Xóa bản ghi";
 "Remove this file from the project?" = "Gỡ tệp này khỏi dự án?";
 "Removes the downloaded mlx-lm runtime and image generation (its runtime and image models) from %@. They're set up again on the next server start, or when image generation is enabled. Saved chats and profiles are kept." = "Xóa runtime mlx-lm đã tải xuống và tính năng tạo ảnh (runtime và các mô hình ảnh) khỏi %@. Chúng sẽ được thiết lập lại khi máy chủ khởi động lại hoặc khi bật tạo ảnh. Các cuộc trò chuyện và hồ sơ đã lưu được giữ nguyên.";
 "Rename" = "Đổi tên";
@@ -840,6 +851,7 @@
 "Retry" = "Thử lại";
 "Review" = "Đánh giá";
 "Revoke" = "Thu hồi";
+"Revoke %@" = "Thu hồi %@";
 "Run benchmark" = "Chạy đo hiệu năng";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Chạy trong Terminal để tăng giới hạn bộ nhớ GPU; sẽ về lại khi Mac khởi động lại.";
 "Running" = "Đang chạy";
@@ -947,6 +959,7 @@
 "Stop Voice Lab and music generation to update it." = "Dừng Voice Lab và tạo nhạc để cập nhật.";
 "Stop Voice Lab first." = "Tắt Voice Lab trước.";
 "Stop generating" = "Dừng tạo nội dung.";
+"Stop recording" = "Dừng ghi âm";
 "Stop server (unload model)" = "Dừng máy chủ (gỡ mô hình khỏi bộ nhớ).";
 "Stop the server to change these." = "Dừng server để thay đổi những mục này.";
 "Stop the server to update the runtime." = "Dừng máy chủ để cập nhật môi trường chạy.";
@@ -1023,6 +1036,8 @@
 "The families of the models used that day (such as qwen or flux), never their names." = "Họ các mô hình được dùng trong ngày đó (ví dụ qwen hoặc flux), không bao giờ tên cụ thể.";
 "The first time, this downloads %@ (%@) to this Mac, now rather than in the middle of a chat." = "Lần đầu, thao tác này tải %@ (%@) xuống máy Mac này ngay bây giờ, thay vì giữa lúc trò chuyện.";
 "The full chat window, with projects and every chat (⌘⇧O)" = "Cửa sổ trò chuyện đầy đủ, có dự án và mọi cuộc trò chuyện (⌘⇧O)";
+"The image draft above is open: Generate or Skip it to keep chatting." = "Bản nháp hình ảnh ở trên đang mở: Tạo hoặc Bỏ qua để tiếp tục trò chuyện.";
+"The image edit draft above is open: Generate or Skip it to keep chatting." = "Bản nháp chỉnh sửa hình ảnh ở trên đang mở: Tạo hoặc Bỏ qua để tiếp tục trò chuyện.";
 "The image generator is busy -- try again once it's done." = "Trình tạo hình đang bận — thử lại khi hoàn tất.";
 "The image generator is busy with another chat -- try again once it's done." = "Trình tạo hình đang bận với cuộc trò chuyện khác — thử lại khi hoàn tất.";
 "The import stopped" = "Quá trình import đã dừng";
@@ -1052,6 +1067,7 @@
 "The model's license, from its card." = "Giấy phép của mô hình, lấy từ model card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "Thư mục models không khả dụng — đĩa của nó đã được kết nối chưa? Chọn lại trong Cài đặt → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "Dung lượng tối đa bộ nhớ đệm cho các prompt trước (kích thước Prompt cache của cấu hình cũng là giới hạn). Nhiều hơn làm các cuộc trò chuyện dài và agents nhanh hơn; quá nhiều sẽ không còn chỗ cho prompt đang được đọc.";
+"The music draft above is open: Generate or Skip it to keep chatting." = "Bản nháp nhạc ở trên đang mở: Tạo hoặc Bỏ qua để tiếp tục trò chuyện.";
 "The music generator is busy -- try again once it's done." = "Trình tạo nhạc đang bận — thử lại khi hoàn tất.";
 "The music generator is busy with another chat -- try again once it's done." = "Trình tạo nhạc đang bận với cuộc chat khác — thử lại khi hoàn tất.";
 "The name can be at most %lld characters." = "Tên tối đa %lld ký tự.";
@@ -1094,6 +1110,8 @@
 "These can't be added to a project" = "Những mục này không thể thêm vào dự án";
 "These models go back to Default: %@." = "Các mô hình này sẽ trở về Default: %@.";
 "They run one at a time, shown in the menu bar's window. You can close this window meanwhile." = "Chúng chạy lần lượt, hiển thị trong cửa sổ thanh menu. Bạn có thể đóng cửa sổ này tạm thời.";
+"Thinking effort: %@" = "Mức suy nghĩ: %@";
+"Thinking effort: how long the model may think before it answers" = "Mức suy nghĩ: mô hình có thể suy nghĩ trong bao lâu trước khi trả lời.";
 "Thinking…" = "Đang suy nghĩ…";
 "Thinking… %@ s of reply ready" = "Đang suy nghĩ… %@ giây phản hồi sẵn sàng";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "Mac này chạy mô hình ở ~%@× thời gian thực: nói, rồi nghe.";
@@ -1120,6 +1138,7 @@
 "Today so far: %@ (sent once the day is over)" = "Hôm nay đến giờ: %@ (gửi khi hết ngày)";
 "Together over 90%: reading a prompt gets %lld%." = "Cộng lại trên 90%: đọc prompt sẽ nhận %lld%.";
 "Tokens" = "Tokens";
+"Told the model about new project files: %@" = "Đã báo cho mô hình về tệp dự án mới: %@";
 "Too long for the selected model's room now, read by search instead: %@" = "Quá dài cho không gian mô hình đã chọn hiện tại, sẽ đọc bằng tìm kiếm thay vào đó: %@";
 "Too long to pin with the selected model: ≈%1$@ tokens, ≈%2$@ of %3$@ left" = "Quá dài để ghim với mô hình đã chọn: ≈%1$@ token, còn lại ≈%2$@ trong %3$@";
 "Too many reviews from this network. Try again in %lld min." = "Quá nhiều đánh giá từ mạng này. Thử lại sau %lld phút.";
@@ -1317,6 +1336,7 @@
 "rename %lld" = "đổi tên %lld";
 "search by words only" = "tìm theo từ";
 "the download finished incomplete" = "việc tải xuống kết thúc không hoàn chỉnh";
+"the installed version didn't change" = "phiên bản đã cài đặt không thay đổi";
 "the model" = "mô hình";
 "the model runtime isn't installed yet" = "chưa cài đặt runtime mô hình";
 "then" = "sau đó";
