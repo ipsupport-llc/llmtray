@@ -243,45 +243,74 @@ extension String {
     var capitalizedFirst: String { prefix(1).uppercased() + dropFirst() }
 }
 
-/// The chat's folder menu (beside the attachments): Allow Folder…, and the
-/// folders this chat may use, each revocable.
-struct ChatFolderMenu: View {
+/// The folder items of the composer's + menu (adr/0014): Allow Folder…,
+/// and the folders this chat may use, each revocable.
+struct FolderMenuItems: View {
     @EnvironmentObject var chat: ChatClient
     @ObservedObject private var manager = FolderAccessManager.shared
 
     var body: some View {
-        Menu {
-            Button("Allow Folder to Look In…") { chat.allowFolder(level: .read) }
-            if chat.currentSessionID != nil {
-                Button("Allow Folder to Change…") { chat.allowFolder(level: .change) }
-            }
-            let folders = chat.accessibleFolders
-            if !folders.isEmpty {
-                Divider()
-                Section("This chat may use") {
-                    ForEach(folders) { grant in
-                        let title = FolderAccessManager.display(grant.root.path) + " — " + FolderAccessManager.levelText(grant.level)
-                            + ", " + FolderAccessManager.lifetimeText(grant)
-                        Menu(title) {
-                            Button("Revoke") { try? manager.revoke(grant) }
-                        }
+        Button("Allow Folder to Look In…") { chat.allowFolder(level: .read) }
+        if chat.currentSessionID != nil {
+            Button("Allow Folder to Change…") { chat.allowFolder(level: .change) }
+        }
+        let folders = chat.accessibleFolders
+        if !folders.isEmpty {
+            Divider()
+            Section("This chat may use") {
+                ForEach(folders) { grant in
+                    let title = FolderAccessManager.display(grant.root.path) + " — " + FolderAccessManager.levelText(grant.level)
+                        + ", " + FolderAccessManager.lifetimeText(grant)
+                    Menu(title) {
+                        Button("Revoke") { try? manager.revoke(grant) }
                     }
                 }
             }
-            Divider()
-            Button("Files Settings…") {
-                NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.folders.rawValue])
-            }
-        } label: {
-            Image(systemName: "folder")
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-        .fixedSize()
-        .help("Folders the chat may use")
-        .accessibilityLabel(Text("Folders"))
-        // Read again when grants change.
-        .id(manager.grantsRevision)
+        Divider()
+        Button("Files Settings…") {
+            NotificationCenter.default.post(name: .showSettings, object: nil, userInfo: ["pane": SettingsPane.folders.rawValue])
+        }
+    }
+}
+
+/// Under the composer while the chat may use folders: one chip each (its
+/// name and look / change), a click on × revokes it. Nothing otherwise.
+struct ChatFolderChips: View {
+    @EnvironmentObject var chat: ChatClient
+    @ObservedObject private var manager = FolderAccessManager.shared
+
+    var body: some View {
+        let folders = manager.isEnabled ? chat.accessibleFolders : []
+        if !folders.isEmpty {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(folders) { grant in
+                        HStack(spacing: 4) {
+                            Image(systemName: grant.level == .change ? "folder.badge.gearshape" : "folder")
+                            Text(URL(fileURLWithPath: grant.root.path).lastPathComponent)
+                            Text("· " + FolderAccessManager.levelText(grant.level)).foregroundStyle(.secondary)
+                            Button {
+                                try? manager.revoke(grant)
+                            } label: {
+                                Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .help("Revoke")
+                            .accessibilityLabel(Text(String(format: NSLocalizedString("Revoke %@", comment: "a folder chip's ×: the folder's name"),
+                                                            URL(fileURLWithPath: grant.root.path).lastPathComponent)))
+                        }
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Color.gray.opacity(0.15)))
+                        .help(FolderAccessManager.display(grant.root.path) + " — " + FolderAccessManager.levelText(grant.level)
+                              + ", " + FolderAccessManager.lifetimeText(grant))
+                    }
+                }
+            }
+            .id(manager.grantsRevision)
+        }
     }
 }
 

@@ -214,13 +214,7 @@ struct ChatComposer: View {
     let dropFiles: ([NSItemProvider]) -> Bool
 
     var body: some View {
-        VStack(spacing: 4) {
-            if canRegenerate || chat.lastTokensPerSecond != nil || canCompact || chat.currentSessionID == nil {
-                turnActions
-            }
-            if !composer.attachments.isEmpty || !composer.recordings.isEmpty {
-                attachmentStrip
-            }
+        VStack(spacing: 6) {
             if !canChat {
                 // No model on this Mac yet: say what to do rather than a grey
                 // field that reads as a broken app.
@@ -232,51 +226,11 @@ struct ChatComposer: View {
                 .font(.callout)
                 .padding(.horizontal, 12)
             }
-            HStack(spacing: 8) {
-                if chat.currentSessionID != nil || composer.acceptsImages {
-                    addMenu
-                }
-                if folders.isEnabled {
-                    ChatFolderMenu()
-                }
-                // Not disabled during streaming: a disabled NSTextField
-                // resigns first responder, which kicked focus out of the
-                // field every time a response started -- send's own guard
-                // already stops a second send.
-                TextField("Message…", text: $composer.draft, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(1...4)
-                    .onSubmit(send)
-                    .onChange(of: composer.draft) { composer.convertDroppedImagePaths() }
-                    .onDrop(of: [.fileURL, .image], isTargeted: nil) { dropFiles($0) }
-                    .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
-                    .focused(isFocused)
-                    .disabled(!canChat)
-                    // Recording: the time and level over the field.
-                    .overlay {
-                        if composer.recorder.isRecording || composer.recorder.heldPending { RecordingBar(recorder: composer.recorder) }
-                    }
-
-                if composer.acceptsAudio {
-                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
-                                 done: { composer.recordings.append($0) },
-                                 sendNow: { composer.recordings.append($0); send() })
-                }
-                if composer.thinkingStyle != .none {
-                    ThinkingEffortPicker()
-                }
-                if chat.isBusy {
-                    Button { chat.cancel() } label: { Image(systemName: "stop.fill") }
-                        .help("Stop generating")
-                        .accessibilityLabel("Stop generating")
-                } else {
-                    Button(action: send) { Image(systemName: "arrow.up.circle.fill") }
-                        .help("Send")
-                        .accessibilityLabel("Send")
-                        .disabled(!canChat || composer.isEmpty)
-                }
-            }
-            .padding(.horizontal, 12)
+            // Above the card, as before: the turn's actions and the folders
+            // the chat may use, then the card.
+            turnActions
+            card
+                .padding(.horizontal, 12)
             if let draft = chat.draft {
                 // A Creator draft holds the chat (it waits for Generate or
                 // Skip, or for its countdown): say so, not a silent Stop.
@@ -295,6 +249,89 @@ struct ChatComposer: View {
             ModelDisclaimer.Line()
                 .padding(.horizontal, 12)
                 .padding(.bottom, 6)
+        }
+        // Room above, so the card doesn't run into the chat.
+        .padding(.top, 8)
+    }
+
+    /// The message as one card, as ChatGPT's and Claude's: attachments and
+    /// recordings at the top, the text, then a row -- + and the microphone
+    /// on the left, the thinking effort and Send on the right.
+    private var card: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if !composer.attachments.isEmpty || !composer.recordings.isEmpty {
+                attachmentStrip
+            }
+            // Not disabled during streaming: a disabled NSTextField
+            // resigns first responder, which kicked focus out of the
+            // field every time a response started -- send's own guard
+            // already stops a second send.
+            TextField("Message…", text: $composer.draft, axis: .vertical)
+                .textFieldStyle(.plain)
+                .font(.body)
+                .lineLimit(1...8)
+                .onSubmit(send)
+                .onChange(of: composer.draft) { composer.convertDroppedImagePaths() }
+                .background(PasteImageWatcher(isFocused: isFocused.wrappedValue) { composer.pasteImages() })
+                .focused(isFocused)
+                .disabled(!canChat)
+                // Recording: the time and level over the field.
+                .overlay {
+                    if composer.recorder.isRecording || composer.recorder.heldPending { RecordingBar(recorder: composer.recorder) }
+                }
+            HStack(spacing: 12) {
+                if chat.currentSessionID != nil || composer.acceptsImages || folders.isEnabled {
+                    addMenu
+                }
+                if composer.acceptsAudio {
+                    RecordButton(recorder: composer.recorder, full: composer.recordings.count >= ComposerModel.maxRecordings,
+                                 done: { composer.recordings.append($0) },
+                                 sendNow: { composer.recordings.append($0); send() })
+                }
+                Spacer(minLength: 8)
+                if composer.thinkingStyle != .none {
+                    ThinkingEffortPicker()
+                }
+                if chat.isBusy {
+                    Button { chat.cancel() } label: {
+                        Image(systemName: "stop.circle.fill").font(.system(size: 28))
+                    }
+                    .buttonStyle(.plain)
+                    .help("Stop generating")
+                    .accessibilityLabel("Stop generating")
+                } else {
+                    Button(action: send) {
+                        Image(systemName: "arrow.up.circle.fill").font(.system(size: 28))
+                            .foregroundStyle(!canChat || composer.isEmpty ? Color.secondary : Color.accentColor)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Send")
+                    .accessibilityLabel("Send")
+                    .disabled(!canChat || composer.isEmpty)
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Color(nsColor: .textBackgroundColor)))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .stroke(Color.gray.opacity(0.3)))
+        // The whole card takes a drop, not only the text.
+        .contentShape(Rectangle())
+        .onTapGesture { isFocused.wrappedValue = true }
+        .onDrop(of: [.fileURL, .image], isTargeted: nil) { dropFiles($0) }
+    }
+
+    static func addHelp(files: Bool, images: Bool, folders: Bool) -> String {
+        switch (files, images, folders) {
+        case (true, true, true): return NSLocalizedString("Add files, images or folders", comment: "the composer's + menu")
+        case (true, true, false): return NSLocalizedString("Add files or images", comment: "the composer's + menu")
+        case (true, false, true): return NSLocalizedString("Add files or folders", comment: "the composer's + menu")
+        case (true, false, false): return NSLocalizedString("Add files", comment: "the composer's + menu")
+        case (false, true, true): return NSLocalizedString("Attach images or allow folders", comment: "the composer's + menu")
+        case (false, true, false): return NSLocalizedString("Attach images", comment: "the composer's + menu")
+        default: return NSLocalizedString("Allow folders", comment: "the composer's + menu")
         }
     }
 
@@ -346,16 +383,23 @@ struct ChatComposer: View {
                     }
                 }
             }
+            // Folder access (adr/0014), where the folder button was.
+            if folders.isEnabled {
+                Divider()
+                Menu("Folders") { FolderMenuItems() }
+                    // Read again when grants change.
+                    .id(folders.grantsRevision)
+            }
         } label: {
-            Image(systemName: "plus.circle")
+            Image(systemName: "plus.circle").font(.title3)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .help(id == nil ? Text("Attach images for the model to see")
-              : composer.acceptsImages ? Text("Add files to a project, or images for the model to see")
-              : Text("Add files to a project"))
-        .accessibilityLabel(id == nil ? Text("Attach images") : composer.acceptsImages ? Text("Add files or images") : Text("Add files"))
+        // What's in it: files (a saved chat), images (a model that sees),
+        // folders (folder access on).
+        .help(Text(Self.addHelp(files: id != nil, images: composer.acceptsImages, folders: folders.isEnabled)))
+        .accessibilityLabel(Text(Self.addHelp(files: id != nil, images: composer.acceptsImages, folders: folders.isEnabled)))
     }
 
     private var turnActions: some View {
@@ -380,6 +424,7 @@ struct ChatComposer: View {
                 .foregroundColor(.secondary)
                 .disabled(chat.isBusy)
             }
+            ChatFolderChips()
             Spacer()
             if let tps = chat.lastTokensPerSecond {
                 Text(String(format: "%.1f tok/s", tps))
@@ -443,7 +488,6 @@ struct ChatComposer: View {
                 }
             }
         }
-        .padding(.horizontal, 12)
     }
 }
 
@@ -551,6 +595,7 @@ struct RecordButton: View {
     var body: some View {
         Image(systemName: recorder.heldPending ? "mic.fill"
               : recorder.isRecording ? (recorder.holdToSend ? "mic.fill" : "stop.circle.fill") : "mic")
+            .font(.title3)
             .foregroundStyle(recorder.isRecording || recorder.heldPending ? Color.red : Color.primary)
             .frame(width: 24, height: 24)
             .contentShape(Rectangle())
@@ -645,6 +690,14 @@ struct RecordButton: View {
 struct RecordingBar: View {
     @ObservedObject var recorder: ChatRecorder
 
+    /// A level (RMS) as a meter shows it: -60 dB to 0 over the bar's
+    /// height (speech is around -40 to -15 dB: linear, it barely moved).
+    static func barHeight(_ rms: Float) -> CGFloat {
+        let db = 20 * log10(max(rms, 1e-6))
+        let fraction = min(max((db + 60) / 60, 0), 1)
+        return 2 + CGFloat(fraction) * 16
+    }
+
     private var hint: String {
         if recorder.heldPending {
             return recorder.holdAway ? NSLocalizedString("Release to cancel", comment: "hold-to-talk, moved off the button")
@@ -661,14 +714,18 @@ struct RecordingBar: View {
         HStack(spacing: 8) {
             Circle().fill(Color.red).frame(width: 8, height: 8)
             Text(RecordButton.time(recorder.seconds)).font(.callout.monospacedDigit())
-            HStack(alignment: .center, spacing: 2) {
-                ForEach(Array(recorder.levels.suffix(28).enumerated()), id: \.offset) { _, level in
-                    Capsule().fill(Color.red.opacity(0.7))
-                        .frame(width: 3, height: max(2, min(18, CGFloat(level) * 120)))
+            // The meter fills the room up to the hint: as many of the last
+            // levels as fit, newest on the right.
+            GeometryReader { geo in
+                HStack(alignment: .center, spacing: 2) {
+                    ForEach(Array(recorder.levels.suffix(max(1, Int(geo.size.width / 5))).enumerated()), id: \.offset) { _, level in
+                        Capsule().fill(Color.red.opacity(0.75))
+                            .frame(width: 3, height: Self.barHeight(level))
+                    }
                 }
+                .frame(width: geo.size.width, height: geo.size.height, alignment: .trailing)
             }
             .frame(height: 20)
-            Spacer(minLength: 4)
             Text(hint).font(.caption).foregroundStyle(.secondary).lineLimit(1)
         }
         .padding(.horizontal, 8)

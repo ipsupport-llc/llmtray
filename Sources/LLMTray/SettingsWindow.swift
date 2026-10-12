@@ -124,16 +124,30 @@ extension Notification.Name {
 
 // MARK: - Shared building blocks
 
-/// The "?" next to every setting: hover shows what it does.
+/// The "?" next to every setting: a click shows what it does (a hover's
+/// tooltip came late, and in a Form often not at all).
 struct SettingHelp: View {
     let text: LocalizedStringKey
+    @State private var shown = false
 
     var body: some View {
-        Image(systemName: "questionmark.circle")
-            .foregroundStyle(.secondary)
-            .imageScale(.small)
-            .help(Text(text))
-            .accessibilityLabel(Text(text))
+        Button {
+            shown.toggle()
+        } label: {
+            Image(systemName: "questionmark.circle")
+                .foregroundStyle(.secondary)
+                .imageScale(.small)
+        }
+        .buttonStyle(.plain)
+        .help(Text(text))
+        .accessibilityLabel(Text(text))
+        .popover(isPresented: $shown, arrowEdge: .trailing) {
+            Text(text)
+                .font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(width: 300, alignment: .leading)
+                .padding(12)
+        }
     }
 }
 

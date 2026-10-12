@@ -117,7 +117,7 @@ final class ChatRecorder: ObservableObject {
         self.seconds = seconds
         self.level = level
         levels.append(level)
-        if levels.count > 40 { levels.removeFirst(levels.count - 40) }
+        if levels.count > 400 { levels.removeFirst(levels.count - 400) }
         if seconds >= Self.maxSeconds {
             let held = holdToSend
             if let wav = stop() {
