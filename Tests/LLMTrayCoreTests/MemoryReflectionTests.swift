@@ -4,7 +4,9 @@ import XCTest
 final class MemoryReflectionTests: XCTestCase {
     let t0 = Date(timeIntervalSince1970: 1_800_000_000)
     let chat = UUID()
-    let on = MemorySettings(enabled: true)
+    /// Learning shared: these tests are about the write itself; keeping it
+    /// apart has its own below.
+    let on = MemorySettings(enabled: true, shareLearned: true)
 
     func batch(_ texts: [String], before: String? = nil) -> MemoryBatch {
         MemoryBatch(id: 1, chat: chat, project: nil, created: t0,
@@ -330,6 +332,41 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(MemoryChange.confirm(id: "b", evidence: e).redirected(map), .confirm(id: "c", evidence: e))
         XCTAssertEqual(MemoryChange.forget(id: "b", vector: nil).redirected(map), .forget(id: "b", vector: nil))
         XCTAssertEqual(MemoryChange.confirm(id: "x", evidence: e).redirected(["x": "y", "y": "x"]).isConfirm, true, "a loop ends")
+    }
+}
+
+extension MemoryReflectionTests {
+    func testKeptApartABatchWritesOnlyItsOwnPlace() {
+        let x = UUID()
+        let apart = MemorySettings(enabled: true)
+        var file = MemoryFile()
+        let global = file.add(subject: .user, topic: "tone", kind: .preference, text: "Detailed answers", now: t0)!
+        file.meet(chat, from: 0)
+        file.enqueue(chat: chat, project: x, messages: [MemoryBatchMessage(seq: 1, date: t0, text: "x", before: nil)], now: t0)
+        let id = file.queue.last!.id
+        file.commit(batch: id, changes: [
+            .supersede(id: global, text: "Terse answers", evidence: evidence("terse please"), vector: nil, wrongLanguage: false),
+            .add(subject: .user, topic: "work", kind: .fact, text: "Leaks everywhere", observed: nil, confidence: .stated,
+                 evidence: evidence("leaks everywhere"), vector: nil, wrongLanguage: false),
+            .add(subject: .project(x), topic: "work", kind: .fact, text: "Uses OTA", observed: nil, confidence: .stated,
+                 evidence: evidence("uses ota"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: apart, liveProjects: [x], now: t0)
+        XCTAssertEqual(file.note(global)?.text, "Detailed answers", "a project's chat doesn't change what all chats see")
+        XCTAssertEqual(file.notes.map(\.text).sorted(), ["Detailed answers", "Uses OTA"])
+    }
+
+    func testProjectChatsLearnNothingWithProjectNotesOffEvenShared() {
+        let x = UUID()
+        var settings = on
+        settings.projectMemory = false
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        file.enqueue(chat: chat, project: x, messages: [MemoryBatchMessage(seq: 1, date: t0, text: "x", before: nil)], now: t0)
+        file.commit(batch: file.queue.last!.id, changes: [
+            .add(subject: .user, topic: "work", kind: .fact, text: "From a project chat", observed: nil, confidence: .stated,
+                 evidence: evidence("from a project"), vector: nil, wrongLanguage: false),
+        ], since: file.generation, settings: settings, liveProjects: [x], now: t0)
+        XCTAssertTrue(file.notes.isEmpty)
     }
 }
 

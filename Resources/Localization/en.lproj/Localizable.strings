@@ -637,6 +637,7 @@
 "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
+"Memory was off. Read what was said meanwhile?" = "Memory was off. Read what was said meanwhile?";
 "Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
 "Microphone level" = "Microphone level";

@@ -155,8 +155,18 @@ or in one project's chats (`project:P`).
 - **"Share what's learned everywhere"** (Settings, off by default): every chat
   sees every note, and the model gives `scope: user | project` in a project's
   chats, so facts about the person stay apart from the work's.
-- Project notes off: nothing is learned in a project's chats (learning kept
-  apart), and no project note is sent.
+- Kept apart, a batch writes only its own place: it's shown only those notes
+  to change, and the write checks it again with the settings as they are then.
+  A new note is still compared with everything the chat sees (About you
+  included), so the same thing confirms what it can't change and adds
+  nothing; one contradicting a note it can't change is its own place's.
+- A `user` note learned while sharing was on and never approved is seen,
+  once sharing is off, only in chats outside projects; one the user wrote or
+  approved is seen everywhere.
+- Project notes off: nothing is learned in a project's chats, shared or not,
+  and no project note is sent.
+- A chat's block is chosen again when the settings it depends on change
+  (sharing, project notes, kinds, the budget), not only its notes.
 - A note's visibility can be changed in Settings (All chats / Chats outside
   projects / a project's chats).
 - Moving a chat to another project: its snapshot is rebuilt (below).
@@ -261,7 +271,8 @@ changes in nearly every chat with memory on.
   chat", puts the watermarks aside (and, for the chat, what was queued from
   it goes). Turning it on again, or "Remember this chat", asks: read what was
   said meanwhile too, or only from now on (closing the question without an
-  answer is "only from now on").
+  answer leaves the choice open in Settings › Memory; nothing is read or met
+  until it's made). A chat opted out waits for its own "Remember".
 - "Don't remember this chat" stops reflection for it and asks whether to forget
   what was already learned from it.
 - Storage is plaintext in `~/Library/Application Support/LLMTray/memory/`

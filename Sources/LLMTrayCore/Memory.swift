@@ -149,7 +149,10 @@ public struct MemorySettings: Equatable, Sendable {
     public func allows(_ note: MemoryNote, project: UUID?) -> Bool {
         guard enabled, note.isActive, kinds.contains(note.kind) else { return false }
         switch note.subject {
-        case .user: return true
+        // What the user wrote or approved is seen everywhere; a note learned
+        // while learning was shared, only where learning is kept apart now
+        // allows it: outside projects.
+        case .user: return shareLearned || note.reviewed || project == nil
         case .general: return shareLearned || project == nil
         case .project(let id): return projectMemory && (shareLearned || id == project)
         }
@@ -161,6 +164,19 @@ public struct MemorySettings: Equatable, Sendable {
     public func learnedSubject(project: UUID?) -> MemorySubject? {
         guard let project else { return .general }
         return projectMemory ? .project(project) : nil
+    }
+
+    /// Whether a chat in `project` may learn at all: not in a project's
+    /// chats with project notes off, shared or not.
+    public func learns(inProject project: UUID?) -> Bool {
+        project == nil || projectMemory
+    }
+
+    /// The settings a chat's block depends on, beyond its notes: a change
+    /// (sharing turned on, a kind back on, a bigger budget) makes a new one.
+    public var fingerprint: String {
+        let k = MemoryKind.allCases.filter(kinds.contains).map(\.rawValue).joined(separator: ",")
+        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)"
     }
 }
 
@@ -223,11 +239,20 @@ extension MemoryFile {
         notes.first { $0.subject == .user && $0.topic == field.topic && $0.pinned }
     }
 
+    /// Whether `note` is one of About you's.
+    public func isAbout(_ note: MemoryNote) -> Bool {
+        MemoryAboutField.allCases.contains { about($0)?.id == note.id }
+    }
+
     /// Sets (or, empty, removes) an About you field. False when the text
     /// can't be a note.
     @discardableResult
     public mutating func setAbout(_ field: MemoryAboutField, _ value: String, now: Date) -> Bool {
-        let value = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        var value = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Typed with its label ("Name: Roman"): not "Name: Name: Roman".
+        if value.lowercased().hasPrefix(field.label.lowercased() + ":") {
+            value = String(value.dropFirst(field.label.count + 1)).trimmingCharacters(in: .whitespaces)
+        }
         let existing = about(field)
         guard !value.isEmpty else {
             if let existing { forget(existing.id, now: now) }
@@ -258,6 +283,12 @@ public enum MemoryTopics {
         let words = topic.lowercased().split { !$0.isLetter && !$0.isNumber }
         let key = String(words.joined(separator: "-").prefix(40))
         return key.isEmpty ? "general" : key
+    }
+
+    /// A topic for a learned note: About you's are the user's alone.
+    public static func learned(_ topic: String?) -> String {
+        let key = normalized(topic ?? "general")
+        return key.hasPrefix("about-") ? "general" : key
     }
 }
 
@@ -449,8 +480,11 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         watermarks = [:]
     }
 
-    /// Whether anything was put aside (a choice to ask for).
-    public var hasPaused: Bool { !pausedWatermarks.isEmpty }
+    /// Whether anything was put aside by memory being off (a choice to ask
+    /// for); a chat that's opted out waits for its own "Remember".
+    public var hasPaused: Bool {
+        pausedWatermarks.keys.contains { key in UUID(uuidString: key).map { !optedOut.contains($0) } ?? false }
+    }
     public func isPaused(_ chat: UUID) -> Bool { pausedWatermarks[chat.uuidString] != nil }
 
     /// On again: what was said meanwhile is read too (`readMeanwhile`), or
@@ -733,13 +767,16 @@ public struct MemorySnapshot: Codable, Equatable, Sendable {
     public var project: UUID?
     /// Its size as estimated then.
     public var tokens: Int
+    /// The settings it was chosen under (MemorySettings.fingerprint).
+    public var settings: String?
 
-    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int) {
+    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int, settings: String? = nil) {
         self.text = text
         self.noteIDs = noteIDs
         self.generation = generation
         self.project = project
         self.tokens = tokens
+        self.settings = settings
     }
 }
 
@@ -786,7 +823,8 @@ public enum MemorySelection {
     public static func choose(_ file: MemoryFile, settings: MemorySettings, project: UUID?, budget: Int,
                               now: Date, tokens: (String) -> Int) -> MemorySnapshot? {
         guard settings.enabled else { return nil }
-        let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0)
+        let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0,
+                                   settings: settings.fingerprint)
         let eligible = file.notes.filter { settings.allows($0, project: project) }
         guard !eligible.isEmpty, budget > 0 else { return empty }
         func isFirst(_ n: MemoryNote) -> Bool {
@@ -816,7 +854,7 @@ public enum MemorySelection {
         guard !chosen.isEmpty else { return empty }
         let text = render(chosen)
         return MemorySnapshot(text: text, noteIDs: chosen.map(\.id), generation: file.generation,
-                              project: project, tokens: tokens(text))
+                              project: project, tokens: tokens(text), settings: settings.fingerprint)
     }
 
     /// Whether a chat's snapshot still holds: memory on, same project,
@@ -826,7 +864,7 @@ public enum MemorySelection {
     /// next chat.
     public static func isCurrent(_ snapshot: MemorySnapshot, file: MemoryFile, settings: MemorySettings,
                                  project: UUID?, budget: Int, tokens: (String) -> Int) -> Bool {
-        guard settings.enabled, snapshot.project == project else { return false }
+        guard settings.enabled, snapshot.project == project, snapshot.settings == settings.fingerprint else { return false }
         guard snapshot.text.isEmpty || tokens(snapshot.text) <= budget else { return false }
         for id in snapshot.noteIDs {
             guard let note = file.note(id), settings.allows(note, project: project),

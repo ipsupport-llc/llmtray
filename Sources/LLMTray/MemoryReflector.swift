@@ -246,12 +246,13 @@ final class MemoryReflector: ObservableObject {
         // learning is shared, else this chat's own place (nil: project
         // notes off, nothing learned in a project's chats).
         let fixedSubject = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
-        guard settings.shareLearned || fixedSubject != nil else {
+        guard settings.learns(inProject: batch.project), settings.shareLearned || fixedSubject != nil else {
             return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
         }
-        // The notes this chat sees, not pinned ones (the user's alone).
+        // The notes it may change: kept apart, only its own place's; shared,
+        // every one this chat sees. Never pinned ones (the user's alone).
         let touchable = memory.file.notes.filter { note in
-            !note.pinned && settings.allows(note, project: batch.project)
+            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -349,9 +350,15 @@ final class MemoryReflector: ObservableObject {
             // made). An add: pinned ones too -- "My name is …" next to About
             // you's Name is the same, and confirming a pinned note writes
             // nothing.
+            // An add is also compared with every note this chat sees (About
+            // you's included): the same as one it may not change confirms it,
+            // and the write drops that -- nothing new, no duplicate.
             let close = memory.file.notes
-                .filter { $0.subject == p.subject && $0.id != p.op.id && settings.kinds.contains($0.kind)
-                    && (p.op.action == .add || !$0.pinned) }
+                .filter { note in
+                    guard note.id != p.op.id, settings.kinds.contains(note.kind) || memory.file.isAbout(note) else { return false }
+                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project) }
+                    return note.subject == p.subject && !note.pinned
+                }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
@@ -397,10 +404,13 @@ final class MemoryReflector: ObservableObject {
                 } else if case .earlierAdd? = related(.same) {
                     // Said twice in this batch: the first stands.
                     continue
-                } else if case .note(let note)? = related(.opposite) {
+                } else if case .note(let note)? = related(.opposite), !note.pinned, fixedSubject.map({ note.subject == $0 }) ?? true {
                     changes.append(.supersede(id: note.id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
                 } else {
-                    changes.append(.add(subject: p.subject, topic: MemoryTopics.normalized(p.op.topic ?? "general"), kind: kind, text: text,
+                    // New -- also when it contradicts a note this chat may
+                    // not change (the user's, another place's): its own place
+                    // gets its own note.
+                    changes.append(.add(subject: p.subject, topic: MemoryTopics.learned(p.op.topic), kind: kind, text: text,
                                         observed: kind == .observation ? p.op.observed : nil,
                                         confidence: kind == .observation ? .inferred : .stated, evidence: evidence,
                                         vector: vector, wrongLanguage: wrongLanguage))

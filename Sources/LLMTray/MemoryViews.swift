@@ -84,6 +84,15 @@ struct MemoryPane: View {
                     }
                 }
                 Section("Learning") {
+                    if memory.file.hasPaused {
+                        // Unanswered: nothing is read or met until it is.
+                        HStack {
+                            Text("Memory was off. Read what was said meanwhile?").font(.caption)
+                            Spacer()
+                            Button("Read It Too") { memory.change { $0.resumeAll(readMeanwhile: true) } }
+                            Button("Only From Now On") { memory.change { $0.resumeAll(readMeanwhile: false) } }
+                        }
+                    }
                     learningStatus
                     Picker(selection: $language) {
                         Text("Same as LLMTray").tag("auto")
@@ -133,8 +142,9 @@ struct MemoryPane: View {
         .onChange(of: enabled) { _, on in
             if on {
                 if memory.file.hasPaused { askResume = true }
-            } else {
-                memory.change { $0.pauseAll() }
+            } else if !memory.change({ $0.pauseAll() }) {
+                // Not put aside on disk: stays on (the error shows above).
+                enabled = true
             }
         }
         .confirmationDialog("Read what was said while memory was off?", isPresented: $askResume) {
@@ -142,10 +152,6 @@ struct MemoryPane: View {
             Button("Only From Now On") { memory.change { $0.resumeAll(readMeanwhile: false) } }
         } message: {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
-        }
-        .onChange(of: askResume) { _, shown in
-            // Closed without a choice: only from now on.
-            if !shown, memory.file.hasPaused { memory.change { $0.resumeAll(readMeanwhile: false) } }
         }
         .onAppear(perform: loadAbout)
         // Expiry follows its settings at once, not at the next chat.
@@ -260,7 +266,7 @@ struct MemoryPane: View {
 
     /// The notes listed: About you's are edited in their own section.
     private var activeNotes: [MemoryNote] {
-        memory.file.notes.filter { $0.isActive && !$0.topic.hasPrefix("about-") }
+        memory.file.notes.filter { $0.isActive && !memory.file.isAbout($0) }
     }
     private var expiredNotes: [MemoryNote] { memory.file.notes.filter { !$0.isActive } }
 

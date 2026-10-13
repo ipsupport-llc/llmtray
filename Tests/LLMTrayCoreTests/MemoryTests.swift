@@ -326,3 +326,49 @@ extension MemoryTests {
         XCTAssertEqual(file.note(id)?.subject, .project(p))
     }
 }
+
+extension MemoryTests {
+    func testLearnedNotesForAllChatsStayOutsideProjectsWhenSharingIsOff() {
+        var file = MemoryFile()
+        let learned = file.add(subject: .user, topic: "work", kind: .fact, text: "Learned while shared", now: t0,
+                               reviewed: false, confidence: .stated)!
+        XCTAssertFalse(on.allows(file.note(learned)!, project: UUID()))
+        XCTAssertTrue(on.allows(file.note(learned)!, project: nil))
+        file.approve(learned)
+        XCTAssertTrue(on.allows(file.note(learned)!, project: UUID()), "approved: the user's, seen everywhere")
+    }
+
+    func testASettingThatWidensWhatAChatSeesMakesANewBlock() {
+        var file = MemoryFile()
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", now: t0)
+        let snap = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0, tokens: tokens)!
+        var shared = on
+        shared.shareLearned = true
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: shared, project: nil, budget: 300, tokens: tokens))
+        var bigger = on
+        bigger.budgetTokens = 600
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: bigger, project: nil, budget: 300, tokens: tokens))
+        XCTAssertTrue(MemorySelection.isCurrent(snap, file: file, settings: on, project: nil, budget: 300, tokens: tokens))
+    }
+
+    func testAboutYouStripsItsLabelAndLearnedTopicsCantTakeIt() {
+        var file = MemoryFile()
+        file.setAbout(.name, "Name: Roman", now: t0)
+        XCTAssertEqual(file.about(.name)?.text, "Name: Roman")
+        XCTAssertTrue(file.isAbout(file.about(.name)!))
+        XCTAssertEqual(MemoryTopics.learned("about-name"), "general")
+        XCTAssertEqual(MemoryTopics.learned("Answer Length"), "answer-length")
+    }
+
+    func testAChatOptedOutDoesntKeepTheMemoryOffQuestionOpen() {
+        var file = MemoryFile()
+        let c = UUID()
+        file.meet(c, from: 0)
+        file.setOptedOut(c, true)
+        XCTAssertFalse(file.hasPaused, "it waits for its own Remember")
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        XCTAssertFalse(file.hasPaused)
+        XCTAssertTrue(file.isPaused(c))
+    }
+}
