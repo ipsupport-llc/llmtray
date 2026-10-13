@@ -350,6 +350,7 @@ final class ChatClient: ObservableObject {
             message.answerStats = pm.answerStats
             message.projectFilesAdded = pm.projectFilesAdded ?? []
             message.seq = pm.seq
+            message.sentAt = pm.sentAt
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -366,8 +367,11 @@ final class ChatClient: ObservableObject {
         loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
         projectFilesSeen = file.projectFilesSeen
         memorySnapshot = file.memorySnapshot
-        // Numbers for user messages from before seqs, after any saved.
-        lastSeq = max(file.lastSeq ?? 0, messages.compactMap(\.seq).max() ?? 0)
+        // Numbers for user messages from before seqs, after any saved --
+        // and after memory's watermark: a chat file older than the queue (a
+        // crash at quit) mustn't hand out a number memory already read.
+        lastSeq = max(file.lastSeq ?? 0, messages.compactMap(\.seq).max() ?? 0,
+                      MemoryManager.shared.file.watermark(file.id) ?? 0)
         for i in messages.indices where messages[i].role == "user" && messages[i].seq == nil {
             lastSeq += 1
             messages[i].seq = lastSeq
@@ -477,6 +481,7 @@ final class ChatClient: ObservableObject {
             persisted.documents = msg.documents.isEmpty ? nil : msg.documents
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
             persisted.seq = msg.seq
+            persisted.sentAt = msg.sentAt
             for document in msg.documents {
                 documentFiles.insert(document.filename)
                 if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
@@ -606,8 +611,11 @@ final class ChatClient: ObservableObject {
             // conversation's summary there.
             guard epoch == conversationEpoch, !Task.isCancelled, middleRange.upperBound <= messages.count else { return }
             // What memory hasn't read of it goes to the queue first: the
-            // summary is never evidence.
-            queueForMemory()
+            // summary is never evidence. Not written: the originals stay.
+            guard queueForMemory() else {
+                errorText = NSLocalizedString("Compaction stopped: memory couldn't save what this chat said.", comment: "")
+                return
+            }
             messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
             // Chosen again for what the chat is now (adr/0024).
             memorySnapshot = nil
@@ -647,6 +655,7 @@ final class ChatClient: ObservableObject {
         }
         lastSeq += 1
         message.seq = lastSeq
+        message.sentAt = Date()
         messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
@@ -708,20 +717,23 @@ final class ChatClient: ObservableObject {
     /// goes quiet, is left, compacted, or the app quits. Not a temporary
     /// chat; nothing with memory off or the chat opted out (the store
     /// decides). Each with the start of the answer before it, for context.
-    func queueForMemory() {
-        guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return }
+    /// False only when there was something to queue and it couldn't be
+    /// saved.
+    @discardableResult
+    func queueForMemory() -> Bool {
+        guard let session = currentSessionID, MemoryManager.shared.isEnabled else { return true }
         var items: [MemoryBatchMessage] = []
         var lastAnswer: String?
         for message in messages {
-            if message.role == "assistant", !message.content.isEmpty {
+            if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
                 lastAnswer = message.content
             } else if message.role == "user", !message.isToolContext, let seq = message.seq {
-                items.append(MemoryBatchMessage(seq: seq, date: Date(), text: message.content, before: lastAnswer))
+                items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer))
             }
         }
-        guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return }
+        guard let mark = MemoryManager.shared.file.watermark(session), items.contains(where: { $0.seq > mark }) else { return true }
         let project = ChatLibraryStore.shared.library.projectContext(forChat: session)?.id
-        MemoryManager.shared.change { $0.enqueue(chat: session, project: project, messages: items, now: Date()) }
+        return MemoryManager.shared.change { $0.enqueue(chat: session, project: project, messages: items, now: Date()) }
     }
 
     /// Quiet for the settings' minutes after its last change: queued.
@@ -928,6 +940,8 @@ final class ChatClient: ObservableObject {
     /// still running -- a title request, a tool round's tail -- may write
     /// this chat again (the chat may be open in another tab by then).
     func close() {
+        // Closed: what it said goes to memory now (adr/0024).
+        queueForMemory()
         cancel()
         titleTask?.cancel()
         titleTask = nil

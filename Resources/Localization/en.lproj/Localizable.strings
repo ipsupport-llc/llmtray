@@ -270,6 +270,7 @@
 "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word." = "Compacting replaces the middle of a long chat with one model-written summary. This many messages at the start are kept word for word.";
 "Compaction" = "Compaction";
 "Compaction failed: %@" = "Compaction failed: %@";
+"Compaction stopped: memory couldn't save what this chat said." = "Compaction stopped: memory couldn't save what this chat said.";
 "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way." = "Compacts the chat automatically once it grows past this many messages. The Compact button in the chat works either way.";
 "Composing…" = "Composing…";
 "Concurrent requests" = "Concurrent requests";

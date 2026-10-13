@@ -209,7 +209,8 @@ final class ChatLibraryStore: ObservableObject {
     /// the current one, which would bring the deleted chat back).
     func delete(_ id: UUID) {
         let tabs = ChatTabs.shared
-        if let index = tabs.index(of: id) {
+        // Every tab showing it, not just the first: another would save it back.
+        while let index = tabs.index(of: id) {
             let chat = tabs.tabs[index]
             chat.forgetCurrentSession()
             chat.newSession()

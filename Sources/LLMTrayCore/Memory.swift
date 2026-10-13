@@ -351,6 +351,12 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         if notes.count != before { _ = bump() }
     }
 
+    /// Memory turned off: every chat is met anew when it's on again, so
+    /// nothing said while it was off is read. What's queued stays.
+    public mutating func forgetWatermarks() {
+        watermarks = [:]
+    }
+
     /// Everything: notes, what's queued, tombstones. The watermarks stay,
     /// so what was already said isn't learned again; the opt-outs stay.
     public mutating func forgetAll() {
@@ -368,8 +374,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
 
     /// A chat memory meets for the first time: learned from `seq` on (0: a
     /// new chat, from its start; an older chat opened again: from now).
+    /// Not an opted-out one.
     public mutating func meet(_ chat: UUID, from seq: Int) {
-        guard watermarks[chat.uuidString] == nil else { return }
+        guard watermarks[chat.uuidString] == nil, !optedOut.contains(chat) else { return }
         watermarks[chat.uuidString] = seq
     }
 
@@ -404,11 +411,14 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     }
 
     /// "Don't remember this chat": nothing more is learned from it, and
-    /// what's queued from it goes.
+    /// what's queued from it goes. Its watermark goes too: remembered
+    /// again, memory meets it anew at its next message, so nothing said
+    /// meanwhile is ever read.
     public mutating func setOptedOut(_ chat: UUID, _ out: Bool) {
         if out {
             optedOut.insert(chat)
             queue.removeAll { $0.chat == chat }
+            watermarks.removeValue(forKey: chat.uuidString)
         } else {
             optedOut.remove(chat)
         }

@@ -96,6 +96,8 @@ final class ChatTabs: ObservableObject {
 
     func select(_ index: Int) {
         guard tabs.indices.contains(index), index != selectedIndex else { return }
+        // Switched away from: what it said goes to memory (adr/0024).
+        if tabs.indices.contains(selectedIndex) { tabs[selectedIndex].queueForMemory() }
         selectedIndex = index
     }
 

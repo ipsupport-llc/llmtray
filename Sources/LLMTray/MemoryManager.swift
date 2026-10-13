@@ -63,15 +63,18 @@ final class MemoryManager: ObservableObject {
 
     /// Applies a change and saves it. Not while the file is unreadable.
     /// Notes it removed leave every chat's block at once, saved chats too.
-    func change(_ apply: (inout MemoryFile) -> Void) {
-        guard !unreadable else { return }
+    /// False when it couldn't be saved (or the file can't be read).
+    @discardableResult
+    func change(_ apply: (inout MemoryFile) -> Void) -> Bool {
+        guard !unreadable else { return false }
         var updated = file
         apply(&updated)
-        guard updated != file else { return }
+        guard updated != file else { return true }
         let removed = Set(file.notes.map(\.id)).subtracting(updated.notes.map(\.id))
         file = updated
         save()
         if !removed.isEmpty { dropFromChats(removed) }
+        return !saveFailed
     }
 
     /// Expiry: at most once an hour as chats start, and at once when the

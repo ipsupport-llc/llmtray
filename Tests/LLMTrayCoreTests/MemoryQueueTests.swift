@@ -52,9 +52,27 @@ final class MemoryQueueTests: XCTestCase {
         file.enqueue(chat: chat, project: nil, messages: [message(1, "a")], now: t0)
         file.setOptedOut(chat, true)
         XCTAssertTrue(file.queue.isEmpty)
-        XCTAssertFalse(file.enqueue(chat: chat, project: nil, messages: [message(2, "b")], now: t0))
+        XCTAssertNil(file.watermark(chat))
+        file.meet(chat, from: 1)
+        XCTAssertNil(file.watermark(chat), "not met while opted out")
+        XCTAssertFalse(file.enqueue(chat: chat, project: nil, messages: [message(2, "said while opted out")], now: t0))
+        // Remembered again: met anew at its next message, so message 2 is never read.
         file.setOptedOut(chat, false)
-        XCTAssertTrue(file.enqueue(chat: chat, project: nil, messages: [message(2, "b")], now: t0))
+        XCTAssertFalse(file.enqueue(chat: chat, project: nil, messages: [message(2, "said while opted out")], now: t0))
+        file.meet(chat, from: 2)
+        file.enqueue(chat: chat, project: nil, messages: [message(2, "said while opted out"), message(3, "c")], now: t0)
+        XCTAssertEqual(file.queue.flatMap { $0.messages.map(\.seq) }, [3])
+    }
+
+    func testMemoryOffForgetsWatermarksSoNothingSaidMeanwhileIsRead() {
+        var file = MemoryFile()
+        file.meet(chat, from: 0)
+        file.enqueue(chat: chat, project: nil, messages: [message(1, "a")], now: t0)
+        file.forgetWatermarks()
+        XCTAssertEqual(file.queue.count, 1, "what's queued stays")
+        XCTAssertFalse(file.enqueue(chat: chat, project: nil, messages: [message(2, "said while off")], now: t0))
+        file.meet(chat, from: 2)
+        XCTAssertEqual(file.watermark(chat), 2)
     }
 
     func learned(_ file: inout MemoryFile, chats: [UUID], text: String, reviewed: Bool = false) -> String {
@@ -86,13 +104,15 @@ final class MemoryQueueTests: XCTestCase {
 
     func testKeepingNotesAndState() {
         var file = MemoryFile()
+        let out = UUID()
         file.meet(chat, from: 3)
-        file.setOptedOut(chat, true)
+        file.setOptedOut(out, true)
         let id = learned(&file, chats: [chat], text: "Kept")
         file.forgetLearned(fromChat: chat, keepState: true, keepNotes: true)
+        file.forgetLearned(fromChat: out, keepState: true)
         XCTAssertNotNil(file.note(id))
         XCTAssertEqual(file.watermark(chat), 3)
-        XCTAssertTrue(file.optedOut.contains(chat))
+        XCTAssertTrue(file.optedOut.contains(out))
     }
 
     func testForgettingALearnedNoteLeavesATombstone() {

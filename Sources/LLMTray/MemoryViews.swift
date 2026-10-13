@@ -108,6 +108,11 @@ struct MemoryPane: View {
             }
         }
         .formStyle(.grouped)
+        // Off: chats are met anew when it's on again, so nothing said
+        // meanwhile is read.
+        .onChange(of: enabled) { _, on in
+            if !on { memory.change { $0.forgetWatermarks() } }
+        }
         // Expiry follows its settings at once, not at the next chat.
         .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in
             memory.sweep()
