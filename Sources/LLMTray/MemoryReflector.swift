@@ -181,8 +181,9 @@ final class MemoryReflector: ObservableObject {
     /// or idle-unloaded (never started from a stop).
     private func switchWhenIdle(to path: String) {
         let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
-        func idle(_ server: ServerManager) -> Bool {
-            server.activeRequestCount == 0 && Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60
+        func idle(_ server: ServerManager, counting own: Int = 0) -> Bool {
+            let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
+            return minutes > 0 && server.activeRequestCount == own && Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60
                 && !ChatTabs.shared.tabs.contains(where: \.isBusy) && !GenerationQueue.shared.hasInteractiveDemand
                 && !server.suspendedForImageGeneration && !server.suspendedForVoice
                 && (server.isIdleUnloaded || { if case .running = server.state { return true } else { return false } }())
@@ -193,9 +194,7 @@ final class MemoryReflector: ObservableObject {
             // Checked again when its turn comes among the transitions: a
             // request, a picture or a chat since then calls it off.
             try? await server.switchLoadedModelInBackground(to: model.path, alias: ModelCatalog.shared.alias(for: model.id),
-                                                            stillWanted: { UserDefaults.standard[Pref.memorySwitchIdleMinutes] > 0
-                                                                && !ChatTabs.shared.tabs.contains(where: \.isBusy)
-                                                                && !GenerationQueue.shared.hasInteractiveDemand })
+                                                            stillWanted: { idle(server, counting: 1) })
             self.poke(after: 5)
         }
     }
@@ -522,10 +521,11 @@ final class MemoryReflector: ObservableObject {
         let style = ModelDiscovery.thinkingStyle(forModelPath: modelPath)
         var fields = Thinking.requestFields(style: style, effort: .off)
         fields["temperature"] = 0.2
-        // Named: should another model be loaded by now, the proxy refuses
-        // it rather than another model reading this chat.
+        // Named by its path (unique; an alias may be empty or shared):
+        // should another model be loaded by now, the proxy refuses it
+        // rather than another model reading this chat.
         let outcome = await BackgroundModelWork.complete(port: UserDefaults.standard[Pref.port],
-                                                         modelAlias: ModelCatalog.shared.alias(for: modelPath), messages: messages,
+                                                         modelAlias: modelPath, messages: messages,
                                                          maxTokens: maxTokens, fields: fields)
         switch outcome {
         case .done(let text): return .success(text)
