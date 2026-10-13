@@ -94,7 +94,6 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
-"About" = "About";
 "About LLMTray" = "About LLMTray";
 "About you" = "About you";
 "About you and your work: what you do, what you use." = "About you and your work: what you do, what you use.";
@@ -121,6 +120,7 @@
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.";
 "Air quality" = "Air quality";
 "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses." = "Alias: the “model” name other tools send to LLMTray's API to get this model. Profile: which settings profile this model uses.";
+"All chats" = "All chats";
 "All off unless you enable them. Models are downloaded after Finish, one at a time." = "All off unless you enable them. Models are downloaded after Finish, one at a time.";
 "Allow" = "Allow";
 "Allow Folder to Change…" = "Allow Folder to Change…";
@@ -137,6 +137,7 @@
 "Already on this Mac" = "Already on this Mac";
 "Already open in another tab" = "Already open in another tab";
 "Also Forget What It Taught" = "Also Forget What It Taught";
+"Also Read What Was Said Meanwhile" = "Also Read What Was Said Meanwhile";
 "Also check when LLMTray starts" = "Also check when LLMTray starts";
 "Also edits images -- one from the chat or one you attach. Edits take a few minutes." = "Also edits images -- one from the chat or one you attach. Edits take a few minutes.";
 "Always" = "Always";
@@ -156,6 +157,7 @@
 "Answer details" = "Answer details";
 "Answer in Russian, briefly" = "Answer in Russian, briefly";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
+"Anything else chats should know" = "Anything else chats should know";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
 "Apply to profile" = "Apply to profile";
@@ -231,6 +233,8 @@
 "Chat with language models that run on this Mac." = "Chat with language models that run on this Mac.";
 "Chat with the files of a project" = "Chat with the files of a project";
 "Chats" = "Chats";
+"Chats of project %@" = "Chats of project %@";
+"Chats outside projects" = "Chats outside projects";
 "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.";
 "Chats won't get them any more. This can't be undone." = "Chats won't get them any more. This can't be undone.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
@@ -629,8 +633,11 @@
 "Measuring the file…" = "Measuring the file…";
 "Memory" = "Memory";
 "Memory Settings…" = "Memory Settings…";
+"Memory can learn from what was written in it while it wasn't remembered, or only from what comes next." = "Memory can learn from what was written in it while it wasn't remembered, or only from what comes next.";
+"Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on." = "Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
 "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved." = "Memory learns nothing more from it. Notes it already taught can go too, except ones you edited, pinned or approved.";
+"Memory was off. Read what was said meanwhile?" = "Memory was off. Read what was said meanwhile?";
 "Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
 "Microphone level" = "Microphone level";
@@ -663,6 +670,7 @@
 "Music off" = "Music off";
 "Name" = "Name";
 "Name new chats automatically" = "Name new chats automatically";
+"Name or how to call you" = "Name or how to call you";
 "Name to show (up to 40 characters)" = "Name to show (up to 40 characters)";
 "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden." = "Names, sizes and dates, and short excerpts of files it asks about. Private places inside (keys, Library) stay hidden.";
 "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open." = "Needs about %1$@ GB, more than the %2$@ GB the GPU may use: it may run out of memory with other apps open.";
@@ -745,11 +753,14 @@
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.";
 "Off" = "Off";
 "Off · enable in Settings" = "Off · enable in Settings";
+"Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project." = "Off: a project's chats learn and see only their own notes, and chats outside projects theirs; what you write here for all chats (About you included) is seen everywhere. On: every chat sees everything learned, and learning keeps what it finds out about you apart from what belongs to a project.";
 "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust." = "Off: only this Mac can reach the server. On: other devices on your network can too -- anyone on it, so only on networks you trust.";
 "Off: only this Mac. On: anyone on your network, so only on networks you trust." = "Off: only this Mac. On: anyone on your network, so only on networks you trust.";
 "Older" = "Older";
 "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150." = "One-time: Coffee $5, Pro Supporter $25, Founding Supporter $150.";
+"Only From Now On" = "Only From Now On";
 "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co." = "Only for gated models (Llama, some Gemma and FLUX repos): accept the model's license on its Hugging Face page, then paste a read token here. Kept in your Keychain, sent only to huggingface.co.";
+"Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer." = "Only if you want: chats get it first, it never expires, and learning never changes it. It stays on this computer.";
 "Only in the packaged app (not when run from a build folder)." = "Only in the packaged app (not when run from a build folder).";
 "Only this Mac can use the server" = "Only this Mac can use the server";
 "Only turbo has this knob: sft has no song planner to vary." = "Only turbo has this knob: sft has no song planner to vary.";
@@ -816,7 +827,6 @@
 "Pro Supporters" = "Pro Supporters";
 "Profile" = "Profile";
 "Profiles" = "Profiles";
-"Project %@" = "Project %@";
 "Project files" = "Project files";
 "Project files are off" = "Project files are off";
 "Project files are turned off" = "Project files are turned off";
@@ -855,6 +865,7 @@
 "Re-index %@" = "Re-index %@";
 "Re-index this file" = "Re-index this file";
 "Reaches into %1$lld subfolders (%2$@): their files are taken out of them." = "Reaches into %1$lld subfolders (%2$@): their files are taken out of them.";
+"Read It Too" = "Read It Too";
 "Read a chat after %lld quiet minutes" = "Read a chat after %lld quiet minutes";
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
@@ -876,7 +887,9 @@
 "Release to send" = "Release to send";
 "Release to send · move away to cancel" = "Release to send · move away to cancel";
 "Remember This Chat" = "Remember This Chat";
+"Remember This Chat…" = "Remember This Chat…";
 "Remember things between chats" = "Remember things between chats";
+"Remember this chat again?" = "Remember this chat again?";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
 "Remove attachment" = "Remove attachment";
@@ -939,6 +952,7 @@
 "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later." = "Search by meaning uses %@ (%@), downloaded to this Mac now. Without it, files are searched by their words only; you can download it here later.";
 "Search chats" = "Search chats";
 "Seconds before the draft goes ahead as it is. 0: wait until you press Generate." = "Seconds before the draft goes ahead as it is. 0: wait until you press Generate.";
+"Seen in" = "Seen in";
 "Select All" = "Select All";
 "Select Model" = "Select Model";
 "Select None" = "Select None";
@@ -968,6 +982,7 @@
 "Setup assistant" = "Setup assistant";
 "Shape" = "Shape";
 "Share anonymous usage statistics" = "Share anonymous usage statistics";
+"Share what's learned everywhere" = "Share what's learned everywhere";
 "Share…" = "Share…";
 "Show All Files…" = "Show All Files…";
 "Show Chat Window" = "Show Chat Window";
@@ -994,6 +1009,7 @@
 "Skip Setup" = "Skip Setup";
 "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts." = "Smallest and most aggressive -- can visibly drift a generation's composition on some prompts.";
 "Some items changed on disk since they were proposed: untick them, or ask again." = "Some items changed on disk since they were proposed: untick them, or ask again.";
+"Some of it can't be kept: at most 160 characters each, no links, file paths or keys." = "Some of it can't be kept: at most 160 characters each, no links, file paths or keys.";
 "Some settings couldn't be changed:" = "Some settings couldn't be changed:";
 "Something went wrong?" = "Something went wrong?";
 "Sort by" = "Sort by";
@@ -1317,6 +1333,7 @@
 "What was copied before stays; importing again goes on from there. %@" = "What was copied before stays; importing again goes on from there. %@";
 "What you corrected before, so it isn't repeated." = "What you corrected before, so it isn't repeated.";
 "What you did, kept apart from what it may mean. Sent as a guess." = "What you did, kept apart from what it may mean. Sent as a guess.";
+"What you do" = "What you do";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read." = "What you wrote in a chat is read for notes once it has been quiet this long, when you leave it, or when LLMTray quits -- in the background, only while the model has nothing else to do. Only your own words count, never the answers, files or web pages. Temporary chats and chats marked \"Don't Remember\" are never read.";
 "What's New" = "What's New";
@@ -1331,6 +1348,7 @@
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Choose any folder, one shared with another app too.";
 "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio." = "Where LLMTray looks for MLX models (one folder per model, e.g. <org>/<name>). Point it at ~/.lmstudio/models to share models with LM Studio.";
+"Where you are: a city, or an address" = "Where you are: a city, or an address";
 "Which model generates new images." = "Which model generates new images.";
 "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start." = "While the model speaks, microphone sound quieter than this reaches it as silence: the trace of its own voice that echo cancellation leaves stays out, a voice over it still interrupts. Raise it if the model hears itself, lower it if it misses you interrupting. Takes effect at the next start.";
 "Wikipedia" = "Wikipedia";

@@ -242,10 +242,17 @@ final class MemoryReflector: ObservableObject {
 
         // The notes this batch may touch: by meaning, then their topics.
         let project = settings.projectMemory ? batch.project : nil
-        // Pinned notes are the user's alone: never shown to be changed.
+        // Where what this chat teaches goes: the model's choice when
+        // learning is shared, else this chat's own place (nil: project
+        // notes off, nothing learned in a project's chats).
+        let fixedSubject = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
+        guard settings.learns(inProject: batch.project), settings.shareLearned || fixedSubject != nil else {
+            return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
+        }
+        // The notes it may change: kept apart, only its own place's; shared,
+        // every one this chat sees. Never pinned ones (the user's alone).
         let touchable = memory.file.notes.filter { note in
-            note.isActive && !note.pinned && settings.kinds.contains(note.kind)
-                && (note.subject == .user || project.map { note.subject == .project($0) } == true)
+            !note.pinned && (fixedSubject.map { note.subject == $0 } ?? true) && settings.allows(note, project: batch.project)
         }
         func score(_ note: MemoryNote) -> Float {
             guard let v = vectors.vector(for: note) else { return 0 }
@@ -265,7 +272,7 @@ final class MemoryReflector: ObservableObject {
         let reflectReply: String
         switch await ask(MemoryReflection.reflectMessages(batch: batch, candidates: candidates, topics: topicList,
                                                           language: Self.languageName(), kinds: settings.kinds,
-                                                          inProject: project != nil),
+                                                          inProject: settings.shareLearned && project != nil),
                          maxTokens: 1500, modelPath: modelPath) {
         case .success(let reply): reflectReply = reply
         case .failure(let error): return error.outcome
@@ -289,7 +296,7 @@ final class MemoryReflector: ObservableObject {
             switch op.action {
             case .add:
                 guard let kind = op.kind, settings.kinds.contains(kind), let text = op.text, MemoryText.problem(text) == nil else { continue }
-                subject = op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user
+                subject = fixedSubject ?? (op.scope == "project" ? project.map(MemorySubject.project) ?? .user : .user)
                 statement = kind == .observation ? (op.observed ?? text) : text
             case .confirm:
                 guard let note else { continue }
@@ -305,7 +312,7 @@ final class MemoryReflector: ObservableObject {
                 statement = "The user asks to forget this, or says it is no longer true: \(note.text)"
             }
             pending.append(Pending(op: op, message: message, subject: subject,
-                                   claim: MemoryReflection.Claim(statement: statement, aboutProject: subject != .user,
+                                   claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
                                                                  message: message.text, quote: op.quote, before: message.before)))
         }
         guard !pending.isEmpty else {
@@ -338,10 +345,20 @@ final class MemoryReflector: ObservableObject {
         var owners: [(item: Int, target: Target)] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
             guard let text = p.op.text, let v = newVectors[text] else { continue }
-            // Only notes the batch may change: a pinned one or a kind that's
-            // off would turn a good update into a merge that can't be made.
+            // An update: only notes the batch may change (a pinned one, or a
+            // kind that's off, would turn it into a merge that can't be
+            // made). An add: pinned ones too -- "My name is …" next to About
+            // you's Name is the same, and confirming a pinned note writes
+            // nothing.
+            // An add is also compared with every note this chat sees (About
+            // you's included): the same as one it may not change confirms it,
+            // and the write drops that -- nothing new, no duplicate.
             let close = memory.file.notes
-                .filter { $0.subject == p.subject && $0.id != p.op.id && !$0.pinned && settings.kinds.contains($0.kind) }
+                .filter { note in
+                    guard note.id != p.op.id, settings.kinds.contains(note.kind) || memory.file.isAbout(note) else { return false }
+                    if p.op.action == .add { return note.subject == p.subject || settings.allows(note, project: batch.project) }
+                    return note.subject == p.subject && !note.pinned
+                }
                 .compactMap { note in vectors.vector(for: note).map { (note, MemoryReflection.cosine($0, v)) } }
                 .filter { $0.1 >= Self.reconcileFloor }
                 .sorted { $0.1 > $1.1 }
@@ -387,10 +404,13 @@ final class MemoryReflector: ObservableObject {
                 } else if case .earlierAdd? = related(.same) {
                     // Said twice in this batch: the first stands.
                     continue
-                } else if case .note(let note)? = related(.opposite) {
+                } else if case .note(let note)? = related(.opposite), !note.pinned, note.subject == p.subject {
                     changes.append(.supersede(id: note.id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
                 } else {
-                    changes.append(.add(subject: p.subject, topic: MemoryTopics.normalized(p.op.topic ?? "general"), kind: kind, text: text,
+                    // New -- also when it contradicts a note of another place
+                    // (the user's, another project's, shared or not): its own
+                    // place gets its own note, the other stays.
+                    changes.append(.add(subject: p.subject, topic: MemoryTopics.learned(p.op.topic), kind: kind, text: text,
                                         observed: kind == .observation ? p.op.observed : nil,
                                         confidence: kind == .observation ? .inferred : .stated, evidence: evidence,
                                         vector: vector, wrongLanguage: wrongLanguage))

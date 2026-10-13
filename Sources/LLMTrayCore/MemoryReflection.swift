@@ -78,7 +78,11 @@ public enum MemoryReflection {
 
     /// One note as the model sees it among the candidates.
     static func candidateLine(_ note: MemoryNote) -> String {
-        let scope = note.subject == .user ? "user" : "project"
+        let scope: String
+        switch note.subject {
+        case .user, .general: scope = "user"
+        case .project: scope = "project"
+        }
         let observed = note.observed.map { " (observed: \($0))" } ?? ""
         return "\(note.id) [\(note.kind.rawValue), \(note.topic), \(scope)] \(note.text)\(observed)"
     }
@@ -322,7 +326,13 @@ extension MemoryFile {
         guard let batch = queue.first(where: { $0.id == id }) else { return [] }
         queue.removeAll { $0.id == id }
         var touched: [String] = []
-        if settings.enabled, !optedOut.contains(batch.chat) {
+        // Where this batch may write, by the settings now: learning kept
+        // apart writes only the chat's own place (sharing turned off
+        // during the pass included); a project's chats with project notes
+        // off write nothing.
+        let writable: MemorySubject? = settings.shareLearned ? nil : settings.learnedSubject(project: batch.project)
+        let mayWrite = settings.learns(inProject: batch.project) && (settings.shareLearned || writable != nil)
+        if settings.enabled, mayWrite, !optedOut.contains(batch.chat) {
             // Whether the user changed a note since the pass began, as the
             // store was before this write: a note changed by an earlier
             // change of this batch is still the batch's to change.
@@ -331,12 +341,14 @@ extension MemoryFile {
             var merged: [String: String] = [:]
             for change in changes {
                 let change = change.redirected(merged)
-                if let note = apply(change, before: before, since: since, settings: settings, liveProjects: liveProjects, now: now) {
+                if let note = apply(change, before: before, since: since, settings: settings, liveProjects: liveProjects,
+                                    writable: writable, now: now) {
                     touched.append(note)
                     if case let .merge(keep, drop, _, _, _, _, _) = change, note == keep { merged[drop] = keep }
                 } else if case let .merge(_, _, source, text, evidence, vector, wrongLanguage) = change,
                           let note = apply(.update(id: source, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage),
-                                           before: before, since: since, settings: settings, liveProjects: liveProjects, now: now) {
+                                           before: before, since: since, settings: settings, liveProjects: liveProjects,
+                                           writable: writable, now: now) {
                     touched.append(note)
                 }
             }
@@ -373,8 +385,9 @@ extension MemoryFile {
     }
 
     private mutating func apply(_ change: MemoryChange, before: [String: Int], since: Int, settings: MemorySettings,
-                                liveProjects: Set<UUID>, now: Date) -> String? {
+                                liveProjects: Set<UUID>, writable: MemorySubject?, now: Date) -> String? {
         func live(_ subject: MemorySubject) -> Bool {
+            if let writable, subject != writable { return false }
             if case .project(let p) = subject { return settings.projectMemory && liveProjects.contains(p) }
             return true
         }

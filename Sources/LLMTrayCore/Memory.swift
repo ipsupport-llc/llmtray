@@ -19,16 +19,20 @@ public enum MemoryConfidence: String, Codable, Sendable {
     var weight: Double { self == .stated ? 1.0 : 0.6 }
 }
 
-/// Whom a note is about: the user, or one project (by id, never by its
-/// name, which can change).
+/// Where a note is seen: every chat (`user`: the user wrote it, or
+/// learning is shared), chats outside projects (`general`), or one
+/// project's chats (by id, never by its name, which can change).
 public enum MemorySubject: Hashable, Sendable, Codable {
     case user
+    case general
     case project(UUID)
 
     public init(from decoder: Decoder) throws {
         let raw = try decoder.singleValueContainer().decode(String.self)
         if raw == "user" {
             self = .user
+        } else if raw == "general" {
+            self = .general
         } else if raw.hasPrefix("project:"), let id = UUID(uuidString: String(raw.dropFirst(8))) {
             self = .project(id)
         } else {
@@ -40,6 +44,7 @@ public enum MemorySubject: Hashable, Sendable, Codable {
         var c = encoder.singleValueContainer()
         switch self {
         case .user: try c.encode("user")
+        case .general: try c.encode("general")
         case .project(let id): try c.encode("project:" + id.uuidString)
         }
     }
@@ -115,12 +120,17 @@ public struct MemorySettings: Equatable, Sendable {
     public var deleteExpiredAfterDays: Int
     /// Notes about a chat's project are sent in its chats.
     public var projectMemory: Bool
+    /// What's learned is seen everywhere, and learning keeps facts about
+    /// the user apart from a project's. Off: a project's chats learn and
+    /// see only their own; chats outside projects, theirs; what the user
+    /// wrote for all chats is seen everywhere either way.
+    public var shareLearned: Bool
 
     public static let defaultHalfLives: [MemoryKind: Double] = [.observation: 30, .fact: 90, .preference: 180, .correction: 180]
 
     public init(enabled: Bool = false, kinds: Set<MemoryKind> = Set(MemoryKind.allCases), budgetTokens: Int = 300,
                 maxActive: Int = 300, halfLifeDays: [MemoryKind: Double] = MemorySettings.defaultHalfLives,
-                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true) {
+                deleteExpiredAfterDays: Int = 30, projectMemory: Bool = true, shareLearned: Bool = false) {
         self.enabled = enabled
         self.kinds = kinds
         self.budgetTokens = budgetTokens
@@ -128,6 +138,7 @@ public struct MemorySettings: Equatable, Sendable {
         self.halfLifeDays = halfLifeDays
         self.deleteExpiredAfterDays = deleteExpiredAfterDays
         self.projectMemory = projectMemory
+        self.shareLearned = shareLearned
     }
 
     public func halfLife(_ kind: MemoryKind) -> Double {
@@ -138,9 +149,34 @@ public struct MemorySettings: Equatable, Sendable {
     public func allows(_ note: MemoryNote, project: UUID?) -> Bool {
         guard enabled, note.isActive, kinds.contains(note.kind) else { return false }
         switch note.subject {
-        case .user: return true
-        case .project(let id): return projectMemory && id == project
+        // What the user wrote or approved is seen everywhere; a note learned
+        // while learning was shared, only where learning is kept apart now
+        // allows it: outside projects.
+        case .user: return shareLearned || note.reviewed || project == nil
+        case .general: return shareLearned || project == nil
+        case .project(let id): return projectMemory && (shareLearned || id == project)
         }
+    }
+
+    /// Where what a chat in `project` teaches is seen, when the model
+    /// doesn't choose (learning not shared); nil: nothing is learned there
+    /// (project notes off).
+    public func learnedSubject(project: UUID?) -> MemorySubject? {
+        guard let project else { return .general }
+        return projectMemory ? .project(project) : nil
+    }
+
+    /// Whether a chat in `project` may learn at all: not in a project's
+    /// chats with project notes off, shared or not.
+    public func learns(inProject project: UUID?) -> Bool {
+        project == nil || projectMemory
+    }
+
+    /// The settings a chat's block depends on, beyond its notes: a change
+    /// (sharing turned on, a kind back on, a bigger budget) makes a new one.
+    public var fingerprint: String {
+        let k = MemoryKind.allCases.filter(kinds.contains).map(\.rawValue).joined(separator: ",")
+        return "share:\(shareLearned)|projects:\(projectMemory)|kinds:\(k)|budget:\(budgetTokens)"
     }
 }
 
@@ -162,12 +198,75 @@ extension MemorySettings {
             budgetTokens: max(0, defaults[Pref.memoryBudgetTokens]), maxActive: max(1, defaults[Pref.memoryMaxActive]),
             halfLifeDays: Dictionary(uniqueKeysWithValues: MemoryKind.allCases.map { ($0, Double(max(1, defaults[Self.halfLifeKey($0)]))) }),
             deleteExpiredAfterDays: max(0, defaults[Pref.memoryDeleteExpiredAfterDays]),
-            projectMemory: defaults[Pref.memoryProjects])
+            projectMemory: defaults[Pref.memoryProjects], shareLearned: defaults[Pref.memoryShareLearned])
     }
 
     /// Stores which kinds are on.
     public static func storeKinds(_ kinds: Set<MemoryKind>, defaults: UserDefaults) {
         defaults[Pref.memoryKinds] = MemoryKind.allCases.filter(kinds.contains).map(\.rawValue).joined(separator: ",")
+    }
+}
+
+/// What the user tells about themselves in Settings › Memory › About you:
+/// each a pinned note (sent first, never expires, never changed by
+/// reflection), filed under its own topic.
+public enum MemoryAboutField: String, CaseIterable, Sendable {
+    case name, location, work, other
+
+    public var topic: String { "about-" + rawValue }
+
+    /// How the note reads: a label, then the user's words.
+    public var label: String {
+        switch self {
+        case .name: return "Name"
+        case .location: return "Location"
+        case .work: return "Work"
+        case .other: return "About them"
+        }
+    }
+
+    public func text(_ value: String) -> String { "\(label): \(value)" }
+
+    /// The user's words back out of a note.
+    public func value(of note: MemoryNote) -> String {
+        let prefix = label + ": "
+        return note.text.hasPrefix(prefix) ? String(note.text.dropFirst(prefix.count)) : note.text
+    }
+}
+
+extension MemoryFile {
+    public func about(_ field: MemoryAboutField) -> MemoryNote? {
+        notes.first { $0.subject == .user && $0.topic == field.topic && $0.pinned }
+    }
+
+    /// Whether `note` is one of About you's.
+    public func isAbout(_ note: MemoryNote) -> Bool {
+        MemoryAboutField.allCases.contains { about($0)?.id == note.id }
+    }
+
+    /// Sets (or, empty, removes) an About you field. False when the text
+    /// can't be a note.
+    @discardableResult
+    public mutating func setAbout(_ field: MemoryAboutField, _ value: String, now: Date) -> Bool {
+        var value = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Typed with its label ("Name: Roman"): not "Name: Name: Roman".
+        if value.lowercased().hasPrefix(field.label.lowercased() + ":") {
+            value = String(value.dropFirst(field.label.count + 1)).trimmingCharacters(in: .whitespaces)
+        }
+        let existing = about(field)
+        guard !value.isEmpty else {
+            if let existing { forget(existing.id, now: now) }
+            return true
+        }
+        let text = field.text(value)
+        guard MemoryText.problem(text) == nil else { return false }
+        if let existing {
+            guard existing.text != text else { return true }
+            return edit(existing.id, text: text, now: now)
+        }
+        guard let id = add(subject: .user, topic: field.topic, kind: .fact, text: text, now: now) else { return false }
+        setPinned(id, true, now: now)
+        return true
     }
 }
 
@@ -184,6 +283,12 @@ public enum MemoryTopics {
         let words = topic.lowercased().split { !$0.isLetter && !$0.isNumber }
         let key = String(words.joined(separator: "-").prefix(40))
         return key.isEmpty ? "general" : key
+    }
+
+    /// A topic for a learned note: About you's are the user's alone.
+    public static func learned(_ topic: String?) -> String {
+        let key = normalized(topic ?? "general")
+        return key.hasPrefix("about-") ? "general" : key
     }
 }
 
@@ -237,6 +342,10 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// Per chat, the seq memory met it at: messages up to it were never
     /// read, nor is the answer to one taken as context.
     public var metFrom: [String: Int] = [:]
+    /// Watermarks put aside while memory was off or the chat opted out:
+    /// remembered again, the user picks whether what was said meanwhile is
+    /// read (they come back) or not (they go, and the chat is met anew).
+    public var pausedWatermarks: [String: Int] = [:]
     /// Chats marked "Don't remember this chat".
     public var optedOut: Set<UUID> = []
     /// Forgotten notes, so they aren't learned again from the same words.
@@ -246,7 +355,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     public init() {}
 
     enum CodingKeys: String, CodingKey {
-        case version, generation, nextID, notes, queue, watermarks, metFrom, optedOut, tombstones, nextBatchID
+        case version, generation, nextID, notes, queue, watermarks, metFrom, pausedWatermarks, optedOut, tombstones, nextBatchID
     }
 
     // The queue and the rest came after the first notes files.
@@ -259,6 +368,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         queue = try c.decodeIfPresent([MemoryBatch].self, forKey: .queue) ?? []
         watermarks = try c.decodeIfPresent([String: Int].self, forKey: .watermarks) ?? [:]
         metFrom = try c.decodeIfPresent([String: Int].self, forKey: .metFrom) ?? [:]
+        pausedWatermarks = try c.decodeIfPresent([String: Int].self, forKey: .pausedWatermarks) ?? [:]
         // A watermark from before metFrom: met there, as far as is known.
         for (chat, mark) in watermarks where metFrom[chat] == nil { metFrom[chat] = mark }
         optedOut = try c.decodeIfPresent(Set<UUID>.self, forKey: .optedOut) ?? []
@@ -295,7 +405,9 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// The user's edit: the old text goes to the history (3 kept). False
     /// when there's no such note or the text can't be a note.
     @discardableResult
-    public mutating func edit(_ id: String, text: String, topic: String? = nil, kind: MemoryKind? = nil, now: Date) -> Bool {
+    /// `subject`: where it's seen -- every chat (the user), or one project's.
+    public mutating func edit(_ id: String, text: String, topic: String? = nil, kind: MemoryKind? = nil,
+                              subject: MemorySubject? = nil, now: Date) -> Bool {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard MemoryText.problem(text) == nil, let i = notes.firstIndex(where: { $0.id == id }) else { return false }
         let g = bump()
@@ -306,6 +418,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         }
         if let topic { notes[i].topic = MemoryTopics.normalized(topic) }
         if let kind { notes[i].kind = kind }
+        if let subject { notes[i].subject = subject }
         // What the user wrote is what they say.
         notes[i].reviewed = true
         notes[i].confidence = .stated
@@ -359,11 +472,39 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         if notes.count != before { _ = bump() }
     }
 
-    /// Memory turned off: every chat is met anew when it's on again, so
-    /// nothing said while it was off is read. What's queued stays.
-    public mutating func forgetWatermarks() {
+    /// Memory turned off: every watermark is put aside; nothing is read or
+    /// met until it's on again and the user has chosen (`resume`). What's
+    /// queued stays.
+    public mutating func pauseAll() {
+        for (chat, mark) in watermarks { pausedWatermarks[chat] = min(pausedWatermarks[chat] ?? mark, mark) }
         watermarks = [:]
-        metFrom = [:]
+    }
+
+    /// Whether anything was put aside by memory being off (a choice to ask
+    /// for); a chat that's opted out waits for its own "Remember".
+    public var hasPaused: Bool {
+        pausedWatermarks.keys.contains { key in UUID(uuidString: key).map { !optedOut.contains($0) } ?? false }
+    }
+    public func isPaused(_ chat: UUID) -> Bool { pausedWatermarks[chat.uuidString] != nil }
+
+    /// On again: what was said meanwhile is read too (`readMeanwhile`), or
+    /// not -- then those chats are met anew from their next message.
+    /// Only chats not opted out.
+    public mutating func resumeAll(readMeanwhile: Bool) {
+        for (chat, mark) in pausedWatermarks {
+            guard let id = UUID(uuidString: chat), !optedOut.contains(id) else { continue }
+            resume(chat, mark: mark, readMeanwhile: readMeanwhile)
+        }
+    }
+
+    private mutating func resume(_ chat: String, mark: Int, readMeanwhile: Bool) {
+        pausedWatermarks.removeValue(forKey: chat)
+        if readMeanwhile {
+            watermarks[chat] = min(watermarks[chat] ?? mark, mark)
+        } else {
+            watermarks.removeValue(forKey: chat)
+            metFrom.removeValue(forKey: chat)
+        }
     }
 
     /// The embedder changed: tombstones' vectors are of the old one (their
@@ -395,7 +536,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// new chat, from its start; an older chat opened again: from now).
     /// Not an opted-out one.
     public mutating func meet(_ chat: UUID, from seq: Int) {
-        guard watermarks[chat.uuidString] == nil, !optedOut.contains(chat) else { return }
+        guard watermarks[chat.uuidString] == nil, !optedOut.contains(chat), pausedWatermarks[chat.uuidString] == nil else { return }
         watermarks[chat.uuidString] = seq
         metFrom[chat.uuidString] = seq
     }
@@ -434,14 +575,23 @@ public struct MemoryFile: Codable, Equatable, Sendable {
     /// what's queued from it goes. Its watermark goes too: remembered
     /// again, memory meets it anew at its next message, so nothing said
     /// meanwhile is ever read.
-    public mutating func setOptedOut(_ chat: UUID, _ out: Bool) {
+    /// `readMeanwhile` (remembered again): what was said while it was out
+    /// is read too, or only what comes from now on.
+    public mutating func setOptedOut(_ chat: UUID, _ out: Bool, readMeanwhile: Bool = false) {
+        let key = chat.uuidString
         if out {
             optedOut.insert(chat)
+            // Put aside from before what was queued, which goes: read again
+            // only if the user asks for it when remembering the chat.
+            let queuedFrom = queue.filter { $0.chat == chat }.flatMap { $0.messages.map(\.seq) }.min().map { $0 - 1 }
+            if let mark = [watermarks[key], queuedFrom, pausedWatermarks[key]].compactMap({ $0 }).min() {
+                pausedWatermarks[key] = mark
+            }
             queue.removeAll { $0.chat == chat }
-            watermarks.removeValue(forKey: chat.uuidString)
-            metFrom.removeValue(forKey: chat.uuidString)
+            watermarks.removeValue(forKey: key)
         } else {
             optedOut.remove(chat)
+            if let mark = pausedWatermarks[key] { resume(key, mark: mark, readMeanwhile: readMeanwhile) }
         }
     }
 
@@ -458,6 +608,7 @@ public struct MemoryFile: Codable, Equatable, Sendable {
         if !keepState {
             if watermarks.removeValue(forKey: chat.uuidString) != nil { changed = true }
             metFrom.removeValue(forKey: chat.uuidString)
+            pausedWatermarks.removeValue(forKey: chat.uuidString)
             if optedOut.remove(chat) != nil { changed = true }
         }
         var removed: [String] = []
@@ -616,13 +767,16 @@ public struct MemorySnapshot: Codable, Equatable, Sendable {
     public var project: UUID?
     /// Its size as estimated then.
     public var tokens: Int
+    /// The settings it was chosen under (MemorySettings.fingerprint).
+    public var settings: String?
 
-    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int) {
+    public init(text: String, noteIDs: [String], generation: Int, project: UUID?, tokens: Int, settings: String? = nil) {
         self.text = text
         self.noteIDs = noteIDs
         self.generation = generation
         self.project = project
         self.tokens = tokens
+        self.settings = settings
     }
 }
 
@@ -641,8 +795,8 @@ public enum MemorySelection {
     }
 
     static func render(_ notes: [MemoryNote]) -> String {
-        let user = notes.filter { $0.subject == .user }.map(line)
-        let project = notes.filter { $0.subject != .user }.map(line)
+        let user = notes.filter { if case .project = $0.subject { return false } else { return true } }.map(line)
+        let project = notes.filter { if case .project = $0.subject { return true } else { return false } }.map(line)
         var parts = [header]
         parts += user
         if !project.isEmpty { parts += [projectHeader] + project }
@@ -669,11 +823,14 @@ public enum MemorySelection {
     public static func choose(_ file: MemoryFile, settings: MemorySettings, project: UUID?, budget: Int,
                               now: Date, tokens: (String) -> Int) -> MemorySnapshot? {
         guard settings.enabled else { return nil }
-        let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0)
+        let empty = MemorySnapshot(text: "", noteIDs: [], generation: file.generation, project: project, tokens: 0,
+                                   settings: settings.fingerprint)
         let eligible = file.notes.filter { settings.allows($0, project: project) }
         guard !eligible.isEmpty, budget > 0 else { return empty }
         func isFirst(_ n: MemoryNote) -> Bool {
-            n.pinned || n.subject == .user && n.confidence == .stated && (n.kind == .preference || n.kind == .correction)
+            guard !n.pinned else { return true }
+            if case .project = n.subject { return false }
+            return n.confidence == .stated && (n.kind == .preference || n.kind == .correction)
         }
         func byStrength(_ a: MemoryNote, _ b: MemoryNote) -> Bool {
             let sa = MemoryFile.strength(a, now: now, settings: settings)
@@ -697,7 +854,7 @@ public enum MemorySelection {
         guard !chosen.isEmpty else { return empty }
         let text = render(chosen)
         return MemorySnapshot(text: text, noteIDs: chosen.map(\.id), generation: file.generation,
-                              project: project, tokens: tokens(text))
+                              project: project, tokens: tokens(text), settings: settings.fingerprint)
     }
 
     /// Whether a chat's snapshot still holds: memory on, same project,
@@ -707,7 +864,7 @@ public enum MemorySelection {
     /// next chat.
     public static func isCurrent(_ snapshot: MemorySnapshot, file: MemoryFile, settings: MemorySettings,
                                  project: UUID?, budget: Int, tokens: (String) -> Int) -> Bool {
-        guard settings.enabled, snapshot.project == project else { return false }
+        guard settings.enabled, snapshot.project == project, snapshot.settings == settings.fingerprint else { return false }
         guard snapshot.text.isEmpty || tokens(snapshot.text) <= budget else { return false }
         for id in snapshot.noteIDs {
             guard let note = file.note(id), settings.allows(note, project: project),

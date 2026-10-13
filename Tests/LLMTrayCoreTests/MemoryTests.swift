@@ -272,3 +272,103 @@ final class MemoryTests: XCTestCase {
         XCTAssertEqual(chatSystemPrompt(profile: "Profile.", memory: "  ", project: nil, toolUsePolicy: nil), "Profile.")
     }
 }
+
+extension MemoryTests {
+    func testVisibilityByWhereAChatIs() {
+        let x = UUID(), z = UUID()
+        var file = MemoryFile()
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Everywhere", now: t0)
+        file.add(subject: .general, topic: "work", kind: .fact, text: "Outside projects", now: t0)
+        file.add(subject: .project(x), topic: "work", kind: .fact, text: "In X", now: t0)
+        func seen(_ project: UUID?, _ settings: MemorySettings) -> Set<String> {
+            Set(file.notes.filter { settings.allows($0, project: project) }.map(\.text))
+        }
+        XCTAssertEqual(seen(x, on), ["Everywhere", "In X"])
+        XCTAssertEqual(seen(z, on), ["Everywhere"], "another project sees only what's for all chats")
+        XCTAssertEqual(seen(nil, on), ["Everywhere", "Outside projects"])
+        var shared = on
+        shared.shareLearned = true
+        XCTAssertEqual(seen(z, shared), ["Everywhere", "Outside projects", "In X"])
+        XCTAssertEqual(on.learnedSubject(project: x), .project(x))
+        XCTAssertEqual(on.learnedSubject(project: nil), .general)
+        var noProjects = on
+        noProjects.projectMemory = false
+        XCTAssertNil(noProjects.learnedSubject(project: x))
+        let data = try! JSONEncoder().encode(MemorySubject.general)
+        XCTAssertEqual(String(decoding: data, as: UTF8.self), "\"general\"")
+        XCTAssertEqual(try! JSONDecoder().decode(MemorySubject.self, from: data), .general)
+    }
+
+    func testAboutYouIsPinnedAndEditedInPlace() {
+        var file = MemoryFile()
+        XCTAssertTrue(file.setAbout(.name, "Roman", now: t0))
+        XCTAssertTrue(file.setAbout(.location, "Kyiv, Khreshchatyk 1", now: t0))
+        let name = file.about(.name)!
+        XCTAssertTrue(name.pinned)
+        XCTAssertEqual(name.text, "Name: Roman")
+        XCTAssertEqual(MemoryAboutField.name.value(of: name), "Roman")
+        XCTAssertTrue(file.setAbout(.name, "Рома", now: t0))
+        XCTAssertEqual(file.about(.name)?.id, name.id)
+        XCTAssertEqual(file.about(.name)?.text, "Name: Рома")
+        XCTAssertFalse(file.setAbout(.other, "see https://x.com", now: t0))
+        XCTAssertTrue(file.setAbout(.location, "  ", now: t0))
+        XCTAssertNil(file.about(.location))
+        XCTAssertTrue(file.tombstones.isEmpty, "nothing the user wrote is tombstoned")
+        let snap = MemorySelection.choose(file, settings: on, project: UUID(), budget: 1000, now: t0, tokens: tokens)!
+        XCTAssertTrue(snap.text.contains("- Name: Рома"))
+    }
+
+    func testANotesVisibilityCanBeChanged() {
+        var file = MemoryFile()
+        let id = file.add(subject: .user, topic: "work", kind: .fact, text: "Uses OTA", now: t0)!
+        let p = UUID()
+        file.edit(id, text: "Uses OTA", subject: .project(p), now: t0)
+        XCTAssertEqual(file.note(id)?.subject, .project(p))
+    }
+}
+
+extension MemoryTests {
+    func testLearnedNotesForAllChatsStayOutsideProjectsWhenSharingIsOff() {
+        var file = MemoryFile()
+        let learned = file.add(subject: .user, topic: "work", kind: .fact, text: "Learned while shared", now: t0,
+                               reviewed: false, confidence: .stated)!
+        XCTAssertFalse(on.allows(file.note(learned)!, project: UUID()))
+        XCTAssertTrue(on.allows(file.note(learned)!, project: nil))
+        file.approve(learned)
+        XCTAssertTrue(on.allows(file.note(learned)!, project: UUID()), "approved: the user's, seen everywhere")
+    }
+
+    func testASettingThatWidensWhatAChatSeesMakesANewBlock() {
+        var file = MemoryFile()
+        file.add(subject: .user, topic: "tone", kind: .preference, text: "Be brief", now: t0)
+        let snap = MemorySelection.choose(file, settings: on, project: nil, budget: 300, now: t0, tokens: tokens)!
+        var shared = on
+        shared.shareLearned = true
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: shared, project: nil, budget: 300, tokens: tokens))
+        var bigger = on
+        bigger.budgetTokens = 600
+        XCTAssertFalse(MemorySelection.isCurrent(snap, file: file, settings: bigger, project: nil, budget: 300, tokens: tokens))
+        XCTAssertTrue(MemorySelection.isCurrent(snap, file: file, settings: on, project: nil, budget: 300, tokens: tokens))
+    }
+
+    func testAboutYouStripsItsLabelAndLearnedTopicsCantTakeIt() {
+        var file = MemoryFile()
+        file.setAbout(.name, "Name: Roman", now: t0)
+        XCTAssertEqual(file.about(.name)?.text, "Name: Roman")
+        XCTAssertTrue(file.isAbout(file.about(.name)!))
+        XCTAssertEqual(MemoryTopics.learned("about-name"), "general")
+        XCTAssertEqual(MemoryTopics.learned("Answer Length"), "answer-length")
+    }
+
+    func testAChatOptedOutDoesntKeepTheMemoryOffQuestionOpen() {
+        var file = MemoryFile()
+        let c = UUID()
+        file.meet(c, from: 0)
+        file.setOptedOut(c, true)
+        XCTAssertFalse(file.hasPaused, "it waits for its own Remember")
+        file.pauseAll()
+        file.resumeAll(readMeanwhile: false)
+        XCTAssertFalse(file.hasPaused)
+        XCTAssertTrue(file.isPaused(c))
+    }
+}
