@@ -116,6 +116,7 @@
 "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it." = "Added to the system prompt whenever tools are offered. The model's own tool template only says how to call a tool, never when not to. Empty disables it.";
 "Adding files" = "Adding files";
 "Advanced" = "Advanced";
+"After %lld idle minutes" = "After %lld idle minutes";
 "After %lld min" = "After %lld min";
 "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works." = "After a new chat's first answer, the model gives it a short title for the chats list (one short extra request). Off: the start of the first message. Renaming a chat always works.";
 "Air quality" = "Air quality";
@@ -609,6 +610,7 @@
 "Listening…" = "Listening…";
 "Live output of the model process: loading, errors, requests." = "Live output of the model process: loading, errors, requests.";
 "Load %@" = "Load %@";
+"Load it itself" = "Load it itself";
 "Loaded: %1$@ · selected: %2$@" = "Loaded: %1$@ · selected: %2$@";
 "Loading %@…" = "Loading %@…";
 "Loading the voice model…" = "Loading the voice model…";
@@ -870,6 +872,7 @@
 "Reading a chat…" = "Reading a chat…";
 "Reading a prompt: up to %lld%" = "Reading a prompt: up to %lld%";
 "Reading what's installed…" = "Reading what's installed…";
+"Reads chats with" = "Reads chats with";
 "Ready." = "Ready.";
 "Ready. This is the Full build: the runtime is included." = "Ready. This is the Full build: the runtime is included.";
 "Reasoning" = "Reasoning";
@@ -1103,6 +1106,8 @@
 "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model is downloading into this folder. Change it in Settings after setup, or pick another chat model first.";
 "The chat model is still loading -- try Voice Lab again once it's up." = "The chat model is still loading -- try Voice Lab again once it's up.";
 "The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first." = "The chat model you picked was downloaded into this folder. Change it in Settings after setup, or pick another chat model first.";
+"The chat's own model" = "The chat's own model";
+"The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below." = "The chat's own model: each chat is read by the model that answered in it -- a chat in Russian with Gemma isn't read by an English-only coder you loaded later. One model: every chat is read by it, so all notes are written alike. Either way a chat waits until its model is loaded and free; nothing is loaded for it unless you allow that below.";
 "The chats and models in that folder were here already." = "The chats and models in that folder were here already.";
 "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them." = "The copies of the files added to projects, and their indexes, together. A project's own are shown in its Files window; deleting a project deletes them.";
 "The day the counts are for." = "The day the counts are for.";
@@ -1212,6 +1217,7 @@
 "This model can't see images: pick one that can (a vision model) to attach them." = "This model can't see images: pick one that can (a vision model) to attach them.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model.";
+"This model's card doesn't list %@: it may read chats in it poorly and write worse notes." = "This model's card doesn't list %@: it may read chats in it poorly and write worse notes.";
 "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings." = "This profile's file can't be read, so it can't be edited here. Fix or delete the file, then reopen Settings.";
 "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added." = "This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheet (xlsx, ods) files and keeps pictures for documents; folders and hidden files can't be added.";
 "This version of LLMTray can't send reviews. Please update the app." = "This version of LLMTray can't send reviews. Please update the app.";
@@ -1311,6 +1317,8 @@
 "Waiting for another chat's image or music to finish…" = "Waiting for another chat's image or music to finish…";
 "Waiting for the chat or a generator to finish" = "Waiting for the chat or a generator to finish";
 "Waiting to be sent: %@" = "Waiting to be sent: %@";
+"Waits for %@ to be loaded." = "Waits for %@ to be loaded.";
+"Waits for a model to be loaded." = "Waits for a model to be loaded.";
 "Waits for a picture or song to finish." = "Waits for a picture or song to finish.";
 "Waits for the model to be free." = "Waits for the model to be free.";
 "Waits for the model to be loaded." = "Waits for the model to be loaded.";
@@ -1343,6 +1351,7 @@
 "When a client asks for another model" = "When a client asks for another model";
 "When an app asks for another model" = "When an app asks for another model";
 "When an app asks for another model: %@" = "When an app asks for another model: %@";
+"When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment." = "When chats wait for a model that isn't loaded, memory may load it once LLMTray has been idle this long (no chat, app or picture at work). The next request for your usual model loads that one back, which takes a moment.";
 "When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat." = "When make_document is declared, once Documents are on (Settings > Files). When needed: the model loads it with load_tools, or you from the + menu, once per chat -- fewer tokens in every request. Always: in every saved chat.";
 "When needed" = "When needed";
 "Where LLMTray keeps its models, one folder per model." = "Where LLMTray keeps its models, one folder per model.";

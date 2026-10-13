@@ -94,7 +94,7 @@ final class MemoryReflector: ObservableObject {
 
     private func runQueue() async {
         let memory = MemoryManager.shared
-        while let batch = memory.file.queue.first {
+        while let head = memory.file.queue.first {
             guard memory.isEnabled, !memory.unreadable, !memory.settings.kinds.isEmpty else {
                 status = .idle
                 return
@@ -103,7 +103,23 @@ final class MemoryReflector: ObservableObject {
                 status = .waiting(NSLocalizedString("Learning needs the embedding model (Settings › Memory).", comment: "memory status"))
                 return
             }
-            guard let server, case .running = server.state, server.activeRequestCount == 0, let model = server.loadedModelPath else {
+            // The first batch the loaded model may read: its chat's model
+            // (or the one set for memory). None: wait for one, or load it
+            // when LLMTray has been idle long enough, if allowed.
+            let loaded: String? = { if let server, case .running = server.state { return server.loadedModelPath } else { return nil } }()
+            guard let model = loaded,
+                  let batch = memory.file.queue.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
+                let wanted = Self.reader(for: head)
+                status = .waiting(wanted.map {
+                    String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName($0))
+                } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status"))
+                // The first waiting batch whose model is installed: a
+                // deleted model's batch doesn't hold the others.
+                if let next = memory.file.queue.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
+                poke(after: 300)
+                return
+            }
+            guard let server, server.activeRequestCount == 0 else {
                 status = .waiting(NSLocalizedString("Waits for the model to be free.", comment: "memory status"))
                 poke(after: 120)
                 return
@@ -142,6 +158,45 @@ final class MemoryReflector: ObservableObject {
             }
         }
         status = .idle
+    }
+
+    /// The model (its path) `batch` is read with: the one set for memory,
+    /// else the one its chat was sent to; nil: any. A model that isn't
+    /// installed any more doesn't count (else its chats would wait for
+    /// ever): the set one gives way to the chat's, the chat's to any.
+    static func reader(for batch: MemoryBatch) -> String? {
+        let installed = Set(ModelCatalog.shared.models.map(\.path))
+        let fixed = UserDefaults.standard[Pref.memoryModel]
+        if !fixed.isEmpty, installed.contains(fixed) { return fixed }
+        return batch.model.flatMap { installed.contains($0) ? $0 : nil }
+    }
+
+    static func displayName(_ path: String) -> String {
+        ModelCatalog.shared.model(id: path)?.displayName ?? (path as NSString).lastPathComponent
+    }
+
+    /// Memory's model loaded by memory itself: only when the user allowed
+    /// it (Settings), LLMTray has been idle that long, nothing runs or waits
+    /// in any chat, no picture or song wants the GPU, and the server is up
+    /// or idle-unloaded (never started from a stop).
+    private func switchWhenIdle(to path: String) {
+        let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
+        func idle(_ server: ServerManager, counting own: Int = 0) -> Bool {
+            let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
+            return minutes > 0 && server.activeRequestCount == own && Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60
+                && !ChatTabs.shared.tabs.contains(where: \.isBusy) && !GenerationQueue.shared.hasInteractiveDemand
+                && !server.suspendedForImageGeneration && !server.suspendedForVoice
+                && (server.isIdleUnloaded || { if case .running = server.state { return true } else { return false } }())
+        }
+        guard minutes > 0, let server, idle(server), let model = ModelCatalog.shared.model(id: path) else { return }
+        server.appendLog("--- memory: loading \(model.displayName) to read chats (idle \(minutes) min) ---\n")
+        Task { @MainActor in
+            // Checked again when its turn comes among the transitions: a
+            // request, a picture or a chat since then calls it off.
+            try? await server.switchLoadedModelInBackground(to: model.path, alias: ModelCatalog.shared.alias(for: model.id),
+                                                            stillWanted: { idle(server, counting: 1) })
+            self.poke(after: 5)
+        }
     }
 
     private func waitForStorage(_ reason: String) {
@@ -466,7 +521,11 @@ final class MemoryReflector: ObservableObject {
         let style = ModelDiscovery.thinkingStyle(forModelPath: modelPath)
         var fields = Thinking.requestFields(style: style, effort: .off)
         fields["temperature"] = 0.2
-        let outcome = await BackgroundModelWork.complete(port: UserDefaults.standard[Pref.port], modelAlias: nil, messages: messages,
+        // Named by its path (unique; an alias may be empty or shared):
+        // should another model be loaded by now, the proxy refuses it
+        // rather than another model reading this chat.
+        let outcome = await BackgroundModelWork.complete(port: UserDefaults.standard[Pref.port],
+                                                         modelAlias: modelPath, messages: messages,
                                                          maxTokens: maxTokens, fields: fields)
         switch outcome {
         case .done(let text): return .success(text)

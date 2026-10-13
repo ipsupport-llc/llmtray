@@ -142,6 +142,9 @@ struct ChatMessage: Identifiable, Equatable {
     // When a user message was sent: its evidence's date (adr/0024). nil
     // for others and for ones from before.
     var sentAt: Date?
+    // The model a user message was sent to (its path): the one that reads
+    // it for memory by default (adr/0024). nil for others and older ones.
+    var modelPath: String?
 }
 
 extension ChatMessage {

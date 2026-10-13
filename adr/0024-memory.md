@@ -200,7 +200,18 @@ or in one project's chats (`project:P`).
     the proxy cancels the background request and waits for it to drain before
     forwarding.
   - Thinking off. One background job at a time.
-- **Model.** The loaded one, or a profile's if that model is loaded.
+- **Model.** (Revised 2026-10-13 with the user: a chat written in Russian with
+  Gemma mustn't be read by a coding or English-only model loaded later.) A
+  batch remembers the model that answered in its chat, and by default that
+  model reads it. Settings can name one model for every chat instead (only
+  models of ~3B and up are offered; one whose card doesn't list the notes'
+  language gets a warning). A batch waits until its model is loaded and free;
+  the first batch the loaded model may read goes first. Memory loads a model
+  itself only if the user allows it ("Load it itself" after N idle minutes,
+  off by default), never from a stop, never while anything runs.
+- **Manner, not mood.** How the user tends to talk (polite, curt, swears when
+  something breaks) may be kept as an observation under `tone` when several
+  messages show it; a passing mood never is (temporary states stay a todo).
 
 ### What goes into a chat
 
