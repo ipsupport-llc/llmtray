@@ -465,7 +465,7 @@ final class MemoryReflector: ObservableObject {
                 if case .note(let note)? = related(.same) ?? related(.broader) {
                     // The same, or less of it: what's there stands, said again.
                     changes.append(.confirm(id: note.id, evidence: evidence))
-                } else if case .earlierAdd? = related(.same) {
+                } else if case .earlierAdd? = related(.same) ?? related(.broader) {
                     // Said twice in this batch: the first stands.
                     continue
                 } else if case .note(let note)? = related(.opposite), !note.pinned, note.subject == p.subject {
@@ -483,7 +483,10 @@ final class MemoryReflector: ObservableObject {
                 changes.append(.confirm(id: p.op.id!, evidence: evidence))
             case .update, .supersede:
                 let id = p.op.id!
-                if p.op.action == .update, case .own? = related(.broader) {
+                // Its own note, by its own pair -- not whichever other note
+                // came out "broader" first.
+                let saysLess = mine.contains { if case .own = owners[$0].target { return relations[$0] == .broader } else { return false } }
+                if p.op.action == .update, saysLess {
                     changes.append(.confirm(id: id, evidence: evidence))
                 } else if p.op.action == .update, case .note(let other)? = related(.same), let mine = shown[id] {
                     // Now the same as another note: the two become one.

@@ -11,7 +11,10 @@ import XCTest
 ///   MEMORY_EVAL_STATE=/tmp/memory-eval.json swift test --filter MemoryLiveEval
 ///
 /// with an mlx_lm.server of that model on the port. The state file carries
-/// the notes from one set (one model) to the next (another model).
+/// the notes from one set (one model) to the next (another model). It's the
+/// pass's model-facing part; the app's extra paths (merges of updates, a
+/// batch's repeated adds, failure counting) are left out, so it may show a
+/// note more than the app would keep.
 final class MemoryLiveEval: XCTestCase {
     struct Chat {
         var project: UUID?

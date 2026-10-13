@@ -53,20 +53,23 @@ public enum MemoryReflection {
         // One op per line (a broken line costs only itself), or the older
         // {"ops": [...]} a model may still write.
         let trimmed = reply.trimmingCharacters(in: .whitespacesAndNewlines)
+        // "NONE" as the whole reply (a full stop allowed): nothing to keep.
+        if ["NONE", "NONE."].contains(trimmed.uppercased()) { return [] }
         var ops: [Any] = []
         if let wrapped = object(trimmed)?["ops"] as? [Any] {
             ops = wrapped
         } else {
-            var lines = 0
             for line in trimmed.components(separatedBy: "\n") {
                 let l = line.trimmingCharacters(in: .whitespaces).trimmingCharacters(in: CharacterSet(charactersIn: ","))
-                guard l.hasPrefix("{") else { continue }
-                lines += 1
-                if case .success(let parsed) = LenientJSON.parse(l), let op = parsed.value as? [String: Any] { ops.append(op) }
+                guard l.hasPrefix("{"), case .success(let parsed) = LenientJSON.parse(l),
+                      let object = parsed.value as? [String: Any] else { continue }
+                // A wrapper on one line among others: its ops count too.
+                if let wrapped = object["ops"] as? [Any] { ops += wrapped } else { ops.append(object) }
             }
-            let none = trimmed.uppercased().hasPrefix("NONE") || trimmed.isEmpty
-            guard lines > 0 || none else { return nil }
         }
+        // Nothing read: an empty reply is nothing to keep; anything else
+        // couldn't be read (the batch is tried again, not used up).
+        if ops.isEmpty, !trimmed.isEmpty, object(trimmed)?["ops"] == nil { return nil }
         var result: [Operation] = []
         for case let op as [String: Any] in ops {
             guard let action = (op["op"] as? String).flatMap(Operation.Action.init(rawValue:)),
