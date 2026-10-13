@@ -52,11 +52,12 @@ struct PersistedMessage: Codable {
     // See ChatMessage.seq and .sentAt; nil, and not written, when none.
     var seq: Int?
     var sentAt: Date?
+    var model: String?
 
     enum CodingKeys: String, CodingKey {
         case role, content, reasoning, isSummary, imageFilenames, imageDurations, imagePrompts, sources
         case audioFilenames, audioPrompts, audioDurations, imageSources, audioSources, citations
-        case answerStats, documents, projectFilesAdded, seq, sentAt
+        case answerStats, documents, projectFilesAdded, seq, sentAt, model
     }
 
     init(
@@ -98,6 +99,7 @@ struct PersistedMessage: Codable {
         projectFilesAdded = try c.decodeIfPresent([String].self, forKey: .projectFilesAdded)
         seq = try c.decodeIfPresent(Int.self, forKey: .seq)
         sentAt = try c.decodeIfPresent(Date.self, forKey: .sentAt)
+        model = try c.decodeIfPresent(String.self, forKey: .model)
     }
 }
 

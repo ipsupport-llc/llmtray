@@ -685,9 +685,9 @@ public struct MemoryBatchMessage: Codable, Equatable, Sendable {
     public var date: Date
     public var text: String
     public var before: String?
-    /// The folder of the model that answered it: by default the one that
-    /// reads it for memory too (a chat in Russian with Gemma isn't read by
-    /// an English-only coder loaded later). nil: unknown, any model.
+    /// The model it was sent to (its path): by default the one that reads
+    /// it for memory too (a chat in Russian with Gemma isn't read by an
+    /// English-only coder loaded later). nil: unknown, any model.
     public var model: String?
 
     /// At most this much of the answer before a message is kept.

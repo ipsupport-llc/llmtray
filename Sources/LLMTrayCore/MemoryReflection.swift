@@ -540,9 +540,12 @@ public enum ModelCardLanguages {
         var result: [String] = []
         var inList = false
         for line in lines.dropFirst() {
-            let trimmed = line.trimmingCharacters(in: .whitespaces)
-            if trimmed == "---" { break }
+            // Comments out; the front matter ends at --- or ...
+            let trimmed = (line.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? "")
+                .trimmingCharacters(in: .whitespaces)
+            if trimmed == "---" || trimmed == "..." { break }
             if inList {
+                if trimmed.isEmpty { continue }
                 if trimmed.hasPrefix("- ") {
                     result.append(clean(String(trimmed.dropFirst(2))))
                     continue

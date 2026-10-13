@@ -400,6 +400,8 @@ extension MemoryReflectionTests {
         XCTAssertEqual(ModelCardLanguages.parse(readme: "---\nlanguage: en\n---"), ["en"])
         XCTAssertNil(ModelCardLanguages.parse(readme: "# No front matter\nlanguage: en"))
         XCTAssertNil(ModelCardLanguages.parse(readme: "---\nlicense: mit\n---"))
+        XCTAssertEqual(ModelCardLanguages.parse(readme: "---\nlanguage: en # supported\n...\nlanguage: fr"), ["en"])
+        XCTAssertEqual(ModelCardLanguages.parse(readme: "---\nlanguage:\n- en\n\n# more\n- uk # Ukrainian\nlicense: mit\n---"), ["en", "uk"])
         XCTAssertTrue(ModelCardLanguages.covers(["en", "ru-RU"], "ru"))
         XCTAssertTrue(ModelCardLanguages.covers(["multilingual"], "uk"))
         XCTAssertFalse(ModelCardLanguages.covers(["en"], "ru"))

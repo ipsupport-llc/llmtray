@@ -107,14 +107,15 @@ final class MemoryReflector: ObservableObject {
             // (or the one set for memory). None: wait for one, or load it
             // when LLMTray has been idle long enough, if allowed.
             let loaded: String? = { if let server, case .running = server.state { return server.loadedModelPath } else { return nil } }()
-            let loadedFolder = loaded.map { ($0 as NSString).lastPathComponent }
             guard let model = loaded,
-                  let batch = memory.file.queue.first(where: { Self.reader(for: $0).map { $0 == loadedFolder } ?? true }) else {
+                  let batch = memory.file.queue.first(where: { Self.reader(for: $0).map { $0 == model } ?? true }) else {
                 let wanted = Self.reader(for: head)
                 status = .waiting(wanted.map {
                     String(format: NSLocalizedString("Waits for %@ to be loaded.", comment: "memory status: a model's name"), Self.displayName($0))
                 } ?? NSLocalizedString("Waits for a model to be loaded.", comment: "memory status"))
-                if let wanted { switchWhenIdle(to: wanted) }
+                // The first waiting batch whose model is installed: a
+                // deleted model's batch doesn't hold the others.
+                if let next = memory.file.queue.lazy.compactMap(Self.reader(for:)).first { switchWhenIdle(to: next) }
                 poke(after: 300)
                 return
             }
@@ -159,31 +160,42 @@ final class MemoryReflector: ObservableObject {
         status = .idle
     }
 
-    /// The model folder `batch` is read with: the one set for memory, else
-    /// the model that answered in its chat; nil: any.
+    /// The model (its path) `batch` is read with: the one set for memory,
+    /// else the one its chat was sent to; nil: any. A model that isn't
+    /// installed any more doesn't count (else its chats would wait for
+    /// ever): the set one gives way to the chat's, the chat's to any.
     static func reader(for batch: MemoryBatch) -> String? {
+        let installed = Set(ModelCatalog.shared.models.map(\.path))
         let fixed = UserDefaults.standard[Pref.memoryModel]
-        return fixed.isEmpty ? batch.model : (fixed as NSString).lastPathComponent
+        if !fixed.isEmpty, installed.contains(fixed) { return fixed }
+        return batch.model.flatMap { installed.contains($0) ? $0 : nil }
     }
 
-    static func displayName(_ folder: String) -> String {
-        ModelCatalog.shared.models.first { ($0.path as NSString).lastPathComponent == folder }?.displayName ?? folder
+    static func displayName(_ path: String) -> String {
+        ModelCatalog.shared.model(id: path)?.displayName ?? (path as NSString).lastPathComponent
     }
 
     /// Memory's model loaded by memory itself: only when the user allowed
     /// it (Settings), LLMTray has been idle that long, nothing runs or waits
     /// in any chat, no picture or song wants the GPU, and the server is up
     /// or idle-unloaded (never started from a stop).
-    private func switchWhenIdle(to folder: String) {
+    private func switchWhenIdle(to path: String) {
         let minutes = UserDefaults.standard[Pref.memorySwitchIdleMinutes]
-        guard minutes > 0, let server, server.activeRequestCount == 0,
-              Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60,
-              !ChatTabs.shared.tabs.contains(where: \.isBusy), !GenerationQueue.shared.hasInteractiveDemand,
-              server.isIdleUnloaded || { if case .running = server.state { return true } else { return false } }(),
-              let model = ModelCatalog.shared.models.first(where: { ($0.path as NSString).lastPathComponent == folder }) else { return }
+        func idle(_ server: ServerManager) -> Bool {
+            server.activeRequestCount == 0 && Date().timeIntervalSince(server.lastActivityAt) >= Double(minutes) * 60
+                && !ChatTabs.shared.tabs.contains(where: \.isBusy) && !GenerationQueue.shared.hasInteractiveDemand
+                && !server.suspendedForImageGeneration && !server.suspendedForVoice
+                && (server.isIdleUnloaded || { if case .running = server.state { return true } else { return false } }())
+        }
+        guard minutes > 0, let server, idle(server), let model = ModelCatalog.shared.model(id: path) else { return }
         server.appendLog("--- memory: loading \(model.displayName) to read chats (idle \(minutes) min) ---\n")
         Task { @MainActor in
-            try? await server.switchLoadedModel(to: model.path, alias: ModelCatalog.shared.alias(for: model.id))
+            // Checked again when its turn comes among the transitions: a
+            // request, a picture or a chat since then calls it off.
+            try? await server.switchLoadedModelInBackground(to: model.path, alias: ModelCatalog.shared.alias(for: model.id),
+                                                            stillWanted: { UserDefaults.standard[Pref.memorySwitchIdleMinutes] > 0
+                                                                && !ChatTabs.shared.tabs.contains(where: \.isBusy)
+                                                                && !GenerationQueue.shared.hasInteractiveDemand })
             self.poke(after: 5)
         }
     }
@@ -510,7 +522,10 @@ final class MemoryReflector: ObservableObject {
         let style = ModelDiscovery.thinkingStyle(forModelPath: modelPath)
         var fields = Thinking.requestFields(style: style, effort: .off)
         fields["temperature"] = 0.2
-        let outcome = await BackgroundModelWork.complete(port: UserDefaults.standard[Pref.port], modelAlias: nil, messages: messages,
+        // Named: should another model be loaded by now, the proxy refuses
+        // it rather than another model reading this chat.
+        let outcome = await BackgroundModelWork.complete(port: UserDefaults.standard[Pref.port],
+                                                         modelAlias: ModelCatalog.shared.alias(for: modelPath), messages: messages,
                                                          maxTokens: maxTokens, fields: fields)
         switch outcome {
         case .done(let text): return .success(text)

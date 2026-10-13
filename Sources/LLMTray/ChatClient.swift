@@ -351,6 +351,7 @@ final class ChatClient: ObservableObject {
             message.projectFilesAdded = pm.projectFilesAdded ?? []
             message.seq = pm.seq
             message.sentAt = pm.sentAt
+            message.modelPath = pm.model
             if pm.imageSources.count == images.count { message.imageSources = pm.imageSources }
             let audios = pm.audioFilenames.compactMap { FileManager.default.contents(atPath: imagesDir + "/" + $0) }
             if audios.count == pm.audioFilenames.count {
@@ -482,6 +483,7 @@ final class ChatClient: ObservableObject {
             persisted.projectFilesAdded = msg.projectFilesAdded.isEmpty ? nil : msg.projectFilesAdded
             persisted.seq = msg.seq
             persisted.sentAt = msg.sentAt
+            persisted.model = msg.modelPath
             for document in msg.documents {
                 documentFiles.insert(document.filename)
                 if let thumbnail = document.thumbnail { documentFiles.insert(thumbnail) }
@@ -656,6 +658,7 @@ final class ChatClient: ObservableObject {
         lastSeq += 1
         message.seq = lastSeq
         message.sentAt = Date()
+        message.modelPath = settings.modelPath
         messages.append(message)
         GettingStarted.noteMessage(inProject: currentSessionID.flatMap { ChatLibraryStore.shared.library.projectContext(forChat: $0)?.id })
         startTurn(port: port, modelAlias: modelAlias, settings: settings, server: server)
@@ -729,15 +732,12 @@ final class ChatClient: ObservableObject {
         var lastAnswer: String?
         var previousSeq = 0
         for message in messages {
-            // The model that answered: by default the one that reads it.
-            if message.role == "assistant", let folder = message.answerStats?.modelFolder,
-               let last = items.indices.last, items[last].model == nil {
-                items[last].model = folder
-            }
             if message.role == "assistant", !message.content.isEmpty, !message.isSummary {
                 lastAnswer = previousSeq > met ? message.content : nil
             } else if message.role == "user", !message.isToolContext, let seq = message.seq {
-                items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer))
+                // The model it was sent to: by default the one that reads it.
+                items.append(MemoryBatchMessage(seq: seq, date: message.sentAt ?? Date(), text: message.content, before: lastAnswer,
+                                                model: message.modelPath))
                 lastAnswer = nil
                 previousSeq = seq
             }

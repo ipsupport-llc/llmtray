@@ -174,6 +174,8 @@ struct MemoryPane: View {
             Text("Memory can learn from what you wrote in your chats while it was off, or only from what you write from now on.")
         }
         .onAppear(perform: loadAbout)
+        .onChange(of: learningModel) { _, _ in reflector.poke(after: 2) }
+        .onChange(of: switchIdleMinutes) { _, _ in reflector.poke(after: 2) }
         // Expiry follows its settings at once, not at the next chat.
         .onChange(of: [maxActive, deleteAfter, halfLifeFact, halfLifePreference, halfLifeCorrection, halfLifeObservation]) { _, _ in
             memory.sweep()
@@ -193,7 +195,7 @@ struct MemoryPane: View {
 
     /// Chat models big enough to write good notes (about 3B parameters and up).
     private var learningModels: [LocalModel] {
-        catalog.models.filter { (catalog.sizes[$0.path] ?? .max) >= 1_500_000_000 }
+        catalog.models.filter { (catalog.sizes[$0.path] ?? .max) >= 1_500_000_000 || $0.path == learningModel }
     }
 
     /// The model set for memory doesn't say it speaks the notes' language.

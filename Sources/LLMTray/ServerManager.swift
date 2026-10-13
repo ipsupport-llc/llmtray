@@ -271,7 +271,10 @@ final class ServerManager: ObservableObject {
     /// than switching back.
     static let switchDeclinedCode = 8
 
-    func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true, mayReplaceLoaded: Bool = true) async throws {
+    /// `onlyIf`: checked inside the serialized transition, before anything
+    /// is unloaded -- false refuses it (`switchDeclinedCode`).
+    func acquireModel(modelPath target: String?, alias: String, loadIfUnloaded: Bool = true, mayReplaceLoaded: Bool = true,
+                      onlyIf: (@MainActor () -> Bool)? = nil) async throws {
         // The model unloaded for an image or a song: the request waits for it
         // to come back instead of failing. Outside the serialized transition
         // (the reload itself goes through it), and again if it was unloaded
@@ -287,7 +290,7 @@ final class ServerManager: ObservableObject {
             }
             do {
                 try await acquireModelNow(modelPath: target, alias: alias, loadIfUnloaded: loadIfUnloaded,
-                                          mayReplaceLoaded: mayReplaceLoaded, epoch: epoch)
+                                          mayReplaceLoaded: mayReplaceLoaded, epoch: epoch, onlyIf: onlyIf)
                 return
             } catch let error as NSError where error.domain == "ServerManager" && error.code == 7
                 && loadIfUnloaded && epoch == stopEpoch && Date() < deadline {
@@ -297,8 +300,12 @@ final class ServerManager: ObservableObject {
     }
 
     private func acquireModelNow(modelPath target: String?, alias: String, loadIfUnloaded: Bool, mayReplaceLoaded: Bool,
-                                 epoch: Int) async throws {
+                                 epoch: Int, onlyIf: (@MainActor () -> Bool)? = nil) async throws {
         try await serialized(epoch: epoch) {
+            if let onlyIf, !onlyIf() {
+                throw NSError(domain: "ServerManager", code: Self.switchDeclinedCode,
+                              userInfo: [NSLocalizedDescriptionKey: "no longer wanted"])
+            }
             if !mayReplaceLoaded, let target, target != self.currentModelPath, case .running = self.state {
                 throw NSError(domain: "ServerManager", code: Self.switchDeclinedCode,
                               userInfo: [NSLocalizedDescriptionKey: "another model is loaded"])
@@ -340,6 +347,25 @@ final class ServerManager: ObservableObject {
             throw error
         }
         endRequest(forwarded: true)
+    }
+
+    /// Memory's model, loaded by memory (adr/0024, "Load it itself"): only
+    /// if, when its turn comes among the transitions, nothing else is at the
+    /// model (this switch aside), no picture or voice holds it unloaded, and
+    /// `stillWanted` holds. Not use: it doesn't keep the model from
+    /// idle-unloading.
+    func switchLoadedModelInBackground(to modelPath: String, alias: String, stillWanted: @escaping @MainActor () -> Bool) async throws {
+        beginRequest(activity: false)
+        do {
+            try await acquireModel(modelPath: modelPath, alias: alias, onlyIf: { [weak self] in
+                guard let self else { return false }
+                return self.activeRequestCount == 1 && !self.suspendedForImageGeneration && !self.suspendedForVoice && stillWanted()
+            })
+        } catch {
+            endRequest(forwarded: false, activity: false)
+            throw error
+        }
+        endRequest(forwarded: true, activity: false)
     }
 
     /// The name the running mlx_lm.server knows its own model by -- what
