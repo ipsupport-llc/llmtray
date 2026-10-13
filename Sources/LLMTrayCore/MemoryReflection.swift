@@ -263,16 +263,23 @@ public enum MemoryReflection {
 }
 
 extension MemoryChange {
-    /// With ids merged away replaced by the ones kept.
+    /// With ids merged away replaced by the ones kept (through chains of
+    /// merges). Not a forget: a note merged away is gone already, and the
+    /// one kept mustn't go with it.
     func redirected(_ map: [String: String]) -> MemoryChange {
         guard !map.isEmpty else { return self }
-        func r(_ id: String) -> String { map[id] ?? id }
+        func r(_ id: String) -> String {
+            var id = id
+            var seen = Set<String>()
+            while let next = map[id], seen.insert(id).inserted { id = next }
+            return id
+        }
         switch self {
         case .add: return self
         case let .confirm(id, e): return .confirm(id: r(id), evidence: e)
         case let .update(id, t, e, v, w): return .update(id: r(id), text: t, evidence: e, vector: v, wrongLanguage: w)
         case let .supersede(id, t, e, v, w): return .supersede(id: r(id), text: t, evidence: e, vector: v, wrongLanguage: w)
-        case let .forget(id, v): return .forget(id: r(id), vector: v)
+        case .forget: return self
         case let .merge(k, d, s, t, e, v, w): return .merge(keep: r(k), drop: r(d), source: r(s), text: t, evidence: e, vector: v, wrongLanguage: w)
         }
     }

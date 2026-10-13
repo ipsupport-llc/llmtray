@@ -323,4 +323,16 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(file.failBatch(id), 1)
         XCTAssertEqual(file.queue.first?.attempts, 2)
     }
+
+    func testRedirectsFollowChainsButNeverForget() {
+        let e = MemoryEvidence(chat: chat, seq: 1, date: t0, quote: "two words")
+        let map = ["b": "a", "a": "c"]
+        XCTAssertEqual(MemoryChange.confirm(id: "b", evidence: e).redirected(map), .confirm(id: "c", evidence: e))
+        XCTAssertEqual(MemoryChange.forget(id: "b", vector: nil).redirected(map), .forget(id: "b", vector: nil))
+        XCTAssertEqual(MemoryChange.confirm(id: "x", evidence: e).redirected(["x": "y", "y": "x"]).isConfirm, true, "a loop ends")
+    }
+}
+
+private extension MemoryChange {
+    var isConfirm: Bool { if case .confirm = self { return true } else { return false } }
 }
