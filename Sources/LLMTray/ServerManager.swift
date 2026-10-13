@@ -167,6 +167,10 @@ final class ServerManager: ObservableObject {
     /// Bumped by stop(): a transition queued before an explicit Stop must
     /// not bring the server back up after it.
     private var stopEpoch = 0
+    /// Raised by every process launch (a switch, a restart, a reload after
+    /// an unload): background work binds to the process it was let in on
+    /// (adr/0024).
+    private(set) var processGeneration = 0
     /// Tail of the transition queue (start / switch / reload / restart):
     /// transitions run strictly one after another, never interleaved.
     private var transitionTail: Task<Void, Never>?
@@ -774,6 +778,7 @@ final class ServerManager: ObservableObject {
     }
 
     private func launchServerProcess(modelPath: String, alias: String) {
+        processGeneration += 1
         isIdleUnloaded = false
         lastActivityAt = Date()
         if idleStopTimer == nil { startIdleStopTimer() }

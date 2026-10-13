@@ -426,13 +426,22 @@ final class ModelProxyServer {
     }
 
     /// The background request, if one runs, is cancelled; this returns once
-    /// it has ended (or after 30 s, whatever happened to it).
+    /// it has ended. Cancelled is at the transport: the model server stops
+    /// it at its next step, so a foreground request may share a batch with
+    /// it for that moment (adr/0021) -- background prompts are kept short
+    /// for that. One not ended 30 s later is given up on: written off as
+    /// ended, so nobody waits on it for ever (its own end, if it comes, is
+    /// then a no-op).
     @MainActor private func yieldBackground() async {
-        guard admission.background != nil else { return }
+        guard let id = admission.background else { return }
         backgroundPreempted = true
         backgroundForward?.preempt()
         DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
-            MainActor.assumeIsolated { self?.resumeBackgroundWaiters() }
+            MainActor.assumeIsolated {
+                guard let self, self.admission.background == id else { return }
+                self.server.appendLog("--- proxy: background work didn't end 30 s after it was cancelled -- going on without it ---\n")
+                self.endBackground(id)
+            }
         }
         await withCheckedContinuation { continuation in
             if admission.background == nil {
@@ -478,15 +487,31 @@ final class ModelProxyServer {
             }
             // Not use: background work doesn't keep a model from idle-unloading.
             server.beginRequest(activity: false)
+            // Bound to this process: a restart or switch queued ahead of it
+            // (the same model, launched again) is not where it was let in.
+            let generation = server.processGeneration
             Task { @MainActor in
                 do {
                     try await self.server.acquireModel(modelPath: loaded, alias: modelName ?? "", loadIfUnloaded: false,
                                                        mayReplaceLoaded: false)
                 } catch {
                     self.server.endRequest(forwarded: false, activity: false)
+                    let preempted = self.backgroundPreempted
+                    self.endBackground(id)
+                    if preempted {
+                        self.sendBackgroundRefusal(connection: connection, status: "503 Service Unavailable",
+                                                   code: BackgroundRequest.preemptedCode, message: "a foreground request came")
+                    } else {
+                        self.sendBackgroundRefusal(connection: connection, status: "409 Conflict", code: BackgroundRequest.notLoadedCode,
+                                                   message: "the model isn't loaded")
+                    }
+                    return
+                }
+                guard self.server.processGeneration == generation else {
+                    self.server.endRequest(forwarded: true, activity: false)
                     self.endBackground(id)
                     self.sendBackgroundRefusal(connection: connection, status: "409 Conflict", code: BackgroundRequest.notLoadedCode,
-                                               message: "the model isn't loaded")
+                                               message: "the model was reloaded")
                     return
                 }
                 guard !self.backgroundPreempted else {
@@ -566,8 +591,8 @@ final class ModelProxyServer {
         var request = URLRequest(url: url)
         request.httpMethod = method
         // The app's token stays here: the model server has no use for it.
-        for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased()
-            && key != BackgroundRequest.header.lowercased() {
+        // (The gate itself lives in LLMTrayCore.ProxyHeaderGate, tested.)
+        for (key, value) in ProxyHeaderGate.forwardedRequestHeaders(headers) {
             request.setValue(value, forHTTPHeaderField: key)
         }
         if !body.isEmpty {
@@ -795,9 +820,7 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         }
         var head = "HTTP/1.1 \(http.statusCode) \(HTTPURLResponse.localizedString(forStatusCode: http.statusCode))\r\n"
         for (key, value) in http.allHeaderFields {
-            guard let keyStr = key as? String else { continue }
-            let lower = keyStr.lowercased()
-            if lower == "connection" || lower == "transfer-encoding" || lower == "content-length" { continue }
+            guard let keyStr = key as? String, ProxyHeaderGate.isForwardedResponseHeader(keyStr) else { continue }
             head += "\(keyStr): \(value)\r\n"
         }
         head += "Transfer-Encoding: chunked\r\nConnection: close\r\n\r\n"

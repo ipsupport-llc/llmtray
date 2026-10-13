@@ -9,7 +9,8 @@ import LLMTrayCore
 enum BackgroundModelWork {
     /// A chat completion of `messages` on the loaded model (`modelAlias`:
     /// its served name; nil: whatever is loaded), streamed and read whole.
-    /// `fields` join the body (sampling, thinking off).
+    /// `fields` join the body (sampling, thinking off). Never throws: a
+    /// cancelled task gets `.failed("cancelled")`.
     static func complete(port: Int, modelAlias: String?, messages: [[String: Any]], maxTokens: Int,
                          fields: [String: Any] = [:]) async -> BackgroundRequest.Outcome {
         guard let url = URL(string: "http://127.0.0.1:\(port)/v1/chat/completions") else { return .failed("bad port") }
@@ -26,6 +27,10 @@ enum BackgroundModelWork {
         // The model may take long on a long prompt; the proxy's own stall
         // watchdog ends a stuck one.
         request.timeoutInterval = 30 * 60
+        // Whether the answer had begun: a failure before it is the
+        // request's (no server, a refusal); one after it is the proxy
+        // cutting it off for a foreground request.
+        var answering = false
         do {
             let (bytes, response) = try await URLSession.shared.bytes(for: request)
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -37,6 +42,7 @@ enum BackgroundModelWork {
                 }
                 return BackgroundRequest.outcome(status: status, body: errorBody)
             }
+            answering = true
             var stream = StreamedContent()
             for try await line in bytes.lines {
                 stream.read(line: line)
@@ -51,8 +57,7 @@ enum BackgroundModelWork {
         } catch let error as URLError where error.code == .cancelled {
             return .failed("cancelled")
         } catch {
-            // The connection dropped mid-answer: preempted, most likely.
-            return .preempted
+            return answering ? .preempted : .failed(error.localizedDescription)
         }
     }
 }
