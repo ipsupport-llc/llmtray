@@ -19,6 +19,18 @@ final class ModelProxyServer {
     /// buffered in memory.
     static let maxBodyBytes = 256 * 1024 * 1024
 
+    // Background work (adr/0024, BackgroundRequest): one at a time, only
+    // while no foreground request is at the model, cancelled by the next
+    // one. Main actor only.
+    private var admission = BackgroundAdmission()
+    /// The running background request's forward, to cancel it.
+    private var backgroundForward: ProxyForwardDelegate?
+    /// A foreground request came while the background one was still
+    /// getting its turn at the model: it ends there.
+    private var backgroundPreempted = false
+    /// Foreground requests waiting for the background one to end.
+    private var backgroundEndWaiters: [CheckedContinuation<Void, Never>] = []
+
     init(server: ServerManager) {
         self.server = server
     }
@@ -251,6 +263,12 @@ final class ModelProxyServer {
         // An outside client asking for another model than the one loaded:
         // the user's Settings → Server → Model switching decides.
         let fromApp = headers[AppRequestToken.header.lowercased()] == AppRequestToken.value
+        // The app's background work: only with the app's token.
+        if fromApp, headers[BackgroundRequest.header.lowercased()] == BackgroundRequest.value, !bodyData.isEmpty {
+            routeBackground(method: method, path: path, headers: headers, body: bodyData, modelName: modelName,
+                            targetPath: targetPath, connection: connection, internalPort: internalPort)
+            return
+        }
         let loaded: String? = { if case .running = server.state { return server.loadedModelPath } else { return nil } }()
         let policy = ModelSwitchPolicy(rawValue: UserDefaults.standard.string(forKey: Pref.modelSwitchPolicy.name) ?? "") ?? .auto
         let prompter = ModelSwitchPrompter.shared
@@ -333,7 +351,11 @@ final class ModelProxyServer {
         // model from idle-unloading.
         let activity = !bodyData.isEmpty
         server.beginRequest(activity: activity)
+        // A request for the model: background work gives way to it, and
+        // none starts until it ends (adr/0024). A probe doesn't count.
+        let foreground = ForegroundTurn(proxy: activity ? self : nil)
         Task {
+            await foreground.yieldBackground()
             do {
                 // Switches to the requested model (or reloads the last one
                 // if it was idle-unloaded), serialized with every other
@@ -344,10 +366,12 @@ final class ModelProxyServer {
             } catch let error as NSError where error.domain == "ServerManager" && error.code == ServerManager.switchDeclinedCode {
                 // Another model got loaded while this one waited its turn.
                 self.server.endRequest(forwarded: false, activity: activity)
+                await foreground.end()
                 self.sendSwitchDeclined(connection: connection, loaded: self.server.loadedModelPath, requested: modelName)
                 return
             } catch {
                 self.server.endRequest(forwarded: false, activity: activity)
+                await foreground.end()
                 self.sendError(connection: connection, message: "model load failed: \(error.localizedDescription)")
                 return
             }
@@ -363,8 +387,126 @@ final class ModelProxyServer {
             // Settings → Models' "last used" (the app's own chats too).
             if activity { await MainActor.run { ModelCatalog.shared.recordUse(self.server.loadedModelPath) } }
             let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
-            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort, activity: activity)
+            self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort,
+                         activity: activity, onFinish: { MainActor.assumeIsolated { foreground.endNow() } })
         }
+    }
+
+    /// One foreground request's hold on the model, ended exactly once.
+    @MainActor private final class ForegroundTurn {
+        private weak var proxy: ModelProxyServer?
+        private var ended = false
+
+        nonisolated init(proxy: ModelProxyServer?) {
+            self.proxy = proxy
+            // Counted at once (route runs on the main queue): a background
+            // request arriving from now on is refused.
+            if let proxy { MainActor.assumeIsolated { proxy.foregroundBegan() } }
+            else { MainActor.assumeIsolated { ended = true } }
+        }
+
+        func yieldBackground() async {
+            guard !ended, let proxy else { return }
+            await proxy.yieldBackground()
+        }
+
+        func end() { endNow() }
+
+        func endNow() {
+            guard !ended else { return }
+            ended = true
+            proxy?.admission.foregroundEnded()
+        }
+    }
+
+    // MARK: - Background work (adr/0024)
+
+    @MainActor private func foregroundBegan() {
+        _ = admission.foregroundBegan()
+    }
+
+    /// The background request, if one runs, is cancelled; this returns once
+    /// it has ended (or after 30 s, whatever happened to it).
+    @MainActor private func yieldBackground() async {
+        guard admission.background != nil else { return }
+        backgroundPreempted = true
+        backgroundForward?.preempt()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+            MainActor.assumeIsolated { self?.resumeBackgroundWaiters() }
+        }
+        await withCheckedContinuation { continuation in
+            if admission.background == nil {
+                continuation.resume()
+            } else {
+                backgroundEndWaiters.append(continuation)
+            }
+        }
+    }
+
+    @MainActor private func resumeBackgroundWaiters() {
+        let waiters = backgroundEndWaiters
+        backgroundEndWaiters = []
+        waiters.forEach { $0.resume() }
+    }
+
+    @MainActor private func endBackground(_ id: Int) {
+        admission.backgroundEnded(id)
+        guard admission.background == nil else { return }
+        backgroundForward = nil
+        backgroundPreempted = false
+        resumeBackgroundWaiters()
+    }
+
+    /// Background work: let in only with no foreground request at the
+    /// model and its model already loaded (never loaded or switched for
+    /// it); cancelled by the next foreground request.
+    private func routeBackground(method: String, path: String, headers: [String: String], body bodyData: Data, modelName: String?,
+                                 targetPath: String?, connection: NWConnection, internalPort: Int) {
+        MainActor.assumeIsolated {
+            guard let id = admission.admitBackground() else {
+                sendBackgroundRefusal(connection: connection, status: "503 Service Unavailable", code: BackgroundRequest.busyCode,
+                                      message: "the model is busy with other requests")
+                return
+            }
+            backgroundPreempted = false
+            let loaded: String? = { if case .running = server.state { return server.loadedModelPath } else { return nil } }()
+            guard let loaded, targetPath == nil || targetPath == loaded else {
+                endBackground(id)
+                sendBackgroundRefusal(connection: connection, status: "409 Conflict", code: BackgroundRequest.notLoadedCode,
+                                      message: "the model isn't loaded")
+                return
+            }
+            // Not use: background work doesn't keep a model from idle-unloading.
+            server.beginRequest(activity: false)
+            Task { @MainActor in
+                do {
+                    try await self.server.acquireModel(modelPath: loaded, alias: modelName ?? "", loadIfUnloaded: false,
+                                                       mayReplaceLoaded: false)
+                } catch {
+                    self.server.endRequest(forwarded: false, activity: false)
+                    self.endBackground(id)
+                    self.sendBackgroundRefusal(connection: connection, status: "409 Conflict", code: BackgroundRequest.notLoadedCode,
+                                               message: "the model isn't loaded")
+                    return
+                }
+                guard !self.backgroundPreempted else {
+                    self.server.endRequest(forwarded: true, activity: false)
+                    self.endBackground(id)
+                    self.sendBackgroundRefusal(connection: connection, status: "503 Service Unavailable",
+                                               code: BackgroundRequest.preemptedCode, message: "a foreground request came")
+                    return
+                }
+                let body = ProxyRequestBody.rewrite(bodyData, backendModel: self.server.backendModelName, defaults: self.server.requestDefaults())
+                self.forward(method: method, path: path, headers: headers, body: body, connection: connection, internalPort: internalPort,
+                             activity: false, background: true, onFinish: { MainActor.assumeIsolated { self.endBackground(id) } })
+            }
+        }
+    }
+
+    private func sendBackgroundRefusal(connection: NWConnection, status: String, code: String, message: String) {
+        sendJSON(connection: connection, status: status, ["error": [
+            "message": message, "type": "background_refused", "code": code,
+        ] as [String: Any]])
     }
 
     /// GET /v1/models (and /v1/models/<id>, LM Studio's /api/v0/models)
@@ -411,16 +553,21 @@ final class ModelProxyServer {
 
     // MARK: - Forwarding
 
-    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int, activity: Bool = true) {
+    /// `onFinish`: once, when the request ends (with endRequest), however.
+    /// `background`: the app's background work, which preempt() cancels.
+    private func forward(method: String, path: String, headers: [String: String], body: Data, connection: NWConnection, internalPort: Int,
+                         activity: Bool = true, background: Bool = false, onFinish: (() -> Void)? = nil) {
         guard let url = URL(string: "http://127.0.0.1:\(internalPort)\(path)") else {
             server.endRequest()
+            onFinish?()
             connection.cancel()
             return
         }
         var request = URLRequest(url: url)
         request.httpMethod = method
         // The app's token stays here: the model server has no use for it.
-        for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased() {
+        for (key, value) in headers where key != "host" && key != "content-length" && key != AppRequestToken.header.lowercased()
+            && key != BackgroundRequest.header.lowercased() {
             request.setValue(value, forHTTPHeaderField: key)
         }
         if !body.isEmpty {
@@ -437,7 +584,8 @@ final class ModelProxyServer {
         // *or* the stall watchdog below gives up on it, not when the last
         // byte reaches the downstream client afterward (that's just local
         // I/O, not model activity).
-        let delegate = ProxyForwardDelegate(connection: connection, server: server, activity: activity)
+        let delegate = ProxyForwardDelegate(connection: connection, server: server, activity: activity, onFinish: onFinish)
+        if background { MainActor.assumeIsolated { backgroundForward = delegate } }
         let queue = OperationQueue()
         queue.underlyingQueue = .main
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: queue)
@@ -493,11 +641,16 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
 
     /// Counts toward idle (see ServerManager.beginRequest).
     private let activity: Bool
+    /// Called once, with endRequest.
+    private let onFinish: (() -> Void)?
+    /// Cancelled for a foreground request (background work, adr/0024).
+    private var preempted = false
 
-    init(connection: NWConnection, server: ServerManager, activity: Bool = true) {
+    init(connection: NWConnection, server: ServerManager, activity: Bool = true, onFinish: (() -> Void)? = nil) {
         self.connection = connection
         self.server = server
         self.activity = activity
+        self.onFinish = onFinish
         let configured = UserDefaults.standard[Pref.stallThresholdSeconds]
         self.stallThreshold = TimeInterval(configured)
         super.init()
@@ -535,6 +688,16 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
                 }
             }
         }
+    }
+
+    /// Background work making way for a foreground request: cancelled
+    /// upstream (the model stops generating it), and the app told so.
+    func preempt() {
+        MainActor.assumeIsolated {
+            guard !finished else { return }
+            preempted = true
+        }
+        cancelUpstream()
     }
 
     private func cancelUpstream() {
@@ -602,6 +765,7 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             } else {
                 server?.endRequest(activity: activity)
             }
+            onFinish?()
             guard stalled else { return }
             session?.invalidateAndCancel()
             if headersSent {
@@ -676,6 +840,14 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         // Done either way: a URLSession keeps its delegate (and this
         // connection) until it's invalidated.
         defer { session.finishTasksAndInvalidate() }
+        if preempted, !headersSent {
+            let body = "{\"error\":{\"message\":\"a foreground request came\",\"type\":\"background_refused\",\"code\":\"\(BackgroundRequest.preemptedCode)\"}}"
+            let response = "HTTP/1.1 503 Service Unavailable\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
+            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+                connection.cancel()
+            })
+            return
+        }
         if error != nil, headersSent {
             // Cut off mid-response (the process died or was switched): no
             // clean terminator, or the client takes a truncated answer for
