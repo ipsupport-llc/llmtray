@@ -77,9 +77,10 @@ Every operation that changes memory (`add`, `confirm`, `update`, `supersede`,
 2. **Support (model).** Provenance doesn't make a claim true: "Translate 'I live
    in Berlin'" contains the quote but doesn't say where the user lives.
    Hypotheticals, negations and talk about other people pass a substring check
-   too. So each surviving operation goes through a short verify call: "Does the
-   quote, as the user's own statement, support this claim about <subject>?
-   yes / no / unclear". Only `yes` is applied.
+   too. So each surviving operation goes through a short verify call that sees
+   the **whole user message** with the quote marked in it, and the assistant
+   message before it for context: "Does the user, speaking for themselves, say
+   this about <subject>? yes / no / unclear". Only `yes` is applied.
 
 ### Same thing, one note: reconcile
 
@@ -104,7 +105,10 @@ same: "prefers long answers" and "prefers short answers" can be close.
 4. **Reconcile in code + one classify call.** Any operation that creates or
    changes text (an `add` or `update` from reflection, an edit or restore in
    Settings, a tidy-up merge) is first compared by embedding with active
-   **and expired** notes of its subject. If the top candidates are within reach
+   **and expired** notes of its subject. A change to an existing note (an
+   `update`, an edit, a restore) excludes that note from its own candidates
+   and keeps its id; the requested text is applied, and if it comes out
+   `same` as another note, the two merge (the older id survives). If the top candidates are within reach
    (similarity ≥ the candidate floor, about 0.6, calibrated by the eval), one
    classify call labels each pair: `same`, `opposite`, `narrower`, `different`.
    - `same`: confirm the existing note (an expired one comes back), add the evidence.
@@ -112,6 +116,9 @@ same: "prefers long answers" and "prefers short answers" can be close.
    - `narrower` / `different`: a new note.
 
    Equivalence is the model's call on an explicit pair, never a threshold.
+   The store enforces pinned immutability after reconcile: an outcome that
+   would confirm-in-place is fine, one that would supersede, merge or rewrite a
+   pinned note becomes a suggestion in Settings instead.
 
    **Without an embedder there is no memory.** Turning memory on asks to download
    bge-m3 (1.1 GB, multilingual, adr/0012), with the same consent as project files.
@@ -137,8 +144,10 @@ same: "prefers long answers" and "prefers short answers" can be close.
   `scope: user | project`, the code maps `project` to P. Facts about the work go
   to the project by default; `user` needs the claim to be about the person
   (tone, language, hardware, habits).
-- Moving a chat to another project or deleting a project: below (snapshot,
-  deletion).
+- Moving a chat to another project: its snapshot is rebuilt (below).
+- Deleting a project deletes its `project:` notes, drops queued batches for it,
+  and rejects any in-flight write to its id at commit. Its chats (which project
+  deletion keeps) lose those notes from their snapshots.
 
 ### When reflection runs
 
@@ -176,11 +185,17 @@ same: "prefers long answers" and "prefers short answers" can be close.
 - **A snapshot per chat.** The rendered memory block, its note ids and the memory
   generation, saved in the chat file. It's built at the chat's first request and
   reused as is, so the block (and, where nothing before it changes, the prompt
-  prefix) stays the same for the KV cache. Rebuilt when:
-  - the chat moves to another project;
-  - the chat is compacted;
-  - the model or profile changes and the block is over the new budget;
-  - one of its notes is forgotten or memory is turned off (privacy beats the cache).
+  prefix) stays the same for the KV cache. Every committed change to memory
+  (any operation, an edit in Settings, expiry, a cascade from a deleted chat or
+  project, a settings change) raises the memory generation. Before each request
+  the snapshot is checked against the current generation, and it is rebuilt when:
+  - one of its notes changed, was forgotten, expired, or is no longer eligible
+    (its kind turned off, project memory off, memory off): privacy and the
+    user's settings beat the cache;
+  - the chat moved to another project or was compacted;
+  - the model or profile changed and the block is over the new budget.
+
+  New notes alone don't rebuild a snapshot: they reach the next chat.
 - **Position.** In `chatSystemPrompt`: after the profile's prompt, before the
   project's instructions and pinned files.
 - **Choice.**
@@ -214,8 +229,12 @@ whenever memory is on.
 
 - **Forget** (one note, or every note learned from one chat):
   - the note is deleted;
-  - a tombstone (the text's embedding, its subject and the source quotes' hashes)
-    stops reflection from writing it again from the same evidence;
+  - a tombstone (its subject, the source quotes' hashes and the text's
+    embedding; never the text) stops reflection from writing it again: the
+    hashes block the same evidence for good, the embedding blocks close
+    rewordings. An embedder change can't re-embed text that's gone, so the
+    embeddings are dropped then and only the hash block remains (Settings says
+    so when it happens);
   - the snapshots that held it are rebuilt;
   - the memory generation goes up, and a queued batch started under an older
     generation re-checks before commit.
