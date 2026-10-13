@@ -24,7 +24,7 @@ shots = [
  ("02-music", "LLMTray-08-music.png", (0, 60, 2880, 1645),
   "Make a song", "A song with vocals from a description, made right here."),
  ("03-chat", "LLMTray-02-chat.png", None,
-  "Zero cloud footprint", "Open models like Gemma and Nemotron run right here. Your chats never leave your computer."),
+  "Zero cloud footprint", "Open models like Gemma and Nemotron run right here. Your chats stay on your computer."),
  ("04-getting-started", "LLMTray-03-getting-started.png", NO_MENUBAR,
   "Up and running in minutes", "A guided start: chat, add your files, turn on images, music and voice."),
  ("05-models", "LLMTray-04-models.png", SETTINGS,
