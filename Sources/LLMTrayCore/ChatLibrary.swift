@@ -175,15 +175,17 @@ public struct ProjectContext: Equatable {
 }
 
 /// The system prompt of a chat request, in its order (adr/0012): the
-/// profile's, then the project's instructions, then its pinned files, then
-/// the tool-use policy (nil when no tools are offered). Empty parts are
-/// left out. The pinned files come before the policy, which can change
-/// within a turn: the prefix the server's prompt cache reuses stays whole.
-public func chatSystemPrompt(profile: String, project: ProjectContext?, toolUsePolicy: String?) -> String {
+/// profile's, then the chat's memory block (adr/0024; nil without one),
+/// then the project's instructions, then its pinned files, then the
+/// tool-use policy (nil when no tools are offered). Empty parts are left
+/// out. The pinned files come before the policy, which can change within a
+/// turn: the prefix the server's prompt cache reuses stays whole.
+public func chatSystemPrompt(profile: String, memory: String? = nil, project: ProjectContext?, toolUsePolicy: String?) -> String {
     let instructions = project?.instructions.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     let projectPart = instructions.isEmpty ? "" : "Instructions for this chat's project, \"\(project?.name ?? "")\":\n\(instructions)"
     let pinned = project.map { PinnedFiles.block($0.pinned, notes: $0.pinnedLeftOut) } ?? ""
-    return [profile.trimmingCharacters(in: .whitespacesAndNewlines), projectPart, pinned, toolUsePolicy ?? ""]
+    let memoryPart = memory?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    return [profile.trimmingCharacters(in: .whitespacesAndNewlines), memoryPart, projectPart, pinned, toolUsePolicy ?? ""]
         .filter { !$0.isEmpty }
         .joined(separator: "\n\n")
 }

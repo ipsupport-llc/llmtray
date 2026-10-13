@@ -251,6 +251,9 @@ struct ChatSettings {
     /// through its tool rounds like modelPath; nil for a chat in none and
     /// for a temporary chat.
     var project: ProjectContext?
+    /// The chat's memory block (adr/0024), set when the turn starts like
+    /// `project`; nil in a temporary chat, with memory off, or with no note.
+    var memoryBlock: String?
     /// The chat as the folder tools know it (adr/0014), set when the turn
     /// starts while the feature is on; nil: no folder tool is declared.
     var folders: FolderChat?

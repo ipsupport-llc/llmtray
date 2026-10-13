@@ -74,8 +74,10 @@
 "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it." = "A chat can look in folders you allow and propose new folders, moves and renames. You approve every change and can undo it.";
 "A chat model" = "A chat model";
 "A client" = "A client";
+"A deleted project" = "A deleted project";
 "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music." = "A fuller, more finished-sounding mix; the lyrics come through less clearly. About 20 s for 30 s of music.";
 "A model is a tool, not an authority" = "A model is a tool, not an authority";
+"A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire." = "A note counts for half as much after this long without being confirmed, and expires after about three times as long. Pinned notes never expire.";
 "A package: moved as one item." = "A package: moved as one item.";
 "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers." = "A per-layer embedding table (Gemma 4 E2B, E4B) is read from disk as needed, and image and audio parts (Gemma 4, Qwen 3.5) load the first time they're used. Up to about 2 GB less memory, for Macs with 8 GB; with the table on disk, generation is about 10% slower. Same answers.";
 "A quiet check at every launch. Only shows anything if an update exists." = "A quiet check at every launch. Only shows anything if an update exists.";
@@ -91,10 +93,14 @@
 "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)" = "ACE-Step sft — clear vocals, GPTQ 4-bit (less memory)";
 "ACE-Step sft — clear vocals, full precision" = "ACE-Step sft — clear vocals, full precision";
 "ACE-Step turbo — fuller sound" = "ACE-Step turbo — fuller sound";
+"About" = "About";
 "About LLMTray" = "About LLMTray";
+"About you" = "About you";
+"About you and your work: what you do, what you use." = "About you and your work: what you do, what you use.";
 "Add" = "Add";
 "Add Files to “%@”…" = "Add Files to “%@”…";
 "Add Files…" = "Add Files…";
+"Add Note…" = "Add Note…";
 "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation." = "Add PDFs, Word and text files to a project. Its chats search them and cite the page; pin a file to keep all of it in the conversation.";
 "Add files" = "Add files";
 "Add files or folders" = "Add files or folders";
@@ -135,6 +141,7 @@
 "An OpenAI-compatible API on localhost for other apps." = "An OpenAI-compatible API on localhost for other apps.";
 "An alias: the alias itself, not what it points to." = "An alias: the alias itself, not what it points to.";
 "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches." = "An editor, an agent or a script asking for a model other than the one loaded. Switching unloads the loaded one -- the chat's too. Ask first: a notification with Switch / Keep; unanswered in a minute counts as Keep. Keep: the client gets an error naming the loaded model. The app's own chat always switches.";
+"An expired note isn't sent any more; you can bring it back until it's deleted." = "An expired note isn't sent any more; you can bring it back until it's deleted.";
 "An item needs the new folder it goes into: tick that folder too." = "An item needs the new folder it goes into: tick that folder too.";
 "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type." = "An optional tip: no subscriptions, no feature locks. Supporters can choose to be listed by a name they type.";
 "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal." = "An unsure item may or may not have changed: look at it in Finder. Settings > Files keeps the journal.";
@@ -145,10 +152,12 @@
 "Answer" = "Answer";
 "Answer (all requests)" = "Answer (all requests)";
 "Answer details" = "Answer details";
+"Answer in Russian, briefly" = "Answer in Russian, briefly";
 "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>." = "Any other mlx_lm.server flags, space-separated, e.g. --draft-model <path>.";
 "Apache License 2.0" = "Apache License 2.0";
 "App language" = "App language";
 "Apply to profile" = "Apply to profile";
+"Approve" = "Approve";
 "Approve Selected" = "Approve Selected";
 "Apps & agents" = "Apps & agents";
 "Apps and agents" = "Apps and agents";
@@ -159,6 +168,7 @@
 "Ask anything." = "Ask anything.";
 "Ask first" = "Ask first";
 "Assistant" = "Assistant";
+"At most %d characters: a note is one short statement." = "At most %d characters: a note is one short statement.";
 "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent." = "At most one report a day, covering one past day, to ipsupport.us. A day not sent yet goes on the next launch, up to 7 days back. Turning this off deletes what wasn't sent.";
 "Attach Images…" = "Attach Images…";
 "Attach images" = "Attach images";
@@ -207,6 +217,7 @@
 "Change the prompt, the model or the shape, then make another version" = "Change the prompt, the model or the shape, then make another version";
 "Change the style, lyrics, model or knobs, then make another version" = "Change the style, lyrics, model or knobs, then make another version";
 "Changed since it was proposed: %@" = "Changed since it was proposed: %@";
+"Changed: the chat gets this from its next message" = "Changed: the chat gets this from its next message";
 "Changes an image you attach or one made in the chat, with FLUX.2 klein 4B." = "Changes an image you attach or one made in the chat, with FLUX.2 klein 4B.";
 "Changing files: %1$lld of %2$lld…" = "Changing files: %1$lld of %2$lld…";
 "Chat" = "Chat";
@@ -218,6 +229,8 @@
 "Chat with language models that run on this Mac." = "Chat with language models that run on this Mac.";
 "Chat with the files of a project" = "Chat with the files of a project";
 "Chats" = "Chats";
+"Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer." = "Chats start with short notes about you and your work: how you like answers, what you're working on, what you corrected before. Only the notes that fit the budget go, and only in LLMTray's own chats -- never to apps using the API, never in temporary chats. Everything stays on this computer.";
+"Chats won't get them any more. This can't be undone." = "Chats won't get them any more. This can't be undone.";
 "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again." = "Chats, projects, profiles and the image, music, voice and embedding models from the version from ipsupport.us are here now. Folders you'd given it access to, and your chat models folder, need your OK again.";
 "Check Again" = "Check Again";
 "Check Now" = "Check Now";
@@ -267,6 +280,8 @@
 "Copy the song as an audio file" = "Copy the song as an audio file";
 "Copy the text" = "Copy the text";
 "Copying the included runtime…" = "Copying the included runtime…";
+"Correction" = "Correction";
+"Corrections" = "Corrections";
 "Couldn't be added: %@" = "Couldn't be added: %@";
 "Couldn't create the report: %@" = "Couldn't create the report: %@";
 "Couldn't move “%@” to the Trash: %@" = "Couldn't move “%@” to the Trash: %@";
@@ -293,6 +308,7 @@
 "Delete" = "Delete";
 "Delete Project" = "Delete Project";
 "Delete Project…" = "Delete Project…";
+"Delete expired notes after %lld days" = "Delete expired notes after %lld days";
 "Delete model" = "Delete model";
 "Delete profile “%@”?" = "Delete profile “%@”?";
 "Delete this chat?" = "Delete this chat?";
@@ -353,7 +369,9 @@
 "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice." = "Echo cancellation couldn't start: %@ -- turn it off in Settings > Voice.";
 "Echo cancellation isn't available on this Mac." = "Echo cancellation isn't available on this Mac.";
 "Echo gate" = "Echo gate";
+"Edit Note" = "Edit Note";
 "Edit Profile…" = "Edit Profile…";
+"Edit…" = "Edit…";
 "Embedding model" = "Embedding model";
 "Enable Project Files…" = "Enable Project Files…";
 "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it." = "Enable Project files in Settings › Files first: then the LLMTray guide is added here, and answers cite it.";
@@ -380,8 +398,11 @@
 "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac." = "Exactly what LLMTray sends to ipsupport.us, field for field. Nothing else leaves your Mac.";
 "Experimental — English only" = "Experimental — English only";
 "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after." = "Experimental — English only. The chat model is unloaded while Voice Lab runs, and reloads after.";
+"Expired" = "Expired";
 "Extra server arguments" = "Extra server arguments";
 "FLUX.2 klein 4B — generate and edit" = "FLUX.2 klein 4B — generate and edit";
+"Fact" = "Fact";
+"Facts" = "Facts";
 "Failed to reload the chat model after image generation: %@" = "Failed to reload the chat model after image generation: %@";
 "Failed: %@" = "Failed: %@";
 "Fast (smaller canvas)" = "Fast (smaller canvas)";
@@ -415,6 +436,10 @@
 "For an Hour" = "For an Hour";
 "For faster answers (speculative decoding)" = "For faster answers (speculative decoding)";
 "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it." = "For models with a published drafter (Gemma 4 26B) or their own MTP head (our Qwen 3.5 models, downloaded with them): it guesses tokens ahead and the main model checks them in one pass. Same output, faster. A request gets it while it's alone; with several at once they share the batch without it.";
+"For now you write the notes yourself. Learning them from your chats comes in a later version." = "For now you write the notes yourself. Learning them from your chats comes in a later version.";
+"Forget" = "Forget";
+"Forget Everything" = "Forget Everything";
+"Forget Everything…" = "Forget Everything…";
 "Found after an interruption" = "Found after an interruption";
 "Founding Supporters" = "Founding Supporters";
 "Free disk space" = "Free disk space";
@@ -462,6 +487,7 @@
 "How do I connect my coding agent to LLMTray?" = "How do I connect my coding agent to LLMTray?";
 "How do you like LLMTray?" = "How do you like LLMTray?";
 "How it was made" = "How it was made";
+"How long notes last" = "How long notes last";
 "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it." = "How many prompt tokens are processed per step. Bigger is faster on long prompts but uses more memory. The benchmark's auto-tune can pick it.";
 "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another." = "How many requests the server answers at once -- your chat and a coding agent, say. One request alone runs at full speed (with its drafter or MTP head); with more they share each GPU step: each a bit slower, all together faster. Every running request holds its own context in memory, so a Mac with little memory to spare answers fewer at once. 1: one after another.";
 "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads." = "How many times you used each of: chat, tool calls, the API server (other apps), image generation, image editing, music, model downloads.";
@@ -469,6 +495,7 @@
 "How much memory the GPU may use. A model's files must fit under it." = "How much memory the GPU may use. A model's files must fit under it.";
 "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s." = "How songs are kept, saved and shared. AAC 256 kbit/s: about 1 MB per 30 s, indistinguishable for most listening. Uncompressed WAV: about 6 MB per 30 s.";
 "How strictly the music follows the style the model described. Higher: closer to it; lower: freer." = "How strictly the music follows the style the model described. Higher: closer to it; lower: freer.";
+"How you like things: language, length, tone, formatting." = "How you like things: language, length, tone, formatting.";
 "How?" = "How?";
 "Hugging Face answered HTTP %d for %@." = "Hugging Face answered HTTP %d for %@.";
 "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models." = "Hugging Face refused %@ (HTTP %d): it's gated or private, or doesn't exist. If it's gated, accept its license on huggingface.co/%@ and check the token in Settings → Models.";
@@ -529,6 +556,7 @@
 "KV group size" = "KV group size";
 "Keep" = "Keep";
 "Keep %@ loaded" = "Keep %@ loaded";
+"Keep at most %lld notes" = "Keep at most %lld notes";
 "Keep current" = "Keep current";
 "Keep first messages: %lld" = "Keep first messages: %lld";
 "Keep last messages: %lld" = "Keep last messages: %lld";
@@ -536,6 +564,7 @@
 "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts." = "Keeps the first N tokens of context at full precision before quantizing. Higher trades memory savings for accuracy on long prompts.";
 "Keeps this port. If another app really has it, the server won't start until you change the port in Settings." = "Keeps this port. If another app really has it, the server won't start until you change the port in Settings.";
 "Kept free: %lld MB" = "Kept free: %lld MB";
+"Kind" = "Kind";
 "LLMTray" = "LLMTray";
 "LLMTray Guide" = "LLMTray Guide";
 "LLMTray isn't allowed to use the microphone." = "LLMTray isn't allowed to use the microphone.";
@@ -590,7 +619,9 @@
 "Max tokens" = "Max tokens";
 "Measuring the file…" = "Measuring the file…";
 "Memory" = "Memory";
+"Memory Settings…" = "Memory Settings…";
 "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory." = "Memory kept for reusing earlier conversations' context, so a continued chat doesn't re-read its whole history. Capped so it can't grow until the server runs out of memory.";
+"Memory: %d" = "Memory: %d";
 "Message…" = "Message…";
 "Microphone level" = "Microphone level";
 "Mixing…" = "Mixing…";
@@ -630,6 +661,7 @@
 "Never" = "Never";
 "New Chat" = "New Chat";
 "New Chat in Project" = "New Chat in Project";
+"New Note" = "New Note";
 "New Profile…" = "New Profile…";
 "New Project…" = "New Project…";
 "New Tab" = "New Tab";
@@ -666,6 +698,7 @@
 "No model uses it." = "No model uses it.";
 "No models found in this folder." = "No models found in this folder.";
 "No models in this folder yet. The next step offers some to download." = "No models in this folder yet. The next step offers some to download.";
+"No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\"." = "No notes yet. Add what every chat should know: \"Answer in Russian, briefly\", \"I build an ESP32 speaker\".";
 "No requests yet." = "No requests yet.";
 "No runs yet." = "No runs yet.";
 "No subscriptions. No feature locks. Support development if LLMTray is useful to you." = "No subscriptions. No feature locks. Support development if LLMTray is useful to you.";
@@ -681,13 +714,21 @@
 "Not enough free disk space: %@ needs about %@, %@ is free." = "Not enough free disk space: %@ needs about %@, %@ is free.";
 "Not identical to %@: not a duplicate." = "Not identical to %@: not a duplicate.";
 "Not indexed" = "Not indexed";
+"Not sent any more. Bring one back, or it's deleted later." = "Not sent any more. Bring one back, or it's deleted later.";
 "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif)." = "Not supported yet: %@. This version indexes text, Markdown, code, PDF, Word (docx, doc), ODT, RTF, HTML and spreadsheets (xlsx, ods), and keeps pictures (png, jpg, heic, webp, tiff, gif).";
+"Notes" = "Notes";
+"Notes about a project go to that project's chats." = "Notes about a project go to that project's chats.";
+"Notes can't hold file paths." = "Notes can't hold file paths.";
+"Notes can't hold links." = "Notes can't hold links.";
 "Nothing new to import" = "Nothing new to import";
 "Nothing sent yet." = "Nothing sent yet.";
 "Nothing to change." = "Nothing to change.";
 "Nothing to pin until the file has been read" = "Nothing to pin until the file has been read";
 "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here." = "Now its settings: choose %@ (it's already selected), then Import. Cancel keeps the settings here.";
 "OK" = "OK";
+"Observation" = "Observation";
+"Observations" = "Observations";
+"Observed: %lld" = "Observed: %lld";
 "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in." = "Of the model's context, and of the memory its weights leave for the context, what a project's pinned files may take together. The answer's max tokens stay free whatever this says. More leaves less room for the conversation, and a long first answer while the files are read in.";
 "Off" = "Off";
 "Off · enable in Settings" = "Off · enable in Settings";
@@ -716,6 +757,7 @@
 "Opens at login" = "Opens at login";
 "Other apps reach your models through an OpenAI-compatible API on this Mac." = "Other apps reach your models through an OpenAI-compatible API on this Mac.";
 "Other devices on your network can use the server" = "Other devices on your network can use the server";
+"Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept." = "Over this, the weakest notes (oldest, least certain) expire. Pinned notes are kept.";
 "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English." = "Overrides the macOS language for LLMTray only. Takes effect after LLMTray restarts. Untranslated text shows in English.";
 "PDF · %lld pages" = "PDF · %lld pages";
 "Past %lld messages" = "Past %lld messages";
@@ -735,6 +777,7 @@
 "Pictures · %lld — for documents, not searched" = "Pictures · %lld — for documents, not searched";
 "Pin" = "Pin";
 "Pin %@" = "Pin %@";
+"Pin: always sent first, never expires" = "Pin: always sent first, never expires";
 "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned." = "Pin: every chat of the project gets the whole file (≈%@ tokens). Web search and image or music generation are off in those chats while it's pinned.";
 "Pinned" = "Pinned";
 "Pinned files may take" = "Pinned files may take";
@@ -748,6 +791,8 @@
 "Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port." = "Port %lld is already used by another app, so LLMTray's server can't start on it. Choose another port.";
 "Port: %lld" = "Port: %lld";
 "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory." = "Precision of the attention cache. 8-bit: nearly lossless, half the memory. 4-bit: a quarter, noticeably worse on long context. Full: best, most memory.";
+"Preference" = "Preference";
+"Preferences" = "Preferences";
 "Prefill step" = "Prefill step";
 "Press Start and talk. Speakers work with echo cancellation; headphones are still best." = "Press Start and talk. Speakers work with echo cancellation; headphones are still best.";
 "Press Start and talk. Use headphones: the model hears its own voice from the speakers." = "Press Start and talk. Use headphones: the model hears its own voice from the speakers.";
@@ -758,6 +803,7 @@
 "Pro Supporters" = "Pro Supporters";
 "Profile" = "Profile";
 "Profiles" = "Profiles";
+"Project %@" = "Project %@";
 "Project files" = "Project files";
 "Project files are off" = "Project files are off";
 "Project files are turned off" = "Project files are turned off";
@@ -767,6 +813,7 @@
 "Project files were turned off" = "Project files were turned off";
 "Project files will be turned on first." = "Project files will be turned on first.";
 "Project name" = "Project name";
+"Project notes" = "Project notes";
 "Projects" = "Projects";
 "Projects' files on disk" = "Projects' files on disk";
 "Prompt" = "Prompt";
@@ -813,6 +860,7 @@
 "Release to cancel" = "Release to cancel";
 "Release to send" = "Release to send";
 "Release to send · move away to cancel" = "Release to send · move away to cancel";
+"Remember things between chats" = "Remember things between chats";
 "Remove" = "Remove";
 "Remove %@" = "Remove %@";
 "Remove attachment" = "Remove attachment";
@@ -841,6 +889,7 @@
 "Restart Server" = "Restart Server";
 "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off." = "Restarts the model process after this many stalled requests in a row, instead of leaving it wedged, and when its generation thread dies (e.g. out of GPU memory; at most 3 times in 10 minutes). 0 turns it off.";
 "Restarts the model process with the new settings (a few seconds to reload)." = "Restarts the model process with the new settings (a few seconds to reload).";
+"Restore" = "Restore";
 "Restore Purchases" = "Restore Purchases";
 "Resume" = "Resume";
 "Resume Download" = "Resume Download";
@@ -850,6 +899,7 @@
 "Review" = "Review";
 "Revoke" = "Revoke";
 "Revoke %@" = "Revoke %@";
+"Room in each chat: %lld tokens" = "Room in each chat: %lld tokens";
 "Run benchmark" = "Run benchmark";
 "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts." = "Run it in Terminal to raise the GPU memory limit; it resets when the Mac restarts.";
 "Running" = "Running";
@@ -1039,6 +1089,7 @@
 "The image generator is busy -- try again once it's done." = "The image generator is busy -- try again once it's done.";
 "The image generator is busy with another chat -- try again once it's done." = "The image generator is busy with another chat -- try again once it's done.";
 "The import stopped" = "The import stopped";
+"The last change couldn't be saved." = "The last change couldn't be saved.";
 "The longest answer the model may write. Also capped by the model's own context length." = "The longest answer the model may write. Also capped by the model's own context length.";
 "The macOS version." = "The macOS version.";
 "The microphone couldn't start: %@" = "The microphone couldn't start: %@";
@@ -1065,6 +1116,7 @@
 "The model's license, from its card." = "The model's license, from its card.";
 "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models." = "The models folder isn't available -- is its disk connected? Choose it again in Settings → Models.";
 "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read." = "The most the cache of earlier prompts may take (the profile's Prompt cache size is also a cap). More makes long chats and agents faster; too much leaves no room for the prompt being read.";
+"The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are." = "The most the notes take in a chat's prompt. Pinned notes and your stated preferences go first, then the rest by how recent they are.";
 "The music draft above is open: Generate or Skip it to keep chatting." = "The music draft above is open: Generate or Skip it to keep chatting.";
 "The music generator is busy -- try again once it's done." = "The music generator is busy -- try again once it's done.";
 "The music generator is busy with another chat -- try again once it's done." = "The music generator is busy with another chat -- try again once it's done.";
@@ -1073,6 +1125,7 @@
 "The name must be on one line." = "The name must be on one line.";
 "The name wasn't accepted: up to 64 characters, on one line." = "The name wasn't accepted: up to 64 characters, on one line.";
 "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it." = "The next steps set up a model and the features you want. Each one can be skipped; nothing is downloaded or enabled unless you choose it.";
+"The notes file can't be read (damaged, or from a newer LLMTray). Nothing is sent or changed until it can." = "The notes file can't be read (damaged, or from a newer LLMTray). Nothing is sent or changed until it can.";
 "The plan changed since you looked at it: review it again." = "The plan changed since you looked at it: review it again.";
 "The port and network access can change only while the server is stopped." = "The port and network access can change only while the server is stopped.";
 "The project's files, and Add Files…" = "The project's files, and Add Files…";
@@ -1113,11 +1166,13 @@
 "Thinking…" = "Thinking…";
 "Thinking… %@ s of reply ready" = "Thinking… %@ s of reply ready";
 "This Mac runs the model at ~%@× real time: talk, then listen." = "This Mac runs the model at ~%@× real time: talk, then listen.";
+"This chat knows" = "This chat knows";
 "This chat may use" = "This chat may use";
 "This couldn't be listed: the payment wasn't found, or the name was refused." = "This couldn't be listed: the payment wasn't found, or the name was refused.";
 "This folder is gone or isn't the one allowed any more: revoke it and allow it again." = "This folder is gone or isn't the one allowed any more: revoke it and allow it again.";
 "This folder is shared with LM Studio: the model is gone there too." = "This folder is shared with LM Studio: the model is gone there too.";
 "This folder's access has ended or was revoked." = "This folder's access has ended or was revoked.";
+"This looks like a key or a password: notes can't hold one." = "This looks like a key or a password: notes can't hold one.";
 "This many of the most recent messages are kept word for word when compacting." = "This many of the most recent messages are kept word for word when compacting.";
 "This model can't see images: pick one that can (a vision model) to attach them." = "This model can't see images: pick one that can (a vision model) to attach them.";
 "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit." = "This model takes %1$@ of the %2$@ GB the GPU may use; long prompts may run out of memory. Use a smaller model, or raise the GPU memory limit.";
@@ -1150,6 +1205,7 @@
 "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac." = "Tools the model may call in the in-app chat (needs a tool-calling model). Web tools send the model's query to that public service (DuckDuckGo, Google News, Wikipedia/Wikidata, Hacker News, date.nager.at, open.er-api.com, Open-Meteo); local ones never leave the Mac.";
 "Top-k" = "Top-k";
 "Top-p" = "Top-p";
+"Topic" = "Topic";
 "Total time" = "Total time";
 "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest." = "Tries 1, 2, 4 and 8 requests at once and prefill-step-size (256-4096) against the running model, restarting the server between each. Concurrent requests: the fewest that reach 90% of the best total speed (more cost memory for little); prefill: the fastest.";
 "Try Again" = "Try Again";
@@ -1230,11 +1286,15 @@
 "Welcome" = "Welcome";
 "Welcome to LLMTray" = "Welcome to LLMTray";
 "What can you do?" = "What can you do?";
+"What chats get" = "What chats get";
 "What decides which models run well here." = "What decides which models run well here.";
 "What else" = "What else";
 "What happened?" = "What happened?";
 "What the model says appears here." = "What the model says appears here.";
+"What this chat knows about you from earlier chats" = "What this chat knows about you from earlier chats";
 "What was copied before stays; importing again goes on from there. %@" = "What was copied before stays; importing again goes on from there. %@";
+"What you corrected before, so it isn't repeated." = "What you corrected before, so it isn't repeated.";
+"What you did, kept apart from what it may mean. Sent as a guess." = "What you did, kept apart from what it may mean. Sent as a guess.";
 "What you were doing, what you expected, what you saw instead. Your chats are never included." = "What you were doing, what you expected, what you saw instead. Your chats are never included.";
 "What's New" = "What's New";
 "What's New in LLMTray %@" = "What's New in LLMTray %@";

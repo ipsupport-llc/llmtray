@@ -424,6 +424,7 @@ struct ChatComposer: View {
                 .foregroundColor(.secondary)
                 .disabled(chat.isBusy)
             }
+            ChatMemoryChip()
             ChatFolderChips()
             Spacer()
             if let tps = chat.lastTokensPerSecond {

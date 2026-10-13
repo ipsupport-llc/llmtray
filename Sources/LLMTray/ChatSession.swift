@@ -132,6 +132,9 @@ struct ChatSessionFile: Codable, Identifiable {
     /// one tells the model what was added since (ProjectFilesNote). Nil in
     /// chats from before: the next message only records them.
     var projectFilesSeen: [String]? = nil
+    /// The memory block the chat got (adr/0024). Nil, and not written,
+    /// when none.
+    var memorySnapshot: MemorySnapshot? = nil
 }
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --
@@ -226,6 +229,21 @@ enum ChatSessionStore {
         guard var file = load(id: id) else { return }
         file.title = title
         save(file)
+    }
+
+    /// Saved chats whose memory block holds any of `ids` lose it (adr/0024:
+    /// a forgotten note mustn't stay in a chat file). Only files that have
+    /// a block are decoded.
+    static func dropMemorySnapshots(holdingAnyOf ids: Set<String>) {
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: sessionsDir) else { return }
+        let key = Data("\"memorySnapshot\"".utf8)
+        for name in names where name.hasSuffix(".json") {
+            guard let data = FileManager.default.contents(atPath: sessionsDir + "/" + name), data.range(of: key) != nil,
+                  var file = try? decoder.decode(ChatSessionFile.self, from: data),
+                  let snapshot = file.memorySnapshot, !ids.isDisjoint(with: snapshot.noteIDs) else { continue }
+            file.memorySnapshot = nil
+            save(file)
+        }
     }
 
     static func delete(id: UUID) {
