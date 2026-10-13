@@ -440,6 +440,9 @@ final class ModelProxyServer {
             MainActor.assumeIsolated {
                 guard let self, self.admission.background == id else { return }
                 self.server.appendLog("--- proxy: background work didn't end 30 s after it was cancelled -- going on without it ---\n")
+                // Ended here, server counts and all (its own late end is
+                // then a no-op); one still waiting for its turn holds none.
+                self.backgroundForward?.abandon()
                 self.endBackground(id)
             }
         }
@@ -723,6 +726,17 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
             preempted = true
         }
         cancelUpstream()
+    }
+
+    /// Given up on (cancelled, yet not ended): ended now as if completed
+    /// -- the server's counts released, the connection closed. Whatever
+    /// URLSession reports later finds it finished.
+    func abandon() {
+        guard finish(stalled: false) else { return }
+        MainActor.assumeIsolated {
+            session?.invalidateAndCancel()
+            connection.cancel()
+        }
     }
 
     private func cancelUpstream() {
