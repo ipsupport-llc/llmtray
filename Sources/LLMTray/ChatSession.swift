@@ -132,6 +132,9 @@ struct ChatSessionFile: Codable, Identifiable {
     /// one tells the model what was added since (ProjectFilesNote). Nil in
     /// chats from before: the next message only records them.
     var projectFilesSeen: [String]? = nil
+    /// The memory block the chat got (adr/0024). Nil, and not written,
+    /// when none.
+    var memorySnapshot: MemorySnapshot? = nil
 }
 
 /// One JSON file per session under Application Support/LLMTray/sessions/ --

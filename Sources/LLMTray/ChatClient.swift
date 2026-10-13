@@ -168,6 +168,9 @@ final class ChatClient: ObservableObject {
     /// This chat's prompt-token estimate (adr/0012), calibrated by each
     /// response's usage against the request it answered.
     private var tokenEstimator = PromptTokenEstimator()
+    /// The memory block this chat got (adr/0024), kept with it so its
+    /// system prompt stays the same while the notes in it don't change.
+    @Published private(set) var memorySnapshot: MemorySnapshot?
     /// A request's shape for the estimate: its size, how many messages of
     /// the history it sent, and the rest serialized -- the system prompt
     /// and parameters, and each tool declaration by name; and its model
@@ -300,6 +303,7 @@ final class ChatClient: ObservableObject {
         loadedToolGroups = []
         pendingToolGroups = []
         projectFilesSeen = nil
+        memorySnapshot = nil
     }
 
     /// The user loads a tool group from the + menu (adr/0020): declared
@@ -343,6 +347,7 @@ final class ChatClient: ObservableObject {
         currentSessionID = file.id
         loadedToolGroups = Set((file.loadedToolGroups ?? []).filter { ToolGroups.named($0) != nil })
         projectFilesSeen = file.projectFilesSeen
+        memorySnapshot = file.memorySnapshot
         pendingToolGroups = Set((file.pendingToolGroups ?? []).filter { ToolGroups.named($0) != nil }).subtracting(loadedToolGroups)
         folderChatID = Self.folderChatID(file.id)
         currentSessionTitle = file.title
@@ -484,7 +489,8 @@ final class ChatClient: ObservableObject {
             messages: persisted,
             loadedToolGroups: loadedToolGroups.isEmpty ? nil : loadedToolGroups.sorted(),
             pendingToolGroups: pendingToolGroups.isEmpty ? nil : pendingToolGroups.sorted(),
-            projectFilesSeen: projectFilesSeen
+            projectFilesSeen: projectFilesSeen,
+            memorySnapshot: memorySnapshot
         )
         // Images no message refers to any more (compacted, regenerated):
         // only once the chat that no longer lists them is on disk.
@@ -573,6 +579,8 @@ final class ChatClient: ObservableObject {
             // conversation's summary there.
             guard epoch == conversationEpoch, !Task.isCancelled, middleRange.upperBound <= messages.count else { return }
             messages.replaceSubrange(middleRange, with: [ChatMessage(role: "assistant", content: summary, isSummary: true)])
+            // Chosen again for what the chat is now (adr/0024).
+            memorySnapshot = nil
             persistCurrentSession()
         } catch {
             guard epoch == conversationEpoch, !Task.isCancelled else { return }
@@ -639,7 +647,23 @@ final class ChatClient: ObservableObject {
         settings.folders = folderChat
         settings.documentsSession = UserDefaults.standard[Pref.documentsEnabled] ? currentSessionID : nil
         settings.loadedToolGroups = loadedToolGroups
+        settings.memoryBlock = memoryBlock(project: settings.project?.id)
         return settings
+    }
+
+    /// The chat's memory block (adr/0024): the one it has while its notes
+    /// stand, else chosen anew. None in a temporary chat.
+    private func memoryBlock(project: UUID?) -> String? {
+        guard currentSessionID != nil else { return nil }
+        let estimator = tokenEstimator
+        let next = MemoryManager.shared.snapshot(current: memorySnapshot, project: project) {
+            estimator.estimate(PromptTokenEstimator.Measure(bytes: $0.utf8.count))
+        }
+        if next != memorySnapshot {
+            memorySnapshot = next
+            hasUnsavedChanges = true
+        }
+        return next?.text
     }
 
     // MARK: - Folder access (adr/0014)

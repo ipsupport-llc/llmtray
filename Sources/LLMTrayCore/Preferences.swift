@@ -134,6 +134,21 @@ public enum Pref {
     /// Chats may make PDF documents (make_document, adr/0020): off until turned on.
     public static let documentsEnabled = PrefKey("llmtray.documents.enabled", default: false)
 
+    // Memory between chats (adr/0024): off until turned on.
+    public static let memoryEnabled = PrefKey("llmtray.memory.enabled", default: false)
+    /// The kinds learned and sent: MemoryKind raw values, comma-separated.
+    public static let memoryKinds = PrefKey("llmtray.memory.kinds", default: "fact,preference,correction,observation")
+    /// The memory block's room in a chat request, in tokens.
+    public static let memoryBudgetTokens = PrefKey("llmtray.memory.budgetTokens", default: 300)
+    public static let memoryMaxActive = PrefKey("llmtray.memory.maxActive", default: 300)
+    /// Half-lives in days, per kind.
+    public static let memoryHalfLifeFact = PrefKey("llmtray.memory.halfLife.fact", default: 90)
+    public static let memoryHalfLifePreference = PrefKey("llmtray.memory.halfLife.preference", default: 180)
+    public static let memoryHalfLifeCorrection = PrefKey("llmtray.memory.halfLife.correction", default: 180)
+    public static let memoryHalfLifeObservation = PrefKey("llmtray.memory.halfLife.observation", default: 30)
+    public static let memoryDeleteExpiredAfterDays = PrefKey("llmtray.memory.deleteExpiredAfterDays", default: 30)
+    public static let memoryProjects = PrefKey("llmtray.memory.projects", default: true)
+
     // Updates
     public static let betaUpdates = PrefKey("llmtray.betaUpdates", default: false)
     public static let checkUpdatesAtLaunch = PrefKey("llmtray.checkUpdatesAtLaunch", default: true)

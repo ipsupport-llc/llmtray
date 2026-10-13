@@ -182,6 +182,8 @@ final class ChatLibraryStore: ObservableObject {
         // Not saved (a full disk): the project would come back at the next
         // launch without its directory. The record finishes it then.
         guard saveLibrary() else { return }
+        // What memory held about it goes too (adr/0024).
+        MemoryManager.shared.change { $0.forget(project: id) }
         // Its indexing cancelled and its index closed first (after the write
         // in progress): the directory isn't removed from under a connection,
         // and nothing recreates it. A quit meanwhile leaves the record.
