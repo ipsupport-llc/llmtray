@@ -404,12 +404,12 @@ final class MemoryReflector: ObservableObject {
                 } else if case .earlierAdd? = related(.same) {
                     // Said twice in this batch: the first stands.
                     continue
-                } else if case .note(let note)? = related(.opposite), !note.pinned, fixedSubject.map({ note.subject == $0 }) ?? true {
+                } else if case .note(let note)? = related(.opposite), !note.pinned, note.subject == p.subject {
                     changes.append(.supersede(id: note.id, text: text, evidence: evidence, vector: vector, wrongLanguage: wrongLanguage))
                 } else {
-                    // New -- also when it contradicts a note this chat may
-                    // not change (the user's, another place's): its own place
-                    // gets its own note.
+                    // New -- also when it contradicts a note of another place
+                    // (the user's, another project's, shared or not): its own
+                    // place gets its own note, the other stays.
                     changes.append(.add(subject: p.subject, topic: MemoryTopics.learned(p.op.topic), kind: kind, text: text,
                                         observed: kind == .observation ? p.op.observed : nil,
                                         confidence: kind == .observation ? .inferred : .stated, evidence: evidence,
