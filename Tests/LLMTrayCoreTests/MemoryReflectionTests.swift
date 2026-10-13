@@ -47,6 +47,7 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertNil(MemoryReflection.parseOperations("{No durable facts found}"), "unreadable, not empty")
         XCTAssertNil(MemoryReflection.parseOperations("Nonetheless, nothing here."))
         XCTAssertEqual(MemoryReflection.parseOperations("none."), [])
+        XCTAssertEqual(MemoryReflection.parseOperations(#"{"ops":[]}"# + "\n" + #"{"ops":[]}"#), [])
         let mixed = #"{"ops":[{"op":"confirm","id":"m1","quote":"short please"}]}"# + "\n" + #"{"op":"confirm","id":"m2","quote":"in russian"}"#
         XCTAssertEqual(MemoryReflection.parseOperations(mixed)?.compactMap(\.id), ["m1", "m2"])
     }
