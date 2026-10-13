@@ -735,8 +735,21 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         guard finish(stalled: false) else { return }
         MainActor.assumeIsolated {
             session?.invalidateAndCancel()
-            connection.cancel()
+            if headersSent {
+                connection.cancel()
+            } else {
+                sendPreempted()
+            }
         }
+    }
+
+    /// 503 background_preempted: the app tries it again later.
+    private func sendPreempted() {
+        let body = "{\"error\":{\"message\":\"a foreground request came\",\"type\":\"background_refused\",\"code\":\"\(BackgroundRequest.preemptedCode)\"}}"
+        let response = "HTTP/1.1 503 Service Unavailable\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
+        connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
+            connection.cancel()
+        })
     }
 
     private func cancelUpstream() {
@@ -878,11 +891,7 @@ private final class ProxyForwardDelegate: NSObject, URLSessionDataDelegate {
         // connection) until it's invalidated.
         defer { session.finishTasksAndInvalidate() }
         if preempted, !headersSent {
-            let body = "{\"error\":{\"message\":\"a foreground request came\",\"type\":\"background_refused\",\"code\":\"\(BackgroundRequest.preemptedCode)\"}}"
-            let response = "HTTP/1.1 503 Service Unavailable\r\nContent-Type: application/json\r\nContent-Length: \(body.utf8.count)\r\nConnection: close\r\n\r\n\(body)"
-            connection.send(content: response.data(using: .utf8), completion: .contentProcessed { [connection] _ in
-                connection.cancel()
-            })
+            sendPreempted()
             return
         }
         if error != nil, headersSent {
