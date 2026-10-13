@@ -63,15 +63,21 @@ final class MemoryManager: ObservableObject {
 
     /// Applies a change and saves it. Not while the file is unreadable.
     /// Notes it removed leave every chat's block at once, saved chats too.
-    func change(_ apply: (inout MemoryFile) -> Void) {
-        guard !unreadable else { return }
+    /// False when it couldn't be saved (or the file can't be read).
+    @discardableResult
+    func change(_ apply: (inout MemoryFile) -> Void) -> Bool {
+        guard !unreadable else { return false }
         var updated = file
         apply(&updated)
-        guard updated != file else { return }
+        guard updated != file else { return true }
+        // Saved first: a change that didn't reach the disk isn't made (a
+        // watermark moved in memory only would let compaction drop what
+        // the queue never kept).
+        guard save(updated) else { return false }
         let removed = Set(file.notes.map(\.id)).subtracting(updated.notes.map(\.id))
         file = updated
-        save()
         if !removed.isEmpty { dropFromChats(removed) }
+        return true
     }
 
     /// Expiry: at most once an hour as chats start, and at once when the
@@ -93,15 +99,17 @@ final class MemoryManager: ObservableObject {
         ChatSessionStore.dropMemorySnapshots(holdingAnyOf: ids)
     }
 
-    private func save() {
+    private func save(_ file: MemoryFile) -> Bool {
         do {
             try FileManager.default.createDirectory(atPath: Self.directory, withIntermediateDirectories: true)
             let data = try Self.encoder.encode(file)
             // Atomic: a crash mid-write mustn't lose the notes.
             try data.write(to: URL(fileURLWithPath: Self.path), options: .atomic)
             saveFailed = false
+            return true
         } catch {
             saveFailed = true
+            return false
         }
     }
 

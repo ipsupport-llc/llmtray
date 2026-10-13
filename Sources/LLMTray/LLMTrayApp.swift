@@ -383,6 +383,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        // What open chats said since memory last read them: queued now,
+        // learned from at the next launch (adr/0024).
+        tabs.tabs.forEach { $0.queueForMemory() }
         tabs.saveAll()
         ProjectIndexer.shared.shutdown()
         ProfileManager.shared.flushPendingWrites()
