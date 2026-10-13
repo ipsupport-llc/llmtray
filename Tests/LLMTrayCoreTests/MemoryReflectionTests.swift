@@ -33,6 +33,23 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(ops[1].id, "m3")
         XCTAssertNil(MemoryReflection.parseOperations("no json here"))
         XCTAssertEqual(MemoryReflection.parseOperations(#"{"ops": []}"#), [])
+        XCTAssertEqual(MemoryReflection.parseOperations("NONE"), [])
+    }
+
+    func testOperationsOnePerLineSurviveABrokenOne() {
+        let reply = """
+        {"op":"add","scope":"user","topic":"tone","kind":"preference","text":"Short answers","quote":"keep it short"}
+        {"op":"add","kind":"fact","text":"Broken" "quote":
+        {"op":"confirm","id":"m2","quote":"in Russian please"},
+        """
+        let ops = MemoryReflection.parseOperations(reply)!
+        XCTAssertEqual(ops.map(\.action), [.add, .confirm])
+        XCTAssertNil(MemoryReflection.parseOperations("{No durable facts found}"), "unreadable, not empty")
+        XCTAssertNil(MemoryReflection.parseOperations("Nonetheless, nothing here."))
+        XCTAssertEqual(MemoryReflection.parseOperations("none."), [])
+        XCTAssertEqual(MemoryReflection.parseOperations(#"{"ops":[]}"# + "\n" + #"{"ops":[]}"#), [])
+        let mixed = #"{"ops":[{"op":"confirm","id":"m1","quote":"short please"}]}"# + "\n" + #"{"op":"confirm","id":"m2","quote":"in russian"}"#
+        XCTAssertEqual(MemoryReflection.parseOperations(mixed)?.compactMap(\.id), ["m1", "m2"])
     }
 
     func testOperationsAreCapped() {
@@ -67,7 +84,10 @@ final class MemoryReflectionTests: XCTestCase {
         XCTAssertEqual(MemoryReflection.source(of: "keep it short", in: b)?.seq, 1)
         XCTAssertNil(MemoryReflection.source(of: "I live in Berlin", in: b), "inside a code fence")
         XCTAssertNil(MemoryReflection.source(of: "lives in Paris", in: b), "the assistant's words")
-        XCTAssertNil(MemoryReflection.source(of: "short", in: b), "one word says nothing on its own")
+        XCTAssertNil(MemoryReflection.source(of: "short", in: b), "one short word says nothing on its own")
+        let ru = batch(["Отвечай по-русски, ладно? Конечно."])
+        XCTAssertEqual(MemoryReflection.source(of: "по-русски", in: ru)?.seq, 1)
+        XCTAssertNil(MemoryReflection.source(of: "Конечно", in: ru))
     }
 
     func testVerifyMarksTheQuoteInTheWholeMessage() {

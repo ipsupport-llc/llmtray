@@ -111,12 +111,15 @@ same: "prefers long answers" and "prefers short answers" can be close.
    and keeps its id; the requested text is applied, and if it comes out
    `same` as another note, the two merge (the older id survives). If the top candidates are within reach
    (similarity ≥ the candidate floor, about 0.6, calibrated by the eval), one
-   classify call labels each pair: `same`, `opposite`, `narrower`, `different`.
-   - `same`: confirm the existing note (an expired one comes back), add the evidence.
+   classify call labels each pair: `same`, `opposite`, `narrower`, `broader` (the new one says less than the old), `different`.
+   - `same` or `broader`: confirm the existing note (an expired one comes back), add the evidence.
    - `opposite`: supersede the existing note.
    - `narrower` / `different`: a new note.
 
    Equivalence is the model's call on an explicit pair, never a threshold.
+   An `update` from reflection is also compared with its own note: if it says
+   less (`broader`), it's a confirm -- found in the first live run, where a
+   small model turned "short answers, in Russian" into "short answers".
    The store enforces pinned immutability after reconcile: an outcome that
    would confirm-in-place is fine, one that would supersede, merge or rewrite a
    pinned note becomes a suggestion in Settings instead.

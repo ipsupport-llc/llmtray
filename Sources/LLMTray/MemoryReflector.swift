@@ -368,7 +368,8 @@ final class MemoryReflector: ObservableObject {
             }
             pending.append(Pending(op: op, message: message, subject: subject,
                                    claim: MemoryReflection.Claim(statement: statement, aboutProject: { if case .project = subject { return true } else { return false } }(),
-                                                                 message: message.text, quote: op.quote, before: message.before)))
+                                                                 message: message.text, quote: op.quote, before: message.before,
+                                                                 isObservation: op.action == .add && op.kind == .observation)))
         }
         guard !pending.isEmpty else {
             return commit(batch, changes: [], since: since, vectors: vectors, newVectors: [:])
@@ -395,7 +396,7 @@ final class MemoryReflector: ObservableObject {
         // Reconcile against a working set: every new or changed text with
         // the notes close to it (active or expired, not its own) and the
         // batch's earlier additions; the model says how each pair relates.
-        enum Target { case note(MemoryNote), earlierAdd(Int) }
+        enum Target { case note(MemoryNote), earlierAdd(Int), own(MemoryNote) }
         var pairs: [(new: String, old: String)] = []
         var owners: [(item: Int, target: Target)] = []
         for (i, p) in pending.enumerated() where [.add, .update, .supersede].contains(p.op.action) {
@@ -421,6 +422,13 @@ final class MemoryReflector: ObservableObject {
             for (note, _) in close {
                 pairs.append((new: text, old: note.text))
                 owners.append((i, .note(note)))
+            }
+            // An update against its own note: one that says less than the
+            // note did isn't an update ("short answers" after "short
+            // answers, in Russian" mustn't lose the Russian).
+            if p.op.action == .update, let own = p.op.id.flatMap({ shown[$0] }) {
+                pairs.append((new: text, old: own.text))
+                owners.append((i, .own(own)))
             }
             guard p.op.action == .add else { continue }
             for j in 0..<i where pending[j].op.action == .add && pending[j].subject == p.subject {
@@ -454,9 +462,10 @@ final class MemoryReflector: ObservableObject {
             switch p.op.action {
             case .add:
                 guard let kind = p.op.kind else { continue }
-                if case .note(let note)? = related(.same) {
+                if case .note(let note)? = related(.same) ?? related(.broader) {
+                    // The same, or less of it: what's there stands, said again.
                     changes.append(.confirm(id: note.id, evidence: evidence))
-                } else if case .earlierAdd? = related(.same) {
+                } else if case .earlierAdd? = related(.same) ?? related(.broader) {
                     // Said twice in this batch: the first stands.
                     continue
                 } else if case .note(let note)? = related(.opposite), !note.pinned, note.subject == p.subject {
@@ -474,7 +483,12 @@ final class MemoryReflector: ObservableObject {
                 changes.append(.confirm(id: p.op.id!, evidence: evidence))
             case .update, .supersede:
                 let id = p.op.id!
-                if p.op.action == .update, case .note(let other)? = related(.same), let mine = shown[id] {
+                // Its own note, by its own pair -- not whichever other note
+                // came out "broader" first.
+                let saysLess = mine.contains { if case .own = owners[$0].target { return relations[$0] == .broader } else { return false } }
+                if p.op.action == .update, saysLess {
+                    changes.append(.confirm(id: id, evidence: evidence))
+                } else if p.op.action == .update, case .note(let other)? = related(.same), let mine = shown[id] {
                     // Now the same as another note: the two become one.
                     let (keep, drop) = mine.created <= other.created ? (mine.id, other.id) : (other.id, mine.id)
                     changes.append(.merge(keep: keep, drop: drop, source: id, text: text, evidence: evidence,
