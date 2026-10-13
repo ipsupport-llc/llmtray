@@ -27,7 +27,7 @@ here; this is where the history lives.
 | [0019](0019-command-line.md) | The `llmtray` command-line tool: an owner-only control socket, the tray's own actions, a symlink in ~/.local/bin; not in the App Store build |
 | [0020](0020-documents.md) | Documents: `make_document` turns the model's Markdown and chart data into a PDF laid out by the app; tools declared on demand (`load_tools`, + menu) and kept for the chat |
 | [0021](0021-concurrent-requests.md) | Concurrent requests: batching with a quantized KV cache, speculation (MTP, drafter) by load with handoff into the batch; Concurrent requests said honestly, memory-aware, auto-tuned |
-| [0022](0022-thinking-effort.md) | Thinking effort: Off / Low / Medium / High per chat, from the model's chat template; Low and Medium as a server-side thinking budget |
+| [0022](0022-thinking-effort.md) | Thinking effort: Off / Low / Medium / High, one setting for every chat, from the model's chat template; Low and Medium as a server-side thinking budget |
 | [0023](0023-spoken-messages.md) | Spoken messages for models that hear: click for a clip, hold to talk; WAV to the runtime's `input_audio` |
 | [0024](0024-memory.md) | Memory between chats: notes learned only from the user's own words, reconciled into one note per claim across languages and models, injected within a budget, aging by kind; opt-in, all local |
 
